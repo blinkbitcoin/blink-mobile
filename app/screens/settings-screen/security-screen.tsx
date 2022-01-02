@@ -148,7 +148,7 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
   }
 
   const onSendLockValueChanged = async (value) => {
-    if(value) {
+    if (value) {
       await KeyStoreWrapper.setIsSendLockEnabled()
       setIsSendLockEnabled(true)
     } else {
@@ -159,7 +159,7 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
           {
             text: translate("common.cancel"),
             onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
+            style: "cancel",
           },
           {
             text: translate("common.ok"),
@@ -172,9 +172,9 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
                 index: 0,
                 routes: [{ name: "Primary" }],
               })
-            }
-          }
-        ]
+            },
+          },
+        ],
       )
     }
   }

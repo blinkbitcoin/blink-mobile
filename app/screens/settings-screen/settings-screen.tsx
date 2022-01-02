@@ -42,10 +42,12 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
   const securityAction = async () => {
     const isBiometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
     const isPinEnabled = await KeyStoreWrapper.getIsPinEnabled()
+    const isSendLockEnabled = await KeyStoreWrapper.getIsSendLockEnabled()
 
     navigation.navigate("security", {
       mIsBiometricsEnabled: isBiometricsEnabled,
       mIsPinEnabled: isPinEnabled,
+      mIsSendLockEnabled: isSendLockEnabled,
     })
   }
 

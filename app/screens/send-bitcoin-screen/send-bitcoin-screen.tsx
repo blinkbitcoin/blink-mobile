@@ -251,11 +251,18 @@ export const SendBitcoinScreen: ScreenType = ({
       return translate("SendBitcoinScreen.amountExceed", {
         balance: formatCurrencyAmount({ sats: satBalance, currency: primaryCurrency }),
       })
-    } else if(isSendLockEnabled) {
+    } else if (isSendLockEnabled) {
       return translate("SendBitcoinScreen.sendLockEnabled")
     }
     return null
-  }, [formatCurrencyAmount, invoiceError, primaryCurrency, satAmount, satBalance, isSendLockEnabled])
+  }, [
+    formatCurrencyAmount,
+    invoiceError,
+    primaryCurrency,
+    satAmount,
+    satBalance,
+    isSendLockEnabled,
+  ])
 
   useEffect(() => {
     setDestinationStatus("NOT_CHECKED")

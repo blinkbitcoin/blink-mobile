@@ -38,6 +38,7 @@ export type RootStackParamList = {
   security: {
     mIsBiometricsEnabled: boolean
     mIsPinEnabled: boolean
+    mIsSendLockEnabled: boolean
   }
   sectionCompleted: { amount: number; sectionTitle: string }
   priceDetail: {
