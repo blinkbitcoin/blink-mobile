@@ -52,6 +52,7 @@
     "graphql": "^16.0.1",
     "i18n-js": "^3.5.1",
     "intl": "^1.2.5",
+    "js-lnurl": "^0.3.0",
     "jwt-decode": "^3.1.2",
     "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",

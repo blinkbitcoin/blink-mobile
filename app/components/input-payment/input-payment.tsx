@@ -74,7 +74,9 @@ export const InputPayment: ComponentType = ({
 
   React.useEffect(() => {
     // TODO: re-use textToCurrency
-    setInput(primaryAmount.value.toString().replace(/[^0-9.]/g, ""))
+    if (primaryAmount?.value) {
+      setInput(primaryAmount.value.toString().replace(/[^0-9.]/g, ""))
+    }
   }, [primaryAmount])
 
   React.useEffect(() => {

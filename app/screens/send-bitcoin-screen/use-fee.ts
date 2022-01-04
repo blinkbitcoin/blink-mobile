@@ -109,7 +109,7 @@ const useFee = ({
   }
 
   const initializeFee = async () => {
-    if (paymentType == "lightning") {
+    if (paymentType == "lightning" || paymentType == "lnurl") {
       if (sameNode) {
         return setFee({
           value: 0,

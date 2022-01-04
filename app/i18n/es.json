@@ -683,6 +683,7 @@
     "csvExport": "Exportar transacciones (CSV)",
     "date": "Fecha ",
     "description": "Descripción",
+    "domain": "Dominio",
     "email": "Correo electrónico",
     "error": "Error",
     "fatal": "Fatal",
@@ -759,5 +760,10 @@
     "contactUs": "¿Necesita ayuda? Contáctenos por WhatsApp",
     "defaultSupportMessage": "¡Hola! Necesito ayuda con Bitcoin Jungle Wallet",
     "contactSupport": "Soporte de contacto"
+  },
+  "lnurl": {
+    "overLimit": "No se puede enviar más de la cantidad máxima",
+    "underLimit": "No se puede enviar una cantidad inferior a la mínima",
+    "commentRequired": "Se requiere una nota"
   }
 }

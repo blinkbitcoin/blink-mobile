@@ -1,3 +1,4 @@
+import { LNURLPayParams } from "js-lnurl"
 import { contacts_me_contacts } from "../screens/contacts-screen/__generated__/contacts"
 import { AccountType, AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 import { IPaymentType } from "../utils/parsing"
@@ -69,6 +70,7 @@ export type MoveMoneyStackParamList = {
   sendBitcoin: {
     payment: string | null
     username?: string | null
+    lnurlParams?: LNURLPayParams | null
   }
   sendBitcoinConfirmation: {
     address: string | null

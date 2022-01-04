@@ -291,7 +291,7 @@ export const SendBitcoinConfirmationScreen = ({
       return
     }
 
-    if (paymentType === "lightning") {
+    if (paymentType === "lightning" || paymentType === "lnurl") {
       if (amountless) {
         payAmountlessLightning()
       } else {
@@ -356,7 +356,7 @@ export const SendBitcoinConfirmationScreen = ({
   let destination = ""
   if (paymentType === "username") {
     destination = username
-  } else if (paymentType === "lightning") {
+  } else if (paymentType === "lightning" || paymentType === "lnurl") {
     destination = `${invoice.substr(0, 18)}...${invoice.substr(-18)}`
   } else if (paymentType === "onchain") {
     destination = address

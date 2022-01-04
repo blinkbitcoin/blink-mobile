@@ -11,6 +11,7 @@ import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"
 import type { ScreenType } from "../../types/jsx"
 import { validPayment } from "../../utils/parsing"
+import { getParams, LNURLPayParams } from "js-lnurl"
 
 import LocalQRCode from "@remobile/react-native-qrcode-local-image"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
@@ -81,12 +82,51 @@ export const ScanningQRCodeScreen: ScreenType = ({
     }
 
     try {
-      const { valid } = validPayment(data, tokenNetwork, myPubKey, username)
+      const { valid, lnurl } = validPayment(data, tokenNetwork, myPubKey, username)
       if (valid) {
-        if (index <= 1) {
-          navigation.replace("sendBitcoin", { payment: data })
+        if (lnurl) {
+          setPending(true)
+          const lnurlParams = await getParams(lnurl)
+
+          if ("reason" in lnurlParams) {
+            throw lnurlParams.reason
+          }
+
+          switch (lnurlParams.tag) {
+            case "payRequest":
+              if (index <= 1) {
+                navigation.replace("sendBitcoin", {
+                  payment: data,
+                  lnurlParams: lnurlParams as LNURLPayParams,
+                })
+              } else {
+                navigation.navigate("sendBitcoin", {
+                  payment: data,
+                  lnurlParams: lnurlParams as LNURLPayParams,
+                })
+              }
+              break
+            default:
+              Alert.alert(
+                translate("ScanningQRCodeScreen.invalidTitle"),
+                translate("ScanningQRCodeScreen.invalidContent", {
+                  found: lnurlParams.tag,
+                }),
+                [
+                  {
+                    text: translate("common.ok"),
+                    onPress: () => setPending(false),
+                  },
+                ],
+              )
+              break
+          }
         } else {
-          navigation.navigate("sendBitcoin", { payment: data })
+          if (index <= 1) {
+            navigation.replace("sendBitcoin", { payment: data })
+          } else {
+            navigation.navigate("sendBitcoin", { payment: data })
+          }
         }
       } else {
         setPending(true)
