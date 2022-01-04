@@ -1,4 +1,3 @@
-import { ApolloError, useQuery } from "@apollo/client"
 import messaging from "@react-native-firebase/messaging"
 import * as React from "react"
 import { useEffect, useState } from "react"
@@ -24,7 +23,6 @@ import { IconTransaction } from "../../components/icon-transactions"
 import { LargeButton } from "../../components/large-button"
 import { Screen } from "../../components/screen"
 import { TransactionItem } from "../../components/transaction-item"
-import { MAIN_QUERY } from "../../graphql/query"
 import { translate } from "../../i18n"
 import { color } from "../../theme"
 import { palette } from "../../theme/palette"
@@ -34,6 +32,7 @@ import { ScreenType } from "../../types/jsx"
 import useToken from "../../utils/use-token"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   balanceHeader: {
@@ -138,16 +137,12 @@ export const MoveMoneyScreenDataInjected: ScreenType = ({
   const { hasToken } = useToken()
 
   const {
+    mobileVersions,
+    transactionsEdges,
+    errors,
     loading: loadingMain,
-    error,
-    data,
     refetch,
-  } = useQuery(MAIN_QUERY, {
-    variables: { hasToken },
-    notifyOnNetworkStatusChange: true,
-    errorPolicy: "all",
-    fetchPolicy: "network-only",
-  })
+  } = useMainQuery()
 
   // temporary fix until we have a better management of notifications:
   // when coming back to active state. look if the invoice has been paid
@@ -207,10 +202,10 @@ export const MoveMoneyScreenDataInjected: ScreenType = ({
     <MoveMoneyScreen
       navigation={navigation}
       loading={loadingMain}
-      error={error}
+      errors={errors}
       refetch={refetch}
-      transactionsEdges={data?.me?.defaultAccount?.wallets?.[0].transactions?.edges}
-      isUpdateAvailable={isUpdateAvailableOrRequired(data?.mobileVersions).available}
+      transactionsEdges={transactionsEdges}
+      isUpdateAvailable={isUpdateAvailableOrRequired(mobileVersions).available}
       hasToken={hasToken}
     />
   )
@@ -219,7 +214,7 @@ export const MoveMoneyScreenDataInjected: ScreenType = ({
 type MoveMoneyScreenProps = {
   navigation: StackNavigationProp<MoveMoneyStackParamList, "moveMoney">
   loading: boolean
-  error: ApolloError
+  errors: []
   transactionsEdges: { cursor: string; node: WalletTransaction | null }[]
   refetch: () => void
   isUpdateAvailable: boolean
@@ -229,7 +224,7 @@ type MoveMoneyScreenProps = {
 export const MoveMoneyScreen: ScreenType = ({
   navigation,
   loading,
-  error,
+  errors,
   refetch,
   transactionsEdges,
   isUpdateAvailable,
@@ -357,7 +352,7 @@ export const MoveMoneyScreen: ScreenType = ({
       <FlatList
         ListHeaderComponent={() => (
           <>
-            {error?.graphQLErrors?.map(({ message }, item) => (
+            {errors?.map(({ message }, item) => (
               <Text key={`error-${item}`} style={styles.error} selectable>
                 {message}
               </Text>

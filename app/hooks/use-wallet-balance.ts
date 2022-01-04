@@ -1,8 +1,6 @@
 import useToken from "../utils/use-token"
-import { MAIN_QUERY } from "../graphql/query"
 import { useMySubscription } from "./user-hooks"
-import { cacheIdVar } from "../graphql/client-only-query"
-import { useApolloClient } from "@apollo/client"
+import useMainQuery from "./use-main-query"
 
 export const useWalletBalance = (): {
   walletId?: string
@@ -10,10 +8,9 @@ export const useWalletBalance = (): {
   usdBalance: number | string
   loading: boolean
 } => {
-  const client = useApolloClient()
-
   const { convertCurrencyAmount, currentBalance, mySubscriptionLoading } =
     useMySubscription()
+  const { btcWalletBalance, btcWalletId, refetch: refetchMainQuery } = useMainQuery()
 
   const { hasToken } = useToken()
 
@@ -25,31 +22,16 @@ export const useWalletBalance = (): {
     }
   }
 
-  const data = client.readQuery({
-    query: MAIN_QUERY,
-    variables: { hasToken },
-  })
-
-  const wallet = data?.me?.defaultAccount?.wallets?.[0]
-
-  if (!wallet) {
-    // If this is thrown, it means Apollo Cache is not able to read the MAIN_QUERY from the cache (because of missing fields)
-    throw new Error("Something went wrong")
-  }
-
-  let satBalance = wallet.balance
-
-  if (currentBalance && currentBalance !== satBalance) {
-    satBalance = currentBalance
-    cacheIdVar(Date.now())
+  if (currentBalance && currentBalance !== btcWalletBalance) {
+    refetchMainQuery()
   }
 
   return {
-    walletId: wallet.id,
-    satBalance,
+    walletId: btcWalletId,
+    satBalance: btcWalletBalance,
     usdBalance:
-      satBalance > 0
-        ? convertCurrencyAmount({ amount: satBalance, from: "BTC", to: "USD" })
+      btcWalletBalance > 0
+        ? convertCurrencyAmount({ amount: btcWalletBalance, from: "BTC", to: "USD" })
         : 0,
     loading: mySubscriptionLoading,
   }

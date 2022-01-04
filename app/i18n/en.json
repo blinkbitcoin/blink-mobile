@@ -681,7 +681,7 @@
     "to": "To",
     "transactions": "Transactions",
     "transactionsError": "Error loading transactions",
-    "tryAgain": "Try again",
+    "tryAgain": "Try Again",
     "type": "Type",
     "username": "Username",
     "usernameRequired": "Username is required"
@@ -698,7 +698,9 @@
     },
     "unexpectedError": "Unexpected error occurred",
     "restartApp": "Please restart the application.",
-    "problemPersists": "If problem persists contact support."
+    "problemPersists": "If problem persists contact support.",
+    "fatalError": "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
+    "showError": "Show Error"
   },
   "notifications": {
     "payment": {

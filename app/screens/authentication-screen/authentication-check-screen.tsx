@@ -16,6 +16,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import BitcoinJungleLogo from "../get-started-screen/BitcoinJungleLogo.png"
 import useToken from "../../utils/use-token"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   Logo: {
@@ -38,7 +39,7 @@ type Props = {
 export const AuthenticationCheckScreen: ScreenType = ({ navigation }: Props) => {
   const client = useApolloClient()
   const { hasToken, tokenNetwork } = useToken()
-
+  const { myPubKey, username } = useMainQuery()
   useEffect(() => {
     ;(async () => {
       const isPinEnabled = await KeyStoreWrapper.getIsPinEnabled()
@@ -55,7 +56,13 @@ export const AuthenticationCheckScreen: ScreenType = ({ navigation }: Props) => 
         navigation.replace("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
       } else {
         navigation.replace("Primary")
-        hasToken && showModalClipboardIfValidPayment({ client, network: tokenNetwork })
+        hasToken &&
+          showModalClipboardIfValidPayment({
+            client,
+            network: tokenNetwork,
+            myPubKey,
+            username,
+          })
       }
     })()
   }, [client, hasToken, navigation, tokenNetwork])

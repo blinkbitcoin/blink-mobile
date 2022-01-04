@@ -15,7 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp } from "@react-navigation/native"
 import type { ScreenType } from "../../types/jsx"
 import { ContactTransactionsDataInjected } from "./contact-transactions"
-import { cacheIdVar } from "../../graphql/client-only-query"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   actionsContainer: { paddingBottom: 18 },
@@ -62,17 +62,26 @@ export const ContactsDetailScreen: ScreenType = ({
   navigation,
 }: ContactDetailProps) => {
   const { contact } = route.params
-  return <ContactsDetailScreenJSX navigation={navigation} contact={contact} />
+  const { refetch: refetchMain } = useMainQuery()
+  return (
+    <ContactsDetailScreenJSX
+      navigation={navigation}
+      contact={contact}
+      refetchMain={refetchMain}
+    />
+  )
 }
 
 type ContactDetailScreenProps = {
   contact: Contact
   navigation: StackNavigationProp<ContactStackParamList, "contactDetail">
+  refetchMain: () => void
 }
 
 export const ContactsDetailScreenJSX: ScreenType = ({
   contact,
   navigation,
+  refetchMain,
 }: ContactDetailScreenProps) => {
   const [contactName, setContactName] = React.useState(contact.alias)
 
@@ -87,7 +96,7 @@ export const ContactsDetailScreenJSX: ScreenType = ({
   `
 
   const [updateNameMutation] = useMutation(UPDATE_NAME, {
-    onCompleted: () => cacheIdVar(Date.now()),
+    onCompleted: () => refetchMain(),
   })
 
   const updateName = async () => {

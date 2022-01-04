@@ -45,7 +45,8 @@
     "no-param-reassign": "error",
     "no-sequences": "error",
     "no-throw-literal": "error",
-    "no-void": "error"
+    "no-void": "error",
+    "react-native/sort-styles": "off"
   },
   "settings": {
     "react-native/style-sheet-object-names": ["EStyleSheet"],

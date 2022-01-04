@@ -25,6 +25,7 @@ import { UsernameValidation } from "../../utils/validation"
 import { TextCurrency } from "../../components/text-currency/text-currency"
 import { useMyCurrencies, useMySubscription } from "../../hooks/user-hooks"
 import { toastShow } from "../../utils/toast"
+import useMainQuery from "@app/hooks/use-main-query"
 
 export const PRICE_CHECK_INTERVAL = 10000
 
@@ -57,7 +58,7 @@ export const SendBitcoinScreen: ScreenType = ({
     setSecondaryAmount,
     setSecondaryAmountValue,
   ] = useMoneyAmount(secondaryCurrency)
-
+  const { myPubKey, username: myUsername } = useMainQuery()
   const [invoiceError, setInvoiceError] = useState("")
   const [address, setAddress] = useState("")
   const [paymentType, setPaymentType] = useState<IPaymentType>(undefined)
@@ -129,7 +130,12 @@ export const SendBitcoinScreen: ScreenType = ({
 
   useEffect(() => {
     reset()
-    const { valid, username } = validPayment(route.params?.payment, tokenNetwork, client)
+    const { valid, username } = validPayment(
+      route.params?.payment,
+      tokenNetwork,
+      myPubKey,
+      myUsername,
+    )
     if (route.params?.username || username) {
       setInteractive(false)
       setDestination(route.params?.username || username)
@@ -197,7 +203,7 @@ export const SendBitcoinScreen: ScreenType = ({
       paymentType,
       address,
       sameNode,
-    } = validPayment(destination, tokenNetwork, client)
+    } = validPayment(destination, tokenNetwork, myPubKey, myUsername)
 
     if (valid) {
       setAddress(address)

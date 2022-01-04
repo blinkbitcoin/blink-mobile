@@ -13,7 +13,7 @@ import { UsernameValidation } from "../../utils/validation"
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { USERNAME_AVAILABLE } from "../../graphql/query"
-import { cacheIdVar } from "../../graphql/client-only-query"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   activity: { marginTop: 12 },
@@ -62,7 +62,7 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
     USERNAME_AVAILABLE,
     { skip: true }, // useLazyQuery executor function does not return data. refetch does.
   )
-
+  const { refetch: refetchMain } = useMainQuery()
   const inputForm = React.createRef<TextInput>()
 
   const [updateUsername, { loading: updatingUsername }] = useMutation(UPDATE_USERNAME, {
@@ -82,7 +82,7 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
         setInputStatus({ message: errorMessage, status: "error" })
       }
 
-      cacheIdVar(Date.now())
+      refetchMain()
 
       Alert.alert(translate("UsernameScreen.success", { input }), null, [
         {

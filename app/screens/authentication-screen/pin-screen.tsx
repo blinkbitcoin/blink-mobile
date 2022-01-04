@@ -19,6 +19,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp } from "@react-navigation/native"
 import useToken from "../../utils/use-token"
 import useLogout from "../../hooks/use-logout"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   bottomSpacer: {
@@ -121,7 +122,7 @@ export const PinScreen: ScreenType = ({ route, navigation }: Props) => {
   const client = useApolloClient()
   const { hasToken, tokenNetwork } = useToken()
   const { logout } = useLogout()
-
+  const { myPubKey, username } = useMainQuery()
   const { screenPurpose } = route.params
 
   const [enteredPIN, setEnteredPIN] = useState("")
@@ -146,7 +147,13 @@ export const PinScreen: ScreenType = ({ route, navigation }: Props) => {
         index: 0,
         routes: [{ name: "Primary" }],
       })
-      hasToken && showModalClipboardIfValidPayment({ client, network: tokenNetwork })
+      hasToken &&
+        showModalClipboardIfValidPayment({
+          client,
+          network: tokenNetwork,
+          myPubKey,
+          username,
+        })
     } else {
       if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
         const newPinAttempts = pinAttempts + 1

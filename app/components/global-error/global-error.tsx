@@ -6,44 +6,6 @@ import { NetworkErrorCode } from "./network-error-code"
 import useLogout from "../../hooks/use-logout"
 import { translate } from "../../i18n"
 import Toast from "react-native-root-toast"
-import { setJSExceptionHandler } from "react-native-exception-handler"
-import { Alert } from "react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
-import RNRestart from "react-native-restart"
-import { openWhatsApp } from "../../utils/external"
-import { WHATSAPP_CONTACT_NUMBER } from "../../constants/support"
-
-setJSExceptionHandler((e) => {
-  crashlytics().log("Caught a fatal javascript error.")
-  crashlytics().recordError(e)
-  Alert.alert(
-    translate("errors.unexpectedError"),
-    `
-${translate("common.error")}: ${e.name}
-
-${translate("errors.restartApp")}
-
-${translate("errors.problemPersists")}
-        `,
-    [
-      {
-        text: translate("common.restart"),
-        onPress: () => {
-          RNRestart.Restart()
-        },
-      },
-      {
-        text: translate("whatsapp.contactSupport"),
-        onPress: () => {
-          openWhatsApp(
-            WHATSAPP_CONTACT_NUMBER,
-            translate("whatsapp.defaultSupportMessage"),
-          )
-        },
-      },
-    ],
-  )
-})
 
 export const GlobalErrorToast: ComponentType = () => {
   const status = useApolloNetworkStatus()

@@ -18,7 +18,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { PaymentConfirmationInformation } from "./payment-confirmation-information"
 import useFee from "./use-fee"
 import { palette } from "../../theme/palette"
-import { cacheIdVar } from "../../graphql/client-only-query"
+import useMainQuery from "@app/hooks/use-main-query"
 
 export const LN_PAY = gql`
   mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
@@ -86,6 +86,7 @@ export const SendBitcoinConfirmationScreen = ({
   const client = useApolloClient()
   const { convertCurrencyAmount, formatCurrencyAmount } = useMySubscription()
   const { walletId: myDefaultWalletId, satBalance, loading } = useWalletBalance()
+  const { refetch: refetchMain } = useMainQuery()
 
   const {
     address,
@@ -121,21 +122,21 @@ export const SendBitcoinConfirmationScreen = ({
   })
 
   const [lnPay] = useMutation(LN_PAY, {
-    onCompleted: () => cacheIdVar(Date.now()),
+    onCompleted: () => refetchMain(),
   })
 
   const [lnNoAmountPay] = useMutation(LN_NO_AMOUNT_PAY, {
-    onCompleted: () => cacheIdVar(Date.now()),
+    onCompleted: () => refetchMain(),
   })
 
   const [intraLedgerPay] = useMutation(INTRA_LEDGER_PAY, {
-    onCompleted: () => cacheIdVar(Date.now()),
+    onCompleted: () => refetchMain(),
   })
 
   // TODO: add user automatically to cache
 
   const [onchainPay] = useMutation(ONCHAIN_PAY, {
-    onCompleted: () => cacheIdVar(Date.now()),
+    onCompleted: () => refetchMain(),
   })
 
   const handlePaymentReturn = (status, errors) => {

@@ -1,4 +1,3 @@
-import { useApolloClient } from "@apollo/client"
 import { useIsFocused, useNavigationState } from "@react-navigation/native"
 import * as React from "react"
 import { Alert, Dimensions, Pressable, View, ViewStyle } from "react-native"
@@ -17,6 +16,7 @@ import LocalQRCode from "@remobile/react-native-qrcode-local-image"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import { StackNavigationProp } from "@react-navigation/stack"
 import useToken from "../../utils/use-token"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const CAMERA: ViewStyle = {
   width: "100%",
@@ -73,16 +73,15 @@ export const ScanningQRCodeScreen: ScreenType = ({
 }: ScanningQRCodeScreenProps) => {
   const index = useNavigationState((state) => state.index)
   const [pending, setPending] = React.useState(false)
-  const client = useApolloClient()
   const { tokenNetwork } = useToken()
-
+  const { myPubKey, username } = useMainQuery()
   const decodeInvoice = async (data) => {
     if (pending) {
       return
     }
 
     try {
-      const { valid } = validPayment(data, tokenNetwork, client)
+      const { valid } = validPayment(data, tokenNetwork, myPubKey, username)
       if (valid) {
         if (index <= 1) {
           navigation.replace("sendBitcoin", { payment: data })

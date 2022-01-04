@@ -20,6 +20,7 @@ import useToken from "../../utils/use-token"
 
 import BitcoinJungleLogo from "../get-started-screen/BitcoinJungleLogo.png"
 import useLogout from "../../hooks/use-logout"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   Logo: {
@@ -76,7 +77,7 @@ export const AuthenticationScreen: ScreenType = ({ route, navigation }: Props) =
   const client = useApolloClient()
   const { hasToken, tokenNetwork } = useToken()
   const { logout } = useLogout()
-
+  const { myPubKey, username } = useMainQuery()
   const { screenPurpose, isPinEnabled } = route.params
 
   useFocusEffect(() => {
@@ -105,7 +106,13 @@ export const AuthenticationScreen: ScreenType = ({ route, navigation }: Props) =
       KeyStoreWrapper.setIsBiometricsEnabled()
     }
     navigation.replace("Primary")
-    hasToken && showModalClipboardIfValidPayment({ client, network: tokenNetwork })
+    hasToken &&
+      showModalClipboardIfValidPayment({
+        client,
+        network: tokenNetwork,
+        myPubKey,
+        username,
+      })
   }
 
   const handleAuthenticationFailure = () => {

@@ -1,3 +1,25 @@
 type SetConvertedAmountsInput = {
   moneyAmount: MoneyAmount
 }
+
+type mobileVersions = {
+  currentSupported: string
+  minSupported: string
+  platform: string
+}
+
+type useMainQueryOutput = {
+  userPreferredLanguage: string
+  btcWalletBalance: number
+  btcWalletId: string
+  transactionsEdges: object[]
+  csvEncoded: any
+  me: any
+  myPubKey: string
+  username?: string
+  phoneNumber: string
+  mobileVersions: mobileVersions
+  loading: boolean
+  refetch: () => void
+  errors: object[]
+}

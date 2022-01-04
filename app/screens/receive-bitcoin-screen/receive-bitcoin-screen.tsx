@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
+import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { StackNavigationProp } from "@react-navigation/stack"
 import * as React from "react"
 import { useCallback, useMemo, useEffect, useState } from "react"
@@ -26,9 +26,9 @@ import {
 } from "../../hooks"
 import { TextCurrency } from "../../components/text-currency"
 import useToken from "../../utils/use-token"
-import { MAIN_QUERY } from "../../graphql/query"
 import { Button, Text } from "react-native-elements"
 import { hasFullPermissions, requestPermission } from "../../utils/notifications"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
   buttonContainer: { marginHorizontal: 52, paddingVertical: 200 },
@@ -134,23 +134,17 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
   const [lastOnChainAddress, setLastOnChainAddress] = useState<string>()
   const [btcAddressRequested, setBtcAddressRequested] = useState<boolean>(false)
 
-  const { data } = useQuery(MAIN_QUERY, {
-    variables: { hasToken },
-    errorPolicy: "all",
-  })
+  const { btcWalletId } = useMainQuery()
 
   const onBtcAddressRequestClick = async () => {
     try {
       setLoading(true)
-      const defaultWalletId: string = data?.me?.defaultAccount?.wallets?.find(
-        (wallet) => wallet?.__typename === "BTCWallet",
-      )?.id
       const {
         data: {
           onChainAddressCurrent: { address },
         },
       } = await getOnchainAddress({
-        variables: { input: { walletId: defaultWalletId } },
+        variables: { input: { walletId: btcWalletId } },
       })
       setLastOnChainAddress(address)
       setBtcAddressRequested(true)
@@ -171,8 +165,6 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
   const [err, setErr] = useState("")
   const { lnUpdate } = useMySubscription()
   const [brightnessInitial, setBrightnessInitial] = useState(null)
-
-  const myDefaultWalletId = data?.me?.defaultAccount?.wallets?.[0].id
 
   const updateInvoice = useMemo(
     () =>
@@ -240,11 +232,11 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
   ])
 
   useEffect((): void | (() => void) => {
-    if (myDefaultWalletId) {
-      updateInvoice({ walletId: myDefaultWalletId, satAmount, memo })
+    if (btcWalletId) {
+      updateInvoice({ walletId: btcWalletId, satAmount, memo })
       return () => updateInvoice.cancel()
     }
-  }, [satAmount, memo, updateInvoice, myDefaultWalletId])
+  }, [satAmount, memo, updateInvoice, btcWalletId])
 
   useEffect(() => {
     const fn = async () => {
