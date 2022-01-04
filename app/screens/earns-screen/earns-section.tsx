@@ -21,7 +21,7 @@ import useToken from "../../utils/use-token"
 import { SVGs } from "./earn-svg-factory"
 import { getCardsFromSection, remainingSatsOnSection } from "./earns-utils"
 import { getQuizQuestions } from "../../graphql/query"
-import { cacheIdVar } from "../../graphql/client-only-query"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const { width: screenWidth } = Dimensions.get("window")
 
@@ -118,6 +118,7 @@ type Props = {
 export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
   const { hasToken } = useToken()
   const client = useApolloClient()
+  const { refetch: refetchMain } = useMainQuery()
 
   const [updateCompleted] = useMutation(
     gql`
@@ -141,7 +142,7 @@ export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
       }
     `,
     {
-      onCompleted: () => cacheIdVar(Date.now()),
+      onCompleted: () => refetchMain(),
     },
   )
 

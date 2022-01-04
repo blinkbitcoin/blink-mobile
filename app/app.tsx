@@ -43,6 +43,8 @@ import useToken, { getAuthorizationHeader } from "./utils/use-token"
 import { getGraphQLUri, loadNetwork } from "./utils/network"
 import { loadAuthToken, networkVar } from "./graphql/client-only-query"
 import { INetwork } from "./types/network"
+import ErrorBoundary from "react-native-error-boundary"
+import { ErrorScreen } from "./screens/error-screen"
 
 export const BUILD_VERSION = "build_version"
 
@@ -248,27 +250,29 @@ export const App = (): JSX.Element => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <NavigationContainer
-        key={token}
-        linking={linking}
-        // fallback={<Text>Loading...</Text>}
-        onStateChange={(state) => {
-          const currentRouteName = getActiveRouteName(state)
+      <ErrorBoundary FallbackComponent={ErrorScreen}>
+        <NavigationContainer
+          key={token}
+          linking={linking}
+          // fallback={<Text>Loading...</Text>}
+          onStateChange={(state) => {
+            const currentRouteName = getActiveRouteName(state)
 
-          if (routeName !== currentRouteName) {
-            analytics().logScreenView({
-              screen_name: currentRouteName,
-              screen_class: currentRouteName,
-            })
-            setRouteName(currentRouteName)
-          }
-        }}
-      >
-        <RootSiblingParent>
-          <GlobalErrorToast />
-          <RootStack />
-        </RootSiblingParent>
-      </NavigationContainer>
+            if (routeName !== currentRouteName) {
+              analytics().logScreenView({
+                screen_name: currentRouteName,
+                screen_class: currentRouteName,
+              })
+              setRouteName(currentRouteName)
+            }
+          }}
+        >
+          <RootSiblingParent>
+            <GlobalErrorToast />
+            <RootStack />
+          </RootSiblingParent>
+        </NavigationContainer>
+      </ErrorBoundary>
     </ApolloProvider>
   )
 }

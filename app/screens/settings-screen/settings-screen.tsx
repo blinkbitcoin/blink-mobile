@@ -3,13 +3,7 @@ import { Alert, Text, TextStyle } from "react-native"
 import Share from "react-native-share"
 import { Divider, Icon, ListItem } from "react-native-elements"
 import { StackNavigationProp } from "@react-navigation/stack"
-import {
-  gql,
-  OperationVariables,
-  QueryLazyOptions,
-  useLazyQuery,
-  useQuery,
-} from "@apollo/client"
+import { gql, OperationVariables, QueryLazyOptions, useLazyQuery } from "@apollo/client"
 import type { ViewStyleProp } from "react-native/Libraries/StyleSheet/StyleSheet"
 
 import { Screen } from "../../components/screen"
@@ -24,8 +18,8 @@ import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import Clipboard from "@react-native-community/clipboard"
 import { toastShow } from "../../utils/toast"
 import useToken from "../../utils/use-token"
-import { MAIN_QUERY } from "../../graphql/query"
 import useLogout from "../../hooks/use-logout"
+import useMainQuery from "@app/hooks/use-main-query"
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "settings">
@@ -35,9 +29,8 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const { logout } = useLogout()
 
-  const { data } = useQuery(MAIN_QUERY, {
-    variables: { hasToken },
-  })
+  const { btcWalletId, csvEncoded, username, phoneNumber, userPreferredLanguage } =
+    useMainQuery()
 
   const securityAction = async () => {
     const isBiometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
@@ -66,9 +59,7 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
     }
   }
 
-  const onGetCsvCallback = async (data) => {
-    const csvEncoded = data.me?.defaultAccount?.csvTransactions
-
+  const onGetCsvCallback = async () => {
     try {
       await Share.open({
         // title: "export-csv-title.csv",
@@ -82,9 +73,6 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       console.error(err)
     }
   }
-
-  const me = data?.me || {}
-  const defaultWalletId = me.defaultAccount?.defaultWalletId
 
   const [getCsv] = useLazyQuery(
     gql`
@@ -105,10 +93,10 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
     <SettingsScreenJSX
       hasToken={hasToken}
       navigation={navigation}
-      username={me.username}
-      phone={me.phone}
-      language={translate(`Languages.${me.language || "DEFAULT"}`)}
-      csvAction={() => getCsv({ variables: { defaultWalletId } })}
+      username={username}
+      phone={phoneNumber}
+      language={translate(`Languages.${userPreferredLanguage || "DEFAULT"}`)}
+      csvAction={() => getCsv({ variables: { btcWalletId } })}
       securityAction={securityAction}
       logoutAction={logoutAction}
     />
@@ -255,7 +243,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
                 </ListItem.Title>
                 {setting.subTitleText && (
                   <ListItem.Subtitle style={settingStyle}>
-                    {setting.subTitleText}
+                    <Text>{setting.subTitleText}</Text>
                   </ListItem.Subtitle>
                 )}
               </ListItem.Content>

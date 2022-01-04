@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { useApolloClient, useQuery, useReactiveVar } from "@apollo/client"
+import { useApolloClient } from "@apollo/client"
 import PushNotificationIOS from "@react-native-community/push-notification-ios"
 import messaging from "@react-native-firebase/messaging"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -14,7 +14,6 @@ import * as RNLocalize from "react-native-localize"
 import Icon from "react-native-vector-icons/Ionicons"
 import analytics from "@react-native-firebase/analytics"
 
-import { MAIN_QUERY } from "../graphql/query"
 import { translate } from "../i18n"
 import {
   AuthenticationScreen,
@@ -61,7 +60,7 @@ import {
 import type { NavigatorType } from "../types/jsx"
 
 import PushNotification from "react-native-push-notification"
-import { cacheIdVar } from "../graphql/client-only-query"
+import useMainQuery from "@app/hooks/use-main-query"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -130,17 +129,23 @@ export const RootStack: NavigatorType = () => {
   const appState = React.useRef(AppState.currentState)
   const client = useApolloClient()
   const { token, hasToken, tokenNetwork } = useToken()
-
+  const { userPreferredLanguage, myPubKey, username } = useMainQuery()
   const _handleAppStateChange = useCallback(
     async (nextAppState) => {
       if (appState.current.match(/background/) && nextAppState === "active") {
         console.log("App has come to the foreground!")
-        hasToken && showModalClipboardIfValidPayment({ client, network: tokenNetwork })
+        hasToken &&
+          showModalClipboardIfValidPayment({
+            client,
+            network: tokenNetwork,
+            myPubKey,
+            username,
+          })
       }
 
       appState.current = nextAppState
     },
-    [client, hasToken, tokenNetwork],
+    [client, hasToken, tokenNetwork, myPubKey, username],
   )
 
   useEffect(() => {
@@ -187,15 +192,10 @@ export const RootStack: NavigatorType = () => {
   const { languageTag } =
     RNLocalize.findBestAvailableLanguage(Object.keys(i18n.translations)) || fallback
 
-  const { data } = useQuery(MAIN_QUERY, {
-    variables: { hasToken },
-    fetchPolicy: "cache-only",
-  })
-
   i18n.locale =
-    !data?.me?.language || data?.me?.language === "DEFAULT"
+    !userPreferredLanguage || userPreferredLanguage === "DEFAULT"
       ? languageTag
-      : data?.me?.language
+      : userPreferredLanguage
 
   // TODO: need to add isHeadless?
   // https://rnfirebase.io/messaging/usage
@@ -483,7 +483,6 @@ export const PrimaryNavigator: NavigatorType = () => {
 
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
-  const cacheId = useReactiveVar<number>(cacheIdVar)
 
   React.useEffect(() => {
     if (tokenNetwork) {
@@ -493,7 +492,6 @@ export const PrimaryNavigator: NavigatorType = () => {
 
   return (
     <Tab.Navigator
-      key={cacheId}
       initialRouteName="MoveMoney"
       screenOptions={{
         tabBarActiveTintColor:

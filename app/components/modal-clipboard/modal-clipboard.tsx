@@ -21,6 +21,7 @@ import useToken from "../../utils/use-token"
 import type { StackNavigationProp } from "@react-navigation/stack"
 import type { ComponentType } from "../../types/jsx"
 import type { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -80,7 +81,7 @@ export const ModalClipboard: ComponentType = () => {
   const client = useApolloClient()
   const navigation = useNavigation<StackNavigationProp<MoveMoneyStackParamList>>()
   const { tokenNetwork } = useToken()
-
+  const { myPubKey, username } = useMainQuery()
   const open = async () => {
     modalClipboardVisibleVar(false)
     navigation.navigate("sendBitcoin", { payment: await Clipboard.getString() })
@@ -106,7 +107,7 @@ export const ModalClipboard: ComponentType = () => {
 
     ;(async () => {
       const clipboard = await Clipboard.getString()
-      const { paymentType } = validPayment(clipboard, tokenNetwork, client)
+      const { paymentType } = validPayment(clipboard, tokenNetwork, myPubKey, username)
       const pathString =
         paymentType === "lightning"
           ? "ModalClipboard.pendingInvoice"

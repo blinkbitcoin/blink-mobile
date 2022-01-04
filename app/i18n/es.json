@@ -715,7 +715,7 @@
     "syncing": "Sincronizando datos",
     "to": "Para",
     "transactions": "\nLas transacciones",
-    "tryAgain": "Inténtalo de nuevo",
+    "tryAgain": "Inténtalo de Nuevo",
     "type": "tipo",
     "username": "Nombre de usuario",
     "usernameRequired": "El nombre de usuario es requerido"
@@ -732,7 +732,9 @@
     },
     "unexpectedError": "Ocurrió un error inesperado",
     "restartApp": "Reinicie la aplicación.",
-    "problemPersists": "Si el problema persiste, comuníquese con el soporte técnico."
+    "problemPersists": "Si el problema persiste, comuníquese con el soporte técnico.",
+    "fatalError": "Lo sentimos, parece que estamos teniendo problemas para cargar la aplicación por usted. Si los problemas persisten, comuníquese con el soporte técnico.",
+    "showError": "Mostrar error"
   },
   "notifications": {
     "payment": {
