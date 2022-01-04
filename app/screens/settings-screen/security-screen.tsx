@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
-import { Text, View } from "react-native"
+import { Text, View, Alert } from "react-native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Button, Switch } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
@@ -21,6 +21,8 @@ import {
   saveHiddenBalanceToolTip,
 } from "../../graphql/client-only-query"
 import { useApolloClient, useQuery } from "@apollo/client"
+import useLogout from "../../hooks/use-logout"
+import { sleep } from "../../utils/sleep"
 
 const styles = EStyleSheet.create({
   button: {
@@ -88,18 +90,21 @@ type Props = {
 
 export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
   const client = useApolloClient()
-  const { mIsBiometricsEnabled, mIsPinEnabled } = route.params
+  const { mIsBiometricsEnabled, mIsPinEnabled, mIsSendLockEnabled } = route.params
   const { data } = useQuery(HIDE_BALANCE)
 
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
+  const [isSendLockEnabled, setIsSendLockEnabled] = useState(mIsSendLockEnabled)
   const [isHideBalanceEnabled, setIsHideBalanceEnabled] = useState(
     data?.hideBalance ?? null,
   )
+  const { logout } = useLogout()
 
   useFocusEffect(() => {
     getIsBiometricsEnabled()
     getIsPinEnabled()
+    getIsSendLockEnabled()
   })
   const getIsBiometricsEnabled = async () => {
     setIsBiometricsEnabled(await KeyStoreWrapper.getIsBiometricsEnabled())
@@ -107,6 +112,10 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
 
   const getIsPinEnabled = async () => {
     setIsPinEnabled(await KeyStoreWrapper.getIsPinEnabled())
+  }
+
+  const getIsSendLockEnabled = async () => {
+    setIsSendLockEnabled(await KeyStoreWrapper.getIsSendLockEnabled())
   }
 
   const onBiometricsValueChanged = async (value) => {
@@ -135,6 +144,38 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
   const handleAuthenticationSuccess = async () => {
     if (await KeyStoreWrapper.setIsBiometricsEnabled()) {
       setIsBiometricsEnabled(true)
+    }
+  }
+
+  const onSendLockValueChanged = async (value) => {
+    if (value) {
+      await KeyStoreWrapper.setIsSendLockEnabled()
+      setIsSendLockEnabled(true)
+    } else {
+      Alert.alert(
+        translate("SecurityScreen.disableSendLockTitle"),
+        translate("SecurityScreen.disableSendLockDescription"),
+        [
+          {
+            text: translate("common.cancel"),
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: translate("common.ok"),
+            onPress: async () => {
+              await KeyStoreWrapper.removeIsSendLockEnabled()
+              setIsSendLockEnabled(false)
+              await logout()
+              await sleep(1000)
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Primary" }],
+              })
+            },
+          },
+        ],
+      )
     }
   }
 
@@ -187,6 +228,25 @@ export const SecurityScreen: ScreenType = ({ route, navigation }: Props) => {
           onValueChange={(value) => onBiometricsValueChanged(value)}
         />
       </View>
+
+      <View style={styles.settingContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{translate("SecurityScreen.sendLockTitle")}</Text>
+          <Text style={styles.subtitle}>
+            {translate("SecurityScreen.sendLockSubtitle")}
+          </Text>
+          <Text style={styles.description}>
+            {translate("SecurityScreen.sendLockDescription")}
+          </Text>
+        </View>
+        <Switch
+          style={styles.switch}
+          value={isSendLockEnabled}
+          color={palette.lightBlue}
+          onValueChange={(value) => onSendLockValueChanged(value)}
+        />
+      </View>
+
       <View style={styles.settingContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{translate("SecurityScreen.pinTitle")}</Text>

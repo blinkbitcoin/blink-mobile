@@ -575,7 +575,12 @@
     "pinDescription": "El PIN se utiliza como método de autenticación de respaldo para la autenticación biométrica.",
     "pinSubtitle": "Habilitar PIN",
     "pinTitle": "Código PIN",
-    "setPin": "Establecer PIN"
+    "setPin": "Establecer PIN",
+    "sendLockTitle": "Bloqueo de Envíos",
+    "sendLockSubtitle": "Habilitar bloqueo de envíos",
+    "sendLockDescription": "Evite que este dispositivo envíe bitcoins desde esta billetera.",
+    "disableSendLockTitle": "Desactivar bloqueo de envío",
+    "disableSendLockDescription": "Para desactivar el bloqueo de envío, deberá cerrar la sesión y volver a iniciarla. ¿Le gustaría cerrar la sesión?"
   },
   "SendBitcoinConfirmationScreen": {
     "amountLabel": "Cantidad:",
@@ -603,7 +608,8 @@
     "payFromUSD": "Pago desde $USD",
     "success": "El pago se ha enviado correctamente.",
     "title": "Enviar Bitcoin",
-    "totalExceed": "total excede su saldo"
+    "totalExceed": "total excede su saldo",
+    "sendLockEnabled": "El bloqueo de envío está habilitado en este dispositivo"
   },
   "SettingsScreen": {
     "activated": "Activada",

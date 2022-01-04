@@ -536,7 +536,12 @@
     "pinDescription": "PIN is used as the backup authentication method for biometric authentication.",
     "pinSubtitle": "Enable PIN",
     "pinTitle": "PIN Code",
-    "setPin": "Set PIN"
+    "setPin": "Set PIN",
+    "sendLockTitle": "Send Lock",
+    "sendLockSubtitle": "Enable send lock",
+    "sendLockDescription": "Prevent this device from sending bitcoin from this wallet.",
+    "disableSendLockTitle": "Disable Send Lock",
+    "disableSendLockDescription": "In order to disable the send lock, you will need to log out and back in again. Would you like to log out?"
   },
   "SendBitcoinConfirmationScreen": {
     "amountLabel": "Amount:",
@@ -564,7 +569,8 @@
     "note": "optional note",
     "success": "Payment has been sent successfully",
     "title": "Send Bitcoin",
-    "usernameNotFound": "A user matching the entered username could not be found."
+    "usernameNotFound": "A user matching the entered username could not be found.",
+    "sendLockEnabled": "Send lock is enabled on this device"
   },
   "SettingsScreen": {
     "activate": "Tap to activate",

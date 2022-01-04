@@ -4,6 +4,7 @@ export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
+  private static readonly SEND_LOCK = "sendLock"
 
   public static async getIsBiometricsEnabled(): Promise<boolean> {
     try {
@@ -97,6 +98,35 @@ export default class KeyStoreWrapper {
   public static async removePinAttempts(): Promise<boolean> {
     try {
       await RNSecureKeyStore.remove(KeyStoreWrapper.PIN_ATTEMPTS)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async getIsSendLockEnabled(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.get(KeyStoreWrapper.SEND_LOCK)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async setIsSendLockEnabled(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.SEND_LOCK, "1", {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removeIsSendLockEnabled(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.SEND_LOCK)
       return true
     } catch {
       return false

@@ -18,6 +18,7 @@ const useLogout = () => {
       await KeyStoreWrapper.removeIsBiometricsEnabled()
       await KeyStoreWrapper.removePin()
       await KeyStoreWrapper.removePinAttempts()
+      await KeyStoreWrapper.removeIsSendLockEnabled()
     } catch (err) {
       console.log({ err }, `error resetting RootStore`)
     }
