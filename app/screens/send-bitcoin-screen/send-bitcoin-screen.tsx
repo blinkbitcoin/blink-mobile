@@ -334,7 +334,15 @@ export const SendBitcoinScreen: ScreenType = ({
       toastShow(translate("SendBitcoinScreen.usernameNotFound"))
       return
     } else if (paymentType == "lnurl") {
-      const satAmount = primaryAmount.value * 1000
+
+      let satAmount = 0
+
+      if(primaryCurrency === "BTC") {
+        satAmount = primaryAmount.value * 1000
+      } else {
+        satAmount = Math.round(secondaryAmount.value) * 1000
+      }
+      
       const lnurlInvoice = await fetchInvoice(
         `${lnurlPay.callback}?amount=${satAmount}&comment=${encodeURIComponent(memo)}`,
       )
@@ -380,6 +388,7 @@ export const SendBitcoinScreen: ScreenType = ({
     invoice,
     lnurlPay,
     primaryAmount,
+    secondaryAmount,
     memo,
     primaryCurrency,
     referenceAmount,
@@ -499,6 +508,18 @@ export const SendBitcoinScreenJSX: ScreenType = ({
         primaryAmount &&
         primaryAmount.currency === "BTC" &&
         primaryAmount.value < lnurlPay.minSendable
+      ) {
+        lnurlErrorStr = translate("lnurl.underLimit")
+      } else if (
+        secondaryAmount &&
+        secondaryAmount.currency === "BTC" &&
+        secondaryAmount.value > lnurlPay.maxSendable
+      ) {
+        lnurlErrorStr = translate("lnurl.overLimit")
+      } else if (
+        secondaryAmount &&
+        secondaryAmount.currency === "BTC" &&
+        secondaryAmount.value < lnurlPay.minSendable
       ) {
         lnurlErrorStr = translate("lnurl.underLimit")
       } else if (lnurlPay.commentAllowed && memo === "") {
