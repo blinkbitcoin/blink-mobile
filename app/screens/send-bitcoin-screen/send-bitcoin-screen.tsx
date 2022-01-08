@@ -334,15 +334,14 @@ export const SendBitcoinScreen: ScreenType = ({
       toastShow(translate("SendBitcoinScreen.usernameNotFound"))
       return
     } else if (paymentType == "lnurl") {
-
       let satAmount = 0
 
-      if(primaryCurrency === "BTC") {
+      if (primaryCurrency === "BTC") {
         satAmount = primaryAmount.value * 1000
       } else {
         satAmount = Math.round(secondaryAmount.value) * 1000
       }
-      
+
       const lnurlInvoice = await fetchInvoice(
         `${lnurlPay.callback}?amount=${satAmount}&comment=${encodeURIComponent(memo)}`,
       )
