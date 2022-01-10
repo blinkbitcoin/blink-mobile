@@ -171,12 +171,6 @@ export const MoveMoneyScreenDataInjected: ScreenType = ({
   }, [])
 
   function isUpdateAvailableOrRequired(mobileVersions) {
-    // TODO :: LEE :: currently this is stored as a static value in a .yaml file in the `galoy` repo. we haven't forked that repo yet so we can't edit it.
-    return {
-      required: false,
-      available: false
-    }
-
     try {
       const minSupportedVersion = mobileVersions?.find(
         (mobileVersion) => mobileVersion?.platform === Platform.OS,
@@ -242,7 +236,7 @@ export const MoveMoneyScreen: ScreenType = ({
   }
 
   // const testflight = "https://testflight.apple.com/join/9aC8MMk2"
-  const appstore = "https://apps.apple.com/app/bitcoin-jungle/id1598646780"
+  const appstore = "https://apps.apple.com/app/bitcoin-jungle/id1600313979"
 
   // from https://github.com/FiberJW/react-native-app-link/blob/master/index.js
   const openInStore = async ({
@@ -261,8 +255,8 @@ export const MoveMoneyScreen: ScreenType = ({
 
   const linkUpgrade = () =>
     openInStore({
-      // appName: "Bitcoin Beach Wallet",
-      // appStoreId: "",
+      appName: "Bitcoin Jungle",
+      appStoreId: "1600313979",
       playStoreId: "app.bitcoinjungle.mobile",
     }).catch((err) => {
       console.log({ err }, "error app link on link")
