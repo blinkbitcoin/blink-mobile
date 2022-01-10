@@ -198,7 +198,7 @@ export const ContactTransactions: ScreenType = ({
           <Text style={styles.sectionHeaderText}>{title}</Text>
           <TouchableOpacity style={styles.row} onPress={nextPrefCurrency}>
             <Text style={styles.sectionHeaderText}>
-              {prefCurrency === "BTC" ? "sats" : prefCurrency}{" "}
+              {prefCurrency === "BTC" ? "sats" : "CRC"}{" "}
             </Text>
             <Icon name="ios-swap-vertical" size={32} style={styles.icon} />
           </TouchableOpacity>
