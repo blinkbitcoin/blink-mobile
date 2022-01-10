@@ -505,6 +505,7 @@
     "seeTransaction": "Supervisar la transacción de apertura",
     "send": "Enviar",
     "title": "Mover dinero",
+    "updateAvailable": "Hay disponible una actualización.\nToca para actualizar ahora",
     "useLightning": "Usamos la red de lightning",
     "walletInCreation": "Se está creando tu billetera"
   },

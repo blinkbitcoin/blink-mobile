@@ -473,7 +473,7 @@
     "receive": "Receive",
     "send": "Send",
     "title": "Home",
-    "updateAvailable": "An update is available.\nTab to update now",
+    "updateAvailable": "An update is available.\nTap to update now",
     "useLightning": "We use the Lightning Network."
   },
   "Overlay": {
