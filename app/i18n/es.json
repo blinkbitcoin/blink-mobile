@@ -711,6 +711,7 @@
     "ok": "OK",
     "openWallet": "Abrir billetera",
     "phoneNumber": "Número de teléfono",
+    "reauth": "Su sesión ha expirado. Inicie sesión de nuevo.",
     "restart": "Reiniciar",
     "sats": "Satoshis",
     "security": "Seguridad",

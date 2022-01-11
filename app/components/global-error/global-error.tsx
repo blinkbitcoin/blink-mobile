@@ -32,10 +32,19 @@ export const GlobalErrorToast: ComponentType = () => {
   }
 
   if (networkError.statusCode >= 400 && networkError.statusCode < 500) {
-    const errorCode = (networkError as ServerError).result?.errors?.[0]?.code
+    let errorCode = (networkError as ServerError).result?.errors?.[0]?.code
+
+    if(!errorCode) {
+      switch(networkError.statusCode) {
+        case 401:
+          errorCode = "INVALID_AUTHENTICATION"
+          break;
+      }
+    }
+
     switch (errorCode) {
       case NetworkErrorCode.InvalidAuthentication:
-        toastShow(translate("common.loggedOut"), {
+        toastShow(translate("common.reauth"), {
           duration: Toast.durations.SHORT,
           onHidden: () => logout(),
         })

@@ -674,6 +674,7 @@
     "ok": "OK",
     "openWallet": "Open Wallet",
     "phoneNumber": "Phone Number",
+    "reauth": "Your session has expired. Please log in again.",
     "restart": "Restart",
     "sats": "sats",
     "search": "Search",
