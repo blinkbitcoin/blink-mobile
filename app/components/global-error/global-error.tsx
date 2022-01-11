@@ -34,11 +34,11 @@ export const GlobalErrorToast: ComponentType = () => {
   if (networkError.statusCode >= 400 && networkError.statusCode < 500) {
     let errorCode = (networkError as ServerError).result?.errors?.[0]?.code
 
-    if(!errorCode) {
-      switch(networkError.statusCode) {
+    if (!errorCode) {
+      switch (networkError.statusCode) {
         case 401:
           errorCode = "INVALID_AUTHENTICATION"
-          break;
+          break
       }
     }
 
