@@ -75,7 +75,7 @@ describe("GlobalError tests", () => {
     expect(toastSpy).toHaveBeenCalledWith("Server Error. Please try again later")
   })
 
-  it(`should show a toast with "You have been logged out." 
+  it(`should show a toast with "Your session has expired. Please log in again." 
       when statusCode >= 400 and < 500; and errorCode is "INVALID_AUTHENTICATION"`, () => {
     renderGlobalErrorToast({
       queryError: {
@@ -87,10 +87,13 @@ describe("GlobalError tests", () => {
     })
 
     expect(toastSpy).toHaveBeenCalledTimes(1)
-    expect(toastSpy).toHaveBeenCalledWith("You have been logged out.", {
-      duration: Toast.durations.SHORT,
-      onHidden: expect.any(Function),
-    })
+    expect(toastSpy).toHaveBeenCalledWith(
+      "Your session has expired. Please log in again.",
+      {
+        duration: Toast.durations.SHORT,
+        onHidden: expect.any(Function),
+      },
+    )
   })
 
   it(`should show a toast with "Request issue.\nContact support if the problem persists" 
