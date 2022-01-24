@@ -616,7 +616,8 @@
     "activated": "Activada",
     "tapLogIn": "\nIngrese aquí para iniciar sesión",
     "tapUserName": "Ingrese aquí para configurarlo",
-    "title": "Configuración"
+    "title": "Configuración",
+    "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte."
   },
   "Languages": {
     "DEFAULT": "Predeterminado (OS)",
@@ -639,11 +640,13 @@
   },
   "UsernameScreen": {
     "3CharactersMinimum": "al menos de 3 letras son necesarias",
+    "50CharactersMaximum": "Este nombre de usuario no puede tener más de 50 letras",
     "available": "✅  %{input} está disponible",
     "confirmSubtext": "Este nombre de usuario es permanente y no se podrá cambiar más adelante.",
     "confirmTitle": "¿Desea establecer %{input} como su nombre de usuario?",
-    "forbiddenStart": "No debe empezar con bc1, 1 o 3",
+    "forbiddenStart": "No debe empezar con lnbc1, bc1, 1 o 3 y no debe ser Bitcoin o factura Lightning",
     "letterAndNumber": "Solo se aceptan letras en minúscula, números y guiones bajos (_)",
+    "emailAddress": "el nombre de usuario no debe ser correo electrónico",
     "notAvailable": "❌  %{input} no está disponible",
     "success": "¡%{input} es ahora su nombre de usuario!",
     "usernameToUse": "¿Qué nombre de usuario desea usar?"

@@ -117,4 +117,19 @@ describe("Username validation", () => {
     expect(hasNoRestictedStartCharacters).toBeFalsy()
     expect(isValid).toBeFalsy()
   })
+
+  it("is invalid for a username beginning with lnbc1", () => {
+    const username = "lnbc1ps7fqhwpp5"
+
+    const hasValidLength = UsernameValidation.hasValidLength(username)
+    const hasValidCharacters = UsernameValidation.hasValidCharacters(username)
+    const hasNoRestictedStartCharacters =
+      UsernameValidation.hasNoRestictedStartCharacters(username)
+    const isValid = UsernameValidation.isValid(username)
+
+    expect(hasValidLength).toBeTruthy()
+    expect(hasValidCharacters).toBeTruthy()
+    expect(hasNoRestictedStartCharacters).toBeFalsy()
+    expect(isValid).toBeFalsy()
+  })
 })
