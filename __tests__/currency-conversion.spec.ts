@@ -7,7 +7,7 @@ describe("currencyToText", () => {
 
     const text = currencyToText(amount, currency)
 
-    expect(text).toBe("0.00")
+    expect(text).toBe("0")
   })
 
   it("0.90", () => {

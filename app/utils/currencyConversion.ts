@@ -1,4 +1,6 @@
 const isCurrencyWithDecimals = (currency) => {
+  // LEE :: We don't want to have decimals in our colones
+  return false
   return currency === "USD"
 }
 
