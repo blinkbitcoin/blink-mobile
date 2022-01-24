@@ -9,7 +9,7 @@ import EStyleSheet from "react-native-extended-stylesheet"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
 import { color, palette } from "../../theme"
-import { UsernameValidation } from "../../utils/validation"
+import { InvalidUsernameError, UsernameValidation } from "../../utils/validation"
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { USERNAME_AVAILABLE } from "../../graphql/query"
@@ -160,17 +160,10 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
   const onChangeText = (value) => {
     setInputStatus({ message: "", status: "" })
     setInput(value)
-
     if (value) {
-      let errorMessage: string | null = null
-      if (!UsernameValidation.hasValidCharacters(value)) {
-        errorMessage = translate("UsernameScreen.letterAndNumber")
-      }
-      if (!UsernameValidation.hasNoRestictedStartCharacters(value)) {
-        errorMessage = translate("UsernameScreen.forbiddenStart")
-      }
-      if (errorMessage) {
-        setInputStatus({ message: errorMessage, status: "error" })
+      const checkedUsername = UsernameValidation.checkedToUsername(value)
+      if (checkedUsername instanceof InvalidUsernameError) {
+        setInputStatus({ message: String(checkedUsername), status: "error" })
       }
     }
   }

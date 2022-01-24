@@ -87,19 +87,17 @@ const Row = ({
   value: string
   type?: SettlementViaType
 }) => (
-  <TouchableWithoutFeedback onPress={() => viewInExplorer(value)}>
-    <View style={styles.description}>
-      <Text style={styles.entry}>
-        {entry + " "}
-        {type === "SettlementViaOnChain" && (
-          <Icon name="open-outline" size={18} color={palette.darkGrey} />
-        )}
-      </Text>
-      <Text selectable style={styles.value}>
-        {value}
-      </Text>
-    </View>
-  </TouchableWithoutFeedback>
+  <View style={styles.description}>
+    <Text style={styles.entry}>
+      {entry + " "}
+      {type === "SettlementViaOnChain" && (
+        <Icon name="open-outline" size={18} color={palette.darkGrey} />
+      )}
+    </Text>
+    <Text selectable style={styles.value}>
+      {value}
+    </Text>
+  </View>
 )
 
 type Props = {
@@ -199,11 +197,17 @@ export const TransactionDetailScreen: ScreenType = ({ route, navigation }: Props
           <Row entry="Hash" value={initiationVia.paymentHash} />
         )}
         {settlementVia.__typename === "SettlementViaOnChain" && (
-          <Row
-            entry="Hash"
-            value={settlementVia.transactionHash}
-            type={settlementVia.__typename}
-          />
+          <TouchableWithoutFeedback
+            onPress={() => viewInExplorer(settlementVia.transactionHash)}
+          >
+            <View>
+              <Row
+                entry="Hash"
+                value={settlementVia.transactionHash}
+                type={settlementVia.__typename}
+              />
+            </View>
+          </TouchableWithoutFeedback>
         )}
         {id && <Row entry="id" value={id} />}
       </View>

@@ -11,7 +11,6 @@ import { VersionComponent } from "../../components/version"
 import { palette } from "../../theme/palette"
 import { LN_PAGE_DOMAIN, WHATSAPP_CONTACT_NUMBER } from "../../constants/support"
 import { translate } from "../../i18n"
-import { openWhatsApp } from "../../utils/external"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -20,6 +19,8 @@ import { toastShow } from "../../utils/toast"
 import useToken from "../../utils/use-token"
 import useLogout from "../../hooks/use-logout"
 import useMainQuery from "@app/hooks/use-main-query"
+import crashlytics from "@react-native-firebase/crashlytics"
+import { openWhatsApp } from "@app/utils/external"
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "settings">
@@ -29,8 +30,63 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const { logout } = useLogout()
 
-  const { btcWalletId, csvEncoded, username, phoneNumber, userPreferredLanguage } =
-    useMainQuery()
+  const { btcWalletId, username, phoneNumber, userPreferredLanguage } = useMainQuery()
+
+  const onGetCsvCallback = async (data) => {
+    const csvEncoded = data?.me?.defaultAccount?.csvTransactions
+    try {
+      await Share.open({
+        title: "export-csv-title.csv",
+        url: `data:text/comma-separated-values;base64,${csvEncoded}`,
+        type: "text/comma-separated-values",
+        // subject: 'csv export',
+        filename: "export",
+        // message: 'export message'
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const [fetchCsvTransactions, { loading: loadingCsvTransactions, called, refetch }] =
+    useLazyQuery(
+      gql`
+        query getWalletCSVTransactions($defaultWalletId: WalletId!) {
+          me {
+            id
+            defaultAccount {
+              id
+              csvTransactions(walletIds: [$defaultWalletId])
+            }
+          }
+        }
+      `,
+      {
+        fetchPolicy: "network-only",
+        notifyOnNetworkStatusChange: true,
+        onCompleted: onGetCsvCallback,
+        onError: (error) => {
+          crashlytics().recordError(error)
+          Alert.alert(
+            translate("common.error"),
+            translate("SettingsScreen.csvTransactionsError"),
+            [
+              {
+                text: translate("whatsapp.contactSupport"),
+                onPress: () =>
+                  openWhatsApp(
+                    WHATSAPP_CONTACT_NUMBER,
+                    translate("whatsapp.defaultSupportMessage"),
+                  ),
+              },
+              {
+                text: translate("common.cancel"),
+              },
+            ],
+          )
+        },
+      },
+    )
 
   const securityAction = async () => {
     const isBiometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
@@ -61,36 +117,6 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
     }
   }
 
-  const onGetCsvCallback = async () => {
-    try {
-      await Share.open({
-        // title: "export-csv-title.csv",
-        url: `data:text/csv;base64,${csvEncoded}`,
-        type: "text/csv",
-        // subject: 'csv export',
-        filename: "export.csv",
-        // message: 'export message'
-      })
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const [getCsv] = useLazyQuery(
-    gql`
-      query getWalletCSVTransactions($defaultWalletId: WalletId!) {
-        me {
-          id
-          defaultAccount {
-            id
-            csvTransactions(walletIds: [$defaultWalletId])
-          }
-        }
-      }
-    `,
-    { onCompleted: onGetCsvCallback },
-  )
-
   return (
     <SettingsScreenJSX
       hasToken={hasToken}
@@ -98,9 +124,18 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       username={username}
       phone={phoneNumber}
       language={translate(`Languages.${userPreferredLanguage || "DEFAULT"}`)}
-      csvAction={() => getCsv({ variables: { btcWalletId } })}
+      csvAction={() => {
+        if (!called) {
+          fetchCsvTransactions({
+            variables: { defaultWalletId: btcWalletId },
+          })
+        } else {
+          refetch({ defaultWalletId: btcWalletId })
+        }
+      }}
       securityAction={securityAction}
       logoutAction={logoutAction}
+      loadingCsvTransactions={loadingCsvTransactions}
     />
   )
 }
@@ -115,6 +150,7 @@ type SettingsScreenProps = {
   csvAction: (options?: QueryLazyOptions<OperationVariables>) => void
   securityAction: () => void
   logoutAction: () => Promise<void>
+  loadingCsvTransactions: boolean
 }
 
 type SettingRow = {
@@ -140,6 +176,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     csvAction,
     securityAction,
     logoutAction,
+    loadingCsvTransactions,
   } = params
   const copyToClipBoard = (username) => {
     Clipboard.setString(LN_PAGE_DOMAIN + username)
@@ -196,8 +233,8 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       icon: "ios-download",
       id: "csv",
       action: () => csvAction(),
-      enabled: hasToken,
-      greyed: !hasToken,
+      enabled: hasToken && !loadingCsvTransactions,
+      greyed: !hasToken || loadingCsvTransactions,
     },
     {
       category: translate("tippingLink.title"),

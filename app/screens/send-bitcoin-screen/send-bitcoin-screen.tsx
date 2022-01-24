@@ -217,7 +217,7 @@ export const SendBitcoinScreen: ScreenType = ({
     () =>
       debounce(async () => {
         userDefaultWalletIdQuery({ variables: { username: destination } })
-      }, 1000),
+      }, 1500),
     [destination, userDefaultWalletIdQuery],
   )
 

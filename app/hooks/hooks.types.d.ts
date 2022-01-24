@@ -13,7 +13,6 @@ type useMainQueryOutput = {
   btcWalletBalance: number
   btcWalletId: string
   transactionsEdges: object[]
-  csvEncoded: any
   me: any
   myPubKey: string
   username?: string
