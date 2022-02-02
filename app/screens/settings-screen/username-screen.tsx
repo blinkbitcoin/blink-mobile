@@ -9,7 +9,8 @@ import EStyleSheet from "react-native-extended-stylesheet"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
 import { color, palette } from "../../theme"
-import { InvalidUsernameError, UsernameValidation } from "../../utils/validation"
+import * as UsernameValidation from "../../utils/validation"
+import { InvalidUsernameError } from "../../utils/validation"
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { USERNAME_AVAILABLE } from "../../graphql/query"
@@ -161,9 +162,9 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
     setInputStatus({ message: "", status: "" })
     setInput(value)
     if (value) {
-      const checkedUsername = UsernameValidation.checkedToUsername(value)
+      const checkedUsername = UsernameValidation.validateUsername(value)
       if (checkedUsername instanceof InvalidUsernameError) {
-        setInputStatus({ message: String(checkedUsername), status: "error" })
+        setInputStatus({ message: String(checkedUsername.message), status: "error" })
       }
     }
   }

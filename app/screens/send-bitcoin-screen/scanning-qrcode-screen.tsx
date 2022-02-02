@@ -6,6 +6,7 @@ import EStyleSheet from "react-native-extended-stylesheet"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
 import Icon from "react-native-vector-icons/Ionicons"
+import Paste from "react-native-vector-icons/FontAwesome"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"
@@ -18,6 +19,7 @@ import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import { StackNavigationProp } from "@react-navigation/stack"
 import useToken from "../../utils/use-token"
 import useMainQuery from "@app/hooks/use-main-query"
+import Clipboard from "@react-native-community/clipboard"
 
 const CAMERA: ViewStyle = {
   width: "100%",
@@ -80,7 +82,6 @@ export const ScanningQRCodeScreen: ScreenType = ({
     if (pending) {
       return
     }
-
     try {
       const { valid, lnurl } = validPayment(data, tokenNetwork, myPubKey, username)
       if (valid) {
@@ -109,7 +110,7 @@ export const ScanningQRCodeScreen: ScreenType = ({
             default:
               Alert.alert(
                 translate("ScanningQRCodeScreen.invalidTitle"),
-                translate("ScanningQRCodeScreen.invalidContent", {
+                translate("ScanningQRCodeScreen.invalidContentLnurl", {
                   found: lnurlParams.tag,
                 }),
                 [
@@ -141,6 +142,15 @@ export const ScanningQRCodeScreen: ScreenType = ({
           ],
         )
       }
+    } catch (err) {
+      Alert.alert(err.toString())
+    }
+  }
+  const handleInvoicePaste = async () => {
+    try {
+      Clipboard.getString().then((data) => {
+        decodeInvoice(data)
+      })
     } catch (err) {
       Alert.alert(err.toString())
     }
@@ -217,6 +227,15 @@ export const ScanningQRCodeScreen: ScreenType = ({
                 color={palette.lightGrey}
                 // eslint-disable-next-line react-native/no-inline-styles
                 style={{ opacity: 0.8 }}
+              />
+            </Pressable>
+            <Pressable onPress={handleInvoicePaste}>
+              <Paste
+                name="paste"
+                size={64}
+                color={palette.lightGrey}
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" }}
               />
             </Pressable>
           </View>
