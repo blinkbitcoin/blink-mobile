@@ -24,6 +24,7 @@ export const networkVar = makeVar<INetwork | null>(null)
 
 export const prefCurrencyVar = makeVar<CurrencyType>("USD")
 export const modalClipboardVisibleVar = makeVar(false)
+export const modalNfcVisibleVar = makeVar(false)
 
 export const nextPrefCurrency = (): void => {
   const units: CurrencyType[] = ["BTC", "USD"]

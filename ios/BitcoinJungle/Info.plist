@@ -143,5 +143,7 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NFCReaderUsageDescription</key>
+	<string>We need to use NFC</string>
 </dict>
 </plist>

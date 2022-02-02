@@ -10,6 +10,7 @@ import {
 import { ScreenProps } from "./screen.props"
 import { isNonScrolling, offsets, presets } from "./screen.presets"
 import { ModalClipboard } from "../modal-clipboard"
+import { ModalNfc } from "../modal-nfc"
 import { isIos } from "../../utils/helper"
 
 function ScreenWithoutScrolling(props: ScreenProps) {
@@ -32,6 +33,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
       />
       {/* modalClipboard requires StoreContext which requiere being inside a navigator */}
       <ModalClipboard />
+      <ModalNfc />
       <Wrapper style={[preset.inner, style]}>{props.children}</Wrapper>
     </KeyboardAvoidingView>
   )
@@ -56,6 +58,7 @@ function ScreenWithScrolling(props: ScreenProps) {
         backgroundColor={props.backgroundColor}
       />
       <ModalClipboard />
+      <ModalNfc />
       <Wrapper style={[preset.outer, backgroundStyle]}>
         <ScrollView
           style={[preset.outer, backgroundStyle]}
