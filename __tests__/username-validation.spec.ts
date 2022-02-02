@@ -1,4 +1,4 @@
-import { UsernameValidation } from "../app/utils/validation"
+import * as UsernameValidation from "../app/utils/validation"
 
 describe("Username validation", () => {
   it("is invalid for an empty username", () => {

@@ -522,7 +522,8 @@
     "invalidContent": "We found:\n\n{{found}}\n\nThis is not a valid Bitcoin address or Lightning invoice",
     "invalidTitle": "Invalid QR Code",
     "noQrCode": "We could not find a QR code in the image",
-    "title": "Scan QR Code"
+    "title": "Scan QR Code",
+    "invalidContentLnurl": "We found:\n\n{{found}}\n\n is not currently supported"
   },
   "SecurityScreen": {
     "biometricDescription": "Unlock with fingerprint or facial recognition.",
