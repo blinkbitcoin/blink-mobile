@@ -15,7 +15,7 @@ type ReadNfcReturn = {
 
 export const writeNfcTag = async (
   lnurlEncodedString: string,
-  payUrlString: string
+  payUrlString: string,
 ): Promise<WriteNfcReturn> => {
   const result = {
     success: false,
@@ -36,7 +36,7 @@ export const writeNfcTag = async (
 
     const bytes = Ndef.encodeMessage([
       Ndef.uriRecord(payUrlString),
-      Ndef.textRecord(lnurlEncodedString), 
+      Ndef.textRecord(lnurlEncodedString),
     ])
 
     await NfcManager.ndefHandler.writeNdefMessage(bytes)
@@ -85,9 +85,8 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
     await NfcManager.requestTechnology(NfcTech.Ndef)
 
     const tag = await NfcManager.getTag()
-    const message = tag?.ndefMessage?.find(el => 
-      Ndef.text.decodePayload(new Uint8Array(el.payload))
-      .indexOf('lnurl') !== -1
+    const message = tag?.ndefMessage?.find(
+      (el) => Ndef.text.decodePayload(new Uint8Array(el.payload)).indexOf("lnurl") !== -1,
     )
 
     if (message && message?.payload) {

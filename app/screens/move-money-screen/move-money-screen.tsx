@@ -262,8 +262,8 @@ export const MoveMoneyScreen: ScreenType = ({
                 },
               ],
             )
-            break  
-        }      
+            break
+        }
       } else {
         Alert.alert(
           translate("ScanningQRCodeScreen.invalidTitle"),
@@ -282,7 +282,7 @@ export const MoveMoneyScreen: ScreenType = ({
 
   const scanNfcTag = async () => {
     const nfcTagReadResult = await readNfcTag()
-        
+
     if (nfcTagReadResult.success) {
       await decodeInvoice(nfcTagReadResult.data)
     } else if (nfcTagReadResult.errorMessage != "UserCancel") {
@@ -301,7 +301,7 @@ export const MoveMoneyScreen: ScreenType = ({
   const onMenuClick = async (target) => {
     if (!hasToken) {
       setModalVisible(true)
-    } else if (target == 'scanningNFCTag') {
+    } else if (target == "scanningNFCTag") {
       await scanNfcTag()
     } else {
       navigation.navigate(target)
