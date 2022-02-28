@@ -4,7 +4,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp } from "@react-navigation/native"
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native"
+import { ActivityIndicator, ScrollView, Text, View } from "react-native"
 import { Button } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import Icon from "react-native-vector-icons/Ionicons"
@@ -88,13 +88,14 @@ export const SendBitcoinScreen: ScreenType = ({
   const [amountless, setAmountless] = useState(false)
   const [destination, setDestinationInternal] = useState("")
   const [destinationStatus, setDestinationStatus] = useState<
-    "VALID" | "INVAILD" | "NOT_CHECKED"
+    "VALID" | "INVALID" | "NOT_CHECKED"
   >("NOT_CHECKED")
   const [invoice, setInvoice] = useState("")
   const [memo, setMemo] = useState<string>("")
   const [sameNode, setSameNode] = useState<boolean | null>(null)
   const [interactive, setInteractive] = useState(false)
   const [isSendLockEnabled, setIsSendLockEnabled] = useState(false)
+  const [isStaticLnurlIdentifier, setIsStaticLnurlIdentifier] = useState(false)
 
   const satAmount =
     primaryCurrency === "BTC" ? primaryAmount.value : secondaryAmount.value
@@ -120,7 +121,7 @@ export const SendBitcoinScreen: ScreenType = ({
       }
     },
     onError: () => {
-      setDestinationStatus("INVAILD")
+      setDestinationStatus("INVALID")
     },
   })
 
@@ -216,12 +217,37 @@ export const SendBitcoinScreen: ScreenType = ({
     setPrimaryAmountValue,
   ])
 
-  const userDefaultWalletIdQueryDebounced = React.useMemo(
+  const userDefaultWalletIdQueryDebounced = useCallback(
+    debounce(async (destination) => {
+      userDefaultWalletIdQuery({ variables: { username: destination } })
+    }, 1500),
+    [],
+  )
+
+  const debouncedGetLnurlParams = useMemo(
     () =>
-      debounce(async () => {
-        userDefaultWalletIdQuery({ variables: { username: destination } })
-      }, 1000),
-    [destination, userDefaultWalletIdQuery],
+      debounce(async (lnurl) => {
+        getParams(lnurl)
+          .then((params) => {
+            if ("reason" in params) {
+              throw params.reason
+            }
+            if (params.tag === "payRequest") {
+              const lnurlparams = setLnurlParams({
+                params: params as LNURLPayParams,
+                lnurl,
+              })
+              setDestinationStatus("VALID")
+              setLnurlPay({ ...lnurlparams })
+            }
+          })
+          .catch((err) => {
+            setDestinationStatus("INVALID")
+            toastShow(err.toString())
+            // Alert.alert(err.toString())
+          })
+      }, 1500),
+    [],
   )
 
   const setLnurlParams = ({ params, lnurl }): LnurlParams => {
@@ -248,6 +274,7 @@ export const SendBitcoinScreen: ScreenType = ({
       address,
       lnurl,
       sameNode,
+      staticLnurlIdentifier,
     } = validPayment(destination, tokenNetwork, myPubKey, myUsername)
 
     if (valid) {
@@ -257,30 +284,19 @@ export const SendBitcoinScreen: ScreenType = ({
 
       if (lnurl) {
         setPaymentType("lnurl")
+        if (staticLnurlIdentifier) {
+          setIsStaticLnurlIdentifier(true)
+          setInteractive(true)
+        }
         if (route.params?.lnurlParams) {
           const params = setLnurlParams({ params: route.params.lnurlParams, lnurl })
           setLnurlPay({ ...params })
         } else {
-          getParams(lnurl)
-            .then((params) => {
-              if ("reason" in params) {
-                throw params.reason
-              }
-              if (params.tag === "payRequest") {
-                const lnurlparams = setLnurlParams({
-                  params: params as LNURLPayParams,
-                  lnurl,
-                })
-                setLnurlPay({ ...lnurlparams })
-              }
-            })
-            .catch((err) => {
-              Alert.alert(err.toString())
-            })
+          debouncedGetLnurlParams(lnurl)
         }
       }
       setAmountless(amountless)
-      if (!amountless) {
+      if (!amountless && !staticLnurlIdentifier) {
         const moneyAmount: MoneyAmount = { value: amountInvoice, currency: "BTC" }
         if (primaryCurrency === "BTC") {
           setPrimaryAmountValue(amountInvoice)
@@ -293,8 +309,6 @@ export const SendBitcoinScreen: ScreenType = ({
       if (!memo && memoInvoice) {
         setMemo(memoInvoice.toString())
       }
-
-      setInteractive(false)
       setSameNode(sameNode)
     } else if (errorMessage) {
       setPaymentType(paymentType)
@@ -304,10 +318,9 @@ export const SendBitcoinScreen: ScreenType = ({
       setPaymentType("username")
 
       if (UsernameValidation.isValid(destination)) {
-        userDefaultWalletIdQueryDebounced()
+        userDefaultWalletIdQueryDebounced(destination)
       }
     }
-    return () => userDefaultWalletIdQueryDebounced.cancel()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destination])
 
@@ -371,7 +384,7 @@ export const SendBitcoinScreen: ScreenType = ({
         `${lnurlPay.callback}?amount=${satAmount}&comment=${encodeURIComponent(memo)}`,
       )
       if (lnurlInvoice.status && lnurlInvoice.status === "ERROR") {
-        toastShow(lnurlInvoice.reason)
+        setLnurlError(lnurlInvoice.reason)
       } else {
         navigation.navigate("sendBitcoinConfirmation", {
           address,
@@ -444,6 +457,7 @@ export const SendBitcoinScreen: ScreenType = ({
       interactive={interactive}
       errorMessage={errorMessage}
       reset={reset}
+      isStaticLnurlIdentifier={isStaticLnurlIdentifier}
     />
   )
 }
@@ -472,6 +486,7 @@ type SendBitcoinScreenJSXProps = {
   interactive: boolean
   errorMessage: string
   reset: () => void
+  isStaticLnurlIdentifier: boolean
 }
 
 export const SendBitcoinScreenJSX: ScreenType = ({
@@ -497,22 +512,29 @@ export const SendBitcoinScreenJSX: ScreenType = ({
   interactive,
   errorMessage,
   reset,
+  isStaticLnurlIdentifier,
 }: SendBitcoinScreenJSXProps) => {
   const destinationInputRightIcon = () => {
-    if (UsernameValidation.hasValidLength(destination) && paymentType === "username") {
+    if (
+      (UsernameValidation.hasValidLength(destination) && paymentType === "username") ||
+      isStaticLnurlIdentifier
+    ) {
       if (
         loadingUserNameExist ||
-        (UsernameValidation.isValid(destination) && destinationStatus === "NOT_CHECKED") // The debounce delay
+        (UsernameValidation.isValid(destination) &&
+          destinationStatus === "NOT_CHECKED") || // The debounce delay
+        (isStaticLnurlIdentifier && destinationStatus === "NOT_CHECKED")
       ) {
         return <ActivityIndicator size="small" />
       } else if (
-        UsernameValidation.isValid(destination) &&
-        destinationStatus === "VALID"
+        (UsernameValidation.isValid(destination) && destinationStatus === "VALID") ||
+        (isStaticLnurlIdentifier && destinationStatus === "VALID")
       ) {
         return <Text>✅</Text>
       } else if (
         !UsernameValidation.isValid(destination) ||
-        destinationStatus === "INVAILD"
+        destinationStatus === "INVALID" ||
+        (isStaticLnurlIdentifier && destinationStatus === "INVALID")
       ) {
         return <Text>⚠️</Text>
       } else {
@@ -668,7 +690,13 @@ export const SendBitcoinScreenJSX: ScreenType = ({
           }
           onPress={pay}
           disabled={
-            !primaryAmount.value || !!errorMessage || !destination || !!lnurlError
+            !primaryAmount.value ||
+            !!errorMessage ||
+            !destination ||
+            !!lnurlError ||
+            loadingUserNameExist ||
+            (UsernameValidation.isValid(destination) &&
+              destinationStatus === "NOT_CHECKED")
           }
         />
       </ScrollView>

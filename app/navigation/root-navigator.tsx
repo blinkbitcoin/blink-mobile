@@ -61,6 +61,7 @@ import type { NavigatorType } from "../types/jsx"
 
 import PushNotification from "react-native-push-notification"
 import useMainQuery from "@app/hooks/use-main-query"
+import { LnurlScreen } from "@app/screens/settings-screen/lnurl-screen"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -370,6 +371,11 @@ export const RootStack: NavigatorType = () => {
         name="security"
         component={SecurityScreen}
         options={{ title: translate("common.security") }}
+      />
+      <RootNavigator.Screen
+        name="lnurl"
+        component={LnurlScreen}
+        options={{ title: "Lnurl" }}
       />
       <RootNavigator.Screen name="Profile" component={DebugScreen} />
       <RootNavigator.Screen

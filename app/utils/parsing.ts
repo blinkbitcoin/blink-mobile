@@ -3,7 +3,7 @@ import moment from "moment"
 import url from "url"
 import { networks, address } from "bitcoinjs-lib"
 import { getDescription, getDestination, getUsername } from "./bolt11"
-
+import { utils } from "lnurl-pay"
 import type { INetwork } from "../types/network"
 import * as parsing from "./parsing"
 
@@ -23,6 +23,7 @@ export interface IValidPaymentReponse {
   paymentType?: IPaymentType
   sameNode?: boolean | undefined
   username?: string | undefined
+  staticLnurlIdentifier?: boolean
 }
 
 const mappingToBitcoinJs = (input: INetwork) => {
@@ -74,6 +75,7 @@ export const validPayment = (
   let [protocol, data] = input.split(":")
   let paymentType: IPaymentType
   let lnurl: string
+  let staticLnurlIdentifier = false
 
   if (protocol.toLowerCase() === "bitcoin") {
     paymentType = "onchain"
@@ -115,8 +117,13 @@ export const validPayment = (
 
     // some apps encode lightning invoices in UPPERCASE
     data = protocol.toLowerCase()
-  } else if (protocol.toLowerCase() === "https") {
+  } else if (utils.isLightningAddress(protocol)) {
+    paymentType = "lnurl"
+    staticLnurlIdentifier = true
+    lnurl = utils.decodeUrlOrAddress(protocol)
+  } else if (!utils.isLightningAddress(protocol) && protocol.toLowerCase() === "https") {
     const domain = "//pay.bitcoinjungle.app/"
+
     if (data.startsWith(domain)) {
       return {
         valid: true,
@@ -218,6 +225,7 @@ export const validPayment = (
       valid: true,
       lnurl,
       amountless: false,
+      staticLnurlIdentifier,
     }
   } else {
     return {

@@ -41,6 +41,7 @@ export type RootStackParamList = {
     mIsPinEnabled: boolean
     mIsSendLockEnabled: boolean
   }
+  lnurl: { username: string }
   sectionCompleted: { amount: number; sectionTitle: string }
   priceDetail: {
     account: AccountType

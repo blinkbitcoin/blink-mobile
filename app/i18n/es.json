@@ -552,6 +552,7 @@
   "ReceiveBitcoinScreen": {
     "activateNotifications": "¿Quieres activar notificaciones para que te avisen cuando haya llegado el pago?",
     "copyClipboard": "La factura se ha copiado al portapapeles.",
+    "copyClipboardBitcoin": "La dirección de Bitcoin se ha copiado en el portapapeles",
     "invoicePaid": "Esta factura ha sido pagada",
     "setNote": "ingrese una nota",
     "tapQrCodeCopy": "Toque el código QR para copiar",
@@ -618,7 +619,9 @@
     "tapLogIn": "\nIngrese aquí para iniciar sesión",
     "tapUserName": "Ingrese aquí para configurarlo",
     "title": "Configuración",
-    "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte."
+    "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte.",
+    "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
+    "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles"
   },
   "Languages": {
     "DEFAULT": "Predeterminado (OS)",
@@ -731,7 +734,9 @@
     "tryAgain": "Inténtalo de Nuevo",
     "type": "tipo",
     "username": "Nombre de usuario",
-    "usernameRequired": "El nombre de usuario es requerido"
+    "usernameRequired": "El nombre de usuario es requerido",
+    "yes": "Sí",
+    "No": "No"
   },
   "errors": {
     "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -770,6 +775,7 @@
   "lnurl": {
     "overLimit": "No se puede enviar más de la cantidad máxima",
     "underLimit": "No se puede enviar una cantidad inferior a la mínima",
-    "commentRequired": "Se requiere una nota"
+    "commentRequired": "Se requiere una nota",
+    "viewPrintable": "Ver Versión Imprimible"
   }
 }
