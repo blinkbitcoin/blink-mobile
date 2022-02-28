@@ -580,7 +580,9 @@
     "tapLogIn": "Tap to log in",
     "tapUserName": "Tap to set username",
     "title": "Settings",
-    "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support."
+    "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
+    "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
+    "copyClipboardLnurl": "Lnurl address has been copied in the clipboard"
   },
   "Languages": {
     "DEFAULT": "Default (OS)",
@@ -696,7 +698,9 @@
     "tryAgain": "Try Again",
     "type": "Type",
     "username": "Username",
-    "usernameRequired": "Username is required"
+    "usernameRequired": "Username is required",
+    "yes": "Yes",
+    "No": "No"
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",
@@ -737,6 +741,7 @@
   "lnurl": {
     "overLimit": "You can't send more than max amount",
     "underLimit": "You can't send less than min amount",
-    "commentRequired": "Comment required"
+    "commentRequired": "Comment required",
+    "viewPrintable": "View Printable Version"
   }
 }

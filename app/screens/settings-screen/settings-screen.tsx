@@ -100,6 +100,26 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
     })
   }
 
+  const lnurlAction = () => {
+    if (username) {
+      navigation.navigate("lnurl", { username: username })
+    } else {
+      Alert.alert(
+        `Lnurl ${translate("SettingsScreen.title")}`,
+        translate("SettingsScreen.lnurlNoUsername"),
+        [
+          {
+            text: translate("Common.yes"),
+            onPress: () => navigation.navigate("setUsername"),
+          },
+          {
+            text: translate("Common.no"),
+          },
+        ],
+      )
+    }
+  }
+
   const logoutAction = async () => {
     try {
       await logout()
@@ -136,6 +156,7 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       securityAction={securityAction}
       logoutAction={logoutAction}
       loadingCsvTransactions={loadingCsvTransactions}
+      lnurlAction={lnurlAction}
     />
   )
 }
@@ -150,6 +171,7 @@ type SettingsScreenProps = {
   csvAction: (options?: QueryLazyOptions<OperationVariables>) => void
   securityAction: () => void
   logoutAction: () => Promise<void>
+  lnurlAction: () => void
   loadingCsvTransactions: boolean
 }
 
@@ -176,6 +198,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     csvAction,
     securityAction,
     logoutAction,
+    lnurlAction,
     loadingCsvTransactions,
   } = params
   const copyToClipBoard = (username) => {
@@ -227,6 +250,14 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       action: securityAction,
       enabled: hasToken,
       greyed: !hasToken,
+    },
+    {
+      category: "lnurl",
+      icon: "ios-globe",
+      id: "lnurl",
+      action: lnurlAction,
+      enabled: hasToken,
+      greyed: !hasToken || !username,
     },
     {
       category: translate("common.csvExport"),
