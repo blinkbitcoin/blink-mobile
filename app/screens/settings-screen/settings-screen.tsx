@@ -9,7 +9,7 @@ import type { ViewStyleProp } from "react-native/Libraries/StyleSheet/StyleSheet
 import { Screen } from "../../components/screen"
 import { VersionComponent } from "../../components/version"
 import { palette } from "../../theme/palette"
-import { LN_PAGE_DOMAIN, WHATSAPP_CONTACT_NUMBER } from "../../constants/support"
+import { GALOY_PAY_DOMAIN, WHATSAPP_CONTACT_NUMBER } from "../../constants/support"
 import { translate } from "../../i18n"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 import type { ScreenType } from "../../types/jsx"
@@ -202,7 +202,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     loadingCsvTransactions,
   } = params
   const copyToClipBoard = (username) => {
-    Clipboard.setString(LN_PAGE_DOMAIN + username)
+    Clipboard.setString(GALOY_PAY_DOMAIN + username)
     Clipboard.getString().then((data) =>
       toastShow(translate("tippingLink.copied", { data }), {
         backgroundColor: palette.lightBlue,
