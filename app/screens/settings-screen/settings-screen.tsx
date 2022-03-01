@@ -217,7 +217,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     const lnurlEncodedString = getLnurlPayEncodedString(username)
     const nfcTagWriteResult = await writeNfcTag(
       lnurlEncodedString,
-      LN_PAGE_DOMAIN + username,
+      GALOY_PAY_DOMAIN + username,
     )
 
     if (nfcTagWriteResult.success) {
