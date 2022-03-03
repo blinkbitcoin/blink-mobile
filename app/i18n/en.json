@@ -627,7 +627,8 @@
     "header": "Enter your phone number, and we'll text you an access code.",
     "headerVerify": "Verify you are human",
     "placeholder": "Phone Number",
-    "verify": "Click to Verify"
+    "verify": "Click to Verify",
+    "continue": "Continue"
   },
   "WelcomePhoneValidationScreen": {
     "errorLoggingIn": "Error logging in. Did you use the right code?",

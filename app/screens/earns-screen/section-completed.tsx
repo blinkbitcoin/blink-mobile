@@ -23,7 +23,7 @@ const styles = EStyleSheet.create({
     backgroundColor: palette.white,
     borderRadius: 32,
     marginTop: "24rem",
-    width: "100%",
+    width: "75%",
   },
 
   container: {
@@ -51,6 +51,8 @@ const styles = EStyleSheet.create({
     color: palette.lightBlue,
     fontSize: "18rem",
     fontWeight: "bold",
+    flex: 1,
+    justifyContent: "center",
   },
 })
 

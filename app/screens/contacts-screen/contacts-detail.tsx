@@ -22,7 +22,7 @@ const styles = EStyleSheet.create({
 
   amount: {
     color: palette.white,
-    fontSize: "40rem",
+    fontSize: "36rem",
   },
 
   amountSecondary: {
@@ -32,8 +32,7 @@ const styles = EStyleSheet.create({
 
   amountView: {
     alignItems: "center",
-    paddingBottom: "24rem",
-    paddingTop: "48rem",
+    paddingBottom: "6rem",
   },
 
   icon: { margin: 0 },
@@ -112,7 +111,7 @@ export const ContactsDetailScreenJSX: ScreenType = ({
       <View style={[styles.amountView, { backgroundColor: palette.green }]}>
         <Icon
           name="ios-person-outline"
-          size={94}
+          size={86}
           color={palette.white}
           style={styles.icon}
         />
