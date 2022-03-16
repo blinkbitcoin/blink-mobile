@@ -56,14 +56,46 @@ type Props = {
 export const MapScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const [isRefreshed, setIsRefreshed] = React.useState(false)
+  const [otherPinData, setOtherPinData] = React.useState([])
   const { data, error, refetch } = useQuery(QUERY_BUSINESSES, {
     notifyOnNetworkStatusChange: true,
   })
+
+  const fetchOtherPins = async () => {
+    try {
+      const res = await fetch('https://us-central1-bitcoin-jungle-maps.cloudfunctions.net/location-list')
+      const data = await res.json()
+
+      if(res.ok) {
+        setOtherPinData(
+          data.map((el) => {
+            return {
+              id: el.id,
+              username: null,
+              mapInfo: {
+                title: el.name,
+                coordinates: {
+                  __typename: "Coordinates",
+                  latitude: el.latLong._latitude,
+                  longitude: el.latLong._longitude,
+                }
+              }
+            }
+          })
+        )
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+    return true
+  }
 
   useFocusEffect(() => {
     if (!isRefreshed) {
       setIsRefreshed(true)
       refetch()
+      fetchOtherPins()
     }
   })
 
@@ -71,7 +103,8 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
     toastShow(error.message)
   }
 
-  const maps = data?.businessMapMarkers ?? []
+  let maps = data?.businessMapMarkers ?? []
+  maps = maps.concat(otherPinData)
 
   const requestLocationPermission = async () => {
     try {
@@ -119,7 +152,7 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
     markers.push(
       <Marker
         coordinate={item.mapInfo.coordinates}
-        key={item.username}
+        key={item.username || item.id}
         pinColor={palette.orange}
       >
         <Callout
@@ -156,8 +189,8 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
         initialRegion={{
           latitude: 9.1549238,
           longitude: -83.7570566,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
+          latitudeDelta: 0.3,
+          longitudeDelta: 0.3,
         }}
       >
         {markers}
