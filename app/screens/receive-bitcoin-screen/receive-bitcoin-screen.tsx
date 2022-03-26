@@ -30,6 +30,20 @@ import { Button, Text } from "react-native-elements"
 import { hasFullPermissions, requestPermission } from "../../utils/notifications"
 import useMainQuery from "@app/hooks/use-main-query"
 
+import { RouteProp } from "@react-navigation/native"
+import { color } from "../../theme"
+
+type LnurlParams = {
+  tag: string
+  minWithdrawable: number
+  maxWithdrawable: number
+  domain: string
+  k1: string
+  callback: string
+  defaultDescription: string
+  error: string
+}
+
 const styles = EStyleSheet.create({
   buttonContainer: { marginHorizontal: 52, paddingVertical: 200 },
 
@@ -38,8 +52,20 @@ const styles = EStyleSheet.create({
     borderRadius: 32,
   },
 
+  receiveButtonStyle: {
+    backgroundColor: color.primary,
+    marginBottom: "32rem",
+    marginHorizontal: "24rem",
+    marginTop: "32rem",
+  },
+
   buttonTitle: {
     fontWeight: "bold",
+  },
+
+  domainText: {
+    fontSize: 20,
+    marginLeft: "4%",
   },
 
   screen: {
@@ -109,9 +135,10 @@ const GET_ONCHAIN_ADDRESS = gql`
 
 type Props = {
   navigation: StackNavigationProp<MoveMoneyStackParamList, "receiveBitcoin">
+  route: RouteProp<MoveMoneyStackParamList, "receiveBitcoin">
 }
 
-export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
+export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) => {
   const client = useApolloClient()
   const { hasToken } = useToken()
 
@@ -135,6 +162,18 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
   const [btcAddressRequested, setBtcAddressRequested] = useState<boolean>(false)
 
   const { btcWalletId } = useMainQuery()
+
+  const [lnurlError, setLnurlError] = useState("")
+  const [lnurlWithdraw, setLnurlWithdraw] = useState<LnurlParams>({
+    tag: "",
+    minWithdrawable: 0,
+    maxWithdrawable: 0,
+    k1: "",
+    defaultDescription: "",
+    callback: "",
+    domain: "",
+    error: "",
+  })
 
   const onBtcAddressRequestClick = async () => {
     try {
@@ -237,6 +276,30 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
       return () => updateInvoice.cancel()
     }
   }, [satAmount, memo, updateInvoice, btcWalletId])
+
+  useEffect(() => {
+    if (route.params?.lnurlParams) {
+      const lnurlParams = setLnurlParams({
+        params: route.params.lnurlParams as LnurlParams,
+      })
+
+      setLnurlWithdraw({ ...lnurlParams })
+
+      if (lnurlParams.defaultDescription) {
+        setMemo(lnurlParams.defaultDescription)
+      }
+
+      if (primaryAmount.currency === "USD") {
+        toggleCurrency()
+      }
+
+      if (lnurlParams.minWithdrawable == lnurlParams.maxWithdrawable) {
+        setTimeout(() => {
+          setPrimaryAmountValue(lnurlParams.minWithdrawable)
+        }, 100)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const fn = async () => {
@@ -342,6 +405,78 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
   const invoicePaid =
     lnUpdate?.paymentHash === invoice?.paymentHash && lnUpdate?.status === "PAID"
 
+  useEffect(() => {
+    let lnurlErrorStr = ""
+    if (
+      primaryAmount &&
+      primaryAmount.currency === "BTC" &&
+      primaryAmount.value > lnurlWithdraw.maxWithdrawable
+    ) {
+      lnurlErrorStr = translate("lnurl.overLimit")
+    } else if (
+      primaryAmount &&
+      primaryAmount.currency === "BTC" &&
+      primaryAmount.value < lnurlWithdraw.minWithdrawable
+    ) {
+      lnurlErrorStr = translate("lnurl.underLimit")
+    } else if (
+      secondaryAmount &&
+      secondaryAmount.currency === "BTC" &&
+      secondaryAmount.value > lnurlWithdraw.maxWithdrawable
+    ) {
+      lnurlErrorStr = translate("lnurl.overLimit")
+    } else if (
+      secondaryAmount &&
+      secondaryAmount.currency === "BTC" &&
+      secondaryAmount.value < lnurlWithdraw.minWithdrawable
+    ) {
+      lnurlErrorStr = translate("lnurl.underLimit")
+    } else {
+      lnurlErrorStr = ""
+    }
+    setLnurlError(lnurlErrorStr)
+  }, [lnurlWithdraw, primaryAmount, secondaryAmount])
+
+  const completeWithdraw = async () => {
+    try {
+      setLoading(true)
+
+      const response = await fetch(
+        `${lnurlWithdraw.callback}${
+          lnurlWithdraw.callback.indexOf("?") > -1 ? "&" : "?"
+        }k1=${lnurlWithdraw.k1}&pr=${invoice?.paymentRequest}`,
+      )
+
+      if (!response.ok) {
+        setLnurlError(translate("errors.network.server"))
+        return
+      }
+
+      const data = await response.json()
+
+      if (data?.status != "OK") {
+        setLnurlError(data.reason)
+      }
+    } catch (err) {
+      setLnurlError(translate("errors.network.server"))
+    }
+
+    setLoading(false)
+  }
+
+  const setLnurlParams = ({ params }): LnurlParams => {
+    return {
+      tag: params.tag,
+      minWithdrawable: params.minWithdrawable / 1000,
+      maxWithdrawable: params.maxWithdrawable / 1000,
+      domain: params.domain,
+      callback: params.callback,
+      k1: params.k1,
+      defaultDescription: params.defaultDescription,
+      error: "",
+    }
+  }
+
   return (
     <Screen backgroundColor={palette.lighterGrey} style={styles.screen} preset="fixed">
       <ScrollView keyboardShouldPersistTaps="always">
@@ -360,6 +495,14 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
             currency={secondaryAmount.currency}
             style={styles.subCurrencyText}
           />
+          {lnurlWithdraw.tag.length > 0 && (
+            <View style={styles.errorContainer}>
+              <Text>
+                Min: {lnurlWithdraw.minWithdrawable} sats - Max:{" "}
+                {lnurlWithdraw.maxWithdrawable} sats
+              </Text>
+            </View>
+          )}
           <GaloyInput
             placeholder={translate("ReceiveBitcoinScreen.setNote")}
             value={memo}
@@ -373,29 +516,26 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
             ref={inputMemoRef}
             disabled={invoicePaid}
           />
+          {lnurlWithdraw.tag.length > 0 && (
+            <View>
+              <Text style={styles.domainText}>
+                {translate("common.domain")}: {lnurlWithdraw.domain}
+              </Text>
+            </View>
+          )}
         </View>
         {/* FIXME: fixed height */}
 
-        <Swiper
-          height={450}
-          loop={false}
-          index={btcAddressRequested ? 1 : 0}
-          showsButtons={true}
-        >
-          <QRView
-            data={invoice?.paymentRequest}
-            type="lightning"
-            amount={satAmount}
-            memo={memo}
-            loading={loading}
-            completed={invoicePaid}
-            navigation={navigation}
-            err={err}
-          />
-          {btcAddressRequested && lastOnChainAddress && (
+        {lnurlWithdraw.tag.length == 0 && (
+          <Swiper
+            height={450}
+            loop={false}
+            index={btcAddressRequested ? 1 : 0}
+            showsButtons={true}
+          >
             <QRView
-              data={lastOnChainAddress}
-              type="bitcoin"
+              data={invoice?.paymentRequest}
+              type="lightning"
               amount={satAmount}
               memo={memo}
               loading={loading}
@@ -403,19 +543,64 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation }: Props) => {
               navigation={navigation}
               err={err}
             />
-          )}
-          {!btcAddressRequested && !lastOnChainAddress && (
-            <Text style={styles.textButtonWrapper}>
+            {btcAddressRequested && lastOnChainAddress && (
+              <QRView
+                data={lastOnChainAddress}
+                type="bitcoin"
+                amount={satAmount}
+                memo={memo}
+                loading={loading}
+                completed={invoicePaid}
+                navigation={navigation}
+                err={err}
+              />
+            )}
+            {!btcAddressRequested && !lastOnChainAddress && (
+              <Text style={styles.textButtonWrapper}>
+                <Button
+                  buttonStyle={styles.buttonStyle}
+                  containerStyle={styles.buttonContainer}
+                  title={"Generate BTC Address"}
+                  onPress={onBtcAddressRequestClick}
+                  titleStyle={styles.buttonTitle}
+                />
+              </Text>
+            )}
+          </Swiper>
+        )}
+
+        {lnurlWithdraw.tag.length > 0 && (
+          <View>
+            {!invoicePaid && (
               <Button
-                buttonStyle={styles.buttonStyle}
-                containerStyle={styles.buttonContainer}
-                title={"Generate BTC Address"}
-                onPress={onBtcAddressRequestClick}
+                buttonStyle={styles.receiveButtonStyle}
+                title={
+                  !primaryAmount.value
+                    ? translate("common.amountRequired")
+                    : lnurlError
+                    ? lnurlError
+                    : translate("common.receive")
+                }
+                onPress={completeWithdraw}
+                disabled={!primaryAmount.value || !!lnurlError || invoicePaid || loading}
                 titleStyle={styles.buttonTitle}
               />
-            </Text>
-          )}
-        </Swiper>
+            )}
+
+            {invoicePaid && (
+              <QRView
+                data={invoice?.paymentRequest}
+                type="lightning"
+                amount={satAmount}
+                memo={memo}
+                loading={loading}
+                completed={invoicePaid}
+                navigation={navigation}
+                err={err}
+              />
+            )}
+          </View>
+        )}
       </ScrollView>
     </Screen>
   )

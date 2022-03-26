@@ -1,4 +1,4 @@
-import { LNURLPayParams } from "js-lnurl"
+import { LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
 import { contacts_me_contacts } from "../screens/contacts-screen/__generated__/contacts"
 import { AccountType, AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 import { IPaymentType } from "../utils/parsing"
@@ -66,7 +66,10 @@ export type MoveMoneyStackParamList = {
   phoneValidation: undefined
   priceDetail: { account: AccountType }
   Profile: undefined
-  receiveBitcoin: undefined
+  receiveBitcoin: {
+    payment?: string | null
+    lnurlParams?: LNURLWithdrawParams | null
+  }
   scanningQRCode: undefined
   sendBitcoin: {
     payment: string | null

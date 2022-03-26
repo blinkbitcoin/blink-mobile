@@ -12,7 +12,7 @@ import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"
 import type { ScreenType } from "../../types/jsx"
 import { validPayment } from "../../utils/parsing"
-import { getParams, LNURLPayParams } from "js-lnurl"
+import { getParams, LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
 
 import LocalQRCode from "@remobile/react-native-qrcode-local-image"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
@@ -104,6 +104,19 @@ export const ScanningQRCodeScreen: ScreenType = ({
                 navigation.navigate("sendBitcoin", {
                   payment: data,
                   lnurlParams: lnurlParams as LNURLPayParams,
+                })
+              }
+              break
+            case "withdrawRequest":
+              if (index <= 1) {
+                navigation.replace("receiveBitcoin", {
+                  payment: data,
+                  lnurlParams: lnurlParams as LNURLWithdrawParams,
+                })
+              } else {
+                navigation.navigate("receiveBitcoin", {
+                  payment: data,
+                  lnurlParams: lnurlParams as LNURLWithdrawParams,
                 })
               }
               break
