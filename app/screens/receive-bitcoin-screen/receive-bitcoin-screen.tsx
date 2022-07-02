@@ -52,6 +52,14 @@ const styles = EStyleSheet.create({
     borderRadius: 32,
   },
 
+  buttonStyleActive: {
+    backgroundColor: palette.blue,
+  },
+
+  buttonStyleInactive: {
+    backgroundColor: palette.midGrey,
+  },
+
   receiveButtonStyle: {
     backgroundColor: color.primary,
     marginBottom: "32rem",
@@ -160,6 +168,9 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
 
   const [lastOnChainAddress, setLastOnChainAddress] = useState<string>()
   const [btcAddressRequested, setBtcAddressRequested] = useState<boolean>(false)
+
+  const [swiperIndex, setSwiperIndex] = useState<integer>(0)
+  const swiperRef = React.createRef()
 
   const { btcWalletId } = useMainQuery()
 
@@ -527,26 +538,57 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
         {/* FIXME: fixed height */}
 
         {lnurlWithdraw.tag.length == 0 && (
-          <Swiper
-            height={450}
-            loop={false}
-            index={btcAddressRequested ? 1 : 0}
-            showsButtons={true}
-          >
-            <QRView
-              data={invoice?.paymentRequest}
-              type="lightning"
-              amount={satAmount}
-              memo={memo}
-              loading={loading}
-              completed={invoicePaid}
-              navigation={navigation}
-              err={err}
-            />
-            {btcAddressRequested && lastOnChainAddress && (
+          <View>
+            <View style={{flex: 1, flexDirection:"row", alignItems: "center", justifyContent: "center", marginBottom: 5}}>
+              <View style={{flex: 1}}>
+                <Button
+                  style={{paddingLeft: 10, paddingRight: 1}}
+                  buttonStyle={(!swiperIndex ? styles.buttonStyleActive : styles.buttonStyleInactive)}
+                  title={
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
+                      <Icon style={{color: "white"}} size={20} name="ios-flash" />
+                      <Text style={{fontWeight: "bold", color: "white"}}>Lightning</Text>
+                    </View>
+                  }
+                  titleStyle={styles.buttonTitle}
+                  onPress={() => {
+                    swiperRef.current.scrollTo(0)
+                  }}
+                />
+              </View>
+              <View style={{flex: 1}}>
+                <Button
+                  style={{paddingRight: 10, paddingLeft: 1}}
+                  buttonStyle={(swiperIndex ? styles.buttonStyleActive : styles.buttonStyleInactive)}
+                  buttonContainer={{flex: 1}}
+                  title={
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
+                      <Icon style={{color: "white"}} size={20} name="logo-bitcoin" />
+                      <Text style={{fontWeight: "bold", color: "white"}}>On-Chain</Text>
+                    </View>
+                  }
+                  
+                  onPress={() => {
+                    swiperRef.current.scrollTo(1)
+                  }}
+                />
+              </View>
+            </View>
+            <Swiper
+              height={450}
+              loop={false}
+              ref={swiperRef}
+              onIndexChanged={setSwiperIndex}
+              index={btcAddressRequested ? 1 : 0}
+              showsButtons={false}
+              showDots={false}
+              renderPagination={() => {
+                // hide the paginator
+              }}
+            >
               <QRView
-                data={lastOnChainAddress}
-                type="bitcoin"
+                data={invoice?.paymentRequest}
+                type="lightning"
                 amount={satAmount}
                 memo={memo}
                 loading={loading}
@@ -554,19 +596,31 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                 navigation={navigation}
                 err={err}
               />
-            )}
-            {!btcAddressRequested && !lastOnChainAddress && (
-              <Text style={styles.textButtonWrapper}>
-                <Button
-                  buttonStyle={styles.buttonStyle}
-                  containerStyle={styles.buttonContainer}
-                  title={"Generate BTC Address"}
-                  onPress={onBtcAddressRequestClick}
-                  titleStyle={styles.buttonTitle}
+              {btcAddressRequested && lastOnChainAddress && (
+                <QRView
+                  data={lastOnChainAddress}
+                  type="bitcoin"
+                  amount={satAmount}
+                  memo={memo}
+                  loading={loading}
+                  completed={invoicePaid}
+                  navigation={navigation}
+                  err={err}
                 />
-              </Text>
-            )}
-          </Swiper>
+              )}
+              {!btcAddressRequested && !lastOnChainAddress && (
+                <Text style={styles.textButtonWrapper}>
+                  <Button
+                    buttonStyle={styles.buttonStyle}
+                    containerStyle={styles.buttonContainer}
+                    title={"Generate BTC Address"}
+                    onPress={onBtcAddressRequestClick}
+                    titleStyle={styles.buttonTitle}
+                  />
+                </Text>
+              )}
+            </Swiper>
+          </View>
         )}
 
         {lnurlWithdraw.tag.length > 0 && (
