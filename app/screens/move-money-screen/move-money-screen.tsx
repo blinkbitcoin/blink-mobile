@@ -2,6 +2,7 @@ import messaging from "@react-native-firebase/messaging"
 import * as React from "react"
 import { useEffect, useState } from "react"
 import {
+  Alert,
   AppState,
   FlatList,
   Linking,
@@ -33,6 +34,10 @@ import useToken from "../../utils/use-token"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import useMainQuery from "@app/hooks/use-main-query"
+import { validPayment } from "../../utils/parsing"
+import { getParams, LNURLPayParams } from "js-lnurl"
+
+import { readNfcTag } from "../../utils/nfc"
 
 const styles = EStyleSheet.create({
   balanceHeader: {
@@ -225,9 +230,82 @@ export const MoveMoneyScreen: ScreenType = ({
   hasToken,
 }: MoveMoneyScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
+  const { tokenNetwork } = useToken()
+  const { myPubKey, username } = useMainQuery()
 
-  const onMenuClick = (target) => {
-    hasToken ? navigation.navigate(target) : setModalVisible(true)
+  const decodeInvoice = async (data) => {
+    try {
+      const { valid, lnurl } = validPayment(data, tokenNetwork, myPubKey, username)
+      if (valid && lnurl) {
+        const lnurlParams = await getParams(lnurl)
+
+        if ("reason" in lnurlParams) {
+          throw lnurlParams.reason
+        }
+
+        switch (lnurlParams.tag) {
+          case "payRequest":
+            navigation.navigate("sendBitcoin", {
+              payment: data,
+              lnurlParams: lnurlParams as LNURLPayParams,
+            })
+            break
+          default:
+            Alert.alert(
+              translate("ScanningQRCodeScreen.invalidTitle"),
+              translate("ScanningQRCodeScreen.invalidContentLnurl", {
+                found: lnurlParams.tag,
+              }),
+              [
+                {
+                  text: translate("common.ok"),
+                },
+              ],
+            )
+            break
+        }
+      } else {
+        Alert.alert(
+          translate("ScanningQRCodeScreen.invalidTitle"),
+          translate("ScanningQRCodeScreen.invalidContent", { found: data.toString() }),
+          [
+            {
+              text: translate("common.ok"),
+            },
+          ],
+        )
+      }
+    } catch (err) {
+      Alert.alert(err.toString())
+    }
+  }
+
+  const scanNfcTag = async () => {
+    const nfcTagReadResult = await readNfcTag()
+
+    if (nfcTagReadResult.success) {
+      await decodeInvoice(nfcTagReadResult.data)
+    } else if (nfcTagReadResult.errorMessage != "UserCancel") {
+      Alert.alert(
+        translate("common.error"),
+        translate(`nfc.${nfcTagReadResult.errorMessage}`),
+        [
+          {
+            text: translate("common.ok"),
+          },
+        ],
+      )
+    }
+  }
+
+  const onMenuClick = async (target) => {
+    if (!hasToken) {
+      setModalVisible(true)
+    } else if (target == "scanningNFCTag") {
+      await scanNfcTag()
+    } else {
+      navigation.navigate(target)
+    }
   }
 
   const activateWallet = () => {
@@ -358,6 +436,11 @@ export const MoveMoneyScreen: ScreenType = ({
             title: translate("ScanningQRCodeScreen.title"),
             target: "scanningQRCode",
             icon: <Icon name="qr-code" size={32} color={palette.orange} />,
+          },
+          {
+            title: translate("MoveMoneyScreen.scanNFCTag"),
+            target: "scanningNFCTag",
+            icon: <Icon name="scan-circle" size={32} color={palette.lightBlue} />,
           },
           {
             title: translate("MoveMoneyScreen.send"),

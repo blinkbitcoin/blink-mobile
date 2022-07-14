@@ -90,6 +90,7 @@
     "react-native-localize": "^2.1.5",
     "react-native-maps": "0.29.4",
     "react-native-modal": "^13.0.0",
+    "react-native-nfc-manager": "^3.13.0",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-push-notification": "^8.1.1",
     "react-native-qrcode-svg": "^6.0.6",

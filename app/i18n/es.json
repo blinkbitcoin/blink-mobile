@@ -502,6 +502,7 @@
     "needBankAccount": "Abra una cuenta de efectivo para activar",
     "openAccount": "Abre una cuenta",
     "receive": "Recibir",
+    "scanNFCTag": "Escanear NFC",
     "seeTransaction": "Supervisar la transacción de apertura",
     "send": "Enviar",
     "title": "Mover dinero",
@@ -621,7 +622,8 @@
     "title": "Configuración",
     "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte.",
     "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
-    "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles"
+    "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles",
+    "programNfcTag": "Programar nueva tag NFC"
   },
   "Languages": {
     "DEFAULT": "Predeterminado (OS)",
@@ -779,5 +781,17 @@
     "underLimit": "No se puede enviar una cantidad inferior a la mínima",
     "commentRequired": "Se requiere una nota",
     "viewPrintable": "Ver Versión Imprimible"
+  },
+  "nfc": {
+    "writeSuccess": "Su tag NFC se ha escrito con éxito y ahora se puede utilizar.",
+    "TagNotWritable": "Esta tag ya se programó una vez y no se puede volver a programar.",
+    "TagConnectionLost": "Se ha perdido la conexión con la tag NFC. Mantenga el teléfono cerca de la tag un poco más cuando vuelva a intentarlo.",
+    "TagUpdateFailure": "Error al escribir en esta tag. Si este problema persiste, puede ser una tag defectuosa.",
+    "Timeout": "Se agotó el tiempo de lectura de esta etiqueta. Inténtalo de nuevo.",
+    "Unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo.",
+    "SystemBusy": "El dispositivo está actualmente ocupado y no puede leer la tag NFC. Por favor, inténtelo de nuevo más tarde.",
+    "FirstNdefInvalid": "Esta tag es ilegible.",
+    "RadioDisabled": "El lector de NFC en este dispositivo está deshabilitado actualmente. Verifique la configuración de su dispositivo.",
+    "UnsupportedFeature": "NFC no es compatible con este tipo de dispositivo."
   }
 }

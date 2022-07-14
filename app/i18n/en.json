@@ -471,6 +471,7 @@
   },
   "MoveMoneyScreen": {
     "receive": "Receive",
+    "scanNFCTag": "Scan NFC Tag",
     "send": "Send",
     "title": "Home",
     "updateAvailable": "An update is available.\nTap to update now",
@@ -582,7 +583,8 @@
     "title": "Settings",
     "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
     "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
-    "copyClipboardLnurl": "Lnurl address has been copied in the clipboard"
+    "copyClipboardLnurl": "Lnurl address has been copied in the clipboard",
+    "programNfcTag": "Program New NFC Tag"
   },
   "Languages": {
     "DEFAULT": "Default (OS)",
@@ -745,5 +747,17 @@
     "underLimit": "You can't send less than min amount",
     "commentRequired": "Comment required",
     "viewPrintable": "View Printable Version"
+  },
+  "nfc": {
+    "writeSuccess": "Your NFC Tag has been written successfully and can now be used.",
+    "TagNotWritable": "This tag has already been programmed once and cannot be re-programmed.",
+    "TagConnectionLost": "The connection to the NFC tag has been lost. Please keep the phone close to the tag a little longer when trying again.",
+    "TagUpdateFailure": "Writing to this tag failed. If this issue persists, it may be a faulty tag.",
+    "Timeout": "Reading this tag has timed out. Please try again.",
+    "Unexpected": "An unexpected error has occurred. Please try again.",
+    "SystemBusy": "The device is currently busy and unable to read the NFC tag. Please try again later.",
+    "FirstNdefInvalid": "This tag is unreadable.",
+    "RadioDisabled": "The NFC reader on this device is currently disabled. Please check your device settings.",
+    "UnsupportedFeature": "NFC is not currently supported on this type of device."
   }
 }

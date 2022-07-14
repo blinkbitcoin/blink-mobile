@@ -22,6 +22,9 @@ import useMainQuery from "@app/hooks/use-main-query"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { openWhatsApp } from "@app/utils/external"
 
+import { writeNfcTag } from "../../utils/nfc"
+import { getLnurlPayEncodedString } from "../../utils/bech32"
+
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "settings">
 }
@@ -210,6 +213,32 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     )
   }
 
+  const writeNfcTagAction = async (username) => {
+    const lnurlEncodedString = getLnurlPayEncodedString(username)
+    const nfcTagWriteResult = await writeNfcTag(
+      lnurlEncodedString,
+      GALOY_PAY_DOMAIN + username,
+    )
+
+    if (nfcTagWriteResult.success) {
+      Alert.alert(translate("common.success"), translate("nfc.writeSuccess"), [
+        {
+          text: translate("common.ok"),
+        },
+      ])
+    } else if (nfcTagWriteResult.errorMessage != "UserCancel") {
+      Alert.alert(
+        translate("common.error"),
+        translate(`nfc.${nfcTagWriteResult.errorMessage}`),
+        [
+          {
+            text: translate("common.ok"),
+          },
+        ],
+      )
+    }
+  }
+
   const openWhatsAppAction = () =>
     openWhatsApp(WHATSAPP_CONTACT_NUMBER, translate("whatsapp.defaultSupportMessage"))
 
@@ -272,6 +301,14 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       icon: "cash-outline",
       id: "tippingLink",
       action: () => copyToClipBoard(username),
+      enabled: hasToken && username !== null,
+      greyed: !hasToken || username === null,
+    },
+    {
+      category: translate("SettingsScreen.programNfcTag"),
+      icon: "pencil",
+      id: "programNfcTag",
+      action: () => writeNfcTagAction(username),
       enabled: hasToken && username !== null,
       greyed: !hasToken || username === null,
     },
