@@ -758,6 +758,20 @@
     "SystemBusy": "The device is currently busy and unable to read the NFC tag. Please try again later.",
     "FirstNdefInvalid": "This tag is unreadable.",
     "RadioDisabled": "The NFC reader on this device is currently disabled. Please check your device settings.",
-    "UnsupportedFeature": "NFC is not currently supported on this type of device."
+    "UnsupportedFeature": "NFC is not currently supported on this type of device.",
+    "SecurityViolation": "A security violation associated with the reader session has occurred.",
+    "InvalidParameter": "An input parameter is invalid.",
+    "InvalidParameterLength": "The length of an input parameter is invalid.",
+    "ParameterOutOfBound": "A parameter value is outside of the acceptable boundary.",
+    "RetryExceeded": "Too many retries have occurred.",
+    "TagResponseError": "The tag has responded with an error.",
+    "SessionInvalidated": "The reader session is invalid.",
+    "TagNotConnected": "The tag isn’t in the connected state.",
+    "PacketTooLong": "The packet length exceeds the limit supported by the tag.",
+    "UserCancel": "The user canceled the reader session.",
+    "InvalidConfiguration": "The configuration of this session is invalid.",
+    "TagSizeTooSmall": "The NDEF tag memory size is too small to store the data.",
+    "ZeroLengthMessage": "The NDEF tag doesn’t contain an NDEF message."
+
   }
 }

@@ -2,6 +2,7 @@ import messaging from "@react-native-firebase/messaging"
 import * as React from "react"
 import { useEffect, useState } from "react"
 import {
+  ActivityIndicator,
   Alert,
   AppState,
   FlatList,
@@ -35,7 +36,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import useMainQuery from "@app/hooks/use-main-query"
 import { validPayment } from "../../utils/parsing"
-import { getParams, LNURLPayParams } from "js-lnurl"
+import { getParams, LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
 
 import { readNfcTag } from "../../utils/nfc"
 
@@ -230,6 +231,7 @@ export const MoveMoneyScreen: ScreenType = ({
   hasToken,
 }: MoveMoneyScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
+  const [nfcScanning, setNfcScanning] = useState(false)
   const { tokenNetwork } = useToken()
   const { myPubKey, username } = useMainQuery()
 
@@ -248,6 +250,12 @@ export const MoveMoneyScreen: ScreenType = ({
             navigation.navigate("sendBitcoin", {
               payment: data,
               lnurlParams: lnurlParams as LNURLPayParams,
+            })
+            break
+          case "withdrawRequest":
+            navigation.navigate("receiveBitcoin", {
+              payment: data,
+              lnurlParams: lnurlParams as LNURLWithdrawParams,
             })
             break
           default:
@@ -302,7 +310,11 @@ export const MoveMoneyScreen: ScreenType = ({
     if (!hasToken) {
       setModalVisible(true)
     } else if (target == "scanningNFCTag") {
-      await scanNfcTag()
+      if (!nfcScanning) {
+        setNfcScanning(true)
+        await scanNfcTag()
+        setNfcScanning(false)
+      }
     } else {
       navigation.navigate(target)
     }
@@ -440,7 +452,7 @@ export const MoveMoneyScreen: ScreenType = ({
           {
             title: translate("MoveMoneyScreen.scanNFCTag"),
             target: "scanningNFCTag",
-            icon: <Icon name="scan-circle" size={32} color={palette.lightBlue} />,
+            icon: (nfcScanning ? <ActivityIndicator animating size="small" /> : <Icon name="scan-circle" size={32} color={palette.lightBlue} />),
           },
           {
             title: translate("MoveMoneyScreen.send"),

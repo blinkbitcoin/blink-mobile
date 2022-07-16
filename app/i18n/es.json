@@ -787,11 +787,24 @@
     "TagNotWritable": "Esta tag ya se programó una vez y no se puede volver a programar.",
     "TagConnectionLost": "Se ha perdido la conexión con la tag NFC. Mantenga el teléfono cerca de la tag un poco más cuando vuelva a intentarlo.",
     "TagUpdateFailure": "Error al escribir en esta tag. Si este problema persiste, puede ser una tag defectuosa.",
-    "Timeout": "Se agotó el tiempo de lectura de esta etiqueta. Inténtalo de nuevo.",
+    "Timeout": "Se agotó el tiempo de lectura de esta tag. Inténtalo de nuevo.",
     "Unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo.",
     "SystemBusy": "El dispositivo está actualmente ocupado y no puede leer la tag NFC. Por favor, inténtelo de nuevo más tarde.",
     "FirstNdefInvalid": "Esta tag es ilegible.",
     "RadioDisabled": "El lector de NFC en este dispositivo está deshabilitado actualmente. Verifique la configuración de su dispositivo.",
-    "UnsupportedFeature": "NFC no es compatible con este tipo de dispositivo."
+    "UnsupportedFeature": "NFC no es compatible con este tipo de dispositivo.",
+    "SecurityViolation": "Se ha producido una violación de seguridad asociada con la sesión del lector.",
+    "InvalidParameter": "Un parámetro de entrada no es válido.",
+    "InvalidParameterLength": "La longitud de un parámetro de entrada no es válida.",
+    "ParameterOutOfBound": "El valor de un parámetro está fuera del límite aceptable.",
+    "RetryExceeded": "Se han producido demasiados reintentos.",
+    "TagResponseError": "La tag ha respondido con un error.",
+    "SessionInvalidated": "La sesión del lector no es válida.",
+    "TagNotConnected": "La tag no está en el estado conectado.",
+    "PacketTooLong": "La longitud del paquete supera el límite admitido por la tag.",
+    "UserCancel": "El usuario canceló la sesión del lector.",
+    "InvalidConfiguration": "La configuración de esta sesión no es válida.",
+    "TagSizeTooSmall": "El tamaño de la memoria de la tag NDEF es demasiado pequeño para almacenar los datos.",
+    "ZeroLengthMessage": "La tag NDEF no contiene un mensaje NDEF."
   }
 }

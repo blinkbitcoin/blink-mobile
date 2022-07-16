@@ -1,4 +1,4 @@
-import NfcManager, { NfcTech, Ndef } from "react-native-nfc-manager"
+import NfcManager, { NfcTech, Ndef, NfcError } from "react-native-nfc-manager"
 import { Platform } from "react-native"
 import { modalNfcVisibleVar } from "../graphql/client-only-query"
 
@@ -23,10 +23,19 @@ export const writeNfcTag = async (
   }
 
   try {
-    if (!NfcManager.isSupported()) {
-      result.errorMessage = "UnsupportedFeature"
-      return result
+    const isSupported = await NfcManager.isSupported()
+
+    if (!isSupported) {
+      throw new NfcError.UnsupportedFeature()
     }
+
+    const isEnabled = await NfcManager.isEnabled()
+
+    if(!isEnabled) {
+      throw new NfcError.RadioDisabled()
+    }
+
+    NfcManager.start()
 
     if (Platform.OS == "android") {
       modalNfcVisibleVar(true)
@@ -47,7 +56,7 @@ export const writeNfcTag = async (
 
     result.success = true
   } catch (ex) {
-    result.errorMessage = ex.constructor.name
+    result.errorMessage = getErrorType(ex)
   } finally {
     NfcManager.cancelTechnologyRequest()
   }
@@ -56,7 +65,7 @@ export const writeNfcTag = async (
     modalNfcVisibleVar(false)
   }
 
-  if (!result.success) {
+  if (!result.success && !result.errorMessage) {
     result.errorMessage = "Unexpected"
   }
 
@@ -70,13 +79,20 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
     errorMessage: "",
   }
 
-  NfcManager.start()
-
   try {
-    if (!NfcManager.isSupported()) {
-      result.errorMessage = "UnsupportedFeature"
-      return result
+    const isSupported = await NfcManager.isSupported()
+
+    if (!isSupported) {
+      throw new NfcError.UnsupportedFeature()
     }
+
+    const isEnabled = await NfcManager.isEnabled()
+
+    if(!isEnabled) {
+      throw new NfcError.RadioDisabled()
+    }
+
+    NfcManager.start()
 
     if (Platform.OS == "android") {
       modalNfcVisibleVar(true)
@@ -85,16 +101,24 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
     await NfcManager.requestTechnology(NfcTech.Ndef)
 
     const tag = await NfcManager.getTag()
+
     const message = tag?.ndefMessage?.find(
-      (el) => Ndef.text.decodePayload(new Uint8Array(el.payload)).indexOf("lnurl") !== -1,
+      (el) => {
+        const payload = Ndef.text.decodePayload(new Uint8Array(el.payload))
+
+        el.payload = payload
+        return payload.toUpperCase().indexOf("LNURL") !== -1
+      } 
     )
 
     if (message && message?.payload) {
-      result.data = Ndef.text.decodePayload(new Uint8Array(message.payload))
+      result.data = message.payload
       result.success = true
+    } else {
+      throw NfcError.FirstNdefInvalid()
     }
   } catch (ex) {
-    result.errorMessage = ex.constructor.name
+    result.errorMessage = getErrorType(ex)
   } finally {
     NfcManager.cancelTechnologyRequest()
   }
@@ -103,9 +127,57 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
     modalNfcVisibleVar(false)
   }
 
-  if (!result.success) {
+  if (!result.success && !result.errorMessage) {
     result.errorMessage = "Unexpected"
   }
 
   return result
+}
+
+const getErrorType = (ex) => {
+  if (ex instanceof NfcError.UnsupportedFeature) {
+    return "UnsupportedFeature"
+  } else if (ex instanceof NfcError.SecurityViolation) {
+    return "SecurityViolation"
+  } else if (ex instanceof NfcError.InvalidParameter) {
+    return "InvalidParameter"
+  } else if (ex instanceof NfcError.InvalidParameterLength) {
+    return "InvalidParameterLength"
+  } else if (ex instanceof NfcError.ParameterOutOfBound) {
+    return "ParameterOutOfBound"
+  } else if (ex instanceof NfcError.RadioDisabled) {
+    return "RadioDisabled"
+  } else if (ex instanceof NfcError.TagConnectionLost) {
+    return "TagConnectionLost"
+  } else if (ex instanceof NfcError.RetryExceeded) {
+    return "RetryExceeded"
+  } else if (ex instanceof NfcError.TagResponseError) {
+    return "TagResponseError"
+  } else if (ex instanceof NfcError.SessionInvalidated) {
+    return "SessionInvalidated"
+  } else if (ex instanceof NfcError.TagNotConnected) {
+    return "TagNotConnected"
+  } else if (ex instanceof NfcError.PacketTooLong) {
+    return "PacketTooLong"
+  } else if (ex instanceof NfcError.UserCancel) {
+    return "UserCancel"
+  } else if (ex instanceof NfcError.Timeout) {
+    return "Timeout"
+  } else if (ex instanceof NfcError.Unexpected) {
+    return "Unexpected"
+  } else if (ex instanceof NfcError.SystemBusy) {
+    return "SystemBusy"
+  } else if (ex instanceof NfcError.FirstNdefInvalid) {
+    return "FirstNdefInvalid"
+  } else if (ex instanceof NfcError.InvalidConfiguration) {
+    return "InvalidConfiguration"
+  } else if (ex instanceof NfcError.TagNotWritable) {
+    return "TagNotWritable"
+  } else if (ex instanceof NfcError.TagUpdateFailure) {
+    return "TagUpdateFailure"
+  } else if (ex instanceof NfcError.TagSizeTooSmall) {
+    return "TagSizeTooSmall"
+  } else if (ex instanceof NfcError.ZeroLengthMessage) {
+    return "ZeroLengthMessage"
+  }
 }

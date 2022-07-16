@@ -8,5 +8,5 @@ export const getLnurlPayEncodedString = (username: string): string => {
       Buffer.from(`${GALOY_PAY_DOMAIN}.well-known/lnurlp/${username}`, "utf8"),
     ),
     1500,
-  )
+  ).toUpperCase()
 }
