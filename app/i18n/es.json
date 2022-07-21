@@ -604,7 +604,7 @@
     "cost": "Costo",
     "fee": "tarifa de red",
     "feeCalculationUnsuccessful": "Error al calcular, inténtelo de nuevo ⚠️",
-    "input": "nombre de usuario o factura",
+    "input": "dirección, nombre de usuario o factura",
     "invalidUsername": "Nombre de usuario no válido",
     "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
     "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
