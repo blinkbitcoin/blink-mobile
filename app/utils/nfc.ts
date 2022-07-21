@@ -45,7 +45,7 @@ export const writeNfcTag = async (
 
     const bytes = Ndef.encodeMessage([
       Ndef.uriRecord(payUrlString),
-      Ndef.textRecord(lnurlEncodedString),
+      Ndef.uriRecord(lnurlEncodedString),
     ])
 
     await NfcManager.ndefHandler.writeNdefMessage(bytes)
@@ -106,8 +106,8 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
       (el) => {
         const payload = Ndef.text.decodePayload(new Uint8Array(el.payload))
 
-        el.payload = payload
-        return payload.toUpperCase().indexOf("LNURL") !== -1
+        el.payload = payload.toLowerCase().replace("lightning://", "").replace("lightning:", "").toUpperCase()
+        return el.payload.indexOf("LNURL") !== -1
       } 
     )
 

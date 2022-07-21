@@ -51,6 +51,9 @@ export type RootStackParamList = {
   transactionDetail: TransactionDetail
   transactionHistory: undefined
   Earn: undefined
+  routeLnurl: {
+    lnurl: string
+  }
 }
 
 export type ContactStackParamList = {

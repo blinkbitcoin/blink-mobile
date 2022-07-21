@@ -12,6 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Removing the access InAppBrowser package adds -->
+    <uses-permission tools:node="remove" android:name="android.permission.QUERY_ALL_PACKAGES" />
+
     <!-- TODO android:roundIcon="@mipmap/ic_launcher_round" -->
     <application
       android:name=".MainApplication"
@@ -62,6 +65,9 @@
     <meta-data
       android:name="com.google.firebase.messaging.default_notification_icon"
       android:resource="@drawable/ic_stat_name" />
+
+    <meta-data tools:replace="android:value" android:name="google_analytics_adid_collection_enabled" android:value="false" />
+
 
      <!-- You will also only need to add this uses-library tag -->
     <uses-library android:name="org.apache.http.legacy" android:required="false"/>

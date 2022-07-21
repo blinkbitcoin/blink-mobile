@@ -21,6 +21,7 @@ import {
   NavigationContainer,
   NavigationState,
   PartialState,
+  getStateFromPath,
 } from "@react-navigation/native"
 import { AsyncStorageWrapper, CachePersistor } from "apollo3-cache-persist"
 import "node-libs-react-native/globals" // needed for Buffer?
@@ -237,7 +238,7 @@ export const App = (): JSX.Element => {
 
   // As of react-navigation 6.x, this code has type problems too
   const linking = {
-    prefixes: ["https://pay.bitcoinjungle.app", "bitcoinjungle://"],
+    prefixes: ["https://pay.bitcoinjungle.app", "bitcoinjungle://", "lightning://", "lightning:"],
     config: {
       screens: hasToken
         ? {
@@ -245,6 +246,26 @@ export const App = (): JSX.Element => {
             moveMoney: "/",
           }
         : null,
+    },
+    getStateFromPath: (path, options) => {
+      let state = getStateFromPath(path, options)
+
+      if(hasToken && path.toUpperCase().indexOf('LNURL') === 0) {
+        state = {
+          ...state,
+          routes: [
+            {
+              name: 'RouteLnurlScreen',
+              path,
+              params: {
+                lnurl: path,
+              }
+            },
+          ],
+        }
+      }
+
+      return state
     },
   }
 
