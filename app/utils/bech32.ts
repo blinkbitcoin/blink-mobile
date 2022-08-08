@@ -10,3 +10,13 @@ export const getLnurlPayEncodedString = (username: string): string => {
     1500,
   ).toUpperCase()
 }
+
+export const getLnurlEncodedCustomString = (str: string): string => {
+  return bech32.encode(
+    "lnurl",
+    bech32.toWords(
+      Buffer.from(str, "utf8"),
+    ),
+    1500,
+  ).toUpperCase()
+}

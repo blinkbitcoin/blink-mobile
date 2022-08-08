@@ -54,6 +54,10 @@ export const writeNfcTag = async (
       await NfcManager.ndefHandler.makeReadOnly()
     }
 
+    if (Platform.OS === 'ios') {
+      await NfcManager.setAlertMessageIOS('Success');
+    }
+
     result.success = true
   } catch (ex) {
     result.errorMessage = getErrorType(ex)
@@ -98,16 +102,20 @@ export const readNfcTag = async (): Promise<ReadNfcReturn> => {
       modalNfcVisibleVar(true)
     }
 
-    await NfcManager.requestTechnology(NfcTech.Ndef)
+    await NfcManager.requestTechnology([NfcTech.Ndef, NfcTech.IsoDep])
 
     const tag = await NfcManager.getTag()
+
+    if (Platform.OS === 'ios') {
+      await NfcManager.setAlertMessageIOS('Success');
+    }
 
     const message = tag?.ndefMessage?.find(
       (el) => {
         const payload = Ndef.text.decodePayload(new Uint8Array(el.payload))
 
-        el.payload = payload.toLowerCase().replace("lightning://", "").replace("lightning:", "").toUpperCase()
-        return el.payload.indexOf("LNURL") !== -1
+        el.payload = payload.replace("LIGHTNING://", "").replace("LIGHTNING:", "").replace("lightning://", "").replace("lightning:", "")
+        return el.payload.toUpperCase().indexOf("LNURL") !== -1
       } 
     )
 

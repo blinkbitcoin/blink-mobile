@@ -6,6 +6,8 @@ import { getDescription, getDestination, getUsername } from "./bolt11"
 import { utils } from "lnurl-pay"
 import type { INetwork } from "../types/network"
 import * as parsing from "./parsing"
+import { getLnurlEncodedCustomString } from "./bech32"
+
 
 // TODO: look if we own the address
 
@@ -67,9 +69,9 @@ export const validPayment = (
   }
 
   // input might start with 'lightning:', 'bitcoin:'
-  if (input.toLowerCase().startsWith("lightning:lnurl")) {
+  if (input.toLowerCase().startsWith("lightning:lnurl") || input.toLowerCase().startsWith("lightning://lnurl")) {
     /* eslint-disable no-param-reassign */
-    input = input.replace("lightning:", "").replace("LIGHTNING:", "")
+    input = input.replace("lightning://", "").replace("LIGHTNING://", "").replace("lightning:", "").replace("LIGHTNING:", "")
   }
   // eslint-disable-next-line prefer-const
   let [protocol, data] = input.split(":")
@@ -91,8 +93,15 @@ export const validPayment = (
   ) {
     paymentType = "lnurl"
 
-    lnurl = protocol || data
-
+    if(protocol && data && !data.toLowerCase().startsWith('lnurl')) {
+      if(!data.toLowerCase().startsWith('https:')) {
+        lnurl = getLnurlEncodedCustomString('https:' + data)
+      } else {
+        lnurl = getLnurlEncodedCustomString(data)
+      }
+    } else {
+      lnurl = protocol || data
+    }
     // no protocol. let's see if this could have an address directly
   } else if (protocol.toLowerCase().startsWith("ln")) {
     // possibly a lightning address?
