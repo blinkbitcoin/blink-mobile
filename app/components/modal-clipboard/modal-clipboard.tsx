@@ -1,5 +1,5 @@
 import { useApolloClient, useReactiveVar } from "@apollo/client"
-import Clipboard from "@react-native-community/clipboard"
+import Clipboard from "@react-native-clipboard/clipboard"
 import { useNavigation } from "@react-navigation/native"
 import * as React from "react"
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native"
@@ -22,6 +22,7 @@ import type { StackNavigationProp } from "@react-navigation/stack"
 import type { ComponentType } from "../../types/jsx"
 import type { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import useMainQuery from "@app/hooks/use-main-query"
+import { getParams, LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -85,8 +86,57 @@ export const ModalClipboard: ComponentType = () => {
   const open = async () => {
     modalClipboardVisibleVar(false)
 
-    //TODO!!!
-    navigation.navigate("sendBitcoin", { payment: await Clipboard.getString() })
+    if(!Clipboard.hasString()) {
+      return
+    }
+
+    const data = await Clipboard.getString()
+
+    try {
+      const { valid, lnurl } = validPayment(data, tokenNetwork, myPubKey, username)
+      if (valid) {
+        if (lnurl) {
+         
+          const lnurlParams = await getParams(lnurl)
+
+          if ("reason" in lnurlParams) {
+            throw lnurlParams.reason
+          }
+
+          switch (lnurlParams.tag) {
+            case "payRequest":
+              navigation.navigate("sendBitcoin", {
+                payment: data,
+                lnurlParams: lnurlParams as LNURLPayParams,
+              })
+              
+              break
+            case "withdrawRequest":
+              navigation.navigate("receiveBitcoin", {
+                payment: data,
+                lnurlParams: lnurlParams as LNURLWithdrawParams,
+              })
+
+              break
+           
+            default:
+              throw "invalid lnurl tag"
+              break
+          }
+        } else {
+          navigation.navigate("sendBitcoin", { payment: data })
+        }
+      }
+    } catch (err) {
+      console.log(err.toString())
+    }
+
+    cache.writeQuery({
+      query: LAST_CLIPBOARD_PAYMENT,
+      data: {
+        lastClipboardPayment: data,
+      },
+    })
   }
 
   const dismiss = async () => {
@@ -111,7 +161,7 @@ export const ModalClipboard: ComponentType = () => {
       const clipboard = await Clipboard.getString()
       const { paymentType } = validPayment(clipboard, tokenNetwork, myPubKey, username)
       const pathString =
-        paymentType === "lightning"
+        paymentType === "lightning" || paymentType === "lnurl"
           ? "ModalClipboard.pendingInvoice"
           : "ModalClipboard.pendingBitcoin"
       setMessage(translate(pathString))

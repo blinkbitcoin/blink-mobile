@@ -489,17 +489,17 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 337;
+				CURRENT_PROJECT_VERSION = 339;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BitcoinJungle/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Jungle";
+				INFOPLIST_KEY_CFBundleDisplayName = BitcoinJungle;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -524,16 +524,16 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 337;
+				CURRENT_PROJECT_VERSION = 339;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BitcoinJungle/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Jungle";
+				INFOPLIST_KEY_CFBundleDisplayName = BitcoinJungle;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

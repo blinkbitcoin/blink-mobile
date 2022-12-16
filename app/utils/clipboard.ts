@@ -1,4 +1,4 @@
-import Clipboard from "@react-native-community/clipboard"
+import Clipboard from "@react-native-clipboard/clipboard"
 import { ApolloClient } from "@apollo/client"
 
 import { validPayment } from "./parsing"
@@ -20,6 +20,9 @@ export const showModalClipboardIfValidPayment = async (
   // eslint-disable-next-line @typescript-eslint/ban-types
   { network, myPubKey, username }: ShowModalClipboardIfValidPaymentInput,
 ): Promise<void> => {
+  if(!Clipboard.hasString()) {
+    return 
+  }
   const clipboard = await Clipboard.getString()
 
   const data = cache.readQuery<{ lastClipboardPayment?: string }, never>({

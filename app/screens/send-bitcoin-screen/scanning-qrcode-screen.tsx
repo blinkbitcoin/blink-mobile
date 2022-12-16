@@ -19,7 +19,7 @@ import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import { StackNavigationProp } from "@react-navigation/stack"
 import useToken from "../../utils/use-token"
 import useMainQuery from "@app/hooks/use-main-query"
-import Clipboard from "@react-native-community/clipboard"
+import Clipboard from "@react-native-clipboard/clipboard"
 
 const CAMERA: ViewStyle = {
   width: "100%",

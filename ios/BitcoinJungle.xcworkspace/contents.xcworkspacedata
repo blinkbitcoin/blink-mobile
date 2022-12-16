@@ -2,9 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:BitcoinJungle.xcodeproj">
+      location = "group:/Users/lee/apps/galoy-mobile/ios/BitcoinJungle.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:BitcoinJungle.xcodeproj">
    </FileRef>
 </Workspace>

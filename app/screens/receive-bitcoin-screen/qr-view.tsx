@@ -1,4 +1,4 @@
-import Clipboard from "@react-native-community/clipboard"
+import Clipboard from "@react-native-clipboard/clipboard"
 import { StackNavigationProp } from "@react-navigation/stack"
 import LottieView from "lottie-react-native"
 import * as React from "react"
