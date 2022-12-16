@@ -96,6 +96,8 @@
 	<string>Activate your camera to scan QR codes</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires FaceID access for quick and secure authentication.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Find Merchant who accepts Lightning payments</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Find Merchant who accepts Lightning payments</string>
 	<key>NSPhotoLibraryUsageDescription</key>
