@@ -140,7 +140,8 @@ android {
         // 1.9.0 doesnt work with android sdk 32
         configurations.all {
             resolutionStrategy { 
-                force 'androidx.core:core:1.8.0'
+                force 'androidx.core:core:1.9.0'
+                force 'com.facebook.react:react-native:0.66.4'
             }
         }
 
