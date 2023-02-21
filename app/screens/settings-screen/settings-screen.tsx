@@ -112,11 +112,11 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
         translate("SettingsScreen.lnurlNoUsername"),
         [
           {
-            text: translate("Common.yes"),
+            text: translate("common.yes"),
             onPress: () => navigation.navigate("setUsername"),
           },
           {
-            text: translate("Common.no"),
+            text: translate("common.no"),
           },
         ],
       )
