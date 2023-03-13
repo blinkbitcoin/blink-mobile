@@ -2495,7 +2495,8 @@
     "headerVerify": "¿Eres un robot?",
     "placeholder": "Número de teléfono",
     "verify": "No soy un robot",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "whatsapp": "Enviar Por WhatsApp?"
   },
   "WelcomePhoneValidationScreen": {
     "errorLoggingIn": "Error al iniciar sesión. ¿Usó el código correcto?",

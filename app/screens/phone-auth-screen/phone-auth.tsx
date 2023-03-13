@@ -18,6 +18,7 @@ import PhoneInput from "react-native-phone-number-input"
 import analytics from "@react-native-firebase/analytics"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp } from "@react-navigation/native"
+import CheckBox from '@react-native-community/checkbox';
 
 import { CloseCross } from "../../components/close-cross"
 import { Screen } from "../../components/screen"
@@ -150,6 +151,13 @@ const styles = EStyleSheet.create({
     paddingHorizontal: "25rem",
     textAlign: "center",
   },
+
+  whatsappRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: "50rem",
+    textAlign: "center",
+  },
 })
 
 type WelcomePhoneInputScreenProps = {
@@ -169,6 +177,7 @@ export const WelcomePhoneInputScreen: ScreenType = ({
   } = useGeetestCaptcha()
 
   const [phoneNumber, setPhoneNumber] = useState("")
+  const [whatsapp, setWhatsApp] = useState(false)
 
   const phoneInputRef = useRef<PhoneInput | null>()
 
@@ -200,6 +209,7 @@ export const WelcomePhoneInputScreen: ScreenType = ({
     try {
       const input = {
         phone: phoneNumber,
+        whatsapp: whatsapp,
         challengeCode: geetestValidationData?.geetestChallenge,
         validationCode: geetestValidationData?.geetestValidate,
         secCode: geetestValidationData?.geetestSecCode,
@@ -322,6 +332,15 @@ export const WelcomePhoneInputScreen: ScreenType = ({
               codeTextStyle={{ marginLeft: -25 }}
               autoFocus
             />
+            <View style={styles.whatsappRow}>
+              <Text>
+                {translate("WelcomePhoneInputScreen.whatsapp")}
+              </Text>
+              <CheckBox
+                value={whatsapp}
+                onValueChange={(newValue) => setWhatsApp(newValue)}
+              />
+            </View>
             <ActivityIndicator
               animating={loadingRequestPhoneCode}
               size="large"

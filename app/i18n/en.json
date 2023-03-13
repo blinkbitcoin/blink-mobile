@@ -2471,7 +2471,8 @@
     "headerVerify": "Verify you are human",
     "placeholder": "Phone Number",
     "verify": "Click to Verify",
-    "continue": "Continue"
+    "continue": "Continue",
+    "whatsapp": "Send Over WhatsApp?"
   },
   "WelcomePhoneValidationScreen": {
     "errorLoggingIn": "Error logging in. Did you use the right code?",
