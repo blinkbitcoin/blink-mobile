@@ -133,6 +133,18 @@ export const SendBitcoinScreen: ScreenType = ({
     setIsSendLockEnabled(await KeyStoreWrapper.getIsSendLockEnabled())
   }
 
+  useEffect(() => {
+    if (lnurlPay.minSendable == lnurlPay.maxSendable) {
+      if (primaryAmount.currency === "USD") {
+        toggleCurrency()
+      }
+
+      setTimeout(() => {
+        setPrimaryAmountValue(lnurlPay.minSendable)
+      }, 100)
+    }
+  }, [lnurlPay])
+
   const reset = useCallback(() => {
     setInvoiceError("")
     setAddress("")
@@ -390,6 +402,7 @@ export const SendBitcoinScreen: ScreenType = ({
           address,
           amountless,
           invoice: lnurlInvoice.pr,
+          lnurlSuccessAction: lnurlInvoice.successAction,
           memo,
           paymentType,
           primaryCurrency,

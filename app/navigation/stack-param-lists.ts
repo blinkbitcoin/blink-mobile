@@ -1,4 +1,4 @@
-import { LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
+import { LNURLPayParams, LNURLPaySuccessAction, LNURLWithdrawParams } from "js-lnurl"
 import { contacts_me_contacts } from "../screens/contacts-screen/__generated__/contacts"
 import { AccountType, AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 import { IPaymentType } from "../utils/parsing"
@@ -83,6 +83,7 @@ export type MoveMoneyStackParamList = {
     address: string | null
     amountless: boolean
     invoice: string | null
+    lnurlSuccessAction?: LNURLPaySuccessAction
     memo: string | null
     paymentType: IPaymentType
     primaryCurrency: CurrencyType

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useEffect, useMemo, useState } from "react"
-import { Text, View } from "react-native"
+import { Linking, Alert, Text, View } from "react-native"
 import { Button } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { gql, useApolloClient, useMutation } from "@apollo/client"
@@ -92,6 +92,7 @@ export const SendBitcoinConfirmationScreen = ({
     address,
     amountless,
     invoice,
+    lnurlSuccessAction,
     memo,
     paymentType,
     primaryCurrency,
@@ -143,6 +144,34 @@ export const SendBitcoinConfirmationScreen = ({
     if (status === "SUCCESS") {
       fetchMainQuery(client, { hasToken: true })
       setStatus(Status.SUCCESS)
+
+      if (lnurlSuccessAction) {
+        if (lnurlSuccessAction.tag === "message") {
+          Alert.alert(
+            translate("common.success"),
+            lnurlSuccessAction.message,
+            [
+              {
+                text: translate("common.ok"),
+              },
+            ],
+          )
+        } else if (lnurlSuccessAction.tag === "url") {
+          Alert.alert(
+            translate("common.success"),
+            lnurlSuccessAction.description,
+            [
+              {
+                text: translate("common.ok"),
+                onPress: () => Linking.openURL(lnurlSuccessAction.url),
+              },
+              {
+                text: translate("common.cancel"),
+              },
+            ],
+          )
+        }
+      }
     } else if (status === "PENDING") {
       setStatus(Status.PENDING)
     } else {
