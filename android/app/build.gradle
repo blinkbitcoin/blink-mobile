@@ -132,7 +132,7 @@ android {
         applicationId "app.bitcoinjungle.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 343
+        versionCode 345
         versionName "1.1.6"
         missingDimensionStrategy 'react-native-camera', 'general' // React native camera
 
