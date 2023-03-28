@@ -134,7 +134,7 @@ export const SendBitcoinScreen: ScreenType = ({
   }
 
   useEffect(() => {
-    if (lnurlPay.minSendable == lnurlPay.maxSendable) {
+    if (lnurlPay.lnurl !== "" && lnurlPay.minSendable > 0 && lnurlPay.minSendable == lnurlPay.maxSendable) {
       if (primaryAmount.currency === "USD") {
         toggleCurrency()
       }
