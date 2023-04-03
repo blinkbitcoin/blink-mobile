@@ -5,6 +5,7 @@ export default class KeyStoreWrapper {
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SEND_LOCK = "sendLock"
+  private static readonly POINT_OF_SALE = "pointOfSaleList"
 
   public static async getIsBiometricsEnabled(): Promise<boolean> {
     try {
@@ -127,6 +128,35 @@ export default class KeyStoreWrapper {
   public static async removeIsSendLockEnabled(): Promise<boolean> {
     try {
       await RNSecureKeyStore.remove(KeyStoreWrapper.SEND_LOCK)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async getPointOfSales(): Promise<array> {
+    try {
+      const data = await RNSecureKeyStore.get(KeyStoreWrapper.POINT_OF_SALE)
+      return JSON.parse(data)
+    } catch {
+      return []
+    }
+  }
+
+  public static async setPointOfSales(arr: array): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.POINT_OF_SALE, JSON.stringify(arr), {
+        accessible: ACCESSIBLE.ALWAYS,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removePointOfSales(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.POINT_OF_SALE)
       return true
     } catch {
       return false

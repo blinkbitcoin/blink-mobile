@@ -19,7 +19,7 @@ import { translate } from "@app/i18n"
 import { color } from "@app/theme"
 
 import useMainQuery from "@app/hooks/use-main-query"
-import { saveString, loadString } from "../../utils/storage"
+import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
@@ -96,7 +96,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const data = JSON.parse(await loadString("pointOfSaleList"))
+        const data = await KeyStoreWrapper.getPointOfSales()
 
         if (data) {
           setStoreData(data)
@@ -157,8 +157,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
         setDefaultCurrency("CRC")
         setDefaultLanguage("en")
 
-        await saveString("pointOfSaleList", JSON.stringify(newStoreData))
-
+        await KeyStoreWrapper.setPointOfSales(newStoreData)
       } else {
         throw new Error(translate("errors.unexpectedError"))
       }

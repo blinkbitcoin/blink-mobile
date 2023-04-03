@@ -318,7 +318,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       id: "pointOfSaleLink",
       action: () => navigation.navigate("pointOfSale"),
       enabled: hasToken && username !== null,
-      grayed: !hasToken || username === null,
+      greyed: !hasToken || username === null,
     },
     {
       category: translate("whatsapp.contactUs"),
