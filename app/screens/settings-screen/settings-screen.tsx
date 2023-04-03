@@ -313,6 +313,14 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       greyed: !hasToken || username === null,
     },
     {
+      category: translate("PointOfSaleScreen.title"),
+      icon: "compass-outline",
+      id: "pointOfSaleLink",
+      action: () => navigation.navigate("pointOfSale"),
+      enabled: hasToken && username !== null,
+      grayed: !hasToken || username === null,
+    },
+    {
       category: translate("whatsapp.contactUs"),
       icon: "ios-logo-whatsapp",
       id: "contact-us",

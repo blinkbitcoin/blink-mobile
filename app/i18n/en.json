@@ -493,6 +493,15 @@
     "tooManyAttempts": "Too many failed attempts. Logging out.",
     "verifyPin": "Verify your PIN code"
   },
+  "PointOfSaleScreen": {
+    "title": "Point of Sale",
+    "create": "Create Point of Sale",
+    "myTitle": "My Points of Sale",
+    "none": "No Point of Sale found.",
+    "storeName": "Store Name",
+    "link": "Link",
+    "currency": "Currency"
+  },
   "PriceScreen": {
     "oneDay": "1D",
     "oneMonth": "1M",

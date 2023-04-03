@@ -534,6 +534,15 @@
     "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
     "verifyPin": "Verifique su PIN"
   },
+  "PointOfSaleScreen": {
+    "title": "Punto de Venta",
+    "create": "Crear Punto de Venta",
+    "myTitle": "Mis Puntos de Venta",
+    "none": "No se encuentra punto de venta.",
+    "storeName": "Nombre de Tienda",
+    "link": "Enlace",
+    "currency": "Moneda"
+  },
   "PriceScreen": {
     "oneDay": "1D",
     "oneMonth": "1M",

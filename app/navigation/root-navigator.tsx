@@ -43,6 +43,7 @@ import {
 import { SettingsScreen, UsernameScreen } from "../screens/settings-screen"
 import { LanguageScreen } from "../screens/settings-screen/language-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
+import { PointOfSaleScreen } from "../screens/settings-screen/point-of-sale-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreenDataInjected } from "../screens/transaction-screen/transaction-screen"
 import { WelcomeFirstScreen } from "../screens/welcome-screens"
@@ -379,6 +380,11 @@ export const RootStack: NavigatorType = () => {
         name="security"
         component={SecurityScreen}
         options={{ title: translate("common.security") }}
+      />
+      <RootNavigator.Screen
+        name="pointOfSale"
+        component={PointOfSaleScreen}
+        options={{ title: translate("PointOfSaleScreen.title") }}
       />
       <RootNavigator.Screen
         name="lnurl"

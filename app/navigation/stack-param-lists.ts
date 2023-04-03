@@ -35,6 +35,7 @@ export type RootStackParamList = {
   }
   settings: undefined
   setUsername: undefined
+  pointOfSale: undefined
   language: undefined
   security: {
     mIsBiometricsEnabled: boolean
