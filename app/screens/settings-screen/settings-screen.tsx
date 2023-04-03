@@ -281,8 +281,8 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       greyed: !hasToken,
     },
     {
-      category: "lnurl",
-      icon: "ios-globe",
+      category: translate("common.lnurl"),
+      icon: "qr-code-outline",
       id: "lnurl",
       action: lnurlAction,
       enabled: hasToken,

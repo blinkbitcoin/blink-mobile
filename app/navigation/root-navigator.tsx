@@ -389,7 +389,7 @@ export const RootStack: NavigatorType = () => {
       <RootNavigator.Screen
         name="lnurl"
         component={LnurlScreen}
-        options={{ title: "Lnurl" }}
+        options={{ title: translate("common.lnurl") }}
       />
       <RootNavigator.Screen name="Profile" component={DebugScreen} />
       <RootNavigator.Screen
