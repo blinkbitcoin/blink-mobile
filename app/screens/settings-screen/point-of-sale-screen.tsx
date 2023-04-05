@@ -194,6 +194,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
               onChangeText={setStoreOwnerEmail}
               value={storeOwnerEmail}
               placeholder={translate("common.email")}
+               placeholderTextColor="#000000"
             />
 
             <TextInput
@@ -201,6 +202,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
               onChangeText={setStoreName}
               value={storeName}
               placeholder={translate("PointOfSaleScreen.storeName")}
+              placeholderTextColor="#000000" 
             />
 
             <Dropdown label={translate("PointOfSaleScreen.currency")} data={[{label: "CRC", value: "CRC"},{label: "USD", value: "USD"}]} onSelect={setDefaultCurrency} />
