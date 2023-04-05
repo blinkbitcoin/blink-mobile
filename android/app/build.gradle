@@ -237,6 +237,9 @@ dependencies {
     // implementation 'com.google.firebase:firebase-inappmessaging:19.0.6'
     // implementation 'com.google.firebase:firebase-inappmessaging-display:19.0.6'
 
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.google.code.gson:gson:2.8.9'
+
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermes-engine/android/";
       debugImplementation files(hermesPath + "hermes-debug.aar")
