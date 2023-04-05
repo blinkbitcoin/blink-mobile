@@ -11,6 +11,12 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		9B843E5229DCD7B000740933 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B843E5129DCD7B000740933 /* WidgetKit.framework */; };
+		9B843E5429DCD7B000740933 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B843E5329DCD7B000740933 /* SwiftUI.framework */; };
+		9B843E5729DCD7B000740933 /* pricewidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B843E5629DCD7B000740933 /* pricewidgetBundle.swift */; };
+		9B843E5929DCD7B000740933 /* pricewidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B843E5829DCD7B000740933 /* pricewidget.swift */; };
+		9B843E5C29DCD7B100740933 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B843E5B29DCD7B100740933 /* Assets.xcassets */; };
+		9B843E6329DCD7B100740933 /* pricewidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9B843E5029DCD7B000740933 /* pricewidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9FD9EC89A207E68E9927AC2A /* libPods-BitcoinJungle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E56FD9E96F3DEA77631B00 /* libPods-BitcoinJungle.a */; };
 		C61EE0AD23C530E30054100C /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C61EE0AC23C530E30054100C /* AuthenticationServices.framework */; };
 		C6A433CD2457478B00AA6FFC /* DMSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C6A433C72457478A00AA6FFC /* DMSans-BoldItalic.ttf */; };
@@ -22,6 +28,30 @@
 		C6E810012333FDA500D41794 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C6E810002333FDA400D41794 /* GoogleService-Info.plist */; };
 		C6FCE05924592E5E0076B3C0 /* LottieEmptyFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6FCE05824592E5E0076B3C0 /* LottieEmptyFile.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9B843E6029DCD7B100740933 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9B843E4F29DCD7B000740933;
+			remoteInfo = pricewidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9B843E6229DCD7B100740933 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9B843E6329DCD7B100740933 /* pricewidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -52,6 +82,13 @@
 		82BC61FD324542C5B6EE33A9 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		8BB9CB264CB6434FA3B52051 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		8E61CF3177BB740CC912E867 /* Pods-BitcoinJungle.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BitcoinJungle.debug.xcconfig"; path = "Target Support Files/Pods-BitcoinJungle/Pods-BitcoinJungle.debug.xcconfig"; sourceTree = "<group>"; };
+		9B843E5029DCD7B000740933 /* pricewidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = pricewidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B843E5129DCD7B000740933 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9B843E5329DCD7B000740933 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9B843E5629DCD7B000740933 /* pricewidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pricewidgetBundle.swift; sourceTree = "<group>"; };
+		9B843E5829DCD7B000740933 /* pricewidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pricewidget.swift; sourceTree = "<group>"; };
+		9B843E5B29DCD7B100740933 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9B843E5D29DCD7B100740933 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B292BC69030949C6A27FA47B /* DMSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Regular.ttf"; path = "../app/theme/fonts/DMSans-Regular.ttf"; sourceTree = "<group>"; };
 		B32B7D09D5FF45EB8C3689F2 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		B5173FE621CC41AB828DE6C0 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
@@ -98,6 +135,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B843E4D29DCD7B000740933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B843E5429DCD7B000740933 /* SwiftUI.framework in Frameworks */,
+				9B843E5229DCD7B000740933 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -123,6 +169,8 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				76E56FD9E96F3DEA77631B00 /* libPods-BitcoinJungle.a */,
+				9B843E5129DCD7B000740933 /* WidgetKit.framework */,
+				9B843E5329DCD7B000740933 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -180,6 +228,7 @@
 				C69AA16B232DD68A00606E11 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* BitcoinJungle */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				9B843E5529DCD7B000740933 /* pricewidget */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				52DBFAFEE2028D1D4AE01CB9 /* Pods */,
@@ -195,8 +244,20 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* Bitcoin Jungle.app */,
+				9B843E5029DCD7B000740933 /* pricewidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9B843E5529DCD7B000740933 /* pricewidget */ = {
+			isa = PBXGroup;
+			children = (
+				9B843E5629DCD7B000740933 /* pricewidgetBundle.swift */,
+				9B843E5829DCD7B000740933 /* pricewidget.swift */,
+				9B843E5B29DCD7B100740933 /* Assets.xcassets */,
+				9B843E5D29DCD7B100740933 /* Info.plist */,
+			);
+			path = pricewidget;
 			sourceTree = "<group>";
 		};
 		C69AA16B232DD68A00606E11 /* Fonts */ = {
@@ -246,15 +307,34 @@
 				702F1602462FA36568C29239 /* [CP] Copy Pods Resources */,
 				03E4FC2B4F75A9058A3B3515 /* [CP-User] [RNFB] Core Configuration */,
 				29C2473E55DF9E4F9AA06144 /* [CP-User] [RNFB] Crashlytics Configuration */,
+				9B843E6229DCD7B100740933 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9B843E6129DCD7B100740933 /* PBXTargetDependency */,
 			);
 			name = BitcoinJungle;
 			productName = BitcoinJungle;
 			productReference = 13B07F961A680F5B00A75B9A /* Bitcoin Jungle.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9B843E4F29DCD7B000740933 /* pricewidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B843E6629DCD7B100740933 /* Build configuration list for PBXNativeTarget "pricewidgetExtension" */;
+			buildPhases = (
+				9B843E4C29DCD7B000740933 /* Sources */,
+				9B843E4D29DCD7B000740933 /* Frameworks */,
+				9B843E4E29DCD7B000740933 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pricewidgetExtension;
+			productName = pricewidgetExtension;
+			productReference = 9B843E5029DCD7B000740933 /* pricewidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -262,12 +342,18 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = "Galoy Inc";
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = QU8N6UZ5LD;
 						LastSwiftMigration = 1140;
+						ProvisioningStyle = Automatic;
+					};
+					9B843E4F29DCD7B000740933 = {
+						CreatedOnToolsVersion = 14.3;
+						DevelopmentTeam = QU8N6UZ5LD;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -286,6 +372,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* BitcoinJungle */,
+				9B843E4F29DCD7B000740933 /* pricewidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -304,6 +391,14 @@
 				C6A433CE2457478B00AA6FFC /* DMSans-MediumItalic.ttf in Resources */,
 				C6A433CF2457478B00AA6FFC /* DMSans-Italic.ttf in Resources */,
 				C6A433D22457478B00AA6FFC /* DMSans-Medium.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B843E4E29DCD7B000740933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B843E5C29DCD7B100740933 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,19 +572,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B843E4C29DCD7B000740933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B843E5729DCD7B000740933 /* pricewidgetBundle.swift in Sources */,
+				9B843E5929DCD7B000740933 /* pricewidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9B843E6129DCD7B100740933 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9B843E4F29DCD7B000740933 /* pricewidgetExtension */;
+			targetProxy = 9B843E6029DCD7B100740933 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8E61CF3177BB740CC912E867 /* Pods-BitcoinJungle.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 348;
+				CURRENT_PROJECT_VERSION = 350;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
@@ -519,12 +632,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 32C8F9F3674E86DDD62D1AFA /* Pods-BitcoinJungle.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 348;
+				CURRENT_PROJECT_VERSION = 350;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -666,6 +780,90 @@
 			};
 			name = Release;
 		};
+		9B843E6429DCD7B100740933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = QU8N6UZ5LD;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = pricewidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Jungle Price";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Galoy Inc. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.2/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.bitcoinjungle.ios.pricewidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9B843E6529DCD7B100740933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = QU8N6UZ5LD;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = pricewidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Jungle Price";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Galoy Inc. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.2/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.bitcoinjungle.ios.pricewidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -683,6 +881,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B843E6629DCD7B100740933 /* Build configuration list for PBXNativeTarget "pricewidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B843E6429DCD7B100740933 /* Debug */,
+				9B843E6529DCD7B100740933 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
