@@ -10,7 +10,13 @@ struct pricewidget: Widget {
         }
         .configurationDisplayName("Bitcoin Price")
         .description("Displays the current price of bitcoin.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryInline,
+            .accessoryCircular,
+            .accessoryRectangular
+        ])
     }
 }
 
@@ -59,13 +65,38 @@ struct BitcoinPriceProvider: TimelineProvider {
 
 struct BitcoinPriceView: View {
     let entry: BitcoinPriceProvider.Entry
+  
+    @Environment(\.widgetFamily) private var family
+  
+    var body: some View {
+        switch family {
+            case .systemSmall, .systemMedium:
+                NormalView(entry: entry)
+          case .accessoryInline, .accessoryRectangular, .accessoryCircular:
+                SmallView(entry: entry)
+            default:
+                SmallView(entry: entry)
+        }
+    }
+}
 
+struct NormalView: View {
+    let entry: BitcoinPriceProvider.Entry
     var body: some View {
         VStack {
             Text("Bitcoin Price")
                 .font(.headline)
             Text("$\(entry.price, specifier: "%.2f")")
                 .font(.title)
+        }
+    }
+}
+
+struct SmallView: View {
+    let entry: BitcoinPriceProvider.Entry
+    var body: some View {
+        VStack {
+            Text("$\(entry.price, specifier: "%.0f")")
         }
     }
 }
