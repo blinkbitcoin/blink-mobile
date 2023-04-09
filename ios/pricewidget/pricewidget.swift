@@ -4,19 +4,30 @@ import SwiftUI
 struct pricewidget: Widget {
     let kind: String = "pricewidget"
 
+    private var supportedFamilies: [WidgetFamily] {
+        if #available(iOSApplicationExtension 16.0, *) {
+            return [
+                .systemSmall,
+                .systemMedium,
+                .accessoryCircular,
+                .accessoryRectangular,
+                .accessoryInline
+            ]
+        } else {
+            return [
+                .systemSmall,
+                .systemMedium
+            ]
+        }
+    }
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: BitcoinPriceProvider()) { entry in
             BitcoinPriceView(entry: entry)
         }
         .configurationDisplayName("Bitcoin Price")
         .description("Displays the current price of bitcoin.")
-        .supportedFamilies([
-            .systemSmall,
-            .systemMedium,
-            .accessoryInline,
-            .accessoryCircular,
-            .accessoryRectangular
-        ])
+        .supportedFamilies(supportedFamilies)
     }
 }
 
@@ -65,17 +76,17 @@ struct BitcoinPriceProvider: TimelineProvider {
 
 struct BitcoinPriceView: View {
     let entry: BitcoinPriceProvider.Entry
-  
+
     @Environment(\.widgetFamily) private var family
-  
+
     var body: some View {
         switch family {
             case .systemSmall, .systemMedium:
                 NormalView(entry: entry)
-          case .accessoryInline, .accessoryRectangular, .accessoryCircular:
+            case .accessoryInline, .accessoryRectangular, .accessoryCircular:
                 SmallView(entry: entry)
             default:
-                SmallView(entry: entry)
+                NormalView(entry: entry)
         }
     }
 }
@@ -107,12 +118,4 @@ struct BitcoinJungleResponse: Codable {
     let USDCRC: Double
     let USDCAD: Double
     let timestamp: String
-}
-
-struct BitcoinPriceIndex: Codable {
-    let USD: BitcoinPrice
-}
-
-struct BitcoinPrice: Codable {
-    let rateFloat: Double
 }
