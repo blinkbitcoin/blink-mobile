@@ -461,7 +461,13 @@
     "locationPermissionPositive": "OK",
     "locationPermissionTitle": "Locate yourself on the map",
     "payBusiness": "pay this business",
-    "title": "Map"
+    "title": "Map",
+    "addToMap": "Add to Map",
+    "addingToMap": "Select location on map",
+    "finishAddingToMap": "Complete Form",
+    "modalTitle": "Add Business to Map",
+    "modalText": "You can use this form to add any business that accepts Bitcoin in Costa Rica to our map.",
+    "successText": "This business has been added successfully. It will now be reviewed by an admin. Once approved, it will show on the map"
   },
   "ModalClipboard": {
     "dismiss": "Dismiss",
@@ -714,7 +720,8 @@
     "username": "Username",
     "usernameRequired": "Username is required",
     "yes": "Yes",
-    "No": "No"
+    "No": "No",
+    "businessName": "Business Name"
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",

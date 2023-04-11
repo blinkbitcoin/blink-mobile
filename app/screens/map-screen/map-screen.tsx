@@ -4,7 +4,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import * as React from "react"
 import { useCallback } from "react"
 // eslint-disable-next-line react-native/split-platform-components
-import { PermissionsAndroid, StyleSheet, Text, View } from "react-native"
+import { PermissionsAndroid, StyleSheet, Text, View, Modal, TextInput, Alert } from "react-native"
 import { Button } from "react-native-elements"
 import MapView, { Callout, CalloutSubview, Marker } from "react-native-maps"
 import { Screen } from "../../components/screen"
@@ -15,6 +15,8 @@ import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"
 import { toastShow } from "../../utils/toast"
 import useToken from "../../utils/use-token"
+import { color } from "@app/theme"
+import useMainQuery from "@app/hooks/use-main-query"
 
 const QUERY_BUSINESSES = gql`
   query businessMapMarkers {
@@ -47,6 +49,50 @@ const styles = StyleSheet.create({
   },
 
   title: { color: palette.darkGrey, fontSize: 18 },
+
+  centeredView: {
+    marginTop: 100,
+  },
+
+  modalView: {
+    margin: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+  modalText: {
+    margin: 5,
+    textAlign: 'center',
+  },
+
+  input: {
+    height: 40,
+    margin: 10,
+    borderWidth: 1,
+    width: "90%",
+    padding: 5
+  },
+
+  cancelButton: {
+    margin: 5,
+    backgroundColor: palette.darkGrey,
+  },
+
+  addButton: {
+    margin: 5,
+    backgroundColor: color.primary,
+  }
+
 })
 
 type Props = {
@@ -57,6 +103,11 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const [isRefreshed, setIsRefreshed] = React.useState(false)
   const [otherPinData, setOtherPinData] = React.useState([])
+  const [showModal, setShowModal] = React.useState(false)
+  const [newPinCoordinates, setNewPinCoordinates] = React.useState(null)
+  const [businessName, setBusinessName] = React.useState("")
+  const [loading, setLoading] = React.useState(false)
+  const { username } = useMainQuery()
   const { data, error, refetch } = useQuery(QUERY_BUSINESSES, {
     notifyOnNetworkStatusChange: true,
   })
@@ -134,6 +185,59 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
     }, []),
   )
 
+  const handleMapOnPress = (e) => {
+    if(showModal) {
+      setNewPinCoordinates(e.nativeEvent.coordinate)
+    }
+  }
+
+  const addToMap = async () => {
+    setLoading(true)
+
+    const res = await fetch("https://maps.bitcoinjungle.app/api/add", {
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      "body": JSON.stringify({
+        name: businessName,
+        latitude: newPinCoordinates.latitude,
+        longitude: newPinCoordinates.longitude,
+        acceptsOnChain: true,
+        acceptsLightning: true,
+        bitcoinJungleUsername: username,
+      })
+    })
+
+    const resData = await res.json()
+
+    if(!res.ok) {
+      Alert.alert(`Error! ${resData.error}`, "", [
+        {
+          text: translate("common.ok"),
+          onPress: () => {
+            // here
+          },
+        },
+      ])
+    } else {
+      setShowModal(!showModal)
+      setNewPinCoordinates(null)
+      setBusinessName("")
+
+      Alert.alert(translate("MapScreen.successText"), "", [
+        {
+          text: translate("common.ok"),
+          onPress: () => {
+            // here
+          },
+        },
+      ])
+    }
+
+    setLoading(false)
+  }
+
   // React.useLayoutEffect(() => {
   //   navigation.setOptions(
   //     {
@@ -183,9 +287,60 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
 
   return (
     <Screen>
+      <Button
+        title={!showModal ? 
+          translate("MapScreen.addToMap") : 
+          !newPinCoordinates ? 
+          translate("MapScreen.addingToMap") : 
+          translate("MapScreen.finishAddingToMap")
+        }
+        onPress={() => setShowModal(!showModal)}
+      />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal && newPinCoordinates !== null}
+        onRequestClose={() => setShowModal(!showModal)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{translate("MapScreen.modalTitle")}</Text>
+            <Text style={styles.modalText}>{translate("MapScreen.modalText")}</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder={translate("common.businessName")}
+              placeholderTextColor="#000000"
+              onChangeText={setBusinessName}
+              value={businessName}
+            />
+
+            <View style={{ flexDirection:"row" }}>
+              <Button
+                title={translate("common.cancel")}
+                buttonStyle={styles.cancelButton}
+                disabled={loading}
+                onPress={() => {
+                  setShowModal(!showModal)
+                  setNewPinCoordinates(null)
+                  setBusinessName("")
+
+                }}>
+              </Button>
+
+              <Button
+                title={translate("MapScreen.addToMap")}
+                disabled={loading}
+                buttonStyle={styles.addButton}
+                onPress={addToMap}>
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <MapView
         style={styles.map}
         showsUserLocation={true}
+        onPress={handleMapOnPress}
         initialRegion={{
           latitude: 9.1549238,
           longitude: -83.7570566,
@@ -193,7 +348,14 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
           longitudeDelta: 0.3,
         }}
       >
-        {markers}
+        {!showModal && markers}
+        {newPinCoordinates &&
+          <Marker
+            coordinate={newPinCoordinates}
+            key={'new-pin'}
+            pinColor={palette.red}
+          />
+        }
       </MapView>
     </Screen>
   )
