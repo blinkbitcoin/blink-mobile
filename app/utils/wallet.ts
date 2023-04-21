@@ -15,7 +15,7 @@ export const getFullUri = ({
 }: GetFullUriInput): string => {
   if (type === TYPE_LIGHTNING) {
     // TODO add lightning:
-    return uppercase ? input.toUpperCase() : input
+    return uppercase && input ? input.toUpperCase() : input
   }
 
   const uriPrefix = prefix ? prefixByType[type] : ""
