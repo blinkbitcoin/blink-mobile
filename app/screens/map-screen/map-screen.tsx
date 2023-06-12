@@ -122,7 +122,7 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
           data.map((el) => {
             return {
               id: el.id,
-              username: null,
+              username: el.bitcoinJungleUsername,
               mapInfo: {
                 title: el.name,
                 coordinates: {
