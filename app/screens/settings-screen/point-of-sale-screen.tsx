@@ -1,13 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
+import { gql, useLazyQuery } from "@apollo/client"
 import * as React from "react"
 import { RouteProp } from "@react-navigation/native"
-import { Pressable, View, TextInput, Linking } from "react-native"
+import { ActivityIndicator, Pressable, View, TextInput, Linking } from "react-native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import EStyleSheet from "react-native-extended-stylesheet"
+import debounce from "lodash.debounce"
 
 import { Screen } from "../../components/screen"
 import { Dropdown } from "../../components/dropdown"
 import { palette } from "../../theme/palette"
+import { GaloyInput } from "../../components/galoy-input"
+import * as UsernameValidation from "../../utils/validation"
 
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -34,6 +38,12 @@ const styles = EStyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: color.primary,
+    marginBottom: "10rem",
+    marginHorizontal: "10rem",
+    marginTop: "10rem",
+  },
+  secondaryButtonStyle: {
+    backgroundColor: palette.midGrey,
     marginBottom: "10rem",
     marginHorizontal: "10rem",
     marginTop: "10rem",
@@ -81,8 +91,40 @@ const copyToClipboard = (str, openURL) => {
   }
 }
 
+const USER_WALLET_ID = gql`
+  query userDefaultWalletId($username: Username!) {
+    userDefaultWalletId(username: $username)
+  }
+`
+
 export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
   const { username } = useMainQuery()
+
+  const [
+    userDefaultWalletIdQuery,
+    { loading: loadingUserDefaultWalletId, data: dataUserDefaultWalletId, variables },
+  ] = useLazyQuery(USER_WALLET_ID, {
+    fetchPolicy: "network-only",
+    onCompleted: (dataUserDefaultWalletId) => {
+      if (dataUserDefaultWalletId?.userDefaultWalletId) {
+        setTipUsername(variables.username, false, true)
+      }
+    },
+    onError: () => {
+      setTipUsername(variables.username, false, false)
+    },
+  })
+
+  const userDefaultWalletIdQueryDebounced = React.useCallback(
+    debounce(async (destination) => {
+      userDefaultWalletIdQuery({ 
+        variables: { 
+          username: destination.username 
+        } 
+      })
+    }, 1500),
+    [],
+  )
 
   const [ loading, setLoading ] = React.useState(false)
   const [ showForm, setShowForm ] = React.useState(false)
@@ -90,6 +132,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
   const [ storeOwnerEmail, setStoreOwnerEmail ] = React.useState("")
   const [ defaultCurrency, setDefaultCurrency ] = React.useState("CRC")
   const [ defaultLanguage, setDefaultLanguage ] = React.useState("en")
+  const [ tipUsernames, setTipUsernames ] = React.useState([{username: "", isValid: null}])
 
   const [ storeData, setStoreData ] = React.useState([])
 
@@ -106,9 +149,51 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
       }
     }
 
-    loadData()
-    
+    loadData()  
   }, [])
+
+  React.useEffect(() => {
+    const newTipUsername = tipUsernames[tipUsernames.length - 1]
+    if (UsernameValidation.hasValidLength(newTipUsername.username) && UsernameValidation.isValid(newTipUsername.username) && newTipUsername.isValid == null) {
+      userDefaultWalletIdQueryDebounced(newTipUsername)
+    }
+  }, [tipUsernames])
+
+  const addTipUsername = () => {
+    const newTipUsernames = [...tipUsernames]
+    newTipUsernames.push({username: "", isValid: null})
+
+    setTipUsernames(newTipUsernames)
+  }
+
+  const setTipUsername = (username, index, isValid) => {
+    const newTipUsernames = [...tipUsernames]
+
+    if(index === false) {
+      index = tipUsernames.findIndex((el) => el.username === username)
+    }
+
+    let updateObj = {
+      username: username,
+      isValid: (typeof isValid != 'undefined' ? isValid : newTipUsernames[index].isValid)
+    }
+
+    newTipUsernames[index] = updateObj
+
+    setTipUsernames(newTipUsernames)
+  }
+
+  const deleteTipUsername = (index) => {
+    const newTipUsernames = [...tipUsernames]
+
+    newTipUsernames.splice(index, 1)
+
+    if(!newTipUsernames.length) {
+      newTipUsernames[0] = {username: "", isValid: null}
+    }
+
+    setTipUsernames(newTipUsernames)
+  }
 
   const createPointOfSale = async () => {
     try {
@@ -127,7 +212,8 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
           defaultCurrency,
           defaultLanguage,
           rate: 1,
-          bitcoinJungleUsername: username
+          bitcoinJungleUsername: username,
+          tipSplit: tipUsernames.map((el) => el.username),
         })
       })
 
@@ -156,6 +242,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
         setStoreName("")
         setDefaultCurrency("CRC")
         setDefaultLanguage("en")
+        setTipUsernames([{username: "", isValid: null}])
 
         await KeyStoreWrapper.setPointOfSales(newStoreData)
       } else {
@@ -174,6 +261,24 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
     }
 
     setLoading(false)
+  }
+
+  const tipInputRightIcon = (obj) => {
+    if (UsernameValidation.hasValidLength(obj.username) && UsernameValidation.isValid(obj.username) && obj.isValid == null) {
+      return <ActivityIndicator size="small" />
+    }
+
+    if(obj.isValid == null) {
+      return <Text></Text>
+    }
+
+    if(!obj.isValid) {
+      return <Text>⚠️</Text>
+    }
+
+    if(obj.isValid) {
+      return <Text>✅</Text>
+    }
   }
 
   return (
@@ -208,6 +313,40 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
             <Dropdown label={translate("PointOfSaleScreen.currency")} data={[{label: "CRC", value: "CRC"},{label: "USD", value: "USD"}]} onSelect={setDefaultCurrency} />
 
             <Dropdown label={translate("common.language")} data={[{label: "English", value: "en"},{label: "Español", value: "es"}]} onSelect={setDefaultLanguage} />
+
+            {tipUsernames.map((obj, i) => {
+              return (
+                <GaloyInput
+                  placeholder={"Tip Recipient Username"}
+                  placeholderTextColor="#000000" 
+                  onChangeText={(val) => {
+                    setTipUsername(val, i)
+                  }}
+                  leftIcon={
+                    <Icon 
+                      name={"delete"}
+                      size={20}
+                      onPress={() => {
+                        deleteTipUsername(i)
+                      } }
+                    />
+                  }
+                  rightIcon={tipInputRightIcon(tipUsernames[i])}
+                  value={tipUsernames[i].username}
+                  editable
+                  autoCompleteType="username"
+                  autoCapitalize="none"
+                />
+              )
+            })}
+
+            <Button
+              buttonStyle={styles.secondaryButtonStyle}
+              containerStyle={{ flex: 1 }}
+              title={"Add another Tip User"}
+              onPress={addTipUsername}
+              disabled={loading}
+            />
 
             <Button
               buttonStyle={styles.buttonStyle}
