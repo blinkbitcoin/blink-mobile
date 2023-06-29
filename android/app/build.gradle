@@ -142,6 +142,8 @@ android {
             resolutionStrategy { 
                 force 'androidx.core:core:1.9.0'
                 force 'com.facebook.react:react-native:0.66.4'
+
+                force 'androidx.browser:browser:1.5.0'
             }
         }
 
