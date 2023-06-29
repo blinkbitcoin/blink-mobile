@@ -1,4 +1,3 @@
-import { gql, useQuery } from "@apollo/client"
 import { useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import * as React from "react"
@@ -17,21 +16,7 @@ import { toastShow } from "../../utils/toast"
 import useToken from "../../utils/use-token"
 import { color } from "@app/theme"
 import useMainQuery from "@app/hooks/use-main-query"
-
-const QUERY_BUSINESSES = gql`
-  query businessMapMarkers {
-    businessMapMarkers {
-      username
-      mapInfo {
-        title
-        coordinates {
-          longitude
-          latitude
-        }
-      }
-    }
-  }
-`
+import Icon from "react-native-vector-icons/Ionicons"
 
 const styles = StyleSheet.create({
   android: { marginTop: 18 },
@@ -48,7 +33,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-  title: { color: palette.darkGrey, fontSize: 18 },
+  title: { 
+    color: palette.darkGrey, 
+    fontSize: 18,
+  },
 
   centeredView: {
     marginTop: 100,
@@ -91,6 +79,15 @@ const styles = StyleSheet.create({
   addButton: {
     margin: 5,
     backgroundColor: color.primary,
+  },
+
+  buttonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+
+  reportButton: {
+    backgroundColor: "#FF0000"
   }
 
 })
@@ -102,38 +99,22 @@ type Props = {
 export const MapScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const [isRefreshed, setIsRefreshed] = React.useState(false)
-  const [otherPinData, setOtherPinData] = React.useState([])
+  const [pinData, setPinData] = React.useState([])
   const [showModal, setShowModal] = React.useState(false)
+  const [showReportModal, setShowReportModal] = React.useState(false)
   const [newPinCoordinates, setNewPinCoordinates] = React.useState(null)
   const [businessName, setBusinessName] = React.useState("")
+  const [problemDescription, setProblemDescription] = React.useState("")
   const [loading, setLoading] = React.useState(false)
   const { username } = useMainQuery()
-  const { data, error, refetch } = useQuery(QUERY_BUSINESSES, {
-    notifyOnNetworkStatusChange: true,
-  })
 
-  const fetchOtherPins = async () => {
+  const fetchPins = async () => {
     try {
-      const res = await fetch('https://us-central1-bitcoin-jungle-maps.cloudfunctions.net/location-list')
+      const res = await fetch('https://us-central1-bitcoin-jungle-maps.cloudfunctions.net/location-list?includeMigrated=true')
       const data = await res.json()
 
       if(res.ok) {
-        setOtherPinData(
-          data.map((el) => {
-            return {
-              id: el.id,
-              username: el.bitcoinJungleUsername,
-              mapInfo: {
-                title: el.name,
-                coordinates: {
-                  __typename: "Coordinates",
-                  latitude: el.latLong._latitude,
-                  longitude: el.latLong._longitude,
-                }
-              }
-            }
-          })
-        )
+        setPinData(data)
       }
     } catch (err) {
       console.log(err)
@@ -145,17 +126,9 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
   useFocusEffect(() => {
     if (!isRefreshed) {
       setIsRefreshed(true)
-      refetch()
-      fetchOtherPins()
+      fetchPins()
     }
   })
-
-  if (error) {
-    toastShow(error.message)
-  }
-
-  let maps = data?.businessMapMarkers ?? []
-  maps = maps.concat(otherPinData)
 
   const requestLocationPermission = async () => {
     try {
@@ -238,6 +211,50 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
     setLoading(false)
   }
 
+  const reportProblem = async () => {
+    setLoading(true)
+
+    const res = await fetch("https://maps.bitcoinjungle.app/api/report", {
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      "body": JSON.stringify({
+        id: showReportModal.id,
+        description: problemDescription,
+      })
+    })
+
+    const resData = await res.json()
+
+    if(!res.ok) {
+      Alert.alert(`Error! ${resData.error}`, "", [
+        {
+          text: translate("common.ok"),
+          onPress: () => {
+            // here
+          },
+        },
+      ])
+    } else {
+      setShowReportModal(false)
+      setProblemDescription("")
+      fetchPins()
+      setIsRefreshed(false)
+
+      Alert.alert(translate("MapScreen.reportSuccess"), "", [
+        {
+          text: translate("common.ok"),
+          onPress: () => {
+            // here
+          },
+        },
+      ])
+    }
+
+    setLoading(false)
+  }
+
   // React.useLayoutEffect(() => {
   //   navigation.setOptions(
   //     {
@@ -248,37 +265,73 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
   // })
 
   const markers: JSX.Element[] = []
-  maps.forEach((item) => {
+  pinData.forEach((item) => {
     const onPress = () =>
       hasToken
-        ? navigation.navigate("sendBitcoin", { username: item.username })
+        ? navigation.navigate("sendBitcoin", { username: item.bitcoinJungleUsername })
         : navigation.navigate("phoneValidation")
     markers.push(
       <Marker
-        coordinate={item.mapInfo.coordinates}
-        key={item.username || item.id}
+        coordinate={{latitude: item.latLong._latitude, longitude: item.latLong._longitude}}
+        key={item.id || item.bitcoinJungleUsername}
         pinColor={palette.orange}
       >
         <Callout
           // alphaHitTest
           // tooltip
-          onPress={() => (!!item.username && !isIos ? onPress() : null)}
+          onPress={() => (!!item.bitcoinJungleUsername && !isIos ? onPress() : null)}
         >
           <View style={styles.customView}>
-            <Text style={styles.title}>{item.mapInfo.title}</Text>
-            {!!item.username && !isIos && (
-              <Button
-                containerStyle={styles.android}
-                title={translate("MapScreen.payBusiness")}
-              />
-            )}
-            {isIos && (
-              <CalloutSubview onPress={() => (item.username ? onPress() : null)}>
-                {!!item.username && (
-                  <Button style={styles.ios} title={translate("MapScreen.payBusiness")} />
-                )}
+            <Text style={styles.title}>
+              {item.name}
+            </Text>
+              
+            <View style={styles.buttonsContainer}>
+              {!!item.bitcoinJungleUsername && !isIos && (
+                <Button
+                  containerStyle={styles.android}
+                  title={
+                    <Icon
+                      name="send-outline"
+                      size={24}
+                      color={palette.white}
+                    />
+                  }
+                />
+              )}
+              {isIos && (
+                <CalloutSubview onPress={() => (item.bitcoinJungleUsername ? onPress() : null)}>
+                  {!!item.bitcoinJungleUsername && (
+                    <Button style={styles.ios} title={
+                        <Icon
+                          name="send-outline"
+                          size={24}
+                          color={palette.white}
+                        />
+                      }
+                    />
+                  )}
+                </CalloutSubview>
+              )}
+              <Text style={{width: 10}}></Text>
+              <CalloutSubview 
+                onPress={() => {
+                  setShowReportModal(item)
+                }}
+              >
+                <Button
+                  buttonStyle={styles.reportButton}
+                  containerStyle={styles.ios}
+                  title={
+                    <Icon
+                      name="alert-circle-outline"
+                      size={24}
+                      color={palette.white}
+                    />
+                  }
+                />
               </CalloutSubview>
-            )}
+            </View>
           </View>
         </Callout>
       </Marker>,
@@ -337,6 +390,51 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
           </View>
         </View>
       </Modal>
+      {showReportModal &&
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={typeof showReportModal === "object" ? true : false}
+          onRequestClose={() => setShowReportModal(!showReportModal)}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+                {translate("MapScreen.reportModalTitle")}
+              </Text>
+              <Text style={styles.modalText}>
+                {translate("MapScreen.reportModalText", {name: showReportModal.name})}
+              </Text>
+
+              <TextInput
+                style={styles.input}
+                placeholder={translate("MapScreen.problemDescription")}
+                placeholderTextColor="#000000"
+                onChangeText={setProblemDescription}
+                value={problemDescription}
+              />
+
+              <View style={{ flexDirection:"row" }}>
+                <Button
+                  title={translate("common.cancel")}
+                  buttonStyle={styles.cancelButton}
+                  disabled={loading}
+                  onPress={() => {
+                    setShowReportModal(false)
+                    setProblemDescription("")
+                  }}>
+                </Button>
+
+                <Button
+                  title={translate("MapScreen.reportModalButton")}
+                  disabled={loading}
+                  buttonStyle={styles.addButton}
+                  onPress={reportProblem}>
+                </Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      }
       <MapView
         style={styles.map}
         showsUserLocation={true}
