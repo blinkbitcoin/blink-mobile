@@ -14,7 +14,7 @@ const GRAPHQL_TESTNET_WS_URI = "wss://api.staging.galoy.io/graphql"
 const GRAPHQL_MAINNET_WS_URI = "wss://api.mainnet.bitcoinjungle.app/graphql"
 
 const OTC_PROD_BASE_URI = "https://orders.bitcoinjungle.app/"
-const OTC_DEV_BASE_URI = `http://${scriptHostname}:3000/`
+const OTC_DEV_BASE_URI = `http://${scriptHostname()}:3000/`
 
 // FIXME: no longer need since we switch from mst-gql to apollo-client
 
