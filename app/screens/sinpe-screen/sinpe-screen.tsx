@@ -6,6 +6,9 @@ import { ActivityIndicator, Text, View, Alert, Button } from "react-native"
 import { WebView } from 'react-native-webview'
 import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { useWalletBalance } from "../../hooks"
+import { getOtcBaseUri } from "../../utils/network"
+import { palette } from "../../theme/palette"
+
 
 import { translate } from "../../i18n"
 
@@ -197,7 +200,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
         <WebView
           ref={(ref) => (this.webview = ref)}
           source={{
-            uri: `http://localhost:3000/?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}`,
+            uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}`,
           }}
           onMessage={async (event) => {
             const data = JSON.parse(event.nativeEvent.data)
