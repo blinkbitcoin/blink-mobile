@@ -321,6 +321,15 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       greyed: !hasToken || username === null,
     },
     {
+      category: "SINPE Móvil",
+      icon: "sync-outline",
+      id: "sinpeLink",
+      action: () => navigation.navigate("sinpeScreen"),
+      enabled: hasToken && username !== null,
+      greyed: !hasToken || username === null,
+      hidden: !hasToken && username !== null,
+    },
+    {
       category: translate("whatsapp.contactUs"),
       icon: "ios-logo-whatsapp",
       id: "contact-us",

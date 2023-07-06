@@ -233,7 +233,7 @@ export const MoveMoneyScreen: ScreenType = ({
   const [modalVisible, setModalVisible] = useState(false)
   const [nfcScanning, setNfcScanning] = useState(false)
   const { tokenNetwork } = useToken()
-  const { myPubKey, username } = useMainQuery()
+  const { myPubKey, username, phoneNumber } = useMainQuery()
 
   const decodeInvoice = async (data) => {
     try {

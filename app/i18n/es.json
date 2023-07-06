@@ -490,6 +490,7 @@
     "locationPermissionPositive": "OK",
     "locationPermissionTitle": "Ubícate en el mapa",
     // "payBusiness": "pagar a este negocio",
+    "actionAlertMessage": "Seleccione una acción",
     "title": "Mapa",
     "addToMap": "Agregar al Mapa",
     "addingToMap": "Seleccione la ubicación",

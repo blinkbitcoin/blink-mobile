@@ -108,6 +108,12 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
   const [loading, setLoading] = React.useState(false)
   const { username } = useMainQuery()
 
+  const handleSendAction = (item) => {
+    hasToken
+      ? navigation.navigate("sendBitcoin", { username: item.bitcoinJungleUsername })
+      : navigation.navigate("phoneValidation")
+  }
+
   const fetchPins = async () => {
     try {
       const res = await fetch('https://us-central1-bitcoin-jungle-maps.cloudfunctions.net/location-list?includeMigrated=true')
@@ -266,10 +272,22 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
 
   const markers: JSX.Element[] = []
   pinData.forEach((item) => {
-    const onPress = () =>
-      hasToken
-        ? navigation.navigate("sendBitcoin", { username: item.bitcoinJungleUsername })
-        : navigation.navigate("phoneValidation")
+    const onPress = () => {
+      Alert.alert(item.name, translate("MapScreen.actionAlertMessage"), [
+        {
+          text: translate("SendBitcoinScreen.title"),
+          onPress: () => {
+            handleSendAction(item)
+          },
+        },
+        {
+          text: translate("MapScreen.reportModalTitle"),
+          onPress: () => {
+            setShowReportModal(item)
+          },
+        },
+      ])
+    }
     markers.push(
       <Marker
         coordinate={{latitude: item.latLong._latitude, longitude: item.latLong._longitude}}
@@ -279,7 +297,7 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
         <Callout
           // alphaHitTest
           // tooltip
-          onPress={() => (!!item.bitcoinJungleUsername && !isIos ? onPress() : null)}
+          onPress={() => (!isIos ? onPress() : null)}
         >
           <View style={styles.customView}>
             <Text style={styles.title}>
@@ -287,7 +305,7 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
             </Text>
               
             <View style={styles.buttonsContainer}>
-              {!!item.bitcoinJungleUsername && !isIos && (
+              {!isIos && (
                 <Button
                   containerStyle={styles.android}
                   title={
@@ -300,37 +318,40 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
                 />
               )}
               {isIos && (
-                <CalloutSubview onPress={() => (item.bitcoinJungleUsername ? onPress() : null)}>
-                  {!!item.bitcoinJungleUsername && (
-                    <Button style={styles.ios} title={
+                <>
+                  <CalloutSubview onPress={() => (item.bitcoinJungleUsername ? handleSendAction(item) : null)}>
+                    {!!item.bitcoinJungleUsername && (
+                      <Button style={styles.ios} title={
+                          <Icon
+                            name="send-outline"
+                            size={24}
+                            color={palette.white}
+                          />
+                        }
+                      />
+                    )}
+                  </CalloutSubview>
+                
+                  <Text style={{width: 10}}></Text>
+                  <CalloutSubview 
+                    onPress={() => {
+                      setShowReportModal(item)
+                    }}
+                  >
+                    <Button
+                      buttonStyle={styles.reportButton}
+                      containerStyle={styles.ios}
+                      title={
                         <Icon
-                          name="send-outline"
+                          name="alert-circle-outline"
                           size={24}
                           color={palette.white}
                         />
                       }
                     />
-                  )}
-                </CalloutSubview>
+                  </CalloutSubview>
+                </>
               )}
-              <Text style={{width: 10}}></Text>
-              <CalloutSubview 
-                onPress={() => {
-                  setShowReportModal(item)
-                }}
-              >
-                <Button
-                  buttonStyle={styles.reportButton}
-                  containerStyle={styles.ios}
-                  title={
-                    <Icon
-                      name="alert-circle-outline"
-                      size={24}
-                      color={palette.white}
-                    />
-                  }
-                />
-              </CalloutSubview>
             </View>
           </View>
         </Callout>

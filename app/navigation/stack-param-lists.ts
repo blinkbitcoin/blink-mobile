@@ -55,6 +55,7 @@ export type RootStackParamList = {
   routeLnurl: {
     lnurl: string
   }
+  sinpe: undefined
 }
 
 export type ContactStackParamList = {

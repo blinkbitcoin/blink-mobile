@@ -28,6 +28,7 @@ import { SectionCompleted } from "../screens/earns-screen/section-completed"
 import { GetStartedScreen } from "../screens/get-started-screen"
 import { MapScreen } from "../screens/map-screen/map-screen"
 import { RouteLnurlScreen } from "../screens/route-lnurl-screen/route-lnurl-screen"
+import { SinpeScreen } from "../screens/sinpe-screen/sinpe-screen"
 import { MoveMoneyScreenDataInjected } from "../screens/move-money-screen"
 import {
   WelcomePhoneInputScreen,
@@ -318,6 +319,11 @@ export const RootStack: NavigatorType = () => {
           headerShown: false,
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
+      />
+      <StackMoveMoney.Screen
+        name="sinpeScreen"
+        component={SinpeScreen}
+        options={{title: "SINPE Móvil"}}
       />
       <StackMoveMoney.Screen
         name="sendBitcoin"

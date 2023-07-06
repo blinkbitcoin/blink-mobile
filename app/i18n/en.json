@@ -461,6 +461,7 @@
     "locationPermissionPositive": "OK",
     "locationPermissionTitle": "Locate yourself on the map",
     // "payBusiness": "pay this business",
+    "actionAlertMessage": "Please select an action",
     "title": "Map",
     "addToMap": "Add to Map",
     "addingToMap": "Select location on map",
