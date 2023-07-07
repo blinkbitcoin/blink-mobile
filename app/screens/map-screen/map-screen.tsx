@@ -136,34 +136,6 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
     }
   })
 
-  const requestLocationPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: translate("MapScreen.locationPermissionTitle"),
-          message: translate("MapScreen.locationPermissionMessage"),
-          buttonNeutral: translate("MapScreen.locationPermissionNeutral"),
-          buttonNegative: translate("MapScreen.locationPermissionNegative"),
-          buttonPositive: translate("MapScreen.locationPermissionPositive"),
-        },
-      )
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("You can use the location")
-      } else {
-        console.log("Location permission denied")
-      }
-    } catch (err) {
-      console.warn(err)
-    }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      requestLocationPermission()
-    }, []),
-  )
-
   const handleMapOnPress = (e) => {
     if(showModal) {
       setNewPinCoordinates(e.nativeEvent.coordinate)
@@ -458,7 +430,7 @@ export const MapScreen: ScreenType = ({ navigation }: Props) => {
       }
       <MapView
         style={styles.map}
-        showsUserLocation={true}
+        showsUserLocation={false}
         onPress={handleMapOnPress}
         initialRegion={{
           latitude: 9.1549238,
