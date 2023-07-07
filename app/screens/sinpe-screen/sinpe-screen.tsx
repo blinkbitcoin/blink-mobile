@@ -201,6 +201,9 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
           ref={(ref) => (this.webview = ref)}
           source={{
             uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}`,
+            headers: {
+              'x-bj-wallet': "true",
+            },
           }}
           onMessage={async (event) => {
             const data = JSON.parse(event.nativeEvent.data)
@@ -227,6 +230,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
             
           }}
           injectedJavaScript={runFirst}
+          sharedCookiesEnabled={true}
         />
       </View>
     </Screen>
