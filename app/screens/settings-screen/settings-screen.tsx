@@ -140,6 +140,31 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
     }
   }
 
+  const deleteAction = async () => {
+    try {
+      Alert.alert(translate("common.accountDeleteConfirm"), "", [
+        {
+          text: translate("common.ok"),
+          style: "destructive",
+          onPress: async () => {
+            await logout()
+            navigation.goBack()
+            Alert.alert(translate("common.accountDeleted"))
+          }
+        },
+        {
+          text: translate("common.cancel"),
+          onPress: () => {
+            console.log('cancel')
+          }
+        }
+      ])
+    } catch (err) {
+      // TODO: figure out why ListItem onPress is swallowing errors
+      console.error(err)
+    }
+  }
+
   return (
     <SettingsScreenJSX
       hasToken={hasToken}
@@ -158,6 +183,7 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       }}
       securityAction={securityAction}
       logoutAction={logoutAction}
+      deleteAction={deleteAction}
       loadingCsvTransactions={loadingCsvTransactions}
       lnurlAction={lnurlAction}
     />
@@ -174,6 +200,7 @@ type SettingsScreenProps = {
   csvAction: (options?: QueryLazyOptions<OperationVariables>) => void
   securityAction: () => void
   logoutAction: () => Promise<void>
+  deleteAction: () => Promise<void>
   lnurlAction: () => void
   loadingCsvTransactions: boolean
 }
@@ -201,6 +228,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     csvAction,
     securityAction,
     logoutAction,
+    deleteAction,
     lnurlAction,
     loadingCsvTransactions,
   } = params
@@ -327,7 +355,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       action: () => navigation.navigate("sinpeScreen"),
       enabled: hasToken && username !== null,
       greyed: !hasToken || username === null,
-      hidden: !hasToken && username !== null,
+      hidden: !hasToken || username === null,
     },
     {
       category: translate("whatsapp.contactUs"),
@@ -347,6 +375,16 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       greyed: !hasToken,
       hidden: !hasToken,
     },
+    {
+      category: translate("common.deleteAccount"),
+      id: "deleteAccount",
+      icon: "trash-outline",
+      action: () => deleteAction(),
+      enabled: hasToken,
+      greyed: !hasToken,
+      hidden: !hasToken,
+      danger: true,
+    },
   ]
 
   return (
@@ -355,7 +393,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
         if (setting.hidden) {
           return null
         }
-        const settingColor = setting.greyed ? palette.midGrey : palette.darkGrey
+        const settingColor = setting.greyed ? palette.midGrey : setting.danger ? palette.red : palette.darkGrey
         const settingStyle: TextStyle = { color: settingColor }
         return (
           <React.Fragment key={`setting-option-${i}`}>
