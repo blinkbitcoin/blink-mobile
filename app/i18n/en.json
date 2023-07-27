@@ -577,7 +577,8 @@
     "stalePrice": "Your bitcoin price is old and was last updated {{timePeriod}} ago. Please restart the app before making a payment.",
     "title": "Confirm Payment",
     "totalLabel": "Total:",
-    "totalExceed": "Total exceeds your balance of {{balance}}"
+    "totalExceed": "Total exceeds your balance of {{balance}}",
+    "totalExceedWithAmount": "Total of {{amount}} exceeds your balance of {{balance}}"
   },
   "SendBitcoinScreen": {
     "amount": "Amount",
@@ -727,7 +728,10 @@
     "usernameRequired": "Username is required",
     "yes": "Yes",
     "No": "No",
-    "businessName": "Business Name"
+    "businessName": "Business Name",
+    "deleteAccount": "Delete Account",
+    "accountDeleteConfirm": "Are you sure you want to delete your account?",
+    "accountDeleted": "Your user account has been deleted successfully."
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",

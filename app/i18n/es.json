@@ -618,7 +618,8 @@
     "stalePrice": "El precio de bitcoin está desactualizado, se actualizó por última vez hace {{timePeriod}}. Por favor reinicie la aplicación antes de realizar el pago.",
     "title": "Confirmar pago",
     "totalLabel": "Total:",
-    "totalExceed": "El total excede su saldo de {{balance}}"
+    "totalExceed": "El total excede su saldo de {{balance}}",
+    "totalExceedWithAmount": "El total de {{amount}} excede su saldo de {{balance}}"
   },
   "SendBitcoinScreen": {
     "amount": "Cantidad",
@@ -763,7 +764,10 @@
     "usernameRequired": "El nombre de usuario es requerido",
     "yes": "Sí",
     "No": "No",
-    "businessName": "Nombre de Empresa"
+    "businessName": "Nombre de Empresa",
+    "deleteAccount": "Borrar Cuenta",
+    "accountDeleteConfirm": "¿Estás seguro de que quieres eliminar tu cuenta?",
+    "accountDeleted": "Su cuenta de usuario ha sido eliminada con éxito."
   },
   "errors": {
     "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

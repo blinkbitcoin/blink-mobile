@@ -8,7 +8,10 @@ import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { useWalletBalance } from "../../hooks"
 import { getOtcBaseUri } from "../../utils/network"
 import { palette } from "../../theme/palette"
-
+import { validPayment } from "../../utils/parsing"
+import useToken from "../../utils/use-token"
+import { useMySubscription } from "../../hooks/user-hooks"
+// import analytics from "@react-native-firebase/analytics"
 
 import { translate } from "../../i18n"
 
@@ -44,10 +47,18 @@ type SinpeScreenProps = {
 
 export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps => {
   let webview = null
-  const { username, phoneNumber, userPreferredLanguage, refetch } = useMainQuery()
+  const { myPubKey, username, phoneNumber, userPreferredLanguage, refetch } = useMainQuery()
   const { walletId: myDefaultWalletId, satBalance, loading } = useWalletBalance()
+  const { tokenNetwork } = useToken()
+  const { formatCurrencyAmount } = useMySubscription()
 
   const runFirst = `
+    true;
+  `;
+
+  const resetTimestamp = `
+    window.dispatchEvent(new CustomEvent("resetTimestamp"));
+
     true;
   `;
 
@@ -61,6 +72,17 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
 
   const payLightning = async (bolt11) => {
     try {
+      const { amount } = validPayment(bolt11, tokenNetwork, myPubKey, username)
+
+      if (amount > satBalance) {
+        Alert.alert('Error!', translate("SendBitcoinConfirmationScreen.totalExceedWithAmount", {
+          balance: formatCurrencyAmount({ sats: satBalance, currency: "USD" }),
+          amount: formatCurrencyAmount({sats: amount, currency: "USD"}),
+        }))
+        this.webview.injectJavaScript(resetTimestamp)
+        return
+      }
+
       const js = `
         window.dispatchEvent(new CustomEvent("toggleLoadingOn"));
 
@@ -86,6 +108,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
         : data.lnInvoicePaymentSend.errors
       handlePaymentReturn(status, errs)
     } catch (err) {
+      console.log('error', err)
       handlePaymentError(err)
     }
   }
@@ -152,11 +175,13 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
       }
 
       Alert.alert("Error!", errorMessage)
+      this.webview.injectJavaScript(resetTimestamp)
     }
   }
 
   const handlePaymentError = (error) => {
    Alert.alert(translate("errors.generic"))
+   this.webview.injectJavaScript(resetTimestamp)
   }
 
   const handleInvoiceReturn = (invoice, errors) => {    
@@ -221,7 +246,11 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
                 break;
 
               case "complete":
-                Alert.alert("Order submitted successfully!")
+                Alert.alert(data.message)
+                // analytics().logScreenView({
+                //   screen_name: "sinpeConfirmationScreen",
+                //   screen_class: "sinpeConfirmationScreen",
+                // })
                 navigation.navigate("moveMoney")
 
                 break;
