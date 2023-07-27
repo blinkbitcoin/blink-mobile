@@ -73,6 +73,7 @@ export const TransactionHistoryScreenDataInjected: ScreenType = ({
 
   const { error, data, refetch, loading } = useQuery(TRANSACTIONS_LIST, {
     variables: { first: TRANSACTIONS_PER_PAGE, after: null },
+    errorPolicy: "all",
     fetchPolicy: "network-only",
   })
 
@@ -85,7 +86,7 @@ export const TransactionHistoryScreenDataInjected: ScreenType = ({
   if (error) {
     console.error(error)
     toastShow(translate("common.transactionsError"))
-    return null
+    // return null
   }
 
   if (!data?.me?.defaultAccount) {
@@ -119,6 +120,9 @@ export const TransactionHistoryScreenDataInjected: ScreenType = ({
 
   for (const txEdge of transactionsRef.current) {
     const tx = txEdge.node
+    if(!tx) {
+      continue
+    }
     if (isToday(tx)) {
       today.push(tx)
     } else if (isYesterday(tx)) {
