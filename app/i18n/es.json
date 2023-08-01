@@ -677,7 +677,8 @@
     "emailAddress": "el nombre de usuario no debe ser correo electrónico",
     "notAvailable": "❌  %{input} no está disponible",
     "success": "¡%{input} es ahora su nombre de usuario!",
-    "usernameToUse": "¿Qué nombre de usuario desea usar?"
+    "usernameToUse": "¿Qué nombre de usuario desea usar?",
+    "setUsername": "Seleccione"
   },
   "WelcomeFirstScreen": {
     "bank": "Bitcoin está diseñado para permitirle almacenar, enviar y recibir dinero, sin depender de un banco o tarjeta de crédito.",

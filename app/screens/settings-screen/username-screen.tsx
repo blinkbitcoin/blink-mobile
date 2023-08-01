@@ -3,6 +3,7 @@ import debounce from "lodash.debounce"
 import { gql, useQuery, useMutation } from "@apollo/client"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { ActivityIndicator, Alert, Text, TextInput } from "react-native"
+import { Button } from "react-native-elements"
 import { Input } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 
@@ -17,7 +18,10 @@ import { USERNAME_AVAILABLE } from "../../graphql/query"
 import useMainQuery from "@app/hooks/use-main-query"
 
 const styles = EStyleSheet.create({
-  activity: { marginTop: 12 },
+  activity: { 
+    marginTop: 2,
+    marginBottom: 2,
+  },
 
   /* eslint-disable react-native/no-unused-styles */
   availableMessage: { color: palette.green },
@@ -159,6 +163,7 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
   }
 
   const onChangeText = (value) => {
+    value = value.trim().toLowerCase().replace(/[^a-z0-9_]/g, "")
     setInputStatus({ message: "", status: "" })
     setInput(value)
     if (value) {
@@ -166,6 +171,8 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
       if (checkedUsername instanceof InvalidUsernameError) {
         setInputStatus({ message: String(checkedUsername.message), status: "error" })
       }
+    } else {
+      setInputStatus({ message: "", status: "empty"})
     }
   }
 
@@ -183,15 +190,22 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
         maxLength={20}
         returnKeyType="send"
         textContentType="username"
-        onBlur={validateAndConfirm}
         autoCompleteType="username"
         autoCapitalize="none"
+        value={input}
       />
       <ActivityIndicator
-        animating={updatingUsername}
+        animating={(inputStatus.message === "" && inputStatus.status === "") || updatingUsername}
         size="large"
         color={color.primary}
         style={styles.activity}
+      />
+      <Button
+        title={translate("UsernameScreen.setUsername")}
+        disabled={inputStatus.status !== "available" || updatingUsername}
+        onPress={() => {
+          validateAndConfirm()
+        }}
       />
     </Screen>
   )

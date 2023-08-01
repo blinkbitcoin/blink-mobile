@@ -638,7 +638,8 @@
     "emailAddress": "Username must not be email address",
     "notAvailable": "❌  %{input} is not available",
     "success": "%{input} is now your username!",
-    "usernameToUse": "What username do you want to use?"
+    "usernameToUse": "What username do you want to use?",
+    "setUsername": "Set Username"
   },
   "WelcomeFirstScreen": {
     "bank": "Bitcoin is designed to let you store, send and receive money, without relying on a bank or credit card.",
