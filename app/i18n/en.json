@@ -697,6 +697,7 @@
     "lastName": "Last Name",
     "later": "Later",
     "lnurl": "Static QR Code",
+    "logOutAction": "Are you sure you want to log out of your account?",
     "loggedOut": "You have been logged out.",
     "logout": "Log Out",
     "minutes": "minutes",

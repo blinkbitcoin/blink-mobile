@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useState } from "react"
 import { Screen } from "../../components/screen"
 import type { ScreenType } from "../../types/jsx"
 import useMainQuery from "@app/hooks/use-main-query"
@@ -51,6 +52,11 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   const { walletId: myDefaultWalletId, satBalance, loading } = useWalletBalance()
   const { tokenNetwork } = useToken()
   const { formatCurrencyAmount } = useMySubscription()
+  const [mySatBalance, setMySatBalance] = useState(null)
+
+  useState(() => {
+    setMySatBalance(satBalance)
+  }, [])
 
   const runFirst = `
     true;
@@ -222,45 +228,47 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   return (
     <Screen>
       <View style={{flex: 1}}>
-        <WebView
-          ref={(ref) => (this.webview = ref)}
-          source={{
-            uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}`,
-            headers: {
-              'x-bj-wallet': "true",
-            },
-          }}
-          onMessage={async (event) => {
-            const data = JSON.parse(event.nativeEvent.data)
+        {mySatBalance !== null &&
+          <WebView
+            ref={(ref) => (this.webview = ref)}
+            source={{
+              uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${mySatBalance}`,
+              headers: {
+                'x-bj-wallet': "true",
+              },
+            }}
+            onMessage={async (event) => {
+              const data = JSON.parse(event.nativeEvent.data)
 
-            switch(data.action) {
-              case "invoice":
-                const invoice = data.bolt11
-                await payLightning(invoice)
+              switch(data.action) {
+                case "invoice":
+                  const invoice = data.bolt11
+                  await payLightning(invoice)
 
-                break;
+                  break;
 
-              case "createInvoice":
-                await createInvoice(data.satAmount)
+                case "createInvoice":
+                  await createInvoice(data.satAmount)
 
-                break;
+                  break;
 
-              case "complete":
-                Alert.alert(data.message)
-                // analytics().logScreenView({
-                //   screen_name: "sinpeConfirmationScreen",
-                //   screen_class: "sinpeConfirmationScreen",
-                // })
-                navigation.navigate("moveMoney")
+                case "complete":
+                  Alert.alert(data.title, data.subtext)
+                  // analytics().logScreenView({
+                  //   screen_name: "sinpeConfirmationScreen",
+                  //   screen_class: "sinpeConfirmationScreen",
+                  // })
+                  navigation.navigate("moveMoney")
 
-                break;
-            }
+                  break;
+              }
 
-            
-          }}
-          injectedJavaScript={runFirst}
-          sharedCookiesEnabled={true}
-        />
+              
+            }}
+            injectedJavaScript={runFirst}
+            sharedCookiesEnabled={true}
+          />
+        }
       </View>
     </Screen>
   )
