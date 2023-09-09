@@ -225,7 +225,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
         <WebView
           ref={(ref) => (this.webview = ref)}
           source={{
-            uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${satBalance}`,
+            uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}`,
             headers: {
               'x-bj-wallet': "true",
             },
@@ -246,7 +246,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
                 break;
 
               case "complete":
-                Alert.alert(data.title, data.subtext)
+                Alert.alert(data.message)
                 // analytics().logScreenView({
                 //   screen_name: "sinpeConfirmationScreen",
                 //   screen_class: "sinpeConfirmationScreen",

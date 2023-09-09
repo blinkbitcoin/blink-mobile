@@ -77,10 +77,6 @@ export const WelcomeFirstScreen: ScreenType = ({ navigation }: Props) => (
       <OnboardingScreen
         action={async () => {
           navigation.replace("Primary")
-          setTimeout(() => {
-            navigation.navigate("phoneValidation")
-          }, 500)
-          
         }}
         Svg={HoneyBadgerShovel}
         nextTitle={translate("WelcomeFirstScreen.learnToEarn")}

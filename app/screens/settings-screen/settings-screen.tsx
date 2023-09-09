@@ -125,22 +125,14 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
 
   const logoutAction = async () => {
     try {
-      Alert.alert(translate("common.logOutAction"), "", [
+      await logout()
+      Alert.alert(translate("common.loggedOut"), "", [
         {
           text: translate("common.ok"),
-          style: "destructive",
-          onPress: async () => {
-            await logout()
-            navigation.goBack()
-            Alert.alert(translate("common.loggedOut"))
-          }
-        },
-        {
-          text: translate("common.cancel"),
           onPress: () => {
-            console.log('cancel')
-          }
-        }
+            navigation.goBack()
+          },
+        },
       ])
     } catch (err) {
       // TODO: figure out why ListItem onPress is swallowing errors
