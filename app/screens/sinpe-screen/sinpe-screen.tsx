@@ -160,7 +160,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
     
     this.webview.injectJavaScript(js);
 
-    if (status === "SUCCESS") {
+    if (status === "SUCCESS" || status === "PENDING" || status === "ALREADY_PAID") {
       setTimeout(() => {
         const js = `
           window.dispatchEvent(new CustomEvent("submitOrder"));
@@ -169,9 +169,6 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
         `;
         this.webview.injectJavaScript(js);
       }, 250)
-
-    } else if (status === "PENDING") {
-      console.log("pending...")
     } else {
       let errorMessage = ''
       if (errors && Array.isArray(errors)) {
@@ -186,8 +183,8 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   }
 
   const handlePaymentError = (error) => {
-   Alert.alert(translate("errors.generic"))
-   this.webview.injectJavaScript(resetTimestamp)
+   // Alert.alert(translate("errors.generic"))
+   // this.webview.injectJavaScript(resetTimestamp)
   }
 
   const handleInvoiceReturn = (invoice, errors) => {    
