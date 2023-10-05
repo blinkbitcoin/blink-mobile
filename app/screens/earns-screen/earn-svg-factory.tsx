@@ -138,12 +138,13 @@ export const SVGs = ({ name, width, theme }: ISVGs): SVGElement => {
 
     default:
       return (
-        <LottieView
-          source={lottieTest}
-          style={[styles.lottieContainer, { width: rWidth }]}
-          autoPlay
-          loop
-        />
+        // <LottieView
+        //   source={lottieTest}
+        //   style={[styles.lottieContainer, { width: rWidth }]}
+        //   autoPlay
+        //   loop
+        // />
+        <WhatIsBitcoinSVG width={rWidth} />
       )
     // default: return <Text>{name} does not exist</Text>
   }
