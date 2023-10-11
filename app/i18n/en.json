@@ -1305,7 +1305,7 @@
           }
         ],
         "meta": {
-          "id": "Bitcoin:Whywasitcreated?",
+          "id": "BitcoinWhyWasItCreated",
           "title": "Bitcoin: Why was it created?"
         }
       },
@@ -1450,7 +1450,7 @@
           }
         ],
         "meta": {
-          "id": "Bitcoin:Howdoesitwork?",
+          "id": "BitcoinHowDoesItWork",
           "title": "Bitcoin: How does it work?"
         }
       },
@@ -1595,7 +1595,7 @@
           }
         ],
         "meta": {
-          "id": "Lightning:Whatdoesitsolve?",
+          "id": "LightningWhatDoesItSolve",
           "title": "Lightning: What does it solve?"
         }
       },
@@ -1706,7 +1706,7 @@
           }
         ],
         "meta": {
-          "id": "BitcoinCriticisms&FallaciesI",
+          "id": "BitcoinCriticismsFallaciesI",
           "title": "Bitcoin Criticisms & Fallacies I"
         }
       },
@@ -1817,7 +1817,7 @@
           }
         ],
         "meta": {
-          "id": "BitcoinCriticisms&FallaciesII",
+          "id": "BitcoinCriticismsFallaciesII",
           "title": "Bitcoin Criticisms & Fallacies II"
         }
       },
@@ -1928,7 +1928,7 @@
           }
         ],
         "meta": {
-          "id": "BitcoinCriticisms&FallaciesIII",
+          "id": "BitcoinCriticismsFallaciesIII",
           "title": "Bitcoin Criticisms & Fallacies III"
         }
       },
