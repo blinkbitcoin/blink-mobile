@@ -675,7 +675,7 @@
               "Sorry, but the opposite is actually true. The fiat banking system, which is regulated by states, requires human intervention to report and prevent certain uses of monetary goods, making it prone to censorship. Try again!"
             ],
             "id": "censorshipResistance",
-            "question": "Which of the following is NOT a reason that Bitcoin is considered a censorship-resistant good",
+            "question": "Which of the following is a reason that Bitcoin is considered a censorship-resistant good",
             "text": "Censorship-resistance is an attribute that has become increasingly important in the digital age, as it refers to the difficulty that external parties, such as corporations or governments, have in preventing an individual from using a particular good.\n\nThis attribute is particularly valuable for individuals living under regimes that enforce capital controls or prohibit certain forms of trade. Bitcoin is often cited as being a censorship-resistant good due to its decentralized, peer-to-peer network, which allows for transactions to be made without human intervention or permission.\n\nIn contrast, the fiat banking system is regulated by states and requires human intervention to report and prevent certain uses of monetary goods, such as capital controls.\n\nGold, although it is not issued by states, can be difficult to transmit at a distance and is therefore more subject to state regulation.\n",
             "title": "No permission required",
             "type": "Text"
@@ -708,13 +708,13 @@
           },
           {
             "answers": [
-              "Coins made of copper and silver",
               "Shells, beads, and gold",
+              "Coins made of copper and silver",
               "Paper bills with pictures of famous leaders"
             ],
             "feedback": [
-              "Sorry, that's incorrect. Copper and silver coins were not used as money in the very beginning of its evolution",
               "Congratulations, you got it right! It's interesting to note that shells, beads, and gold were all valued for their appearance or special qualities before becoming widely used as money",
+              "Sorry, that's incorrect. Copper and silver coins were not used as money in the very beginning of its evolution",
               "Wrong! But at least you're thinking about the more modern forms of money. Paper bills with pictures of famous leaders were not used in the very beginning of money's evolution."
             ],
             "id": "collectible",

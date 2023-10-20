@@ -702,7 +702,7 @@
                     "Lo siento, pero en realidad es todo lo contrario. El sistema bancario fiat, que está regulado por los estados, requiere intervención humana para informar e impedir ciertos usos de bienes monetarios, lo que lo hace propenso a la censura. ¡Intenta otra vez!"
                 ],
                 "id": "censorshipResistance",
-                "question": "¿Cuál de las siguientes NO es una razón por la que Bitcoin se considera un bien resistente a la censura?",
+                "question": "¿Cuál de las siguientes es una razón por la que Bitcoin se considera un bien resistente a la censura?",
                 "text": "La resistencia a la censura es un atributo que se ha vuelto cada vez más importante en la era digital, ya que se refiere a la dificultad que tienen partes externas, como corporaciones o gobiernos, para impedir que un individuo utilice un bien en particular.\n\nEste atributo es particularmente valioso para las personas que viven bajo regímenes que imponen controles de capital o prohíben ciertas formas de comercio. A menudo se cita a Bitcoin como un bien resistente a la censura debido a su red descentralizada de igual a igual, que permite realizar transacciones sin intervención o permiso humano.\n\nPor el contrario, el sistema bancario fiat está regulado por los estados y requiere intervención humana para informar e impedir ciertos usos de bienes monetarios, como los controles de capital.\n\nEl oro, aunque no es emitido por los estados, puede ser difícil de transmitir a distancia y, por lo tanto, está más sujeto a la regulación estatal.\n",
                 "title": "No se requiere permiso",
                 "type": "Text"
@@ -734,13 +734,13 @@
             },
             {
                 "answers": [
-                    "Monedas de cobre y plata.",
                     "Conchas, cuentas y oro.",
+                    "Monedas de cobre y plata.",
                     "Billetes de papel con fotografías de líderes famosos."
                 ],
                 "feedback": [
-                    "Lo siento, eso es incorrecto. Las monedas de cobre y plata no se utilizaron como dinero al principio de su evolución.",
                     "¡Felicitaciones, lo hiciste bien! Es interesante notar que las conchas, las cuentas y el oro fueron valorados por su apariencia o cualidades especiales antes de ser ampliamente utilizados como dinero.",
+                    "Lo siento, eso es incorrecto. Las monedas de cobre y plata no se utilizaron como dinero al principio de su evolución.",
                     "¡Equivocado! Pero al menos estás pensando en las formas más modernas de dinero. Los billetes de papel con fotografías de líderes famosos no se utilizaron al principio de la evolución del dinero."
                 ],
                 "id": "collectible",
