@@ -302,12 +302,12 @@
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
+				9B843E6229DCD7B100740933 /* Embed Foundation Extensions */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				C655A53423D256CE008ACDDA /* ShellScript */,
 				702F1602462FA36568C29239 /* [CP] Copy Pods Resources */,
 				03E4FC2B4F75A9058A3B3515 /* [CP-User] [RNFB] Core Configuration */,
 				29C2473E55DF9E4F9AA06144 /* [CP-User] [RNFB] Crashlytics Configuration */,
-				9B843E6229DCD7B100740933 /* Embed Foundation Extensions */,
+				C655A53423D256CE008ACDDA /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -607,6 +607,7 @@
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BitcoinJungle/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BitcoinJungle;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
@@ -642,6 +643,7 @@
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BitcoinJungle/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BitcoinJungle;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
