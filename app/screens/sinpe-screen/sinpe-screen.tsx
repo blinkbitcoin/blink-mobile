@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Screen } from "../../components/screen"
 import type { ScreenType } from "../../types/jsx"
 import useMainQuery from "@app/hooks/use-main-query"
@@ -53,6 +53,21 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   const { tokenNetwork } = useToken()
   const { formatCurrencyAmount } = useMySubscription()
   const [mySatBalance, setMySatBalance] = useState(null)
+  const [submittingForm, setSubmittingForm] = useState(false)
+
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        if (!submittingForm) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+      }),
+    [navigation, submittingForm]
+  )
 
   useState(() => {
     setMySatBalance(satBalance)
@@ -257,6 +272,10 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
                   // })
                   navigation.navigate("moveMoney")
 
+                  break;
+
+                case "submittingForm":
+                  setSubmittingForm(data.submittingForm)
                   break;
               }
 

@@ -307,6 +307,7 @@
 				702F1602462FA36568C29239 /* [CP] Copy Pods Resources */,
 				03E4FC2B4F75A9058A3B3515 /* [CP-User] [RNFB] Core Configuration */,
 				29C2473E55DF9E4F9AA06144 /* [CP-User] [RNFB] Crashlytics Configuration */,
+				9B843E6229DCD7B100740933 /* Embed Foundation Extensions */,
 				C655A53423D256CE008ACDDA /* ShellScript */,
 			);
 			buildRules = (
@@ -602,10 +603,11 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 382;
+				CURRENT_PROJECT_VERSION = 383;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BitcoinJungle/Info.plist;
@@ -613,11 +615,12 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.bitcoinjungle.ios;
 				PRODUCT_NAME = "Bitcoin Jungle";
@@ -639,7 +642,7 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 382;
+				CURRENT_PROJECT_VERSION = 383;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -649,11 +652,12 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.bitcoinjungle.ios;
 				PRODUCT_NAME = "Bitcoin Jungle";

@@ -6,6 +6,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -334,9 +335,11 @@ export const WelcomePhoneInputScreen: ScreenType = ({
               autoFocus
             />
             <View style={styles.whatsappRow}>
-              <Text>
-                {translate("WelcomePhoneInputScreen.whatsapp")}
-              </Text>
+              <Pressable onPress={() => setWhatsApp(!whatsapp)}>
+                <Text>
+                  {translate("WelcomePhoneInputScreen.whatsapp")}
+                </Text>
+              </Pressable>
               <CheckBox
                 value={whatsapp}
                 onValueChange={(newValue) => setWhatsApp(newValue)}
