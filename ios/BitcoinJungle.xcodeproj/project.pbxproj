@@ -307,7 +307,6 @@
 				702F1602462FA36568C29239 /* [CP] Copy Pods Resources */,
 				03E4FC2B4F75A9058A3B3515 /* [CP-User] [RNFB] Core Configuration */,
 				29C2473E55DF9E4F9AA06144 /* [CP-User] [RNFB] Crashlytics Configuration */,
-				9B843E6229DCD7B100740933 /* Embed Foundation Extensions */,
 				C655A53423D256CE008ACDDA /* ShellScript */,
 			);
 			buildRules = (
