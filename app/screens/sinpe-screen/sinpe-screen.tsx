@@ -105,7 +105,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
       }
 
       const js = `
-        window.dispatchEvent(new CustomEvent("toggleLoadingOn"));
+        window.dispatchEvent(new CustomEvent("submitOrder"));
 
         true;
       `;
