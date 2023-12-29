@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { gql, useApolloClient, useMutation } from "@apollo/client"
 
 import { useMySubscription } from "../../hooks/user-hooks"
@@ -60,6 +60,7 @@ type UseFeeInput = {
   sameNode: boolean
   paymentSatAmount: number
   primaryCurrency: CurrencyType
+  targetConfirmations: number
 }
 
 type UseFeeReturn = {
@@ -77,6 +78,7 @@ const useFee = ({
   sameNode,
   paymentSatAmount,
   primaryCurrency,
+  targetConfirmations = 1,
 }: UseFeeInput): UseFeeReturn => {
   const client = useApolloClient()
   const { formatCurrencyAmount } = useMySubscription()
@@ -85,6 +87,14 @@ const useFee = ({
     value: null,
     status: "unset",
   })
+
+  useEffect(() => {
+    setFee({
+      value: null,
+      status: "unset",
+    })
+  }, [targetConfirmations])
+
 
   const [getLightningFees] = useMutation(LIGHTNING_FEES)
   const [getNoAmountLightningFees] = useMutation(NO_AMOUNT_LIGHTNING_FEES)
@@ -177,7 +187,7 @@ const useFee = ({
 
         const { data } = await client.query({
           query: ONCHAIN_FEES,
-          variables: { walletId, address, amount: paymentSatAmount },
+          variables: { walletId, address, amount: paymentSatAmount, targetConfirmations },
           fetchPolicy: "no-cache",
         })
         const feeValue = data.onChainTxFee.amount

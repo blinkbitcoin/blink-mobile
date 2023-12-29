@@ -104,6 +104,7 @@ export const SendBitcoinConfirmationScreen = ({
 
   const [errs, setErrs] = useState<{ message: string }[]>([])
   const [status, setStatus] = useState<StatusType>(Status.IDLE)
+  const [targetConfirmations, setTargetConfirmations] = useState<number>(1)
 
   const paymentSatAmount = convertCurrencyAmount({
     amount: referenceAmount.value,
@@ -120,6 +121,7 @@ export const SendBitcoinConfirmationScreen = ({
     sameNode,
     paymentSatAmount,
     primaryCurrency,
+    targetConfirmations,
   })
 
   const [lnPay] = useMutation(LN_PAY, {
@@ -299,6 +301,7 @@ export const SendBitcoinConfirmationScreen = ({
             address,
             amount: paymentSatAmount,
             memo,
+            targetConfirmations,
           },
         },
       })
@@ -444,6 +447,9 @@ export const SendBitcoinConfirmationScreen = ({
             secondaryAmount={secondaryAmount}
             primaryTotalAmount={primaryTotalAmount}
             secondaryTotalAmount={secondaryTotalAmount}
+            paymentType={paymentType}
+            targetConfirmations={targetConfirmations}
+            setTargetConfirmations={setTargetConfirmations}
           />
         </View>
         {hasCompletedPayment && (

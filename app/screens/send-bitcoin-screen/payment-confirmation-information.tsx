@@ -1,10 +1,13 @@
 import * as React from "react"
 import { ActivityIndicator, Text, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
+import { Slider } from "react-native-elements"
+
 
 import { translate } from "../../i18n"
 import { currencyToTextWithUnits } from "../../utils/currencyConversion"
 import { palette } from "../../theme/palette"
+import { color } from "../../theme"
 
 type FeeType = {
   value: number | null | undefined
@@ -24,6 +27,9 @@ type PaymentConfirmationInformationProps = {
   secondaryAmount: MoneyAmount
   primaryTotalAmount: MoneyAmount
   secondaryTotalAmount: MoneyAmount
+  paymentType: string
+  targetConfirmations: Number
+  setTargetConfirmations: Function
 }
 
 export const PaymentConfirmationInformation = ({
@@ -34,7 +40,20 @@ export const PaymentConfirmationInformation = ({
   secondaryAmount,
   primaryTotalAmount,
   secondaryTotalAmount,
+  paymentType,
+  targetConfirmations,
+  setTargetConfirmations,
 }: PaymentConfirmationInformationProps): JSX.Element => {
+  const getEstimatedWaitTime = () => {
+    if(targetConfirmations === 1) {
+      return `~10 ${translate("common.minutes")}`
+    }
+
+    const numHours = Math.floor(targetConfirmations / 6)
+
+    return `~${numHours} ${translate("common.hours")}`
+  }
+
   return (
     <View style={styles.paymentInformation}>
       <View style={styles.paymentInformationRow}>
@@ -89,6 +108,26 @@ export const PaymentConfirmationInformation = ({
         </Text>
         <FeeDetails fee={fee} />
       </View>
+
+      {paymentType === "onchain" &&
+        <View style={styles.paymentInformationRow}>
+          <Text style={styles.paymentInformationLabel}>
+            {translate("SendBitcoinConfirmationScreen.confTime")}
+          </Text>
+          <View style={styles.paymentInformationData}>
+            <Slider
+              value={targetConfirmations}
+              onSlidingComplete={setTargetConfirmations}
+              maximumValue={40}
+              minimumValue={1}
+              step={5}
+              thumbTintColor={color.primary}
+            />
+            <Text>{translate("SendBitcoinConfirmationScreen.waitTime")} {getEstimatedWaitTime()}</Text>
+          </View>
+        </View>
+      }
+
     </View>
   )
 }

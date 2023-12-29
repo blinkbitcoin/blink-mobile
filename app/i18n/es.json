@@ -2416,6 +2416,8 @@
     "confirmPayment?": "¿Desea confirmar este pago?",
     "destinationLabel": "Para:",
     "feeLabel": "Tarifa de red:",
+    "confTime": "Tiempo de espera:",
+    "waitTime": "Tiempo de espera estimado:",
     "memoLabel": "Nota:",
     "paymentFinal": "Recuerde que los pagos son definitivos y una vez realizados son irreversibles.",
     "stalePrice": "El precio de bitcoin está desactualizado, se actualizó por última vez hace {{timePeriod}}. Por favor reinicie la aplicación antes de realizar el pago.",

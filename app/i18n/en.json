@@ -2390,6 +2390,8 @@
     "confirmPayment?": "Do you want to confirm this payment?",
     "destinationLabel": "To:",
     "feeLabel": "Fee:",
+    "confTime": "Wait Time:",
+    "waitTime": "Estimated Wait Time:",
     "memoLabel": "Note:",
     "paymentFinal": "Payments are final.",
     "stalePrice": "Your bitcoin price is old and was last updated {{timePeriod}} ago. Please restart the app before making a payment.",
