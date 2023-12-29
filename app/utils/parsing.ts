@@ -2,6 +2,7 @@ import * as lightningPayReq from "bolt11"
 import moment from "moment"
 import url from "url"
 import { networks, address } from "bitcoinjs-lib"
+import * as bip21 from "bip21"
 import { getDescription, getDestination, getUsername } from "./bolt11"
 import { utils } from "lnurl-pay"
 import type { INetwork } from "../types/network"
@@ -73,6 +74,17 @@ export const validPayment = (
     /* eslint-disable no-param-reassign */
     input = input.replace("lightning://", "").replace("LIGHTNING://", "").replace("lightning:", "").replace("LIGHTNING:", "")
   }
+
+  try {
+    const bip21Decoded = bip21.decode(input)
+
+    if(bip21Decoded && bip21Decoded.options && bip21Decoded.options.lightning) {
+      input = `lightning:${bip21Decoded.options.lightning.toLowerCase()}`
+    }
+  } catch (e) {
+    console.log('error parsing bip21', e)
+  }
+
   // eslint-disable-next-line prefer-const
   let [protocol, data] = input.split(":")
   let paymentType: IPaymentType

@@ -1995,10 +1995,10 @@
   resolved "https://registry.npmjs.org/@expo/sdk-runtime-versions/-/sdk-runtime-versions-1.0.0.tgz"
   integrity sha512-Doz2bfiPndXYFPMRwPyGa1k5QaKDVpY806UJj570epIiMzWaYyCtobasyfC++qfIXVb5Ocy7r3tP9d62hAQ7IQ==
 
-"@galoymoney/react-native-geetest-module@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.npmjs.org/@galoymoney/react-native-geetest-module/-/react-native-geetest-module-0.1.3.tgz"
-  integrity sha512-fLERd8Xl65kDYet7osKFcrcGQIum3TO8pDyMWWXPu5nwTGfzUos+s4LPgCG3/zMusA6Ft+p4cqjHgD9wgySXgQ==
+"@galoymoney/react-native-geetest-module@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.npmjs.org/@galoymoney/react-native-geetest-module/-/react-native-geetest-module-0.1.5.tgz#b7fcaa713318493b552676e2994f933f3fbecf5b"
+  integrity sha512-U7PbibBI2oDhBsF3AUPKS51Eg7XvdJfi6Tz1gZu20LorGNmas9CIB207KpJBSS+TVQEVslxh0Y70y6EsAS5S6Q==
 
 "@graphql-typed-document-node/core@^3.0.0":
   version "3.1.0"
@@ -5161,6 +5161,13 @@ bip174@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/bip174/-/bip174-2.0.1.tgz"
   integrity sha512-i3X26uKJOkDTAalYAp0Er+qGMDhrbbh2o93/xiPyAN2s25KrClSpe3VXo/7mNJoqA5qfko8rLS2l3RWZgYmjKQ==
+
+bip21@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/bip21/-/bip21-2.0.3.tgz#6e95b542718af497b442d92ae8af433d6ea80368"
+  integrity sha512-L4ODmASLjsHYAU+TG7xffkYNMvHzAe4mkVX7mcvOUyKAr/MDBPrsRgqUhE8EmKdeEKHk5SYpX1Aexzvm/6WdbQ==
+  dependencies:
+    qs "^6.3.0"
 
 bip32@^2.0.4:
   version "2.0.6"
@@ -13703,6 +13710,13 @@ qs@^6.10.0, qs@^6.6.0:
   version "6.10.1"
   resolved "https://registry.npmjs.org/qs/-/qs-6.10.1.tgz"
   integrity sha512-M528Hph6wsSVOBiYUnGf+K/7w0hNshs/duGsNXPUCLH5XAqjEtiPGwNONLV0tBH8NoGb0mvD5JubnUTrujKDTg==
+  dependencies:
+    side-channel "^1.0.4"
+
+qs@^6.3.0:
+  version "6.11.2"
+  resolved "https://registry.npmjs.org/qs/-/qs-6.11.2.tgz#64bea51f12c1f5da1bc01496f48ffcff7c69d7d9"
+  integrity sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==
   dependencies:
     side-channel "^1.0.4"
 
