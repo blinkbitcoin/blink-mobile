@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 
 public class BitcoinPriceWidgetProvider extends AppWidgetProvider {
 
-    private static final String API_URL = "https://orders.bitcoinjungle.app/price";
+    private static final String API_URL = "https://price.bitcoinjungle.app/ticker";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -50,7 +50,7 @@ public class BitcoinPriceWidgetProvider extends AppWidgetProvider {
                     String jsonResponse = response.body().string();
                     Gson gson = new Gson();
                     PriceResponse priceResponse = gson.fromJson(jsonResponse, PriceResponse.class);
-                    double btcUsd = priceResponse.BTCUSD;
+                    double btcUsd = priceResponse.BTCUSD.indexPrice;
 
                     NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
                     String formattedPrice = currencyFormat.format(btcUsd);
@@ -62,6 +62,10 @@ public class BitcoinPriceWidgetProvider extends AppWidgetProvider {
     }
 
     private static class PriceResponse {
-        double BTCUSD;
+        public PriceObject BTCUSD;
+
+        private static class PriceObject {
+            public double indexPrice;
+        }
     }
 }
