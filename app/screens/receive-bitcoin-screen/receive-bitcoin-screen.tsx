@@ -613,7 +613,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                   <Button
                     buttonStyle={styles.buttonStyle}
                     containerStyle={styles.buttonContainer}
-                    title={"Generate BTC Address"}
+                    title={translate("ReceiveBitcoinScreen.generateQr")}
                     onPress={onBtcAddressRequestClick}
                     titleStyle={styles.buttonTitle}
                   />

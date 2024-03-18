@@ -2356,7 +2356,8 @@
     "setNote": "set a note",
     "tapQrCodeCopy": "Tap QR Code to Copy",
     "title": "Receive Bitcoin",
-    "error": "Failed to generate invoice. Please contact support if this problem persists."
+    "error": "Failed to generate invoice. Please contact support if this problem persists.",
+    "generateQr": "Generate BTC Address"
   },
   "ScanningQRCodeScreen": {
     "invalidContent": "We found:\n\n{{found}}\n\nThis is not a valid Bitcoin address or Lightning invoice",
