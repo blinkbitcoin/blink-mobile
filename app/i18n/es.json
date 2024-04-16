@@ -2356,7 +2356,9 @@
     "none": "No se encuentra punto de venta.",
     "storeName": "Nombre de Tienda",
     "link": "Enlace",
-    "currency": "Moneda"
+    "currency": "Moneda",
+    "qrCodeText1": "Escanea el código QR en su dispositivo.",
+    "qrCodeText2": "Luego, puede agregarlo a la pantalla de inicio para facilitar el acceso."
   },
   "PriceScreen": {
     "oneDay": "1D",

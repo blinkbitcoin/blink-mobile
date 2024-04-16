@@ -2330,7 +2330,9 @@
     "none": "No Point of Sale found.",
     "storeName": "Store Name",
     "link": "Link",
-    "currency": "Currency"
+    "currency": "Currency",
+    "qrCodeText1": "Scan the QR Code on your device.",
+    "qrCodeText2": "Then, you can add it to the home screen for easy access."
   },
   "PriceScreen": {
     "oneDay": "1D",

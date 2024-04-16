@@ -25,7 +25,8 @@ import { color } from "@app/theme"
 import useMainQuery from "@app/hooks/use-main-query"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import Icon from "react-native-vector-icons/Ionicons"
+import QRCode from "react-native-qrcode-svg"
 
 import { CREATE_POS_API_KEY } from "../../constants/support"
 
@@ -133,6 +134,7 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
   const [ defaultCurrency, setDefaultCurrency ] = React.useState("CRC")
   const [ defaultLanguage, setDefaultLanguage ] = React.useState("en")
   const [ tipUsernames, setTipUsernames ] = React.useState([{username: "", isValid: null}])
+  const [ qrCodeToShow, setQrCodeToShow ] = React.useState(null)
 
   const [ storeData, setStoreData ] = React.useState([])
 
@@ -368,10 +370,18 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
         {
           storeData.map((el) => {
             return (
-             <ListItem key={el.id} bottomDivider onPress={() => copyToClipboard(el.id, true)}>
-              <Icon name={"compass-outline"} size={20} />
+             <ListItem key={el.id} bottomDivider>
+              <Icon name="qr-code" size={20} onPress={() => setQrCodeToShow(qrCodeToShow === el.id ? null : el.id)} />
+              <Icon name={"compass-outline"} size={20} onPress={() => copyToClipboard(el.id, true)} />
               <ListItem.Content>
                 <ListItem.Title>{el.name}</ListItem.Title>
+                {el.id === qrCodeToShow &&
+                  <View>
+                    <QRCode size={200} value={`https://btcpayserver.bitcoinjungle.app/apps/${qrCodeToShow}/pos`} logoBackgroundColor="white" ecl={"H"} />
+                    <Text>{translate("PointOfSaleScreen.qrCodeText1")}</Text>
+                    <Text>{translate("PointOfSaleScreen.qrCodeText2")}</Text>
+                  </View>
+                }
               </ListItem.Content>
               </ListItem>
             )
