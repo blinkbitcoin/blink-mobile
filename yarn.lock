@@ -2574,10 +2574,10 @@
   resolved "https://registry.npmjs.org/@react-native-firebase/messaging/-/messaging-13.0.1.tgz"
   integrity sha512-EYEExRXtGrDgYciWPDvCKXGVQLXEAErE1KFWglzcEBjFOyp9NGf0kj1Gd54r03g7BN1JybK8AC+pWgkTTkFf5A==
 
-"@react-native-picker/picker@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.2.1.tgz"
-  integrity sha512-EC7yv22QLHlTfnbC1ez9IUdXTOh1W31x96Oir0PfskSGFFJMWWdLTg4VrcE2DsGLzbfjjkBk123c173vf2a5MQ==
+"@react-native-picker/picker@^2.6.1":
+  version "2.6.1"
+  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.6.1.tgz#3b20ddd1385fab0487db103dc6519570f8892e6d"
+  integrity sha512-oJftvmLOj6Y6/bF4kPcK6L83yNBALGmqNYugf94BzP0FQGpHBwimVN2ygqkQ2Sn2ZU3pGUZMs0jV6+Gku2GyYg==
 
 "@react-native/assets@1.0.0":
   version "1.0.0"
@@ -14349,6 +14349,11 @@ react-native-secure-key-store@^2.0.9:
   resolved "https://registry.npmjs.org/react-native-secure-key-store/-/react-native-secure-key-store-2.0.9.tgz"
   integrity sha512-9qi1rOlv4qNSpJIjqcIB7d0EQSwo2Yho8NVBT/Jc9NeYibDLHdArLXl8jn8H6nlf+8alk/bXqr4rPINrCTtmog==
 
+react-native-send-direct-sms@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/react-native-send-direct-sms/-/react-native-send-direct-sms-0.2.0.tgz#2c228064766b78565bcd70cf40aaa41a49352724"
+  integrity sha512-nK2Lp7HAt08gcvJs/xXXJhwCALVPdM0axwWJ4t7fOsFGliuhhTrcSSdA06mDwdVJd9WKUSIPCx1RwEgwyEhQ2A==
+
 react-native-share@^7.3.0:
   version "7.3.0"
   resolved "https://registry.npmjs.org/react-native-share/-/react-native-share-7.3.0.tgz"
@@ -14358,6 +14363,11 @@ react-native-size-matters@^0.3.1:
   version "0.3.1"
   resolved "https://registry.npmjs.org/react-native-size-matters/-/react-native-size-matters-0.3.1.tgz"
   integrity sha512-mKOfBLIBFBcs9br1rlZDvxD5+mAl8Gfr5CounwJtxI6Z82rGrMO+Kgl9EIg3RMVf3G855a85YVqHJL2f5EDRlw==
+
+react-native-sms@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.npmjs.org/react-native-sms/-/react-native-sms-1.11.0.tgz#02e191ef35fae163d7fae1f78f42f202c33f8c9e"
+  integrity sha512-G5q61qGknNyftN1cFkXfH46UkQWMf3fy/M1fxK/QJzLDJAgCSeBqge62FgJClw1FqzYGSjZeoZvkgpWGDCd3wQ==
 
 react-native-snap-carousel@^3.9.1:
   version "3.9.1"

@@ -1,9 +1,11 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
+import SendSMS from 'react-native-sms'
+// import { SendDirectSms } from 'react-native-send-direct-sms'
 import { Screen } from "../../components/screen"
 import type { ScreenType } from "../../types/jsx"
 import useMainQuery from "@app/hooks/use-main-query"
-import { ActivityIndicator, Text, View, Alert, Button } from "react-native"
+import { ActivityIndicator, Text, View, Alert, Button, Platform, BackHandler } from "react-native"
 import { WebView } from 'react-native-webview'
 import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { useWalletBalance } from "../../hooks"
@@ -53,33 +55,64 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   const { tokenNetwork } = useToken()
   const { formatCurrencyAmount } = useMySubscription()
   const [mySatBalance, setMySatBalance] = useState(null)
-  const [submittingForm, setSubmittingForm] = useState(false)
+  const [canGoBack, setCanGoBack] = useState(false)
+  const otcBaseUri = getOtcBaseUri()
 
-  useEffect(
-    () =>
-      navigation.addListener('beforeRemove', (e) => {
-        if (!submittingForm) {
-          // If we don't have unsaved changes, then we don't need to do anything
-          return;
+  const handleBackButtonPress = () => {
+    try {
+      if(canGoBack) {
+        this.webview.goBack()
+        return true
+      }
+    } catch (err) {
+      console.log("[handleBackButtonPress] Error : ", err.message)
+    }
+
+    return false
+  }
+
+  const sendMessage = (data) => {
+    console.log('sendMessage', data)
+    if(false && Platform.OS === 'android') {
+      // SendDirectSms(data.to, decodeURIComponent(data.message))
+      // .then((res) => {
+      //   if(res && res === 'SMS sent') {
+      //     const js = `
+      //       window.dispatchEvent(new CustomEvent("smsSent"));
+
+      //       true;
+      //     `;
+      //     this.webview.injectJavaScript(js);
+      //   }
+      // })
+      // .catch((err) => console.log("catch", err))
+    } else {
+      console.log('manual send')
+      SendSMS.send({
+        body: data.message,
+        recipients: [data.to],
+        allowAndroidSendWithoutReadPermission: true,
+        successTypes: ['all'],
+      }, (completed, cancelled, error) => {
+        console.log(completed,cancelled,error)
+
+        if(completed) {
+          const js = `
+            window.dispatchEvent(new CustomEvent("smsSent"));
+
+            true;
+          `;
+          this.webview.injectJavaScript(js);
         }
-
-        // Prevent default behavior of leaving the screen
-        e.preventDefault();
-      }),
-    [navigation, submittingForm]
-  )
+      })
+    }
+  }
 
   useState(() => {
     setMySatBalance(satBalance)
   }, [])
 
   const runFirst = `
-    true;
-  `;
-
-  const resetTimestamp = `
-    window.dispatchEvent(new CustomEvent("resetTimestamp"));
-
     true;
   `;
 
@@ -100,16 +133,8 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
           balance: formatCurrencyAmount({ sats: satBalance, currency: "USD" }),
           amount: formatCurrencyAmount({sats: amount, currency: "USD"}),
         }))
-        this.webview.injectJavaScript(resetTimestamp)
         return
       }
-
-      const js = `
-        window.dispatchEvent(new CustomEvent("submitOrder"));
-
-        true;
-      `;
-      this.webview.injectJavaScript(js);
 
       const { data, errors } = await lnPay({
         variables: {
@@ -137,13 +162,6 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   const createInvoice = async(satAmount) => {
     console.log('create invoice', satAmount)
     try {
-      const js = `
-        window.dispatchEvent(new CustomEvent("toggleLoadingOn"));
-
-        true;
-      `;
-      this.webview.injectJavaScript(js);
-
       const { data, errors } = await addInvoice({
         variables: {
           input: { 
@@ -168,22 +186,8 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   }
 
   const handlePaymentReturn = (status, errors) => {    
-    const js = `
-      window.dispatchEvent(new CustomEvent("toggleLoadingOff"));
-      true;
-    `;
-    
-    this.webview.injectJavaScript(js);
-
     if (status === "SUCCESS" || status === "PENDING" || status === "ALREADY_PAID") {
-      setTimeout(() => {
-        const js = `
-          window.dispatchEvent(new CustomEvent("submitOrder"));
-
-          true;
-        `;
-        this.webview.injectJavaScript(js);
-      }, 250)
+     
     } else {
       let errorMessage = ''
       if (errors && Array.isArray(errors)) {
@@ -193,24 +197,11 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
       }
 
       Alert.alert("Error!", errorMessage)
-      this.webview.injectJavaScript(resetTimestamp)
     }
-  }
-
-  const handlePaymentError = (error) => {
-   // Alert.alert(translate("errors.generic"))
-   // this.webview.injectJavaScript(resetTimestamp)
   }
 
   const handleInvoiceReturn = (invoice, errors) => {    
     console.log(invoice, errors)
-    const js = `
-      window.dispatchEvent(new CustomEvent("toggleLoadingOff"));
-      true;
-    `;
-    
-    this.webview.injectJavaScript(js);
-
     if (!errors || !errors.length) {
       setTimeout(() => {
         const js = `
@@ -237,6 +228,48 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
    Alert.alert(translate("errors.generic"))
   }
 
+  const confirmLightning = async (amount) => {
+    Alert.alert(
+      translate("SendBitcoinConfirmationScreen.confirmPayment"),
+      translate(
+        "SendBitcoinConfirmationScreen.areYouSure", 
+        {
+          satAmount: formatCurrencyAmount({sats: Number(amount * 100000000), currency: "BTC"}),
+          fiatAmount: formatCurrencyAmount({sats: amount * 100000000, currency: "USD"}),
+        }
+      ), 
+      [
+        {
+          text: translate("common.cancel"),
+          onPress: () => console.log('canceled'),
+          style: 'cancel',
+        },
+        {
+          text: translate("common.ok"),
+          onPress: async () => {
+            setTimeout(() => {
+              const js = `
+                window.dispatchEvent(new CustomEvent("userConfirmed"));
+
+                true;
+              `;
+              this.webview.injectJavaScript(js);
+            }, 250)
+          }
+        },
+      ]
+    );
+  }
+
+  useEffect(() => {
+    if(Platform.OS === 'android') {
+      BackHandler.addEventListener("hardwareBackPress", handleBackButtonPress)
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handleBackButtonPress)
+      }
+    }
+  }, [canGoBack])
+
   return (
     <Screen>
       <View style={{flex: 1}}>
@@ -244,7 +277,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
           <WebView
             ref={(ref) => (this.webview = ref)}
             source={{
-              uri: `${getOtcBaseUri()}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${mySatBalance}`,
+              uri: `${otcBaseUri.url}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${mySatBalance}`,
               headers: {
                 'x-bj-wallet': "true",
               },
@@ -253,6 +286,11 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
               const data = JSON.parse(event.nativeEvent.data)
 
               switch(data.action) {
+                case "confirm":
+                  await confirmLightning(data.amount)
+
+                  break;
+
                 case "invoice":
                   const invoice = data.bolt11
                   await payLightning(invoice)
@@ -274,15 +312,21 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
 
                   break;
 
-                case "submittingForm":
-                  setSubmittingForm(data.submittingForm)
+                case "sendSms":
+                  sendMessage(data)
                   break;
               }
-
-              
             }}
+            allowsBackForwardNavigationGestures={true}
             injectedJavaScript={runFirst}
+            onNavigationStateChange={(navState) => {
+              setCanGoBack(navState.canGoBack)
+            }}
             sharedCookiesEnabled={true}
+            basicAuthCredential={{
+              username: otcBaseUri.username,
+              password: otcBaseUri.password
+            }}   
           />
         }
       </View>

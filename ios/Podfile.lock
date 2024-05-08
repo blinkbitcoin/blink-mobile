@@ -334,6 +334,10 @@ PODS:
     - React-Core
   - react-native-screen-brightness (2.0.0-alpha):
     - React
+  - react-native-send-direct-sms (0.2.0):
+    - React-Core
+  - react-native-sms (1.11.0):
+    - React
   - react-native-version-number (0.3.6):
     - React
   - react-native-webview (11.26.1):
@@ -412,7 +416,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
-  - RNCPicker (2.2.1):
+  - RNCPicker (2.6.1):
     - React-Core
   - RNCPushNotificationIOS (1.10.1):
     - React-Core
@@ -528,6 +532,8 @@ DEPENDENCIES:
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screen-brightness (from `../node_modules/react-native-screen-brightness`)
+  - react-native-send-direct-sms (from `../node_modules/react-native-send-direct-sms`)
+  - react-native-sms (from `../node_modules/react-native-sms`)
   - react-native-version-number (from `../node_modules/react-native-version-number`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -655,6 +661,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-screen-brightness:
     :path: "../node_modules/react-native-screen-brightness"
+  react-native-send-direct-sms:
+    :path: "../node_modules/react-native-send-direct-sms"
+  react-native-sms:
+    :path: "../node_modules/react-native-sms"
   react-native-version-number:
     :path: "../node_modules/react-native-version-number"
   react-native-webview:
@@ -784,6 +794,8 @@ SPEC CHECKSUMS:
   react-native-restart: 733a51ad137f15b0f8dc34c4082e55af7da00979
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   react-native-screen-brightness: 9eefe6db96a5d757e63cdfce8e48d7c9039f2af2
+  react-native-send-direct-sms: 10fa6db98a5a2605720d9657cd6014716b1466e5
+  react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
   react-native-version-number: b415bbec6a13f2df62bf978e85bc0d699462f37f
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: 93075d8931c32cd1fce8a98c15d2d5ccc4d891bd
@@ -802,7 +814,7 @@ SPEC CHECKSUMS:
   RNCCheckbox: 38989bbd3d7d536adf24ba26c6b3e6cefe0bea6f
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
-  RNCPicker: cb57c823d5ce8d2d0b5dfb45ad97b737260dc59e
+  RNCPicker: b18aaf30df596e9b1738e7c1f9ee55402a229dca
   RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
   RNDeviceInfo: 0400a6d0c94186d1120c3cbd97b23abc022187a9
   RNFBAnalytics: b6b6b4767c1560e11cb81de52bb97007be6f6c09

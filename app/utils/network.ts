@@ -13,8 +13,8 @@ const GRAPHQL_REGTEST_WS_URI = `ws://${scriptHostname()}:4002/graphql`
 const GRAPHQL_TESTNET_WS_URI = "wss://api.staging.galoy.io/graphql"
 const GRAPHQL_MAINNET_WS_URI = "wss://api.mainnet.bitcoinjungle.app/graphql"
 
-const OTC_PROD_BASE_URI = "https://orders.bitcoinjungle.app/"
-const OTC_DEV_BASE_URI = `http://${scriptHostname()}:3000/`
+const OTC_PROD_BASE_URI = "https://cr.bullbitcoin.com/"
+const OTC_DEV_BASE_URI = `https://cr.bullbitcoin.dev/`
 
 // FIXME: no longer need since we switch from mst-gql to apollo-client
 
@@ -42,10 +42,18 @@ export const removeNetwork = async (): Promise<void> => {
 
 export const getOtcBaseUri = () => {
   if(__DEV__) {
-    return OTC_DEV_BASE_URI
+    return {
+      url: OTC_DEV_BASE_URI,
+      username: 'bbadmin',
+      password: 'We are staging 02!',
+    }
   }
 
-  return OTC_PROD_BASE_URI
+  return {
+    url: OTC_PROD_BASE_URI,
+    username: 'bbadmin',
+    password: '20b45614-60f7-46c9-9565-c9936fbc4c99',
+  }
 }
 
 export const getGraphQLUri = (

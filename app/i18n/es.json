@@ -2427,7 +2427,8 @@
     "title": "Confirmar pago",
     "totalLabel": "Total:",
     "totalExceed": "El total excede su saldo de {{balance}}",
-    "totalExceedWithAmount": "El total de {{amount}} excede su saldo de {{balance}}"
+    "totalExceedWithAmount": "El total de {{amount}} excede su saldo de {{balance}}",
+    "areYouSure": "Estás a punto de enviar un pago de {{satAmount}} con un valor de {{fiatAmount}}. ¿Le gustaría proceder?"
   },
   "SendBitcoinScreen": {
     "amount": "Cantidad",
