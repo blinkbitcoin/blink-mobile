@@ -5,7 +5,7 @@ import SendSMS from 'react-native-sms'
 import { Screen } from "../../components/screen"
 import type { ScreenType } from "../../types/jsx"
 import useMainQuery from "@app/hooks/use-main-query"
-import { ActivityIndicator, Text, View, Alert, Button, Platform, BackHandler } from "react-native"
+import { ActivityIndicator, Text, View, Alert, Button, Platform, BackHandler, Linking } from "react-native"
 import { WebView } from 'react-native-webview'
 import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { useWalletBalance } from "../../hooks"
@@ -314,6 +314,11 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
 
                 case "sendSms":
                   sendMessage(data)
+                  break;
+
+                case "clickLink":
+                  console.log(data)
+                  Linking.openURL(data.url)
                   break;
               }
             }}
