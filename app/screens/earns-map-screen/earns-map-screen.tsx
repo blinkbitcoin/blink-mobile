@@ -1,9 +1,9 @@
+import * as React from "react";
 import { useApolloClient } from "@apollo/client"
 import { StackNavigationProp } from "@react-navigation/stack"
 import i18n from "i18n-js"
-import * as React from "react"
-import { StatusBar, StyleSheet, Text, View } from "react-native"
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler"
+import { StatusBar, StyleSheet, Text, View, Modal, Button } from "react-native"
+import { ScrollView, TouchableOpacity, PanGestureHandler, State } from "react-native-gesture-handler"
 import { SvgProps } from "react-native-svg"
 import { MountainHeader } from "../../components/mountain-header"
 import { Screen } from "../../components/screen"
@@ -15,6 +15,7 @@ import { palette } from "../../theme/palette"
 import { ComponentType, ScreenType } from "../../types/jsx"
 import useToken from "../../utils/use-token"
 import { sectionCompletedPct } from "../earns-screen"
+import ChatInterface from '../../components/chat-interface/ChatInterface'
 import BitcoinCircle from "./bitcoin-circle-01.svg"
 import BottomOngoing from "./bottom-ongoing-01.svg"
 import BottomStart from "./bottom-start-01.svg"
@@ -72,6 +73,52 @@ const styles = StyleSheet.create({
   progressContainer: { backgroundColor: palette.darkGrey, margin: 10 },
 
   position: { height: 40 },
+
+  chatBubble: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: palette.lightBlue,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    zIndex: 1000,
+  },
+
+  chatBubbleText: {
+    fontSize: 30,
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    height: '80%', // takes up 80% of the screen height
+  },
+  dragIndicator: {
+    width: 40,
+    height: 5,
+    backgroundColor: 'grey',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  chatContainer: {
+    flex: 1,
+  },
 })
 
 type SideType = "left" | "right"
@@ -204,9 +251,11 @@ export const EarnMapScreen: React.FC<IEarnMapScreen> = ({
   progress,
   earned,
 }: IEarnMapScreen) => {
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+
   const Finish = ({ currSection, length }: FinishProps) => {
     if (currSection !== sectionsData.length) return null
-
+    
     return (
       <>
         <Text style={styles.finishText}>{translate("EarnScreen.finishText")}</Text>
@@ -332,6 +381,16 @@ export const EarnMapScreen: React.FC<IEarnMapScreen> = ({
     }
   }
 
+  const onPanGestureEvent = (event) => {
+    if (event.nativeEvent.translationY > 50) {
+      setIsChatOpen(false);
+    }
+  };
+
+  React.useEffect(() => {
+    console.log('isChatOpen:', isChatOpen);
+  }, [isChatOpen]);
+
   return (
     <Screen unsafe statusBar="light-content">
       <ScrollView
@@ -365,6 +424,36 @@ export const EarnMapScreen: React.FC<IEarnMapScreen> = ({
           )}
         </View>
       </ScrollView>
+      <Button
+        title="Chat With Us 💬"
+        onPress={() => setIsChatOpen(true)}
+      />
+      <Modal
+        visible={isChatOpen}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsChatOpen(false)}
+      >
+        <View style={styles.modalContainer}>
+          <PanGestureHandler
+            onGestureEvent={onPanGestureEvent}
+            onHandlerStateChange={({ nativeEvent }) => {
+              if (nativeEvent.oldState === State.ACTIVE) {
+                if (nativeEvent.translationY > 50) {
+                  setIsChatOpen(false);
+                }
+              }
+            }}
+          >
+            <View style={styles.modalContent}>
+              <View style={styles.dragIndicator} />
+              <View style={styles.chatContainer}>
+                <ChatInterface />
+              </View>
+            </View>
+          </PanGestureHandler>
+        </View>
+      </Modal>
     </Screen>
   )
 }
