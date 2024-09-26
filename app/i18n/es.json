@@ -52,6 +52,14 @@
   "DepositCashScreen": {
     "title": "Depositar efectivo"
   },
+  "TransactionStatsScreen": {
+    "title": "Estadísticas de transacciones",
+    "totalReceiveFiat": "Total Recibir Fiat",
+    "totalSendFiat": "Total Enviar Fiat",
+    "totalReceiveBtc": "Total Recibir BTC",
+    "totalSendBtc": "Total Enviar BTC",
+    "transactionCount": "Cantidad de transacciones"
+  },
   "DirectDepositScreen": {
     "account": "Cuenta",
     "action": "Mover mi cheque de pago",

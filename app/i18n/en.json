@@ -26,6 +26,14 @@
   "DepositCashScreen": {
     "title": "Deposit Cash"
   },
+  "TransactionStatsScreen": {
+    "title": "Transaction Stats",
+    "totalReceiveFiat": "Total Receive Fiat",
+    "totalSendFiat": "Total Send Fiat",
+    "totalReceiveBtc": "Total Receive BTC",
+    "totalSendBtc": "Total Send BTC",
+    "transactionCount": "Transaction Count"
+  },
   "EarnScreen": {
     "earnSats": {
       "one": "Earn 1 sat",

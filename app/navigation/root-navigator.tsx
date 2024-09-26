@@ -65,6 +65,7 @@ import type { NavigatorType } from "../types/jsx"
 import PushNotification from "react-native-push-notification"
 import useMainQuery from "@app/hooks/use-main-query"
 import { LnurlScreen } from "@app/screens/settings-screen/lnurl-screen"
+import { TransactionStatsScreen } from "../screens/transaction-stats-screen/transaction-stats-screen"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -435,6 +436,13 @@ export const RootStack: NavigatorType = () => {
           title: translate("common.bitcoinPrice"),
         }}
         initialParams={{ account: AccountType.Bitcoin }}
+      />
+      <RootNavigator.Screen
+        name="transactionStats"
+        component={TransactionStatsScreen}
+        options={{
+          title: translate("TransactionStatsScreen.title"),
+        }}
       />
     </RootNavigator.Navigator>
   )

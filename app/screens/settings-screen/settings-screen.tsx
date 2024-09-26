@@ -35,62 +35,6 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
 
   const { btcWalletId, username, phoneNumber, userPreferredLanguage } = useMainQuery()
 
-  const onGetCsvCallback = async (data) => {
-    const csvEncoded = data?.me?.defaultAccount?.csvTransactions
-    try {
-      await Share.open({
-        title: "export-csv-title.csv",
-        url: `data:text/comma-separated-values;base64,${csvEncoded}`,
-        type: "text/comma-separated-values",
-        // subject: 'csv export',
-        filename: "export",
-        // message: 'export message'
-      })
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const [fetchCsvTransactions, { loading: loadingCsvTransactions, called, refetch }] =
-    useLazyQuery(
-      gql`
-        query getWalletCSVTransactions($defaultWalletId: WalletId!) {
-          me {
-            id
-            defaultAccount {
-              id
-              csvTransactions(walletIds: [$defaultWalletId])
-            }
-          }
-        }
-      `,
-      {
-        fetchPolicy: "network-only",
-        notifyOnNetworkStatusChange: true,
-        onCompleted: onGetCsvCallback,
-        onError: (error) => {
-          crashlytics().recordError(error)
-          Alert.alert(
-            translate("common.error"),
-            translate("SettingsScreen.csvTransactionsError"),
-            [
-              {
-                text: translate("whatsapp.contactSupport"),
-                onPress: () =>
-                  openWhatsApp(
-                    WHATSAPP_CONTACT_NUMBER,
-                    translate("whatsapp.defaultSupportMessage"),
-                  ),
-              },
-              {
-                text: translate("common.cancel"),
-              },
-            ],
-          )
-        },
-      },
-    )
-
   const securityAction = async () => {
     const isBiometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
     const isPinEnabled = await KeyStoreWrapper.getIsPinEnabled()
@@ -180,19 +124,9 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       username={username}
       phone={phoneNumber}
       language={translate(`Languages.${userPreferredLanguage || "DEFAULT"}`)}
-      csvAction={() => {
-        if (!called) {
-          fetchCsvTransactions({
-            variables: { defaultWalletId: btcWalletId },
-          })
-        } else {
-          refetch({ defaultWalletId: btcWalletId })
-        }
-      }}
       securityAction={securityAction}
       logoutAction={logoutAction}
       deleteAction={deleteAction}
-      loadingCsvTransactions={loadingCsvTransactions}
       lnurlAction={lnurlAction}
     />
   )
@@ -205,12 +139,10 @@ type SettingsScreenProps = {
   phone: string
   language: string
   notificationsEnabled: boolean
-  csvAction: (options?: QueryLazyOptions<OperationVariables>) => void
   securityAction: () => void
   logoutAction: () => Promise<void>
   deleteAction: () => Promise<void>
   lnurlAction: () => void
-  loadingCsvTransactions: boolean
 }
 
 type SettingRow = {
@@ -233,12 +165,10 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     username,
     phone,
     language,
-    csvAction,
     securityAction,
     logoutAction,
     deleteAction,
     lnurlAction,
-    loadingCsvTransactions,
   } = params
   const copyToClipBoard = (username) => {
     Clipboard.setString(GALOY_PAY_DOMAIN + username)
@@ -325,12 +255,12 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       greyed: !hasToken || !username,
     },
     {
-      category: translate("common.csvExport"),
-      icon: "ios-download",
-      id: "csv",
-      action: () => csvAction(),
-      enabled: hasToken && !loadingCsvTransactions,
-      greyed: !hasToken || loadingCsvTransactions,
+      category: translate("TransactionStatsScreen.title"),
+      icon: "analytics-outline",
+      id: "transactionStats",
+      action: () => navigation.navigate("transactionStats"),
+      enabled: hasToken,
+      greyed: !hasToken,
     },
     {
       category: translate("tippingLink.title"),
