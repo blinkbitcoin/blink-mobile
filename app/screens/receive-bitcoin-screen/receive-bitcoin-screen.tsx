@@ -4,7 +4,7 @@ import * as React from "react"
 import { useCallback, useMemo, useEffect, useState } from "react"
 import { Alert, Keyboard, Platform, ScrollView, TextInput, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
-import ScreenBrightness from "react-native-screen-brightness"
+// import ScreenBrightness from "react-native-screen-brightness"
 import Swiper from "react-native-swiper"
 import Icon from "react-native-vector-icons/Ionicons"
 import debounce from "lodash.debounce"
@@ -312,48 +312,48 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
     }
   }, [])
 
-  useEffect(() => {
-    const fn = async () => {
-      // android required permission, and open the settings page for it
-      // it's probably not worth the hurdle
-      //
-      // only doing the brightness for iOS for now
-      //
-      // only need     <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions"/>
-      // in the manifest
-      // see: https://github.com/robinpowered/react-native-screen-brightness/issues/38
-      //
-      if (!isIos) {
-        return
-      }
+  // useEffect(() => {
+  //   const fn = async () => {
+  //     // android required permission, and open the settings page for it
+  //     // it's probably not worth the hurdle
+  //     //
+  //     // only doing the brightness for iOS for now
+  //     //
+  //     // only need     <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions"/>
+  //     // in the manifest
+  //     // see: https://github.com/robinpowered/react-native-screen-brightness/issues/38
+  //     //
+  //     if (!isIos) {
+  //       return
+  //     }
 
-      // let hasPerm = await ScreenBrightness.hasPermission();
+  //     // let hasPerm = await ScreenBrightness.hasPermission();
 
-      // if(!hasPerm){
-      //   ScreenBrightness.requestPermission();
-      // }
+  //     // if(!hasPerm){
+  //     //   ScreenBrightness.requestPermission();
+  //     // }
 
-      // only enter this loop when brightnessInitial is not set
-      // if (!brightnessInitial && hasPerm) {
-      if (!brightnessInitial) {
-        ScreenBrightness.getBrightness().then((brightness: number) => {
-          setBrightnessInitial(brightness)
-          ScreenBrightness.setBrightness(1) // between 0 and 1
-        })
-      }
-    }
+  //     // only enter this loop when brightnessInitial is not set
+  //     // if (!brightnessInitial && hasPerm) {
+  //     // if (!brightnessInitial) {
+  //     //   ScreenBrightness.getBrightness().then((brightness: number) => {
+  //     //     setBrightnessInitial(brightness)
+  //     //     ScreenBrightness.setBrightness(1) // between 0 and 1
+  //     //   })
+  //     // }
+  //   }
 
-    fn()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  //   fn()
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
-  useEffect(
-    () =>
-      brightnessInitial
-        ? () => ScreenBrightness.setBrightness(brightnessInitial)
-        : () => null,
-    [brightnessInitial],
-  )
+  // useEffect(
+  //   () =>
+  //     brightnessInitial
+  //       ? () => ScreenBrightness.setBrightness(brightnessInitial)
+  //       : () => null,
+  //   [brightnessInitial],
+  // )
 
   useEffect(() => {
     const notifRequest = async () => {
