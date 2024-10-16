@@ -9,7 +9,7 @@ export const PriceScreen: ScreenType = () => {
   return (
     // eslint-disable-next-line react-native/no-inline-styles
     <Screen backgroundColor={palette.white} preset="scroll" style={{ flex: 1 }}>
-      <BalanceHeader showSecondaryCurrency={false} />
+      {/* <BalanceHeader showSecondaryCurrency={false} /> */}
       <PriceGraphDataInjected />
     </Screen>
   )
