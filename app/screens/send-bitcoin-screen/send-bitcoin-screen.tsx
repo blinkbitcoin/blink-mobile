@@ -362,7 +362,7 @@ export const SendBitcoinScreen: ScreenType = ({
 
   const fetchInvoice = async (url) => {
     try {
-      const response = await fetch(url)
+      const response = await fetch(url.replace('/&', '&'))
       if (!response.ok) {
         return {
           status: "ERROR",
@@ -392,9 +392,11 @@ export const SendBitcoinScreen: ScreenType = ({
         satAmount = Math.round(secondaryAmount.value) * 1000
       }
 
-      const lnurlInvoice = await fetchInvoice(
-        `${lnurlPay.callback}?amount=${satAmount}&comment=${encodeURIComponent(memo)}`,
-      )
+      const url = new URL(lnurlPay.callback)
+      url.searchParams.append('amount', satAmount.toString())
+      url.searchParams.append('comment', memo)
+      const lnurlInvoice = await fetchInvoice(url.toString())
+
       if (lnurlInvoice.status && lnurlInvoice.status === "ERROR") {
         setLnurlError(lnurlInvoice.reason)
       } else {
