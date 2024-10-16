@@ -1,10 +1,11 @@
 import { gql, useQuery } from "@apollo/client"
 import * as React from "react"
-import { ActivityIndicator, StyleProp, Text, View } from "react-native"
+import { ActivityIndicator, StyleProp, Text, View, Dimensions } from "react-native"
 import { Button } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
-import { VictoryAxis, VictoryChart, VictoryLine } from "victory-native"
+import { VictoryChart, VictoryLine, VictoryVoronoiContainer, VictoryTooltip } from "victory-native"
 import * as currency_fmt from "currency.js"
+import { parseDate } from "../../utils/date"
 import {
   TextStyle,
   ViewStyle,
@@ -121,6 +122,14 @@ export const PriceGraph: ComponentType = ({
   let delta
   let color
 
+  const [selectedPrice, setSelectedPrice] = React.useState<Price | null>(null)
+
+  const formatPrice = (price: number) => {
+    return currency_fmt
+      .default(price, { precision: 2, symbol: "₡", separator: ".", decimal: "," })
+      .format()
+  }
+
   try {
     const currentPriceData = prices[prices.length - 1].price
     const startPriceData = prices[0].price
@@ -133,9 +142,8 @@ export const PriceGraph: ComponentType = ({
         (startPriceData.base / 10 ** startPriceData.offset) *
           multiple(startPriceData.currencyUnit)) /
       price
-    color = delta > 0 ? { color: palette.green } : { color: palette.red }
+    color = delta > 0 ? palette.green : palette.red
   } catch (err) {
-    // FIXME proper Loader
     return <ActivityIndicator animating size="large" color={palette.lightBlue} />
   }
 
@@ -164,39 +172,59 @@ export const PriceGraph: ComponentType = ({
   }
 
   return (
-    <>
-      <View style={styles.textView}>
-        <Text style={styles.neutral}>{translate("PriceScreen.satPrice")}</Text>
-        <Text style={styles.price}>{currency_fmt
-          .default(price, { precision: 2, symbol: "₡", separator: ".", decimal: "," })
-          .format()}
-        </Text>
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        {!selectedPrice && (
+          <View style={styles.textView}>
+            <Text style={[styles.delta, { color }]}>{(delta * 100).toFixed(2)}% </Text>
+            <Text style={styles.neutral}>{label()}</Text>
+          </View>
+        )}
+        {selectedPrice && (
+          <View>
+            <Text style={styles.selectedPrice}>
+              {parseDate(selectedPrice.timestamp).toDateString()}
+            </Text>
+            <Text style={styles.selectedPrice}>
+              {formatPrice((selectedPrice.base / 10 ** selectedPrice.offset) * multiple(selectedPrice.currencyUnit) * 1000 )}
+            </Text>
+          </View>
+        )}
       </View>
-      <View style={styles.textView}>
-        <Text style={[styles.delta, color]}>{(delta * 100).toFixed(2)}% </Text>
-        <Text style={styles.neutral}>{label()}</Text>
-      </View>
-      <View style={styles.chart}>
-        <VictoryChart>
-          <VictoryAxis
-            dependentAxis
-            standalone
-            style={{
-              axis: { strokeWidth: 0 },
-              tickLabels: {
-                fill: palette.midGrey,
-                fontSize: 14,
-              },
-            }}
-          />
+      <View style={styles.chartContainer}>
+        <VictoryChart
+          width={Dimensions.get("window").width}
+          height={Dimensions.get("window").height * 0.7}
+          padding={0}
+          containerComponent={
+            <VictoryVoronoiContainer
+              voronoiDimension="x"
+              onActivated={(points) => {
+                if (points && points.length > 0) {
+                  console.log(points[0])
+                  setSelectedPrice({
+                    timestamp: points[0]["_x"],
+                    ...points[0].price
+                  })
+                }
+              }}
+              // onDeactivated={() => setSelectedPrice(null)}
+            />
+          }
+        >
           <VictoryLine
             data={prices.map((index) => ({
-              y:
-                (index.price.base / 10 ** index.price.offset) *
-                multiple(index.price.currencyUnit),
+              x: index.timestamp,
+              y: (index.price.base / 10 ** index.price.offset) * multiple(index.price.currencyUnit),
+              price: index.price,
             }))}
-            interpolation="basis"
-            style={{ data: { stroke: palette.lightBlue, strokeWidth: 4 } }}
+            interpolation="monotoneX"
+            style={{
+              data: { 
+                stroke: color,
+                strokeWidth: 2 
+              }
+            }}
           />
         </VictoryChart>
       </View>
@@ -226,57 +254,77 @@ export const PriceGraph: ComponentType = ({
           onPress={() => setGraphRange(Graph_Range.ONE_YEAR)}
         />
       </View>
-    </>
+    </View>
   )
 }
 
 const styles = EStyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  
+  topContainer: {
+    // paddingTop: '10rem',
+    // paddingHorizontal: '20rem',
+  },
+
+  chartContainer: {
+    width: '100%',
+    height: Dimensions.get("window").height * 0.7, // Increased height
+  },
+
   buttonStyleTime: {
     backgroundColor: color.transparent,
-    borderRadius: "40rem",
-    width: "42rem",
+    borderRadius: '40rem',
+    paddingHorizontal: '10rem',
   },
 
   buttonStyleTimeActive: {
     backgroundColor: palette.lightBlue,
-    borderRadius: "40rem",
-    width: "42rem",
-  },
-
-  chart: {
-    alignSelf: "center",
-    marginLeft: "32rem",
+    borderRadius: '40rem',
+    paddingHorizontal: '10rem',
   },
 
   delta: {
-    fontSize: "16rem",
-    fontWeight: "bold",
+    fontSize: '18rem',
+    fontWeight: 'bold',
   },
 
   neutral: {
     color: palette.darkGrey,
-    fontSize: "16rem",
+    fontSize: '18rem',
   },
 
   price: {
     color: palette.lightBlue,
-    fontSize: "16rem",
-    fontWeight: "bold",
+    fontSize: '24rem',
+    fontWeight: 'bold',
   },
 
   pricesContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 64,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: '20rem',
+    paddingBottom: '20rem',
   },
 
   textView: {
-    alignSelf: "center",
-    flexDirection: "row",
-    marginVertical: "3rem",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: '10rem',
   },
 
   titleStyleTime: {
     color: palette.midGrey,
+  },
+
+  selectedPrice: {
+    fontSize: '20rem',
+    fontWeight: 'bold',
+    color: palette.lightBlue,
+    textAlign: 'center',
+    marginTop: '5rem',
   },
 })
