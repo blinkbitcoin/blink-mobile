@@ -316,8 +316,6 @@ PODS:
   - react-native-geetest-module (0.1.5):
     - GT3Captcha-iOS
     - React-Core
-  - react-native-geolocation (2.0.2):
-    - React
   - react-native-image-picker (4.10.3):
     - React-Core
   - react-native-maps (0.29.4):
@@ -332,8 +330,6 @@ PODS:
     - React-Core
   - react-native-safe-area-context (3.3.2):
     - React-Core
-  - react-native-screen-brightness (2.0.0-alpha):
-    - React
   - react-native-send-direct-sms (0.2.0):
     - React-Core
   - react-native-sms (1.11.0):
@@ -523,7 +519,6 @@ DEPENDENCIES:
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - "react-native-geetest-module (from `../node_modules/@galoymoney/react-native-geetest-module`)"
-  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -531,7 +526,6 @@ DEPENDENCIES:
   - "react-native-qrcode-local-image (from `../node_modules/@remobile/react-native-qrcode-local-image`)"
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - react-native-screen-brightness (from `../node_modules/react-native-screen-brightness`)
   - react-native-send-direct-sms (from `../node_modules/react-native-send-direct-sms`)
   - react-native-sms (from `../node_modules/react-native-sms`)
   - react-native-version-number (from `../node_modules/react-native-version-number`)
@@ -643,8 +637,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-geetest-module:
     :path: "../node_modules/@galoymoney/react-native-geetest-module"
-  react-native-geolocation:
-    :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-maps:
@@ -659,8 +651,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-screen-brightness:
-    :path: "../node_modules/react-native-screen-brightness"
   react-native-send-direct-sms:
     :path: "../node_modules/react-native-send-direct-sms"
   react-native-sms:
@@ -785,7 +775,6 @@ SPEC CHECKSUMS:
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
   react-native-geetest-module: ed6a20774a7975640b79a2f639327c674a488cb5
-  react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
   react-native-maps: a421fe6aeb74279597c4ea9598f25796108e2d89
   react-native-netinfo: 27f287f2d191693f3b9d01a4273137fcf91c3b5d
@@ -793,7 +782,6 @@ SPEC CHECKSUMS:
   react-native-qrcode-local-image: a16d554baf5cf5c04da86b464d99cf658e215c52
   react-native-restart: 733a51ad137f15b0f8dc34c4082e55af7da00979
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
-  react-native-screen-brightness: 9eefe6db96a5d757e63cdfce8e48d7c9039f2af2
   react-native-send-direct-sms: 10fa6db98a5a2605720d9657cd6014716b1466e5
   react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
   react-native-version-number: b415bbec6a13f2df62bf978e85bc0d699462f37f
