@@ -5,8 +5,8 @@ buildscript {
         ndkVersion = "21.4.7075529"
         buildToolsVersion = "33.0.1"
         minSdkVersion = 21
-        compileSdkVersion = 33
-        targetSdkVersion = 33
+        compileSdkVersion = 34
+        targetSdkVersion = 34
         kotlinVersion = "1.8.10" // https://github.com/wix/react-native-notifications/issues/649
 
         androidXCore = "1.5.0"
@@ -45,7 +45,7 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-
+        maven { url 'https://jitpack.io' }  // Example alternative repo
         google()
         mavenCentral()
         jcenter()
