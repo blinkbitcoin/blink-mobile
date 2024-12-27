@@ -2325,13 +2325,13 @@
     "needBankAccount": "Abra una cuenta de efectivo para activar",
     "openAccount": "Abre una cuenta",
     "receive": "Recibir",
-    "scanNFCTag": "Escanear NFC",
     "seeTransaction": "Supervisar la transacción de apertura",
     "send": "Enviar",
     "title": "Mover dinero",
     "updateAvailable": "Hay disponible una actualización.\nToca para actualizar ahora",
     "useLightning": "Usamos la red de lightning",
-    "walletInCreation": "Se está creando tu billetera"
+    "walletInCreation": "Se está creando tu billetera",
+    "sinpeMessage": "¿Buscando SINPE? Haz click aqui para configurar tu nombre de usuario y empezar!"
   },
   "OpenBankScreen": {
     "accountsBenefits": "¡Está a solo unos minutos de tener una cuenta de efectivo en Galoy! ¡Solicite una tarjeta de débito para recibir recompensas de bitcoin del 1% en todos los gastos!",
@@ -2463,6 +2463,10 @@
     "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
     "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles",
     "programNfcTag": "Programar nueva tag NFC"
+  },
+  "AdvancedFeaturesScreen": {
+    "title": "Funciones Avanzadas",
+    "scanNfcTag": "Tap NFC"
   },
   "Languages": {
     "DEFAULT": "Predeterminado (OS)",

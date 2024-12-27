@@ -2309,11 +2309,11 @@
   },
   "MoveMoneyScreen": {
     "receive": "Receive",
-    "scanNFCTag": "Scan NFC Tag",
     "send": "Send",
     "title": "Home",
     "updateAvailable": "An update is available.\nTap to update now",
-    "useLightning": "We use the Lightning Network."
+    "useLightning": "We use the Lightning Network.",
+    "sinpeMessage": "Looking to use SINPE? Click here to set up your username and get started!",
   },
   "Overlay": {
     "accounts": "Start by getting\nsome rewards!",
@@ -2439,6 +2439,10 @@
     "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
     "copyClipboardLnurl": "Lnurl address has been copied in the clipboard",
     "programNfcTag": "Program New NFC Tag"
+  },
+  "AdvancedFeaturesScreen": {
+    "title": "Advanced Features",
+    "scanNfcTag": "Tap NFC Tag"
   },
   "Languages": {
     "DEFAULT": "Default (OS)",

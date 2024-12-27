@@ -6,6 +6,7 @@ import {
   Alert,
   AppState,
   FlatList,
+  Image,
   Linking,
   Platform,
   Pressable,
@@ -35,10 +36,6 @@ import useToken from "../../utils/use-token"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import useMainQuery from "@app/hooks/use-main-query"
-import { validPayment } from "../../utils/parsing"
-import { getParams, LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
-
-import { readNfcTag } from "../../utils/nfc"
 
 const styles = EStyleSheet.create({
   balanceHeader: {
@@ -92,7 +89,7 @@ const styles = EStyleSheet.create({
   },
 
   listContainer: {
-    marginTop: "24rem",
+    marginTop: "12rem",
   },
 
   menuIcon: {
@@ -130,6 +127,33 @@ const styles = EStyleSheet.create({
     height: "25%",
     justifyContent: "flex-end",
     paddingHorizontal: 20,
+  },
+
+  bannerImage: {
+    width: '100%',
+    height: 120,
+    marginBottom: 0,
+    resizeMode: 'cover',
+  },
+
+  bannerTouchable: {
+    marginHorizontal: 30,
+  },
+
+  sinpeMessage: {
+    backgroundColor: palette.white,
+    padding: 16,
+    marginHorizontal: 30,
+    marginTop: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: color.primary,
+  },
+
+  sinpeText: {
+    color: palette.darkGrey,
+    fontSize: 14,
+    textAlign: 'center',
   },
 })
 
@@ -231,90 +255,12 @@ export const MoveMoneyScreen: ScreenType = ({
   hasToken,
 }: MoveMoneyScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
-  const [nfcScanning, setNfcScanning] = useState(false)
   const { tokenNetwork } = useToken()
   const { myPubKey, username, phoneNumber } = useMainQuery()
-
-  const decodeInvoice = async (data) => {
-    try {
-      const { valid, lnurl } = validPayment(data, tokenNetwork, myPubKey, username)
-      if (valid && lnurl) {
-        const lnurlParams = await getParams(lnurl)
-
-        if ("reason" in lnurlParams) {
-          throw lnurlParams.reason
-        }
-
-        switch (lnurlParams.tag) {
-          case "payRequest":
-            navigation.navigate("sendBitcoin", {
-              payment: data,
-              lnurlParams: lnurlParams as LNURLPayParams,
-            })
-            break
-          case "withdrawRequest":
-            navigation.navigate("receiveBitcoin", {
-              payment: data,
-              lnurlParams: lnurlParams as LNURLWithdrawParams,
-            })
-            break
-          default:
-            Alert.alert(
-              translate("ScanningQRCodeScreen.invalidTitle"),
-              translate("ScanningQRCodeScreen.invalidContentLnurl", {
-                found: lnurlParams.tag,
-              }),
-              [
-                {
-                  text: translate("common.ok"),
-                },
-              ],
-            )
-            break
-        }
-      } else {
-        Alert.alert(
-          translate("ScanningQRCodeScreen.invalidTitle"),
-          translate("ScanningQRCodeScreen.invalidContent", { found: data.toString() }),
-          [
-            {
-              text: translate("common.ok"),
-            },
-          ],
-        )
-      }
-    } catch (err) {
-      Alert.alert(err.toString())
-    }
-  }
-
-  const scanNfcTag = async () => {
-    const nfcTagReadResult = await readNfcTag()
-
-    if (nfcTagReadResult.success) {
-      await decodeInvoice(nfcTagReadResult.data)
-    } else if (nfcTagReadResult.errorMessage != "UserCancel") {
-      Alert.alert(
-        translate("common.error"),
-        translate(`nfc.${nfcTagReadResult.errorMessage}`),
-        [
-          {
-            text: translate("common.ok"),
-          },
-        ],
-      )
-    }
-  }
 
   const onMenuClick = async (target) => {
     if (!hasToken) {
       setModalVisible(true)
-    } else if (target == "scanningNFCTag") {
-      if (!nfcScanning) {
-        setNfcScanning(true)
-        await scanNfcTag()
-        setNfcScanning(false)
-      }
     } else {
       navigation.navigate(target)
     }
@@ -433,6 +379,26 @@ export const MoveMoneyScreen: ScreenType = ({
         />
       </View>
 
+      <Pressable 
+        style={styles.bannerTouchable}
+        onPress={() => Linking.openURL('https://awakeearthfestival.com')}>
+        <Image
+          source={{uri: 'https://storage.googleapis.com/bitcoin-jungle-branding/festival/awake-earth-festival-banner.png'}}
+          style={styles.bannerImage}
+        />
+      </Pressable>
+
+      {!loading && phoneNumber?.startsWith("+506") && !username && (
+        <Pressable 
+          style={styles.sinpeMessage}
+          onPress={() => navigation.navigate("setUsername")}
+        >
+          <Text style={styles.sinpeText}>
+            {translate("MoveMoneyScreen.sinpeMessage")}
+          </Text>
+        </Pressable>
+      )}
+
       <FlatList
         ListHeaderComponent={() => (
           <>
@@ -448,11 +414,6 @@ export const MoveMoneyScreen: ScreenType = ({
             title: translate("ScanningQRCodeScreen.title"),
             target: "scanningQRCode",
             icon: <Icon name="qr-code" size={32} color={palette.orange} />,
-          },
-          {
-            title: translate("MoveMoneyScreen.scanNFCTag"),
-            target: "scanningNFCTag",
-            icon: (nfcScanning ? <ActivityIndicator animating size="small" /> : <Icon name="scan-circle" size={32} color={palette.lightBlue} />),
           },
           {
             title: translate("MoveMoneyScreen.send"),

@@ -56,6 +56,8 @@ export type RootStackParamList = {
     lnurl: string
   }
   sinpe: undefined
+  transactionStats: undefined
+  advancedFeatures: undefined
 }
 
 export type ContactStackParamList = {

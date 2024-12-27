@@ -66,6 +66,7 @@ import PushNotification from "react-native-push-notification"
 import useMainQuery from "@app/hooks/use-main-query"
 import { LnurlScreen } from "@app/screens/settings-screen/lnurl-screen"
 import { TransactionStatsScreen } from "../screens/transaction-stats-screen/transaction-stats-screen"
+import { AdvancedFeaturesScreen } from "../screens/settings-screen/advanced-features-screen"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -442,6 +443,13 @@ export const RootStack: NavigatorType = () => {
         component={TransactionStatsScreen}
         options={{
           title: translate("TransactionStatsScreen.title"),
+        }}
+      />
+      <RootNavigator.Screen
+        name="advancedFeatures"
+        component={AdvancedFeaturesScreen}
+        options={{
+          title: translate("AdvancedFeaturesScreen.title"),
         }}
       />
     </RootNavigator.Navigator>
