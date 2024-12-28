@@ -51,8 +51,15 @@ export interface TransactionItemProps {
 moment.locale(i18n.locale)
 
 const dateDisplay = ({ createdAt, showFullDate }) => {
-  return showFullDate ? moment.unix(createdAt).locale(i18n.locale).format('L h:mm a') : moment.duration(Math.min(0, moment.unix(createdAt).diff(moment()))).humanize(true)
-}
+  if (!createdAt || isNaN(createdAt)) {
+    console.error("Invalid 'createdAt' value:", createdAt);
+    return '';
+  }
+  const locale = i18n.locale.split('-')[0] || 'en';
+  return showFullDate
+    ? moment.unix(createdAt).locale(locale).format('L h:mm a')
+    : moment.duration(Math.min(0, moment.unix(createdAt).diff(moment()))).humanize(true);
+};
 
 const computeCurrencyAmount = (tx: WalletTransaction) => {
   const { settlementAmount, settlementPrice } = tx
