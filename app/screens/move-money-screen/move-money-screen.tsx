@@ -245,6 +245,12 @@ type MoveMoneyScreenProps = {
   hasToken: boolean
 }
 
+type BannerData = {
+  show: boolean
+  imageUrl: string
+  link: string
+}
+
 export const MoveMoneyScreen: ScreenType = ({
   navigation,
   loading,
@@ -255,6 +261,11 @@ export const MoveMoneyScreen: ScreenType = ({
   hasToken,
 }: MoveMoneyScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
+  const [bannerData, setBannerData] = useState<BannerData>({
+    show: false,
+    imageUrl: '',
+    link: '',
+  })
   const { tokenNetwork } = useToken()
   const { myPubKey, username, phoneNumber } = useMainQuery()
 
@@ -298,6 +309,20 @@ export const MoveMoneyScreen: ScreenType = ({
       console.log({ err }, "error app link on link")
       // handle error
     })
+  
+  const fetchBannerData = async () => {
+    try {
+      const response = await fetch('https://storage.googleapis.com/bitcoin-jungle-wallet/banner.json')
+      const data = await response.json()
+      setBannerData(data)
+    } catch (error) {
+      console.error('Error fetching banner data:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchBannerData()
+  }, [])
 
   let recentTRansactionsData = undefined
 
@@ -379,14 +404,16 @@ export const MoveMoneyScreen: ScreenType = ({
         />
       </View>
 
-      <Pressable 
-        style={styles.bannerTouchable}
-        onPress={() => Linking.openURL('https://awakeearthfestival.com')}>
-        <Image
-          source={{uri: 'https://storage.googleapis.com/bitcoin-jungle-branding/festival/awake-earth-festival-banner.png'}}
-          style={styles.bannerImage}
-        />
-      </Pressable>
+      {bannerData.show && hasToken && (
+        <Pressable 
+          style={styles.bannerTouchable}
+          onPress={() => Linking.openURL(bannerData.link)}>
+          <Image
+            source={{uri: bannerData.imageUrl}}
+            style={styles.bannerImage}
+          />
+        </Pressable>
+      )}
 
       {!loading && phoneNumber?.startsWith("+506") && !username && (
         <Pressable 
