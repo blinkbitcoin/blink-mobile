@@ -602,7 +602,7 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 404;
+				CURRENT_PROJECT_VERSION = 406;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
@@ -641,7 +641,7 @@
 				CODE_SIGN_ENTITLEMENTS = BitcoinJungle/BitcoinJungle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 404;
+				CURRENT_PROJECT_VERSION = 406;
 				DEVELOPMENT_TEAM = QU8N6UZ5LD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
