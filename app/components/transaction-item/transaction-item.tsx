@@ -34,18 +34,25 @@ const styles = EStyleSheet.create({
   send: {
     color: palette.darkGrey,
   },
+
+  subtitle: {
+    fontSize: "12rem",
+    color: palette.darkGrey,
+  },
 })
 
 export interface TransactionItemProps {
   navigation: StackNavigationProp<ParamListBase>
   tx: WalletTransaction
   subtitle?: boolean
+  showFullDate?: boolean
 }
 
 moment.locale(i18n.locale)
 
-const dateDisplay = ({ createdAt }) =>
-  moment.duration(Math.min(0, moment.unix(createdAt).diff(moment()))).humanize(true)
+const dateDisplay = ({ createdAt, showFullDate }) => {
+  return showFullDate ? moment.unix(createdAt).locale(i18n.locale).format('L h:mm a') : moment.duration(Math.min(0, moment.unix(createdAt).diff(moment()))).humanize(true)
+}
 
 const computeCurrencyAmount = (tx: WalletTransaction) => {
   const { settlementAmount, settlementPrice } = tx
@@ -100,6 +107,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   tx,
   navigation,
   subtitle = false,
+  showFullDate = false,
 }: TransactionItemProps) => {
   const primaryCurrency = primaryCurrencyVar()
   const hideBalance = useHideBalance()
@@ -133,7 +141,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
       <IconTransaction isReceive={isReceive} size={24} pending={isPending} />
       <ListItem.Content>
         <ListItem.Title>{description}</ListItem.Title>
-        <ListItem.Subtitle>{subtitle ? dateDisplay(tx) : undefined}</ListItem.Subtitle>
+        <ListItem.Subtitle style={styles.subtitle}>{subtitle ? dateDisplay({...tx, showFullDate}) : undefined}</ListItem.Subtitle>
       </ListItem.Content>
       {txHideBalance ? (
         <Icon style={styles.hiddenBalanceContainer} name="eye" onPress={pressTxAmount} />

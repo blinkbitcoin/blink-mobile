@@ -190,7 +190,7 @@ export const TransactionScreen: ScreenType = ({
   <Screen style={styles.screen}>
     <SectionList
       renderItem={({ item }) => (
-        <TransactionItem key={`txn-${item.id}`} navigation={navigation} tx={item} />
+        <TransactionItem key={`txn-${item.id}`} navigation={navigation} tx={item} subtitle={true} showFullDate={true} />
       )}
       ListHeaderComponent={() => (
         <>
