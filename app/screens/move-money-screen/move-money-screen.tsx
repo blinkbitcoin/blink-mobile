@@ -17,7 +17,7 @@ import {
 } from "react-native"
 import { Button } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
-import { TouchableWithoutFeedback } from "react-native-gesture-handler"
+import { TouchableWithoutFeedback, GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
 import { getBuildNumber } from "react-native-device-info"
@@ -350,135 +350,162 @@ export const MoveMoneyScreen: ScreenType = ({
     }
   }
 
+  const onGestureEvent = (event) => {
+    const { translationX } = event.nativeEvent;
+    const SWIPE_THRESHOLD = 100;
+
+    if (translationX > SWIPE_THRESHOLD) {
+      if (!hasToken) {
+        setModalVisible(true)
+      } else {
+        navigation.navigate("scanningQRCode")
+      }
+    } else if (translationX < -SWIPE_THRESHOLD) {
+      if (!hasToken) {
+        setModalVisible(true)
+      } else {
+        navigation.navigate("receiveBitcoin")
+      }
+    }
+  }
+
   return (
-    <Screen style={styles.screenStyle}>
-      <StatusBar backgroundColor={palette.lighterGrey} barStyle="dark-content" />
-      <Modal
-        style={styles.modal}
-        isVisible={modalVisible}
-        swipeDirection={modalVisible ? ["down"] : ["up"]}
-        onSwipeComplete={() => setModalVisible(false)}
-        swipeThreshold={50}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PanGestureHandler
+        onEnded={onGestureEvent}
       >
-        <View style={styles.flex}>
-          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.cover} />
-          </TouchableWithoutFeedback>
-        </View>
-        <View style={styles.viewModal}>
-          <Icon
-            name="ios-remove"
-            size={64}
-            color={palette.lightGrey}
-            style={styles.icon}
-          />
-          <Text style={styles.text}>{translate("common.needWallet")}</Text>
-          <Button
-            title={translate("common.openWallet")}
-            onPress={activateWallet}
-            type="outline"
-            buttonStyle={styles.buttonStyle}
-            titleStyle={styles.titleStyle}
-            containerStyle={styles.buttonContainerStyle}
-          />
-          <View style={styles.divider} />
-        </View>
-      </Modal>
-      <View style={styles.header}>
-        <Button
-          buttonStyle={styles.buttonStyleTime}
-          containerStyle={styles.separator}
-          onPress={() =>
-            navigation.navigate("priceDetail", {
-              account: AccountType.Bitcoin,
-            })
-          }
-          icon={<Icon name="ios-trending-up-outline" size={32} style={styles.menuIcon} />}
-        />
-        <BalanceHeader loading={loading} style={styles.balanceHeader} />
-        <Button
-          buttonStyle={styles.buttonStyleTime}
-          containerStyle={styles.separator}
-          onPress={() => navigation.navigate("settings")}
-          icon={<Icon name="ios-settings-outline" size={32} style={styles.menuIcon} />}
-        />
-      </View>
-
-      {bannerData.show && hasToken && (
-        <Pressable 
-          style={styles.bannerTouchable}
-          onPress={() => Linking.openURL(bannerData.link)}>
-          <Image
-            source={{uri: bannerData.imageUrl}}
-            style={styles.bannerImage}
-          />
-        </Pressable>
-      )}
-
-      {!loading && phoneNumber?.startsWith("+506") && !username && (
-        <Pressable 
-          style={styles.sinpeMessage}
-          onPress={() => navigation.navigate("setUsername")}
-        >
-          <Text style={styles.sinpeText}>
-            {translate("MoveMoneyScreen.sinpeMessage")}
-          </Text>
-        </Pressable>
-      )}
-
-      <FlatList
-        ListHeaderComponent={() => (
-          <>
-            {errors?.map(({ message }, item) => (
-              <Text key={`error-${item}`} style={styles.error} selectable>
-                {message}
-              </Text>
-            ))}
-          </>
-        )}
-        data={[
-          {
-            title: translate("ScanningQRCodeScreen.title"),
-            target: "scanningQRCode",
-            icon: <Icon name="qr-code" size={32} color={palette.orange} />,
-          },
-          {
-            title: translate("MoveMoneyScreen.send"),
-            target: "sendBitcoin",
-            icon: <IconTransaction isReceive={false} size={32} />,
-          },
-          {
-            title: translate("MoveMoneyScreen.receive"),
-            target: "receiveBitcoin",
-            icon: <IconTransaction isReceive size={32} />,
-          },
-          recentTRansactionsData,
-        ]}
-        style={styles.listContainer}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
-        renderItem={({ item }) =>
-          item && (
-            <>
-              <LargeButton
-                title={item.title}
-                icon={item.icon}
-                onPress={() => onMenuClick(item.target)}
-                style={item.style}
+        <View style={{ flex: 1 }}>
+          <Screen style={styles.screenStyle}>
+            <StatusBar backgroundColor={palette.lighterGrey} barStyle="dark-content" />
+            <Modal
+              style={styles.modal}
+              isVisible={modalVisible}
+              swipeDirection={modalVisible ? ["down"] : ["up"]}
+              onSwipeComplete={() => setModalVisible(false)}
+              swipeThreshold={50}
+            >
+              <View style={styles.flex}>
+                <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                  <View style={styles.cover} />
+                </TouchableWithoutFeedback>
+              </View>
+              <View style={styles.viewModal}>
+                <Icon
+                  name="ios-remove"
+                  size={64}
+                  color={palette.lightGrey}
+                  style={styles.icon}
+                />
+                <Text style={styles.text}>{translate("common.needWallet")}</Text>
+                <Button
+                  title={translate("common.openWallet")}
+                  onPress={activateWallet}
+                  type="outline"
+                  buttonStyle={styles.buttonStyle}
+                  titleStyle={styles.titleStyle}
+                  containerStyle={styles.buttonContainerStyle}
+                />
+                <View style={styles.divider} />
+              </View>
+            </Modal>
+            <View style={styles.header}>
+              <Button
+                buttonStyle={styles.buttonStyleTime}
+                containerStyle={styles.separator}
+                onPress={() =>
+                  navigation.navigate("priceDetail", {
+                    account: AccountType.Bitcoin,
+                  })
+                }
+                icon={<Icon name="ios-trending-up-outline" size={32} style={styles.menuIcon} />}
               />
-              {item.details}
-            </>
-          )
-        }
-      />
-      <View style={styles.bottom}>
-        {isUpdateAvailable && (
-          <Pressable onPress={linkUpgrade}>
-            <Text style={styles.lightningText}>
-              {translate("MoveMoneyScreen.updateAvailable")}
-            </Text>
-          </Pressable>
-        )}
-      </View>
-    </Screen>
+              <BalanceHeader loading={loading} style={styles.balanceHeader} />
+              <Button
+                buttonStyle={styles.buttonStyleTime}
+                containerStyle={styles.separator}
+                onPress={() => navigation.navigate("settings")}
+                icon={<Icon name="ios-settings-outline" size={32} style={styles.menuIcon} />}
+              />
+            </View>
+
+            {bannerData.show && hasToken && (
+              <Pressable 
+                style={styles.bannerTouchable}
+                onPress={() => Linking.openURL(bannerData.link)}>
+                <Image
+                  source={{uri: bannerData.imageUrl}}
+                  style={styles.bannerImage}
+                />
+              </Pressable>
+            )}
+
+            {!loading && phoneNumber?.startsWith("+506") && !username && (
+              <Pressable 
+                style={styles.sinpeMessage}
+                onPress={() => navigation.navigate("setUsername")}
+              >
+                <Text style={styles.sinpeText}>
+                  {translate("MoveMoneyScreen.sinpeMessage")}
+                </Text>
+              </Pressable>
+            )}
+
+            <FlatList
+              ListHeaderComponent={() => (
+                <>
+                  {errors?.map(({ message }, item) => (
+                    <Text key={`error-${item}`} style={styles.error} selectable>
+                      {message}
+                    </Text>
+                  ))}
+                </>
+              )}
+              data={[
+                {
+                  title: translate("ScanningQRCodeScreen.title"),
+                  target: "scanningQRCode",
+                  icon: <Icon name="qr-code" size={32} color={palette.orange} />,
+                },
+                {
+                  title: translate("MoveMoneyScreen.send"),
+                  target: "sendBitcoin",
+                  icon: <IconTransaction isReceive={false} size={32} />,
+                },
+                {
+                  title: translate("MoveMoneyScreen.receive"),
+                  target: "receiveBitcoin",
+                  icon: <IconTransaction isReceive size={32} />,
+                },
+                recentTRansactionsData,
+              ]}
+              style={styles.listContainer}
+              refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
+              renderItem={({ item }) =>
+                item && (
+                  <>
+                    <LargeButton
+                      title={item.title}
+                      icon={item.icon}
+                      onPress={() => onMenuClick(item.target)}
+                      style={item.style}
+                    />
+                    {item.details}
+                  </>
+                )
+              }
+            />
+            <View style={styles.bottom}>
+              {isUpdateAvailable && (
+                <Pressable onPress={linkUpgrade}>
+                  <Text style={styles.lightningText}>
+                    {translate("MoveMoneyScreen.updateAvailable")}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          </Screen>
+        </View>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   )
 }
