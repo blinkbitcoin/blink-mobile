@@ -486,8 +486,8 @@ export const MoveMoneyScreen: ScreenType = ({
                   icon: <Icon name="cash-outline" size={32} color={palette.orange} />,
                   hidden: !phoneNumber?.startsWith("+506") || !username,
                 },
-                recentTRansactionsData,
-              ].filter((item) => !item.hidden)}
+                ...(recentTRansactionsData ? [recentTRansactionsData] : []),
+              ].filter((item): item is NonNullable<typeof item> => item !== undefined && !item.hidden)}
               style={styles.listContainer}
               refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
               renderItem={({ item }) =>
