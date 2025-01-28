@@ -332,6 +332,7 @@ export const MoveMoneyScreen: ScreenType = ({
       target: "transactionHistory",
       icon: <Icon name="ios-list-outline" size={32} color={palette.black} />,
       style: "transactionViewContainer",
+      hidden: false,
       details: (
         <View style={styles.transactionsView}>
           {transactionsEdges.map(
@@ -465,19 +466,28 @@ export const MoveMoneyScreen: ScreenType = ({
                   title: translate("ScanningQRCodeScreen.title"),
                   target: "scanningQRCode",
                   icon: <Icon name="qr-code" size={32} color={palette.orange} />,
+                  hidden: false,
                 },
                 {
                   title: translate("MoveMoneyScreen.send"),
                   target: "sendBitcoin",
                   icon: <IconTransaction isReceive={false} size={32} />,
+                  hidden: false,
                 },
                 {
                   title: translate("MoveMoneyScreen.receive"),
                   target: "receiveBitcoin",
                   icon: <IconTransaction isReceive size={32} />,
+                  hidden: false,
+                },
+                {
+                  title: translate("MoveMoneyScreen.sinpe"),
+                  target: "sinpeScreen",
+                  icon: <Icon name="cash-outline" size={32} color={palette.orange} />,
+                  hidden: !phoneNumber?.startsWith("+506") || !username,
                 },
                 recentTRansactionsData,
-              ]}
+              ].filter((item) => !item.hidden)}
               style={styles.listContainer}
               refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
               renderItem={({ item }) =>
