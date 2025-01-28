@@ -82,23 +82,36 @@ const Row = ({
   entry,
   value,
   type,
+  navigation,
 }: {
   entry: string
   value: string
   type?: SettlementViaType
-}) => (
-  <View style={styles.description}>
-    <Text style={styles.entry}>
-      {entry + " "}
-      {type === "SettlementViaOnChain" && (
-        <Icon name="open-outline" size={18} color={palette.darkGrey} />
-      )}
-    </Text>
-    <Text selectable style={styles.value}>
-      {value}
-    </Text>
-  </View>
-)
+  navigation: StackNavigationProp<RootStackParamList, "transactionDetail">
+}) => {
+  const bbOrderNbr = value.match(/Order (\d+)/)?.[1]
+
+  return (
+    <View style={styles.description}>
+      <Text style={styles.entry}>
+        {entry + " "}
+        {type === "SettlementViaOnChain" && (
+          <Icon name="open-outline" size={18} color={palette.darkGrey} />
+        )}
+        {bbOrderNbr && (
+          <Icon name="information-circle-outline" size={18} color={palette.darkGrey} onPress={() => {
+            navigation.navigate("sinpeScreen", {
+              orderNbr: bbOrderNbr,
+            })
+          }} />
+        )}
+      </Text>
+      <Text selectable style={styles.value}>
+        {value}
+      </Text>
+    </View>
+  )
+}
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "transactionDetail">
@@ -180,21 +193,23 @@ export const TransactionDetailScreen: ScreenType = ({ route, navigation }: Props
           {translate("TransactionDetailScreen.detail")}
         </Text>
         <Divider style={styles.divider} />
-        <Row entry={translate("common.date")} value={dateDisplay} />
-        {!isReceive && <Row entry={translate("common.fees")} value={feeEntry} />}
-        <Row entry={translate("common.description")} value={description} />
+        <Row entry={translate("common.date")} value={dateDisplay} navigation={navigation} />
+        {!isReceive && <Row entry={translate("common.fees")} value={feeEntry} navigation={navigation} />}
+        <Row entry={translate("common.description")} value={description} navigation={navigation} />
         {settlementVia.__typename === "SettlementViaIntraLedger" && (
           <Row
             entry={translate("TransactionDetailScreen.paid")}
             value={settlementVia.counterPartyUsername || "Bitcoin Jungle Wallet"}
+            navigation={navigation}
           />
         )}
         <Row
           entry={translate("common.type")}
           value={typeDisplay(settlementVia.__typename)}
+          navigation={navigation}
         />
         {settlementVia.__typename === "SettlementViaLn" && (
-          <Row entry="Hash" value={initiationVia.paymentHash} />
+          <Row entry="Hash" value={initiationVia.paymentHash} navigation={navigation} />
         )}
         {settlementVia.__typename === "SettlementViaOnChain" && (
           <TouchableWithoutFeedback
@@ -205,11 +220,12 @@ export const TransactionDetailScreen: ScreenType = ({ route, navigation }: Props
                 entry="Hash"
                 value={settlementVia.transactionHash}
                 type={settlementVia.__typename}
+                navigation={navigation}
               />
             </View>
           </TouchableWithoutFeedback>
         )}
-        {id && <Row entry="id" value={id} />}
+        {id && <Row entry="id" value={id} navigation={navigation} />}
       </View>
       <CloseCross color={palette.white} onPress={() => navigation.goBack()} />
     </Screen>

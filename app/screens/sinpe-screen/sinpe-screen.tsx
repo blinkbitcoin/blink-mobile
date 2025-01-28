@@ -17,6 +17,9 @@ import { useMySubscription } from "../../hooks/user-hooks"
 // import analytics from "@react-native-firebase/analytics"
 
 import { translate } from "../../i18n"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { RouteProp } from "@react-navigation/native"
 
 export const LN_PAY = gql`
   mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
@@ -48,7 +51,7 @@ type SinpeScreenProps = {
   route: RouteProp<RootStackParamList, "sinpe">
 }
 
-export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps => {
+export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) => {
   let webview = null
   const { myPubKey, username, phoneNumber, userPreferredLanguage, refetch } = useMainQuery()
   const { walletId: myDefaultWalletId, satBalance, loading } = useWalletBalance()
@@ -57,6 +60,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
   const [mySatBalance, setMySatBalance] = useState(null)
   const [canGoBack, setCanGoBack] = useState(false)
   const otcBaseUri = getOtcBaseUri()
+  const { orderNbr } = route?.params || {}
 
   const handleBackButtonPress = () => {
     try {
@@ -155,7 +159,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
       handlePaymentReturn(status, errs)
     } catch (err) {
       console.log('error', err)
-      handlePaymentError(err)
+      // handlePaymentError(err)
     }
   }
 
@@ -277,7 +281,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}): SinpeScreenProps =
           <WebView
             ref={(ref) => (this.webview = ref)}
             source={{
-              uri: `${otcBaseUri.url}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${mySatBalance}`,
+              uri: `${otcBaseUri.url}?key=E4WE5GgDr6g8HFyS4K4m5rdJ&fromBJ=true&phone=${encodeURIComponent(phoneNumber)}&username=${encodeURIComponent(username)}&lang=${userPreferredLanguage}&satBalance=${mySatBalance}${(orderNbr ? `#/order/${orderNbr}` : '')}`,
               headers: {
                 'x-bj-wallet': "true",
               },

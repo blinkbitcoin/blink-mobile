@@ -122,6 +122,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   const isReceive = tx.direction === "RECEIVE"
   const isPending = tx.status === "PENDING"
   const description = descriptionDisplay(tx)
+  const bbOrderNbr = description.match(/Order (\d+)/)?.[1]
   const currencyAmount = computeCurrencyAmount(tx)
 
   const [txHideBalance, setTxHideBalance] = useState(hideBalance)
@@ -148,7 +149,14 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
       <IconTransaction isReceive={isReceive} size={24} pending={isPending} />
       <ListItem.Content>
         <ListItem.Title>{description}</ListItem.Title>
-        <ListItem.Subtitle style={styles.subtitle}>{subtitle ? dateDisplay({...tx, showFullDate}) : undefined}</ListItem.Subtitle>
+        <ListItem.Subtitle style={styles.subtitle}>
+          {subtitle ? dateDisplay({...tx, showFullDate}) : undefined}
+          {bbOrderNbr && <Icon name="information-circle-outline" size={16} color={palette.darkGrey} onPress={() => {
+            navigation.navigate("sinpeScreen", {
+              orderNbr: bbOrderNbr,
+            })
+          }} />}
+        </ListItem.Subtitle>
       </ListItem.Content>
       {txHideBalance ? (
         <Icon style={styles.hiddenBalanceContainer} name="eye" onPress={pressTxAmount} />

@@ -55,7 +55,9 @@ export type RootStackParamList = {
   routeLnurl: {
     lnurl: string
   }
-  sinpe: undefined
+  sinpe: {
+    orderNbr?: string
+  }
   transactionStats: undefined
   advancedFeatures: undefined
 }
