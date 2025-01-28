@@ -442,7 +442,7 @@ export const MoveMoneyScreen: ScreenType = ({
             {!loading && phoneNumber?.startsWith("+506") && !username && (
               <Pressable 
                 style={styles.sinpeMessage}
-                onPress={() => navigation.navigate("setUsername")}
+                onPress={() => navigation.getParent()?.navigate("setUsername", { type: "sinpe" })}
               >
                 <Text style={styles.sinpeText}>
                   {translate("MoveMoneyScreen.sinpeMessage")}

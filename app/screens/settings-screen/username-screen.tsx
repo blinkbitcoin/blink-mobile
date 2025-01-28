@@ -2,7 +2,7 @@ import * as React from "react"
 import debounce from "lodash.debounce"
 import { gql, useQuery, useMutation } from "@apollo/client"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { ActivityIndicator, Alert, Text, TextInput } from "react-native"
+import { ActivityIndicator, Alert, Text, TextInput, KeyboardAvoidingView, Keyboard, Platform, InteractionManager } from "react-native"
 import { Button } from "react-native-elements"
 import { Input } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
@@ -40,6 +40,11 @@ const styles = EStyleSheet.create({
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "setUsername">
+  route: {
+    params: {
+      type?: "sinpe"
+    }
+  }
 }
 
 const UPDATE_USERNAME = gql`
@@ -56,8 +61,10 @@ const UPDATE_USERNAME = gql`
   }
 `
 
-export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
+export const UsernameScreen: ScreenType = ({ navigation, route }: Props) => {
+  const { type } = route.params
   const [input, setInput] = React.useState("")
+  const [firstValidationDone, setFirstValidationDone] = React.useState(false)
   const [inputStatus, setInputStatus] = React.useState({
     status: "empty",
     message: "",
@@ -89,14 +96,18 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
 
       refetchMain()
 
-      Alert.alert(translate("UsernameScreen.success", { input }), null, [
-        {
-          text: translate("common.ok"),
-          onPress: () => {
-            navigation.pop(2)
+      if(type === "sinpe") {
+        navigation.navigate("sinpeScreen")
+      } else {
+        Alert.alert(translate("UsernameScreen.success", { input }), null, [
+          {
+            text: translate("common.ok"),
+            onPress: () => {
+              navigation.pop(2)
+            },
           },
-        },
-      ])
+        ])
+      }
     },
   })
 
@@ -126,6 +137,19 @@ export const UsernameScreen: ScreenType = ({ navigation }: Props) => {
     checkUsernameDebounced()
     return () => checkUsernameDebounced.cancel()
   }, [checkUsernameDebounced])
+
+  React.useEffect(() => {
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      if (input && inputStatus.status === "available" && !firstValidationDone) {
+        validateAndConfirm()
+        setFirstValidationDone(true)
+      }
+    })
+
+    return () => {
+      keyboardDidHideListener.remove()
+    }
+  }, [input, inputStatus.status])
 
   const validateAndConfirm = async () => {
     if (inputStatus.status !== "available") {
