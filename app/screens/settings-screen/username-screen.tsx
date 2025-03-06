@@ -42,7 +42,7 @@ type Props = {
   navigation: StackNavigationProp<RootStackParamList, "setUsername">
   route: {
     params: {
-      type?: "sinpe"
+      type?: string
     }
   }
 }
@@ -62,7 +62,7 @@ const UPDATE_USERNAME = gql`
 `
 
 export const UsernameScreen: ScreenType = ({ navigation, route }: Props) => {
-  const { type } = route.params
+  const { type } = route?.params ?? {}
   const [input, setInput] = React.useState("")
   const [firstValidationDone, setFirstValidationDone] = React.useState(false)
   const [inputStatus, setInputStatus] = React.useState({

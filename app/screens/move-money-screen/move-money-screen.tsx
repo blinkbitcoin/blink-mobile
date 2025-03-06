@@ -302,9 +302,7 @@ export const MoveMoneyScreen: ScreenType = ({
 
   const linkUpgrade = () =>
     openInStore({
-      appName: "Bitcoin Jungle",
-      appStoreId: "1600313979",
-      playStoreId: "app.bitcoinjungle.mobile",
+      playStoreId: "app.bitcoinjungle.mobile"
     }).catch((err) => {
       console.log({ err }, "error app link on link")
       // handle error
@@ -374,6 +372,7 @@ export const MoveMoneyScreen: ScreenType = ({
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PanGestureHandler
         onEnded={onGestureEvent}
+        activeOffsetX={[-20, 20]}
       >
         <View style={{ flex: 1 }}>
           <Screen style={styles.screenStyle}>
