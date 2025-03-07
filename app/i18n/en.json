@@ -2435,6 +2435,8 @@
     "logOutSuccesful": "You have been logged out.\n\nPlease restart the app to start fresh",
     "tapLogIn": "Tap to log in",
     "tapUserName": "Tap to set username",
+    "emailTitle": "Recovery Email",
+    "tapEmail": "Tap to set recovery email",
     "title": "Settings",
     "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
     "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
@@ -2477,6 +2479,15 @@
     "success": "%{input} is now your username!",
     "usernameToUse": "What username do you want to use?",
     "setUsername": "Set Username"
+  },
+  "EmailScreen": {
+    "confirmSubtext": "The email is permanent and can not be changed later",
+    "confirmTitle": "Set %{input} as your email?",
+    "invalidEmail": "Please enter a valid email address",
+    "success": "%{input} is now your email!",
+    "emailToUse": "What email do you want to use?",
+    "emailToUseSubtitle": "This email will be used for recovery purposes and cannot be changed later. Be sure to use a valid email address that you control.",
+    "setEmail": "Set Email"
   },
   "WelcomeFirstScreen": {
     "bank": "Bitcoin is designed to let you store, send and receive money, without relying on a bank or credit card.",

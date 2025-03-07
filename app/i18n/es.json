@@ -2459,6 +2459,8 @@
     "activated": "Activada",
     "tapLogIn": "\nIngrese aquí para iniciar sesión",
     "tapUserName": "Ingrese aquí para configurarlo",
+    "emailTitle": "Email de recuperación",
+    "tapEmail": "Ingrese aquí para configurarlo",
     "title": "Configuración",
     "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte.",
     "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
@@ -2501,6 +2503,15 @@
     "success": "¡%{input} es ahora su nombre de usuario!",
     "usernameToUse": "¿Qué nombre de usuario desea usar?",
     "setUsername": "Seleccione"
+  },
+  "EmailScreen": {
+    "confirmSubtext": "El correo electrónico es permanente y no se puede cambiar más adelante",
+    "confirmTitle": "Establecer %{input} como su correo electrónico?",
+    "invalidEmail": "Por favor, ingrese una dirección de correo electrónico válida",
+    "success": "%{input} es ahora su correo electrónico!",
+    "emailToUse": "¿Qué correo electrónico desea usar?",
+    "emailToUseSubtitle": "Este correo electrónico se usará para propósitos de recuperación y no se puede cambiar más adelante. Asegúrese de usar una dirección de correo electrónico válida que controla.",
+    "setEmail": "Establecer correo electrónico"
   },
   "WelcomeFirstScreen": {
     "bank": "Bitcoin está diseñado para permitirle almacenar, enviar y recibir dinero, sin depender de un banco o tarjeta de crédito.",

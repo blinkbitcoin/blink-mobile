@@ -67,6 +67,7 @@ import useMainQuery from "@app/hooks/use-main-query"
 import { LnurlScreen } from "@app/screens/settings-screen/lnurl-screen"
 import { TransactionStatsScreen } from "../screens/transaction-stats-screen/transaction-stats-screen"
 import { AdvancedFeaturesScreen } from "../screens/settings-screen/advanced-features-screen"
+import { EmailScreen } from "../screens/settings-screen/email-screen"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -386,6 +387,13 @@ export const RootStack: NavigatorType = () => {
       <RootNavigator.Screen
         name="setUsername"
         component={UsernameScreen}
+        options={() => ({
+          title: "",
+        })}
+      />
+      <RootNavigator.Screen
+        name="setEmail"
+        component={EmailScreen}
         options={() => ({
           title: "",
         })}

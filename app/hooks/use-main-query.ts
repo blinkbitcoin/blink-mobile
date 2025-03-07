@@ -63,6 +63,7 @@ const useMainQuery = (): useMainQueryOutput => {
   const myPubKey = data?.globals?.nodesIds?.[0] ?? ""
   const username = data?.me?.username
   const phoneNumber = data?.me?.phone
+  const email = data?.me?.email
   const mobileVersions = data?.mobileVersions
 
   return {
@@ -74,6 +75,7 @@ const useMainQuery = (): useMainQueryOutput => {
     myPubKey,
     username,
     phoneNumber,
+    email,
     mobileVersions,
     loading,
     refetch,
