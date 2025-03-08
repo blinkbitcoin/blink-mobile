@@ -155,6 +155,14 @@ export const AdvancedFeaturesScreen: React.FC<AdvancedFeaturesScreenProps> = ({ 
       enabled: true,
       greyed: false,
     },
+    {
+      category: translate("BoltCardScreen.manageBoltCards"),
+      icon: "card-outline",
+      id: "bolt-cards",
+      action: () => navigation.navigate("boltCards"),
+      enabled: true,
+      greyed: false,
+    },
   ]
 
   return (

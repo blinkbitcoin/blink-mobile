@@ -151,10 +151,16 @@
 	<array>
 		<string>NDEF</string>
 		<string>IsoDep</string>
+		<string>TAG</string>
 	</array>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
+		<string>D2760000850101</string>
 		<string>D2760000850100</string>
+		<string>A0000002471001</string>
+		<string>A000000003101001</string>
+		<string>A00A4000002E10300</string>
+		<string>A00A4000002E10400</string>
 	</array>
 </dict>
 </plist>

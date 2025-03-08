@@ -63,6 +63,10 @@ export type RootStackParamList = {
   sinpeScreen: undefined
   transactionStats: undefined
   advancedFeatures: undefined
+  boltCards: undefined
+  boltCardDetail: { cardId: string }
+  boltCardRegister: undefined
+  boltCardPair: { cardId: string, cardUID: string }
 }
 
 export type ContactStackParamList = {

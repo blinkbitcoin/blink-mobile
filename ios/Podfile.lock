@@ -322,10 +322,12 @@ PODS:
     - React-Core
   - react-native-netinfo (7.1.7):
     - React-Core
-  - react-native-nfc-manager (3.13.5):
+  - react-native-nfc-manager (3.16.1):
     - React-Core
   - react-native-qrcode-local-image (1.0.4):
     - React
+  - react-native-randombytes (3.6.1):
+    - React-Core
   - react-native-restart (0.0.22):
     - React-Core
   - react-native-safe-area-context (3.3.2):
@@ -524,6 +526,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - "react-native-qrcode-local-image (from `../node_modules/@remobile/react-native-qrcode-local-image`)"
+  - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-send-direct-sms (from `../node_modules/react-native-send-direct-sms`)
@@ -647,6 +650,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nfc-manager"
   react-native-qrcode-local-image:
     :path: "../node_modules/@remobile/react-native-qrcode-local-image"
+  react-native-randombytes:
+    :path: "../node_modules/react-native-randombytes"
   react-native-restart:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
@@ -778,8 +783,9 @@ SPEC CHECKSUMS:
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
   react-native-maps: a421fe6aeb74279597c4ea9598f25796108e2d89
   react-native-netinfo: 27f287f2d191693f3b9d01a4273137fcf91c3b5d
-  react-native-nfc-manager: 42ebc22a04f32c0c2bc63a016ab30fa6486de450
+  react-native-nfc-manager: 5213321cf6c18d879c8092c0bf56806b771ec5ac
   react-native-qrcode-local-image: a16d554baf5cf5c04da86b464d99cf658e215c52
+  react-native-randombytes: 421f1c7d48c0af8dbcd471b0324393ebf8fe7846
   react-native-restart: 733a51ad137f15b0f8dc34c4082e55af7da00979
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   react-native-send-direct-sms: 10fa6db98a5a2605720d9657cd6014716b1466e5

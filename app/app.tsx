@@ -25,6 +25,7 @@ import {
 } from "@react-navigation/native"
 import { AsyncStorageWrapper, CachePersistor } from "apollo3-cache-persist"
 import "node-libs-react-native/globals" // needed for Buffer?
+import "./utils/randombytes-init"
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { createNetworkStatusNotifier } from "react-apollo-network-status"

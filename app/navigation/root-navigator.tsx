@@ -67,6 +67,12 @@ import useMainQuery from "@app/hooks/use-main-query"
 import { LnurlScreen } from "@app/screens/settings-screen/lnurl-screen"
 import { TransactionStatsScreen } from "../screens/transaction-stats-screen/transaction-stats-screen"
 import { AdvancedFeaturesScreen } from "../screens/settings-screen/advanced-features-screen"
+import {
+  BoltCardsScreen,
+  BoltCardDetailScreen,
+  BoltCardRegisterScreen,
+  BoltCardPairScreen,
+} from "../screens/settings-screen/bolt-card"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -461,6 +467,34 @@ export const RootStack: NavigatorType = () => {
         component={AdvancedFeaturesScreen}
         options={{
           title: translate("AdvancedFeaturesScreen.title"),
+        }}
+      />
+      <RootNavigator.Screen
+        name="boltCards"
+        component={BoltCardsScreen}
+        options={{
+          title: translate("BoltCardsScreen.title"),
+        }}
+      />
+      <RootNavigator.Screen
+        name="boltCardDetail"
+        component={BoltCardDetailScreen}
+        options={{
+          title: translate("BoltCardDetailScreen.title"),
+        }}
+      />
+      <RootNavigator.Screen
+        name="boltCardRegister"
+        component={BoltCardRegisterScreen}
+        options={{
+          title: translate("BoltCardRegisterScreen.title"),
+        }}
+      />
+      <RootNavigator.Screen
+        name="boltCardPair"
+        component={BoltCardPairScreen}
+        options={{
+          title: translate("BoltCardPairScreen.title"),
         }}
       />
     </RootNavigator.Navigator>

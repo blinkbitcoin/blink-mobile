@@ -1,4 +1,8 @@
 /* eslint-disable no-param-reassign */
+import i18n from 'i18n-js';
+import moment from 'moment';
+
+moment.locale(i18n.locale)
 
 // refactor these utils
 export const sameDay = (d1: number, d2: number | Date): boolean => {
@@ -40,3 +44,14 @@ export const parseDate = (timeStamp: number): Date => {
 }
 
 export const unixTime = (): number => Math.floor(Date.now() / 1000)
+
+export const formatDate = ({ createdAt, showFullDate }: { createdAt: number, showFullDate: boolean }) => {
+  if (!createdAt || isNaN(createdAt)) {
+    console.error("Invalid 'createdAt' value:", createdAt);
+    return '';
+  }
+  const locale = i18n.locale.split('-')[0] || 'en';
+  return showFullDate
+    ? moment.unix(createdAt).locale(locale).format('L h:mm a')
+    : moment.duration(Math.min(0, moment.unix(createdAt).diff(moment()))).humanize(true);
+};

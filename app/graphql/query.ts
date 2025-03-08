@@ -135,6 +135,142 @@ export const TRANSACTIONS_LIST_FOR_CONTACT = gql`
   ${TRANSACTION_LIST_FRAGMENT}
 `
 
+export const BOLT_CARDS_QUERY = gql`
+  query boltCards {
+    boltCards {
+      id
+      walletId
+      cardName
+      uid
+      enabled
+      txLimit
+      dailyLimit
+      createdAt
+      updatedAt
+      lastUsedAt
+      usages {
+        id
+        amount
+        oldCounter
+        newCounter
+        createdAt
+        ip
+        userAgent
+      }
+    }
+  }
+`
+
+export const BOLT_CARD_QUERY = gql`
+  query boltCard($id: ID!) {
+    boltCard(id: $id) {
+      id
+      walletId
+      cardName
+      uid
+      enabled
+      txLimit
+      dailyLimit
+      createdAt
+      updatedAt
+      lastUsedAt
+      usages {
+        id
+        amount
+        oldCounter
+        newCounter
+        createdAt
+        ip
+        userAgent
+      }
+    }
+  }
+`
+
+export const BOLT_CARD_REGISTER_MUTATION = gql`
+  mutation boltCardRegister($input: BoltCardRegisterInput!) {
+    boltCardRegister(input: $input) {
+      errors {
+        message
+      }
+      boltCard {
+        id
+        walletId
+        cardName
+        uid
+        enabled
+        txLimit
+        dailyLimit
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`
+
+export const BOLT_CARD_UPDATE_MUTATION = gql`
+  mutation boltCardUpdate($input: BoltCardUpdateInput!) {
+    boltCardUpdate(input: $input) {
+      errors {
+        message
+      }
+      boltCard {
+        id
+        cardName
+        enabled
+        txLimit
+        dailyLimit
+        updatedAt
+      }
+    }
+  }
+`
+
+export const BOLT_CARD_DISABLE_MUTATION = gql`
+  mutation boltCardDisable($input: BoltCardDisableInput!) {
+    boltCardDisable(input: $input) {
+      errors {
+        message
+      }
+      boltCard {
+        id
+        enabled
+        updatedAt
+      }
+    }
+  }
+`
+
+export const BOLT_CARD_PAIR_MUTATION = gql`
+  mutation PairCard($input: BoltCardPairInput!) {
+    boltCardPair(input: $input) {
+      errors {
+        message
+      }
+      cardName
+      k0
+      k1
+      k2
+      k3
+      k4
+      lnurlwBase
+      protocolName
+      protocolVersion
+    }
+  }
+`
+
+export const BOLT_CARD_GENERATE_OTP_MUTATION = gql`
+  mutation GenerateCardOtp($input: BoltCardGenerateOtpInput!) {
+    boltCardGenerateOtp(input: $input) {
+      errors {
+        message
+      }
+      otp
+    }
+  }
+`
+
 export const fetchMainQuery = async (
   client: ApolloClient<unknown>,
   variables: { hasToken: boolean },

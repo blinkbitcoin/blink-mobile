@@ -22,7 +22,7 @@
     "storybook": "start-storybook -p 9001",
     "adb": "adb reverse tcp:9090 tcp:9090 && adb reverse tcp:3000 tcp:3000 && adb reverse tcp:4000 tcp:4000 && adb reverse tcp:9001 tcp:9001 && adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4001 tcp:4001 && adb reverse tcp:4002 tcp:4002",
     "patch": "patch-package",
-    "postinstall": "jetify && if which pod >/dev/null; then (cd ios; pod install); fi",
+    "postinstall": "rn-nodeify --install buffer,process,stream,crypto,events --hack --yarn && jetify && if which pod >/dev/null; then (cd ios; pod install); fi",
     "hack:types-react-native": "rimraf node_modules/@types/react-native/node_modules/@types",
     "prepare": "npm-run-all patch hack:*"
   },
@@ -51,6 +51,8 @@
     "bitcoinjs-lib": "^5.1.10",
     "bolt11": "nicolasburtey/bolt11",
     "buffer": "^6.0.3",
+    "crc": "^4.3.2",
+    "crypto-js": "^4.2.0",
     "currency.js": "^2.0.2",
     "graphql": "^16.0.1",
     "i18n-js": "^3.5.1",
@@ -77,6 +79,7 @@
     "react-dom": "^17.0.1",
     "react-native": "0.66.4",
     "react-native-camera": "^4.2.1",
+    "react-native-crypto": "^2.2.0",
     "react-native-device-info": "^8.4.8",
     "react-native-elements": "^3.4.2",
     "react-native-error-boundary": "^1.1.12",
@@ -92,10 +95,11 @@
     "react-native-localize": "^2.1.5",
     "react-native-maps": "0.29.4",
     "react-native-modal": "^13.0.0",
-    "react-native-nfc-manager": "^3.13.5",
+    "react-native-nfc-manager": "^3.16.1",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-push-notification": "^8.1.1",
     "react-native-qrcode-svg": "^6.0.6",
+    "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "^2.2.3",
     "react-native-restart": "daviroo/react-native-restart.git#master",
     "react-native-root-siblings": "^4.1.1",
@@ -114,6 +118,8 @@
     "react-native-walkthrough-tooltip": "^1.2.0",
     "react-native-webview": "11",
     "react-native-youtube": "^2.0.0",
+    "readable-stream": "1.0.33",
+    "stream-browserify": "^1.0.0",
     "subscriptions-transport-ws": "^0.11.0",
     "url": "^0.11.0",
     "victory-native": "^36.2.0"
@@ -177,11 +183,30 @@
     "react-native-svg-transformer": "^0.14.3",
     "react-test-renderer": "^17.0.2",
     "rimraf": "3.0.2",
+    "rn-nodeify": "github:tradle/rn-nodeify",
     "solidarity": "^3.0.0",
     "ts-jest": "^27.0.7",
     "typescript": "^4.5.2"
   },
   "peerDependencies": {
     "solidarity": "^2.3.1"
+  },
+  "react-native": {
+    "crypto": "react-native-crypto",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  },
+  "browser": {
+    "crypto": "react-native-crypto",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
   }
 }
