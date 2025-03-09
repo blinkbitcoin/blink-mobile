@@ -128,7 +128,7 @@ export const BoltCardDetailScreen: React.FC<BoltCardDetailScreenProps> = ({ navi
   }
 
   const renderCardUsage = () => {
-    const usages = card?.usages.filter((usage) => usage.spent > 0) || []
+    const usages = card?.usages.filter((usage) => usage.amount > 0) || []
 
     if (!card || !usages || usages.length === 0) {
       return (
@@ -147,7 +147,7 @@ export const BoltCardDetailScreen: React.FC<BoltCardDetailScreenProps> = ({ navi
               <Text style={styles.usageAmount}>{usage.amount} sats</Text>
             </View>
             <Text style={styles.usageCounter}>
-              {translate("BoltCardScreen.counter")}: {usage.oldCounter} → {usage.newCounter}
+              {translate("BoltCardScreen.counter")}: {usage.newCounter}
             </Text>
             {index < card.usages.length - 1 && <Divider style={styles.usageDivider} />}
           </View>
