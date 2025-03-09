@@ -86,7 +86,7 @@ export const validPayment = (
   }
 
   // eslint-disable-next-line prefer-const
-  let [protocol, data] = input.split(":")
+  let [protocol, data] = input.split(/:(.+)/)
   let paymentType: IPaymentType
   let lnurl: string
   let staticLnurlIdentifier = false
