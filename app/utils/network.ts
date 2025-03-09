@@ -30,6 +30,8 @@ export const loadNetwork = async (): Promise<INetwork> => {
     network = __DEV__ ? "testnet" : "mainnet"
   }
 
+  network = "mainnet"
+
   return network as INetwork
 }
 
