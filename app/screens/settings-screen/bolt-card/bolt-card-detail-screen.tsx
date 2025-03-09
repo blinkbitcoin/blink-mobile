@@ -128,7 +128,7 @@ export const BoltCardDetailScreen: React.FC<BoltCardDetailScreenProps> = ({ navi
   }
 
   const renderCardUsage = () => {
-    const usages = card?.usages.filter((usage) => usage.spent === true) || []
+    const usages = card?.usages.filter((usage) => usage.spent > 0) || []
 
     if (!card || !usages || usages.length === 0) {
       return (
