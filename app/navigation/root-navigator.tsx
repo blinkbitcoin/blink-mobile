@@ -73,6 +73,7 @@ import {
   BoltCardRegisterScreen,
   BoltCardPairScreen,
 } from "../screens/settings-screen/bolt-card"
+import { EmailScreen } from "../screens/settings-screen/email-screen"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -392,6 +393,13 @@ export const RootStack: NavigatorType = () => {
       <RootNavigator.Screen
         name="setUsername"
         component={UsernameScreen}
+        options={() => ({
+          title: "",
+        })}
+      />
+      <RootNavigator.Screen
+        name="setEmail"
+        component={EmailScreen}
         options={() => ({
           title: "",
         })}

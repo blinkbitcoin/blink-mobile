@@ -17,6 +17,7 @@ type useMainQueryOutput = {
   myPubKey: string
   username?: string
   phoneNumber: string
+  email?: string
   mobileVersions: mobileVersions
   loading: boolean
   refetch: () => void

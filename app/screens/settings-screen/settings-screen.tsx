@@ -22,11 +22,15 @@ import useMainQuery from "@app/hooks/use-main-query"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { openWhatsApp } from "@app/utils/external"
 
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, "settings">
+}
+
 export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
   const { hasToken } = useToken()
   const { logout } = useLogout()
 
-  const { btcWalletId, username, phoneNumber, userPreferredLanguage } = useMainQuery()
+  const { btcWalletId, username, phoneNumber, userPreferredLanguage, email } = useMainQuery()
 
   const securityAction = async () => {
     const isBiometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
@@ -116,6 +120,7 @@ export const SettingsScreen: ScreenType = ({ navigation }: Props) => {
       navigation={navigation}
       username={username}
       phone={phoneNumber}
+      email={email}
       language={translate(`Languages.${userPreferredLanguage || "DEFAULT"}`)}
       securityAction={securityAction}
       logoutAction={logoutAction}
@@ -130,6 +135,7 @@ type SettingsScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "settings">
   username: string
   phone: string
+  email: string
   language: string
   notificationsEnabled: boolean
   securityAction: () => void
@@ -148,6 +154,7 @@ type SettingRow = {
   subTitleDefaultValue?: string
   action?: () => void
   greyed?: boolean
+  danger?: boolean
   styleDivider?: ViewStyleProp
 }
 
@@ -157,6 +164,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     navigation,
     username,
     phone,
+    email,
     language,
     securityAction,
     logoutAction,
@@ -195,6 +203,16 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
       action: () => navigation.navigate("setUsername"),
       enabled: hasToken && !username,
       greyed: !hasToken || !!(hasToken && username),
+    },
+    {
+      category: translate("SettingsScreen.emailTitle"),
+      icon: "mail-outline",
+      id: "email",
+      subTitleDefaultValue: translate("SettingsScreen.tapEmail"),
+      subTitleText: email,
+      action: () => navigation.navigate("setEmail"),
+      enabled: hasToken && !email,
+      greyed: !hasToken || !!(hasToken && email),
     },
     {
       category: translate("common.language"),

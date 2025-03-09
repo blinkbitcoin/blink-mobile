@@ -37,6 +37,7 @@ export type RootStackParamList = {
   setUsername: {
     type?: "sinpe"
   }
+  setEmail: undefined
   pointOfSale: undefined
   language: undefined
   security: {
