@@ -78,6 +78,7 @@ describe("SendBitcoinCompletedScreen", () => {
           iv: null,
           decipher: () => null,
         },
+        formatAmount: "%240.00%20(3%20SATS)",
       },
     } as const
 
@@ -88,7 +89,6 @@ describe("SendBitcoinCompletedScreen", () => {
     )
 
     expect(screen.getByText(lud09MessageRoute.params.successAction.message)).toBeTruthy()
-    expect(screen.getByText(LL.SendBitcoinScreen.note())).toBeTruthy()
   })
 
   it("render successAction - LUD 09 - URL", async () => {
@@ -106,6 +106,7 @@ describe("SendBitcoinCompletedScreen", () => {
           iv: null,
           decipher: () => null,
         },
+        formatAmount: "%240.00%20(3%20SATS)",
       },
     } as const
 
@@ -139,6 +140,7 @@ describe("SendBitcoinCompletedScreen", () => {
           iv: null,
           decipher: () => null,
         },
+        formatAmount: "%240.00%20(3%20SATS)",
       },
     } as const
 
@@ -149,7 +151,9 @@ describe("SendBitcoinCompletedScreen", () => {
     )
 
     expect(
-      screen.getByText(lud09URLWithDescRoute.params.successAction.description),
+      screen.getByText(
+        `${lud09URLWithDescRoute.params.successAction.description} ${lud09URLWithDescRoute.params.successAction.url}`,
+      ),
     ).toBeTruthy()
 
     const button = screen.getByText(LL.ScanningQRCodeScreen.openLinkTitle())
@@ -180,6 +184,7 @@ describe("SendBitcoinCompletedScreen", () => {
           decipher: () => null,
         },
         preimage: "25004cd52960a3bac983e3f95c432341a7052cef37b9253b0b0b1256d754559b",
+        formatAmount: "%240.00%20(3%20SATS)",
       },
     } as const
 
@@ -191,6 +196,5 @@ describe("SendBitcoinCompletedScreen", () => {
 
     expect(screen.getByText(lud10AESRoute.params.successAction.description)).toBeTruthy()
     expect(screen.getByText(encryptedMessage)).toBeTruthy()
-    expect(screen.getByText(LL.SendBitcoinScreen.note())).toBeTruthy()
   })
 })

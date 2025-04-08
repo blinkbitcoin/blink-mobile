@@ -55,6 +55,7 @@ export type RootStackParamList = {
     status: PaymentSendCompletedStatus
     successAction?: LNURLPaySuccessAction
     preimage?: string
+    formatAmount?: string
   }
   language: undefined
   currency: undefined

@@ -107,6 +107,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   })
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
+  let formatAmount = ""
   const { LL } = useI18nContext()
 
   const fee = useFee(getFee)
@@ -156,6 +157,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 status,
                 successAction: paymentDetail?.successAction,
                 preimage: extraInfo?.preimage,
+                formatAmount,
               },
             },
           ]
@@ -206,6 +208,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     sendPayment,
     setPaymentError,
     sendingWalletDescriptor?.currency,
+    formatAmount,
   ])
 
   let validAmount = true
@@ -260,6 +263,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const errorMessage = paymentError || invalidAmountErrorMessage
 
   const displayAmount = convertMoneyAmount(settlementAmount, DisplayCurrency)
+  formatAmount = encodeURIComponent(
+    formatDisplayAndWalletAmount({
+      displayAmount,
+      walletAmount: settlementAmount,
+    }),
+  )
 
   const transactionType = () => {
     if (paymentType === "intraledger") return LL.common.intraledger()

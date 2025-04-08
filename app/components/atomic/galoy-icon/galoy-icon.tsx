@@ -52,6 +52,7 @@ import Note from "@app/assets/icons/note.svg"
 import People from "@app/assets/icons/people.svg"
 import Rank from "@app/assets/icons/rank.svg"
 import Refresh from "@app/assets/icons/refresh.svg"
+import OpenLink from "@app/assets/icons/open-link.svg"
 import { makeStyles, useTheme } from "@rneui/themed"
 
 export const icons = {
@@ -106,6 +107,7 @@ export const icons = {
   "payment-error": PaymentError,
   "bell": Bell,
   "refresh": Refresh,
+  "open-link": OpenLink,
 } as const
 
 export type IconNamesType = keyof typeof icons

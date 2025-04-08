@@ -1,16 +1,22 @@
 import React from "react"
 import { utils } from "lnurl-pay"
-import { View, Text, TouchableOpacity, Linking } from "react-native"
-import { makeStyles } from "@rneui/themed"
+import { View, Text, Linking, TouchableOpacity } from "react-native"
+import { makeStyles, useTheme } from "@rneui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SuccessActionComponentProps, SuccessActionTag } from "./success-action.props"
-import { FieldWithCopy } from "./field-with-copy"
+import { FieldWithIconEvent } from "./field-with-icon"
+import Clipboard from "@react-native-clipboard/clipboard"
+import { toastShow } from "@app/utils/toast"
+import { GaloyIcon } from "../atomic/galoy-icon"
 
 export const SuccessActionComponent: React.FC<SuccessActionComponentProps> = ({
   successAction,
   preimage,
 }) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL } = useI18nContext()
 
   if (!successAction) return null
@@ -21,40 +27,47 @@ export const SuccessActionComponent: React.FC<SuccessActionComponentProps> = ({
       ? utils.decipherAES({ successAction, preimage })
       : null
 
+  const copyToClipboard = (text: string, message: string) => {
+    Clipboard.setString(text)
+    toastShow({ type: "success", message, LL })
+  }
+
   return (
     <View style={styles.successActionContainer}>
       {tag === SuccessActionTag.MESSAGE && message && (
-        <>
-          <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-          <FieldWithCopy
-            text={message}
-            copiedMessage={LL.SendBitcoinScreen.copiedSuccessMessage()}
-            accessibilityLabel={LL.SendBitcoinScreen.copySuccessMessage()}
-          />
-        </>
+        <FieldWithIconEvent
+          text={message}
+          event={() =>
+            copyToClipboard(message, LL.SendBitcoinScreen.copiedSuccessMessage())
+          }
+          iconName="copy-paste"
+          accessibilityLabel={LL.SendBitcoinScreen.copySuccessMessage()}
+        />
       )}
 
       {tag === SuccessActionTag.URL && (
         <>
-          {description && (
-            <>
-              <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-              <FieldWithCopy
-                text={description}
-                copiedMessage={LL.SendBitcoinScreen.copiedSuccessMessage()}
-                accessibilityLabel={LL.SendBitcoinScreen.copySecretMessage()}
-              />
-            </>
-          )}
+          <FieldWithIconEvent
+            text={`${description} ${url!}`}
+            event={() =>
+              copyToClipboard(
+                `${description} ${url!}`,
+                LL.SendBitcoinScreen.copiedSuccessMessage(),
+              )
+            }
+            iconName="copy-paste"
+            accessibilityLabel={LL.SendBitcoinScreen.copySecretMessage()}
+          />
           <TouchableOpacity
-            style={styles.copyUrlButton}
+            style={styles.urlButton}
             onPress={() => Linking.openURL(url!)}
             accessibilityLabel={LL.SendBitcoinScreen.openSuccessUrl()}
             hitSlop={styles.hitSlopIcon}
           >
-            <Text style={styles.copyUrlButtonText}>
+            <Text style={styles.urlButtonText}>
               {LL.ScanningQRCodeScreen.openLinkTitle()}
             </Text>
+            <GaloyIcon name={"open-link"} size={14} color={colors.primary} />
           </TouchableOpacity>
         </>
       )}
@@ -63,16 +76,25 @@ export const SuccessActionComponent: React.FC<SuccessActionComponentProps> = ({
         <>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
           {description && (
-            <FieldWithCopy
+            <FieldWithIconEvent
               text={description}
-              copiedMessage={LL.SendBitcoinScreen.copiedSuccessMessage()}
+              event={() =>
+                copyToClipboard(description, LL.SendBitcoinScreen.copiedSuccessMessage())
+              }
+              iconName="copy-paste"
               accessibilityLabel={LL.SendBitcoinScreen.copySuccessMessage()}
             />
           )}
           {decryptedMessage ? (
-            <FieldWithCopy
+            <FieldWithIconEvent
               text={decryptedMessage}
-              copiedMessage={LL.SendBitcoinScreen.copiedSecretMessage()}
+              event={() =>
+                copyToClipboard(
+                  decryptedMessage,
+                  LL.SendBitcoinScreen.copiedSecretMessage(),
+                )
+              }
+              iconName="copy-paste"
               accessibilityLabel={LL.SendBitcoinScreen.copySecretMessage()}
             />
           ) : (
@@ -109,7 +131,7 @@ const useStyles = makeStyles(({ colors }) => ({
     left: 10,
     right: 10,
   },
-  copyUrlButton: {
+  urlButton: {
     backgroundColor: colors.grey5,
     flexDirection: "row",
     justifyContent: "center",
@@ -117,8 +139,10 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
+    alignSelf: "center",
+    gap: 15,
   },
-  copyUrlButtonText: {
+  urlButtonText: {
     fontSize: 16,
     textAlign: "center",
     color: colors.grey1,
