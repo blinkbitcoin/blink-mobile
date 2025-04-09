@@ -7,7 +7,7 @@ if [[ $(which ytt) == "" ]]; then
   exit 1
 fi
 
-target="${FLY_TARGET:-dev}"
+target="${FLY_TARGET:-galoy}"
 team=dev
 
 TMPDIR=""
@@ -18,5 +18,5 @@ ytt -f ci > ${TMPDIR}/pipeline.yml
 
 echo "Updating pipeline @ ${target}"
 
-fly -t ${target} set-pipeline --team=${team} -p galoy-mobile -c ${TMPDIR}/pipeline.yml
+fly -t ${target} set-pipeline --team=${team} -p blink-mobile -c ${TMPDIR}/pipeline.yml
 fly -t ${target} unpause-pipeline --team=${team} -p galoy-mobile
