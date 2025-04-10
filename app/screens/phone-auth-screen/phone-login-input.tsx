@@ -3,8 +3,8 @@ import {
   getCountryCallingCode,
 } from "libphonenumber-js/mobile"
 import * as React from "react"
-import { useEffect } from "react"
-import { ActivityIndicator, View } from "react-native"
+import { useEffect, useState } from "react"
+import { ActivityIndicator, View, Linking, Platform } from "react-native"
 import CountryPicker, {
   CountryCode,
   DARK_THEME,
@@ -25,6 +25,7 @@ import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, useTheme, Text, Input } from "@rneui/themed"
+import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 
 import { Screen } from "../../components/screen"
 import type { PhoneValidationStackParamList } from "../../navigation/stack-param-lists"
@@ -36,6 +37,40 @@ import {
 
 const DEFAULT_COUNTRY_CODE = "SV"
 const PLACEHOLDER_PHONE_NUMBER = "123-456-7890"
+
+const TELEGRAM_BOT_ID = 5130895329
+const TELEGRAM_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAweXJKoO7pm6oRUuO+vir
+VdQlAEKE6qXAzfF7o7m2WaHBCOQok5h7R2xzUffjKfuco2qQUUsoMqfd8XKFZ703
+YkbH0xvuCmbe3vE/8kGL8IXDVGicv7O3OpRecEZocy5HQUOfritlzXU2WAcFSqt5
+vWh6Ej6nFLtntcGBf747I4tZjae4J8XkQg0zf59mlIAQG3PVStEdJnDyskWpQH0Q
+HuJCrkxMdq0OHNrzS//8OXb6UgRZYRSUCL7ZBO2kpK3RU/gprcvStlh3ZJUNt59P
+P1Dl+JcSvvWQM07rmi8UxIH67jVL8qz4rD9G9iV4BpHAO7rwA3AEEwMs55lX8LUQ
+HQIDAQAB
+-----END PUBLIC KEY-----`
+const TELEGRAM_RETURN_URL = BLINK_DEEP_LINK_PREFIX + "/auth/telegram"
+
+// Helper function to generate a random nonce
+const generateNonce = (length = 32) => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  let result = ""
+  const randomValues = new Uint8Array(length)
+
+  // Use crypto.getRandomValues if available (for better security)
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    crypto.getRandomValues(randomValues)
+    for (let i = 0; i < length; i++) {
+      result += chars[randomValues[i] % chars.length]
+    }
+  } else {
+    // Fallback to Math.random (less secure)
+    for (let i = 0; i < length; i++) {
+      result += chars[Math.floor(Math.random() * chars.length)]
+    }
+  }
+
+  return result
+}
 
 const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
@@ -99,6 +134,9 @@ const useStyles = makeStyles(({ colors }) => ({
   whatsAppButton: {
     marginBottom: 20,
   },
+  telegramButton: {
+    marginBottom: 20,
+  },
   contactSupportButton: {
     marginTop: 10,
   },
@@ -122,6 +160,9 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   route,
 }) => {
   const { appConfig } = useAppConfig()
+  const [telegramLoading, setTelegramLoading] = useState(false)
+  const [telegramError, setTelegramError] = useState<string | null>(null)
+  const [currentNonce, setCurrentNonce] = useState<string>("")
 
   const styles = useStyles()
 
@@ -159,6 +200,120 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
     screenType === PhoneLoginInitiateType.CreateAccount &&
     phoneInputInfo?.countryCode &&
     DisableCountriesForAccountCreation.includes(phoneInputInfo.countryCode)
+
+  // Handle Telegram Passport authentication
+  const handleTelegramAuth = async () => {
+    setTelegramLoading(true)
+    setTelegramError(null)
+
+    try {
+      // Generate a fresh nonce for this request
+      const nonce = generateNonce()
+      setCurrentNonce(nonce) // Store it for verification when Telegram returns
+
+      // Create a scope object that only requests phone_number
+      const scope = {
+        data: ["phone_number"],
+        v: 1,
+      }
+
+      // Parameters for Telegram Passport
+      const params = {
+        bot_id: TELEGRAM_BOT_ID,
+        scope: scope,
+        public_key: TELEGRAM_PUBLIC_KEY,
+        nonce: nonce,
+        callback_url: TELEGRAM_RETURN_URL,
+      }
+
+      // For React Native, create a proper URL to launch the Telegram app with Passport
+      const telegramUrl = `tg://resolve?domain=telegrampassport&bot_id=${params.bot_id}&scope=${encodeURIComponent(JSON.stringify(params.scope))}&public_key=${encodeURIComponent(params.public_key)}&nonce=${encodeURIComponent(params.nonce)}&callback_url=${encodeURIComponent(params.callback_url)}`
+
+      // Check if the URL can be opened
+      const canOpen = true //await Linking.canOpenURL(telegramUrl)
+
+      if (canOpen) {
+        // Open Telegram app
+        await Linking.openURL(telegramUrl)
+      } else {
+        // Fallback if Telegram app is not installed - open web version
+        const webTelegramUrl = `https://telegram.me/telegrampassport?bot_id=${params.bot_id}&scope=${encodeURIComponent(JSON.stringify(params.scope))}&public_key=${encodeURIComponent(params.public_key)}&nonce=${encodeURIComponent(params.nonce)}&callback_url=${encodeURIComponent(params.callback_url)}`
+        await Linking.openURL(webTelegramUrl)
+      }
+    } catch (err) {
+      setTelegramError("Failed to open Telegram. Please make sure the app is installed.")
+      console.error("Telegram auth error:", err)
+    } finally {
+      setTelegramLoading(false)
+    }
+  }
+
+  // Set up deep link handler for Telegram return
+  useEffect(() => {
+    // Function to handle deep links from Telegram
+    const handleDeepLink = (event) => {
+      console.error("============ EVENT: ", event)
+      const { url } = event
+
+      if (url.includes("auth/telegram")) {
+        // Parse the incoming URL parameters from Telegram
+        const urlParams = new URL(url)
+        const params = new URLSearchParams(urlParams.search)
+
+        // Get the encrypted Telegram Passport data
+        const telegramData = params.get("tgAuthResult")
+
+        if (telegramData) {
+          // In a real implementation, you would:
+          // 1. Send this encrypted data to your backend along with the stored nonce
+          // 2. Backend decrypts using your private key (corresponding to the public key used for request)
+          // 3. Backend verifies the nonce matches what was sent
+          // 4. Extract the phone number from the decrypted data
+
+          console.log("Received encrypted Telegram data:", telegramData)
+          console.log("Verifying with nonce:", currentNonce)
+
+          // For demo purposes, we're showing a success navigation
+          // In production, you should verify the data on your server first
+
+          // You would typically make an API call here:
+          // const response = await yourApiService.verifyTelegramPassport({
+          //   telegramData: telegramData,
+          //   nonce: currentNonce
+          // });
+          // if (response.verified && response.phoneNumber) {
+          //   navigation.navigate("phoneLoginValidate", {
+          //     type: screenType,
+          //     phone: response.phoneNumber,
+          //     channel: "Telegram"
+          //   });
+          // }
+
+          // For now, we'll just navigate with placeholder data
+          navigation.navigate("phoneLoginValidate", {
+            type: screenType,
+            phone: "Verified via Telegram", // You would use the actual decrypted phone here
+            channel: "Telegram",
+          })
+        }
+      }
+    }
+
+    // Add event listener for deep links
+    const linkingSubscription = Linking.addEventListener("url", handleDeepLink)
+
+    // Check for initial URL (in case app was opened from a deep link)
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url })
+      }
+    })
+
+    // Clean up
+    return () => {
+      linkingSubscription.remove()
+    }
+  }, [navigation, screenType])
 
   useEffect(() => {
     if (status === RequestPhoneCodeStatus.SuccessRequestingCode) {
@@ -217,9 +372,31 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   if (isDisabledCountryAndCreateAccount) {
     errorMessage = LL.PhoneLoginInitiateScreen.errorUnsupportedCountry()
   }
+  if (telegramError) {
+    errorMessage = telegramError
+  }
 
   let PrimaryButton = undefined
   let SecondaryButton = undefined
+  let TelegramButton = undefined
+
+  // Add Telegram button
+  TelegramButton = (
+    <GaloySecondaryButton
+      title="Get Phone Number via Telegram"
+      containerStyle={styles.telegramButton}
+      loading={telegramLoading}
+      onPress={handleTelegramAuth}
+      disabled={isDisabledCountryAndCreateAccount}
+      icon={{
+        name: "paper-plane",
+        type: "font-awesome",
+        size: 15,
+        color: "white",
+      }}
+    />
+  )
+
   switch (true) {
     case isSmsSupported && isWhatsAppSupported:
       PrimaryButton = (
@@ -333,7 +510,14 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
             <ContactSupportButton containerStyle={styles.contactSupportButton} />
           </View>
         )}
+        <View style={styles.infoContainer}>
+          <GaloyInfo>
+            You can also use Telegram Passport to securely share your phone number without
+            manual entry
+          </GaloyInfo>
+        </View>
         <View style={styles.buttonsContainer}>
+          {TelegramButton}
           {SecondaryButton}
           {PrimaryButton}
         </View>
