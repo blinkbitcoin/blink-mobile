@@ -1,4 +1,9 @@
+const getReadableVersion = jest.fn(() => "1.0.0")
+const getBuildNumber = jest.fn(() => "1234")
+
+export { getReadableVersion, getBuildNumber }
+
 export default {
-  getReadableVersion: jest.fn(() => "1.0.0"),
-  getBuildNumber: jest.fn(() => "1234"),
+  getReadableVersion,
+  getBuildNumber,
 }

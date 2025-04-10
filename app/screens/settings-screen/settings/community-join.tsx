@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { getReadableVersion } from "react-native-device-info"
 
 import ContactModal, {

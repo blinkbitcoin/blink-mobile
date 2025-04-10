@@ -1,5 +1,5 @@
 import { ScrollView } from "react-native-gesture-handler"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { TouchableOpacity } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
@@ -23,6 +23,7 @@ import { AccountLNAddress } from "./settings/account-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
+import { SwitchAccount } from "./settings/switch-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -81,7 +82,7 @@ export const SettingsScreen: React.FC = () => {
   })
 
   const items = {
-    account: [AccountLevelSetting, TxLimits],
+    account: [AccountLevelSetting, TxLimits, SwitchAccount],
     loginMethods: [EmailSetting, PhoneSetting],
     waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
     preferences: [

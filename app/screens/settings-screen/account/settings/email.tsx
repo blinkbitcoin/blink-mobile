@@ -1,3 +1,4 @@
+import React from "react"
 import { Alert, View } from "react-native"
 
 import { gql } from "@apollo/client"

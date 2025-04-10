@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
@@ -15,6 +15,7 @@ type Props = {
   rightIconAction?: () => void | Promise<void>
   loading?: boolean
   spinner?: boolean
+  expanded?: boolean
 }
 
 export const SettingsRow: React.FC<Props> = ({
@@ -28,6 +29,7 @@ export const SettingsRow: React.FC<Props> = ({
   extraComponentBesideTitle = <></>,
   loading,
   spinner,
+  expanded = false,
 }) => {
   const [hovering, setHovering] = useState(false)
   const styles = useStyles({ hovering })
@@ -40,10 +42,11 @@ export const SettingsRow: React.FC<Props> = ({
       </View>
     )
 
+  const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
-      <Icon name={rightIcon ? rightIcon : "chevron-forward"} type="ionicon" />
+      <Icon name={rightIcon ? rightIcon : defaultIcon} type="ionicon" />
     ) : (
       rightIcon
     ))

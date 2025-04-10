@@ -27,6 +27,7 @@ module.exports = {
       "|@react-native" +
       "|@react-navigation" +
       "|react-native-animatable" +
+      "|react-native-secure-key-store" +
       "|react-native-country-picker-modal" +
       "|react-native-error-boundary" +
       "|react-native-extended-stylesheet" +

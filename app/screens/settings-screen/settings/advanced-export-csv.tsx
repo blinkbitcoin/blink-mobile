@@ -1,3 +1,4 @@
+import React from "react"
 import Share from "react-native-share"
 
 import { gql } from "@apollo/client"
