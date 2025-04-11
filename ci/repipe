@@ -7,7 +7,7 @@ if [[ $(which ytt) == "" ]]; then
   exit 1
 fi
 
-target="${FLY_TARGET:-galoy}"
+target="${FLY_TARGET:-ciblink}"
 team=dev
 
 TMPDIR=""

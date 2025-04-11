@@ -1,7 +1,7 @@
 #@data/values
 ---
 git_uri: git@github.com:blinkbitcoin/blink-mobile.git
-concourse_locks_git_uri: git@github.com:GaloyMoney/concourse-locks.git
+concourse_locks_git_uri: git@github.com:blinkbitcoin/concourse-locks.git
 
 git_mobile_deployments_uri: git@github.com:blinkbitcoin/blink-mobile-deployments.git
 git_version_branch: main
