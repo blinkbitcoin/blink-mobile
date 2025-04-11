@@ -32,7 +32,16 @@ const useDeviceLocation = () => {
             setCountryCode(_countryCode)
             updateCountryCode(client, _countryCode)
           } else {
-            console.warn("no data. default of SV will be used")
+            const response2 = await axios.get("https://api.ip2location.io/", {
+              timeout: 5000,
+            })
+            const _countryCode2 = response2?.data?.country_code
+            if (_countryCode2) {
+              setCountryCode(_countryCode2)
+              updateCountryCode(client, _countryCode2)
+            } else {
+              console.warn("no data. default of SV will be used")
+            }
           }
           // can throw a 429 for device's rate-limiting. resort to cached value if available
         } catch (err) {
