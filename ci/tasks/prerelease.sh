@@ -27,13 +27,14 @@ cat artifacts/gh-release-notes.md
 echo "-------------------------------"
 
 if [[ $(cat artifacts/gh-release-notes.md | wc -l) == "0" ]]; then
-  echo "Nothing to Release"
-  exit 1
+  echo "    --> Nothing to Release"
+  echo "ignoring and continuing anyway"
+  #exit 1
 fi
 
 # ------------ BUMP VERSION ------------
 
-echo -n "Prev Version: "
+echo -n "    --> Prev Version: "
 cat testflight-version/version
 echo ""
 
@@ -44,14 +45,14 @@ if [[ $(cat testflight-version/version) == "0.0.0" ]]; then
   echo "0.1.0" > testflight-version/testflight-version
 # Figure out proper version to release
 elif [[ $(cat artifacts/gh-release-notes.md | grep \*\*breaking\*\*) != '' ]]; then
-  echo "Breaking change / Feature Addition found, bumping minor version..."
+  echo "    --> Breaking change / Feature Addition found, bumping minor version..."
   bump2version minor --current-version $(cat testflight-version/version) --allow-dirty testflight-version/testflight-version
 else
-  echo "Only patches and fixes found - no breaking changes, bumping patch version..."
+  echo "    --> Only patches and fixes found - no breaking changes, bumping patch version..."
   bump2version patch --current-version $(cat testflight-version/version) --allow-dirty testflight-version/testflight-version
 fi
 
-echo -n "Release Version: "
+echo -n "    --> Release Version: "
 cat testflight-version/testflight-version
 echo ""
 
