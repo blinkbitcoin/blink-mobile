@@ -17,7 +17,7 @@ docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
 docker_registry_password: ((docker-creds.password))
 
-gh_org: blinkbitcoiny
+gh_org: blinkbitcoin
 gh_repository: blink-mobile
 
 build_artifacts_bucket_name: galoy-build-artifacts
