@@ -1,3 +1,4 @@
+import React from "react"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"

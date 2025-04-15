@@ -1,3 +1,4 @@
+import React from "react"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LocaleToTranslateLanguageSelector } from "@app/i18n/mapping"

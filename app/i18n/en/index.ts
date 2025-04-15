@@ -2381,6 +2381,8 @@ const en: BaseTranslation = {
     tapToAddPhoneNumber: "Tap to add phone number",
     loginMethods: "Login Methods",
     level: "Level {level: string}",
+    switchAccount: "Switch Account",
+    pleaseWait: "Please Wait.",
     accountLevel: "Account Level",
     upgrade: "Upgrade your account",
     logOutAndDeleteLocalData: "Log out and clear all local data",
@@ -2429,6 +2431,10 @@ const en: BaseTranslation = {
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
     copy: "Copy",
+  },
+  ProfileScreen: {
+    addAccount: "Add Account",
+    error: "Unable to fetch profiles at this time",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { useSettingsScreenQuery } from "@app/graphql/generated"

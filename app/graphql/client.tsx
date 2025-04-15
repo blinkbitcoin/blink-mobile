@@ -199,15 +199,15 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       if (token) {
         authLink = setContext((request, { headers }) => ({
           headers: {
-            ...headers,
             authorization: getAuthorizationHeader(token),
+            ...headers,
           },
         }))
       } else {
         authLink = setContext((request, { headers }) => ({
           headers: {
-            ...headers,
             authorization: "",
+            ...headers,
           },
         }))
       }

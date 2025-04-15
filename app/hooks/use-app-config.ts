@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react"
 
 import { GaloyInstance, resolveGaloyInstanceOrDefault } from "@app/config"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const useAppConfig = () => {
   const { persistentState, updateState } = usePersistentStateContext()
@@ -29,7 +30,8 @@ export const useAppConfig = () => {
   )
 
   const saveToken = useCallback(
-    (token: string) => {
+    async (token: string) => {
+      await saveSessionToken(token)
       updateState((state) => {
         if (state)
           return {
@@ -43,7 +45,8 @@ export const useAppConfig = () => {
   )
 
   const saveTokenAndInstance = useCallback(
-    ({ token, instance }: { token: string; instance: GaloyInstance }) => {
+    async ({ token, instance }: { token: string; instance: GaloyInstance }) => {
+      await saveSessionToken(token)
       updateState((state) => {
         if (state)
           return {
@@ -56,6 +59,10 @@ export const useAppConfig = () => {
     },
     [updateState],
   )
+
+  const saveSessionToken = async (token: string) => {
+    await KeyStoreWrapper.saveSessionToken(token)
+  }
 
   return {
     appConfig,

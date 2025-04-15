@@ -4,6 +4,7 @@
  * If the user isn't logged in, it shows Login or Create Account
  * Later on, this will support switching between accounts
  */
+import React from "react"
 import { View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 

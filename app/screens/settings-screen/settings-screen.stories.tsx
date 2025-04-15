@@ -1,40 +1,13 @@
 import * as React from "react"
 
-import { MockedProvider } from "@apollo/client/testing"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { Meta } from "@storybook/react"
 
 import { StoryScreen } from "../../../.storybook/views"
 import { createCache } from "../../graphql/cache"
 import { SettingsScreenDocument } from "../../graphql/generated"
 import { IsAuthedContextProvider } from "../../graphql/is-authed-context"
-import mocks from "../../graphql/mocks"
 import { SettingsScreen } from "./settings-screen"
-
-const mocksWithUsername = [
-  ...mocks,
-  {
-    request: {
-      query: SettingsScreenDocument,
-    },
-    result: {
-      data: {
-        me: {
-          id: "70df9822-efe0-419c-b864-c9efa99872ea",
-          phone: "+50365055539",
-          username: "test1",
-          language: "",
-          defaultAccount: {
-            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
-            displayCurrency: "EUR",
-            defaultWalletId: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
-            __typename: "ConsumerAccount",
-          },
-          __typename: "User",
-        },
-      },
-    },
-  },
-]
 
 const mocksNoUsername = [
   {
@@ -83,8 +56,8 @@ export const LoggedInNoUsername = () => (
   </MockedProvider>
 )
 
-export const LoggedInWithUsername = () => (
-  <MockedProvider mocks={mocksWithUsername} cache={createCache()}>
+export const LoggedInWithUsername = ({ mock }: { mock: MockedResponse[] }) => (
+  <MockedProvider mocks={mock} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
       <SettingsScreen />
     </IsAuthedContextProvider>
