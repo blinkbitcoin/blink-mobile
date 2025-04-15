@@ -1592,6 +1592,7 @@ export const PayoutSpeed = {
 export type PayoutSpeed = typeof PayoutSpeed[keyof typeof PayoutSpeed];
 export const PhoneCodeChannelType = {
   Sms: 'SMS',
+  Telegram: 'TELEGRAM',
   Whatsapp: 'WHATSAPP'
 } as const;
 
