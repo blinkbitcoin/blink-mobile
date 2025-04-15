@@ -348,13 +348,11 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
               <GaloyInfo>
                 {LL.PhoneLoginValidationScreen.sendViaOtherChannel({
                   channel: PhoneCodeChannelToFriendlyName[channel],
-                  other:
-                    PhoneCodeChannelToFriendlyName[
-                      Object.values(PhoneCodeChannelType)
-                        .filter((type) => type !== channel)
-                        .at(0) ?? PhoneCodeChannelType.Sms
-                    ],
-                })}
+                    other:
+                    channel === PhoneCodeChannelType.Sms
+                    ? PhoneCodeChannelType.Whatsapp
+                    : PhoneCodeChannelType.Sms
+                )}
               </GaloyInfo>
             </View>
           )}
