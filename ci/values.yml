@@ -6,8 +6,8 @@ concourse_locks_git_uri: git@github.com:blinkbitcoin/concourse-locks.git
 git_mobile_deployments_uri: git@github.com:blinkbitcoin/blink-mobile-deployments.git
 git_version_branch: main
 
-git_branch: kn/fix_prerelease
-pipeline_git_branch: kn/fix_prerelease
+git_branch: main
+pipeline_git_branch: main
 git_build_number_branch: build-numbers
 
 github_private_key: ((github-blinkbitcoin.private_key))
