@@ -67,6 +67,7 @@ export type UseRequestPhoneCodeReturn = {
 export const PhoneCodeChannelToFriendlyName = {
   [PhoneCodeChannelType.Sms]: "SMS",
   [PhoneCodeChannelType.Whatsapp]: "WhatsApp",
+  [PhoneCodeChannelType.Telegram]: "Telegram",
 }
 
 gql`
