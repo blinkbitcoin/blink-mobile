@@ -28,8 +28,7 @@ echo "-------------------------------"
 
 if [[ $(cat artifacts/gh-release-notes.md | wc -l) == "0" ]]; then
   echo "    --> Nothing to Release"
-  echo "ignoring and continuing anyway"
-  #exit 1
+  exit 1
 fi
 
 # ------------ BUMP VERSION ------------
