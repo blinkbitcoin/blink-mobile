@@ -1,6 +1,6 @@
 // Welcome to the main entry point of the app.
 //
-// In this file, we'll be kicking off our app
+// In this file, we'll be kicking off the app
 // language related import
 import "intl-pluralrules"
 import "node-libs-react-native/globals"
