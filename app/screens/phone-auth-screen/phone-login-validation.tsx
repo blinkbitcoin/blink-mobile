@@ -346,13 +346,15 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
           ValidatePhoneCodeErrors.CannotUpgradeToExistingAccount ? null : (
             <View style={styles.marginBottom}>
               <GaloyInfo>
-                {LL.PhoneLoginValidationScreen.sendViaOtherChannel({
+              {LL.PhoneLoginValidationScreen.sendViaOtherChannel({
                   channel: PhoneCodeChannelToFriendlyName[channel],
-                    other:
-                    channel === PhoneCodeChannelType.Sms
-                    ? PhoneCodeChannelType.Whatsapp
-                    : PhoneCodeChannelType.Sms
-                )}
+                  other:
+                    PhoneCodeChannelToFriendlyName[
+                      channel === PhoneCodeChannelType.Sms
+                        ? PhoneCodeChannelType.Whatsapp
+                        : PhoneCodeChannelType.Sms
+                    ],
+                })}
               </GaloyInfo>
             </View>
           )}
