@@ -7,7 +7,7 @@ import {
   moneyAmountIsCurrencyType,
   toUsdMoneyAmount,
 } from "@app/types/amounts"
-import { PaymentType } from "@galoymoney/client"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import {
   AmountInvalidReason,

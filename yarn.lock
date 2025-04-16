@@ -1444,6 +1444,11 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
+"@blinkbitcoin/blink-client@0.2.18":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.2.18.tgz#54f31fe929150c6e37de06910ffae632323d678b"
+  integrity sha512-TJvtA1w1a1cLGDdJTfvObdJfoVJ5Jlqw2zGNQxjf+Hl1ivwGArZjBKVykB1rHP/ZXCLDkvA9B4LUWuIcO8hyjw==
+
 "@callstack/react-theme-provider@3.0.3":
   version "3.0.3"
   resolved "https://registry.npmjs.org/@callstack/react-theme-provider/-/react-theme-provider-3.0.3.tgz#f964dda28cd6e731c3fbcf916b0579c6f9fb2db7"
@@ -2014,11 +2019,6 @@
     "@formatjs/ecma402-abstract" "1.18.2"
     "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
-
-"@galoymoney/client@0.2.13":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@galoymoney/client/-/client-0.2.13.tgz#582f756019bec88a435c041385f35347e70048a4"
-  integrity sha512-pI6/T1sKrXv6XxuH1P4EJR+v03S9QQ6lCJjxb00zSIvT7TKvV9U8oZdOsukSGytdcDiZPgNrYJNnFk+U4qVmDw==
 
 "@galoymoney/react-native-geetest-module@^0.1.3":
   version "0.1.5"

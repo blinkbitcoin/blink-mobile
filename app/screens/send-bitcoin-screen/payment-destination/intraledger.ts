@@ -3,7 +3,7 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { ZeroBtcMoneyAmount } from "@app/types/amounts"
-import { IntraledgerPaymentDestination } from "@galoymoney/client"
+import { IntraledgerPaymentDestination } from "@blinkbitcoin/blink-client"
 
 import { createIntraledgerPaymentDetails } from "../payment-details"
 import {

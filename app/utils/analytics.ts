@@ -8,7 +8,7 @@ import {
 import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { PaymentType as ParsedPaymentType } from "@galoymoney/client"
+import { PaymentType as ParsedPaymentType } from "@blinkbitcoin/blink-client"
 import analytics from "@react-native-firebase/analytics"
 
 export const logRequestAuthCode = ({

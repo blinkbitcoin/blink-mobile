@@ -41,11 +41,11 @@ The mobile app uses the [galoy-client](https://github.com/GaloyMoney/galoy-clien
 
 **Before you run these commands the client will need to be published using `yalc`. Instructions for this are included in the readme for the client.**
 
-`npx yalc add @galoymoney/client`
+`npx yalc add @blinkbitcoin/blink-client`
 
 When you are finished developing locally and are ready to push to github you will need to remove the yalc dependency using the following command.
 
-`npx yalc remove @galoymoney/client`
+`npx yalc remove @blinkbitcoin/blink-client`
 
 ## Adding new fonts
 

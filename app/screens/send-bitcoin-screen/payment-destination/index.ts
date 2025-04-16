@@ -2,7 +2,7 @@ import {
   parsePaymentDestination,
   PaymentType,
   Network as NetworkGaloyClient,
-} from "@galoymoney/client"
+} from "@blinkbitcoin/blink-client"
 
 import {
   InvalidDestinationReason,

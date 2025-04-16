@@ -5,7 +5,7 @@ import { ModalTooltip } from "@app/components/modal-tooltip/modal-tooltip"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
-import { IntraledgerPaymentDestination } from "@galoymoney/client"
+import { IntraledgerPaymentDestination } from "@blinkbitcoin/blink-client"
 import { Text, makeStyles, useTheme } from "@rneui/themed"
 
 import { InvalidDestinationReason } from "./payment-destination/index.types"

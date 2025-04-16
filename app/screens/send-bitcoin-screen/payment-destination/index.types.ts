@@ -13,7 +13,7 @@ import {
   OnchainPaymentDestination,
   ParsedPaymentDestination,
   PaymentType,
-} from "@galoymoney/client"
+} from "@blinkbitcoin/blink-client"
 
 import { ConvertMoneyAmount, PaymentDetail } from "../payment-details"
 

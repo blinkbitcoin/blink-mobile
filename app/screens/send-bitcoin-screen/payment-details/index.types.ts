@@ -30,7 +30,7 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { PaymentType } from "@galoymoney/client"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 
 export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
   moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,

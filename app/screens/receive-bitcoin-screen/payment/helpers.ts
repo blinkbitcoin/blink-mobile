@@ -1,5 +1,8 @@
 import { Network } from "@app/graphql/generated"
-import { decodeInvoiceString, Network as NetworkLibGaloy } from "@galoymoney/client"
+import {
+  decodeInvoiceString,
+  Network as NetworkLibGaloy,
+} from "@blinkbitcoin/blink-client"
 
 import { Invoice, GetFullUriInput } from "./index.types"
 

@@ -2,7 +2,7 @@ import React from "react"
 
 import { MockedProvider } from "@apollo/client/testing"
 import { ZeroBtcMoneyAmount } from "@app/types/amounts"
-import { PaymentType } from "@galoymoney/client"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 import { Meta } from "@storybook/react"
 
 import { StoryScreen } from "../../../.storybook/views"

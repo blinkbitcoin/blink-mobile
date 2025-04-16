@@ -7,7 +7,7 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { LnurlPaymentDestination, PaymentType } from "@galoymoney/client"
+import { LnurlPaymentDestination, PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createLnurlPaymentDetails } from "../payment-details"
 import {

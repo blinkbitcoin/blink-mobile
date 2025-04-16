@@ -3,7 +3,7 @@ import { ZeroBtcMoneyAmount, toBtcMoneyAmount } from "@app/types/amounts"
 import {
   InvalidLightningDestinationReason,
   LightningPaymentDestination,
-} from "@galoymoney/client"
+} from "@blinkbitcoin/blink-client"
 
 import {
   createAmountLightningPaymentDetails,

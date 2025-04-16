@@ -38,7 +38,10 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { toastShow } from "@app/utils/toast"
-import { decodeInvoiceString, Network as NetworkLibGaloy } from "@galoymoney/client"
+import {
+  decodeInvoiceString,
+  Network as NetworkLibGaloy,
+} from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
