@@ -41,6 +41,13 @@ platform :android do
       track: "internal",
       skip_upload_changelogs: true,
       skip_upload_images: true,
+      release_status: "completed",
+      # Add health-related declarations
+      app_store_metadata: {
+        contains_health_features: false,
+        contains_medical_device_features: false,
+        contains_covid19_features: false
+      }
     )
   end
 
