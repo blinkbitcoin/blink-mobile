@@ -14,6 +14,7 @@ import { palette } from "../../theme/palette"
 import { validPayment } from "../../utils/parsing"
 import useToken from "../../utils/use-token"
 import { useMySubscription } from "../../hooks/user-hooks"
+import Share from "react-native-share"
 // import analytics from "@react-native-firebase/analytics"
 
 import { translate } from "../../i18n"
@@ -232,6 +233,31 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
    Alert.alert(translate("errors.generic"))
   }
 
+  const downloadFile = async (data, filename, mimeType) => {
+    try {
+      console.log('downloadFile', data, filename, mimeType)
+      const fileBase64 = btoa(data)
+      
+      // Set default MIME type if not provided
+      const fileType = mimeType || 'text/plain'
+      
+      const url = `data:${fileType};base64,${fileBase64}`
+      
+      await Share.open({
+        title: filename,
+        message: filename,
+        url: url,
+        type: fileType,
+        filename: filename,
+        failOnCancel: false,
+        showAppsToView: true,
+        saveToFiles: true,
+      })
+    } catch (error) {
+      console.error("Error downloading file:", error)
+    }
+  }
+
   const confirmLightning = async (amount) => {
     Alert.alert(
       translate("SendBitcoinConfirmationScreen.confirmPayment"),
@@ -324,6 +350,10 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
                   console.log(data)
                   Linking.openURL(data.url)
                   break;
+
+                case "downloadFile":
+                  await downloadFile(data.data, data.filename, data.mimeType)
+                  break;
               }
             }}
             allowsBackForwardNavigationGestures={true}
@@ -335,7 +365,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
             basicAuthCredential={{
               username: otcBaseUri.username,
               password: otcBaseUri.password
-            }}   
+            }}
           />
         }
       </View>

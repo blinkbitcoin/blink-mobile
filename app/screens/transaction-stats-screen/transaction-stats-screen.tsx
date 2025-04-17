@@ -52,10 +52,12 @@ export const TransactionStatsScreen: React.FC = () => {
       if (csvTransactions) {
         await Share.open({
           title: "bj-transactions.csv",
+          message: "bj-transactions.csv",
           url: `data:text/csv;base64,${csvTransactions}`,
           type: "text/csv",
           filename: "bj-transactions.csv",
           failOnCancel: false,
+          saveToFiles: true,
         })
       } else {
         throw new Error("CSV data not available")
