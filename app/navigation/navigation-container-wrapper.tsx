@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react"
 import { Linking } from "react-native"
 import RNBootSplash from "react-native-bootsplash"
 
-import { PREFIX_LINKING } from "@app/config"
 import analytics from "@react-native-firebase/analytics"
 import {
   LinkingOptions,
@@ -16,6 +15,8 @@ import { useTheme } from "@rneui/themed"
 
 import { useIsAuthed } from "../graphql/is-authed-context"
 import { RootStackParamList } from "./stack-param-lists"
+
+import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { Action, useActionsContext } from "@app/components/actions"
 
 export type AuthenticationContextType = {
@@ -144,6 +145,8 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     },
     subscribe: (listener) => {
       const onReceiveURL = ({ url }: { url: string }) => {
+        if (url.includes(TELEGRAM_CALLBACK_PATH)) return
+
         if (!isAppLocked && isAuthed) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {

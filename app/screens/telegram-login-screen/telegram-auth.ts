@@ -7,9 +7,9 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { PhoneValidationStackParamList } from "@app/navigation/stack-param-lists"
+import { BLINK_DEEP_LINK_PREFIX, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { formatPublicKey } from "@app/utils/format-public-key"
 import { useAppConfig } from "@app/hooks"
-import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 
 export const ErrorType = {
   FetchParamsError: "FetchParamsError",
@@ -42,7 +42,7 @@ export const useTelegramLogin = (phone: string) => {
   const MAX_POLLING_ATTEMPTS = 3
   const POLLING_INTERVAL_MS = 5000
   const TELEGRAM_CALLBACK = encodeURIComponent(
-    `${BLINK_DEEP_LINK_PREFIX}/passport-callback`,
+    `${BLINK_DEEP_LINK_PREFIX}/${TELEGRAM_CALLBACK_PATH}`,
   )
 
   const {
@@ -126,7 +126,7 @@ export const useTelegramLogin = (phone: string) => {
       const handleDeepLink = ({ url }: { url: string }) => {
         const cleanUrl = url.replace(`${BLINK_DEEP_LINK_PREFIX}/`, "")
         const [path, query] = cleanUrl.split("&")
-        if (path !== "passport-callback") return
+        if (!path.includes(TELEGRAM_CALLBACK_PATH)) return
 
         const params = new URLSearchParams(query)
         if (params.get("tg_passport") === "success") {
