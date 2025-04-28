@@ -15,6 +15,7 @@ import {
 import { useAppConfig, useGeetestCaptcha } from "@app/hooks"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { logRequestAuthCode } from "@app/utils/analytics"
+import { isIos } from "@app/utils/helper"
 
 import useAppCheckToken from "../get-started-screen/use-device-token"
 
@@ -144,8 +145,9 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
     ) || []) as CountryCode[]
 
     const isTelegramSupported =
-      currentCountry?.supportedAuthChannels.includes(PhoneCodeChannelType.Telegram) ||
-      false
+      !isIos &&
+      (currentCountry?.supportedAuthChannels.includes(PhoneCodeChannelType.Telegram) ||
+        false)
     const isWhatsAppSupported =
       currentCountry?.supportedAuthChannels.includes(PhoneCodeChannelType.Whatsapp) ||
       false
