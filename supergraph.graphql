@@ -1627,6 +1627,7 @@ enum PhoneCodeChannelType
   @join__type(graph: BLINK)
 {
   SMS @join__enumValue(graph: BLINK)
+  TELEGRAM @join__enumValue(graph: BLINK)
   WHATSAPP @join__enumValue(graph: BLINK)
 }
 
