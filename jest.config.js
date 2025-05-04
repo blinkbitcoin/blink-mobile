@@ -39,6 +39,7 @@ module.exports = {
       "|react-native-linear-gradient" +
       "|react-native-root-siblings" +
       "|react-native-screens" +
+      "|react-native-secure-key-store" +
       "|react-native-size-matters" +
       "|react-native-splash-screen" +
       "|react-native-toast-message" +

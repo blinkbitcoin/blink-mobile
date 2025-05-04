@@ -1,6 +1,6 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
 
-type PersistentState_3 = {
+type LocalStorageState_3 = {
   schemaVersion: 3
   hasShownStableSatsWelcome: boolean
   isUsdDisabled: boolean
@@ -9,7 +9,7 @@ type PersistentState_3 = {
   isAnalyticsEnabled: boolean
 }
 
-type PersistentState_4 = {
+type LocalStorageState_4 = {
   schemaVersion: 4
   hasShownStableSatsWelcome: boolean
   isUsdDisabled: boolean
@@ -18,29 +18,43 @@ type PersistentState_4 = {
   isAnalyticsEnabled: boolean
 }
 
-type PersistentState_5 = {
+type LocalStorageState_5 = {
   schemaVersion: 5
   galoyInstance: GaloyInstanceInput
   galoyAuthToken: string
 }
 
-type PersistentState_6 = {
+type LocalStorageState_6 = {
   schemaVersion: 6
   galoyInstance: GaloyInstanceInput
   galoyAuthToken: string
 }
 
-const migrate6ToCurrent = (state: PersistentState_6): Promise<PersistentState> =>
+type LocalStorageState_7 = {
+  schemaVersion: 7
+  galoyInstance: GaloyInstanceInput
+}
+
+const migrate7ToCurrent = (state: LocalStorageState_7): Promise<LocalStorageState> =>
   Promise.resolve(state)
 
-const migrate5ToCurrent = (state: PersistentState_5): Promise<PersistentState> => {
+const migrate6ToCurrent = (state: LocalStorageState_6): Promise<LocalStorageState> => {
+  const { galoyInstance } = state
+
+  return migrate7ToCurrent({
+    galoyInstance,
+    schemaVersion: 7,
+  })
+}
+
+const migrate5ToCurrent = (state: LocalStorageState_5): Promise<LocalStorageState> => {
   return migrate6ToCurrent({
     ...state,
     schemaVersion: 6,
   })
 }
 
-const migrate4ToCurrent = (state: PersistentState_4): Promise<PersistentState> => {
+const migrate4ToCurrent = (state: LocalStorageState_4): Promise<LocalStorageState> => {
   const newGaloyInstance = GALOY_INSTANCES.find(
     (instance) => instance.name === state.galoyInstance.name,
   )
@@ -77,7 +91,7 @@ const migrate4ToCurrent = (state: PersistentState_4): Promise<PersistentState> =
   })
 }
 
-const migrate3ToCurrent = (state: PersistentState_3): Promise<PersistentState> => {
+const migrate3ToCurrent = (state: LocalStorageState_3): Promise<LocalStorageState> => {
   const newGaloyInstance = GALOY_INSTANCES.find(
     (instance) => instance.name === state.galoyInstance.name,
   )
@@ -94,10 +108,11 @@ const migrate3ToCurrent = (state: PersistentState_3): Promise<PersistentState> =
 }
 
 type StateMigrations = {
-  3: (state: PersistentState_3) => Promise<PersistentState>
-  4: (state: PersistentState_4) => Promise<PersistentState>
-  5: (state: PersistentState_5) => Promise<PersistentState>
-  6: (state: PersistentState_6) => Promise<PersistentState>
+  3: (state: LocalStorageState_3) => Promise<LocalStorageState>
+  4: (state: LocalStorageState_4) => Promise<LocalStorageState>
+  5: (state: LocalStorageState_5) => Promise<LocalStorageState>
+  6: (state: LocalStorageState_6) => Promise<LocalStorageState>
+  7: (state: LocalStorageState_7) => Promise<LocalStorageState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -105,34 +120,49 @@ const stateMigrations: StateMigrations = {
   4: migrate4ToCurrent,
   5: migrate5ToCurrent,
   6: migrate6ToCurrent,
+  7: migrate7ToCurrent,
 }
 
-export type PersistentState = PersistentState_6
+export type LocalStorageState = LocalStorageState_7
 
-export const defaultPersistentState: PersistentState = {
-  schemaVersion: 6,
+export const defaultLocalStorageState: LocalStorageState = {
+  schemaVersion: 7,
   galoyInstance: { id: "Main" },
-  galoyAuthToken: "",
 }
 
-export const migrateAndGetPersistentState = async (
+export const migrateAndGetLocalStorageState = async (
   // TODO: pass the correct type.
   // this is especially important given this is migration code and it's hard to test manually
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
-): Promise<PersistentState> => {
+): Promise<LocalStorageState> => {
   if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 = data.schemaVersion
+    const schemaVersion: 3 | 4 | 5 | 6 | 7 = data.schemaVersion
     try {
       const migration = stateMigrations[schemaVersion]
-      const persistentState = await migration(data)
-      if (persistentState) {
-        return persistentState
+      const localStorageState = await migration(data)
+      if (localStorageState) {
+        return localStorageState
       }
     } catch (err) {
-      console.error({ err }, "error migrating persistent state")
+      console.error({ err }, "error migrating local storage state")
     }
   }
 
-  return defaultPersistentState
+  return defaultLocalStorageState
+}
+
+export type SecureStorageState = {
+  galoyAuthToken: string
+}
+
+export const defaultSecureStorageState: SecureStorageState = {
+  galoyAuthToken: "",
+}
+
+export type PersistentState = LocalStorageState & SecureStorageState
+
+export const defaultPersistentState: PersistentState = {
+  ...defaultLocalStorageState,
+  ...defaultSecureStorageState,
 }
