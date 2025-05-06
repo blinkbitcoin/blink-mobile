@@ -1,9 +1,9 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, StatusBar, Text, View } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
-import Icon from "react-native-vector-icons/Feather"
+// import Icon from "react-native-vector-icons/Feather"
 import { useApolloClient } from "@apollo/client"
 
 import { Screen } from "../../components/screen"

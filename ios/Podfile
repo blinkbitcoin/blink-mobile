@@ -1,43 +1,58 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-$RNFirebaseAnalyticsWithoutAdIdSupport=true
+ENV["RCT_NEW_ARCH_ENABLED"] = "0"
 
-platform :ios, '12.0'
+$RNFirebaseAnalyticsWithoutAdIdSupport = true
+
+# ↑ React-runtimeexecutor (and other codegen pods) require iOS 15+
+platform :ios, '15.1'
 
 target 'BitcoinJungle' do
   config = use_native_modules!
 
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(
+    :path => config[:reactNativePath],
+    hermes_enabled: false,
+    fabric_enabled: false,
+    :new_arch_enabled => false 
+    # To re-enable Flipper, you could instead pass:
+    # :flipper_configuration => FlipperConfiguration.enabled
+  )
 
-  # Enables Flipper.
-  #
-  # Note that if you have use_frameworks! enabled, Flipper will not work and
-  # you should disable these next few lines.
-  # use_flipper!
-  # post_install do |installer|
-  #   flipper_post_install(installer)
-  # end
-
-  pod 'XCDYouTubeKit', '~> 2.8' # for YouTubeStandaloneIOS
-
+  # Third-party pods
+  pod 'XCDYouTubeKit', '~> 2.8'
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
-
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+  pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app', :modular_headers => true
+  pod 'RNFBCrashlytics', :path => '../node_modules/@react-native-firebase/crashlytics', :modular_headers => true
+  pod 'RNFBMessaging', :path => '../node_modules/@react-native-firebase/messaging', :modular_headers => true
+
+  # Force their dependencies (GoogleUtilities, nanopb, etc.) to expose modules:
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'FirebaseCore',         :modular_headers => true
+  pod 'FirebaseCoreExtension',:modular_headers => true
+  pod 'FirebaseInstallations',:modular_headers => true
+  pod 'FirebaseSessions',     :modular_headers => true
+  pod 'GoogleDataTransport',  :modular_headers => true
+  pod 'GoogleUtilities',      :modular_headers => true
+  pod 'nanopb',               :modular_headers => true
 
   post_install do |installer|
-    installer.pods_project.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-      # config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-    end
+    # Force every Pod target to build with iOS 15.0
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION']
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
         config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+          '$(inherited)',
+          '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION'
+        ]
       end
     end
-    react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
-  end
 
+    # Standard RN post-install tweaks
+    react_native_post_install(installer)
+    __apply_Xcode_12_5_M1_post_install_workaround(installer) if respond_to?(:__apply_Xcode_12_5_M1_post_install_workaround)
+  end
 end

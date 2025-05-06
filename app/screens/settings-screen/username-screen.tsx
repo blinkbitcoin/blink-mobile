@@ -207,14 +207,14 @@ export const UsernameScreen: ScreenType = ({ navigation, route }: Props) => {
         ref={inputForm}
         autoFocus
         placeholder={translate("common.username")}
-        leftIcon={{ type: "ionicon", name: "ios-person-circle" }}
+        leftIcon={{ type: "ionicon", name: "person-circle" }}
         onChangeText={onChangeText}
         errorStyle={styles[`${inputStatus.status}Message`]}
         errorMessage={checkingUserName ? "" : inputStatus.message}
         maxLength={20}
         returnKeyType="send"
         textContentType="username"
-        autoCompleteType="username"
+        autoComplete="username"
         autoCapitalize="none"
         value={input}
       />

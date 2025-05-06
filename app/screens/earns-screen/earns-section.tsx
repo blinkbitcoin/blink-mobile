@@ -5,11 +5,16 @@ import I18n from "i18n-js"
 import * as React from "react"
 import { useState } from "react"
 import { Dimensions, Text, View } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import Carousel, { Pagination } from "react-native-snap-carousel"
-import Icon from "react-native-vector-icons/Ionicons"
+import Carousel, { Pagination } from "react-native-reanimated-carousel"
+import {
+	Extrapolation,
+	interpolate,
+	useSharedValue,
+} from "react-native-reanimated";
+// import Icon from "react-native-vector-icons/Ionicons"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -153,6 +158,7 @@ export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
 
   const itemIndex = cards.findIndex((item) => !item.fullfilled)
   const [firstItem] = useState(itemIndex >= 0 ? itemIndex : 0)
+  const caruouselIndex = useSharedValue(firstItem)
   const [currRewardIndex, setCurrRewardIndex] = useState(firstItem)
 
   const remainingSats = remainingSatsOnSection({ quizQuestions, sectionIndex })
@@ -233,7 +239,7 @@ export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
             disabled={!item.enabled}
           >
             <View style={styles.svgContainer}>
-              {SVGs({ name: item.id, width: svgWidth })}
+              {SVGs({ name: item.id, width: svgWidth }) as unknown as React.ReactNode}
             </View>
           </TouchableOpacity>
           <View>
@@ -289,22 +295,15 @@ export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
       <Carousel
         data={cards}
         renderItem={CardItem}
-        sliderWidth={screenWidth}
-        // scrollEnabled={!isRewardOpen}
-        itemWidth={screenWidth - 60}
-        hasParallaxImages
-        firstItem={firstItem}
-        // inactiveSlideOpacity={isRewardOpen ? 0 : 0.7}
-        removeClippedSubviews={false}
-        onBeforeSnapToItem={(index) => setCurrRewardIndex(index)}
+        width={screenWidth - 60}
+        mode="parallax"
+        style={{ width: screenWidth }}
+        onProgressChange={caruouselIndex}
       />
       <View style={styles.divider} />
-      <Pagination
-        dotsLength={cards.length}
-        activeDotIndex={currRewardIndex}
-        dotStyle={styles.dot}
-        inactiveDotOpacity={0.4}
-        inactiveDotScale={0.6}
+      <Pagination.Basic
+        progress={caruouselIndex}
+        data={cards}
       />
     </Screen>
   )

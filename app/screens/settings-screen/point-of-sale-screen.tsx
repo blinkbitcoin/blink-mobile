@@ -16,7 +16,7 @@ import * as UsernameValidation from "../../utils/validation"
 import type { ScreenType } from "../../types/jsx"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 
-import { Button, Text, ListItem } from "react-native-elements"
+import { Button, Text, ListItem, Icon } from "react-native-elements"
 import Clipboard from "@react-native-clipboard/clipboard"
 import Toast from "react-native-root-toast"
 import { translate } from "@app/i18n"
@@ -25,7 +25,7 @@ import { color } from "@app/theme"
 import useMainQuery from "@app/hooks/use-main-query"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import QRCode from "react-native-qrcode-svg"
 
 import { CREATE_POS_API_KEY } from "../../constants/support"

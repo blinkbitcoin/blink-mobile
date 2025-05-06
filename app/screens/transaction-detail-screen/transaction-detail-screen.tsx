@@ -2,7 +2,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp } from "@react-navigation/native"
 import * as React from "react"
 import { Text, View, Linking, TouchableWithoutFeedback } from "react-native"
-import { Divider } from "react-native-elements"
+import { Divider, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { CloseCross } from "../../components/close-cross"
 import {
@@ -17,7 +17,7 @@ import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { palette } from "../../theme/palette"
 import moment from "moment"
 import { formatUsdAmount } from "../../hooks"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import { BLOCKCHAIN_EXPLORER_URL } from "../../constants/support"
 
 const viewInExplorer = (hash: string): Promise<Linking> =>

@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import {View, StyleSheet, Text, ActivityIndicator, TouchableOpacity, Share, Clipboard} from 'react-native';
 import NfcManager, {Ndef, NfcTech} from 'react-native-nfc-manager';
 import {Button} from 'react-native-elements';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Icon} from 'react-native-elements'
 import Ntag424 from '../../utils/Ntag424';
 import QRCode from 'react-native-qrcode-svg';
 import {useMutation} from '@apollo/client';
@@ -304,7 +304,7 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
           <View style={styles.container}>
             <View style={styles.optionsContainer}>
               <View style={styles.optionCard}>
-                <Ionicons name="phone-portrait" size={40} color="#2089dc" style={styles.optionIcon} />
+                <Icon name="phone-portrait" size={40} color="#2089dc" style={styles.optionIcon} />
                 <Text style={styles.optionTitle}>{translate('BoltCardScreen.programCardThisDevice')}</Text>
                 <Text style={styles.optionDescription}>
                   {translate('BoltCardScreen.programCardDescriptionThisDevice')}
@@ -313,12 +313,12 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
                   title={translate('BoltCardScreen.programCard')}
                   onPress={programCard}
                   buttonStyle={styles.button}
-                  icon={<Ionicons name="flash" size={20} color="white" style={{marginRight: 10}} />}
+                  icon={<Icon name="flash" size={20} color="white" style={{marginRight: 10}} />}
                 />
               </View>
               
               <View style={styles.optionCard}>
-                <Ionicons name="link" size={40} color="#2089dc" style={styles.optionIcon} />
+                <Icon name="link" size={40} color="#2089dc" style={styles.optionIcon} />
                 <Text style={styles.optionTitle}>{translate('BoltCardScreen.getSetupUrl')}</Text>
                 <Text style={styles.optionDescription}>
                   {translate('BoltCardScreen.programCardOtherDevice')}
@@ -329,7 +329,7 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
                   buttonStyle={styles.button}
                   loading={isGeneratingUrl}
                   disabled={isGeneratingUrl}
-                  icon={<Ionicons name="qr-code" size={20} color="white" style={{marginRight: 10}} />}
+                  icon={<Icon name="qr-code" size={20} color="white" style={{marginRight: 10}} />}
                 />
               </View>
             </View>
@@ -414,13 +414,13 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
                 title="Copy URL"
                 onPress={copyUrl}
                 buttonStyle={[styles.button, styles.buttonSmall]}
-                icon={<Ionicons name="copy" size={20} color="white" style={{marginRight: 10}} />}
+                icon={<Icon name="copy" size={20} color="white" style={{marginRight: 10}} />}
               />
               <Button
                 title="Share URL"
                 onPress={shareUrl}
                 buttonStyle={[styles.button, styles.buttonSmall]}
-                icon={<Ionicons name="share" size={20} color="white" style={{marginRight: 10}} />}
+                icon={<Icon name="share" size={20} color="white" style={{marginRight: 10}} />}
               />
             </View>
           </View>

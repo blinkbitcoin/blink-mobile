@@ -4,8 +4,7 @@ import Share from "react-native-share"
 import { Divider, Icon, ListItem } from "react-native-elements"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { gql, OperationVariables, QueryLazyOptions, useLazyQuery } from "@apollo/client"
-import type { ViewStyleProp } from "react-native/Libraries/StyleSheet/StyleSheet"
-
+import type { StyleProp, ViewStyle } from 'react-native';
 import { Screen } from "../../components/screen"
 import { VersionComponent } from "../../components/version"
 import { palette } from "../../theme/palette"
@@ -155,7 +154,7 @@ type SettingRow = {
   action?: () => void
   greyed?: boolean
   danger?: boolean
-  styleDivider?: ViewStyleProp
+  styleDivider?: StyleProp<ViewStyle>
 }
 
 export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
@@ -196,7 +195,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     },
     {
       category: translate("common.username"),
-      icon: "ios-person-circle",
+      icon: "person-circle",
       id: "username",
       subTitleDefaultValue: translate("SettingsScreen.tapUserName"),
       subTitleText: username,
@@ -216,7 +215,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     },
     {
       category: translate("common.language"),
-      icon: "ios-language",
+      icon: "language",
       id: "language",
       subTitleText: language,
       action: () => navigation.navigate("language"),
@@ -282,7 +281,7 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     },
     {
       category: translate("whatsapp.contactUs"),
-      icon: "ios-logo-whatsapp",
+      icon: "logo-whatsapp",
       id: "contact-us",
       action: openWhatsAppAction,
       enabled: true,
@@ -291,8 +290,8 @@ export const SettingsScreenJSX: ScreenType = (params: SettingsScreenProps) => {
     },
     {
       category: translate("common.logout"),
-      id: "logout",
-      icon: "ios-log-out",
+      id: "log-out",
+      icon: "log-out",
       action: () => logoutAction(),
       enabled: hasToken,
       greyed: !hasToken,

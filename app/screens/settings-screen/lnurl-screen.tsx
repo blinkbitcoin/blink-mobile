@@ -14,11 +14,11 @@ import { GALOY_PAY_DOMAIN } from "../../constants/support"
 
 import { bech32 } from "bech32"
 import QRCode from "react-native-qrcode-svg"
-import { Button, Text } from "react-native-elements"
+import { Button, Text, Icon } from "react-native-elements"
 import Clipboard from "@react-native-clipboard/clipboard"
 import Toast from "react-native-root-toast"
 import { translate } from "@app/i18n"
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+// import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { color } from "@app/theme"
 
 const styles = EStyleSheet.create({

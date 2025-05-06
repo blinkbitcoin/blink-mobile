@@ -6,7 +6,7 @@ import { Alert, Keyboard, Platform, ScrollView, TextInput, View } from "react-na
 import EStyleSheet from "react-native-extended-stylesheet"
 // import ScreenBrightness from "react-native-screen-brightness"
 import Swiper from "react-native-swiper"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import debounce from "lodash.debounce"
 
 import { GaloyInput } from "../../components/galoy-input"
@@ -26,7 +26,7 @@ import {
 } from "../../hooks"
 import { TextCurrency } from "../../components/text-currency"
 import useToken from "../../utils/use-token"
-import { Button, Text } from "react-native-elements"
+import { Button, Text, Icon } from "react-native-elements"
 import { hasFullPermissions, requestPermission } from "../../utils/notifications"
 import useMainQuery from "@app/hooks/use-main-query"
 

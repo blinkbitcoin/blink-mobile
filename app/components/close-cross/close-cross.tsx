@@ -1,5 +1,6 @@
 import { View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { Icon } from 'react-native-elements'
+// import Icon from "react-native-vector-iconS/Ionicons"
 import * as React from "react"
 import EStyleSheet from "react-native-extended-stylesheet"
 
@@ -24,6 +25,6 @@ type Props = {
 
 export const CloseCross: React.FC<Props> = ({ onPress, color }: Props) => (
   <View style={styles.iconContainer}>
-    <Icon name="ios-close" style={styles.icon} onPress={onPress} color={color} />
+    <Icon name="close" style={styles.icon} onPress={onPress} color={color} />
   </View>
 )

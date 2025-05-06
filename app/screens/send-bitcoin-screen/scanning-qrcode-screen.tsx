@@ -5,8 +5,8 @@ import { RNCamera } from "react-native-camera"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
-import Icon from "react-native-vector-icons/Ionicons"
-import Paste from "react-native-vector-icons/FontAwesome"
+import { Icon } from 'react-native-elements'
+// import Icon from "react-native-vector-icons/Ionicons"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"
@@ -225,7 +225,7 @@ export const ScanningQRCodeScreen: ScreenType = ({
                 <Circle cx={50} cy={50} r={50} fill={palette.white} opacity={0.5} />
               </Svg>
               <Icon
-                name="ios-close"
+                name="close"
                 size={64}
                 // eslint-disable-next-line react-native/no-inline-styles
                 style={{ position: "absolute", top: -2 }}
@@ -243,8 +243,8 @@ export const ScanningQRCodeScreen: ScreenType = ({
               />
             </Pressable>
             <Pressable onPress={handleInvoicePaste}>
-              <Paste
-                name="paste"
+              <Icon
+                name="content-paste"
                 size={64}
                 color={palette.lightGrey}
                 // eslint-disable-next-line react-native/no-inline-styles

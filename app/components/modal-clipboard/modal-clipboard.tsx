@@ -3,10 +3,10 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { useNavigation } from "@react-navigation/native"
 import * as React from "react"
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 
 import {
   LAST_CLIPBOARD_PAYMENT,

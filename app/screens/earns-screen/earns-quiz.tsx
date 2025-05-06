@@ -3,11 +3,11 @@ import * as React from "react"
 import I18n from "i18n-js"
 import { useEffect, useState } from "react"
 import { StatusBar, Text, View, ScrollView, TouchableWithoutFeedback } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import { CloseCross } from "../../components/close-cross"
 import { Screen } from "../../components/screen"
 import { translate } from "../../i18n"
@@ -34,7 +34,7 @@ const styles = EStyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 0,
-    shadowColor: palette.grey2,
+    shadowColor: palette.darkGrey,
     shadowOpacity: 5,
     shadowRadius: 8,
   },

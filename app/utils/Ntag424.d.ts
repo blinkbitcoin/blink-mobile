@@ -1,7 +1,7 @@
 import NfcManager from 'react-native-nfc-manager';
 
 declare module '../../utils/Ntag424' {
-  interface Ntag424Interface extends typeof NfcManager {
+  interface Ntag424Interface extends NfcManager {
     ti: any;
     sesAuthEncKey: any;
     sesAuthMacKey: any;

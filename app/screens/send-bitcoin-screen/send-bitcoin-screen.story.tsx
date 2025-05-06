@@ -89,7 +89,7 @@ storiesOf("Send bitcoin Screen", module)
   .add("bitcoin", () => (
     <SendBitcoinScreenJSX
       status="idle"
-      paymentType="bitcoin"
+      paymentType="onchain"
       amountless={false}
       initAmount={1000}
       note={null}
@@ -110,7 +110,7 @@ storiesOf("Send bitcoin Screen", module)
   .add("bitcoin fee loading", () => (
     <SendBitcoinScreenJSX
       status="idle"
-      paymentType="bitcoin"
+      paymentType="onchain"
       amountless={false}
       initAmount={1000}
       note={null}

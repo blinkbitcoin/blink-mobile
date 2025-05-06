@@ -156,7 +156,7 @@ type ProgressProps = {
 }
 
 export const ProgressBar: ComponentType = ({ progress }: ProgressProps) => {
-  const balanceWidth = `${progress * 100}%`
+  const balanceWidth = progress * 100
 
   return (
     <View style={styles.progressContainer}>

@@ -5,9 +5,9 @@ import { RouteProp } from "@react-navigation/native"
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { ActivityIndicator, ScrollView, Text, View } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import debounce from "lodash.debounce"
 import { getParams, LNURLPayParams } from "js-lnurl"
 
@@ -556,7 +556,7 @@ export const SendBitcoinScreenJSX: ScreenType = ({
         return <Text></Text>
       }
     } else if (paymentType === "lightning" || paymentType === "onchain") {
-      return <Icon name="ios-close-circle-outline" onPress={reset} size={30} />
+      return <Icon name="remove-circle-outline" onPress={reset} size={30} />
     } else if (paymentType === "lnurl") {
       let lnurlErrorStr = ""
       if (
@@ -612,7 +612,7 @@ export const SendBitcoinScreenJSX: ScreenType = ({
       >
         <View style={styles.section}>
           <InputPayment
-            editable={paymentType !== ("lightning" || "onchain") || amountless}
+            editable={(paymentType !== "lightning" && paymentType !== "onchain") || amountless}
             forceKeyboard={navigation?.isFocused() ?? false}
             toggleCurrency={toggleCurrency}
             onUpdateAmount={setPrimaryAmountValue}
@@ -640,7 +640,7 @@ export const SendBitcoinScreenJSX: ScreenType = ({
               <View style={styles.row}>
                 <Text style={styles.smallText}>{translate("common.to")}</Text>
                 <Icon
-                  name="ios-log-out"
+                  name="log-out"
                   size={24}
                   color={color.primary}
                   style={styles.icon}

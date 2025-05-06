@@ -15,11 +15,11 @@ import {
   Text,
   View,
 } from "react-native"
-import { Button } from "react-native-elements"
+import { Button, Icon } from "react-native-elements"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { TouchableWithoutFeedback, GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
+// import Icon from "react-native-vector-icons/Ionicons"
 import { getBuildNumber } from "react-native-device-info"
 import { BalanceHeader } from "../../components/balance-header"
 import { IconTransaction } from "../../components/icon-transactions"
@@ -36,6 +36,9 @@ import useToken from "../../utils/use-token"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import useMainQuery from "@app/hooks/use-main-query"
+
+import IconM from "@mdi/react"
+import { mdiTrendingUp } from "@mdi/js"
 
 const styles = EStyleSheet.create({
   balanceHeader: {
@@ -328,7 +331,7 @@ export const MoveMoneyScreen: ScreenType = ({
     recentTRansactionsData = {
       title: translate("TransactionScreen.title"),
       target: "transactionHistory",
-      icon: <Icon name="ios-list-outline" size={32} color={palette.black} />,
+      icon: <Icon name="list" size={32} color={palette.black} />,
       style: "transactionViewContainer",
       hidden: false,
       details: (
@@ -417,14 +420,14 @@ export const MoveMoneyScreen: ScreenType = ({
                     account: AccountType.Bitcoin,
                   })
                 }
-                icon={<Icon name="ios-trending-up-outline" size={32} style={styles.menuIcon} />}
+                icon={<Icon name="trending-up" size={32} style={styles.menuIcon} />}
               />
               <BalanceHeader loading={loading} style={styles.balanceHeader} />
               <Button
                 buttonStyle={styles.buttonStyleTime}
                 containerStyle={styles.separator}
                 onPress={() => navigation.navigate("settings")}
-                icon={<Icon name="ios-settings-outline" size={32} style={styles.menuIcon} />}
+                icon={<Icon name="settings" size={32} style={styles.menuIcon} />}
               />
             </View>
 

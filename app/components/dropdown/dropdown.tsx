@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const Dropdown: FC<Props> = ({ label, data, onSelect }) => {
-  const DropdownButton = useRef();
+  const DropdownButton = useRef<View>(null);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(undefined);
   const [dropdownTop, setDropdownTop] = useState(0);

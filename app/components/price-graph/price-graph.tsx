@@ -1,16 +1,11 @@
 import { gql, useQuery } from "@apollo/client"
 import * as React from "react"
-import { ActivityIndicator, StyleProp, Text, View, Dimensions } from "react-native"
-import { Button } from "react-native-elements"
+import { ActivityIndicator, StyleProp, Text, View, Dimensions, ViewStyle, TextStyle } from "react-native"
+import { Button } from "@rneui/themed"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { VictoryChart, VictoryLine, VictoryVoronoiContainer, VictoryTooltip } from "victory-native"
 import * as currency_fmt from "currency.js"
 import { parseDate } from "../../utils/date"
-import {
-  TextStyle,
-  ViewStyle,
-} from "react-native-vector-icons/node_modules/@types/react-native/index"
-
 import { color } from "../../theme"
 import { palette } from "../../theme/palette"
 import { translate } from "../../i18n"
@@ -103,6 +98,7 @@ export const PriceGraphDataInjected: ComponentType = () => {
       prices={data.btcPriceList}
       graphRange={graphRange}
       setGraphRange={setGraphRange}
+      timestamp={data.btcPriceList.timestamp}
     />
   )
 }
@@ -111,12 +107,14 @@ type Props = {
   graphRange: GraphRangeType
   prices: PricePoint[]
   setGraphRange: (graphRange: GraphRangeType) => void
+  timestamp: number
 }
 
 export const PriceGraph: ComponentType = ({
   graphRange,
   prices,
   setGraphRange,
+  timestamp,
 }: Props) => {
   let price
   let delta
@@ -183,7 +181,7 @@ export const PriceGraph: ComponentType = ({
         {selectedPrice && (
           <View>
             <Text style={styles.selectedPrice}>
-              {parseDate(selectedPrice.timestamp).toDateString()}
+              {parseDate(timestamp).toDateString()}
             </Text>
             <Text style={styles.selectedPrice}>
               {formatPrice((selectedPrice.base / 10 ** selectedPrice.offset) * multiple(selectedPrice.currencyUnit) * 1000 )}
