@@ -40,7 +40,7 @@ type Config = {
 
 const config = {
   network: "signet",
-  graphqlUrl: "https://api.staging.galoy.io/graphql",
+  graphqlUrl: "https://api.staging.blink.sv/graphql",
 }
 
 const createGaloyServerClient = (config: Config) => (authToken: string) => {

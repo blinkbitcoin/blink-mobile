@@ -74,12 +74,12 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
   {
     id: "Staging",
     name: "Staging",
-    graphqlUri: "https://api.staging.galoy.io/graphql",
-    graphqlWsUri: "wss://ws.staging.galoy.io/graphql",
-    authUrl: "https://api.staging.galoy.io",
-    posUrl: "https://pay.staging.galoy.io",
+    graphqlUri: "https://api.staging.blink.sv/graphql",
+    graphqlWsUri: "wss://ws.staging.blink.sv/graphql",
+    authUrl: "https://api.staging.blink.sv",
+    posUrl: "https://pay.staging.blink.sv",
     kycUrl: "https://kyc.staging.blink.sv",
-    lnAddressHostname: "pay.staging.galoy.io",
+    lnAddressHostname: "pay.staging.blink.sv",
     blockExplorer: "https://mempool.space/signet/tx/",
   },
   {

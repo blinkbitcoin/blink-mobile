@@ -1,5 +1,5 @@
 overwrite: true
-schema: "https://api.staging.galoy.io/graphql"
+schema: "https://api.staging.blink.sv/graphql"
 # schema: "./supergraph.graphql"
 documents:
   - "app/**/*.ts"

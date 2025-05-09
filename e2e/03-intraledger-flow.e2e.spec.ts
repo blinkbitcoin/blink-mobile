@@ -18,7 +18,7 @@ const timeout = 30000
 
 describe("Validate Username Flow", () => {
   const username = "unclesamtoshi"
-  const lnAddress = "unclesamtoshi@pay.staging.galoy.io"
+  const lnAddress = "unclesamtoshi@pay.staging.blink.sv"
 
   it("Click Send", async () => {
     await clickIcon(LL.HomeScreen.send())

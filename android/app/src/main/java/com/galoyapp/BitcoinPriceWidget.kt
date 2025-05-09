@@ -203,7 +203,7 @@ class FetchPriceWorker(context: Context, params: WorkerParameters) : Worker(cont
     }
 
     private fun fetchBitcoinPrice(range: BitcoinPriceRanges): JSONObject {
-        val url = URL("https://api.mainnet.galoy.io/graphql")
+        val url = URL("https://api.blink.sv/graphql")
         val query = "query BitcoinPriceForAppWidget(\$range: PriceGraphRange!) { btcPriceList(range: \$range) { timestamp price { base offset currencyUnit formattedAmount } } realtimePrice { btcSatPrice { base offset } timestamp usdCentPrice { base offset } } }"
         val jsonInputString = """{ "query": "$query", "variables": { "range": "$range" } }"""
 
