@@ -1,38 +1,36 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require('path');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+
 /**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
+ * Metro configuration
+ * https://reactnative.dev/docs/metro
  *
- * @format
+ * @type {import('metro-config').MetroConfig}
  */
 
-const path = require("path")
-const { getDefaultConfig } = require("metro-config")
-
 module.exports = (async () => {
-  const {
-    resolver: { sourceExts, assetExts },
-  } = await getDefaultConfig()
-  return {
+  const baseConfig = await getDefaultConfig(__dirname);
+
+  return mergeConfig(baseConfig, {
     transformer: {
+      babelTransformerPath: require.resolve('react-native-svg-transformer'),
       getTransformOptions: async () => ({
         transform: {
           experimentalImportSupport: false,
           inlineRequires: false,
         },
       }),
-      babelTransformerPath: require.resolve("react-native-svg-transformer"),
     },
-    projectRoot: path.resolve(__dirname),
     resolver: {
-      assetExts: assetExts.filter((ext) => ext !== "svg"),
-      sourceExts: [...sourceExts, "svg"],
+      assetExts: baseConfig.resolver.assetExts.filter(ext => ext !== 'svg'),
+      sourceExts: [...baseConfig.resolver.sourceExts, 'svg'],
       extraNodeModules: {
-        stream: path.resolve(__dirname, "node_modules/readable-stream"),
-        zlib: path.resolve(__dirname, "node_modules/browserify-zlib"),
-        types: path.resolve(__dirname, "../common/types"),
+        stream: path.resolve(__dirname, 'node_modules/readable-stream'),
+        zlib: path.resolve(__dirname, 'node_modules/browserify-zlib'),
+        types: path.resolve(__dirname, '../common/types'),
       },
     },
+    projectRoot: path.resolve(__dirname),
     maxWorkers: 2,
-  }
-})()
+  });
+})();

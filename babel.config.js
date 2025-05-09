@@ -1,14 +1,18 @@
 module.exports = {
-  presets: ["module:metro-react-native-babel-preset"],
+  presets: [
+    'module:@react-native/babel-preset',
+    '@babel/preset-flow',
+  ],
   plugins: [
     [
-      "module-resolver",
+      'module-resolver',
       {
-        root: ["./app"],
+        root: ['./app'],
         alias: {
-          "^@app/(.+)": "./app/\\1",
+          '^@app/(.+)': './app/\\1',
         },
       },
     ],
+    'react-native-reanimated/plugin', // must be last
   ],
-}
+};
