@@ -3,9 +3,9 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { ListItem, Icon, makeStyles } from "@rneui/themed"
 
-import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsRow } from "@app/screens/settings-screen/row"
+import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { Profile } from "./profile"
@@ -17,6 +17,7 @@ export const SwitchAccount: React.FC = () => {
   const {
     appConfig: { token: currentToken },
   } = useAppConfig()
+  const { saveProfile } = useSaveSessionProfile()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
@@ -27,12 +28,16 @@ export const SwitchAccount: React.FC = () => {
     if (!expanded) return
 
     const loadProfiles = async () => {
-      const profilesList = await fetchProfiles(currentToken)
+      let profilesList = await fetchProfiles(currentToken)
+      if (profilesList.length === 0) {
+        await saveProfile(currentToken)
+        profilesList = await fetchProfiles(currentToken)
+      }
       setProfiles(profilesList)
     }
 
     loadProfiles()
-  }, [expanded, currentToken, LL])
+  }, [expanded, saveProfile, currentToken, LL])
 
   const handleAddNew = () => {
     navigation.navigate("getStarted")
