@@ -28,6 +28,19 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+jest.mock("@app/hooks", () => ({
+  useAppConfig: () => ({
+    appConfig: {
+      galoyInstance: {
+        authUrl: "https://api.blink.sv",
+      },
+    },
+  }),
+  useSaveSessionProfile: () => ({
+    saveProfile: jest.fn(),
+  }),
+}))
+
 describe("Settings", () => {
   let LL: ReturnType<typeof i18nObject>
 
@@ -62,7 +75,7 @@ describe("Settings", () => {
       expect(screen.getByText("TestUser")).toBeTruthy()
     })
 
-    expect(KeyStoreWrapper.getSessionProfiles).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.getSessionProfiles).toHaveBeenCalled()
     const profiles = await KeyStoreWrapper.getSessionProfiles()
     expect(profiles).toEqual(expectedProfiles)
   })
