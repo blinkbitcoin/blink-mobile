@@ -14,7 +14,7 @@ import type { ScreenType } from "../../types/jsx"
 import { validPayment } from "../../utils/parsing"
 import { getParams, LNURLPayParams, LNURLWithdrawParams } from "js-lnurl"
 
-import LocalQRCode from "@remobile/react-native-qrcode-local-image"
+import LocalQRCode from "@flyskywhy/react-native-qrcode-local-image"
 import { MoveMoneyStackParamList } from "../../navigation/stack-param-lists"
 import { StackNavigationProp } from "@react-navigation/stack"
 import useToken from "../../utils/use-token"

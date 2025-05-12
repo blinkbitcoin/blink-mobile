@@ -20,6 +20,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+**/.xcode.env.local
 project.xcworkspace
 
 # Android/IntelliJ
@@ -30,6 +31,9 @@ build/
 local.properties
 *.iml
 *.hprof
+.cxx/
+*.keystore
+!debug.keystore
 
 # node.js
 #
@@ -37,16 +41,11 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# BUCK
-buck-out/
-\.buckd/
-*.keystore
 
 # VS Code
 .vscode
 
 # ios
-ios/Pods
 ios/Xcode.app
 ios/.bundle
 ios/vendor
@@ -62,8 +61,30 @@ app/services/lnd/generated/*
 android/api-8350101450647692243-59029-b9bec84a7e5a.json
 android/fastlane/report.xml
 android/fastlane/metadata/android/en-US/
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
 
 galoy.code-workspace
 
 .phrase.yml
 ios/GoogleService-Info.plist
+
+# Ruby / CocoaPods
+**/Pods/
+/vendor/bundle/
+ 
+# Temporary files created by Metro to check the health of the file watcher
+.metro-health-check*
+ 
+# testing
+/coverage
+ 
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

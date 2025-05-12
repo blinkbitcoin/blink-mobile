@@ -8,6 +8,7 @@
         <item name="android:textColorSecondary">#939AA4</item>
         <item name="android:textColorTertiary">#315b5a</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     </style>
 
      <style name="AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">

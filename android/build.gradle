@@ -3,15 +3,25 @@
 buildscript {
     ext {
         ndkVersion = "21.4.7075529"
-        buildToolsVersion = "33.0.1"
-        minSdkVersion = 21
+        buildToolsVersion = "35.0.0"
+        minSdkVersion = 24
         compileSdkVersion = 34
         targetSdkVersion = 34
-        kotlinVersion = "1.8.10" // https://github.com/wix/react-native-notifications/issues/649
+        kotlinVersion = "1.9.25"
 
         androidXCore = "1.5.0"
         androidXAnnotation = "1.2.0"
         androidXBrowser = "1.3.0"
+    }
+    subprojects { subproject ->
+        afterEvaluate{
+            if((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) {
+                android {
+                    compileSdkVersion rootProject.ext.compileSdkVersion
+                    buildToolsVersion rootProject.ext.buildToolsVersion
+                }
+            }
+        }
     }
     repositories {
         google()
@@ -20,47 +30,16 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:4.2.2')
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
-        classpath 'com.google.gms:google-services:4.3.10' // firebase
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.0'
-
-        // https://github.com/wix/react-native-notifications/issues/649
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion" // add this line
-
+        classpath 'com.google.gms:google-services:4.4.2' // firebase
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'
     }
 }
 
-allprojects {
-    repositories {
-        mavenLocal()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url("$rootDir/../node_modules/react-native/android")
-        }
-        maven {
-            // Android JSC is installed from npm
-            url("$rootDir/../node_modules/jsc-android/dist")
-        }
-        maven { url 'https://jitpack.io' }  // Example alternative repo
-        google()
-        mavenCentral()
-        jcenter()
-    }
-
-    //add the folllowing lines to force libs to use recent buildtools
-    subprojects {
-        afterEvaluate {
-            project ->
-                if (project.hasProperty("android")) {
-                    android {
-                        compileSdkVersion = 33
-                        buildToolsVersion = "33.0.1"
-                    }
-                }
-        }
-    }
-}
+apply plugin: "com.facebook.react.rootproject"
