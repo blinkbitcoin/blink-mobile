@@ -199,7 +199,7 @@ export const InputPayment: ComponentType = ({
           selection={{ start: displayValue.length, end: displayValue.length }}
         />
         <TouchableOpacity onPress={toggleCurrency}>
-          <Icon name="ios-swap-vertical" size={32} style={styles.icon} />
+          <Icon name="swap-vert" size={32} style={styles.icon} />
         </TouchableOpacity>
       </View>
     </View>

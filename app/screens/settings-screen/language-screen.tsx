@@ -68,7 +68,7 @@ export const LanguageScreen: ScreenType = () => {
         >
           <ListItem.Title>{translate(`Languages.${language}`)}</ListItem.Title>
           {userPreferredLanguage === language && (
-            <Icon name="ios-checkmark-circle" size={18} color={palette.green} />
+            <Icon name="checkmark-circle" size={18} color={palette.green} type="ionicon" />
           )}
         </ListItem>
       ))}

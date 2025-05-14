@@ -640,7 +640,7 @@ export const SendBitcoinScreenJSX: ScreenType = ({
               <View style={styles.row}>
                 <Text style={styles.smallText}>{translate("common.to")}</Text>
                 <Icon
-                  name="log-out"
+                  name="logout"
                   size={24}
                   color={color.primary}
                   style={styles.icon}
@@ -667,7 +667,7 @@ export const SendBitcoinScreenJSX: ScreenType = ({
               <View style={styles.row}>
                 <Text style={styles.smallText}>{translate("common.note")}</Text>
                 <Icon
-                  name="ios-create-outline"
+                  name="add-circle-outline"
                   size={24}
                   color={color.primary}
                   style={styles.icon}

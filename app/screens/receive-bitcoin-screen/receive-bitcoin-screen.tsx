@@ -522,7 +522,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
             containerStyle={{ marginTop: 0 }}
             inputStyle={styles.textStyle}
             leftIcon={
-              <Icon name="ios-create-outline" size={21} color={palette.darkGrey} />
+              <Icon name="add-circle-outline" size={21} color={palette.darkGrey} />
             }
             ref={inputMemoRef}
             disabled={invoicePaid}
@@ -546,7 +546,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                   buttonStyle={(!swiperIndex ? styles.buttonStyleActive : styles.buttonStyleInactive)}
                   title={
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
-                      <Icon style={{color: "white"}} size={20} name="ios-flash" />
+                      <Icon style={{color: "white"}} size={20} name="bolt" />
                       <Text style={{fontWeight: "bold", color: "white"}}>Lightning</Text>
                     </View>
                   }
@@ -563,7 +563,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                   buttonContainer={{flex: 1}}
                   title={
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
-                      <Icon style={{color: "white"}} size={20} name="logo-bitcoin" />
+                      <Icon style={{color: "white"}} size={20} name="currency-bitcoin" />
                       <Text style={{fontWeight: "bold", color: "white"}}>On-Chain</Text>
                     </View>
                   }

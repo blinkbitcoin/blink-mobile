@@ -4,7 +4,6 @@ import ContentLoader, { Rect } from "react-content-loader/native"
 import { StyleProp, Text, TouchableHighlight, View, ViewStyle } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { Icon } from 'react-native-elements'
-// import Icon from "react-native-vector-icons/Ionicons"
 import Tooltip from "react-native-walkthrough-tooltip"
 import { translate } from "../../i18n"
 import { palette } from "../../theme/palette"

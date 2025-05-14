@@ -240,7 +240,7 @@ export const ContactsScreen: ScreenType = ({ navigation }: Props) => {
             containerStyle={styles.itemContainer}
             onPress={() => navigation.navigate("contactDetail", { contact: item })}
           >
-            <Icon name={"ios-person-outline"} size={24} color={color.palette.green} />
+            <Icon name={"person-outline"} size={24} color={color.palette.green} type="ionicon" />
             <ListItem.Content>
               <ListItem.Title>{item.alias}</ListItem.Title>
             </ListItem.Content>

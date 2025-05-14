@@ -210,7 +210,7 @@ export const TransactionScreen: ScreenType = ({
             <Text style={styles.sectionHeaderText}>
               {prefCurrency === "BTC" ? "sats" : "CRC"}{" "}
             </Text>
-            <Icon name="ios-swap-vertical" size={32} style={styles.icon} />
+            <Icon name="swap-vert" size={32} style={styles.icon} />
           </TouchableOpacity>
         </View>
       )}

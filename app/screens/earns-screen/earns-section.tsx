@@ -267,10 +267,11 @@ export const EarnSection: ScreenType = ({ route, navigation }: Props) => {
               icon={
                 item.fullfilled ? (
                   <Icon
-                    name="ios-checkmark-circle-outline"
+                    name="checkmark-circle-outline"
                     size={36}
                     color={palette.white}
                     style={styles.icon}
+                    type="ionicon"
                   />
                 ) : undefined
               }

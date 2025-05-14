@@ -98,7 +98,6 @@ export const PriceGraphDataInjected: ComponentType = () => {
       prices={data.btcPriceList}
       graphRange={graphRange}
       setGraphRange={setGraphRange}
-      timestamp={data.btcPriceList.timestamp}
     />
   )
 }
@@ -107,14 +106,12 @@ type Props = {
   graphRange: GraphRangeType
   prices: PricePoint[]
   setGraphRange: (graphRange: GraphRangeType) => void
-  timestamp: number
 }
 
 export const PriceGraph: ComponentType = ({
   graphRange,
   prices,
   setGraphRange,
-  timestamp,
 }: Props) => {
   let price
   let delta
@@ -181,7 +178,7 @@ export const PriceGraph: ComponentType = ({
         {selectedPrice && (
           <View>
             <Text style={styles.selectedPrice}>
-              {parseDate(timestamp).toDateString()}
+              {parseDate(selectedPrice.timestamp).toDateString()}
             </Text>
             <Text style={styles.selectedPrice}>
               {formatPrice((selectedPrice.base / 10 ** selectedPrice.offset) * multiple(selectedPrice.currencyUnit) * 1000 )}

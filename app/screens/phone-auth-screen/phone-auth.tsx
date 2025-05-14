@@ -38,6 +38,7 @@ import { parseTimer } from "../../utils/timer"
 import { useGeetestCaptcha } from "../../hooks"
 import { networkVar } from "../../graphql/client-only-query"
 import { requestPermission } from "../../utils/notifications"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const phoneRegex = new RegExp("^\\+[0-9]+$")
 
@@ -295,75 +296,77 @@ export const WelcomePhoneInputScreen: ScreenType = ({
   }
 
   return (
-    <Screen backgroundColor={palette.lighterGrey} preset="scroll">
-      <View style={{ flex: 1, justifyContent: "space-around", marginTop: 50 }}>
-        <View>
-          <BadgerPhone style={styles.image} />
-          <Text style={styles.text}>
-            {showCaptcha
-              ? translate("WelcomePhoneInputScreen.headerVerify")
-              : translate("WelcomePhoneInputScreen.header")}
-          </Text>
-        </View>
-        {showCaptcha ? (
-          captchaContent
-        ) : (
-          <KeyboardAvoidingView>
-            <PhoneInput
-              ref={phoneInputRef}
-              value={phoneNumber}
-              containerStyle={styles.phoneEntryContainer}
-              textInputStyle={styles.textEntry}
-              textContainerStyle={styles.textContainer}
-              defaultValue={phoneNumber}
-              defaultCode="CR"
-              layout="first"
-              textInputProps={{
-                placeholder: translate("WelcomePhoneInputScreen.placeholder"),
-                returnKeyType: loadingRequestPhoneCode ? "default" : "done",
-                onSubmitEditing: submitPhoneNumber,
-                keyboardType: "phone-pad",
-                textContentType: "telephoneNumber",
-                accessibilityLabel: "Input phone number",
-              }}
-              countryPickerProps={{
-                modalProps: {
-                  testID: "country-picker",
-                },
-              }}
-              codeTextStyle={{ marginLeft: -25 }}
-              autoFocus
-            />
-            <View style={styles.whatsappRow}>
-              <Pressable onPress={() => setWhatsApp(!whatsapp)}>
-                <Text>
-                  {translate("WelcomePhoneInputScreen.whatsapp")}
-                </Text>
-              </Pressable>
-              <CheckBox
-                value={whatsapp}
-                onValueChange={(newValue) => setWhatsApp(newValue)}
+    <SafeAreaView style={{ flex: 1, backgroundColor: palette.white }}>
+      <Screen backgroundColor={palette.lighterGrey} preset="scroll">
+        <View style={{ flex: 1, justifyContent: "space-around", marginTop: 50 }}>
+          <View>
+            <BadgerPhone style={styles.image} />
+            <Text style={styles.text}>
+              {showCaptcha
+                ? translate("WelcomePhoneInputScreen.headerVerify")
+                : translate("WelcomePhoneInputScreen.header")}
+            </Text>
+          </View>
+          {showCaptcha ? (
+            captchaContent
+          ) : (
+            <KeyboardAvoidingView>
+              <PhoneInput
+                ref={phoneInputRef}
+                value={phoneNumber}
+                containerStyle={styles.phoneEntryContainer}
+                textInputStyle={styles.textEntry}
+                textContainerStyle={styles.textContainer}
+                defaultValue={phoneNumber}
+                defaultCode="CR"
+                layout="first"
+                textInputProps={{
+                  placeholder: translate("WelcomePhoneInputScreen.placeholder"),
+                  returnKeyType: loadingRequestPhoneCode ? "default" : "done",
+                  onSubmitEditing: submitPhoneNumber,
+                  keyboardType: "phone-pad",
+                  textContentType: "telephoneNumber",
+                  accessibilityLabel: "Input phone number",
+                }}
+                countryPickerProps={{
+                  modalProps: {
+                    testID: "country-picker",
+                  },
+                }}
+                codeTextStyle={{ marginLeft: -25 }}
+                autoFocus
               />
-            </View>
-            <ActivityIndicator
-              animating={loadingRequestPhoneCode}
-              size="large"
-              color={color.primary}
-              style={{ marginTop: 32 }}
-            />
-          </KeyboardAvoidingView>
-        )}
-        <Button
-          buttonStyle={styles.buttonContinue}
-          title={translate("WelcomePhoneInputScreen.continue")}
-          disabled={phoneNumber ? true : false}
-          onPress={() => {
-            submitPhoneNumber()
-          }}
-        />
-      </View>
-      <CloseCross color={palette.darkGrey} onPress={() => navigation.goBack()} />
-    </Screen>
+              <View style={styles.whatsappRow}>
+                <Pressable onPress={() => setWhatsApp(!whatsapp)}>
+                  <Text>
+                    {translate("WelcomePhoneInputScreen.whatsapp")}
+                  </Text>
+                </Pressable>
+                <CheckBox
+                  value={whatsapp}
+                  onValueChange={(newValue) => setWhatsApp(newValue)}
+                />
+              </View>
+              <ActivityIndicator
+                animating={loadingRequestPhoneCode}
+                size="large"
+                color={color.primary}
+                style={{ marginTop: 32 }}
+              />
+            </KeyboardAvoidingView>
+          )}
+          <Button
+            buttonStyle={styles.buttonContinue}
+            title={translate("WelcomePhoneInputScreen.continue")}
+            disabled={phoneNumber ? true : false}
+            onPress={() => {
+              submitPhoneNumber()
+            }}
+          />
+        </View>
+        <CloseCross color={palette.darkGrey} onPress={() => navigation.goBack()} />
+      </Screen>
+    </SafeAreaView>
   )
 }
 

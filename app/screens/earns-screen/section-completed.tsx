@@ -12,6 +12,7 @@ import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import type { ScreenType } from "../../types/jsx"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const styles = EStyleSheet.create({
   bottomView: {
@@ -65,25 +66,27 @@ export const SectionCompleted: ScreenType = ({ navigation, route }: Props) => {
   const { amount, sectionTitle } = route.params
 
   return (
-    <Screen backgroundColor={palette.orange} unsafe>
-      <MountainHeader amount={amount.toString()} color={palette.orange} />
-      <View style={styles.container}>
-        <View style={styles.divider} />
-        <BadgerShovelBitcoin />
-        <Text style={styles.headerSection}>
-          {translate("EarnScreen.sectionsCompleted")}
-        </Text>
-        <Text style={styles.titleSection}>{sectionTitle}</Text>
-        <Button
-          title={translate("EarnScreen.keepDigging")}
-          type="solid"
-          buttonStyle={styles.buttonStyle}
-          titleStyle={styles.titleStyle}
-          onPress={() => navigation.navigate("Earn")}
-        />
-      </View>
-      <View style={styles.bottomView} />
-      <CloseCross color={palette.white} onPress={() => navigation.navigate("Earn")} />
-    </Screen>
+    <SafeAreaView style={{ flex: 1, backgroundColor: palette.white }}>
+      <Screen backgroundColor={palette.orange} unsafe>
+        <MountainHeader amount={amount.toString()} color={palette.orange} />
+        <View style={styles.container}>
+          <View style={styles.divider} />
+          <BadgerShovelBitcoin />
+          <Text style={styles.headerSection}>
+            {translate("EarnScreen.sectionsCompleted")}
+          </Text>
+          <Text style={styles.titleSection}>{sectionTitle}</Text>
+          <Button
+            title={translate("EarnScreen.keepDigging")}
+            type="solid"
+            buttonStyle={styles.buttonStyle}
+            titleStyle={styles.titleStyle}
+            onPress={() => navigation.navigate("Earn")}
+          />
+        </View>
+        <View style={styles.bottomView} />
+        <CloseCross color={palette.white} onPress={() => navigation.navigate("Earn")} />
+      </Screen>
+    </SafeAreaView>
   )
 }

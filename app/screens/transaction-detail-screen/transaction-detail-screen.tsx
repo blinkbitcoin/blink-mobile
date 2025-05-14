@@ -19,6 +19,7 @@ import moment from "moment"
 import { formatUsdAmount } from "../../hooks"
 // import Icon from "react-native-vector-icons/Ionicons"
 import { BLOCKCHAIN_EXPLORER_URL } from "../../constants/support"
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const viewInExplorer = (hash: string): Promise<Linking> =>
   Linking.openURL(BLOCKCHAIN_EXPLORER_URL + hash)
@@ -170,64 +171,66 @@ export const TransactionDetailScreen: ScreenType = ({ route, navigation }: Props
   })
 
   return (
-    <Screen backgroundColor={palette.white} unsafe preset="scroll">
-      <View
-        style={[
-          styles.amountView,
-          { backgroundColor: colorTypeFromIconType({ isReceive, isPending }) },
-        ]}
-      >
-        <IconTransaction isReceive={isReceive} size={100} transparent />
+    <SafeAreaView style={{ flex: 1, backgroundColor: palette.white }}>
+      <Screen backgroundColor={palette.white} unsafe preset="scroll">
+        <View
+          style={[
+            styles.amountView,
+            { backgroundColor: colorTypeFromIconType({ isReceive, isPending }) },
+          ]}
+        >
+          <IconTransaction isReceive={isReceive} size={100} transparent />
 
-        <Text style={styles.amountText}>{spendOrReceiveText}</Text>
-        <TextCurrency amount={Math.abs(usdAmount)} currency="USD" style={styles.amount} />
-        <TextCurrency
-          amount={Math.abs(settlementAmount)}
-          currency="BTC"
-          style={styles.amountSecondary}
-        />
-      </View>
+          <Text style={styles.amountText}>{spendOrReceiveText}</Text>
+          <TextCurrency amount={Math.abs(usdAmount)} currency="USD" style={styles.amount} />
+          <TextCurrency
+            amount={Math.abs(settlementAmount)}
+            currency="BTC"
+            style={styles.amountSecondary}
+          />
+        </View>
 
-      <View style={styles.transactionDetailView}>
-        <Text style={styles.transactionDetailText}>
-          {translate("TransactionDetailScreen.detail")}
-        </Text>
-        <Divider style={styles.divider} />
-        <Row entry={translate("common.date")} value={dateDisplay} navigation={navigation} />
-        {!isReceive && <Row entry={translate("common.fees")} value={feeEntry} navigation={navigation} />}
-        <Row entry={translate("common.description")} value={description} navigation={navigation} />
-        {settlementVia.__typename === "SettlementViaIntraLedger" && (
+        <View style={styles.transactionDetailView}>
+          <Text style={styles.transactionDetailText}>
+            {translate("TransactionDetailScreen.detail")}
+          </Text>
+          <Divider style={styles.divider} />
+          <Row entry={translate("common.date")} value={dateDisplay} navigation={navigation} />
+          {!isReceive && <Row entry={translate("common.fees")} value={feeEntry} navigation={navigation} />}
+          <Row entry={translate("common.description")} value={description} navigation={navigation} />
+          {settlementVia.__typename === "SettlementViaIntraLedger" && (
+            <Row
+              entry={translate("TransactionDetailScreen.paid")}
+              value={settlementVia.counterPartyUsername || "Bitcoin Jungle Wallet"}
+              navigation={navigation}
+            />
+          )}
           <Row
-            entry={translate("TransactionDetailScreen.paid")}
-            value={settlementVia.counterPartyUsername || "Bitcoin Jungle Wallet"}
+            entry={translate("common.type")}
+            value={typeDisplay(settlementVia.__typename)}
             navigation={navigation}
           />
-        )}
-        <Row
-          entry={translate("common.type")}
-          value={typeDisplay(settlementVia.__typename)}
-          navigation={navigation}
-        />
-        {settlementVia.__typename === "SettlementViaLn" && (
-          <Row entry="Hash" value={initiationVia.paymentHash} navigation={navigation} />
-        )}
-        {settlementVia.__typename === "SettlementViaOnChain" && (
-          <TouchableWithoutFeedback
-            onPress={() => viewInExplorer(settlementVia.transactionHash)}
-          >
-            <View>
-              <Row
-                entry="Hash"
-                value={settlementVia.transactionHash}
-                type={settlementVia.__typename}
-                navigation={navigation}
-              />
-            </View>
-          </TouchableWithoutFeedback>
-        )}
-        {id && <Row entry="id" value={id} navigation={navigation} />}
-      </View>
-      <CloseCross color={palette.white} onPress={() => navigation.goBack()} />
-    </Screen>
+          {settlementVia.__typename === "SettlementViaLn" && (
+            <Row entry="Hash" value={initiationVia.paymentHash} navigation={navigation} />
+          )}
+          {settlementVia.__typename === "SettlementViaOnChain" && (
+            <TouchableWithoutFeedback
+              onPress={() => viewInExplorer(settlementVia.transactionHash)}
+            >
+              <View>
+                <Row
+                  entry="Hash"
+                  value={settlementVia.transactionHash}
+                  type={settlementVia.__typename}
+                  navigation={navigation}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          )}
+          {id && <Row entry="id" value={id} navigation={navigation} />}
+        </View>
+        <CloseCross color={palette.white} onPress={() => navigation.goBack()} />
+      </Screen>
+    </SafeAreaView>
   )
 }

@@ -105,7 +105,7 @@ export const ModalNfc: ComponentType = () => {
       <SafeAreaView style={styles.modalForeground}>
         <View style={styles.iconContainer}>
           <Icon
-            name="ios-remove"
+            name="remove"
             size={72}
             color={palette.lightGrey}
             style={styles.icon}
@@ -114,10 +114,11 @@ export const ModalNfc: ComponentType = () => {
         <Text style={styles.message}>Scan NFC Now</Text>
         <View style={styles.scanIconContainer}>
           <Icon
-            name="ios-scan"
+            name="scan-outline"
             size={40}
             color={palette.lightGrey}
             style={styles.scanIcon}
+            type="ionicon"
           />
         </View>
         <View style={styles.buttonContainer}>

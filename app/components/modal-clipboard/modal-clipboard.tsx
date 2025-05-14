@@ -186,7 +186,7 @@ export const ModalClipboard: ComponentType = () => {
       <SafeAreaView style={styles.modalForeground}>
         <View style={styles.iconContainer}>
           <Icon
-            name="ios-remove"
+            name="remove"
             size={72}
             color={palette.lightGrey}
             style={styles.icon}

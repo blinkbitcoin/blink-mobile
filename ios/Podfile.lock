@@ -1429,7 +1429,7 @@ PODS:
     - React-Core
   - react-native-restart (0.0.22):
     - React-Core
-  - react-native-safe-area-context (3.4.1):
+  - react-native-safe-area-context (5.4.0):
     - React-Core
   - react-native-secure-key-store (2.0.10):
     - React-Core
@@ -1697,7 +1697,7 @@ PODS:
     - React-utils (= 0.76.9)
   - RNCAsyncStorage (1.24.0):
     - React-Core
-  - RNCCheckbox (0.5.17):
+  - RNCCheckbox (0.5.20):
     - BEMCheckBox (~> 1.4)
     - React-Core
   - RNCClipboard (1.16.2):
@@ -1710,19 +1710,19 @@ PODS:
     - React-Core
   - RNDeviceInfo (8.7.1):
     - React-Core
-  - RNFBAnalytics (22.1.0):
+  - RNFBAnalytics (22.2.0):
     - Firebase/AnalyticsWithoutAdIdSupport (= 11.12.0)
     - React-Core
     - RNFBApp
-  - RNFBApp (22.1.0):
+  - RNFBApp (22.2.0):
     - Firebase/CoreOnly (= 11.12.0)
     - React-Core
-  - RNFBCrashlytics (22.1.0):
+  - RNFBCrashlytics (22.2.0):
     - Firebase/Crashlytics (= 11.12.0)
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
-  - RNFBMessaging (22.1.0):
+  - RNFBMessaging (22.2.0):
     - Firebase/Messaging (= 11.12.0)
     - FirebaseCoreExtension
     - React-Core
@@ -1893,7 +1893,7 @@ PODS:
     - Yoga
   - RNShare (7.9.1):
     - React-Core
-  - RNSVG (15.11.2):
+  - RNSVG (15.12.0):
     - React-Core
   - RNVectorIcons (10.2.0):
     - DoubleConversion
@@ -2344,7 +2344,7 @@ SPEC CHECKSUMS:
   react-native-qrcode-local-image: 04e7d0fcfda4ac9b0f7b953e9f38333f98cf7bba
   react-native-randombytes: 3c8f3e89d12487fd03a2f966c288d495415fc116
   react-native-restart: f6f591aeb40194c41b9b5013901f00e6cf7d0f29
-  react-native-safe-area-context: 667324e20fb3dd9c39c12d6036675ed90099bcd5
+  react-native-safe-area-context: 9d72abf6d8473da73033b597090a80b709c0b2f1
   react-native-secure-key-store: eb45b44bdec3f48e9be5cdfca0f49ddf64892ea6
   react-native-sms: 6abc83829639e90badc1f7211d2159a641e873a0
   react-native-vector-icons-fontawesome6: b5647e0499000d08551a8d037d9883ed6b5eb604
@@ -2377,16 +2377,16 @@ SPEC CHECKSUMS:
   ReactCodegen: 25c2c1bed6e2c89daaa9e61c40e8680803df3c8f
   ReactCommon: 9cd9f89d1600b392c3a94552afc34def5fe54d02
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
-  RNCCheckbox: 450ce156f3e29e25efa0315c96cfbabe5a39ded1
+  RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
   RNCClipboard: e1d17c9d093d8129ef50b39b63a17a0e8ccd0ade
   RNCMaskedView: 4c5ee1c8667d56077246cc6d1977f77393923560
   RNCPicker: 124b4fb5859ba1a3fd53a91e16d1e7a0fc016e59
   RNCPushNotificationIOS: 6c4ca3388c7434e4a662b92e4dfeeee858e6f440
   RNDeviceInfo: d3e91ffb33ee97a7982108476edb68cb3672efa6
-  RNFBAnalytics: 7c3193915526bcdf5f02e6f41f6e8b3474f7915a
-  RNFBApp: cb46a0facdbd687c5379783d6dc35c5ae71e1c6d
-  RNFBCrashlytics: 439bef6f0acb6a72b16281b7e7057e1690327d31
-  RNFBMessaging: fef744ae75df2d990c5cfeb0ac895876c7a04bfc
+  RNFBAnalytics: 81e00e4209b0a6268c2a8b262d7e451493bda824
+  RNFBApp: 2b2bb0f17eb6732e2e90d9c57bfde443cd7fc681
+  RNFBCrashlytics: 266758adee95705af20f106c767e19588a5de665
+  RNFBMessaging: 4627e84e9e363953357dd122543e4223c49e6bc1
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: d1b9432bb98d6ab424484d8aee035f11505205a9
   RNICloudStore: e0a579c3658e4ef49b84de2575886459c3ad695d
@@ -2397,7 +2397,7 @@ SPEC CHECKSUMS:
   RNReanimated: e72e05c6e066f1b1760dd61b14773d460980b7d3
   RNScreens: f20438755e7efb1812e53baf99041fa17e03b5e9
   RNShare: 06d69a0de7cc111302172cd8bd6d228462a6bbc1
-  RNSVG: a07e14363aa208062c6483bad24a438d5986d490
+  RNSVG: df335373ea2cb29876864e6a2ea8c86aad305838
   RNVectorIcons: 6979cfd2d04844623f2f18ce18139bbc99e95e32
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018

@@ -1,6 +1,5 @@
 import { View } from "react-native"
 import { Icon } from 'react-native-elements'
-// import Icon from "react-native-vector-iconS/Ionicons"
 import * as React from "react"
 import EStyleSheet from "react-native-extended-stylesheet"
 

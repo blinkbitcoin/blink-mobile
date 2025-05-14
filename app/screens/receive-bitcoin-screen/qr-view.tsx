@@ -33,13 +33,13 @@ const configByType = {
     copyToClipboardLabel: "ReceiveBitcoinScreen.copyClipboard",
     shareButtonLabel: "common.shareLightning",
     ecl: "L" as const,
-    icon: "ios-flash",
+    icon: "bolt",
   },
   [TYPE_BITCOIN]: {
     copyToClipboardLabel: "ReceiveBitcoinScreen.copyClipboardBitcoin",
     shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "logo-bitcoin",
+    icon: "currency-bitcoin",
   },
 }
 
