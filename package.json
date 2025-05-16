@@ -177,7 +177,7 @@
     "@storybook/addon-ondevice-backgrounds": "6.5.2",
     "@storybook/addon-ondevice-controls": "6.5.2",
     "@storybook/addon-ondevice-knobs": "6.5.2",
-    "@storybook/addon-ondevice-notes": "6.5.2",
+    "@storybook/addon-ondevice-notes": "8.6.2",
     "@storybook/addons": "6.5.16",
     "@storybook/docs-tools": "6.5.16",
     "@storybook/eslint-config-storybook": "3.1.2",
