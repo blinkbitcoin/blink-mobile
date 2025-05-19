@@ -1298,18 +1298,18 @@ const en: BaseTranslation = {
           },
           difficultyAdjustment: {
             answers: [
-              "It is reduced by half",
-              "It is doubled",
-              "It is multiplied by a random number chosen by the bitcoin software",
+              "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+              "It adjusts once a year based on market price",
+              "It is randomly changed by miners through consensus",
             ],
             feedback: [
-              "That's right! Satoshi determined the reduction of new bitcoin supply by half in the very first release of the Bitcoin software in 2009 and it is practically impossible to change",
-              "Sorry, but the block reward is not doubled every four years. You must be confusing Bitcoin with the supplies of fiat currencies which are ever expanding at a faster rate. Try again",
-              "Very creative, but wrong. The Bitcoin supply schedule is anything but random. Its predictability provides certainty for economic actors unlike anything in the history of mankind. Try again!",
+              "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2,016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+              "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It’s based solely on time—specifically, how long it took to mine the last 2,016 blocks. Try again!",
+              "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!",
             ],
             question:
-              "What happens to the block reward in the bitcoin network every four years",
-            text: "A crucial element of the Bitcoin protocol is the Difficulty Adjustment. This algorithm ensures that new blocks are found every 10 minutes on average.\n\nWhen more miners join the network, the average time required to find a new block goes down. In the opposite case, when miners leave the network, it takes longer to add a new block. The Difficulty Adjustment algorithm adjusts the difficulty of the mathematical puzzle to match changes in the combined computing power of all miners. This prevents the creation of more (or less) bitcoin units than the predetermined supply schedule.\n\nThis is in stark contrast to physical mining of precious metals like gold where adding more gold miners leads to a higher supply of gold and therefore a decrease in its price. In Bitcoin however, the addition of new miners only adds more security to the network.\n",
+              "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+            text: 'Another critical component of the Bitcoin network is the "Difficulty Adjustment"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2,016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.',
             title: "Difficulty Adjustment",
           },
           halving: {
