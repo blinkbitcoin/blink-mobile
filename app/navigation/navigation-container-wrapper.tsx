@@ -99,7 +99,15 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   }
 
   const linking: LinkingOptions<RootStackParamList> = {
-    prefixes: [...PREFIX_LINKING, "bitcoin://", "lightning://", "lapp://", "lnurlw://", "lnurlp://", "lnurl://"],
+    prefixes: [
+      ...PREFIX_LINKING,
+      "bitcoin://",
+      "lightning://",
+      "lapp://",
+      "lnurlw://",
+      "lnurlp://",
+      "lnurl://",
+    ],
     config: {
       screens: {
         Primary: {
