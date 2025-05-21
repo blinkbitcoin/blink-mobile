@@ -1303,13 +1303,13 @@ const en: BaseTranslation = {
               "It is randomly changed by miners through consensus",
             ],
             feedback: [
-              "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2,016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
-              "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It’s based solely on time—specifically, how long it took to mine the last 2,016 blocks. Try again!",
+              "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+              "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
               "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!",
             ],
             question:
               "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
-            text: 'Another critical component of the Bitcoin network is the "Difficulty Adjustment"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2,016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.',
+            text: 'Another critical component of the Bitcoin network is the "Difficulty Adjustment"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.',
             title: "Difficulty Adjustment",
           },
           halving: {
@@ -2596,7 +2596,7 @@ const en: BaseTranslation = {
     errorFetchLogin: "Failed to fetch Telegram login",
     errorAuthTimeout: "Authorization timed out. Please try again.",
     errorOpenAppError: "Failed to open Telegram. Please make sure the app is installed.",
-  },  
+  },
   PhoneRegistrationInitiateScreen: {
     title: "Phone set up",
     header: "Enter your phone number, and we'll text you an access code.",

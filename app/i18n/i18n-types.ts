@@ -4030,11 +4030,11 @@ type RootTranslation = {
 						}
 						feedback: {
 							/**
-							 * T​h​a​t​'​s​ ​r​i​g​h​t​!​ ​T​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​d​j​u​s​t​s​ ​t​h​e​ ​m​i​n​i​n​g​ ​d​i​f​f​i​c​u​l​t​y​ ​e​v​e​r​y​ ​2​,​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​o​ ​t​a​r​g​e​t​ ​a​ ​s​t​e​a​d​y​ ​p​a​c​e​ ​o​f​ ​o​n​e​ ​b​l​o​c​k​ ​e​v​e​r​y​ ​1​0​ ​m​i​n​u​t​e​s​.​ ​T​h​i​s​ ​i​s​ ​o​n​e​ ​o​f​ ​t​h​e​ ​m​o​s​t​ ​e​l​e​g​a​n​t​ ​f​e​a​t​u​r​e​s​ ​o​f​ ​t​h​e​ ​p​r​o​t​o​c​o​l​.
+							 * T​h​a​t​'​s​ ​r​i​g​h​t​!​ ​T​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​d​j​u​s​t​s​ ​t​h​e​ ​m​i​n​i​n​g​ ​d​i​f​f​i​c​u​l​t​y​ ​e​v​e​r​y​ ​2​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​o​ ​t​a​r​g​e​t​ ​a​ ​s​t​e​a​d​y​ ​p​a​c​e​ ​o​f​ ​o​n​e​ ​b​l​o​c​k​ ​e​v​e​r​y​ ​1​0​ ​m​i​n​u​t​e​s​.​ ​T​h​i​s​ ​i​s​ ​o​n​e​ ​o​f​ ​t​h​e​ ​m​o​s​t​ ​e​l​e​g​a​n​t​ ​f​e​a​t​u​r​e​s​ ​o​f​ ​t​h​e​ ​p​r​o​t​o​c​o​l​.
 							 */
 							'0': string
 							/**
-							 * N​o​t​ ​q​u​i​t​e​.​ ​W​h​i​l​e​ ​p​r​i​c​e​ ​d​o​e​s​ ​i​n​f​l​u​e​n​c​e​ ​h​o​w​ ​m​a​n​y​ ​m​i​n​e​r​s​ ​a​r​e​ ​a​c​t​i​v​e​,​ ​t​h​e​ ​d​i​f​f​i​c​u​l​t​y​ ​a​d​j​u​s​t​m​e​n​t​ ​h​a​s​ ​n​o​t​h​i​n​g​ ​t​o​ ​d​o​ ​w​i​t​h​ ​p​r​i​c​e​.​ ​I​t​’​s​ ​b​a​s​e​d​ ​s​o​l​e​l​y​ ​o​n​ ​t​i​m​e​—​s​p​e​c​i​f​i​c​a​l​l​y​,​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​l​a​s​t​ ​2​,​0​1​6​ ​b​l​o​c​k​s​.​ ​T​r​y​ ​a​g​a​i​n​!
+							 * N​o​t​ ​q​u​i​t​e​.​ ​W​h​i​l​e​ ​p​r​i​c​e​ ​d​o​e​s​ ​i​n​f​l​u​e​n​c​e​ ​h​o​w​ ​m​a​n​y​ ​m​i​n​e​r​s​ ​a​r​e​ ​a​c​t​i​v​e​,​ ​t​h​e​ ​d​i​f​f​i​c​u​l​t​y​ ​a​d​j​u​s​t​m​e​n​t​ ​h​a​s​ ​n​o​t​h​i​n​g​ ​t​o​ ​d​o​ ​w​i​t​h​ ​p​r​i​c​e​.​ ​I​t​ ​i​s​ ​b​a​s​e​d​ ​s​o​l​e​l​y​ ​o​n​ ​t​i​m​e​—​s​p​e​c​i​f​i​c​a​l​l​y​,​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​l​a​s​t​ ​2​0​1​6​ ​b​l​o​c​k​s​.​ ​T​r​y​ ​a​g​a​i​n​!
 							 */
 							'1': string
 							/**
@@ -4049,7 +4049,7 @@ type RootTranslation = {
 						/**
 						 * A​n​o​t​h​e​r​ ​c​r​i​t​i​c​a​l​ ​c​o​m​p​o​n​e​n​t​ ​o​f​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​ ​i​s​ ​t​h​e​ ​"​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​"​—​a​n​ ​a​u​t​o​m​a​t​i​c​ ​r​e​c​a​l​i​b​r​a​t​i​o​n​ ​m​e​c​h​a​n​i​s​m​ ​t​h​a​t​ ​e​n​s​u​r​e​s​ ​b​l​o​c​k​s​ ​a​r​e​ ​f​o​u​n​d​ ​a​t​ ​a​ ​r​e​g​u​l​a​r​ ​i​n​t​e​r​v​a​l​ ​o​f​ ​a​b​o​u​t​ ​1​0​ ​m​i​n​u​t​e​s​,​ ​r​e​g​a​r​d​l​e​s​s​ ​o​f​ ​h​o​w​ ​m​a​n​y​ ​m​i​n​e​r​s​ ​a​r​e​ ​p​a​r​t​i​c​i​p​a​t​i​n​g​.​
 					​
-					​E​v​e​r​y​ ​2​,​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​c​h​e​c​k​s​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​p​r​e​v​i​o​u​s​ ​b​a​t​c​h​.​ ​I​f​ ​b​l​o​c​k​s​ ​w​e​r​e​ ​b​e​i​n​g​ ​m​i​n​e​d​ ​t​o​o​ ​q​u​i​c​k​l​y​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​c​r​y​p​t​o​g​r​a​p​h​i​c​ ​p​u​z​z​l​e​ ​m​o​r​e​ ​d​i​f​f​i​c​u​l​t​.​ ​I​f​ ​t​h​e​y​ ​w​e​r​e​ ​t​o​o​ ​s​l​o​w​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​p​u​z​z​l​e​ ​e​a​s​i​e​r​.​ ​T​h​i​s​ ​k​e​e​p​s​ ​t​h​e​ ​i​s​s​u​a​n​c​e​ ​o​f​ ​n​e​w​ ​b​i​t​c​o​i​n​ ​o​n​ ​a​ ​p​r​e​d​i​c​t​a​b​l​e​ ​s​c​h​e​d​u​l​e​.​
+					​E​v​e​r​y​ ​2​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​c​h​e​c​k​s​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​p​r​e​v​i​o​u​s​ ​b​a​t​c​h​.​ ​I​f​ ​b​l​o​c​k​s​ ​w​e​r​e​ ​b​e​i​n​g​ ​m​i​n​e​d​ ​t​o​o​ ​q​u​i​c​k​l​y​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​c​r​y​p​t​o​g​r​a​p​h​i​c​ ​p​u​z​z​l​e​ ​m​o​r​e​ ​d​i​f​f​i​c​u​l​t​.​ ​I​f​ ​t​h​e​y​ ​w​e​r​e​ ​t​o​o​ ​s​l​o​w​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​p​u​z​z​l​e​ ​e​a​s​i​e​r​.​ ​T​h​i​s​ ​k​e​e​p​s​ ​t​h​e​ ​i​s​s​u​a​n​c​e​ ​o​f​ ​n​e​w​ ​b​i​t​c​o​i​n​ ​o​n​ ​a​ ​p​r​e​d​i​c​t​a​b​l​e​ ​s​c​h​e​d​u​l​e​.​
 					​
 					​T​h​i​s​ ​m​e​c​h​a​n​i​s​m​ ​i​s​ ​u​n​l​i​k​e​ ​a​n​y​t​h​i​n​g​ ​i​n​ ​t​h​e​ ​p​h​y​s​i​c​a​l​ ​w​o​r​l​d​.​ ​F​o​r​ ​e​x​a​m​p​l​e​,​ ​w​h​e​n​ ​m​o​r​e​ ​g​o​l​d​ ​m​i​n​e​r​s​ ​j​o​i​n​ ​t​h​e​ ​h​u​n​t​ ​f​o​r​ ​g​o​l​d​,​ ​t​h​e​ ​s​u​p​p​l​y​ ​i​n​c​r​e​a​s​e​s​.​ ​I​n​ ​B​i​t​c​o​i​n​,​ ​m​o​r​e​ ​m​i​n​e​r​s​ ​s​i​m​p​l​y​ ​i​n​c​r​e​a​s​e​ ​n​e​t​w​o​r​k​ ​s​e​c​u​r​i​t​y​,​ ​n​o​t​ ​t​h​e​ ​i​s​s​u​a​n​c​e​ ​r​a​t​e​.​ ​T​h​e​ ​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​ ​i​s​ ​w​h​a​t​ ​k​e​e​p​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​m​a​c​h​i​n​e​ ​t​i​c​k​i​n​g​ ​o​n​ ​t​i​m​e​.
 						 */
@@ -13175,11 +13175,11 @@ export type TranslationFunctions = {
 						}
 						feedback: {
 							/**
-							 * That's right! The Bitcoin software automatically adjusts the mining difficulty every 2,016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.
+							 * That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.
 							 */
 							'0': () => LocalizedString
 							/**
-							 * Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It’s based solely on time—specifically, how long it took to mine the last 2,016 blocks. Try again!
+							 * Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!
 							 */
 							'1': () => LocalizedString
 							/**
@@ -13194,7 +13194,7 @@ export type TranslationFunctions = {
 						/**
 						 * Another critical component of the Bitcoin network is the "Difficulty Adjustment"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.
 				
-					Every 2,016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.
+					Every 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.
 				
 					This mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.
 						 */
