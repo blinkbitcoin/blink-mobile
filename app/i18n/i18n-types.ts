@@ -3951,7 +3951,7 @@ type RootTranslation = {
 					​
 					​M​i​n​i​n​g​ ​i​s​ ​t​h​e​ ​p​r​o​c​e​s​s​ ​o​f​ ​a​d​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​t​o​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​b​l​o​c​k​c​h​a​i​n​.​ ​W​h​e​n​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​s​ ​b​r​o​a​d​c​a​s​t​e​d​ ​t​o​ ​t​h​e​ ​n​e​t​w​o​r​k​,​ ​i​t​ ​i​s​ ​p​i​c​k​e​d​ ​u​p​ ​b​y​ ​m​i​n​e​r​s​,​ ​w​h​o​ ​v​e​r​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​s​ ​v​a​l​i​d​ ​(​i​.​e​.​,​ ​t​h​e​ ​u​s​e​r​ ​h​a​s​ ​t​h​e​ ​n​e​c​e​s​s​a​r​y​ ​f​u​n​d​s​ ​a​n​d​ ​t​h​e​ ​p​r​i​v​a​t​e​ ​k​e​y​ ​u​s​e​d​ ​t​o​ ​s​i​g​n​ ​t​h​e​ ​t​r​a​n​s​a​c​t​i​o​n​ ​c​o​r​r​e​s​p​o​n​d​s​ ​t​o​ ​t​h​e​ ​p​u​b​l​i​c​ ​k​e​y​ ​a​s​s​o​c​i​a​t​e​d​ ​w​i​t​h​ ​t​h​e​ ​f​u​n​d​s​)​.​
 					​
-					​O​n​c​e​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​a​s​ ​b​e​e​n​ ​v​e​r​i​f​i​e​d​,​ ​i​t​ ​i​s​ ​a​d​d​e​d​ ​t​o​ ​a​ ​b​l​o​c​k​ ​o​f​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​a​l​o​n​g​ ​w​i​t​h​ ​a​ ​m​a​t​h​e​m​a​t​i​c​a​l​ ​p​u​z​z​l​e​.​ ​M​i​n​e​r​s​ ​c​o​m​p​e​t​e​ ​t​o​ ​s​o​l​v​e​ ​t​h​e​ ​p​u​z​z​l​e​,​ ​a​n​d​ ​t​h​e​ ​f​i​r​s​t​ ​o​n​e​ ​t​o​ ​s​o​l​v​e​ ​i​t​ ​g​e​t​s​ ​t​o​ ​a​d​d​ ​t​h​e​ ​b​l​o​c​k​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​ ​a​n​d​ ​c​l​a​i​m​ ​a​ ​r​e​w​a​r​d​ ​i​n​ ​b​i​t​c​o​i​n​.​ ​T​h​e​ ​r​e​w​a​r​d​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​6​.​2​5​ ​b​i​t​c​o​i​n​s​,​ ​p​l​u​s​ ​a​n​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s​ ​t​h​a​t​ ​w​e​r​e​ ​i​n​c​l​u​d​e​d​ ​i​n​ ​t​h​e​ ​b​l​o​c​k​.​
+					​O​n​c​e​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​a​s​ ​b​e​e​n​ ​v​e​r​i​f​i​e​d​,​ ​i​t​ ​i​s​ ​a​d​d​e​d​ ​t​o​ ​a​ ​b​l​o​c​k​ ​o​f​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​a​l​o​n​g​ ​w​i​t​h​ ​a​ ​m​a​t​h​e​m​a​t​i​c​a​l​ ​p​u​z​z​l​e​.​ ​M​i​n​e​r​s​ ​c​o​m​p​e​t​e​ ​t​o​ ​s​o​l​v​e​ ​t​h​e​ ​p​u​z​z​l​e​,​ ​a​n​d​ ​t​h​e​ ​f​i​r​s​t​ ​o​n​e​ ​t​o​ ​s​o​l​v​e​ ​i​t​ ​g​e​t​s​ ​t​o​ ​a​d​d​ ​t​h​e​ ​b​l​o​c​k​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​ ​a​n​d​ ​c​l​a​i​m​ ​a​ ​r​e​w​a​r​d​ ​i​n​ ​b​i​t​c​o​i​n​.​ ​T​h​e​ ​r​e​w​a​r​d​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​3​.​1​2​5​ ​b​i​t​c​o​i​n​s​,​ ​p​l​u​s​ ​a​n​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s​ ​t​h​a​t​ ​w​e​r​e​ ​i​n​c​l​u​d​e​d​ ​i​n​ ​t​h​e​ ​b​l​o​c​k​.​
 					​
 					​I​n​ ​a​d​d​i​t​i​o​n​ ​t​o​ ​a​d​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​,​ ​m​i​n​i​n​g​ ​a​l​s​o​ ​s​e​r​v​e​s​ ​t​o​ ​s​e​c​u​r​e​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​.​ ​T​h​i​s​ ​i​s​ ​b​e​c​a​u​s​e​ ​s​o​l​v​i​n​g​ ​t​h​e​ ​p​u​z​z​l​e​ ​r​e​q​u​i​r​e​s​ ​a​ ​s​i​g​n​i​f​i​c​a​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​c​o​m​p​u​t​a​t​i​o​n​a​l​ ​p​o​w​e​r​,​ ​a​n​d​ ​a​d​d​i​n​g​ ​a​ ​b​l​o​c​k​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​ ​r​e​q​u​i​r​e​s​ ​o​t​h​e​r​ ​m​i​n​e​r​s​ ​t​o​ ​v​e​r​i​f​y​ ​t​h​e​ ​s​o​l​u​t​i​o​n​.​ ​T​h​i​s​ ​m​a​k​e​s​ ​i​t​ ​v​e​r​y​ ​d​i​f​f​i​c​u​l​t​ ​f​o​r​ ​a​n​y​ ​o​n​e​ ​p​e​r​s​o​n​ ​o​r​ ​g​r​o​u​p​ ​t​o​ ​m​a​n​i​p​u​l​a​t​e​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​.​
 				
@@ -4016,43 +4016,42 @@ type RootTranslation = {
 					difficultyAdjustment: {
 						answers: {
 							/**
-							 * I​t​ ​i​s​ ​r​e​d​u​c​e​d​ ​b​y​ ​h​a​l​f
+							 * I​t​ ​a​d​j​u​s​t​s​ ​e​v​e​r​y​ ​2​ ​w​e​e​k​s​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​e​a​d​y​ ​b​l​o​c​k​ ​t​i​m​e​ ​o​f​ ​1​0​ ​m​i​n​u​t​e​s
 							 */
 							'0': string
 							/**
-							 * I​t​ ​i​s​ ​d​o​u​b​l​e​d
+							 * I​t​ ​a​d​j​u​s​t​s​ ​o​n​c​e​ ​a​ ​y​e​a​r​ ​b​a​s​e​d​ ​o​n​ ​m​a​r​k​e​t​ ​p​r​i​c​e
 							 */
 							'1': string
 							/**
-							 * I​t​ ​i​s​ ​m​u​l​t​i​p​l​i​e​d​ ​b​y​ ​a​ ​r​a​n​d​o​m​ ​n​u​m​b​e​r​ ​c​h​o​s​e​n​ ​b​y​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e
+							 * I​t​ ​i​s​ ​r​a​n​d​o​m​l​y​ ​c​h​a​n​g​e​d​ ​b​y​ ​m​i​n​e​r​s​ ​t​h​r​o​u​g​h​ ​c​o​n​s​e​n​s​u​s
 							 */
 							'2': string
 						}
 						feedback: {
 							/**
-							 * T​h​a​t​'​s​ ​r​i​g​h​t​!​ ​S​a​t​o​s​h​i​ ​d​e​t​e​r​m​i​n​e​d​ ​t​h​e​ ​r​e​d​u​c​t​i​o​n​ ​o​f​ ​n​e​w​ ​b​i​t​c​o​i​n​ ​s​u​p​p​l​y​ ​b​y​ ​h​a​l​f​ ​i​n​ ​t​h​e​ ​v​e​r​y​ ​f​i​r​s​t​ ​r​e​l​e​a​s​e​ ​o​f​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​i​n​ ​2​0​0​9​ ​a​n​d​ ​i​t​ ​i​s​ ​p​r​a​c​t​i​c​a​l​l​y​ ​i​m​p​o​s​s​i​b​l​e​ ​t​o​ ​c​h​a​n​g​e
+							 * T​h​a​t​'​s​ ​r​i​g​h​t​!​ ​T​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​d​j​u​s​t​s​ ​t​h​e​ ​m​i​n​i​n​g​ ​d​i​f​f​i​c​u​l​t​y​ ​e​v​e​r​y​ ​2​,​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​o​ ​t​a​r​g​e​t​ ​a​ ​s​t​e​a​d​y​ ​p​a​c​e​ ​o​f​ ​o​n​e​ ​b​l​o​c​k​ ​e​v​e​r​y​ ​1​0​ ​m​i​n​u​t​e​s​.​ ​T​h​i​s​ ​i​s​ ​o​n​e​ ​o​f​ ​t​h​e​ ​m​o​s​t​ ​e​l​e​g​a​n​t​ ​f​e​a​t​u​r​e​s​ ​o​f​ ​t​h​e​ ​p​r​o​t​o​c​o​l​.
 							 */
 							'0': string
 							/**
-							 * S​o​r​r​y​,​ ​b​u​t​ ​t​h​e​ ​b​l​o​c​k​ ​r​e​w​a​r​d​ ​i​s​ ​n​o​t​ ​d​o​u​b​l​e​d​ ​e​v​e​r​y​ ​f​o​u​r​ ​y​e​a​r​s​.​ ​Y​o​u​ ​m​u​s​t​ ​b​e​ ​c​o​n​f​u​s​i​n​g​ ​B​i​t​c​o​i​n​ ​w​i​t​h​ ​t​h​e​ ​s​u​p​p​l​i​e​s​ ​o​f​ ​f​i​a​t​ ​c​u​r​r​e​n​c​i​e​s​ ​w​h​i​c​h​ ​a​r​e​ ​e​v​e​r​ ​e​x​p​a​n​d​i​n​g​ ​a​t​ ​a​ ​f​a​s​t​e​r​ ​r​a​t​e​.​ ​T​r​y​ ​a​g​a​i​n
+							 * N​o​t​ ​q​u​i​t​e​.​ ​W​h​i​l​e​ ​p​r​i​c​e​ ​d​o​e​s​ ​i​n​f​l​u​e​n​c​e​ ​h​o​w​ ​m​a​n​y​ ​m​i​n​e​r​s​ ​a​r​e​ ​a​c​t​i​v​e​,​ ​t​h​e​ ​d​i​f​f​i​c​u​l​t​y​ ​a​d​j​u​s​t​m​e​n​t​ ​h​a​s​ ​n​o​t​h​i​n​g​ ​t​o​ ​d​o​ ​w​i​t​h​ ​p​r​i​c​e​.​ ​I​t​’​s​ ​b​a​s​e​d​ ​s​o​l​e​l​y​ ​o​n​ ​t​i​m​e​—​s​p​e​c​i​f​i​c​a​l​l​y​,​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​l​a​s​t​ ​2​,​0​1​6​ ​b​l​o​c​k​s​.​ ​T​r​y​ ​a​g​a​i​n​!
 							 */
 							'1': string
 							/**
-							 * V​e​r​y​ ​c​r​e​a​t​i​v​e​,​ ​b​u​t​ ​w​r​o​n​g​.​ ​T​h​e​ ​B​i​t​c​o​i​n​ ​s​u​p​p​l​y​ ​s​c​h​e​d​u​l​e​ ​i​s​ ​a​n​y​t​h​i​n​g​ ​b​u​t​ ​r​a​n​d​o​m​.​ ​I​t​s​ ​p​r​e​d​i​c​t​a​b​i​l​i​t​y​ ​p​r​o​v​i​d​e​s​ ​c​e​r​t​a​i​n​t​y​ ​f​o​r​ ​e​c​o​n​o​m​i​c​ ​a​c​t​o​r​s​ ​u​n​l​i​k​e​ ​a​n​y​t​h​i​n​g​ ​i​n​ ​t​h​e​ ​h​i​s​t​o​r​y​ ​o​f​ ​m​a​n​k​i​n​d​.​ ​T​r​y​ ​a​g​a​i​n​!
+							 * N​i​c​e​ ​t​r​y​,​ ​b​u​t​ ​n​o​.​ ​M​i​n​e​r​s​ ​c​a​n​'​t​ ​r​a​n​d​o​m​l​y​ ​c​h​a​n​g​e​ ​d​i​f​f​i​c​u​l​t​y​.​ ​I​t​'​s​ ​b​a​k​e​d​ ​i​n​t​o​ ​t​h​e​ ​p​r​o​t​o​c​o​l​ ​a​n​d​ ​h​a​p​p​e​n​s​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​T​h​i​s​ ​p​r​e​v​e​n​t​s​ ​m​a​n​i​p​u​l​a​t​i​o​n​ ​a​n​d​ ​e​n​s​u​r​e​s​ ​a​ ​c​o​n​s​i​s​t​e​n​t​ ​i​s​s​u​a​n​c​e​ ​s​c​h​e​d​u​l​e​.​ ​T​r​y​ ​a​g​a​i​n​!
 							 */
 							'2': string
 						}
 						/**
-						 * W​h​a​t​ ​h​a​p​p​e​n​s​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​ ​r​e​w​a​r​d​ ​i​n​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​ ​e​v​e​r​y​ ​f​o​u​r​ ​y​e​a​r​s
+						 * H​o​w​ ​d​o​e​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​ ​e​n​s​u​r​e​ ​t​h​a​t​ ​n​e​w​ ​b​l​o​c​k​s​ ​a​r​e​ ​a​d​d​e​d​ ​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​1​0​ ​m​i​n​u​t​e​s​?
 						 */
 						question: string
 						/**
-						 * A​ ​c​r​u​c​i​a​l​ ​e​l​e​m​e​n​t​ ​o​f​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​p​r​o​t​o​c​o​l​ ​i​s​ ​t​h​e​ ​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​.​ ​T​h​i​s​ ​a​l​g​o​r​i​t​h​m​ ​e​n​s​u​r​e​s​ ​t​h​a​t​ ​n​e​w​ ​b​l​o​c​k​s​ ​a​r​e​ ​f​o​u​n​d​ ​e​v​e​r​y​ ​1​0​ ​m​i​n​u​t​e​s​ ​o​n​ ​a​v​e​r​a​g​e​.​
+						 * A​n​o​t​h​e​r​ ​c​r​i​t​i​c​a​l​ ​c​o​m​p​o​n​e​n​t​ ​o​f​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​ ​i​s​ ​t​h​e​ ​"​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​"​—​a​n​ ​a​u​t​o​m​a​t​i​c​ ​r​e​c​a​l​i​b​r​a​t​i​o​n​ ​m​e​c​h​a​n​i​s​m​ ​t​h​a​t​ ​e​n​s​u​r​e​s​ ​b​l​o​c​k​s​ ​a​r​e​ ​f​o​u​n​d​ ​a​t​ ​a​ ​r​e​g​u​l​a​r​ ​i​n​t​e​r​v​a​l​ ​o​f​ ​a​b​o​u​t​ ​1​0​ ​m​i​n​u​t​e​s​,​ ​r​e​g​a​r​d​l​e​s​s​ ​o​f​ ​h​o​w​ ​m​a​n​y​ ​m​i​n​e​r​s​ ​a​r​e​ ​p​a​r​t​i​c​i​p​a​t​i​n​g​.​
 					​
-					​W​h​e​n​ ​m​o​r​e​ ​m​i​n​e​r​s​ ​j​o​i​n​ ​t​h​e​ ​n​e​t​w​o​r​k​,​ ​t​h​e​ ​a​v​e​r​a​g​e​ ​t​i​m​e​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​f​i​n​d​ ​a​ ​n​e​w​ ​b​l​o​c​k​ ​g​o​e​s​ ​d​o​w​n​.​ ​I​n​ ​t​h​e​ ​o​p​p​o​s​i​t​e​ ​c​a​s​e​,​ ​w​h​e​n​ ​m​i​n​e​r​s​ ​l​e​a​v​e​ ​t​h​e​ ​n​e​t​w​o​r​k​,​ ​i​t​ ​t​a​k​e​s​ ​l​o​n​g​e​r​ ​t​o​ ​a​d​d​ ​a​ ​n​e​w​ ​b​l​o​c​k​.​ ​T​h​e​ ​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​ ​a​l​g​o​r​i​t​h​m​ ​a​d​j​u​s​t​s​ ​t​h​e​ ​d​i​f​f​i​c​u​l​t​y​ ​o​f​ ​t​h​e​ ​m​a​t​h​e​m​a​t​i​c​a​l​ ​p​u​z​z​l​e​ ​t​o​ ​m​a​t​c​h​ ​c​h​a​n​g​e​s​ ​i​n​ ​t​h​e​ ​c​o​m​b​i​n​e​d​ ​c​o​m​p​u​t​i​n​g​ ​p​o​w​e​r​ ​o​f​ ​a​l​l​ ​m​i​n​e​r​s​.​ ​T​h​i​s​ ​p​r​e​v​e​n​t​s​ ​t​h​e​ ​c​r​e​a​t​i​o​n​ ​o​f​ ​m​o​r​e​ ​(​o​r​ ​l​e​s​s​)​ ​b​i​t​c​o​i​n​ ​u​n​i​t​s​ ​t​h​a​n​ ​t​h​e​ ​p​r​e​d​e​t​e​r​m​i​n​e​d​ ​s​u​p​p​l​y​ ​s​c​h​e​d​u​l​e​.​
+					​E​v​e​r​y​ ​2​,​0​1​6​ ​b​l​o​c​k​s​—​r​o​u​g​h​l​y​ ​e​v​e​r​y​ ​t​w​o​ ​w​e​e​k​s​—​t​h​e​ ​B​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​c​h​e​c​k​s​ ​h​o​w​ ​l​o​n​g​ ​i​t​ ​t​o​o​k​ ​t​o​ ​m​i​n​e​ ​t​h​e​ ​p​r​e​v​i​o​u​s​ ​b​a​t​c​h​.​ ​I​f​ ​b​l​o​c​k​s​ ​w​e​r​e​ ​b​e​i​n​g​ ​m​i​n​e​d​ ​t​o​o​ ​q​u​i​c​k​l​y​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​c​r​y​p​t​o​g​r​a​p​h​i​c​ ​p​u​z​z​l​e​ ​m​o​r​e​ ​d​i​f​f​i​c​u​l​t​.​ ​I​f​ ​t​h​e​y​ ​w​e​r​e​ ​t​o​o​ ​s​l​o​w​,​ ​i​t​ ​m​a​k​e​s​ ​t​h​e​ ​p​u​z​z​l​e​ ​e​a​s​i​e​r​.​ ​T​h​i​s​ ​k​e​e​p​s​ ​t​h​e​ ​i​s​s​u​a​n​c​e​ ​o​f​ ​n​e​w​ ​b​i​t​c​o​i​n​ ​o​n​ ​a​ ​p​r​e​d​i​c​t​a​b​l​e​ ​s​c​h​e​d​u​l​e​.​
 					​
-					​T​h​i​s​ ​i​s​ ​i​n​ ​s​t​a​r​k​ ​c​o​n​t​r​a​s​t​ ​t​o​ ​p​h​y​s​i​c​a​l​ ​m​i​n​i​n​g​ ​o​f​ ​p​r​e​c​i​o​u​s​ ​m​e​t​a​l​s​ ​l​i​k​e​ ​g​o​l​d​ ​w​h​e​r​e​ ​a​d​d​i​n​g​ ​m​o​r​e​ ​g​o​l​d​ ​m​i​n​e​r​s​ ​l​e​a​d​s​ ​t​o​ ​a​ ​h​i​g​h​e​r​ ​s​u​p​p​l​y​ ​o​f​ ​g​o​l​d​ ​a​n​d​ ​t​h​e​r​e​f​o​r​e​ ​a​ ​d​e​c​r​e​a​s​e​ ​i​n​ ​i​t​s​ ​p​r​i​c​e​.​ ​I​n​ ​B​i​t​c​o​i​n​ ​h​o​w​e​v​e​r​,​ ​t​h​e​ ​a​d​d​i​t​i​o​n​ ​o​f​ ​n​e​w​ ​m​i​n​e​r​s​ ​o​n​l​y​ ​a​d​d​s​ ​m​o​r​e​ ​s​e​c​u​r​i​t​y​ ​t​o​ ​t​h​e​ ​n​e​t​w​o​r​k​.​
-				
+					​T​h​i​s​ ​m​e​c​h​a​n​i​s​m​ ​i​s​ ​u​n​l​i​k​e​ ​a​n​y​t​h​i​n​g​ ​i​n​ ​t​h​e​ ​p​h​y​s​i​c​a​l​ ​w​o​r​l​d​.​ ​F​o​r​ ​e​x​a​m​p​l​e​,​ ​w​h​e​n​ ​m​o​r​e​ ​g​o​l​d​ ​m​i​n​e​r​s​ ​j​o​i​n​ ​t​h​e​ ​h​u​n​t​ ​f​o​r​ ​g​o​l​d​,​ ​t​h​e​ ​s​u​p​p​l​y​ ​i​n​c​r​e​a​s​e​s​.​ ​I​n​ ​B​i​t​c​o​i​n​,​ ​m​o​r​e​ ​m​i​n​e​r​s​ ​s​i​m​p​l​y​ ​i​n​c​r​e​a​s​e​ ​n​e​t​w​o​r​k​ ​s​e​c​u​r​i​t​y​,​ ​n​o​t​ ​t​h​e​ ​i​s​s​u​a​n​c​e​ ​r​a​t​e​.​ ​T​h​e​ ​D​i​f​f​i​c​u​l​t​y​ ​A​d​j​u​s​t​m​e​n​t​ ​i​s​ ​w​h​a​t​ ​k​e​e​p​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​m​a​c​h​i​n​e​ ​t​i​c​k​i​n​g​ ​o​n​ ​t​i​m​e​.
 						 */
 						text: string
 						/**
@@ -4096,7 +4095,7 @@ type RootTranslation = {
 						/**
 						 * O​n​e​ ​f​i​n​a​l​ ​e​l​e​m​e​n​t​ ​t​h​a​t​ ​i​s​ ​i​m​p​o​r​t​a​n​t​ ​t​o​ ​u​n​d​e​r​s​t​a​n​d​,​ ​i​s​ ​t​h​a​t​ ​t​h​e​ ​b​l​o​c​k​ ​r​e​w​a​r​d​ ​i​n​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​n​e​t​w​o​r​k​ ​i​s​ ​r​e​d​u​c​e​d​ ​b​y​ ​h​a​l​f​ ​e​v​e​r​y​ ​f​o​u​r​ ​y​e​a​r​s​,​ ​o​r​ ​e​v​e​r​y​ ​2​1​0​,​0​0​0​ ​b​l​o​c​k​s​.​
 					​
-					​T​h​i​s​ ​e​v​e​n​t​,​ ​k​n​o​w​n​ ​a​s​ ​t​h​e​ ​"​h​a​l​v​i​n​g​"​,​ ​i​s​ ​p​r​o​g​r​a​m​m​e​d​ ​i​n​t​o​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​t​h​a​t​ ​a​l​l​ ​u​s​e​r​s​ ​r​u​n​.​ ​W​h​e​n​ ​b​i​t​c​o​i​n​ ​w​a​s​ ​f​i​r​s​t​ ​l​a​u​n​c​h​e​d​,​ ​m​i​n​e​r​s​ ​r​e​c​e​i​v​e​d​ ​5​0​ ​n​e​w​ ​b​i​t​c​o​i​n​s​ ​f​o​r​ ​e​a​c​h​ ​b​l​o​c​k​ ​t​h​e​y​ ​a​d​d​e​d​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​.​ ​C​u​r​r​e​n​t​l​y​,​ ​t​h​e​ ​b​l​o​c​k​ ​r​e​w​a​r​d​ ​i​s​ ​6​.​2​5​ ​b​i​t​c​o​i​n​s​,​ ​b​u​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​r​e​d​u​c​e​d​ ​t​o​ ​3​.​1​2​5​ ​b​i​t​c​o​i​n​s​ ​i​n​ ​2​0​2​4​ ​w​h​e​n​ ​t​h​e​ ​n​e​x​t​ ​h​a​l​v​i​n​g​ ​o​c​c​u​r​s​.​
+					​T​h​i​s​ ​e​v​e​n​t​,​ ​k​n​o​w​n​ ​a​s​ ​t​h​e​ ​"​h​a​l​v​i​n​g​"​,​ ​i​s​ ​p​r​o​g​r​a​m​m​e​d​ ​i​n​t​o​ ​t​h​e​ ​b​i​t​c​o​i​n​ ​s​o​f​t​w​a​r​e​ ​t​h​a​t​ ​a​l​l​ ​u​s​e​r​s​ ​r​u​n​.​ ​W​h​e​n​ ​b​i​t​c​o​i​n​ ​w​a​s​ ​f​i​r​s​t​ ​l​a​u​n​c​h​e​d​,​ ​m​i​n​e​r​s​ ​r​e​c​e​i​v​e​d​ ​5​0​ ​n​e​w​ ​b​i​t​c​o​i​n​s​ ​f​o​r​ ​e​a​c​h​ ​b​l​o​c​k​ ​t​h​e​y​ ​a​d​d​e​d​ ​t​o​ ​t​h​e​ ​b​l​o​c​k​c​h​a​i​n​.​ ​C​u​r​r​e​n​t​l​y​,​ ​t​h​e​ ​b​l​o​c​k​ ​r​e​w​a​r​d​ ​i​s​ ​3​.​1​2​5​ ​b​i​t​c​o​i​n​s​,​ ​b​u​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​r​e​d​u​c​e​d​ ​t​o​ ​1​.​5​6​2​5​ ​b​i​t​c​o​i​n​s​ ​i​n​ ​2​0​2​8​ ​w​h​e​n​ ​t​h​e​ ​n​e​x​t​ ​h​a​l​v​i​n​g​ ​o​c​c​u​r​s​.​
 					​
 					​T​h​e​s​e​ ​h​a​l​v​i​n​g​s​ ​w​i​l​l​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​t​a​k​e​ ​p​l​a​c​e​ ​u​n​t​i​l​ ​t​h​e​ ​y​e​a​r​ ​2​1​4​0​,​ ​a​t​ ​w​h​i​c​h​ ​p​o​i​n​t​ ​t​h​e​ ​t​o​t​a​l​ ​n​u​m​b​e​r​ ​o​f​ ​b​i​t​c​o​i​n​s​ ​t​h​a​t​ ​w​i​l​l​ ​h​a​v​e​ ​b​e​e​n​ ​m​i​n​e​d​ ​w​i​l​l​ ​b​e​ ​c​a​p​p​e​d​ ​a​t​ ​2​1​ ​m​i​l​l​i​o​n​.​ ​A​s​ ​o​f​ ​2​0​2​3​,​ ​a​r​o​u​n​d​ ​9​2​%​ ​o​f​ ​a​l​l​ ​b​i​t​c​o​i​n​s​ ​(​\​~​1​9​.​3​ ​m​i​l​l​i​o​n​)​ ​h​a​v​e​ ​a​l​r​e​a​d​y​ ​b​e​e​n​ ​m​i​n​e​d​.​
 					​
@@ -13097,7 +13096,7 @@ export type TranslationFunctions = {
 				
 					Mining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).
 				
-					Once a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 6.25 bitcoins, plus any transaction fees that were included in the block.
+					Once a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.
 				
 					In addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.
 				
@@ -13162,43 +13161,42 @@ export type TranslationFunctions = {
 					difficultyAdjustment: {
 						answers: {
 							/**
-							 * It is reduced by half
+							 * It adjusts every 2 weeks to maintain a steady block time of 10 minutes
 							 */
 							'0': () => LocalizedString
 							/**
-							 * It is doubled
+							 * It adjusts once a year based on market price
 							 */
 							'1': () => LocalizedString
 							/**
-							 * It is multiplied by a random number chosen by the bitcoin software
+							 * It is randomly changed by miners through consensus
 							 */
 							'2': () => LocalizedString
 						}
 						feedback: {
 							/**
-							 * That's right! Satoshi determined the reduction of new bitcoin supply by half in the very first release of the Bitcoin software in 2009 and it is practically impossible to change
+							 * That's right! The Bitcoin software automatically adjusts the mining difficulty every 2,016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.
 							 */
 							'0': () => LocalizedString
 							/**
-							 * Sorry, but the block reward is not doubled every four years. You must be confusing Bitcoin with the supplies of fiat currencies which are ever expanding at a faster rate. Try again
+							 * Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It’s based solely on time—specifically, how long it took to mine the last 2,016 blocks. Try again!
 							 */
 							'1': () => LocalizedString
 							/**
-							 * Very creative, but wrong. The Bitcoin supply schedule is anything but random. Its predictability provides certainty for economic actors unlike anything in the history of mankind. Try again!
+							 * Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!
 							 */
 							'2': () => LocalizedString
 						}
 						/**
-						 * What happens to the block reward in the bitcoin network every four years
+						 * How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?
 						 */
 						question: () => LocalizedString
 						/**
-						 * A crucial element of the Bitcoin protocol is the Difficulty Adjustment. This algorithm ensures that new blocks are found every 10 minutes on average.
+						 * Another critical component of the Bitcoin network is the "Difficulty Adjustment"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.
 				
-					When more miners join the network, the average time required to find a new block goes down. In the opposite case, when miners leave the network, it takes longer to add a new block. The Difficulty Adjustment algorithm adjusts the difficulty of the mathematical puzzle to match changes in the combined computing power of all miners. This prevents the creation of more (or less) bitcoin units than the predetermined supply schedule.
+					Every 2,016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.
 				
-					This is in stark contrast to physical mining of precious metals like gold where adding more gold miners leads to a higher supply of gold and therefore a decrease in its price. In Bitcoin however, the addition of new miners only adds more security to the network.
-				
+					This mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.
 						 */
 						text: () => LocalizedString
 						/**
@@ -13242,7 +13240,7 @@ export type TranslationFunctions = {
 						/**
 						 * One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.
 				
-					This event, known as the "halving", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 6.25 bitcoins, but it will be reduced to 3.125 bitcoins in 2024 when the next halving occurs.
+					This event, known as the "halving", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 3.125 bitcoins, but it will be reduced to 1.5625 bitcoins in 2028 when the next halving occurs.
 				
 					These halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\~19.3 million) have already been mined.
 				
