@@ -1,8 +1,13 @@
 ## i18n
 
-if you want to add or edit a string in the wallet, you need to edit en/index.ts
-
-then you need to run `yarn typesafe-i18n:export` to update the translations for other language.
+1. If you want to add or edit a string in the wallet, you need to edit:
+    ```
+    en/index.ts
+    ```
+2. to update the translations for other languages run:
+    ```
+    yarn update-translations
+    ```
 
 ### why the folder structure?
 
