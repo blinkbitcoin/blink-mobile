@@ -9,6 +9,7 @@ import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import {
+  PayoutSpeed,
   useSendBitcoinConfirmationScreenQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
@@ -35,7 +36,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { BottomSheet, ListItem, makeStyles, Text, useTheme } from "@rneui/themed"
 
 import { testProps } from "../../utils/testProps"
 import useFee from "./use-fee"
@@ -58,12 +59,44 @@ gql`
 `
 
 type Props = { route: RouteProp<RootStackParamList, "sendBitcoinConfirmation"> }
+type FeesProps = {
+  title: string
+  captionTitle?: string
+  subtitle?: string
+  selected?: boolean
+  payoutSpeed: PayoutSpeed
+}
 
 const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const {
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
+
+  const [isVisible, setIsVisible] = useState(false)
+  const [feesList, setFeesList] = useState<FeesProps[]>([
+    {
+      title: "Next Block",
+      captionTitle: "(with higher fees)",
+      subtitle: "0",
+      selected: true,
+      payoutSpeed: PayoutSpeed.Fast,
+    },
+    {
+      title: "4 Hours Block",
+      captionTitle: "(with medium fees)",
+      subtitle: "0",
+      selected: true,
+      payoutSpeed: PayoutSpeed.Fast,
+    },
+    {
+      title: "Next Day",
+      captionTitle: "(with lower fees)",
+      subtitle: "0",
+      selected: true,
+      payoutSpeed: PayoutSpeed.Fast,
+    },
+  ])
 
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">>()
@@ -398,18 +431,26 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               isLightningRecommended() ? styles.warningOutline : undefined,
             ]}
           >
-            {fee.status === "loading" && <ActivityIndicator />}
-            {fee.status === "set" && (
-              <Text type="p2" {...testProps("Successful Fee")}>
-                {feeDisplayText}
-              </Text>
-            )}
-            {fee.status === "error" && Boolean(fee.amount) && (
-              <Text type="p2">{feeDisplayText} *</Text>
-            )}
-            {fee.status === "error" && !fee.amount && (
-              <Text type="p2">{LL.SendBitcoinConfirmationScreen.feeError()}</Text>
-            )}
+            <TouchableOpacity
+              style={styles.feeContainer}
+              onPress={() => setIsVisible(true)}
+              hitSlop={30}
+            >
+              {fee.status === "loading" && <ActivityIndicator />}
+              {fee.status === "set" && (
+                <Text type="p2" {...testProps("Successful Fee")}>
+                  {feeDisplayText}
+                </Text>
+              )}
+              {fee.status === "error" && Boolean(fee.amount) && (
+                <Text type="p2">{feeDisplayText} *</Text>
+              )}
+              {fee.status === "error" && !fee.amount && (
+                <Text type="p2">{LL.SendBitcoinConfirmationScreen.feeError()}</Text>
+              )}
+
+              <GaloyIcon name={"caret-right"} size={18} color={colors.primary} />
+            </TouchableOpacity>
           </View>
           {fee.status === "error" && Boolean(fee.amount) && (
             <Text type="p2" style={styles.maxFeeWarningText}>
@@ -440,6 +481,41 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           </PanGestureHandler>
         </View>
       </View>
+      <BottomSheet
+        modalProps={{}}
+        isVisible={isVisible}
+        onBackdropPress={() => setIsVisible(false)}
+      >
+        <View style={styles.bottomSheet}>
+          <Text type="p2" style={styles.bottomSheetText}>
+            Network Fee
+          </Text>
+          {feesList.map((item, i) => (
+            <View style={[styles.fieldContainer]}>
+              <ListItem
+                key={i}
+                containerStyle={styles.listItems}
+                onPress={() => {}}
+                style={item.selected && styles.listItemSelected}
+                bottomDivider
+              >
+                <ListItem.Content>
+                  <ListItem.Title>
+                    <Text type="p2">{item.title}</Text>
+
+                    <Text type={"p3"} ellipsizeMode="tail" numberOfLines={1}>
+                      {" "}
+                      {item.captionTitle}
+                    </Text>
+                  </ListItem.Title>
+                  <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+                </ListItem.Content>
+                {/* <GaloyIcon name={"caret-right"} size={18} color={colors.primary} /> */}
+              </ListItem>
+            </View>
+          ))}
+        </View>
+      </BottomSheet>
     </Screen>
   )
 }
@@ -572,5 +648,39 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   sliderContainer: {
     padding: 20,
+  },
+  bottomSheet: {
+    backgroundColor: colors.grey4,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    paddingTop: 20,
+  },
+  feeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flex: 1,
+  },
+  listItemSelected: {
+    borderLeftWidth: 5,
+    borderLeftColor: colors.primary,
+    borderRadius: 10,
+  },
+  listItems: {
+    flexDirection: "row",
+    borderStyle: "solid",
+    overflow: "hidden",
+    backgroundColor: colors.grey5,
+    minHeight: 60,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  bottomSheetText: {
+    fontSize: 18,
+    fontWeight: "semibold",
+    marginBottom: 4,
+    textAlign: "center",
+    paddingBottom: 10,
   },
 }))
