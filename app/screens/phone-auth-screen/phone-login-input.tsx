@@ -25,7 +25,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, useTheme, Text, Input } from "@rneui/themed"
 
 import { Screen } from "../../components/screen"
-import { PhoneChannelButtons } from "./phone-channel-buttons"
+import { PhoneChannelButton } from "./phone-channel-buttons"
 import type { PhoneValidationStackParamList } from "../../navigation/stack-param-lists"
 import {
   ErrorType,
@@ -147,6 +147,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   const { LL } = useI18nContext()
 
   const screenType = route.params.type
+  const phoneChannel = route.params.channel as PhoneCodeChannelType
 
   const isDisabledCountryAndCreateAccount =
     screenType === PhoneLoginInitiateType.CreateAccount &&
@@ -291,11 +292,8 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
             <ContactSupportButton containerStyle={styles.contactSupportButton} />
           </View>
         )}
-        <PhoneChannelButtons
-          isTelegramSupported={isTelegramSupported}
-          isSmsSupported={isSmsSupported}
-          isWhatsAppSupported={isWhatsAppSupported}
-          phoneCodeChannel={phoneCodeChannel}
+        <PhoneChannelButton
+          phoneCodeChannel={phoneChannel}
           captchaLoading={captchaLoading}
           isDisabled={isDisabledCountryAndCreateAccount}
           submit={userSubmitPhoneNumber}

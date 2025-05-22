@@ -30,6 +30,8 @@ import Info from "@app/assets/icons-redesign/info.svg"
 import Lightning from "@app/assets/icons-redesign/lightning.svg"
 import Link from "@app/assets/icons-redesign/link.svg"
 import Loading from "@app/assets/icons-redesign/loading.svg"
+import MailCheck from "@app/assets/icons-redesign/mail-check.svg"
+import MailQuestion from "@app/assets/icons-redesign/mail-question.svg"
 import MagnifyingGlass from "@app/assets/icons-redesign/magnifying-glass.svg"
 import Map from "@app/assets/icons-redesign/map.svg"
 import Menu from "@app/assets/icons-redesign/menu.svg"
@@ -85,6 +87,8 @@ export const icons = {
   "lightning": Lightning,
   "link": Link,
   "loading": Loading,
+  "mail-check": MailCheck,
+  "mail-question": MailQuestion,
   "magnifying-glass": MagnifyingGlass,
   "map": Map,
   "menu": Menu,

@@ -59,6 +59,7 @@ import { makeStyles, useTheme } from "@rneui/themed"
 import {
   AuthenticationCheckScreen,
   AuthenticationScreen,
+  LoginMethodScreen,
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
 import { DeveloperScreen } from "../screens/developer-screen"
@@ -78,6 +79,15 @@ import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
+  WelcomeLevel1Screen,
+  EmailBenefitsScreen,
+  EmailConfirmedScreen,
+  LightningBenefitsScreen,
+  LightningConfirmedScreen,
+  SupportOnboardingScreen,
+} from "@app/screens/onboarding-screen"
+import {
+  OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
   PrimaryStackParamList,
@@ -123,6 +133,18 @@ export const RootStack = () => {
         component={AuthenticationScreen}
         options={{ headerShown: false, animationEnabled: false }}
       />
+      <RootNavigator.Screen
+        name="login"
+        component={LoginMethodScreen}
+        options={({ route: { params } }) => ({
+          title:
+            params.title ??
+            (params.type === PhoneLoginInitiateType.Login
+              ? LL.GetStartedScreen.login()
+              : LL.GetStartedScreen.createAccount()),
+        })}
+      />
+
       <RootNavigator.Screen
         name="pin"
         component={PinScreen}
@@ -432,7 +454,89 @@ export const RootStack = () => {
         component={NotificationHistoryScreen}
         options={{ title: LL.NotificationHistory.title() }}
       />
+      <RootNavigator.Screen
+        name="onboarding"
+        component={OnboardingNavigator}
+        options={{ headerShown: false }}
+      />
     </RootNavigator.Navigator>
+  )
+}
+
+const Onboarding = createStackNavigator<OnboardingStackParamList>()
+
+export const OnboardingNavigator = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
+  return (
+    <Onboarding.Navigator
+      screenOptions={{
+        gestureEnabled: true,
+        headerBackTitle: LL.common.back(),
+        headerBackTestID: LL.common.back(),
+        headerStyle: styles.headerStyle,
+        headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.title,
+        headerTintColor: colors.black,
+      }}
+    >
+      <Onboarding.Screen
+        name="welcomeLevel1"
+        component={WelcomeLevel1Screen}
+        options={{
+          title: LL.OnboardingScreen.welcomeLevel1.mainTitle(),
+          headerShown: true,
+          headerLeft: () => null,
+        }}
+      />
+      <Onboarding.Screen
+        name="emailBenefits"
+        component={EmailBenefitsScreen}
+        options={{
+          title: LL.OnboardingScreen.emailBenefits.mainTitle(),
+          headerShown: true,
+        }}
+      />
+      <Onboarding.Screen
+        name="emailConfirmed"
+        component={EmailConfirmedScreen}
+        options={{
+          title: LL.OnboardingScreen.emailConfirmed.mainTitle(),
+          headerShown: true,
+          headerLeft: () => null,
+        }}
+      />
+      <Onboarding.Screen
+        name="lightningBenefits"
+        component={LightningBenefitsScreen}
+        options={{
+          title: LL.OnboardingScreen.lightningBenefits.mainTitle(),
+          headerShown: true,
+        }}
+      />
+      <Onboarding.Screen
+        name="lightningConfirmed"
+        component={LightningConfirmedScreen}
+        options={{
+          title: LL.OnboardingScreen.lightningConfirmed.mainTitle(),
+          headerShown: true,
+          headerLeft: () => null,
+        }}
+      />
+      <Onboarding.Screen
+        name="supportScreen"
+        component={SupportOnboardingScreen}
+        options={{
+          title: LL.OnboardingScreen.supportScreen.mainTitle(),
+          headerShown: true,
+          headerLeft: () => null,
+        }}
+      />
+    </Onboarding.Navigator>
   )
 }
 
@@ -518,7 +622,7 @@ export const PhoneLoginNavigator = () => {
       <StackPhoneValidation.Screen
         name="phoneLoginInitiate"
         options={(props) => ({
-          title: getTitle(props.route.params.type),
+          title: props.route.params.title,
         })}
         component={PhoneLoginInitiateScreen}
       />

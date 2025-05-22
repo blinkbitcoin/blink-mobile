@@ -20,6 +20,11 @@ export type RootStackParamList = {
     appCheckToken: string
   }
   developerScreen: undefined
+  login: {
+    type: PhoneLoginInitiateType
+    title?: string
+    upgrade?: boolean
+  }
   authenticationCheck: undefined
   authentication: {
     screenPurpose: AuthenticationScreenPurpose
@@ -102,6 +107,16 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   supportChat: undefined
   notificationHistory: undefined
+  onboarding: NavigatorScreenParams<OnboardingStackParamList>
+}
+
+export type OnboardingStackParamList = {
+  welcomeLevel1: undefined
+  emailBenefits: undefined
+  emailConfirmed: undefined
+  lightningBenefits: undefined
+  lightningConfirmed: undefined
+  supportScreen: undefined
 }
 
 export type PeopleStackParamList = {
@@ -115,6 +130,8 @@ export type PhoneValidationStackParamList = {
   Primary: undefined
   phoneLoginInitiate: {
     type: PhoneLoginInitiateType
+    channel: PhoneCodeChannelType
+    title?: string
   }
   telegramLoginValidate: {
     phone: string

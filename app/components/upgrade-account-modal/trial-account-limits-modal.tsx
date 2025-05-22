@@ -2,31 +2,41 @@ import * as React from "react"
 import { View } from "react-native"
 import { LocalizedString } from "typesafe-i18n"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rneui/themed"
 
-export type UpgradeAccountModalProps = {
+export type TrialAccountLimitsModalProps = {
   isVisible: boolean
   closeModal: () => void
 }
 
-export const UpgradeAccountModal: React.FC<UpgradeAccountModalProps> = ({
+const UPGRADE_TO = 1
+
+export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = ({
   isVisible,
   closeModal,
 }) => {
   const { LL } = useI18nContext()
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "getStarted">>()
 
   const navigateToPhoneLogin = () => {
     navigation.navigate("login", {
       type: PhoneLoginInitiateType.CreateAccount,
+      title: LL.UpgradeAccountModal.upgradeToLevel({ level: UPGRADE_TO }),
+      upgrade: true,
     })
     closeModal()
   }
@@ -35,47 +45,44 @@ export const UpgradeAccountModal: React.FC<UpgradeAccountModalProps> = ({
     <CustomModal
       isVisible={isVisible}
       toggleModal={closeModal}
-      image={<GaloyIcon name="payment-success" size={100} />}
+      image={<GaloyIcon name="info" color={colors.primary3} size={100} />}
       title={LL.UpgradeAccountModal.title()}
       body={
-        <View>
-          <AccountBenefit text={LL.UpgradeAccountModal.backUpFunds()} />
-          <AccountBenefit text={LL.UpgradeAccountModal.higherLimits()} />
-          <AccountBenefit text={LL.UpgradeAccountModal.receiveOnchain()} />
+        <View style={styles.modalBody}>
+          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.recoveryOption()} />
+          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.dailyLimit()} />
+          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.onchainReceive()} />
         </View>
       }
-      primaryButtonTextAbove={LL.UpgradeAccountModal.onlyAPhoneNumber()}
-      primaryButtonTitle={LL.UpgradeAccountModal.letsGo()}
+      primaryButtonTitle={LL.UpgradeAccountModal.upgradeToLevel({ level: UPGRADE_TO })}
       primaryButtonOnPress={navigateToPhoneLogin}
-      secondaryButtonTitle={LL.UpgradeAccountModal.stayInTrialMode()}
+      secondaryButtonTitle={LL.UpgradeAccountModal.notNow()}
       secondaryButtonOnPress={closeModal}
     />
   )
 }
 
-const AccountBenefit = ({ text }: { text: LocalizedString }) => {
+const LimitItem = ({ text }: { text: LocalizedString }) => {
   const styles = useStyles()
 
-  const {
-    theme: { colors },
-  } = useTheme()
   return (
-    <View style={styles.accountBenefitRow}>
-      <GaloyIcon color={colors.success} name="check" size={14} />
-      <Text type="h2" style={styles.accountBenefitText}>
-        {text}
+    <View style={styles.limitRow}>
+      <Text type="h2" style={styles.limitText}>
+        - {text}
       </Text>
     </View>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  accountBenefitRow: {
+  limitRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
   },
-  accountBenefitText: {
+  limitText: {
     marginLeft: 12,
+  },
+  modalBody: {
+    rowGap: 8,
   },
 }))
