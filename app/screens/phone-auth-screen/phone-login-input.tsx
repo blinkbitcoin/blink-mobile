@@ -103,7 +103,7 @@ export const PhoneLoginInitiateType = {
   CreateAccount: "CreateAccount",
 } as const
 
-const DisableCountriesForAccountCreation = ["US"]
+const DisableCountriesForAccountCreation = [""]
 
 export type PhoneLoginInitiateType =
   (typeof PhoneLoginInitiateType)[keyof typeof PhoneLoginInitiateType]
