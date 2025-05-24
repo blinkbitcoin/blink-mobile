@@ -2445,7 +2445,7 @@
         "backHome": "Terug na Tuisblad",
         "bank": "Bank",
         "bankAccount": "Kontantrekening",
-        "bankAdvice": "{bank: Name:string} Advies",
+        "bankAdvice": "{bankName: string} Advies",
         "bankInfo": "{bankName: string} Inligting",
         "beta": "beta",
         "bitcoin": "Bitcoin",
