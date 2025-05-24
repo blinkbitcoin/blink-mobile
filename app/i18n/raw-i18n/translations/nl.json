@@ -2143,7 +2143,7 @@
         "feeLabel": "Kosten",
         "memoLabel": "Noot:",
         "paymentFinal": "Betalingen zijn definitief.",
-        "stalePrice": "Je bitcoin-prijs is oud en is {timePeriod} geleden voor het laatst bijgewerkt. Start de app opnieuw voordat u een betaling uitvoert.",
+        "stalePrice": "Je bitcoin-prijs is oud en is {timePeriod: string} geleden voor het laatst bijgewerkt. Start de app opnieuw voordat u een betaling uitvoert.",
         "title": "Bevestig Betaling",
         "totalLabel": "Totaal:",
         "totalExceed": "Totaal overschrijdt uw saldo van {balance: string}",
@@ -2640,7 +2640,7 @@
         "drivingAdoption": "Ik stimuleer de adoptie van Bitcoin met Blink.",
         "septChallenge": {
             "title": "September-uitdaging!",
-            "description": "Inner Cirkel {innerCircle: nummer}/21 - Verdien $ 21\nTop 3 - Win kaartjes voor Adopting Bitcoin in El Salvador!",
+            "description": "Inner Cirkel {innerCircle: number}/21 - Verdien $ 21\nTop 3 - Win kaartjes voor Adopting Bitcoin in El Salvador!",
             "details": "Breid je innerlijke cirkel uit met 21 mensen in september en deel op social media met #blinkcircles om $ 21 op je Stablesats-account te krijgen. Top 3 wint tickets voor het Adopting Bitcoin in El Salvador!",
             "peopleWelcomedSoFar": "mensen die je tot nu toe hebt verwelkomd",
             "yourRank": "je rang",

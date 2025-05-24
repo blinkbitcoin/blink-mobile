@@ -2,14 +2,14 @@
     "GaloyAddressScreen": {
         "title": "Přijměte platbu pomocí:",
         "buttonTitle": "Nastavte svou adresu",
-        "yourAddress": "Vaše {bankName} adresa",
-        "notAbleToChange": "Po nastavení adresy {bankName} ji nebudete moci změnit.",
-        "addressNotAvailable": "Tato adresa {bankName} je již obsazena.",
+        "yourAddress": "Vaše {bankName: string} adresa",
+        "notAbleToChange": "Po nastavení adresy {bankName: string} ji nebudete moci změnit.",
+        "addressNotAvailable": "Tato adresa {bankName: string} je již obsazena.",
         "somethingWentWrong": "Něco se pokazilo. Zkuste to prosím později.",
         "merchantTitle": "Pro obchodníky",
         "yourCashRegister": "Vaše Lightningová pokladna",
         "yourPaycode": "Váš platební kód",
-        "copiedAddressToClipboard": "Adresa {bankName} zkopírovaná do schránky",
+        "copiedAddressToClipboard": "Adresa {bankName: string} zkopírovaná do schránky",
         "copiedPaycodeToClipboard": "Kód platby byl zkopírován do schránky",
         "copiedCashRegisterLinkToClipboard": "Adresa pokladny zkopírována do schránky",
         "howToUseIt": "Jak to použít?",
@@ -48,7 +48,7 @@
         "frequentContacts": "Časté kontakty"
     },
     "ContactDetailsScreen": {
-        "title": "Transakce s {username}"
+        "title": "Transakce s {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Převod",
@@ -2029,7 +2029,7 @@
         "myAccounts": "Moje účty"
     },
     "PinScreen": {
-        "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining} zbývající pokusy.",
+        "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
         "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
         "setPin": "Nastavení PIN kódu",
         "setPinFailedMatch": "Piny se neshodují - nastavte svůj PIN kód",
@@ -2115,13 +2115,13 @@
         "redeemAmountFrom": "Vyzvednout {amountToRedeem: string} z {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Našli jsme:\n\n{found}\n\nToto není platná bitcoinová adresa nebo Lightning faktura",
+        "invalidContent": "Našli jsme:\n\n{found: string}\n\nToto není platná bitcoinová adresa nebo Lightning faktura",
         "expiredContent": "Zjistili jsme:\n\n{found: string}\n\nTato faktura již vypršela",
         "invalidTitle": "Neplatný QR kód",
         "noQrCode": "Na obrázku se nám nepodařilo najít QR kód.",
         "title": "Sken QR kódu",
         "permissionCamera": "We need permission to use your camera",
-        "invalidContentLnurl": "Našli jsme:\n\n{found}\n\nnení v současné době podporováno",
+        "invalidContentLnurl": "Našli jsme:\n\n{found: string}\n\nnení v současné době podporováno",
         "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
     },
     "SecurityScreen": {
@@ -2143,44 +2143,44 @@
         "feeLabel": "Poplatek",
         "memoLabel": "Poznámka:",
         "paymentFinal": "Platby jsou konečné.",
-        "stalePrice": "Vaše cena bitcoinu je stará a naposledy byla aktualizována před {timePeriod}. Před provedením platby prosím restartujte aplikaci.",
+        "stalePrice": "Vaše cena bitcoinu je stará a naposledy byla aktualizována před {timePeriod: string}. Před provedením platby prosím restartujte aplikaci.",
         "title": "Potvrďte platbu",
         "totalLabel": "Celkem:",
-        "totalExceed": "Celková částka přesahuje váš zůstatek ve výši {balance}",
+        "totalExceed": "Celková částka přesahuje váš zůstatek ve výši {balance: string}",
         "maxFeeSelected": "Jedná se o maximální poplatek, který vám bude za tuto transakci účtován. Po provedení platby může být nakonec nižší.",
         "feeError": "Nepodařilo se vypočítat poplatek"
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "Uživatelská jména {bankName} jsou nyní adresy {bankName}.",
-        "usernameNowAddressInfo": "Když zadáte uživatelské jméno {bankName}, přidáte k němu \"@{lnDomain}\" (např. marie@{lnDomain}), aby se z něj stala adresa. Vaše uživatelské jméno je nyní také adresou {bankName}.\n\nPřejděte na stránku s adresou {bankName} z Nastavení a dozvíte se, jak ji používat nebo sdílet pro příjem plateb.",
+        "usernameNowAddress": "Uživatelská jména {bankName: string} jsou nyní adresy {bankName: string}.",
+        "usernameNowAddressInfo": "Když zadáte uživatelské jméno {bankName: string}, přidáte k němu \"@{lnDomain: string}\" (např. marie@{lnDomain: string}), aby se z něj stala adresa. Vaše uživatelské jméno je nyní také adresou {bankName: string}.\n\nPřejděte na stránku s adresou {bankName: string} z Nastavení a dozvíte se, jak ji používat nebo sdílet pro příjem plateb.",
         "enterValidDestination": "Zadejte prosím platný cíl",
-        "destinationOptions": "Můžete odesílat na {bankName} adresu, LN adresu, LN fakturu nebo BTC adresu.",
+        "destinationOptions": "Můžete odesílat na {bankName: string} adresu, LN adresu, LN fakturu nebo BTC adresu.",
         "expiredInvoice": "Platnost této faktury vypršela. Vytvořte prosím novou fakturu.",
         "wrongNetwork": "Tato faktura se týká jiné sítě. Vytvořte prosím novou fakturu.",
         "invalidAmount": "Obsahuje neplatnou částku. Vytvořte znovu a zadejte platnou částku.",
-        "usernameDoesNotExist": "Příjemce {lnAddress} s adresou {bankName} nejspíše neexistuje.",
+        "usernameDoesNotExist": "Příjemce {lnAddress: string} s adresou {bankName: string} nejspíše neexistuje.",
         "usernameDoesNotExistAdvice": "Ujistěte se, že máte správný text, nebo požádejte příjemce o LN fakturu nebo BTC adresu.",
-        "selfPaymentError": "{lnAddress} je vaše {bankName} adresa.",
+        "selfPaymentError": "{lnAddress: string} je vaše {bankName: string} adresa.",
         "selfPaymentAdvice": "Pokud chcete poslat peníze na jiný účet, který vlastníte, můžete místo toho použít LN fakturu nebo adresu nebo BTC adresu.",
         "lnAddressError": "Na tuto Lightning adresu se nemůžeme připojit. Pokud jste si jisti, že existuje, zkuste to prosím za chvíli.",
         "lnAddressAdvice": "Ujistěte se, že máte správný text, nebo požádejte příjemce o LN fakturu nebo BTC adresu.",
         "unknownLightning": "Tuto Lightning adresu nemůžeme zpracovat. Zkuste to prosím znovu.",
         "unknownOnchain": "Tuto Bitcoinovou adresu nemůžeme zpracovat. Zkuste to prosím znovu.",
-        "newBankAddressUsername": "{lnAddress} existuje jako adresa {bankName}, ale nikdy jste na ni neposlali peníze.",
+        "newBankAddressUsername": "{lnAddress: string} existuje jako adresa {bankName: string}, ale nikdy jste na ni neposlali peníze.",
         "confirmModal": {
             "title": "Na tuto adresu jste nikdy neposílali peníze",
             "body1": "Ujistěte se, že vám příjemce poskytl adresu {bankName: string},",
             "bold2bold": "ne uživatelské jméno z jiné peněženky.",
             "body3": "V opačném případě budou peníze převedeny na {bankName: string}. Účet, který má adresu \"{lnAddress: string}\".\n\nZkontrolujte také možné překlepy v první části adresy. např. jackie a jack1e jsou 2 různé adresy.",
-            "warning": "Pokud je adresa {bankName} zadána špatně, {bankName} nemůže transakci vrátit zpět.",
-            "checkBox": "{lnAddress} je správná adresa.",
+            "warning": "Pokud je adresa {bankName: string} zadána špatně, {bankName: string} nemůže transakci vrátit zpět.",
+            "checkBox": "{lnAddress: string} je správná adresa.",
             "confirmButton": "Jsem si 100% jistý."
         },
         "clipboardError": "Chyba při získávání hodnoty ze schránky"
     },
     "SendBitcoinScreen": {
         "amount": "Částka",
-        "amountExceed": "Částka přesahuje váš zůstatek ve výši {balance}",
+        "amountExceed": "Částka přesahuje váš zůstatek ve výši {balance: string}",
         "amountExceedsLimit": "Částka přesahuje váš zbývající denní limit {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgradujte svůj účet a zvyšte svůj limit",
         "amountIsRequired": "Je požadována částka",
@@ -2358,7 +2358,7 @@
         "stayInTrialMode": "Zůstat ve zkušebním režimu"
     },
     "SetAddressModal": {
-        "title": "Vaše {bankName} adresa",
+        "title": "Vaše {bankName: string} adresa",
         "Errors": {
             "tooShort": "Adresa musí mít alespoň 3 znaky",
             "tooLong": "Adresa může mít maximálně 50 znaků",
@@ -2445,8 +2445,8 @@
         "backHome": "Zpět domů",
         "bank": "Banka",
         "bankAccount": "Peněžní účet",
-        "bankAdvice": "{bankName} Poradna",
-        "bankInfo": "{bankName} Info",
+        "bankAdvice": "{bankName: string} Poradna",
+        "bankInfo": "{bankName: string} Info",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Cena bitcoinu",
@@ -2545,7 +2545,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Právě jste obdrželi {value} satů",
+            "body": "Právě jste obdrželi {value: string} satů",
             "title": "Přijatá platba"
         }
     },
@@ -2630,8 +2630,8 @@
         "peopleWelcomedByMyCircle": "lidé přivítaní mojim okruhem",
         "yourSphere": "Vaše Sféra",
         "mySphere": "Moje Sféra",
-        "yourRankMessage": "Tento měsíc jste #{thisMonthRank: číslo} a #{allTimeRank: číslo} za celou dobu!",
-        "rankMessage": "#{thisMonthRank: číslo} tento měsíc a #{allTimeRank: číslo} za celou dobu!",
+        "yourRankMessage": "Tento měsíc jste #{thisMonthRank: number} a #{allTimeRank: number} za celou dobu!",
+        "rankMessage": "#{thisMonthRank: number} tento měsíc a #{allTimeRank: number} za celou dobu!",
         "inviteFriends": "Pozvěte přítele do Blinku",
         "buildYourCircle": "Budujte své kruhy",
         "myBlinkCircles": "Moje Blink Kruhy",
@@ -2640,7 +2640,7 @@
         "drivingAdoption": "Přijímání bitcoinů řídím pomocí aplikace Blink.",
         "septChallenge": {
             "title": "Výzva na září!",
-            "description": "Vnitřní kruh {innerCircle: číslo}/21 - Vydělejte $21\nTop 3 - Vyhrajte vstupenky na Adopting Bitcoin!",
+            "description": "Vnitřní kruh {innerCircle: number}/21 - Vydělejte $21\nTop 3 - Vyhrajte vstupenky na Adopting Bitcoin!",
             "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
             "peopleWelcomedSoFar": "dosud přivítaných osob",
             "yourRank": "vaše umístnění",

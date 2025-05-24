@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "Cara menggunakan Mesin Kasir anda",
         "howToUseYourAddressExplainer": "Bagikan dengan seseorang yang memiliki dompet yang kompatibel, seperti:",
         "howToUseYourPaycodeExplainer": "Anda dapat mencetak Paycode Anda (secara teknis, ini adalah alamat lnurl-pay) dan tampilkan di bisnis anda untuk menerima pembayaran. Seseorang dapat membayar anda dengan memindainya menggunakan dompet yang mendukung Lightning.\n\nNamun, perlu diketahui bahwa beberapa dompet tidak bisa memindai Paycode, seperti:",
-        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {BankName: string} Dompet anda."
+        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {bankName: string} Dompet anda."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Syarat dan Ketentuan",
@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "mendapatkan {formatNumber | sats}",
+        "earnSats": "mendapatkan {formatNumber | sats: string}",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "Bitcoin: Apa itu?",
@@ -2162,7 +2162,7 @@
         "feeLabel": "Biaya",
         "memoLabel": "Catatan:",
         "paymentFinal": "Pembayaran bersifat final.",
-        "stalePrice": "Harga bitcoin Anda sudah lama dan terakhir diperbarui {timePeriod} yang lalu. Silakan mulai ulang aplikasi sebelum melakukan pembayaran.",
+        "stalePrice": "Harga bitcoin Anda sudah lama dan terakhir diperbarui {timePeriod: string} yang lalu. Silakan mulai ulang aplikasi sebelum melakukan pembayaran.",
         "title": "Konfirmasi Pembayaran",
         "totalLabel": "Total:",
         "totalExceed": "Total melebihi saldo Anda sebesar {balance: string}",
@@ -2178,7 +2178,7 @@
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",
-        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {namaBank: string} juga.\n\nBuka halaman alamat {namaBank: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
+        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {bankName: string} juga.\n\nBuka halaman alamat {bankName: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
         "enterValidDestination": "Silakan masukkan tujuan yang valid",
         "destinationOptions": "Anda dapat mengirim ke alamat {bankName: string}, alamat LN, faktur LN, atau alamat BTC.",
         "expiredInvoice": "Faktur ini telah kedaluwarsa. Silakan buat faktur baru.",

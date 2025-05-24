@@ -1,903 +1,903 @@
 {
-  "GaloyAddressScreen": {
-    "title": "Receive payment by using:",
-    "buttonTitle": "Set your address",
-    "yourAddress": "Idilesi {bankName: string} yakho",
-    "notAbleToChange": "Awuzukwazi ukutshintsha {bankName: string} iadresi yakho emva kokuba isetiwe",
-    "addressNotAvailable": "Le {bankName: string} dilesi sele ithathiwe",
-    "somethingWentWrong": "Ikhona into engahambi kakuhle",
-    "merchantTitle": "Eyabarhwebi",
-    "yourCashRegister": "Your Lightning Cash Register",
-    "yourPaycode": "Ikhowudi yakho yokuhlawula",
-    "copiedAddressToClipboard": "Khuphela {bankName: string} idilesi kwibhodi eqhotyoshwayo ",
-    "copiedPaycodeToClipboard": "Ikhowudi yokuhlawula ikopishwe kwibhodi eqhotyoshwayo",
-    "copiedCashRegisterLinkToClipboard": "Copied Cash Register Link to clipboard",
-    "howToUseIt": "How to use it?",
-    "howToUseYourAddress": "How to use a Lightning address",
-    "howToUseYourPaycode": "Uyisebenzisa njani ikhowudi yakho yokuhlawula",
-    "howToUseYourCashRegister": "Uyisebenzisa njani irejista yakho yemali",
-    "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
-    "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
-  },
-  "AuthenticationScreen": {
-    "authenticationDescription": "Qinisekisa ukuqhubeka",
-    "setUp": "Cwangcisa uQinisekiso lwebhayometriki",
-    "setUpAuthenticationDescription": "Sebenzisa ibhayometriki ukungqinisisa",
-    "skip": "Tsiba",
-    "unlock": "Vula",
-    "usePin": "Sebenzisa iphini"
-  },
-  "ContactsScreen": {
-    "noContactsTitle": "Akukho bafowunelwa abafunyenweyo",
-    "noContactsYet": "Thumela okanye ufumane intlawulo usebenzisa igama lomsebenzisi kunye nabafowunelwa baya kongezelelwa apha ngokuzenzekelayo",
-    "noMatchingContacts": "Akukho mfowunelwa othelekisekayo uphendlo lwakho ofunyenweyo",
-    "title": "Abafowunelwa\n "
-  },
-  "ContactDetailsScreen": {
-    "title": "Itransekshini nge {username: string}"
-  },
-  "ConversionDetailsScreen": {
-    "title": "Guqula",
-    "percentageToConvert": "% ukuguqula"
-  },
-  "ConversionConfirmationScreen": {
-    "title": "Phonononga uguqulo",
-    "youreConverting": "Uyaguqula",
-    "receivingAccount": "Akhawunti yokufumana"
-  },
-  "ConversionSuccessScreen": {
-    "title": "Impumelelo yoguqulo",
-    "message": "Uguqulo luphumelele"
-  },
-  "EarnScreen": {
-    "earnSats": "Zuza/fumana {formattedNumberlsats}",
-    "earnSections": {
-      "bitcoinWhatIsIt": {
-        "title": "Yintoni Bitcoin?",
-        "questions": {
-          "whatIsBitcoin": {
-            "answers": [
-              "Imali yedijithali",
-              "umdlalo yevidiyo",
-              "umlinganiswa omtsha wekhathuni"
-            ],
-            "feedback": [
-              "Siyavuyisana nawe. Usanda kufumana “isethi” enye -1!",
-              "Ayivumi, nceda uzame kwakhona",
-              "Hayi. Asinalo noluncane ulwazi"
-            ],
-            "question": "Yintoni kanye kanye iBitcoin?",
-            "text": "I-Bitcoin yimali yedijithali.\n\n Inokuthi idluliselwe ngokukhawuleza kwaye ikhuselekile phakathi kwanabaphi na abantu ababini emhlabeni - ngaphandle kwesidingo sebhanki okanye nayiphi na enye inkampani yemali phakathi.",
-            "title": "Yintoni kanye iBitcoin?"
-          },
-          "sat": {
-            "answers": [
-              "Iyunithi encinci yeBitcoin",
-              "Isathelayithi encinci",
-              "iKati yasemajukujukwini"
-            ],
-            "feedback": [
-              "Sivuyisana nawe. Ufumene ezinye ezimbini!",
-              "Mhlawumbi… kodwa ayisiyiyo impendulo echanekileyo kulo mongo🙂",
-              "Ummm....akunjalo!"
-            ],
-            "question": "Ndisanda kufumana \"Sat\". Yintoni iSat?",
-            "text": "\"iSat\"enye yiyunithi encinci ye-bitcoin. Sonke siyazi ukuba iDola enye yase-US inokohlulwa ibe yi-100 yeesenti. Ngokufanayo, i-Bitcoin enye inokwahlulwa ibe yi-100,000,000 sats.\n\n Ngapha koko, awudingi ukuba ne-bitcoin enye epheleleyo ukuze uyisebenzise. Ungasebenzisa i-bitcoin nokuba unayo i-20 sats, i-3000 sats - okanye i-100,000,000 sats (oyaziyo ngoku ilingana ne-bitcoin enye).",
-            "title": "Ndisanda kufumana \"Sat\". Yintoni iSat?"
-          },
-          "whereBitcoinExist": {
-            "answers": [
-              "kwi-Intanethi",
-              "Enyangeni",
-              "Kwi-akhawunti yebhanki ye-Federal"
-            ],
-            "feedback": [
-              "Siyavuyisan nawe. Usanda kufumana ezinye iiseti ezi-5",
-              "Incorrect. Well… at least not yet ;)",
-              "Ayivumi. Nceda uzame kwakhona"
-            ],
-            "question": "Zifumaneka phi bitcoin?",
-            "text": "I-Bitcoin yindlela entsha yemali. Inokusetyenziswa nguye nabani na, nanini na -- naphi na emhlabeni.\n\nAyibotshelelwanga kurhulumente okanye ummandla othile (njengeedola zase-US). Kananjalo akukho matyala ephepha, iingqekembe zentsimbi okanye amakhadi eplastiki. Yonke into i-100% yedijithali. I-Bitcoin yinethiwekhi yeekhompyuter ezisebenza kwi-intanethi.\n\n I-bitcoin yakho ilawulwa ngokulula ngesoftware kwi-smartphone okanye kwikhompyuter yakho!",
-            "title": "Zifumaneka phi bitcoin?"
-          },
-          "whoControlsBitcoin": {
-            "answers": [
-              " Uluntu oluzinikeyo lwabasebenzisi kwihlabathi liphela\n ",
-              "UMnu Burns ovela kwi-Simpsons",
-              "Urhulumente waseFransi"
-            ],
-            "feedback": [
-              "Liyinyani eloba I-Bitcoin yenziwa ukuba ibekho ngabantu kwihlabathi liphela besebenzisa isoftware ye-bitcoin kwiikhompyuter zabo kunye nee-smartphones.",
-              "Ingcinga ehlekisayo - kodwa ayilunganga!",
-              "Asivumelani. Akukho nkampani okanye urhulumente olawula i-Bitcoin."
-            ],
-            "question": "Ngubani olawula iBitcoin?",
-            "text": "I-Bitcoin ayilawulwa nguye nawuphi na umntu, inkampani okanye urhulumente. Iqhutywa luluntu oluyisebenzisayo kunye neenkampani kwihlabathi liphela ngokuzinikela,  ziqhuba isoftware ye-bitcoin kwiikhompyuter zabo kunye nee-smartphones.",
-            "title": "Ngubani olawula iBitcoin?"
-          },
-          "copyBitcoin": {
-            "answers": [
-              "Akukwazeki ukukopisha okanye ukuphinda - phinda ixabiso le-bitcoin",
-              "Ewe, unokukopa iibitcoins ngokulula kanjengokuba ukwazi ukopa ifoto yedijithali",
-              "Ewe, kodwa ukukopa i-bitcoin kufuna iikhompyuter ezikhethekileyo "
-            ],
-            "feedback": [
-              "Sivumelana nawe kakhulu!",
-              "Asiyonyaniso. Zama kwakhona",
-              "Akuvumelekanga. Akukho ndlela yokuba nabani na akope, okanye enze ikopi, ye-bitcoin."
-            ],
-            "question": "Ukuba iBitcoin yimali yedijithali, ngaba umntu akanakuyikopisha nje - kwaye enze imali yasimahla?",
-            "text": "Ixabiso le-bitcoin alinakuze likhutshelwe. Esi sesona sizathu sibangela ukuba i-Bitcoin ibe yinto entsha enamandla kangaka!! \n\nUninzi lweefayile zedijithali - ezinje ngefoto ye-iPhone, ingoma yeMP3, okanye uxwebhu lweMicrosoft Word - zinokuphinda-phinda kwaye kwabelwane ngazo. \n\nIsoftware yeBitcoin inqanda ngokukodwa ukuphinda-okanye \"inkcitho kabini\" - yemali yedijithali. Siza kwabelana ngokuthe ngqo ukuba oku kusebenza njani kamva!",
-            "title": "Ukuba iBitcoin yimali yedijithali, ngaba umntu akanakuyikopisha nje - kwaye enze imali yasimahla?"
-          }
-        }
-      },
-      "WhatIsMoney": {
-        "title": "Lento kuthiwa yimali yintoni?",
-        "questions": {
-          "moneySocialAggrement": {
-            "answers": [
-              "Kuba abantu banethemba lokuba nabanye abantu baya kuyixabisa ngendlela efanayo imali",
-              "Ngokuba kaloku umama wakho ukuxelele njalo",
-              "Ngokuba idolla ixabiso layo lifana nelegolide"
-            ],
-            "feedback": [
-              "Kulungile. Oku kukuvumela ukuba imali isebenze",
-              "Kusenokwenzeka ukuba unayo. Kodwa ayiyompendulo ichanekileyo leyo apha!",
-              "Hayi. Ngaphambili ubunokutshintshisa ngeedola zaseMelika ngegolide. Kodwa oku akusekho"
-            ],
-            "question": "Kutheni imali inexabiso?",
-            "text": "Imali ifuna abantu bathembane.\n\nAbantu bayawathemba amaphepha edola epokothweni. Bazithemba iidijithi kwiakhawunti yabo yebhanki ekwi-intanethi. Bathemba ibhalansi kwikhadi lesipho sevenkile liya kuhlawuleka. Ukuba nemali kuvumela abantu ukuba bayirhwebe ngokulula ngokukhawuleza ukuze bafumane okulungileyo, okanye inkonzo.",
-            "title": "Imali sisivumelwano soluntu."
-          },
-          "coincidenceOfWants": {
-            "answers": [
-              "Ukudibana kweemfuno",
-              "Ukuhambelana kwemini nobusuku",
-              "Ukuzenzekela kwenyanga ukuvala ilanga"
-            ],
-            "feedback": [
-              "Lonto ilungile. Imali ikuvumela ukuba uthenge into ngokulula, ngaphandle kokungcungcuthekisa malunga nendlela yokuhlawula",
-              "Hayi sisidenge, uyazi ukuba ayiyompendulo leyo.",
-              "Akunjalo. Oko sikubiza ngokusithwa kwelanga yinyanga 🌚"
-            ],
-            "question": "Yeyiphi into eyenzekayo xa imali isombulula?",
-            "text": "Kwiinkulungwane ezadlulayo, ngaphambi kokuba abantu babe nemali, babetshintshiselana--okanye baxoxisane ngendlela yokurhweba ngento eyodwa eyodwa, ukutshintshiselana kwenye into okanye inkonzo.\n\n Masithi ubufuna ukutya kwindawo yokutyela yendawo, kwaye unike umniniyo umtshayelo. Umnini usenokuthi “hayi” -- kodwa ndiya kwamkela iminqwazi emithathu endaweni yoko, ukuba kuyenzeka ukuba unayo.\n\n Unokucinga ukuba kuya kuba nzima kwaye kungasebenzi kakuhle kangakanani \"uqoqosho lwamashishini\"!\n\n Ngokwahlukileyo, ngemali, unokubonisa ngokulula ibhilikhwe yeedola ezingama-20. Kwaye uyazi ukuba umnini wevenkile yokutyela uya kuyamkela ngokukhawuleza.",
-            "title": "Imali isombulula \"ukuhambelana kweemfuno\"... Yintoni leyo?"
-          },
-          "moneyEvolution": {
-            "answers": [
-              "Amatye, oonokrwece baselwandle kunye negolide",
-              "Izindlu zebhodi yeplastiki encinci yeMonopoly",
-              "Iingqekembe ezenziwe ngetshokolethi"
-            ],
-            "feedback": [
-              "Kulungile. Izinto ezinqabileyo nekunzima ukuzikhuphela ngokufuthi bezisetyenziswa njengemali.",
-              "Ayilunganga. Banokuba nexabiso xa bedlala umdlalo -- kodwa hayi kwigama lokwenyani",
-              "Hayi. Zisenokuba mnandi. Kodwa aziloncedo njengemali."
-            ],
-            "question": "Zeziphi ezinye izinto ebezisetyenziswa ngokwembali njengeyunithi yemali?",
-            "text": "Kumawaka eminyaka eyadlulayo, uluntu lwaseMicronesia lwalusebenzisa amatye amakhulu kakhulu nanqabileyo njengendlela yemali ekuvunyelwene ngayo.\n\n Ukususela ngeminyaka yee-1500, amaqokobhe eCowrie anqabileyo (awafunyanwa elwandle) ayesetyenziswa kumazwe amaninzi njengohlobo lwemali.\n\n Kwaye kangangamawaka eminyaka, igolide ibisetyenziswa njengohlobo lwemali kumazwe ehlabathi jikelele-- kubandakanywa ne-United States (de kube ngo-1971).",
-            "title": "Imali iye yavela, ukususela ekuqaleni kwexesha"
-          },
-          "whyStonesShellGold": {
-            "answers": [
-              "Ngenxa yokuba zineempawu eziphambili--ezifana nokuqina, ukufana kunye nokwahlulwa.",
-              "Ngenxa yokuba bahle kwaye bayakhazimla",
-              "Kuba zingena ngaphakathi epokothweni yakho"
-            ],
-            "feedback": [
-              "Kulungile. Iimpawu eziphambili ezingakumbi ziquka ukunqongophala kunye nokuphatheka.",
-              "Ayilunganga. Oko kusenokuba yinyaniso, kodwa iyodwa ayizizo iimpawu ezintle zemali.",
-              "Akunjalo. Nangona ezi zinto zaziphathwa ngokuqinisekileyo, oko kuphela kwakungesosizathu sokusetyenziswa njengemali."
-            ],
-            "question": "Kwakutheni ukuze kusetyenziswe amatye, oonokrwece baselwandle kunye negolide njengeeyunithi zemali?",
-            "text": "Ewe, ezi zinto zonke zinezinye-kodwa hayi zonke--yeempawu zemali elungileyo. \n\nNgoko ke zeziphi iimpawu ezenza imali “elungileyo”? Ukunqongophala: akukho maninzi, kwaye akukho lula ukuyivelisa okanye ukuyikhuphela Yamkelwe: kulula ukuba abantu baqinisekise ubunyani bayo Yomelele: kulula ukuyigcina, kwaye ayitshabalali okanye iwahlukane Iyunifomu: itshintsheka lula nenye into ekwimo efanayo Ephathekayo:\n\n kulula ukuthutha Yahlukana: inokwahlulwa kwaye kwabelwane ngayo ngamaqhekeza amancinci",
-            "title": "Kutheni le nto amatye, amaqokobhe kunye negolide zazisetyenziswa njengemali ngaphambili?"
-          },
-          "moneyIsImportant": {
-            "answers": [
-              "Imali ivumela abantu ukuba bathenge iimpahla kunye neenkonzo namhlanje -- nangomso.",
-              "Imali ikuvumela ukuba uye enyangeni.",
-              "Imali sisisombululo kuzo zonke iingxaki."
-            ],
-            "feedback": [
-              "Lonto ilungile!",
-              "Ayilunganga. Nangona oko kunokutshintsha kwixesha elizayo;)",
-              "Akunjalo. Nangona abanye abantu besenokukukholelwa oko, le mpendulo ayibhekiseli kwinjongo ephambili yemali."
-            ],
-            "question": "Sesiphi esona sizathu siphambili sokuba imali ibaluleke?",
-            "text": "Wonke umntu uyazi ukuba imali ibalulekile.\n\n Uninzi lwabantu lutshintshisa ixesha namandla abo -- ngomsebenzi -- ukuze bafumane imali. Abantu benza njalo, ukuze bakwazi ukuthenga iimpahla kunye neenkonzo namhlanje - nakwixesha elizayo.",
-            "title": "Imali ibalulekile kumntu ngamnye"
-          },
-          "moneyImportantGovernement": {
-            "answers": [
-              "IBhanki Embindi yase-US (I-Federal Reserve)",
-              "UMnu Burns ovela kwi-Simpsons",
-              "Umfana onomatshini wokushicilela kwigumbi lakhe elingaphantsi"
-            ],
-            "feedback": [
-              "Kulungile. Urhulumente wase-US unokuprinta imali eninzi njengoko efuna nangaliphi na ixesha.",
-              "Ayilunganga. Nangona kwakubonakala ngathi wayesoloko enemali eninzi.",
-              "Hayi. Ngelixa abanye abantu besenza iidola zomgunyathi, ngokuqinisekileyo akukho mthethweni!"
-            ],
-            "question": "Ngubani onokuprinta ngokusemthethweni iiDola zaseMelika, nangaliphi na ixesha abanqwenela ngalo?",
-            "text": "Uqoqosho lwale mihla luququzelelwa ngamazwe-lizwe: i-USA, iJapan, iSwitzerland, iBrazil, iNorway, iChina, njl. Ngokufanelekileyo, kwinkoliso yezizwe zonke, urhulumente unegunya lokukhupha nokulawula imali. EUnited States, iBhanki Ephakathi (eyaziwa ngokuba yi-Federal Reserve, okanye \"i-Fed\") ingaprinta, okanye idale, iidola zase-US ezininzi nangaliphi na ixesha elifunayo. \"I-Fed\" ayifuni mvume kuMongameli, okanye iCongress, kwaye ngokuqinisekileyo ayiveli kubemi base-US. Khawufane ucinge ukuba ubunakho ukuprinta iiDola zaseMelika nangaliphi na ixesha ufuna uku-- ungenza ntoni?",
-            "title": "Imali ikwabalulekile koorhulumente"
-          }
-        }
-      },
-      "HowDoesMoneyWork": {
-        "title": "Isebenza njani Imali?",
-        "questions": {
-          "WhatIsFiat": {
-            "answers": [
-              "Idalwe ngomyalelo worhulumente weSizwe kwilizwe elinikiweyo.",
-              "Ngomphathi webhanki yesebe lengingqi.",
-              "Indoda yeMali yeMonopoly."
-            ],
-            "feedback": [
-              "Kulungile. Ibhanki ephakathi karhulumente yenza imali yefiat.",
-              "Ayilunganga. Ibhanki yendawo inokulawula kuphela imali eyenziwe ngurhulumente ngaphambili.",
-              "Hayi. Zama kwakhona!"
-            ],
-            "question": "Ngubani owenza imali ye-fiat, efana ne-US Dollars okanye i-Swiss Francs?",
-            "text": "Zonke iimali zelizwe ezijikelezayo namhlanje zibizwa ngokuba yimali \"ye-fiat\". Oku kuquka iiDola zaseMelika, iYen yaseJapan, iifranc zaseSwitzerland, njalo njalo.\n\n Igama elithi \"fiat\" ngesiLatini lithetha \"ngommiselo\" -- elithetha \"ngomyalelo osemthethweni\". Oku kuthetha ukuba yonke imali ye-fiat -- kuquka iDola yase-US -- yenziwa ngokulula ngumyalelo worhulumente wesizwe.",
-            "title": "Fiat Currency: Yintoni leyo?"
-          },
-          "whyCareAboutFiatMoney": {
-            "answers": [
-              "Yonke imali ye-fiat ekugqibeleni isetyenziswa kakubi ngabasemagunyeni bakarhulumente.",
-              "Iibhanki zasekuhlaleni zisenokungabi nandawo yaneleyo yokugcina idola",
-              "Kusenokungabikho imithi eyaneleyo yokwenza iphepha kuzo zonke iibhili zeedola ezongezelelweyo."
-            ],
-            "feedback": [
-              "Kulungile. Mandulo, oorhulumente bebengakwazi ukuxhathisa ukukwazi ukushicilela imali, njengoko bengenasinyanzelo sokubuyisela le mali.",
-              "Hayi, ngokuqinisekileyo akunjalo.",
-              "Ayivumi. Nceda uzame kwakhona"
-            ],
-            "question": "Kutheni kufuneka ndikhathalele urhulumente olawula imali ye-fiat?",
-            "text": "Njengoko kwabelwane ngemibuzo yangaphambili, iBhanki yase-US yiFederal Reserve, okanye “iFed”.\n\n I-Fed inokushicilela iidola ezininzi nangaliphi na ixesha- kwaye ayifuni mvume kuMongameli, okanye iCongress, kwaye ngokuqinisekileyo ayiveli kubemi baseMelika.\n\n Ukulawula imali kunokuhenda kakhulu ukuba abasemagunyeni basebenzise kakubi - kwaye amaxesha amaninzi kukhokelela ekunyukeni okukhulu kwamaxabiso, ukuthinjwa ngokungekho semthethweni kunye norhwaphilizo. \n\nNgapha koko, u-Alan Greenspan, owayesakuba ngusihlalo odumileyo we-Fed, ngokudumileyo wathi i-US \"inokuhlawula naliphi na ityala elinalo, kuba sinokuhlala siprinta ngakumbi ukwenza oko\".",
-            "title": "Ndiyamthemba urhulumente wam. Kutheni kufuneka ndiyikhathalele imali ye-fiat?"
-          },
-          "GovernementCanPrintMoney": {
-            "answers": [
-              "Ukushicilelwa kwemali eyongezelelweyo kukhokelela ekunyukeni kwamaxabiso.",
-              "Abantu kufuneka batshintshe iidola endala ebhankini rhoqo ngonyaka.",
-              "Ukubonakala  kwedola kuyatshintsha."
-            ],
-            "feedback": [
-              "Liyinyani. Elokuba  iimpahla kunye neenkonzo ziya kuxabisa ngaphezulu kwixesha elizayo.",
-              "Hayi. Idola endala isebenza kanye njengamatsha.",
-              "Ayilunganga. Nangona urhulumente enokuthi akhuphe imbonakalo emitsha yeebhili, oku akunanto yakwenza nokwandisa imali."
-            ],
-            "question": "Kuthetha ukuthini xa urhulumente eprinta imali?",
-            "text": "Ewe, wonke umntu makakhathalele!\n\n Ukwenziwa koshicilelo lwemali karhulumente -- okanye ukonyusa unikezelo lweedola -- kukhokelela ekwenyukeni kwamaxabiso. \n\nUkunyuka kwamaxabiso kukukhula kwexabiso lempahla neenkonzo. Ngamanye amazwi, ixabiso lento kwixesha elizayo liya kuba libiza kakhulu kunanamhlanje. \n\nNgoko kuthetha ntoni ukunyuka kwamaxabiso kubemi? EUnited Kingdom, iPound Sterling ilahlekelwe yi-99.5% yexabiso layo ukusukela oko yaziswa kwiminyaka engama-300 eyadlulayo. \n\nEUnited States, idola ilahlekelwe yi-97% yexabiso layo ukususela ekupheleni kweWWI, malunga neminyaka eyi-100 edlulileyo. Oku kuthetha inyama yenyama eyayixabisa i-$0.30 ngo-1920... yayiyi-3 yeedola ngo-1990… kwaye malunga ne-15 yeedola namhlanje, ngonyaka ka-2020!",
-            "title": "Ngubani omele akhathalele ukuba urhulumente angaprinta imali engenamkhawulo?"
-          },
-          "FiatLosesValueOverTime": {
-            "answers": [
-              "Yonke imali eyakha yabakho ilahlekelwe sisixa esikhulu sexabiso.",
-              "Ixabiso lihlala linjalo ngonaphakade.",
-              "Inkangeleko kunye ne-designer yephepha yebhili luhlaziywa rhoqo emva kweminyaka eyi-10 okanye njalo."
-            ],
-            "feedback": [
-              "Kulungile. Oku kuyinyaniso nakwi-USD, elahlekelwe yi-97% yexabiso layo kwiminyaka eyi-100 esiyidlulileyo.",
-              "Ayiyo. Nceda zame kwakhona.",
-              "Akunjalo. Nangona i-designer yamaphepha eebhili zingatshintsha, oku akunanto yakwenza nexabiso labo."
-            ],
-            "question": "Kwenzeka ntoni kwixabiso layo yonke imali ye-fiat ukuhambeni kwexesha?",
-            "text": "Kwimbali yehlabathi, kuye kwadalwa iimali ze-775 ze-fiat. Uninzi alusekho, kwaye ubomi obuqhelekileyo bayo nayiphi na imali ye-fiat yiminyaka engama-27 kuphela.\n\n IPonti yaseBritane yeyona mali indala yefiat. Ilahlekelwe ngaphezulu kwe-99% yexabiso layo ukusukela ngo-1694.\n\n Akukho mzekelo kuyo nayiphi na imali ye-fiat egcina ixabiso layo ngokuhamba kwexesha. Oku kukunyuka kwamaxabiso. Luhlobo olusebenzayo lobusela lwemali oyisebenze nzima!",
-            "title": "Ngaba oku kuthetha ukuba yonke imali ye-fiat ilahlekelwa lixabiso ngokuhamba kwexesha?"
-          },
-          "OtherIssues": {
-            "answers": [
-              "Imali inzima ukuhamba kwihlabathi jikelele, kwaye inokujongwa.",
-              "Imali ayisafuneki kwi 21st Century.",
-              "Imali yingcambu yabo bonke ububi."
-            ],
-            "feedback": [
-              "Kulungile. Siza kucacisa ngakumbi ngale miba kwiimodyuli zemibuzo elandelayo. Qhubeka ugrumba!!",
-              "Impendulo engalunganga. Uyazi ukuba asiyonyani leyo.",
-              "Ngelixa abanye benokukholelwa ukuba oku kunjalo, akuyompendulo esiyifunayo apha."
-            ],
-            "question": "Yeyiphi eminye imiba ekhoyo ngemali yefiat?",
-            "text": "Ewe, mininzi eminye imiba ekhoyo ngemali yefiat yanamhlanje. Okokuqala, kunokuba nzima kakhulu ukuhambisa imali kwihlabathi jikelele. Rhoqo, oorhulumente baya kuyibekela imida intshukumo -- kwaye ngamanye amaxesha bade bathathe imali -- ngaphandle kwesizathu esibambekayo okanye ingcaciso. Kwaye nokuba unokuthumela imali, imirhumo ephezulu yentengiselwano iyenza ibize kakhulu. Okwesibini, nase-US, kubekho ilahleko epheleleyo yobungasese, njengoko uninzi lorhwebo luthatha indawo ngedebhithi namakhadi okuthenga ngetyala, kunye ne-intanethi nezinye iinkqubo ezifana nePayPal kunye neApple Pay. Ngaba ukhe wayiqaphela indlela intengiso ebonakala ngayo kwimidiya yakho yentlalo okanye iGmail kwimizuzwana nje emva kokukhangela imveliso okanye inkonzo ethile? Oku kwaziwa ngokuba yi-“surveillance capitalism”, kwaye isekwe kwiinkampani ezithengisa iinkcukacha zakho zemali.",
-            "title": "Kulungile, imali ye-fiat ilahlekelwa yixabiso ngokuhamba kwexesha. Ngaba ikhona eminye imiba?"
-          }
-        }
-      },
-      "BitcoinWhySpecial": {
-        "title": "I-Bitcoin: Kutheni ikhethekile?",
-        "questions": {
-          "LimitedSupply": {
-            "answers": [
-              "Ewe. Akunakuze kubekho ngaphezu kwe-21 yezigidi ze-bitcoin ezenziweyo.",
-              "Hayi. Urhulumente unokudala i-bitcoin engaphezulu nangaliphi na ixesha.",
-              "Hayi, isoftware ye-bitcoin inokutshintshwa ukuvumela ukuba kwenziwe ii-bitcoins ezininzi."
-            ],
-            "feedback": [
-              "Kulungile. Ngokunciphisa inani elinokwenziwa, i-Bitcoin yenzelwe ukwandisa ixabiso ngokuhamba kwexesha.",
-              "Impendulo engalunganga. Urhulumente akanalo ulawulo kwi-Bitcoin.",
-              "Ayilunganga. Enye yeempawu eziphambili ze-bitcoin kukuba unikezelo lulinganiselwe ngonaphakade."
-            ],
-            "question": "Ngaba unikezelo lwe-bitcoin lulinganiselwe ngonaphakade?",
-            "text": "Oorhulumente banokuprinta imali ye-fiat ngobuninzi obungenamkhawulo. Ngokwahlukileyo, ukunikezelwa kweBitcoin kulungisiwe - kwaye akunakuze kudlule i-21 yezigidi zemali. Ubonelelo oluqhubekayo lwemali ye-fiat ludala ukunyuka kwamaxabiso. Oku kuthetha ukuba imali onayo namhlanje ayinaxabiso elincinci kwixesha elizayo. Umzekelo omnye olula: Ilofu yesonka eyayixabisa malunga neesenti ezisi-8 ngowe-1920. Ngonyaka we-1990 ilofu enye yayixabisa malunga nee-R1,00, yaye namhlanje ixabiso layo lisondele kwi-R2,50! Ukunikezelwa okulinganiselwe kwe-bitcoin kunempembelelo echaseneyo, enye ye-deflation. Oku kuthetha ukuba i-bitcoin oyibambe namhlanje yenzelwe ukuba yexabiso ngakumbi kwixesha elizayo - kuba inqabile.",
-            "title": "Uphawu Olulodwa #1: Umda we - saplaya"
-          },
-          "Decentralized": {
-            "answers": [
-              "Hayi. Bitcoin \"decentralized\" ngokupheleleyo.",
-              "Ewe. Ilawulwa ngumbindi weZizwe eziManyeneyo.",
-              "Ewe. Ilawulwa embindini ziibhanki ezinkulu zehlabathi."
-            ],
-            "feedback": [
-              "Ichanile loo nto. Akukho nkampani, urhulumente okanye iziko elilawula i-bitcoin. Nabani na unokusebenzisa i-bitcoin into efunekayo si-smartphone kunye noqhagamshelo lwe-intanethi.",
-              "Ayompendulo ifanelekileyo. Nceda zama kwakhona.",
-              "Ayilunganga. Sele uyazi ukuba oku akuyonyani!"
-            ],
-            "question": "Ngaba i-bitcoin iphakathi?",
-            "text": "Imali yeFiat ilawulwa ziibhanki noorhulumente - yiyo loo nto abantu beyibiza njengemali \"ephakathi\". I-Bitcoin ayilawulwa nguye nawuphi na umntu, urhulumente okanye inkampani — nto leyo eyenza ukuba “inatyisiwe” Ukungabandakanyekanga kweebhanki kuthetha ukuba akukho mntu unokukwala ukuba ufikelele kwi-bitcoin - ngenxa yobuhlanga, isini, umvuzo, imbali yetyala, indawo yejografi - okanye nayiphi na enye into. Nabani na - naphi na emhlabeni - unokufikelela kwaye asebenzise iBitcoin nanini na ufuna. Ekuphela kwento oyifunayo yikhompyuter okanye i-smartphone, kunye noqhagamshelo lwe-intanethi!",
-            "title": "Uphawu Olulodwa #2: Ukwabela amagunya"
-          },
-          "NoCounterfeitMoney": {
-            "answers": [
-              "Hayi. Akunakwenzeka ukwenza i-Bitcoin yomgunyathi.",
-              "Ewe. Nangona ukwenza i-bitcoin yobuxoki kufuna iikhompyuter ezikhethekileyo.",
-              "Ewe. Urhulumente unokuprinta i-bitcoin eninzi njengoko ethanda."
-            ],
-            "feedback": [
-              "Leyo yimpendulo echanekileyo. Kwimibuzo elandelayo, uHoney Badger uya kucacisa iinkcukacha zokuba kutheni oku kunjalo!",
-              "Ayilunganga. Akukho ndlela yokuba nabani na akhuphele okanye aphindaphinde ixabiso le-bitcoin.",
-              "Ayilunganga. Nangona urhulumente enokushicilela iidola ezingenamkhawulo, akakwazi ukuprinta i-bitcoin."
-            ],
-            "question": "Ngaba abantu bangayenza iBitcoin yomgunyathi?",
-            "text": "Imali yamaphepha, iitshekhi kunye nentengiselwano yekhadi lokuthenga ngetyala zonke zinokuba zezomgunyathi, okanye zomgunyathi. Isoftware ekhethekileyo eqhuba inethiwekhi yeBitcoin isusa ithuba lokuphinda imali ngeenjongo zomgunyathi. I-bitcoin entsha inokukhutshwa kuphela ukuba kukho isivumelwano phakathi kwabathathi-nxaxheba kwinethiwekhi. Abantu abasebenzisa isoftware ye-bitcoin ngokuzithandela kwiikhompyuter zabo kunye nee-smartphones. Oku kuqinisekisa ukuba akunakwenzeka ukwenza umgunyathi, okanye ukudala i-bitcoins yobuxoki.",
-            "title": "Uphawu Olulodwa #3: Akukho Mali Yenkohliso"
-          },
-          "HighlyDivisible": {
-            "answers": [
-              "0.00000001 BTC",
-              "I-bitcoin enye epheleleyo. Akunakwenzeka ukusebenzisa nantoni na encinci.",
-              "0.01 BTC"
-            ],
-            "feedback": [
-              "Ewe. Unokwahlula i-bitcoin kwiinqununu ze-100,000,000. Njengoko sele uyazi, iyunithi encinci ye-bitcoin - B0.00000001 - iyaziwa ngokuba \"iSeti”.",
-              "Ayilunganga. I-Bitcoin yahlukana kakhulu. Ungasebenzisa ngokulula iqhezu elincinci le-bitcoin.",
-              "Ayilunganga. Nangona eyona yunithi incinci yemali yase-US iyipeni enye, i-bitcoin yahlulahlula ngaphezu kwe-100x."
-            ],
-            "question": "Yeyiphi eyona mali incinci yeBitcoin umntu anokuba nayo, okanye ayisebenzise?",
-            "text": "Imali yefiat yakudala inokuchithwa kuphela ngokwemali encinci njengepeni enye - okanye iindawo ezimbini zedesimali kwiDola enye yaseMelika ($0.01). Ngakolunye uhlangothi, i-Bitcoin inokwahlulwa ngamaxesha angama-100,000,000 ngaphezulu. Oku kuthetha ukuba ungachitha kancinci njenge ₿0.00000001. Uya kuqaphela uphawu \"₿\", olulingana neBitcoin \"$\". Ngamanye amaxesha uya kubona nokusetyenziswa kwe-BTC, endaweni ye-₿. Ngokwahlukileyo, i-Bitcoin inokuphatha iintlawulo ezincinci kakhulu - nezo zingaphantsi kwe penny yase-US!",
-            "title": "Uphawu Olulodwa #4: Yahlukana kakhulu"
-          },
-          "securePartOne": {
-            "answers": [
-              "Ewe. Inethiwekhi ye-bitcoin ikhuselekile kakhulu.",
-              "Ingayiyo. Kuxhomekeke kumhla weveki.",
-              "Hayi. Yisoftware yomthombo ovulekileyo, kwaye ihlaselwa lula."
-            ],
-            "feedback": [
-              "Kulungile. Enyanisweni, inethiwekhi ye-Bitcoin ayizange ifakwe. Phendula umbuzo olandelayo ukuze ufunde ngakumbi!",
-              "Kuhle ukuzama, kodwa kuphosakele. Inethiwekhi ye-bitcoin ikhuselekile kwaye ikhuselekile - iiyure ze-24 ngosuku, iintsuku ze-365 ngonyaka.",
-              "Ayilunganga. Nangona i-bitcoin ngenene iyisoftware \"evulekileyo\" - okanye ifumaneka kuluntu simahla - isakhuseleke kakhulu."
-            ],
-            "question": "Ngaba inethiwekhi yeBitcoin ikhuselekile?",
-            "text": "Inethiwekhi ye-bitcoin ixabisa ngaphezulu kwe-100 yeebhiliyoni zeedola namhlanje. Ngokufanelekileyo, inethiwekhi kufuneka ikhuseleke kakhulu - ukuze imali ingaze ibiwe. I-Bitcoin yaziwa ngokuba yi-cryptocurrency yokuqala yehlabathi. Inxalenye ye \"crypto\" yegama ivela kwi-cryptography. Ngamafutshane, i-cryptography ikhusela ulwazi ngemisebenzi yezibalo enzima kakhulu. Uninzi lwabantu aluqondi - kodwa i-Bitcoin ngenene yeyona nethiwekhi yekhompyuter ikhuselekile emhlabeni! (usenokuba ukhe weva nge-bitcoin \"hacks\" - esiza kuyiphendula kwimibuzo elandelayo)",
-            "title": "Uphawu Olulodwa #5: Khusela -- Icandelo I"
-          },
-          "securePartTwo": {
-            "answers": [
-              "Hayi. I-Bitcoin ayizange ikhutshwe.",
-              "Ewe. I-Bitcoin iqhekezwa rhoqo.",
-              "Ewe. I-Bitcoin ihlala iqhekezwa ngeeholide, xa iibhanki zemveli zivaliwe."
-            ],
-            "feedback": [
-              "Liyinyani elo. Inethiwekhi ye-bitcoin ayizange ifakwe phantsi. Nangona kunjalo, kubalulekile ukusebenzisa kuphela izipaji zedijithali ezikhuselekileyo ukugcina iibitcoins zakho zobuqu zikhuselekile ngamaxesha onke.",
-              "Ayivumi. Nceda uzame kwakhona",
-              "Hayi sisidenge, uyazi ukuba ayiyompendulo ichanekileyo leyo."
-            ],
-            "question": "Ngaba i-Bitcoin yakha yaqhekezwa?",
-            "text": "Ukuthe ngqo: inethiwekhi ye-bitcoin ngokwayo ayizange ikhutshwe. Zange nakanye. Ke yintoni kanye kanye eye yagqekezelwa? Izipaji ezithile zedijithali ezazingenalo ukhuseleko olufanelekileyo kwindawo. Kanye njenge-wallet ebonakalayo ibamba imali ye-fiat (ngendlela yamatyala ephepha), i-wallet yedijithali ibamba isixa se-bitcoin. Kwilizwe lenyama, izigebenga zikhuthuza iibhanki- kwaye zihambe neeDola zaseMelika. Into yokuba umntu aphange ibhanki ayinabo nabuphi na ubudlelwane bokuba iDola yaseMelika izinzile okanye iyimali ethembekileyo. Ngokufanayo, abanye abahlaseli bekhompyuter babile i-bitcoin kwizipaji zedijithali ezingakhuselekanga - i-intanethi ilingana nokuphangwa kwebhanki. Nangona kunjalo, kubalulekile ukwazi ukuba inethiwekhi ye-bitcoin ayizange igqekezwe okanye ifakwe esichengeni!",
-            "title": "Uphawu Olulodwa #5: Khusela -- Icandelo II"
-          }
-        }
-      }
+    "GaloyAddressScreen": {
+        "title": "Receive payment by using:",
+        "buttonTitle": "Set your address",
+        "yourAddress": "Idilesi {bankName: string} yakho",
+        "notAbleToChange": "Awuzukwazi ukutshintsha {bankName: string} iadresi yakho emva kokuba isetiwe",
+        "addressNotAvailable": "Le {bankName: string} dilesi sele ithathiwe",
+        "somethingWentWrong": "Ikhona into engahambi kakuhle",
+        "merchantTitle": "Eyabarhwebi",
+        "yourCashRegister": "Your Lightning Cash Register",
+        "yourPaycode": "Ikhowudi yakho yokuhlawula",
+        "copiedAddressToClipboard": "Khuphela {bankName: string} idilesi kwibhodi eqhotyoshwayo ",
+        "copiedPaycodeToClipboard": "Ikhowudi yokuhlawula ikopishwe kwibhodi eqhotyoshwayo",
+        "copiedCashRegisterLinkToClipboard": "Copied Cash Register Link to clipboard",
+        "howToUseIt": "How to use it?",
+        "howToUseYourAddress": "How to use a Lightning address",
+        "howToUseYourPaycode": "Uyisebenzisa njani ikhowudi yakho yokuhlawula",
+        "howToUseYourCashRegister": "Uyisebenzisa njani irejista yakho yemali",
+        "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
+        "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
+        "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
     },
-    "finishText": "Kuphelele apho okwangoku, siza kukwazisa xa kukho okuninzi okuza kutyhilwa",
-    "getRewardNow": "Phendula imibuzo",
-    "keepDigging": "Qhubeka ugrumba!",
-    "phoneNumberNeeded": "Inombolo yefowuni iyafuneka",
-    "quizComplete": "Imibuzo igqityiwe kwaye {formattedNumber | sats} elifunyenweyo",
-    "reviewQuiz": "Phonononga imibuzo",
-    "satAccumulated": "IiSats ziqokelelene",
-    "satsEarned": "{formattedNumber | sats} efunyenweyo",
-    "sectionsCompleted": "Ugqibile",
-    "title": "Zuza",
-    "unlockQuestion": "Ukuvula, phendula umbuzo:",
-    "youEarned": "Uzuzile",
-    "registerTitle": "Need to upgrade your account",
-    "registerContent": "Register with your phone number to receive sats"
-  },
-  "GetStartedScreen": {
-    "logInCreateAccount": "Log in / create account",
-    "exploreWalletInstead": "Explore wallet instead",
-    "headline": "Isipaji siqhutywa nguGaloy",
-    "startTrialAccount": "Start with a trial account",
-    "iUnderstand": "I understand, continue",
-    "startWithTrialAccount": "Start with trial account",
-    "registerPhoneAccount": "Register phone account",
-    "trialAccountCreationFailed": "Trial account creation failed",
-    "trialAccountCreationFailedMessage": "Unfortunately, we were unable to create your trial account. Try again later or create an account with a phone number.",
-    "trialAccountHasLimits": "Trial account has limits",
-    "trialAccountLimits": {
-      "noBackup": "No backup option",
-      "sendingLimit": "Reduced daily sending limit",
-      "noOnchain": "No receiving bitcoin onchain"
+    "AuthenticationScreen": {
+        "authenticationDescription": "Qinisekisa ukuqhubeka",
+        "setUp": "Cwangcisa uQinisekiso lwebhayometriki",
+        "setUpAuthenticationDescription": "Sebenzisa ibhayometriki ukungqinisisa",
+        "skip": "Tsiba",
+        "unlock": "Vula",
+        "usePin": "Sebenzisa iphini"
+    },
+    "ContactsScreen": {
+        "noContactsTitle": "Akukho bafowunelwa abafunyenweyo",
+        "noContactsYet": "Thumela okanye ufumane intlawulo usebenzisa igama lomsebenzisi kunye nabafowunelwa baya kongezelelwa apha ngokuzenzekelayo",
+        "noMatchingContacts": "Akukho mfowunelwa othelekisekayo uphendlo lwakho ofunyenweyo",
+        "title": "Abafowunelwa\n "
+    },
+    "ContactDetailsScreen": {
+        "title": "Itransekshini nge {username: string}"
+    },
+    "ConversionDetailsScreen": {
+        "title": "Guqula",
+        "percentageToConvert": "% ukuguqula"
+    },
+    "ConversionConfirmationScreen": {
+        "title": "Phonononga uguqulo",
+        "youreConverting": "Uyaguqula",
+        "receivingAccount": "Akhawunti yokufumana"
+    },
+    "ConversionSuccessScreen": {
+        "title": "Impumelelo yoguqulo",
+        "message": "Uguqulo luphumelele"
+    },
+    "EarnScreen": {
+        "earnSats": "Zuza/fumana {formattedNumberlsats}",
+        "earnSections": {
+            "bitcoinWhatIsIt": {
+                "title": "Yintoni Bitcoin?",
+                "questions": {
+                    "whatIsBitcoin": {
+                        "answers": [
+                            "Imali yedijithali",
+                            "umdlalo yevidiyo",
+                            "umlinganiswa omtsha wekhathuni"
+                        ],
+                        "feedback": [
+                            "Siyavuyisana nawe. Usanda kufumana “isethi” enye -1!",
+                            "Ayivumi, nceda uzame kwakhona",
+                            "Hayi. Asinalo noluncane ulwazi"
+                        ],
+                        "question": "Yintoni kanye kanye iBitcoin?",
+                        "text": "I-Bitcoin yimali yedijithali.\n\n Inokuthi idluliselwe ngokukhawuleza kwaye ikhuselekile phakathi kwanabaphi na abantu ababini emhlabeni - ngaphandle kwesidingo sebhanki okanye nayiphi na enye inkampani yemali phakathi.",
+                        "title": "Yintoni kanye iBitcoin?"
+                    },
+                    "sat": {
+                        "answers": [
+                            "Iyunithi encinci yeBitcoin",
+                            "Isathelayithi encinci",
+                            "iKati yasemajukujukwini"
+                        ],
+                        "feedback": [
+                            "Sivuyisana nawe. Ufumene ezinye ezimbini!",
+                            "Mhlawumbi… kodwa ayisiyiyo impendulo echanekileyo kulo mongo🙂",
+                            "Ummm....akunjalo!"
+                        ],
+                        "question": "Ndisanda kufumana \"Sat\". Yintoni iSat?",
+                        "text": "\"iSat\"enye yiyunithi encinci ye-bitcoin. Sonke siyazi ukuba iDola enye yase-US inokohlulwa ibe yi-100 yeesenti. Ngokufanayo, i-Bitcoin enye inokwahlulwa ibe yi-100,000,000 sats.\n\n Ngapha koko, awudingi ukuba ne-bitcoin enye epheleleyo ukuze uyisebenzise. Ungasebenzisa i-bitcoin nokuba unayo i-20 sats, i-3000 sats - okanye i-100,000,000 sats (oyaziyo ngoku ilingana ne-bitcoin enye).",
+                        "title": "Ndisanda kufumana \"Sat\". Yintoni iSat?"
+                    },
+                    "whereBitcoinExist": {
+                        "answers": [
+                            "kwi-Intanethi",
+                            "Enyangeni",
+                            "Kwi-akhawunti yebhanki ye-Federal"
+                        ],
+                        "feedback": [
+                            "Siyavuyisan nawe. Usanda kufumana ezinye iiseti ezi-5",
+                            "Incorrect. Well… at least not yet ;)",
+                            "Ayivumi. Nceda uzame kwakhona"
+                        ],
+                        "question": "Zifumaneka phi bitcoin?",
+                        "text": "I-Bitcoin yindlela entsha yemali. Inokusetyenziswa nguye nabani na, nanini na -- naphi na emhlabeni.\n\nAyibotshelelwanga kurhulumente okanye ummandla othile (njengeedola zase-US). Kananjalo akukho matyala ephepha, iingqekembe zentsimbi okanye amakhadi eplastiki. Yonke into i-100% yedijithali. I-Bitcoin yinethiwekhi yeekhompyuter ezisebenza kwi-intanethi.\n\n I-bitcoin yakho ilawulwa ngokulula ngesoftware kwi-smartphone okanye kwikhompyuter yakho!",
+                        "title": "Zifumaneka phi bitcoin?"
+                    },
+                    "whoControlsBitcoin": {
+                        "answers": [
+                            " Uluntu oluzinikeyo lwabasebenzisi kwihlabathi liphela\n ",
+                            "UMnu Burns ovela kwi-Simpsons",
+                            "Urhulumente waseFransi"
+                        ],
+                        "feedback": [
+                            "Liyinyani eloba I-Bitcoin yenziwa ukuba ibekho ngabantu kwihlabathi liphela besebenzisa isoftware ye-bitcoin kwiikhompyuter zabo kunye nee-smartphones.",
+                            "Ingcinga ehlekisayo - kodwa ayilunganga!",
+                            "Asivumelani. Akukho nkampani okanye urhulumente olawula i-Bitcoin."
+                        ],
+                        "question": "Ngubani olawula iBitcoin?",
+                        "text": "I-Bitcoin ayilawulwa nguye nawuphi na umntu, inkampani okanye urhulumente. Iqhutywa luluntu oluyisebenzisayo kunye neenkampani kwihlabathi liphela ngokuzinikela,  ziqhuba isoftware ye-bitcoin kwiikhompyuter zabo kunye nee-smartphones.",
+                        "title": "Ngubani olawula iBitcoin?"
+                    },
+                    "copyBitcoin": {
+                        "answers": [
+                            "Akukwazeki ukukopisha okanye ukuphinda - phinda ixabiso le-bitcoin",
+                            "Ewe, unokukopa iibitcoins ngokulula kanjengokuba ukwazi ukopa ifoto yedijithali",
+                            "Ewe, kodwa ukukopa i-bitcoin kufuna iikhompyuter ezikhethekileyo "
+                        ],
+                        "feedback": [
+                            "Sivumelana nawe kakhulu!",
+                            "Asiyonyaniso. Zama kwakhona",
+                            "Akuvumelekanga. Akukho ndlela yokuba nabani na akope, okanye enze ikopi, ye-bitcoin."
+                        ],
+                        "question": "Ukuba iBitcoin yimali yedijithali, ngaba umntu akanakuyikopisha nje - kwaye enze imali yasimahla?",
+                        "text": "Ixabiso le-bitcoin alinakuze likhutshelwe. Esi sesona sizathu sibangela ukuba i-Bitcoin ibe yinto entsha enamandla kangaka!! \n\nUninzi lweefayile zedijithali - ezinje ngefoto ye-iPhone, ingoma yeMP3, okanye uxwebhu lweMicrosoft Word - zinokuphinda-phinda kwaye kwabelwane ngazo. \n\nIsoftware yeBitcoin inqanda ngokukodwa ukuphinda-okanye \"inkcitho kabini\" - yemali yedijithali. Siza kwabelana ngokuthe ngqo ukuba oku kusebenza njani kamva!",
+                        "title": "Ukuba iBitcoin yimali yedijithali, ngaba umntu akanakuyikopisha nje - kwaye enze imali yasimahla?"
+                    }
+                }
+            },
+            "WhatIsMoney": {
+                "title": "Lento kuthiwa yimali yintoni?",
+                "questions": {
+                    "moneySocialAggrement": {
+                        "answers": [
+                            "Kuba abantu banethemba lokuba nabanye abantu baya kuyixabisa ngendlela efanayo imali",
+                            "Ngokuba kaloku umama wakho ukuxelele njalo",
+                            "Ngokuba idolla ixabiso layo lifana nelegolide"
+                        ],
+                        "feedback": [
+                            "Kulungile. Oku kukuvumela ukuba imali isebenze",
+                            "Kusenokwenzeka ukuba unayo. Kodwa ayiyompendulo ichanekileyo leyo apha!",
+                            "Hayi. Ngaphambili ubunokutshintshisa ngeedola zaseMelika ngegolide. Kodwa oku akusekho"
+                        ],
+                        "question": "Kutheni imali inexabiso?",
+                        "text": "Imali ifuna abantu bathembane.\n\nAbantu bayawathemba amaphepha edola epokothweni. Bazithemba iidijithi kwiakhawunti yabo yebhanki ekwi-intanethi. Bathemba ibhalansi kwikhadi lesipho sevenkile liya kuhlawuleka. Ukuba nemali kuvumela abantu ukuba bayirhwebe ngokulula ngokukhawuleza ukuze bafumane okulungileyo, okanye inkonzo.",
+                        "title": "Imali sisivumelwano soluntu."
+                    },
+                    "coincidenceOfWants": {
+                        "answers": [
+                            "Ukudibana kweemfuno",
+                            "Ukuhambelana kwemini nobusuku",
+                            "Ukuzenzekela kwenyanga ukuvala ilanga"
+                        ],
+                        "feedback": [
+                            "Lonto ilungile. Imali ikuvumela ukuba uthenge into ngokulula, ngaphandle kokungcungcuthekisa malunga nendlela yokuhlawula",
+                            "Hayi sisidenge, uyazi ukuba ayiyompendulo leyo.",
+                            "Akunjalo. Oko sikubiza ngokusithwa kwelanga yinyanga 🌚"
+                        ],
+                        "question": "Yeyiphi into eyenzekayo xa imali isombulula?",
+                        "text": "Kwiinkulungwane ezadlulayo, ngaphambi kokuba abantu babe nemali, babetshintshiselana--okanye baxoxisane ngendlela yokurhweba ngento eyodwa eyodwa, ukutshintshiselana kwenye into okanye inkonzo.\n\n Masithi ubufuna ukutya kwindawo yokutyela yendawo, kwaye unike umniniyo umtshayelo. Umnini usenokuthi “hayi” -- kodwa ndiya kwamkela iminqwazi emithathu endaweni yoko, ukuba kuyenzeka ukuba unayo.\n\n Unokucinga ukuba kuya kuba nzima kwaye kungasebenzi kakuhle kangakanani \"uqoqosho lwamashishini\"!\n\n Ngokwahlukileyo, ngemali, unokubonisa ngokulula ibhilikhwe yeedola ezingama-20. Kwaye uyazi ukuba umnini wevenkile yokutyela uya kuyamkela ngokukhawuleza.",
+                        "title": "Imali isombulula \"ukuhambelana kweemfuno\"... Yintoni leyo?"
+                    },
+                    "moneyEvolution": {
+                        "answers": [
+                            "Amatye, oonokrwece baselwandle kunye negolide",
+                            "Izindlu zebhodi yeplastiki encinci yeMonopoly",
+                            "Iingqekembe ezenziwe ngetshokolethi"
+                        ],
+                        "feedback": [
+                            "Kulungile. Izinto ezinqabileyo nekunzima ukuzikhuphela ngokufuthi bezisetyenziswa njengemali.",
+                            "Ayilunganga. Banokuba nexabiso xa bedlala umdlalo -- kodwa hayi kwigama lokwenyani",
+                            "Hayi. Zisenokuba mnandi. Kodwa aziloncedo njengemali."
+                        ],
+                        "question": "Zeziphi ezinye izinto ebezisetyenziswa ngokwembali njengeyunithi yemali?",
+                        "text": "Kumawaka eminyaka eyadlulayo, uluntu lwaseMicronesia lwalusebenzisa amatye amakhulu kakhulu nanqabileyo njengendlela yemali ekuvunyelwene ngayo.\n\n Ukususela ngeminyaka yee-1500, amaqokobhe eCowrie anqabileyo (awafunyanwa elwandle) ayesetyenziswa kumazwe amaninzi njengohlobo lwemali.\n\n Kwaye kangangamawaka eminyaka, igolide ibisetyenziswa njengohlobo lwemali kumazwe ehlabathi jikelele-- kubandakanywa ne-United States (de kube ngo-1971).",
+                        "title": "Imali iye yavela, ukususela ekuqaleni kwexesha"
+                    },
+                    "whyStonesShellGold": {
+                        "answers": [
+                            "Ngenxa yokuba zineempawu eziphambili--ezifana nokuqina, ukufana kunye nokwahlulwa.",
+                            "Ngenxa yokuba bahle kwaye bayakhazimla",
+                            "Kuba zingena ngaphakathi epokothweni yakho"
+                        ],
+                        "feedback": [
+                            "Kulungile. Iimpawu eziphambili ezingakumbi ziquka ukunqongophala kunye nokuphatheka.",
+                            "Ayilunganga. Oko kusenokuba yinyaniso, kodwa iyodwa ayizizo iimpawu ezintle zemali.",
+                            "Akunjalo. Nangona ezi zinto zaziphathwa ngokuqinisekileyo, oko kuphela kwakungesosizathu sokusetyenziswa njengemali."
+                        ],
+                        "question": "Kwakutheni ukuze kusetyenziswe amatye, oonokrwece baselwandle kunye negolide njengeeyunithi zemali?",
+                        "text": "Ewe, ezi zinto zonke zinezinye-kodwa hayi zonke--yeempawu zemali elungileyo. \n\nNgoko ke zeziphi iimpawu ezenza imali “elungileyo”? Ukunqongophala: akukho maninzi, kwaye akukho lula ukuyivelisa okanye ukuyikhuphela Yamkelwe: kulula ukuba abantu baqinisekise ubunyani bayo Yomelele: kulula ukuyigcina, kwaye ayitshabalali okanye iwahlukane Iyunifomu: itshintsheka lula nenye into ekwimo efanayo Ephathekayo:\n\n kulula ukuthutha Yahlukana: inokwahlulwa kwaye kwabelwane ngayo ngamaqhekeza amancinci",
+                        "title": "Kutheni le nto amatye, amaqokobhe kunye negolide zazisetyenziswa njengemali ngaphambili?"
+                    },
+                    "moneyIsImportant": {
+                        "answers": [
+                            "Imali ivumela abantu ukuba bathenge iimpahla kunye neenkonzo namhlanje -- nangomso.",
+                            "Imali ikuvumela ukuba uye enyangeni.",
+                            "Imali sisisombululo kuzo zonke iingxaki."
+                        ],
+                        "feedback": [
+                            "Lonto ilungile!",
+                            "Ayilunganga. Nangona oko kunokutshintsha kwixesha elizayo;)",
+                            "Akunjalo. Nangona abanye abantu besenokukukholelwa oko, le mpendulo ayibhekiseli kwinjongo ephambili yemali."
+                        ],
+                        "question": "Sesiphi esona sizathu siphambili sokuba imali ibaluleke?",
+                        "text": "Wonke umntu uyazi ukuba imali ibalulekile.\n\n Uninzi lwabantu lutshintshisa ixesha namandla abo -- ngomsebenzi -- ukuze bafumane imali. Abantu benza njalo, ukuze bakwazi ukuthenga iimpahla kunye neenkonzo namhlanje - nakwixesha elizayo.",
+                        "title": "Imali ibalulekile kumntu ngamnye"
+                    },
+                    "moneyImportantGovernement": {
+                        "answers": [
+                            "IBhanki Embindi yase-US (I-Federal Reserve)",
+                            "UMnu Burns ovela kwi-Simpsons",
+                            "Umfana onomatshini wokushicilela kwigumbi lakhe elingaphantsi"
+                        ],
+                        "feedback": [
+                            "Kulungile. Urhulumente wase-US unokuprinta imali eninzi njengoko efuna nangaliphi na ixesha.",
+                            "Ayilunganga. Nangona kwakubonakala ngathi wayesoloko enemali eninzi.",
+                            "Hayi. Ngelixa abanye abantu besenza iidola zomgunyathi, ngokuqinisekileyo akukho mthethweni!"
+                        ],
+                        "question": "Ngubani onokuprinta ngokusemthethweni iiDola zaseMelika, nangaliphi na ixesha abanqwenela ngalo?",
+                        "text": "Uqoqosho lwale mihla luququzelelwa ngamazwe-lizwe: i-USA, iJapan, iSwitzerland, iBrazil, iNorway, iChina, njl. Ngokufanelekileyo, kwinkoliso yezizwe zonke, urhulumente unegunya lokukhupha nokulawula imali. EUnited States, iBhanki Ephakathi (eyaziwa ngokuba yi-Federal Reserve, okanye \"i-Fed\") ingaprinta, okanye idale, iidola zase-US ezininzi nangaliphi na ixesha elifunayo. \"I-Fed\" ayifuni mvume kuMongameli, okanye iCongress, kwaye ngokuqinisekileyo ayiveli kubemi base-US. Khawufane ucinge ukuba ubunakho ukuprinta iiDola zaseMelika nangaliphi na ixesha ufuna uku-- ungenza ntoni?",
+                        "title": "Imali ikwabalulekile koorhulumente"
+                    }
+                }
+            },
+            "HowDoesMoneyWork": {
+                "title": "Isebenza njani Imali?",
+                "questions": {
+                    "WhatIsFiat": {
+                        "answers": [
+                            "Idalwe ngomyalelo worhulumente weSizwe kwilizwe elinikiweyo.",
+                            "Ngomphathi webhanki yesebe lengingqi.",
+                            "Indoda yeMali yeMonopoly."
+                        ],
+                        "feedback": [
+                            "Kulungile. Ibhanki ephakathi karhulumente yenza imali yefiat.",
+                            "Ayilunganga. Ibhanki yendawo inokulawula kuphela imali eyenziwe ngurhulumente ngaphambili.",
+                            "Hayi. Zama kwakhona!"
+                        ],
+                        "question": "Ngubani owenza imali ye-fiat, efana ne-US Dollars okanye i-Swiss Francs?",
+                        "text": "Zonke iimali zelizwe ezijikelezayo namhlanje zibizwa ngokuba yimali \"ye-fiat\". Oku kuquka iiDola zaseMelika, iYen yaseJapan, iifranc zaseSwitzerland, njalo njalo.\n\n Igama elithi \"fiat\" ngesiLatini lithetha \"ngommiselo\" -- elithetha \"ngomyalelo osemthethweni\". Oku kuthetha ukuba yonke imali ye-fiat -- kuquka iDola yase-US -- yenziwa ngokulula ngumyalelo worhulumente wesizwe.",
+                        "title": "Fiat Currency: Yintoni leyo?"
+                    },
+                    "whyCareAboutFiatMoney": {
+                        "answers": [
+                            "Yonke imali ye-fiat ekugqibeleni isetyenziswa kakubi ngabasemagunyeni bakarhulumente.",
+                            "Iibhanki zasekuhlaleni zisenokungabi nandawo yaneleyo yokugcina idola",
+                            "Kusenokungabikho imithi eyaneleyo yokwenza iphepha kuzo zonke iibhili zeedola ezongezelelweyo."
+                        ],
+                        "feedback": [
+                            "Kulungile. Mandulo, oorhulumente bebengakwazi ukuxhathisa ukukwazi ukushicilela imali, njengoko bengenasinyanzelo sokubuyisela le mali.",
+                            "Hayi, ngokuqinisekileyo akunjalo.",
+                            "Ayivumi. Nceda uzame kwakhona"
+                        ],
+                        "question": "Kutheni kufuneka ndikhathalele urhulumente olawula imali ye-fiat?",
+                        "text": "Njengoko kwabelwane ngemibuzo yangaphambili, iBhanki yase-US yiFederal Reserve, okanye “iFed”.\n\n I-Fed inokushicilela iidola ezininzi nangaliphi na ixesha- kwaye ayifuni mvume kuMongameli, okanye iCongress, kwaye ngokuqinisekileyo ayiveli kubemi baseMelika.\n\n Ukulawula imali kunokuhenda kakhulu ukuba abasemagunyeni basebenzise kakubi - kwaye amaxesha amaninzi kukhokelela ekunyukeni okukhulu kwamaxabiso, ukuthinjwa ngokungekho semthethweni kunye norhwaphilizo. \n\nNgapha koko, u-Alan Greenspan, owayesakuba ngusihlalo odumileyo we-Fed, ngokudumileyo wathi i-US \"inokuhlawula naliphi na ityala elinalo, kuba sinokuhlala siprinta ngakumbi ukwenza oko\".",
+                        "title": "Ndiyamthemba urhulumente wam. Kutheni kufuneka ndiyikhathalele imali ye-fiat?"
+                    },
+                    "GovernementCanPrintMoney": {
+                        "answers": [
+                            "Ukushicilelwa kwemali eyongezelelweyo kukhokelela ekunyukeni kwamaxabiso.",
+                            "Abantu kufuneka batshintshe iidola endala ebhankini rhoqo ngonyaka.",
+                            "Ukubonakala  kwedola kuyatshintsha."
+                        ],
+                        "feedback": [
+                            "Liyinyani. Elokuba  iimpahla kunye neenkonzo ziya kuxabisa ngaphezulu kwixesha elizayo.",
+                            "Hayi. Idola endala isebenza kanye njengamatsha.",
+                            "Ayilunganga. Nangona urhulumente enokuthi akhuphe imbonakalo emitsha yeebhili, oku akunanto yakwenza nokwandisa imali."
+                        ],
+                        "question": "Kuthetha ukuthini xa urhulumente eprinta imali?",
+                        "text": "Ewe, wonke umntu makakhathalele!\n\n Ukwenziwa koshicilelo lwemali karhulumente -- okanye ukonyusa unikezelo lweedola -- kukhokelela ekwenyukeni kwamaxabiso. \n\nUkunyuka kwamaxabiso kukukhula kwexabiso lempahla neenkonzo. Ngamanye amazwi, ixabiso lento kwixesha elizayo liya kuba libiza kakhulu kunanamhlanje. \n\nNgoko kuthetha ntoni ukunyuka kwamaxabiso kubemi? EUnited Kingdom, iPound Sterling ilahlekelwe yi-99.5% yexabiso layo ukusukela oko yaziswa kwiminyaka engama-300 eyadlulayo. \n\nEUnited States, idola ilahlekelwe yi-97% yexabiso layo ukususela ekupheleni kweWWI, malunga neminyaka eyi-100 edlulileyo. Oku kuthetha inyama yenyama eyayixabisa i-$0.30 ngo-1920... yayiyi-3 yeedola ngo-1990… kwaye malunga ne-15 yeedola namhlanje, ngonyaka ka-2020!",
+                        "title": "Ngubani omele akhathalele ukuba urhulumente angaprinta imali engenamkhawulo?"
+                    },
+                    "FiatLosesValueOverTime": {
+                        "answers": [
+                            "Yonke imali eyakha yabakho ilahlekelwe sisixa esikhulu sexabiso.",
+                            "Ixabiso lihlala linjalo ngonaphakade.",
+                            "Inkangeleko kunye ne-designer yephepha yebhili luhlaziywa rhoqo emva kweminyaka eyi-10 okanye njalo."
+                        ],
+                        "feedback": [
+                            "Kulungile. Oku kuyinyaniso nakwi-USD, elahlekelwe yi-97% yexabiso layo kwiminyaka eyi-100 esiyidlulileyo.",
+                            "Ayiyo. Nceda zame kwakhona.",
+                            "Akunjalo. Nangona i-designer yamaphepha eebhili zingatshintsha, oku akunanto yakwenza nexabiso labo."
+                        ],
+                        "question": "Kwenzeka ntoni kwixabiso layo yonke imali ye-fiat ukuhambeni kwexesha?",
+                        "text": "Kwimbali yehlabathi, kuye kwadalwa iimali ze-775 ze-fiat. Uninzi alusekho, kwaye ubomi obuqhelekileyo bayo nayiphi na imali ye-fiat yiminyaka engama-27 kuphela.\n\n IPonti yaseBritane yeyona mali indala yefiat. Ilahlekelwe ngaphezulu kwe-99% yexabiso layo ukusukela ngo-1694.\n\n Akukho mzekelo kuyo nayiphi na imali ye-fiat egcina ixabiso layo ngokuhamba kwexesha. Oku kukunyuka kwamaxabiso. Luhlobo olusebenzayo lobusela lwemali oyisebenze nzima!",
+                        "title": "Ngaba oku kuthetha ukuba yonke imali ye-fiat ilahlekelwa lixabiso ngokuhamba kwexesha?"
+                    },
+                    "OtherIssues": {
+                        "answers": [
+                            "Imali inzima ukuhamba kwihlabathi jikelele, kwaye inokujongwa.",
+                            "Imali ayisafuneki kwi 21st Century.",
+                            "Imali yingcambu yabo bonke ububi."
+                        ],
+                        "feedback": [
+                            "Kulungile. Siza kucacisa ngakumbi ngale miba kwiimodyuli zemibuzo elandelayo. Qhubeka ugrumba!!",
+                            "Impendulo engalunganga. Uyazi ukuba asiyonyani leyo.",
+                            "Ngelixa abanye benokukholelwa ukuba oku kunjalo, akuyompendulo esiyifunayo apha."
+                        ],
+                        "question": "Yeyiphi eminye imiba ekhoyo ngemali yefiat?",
+                        "text": "Ewe, mininzi eminye imiba ekhoyo ngemali yefiat yanamhlanje. Okokuqala, kunokuba nzima kakhulu ukuhambisa imali kwihlabathi jikelele. Rhoqo, oorhulumente baya kuyibekela imida intshukumo -- kwaye ngamanye amaxesha bade bathathe imali -- ngaphandle kwesizathu esibambekayo okanye ingcaciso. Kwaye nokuba unokuthumela imali, imirhumo ephezulu yentengiselwano iyenza ibize kakhulu. Okwesibini, nase-US, kubekho ilahleko epheleleyo yobungasese, njengoko uninzi lorhwebo luthatha indawo ngedebhithi namakhadi okuthenga ngetyala, kunye ne-intanethi nezinye iinkqubo ezifana nePayPal kunye neApple Pay. Ngaba ukhe wayiqaphela indlela intengiso ebonakala ngayo kwimidiya yakho yentlalo okanye iGmail kwimizuzwana nje emva kokukhangela imveliso okanye inkonzo ethile? Oku kwaziwa ngokuba yi-“surveillance capitalism”, kwaye isekwe kwiinkampani ezithengisa iinkcukacha zakho zemali.",
+                        "title": "Kulungile, imali ye-fiat ilahlekelwa yixabiso ngokuhamba kwexesha. Ngaba ikhona eminye imiba?"
+                    }
+                }
+            },
+            "BitcoinWhySpecial": {
+                "title": "I-Bitcoin: Kutheni ikhethekile?",
+                "questions": {
+                    "LimitedSupply": {
+                        "answers": [
+                            "Ewe. Akunakuze kubekho ngaphezu kwe-21 yezigidi ze-bitcoin ezenziweyo.",
+                            "Hayi. Urhulumente unokudala i-bitcoin engaphezulu nangaliphi na ixesha.",
+                            "Hayi, isoftware ye-bitcoin inokutshintshwa ukuvumela ukuba kwenziwe ii-bitcoins ezininzi."
+                        ],
+                        "feedback": [
+                            "Kulungile. Ngokunciphisa inani elinokwenziwa, i-Bitcoin yenzelwe ukwandisa ixabiso ngokuhamba kwexesha.",
+                            "Impendulo engalunganga. Urhulumente akanalo ulawulo kwi-Bitcoin.",
+                            "Ayilunganga. Enye yeempawu eziphambili ze-bitcoin kukuba unikezelo lulinganiselwe ngonaphakade."
+                        ],
+                        "question": "Ngaba unikezelo lwe-bitcoin lulinganiselwe ngonaphakade?",
+                        "text": "Oorhulumente banokuprinta imali ye-fiat ngobuninzi obungenamkhawulo. Ngokwahlukileyo, ukunikezelwa kweBitcoin kulungisiwe - kwaye akunakuze kudlule i-21 yezigidi zemali. Ubonelelo oluqhubekayo lwemali ye-fiat ludala ukunyuka kwamaxabiso. Oku kuthetha ukuba imali onayo namhlanje ayinaxabiso elincinci kwixesha elizayo. Umzekelo omnye olula: Ilofu yesonka eyayixabisa malunga neesenti ezisi-8 ngowe-1920. Ngonyaka we-1990 ilofu enye yayixabisa malunga nee-R1,00, yaye namhlanje ixabiso layo lisondele kwi-R2,50! Ukunikezelwa okulinganiselwe kwe-bitcoin kunempembelelo echaseneyo, enye ye-deflation. Oku kuthetha ukuba i-bitcoin oyibambe namhlanje yenzelwe ukuba yexabiso ngakumbi kwixesha elizayo - kuba inqabile.",
+                        "title": "Uphawu Olulodwa #1: Umda we - saplaya"
+                    },
+                    "Decentralized": {
+                        "answers": [
+                            "Hayi. Bitcoin \"decentralized\" ngokupheleleyo.",
+                            "Ewe. Ilawulwa ngumbindi weZizwe eziManyeneyo.",
+                            "Ewe. Ilawulwa embindini ziibhanki ezinkulu zehlabathi."
+                        ],
+                        "feedback": [
+                            "Ichanile loo nto. Akukho nkampani, urhulumente okanye iziko elilawula i-bitcoin. Nabani na unokusebenzisa i-bitcoin into efunekayo si-smartphone kunye noqhagamshelo lwe-intanethi.",
+                            "Ayompendulo ifanelekileyo. Nceda zama kwakhona.",
+                            "Ayilunganga. Sele uyazi ukuba oku akuyonyani!"
+                        ],
+                        "question": "Ngaba i-bitcoin iphakathi?",
+                        "text": "Imali yeFiat ilawulwa ziibhanki noorhulumente - yiyo loo nto abantu beyibiza njengemali \"ephakathi\". I-Bitcoin ayilawulwa nguye nawuphi na umntu, urhulumente okanye inkampani — nto leyo eyenza ukuba “inatyisiwe” Ukungabandakanyekanga kweebhanki kuthetha ukuba akukho mntu unokukwala ukuba ufikelele kwi-bitcoin - ngenxa yobuhlanga, isini, umvuzo, imbali yetyala, indawo yejografi - okanye nayiphi na enye into. Nabani na - naphi na emhlabeni - unokufikelela kwaye asebenzise iBitcoin nanini na ufuna. Ekuphela kwento oyifunayo yikhompyuter okanye i-smartphone, kunye noqhagamshelo lwe-intanethi!",
+                        "title": "Uphawu Olulodwa #2: Ukwabela amagunya"
+                    },
+                    "NoCounterfeitMoney": {
+                        "answers": [
+                            "Hayi. Akunakwenzeka ukwenza i-Bitcoin yomgunyathi.",
+                            "Ewe. Nangona ukwenza i-bitcoin yobuxoki kufuna iikhompyuter ezikhethekileyo.",
+                            "Ewe. Urhulumente unokuprinta i-bitcoin eninzi njengoko ethanda."
+                        ],
+                        "feedback": [
+                            "Leyo yimpendulo echanekileyo. Kwimibuzo elandelayo, uHoney Badger uya kucacisa iinkcukacha zokuba kutheni oku kunjalo!",
+                            "Ayilunganga. Akukho ndlela yokuba nabani na akhuphele okanye aphindaphinde ixabiso le-bitcoin.",
+                            "Ayilunganga. Nangona urhulumente enokushicilela iidola ezingenamkhawulo, akakwazi ukuprinta i-bitcoin."
+                        ],
+                        "question": "Ngaba abantu bangayenza iBitcoin yomgunyathi?",
+                        "text": "Imali yamaphepha, iitshekhi kunye nentengiselwano yekhadi lokuthenga ngetyala zonke zinokuba zezomgunyathi, okanye zomgunyathi. Isoftware ekhethekileyo eqhuba inethiwekhi yeBitcoin isusa ithuba lokuphinda imali ngeenjongo zomgunyathi. I-bitcoin entsha inokukhutshwa kuphela ukuba kukho isivumelwano phakathi kwabathathi-nxaxheba kwinethiwekhi. Abantu abasebenzisa isoftware ye-bitcoin ngokuzithandela kwiikhompyuter zabo kunye nee-smartphones. Oku kuqinisekisa ukuba akunakwenzeka ukwenza umgunyathi, okanye ukudala i-bitcoins yobuxoki.",
+                        "title": "Uphawu Olulodwa #3: Akukho Mali Yenkohliso"
+                    },
+                    "HighlyDivisible": {
+                        "answers": [
+                            "0.00000001 BTC",
+                            "I-bitcoin enye epheleleyo. Akunakwenzeka ukusebenzisa nantoni na encinci.",
+                            "0.01 BTC"
+                        ],
+                        "feedback": [
+                            "Ewe. Unokwahlula i-bitcoin kwiinqununu ze-100,000,000. Njengoko sele uyazi, iyunithi encinci ye-bitcoin - B0.00000001 - iyaziwa ngokuba \"iSeti”.",
+                            "Ayilunganga. I-Bitcoin yahlukana kakhulu. Ungasebenzisa ngokulula iqhezu elincinci le-bitcoin.",
+                            "Ayilunganga. Nangona eyona yunithi incinci yemali yase-US iyipeni enye, i-bitcoin yahlulahlula ngaphezu kwe-100x."
+                        ],
+                        "question": "Yeyiphi eyona mali incinci yeBitcoin umntu anokuba nayo, okanye ayisebenzise?",
+                        "text": "Imali yefiat yakudala inokuchithwa kuphela ngokwemali encinci njengepeni enye - okanye iindawo ezimbini zedesimali kwiDola enye yaseMelika ($0.01). Ngakolunye uhlangothi, i-Bitcoin inokwahlulwa ngamaxesha angama-100,000,000 ngaphezulu. Oku kuthetha ukuba ungachitha kancinci njenge ₿0.00000001. Uya kuqaphela uphawu \"₿\", olulingana neBitcoin \"$\". Ngamanye amaxesha uya kubona nokusetyenziswa kwe-BTC, endaweni ye-₿. Ngokwahlukileyo, i-Bitcoin inokuphatha iintlawulo ezincinci kakhulu - nezo zingaphantsi kwe penny yase-US!",
+                        "title": "Uphawu Olulodwa #4: Yahlukana kakhulu"
+                    },
+                    "securePartOne": {
+                        "answers": [
+                            "Ewe. Inethiwekhi ye-bitcoin ikhuselekile kakhulu.",
+                            "Ingayiyo. Kuxhomekeke kumhla weveki.",
+                            "Hayi. Yisoftware yomthombo ovulekileyo, kwaye ihlaselwa lula."
+                        ],
+                        "feedback": [
+                            "Kulungile. Enyanisweni, inethiwekhi ye-Bitcoin ayizange ifakwe. Phendula umbuzo olandelayo ukuze ufunde ngakumbi!",
+                            "Kuhle ukuzama, kodwa kuphosakele. Inethiwekhi ye-bitcoin ikhuselekile kwaye ikhuselekile - iiyure ze-24 ngosuku, iintsuku ze-365 ngonyaka.",
+                            "Ayilunganga. Nangona i-bitcoin ngenene iyisoftware \"evulekileyo\" - okanye ifumaneka kuluntu simahla - isakhuseleke kakhulu."
+                        ],
+                        "question": "Ngaba inethiwekhi yeBitcoin ikhuselekile?",
+                        "text": "Inethiwekhi ye-bitcoin ixabisa ngaphezulu kwe-100 yeebhiliyoni zeedola namhlanje. Ngokufanelekileyo, inethiwekhi kufuneka ikhuseleke kakhulu - ukuze imali ingaze ibiwe. I-Bitcoin yaziwa ngokuba yi-cryptocurrency yokuqala yehlabathi. Inxalenye ye \"crypto\" yegama ivela kwi-cryptography. Ngamafutshane, i-cryptography ikhusela ulwazi ngemisebenzi yezibalo enzima kakhulu. Uninzi lwabantu aluqondi - kodwa i-Bitcoin ngenene yeyona nethiwekhi yekhompyuter ikhuselekile emhlabeni! (usenokuba ukhe weva nge-bitcoin \"hacks\" - esiza kuyiphendula kwimibuzo elandelayo)",
+                        "title": "Uphawu Olulodwa #5: Khusela -- Icandelo I"
+                    },
+                    "securePartTwo": {
+                        "answers": [
+                            "Hayi. I-Bitcoin ayizange ikhutshwe.",
+                            "Ewe. I-Bitcoin iqhekezwa rhoqo.",
+                            "Ewe. I-Bitcoin ihlala iqhekezwa ngeeholide, xa iibhanki zemveli zivaliwe."
+                        ],
+                        "feedback": [
+                            "Liyinyani elo. Inethiwekhi ye-bitcoin ayizange ifakwe phantsi. Nangona kunjalo, kubalulekile ukusebenzisa kuphela izipaji zedijithali ezikhuselekileyo ukugcina iibitcoins zakho zobuqu zikhuselekile ngamaxesha onke.",
+                            "Ayivumi. Nceda uzame kwakhona",
+                            "Hayi sisidenge, uyazi ukuba ayiyompendulo ichanekileyo leyo."
+                        ],
+                        "question": "Ngaba i-Bitcoin yakha yaqhekezwa?",
+                        "text": "Ukuthe ngqo: inethiwekhi ye-bitcoin ngokwayo ayizange ikhutshwe. Zange nakanye. Ke yintoni kanye kanye eye yagqekezelwa? Izipaji ezithile zedijithali ezazingenalo ukhuseleko olufanelekileyo kwindawo. Kanye njenge-wallet ebonakalayo ibamba imali ye-fiat (ngendlela yamatyala ephepha), i-wallet yedijithali ibamba isixa se-bitcoin. Kwilizwe lenyama, izigebenga zikhuthuza iibhanki- kwaye zihambe neeDola zaseMelika. Into yokuba umntu aphange ibhanki ayinabo nabuphi na ubudlelwane bokuba iDola yaseMelika izinzile okanye iyimali ethembekileyo. Ngokufanayo, abanye abahlaseli bekhompyuter babile i-bitcoin kwizipaji zedijithali ezingakhuselekanga - i-intanethi ilingana nokuphangwa kwebhanki. Nangona kunjalo, kubalulekile ukwazi ukuba inethiwekhi ye-bitcoin ayizange igqekezwe okanye ifakwe esichengeni!",
+                        "title": "Uphawu Olulodwa #5: Khusela -- Icandelo II"
+                    }
+                }
+            }
+        },
+        "finishText": "Kuphelele apho okwangoku, siza kukwazisa xa kukho okuninzi okuza kutyhilwa",
+        "getRewardNow": "Phendula imibuzo",
+        "keepDigging": "Qhubeka ugrumba!",
+        "phoneNumberNeeded": "Inombolo yefowuni iyafuneka",
+        "quizComplete": "Imibuzo igqityiwe kwaye {formattedNumber | sats} elifunyenweyo",
+        "reviewQuiz": "Phonononga imibuzo",
+        "satAccumulated": "IiSats ziqokelelene",
+        "satsEarned": "{formattedNumber | sats} efunyenweyo",
+        "sectionsCompleted": "Ugqibile",
+        "title": "Zuza",
+        "unlockQuestion": "Ukuvula, phendula umbuzo:",
+        "youEarned": "Uzuzile",
+        "registerTitle": "Need to upgrade your account",
+        "registerContent": "Register with your phone number to receive sats"
+    },
+    "GetStartedScreen": {
+        "logInCreateAccount": "Log in / create account",
+        "exploreWalletInstead": "Explore wallet instead",
+        "headline": "Isipaji siqhutywa nguGaloy",
+        "startTrialAccount": "Start with a trial account",
+        "iUnderstand": "I understand, continue",
+        "startWithTrialAccount": "Start with trial account",
+        "registerPhoneAccount": "Register phone account",
+        "trialAccountCreationFailed": "Trial account creation failed",
+        "trialAccountCreationFailedMessage": "Unfortunately, we were unable to create your trial account. Try again later or create an account with a phone number.",
+        "trialAccountHasLimits": "Trial account has limits",
+        "trialAccountLimits": {
+            "noBackup": "No backup option",
+            "sendingLimit": "Reduced daily sending limit",
+            "noOnchain": "No receiving bitcoin onchain"
+        }
+    },
+    "MapScreen": {
+        "locationPermissionMessage": "Vula indawo yakho ukuze wazi ukuba uphi kwimephu",
+        "locationPermissionNegative": "Rhoxisa",
+        "locationPermissionNeutral": "Ndibuze Kamva",
+        "locationPermissionPositive": "KULUNGILE",
+        "locationPermissionTitle": "Zijonge kwimephu",
+        "payBusiness": "hlawula eli shishini",
+        "title": "Imephu"
+    },
+    "HomeScreen": {
+        "receive": "Yamkela",
+        "send": "Thumela",
+        "title": "Ekhaya",
+        "scan": "Scan",
+        "updateAvailable": "Uhlaziyo luyafumaneka. Cofa ukuhlaziya ngoku",
+        "useLightning": "Sisebenzisa inethiwekhi yombane.",
+        "myAccounts": "My Accounts"
+    },
+    "PinScreen": {
+        "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
+        "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
+        "setPin": "Seta ikhowudi yakho ye-PIN",
+        "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
+        "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
+        "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo. Ukuloga ngaphandle.",
+        "verifyPin": "Qinisekisa ikhowudi yakho ye-PIN"
+    },
+    "PriceHistoryScreen": {
+        "oneDay": "1D",
+        "oneMonth": "1M",
+        "oneWeek": "1W",
+        "oneYear": "1Y",
+        "fiveYears": "5Y",
+        "satPrice": "Ixabiso le-100,000 sats:",
+        "last24Hours": "iiyure ezingama-24 ezidlulileyo",
+        "lastWeek": "kwiveki ephelile",
+        "lastMonth": "kwinyanga ephelile",
+        "lastYear": "kunyaka ophelile",
+        "lastFiveYears": "iminyaka emihlanu edlulileyo"
+    },
+    "PrimaryScreen": {
+        "title": "Ekhaya"
+    },
+    "ReceiveScreen": {
+        "activateNotifications": "Ngaba uyafuna ukwenza izaziso zisebenze xa intlawulo ifikile?",
+        "copyClipboard": "I-invoyisi ikhutshelwe kwibhodi eqhotyoshwayo",
+        "copyClipboardBitcoin": "Idilesi yeBitcoin ikhutshelwe kwibhodi eqhotyoshwayo",
+        "invoicePaid": "Le invoyisi ihlawulwe",
+        "setNote": "seta inqaku",
+        "tapQrCodeCopy": "Cofa iKhowudi yeQR ukukopa",
+        "title": "Fumana i-Bitcoin",
+        "usdTitle": "Fumana iUSD",
+        "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
+        "copyInvoice": "Khuphela i-invoyisi",
+        "shareInvoice": "Yabelana nge-invoyisi",
+        "addAmount": "Cela Isixa esithile",
+        "expired": "I-invoyisi iphelelwe lixesha",
+        "expiresIn": "Iphelelwa",
+        "updateInvoice": "Hlaziya i-invoyisi",
+        "flexibleAmountInvoice": "I-invoyisi yeMali eguquguqukayo",
+        "copyAddress": "Kopa Idilesi",
+        "shareAddress": "Yabelana Ngedilesi",
+        "generatingInvoice": "Ukuvelisa i-invoyisi",
+        "regenerateInvoice": "Hlaziya i-invoyisi",
+        "useABitcoinOnchainAddress": "Sebenzisa idilesi ye-Bitcoin onchain",
+        "useALightningInvoice": "Sebenzisa i-invoyisi yoMbane",
+        "setANote": "Seta Inqaku",
+        "invoiceAmount": "Isixa se-invoyisi",
+        "fees": "{minBankFee: string} sats fees for onchain payment below {minBankFeeThreshold: string} sats"
+    },
+    "RedeemBitcoinScreen": {
+        "title": "Sebenzisa i-Bitcoin",
+        "usdTitle": "Sebenzisa ngeUSD",
+        "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
+        "redeemingError": "Ayiphumelelanga ukusebenzisa iBitcoin. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
+        "submissionError": "Ayiphumelelanga ukungenisa isicelo sokurhoxisa. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
+        "minMaxRange": "Ubuncinci: {minimumAmount: umtya}, Ubuninzi: {maximumAmount: umtya}",
+        "redeemBitcoin": "Sebenzisa i-Bitcoin",
+        "amountToRedeemFrom": "Imali oza kuyifumana kwi {domain: string}",
+        "redeemAmountFrom": "Redeem {amountToRedeem: string} from {domain: string}"
+    },
+    "ScanningQRCodeScreen": {
+        "invalidContent": "Sifumene: {ifunyenwe: umtya} Le ayisiyiyo idilesi yeBitcoin esebenzayo okanye i-invoyisi yoMbane",
+        "expiredContent": "Sifumene: {ifunyenwe: umtya} Le invoyisi iphelelwe lixesha",
+        "invalidTitle": "Ikhowudi yeQR engasebenziyo",
+        "noQrCode": "Asikwazanga ukufumana ikhowudi ye-QR emfanekisweni",
+        "title": "Skena i-QR",
+        "invalidContentLnurl": "Sifumene: {ifunyenwe: umtya} ayixhaswa okwangoku"
+    },
+    "SecurityScreen": {
+        "biometricDescription": "Vula ngomnwe okanye ukuqaphela ubuso.",
+        "biometricTitle": "Ibhayometriki",
+        "biometryNotAvailable": "Isensor yebhayometriki ayifumaneki.",
+        "biometryNotEnrolled": "Nceda ubhalise isensor sebhayometriki ukuze usebenzise uqinisekiso lwebhayometriki esekwe.",
+        "hideBalanceDescription": "Ifihla ibhalansi yakho kwiscreen sasekhaya ngokuzenzekelayo, ukuze ungayivezi nakubani na ojonga isikrini sakho.",
+        "hideBalanceTitle": "Hide Balance",
+        "pinDescription": "I-PIN isetyenziswa njengendlela yokuqinisekisa yogcino lwebhayometriki.",
+        "pinTitle": "PIN Code",
+        "setPin": "Faka iPin"
+    },
+    "SendBitcoinConfirmationScreen": {
+        "amountLabel": "Isixa",
+        "confirmPayment": "Qinisekisa intlawulo",
+        "confirmPaymentQuestion": "Ngaba uyafuna ukuqinisekisa le ntlawulo?",
+        "destinationLabel": "ukuya:",
+        "feeLabel": "Umrhumo",
+        "memoLabel": "Phawula:",
+        "paymentFinal": "Iintlawulo zokugqibela.",
+        "stalePrice": "Ixabiso lakho le-bitcoin lidala kwaye ligqibele ukuhlaziywa {timePeriod: string} eyadlulayo. Nceda uqalise kwakhona i-app phambi kokuba wenze intlawulo.",
+        "title": "Qinisekisa intlawulo",
+        "totalLabel": "Iyonke",
+        "totalExceed": "Iyonke igqithile kwibhalansi yakho {balance: string}",
+        "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
+        "feeError": "Ayiphumelelanga ukubala umrhumo"
+    },
+    "SendBitcoinDestinationScreen": {
+        "usernameNowAddress": "bankName:} amagama abasebenzisi ngoku {bankName: string} iidilesi.",
+        "usernameNowAddressInfo": "Xa ungenisa i- {bankName: string} igama lomsebenzisi, siyakongeza \"{lnDomain: string}\" kuyo (umzekelo maria {lnDomain: string}) ukuyenza idilesi. Igama lakho lomsebenzisi ngoku yi- {bankName: string} idilesi nayo. Yiya kwi {bankName: string} iphepha ledilesi ukusuka kwiSetingi zakho ukuze ufunde indlela yokuyisebenzisa okanye ukwabelana ngayo ukuze ufumane iintlawulo.",
+        "enterValidDestination": "Nceda ngenisa indawo esebenzayo",
+        "destinationOptions": "Ungathumela kwi {bankName: umtya} idilesi, idilesi ye-LN, i-invoyisi ye-LN, okanye idilesi ye-BTC.",
+        "expiredInvoice": "Le invoyisi iphelelwe lixesha. Nceda wenze i-invoyisi entsha",
+        "wrongNetwork": "Le invoyisi yeyenethiwekhi eyahlukileyo. Nceda wenze i-invoyisi entsha",
+        "invalidAmount": "Oku kuqulethe isixa esingasebenziyo. Nceda wenze ngokutsha ngexabiso elisebenzayo.",
+        "usernameDoesNotExist": " {lnAddress: string} ayibonakali ngathi yi {bankName: string} idilesi ekhoyo.",
+        "usernameDoesNotExistAdvice": "Qiniseka ukuba upelo luchanekile okanye ucele umamkeli nge-invoyisi ye-LN okanye idilesi ye-BTC endaweni yoko.",
+        "selfPaymentError": "{lnAddress: string} yeyakho {bankName: string} idilesi.",
+        "selfPaymentAdvice": "Ukuba ufuna ukuthumela imali kwenye iakhawunti yakho, ungasebenzisa i-invoyisi, i-LN okanye idilesi ye-BTC endaweni yoko.",
+        "lnAddressError": "Asikwazi ukufikelela kule dilesi yoMbane. Ukuba uqinisekile ukuba ikhona, ungazama kwakhona kamva.",
+        "lnAddressAdvice": "Qiniseka ukuba upelo luchanekile okanye cela umamkeli nge-invoyisi okanye idilesi ye-BTC endaweni yoko.",
+        "unknownLightning": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",
+        "unknownOnchain": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",
+        "newBankAddressUsername": "{Address: string} ikhona njenge {bankName: string} idilesi, kodwa zange wayithumela imali kuyo.",
+        "confirmModal": {
+            "title": "You've never sent money to this address",
+            "body1": "Nceda uqinisekise ukuba umamkeli ukunika idilesi ye {bankName: string},",
+            "bold2bold": "Hayi igama lomsebenzisi elisuka kwesinye isipaji.",
+            "body3": "Kungenjalo, imali iya kwi {bankName: string} Iakhawunti enedilesi \"{lnAddress: string}\". Jonga upelo lwenxalenye yokuqala yedilesi ngokunjalo. umz. ijackie kunye ne-jack1e ziidilesi ezi-2 ezahlukeneyo",
+            "warning": "Ukuba idilesi ye- {bankName: string} ayifakwanga ngokungachanekanga, {bankName: string} ayikwazi ukurhoxisa intengiselwano.",
+            "checkBox": "{Idilesi: string} yidilesi elungileyo.",
+            "confirmButton": "Ndiqinisekile ngo-100%."
+        },
+        "clipboardError": "Impazamo ekufumaneni ixabiso kwibhodi eqhotyoshwayo"
+    },
+    "SendBitcoinScreen": {
+        "amount": "Isixa",
+        "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
+        "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+        "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
+        "amountIsRequired": "Imali iyafuneka",
+        "cost": "Iindleko",
+        "destination": "Indawo ekuyiwa kuyo",
+        "destinationIsRequired": "Indawo yokufikela iyafuneka",
+        "fee": "Intlawulo yenethiwekhi",
+        "feeCalculationUnsuccessful": "Ubalo aluphumelelanga ⚠️",
+        "input": "Igama lomsebenzisi, i-invoyisi, okanye idilesi",
+        "invalidUsername": "Igama lomsebenzisi elingasebenziyo",
+        "noAmount": "Le invoyisi ayinasixa, ngoko ke kufuneka uchaze ngesandla ukuba yimalini na ofuna ukuyithumela",
+        "notConfirmed": "Intlawulo ithunyelwe kodwa ayikaqinisekiswa okwangoku Ungajonga ubume yentlawulo kwiiNtengiselwano",
+        "note": "Qaphela",
+        "success": "Intlawulo ithunyelwe ngempumelelo",
+        "max": "Max",
+        "maxAmount": "Max Amount",
+        "title": "Thumela iBitcoin",
+        "failedToFetchLnurlInvoice": "Ayiphumelelanga ukulanda i-invoyisi ye-lnurl",
+        "lnurlInvoiceIncorrectAmount": "Iseva ye-lnurl iphendule nge-invoyisi ngexabiso elingachanekanga.",
+        "lnurlInvoiceIncorrectDescription": "Iseva ye-lnurl iphendule nge-invoyisi enenkcazo engachanekanga i-hash."
+    },
+    "SettingsScreen": {
+        "activated": "Yenziwe yasebenza",
+        "tapLogIn": "Cofa ukwazi ukungena",
+        "addressScreen": "Iindlela zokuhlawulwa",
+        "tapUserName": "Cofa ukuseta igama lomsebenzisi",
+        "title": "Iisetingi",
+        "darkMode": "Isimo Esimnyama",
+        "setToDark": "Isimo: Esimnyama.",
+        "setToLight": "Isimo: Esikhanyayo",
+        "darkDefault": "Isimo: kumnyama, (Okuhlala kukho).",
+        "lightDefault": "Isimo: ukukhanya, (Okuhlala kukho).",
+        "csvTransactionsError": "Ayikwazanga ukuthumela ngaphandle intengiselwano kwi-csv. Into ayihamba kakuhle. Ukuba umcimbi uyaqhubeka ufuna uncedo olupheleleyo.",
+        "lnurlNoUsername": "Ukwenza idilesi ye-lnurl kufuneka uqale usete igama lomsebenzisi. Ngaba ufuna ukuseta igama lokusebenzisa ngoku?",
+        "copyClipboardLnurl": "Idilesi ye-Lnurl ikotshwe kwiKlipbhodi.",
+        "defaultWallet": "Iakhawunti ehlala ikho",
+        "rateUs": "Isilinganisele kwi- {storeName.: string}",
+        "theme": "Theme",
+        "nfc": "Receive from NFC",
+        "nfcError": "Error reading NFC tag. Please try again.",
+        "nfcNotCompatible": "The information fetch from the card is not a compatible lnurl-withdraw link.",
+        "nfcOnlyReceive": "Only receive from NFC is available for now",
+        "nfcScanNow": "Scan NFC Now",
+        "nfcNotSupported": "NFC is not supported on this device"
+    },
+    "AccountScreen": {
+        "accountLevel": "Account Level",
+        "logIn": "Log in",
+        "upgrade": "Upgrade your account",
+        "logOutAndDeleteLocalData": "Log out and clear all local data",
+        "IUnderstand": "I understand. Please log me out.",
+        "logoutAlertTitle": "Are you sure you want to log out and delete all local data?",
+        "logoutAlertContent": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure to have access to it to log back in",
+        "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+        "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
+        "secureYourAccount": "Register to secure your account"
+    },
+    "DefaultWalletScreen": {
+        "title": "Iakhawunti ehlala ikho",
+        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+    },
+    "ThemeScreen": {
+        "title": "Theme",
+        "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
+        "system": "Use System setting",
+        "light": "Use Light Mode",
+        "dark": "Use Dark Mode"
+    },
+    "Languages": {
+        "DEFAULT": "Okuhlala kukho (OS)"
+    },
+    "StablesatsModal": {
+        "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
+        "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
+        "termsAndConditions": "Funda iMigaqo neMiqathango.",
+        "learnMore": "Funda ngakumbi malunga neStablesats"
+    },
+    "SplashScreen": {
+        "update": "Usetyenziso lwakho luphelelwe lixesha. Uhlaziyo luyafuneka phambi kokuba i-app isetyenziswe. Oku kunokwenziwa kwi-PlayStore ye-Android kunye ne-Testflight ye-iOS"
+    },
+    "TransactionDetailScreen": {
+        "paid": "Ihlawulwe ukuya/ukusuka",
+        "received": "Ufumene",
+        "spent": "Uchithe",
+        "receivingAccount": "Ukufumana iAkhawunti",
+        "sendingAccount": "Ukuthumela iAkhawunti",
+        "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment."
+    },
+    "TransactionLimitsScreen": {
+        "receive": "Yamkela",
+        "withdraw": "Rhoxisa",
+        "perDay": "ngosuku",
+        "perWeek": "Ngeveki",
+        "unlimited": "Engenasiphelo",
+        "remaining": "Ekuseleyo",
+        "stablesatTransfers": "iStablesat transifer -Dluliselo",
+        "internalSend": "Thumela ku {bankName: string} Umsebenzisi",
+        "error": "Ayikwazanga kulanda imida ngeli xesha",
+        "contactUsMessageBody": "Molo, ndingathanda ukonyusa ilimit  yeakhawunti yam {bankName: string}.",
+        "contactUsMessageSubject": "Isicelo Sokunyusa ilimit yeNtengiselwano",
+        "contactSupportToPerformKyc": "Contact support to perform manual KYC to increase your limit",
+        "increaseLimits": "Increase your limits"
+    },
+    "TransactionScreen": {
+        "noTransaction": "Akho tshintshelwano lubonakalayo",
+        "title": "Iintengiselwano/ utshintshwelano",
+        "recentTransactions": "Iintengiselwano zakutsha nje",
+        "transactionHistoryTitle": "Imbali yentengiselwano"
+    },
+    "TransferScreen": {
+        "title": "Udluliselo",
+        "percentageToConvert": "% ukuguqula"
+    },
+    "UpgradeAccountModal": {
+        "title": "Upgrade your account",
+        "backUpFunds": "Back up your funds",
+        "higherLimits": "Increase your transaction limits",
+        "receiveOnchain": "Receive bitcoin onchain",
+        "onlyAPhoneNumber": "Quick and easy phone number verification",
+        "letsGo": "Let's go!",
+        "stayInTrialMode": "Stay in trial mode"
+    },
+    "SetAddressModal": {
+        "title": "Set {bankName: string} address",
+        "Errors": {
+            "tooShort": "Address must be at least 3 characters long",
+            "tooLong": "Address must be at most 50 characters long",
+            "invalidCharacter": "Address can only contain letters, numbers, and underscores",
+            "addressUnavailable": "Sorry, this address is already taken",
+            "unknownError": "An unknown error occurred, please try again later"
+        },
+        "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
+        "itCannotBeChanged": "It can't be changed later."
+    },
+    "WelcomeFirstScreen": {
+        "bank": "Bitcoin is designed to let you store, send and receive money, without relying on a bank or credit card.",
+        "before": "Before Bitcoin, people had to rely on banks or credit card providers, to spend, send and receive money.",
+        "care": "Why should I care?",
+        "learn": "I don't mean to badger you, but there's lot more to learn, dig in...",
+        "learnToEarn": "Learn to Earn"
+    },
+    "PhoneLoginInitiateScreen": {
+        "title": "Account set up",
+        "header": "Enter your phone number, and we'll text you an access code.",
+        "headerVerify": "Verify you are human",
+        "errorRequestingCaptcha": "Something went wrong verifying you are human, please try again later.",
+        "errorRequestingCode": "Something went wrong requesting the phone code, please try again later.",
+        "errorInvalidPhoneNumber": "Invalid phone number. Are you sure you entered the right number?",
+        "errorUnsupportedCountry": "We are unable to support customers in your country.",
+        "placeholder": "Phone Number",
+        "verify": "Click to Verify",
+        "sms": "Send via SMS",
+        "whatsapp": "Send via WhatsApp"
+    },
+    "PhoneLoginValidationScreen": {
+        "errorLoggingIn": "Error logging in. Did you use the right code?",
+        "errorTooManyAttempts": "Too many attempts. Please try again later.",
+        "errorCannotUpgradeToExistingAccount": "This phone account already exists. Please log out of your trial account and then log in with your phone number.",
+        "header": "To confirm your phone number, enter the code we just sent you by {channel: string} on {phoneNumber: string}",
+        "placeholder": "6 Digit Code",
+        "sendAgain": "Send Again",
+        "tryAgain": "Try Again",
+        "sendViaOtherChannel": "You selected to receive the code via {channel: string}. You can try receiving via {other: string} instead"
+    },
+    "common": {
+        "account": "Account",
+        "transactionLimits": "Transaction Limits",
+        "activateWallet": "Activate Wallet",
+        "amountRequired": "Imali iyafuneka",
+        "back": "Back",
+        "backHome": "Back home",
+        "bank": "Bank",
+        "bankAccount": "Cash Account",
+        "bankAdvice": "{bankName: string} Advice",
+        "bankInfo": "{bankName: string} Info",
+        "beta": "beta",
+        "bitcoin": "Bitcoin",
+        "bitcoinPrice": "Bitcoin Price",
+        "btcAccount": "BTC Account",
+        "cancel": "Rhoxisa",
+        "close": "Close",
+        "confirm": "Confirm",
+        "convert": "Guqula",
+        "currency": "Currency",
+        "currencySyncIssue": "Currency issue. Refresh needed",
+        "csvExport": "Export transactions as CSV",
+        "date": "Date",
+        "description": "Description",
+        "domain": "Domain",
+        "email": "Email",
+        "error": "Error",
+        "fatal": "Fatal",
+        "fee": "fee",
+        "Fee": "Umrhumo",
+        "fees": "Fees",
+        "firstName": "First Name",
+        "from": "From",
+        "hour": "hour",
+        "hours": "hours",
+        "invoice": "Invoice",
+        "language": "Language",
+        "languagePreference": "Language preference",
+        "lastName": "Last Name",
+        "later": "Later",
+        "loggedOut": "You have been logged out.",
+        "logout": "Log Out",
+        "minutes": "minutes",
+        "needWallet": "Log in or create an account to access your wallet",
+        "next": "Next",
+        "No": "No",
+        "note": "Note",
+        "notification": "Notification",
+        "ok": "KULUNGILE",
+        "openWallet": "Open Wallet",
+        "phoneNumber": "Phone Number",
+        "rate": "Rate",
+        "reauth": "Your session has expired. Please log in again.",
+        "restart": "Restart",
+        "sats": "sats",
+        "search": "Search",
+        "security": "Security",
+        "send": "Thumela",
+        "setAnAmount": "set an amount",
+        "share": "Share",
+        "shareBitcoin": "Share Bitcoin Address",
+        "shareLightning": "Share Lightning Invoice",
+        "soon": "Coming soon!",
+        "success": "Success!",
+        "to": "To",
+        "total": "Total",
+        "transactions": "Iintengiselwano/ utshintshwelano",
+        "transactionsError": "Error loading transactions",
+        "tryAgain": "Try Again",
+        "type": "Type",
+        "usdAccount": "USD Account",
+        "username": "Username",
+        "usernameRequired": "Username is required",
+        "backupAccount": "Backup/upgrade account",
+        "viewTransaction": "View transaction",
+        "yes": "Yes",
+        "pending": "pending",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisMonth": "This month",
+        "prevMonths": "Previous months",
+        "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
+        "warning": "Warning"
+    },
+    "errors": {
+        "generic": "There was an error.\nPlease try again later.",
+        "invalidEmail": "Invalid email",
+        "invalidPhoneNumber": "is not a valid phone number",
+        "tooManyRequestsPhoneCode": "Too many requests. Please wait before requesting another text message.",
+        "network": {
+            "server": "Server Error. Please try again later",
+            "request": "Request issue.\nContact support if the problem persists",
+            "connection": "Connection issue.\nVerify your internet connection"
+        },
+        "unexpectedError": "Unexpected error occurred",
+        "restartApp": "Please restart the application.",
+        "problemPersists": "If problem persists contact support.",
+        "fatalError": "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
+        "showError": "Show Error",
+        "clearAppData": "Clear App Data and Logout"
+    },
+    "notifications": {
+        "payment": {
+            "body": "You just received {value: string} sats",
+            "title": "Payment received"
+        }
+    },
+    "support": {
+        "contactUs": "Need help? Contact us.",
+        "joinTheCommunity": "Join the community",
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "statusPage": "Status Page",
+        "telegram": "Telegram",
+        "mattermost": "Mattermost",
+        "defaultEmailSubject": "{bankName: string} - Support",
+        "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
+        "emailCopied": "email {email: string} copied to clipboard",
+        "deleteAccount": "Delete account",
+        "delete": "delete",
+        "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+        "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
+        "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
+        "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
+        "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
+        "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+        "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
+        "bye": "Bye!"
+    },
+    "lnurl": {
+        "overLimit": "You can't send more than max amount",
+        "underLimit": "You can't send less than min amount",
+        "commentRequired": "Comment required",
+        "viewPrintable": "View Printable Version"
+    },
+    "DisplayCurrencyScreen": {
+        "errorLoading": "Error loading list of currencies"
+    },
+    "AmountInputScreen": {
+        "enterAmount": "Enter Amount",
+        "setAmount": "Set Amount",
+        "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+        "minAmountNotMet": "Amount must be at least {minAmount: string}."
+    },
+    "AmountInputButton": {
+        "tapToSetAmount": "Tap to set amount"
+    },
+    "AppUpdate": {
+        "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
+        "versionNotSupported": "This mobile version is no longer supported",
+        "updateMandatory": "Update is mandatory",
+        "tapHereUpdate": "Tap here to update now",
+        "contactSupport": "Contact Support"
     }
-  },
-  "MapScreen": {
-    "locationPermissionMessage": "Vula indawo yakho ukuze wazi ukuba uphi kwimephu",
-    "locationPermissionNegative": "Rhoxisa",
-    "locationPermissionNeutral": "Ndibuze Kamva",
-    "locationPermissionPositive": "KULUNGILE",
-    "locationPermissionTitle": "Zijonge kwimephu",
-    "payBusiness": "hlawula eli shishini",
-    "title": "Imephu"
-  },
-  "HomeScreen": {
-    "receive": "Yamkela",
-    "send": "Thumela",
-    "title": "Ekhaya",
-    "scan": "Scan",
-    "updateAvailable": "Uhlaziyo luyafumaneka. Cofa ukuhlaziya ngoku",
-    "useLightning": "Sisebenzisa inethiwekhi yombane.",
-    "myAccounts": "My Accounts"
-  },
-  "PinScreen": {
-    "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
-    "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
-    "setPin": "Seta ikhowudi yakho ye-PIN",
-    "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
-    "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
-    "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo. Ukuloga ngaphandle.",
-    "verifyPin": "Qinisekisa ikhowudi yakho ye-PIN"
-  },
-  "PriceHistoryScreen": {
-    "oneDay": "1D",
-    "oneMonth": "1M",
-    "oneWeek": "1W",
-    "oneYear": "1Y",
-    "fiveYears": "5Y",
-    "satPrice": "Ixabiso le-100,000 sats:",
-    "last24Hours": "iiyure ezingama-24 ezidlulileyo",
-    "lastWeek": "kwiveki ephelile",
-    "lastMonth": "kwinyanga ephelile",
-    "lastYear": "kunyaka ophelile",
-    "lastFiveYears": "iminyaka emihlanu edlulileyo"
-  },
-  "PrimaryScreen": {
-    "title": "Ekhaya"
-  },
-  "ReceiveScreen": {
-    "activateNotifications": "Ngaba uyafuna ukwenza izaziso zisebenze xa intlawulo ifikile?",
-    "copyClipboard": "I-invoyisi ikhutshelwe kwibhodi eqhotyoshwayo",
-    "copyClipboardBitcoin": "Idilesi yeBitcoin ikhutshelwe kwibhodi eqhotyoshwayo",
-    "invoicePaid": "Le invoyisi ihlawulwe",
-    "setNote": "seta inqaku",
-    "tapQrCodeCopy": "Cofa iKhowudi yeQR ukukopa",
-    "title": "Fumana i-Bitcoin",
-    "usdTitle": "Fumana iUSD",
-    "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
-    "copyInvoice": "Khuphela i-invoyisi",
-    "shareInvoice": "Yabelana nge-invoyisi",
-    "addAmount": "Cela Isixa esithile",
-    "expired": "I-invoyisi iphelelwe lixesha",
-    "expiresIn": "Iphelelwa",
-    "updateInvoice": "Hlaziya i-invoyisi",
-    "flexibleAmountInvoice": "I-invoyisi yeMali eguquguqukayo",
-    "copyAddress": "Kopa Idilesi",
-    "shareAddress": "Yabelana Ngedilesi",
-    "generatingInvoice": "Ukuvelisa i-invoyisi",
-    "regenerateInvoice": "Hlaziya i-invoyisi",
-    "useABitcoinOnchainAddress": "Sebenzisa idilesi ye-Bitcoin onchain",
-    "useALightningInvoice": "Sebenzisa i-invoyisi yoMbane",
-    "setANote": "Seta Inqaku",
-    "invoiceAmount": "Isixa se-invoyisi",
-    "fees": "{minBankFee: string} sats fees for onchain payment below {minBankFeeThreshold: string} sats"
-  },
-  "RedeemBitcoinScreen": {
-    "title": "Sebenzisa i-Bitcoin",
-    "usdTitle": "Sebenzisa ngeUSD",
-    "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
-    "redeemingError": "Ayiphumelelanga ukusebenzisa iBitcoin. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
-    "submissionError": "Ayiphumelelanga ukungenisa isicelo sokurhoxisa. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
-    "minMaxRange": "Ubuncinci: {minimumAmount: umtya}, Ubuninzi: {maximumAmount: umtya}",
-    "redeemBitcoin": "Sebenzisa i-Bitcoin",
-    "amountToRedeemFrom": "Imali oza kuyifumana kwi {domain: string}",
-    "redeemAmountFrom": "Redeem {amountToRedeem: string} from {domain: string}"
-  },
-  "ScanningQRCodeScreen": {
-    "invalidContent": "Sifumene: {ifunyenwe: umtya} Le ayisiyiyo idilesi yeBitcoin esebenzayo okanye i-invoyisi yoMbane",
-    "expiredContent": "Sifumene: {ifunyenwe: umtya} Le invoyisi iphelelwe lixesha",
-    "invalidTitle": "Ikhowudi yeQR engasebenziyo",
-    "noQrCode": "Asikwazanga ukufumana ikhowudi ye-QR emfanekisweni",
-    "title": "Skena i-QR",
-    "invalidContentLnurl": "Sifumene: {ifunyenwe: umtya} ayixhaswa okwangoku"
-  },
-  "SecurityScreen": {
-    "biometricDescription": "Vula ngomnwe okanye ukuqaphela ubuso.",
-    "biometricTitle": "Ibhayometriki",
-    "biometryNotAvailable": "Isensor yebhayometriki ayifumaneki.",
-    "biometryNotEnrolled": "Nceda ubhalise isensor sebhayometriki ukuze usebenzise uqinisekiso lwebhayometriki esekwe.",
-    "hideBalanceDescription": "Ifihla ibhalansi yakho kwiscreen sasekhaya ngokuzenzekelayo, ukuze ungayivezi nakubani na ojonga isikrini sakho.",
-    "hideBalanceTitle": "Hide Balance",
-    "pinDescription": "I-PIN isetyenziswa njengendlela yokuqinisekisa yogcino lwebhayometriki.",
-    "pinTitle": "PIN Code",
-    "setPin": "Faka iPin"
-  },
-  "SendBitcoinConfirmationScreen": {
-    "amountLabel": "Isixa",
-    "confirmPayment": "Qinisekisa intlawulo",
-    "confirmPaymentQuestion": "Ngaba uyafuna ukuqinisekisa le ntlawulo?",
-    "destinationLabel": "ukuya:",
-    "feeLabel": "Umrhumo",
-    "memoLabel": "Phawula:",
-    "paymentFinal": "Iintlawulo zokugqibela.",
-    "stalePrice": "Ixabiso lakho le-bitcoin lidala kwaye ligqibele ukuhlaziywa {timePeriod} eyadlulayo. Nceda uqalise kwakhona i-app phambi kokuba wenze intlawulo.",
-    "title": "Qinisekisa intlawulo",
-    "totalLabel": "Iyonke",
-    "totalExceed": "Iyonke igqithile kwibhalansi yakho {balance: }",
-    "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
-    "feeError": "Ayiphumelelanga ukubala umrhumo"
-  },
-  "SendBitcoinDestinationScreen": {
-    "usernameNowAddress": "bankName:} amagama abasebenzisi ngoku {bankName: string} iidilesi.",
-    "usernameNowAddressInfo": "Xa ungenisa i- {bankName: string} igama lomsebenzisi, siyakongeza \"{lnDomain: string}\" kuyo (umzekelo maria {lnDomain: string}) ukuyenza idilesi. Igama lakho lomsebenzisi ngoku yi- {bankName: string} idilesi nayo. Yiya kwi {bankName: string} iphepha ledilesi ukusuka kwiSetingi zakho ukuze ufunde indlela yokuyisebenzisa okanye ukwabelana ngayo ukuze ufumane iintlawulo.",
-    "enterValidDestination": "Nceda ngenisa indawo esebenzayo",
-    "destinationOptions": "Ungathumela kwi {bankName: umtya} idilesi, idilesi ye-LN, i-invoyisi ye-LN, okanye idilesi ye-BTC.",
-    "expiredInvoice": "Le invoyisi iphelelwe lixesha. Nceda wenze i-invoyisi entsha",
-    "wrongNetwork": "Le invoyisi yeyenethiwekhi eyahlukileyo. Nceda wenze i-invoyisi entsha",
-    "invalidAmount": "Oku kuqulethe isixa esingasebenziyo. Nceda wenze ngokutsha ngexabiso elisebenzayo.",
-    "usernameDoesNotExist": " {lnIdilesi: } ayibonakali ngathi yi {bankName: } idilesi ekhoyo.",
-    "usernameDoesNotExistAdvice": "Qiniseka ukuba upelo luchanekile okanye ucele umamkeli nge-invoyisi ye-LN okanye idilesi ye-BTC endaweni yoko.",
-    "selfPaymentError": "{Idilesi: } yeyakho {bankName: } idilesi.",
-    "selfPaymentAdvice": "Ukuba ufuna ukuthumela imali kwenye iakhawunti yakho, ungasebenzisa i-invoyisi, i-LN okanye idilesi ye-BTC endaweni yoko.",
-    "lnAddressError": "Asikwazi ukufikelela kule dilesi yoMbane. Ukuba uqinisekile ukuba ikhona, ungazama kwakhona kamva.",
-    "lnAddressAdvice": "Qiniseka ukuba upelo luchanekile okanye cela umamkeli nge-invoyisi okanye idilesi ye-BTC endaweni yoko.",
-    "unknownLightning": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",
-    "unknownOnchain": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",
-    "newBankAddressUsername": "{Address: } ikhona njenge {bankName:} idilesi, kodwa zange wayithumela imali kuyo.",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "Nceda uqinisekise ukuba umamkeli ukunika idilesi ye {bankName: },",
-      "bold2bold": "Hayi igama lomsebenzisi elisuka kwesinye isipaji.",
-      "body3": "Kungenjalo, imali iya kwi {bankName: } Iakhawunti enedilesi \"{lnAddress: }\". Jonga upelo lwenxalenye yokuqala yedilesi ngokunjalo. umz. ijackie kunye ne-jack1e ziidilesi ezi-2 ezahlukeneyo",
-      "warning": "Ukuba idilesi ye- {bankName: } ayifakwanga ngokungachanekanga, {bankName: } ayikwazi ukurhoxisa intengiselwano.",
-      "checkBox": "{Idilesi: } yidilesi elungileyo.",
-      "confirmButton": "Ndiqinisekile ngo-100%."
-    },
-    "clipboardError": "Impazamo ekufumaneni ixabiso kwibhodi eqhotyoshwayo"
-  },
-  "SendBitcoinScreen": {
-    "amount": "Isixa",
-    "amountExceed": "Imali idlula ibhalansi yakho {balance:}",
-    "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
-    "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
-    "amountIsRequired": "Imali iyafuneka",
-    "cost": "Iindleko",
-    "destination": "Indawo ekuyiwa kuyo",
-    "destinationIsRequired": "Indawo yokufikela iyafuneka",
-    "fee": "Intlawulo yenethiwekhi",
-    "feeCalculationUnsuccessful": "Ubalo aluphumelelanga ⚠️",
-    "input": "Igama lomsebenzisi, i-invoyisi, okanye idilesi",
-    "invalidUsername": "Igama lomsebenzisi elingasebenziyo",
-    "noAmount": "Le invoyisi ayinasixa, ngoko ke kufuneka uchaze ngesandla ukuba yimalini na ofuna ukuyithumela",
-    "notConfirmed": "Intlawulo ithunyelwe kodwa ayikaqinisekiswa okwangoku Ungajonga ubume yentlawulo kwiiNtengiselwano",
-    "note": "Qaphela",
-    "success": "Intlawulo ithunyelwe ngempumelelo",
-    "max": "Max",
-    "maxAmount": "Max Amount",
-    "title": "Thumela iBitcoin",
-    "failedToFetchLnurlInvoice": "Ayiphumelelanga ukulanda i-invoyisi ye-lnurl",
-    "lnurlInvoiceIncorrectAmount": "Iseva ye-lnurl iphendule nge-invoyisi ngexabiso elingachanekanga.",
-    "lnurlInvoiceIncorrectDescription": "Iseva ye-lnurl iphendule nge-invoyisi enenkcazo engachanekanga i-hash."
-  },
-  "SettingsScreen": {
-    "activated": "Yenziwe yasebenza",
-    "tapLogIn": "Cofa ukwazi ukungena",
-    "addressScreen": "Iindlela zokuhlawulwa",
-    "tapUserName": "Cofa ukuseta igama lomsebenzisi",
-    "title": "Iisetingi",
-    "darkMode": "Isimo Esimnyama",
-    "setToDark": "Isimo: Esimnyama.",
-    "setToLight": "Isimo: Esikhanyayo",
-    "darkDefault": "Isimo: kumnyama, (Okuhlala kukho).",
-    "lightDefault": "Isimo: ukukhanya, (Okuhlala kukho).",
-    "csvTransactionsError": "Ayikwazanga ukuthumela ngaphandle intengiselwano kwi-csv. Into ayihamba kakuhle. Ukuba umcimbi uyaqhubeka ufuna uncedo olupheleleyo.",
-    "lnurlNoUsername": "Ukwenza idilesi ye-lnurl kufuneka uqale usete igama lomsebenzisi. Ngaba ufuna ukuseta igama lokusebenzisa ngoku?",
-    "copyClipboardLnurl": "Idilesi ye-Lnurl ikotshwe kwiKlipbhodi.",
-    "defaultWallet": "Iakhawunti ehlala ikho",
-    "rateUs": "Isilinganisele kwi- {storeName.}",
-    "theme": "Theme",
-    "nfc": "Receive from NFC",
-    "nfcError": "Error reading NFC tag. Please try again.",
-    "nfcNotCompatible": "The information fetch from the card is not a compatible lnurl-withdraw link.",
-    "nfcOnlyReceive": "Only receive from NFC is available for now",
-    "nfcScanNow": "Scan NFC Now",
-    "nfcNotSupported": "NFC is not supported on this device"
-  },
-  "AccountScreen": {
-    "accountLevel": "Account Level",
-    "logIn": "Log in",
-    "upgrade": "Upgrade your account",
-    "logOutAndDeleteLocalData": "Log out and clear all local data",
-    "IUnderstand": "I understand. Please log me out.",
-    "logoutAlertTitle": "Are you sure you want to log out and delete all local data?",
-    "logoutAlertContent": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure to have access to it to log back in",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
-    "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
-    "secureYourAccount": "Register to secure your account"
-  },
-  "DefaultWalletScreen": {
-    "title": "Iakhawunti ehlala ikho",
-    "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
-  },
-  "ThemeScreen": {
-    "title": "Theme",
-    "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
-    "system": "Use System setting",
-    "light": "Use Light Mode",
-    "dark": "Use Dark Mode"
-  },
-  "Languages": {
-    "DEFAULT": "Okuhlala kukho (OS)"
-  },
-  "StablesatsModal": {
-    "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
-    "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
-    "termsAndConditions": "Funda iMigaqo neMiqathango.",
-    "learnMore": "Funda ngakumbi malunga neStablesats"
-  },
-  "SplashScreen": {
-    "update": "Usetyenziso lwakho luphelelwe lixesha. Uhlaziyo luyafuneka phambi kokuba i-app isetyenziswe. Oku kunokwenziwa kwi-PlayStore ye-Android kunye ne-Testflight ye-iOS"
-  },
-  "TransactionDetailScreen": {
-    "paid": "Ihlawulwe ukuya/ukusuka",
-    "received": "Ufumene",
-    "spent": "Uchithe",
-    "receivingAccount": "Ukufumana iAkhawunti",
-    "sendingAccount": "Ukuthumela iAkhawunti",
-    "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment."
-  },
-  "TransactionLimitsScreen": {
-    "receive": "Yamkela",
-    "withdraw": "Rhoxisa",
-    "perDay": "ngosuku",
-    "perWeek": "Ngeveki",
-    "unlimited": "Engenasiphelo",
-    "remaining": "Ekuseleyo",
-    "stablesatTransfers": "iStablesat transifer -Dluliselo",
-    "internalSend": "Thumela ku {bankName:} Umsebenzisi",
-    "error": "Ayikwazanga kulanda imida ngeli xesha",
-    "contactUsMessageBody": "Molo, ndingathanda ukonyusa ilimit  yeakhawunti yam {bankName: string}.",
-    "contactUsMessageSubject": "Isicelo Sokunyusa ilimit yeNtengiselwano",
-    "contactSupportToPerformKyc": "Contact support to perform manual KYC to increase your limit",
-    "increaseLimits": "Increase your limits"
-  },
-  "TransactionScreen": {
-    "noTransaction": "Akho tshintshelwano lubonakalayo",
-    "title": "Iintengiselwano/ utshintshwelano",
-    "recentTransactions": "Iintengiselwano zakutsha nje",
-    "transactionHistoryTitle": "Imbali yentengiselwano"
-  },
-  "TransferScreen": {
-    "title": "Udluliselo",
-    "percentageToConvert": "% ukuguqula"
-  },
-  "UpgradeAccountModal": {
-    "title": "Upgrade your account",
-    "backUpFunds": "Back up your funds",
-    "higherLimits": "Increase your transaction limits",
-    "receiveOnchain": "Receive bitcoin onchain",
-    "onlyAPhoneNumber": "Quick and easy phone number verification",
-    "letsGo": "Let's go!",
-    "stayInTrialMode": "Stay in trial mode"
-  },
-  "SetAddressModal": {
-    "title": "Set {bankName: string} address",
-    "Errors": {
-      "tooShort": "Address must be at least 3 characters long",
-      "tooLong": "Address must be at most 50 characters long",
-      "invalidCharacter": "Address can only contain letters, numbers, and underscores",
-      "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
-    },
-    "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
-    "itCannotBeChanged": "It can't be changed later."
-  },
-  "WelcomeFirstScreen": {
-    "bank": "Bitcoin is designed to let you store, send and receive money, without relying on a bank or credit card.",
-    "before": "Before Bitcoin, people had to rely on banks or credit card providers, to spend, send and receive money.",
-    "care": "Why should I care?",
-    "learn": "I don't mean to badger you, but there's lot more to learn, dig in...",
-    "learnToEarn": "Learn to Earn"
-  },
-  "PhoneLoginInitiateScreen": {
-    "title": "Account set up",
-    "header": "Enter your phone number, and we'll text you an access code.",
-    "headerVerify": "Verify you are human",
-    "errorRequestingCaptcha": "Something went wrong verifying you are human, please try again later.",
-    "errorRequestingCode": "Something went wrong requesting the phone code, please try again later.",
-    "errorInvalidPhoneNumber": "Invalid phone number. Are you sure you entered the right number?",
-    "errorUnsupportedCountry": "We are unable to support customers in your country.",
-    "placeholder": "Phone Number",
-    "verify": "Click to Verify",
-    "sms": "Send via SMS",
-    "whatsapp": "Send via WhatsApp"
-  },
-  "PhoneLoginValidationScreen": {
-    "errorLoggingIn": "Error logging in. Did you use the right code?",
-    "errorTooManyAttempts": "Too many attempts. Please try again later.",
-    "errorCannotUpgradeToExistingAccount": "This phone account already exists. Please log out of your trial account and then log in with your phone number.",
-    "header": "To confirm your phone number, enter the code we just sent you by {channel: string} on {phoneNumber: string}",
-    "placeholder": "6 Digit Code",
-    "sendAgain": "Send Again",
-    "tryAgain": "Try Again",
-    "sendViaOtherChannel": "You selected to receive the code via {channel: string}. You can try receiving via {other: string} instead"
-  },
-  "common": {
-    "account": "Account",
-    "transactionLimits": "Transaction Limits",
-    "activateWallet": "Activate Wallet",
-    "amountRequired": "Imali iyafuneka",
-    "back": "Back",
-    "backHome": "Back home",
-    "bank": "Bank",
-    "bankAccount": "Cash Account",
-    "bankAdvice": "{bankName: string} Advice",
-    "bankInfo": "{bankName: string} Info",
-    "beta": "beta",
-    "bitcoin": "Bitcoin",
-    "bitcoinPrice": "Bitcoin Price",
-    "btcAccount": "BTC Account",
-    "cancel": "Rhoxisa",
-    "close": "Close",
-    "confirm": "Confirm",
-    "convert": "Guqula",
-    "currency": "Currency",
-    "currencySyncIssue": "Currency issue. Refresh needed",
-    "csvExport": "Export transactions as CSV",
-    "date": "Date",
-    "description": "Description",
-    "domain": "Domain",
-    "email": "Email",
-    "error": "Error",
-    "fatal": "Fatal",
-    "fee": "fee",
-    "Fee": "Umrhumo",
-    "fees": "Fees",
-    "firstName": "First Name",
-    "from": "From",
-    "hour": "hour",
-    "hours": "hours",
-    "invoice": "Invoice",
-    "language": "Language",
-    "languagePreference": "Language preference",
-    "lastName": "Last Name",
-    "later": "Later",
-    "loggedOut": "You have been logged out.",
-    "logout": "Log Out",
-    "minutes": "minutes",
-    "needWallet": "Log in or create an account to access your wallet",
-    "next": "Next",
-    "No": "No",
-    "note": "Note",
-    "notification": "Notification",
-    "ok": "KULUNGILE",
-    "openWallet": "Open Wallet",
-    "phoneNumber": "Phone Number",
-    "rate": "Rate",
-    "reauth": "Your session has expired. Please log in again.",
-    "restart": "Restart",
-    "sats": "sats",
-    "search": "Search",
-    "security": "Security",
-    "send": "Thumela",
-    "setAnAmount": "set an amount",
-    "share": "Share",
-    "shareBitcoin": "Share Bitcoin Address",
-    "shareLightning": "Share Lightning Invoice",
-    "soon": "Coming soon!",
-    "success": "Success!",
-    "to": "To",
-    "total": "Total",
-    "transactions": "Iintengiselwano/ utshintshwelano",
-    "transactionsError": "Error loading transactions",
-    "tryAgain": "Try Again",
-    "type": "Type",
-    "usdAccount": "USD Account",
-    "username": "Username",
-    "usernameRequired": "Username is required",
-    "backupAccount": "Backup/upgrade account",
-    "viewTransaction": "View transaction",
-    "yes": "Yes",
-    "pending": "pending",
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "thisMonth": "This month",
-    "prevMonths": "Previous months",
-    "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-    "warning": "Warning"
-  },
-  "errors": {
-    "generic": "There was an error.\nPlease try again later.",
-    "invalidEmail": "Invalid email",
-    "invalidPhoneNumber": "is not a valid phone number",
-    "tooManyRequestsPhoneCode": "Too many requests. Please wait before requesting another text message.",
-    "network": {
-      "server": "Server Error. Please try again later",
-      "request": "Request issue.\nContact support if the problem persists",
-      "connection": "Connection issue.\nVerify your internet connection"
-    },
-    "unexpectedError": "Unexpected error occurred",
-    "restartApp": "Please restart the application.",
-    "problemPersists": "If problem persists contact support.",
-    "fatalError": "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
-    "showError": "Show Error",
-    "clearAppData": "Clear App Data and Logout"
-  },
-  "notifications": {
-    "payment": {
-      "body": "You just received {value: string} sats",
-      "title": "Payment received"
-    }
-  },
-  "support": {
-    "contactUs": "Need help? Contact us.",
-    "joinTheCommunity": "Join the community",
-    "whatsapp": "WhatsApp",
-    "email": "Email",
-    "statusPage": "Status Page",
-    "telegram": "Telegram",
-    "mattermost": "Mattermost",
-    "defaultEmailSubject": "{bankName: string} - Support",
-    "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
-    "emailCopied": "email {email: string} copied to clipboard",
-    "deleteAccount": "Delete account",
-    "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
-    "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
-    "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
-    "bye": "Bye!"
-  },
-  "lnurl": {
-    "overLimit": "You can't send more than max amount",
-    "underLimit": "You can't send less than min amount",
-    "commentRequired": "Comment required",
-    "viewPrintable": "View Printable Version"
-  },
-  "DisplayCurrencyScreen": {
-    "errorLoading": "Error loading list of currencies"
-  },
-  "AmountInputScreen": {
-    "enterAmount": "Enter Amount",
-    "setAmount": "Set Amount",
-    "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
-    "minAmountNotMet": "Amount must be at least {minAmount: string}."
-  },
-  "AmountInputButton": {
-    "tapToSetAmount": "Tap to set amount"
-  },
-  "AppUpdate": {
-    "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
-    "versionNotSupported": "This mobile version is no longer supported",
-    "updateMandatory": "Update is mandatory",
-    "tapHereUpdate": "Tap here to update now",
-    "contactSupport": "Contact Support"
-  }
 }

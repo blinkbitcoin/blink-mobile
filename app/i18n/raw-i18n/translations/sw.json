@@ -2129,7 +2129,7 @@
         "redeemAmountFrom": "Komboa {amountToRedeem: string} kutoka kwa {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Tulipata:\n\n{found:string} \n\nHii sio anwani halisi ya Bitcoin wala ankara ya Lightning.",
+        "invalidContent": "Tulipata:\n\n{found: string} \n\nHii sio anwani halisi ya Bitcoin wala ankara ya Lightning.",
         "expiredContent": "Tulipata:{found: string} Ankara hii imeisha muda wake",
         "invalidTitle": "QR Code batili.",
         "openLinkTitle": "Fungua Kiungo",
@@ -2162,7 +2162,7 @@
         "feeLabel": "Ada",
         "memoLabel": "Kidokezo:",
         "paymentFinal": "Malipo hayawezi kubadilishwa",
-        "stalePrice": "Bei yako ya Bitcoin ni zee na ilisasishwa mwisho {timePeriod} iliopita. Tafadhali anzisha upya programu yako kabla ya kufanya malipo.",
+        "stalePrice": "Bei yako ya Bitcoin ni zee na ilisasishwa mwisho {timePeriod: string} iliopita. Tafadhali anzisha upya programu yako kabla ya kufanya malipo.",
         "title": "Thibitisha malipo.",
         "totalLabel": "Jumla:",
         "totalExceed": "Jumla imezidi baki lako la {balance: string}",
@@ -2178,7 +2178,7 @@
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} majina ya watumiaji sasa ni anwani za {bankName: string} ",
-        "usernameNowAddressInfo": "Unapoandika jina la mtumiaji la {bankName: string}, tutaongeza \"@{lnDomain: string}\" kuifanya (eg.maria@{lnDomain:string}) ili kuifanya anwani. Jina lako la mtumiaji sasa ni anwani ya {bankName: string} pia.\n\nEnda kwenye ukurasa wa anwani ya {bankName: string} kutoka kwenye Mipangilio kujifunza jinsi ya kuitumia au kuisambaza ili kupata malipo.",
+        "usernameNowAddressInfo": "Unapoandika jina la mtumiaji la {bankName: string}, tutaongeza \"@{lnDomain: string}\" kuifanya (eg.maria@{lnDomain: string}) ili kuifanya anwani. Jina lako la mtumiaji sasa ni anwani ya {bankName: string} pia.\n\nEnda kwenye ukurasa wa anwani ya {bankName: string} kutoka kwenye Mipangilio kujifunza jinsi ya kuitumia au kuisambaza ili kupata malipo.",
         "enterValidDestination": "Tafadhali andika mahali pa mwisho halali.",
         "destinationOptions": "Unaweza kutuma kwa anwani ya {bankName: string}, anwani ya LN, ankara ya malipo ya LN, au anwani ya BTC",
         "expiredInvoice": "Muda wa ankara hii umeisha. Tafadhali toa ankara mpya ya malipo.",

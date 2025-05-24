@@ -2162,7 +2162,7 @@
         "feeLabel": "Sente",
         "memoLabel": "Weetegereze:",
         "paymentFinal": "Okusasula kwa nkomerero.",
-        "stalePrice": "Bbeeyi yo eya bitcoin nkadde era yasemba okutereezebwa {timePeriod} emabega. Nsaba oddemu okutandika app nga tonnasasula.",
+        "stalePrice": "Bbeeyi yo eya bitcoin nkadde era yasemba okutereezebwa {timePeriod: string} emabega. Nsaba oddemu okutandika app nga tonnasasula.",
         "title": "Kakasa Okusasula",
         "totalLabel": "Omugatte:",
         "totalExceed": "Omugatte gusuka bbaansi wo eya {balance: string}",
@@ -2195,7 +2195,7 @@
         "newBankAddressUsername": "{lnAddress: string} eriwo nga {bankName: string} endagiriro, naye ogiweerezza ssente.",
         "confirmUsernameModal": {
             "title": "Toweerezangako ssente ku ndagiriro eno",
-            "body1": "Tukusaba okakasizza nti oyo afuna yakuwa endagiriro ya {erinnyaLyaBbanka: string},",
+            "body1": "Tukusaba okakasizza nti oyo afuna yakuwa endagiriro ya {bankName: string},",
             "bold2bold": "si linnya lya mukozesa okuva mu waleti endala",
             "body3": "Bwe kitaba ekyo, ssente zijja kugenda ku Akawunti ya {bankName: string} erimu endagiriro ya “{lnAddress: string}”.\n\nKebera n’enjatula y’ekitundu ekisooka eky’endagiriro. e.g. jackie ne jack1e ndagiriro 2 ez'enjawulo",
             "warning": "Singa endagiriro ya {bankName: string} eyingiziddwa mu bukyamu, {bankName: string} tesobola kuzzaawo empaanyisa.",
@@ -2312,9 +2312,9 @@
         "logOutAndDeleteLocalData": "Log out oggyewo ne bwino yenna",
         "IUnderstand": "Ntegeera. Nsaba ku logginga out.",
         "logoutAlertTitle": "Oli mukakafu nti oyagala okufuluma n'okuggyawo bwino yenna aliko?",
-        "logoutAlertContentPhone": "Ojja kwetaaga okuddamu okuyingiza ennamba y'essimu yo okuddamu okuyingira.\nEssimu yo eri {nnambaY'essimu: string} n'olwekyo kakasa nti osobola okugiyingira",
+        "logoutAlertContentPhone": "Ojja kwetaaga okuddamu okuyingiza ennamba y'essimu yo okuddamu okuyingira.\nEssimu yo eri {phoneNumber: string} n'olwekyo kakasa nti osobola okugiyingira",
         "logoutAlertContentEmail": "Ojja kwetaaga okuddamu okuyingiza e-mail yo okuddamu okuyingira.\nE-mail yo eri {email: string} n'olwekyo kakasa nti osobola okugiyingiramu",
-        "logoutAlertContentPhoneEmail": "Ojja kwetaaga okuddamu okuyingiza ennamba yo ey'essimu oba e-mail okuddamu okuyingira.\nnamba y'essimu yo eri {nnambaY'essimu: string} ate e-mail yo eri {email: string} n'olwekyo kakasa nti olina obusobozi ku ezo ez'okuddamu okuyingira",
+        "logoutAlertContentPhoneEmail": "Ojja kwetaaga okuddamu okuyingiza ennamba yo ey'essimu oba e-mail okuddamu okuyingira.\nnamba y'essimu yo eri {phoneNumber: string} ate e-mail yo eri {email: string} n'olwekyo kakasa nti olina obusobozi ku ezo ez'okuddamu okuyingira",
         "usdBalanceWarning": "Olina omuwendo gwa Stablesata agusigadewo ogwa {balance: string}.",
         "btcBalanceWarning": "Olina omuwendo gwa bitcoin agusigadewo ogwa {balance: string}.",
         "secureYourAccount": "Wewandiise okukuuma akawunti yo",
@@ -2399,7 +2399,7 @@
         "sendingAccount": "Akawunti Esindika",
         "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
         "momentarily": "akaseera katono",
-        "hasBeenCopiedToClipboard": "{ekika: string} ekoppoleddwa ku lutimbe"
+        "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
     },
     "TransactionLimitsScreen": {
         "receive": "Funa",
@@ -2409,7 +2409,7 @@
         "unlimited": "Ekitaliiko kkomo",
         "remaining": "Ekisigaddewo",
         "stablesatTransfers": "Empaanyisa za Stablesat",
-        "internalSend": "Sindikira {eirnnyaLyaBbanka: string} Omukozesa ",
+        "internalSend": "Sindikira {bankName: string} Omukozesa ",
         "error": "Tetusobodde kufuna kkomo mu kiseera kino",
         "increaseLimits": "Yongeza ekkomo lyo"
     },
@@ -2433,7 +2433,7 @@
         "stayInTrialMode": "Sigala mu nkola ey'okugezesa"
     },
     "SetAddressModal": {
-        "title": "Teeka {erinnyaLyaBbanka: string} endagiriro",
+        "title": "Teeka {bankName: string} endagiriro",
         "setLightningAddress": "Kola endagiriro ya Lightning",
         "Errors": {
             "tooShort": "Endagiriro eteekwa okuba ekitono n'ennukuta nga 3 obuwanvu",
@@ -2442,7 +2442,7 @@
             "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
             "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma"
         },
-        "receiveMoney": "Funa ssente okuva mu waleti za laddu endala ne {erinnyaLyaBbanka: string} abakozesa ne ndagiriro eno.",
+        "receiveMoney": "Funa ssente okuva mu waleti za laddu endala ne {bankName: string} abakozesa ne ndagiriro eno.",
         "itCannotBeChanged": "Tekisobola kukyusibwa oluvannyuma."
     },
     "WelcomeFirstScreen": {
@@ -2472,7 +2472,7 @@
         "errorIpNotAllowed": "IP eno eva mu ggwanga eritalina buyambi era akawunti ziyinza obutatondebwa okuva mu ggwanga eryo. Bw'oba oli mu nsi eyawagiddwa naye ng'okozesa VPN, gezaako okugiggalawo.",
         "errorPhoneNotAllowed": "Akawunti ziyinza obutatondebwa ku nnamba y'essimu eno.",
         "errorCannotUpgradeToExistingAccount": "Akawunti eno ey'essimu yaliwo dda. Yingira mu akawunti yo ey'okugezesa oluvannyuma oyingirire n'ennamba y'essimu yo.",
-        "header": "Okukakasa nnamba yo ey'essimu, yingiza koodi gy'etukuwereza okuyita ku {olusalosalo: string} ku {nnambaY'essimu: string}",
+        "header": "Okukakasa nnamba yo ey'essimu, yingiza koodi gy'etukuwereza okuyita ku {channel: string} ku {phoneNumber: string}",
         "placeholder": "Koodi y'ennukuta 6",
         "sendAgain": "Ddamu osindike",
         "tryAgain": "Ddamu ogezeeko",
@@ -2533,8 +2533,8 @@
         "backHome": "Bbanka ewaka",
         "bank": "Bbanka",
         "bankAccount": "Akawunti y'ensimbi",
-        "bankAdvice": "{erinnyaLyaBbanka: string} Okuwabula",
-        "bankInfo": "{erinnyaLyaBbanka: string} Obubaka",
+        "bankAdvice": "{bankName: string} Okuwabula",
+        "bankInfo": "{bankName: string} Obubaka",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Okulamula kwa Bitcoin",
@@ -2638,7 +2638,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Ofunye {omuwendo: akaguwa} sats",
+            "body": "Ofunye {value: string} sats",
             "title": "Okusasula kufunidwa"
         }
     },
@@ -2654,9 +2654,9 @@
         "telegram": "Telegram",
         "mattermost": "Ekisinga obukulu",
         "thankYouText": "Webale nnyo endowooza yo, wandyagadde okuteesa ku nnongoosereza?",
-        "defaultEmailSubject": "{erinnyaLyaBbanka: akaguwa} - Okuwagira",
-        "defaultSupportMessage": "Ab'eyo! Nze nneetaaga obuyambi ku {erinnyaLyaBbanka: akaguwa}, nkozesa enkyusa {ekika: akaguwa} ku {os: akaguwa}.",
-        "emailCopied": "email {email: akaguwa} ekoppedwa ku clipboard",
+        "defaultEmailSubject": "{bankName: string} - Okuwagira",
+        "defaultSupportMessage": "Ab'eyo! Nze nneetaaga obuyambi ku {bankName: string}, nkozesa enkyusa {type: string} ku {os: string}.",
+        "emailCopied": "email {email: string} ekoppedwa ku clipboard",
         "deleteAccount": "Sazaamu akawunti",
         "delete": "siimuula",
         "typeDelete": "Tukusaba wandiika \"{delete: string}\" okukakasa okuggyawo kwa akawunti",
@@ -2729,7 +2729,7 @@
         "inviteFriends": "Yita mukwano gwo",
         "buildYourCircle": "Zimba nnamuziga zo",
         "myBlinkCircles": "Ennamuziga ezange eza Blink",
-        "someones": "{erinnyaly'omukozesa: omuguwa}",
+        "someones": "{username: string}",
         "groupEffort": "Enkozasa ya Bitcoin kaweefube wa kibiina.\nYita mukwano gwo obasindikira sats okutandika okuzimba enkulungo zo.",
         "drivingAdoption": "Ndi muvuzi w'enkozesa ya Bitcoin nga nkozesa Blink.",
         "connectOnSocial": "Tukwatagane ku mpuliziganyo:",
@@ -2751,7 +2751,7 @@
         "confirmNameTitle": "Okukakasa erinnya",
         "firstName": "Erinnya erisooka",
         "lastName": "Erinnya erisemba",
-        "confirmNameContent": "Enjatula y’erinnya lyo ntuufu?\n\n{erinnyaErisooka: omuguwa} {erinnyaErisembayo: omuguwa}\n\nLirina okukwatagana n’erinnya eriri ku ndagamuntu yo.",
+        "confirmNameContent": "Enjatula y’erinnya lyo ntuufu?\n\n{firstName: string} {lastName: string}\n\nLirina okukwatagana n’erinnya eriri ku ndagamuntu yo.",
         "requirements": "Okulongoosa akawunti yo kijja kwongera ku kkomo lyo n’okukuwa emirimu emirala ng’okukyusa ku akawunti za bbanka mu nsi ezirondeddwa.\n\nOjja kuba olina okuwaayo amannya go, endagamuntu efulumiziddwa gavumenti n’okwekubya ebifaananyi. Tujja kutandika n'erinnya lyo.",
         "success": "Ebiwandiiko biwanuliddwa bulungi era mu bbanga ttono bigenda kukolebwako. osobola okudda oluvanyuma okufuna okutegezebwa ku nyimirira yo ey'okuberako",
         "error": "Wabaddewo ensobi mu kuwaayo ebiwandiiko byo. Osobola okutuukirira abayambi singa ekizibu kisigalawo.",

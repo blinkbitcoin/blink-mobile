@@ -56,7 +56,7 @@
         "frequentContacts": "Contatos frequentes"
     },
     "ContactDetailsScreen": {
-        "title": "Transações com {username}"
+        "title": "Transações com {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Converter",
@@ -2042,7 +2042,7 @@
         "walletCountNotTwo": "O número de carteiras não é 2. Por favor, utilize o painel para ver todas as carteiras e fundos desta conta."
     },
     "PinScreen": {
-        "attemptsRemaining": "PIN incorreto. {attemptsRemaining} tentativas restantes.",
+        "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
@@ -2129,7 +2129,7 @@
         "redeemAmountFrom": "Resgatar {amountToRedeem: string} de {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Encontramos:\n\n{found}\n\nEste não é um endereço Bitcoin válido ou fatura Lightning",
+        "invalidContent": "Encontramos:\n\n{found: string}\n\nEste não é um endereço Bitcoin válido ou fatura Lightning",
         "expiredContent": "Nós achamos:\n\n{encontrado: string}\n\nEsta fatura expirou",
         "invalidTitle": "Código QR inválido",
         "openLinkTitle": "Abrir link",
@@ -2140,7 +2140,7 @@
         "noCamera": "Nenhuma câmera encontrada",
         "openSettings": "Abrir Configurações",
         "unableToOpenSettings": "Incapaz de abrir configurações",
-        "invalidContentLnurl": "Encontramos:\n\n{found}\n\n não é suportado no momento",
+        "invalidContentLnurl": "Encontramos:\n\n{found: string}\n\n não é suportado no momento",
         "imageLibraryPermissionsNotGranted": "Não temos permissões para acessar a biblioteca de imagens. Por favor, verifique as configurações do aplicativo para a sua plataforma."
     },
     "SecurityScreen": {
@@ -2162,10 +2162,10 @@
         "feeLabel": "Taxa:",
         "memoLabel": "Observação:",
         "paymentFinal": "Os pagamentos são finais.",
-        "stalePrice": "O preço do seu bitcoin é antigo e foi atualizado pela última vez {timePeriod} atrás. Reinicie o aplicativo antes de fazer um pagamento.",
+        "stalePrice": "O preço do seu bitcoin é antigo e foi atualizado pela última vez {timePeriod: string} atrás. Reinicie o aplicativo antes de fazer um pagamento.",
         "title": "Confirmar Pagamento",
         "totalLabel": "Total:",
-        "totalExceed": "O total excede seu saldo de {balance}",
+        "totalExceed": "O total excede seu saldo de {balance: string}",
         "maxFeeSelected": "Esta é a taxa máxima que será cobrada por esta transação. Pode acabar sendo menor uma vez que o pagamento foi feito.",
         "feeError": "Não foi possível calcular a taxa.",
         "invoiceAlreadyPaid": "Esta fatura já foi paga",
@@ -2208,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "A transação deve ser enviada para o mempool.",
         "amount": "quantidade",
-        "amountExceed": "O valor excede seu saldo de {balance}",
+        "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
         "amountIsRequired": "O valor é obrigatório",
@@ -2638,7 +2638,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Você acabou de receber {value} sats",
+            "body": "Você acabou de receber {value: string} sats",
             "title": "Pagamento recebido"
         }
     },
@@ -2724,8 +2724,8 @@
         "peopleWelcomedByMyCircle": "pessoas recebidas pelo meu círculo",
         "yourSphere": "Sua Esfera",
         "mySphere": "Minha Esfera",
-        "yourRankMessage": "Você está #{thisMonthRank: número} este mês e #{allTimeRank: número} de todos os tempos!",
-        "rankMessage": "#{thisMonthRank: número} este mês e #{allTimeRank: número} de todos os tempos!",
+        "yourRankMessage": "Você está #{thisMonthRank: number} este mês e #{allTimeRank: number} de todos os tempos!",
+        "rankMessage": "#{thisMonthRank: number} este mês e #{allTimeRank: number} de todos os tempos!",
         "inviteFriends": "Convidar um amigo",
         "buildYourCircle": "Construa seus círculos",
         "myBlinkCircles": "Meu círculo Blink",

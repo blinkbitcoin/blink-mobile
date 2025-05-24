@@ -2143,7 +2143,7 @@
         "feeLabel": "Naknada",
         "memoLabel": "Bilješka:",
         "paymentFinal": "Plaćanja su konačna.",
-        "stalePrice": "Vaša cijena bitcoina je stara i zadnji put je ažurirana prije {timePeriod}. Ponovno pokrenite aplikaciju prije plaćanja.",
+        "stalePrice": "Vaša cijena bitcoina je stara i zadnji put je ažurirana prije {timePeriod: string}. Ponovno pokrenite aplikaciju prije plaćanja.",
         "title": "Potvrdi plaćanje",
         "totalLabel": "Ukupno:",
         "totalExceed": "Ukupno premašuje vaš saldo od {balance: string}",

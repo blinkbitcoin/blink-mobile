@@ -56,7 +56,7 @@
         "frequentContacts": "Häufig kontaktiert"
     },
     "ContactDetailsScreen": {
-        "title": "Transaktionen mit {username}"
+        "title": "Transaktionen mit {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Konvertieren",
@@ -2042,7 +2042,7 @@
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
-        "attemptsRemaining": "Falsche PIN. {attemptsRemaining} verbleibende Versuche.",
+        "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
@@ -2129,7 +2129,7 @@
         "redeemAmountFrom": "Einlösen {amountToRedeem: string} von {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Gefunden:\n\n{found}\n\nDies ist keine gültige Bitcoin Adresse oder Lightning Invoice",
+        "invalidContent": "Gefunden:\n\n{found: string}\n\nDies ist keine gültige Bitcoin Adresse oder Lightning Invoice",
         "expiredContent": "Wir haben gefunden:\n\n{found: string}\n\nDiese Invoice ist abgelaufen",
         "invalidTitle": "Ungültiger QR Code",
         "openLinkTitle": "Link öffnen",
@@ -2140,7 +2140,7 @@
         "noCamera": "Keine Kamera gefunden",
         "openSettings": "Einstellungen öffnen",
         "unableToOpenSettings": "Kann Einstellungen nicht öffnen",
-        "invalidContentLnurl": "Gefunden:\n\n{found}\n\n ist aktuell nicht unterstützt",
+        "invalidContentLnurl": "Gefunden:\n\n{found: string}\n\n ist aktuell nicht unterstützt",
         "imageLibraryPermissionsNotGranted": "Wir haben keine Berechtigung für den Zugriff auf die Bilderbibliothek. Bitte überprüfen Sie die App-Einstellungen für Ihre Plattform."
     },
     "SecurityScreen": {
@@ -2162,10 +2162,10 @@
         "feeLabel": "Gebühr",
         "memoLabel": "Notiz:",
         "paymentFinal": "Zahlungen sind final.",
-        "stalePrice": "Der Bitcoin Preis ist veraltet und wurde zuletzt {timePeriod} aktualisiert. Bitte starte die App erneut, bevor Du eine Zahlung tätigst.",
+        "stalePrice": "Der Bitcoin Preis ist veraltet und wurde zuletzt {timePeriod: string} aktualisiert. Bitte starte die App erneut, bevor Du eine Zahlung tätigst.",
         "title": "Zahlung bestätigen",
         "totalLabel": "Gesamt:",
-        "totalExceed": "Der Gesamtbetrag übersteigt dein Guthaben von {balance}",
+        "totalExceed": "Der Gesamtbetrag übersteigt dein Guthaben von {balance: string}",
         "maxFeeSelected": "Dies ist die maximale Transaktionsgebühr. Die tatsächlich gezahlte Gebühr kann weniger betragen.",
         "feeError": "Kann Gebühr nicht berechnen",
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
@@ -2177,29 +2177,29 @@
         "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning."
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "{bankName} Benutzernamen sind nun {bankName} Adressen.",
-        "usernameNowAddressInfo": "Wenn Du einen {bankName} Benutzernamen angibst, ergänzen wir \"@{lnDomain}\" (bspw. maria@{lnDomain}) um daraus eine Adresse zu machen. Dein Benutzername ist jetzt auch eine {bankName} Adresse.\n\nGehe zu deiner {bankName} Adresse in den Einstellungen, um mehr darüber zu erfahren oder um sie zu teilen, damit Du Zahlungen empfangen kannst.",
+        "usernameNowAddress": "{bankName: string} Benutzernamen sind nun {bankName: string} Adressen.",
+        "usernameNowAddressInfo": "Wenn Du einen {bankName: string} Benutzernamen angibst, ergänzen wir \"@{lnDomain: string}\" (bspw. maria@{lnDomain: string}) um daraus eine Adresse zu machen. Dein Benutzername ist jetzt auch eine {bankName: string} Adresse.\n\nGehe zu deiner {bankName: string} Adresse in den Einstellungen, um mehr darüber zu erfahren oder um sie zu teilen, damit Du Zahlungen empfangen kannst.",
         "enterValidDestination": "Bitte gib ein gültiges Ziel an.",
-        "destinationOptions": "Du kannst an eine {bankName} Adresse, Lightning Adresse, Lightning Invoice oder BTC Adresse senden.",
+        "destinationOptions": "Du kannst an eine {bankName: string} Adresse, Lightning Adresse, Lightning Invoice oder BTC Adresse senden.",
         "expiredInvoice": "Diese Invoice ist abgelaufen. Bitte generiere eine neue Rechnung.",
         "wrongNetwork": "Diese Invoice ist für ein anderes Netzwerk. Bitte generiere eine neue Invoice.",
         "invalidAmount": "Diese Invoice enthält einen ungültigen Betrag. Bitte generiere eine neue Invoice.",
-        "usernameDoesNotExist": "{lnAddress} scheint keine existierende {bankName} Adresse zu sein.",
+        "usernameDoesNotExist": "{lnAddress: string} scheint keine existierende {bankName: string} Adresse zu sein.",
         "usernameDoesNotExistAdvice": "Gehe sicher, dass Du alles richtig geschrieben hast oder frage den Empfänger nach einer Lightning Invoice oder BTC Adresse.",
-        "selfPaymentError": "{lnAddress} ist deine {bankName} Adresse.",
+        "selfPaymentError": "{lnAddress: string} ist deine {bankName: string} Adresse.",
         "selfPaymentAdvice": "Wenn Du Geld an ein anderes Konto von dir senden möchtest, nutze dafür eine Lightning Invoice, Lightning Adresse oder BTC Adresse.",
         "lnAddressError": "Wir konnten diese Lightning Adresse nicht erreichen. Wenn Du dir sicher bist dass sie existiert, probiere es später erneut.",
         "lnAddressAdvice": "Gehe sicher, dass Du alles richtig geschrieben hast oder frage den Empfänger nach einer Lightning Invoice oder BTC Adresse.",
         "unknownLightning": "Wir können diese Lightning Adresse nicht dekodieren. Bitte versuche es erneut.",
         "unknownOnchain": "Wir können diese Bitcoin Adresse nicht dekodieren. Bitte versuche es erneut.",
-        "newBankAddressUsername": "{lnAddress} ist eine {bankName} Adresse, aber Du hast bisher keine Geld dorthin gesendet.",
+        "newBankAddressUsername": "{lnAddress: string} ist eine {bankName: string} Adresse, aber Du hast bisher keine Geld dorthin gesendet.",
         "confirmUsernameModal": {
             "title": "Du hast noch nie Geld an diese Adresse gesendet",
             "body1": "Bitte stelle sicher, dass der Empfänger dir eine {bankName: string} Adresse gegeben hat,",
             "bold2bold": "kein Benutzername von einer anderen Wallet.",
             "body3": "Andernfalls wird das Geld an ein {bankName: string} Konto gesendet, das die “{lnAddress: string}” Adresse hat.\n\nÜberprüfe auch die Schreibweise des ersten Teils der Adresse. Zum Beispiel sind jackie and jack1e zwei unterschiedliche Adressen",
-            "warning": "Wenn die {bankName} Adresse falsch geschrieben ist, kann {bankName} die Transaktion nicht rückgängig machen.",
-            "checkBox": "{lnAddress} ist die richtige Adresse.",
+            "warning": "Wenn die {bankName: string} Adresse falsch geschrieben ist, kann {bankName: string} die Transaktion nicht rückgängig machen.",
+            "checkBox": "{lnAddress: string} ist die richtige Adresse.",
             "confirmButton": "Ich bin mir 100% sicher"
         },
         "clipboardError": "Fehler beim Abrufen des Werts aus der Zwischenablage",
@@ -2208,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
         "amount": "Betrag",
-        "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance}",
+        "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
         "amountIsRequired": "Betrag ist erforderlich",
@@ -2399,7 +2399,7 @@
         "sendingAccount": "Sendendes Konto",
         "txNotBroadcast": "Ihre Transaktion befindet sich in der Warteschlange. Sie sollte im Mempool erscheinen: {countdown: string} ",
         "momentarily": "momentan",
-        "hasBeenCopiedToClipboard": "{Typ: String} wurde in die Zwischenablage kopiert"
+        "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert"
     },
     "TransactionLimitsScreen": {
         "receive": "Erhalten",
@@ -2533,8 +2533,8 @@
         "backHome": "Zurück zur Übersicht",
         "bank": "Bank",
         "bankAccount": "Konto",
-        "bankAdvice": "{bankName} Vorschlag",
-        "bankInfo": "{bankName} Info",
+        "bankAdvice": "{bankName: string} Vorschlag",
+        "bankInfo": "{bankName: string} Info",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Preis",
@@ -2638,7 +2638,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Du hast {value} Sats empfangen",
+            "body": "Du hast {value: string} Sats empfangen",
             "title": "Zahlung empfangen"
         }
     },

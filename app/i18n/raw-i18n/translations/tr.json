@@ -2162,7 +2162,7 @@
         "feeLabel": "Ücret:",
         "memoLabel": "Not:",
         "paymentFinal": "Ödemeler iptal edilemez.",
-        "stalePrice": "Bitcoin fiyatınız eski ve en son {timePeriod} önce güncellendi. Lütfen ödeme yapmadan önce uygulamayı yeniden başlatın.",
+        "stalePrice": "Bitcoin fiyatınız eski ve en son {timePeriod: string} önce güncellendi. Lütfen ödeme yapmadan önce uygulamayı yeniden başlatın.",
         "title": "Ödemeyi Onayla",
         "totalLabel": "Toplam:",
         "totalExceed": "Toplam tutar {balance: string} bakiyenizi aşıyor",
@@ -2177,8 +2177,8 @@
         "lightningRecommended": "Yüksek komisyon! Lightning kullanmanızı öneriyoruz."
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "{BankName: string} kullanıcı adları artık {bankName: string} adresleridir.",
-        "usernameNowAddressInfo": "Bir {bankName: string} kullanıcı adı girdiğinizde, bunu bir adres haline getirmek için ona \"@{lnDomain: string}\" ekleyeceğiz (örneğin maria@{lnDomain: string}). Kullanıcı adınız artık bir {bankName: string} adresidir.\n\nNasıl kullanacağınızı öğrenmek veya ödeme almak üzere paylaşmak için Ayarlar'ınızdan {bankAdı: string} adres sayfanıza gidin.",
+        "usernameNowAddress": "{bankName: string} kullanıcı adları artık {bankName: string} adresleridir.",
+        "usernameNowAddressInfo": "Bir {bankName: string} kullanıcı adı girdiğinizde, bunu bir adres haline getirmek için ona \"@{lnDomain: string}\" ekleyeceğiz (örneğin maria@{lnDomain: string}). Kullanıcı adınız artık bir {bankName: string} adresidir.\n\nNasıl kullanacağınızı öğrenmek veya ödeme almak üzere paylaşmak için Ayarlar'ınızdan {bankName: string} adres sayfanıza gidin.",
         "enterValidDestination": "Lütfen geçerli bir gönderi adresi kullanınız.",
         "destinationOptions": "Bir {bankName: string} adresine, LN adresine, LN faturasına veya BTC adresine gönderebilirsiniz.",
         "expiredInvoice": "Bu faturanın süresi geçti. Lütfen yeni bir fatura oluşturun.",

@@ -2143,7 +2143,7 @@
         "feeLabel": "Frais",
         "memoLabel": "Note :",
         "paymentFinal": "Les paiements sont définitifs.",
-        "stalePrice": "Votre prix pour un bitcoin n’est plus valable et a été mis-à-jour il y a {timePeriod}. Veuillez redémarrer l’application avant d’effectuer un paiement.",
+        "stalePrice": "Votre prix pour un bitcoin n’est plus valable et a été mis-à-jour il y a {timePeriod: string}. Veuillez redémarrer l’application avant d’effectuer un paiement.",
         "title": "Confirmer le paiement",
         "totalLabel": "Solde :",
         "totalExceed": "Le total excède votre solde de {balance: string}",

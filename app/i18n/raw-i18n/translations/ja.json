@@ -2143,7 +2143,7 @@
         "feeLabel": "手数料",
         "memoLabel": "メモ：",
         "paymentFinal": "最終的な送金です。",
-        "stalePrice": "お客様のビットコイン価格は有効期限切れです。最終更新日は{timePeriod}前ですので、お支払いの前にアプリを再起動してください。",
+        "stalePrice": "お客様のビットコイン価格は有効期限切れです。最終更新日は{timePeriod: string}前ですので、お支払いの前にアプリを再起動してください。",
         "title": "送金する",
         "totalLabel": "総額：",
         "totalExceed": "合計金額が{balance: string}を超えています",
@@ -2151,7 +2151,7 @@
         "feeError": "手数料の計算に失敗しました"
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "ユーザー名{BankName: string}がアドレス{BankName: string}になりました。",
+        "usernameNowAddress": "ユーザー名{bankName: string}がアドレス{bankName: string}になりました。",
         "usernameNowAddressInfo": "ユーザー名 {bankName: string}を入力すると、それに「@{lnDomain: string}」を追加して（例：maria@{lnDomain: string}）というアドレスになります。これであなたのユーザー名も{bankName: string}アドレスになります。\n\n設定から {bankName: string}アドレスのページにアクセスし、使い方を学んだり、支払いを受け取るために共有することができます。",
         "enterValidDestination": "有効な送金先を入力してください",
         "destinationOptions": "{bankName: string}アドレス、ライトニング・アドレス、ライトニング・インボイス、またはビットコイン・アドレスへ送金することができます。",

@@ -2162,7 +2162,7 @@
         "feeLabel": "Díj",
         "memoLabel": "Megjegyzés:",
         "paymentFinal": "A fizetések véglegesek.",
-        "stalePrice": "A Bitcoin ár elavult. Az utolsó frissítés óta eltelt idő: {timePeriod}. Kérjük, indítsd újra az alkalmazást, mielőtt fizetést hajtanál végre.",
+        "stalePrice": "A Bitcoin ár elavult. Az utolsó frissítés óta eltelt idő: {timePeriod: string}. Kérjük, indítsd újra az alkalmazást, mielőtt fizetést hajtanál végre.",
         "title": "Fizetés Megerősítése",
         "totalLabel": "Összesen:",
         "totalExceed": "Az összeg meghaladja az egyenleged, amely {balance: string}",

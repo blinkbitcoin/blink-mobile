@@ -2,14 +2,14 @@
     "GaloyAddressScreen": {
         "title": "Receive payment by using:",
         "buttonTitle": "Set your address",
-        "yourAddress": "عنوانك في {bankName}",
-        "notAbleToChange": "لن تستطيع تغيير عنوانك في {bankName} بعد تحديده.",
-        "addressNotAvailable": "هذا العنوان في {bankName} مأخوذ من قبل.",
+        "yourAddress": "عنوانك في {bankName: string}",
+        "notAbleToChange": "لن تستطيع تغيير عنوانك في {bankName: string} بعد تحديده.",
+        "addressNotAvailable": "هذا العنوان في {bankName: string} مأخوذ من قبل.",
         "somethingWentWrong": "حدث خطأ. رجاءً حاول مرة أخرى.",
         "merchantTitle": "للتجار",
         "yourCashRegister": "Your Lightning Cash Register",
         "yourPaycode": "رمز الدفع التي تم شرائها ",
-        "copiedAddressToClipboard": "نُسخ عنوانك في {bankName} إلى الحافظة.",
+        "copiedAddressToClipboard": "نُسخ عنوانك في {bankName: string} إلى الحافظة.",
         "copiedPaycodeToClipboard": "نُسخ كود الدفع إلى الحافظة.",
         "copiedCashRegisterLinkToClipboard": "Copied Cash Register Link to clipboard",
         "howToUseIt": "How to use it?",
@@ -48,7 +48,7 @@
         "frequentContacts": "Frequent Contacts"
     },
     "ContactDetailsScreen": {
-        "title": "المعاملات مع {username}"
+        "title": "المعاملات مع {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "تحويل",
@@ -2029,7 +2029,7 @@
         "myAccounts": "My Accounts"
     },
     "PinScreen": {
-        "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining} محاولات.",
+        "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
         "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
         "setPin": "عيّن رمزك الشخصي (PIN)",
         "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
@@ -2108,18 +2108,18 @@
         "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
         "redeemingError": "أخفق تحرير البيتكوين. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
         "submissionError": "أخفق تقديم طلب السحب. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
-        "minMaxRange": "الحد الأدنى: {minimumAmount}، الحد الأقصى: {maximumAmount}",
+        "minMaxRange": "الحد الأدنى: {minimumAmount: string}، الحد الأقصى: {maximumAmount: string}",
         "redeemBitcoin": "تحرير البيتكوين",
-        "amountToRedeemFrom": "المقدار المطلوب تحريره من {domain}",
-        "redeemAmountFrom": "تحرير {amountToRedeem} من {domain}"
+        "amountToRedeemFrom": "المقدار المطلوب تحريره من {domain: string}",
+        "redeemAmountFrom": "تحرير {amountToRedeem: string} من {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "وجدنا:\n\n{found}\nليس هذا عنوان بيتكوين صالحًا ولا فاتورة برق.",
-        "expiredContent": "وجدنا:\n\n{found}\n\nهذه الفاتورة منتهية الصلاحية",
+        "invalidContent": "وجدنا:\n\n{found: string}\nليس هذا عنوان بيتكوين صالحًا ولا فاتورة برق.",
+        "expiredContent": "وجدنا:\n\n{found: string}\n\nهذه الفاتورة منتهية الصلاحية",
         "invalidTitle": "كود QR غير صالح",
         "noQrCode": "لم نستطع ايجاد كود qr في الصورة",
         "title": "Scan QR",
-        "invalidContentLnurl": "وجدنا:\n\n{found}\n\nوهو غير مدعوم حاليًّا",
+        "invalidContentLnurl": "وجدنا:\n\n{found: string}\n\nوهو غير مدعوم حاليًّا",
         "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
     },
     "SecurityScreen": {
@@ -2141,44 +2141,44 @@
         "feeLabel": "رسوم تحويل",
         "memoLabel": "اكتب ملاحظة:",
         "paymentFinal": "المدفوعات نهائية.",
-        "stalePrice": "سعر البيتكوين عندك قديم لم يحدّث منذ {timePeriod}. أعد تشغيل التطبيق رجاءً قبل أي دفع.",
+        "stalePrice": "سعر البيتكوين عندك قديم لم يحدّث منذ {timePeriod: string}. أعد تشغيل التطبيق رجاءً قبل أي دفع.",
         "title": "تأكيد الدفع",
         "totalLabel": "المجموع :",
-        "totalExceed": "الإجمالي أكبر من ميزانيتك التي تبلغ {balance}",
+        "totalExceed": "الإجمالي أكبر من ميزانيتك التي تبلغ {balance: string}",
         "maxFeeSelected": "هذا هو الحد الأقصى للرسوم التي ستُقتضى منك لهذه المعاملة. قد تكون أقل من ذلك عند إتمام الدفع.",
         "feeError": "فشل في حساب العمولة"
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "أسماء المستخدمين في {bankName} أصبحت عناوين في {bankName}",
-        "usernameNowAddressInfo": "عندما تدخل اسم مستخدم في {bankName} عليك أن تضيف \"@{lnDomain}\" في آخره (مثال: maria@{lnDomain}) لتجعله عنوانًا. اسم مستخدمك في {bankName} أصبح الآن عنوانًا أيضًا.\n\nاذهب إلى صفحة عنوان {bankName} في الإعدادات وتعلم كيف تستخدمه وتشاركه لتلقي المدفوعات.",
+        "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",
+        "usernameNowAddressInfo": "عندما تدخل اسم مستخدم في {bankName: string} عليك أن تضيف \"@{lnDomain: string}\" في آخره (مثال: maria@{lnDomain: string}) لتجعله عنوانًا. اسم مستخدمك في {bankName: string} أصبح الآن عنوانًا أيضًا.\n\nاذهب إلى صفحة عنوان {bankName: string} في الإعدادات وتعلم كيف تستخدمه وتشاركه لتلقي المدفوعات.",
         "enterValidDestination": "الرجاء إدخال وجهة صحيحة",
-        "destinationOptions": "يمكنك أن ترسل إلى عنوان في {bankName}، أو إلى عنوان برق، أو فاتورة برق، أو عنوان بيتكوين.",
+        "destinationOptions": "يمكنك أن ترسل إلى عنوان في {bankName: string}، أو إلى عنوان برق، أو فاتورة برق، أو عنوان بيتكوين.",
         "expiredInvoice": "لقد انتهت صلاحية الفاتورة. ولّد واحدة جديدة رجاءً.",
         "wrongNetwork": "هذه الفاتورة لشبكة أخرى. ولّد فاتورة جديدة من فضلك.",
         "invalidAmount": "في هذه الفاتورة مقدار غير صالح. ولّدها مرة أخرى بعنوان صالح من فضلك.",
-        "usernameDoesNotExist": "لا يبدو أن عنوان البرق هذا ({lnAddress}) عنوان صالح وموجود في {bankName}.",
+        "usernameDoesNotExist": "لا يبدو أن عنوان البرق هذا ({lnAddress: string}) عنوان صالح وموجود في {bankName: string}.",
         "usernameDoesNotExistAdvice": "تحقق من الكتابة الصحيحة أو اطلب من المتلقّي فاتورة برق أو عنوان بيتكوين بدلًا من ذلك.",
-        "selfPaymentError": "عنوان البرق هذا ({lnAddress}) هو عنوانك في {bankName}.",
+        "selfPaymentError": "عنوان البرق هذا ({lnAddress: string}) هو عنوانك في {bankName: string}.",
         "selfPaymentAdvice": "إذا أردت إرسال النقد إلى حساب آخر لك، يمكنك أن تستعمل فاتورة في شبكة البرق أو عنوان بيتكوين.",
         "lnAddressError": "لم نستطع بلوغ عنوان البرق هذا. إن كنت متأكدًا من وجوده، جرّب مرة أخرى لاحقًا.",
         "lnAddressAdvice": "تحقق من صحة الكتابة أو اطلب من المتلقّي فاتورة برق أو عنوان بيتكوين بدلًا من ذلك.",
         "unknownLightning": "لم نستطع تفسير عنوان البرق هذا. حاول مرة أخرى.",
         "unknownOnchain": "لم نستطع تفسير عنوان البيتكوين هذا. حاول مرة أخرى.",
-        "newBankAddressUsername": "عنوان البرق هذا ({lnAddress}) هو عنوان موجود في {bankName}، لكنك لم ترسل إليه نقدًا قط.",
+        "newBankAddressUsername": "عنوان البرق هذا ({lnAddress: string}) هو عنوان موجود في {bankName: string}، لكنك لم ترسل إليه نقدًا قط.",
         "confirmModal": {
             "title": "You've never sent money to this address",
-            "body1": "رجاءً تأكد أن المتلقي أعطاك عنوانًا في {bankName}.",
+            "body1": "رجاءً تأكد أن المتلقي أعطاك عنوانًا في {bankName: string}.",
             "bold2bold": "ليس أسم مستخدم من محفظة أخرى",
-            "body3": "وإلا، سيذهب النقد إلى الحساب في {bankName}، الذي عنوانه البرقي هو “{lnAddress}”.\n\nتحقق من صحة كتابة العنوان كذلك، مثلًا jackie ليس نفسه jack1e.",
-            "warning": "إذا كان العنوان مدخلًا خطأً، لن يستطيع {bankName} التراجع عن المعاملة.",
-            "checkBox": "{lnAddress} هو العنوان الصحيح.",
+            "body3": "وإلا، سيذهب النقد إلى الحساب في {bankName: string}، الذي عنوانه البرقي هو “{lnAddress: string}”.\n\nتحقق من صحة كتابة العنوان كذلك، مثلًا jackie ليس نفسه jack1e.",
+            "warning": "إذا كان العنوان مدخلًا خطأً، لن يستطيع {bankName: string} التراجع عن المعاملة.",
+            "checkBox": "{lnAddress: string} هو العنوان الصحيح.",
             "confirmButton": "أنا متأكد 100%"
         },
         "clipboardError": "خطأ في الحصول على القيمة من الحافظة"
     },
     "SendBitcoinScreen": {
         "amount": "الكمية",
-        "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance}",
+        "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
         "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
         "amountIsRequired": "المبلغ مطلوب",
@@ -2332,7 +2332,7 @@
         "unlimited": "غير محدود",
         "remaining": "الباقي",
         "stablesatTransfers": "مناقلات Stablesat",
-        "internalSend": "أرسل إلى مستخدم في {bankName}",
+        "internalSend": "أرسل إلى مستخدم في {bankName: string}",
         "error": "لم يُستطَع الحصول على القيود الآن",
         "increaseLimits": "Increase your limits"
     },
@@ -2443,7 +2443,7 @@
         "backHome": "الرجوع الى الخلف",
         "bank": "حساب مصرفي",
         "bankAccount": "حساب الكاش",
-        "bankAdvice": "نصيحة {bankName}",
+        "bankAdvice": "نصيحة {bankName: string}",
         "bankInfo": "تفاصيل {bankName: string}",
         "beta": "beta",
         "bitcoin": " البيتكوين",
