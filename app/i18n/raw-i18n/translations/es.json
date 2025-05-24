@@ -2042,7 +2042,7 @@
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {
-        "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining} intentos.",
+        "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
@@ -2123,14 +2123,14 @@
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "redeemingError": "Error al canjear Bitcoin. Póngase en contacto con el soporte técnico si este problema persiste.",
         "submissionError": "No se pudo enviar la solicitud de retiro. Póngase en contacto con el soporte técnico si este problema persiste.",
-        "minMaxRange": "Min: {minimumAmount}, Max: {maximumAmount}",
+        "minMaxRange": "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
         "redeemBitcoin": "Canjear Bitcoin",
-        "amountToRedeemFrom": "Cantidad a canjear de {domain}",
-        "redeemAmountFrom": "Canjear {amountToRedeem} de {domain}"
+        "amountToRedeemFrom": "Cantidad a canjear de {domain: string}",
+        "redeemAmountFrom": "Canjear {amountToRedeem: string} de {domain: string}"
     },
     "ScanningQRCodeScreen": {
         "invalidContent": "Encontramos lo siguiente:\n\n{found: string}\n\nEsto no es una dirección Bitcoin o factura Lightning válida",
-        "expiredContent": "Hemos encontrado:\n\n{found}\n\nEsta factura ha caducado",
+        "expiredContent": "Hemos encontrado:\n\n{found: string}\n\nEsta factura ha caducado",
         "invalidTitle": "Código QR inválido",
         "openLinkTitle": "Abrir enlace",
         "confirmOpenLink": "Estás seguro de que quieres abrir este enlace?",
@@ -2162,7 +2162,7 @@
         "feeLabel": "Tarifa de red",
         "memoLabel": "Nota:",
         "paymentFinal": "Recuerde que los pagos son definitivos y una vez realizados son irreversibles.",
-        "stalePrice": "El precio de bitcoin está desactualizado, se actualizó por última vez hace {timePeriod}. Por favor reinicie la aplicación antes de realizar el pago.",
+        "stalePrice": "El precio de bitcoin está desactualizado, se actualizó por última vez hace {timePeriod: string}. Por favor reinicie la aplicación antes de realizar el pago.",
         "title": "Confirmar pago",
         "totalLabel": "Total:",
         "totalExceed": "El total excede su saldo de {balance: string}",
@@ -2177,29 +2177,29 @@
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning."
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "Los nombres de usuario de {bankName} ahora son direcciones de {bankName}.",
+        "usernameNowAddress": "Los nombres de usuario de {bankName: string} ahora son direcciones de {bankName: string}.",
         "usernameNowAddressInfo": "Cuando ingrese un nombre de usuario de {bankName: string}, le agregaremos \"@{lnDomain: string}\" ( por ejemplo, maria@{lnDomain: string} ) para convertirlo en una dirección. Tu nombre de usuario ahora también es una dirección de {bankName: string}.\n\nLos nombres de usuario de {bankName: string} solo permitían transacciones dentro de {bankName: string}, mientras que las direcciones de {bankName: string} permiten realizar pagos con personas que usan diferentes billeteras.",
         "enterValidDestination": "Introduce un destino válido.",
-        "destinationOptions": "Puede enviar a una dirección {bankName}, una dirección LN, una factura LN o una dirección BTC.",
+        "destinationOptions": "Puede enviar a una dirección {bankName: string}, una dirección LN, una factura LN o una dirección BTC.",
         "expiredInvoice": "Esta factura ha caducado. Por favor, genere una nueva factura.",
         "wrongNetwork": "Esta factura es para una red diferente. Por favor, genere una nueva factura.",
         "invalidAmount": "Esto contiene un monto inválido. Por favor, ingrese nuevamente con un monto válido.",
-        "usernameDoesNotExist": "{lnAddress} no parece ser una dirección de {bankName} que exista.",
+        "usernameDoesNotExist": "{lnAddress: string} no parece ser una dirección de {bankName: string} que exista.",
         "usernameDoesNotExistAdvice": "En su lugar, puede pedirle al destinatario una factura o una dirección BTC.",
-        "selfPaymentError": "{lnAddress} es su dirección de {bankName}.",
+        "selfPaymentError": "{lnAddress: string} es su dirección de {bankName: string}.",
         "selfPaymentAdvice": "Si desea enviar dinero a otra billetera de su propiedad, puede usar una factura, una dirección LN o BTC en su lugar.",
         "lnAddressError": "No podemos comunicarnos con esta dirección Lightning. Si está seguro de que existe, puede volver a intentarlo más tarde.",
         "lnAddressAdvice": "En su lugar, puede pedirle al destinatario una factura o una dirección BTC.",
         "unknownLightning": "No podemos verificar esta dirección Lightning. Por favor, inténtelo de nuevo con una dirección diferente.",
         "unknownOnchain": "No podemos verificar esta dirección Bitcoin. Por favor, inténtelo de nuevo con una dirección diferente.",
-        "newBankAddressUsername": "{lnAddress} existe como dirección de {bankName}, pero nunca has enviado dinero a esta dirección.",
+        "newBankAddressUsername": "{lnAddress: string} existe como dirección de {bankName: string}, pero nunca has enviado dinero a esta dirección.",
         "confirmUsernameModal": {
             "title": "Nunca has enviado dinero a esta dirección.",
             "body1": "Asegúrese que el destinatario le dio una dirección de {bankName: string},",
             "bold2bold": "no un nombre de usuario de otra billetera.",
-            "body3": "De lo contrario, el dinero irá a una cuenta {bankName} que tenga la dirección “{lnAddress}” .\n\nRevisa también la ortografía de la primera parte de la dirección por ejemplo: “jackie” y “jack1e” ya que son 2 direcciones diferentes.",
-            "warning": "Si la dirección de {bankName} se ingresa incorrectamente, {bankName} no puede deshacer la transacción.",
-            "checkBox": "{lnAddress} si es la dirección correcta.",
+            "body3": "De lo contrario, el dinero irá a una cuenta {bankName: string} que tenga la dirección “{lnAddress: string}” .\n\nRevisa también la ortografía de la primera parte de la dirección por ejemplo: “jackie” y “jack1e” ya que son 2 direcciones diferentes.",
+            "warning": "Si la dirección de {bankName: string} se ingresa incorrectamente, {bankName: string} no puede deshacer la transacción.",
+            "checkBox": "{lnAddress: string} si es la dirección correcta.",
             "confirmButton": "Estoy 100% seguro"
         },
         "clipboardError": "Error al obtener el valor del portapapeles",
@@ -2208,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
-        "amountExceed": "La cantidad excede su saldo de {balance}",
+        "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
         "amountIsRequired": "Se requiere cantidad",
@@ -2419,7 +2419,7 @@
         "unlimited": "ilimitado",
         "remaining": "Restante",
         "stablesatTransfers": "Transferencias de Stablesats",
-        "internalSend": "Enviar a Usuario {bankName}",
+        "internalSend": "Enviar a Usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
     },
@@ -2554,8 +2554,8 @@
         "backHome": "Atrás",
         "bank": "Banco",
         "bankAccount": "Cuenta de efectivo",
-        "bankAdvice": "{bankName} Tip",
-        "bankInfo": "{bankName} Info",
+        "bankAdvice": "{bankName: string} Tip",
+        "bankInfo": "{bankName: string} Info",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Precio de Bitcoin",
@@ -2676,8 +2676,8 @@
         "mattermost": "Mattermost",
         "thankYouText": "Gracias por tus comentarios, ¿te gustaría sugerir una mejora?",
         "defaultEmailSubject": "{bankName: string} - Soporte",
-        "defaultSupportMessage": "Hola! Necesito ayuda con {bankName}, estoy usando la versión {version} de {os}.",
-        "emailCopied": "dirección electrónica {email} copiada al portapapeles",
+        "defaultSupportMessage": "Hola! Necesito ayuda con {bankName: string}, estoy usando la versión {version: string} de {os: string}.",
+        "emailCopied": "dirección electrónica {email: string} copiada al portapapeles",
         "deleteAccount": "Eliminar cuenta",
         "delete": "Eliminar ",
         "typeDelete": "Escribe \"{delete: string}\" para confirmar la eliminación de la cuenta",
@@ -2701,14 +2701,14 @@
     "AmountInputScreen": {
         "enterAmount": "Escribir una cantidad",
         "setAmount": "Establecer una cantidad",
-        "maxAmountExceeded": "La cantidad no debe superar {maxAmount}.",
-        "minAmountNotMet": "La cantidad debe ser como mínimo {minAmount}."
+        "maxAmountExceeded": "La cantidad no debe superar {maxAmount: string}.",
+        "minAmountNotMet": "La cantidad debe ser como mínimo {minAmount: string}."
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
     },
     "AppUpdate": {
-        "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os} con la versión {version}.",
+        "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",
         "versionNotSupported": "Esta versión para móviles ya no es compatible",
         "updateMandatory": "La actualización es obligatoria",
         "tapHereUpdate": "Pulse para actualizar ahora",

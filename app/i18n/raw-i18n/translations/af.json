@@ -48,7 +48,7 @@
         "frequentContacts": "Gereelde kontakte"
     },
     "ContactDetailsScreen": {
-        "title": "Transaksies met {username:string}"
+        "title": "Transaksies met {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Ruil",
@@ -2111,7 +2111,7 @@
         "submissionError": "Kon nie onttrekking aanvraag indien nie. Kontak asseblief ondersteuning as die probleem voortduur.",
         "minMaxRange": "Min: {minimumAmount: string}, Maks: {maximumAmount: string}",
         "redeemBitcoin": "Verkry Bitcoin",
-        "amountToRedeemFrom": "Bedrag om te verkry vanaf {domain:string}",
+        "amountToRedeemFrom": "Bedrag om te verkry vanaf {domain: string}",
         "redeemAmountFrom": "Verkry {amountToRedeem: string} van {domain: string}"
     },
     "ScanningQRCodeScreen": {
@@ -2143,7 +2143,7 @@
         "feeLabel": "Fooi",
         "memoLabel": "Nota:",
         "paymentFinal": "Betalings is finaal en onomkeerbaar.",
-        "stalePrice": "Jou Bitcoin prys is oud en was {timePeriod} gelede laas hersien. Herlaai asseblief die toepassing voordat jy betalngs maak.",
+        "stalePrice": "Jou Bitcoin prys is oud en was {timePeriod: string} gelede laas hersien. Herlaai asseblief die toepassing voordat jy betalngs maak.",
         "title": "Bevestig Betaling ",
         "totalLabel": "Totaal:",
         "totalExceed": "Die totaal is meer as jou saldo van {balance: string}",
@@ -2152,7 +2152,7 @@
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} gebruikersname is nou {bankName: string} adresse. ",
-        "usernameNowAddressInfo": "Wanneer jy 'n {bankName: string} gebruikersnaam invul, las ons \"@{lnDomain:string}\" by. Jou gebruikersnaam is nou 'n {bankName: string} adres. \n\nGaan na die {bankName: string} adres blad van verstellings af om te sien hoe om dit te gebruik om betalings te ontvang. ",
+        "usernameNowAddressInfo": "Wanneer jy 'n {bankName: string} gebruikersnaam invul, las ons \"@{lnDomain: string}\" by. Jou gebruikersnaam is nou 'n {bankName: string} adres. \n\nGaan na die {bankName: string} adres blad van verstellings af om te sien hoe om dit te gebruik om betalings te ontvang. ",
         "enterValidDestination": "Verskaf asseblief 'n geldige bestemming",
         "destinationOptions": "Jy kan na 'n {bankName: string} adres, LN adres, LN faktuur of BTC adres stuur. ",
         "expiredInvoice": "Hierdie faktuur het verval. Genereer asseblief 'n nuwe faktuur.",
@@ -2166,21 +2166,21 @@
         "lnAddressAdvice": "Maak seker die spelling is reg of vra die onvanger eerder vir 'n BTC-adres. ",
         "unknownLightning": "Ons kan nie hierdie Lightning-adres verwerk nie. Probeer asseblief weer. ",
         "unknownOnchain": "Ons kan nie hierdie Bitcoin-adres verwerk nie. Probeer asseblief weer. ",
-        "newBankAddressUsername": "{lnAddress:string} bestaan as 'n {bankName:string}-adres, maar jy het nog nooit geld daarheen oorgeplaas nie. ",
+        "newBankAddressUsername": "{lnAddress: string} bestaan as 'n {bankName: string}-adres, maar jy het nog nooit geld daarheen oorgeplaas nie. ",
         "confirmModal": {
             "title": "Jy het nog nooit fondse na die adres gestuur nie",
             "body1": "Maak asseblief seker die ontvanger het vir jou 'n {bankName: adres} gegee",
             "bold2bold": "nie 'n gebruikersnaam van 'n ander beursie nie.",
             "body3": "Anders gaan die geld na 'n {bankName: string} rekening wat die \"{lnAddress: string}\"-adres bevat.\n\nBevestig die spelling van die eerste deel van die adres ook bv. fanie en fan1e is 2 verskillende adresse.",
             "warning": "As die {bankName: string}-adres verkeerd ingevul word, kan {bankName: string} nie die transaksie regstel of verander nie. ",
-            "checkBox": "{lnAddress:string} is die regte adres. ",
+            "checkBox": "{lnAddress: string} is die regte adres. ",
             "confirmButton": "Ek is 100% seker"
         },
         "clipboardError": "Fout - Kon nie die waarde van die knipbord kry nie. "
     },
     "SendBitcoinScreen": {
         "amount": "Bedrag",
-        "amountExceed": "Bedrag oorskry jou saldo van {balance:string}",
+        "amountExceed": "Bedrag oorskry jou saldo van {balance: string}",
         "amountExceedsLimit": "Bedrag oorskry jou oorblywende daaglikse limiet van {limit: string}",
         "upgradeAccountToIncreaseLimit": "Opgradeer jou rekening om jou limiet te verhoog",
         "amountIsRequired": "Bedrag word benodig",
@@ -2445,8 +2445,8 @@
         "backHome": "Terug na Tuisblad",
         "bank": "Bank",
         "bankAccount": "Kontantrekening",
-        "bankAdvice": "{bank:Name:string} Advies",
-        "bankInfo": "{bankName:string} Inligting",
+        "bankAdvice": "{bank: Name:string} Advies",
+        "bankInfo": "{bankName: string} Inligting",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin-prys ",
@@ -2545,7 +2545,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Jy het sopas {value:string} sats ontvang",
+            "body": "Jy het sopas {value: string} sats ontvang",
             "title": "Betaling ontvang"
         }
     },
@@ -2562,7 +2562,7 @@
         "thankYouText": "Dankie vir die terugvoer, wil jy 'n verbetering voorstel?",
         "defaultEmailSubject": "{bankName: string} - Ondersteuning",
         "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
-        "emailCopied": "e-pos {email:string} oorgedra na knipbord",
+        "emailCopied": "e-pos {email: string} oorgedra na knipbord",
         "deleteAccount": "Skrap rekening",
         "delete": "Vee uit",
         "typeDelete": "Tik asseblief \"{delete: string}\" om rekeningskrap te bevestig",

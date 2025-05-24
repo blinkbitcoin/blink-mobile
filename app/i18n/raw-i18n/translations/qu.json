@@ -2141,7 +2141,7 @@
         "feeLabel": "Fee",
         "memoLabel": "Ñuqa:",
         "paymentFinal": "Kawsayniyta qillqata sutichinaqinmi, kaniy rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
-        "stalePrice": "Kaniyta rikuyta munanpi, Bitcoin kawsayniyta qillqata sutichinaqinmi, chaypi {timePeriod} qhipa kaniyta rikuyta munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi. Kawsayniyta qillqata sutichinaqinmi kaniy rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
+        "stalePrice": "Kaniyta rikuyta munanpi, Bitcoin kawsayniyta qillqata sutichinaqinmi, chaypi {timePeriod: string} qhipa kaniyta rikuyta munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi. Kawsayniyta qillqata sutichinaqinmi kaniy rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
         "title": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi",
         "totalLabel": "Suma:",
         "totalExceed": "Kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Chaynamanta kaniyta rikuyta munanpi, {balance: string} kawsayniyta qillqata sutichinaqinmi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
@@ -2332,7 +2332,7 @@
         "unlimited": "Mana kaniyta k'anchay",
         "remaining": "Qatichkan",
         "stablesatTransfers": "Stablesat kawsayniyta qillqata sutichinaqin",
-        "internalSend": "{bankName:} qillqata sutichinaqinmi kawsayniyta yachachiykachkanki",
+        "internalSend": "{bankName: string} qillqata sutichinaqinmi kawsayniyta yachachiykachkanki",
         "error": "Mana kaniyta rikuchiy kawsayniyta qillqata sutichinaqinmi k'anchayta qallariyta yachanakuyta munanki",
         "increaseLimits": "Increase your limits"
     },

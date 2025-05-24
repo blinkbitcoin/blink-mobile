@@ -1984,7 +1984,7 @@
         "quizComplete": "Selesai kuiz anda dan {formattedNumber | sats} telah berjaya diterima",
         "reviewQuiz": "Semak jawapan kuiz",
         "satAccumulated": "sats telah dikumpul",
-        "satsEarned": "{format nombor dalam |sats} telah diperolehi",
+        "satsEarned": "{format nombor dalam |sats: string} telah diperolehi",
         "sectionsCompleted": "Dah selesai",
         "title": "Dapat",
         "unlockQuestion": "Untuk membuka kunci, sila jawab soalan:",
@@ -2143,44 +2143,44 @@
         "feeLabel": "Cas dikenakan",
         "memoLabel": "Nota pesanan:",
         "paymentFinal": "Bayaran adalah betul",
-        "stalePrice": "Harga bitcoin anda ni yang lama dan tidak dikemaskin{tempohWaktu} yang lalu. Sila mula semula aplikasi ini sebelum membuat apa apa bayaran.",
+        "stalePrice": "Harga bitcoin anda ni yang lama dan tidak dikemaskin{tempohWaktu: string} yang lalu. Sila mula semula aplikasi ini sebelum membuat apa apa bayaran.",
         "title": "Pastikan bayaran anda",
         "totalLabel": "Jumlah:",
-        "totalExceed": "Jumlah yang melebihi baki anda {baki: string}",
+        "totalExceed": "Jumlah yang melebihi baki anda {balance: string}",
         "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
         "feeError": "Gagal untuk kira berapa cas dikenakan"
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "{NamaBank: string} id pengguna sekarang adalah {NamaBank: string} alamatnya.",
-        "usernameNowAddressInfo": "Bila kita isi id pengguna {NamaBank: string} , kita akan tambah \"@{lnDomain: string}\" menjadi (contoh maria@{lnDomain: string}) untuk menjadikannya alamat lengkap. Id pengguna anda sekarang adalah alamatnya juga{NamaBank: string} .\n\nSila ke alamat {NamaBank: string} yang ada di halaman tetapan setting untuk mengetahui bagaimana untuk menggunakannya atau dikongsi kepada orang lain untuk terima bayaran.",
+        "usernameNowAddress": "{bankName: string} id pengguna sekarang adalah {bankName: string} alamatnya.",
+        "usernameNowAddressInfo": "Bila kita isi id pengguna {bankName: string} , kita akan tambah \"@{lnDomain: string}\" menjadi (contoh maria@{lnDomain: string}) untuk menjadikannya alamat lengkap. Id pengguna anda sekarang adalah alamatnya juga{bankName: string} .\n\nSila ke alamat {bankName: string} yang ada di halaman tetapan setting untuk mengetahui bagaimana untuk menggunakannya atau dikongsi kepada orang lain untuk terima bayaran.",
         "enterValidDestination": "Masukkan destinasi yang tepat",
-        "destinationOptions": "Anda boleh hantar kepada alamat {NamaBank: string} , alamat LN, invois LN, ataupun alamat BTC",
+        "destinationOptions": "Anda boleh hantar kepada alamat {bankName: string} , alamat LN, invois LN, ataupun alamat BTC",
         "expiredInvoice": "Invois ini telah tamat tempoh. Sila jana invois yang baru.",
         "wrongNetwork": "Invois ini untuk kegunaan rangkaian lain. Sila jana invois yang baru.",
         "invalidAmount": "Amaun yang salah. Mohon buat semula amaun yang tepat.",
-        "usernameDoesNotExist": "Alamat {lnAdress: string} tak sama macam alamat {Namabank: string} yang ada",
+        "usernameDoesNotExist": "Alamat {lnAddress: string} tak sama macam alamat {bankName: string} yang ada",
         "usernameDoesNotExistAdvice": "Pastikan ejaan betul atau minta penerima invois LN atau alamat BTC",
-        "selfPaymentError": "{AlamatLN: string} adalah alamat {NamaBank: string} anda",
+        "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} anda",
         "selfPaymentAdvice": "Jika anda nak hantar wang kepada akaun lain kepunyaan anda, anda boleh gunakan invois, LN atau alamat BTC ",
         "lnAddressError": "Kami tak dapat nak capai alamat LN ini. Jika anda pasti alamat ini betul, sila cuba lagi.",
         "lnAddressAdvice": "Pastikan ejaan anda betul atau minta penerima beri invois atau alamat BTC",
         "unknownLightning": "Kami tak dapat kesan, analisa alamat LN ini. Cuba lagi",
         "unknownOnchain": "Kami tak dapat kesan, analisa alamat Bitcoin ini. Cuba lagi",
-        "newBankAddressUsername": "{alamatLN: string} telah ada sebagai alamat {NamaBank: string} , tapi awak tak pernah hantar wang lagi kepadanya.",
+        "newBankAddressUsername": "{lnAddress: string} telah ada sebagai alamat {bankName: string} , tapi awak tak pernah hantar wang lagi kepadanya.",
         "confirmModal": {
             "title": "Anda tak pernah menghantar wang ke alamat ini ",
-            "body1": "Sila pastikan penerima telah memberi anda alamat {NamaBank: string}, ",
+            "body1": "Sila pastikan penerima telah memberi anda alamat {bankName: string}, ",
             "bold2bold": "id pengguna ini tiada atau bukan dari dompet yang lain.",
-            "body3": "Sebaliknya, wang tersebut akan masuk ke akaun {NamaBank: string} yang mempunyai alamat “{AlamatLn: string}”.\n\nSemak ejaan bahagian pertama alamat dengan baik. contoh jackie dan jack1e adalah 2 alamat yang berbeza ",
-            "warning": "Jika alamat {NamaBank: string} ditulis tidak tepat, transaksi ke {NamaBank: string} tidak dapat dipulangkan semula",
-            "checkBox": "{AlamatLN: string} adalah alamat yang betul.",
+            "body3": "Sebaliknya, wang tersebut akan masuk ke akaun {bankName: string} yang mempunyai alamat “{AlamatLn: string}”.\n\nSemak ejaan bahagian pertama alamat dengan baik. contoh jackie dan jack1e adalah 2 alamat yang berbeza ",
+            "warning": "Jika alamat {bankName: string} ditulis tidak tepat, transaksi ke {bankName: string} tidak dapat dipulangkan semula",
+            "checkBox": "{lnAddress: string} adalah alamat yang betul.",
             "confirmButton": "Saya 100% yakin"
         },
         "clipboardError": "Ada kesalahan ketika nak dapatkan nilai daripada clipboard"
     },
     "SendBitcoinScreen": {
         "amount": "Amaun",
-        "amountExceed": "Amaun ini telah melebihi baki {baki: string}",
+        "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
         "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
         "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
         "amountIsRequired": "Jumlah diperlukan",
@@ -2218,7 +2218,7 @@
         "lnurlNoUsername": "Untuk menjana alamat lnurl anda mesti mempunyai ID pengguna. Nak tetapkan ID pengguna anda sekarang?",
         "copyClipboardLnurl": "Alamat Lnurl telah disalin dalam clipboard",
         "defaultWallet": "Akaun tetap",
-        "rateUs": "Berikan rating anda {Namakedai: string}",
+        "rateUs": "Berikan rating anda {storeName: string}",
         "theme": "Tema",
         "nfc": "Terima dari NFC",
         "nfcError": "Ada masalah ketika membaca tag NFC. Sila cuba lagi",
@@ -2248,11 +2248,11 @@
         "logOutAndDeleteLocalData": "Log keluar, dan hapus semua data",
         "IUnderstand": "Aku faham. Tolong aku log keluar",
         "logoutAlertTitle": "Anda pasti nak log keluar dan padam semua data yang ada?",
-        "logoutAlertContentPhone": "Anda perlu untuk masukkan semula nombor telefon untuk log masuk.\nNombor telefon anda {Nombortelefon: string} sila pastikan anda mempunyai akses kepada nombor tersebut untuk log masuk",
-        "logoutAlertContentEmail": "Anda perlu memasukkan semula emel untuk log masuk.\nemel anda adalah {emel: string}. Sila pastikan anda mempunyai akses kepadanya untuk log masuk",
-        "logoutAlertContentPhoneEmail": "Anda perlu untuk masukkan semula nombor telefon atau emel untuk log masuk.\nNombor telefon anda {nomborteledon: string} dan emel anda adalah {emel: string} jadi pastikan anda mempunyai akses ke atasnya intuk log masik",
-        "usdBalanceWarning": "Baki stablesats anda adalah {baki: string}",
-        "btcBalanceWarning": "Baki Bitcoin anda {baki: string}",
+        "logoutAlertContentPhone": "Anda perlu untuk masukkan semula nombor telefon untuk log masuk.\nNombor telefon anda {phoneNumber: string} sila pastikan anda mempunyai akses kepada nombor tersebut untuk log masuk",
+        "logoutAlertContentEmail": "Anda perlu memasukkan semula emel untuk log masuk.\nemel anda adalah {email: string}. Sila pastikan anda mempunyai akses kepadanya untuk log masuk",
+        "logoutAlertContentPhoneEmail": "Anda perlu untuk masukkan semula nombor telefon atau emel untuk log masuk.\nNombor telefon anda {phoneNumber: string} dan emel anda adalah {email: string} jadi pastikan anda mempunyai akses ke atasnya intuk log masik",
+        "usdBalanceWarning": "Baki stablesats anda adalah {balance: string}",
+        "btcBalanceWarning": "Baki Bitcoin anda {balance: string}",
         "secureYourAccount": "Daftar untuk dapatkan akaun anda",
         "tapToAdd": "Tekan untuk tambah",
         "deleteEmailPromptTitle": "Padam emel",
@@ -2334,7 +2334,7 @@
         "unlimited": "Tidak terhad",
         "remaining": "Masih berbaki",
         "stablesatTransfers": "Pemindahan stablesats",
-        "internalSend": "Hantar kepada {NamaBank: string} pengguna",
+        "internalSend": "Hantar kepada {bankName: string} pengguna",
         "error": "Tak dapat nak ikut had anda buat masa ini",
         "increaseLimits": "Tambahkan had anda"
     },
@@ -2358,7 +2358,7 @@
         "stayInTrialMode": "Kekal dalam mode percubaan"
     },
     "SetAddressModal": {
-        "title": "Tetapkan alamat {NamaBank: string}",
+        "title": "Tetapkan alamat {bankName: string}",
         "Errors": {
             "tooShort": "Alamat mesti melebihi 3 huruf",
             "tooLong": "Panjang alamat maksimum adalah 50 aksara",
@@ -2366,7 +2366,7 @@
             "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
             "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali."
         },
-        "receiveMoney": "Terima wang daripada dompet Lightning yang lain dan pengguna {NamaBank: string} dengan alamat ini.",
+        "receiveMoney": "Terima wang daripada dompet Lightning yang lain dan pengguna {bankName: string} dengan alamat ini.",
         "itCannotBeChanged": "Ia tak boleh ditukar selepas ini."
     },
     "WelcomeFirstScreen": {
@@ -2393,11 +2393,11 @@
         "errorLoggingIn": "Tak dapat nak log masuk. Anda pasti dah masukkan kod yang betul?",
         "errorTooManyAttempts": "Terlalu banyak percubaan. Cuba lagi nanti",
         "errorCannotUpgradeToExistingAccount": "Akaun menggunakan nombor telefon ini dah ada. Sila log keluar dari akaun percubaan anda, dan cuba log masuk semula dengan nombor telefon lain",
-        "header": "Untuk pastikan ini sdalah nombor telefon anda, masukkan kod yang baru sahaja kami hantar dengan menggunakan {saluran: string} pada {nombortelefon: string}",
+        "header": "Untuk pastikan ini sdalah nombor telefon anda, masukkan kod yang baru sahaja kami hantar dengan menggunakan {channel: string} pada {phoneNumber: string}",
         "placeholder": "Kod 6 digit",
         "sendAgain": "Hantar semula",
         "tryAgain": "Cuba lagi",
-        "sendViaOtherChannel": "Anda memilih untuk terima kod melalui {saluran: string}. Anda juga boleh mencuba untuk menerimanya melalui {lainlain: string}"
+        "sendViaOtherChannel": "Anda memilih untuk terima kod melalui {channel: string}. Anda juga boleh mencuba untuk menerimanya melalui {lainlain: string}"
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Tetapkan telefon anda",
@@ -2423,8 +2423,8 @@
         "placeholder": "hal@finney.org"
     },
     "EmailRegistrationValidateScreen": {
-        "header": "Untuk sahkan emel anda, sila masukkan kod yang baru sahaja kami hantar ke {emel: string}",
-        "success": "Emel {emel: string} telah berjaya disahkan"
+        "header": "Untuk sahkan emel anda, sila masukkan kod yang baru sahaja kami hantar ke {email: string}",
+        "success": "Emel {email: string} telah berjaya disahkan"
     },
     "EmailLoginInitiateScreen": {
         "title": "Log masuk menggunakan email",
@@ -2433,8 +2433,8 @@
         "send": "Hantar Kod"
     },
     "EmailLoginValidateScreen": {
-        "header": "Jika ada akaun yang menggunakan alamat {emel: string}, anda perlu menerima kod 6 digit untuk masuk\n\nJika anda tidak menerimanya, ia mungkin disebabkan bukan emel yang betul, emel tersebut ada di dalam fail spam.",
-        "success": "Emel {emel: string} telah berjaya disahkan"
+        "header": "Jika ada akaun yang menggunakan alamat {email: string}, anda perlu menerima kod 6 digit untuk masuk\n\nJika anda tidak menerimanya, ia mungkin disebabkan bukan emel yang betul, emel tersebut ada di dalam fail spam.",
+        "success": "Emel {email: string} telah berjaya disahkan"
     },
     "common": {
         "account": "Akaun",
@@ -2445,8 +2445,8 @@
         "backHome": "Kembali ke laman utama",
         "bank": "Bank",
         "bankAccount": "Akaun tunai",
-        "bankAdvice": "Pesanan kepada {NamaBank:string} ",
-        "bankInfo": "Info {NamaBank: string}",
+        "bankAdvice": "Pesanan kepada {bankName: string} ",
+        "bankInfo": "Info {bankName: string}",
         "beta": "Beta",
         "bitcoin": "Bitcoin ",
         "bitcoinPrice": "Harga Bitcoin",
@@ -2545,7 +2545,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Anda baru sahaja menerima {nilai: string} sats",
+            "body": "Anda baru sahaja menerima {value: string} sats",
             "title": "Bayaran telah diterima"
         }
     },
@@ -2560,18 +2560,18 @@
         "telegram": "Telegram",
         "mattermost": "Paling penting",
         "thankYouText": "Terima kasih atas maklum balas anda, bolehkah anda cadangkan kepada kami beberapa penambah baikan?",
-        "defaultEmailSubject": "Sokongan - {NamaBank: string}",
-        "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {NamaBank: string}, Saya menggunakan versi {version: string} pada {os: string}.",
-        "emailCopied": "emel {emel: string} telah disalin ke clipboard",
+        "defaultEmailSubject": "Sokongan - {bankName: string}",
+        "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {bankName: string}, Saya menggunakan versi {version: string} pada {os: string}.",
+        "emailCopied": "emel {email: string} telah disalin ke clipboard",
         "deleteAccount": "Padam akaun",
         "delete": "padam",
-        "typeDelete": "Sila taip \"{padam: string} untuk pastikan bahawa akaun ini akan dilupuskan.",
+        "typeDelete": "Sila taip \"{delete: string} untuk pastikan bahawa akaun ini akan dilupuskan.",
         "finalConfirmationAccountDeletionTitle": "Pengsahan Akhir Diperlukan",
         "finalConfirmationAccountDeletionMessage": "Anda pasti nak lupuskan akaun anda? Anda ini tidak boleh berpatah balik dengan keputusan ini.",
         "deleteAccountBalanceWarning": "Melupuskan akaun anda akan mengakibatkan kehilangan akses anda pada baki semasa. Anda pasti nak teruskan juga?",
         "deleteAccountConfirmation": "Anda telah memutuskan untuk memadam akaun anda.\n\nSekiranya tempoh percubaan berkenaan dengan keperluan regulasi telah tamat, baki data yang berkaitan dengan akaun anda akan dipadam selamanya.",
         "deleteAccountFromPhone": "Hai!, sila nyah aktifkan akaun saya. Nombor telefon saya adalah {phoneNumber: string}.",
-        "deleteAccountError": "Sesuatu yang salah telah berlaku  Hubungi {emel: string} untuk bantuan lanjut.",
+        "deleteAccountError": "Sesuatu yang salah telah berlaku  Hubungi {email: string} untuk bantuan lanjut.",
         "bye": "Selamat tinggal!"
     },
     "lnurl": {
@@ -2586,14 +2586,14 @@
     "AmountInputScreen": {
         "enterAmount": "Masukkan amaun",
         "setAmount": "Tetapkan amaun",
-        "maxAmountExceeded": "Amaun mestilah tidak melebihi {AmaunMaksimum: string}.",
-        "minAmountNotMet": "Amaun minimum mestilah {AmaunMinimum: string}."
+        "maxAmountExceeded": "Amaun mestilah tidak melebihi {maxAmount: string}.",
+        "minAmountNotMet": "Amaun minimum mestilah {minAmount: string}."
     },
     "AmountInputButton": {
         "tapToSetAmount": "Tetapkan amaun"
     },
     "AppUpdate": {
-        "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {versi: string}",
+        "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",
         "versionNotSupported": "Telefon pintar ini tidak lagi boleh gunakan aplikasi ini",
         "updateMandatory": "Kemaskini adalah wajib",
         "tapHereUpdate": "Tekan sini untuk kemaskini sekarang",
@@ -2635,7 +2635,7 @@
         "inviteFriends": "Jemput rakan anda",
         "buildYourCircle": "Kembangkan kumpulan kecil anda",
         "myBlinkCircles": "Kumpulan kecil dalam Blink saya",
-        "someones": "{pengguna: string}'s",
+        "someones": "{username: string}'s",
         "groupEffort": "Adaptasi Bitcoin adalah sebuah usaha berkumpulan.\nJemput rakan anda dan hantar sats kepada mereka untuk mula membina rangkaian kumpulan kecil anda.",
         "drivingAdoption": "Aku sedang mengemudi adaptasi Bitcoin menggunakan Blink.",
         "septChallenge": {

@@ -2151,7 +2151,7 @@
         "feeLabel": "Gebyr",
         "memoLabel": "Note:",
         "paymentFinal": "Betalinger er endelige.",
-        "stalePrice": "Din bitcoin-pris er gammel og blev sidst opdateret for {timePeriod} siden. Genstart appen, inden du foretager en betaling.",
+        "stalePrice": "Din bitcoin-pris er gammel og blev sidst opdateret for {timePeriod: string} siden. Genstart appen, inden du foretager en betaling.",
         "title": "Bekræft betaling",
         "totalLabel": "Total:",
         "totalExceed": "Totalen overstiger din saldo på {balance: string}",

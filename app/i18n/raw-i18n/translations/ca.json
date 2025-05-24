@@ -4,7 +4,7 @@
         "buttonTitle": "Estableix la teva adreça",
         "yourLightningAddress": "La teva adreça Lightning",
         "notAbleToChange": "No podràs canviar la teva {bankName: string} adreça un cop l'hagis configurat.",
-        "addressNotAvailable": "Aquesta {bankName} adreça ja està presa.",
+        "addressNotAvailable": "Aquesta {bankName: string} adreça ja està presa.",
         "somethingWentWrong": "Alguna cosa ha anat malament. Si us plau, intenta-ho més tard. ",
         "merchantTitle": "Per als comerciants",
         "yourCashRegister": "La teva caixa registradora Lightning",
@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "Com utilitzar la teva Caixa Registradora",
         "howToUseYourAddressExplainer": "Comparteix amb algú que tingui un moneder compatible, com ara:",
         "howToUseYourPaycodeExplainer": "Pots imprimir el teu codi de pagament  (és una factura sense import) i mostrar-lo al teu comerç per rebre pagaments. Les persones poden pagar-te escanejant-lo amb un moneder que tingui activat el  Lightning.\n\nNo obstant, tinguis en compte que alguns moneders no poden escanejar factures sense import:",
-        "howToUseYourCashRegisterExplainer": "Permet que les persones recaptin pagaments mitjançant l'enllaç de la caixa registradora, sense accedir al teu moneder.\nPoden crear factures i els pagaments s'enviaran directament al teu moneder {bankName}."
+        "howToUseYourCashRegisterExplainer": "Permet que les persones recaptin pagaments mitjançant l'enllaç de la caixa registradora, sense accedir al teu moneder.\nPoden crear factures i els pagaments s'enviaran directament al teu moneder {bankName: string}."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Termes i Condicions",
@@ -56,7 +56,7 @@
         "frequentContacts": "Contactes freqüents"
     },
     "ContactDetailsScreen": {
-        "title": "Transaccions amb {username}"
+        "title": "Transaccions amb {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Converteix",
@@ -2042,7 +2042,7 @@
         "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
     },
     "PinScreen": {
-        "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining} intents.",
+        "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
         "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
         "setPin": "Configura el teu codi PIN",
         "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
@@ -2104,7 +2104,7 @@
         "invoiceExpired": "Factura caducada",
         "invoiceValidity": {
             "validFor1Day": "Vàlid per 1 dia",
-            "validForNext": "Vàlid per al proper {duration:string}",
+            "validForNext": "Vàlid per al proper {duration: string}",
             "validBefore": "Vàlid abans de {time: string}",
             "expiresIn": "Caduca en {duration: string}",
             "expiresNow": "Caduca ara"
@@ -2123,14 +2123,14 @@
         "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
         "redeemingError": "No s'ha pogut bescanviar Bitcoin. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
         "submissionError": "No s'ha pogut enviar la petició de retirada. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
-        "minMaxRange": "Min: {minimumAmount}, Max: {maximumAmount}",
+        "minMaxRange": "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
         "redeemBitcoin": "Bescanviar Bitcoin",
-        "amountToRedeemFrom": "Import a bescanviar de {domain}",
-        "redeemAmountFrom": "Bescanviar {amountToRedeem} de {domain}"
+        "amountToRedeemFrom": "Import a bescanviar de {domain: string}",
+        "redeemAmountFrom": "Bescanviar {amountToRedeem: string} de {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Hem trobat:\n\n{found}\n\nAquesta no és una adreça Bitcoin vàlida o una factura Lightning",
-        "expiredContent": "Hem trobat:\n\n{found}\n\nAquesta factura ha caducat",
+        "invalidContent": "Hem trobat:\n\n{found: string}\n\nAquesta no és una adreça Bitcoin vàlida o una factura Lightning",
+        "expiredContent": "Hem trobat:\n\n{found: string}\n\nAquesta factura ha caducat",
         "invalidTitle": "Codi QR no vàlid",
         "openLinkTitle": "Obrir l'enllaç",
         "confirmOpenLink": "Estàs segur que vols obrir aquest enllaç?",
@@ -2140,7 +2140,7 @@
         "noCamera": "No s'ha trobat cap càmera",
         "openSettings": "Obra la configuració",
         "unableToOpenSettings": "No és possible obrir la configuració",
-        "invalidContentLnurl": "Hem trobat:\n\n{found}\n\nactualment no és compatible",
+        "invalidContentLnurl": "Hem trobat:\n\n{found: string}\n\nactualment no és compatible",
         "imageLibraryPermissionsNotGranted": "No tenim permí per accedir a la biblioteca d'imatges. Comprova la configuració de l'aplicació."
     },
     "SecurityScreen": {
@@ -2162,10 +2162,10 @@
         "feeLabel": "Comissió",
         "memoLabel": "Nota:",
         "paymentFinal": "Els pagaments són definitius.",
-        "stalePrice": "El preu de bitcoin és antic i es va actualitzar per última vegada fa {timePeriod}. Si us plau, reinicia l'aplicació abans de fer un pagament.",
+        "stalePrice": "El preu de bitcoin és antic i es va actualitzar per última vegada fa {timePeriod: string}. Si us plau, reinicia l'aplicació abans de fer un pagament.",
         "title": "Confirma el pagament",
         "totalLabel": "Total:",
-        "totalExceed": "El total supera el teu saldo de {balance:}",
+        "totalExceed": "El total supera el teu saldo de {balance: string}",
         "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
         "feeError": "No s'ha pogut calcular la comissió",
         "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
@@ -2177,29 +2177,29 @@
         "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning."
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "{bankName} nom d'usuari és ara la adreça {bankName}.",
-        "usernameNowAddressInfo": "Quan introdueixes un nom d'usuari {bankName} , afegirem \"@{lnDomain}\" al nom  (e.g maria@{lnDomain}) per convertir-lo en adreça. El teu nom d'usuari {bankName} és tambe una adreça.\n\nVes a la teva pàgina {bankName} des de configuració per apendre a utilitzar-la o per compartir-la per rebre pagaments.",
+        "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",
+        "usernameNowAddressInfo": "Quan introdueixes un nom d'usuari {bankName: string} , afegirem \"@{lnDomain: string}\" al nom  (e.g maria@{lnDomain: string}) per convertir-lo en adreça. El teu nom d'usuari {bankName: string} és tambe una adreça.\n\nVes a la teva pàgina {bankName: string} des de configuració per apendre a utilitzar-la o per compartir-la per rebre pagaments.",
         "enterValidDestination": "Si us plau introdueix una destinació vàlida",
-        "destinationOptions": "Pots enviar a {bankName} adreça, adreça LN, factura LN, o a adreça BTC.",
+        "destinationOptions": "Pots enviar a {bankName: string} adreça, adreça LN, factura LN, o a adreça BTC.",
         "expiredInvoice": "Aquesta factura ha caducat. Si us plau genera una nova factura.",
         "wrongNetwork": "Aquesta factura és per a una altra xarxa. Si us plau genera una nova factura.",
         "invalidAmount": "Això conté un import invàlid. Si us plau torna-ho a generar amb un import vàlid.",
-        "usernameDoesNotExist": "{lnAddress} no sembla ser una {bankName} adreça existent.",
+        "usernameDoesNotExist": "{lnAddress: string} no sembla ser una {bankName: string} adreça existent.",
         "usernameDoesNotExistAdvice": "Assegurat que l'ortografia sigui correcta o demana al destinatari una factura LN o una adreça BTC.",
-        "selfPaymentError": "{lnAddress} és la teva adreça {bankName} .",
+        "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
         "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
         "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
         "lnAddressAdvice": "Revisa que l'ortografia sigui correcta o demana al destinatari una factura o una adreça BTC.",
         "unknownLightning": "No podem analitzar aquesta adreça Lightning. Si us plau torna-ho.a provar",
         "unknownOnchain": "No podem analitzar aquesta adreça Bitcoin. Si us plau torna-ho a provar.",
-        "newBankAddressUsername": "{lnAddress: string} existeix com a adreça {bankName}, però mai hi has enviat diners.",
+        "newBankAddressUsername": "{lnAddress: string} existeix com a adreça {bankName: string}, però mai hi has enviat diners.",
         "confirmUsernameModal": {
             "title": "Mai has enviat diners a aquesta adreça",
-            "body1": "Si us plau, assegura't que el destinatari t'ha donat una adreça {bankName},",
+            "body1": "Si us plau, assegura't que el destinatari t'ha donat una adreça {bankName: string},",
             "bold2bold": "no un nom d'usuari d'un altre moneder.",
-            "body3": "En cas contrari, els diners aniran al compte  {bankName} que té l'adreça “{lnAddress}”.\n\nRevisa l'ortografia de la primera part de l'adreça. per exemple. jackie i jack1e són 2 adreces diferents",
-            "warning": "Si l'adreça {bankName} s'introdueix incorrectament, {bankName} no es podrà anular la transacció.",
-            "checkBox": "{lnAddress} és l'adreça correcta.",
+            "body3": "En cas contrari, els diners aniran al compte  {bankName: string} que té l'adreça “{lnAddress: string}”.\n\nRevisa l'ortografia de la primera part de l'adreça. per exemple. jackie i jack1e són 2 adreces diferents",
+            "warning": "Si l'adreça {bankName: string} s'introdueix incorrectament, {bankName: string} no es podrà anular la transacció.",
+            "checkBox": "{lnAddress: string} és l'adreça correcta.",
             "confirmButton": "Estic 100% segur"
         },
         "clipboardError": "S'ha produït un error en obtenir un valor del porta-retalls",
@@ -2208,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
         "amount": "Import",
-        "amountExceed": "L'import excedeix el teu saldo {balance}",
+        "amountExceed": "L'import excedeix el teu saldo {balance: string}",
         "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
         "amountIsRequired": "L'import és necessari",
@@ -2265,7 +2265,7 @@
         "lnurlNoUsername": "Per generar una adreça lnurl primer has d'establir un nom d'usuari. Vols configurar un nom d'usuari ara?",
         "copyClipboardLnurl": "L'adreça Lnurl s'ha copiat al porta-retalls",
         "defaultWallet": "Compte predeterminat",
-        "rateUs": "Valora'ns a {storeName}",
+        "rateUs": "Valora'ns a {storeName: string}",
         "theme": "Tema",
         "nfc": "Rep per NFC",
         "nfcError": "Error llegint la etiqueta NFC. Si us plau torna-ho a provar.",
@@ -2409,7 +2409,7 @@
         "unlimited": "Il·limitat",
         "remaining": "Restant",
         "stablesatTransfers": "Transferències de Stablesats",
-        "internalSend": "Enviar a usuari {bankName} ",
+        "internalSend": "Enviar a usuari {bankName: string} ",
         "error": "No es poden obtenir els límits en aquest moment",
         "increaseLimits": "Incrementa els teus límits"
     },
@@ -2533,8 +2533,8 @@
         "backHome": "Retorn a l'inici",
         "bank": "Banc",
         "bankAccount": "Compte fiat",
-        "bankAdvice": "{bankName} Consell",
-        "bankInfo": "{bankName} Informació",
+        "bankAdvice": "{bankName: string} Consell",
+        "bankInfo": "{bankName: string} Informació",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Preu de Bitcoin",
@@ -2638,7 +2638,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Acabes de rebre {value} sats",
+            "body": "Acabes de rebre {value: string} sats",
             "title": "Pagament rebut"
         }
     },
@@ -2655,8 +2655,8 @@
         "mattermost": "Mattermost",
         "thankYouText": "Gràcies pels comentaris, vols suggerir una millora?",
         "defaultEmailSubject": "{bankName: string} - Suport",
-        "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName}, utilitzo la versió {version} de {os}.",
-        "emailCopied": "l'adreça electrònica {email} s'ha copiat al porta-retalls",
+        "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
+        "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
         "deleteAccount": "Elimina el compte",
         "delete": "esborrar",
         "typeDelete": "Escriu \"{delete: string}\" per confirmar la supressió del compte",
@@ -2680,14 +2680,14 @@
     "AmountInputScreen": {
         "enterAmount": "Introdüeix l'import",
         "setAmount": "Estableix l'import",
-        "maxAmountExceeded": "l'import no ha de superar {maxAmount}.",
-        "minAmountNotMet": "l'import ha de ser com a mínimt {minAmount}."
+        "maxAmountExceeded": "l'import no ha de superar {maxAmount: string}.",
+        "minAmountNotMet": "l'import ha de ser com a mínimt {minAmount: string}."
     },
     "AmountInputButton": {
         "tapToSetAmount": "Estableix l'import"
     },
     "AppUpdate": {
-        "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os} versió {version}.",
+        "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",
         "versionNotSupported": "Aquesta versió per a mòbils ja no s'admet",
         "updateMandatory": "L'actualització és obligatòria",
         "tapHereUpdate": "Prem aquí per actualitzar ara",
