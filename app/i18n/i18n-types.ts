@@ -8630,6 +8630,10 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * P​r​o​f​i​l​e​s
+		 */
+		profile: string
 	}
 	errors: {
 		/**
@@ -17716,6 +17720,10 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Profiles
+		 */
+		profile: () => LocalizedString
 	}
 	errors: {
 		/**
