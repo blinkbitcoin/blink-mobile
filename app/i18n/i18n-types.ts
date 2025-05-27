@@ -8813,6 +8813,10 @@ type RootTranslation = {
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
+		/**
+		 * P​r​o​f​i​l​e​s
+		 */
+		profile: string
 	}
 	errors: {
 		/**
@@ -18083,6 +18087,10 @@ export type TranslationFunctions = {
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
+		/**
+		 * Profiles
+		 */
+		profile: () => LocalizedString
 	}
 	errors: {
 		/**

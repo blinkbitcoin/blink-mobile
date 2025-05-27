@@ -5,7 +5,7 @@
  * Later on, this will support switching between accounts
  */
 import React from "react"
-import { View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -20,6 +20,9 @@ import { Text, makeStyles, useTheme, Skeleton } from "@rneui/themed"
 export const AccountBanner = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
@@ -31,6 +34,10 @@ export const AccountBanner = () => {
   const usernameTitle = data?.me?.username || LL.common.blinkUser()
 
   if (loading) return <Skeleton style={styles.outer} animation="pulse" />
+
+  const handleSwitchPress = () => {
+    navigation.navigate("profileScreen")
+  }
 
   return (
     <TouchableWithoutFeedback
@@ -47,6 +54,11 @@ export const AccountBanner = () => {
         <Text type="p2">
           {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
         </Text>
+        {isUserLoggedIn && (
+          <TouchableOpacity style={styles.switch} onPress={handleSwitchPress}>
+            <GaloyIcon name="transfer" size={27} color={colors.primary} />
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableWithoutFeedback>
   )
@@ -67,5 +79,12 @@ const useStyles = makeStyles(() => ({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 12,
+  },
+  switch: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 4,
+    marginLeft: "auto",
   },
 }))
