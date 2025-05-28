@@ -8630,6 +8630,22 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * E​x​p​i​r​a​t​i​o​n​ ​T​i​m​e
+		 */
+		expirationTime: string
+		/**
+		 * M​i​n​u​t​e
+		 */
+		minute: string
+		/**
+		 * D​a​y​s
+		 */
+		days: string
+		/**
+		 * D​a​y
+		 */
+		day: string
 	}
 	errors: {
 		/**
@@ -17716,6 +17732,22 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Expiration Time
+		 */
+		expirationTime: () => LocalizedString
+		/**
+		 * Minute
+		 */
+		minute: () => LocalizedString
+		/**
+		 * Days
+		 */
+		days: () => LocalizedString
+		/**
+		 * Day
+		 */
+		day: () => LocalizedString
 	}
 	errors: {
 		/**

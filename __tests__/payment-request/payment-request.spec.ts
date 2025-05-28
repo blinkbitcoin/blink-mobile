@@ -193,6 +193,62 @@ describe("payment request", () => {
     expect(prNew.info?.data?.getFullUriFn({})).toBe(usdAmountInvoice)
   })
 
+  it("ln with usd receiving wallet - set expiration time", async () => {
+    const prcd = createPaymentRequestCreationData({
+      ...defaultParams,
+      receivingWalletDescriptor: usdWalletDescriptor,
+      unitOfAccountAmount: toUsdMoneyAmount(1),
+      expirationTime: 5,
+    })
+
+    const pr = createPaymentRequest({ creationData: prcd, mutations })
+
+    expect(pr.info).toBeUndefined()
+    expect(pr.state).toBe(PaymentRequestState.Idle)
+
+    const prNew = await pr.generateRequest()
+
+    const expiresAt =
+      prNew?.info?.data?.invoiceType === Invoice.Lightning && prNew.info?.data?.expiresAt
+        ? prNew.info.data.expiresAt?.toISOString()
+        : null
+
+    expect(prNew.info).not.toBeUndefined()
+    expect(mockLnUsdInvoiceCreate).toHaveBeenCalled()
+    expect(prNew.state).toBe(PaymentRequestState.Created)
+    expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
+    expect(prNew.info?.data?.getFullUriFn({})).toBe(usdAmountInvoice)
+    expect(expiresAt).toBe("2023-02-21T17:51:00.000Z")
+  })
+
+  it("ln with btc receiving wallet - set expiration time", async () => {
+    const prcd = createPaymentRequestCreationData({
+      ...defaultParams,
+      receivingWalletDescriptor: btcWalletDescriptor,
+      unitOfAccountAmount: toUsdMoneyAmount(1),
+      expirationTime: 60,
+    })
+
+    const pr = createPaymentRequest({ creationData: prcd, mutations })
+
+    expect(pr.info).toBeUndefined()
+    expect(pr.state).toBe(PaymentRequestState.Idle)
+
+    const prNew = await pr.generateRequest()
+
+    const expiresAt =
+      prNew?.info?.data?.invoiceType === Invoice.Lightning && prNew.info?.data?.expiresAt
+        ? prNew.info.data.expiresAt?.toISOString()
+        : null
+
+    expect(prNew.info).not.toBeUndefined()
+    expect(mockLnInvoiceCreate).toHaveBeenCalled()
+    expect(prNew.state).toBe(PaymentRequestState.Created)
+    expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
+    expect(prNew.info?.data?.getFullUriFn({})).toBe(btcAmountInvoice)
+    expect(expiresAt).toBe("2023-02-22T17:46:48.000Z")
+  })
+
   it("paycode/lnurl", async () => {
     const prcd = createPaymentRequestCreationData({
       ...defaultParams,

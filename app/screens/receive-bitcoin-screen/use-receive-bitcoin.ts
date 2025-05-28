@@ -227,6 +227,7 @@ export const useReceiveBitcoin = () => {
   }, [
     prcd?.type,
     prcd?.unitOfAccountAmount,
+    prcd?.expirationTime,
     prcd?.memo,
     prcd?.receivingWalletDescriptor,
     prcd?.username,
@@ -445,11 +446,21 @@ export const useReceiveBitcoin = () => {
       }
       return pr
     })
+    setExpirationTime(0)
   }
   const setAmount = (amount: MoneyAmount<WalletOrDisplayCurrency>) => {
     setPRCD((pr) => {
       if (pr && pr.setAmount) {
         return pr.setAmount(amount)
+      }
+      return pr
+    })
+  }
+
+  const setExpirationTime = (expirationTime: number) => {
+    setPRCD((pr) => {
+      if (pr && pr.setExpirationTime) {
+        return pr.setExpirationTime(expirationTime)
       }
       return pr
     })
@@ -507,6 +518,7 @@ export const useReceiveBitcoin = () => {
     setMemo,
     setReceivingWallet,
     setAmount,
+    setExpirationTime,
     feesInformation: data?.globals?.feesInformation,
     memoChangeText,
     setMemoChangeText,
