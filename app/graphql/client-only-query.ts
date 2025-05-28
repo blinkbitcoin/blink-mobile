@@ -23,6 +23,9 @@ import {
   IntroducingCirclesModalShownQuery,
   RegionDocument,
   RegionQuery,
+  AccountMetadataDocument,
+  AccountMetadataQuery,
+  // AccountMetadataEntry,
 } from "./generated"
 
 export default gql`
@@ -69,6 +72,14 @@ export default gql`
 
   query innerCircleValue {
     innerCircleValue @client
+  }
+
+  query accountMetadata {
+    accountMetadata @client {
+      accountId
+      sessionCount
+      upgradeModalShown
+    }
   }
 `
 
@@ -226,5 +237,64 @@ export const setInnerCircleCachedValue = (
     })
   } catch {
     console.warn("unable to update InnerCircleValueDocument")
+  }
+}
+
+export const getAccountMetadata = (client: ApolloClient<unknown>, accountId: string) => {
+  try {
+    const result = client.readQuery<AccountMetadataQuery>({
+      query: AccountMetadataDocument,
+    })
+
+    return (
+      result?.accountMetadata.find((entry) => entry.accountId === accountId) ?? {
+        accountId,
+        sessionCount: 0,
+        upgradeModalShown: 0,
+      }
+    )
+  } catch {
+    return {
+      accountId,
+      sessionCount: 0,
+      upgradeModalShown: 0,
+    }
+  }
+}
+
+export const updateAccountMetadata = (
+  client: ApolloClient<unknown>,
+  accountId: string,
+  updates: { sessionCount?: number; upgradeModalShown?: number },
+) => {
+  try {
+    const result = client.readQuery<AccountMetadataQuery>({
+      query: AccountMetadataDocument,
+    })
+
+    const current = result?.accountMetadata ?? []
+    const existing = current.find((entry) => entry.accountId === accountId)
+
+    const updatedEntry = {
+      accountId,
+      sessionCount: updates.sessionCount ?? existing?.sessionCount ?? 0,
+      upgradeModalShown: updates.upgradeModalShown ?? existing?.upgradeModalShown ?? 0,
+      __typename: "AccountMetadataEntry" as const,
+    }
+
+    const newList = [
+      ...current.filter((entry) => entry.accountId !== accountId),
+      updatedEntry,
+    ] as const
+
+    client.writeQuery<AccountMetadataQuery>({
+      query: AccountMetadataDocument,
+      data: {
+        __typename: "Query",
+        accountMetadata: newList,
+      },
+    })
+  } catch (err) {
+    console.warn("Could not update accountMetadata", err)
   }
 }

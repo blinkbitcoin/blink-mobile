@@ -2045,6 +2045,7 @@ const en: BaseTranslation = {
     logInCreateAccount: "Log in / create account",
     createAccount: "Create new account",
     exploreWallet: "Explore wallet",
+    login: "Login",
     logBackInWith: "Log back in with",
     headline: "Wallet powered by Galoy",
     startTrialAccount: "Start with a trial account",
@@ -2058,6 +2059,9 @@ const en: BaseTranslation = {
       noBackup: "No backup option",
       sendingLimit: "Reduced daily sending limit",
       noOnchain: "No receiving bitcoin onchain",
+      recoveryOption: "Recovery option",
+      dailyLimit: "$1000 daily transaction limit",
+      onchainReceive: "Receive bitcoin onchain",
     },
   },
   MapScreen: {
@@ -2529,9 +2533,13 @@ const en: BaseTranslation = {
     onlyAPhoneNumber: "Quick and easy phone number verification",
     letsGo: "Let's go!",
     stayInTrialMode: "Stay in trial mode",
+    upgradeToLevel: "Upgrade to Level {level: number}",
+    notNow: "Not now",
+    setUpLevelAccount: "Set up Level {level: number} account",
   },
   SetAddressModal: {
     title: "Set {bankName: string} address",
+    mainTitle: "Choose Lightning Address",
     setLightningAddress: "Set Lightning address",
     Errors: {
       tooShort: "Address must be at least 3 characters long",
@@ -2542,7 +2550,7 @@ const en: BaseTranslation = {
     },
     receiveMoney:
       "Receive money from other lightning wallets and {bankName: string} users with this address.",
-    itCannotBeChanged: "It can't be changed later.",
+    itCannotBeChanged: "Choose well – it cannot be changed later!",
   },
   WelcomeFirstScreen: {
     bank: "Bitcoin is designed to let you store, send and receive money, without relying on a bank or credit card.",
@@ -2570,6 +2578,61 @@ const en: BaseTranslation = {
     sms: "Send via SMS",
     whatsapp: "Send via WhatsApp",
     telegram: "Send via Telegram",
+  },
+  LoginMethodScreen: {
+    title: "Select how you want to login to your account.",
+    useTelegram: "Use Telegram",
+    useSms: "Use SMS",
+    useWhatsapp: "Use WhatsApp",
+    useEmail: "Use Email",
+    setupTelegram: "Set up Telegram login",
+    setupSms: "Set up SMS login",
+    setupWhatsapp: "Set up WhatsApp login",
+    setupEmail: "Set up Email login",
+  },
+  OnboardingScreen: {
+    welcomeLevel1: {
+      mainTitle: "Welcome to Level 1",
+      title: "New features unlocked for your account:",
+      receibeBitcoinDescription: "Receive Bitcoin using your phone number",
+      dailyLimitDescription: "Send up to $1,000 USD per day",
+      onchainDescription: "Receive on-chain payments",
+    },
+    emailBenefits: {
+      mainTitle: "Add email login",
+      title: "Email login allows you to:",
+      backupDescription: "Have a backup to accessing your account",
+      supportDescription: "Make it easier for us to give you support",
+      securityDescription: "Increase account security",
+      primaryButton: "Set up email login",
+    },
+    emailConfirmed: {
+      mainTitle: "Email login added",
+      title: "New features unlocked for your account:",
+    },
+    lightningBenefits: {
+      mainTitle: "Set up Lightning Address",
+      title: "Lightning Address benefits:",
+      staticAddressDescription: "A static address to receive payments",
+      easyToShareDescription: "Easy to memorize and share publicly or privately",
+      blinkToolsDescription: "Unlocks various Blink tools useful for commerce",
+      primaryButton: "Set up Lightning Address",
+    },
+    lightningConfirmed: {
+      mainTitle: "Lightning Address set",
+      title: "New features unlocked for your account:",
+    },
+    supportScreen: {
+      mainTitle: "Blink Support",
+      title: "One more thing:",
+      description: "We are on a mission to make bitcoin accessible to all, and we would love to hear from you.",
+      contactInfo: {
+        messagePrefix: "Don't hesitate to contact us at ",
+        messageSuffix: " and share how we can make Blink better for you and others."
+      },
+      primaryButton: "Done",
+      secondaryButton: "Contact Support",
+    }
   },
   PhoneLoginValidationScreen: {
     errorLoggingIn: "Error logging in. Did you use the right code?",
@@ -2742,6 +2805,7 @@ const en: BaseTranslation = {
     problemMaybeReauth:
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
+    recommended: "Recommended",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -2773,6 +2837,7 @@ const en: BaseTranslation = {
     joinTheCommunity: "Join the community",
     whatsapp: "WhatsApp",
     email: "Email",
+    sms: "SMS",
     faq: "FAQ",
     enjoyingApp: "Enjoying the app?",
     statusPage: "Status Page",

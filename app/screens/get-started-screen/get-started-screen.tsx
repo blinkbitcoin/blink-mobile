@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, TouchableOpacity, View } from "react-native"
+import { Pressable, View } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -18,8 +18,8 @@ import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/app-logo-light.svg"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { PhoneLoginInitiateType } from "../phone-auth-screen"
 import useAppCheckToken from "./use-device-token"
+import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
 export const GetStartedScreen: React.FC = () => {
   const navigation =
@@ -48,33 +48,6 @@ export const GetStartedScreen: React.FC = () => {
 
   const handleCreateAccount = () => {
     logGetStartedAction({
-      action: "log_in",
-      createDeviceAccountEnabled: Boolean(appCheckToken),
-    })
-    navigation.navigate("acceptTermsAndConditions", { flow: "phone" })
-  }
-
-  const handleLoginWithPhone = () => {
-    logGetStartedAction({
-      action: "log_in",
-      createDeviceAccountEnabled: Boolean(appCheckToken),
-    })
-    navigation.navigate("phoneFlow", {
-      screen: "phoneLoginInitiate",
-      params: { type: PhoneLoginInitiateType.Login },
-    })
-  }
-
-  const handleExploreWallet = () => {
-    logGetStartedAction({
-      action: "explore_wallet",
-      createDeviceAccountEnabled: Boolean(appCheckToken),
-    })
-    navigation.navigate("Primary")
-  }
-
-  const handleCreateDeviceAccount = async () => {
-    logGetStartedAction({
       action: "create_device_account",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
@@ -82,13 +55,14 @@ export const GetStartedScreen: React.FC = () => {
     navigation.navigate("acceptTermsAndConditions", { flow: "trial" })
   }
 
-  const handleLoginWithEmail = async () => {
+  const handleLogin = () => {
     logGetStartedAction({
-      action: "login_with_email",
+      action: "log_in",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
-
-    navigation.navigate("emailLoginInitiate")
+    navigation.navigate("login", {
+      type: PhoneLoginInitiateType.Login,
+    })
   }
 
   const {
@@ -122,35 +96,7 @@ export const GetStartedScreen: React.FC = () => {
           onPress={() => handleCreateAccount()}
           containerStyle={styles.buttonContainer}
         />
-        {appCheckToken ? (
-          <GaloySecondaryButton
-            title={LL.GetStartedScreen.startTrialAccount()}
-            onPress={handleCreateDeviceAccount}
-          />
-        ) : (
-          <GaloySecondaryButton
-            title={LL.GetStartedScreen.exploreWallet()}
-            onPress={handleExploreWallet}
-          />
-        )}
-        <View style={styles.loginFooterContainer}>
-          <Text type="p2">{LL.GetStartedScreen.logBackInWith()} </Text>
-          <TouchableOpacity activeOpacity={0.5} onPress={handleLoginWithPhone}>
-            <Text type="p2" style={styles.buttonText}>
-              {LL.common.phone()}
-            </Text>
-          </TouchableOpacity>
-          <Text type="p2"> {LL.common.or()} </Text>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={handleLoginWithEmail}
-            {...testProps("email-button")}
-          >
-            <Text type="p2" style={styles.buttonText}>
-              {LL.common.email()}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <GaloySecondaryButton title={LL.GetStartedScreen.login()} onPress={handleLogin} />
       </View>
     </Screen>
   )
@@ -170,21 +116,11 @@ const useStyles = makeStyles(() => ({
 
   logoContainer: { width: "100%", height: "50%", marginTop: 50 },
 
-  loginFooterContainer: {
-    marginTop: 24,
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-
   textInstance: {
     justifyContent: "center",
     flexDirection: "row",
     textAlign: "center",
     marginTop: 24,
     marginBottom: -24,
-  },
-
-  buttonText: {
-    textDecorationLine: "underline",
   },
 }))

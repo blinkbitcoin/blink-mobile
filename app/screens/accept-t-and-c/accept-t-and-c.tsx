@@ -1,49 +1,52 @@
 import * as React from "react"
 import { Alert, View } from "react-native"
-
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles } from "@rneui/themed"
-
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import InAppBrowser from "react-native-inappbrowser-reborn"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+
 import { Screen } from "../../components/screen"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
-import { DeviceAccountModal } from "../get-started-screen/device-account-modal"
+import useAppCheckToken from "../get-started-screen/use-device-token"
+import { useCreateDeviceAccount } from "../get-started-screen/use-create-device-account"
 
 export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const styles = useStyles()
-
+  const { LL } = useI18nContext()
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "acceptTermsAndConditions">>()
-
-  const { LL } = useI18nContext()
 
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow } = route.params || { flow: "phone" }
 
-  const [confirmationModalVisible, setConfirmationModalVisible] = React.useState(false)
-  const openConfirmationModal = () => setConfirmationModalVisible(true)
-  const closeConfirmationModal = () => {
-    setConfirmationModalVisible(false)
+  const { deviceAccountEnabled } = useFeatureFlags()
+  const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
+  const { createDeviceAccountAndLogin, loading } = useCreateDeviceAccount()
+
+  const fallbackToPhoneLogin = () => {
+    navigation.navigate("login", {
+      type: PhoneLoginInitiateType.CreateAccount,
+    })
   }
 
-  const action = () => {
-    if (flow === "phone") {
-      navigation.navigate("phoneFlow", {
-        screen: "phoneLoginInitiate",
-        params: {
-          type: PhoneLoginInitiateType.CreateAccount,
-        },
-      })
-    } else if (flow === "trial") {
-      openConfirmationModal()
-    } else {
-      Alert.alert("unknown flow")
+  const action = async () => {
+    if (flow === "phone" || !appCheckToken) {
+      fallbackToPhoneLogin()
+      return
     }
+
+    if (flow === "trial") {
+      createDeviceAccountAndLogin(appCheckToken).catch(fallbackToPhoneLogin)
+      return
+    }
+
+    Alert.alert("unknown flow")
   }
 
   return (
@@ -53,10 +56,6 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       keyboardOffset="navigationHeader"
       keyboardShouldPersistTaps="handled"
     >
-      <DeviceAccountModal
-        isVisible={confirmationModalVisible}
-        closeModal={closeConfirmationModal}
-      />
       <View style={styles.viewWrapper}>
         <View style={styles.textContainer}>
           <Text type={"p1"}>{LL.AcceptTermsAndConditionsScreen.text()}</Text>
@@ -83,6 +82,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AcceptTermsAndConditionsScreen.accept()}
             onPress={action}
+            loading={loading}
+            disabled={loading}
           />
         </View>
       </View>
