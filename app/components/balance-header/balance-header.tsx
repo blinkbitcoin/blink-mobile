@@ -1,15 +1,11 @@
 import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { Pressable, TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 
 
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text } from "@rneui/themed"
-import { GaloyIcon } from "../atomic/galoy-icon"
-import { useNavigation } from "@react-navigation/native"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { StackNavigationProp } from "@react-navigation/stack"
 
 const Loader = () => {
   const styles = useStyles()
@@ -33,7 +29,6 @@ type Props = {
 
 export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) => {
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
@@ -71,18 +66,8 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
     }
   }
 
-  const handleSwitchPress = () => {
-    navigation.navigate("profileScreen")
-  }
-
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
-      <Pressable onPress={handleSwitchPress}>
-        <View style={styles.profileContainer}>
-          <Text type="p2">businessusername</Text>
-          <GaloyIcon name={"caret-down"} size={18} />
-        </View>
-      </Pressable>
       {hideAmount ? (
         <TouchableOpacity onPress={switchMemoryHideAmount}>
           <Text style={styles.balanceHiddenText}>****</Text>
@@ -130,12 +115,5 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHiddenText: {
     fontSize: 32,
     fontWeight: "bold",
-  },
-  profileContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-    margin: 0,
-    padding: 0,
   },
 }))

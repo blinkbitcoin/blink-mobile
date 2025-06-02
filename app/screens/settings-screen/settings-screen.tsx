@@ -24,7 +24,6 @@ import { AccountLNAddress } from "./settings/account-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
-import { SwitchAccount } from "./settings/multi-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -81,8 +80,10 @@ export const SettingsScreen: React.FC = () => {
     fetchPolicy: "cache-and-network",
   })
 
+  const accountItems = [AccountLevelSetting, TxLimits]
+
   const items = {
-    account: [AccountLevelSetting, TxLimits, SwitchAccount],
+    account: [...accountItems],
     loginMethods: [EmailSetting, PhoneSetting],
     waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
     preferences: [

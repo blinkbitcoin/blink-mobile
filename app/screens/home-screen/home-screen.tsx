@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMemo } from "react"
-import { RefreshControl, View, Alert } from "react-native"
+import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql, useApolloClient } from "@apollo/client"
 import Modal from "react-native-modal"
 import { LocalizedString } from "typesafe-i18n"
@@ -16,7 +16,7 @@ import {
 
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { icons } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
@@ -49,9 +49,22 @@ import {
   useSettingsScreenQuery,
   useUpgradeModalShownQuery,
 } from "@app/graphql/generated"
-
-// import { triggerUpgradeModal } from "./trigger-upgrade-modal"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { getErrorMessages } from "@app/graphql/utils"
+import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { isIos } from "@app/utils/helper"
+import { useNavigation, useIsFocused } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { Text, makeStyles, useTheme } from "@rneui/themed"
+
+import { BalanceHeader } from "../../components/balance-header"
+import { Screen } from "../../components/screen"
+import { MemoizedTransactionItem } from "../../components/transaction-item"
+import { RootStackParamList } from "../../navigation/stack-param-lists"
+import { testProps } from "../../utils/testProps"
+import { fetchProfiles } from "@app/utils/multi-account"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 
@@ -153,12 +166,17 @@ export const HomeScreen: React.FC = () => {
     React.useState(false)
   const toggleSetDefaultAccountModal = () =>
     setSetDefaultAccountModalVisible(!setDefaultAccountModalVisible)
+  const [profiles, setProfiles] = React.useState<ProfileProps[]>([])
+  const [currentProfile, setCurrentProfile] = React.useState<ProfileProps>()
+
+  const { saveProfile } = useSaveSessionProfile()
 
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
   const {
     appConfig: {
       galoyInstance: { id: galoyInstanceId },
+      token: currentToken,
     },
   } = useAppConfig()
 
@@ -435,6 +453,27 @@ export const HomeScreen: React.FC = () => {
     </Modal>
   )
 
+  React.useEffect(() => {
+    const loadProfiles = async () => {
+      let profilesList = await fetchProfiles(currentToken)
+
+      if (profilesList.length === 0) {
+        await saveProfile(currentToken)
+        profilesList = await fetchProfiles(currentToken)
+      }
+      setProfiles(profilesList)
+      setCurrentProfile(profilesList.find((profile) => profile.selected))
+    }
+
+    if (!loading && currentToken) {
+      loadProfiles()
+    }
+  }, [saveProfile, currentToken, loading])
+
+  const handleSwitchPress = () => {
+    navigation.navigate("profileScreen")
+  }
+
   return (
     <Screen>
       {AccountCreationNeededModal}
@@ -446,6 +485,16 @@ export const HomeScreen: React.FC = () => {
         isVisible={isUpgradeModalVisible}
         closeModal={closeUpgradeModal}
       />
+      <View style={styles.multiAccountContianer}>
+        {!loading && profiles.length > 1 && currentProfile?.identifier && (
+          <Pressable onPress={handleSwitchPress}>
+            <View style={styles.profileContainer}>
+              <Text type="p2">{currentProfile?.identifier}</Text>
+              <GaloyIcon name={"caret-down"} size={18} />
+            </View>
+          </Pressable>
+        )}
+      </View>
       <View style={[styles.header, styles.container]}>
         <GaloyIconButton
           onPress={() => navigation.navigate("priceHistory")}
@@ -593,7 +642,7 @@ const useStyles = makeStyles(({ colors }) => ({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    height: 120,
+    marginBottom: 37,
   },
   error: {
     alignSelf: "center",
@@ -601,5 +650,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   container: {
     marginHorizontal: 20,
+  },
+  multiAccountContianer: {
+    alignSelf: "center",
+    marginTop: 37,
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+    marginBottom: 5,
   },
 }))
