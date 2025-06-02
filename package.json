@@ -151,7 +151,7 @@
   "devDependencies": {
     "@babel/core": "^7.24.4",
     "@babel/preset-env": "^7.24.4",
-    "@babel/runtime": "^7.24.4",
+    "@babel/runtime": "^7.27.4",
     "@graphql-codegen/add": "^5.0.2",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/client-preset": "^4.2.5",
