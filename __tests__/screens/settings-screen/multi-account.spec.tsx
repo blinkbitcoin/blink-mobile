@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, waitFor, screen } from "@testing-library/react-native"
+import { render, waitFor, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { SwitchAccountComponent } from "@app/screens/settings-screen/account/multi-account/switch-account.stories"
