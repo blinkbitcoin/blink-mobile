@@ -88,6 +88,7 @@ export type RootStackParamList = {
   transactionHistory?: undefined
   Earn: undefined
   accountScreen: undefined
+  profileScreen: undefined
   notificationSettingsScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList

@@ -2742,6 +2742,7 @@ const en: BaseTranslation = {
     problemMaybeReauth:
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
+    profile: "Profiles",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

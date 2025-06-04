@@ -12,10 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  useBetaQuery,
-  useUnacknowledgedNotificationCountQuery,
-} from "@app/graphql/generated"
+import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 
 import { AccountBanner } from "./account/banner"
 import { EmailSetting } from "./account/settings/email"
@@ -27,7 +24,6 @@ import { AccountLNAddress } from "./settings/account-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
-import { SwitchAccount } from "./settings/multi-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -79,18 +75,15 @@ export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { data: dataBeta } = useBetaQuery()
   const { currentLevel, isAtLeastLevelOne } = useLevel()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     fetchPolicy: "cache-and-network",
   })
 
-  const beta = dataBeta?.beta ?? false
   const accountItems = [AccountLevelSetting, TxLimits]
-  const switchAcccount = () => <>{beta && <SwitchAccount />}</>
 
   const items = {
-    account: [...accountItems, switchAcccount],
+    account: [...accountItems],
     loginMethods: [EmailSetting, PhoneSetting],
     waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
     preferences: [
