@@ -52,7 +52,10 @@ export const WalletFilterDropdown: React.FC<{
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={loading ? undefined : toggleModal}>
+      <TouchableWithoutFeedback
+        onPress={loading ? undefined : toggleModal}
+        testID="wallet-filter-dropdown"
+      >
         <View style={[styles.fieldBackground, loading && styles.disabled]}>
           <View style={styles.walletSelectorTypeContainer}>
             <View style={current.containerStyle}>
