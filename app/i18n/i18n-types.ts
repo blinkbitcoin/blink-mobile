@@ -8630,6 +8630,18 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * D​o​l​l​a​r
+		 */
+		dollar: string
+		/**
+		 * A​L​L
+		 */
+		all: string
+		/**
+		 * A​l​l​ ​a​c​c​o​u​n​t​s
+		 */
+		allAccounts: string
 	}
 	errors: {
 		/**
@@ -17716,6 +17728,18 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Dollar
+		 */
+		dollar: () => LocalizedString
+		/**
+		 * ALL
+		 */
+		all: () => LocalizedString
+		/**
+		 * All accounts
+		 */
+		allAccounts: () => LocalizedString
 	}
 	errors: {
 		/**
