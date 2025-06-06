@@ -485,7 +485,7 @@ export const MoveMoneyScreen: ScreenType = ({
                 {
                   title: translate("MoveMoneyScreen.sinpe"),
                   target: "sinpeScreen",
-                  icon: <Icon name="cash-outline" size={32} color={palette.orange} />,
+                  icon: <Icon name="payments" size={32} color={palette.orange} />,
                   hidden: !phoneNumber?.startsWith("+506") || !username,
                 },
                 ...(recentTRansactionsData ? [recentTRansactionsData] : []),

@@ -151,7 +151,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         <ListItem.Title>{description}</ListItem.Title>
         <ListItem.Subtitle style={styles.subtitle}>
           {subtitle ? dateDisplay({...tx, showFullDate}) : undefined}
-          {bbOrderNbr && <Icon name="information-circle-outline" size={16} color={palette.darkGrey} onPress={() => {
+          {bbOrderNbr && <Icon name="info-outline" size={16} color={palette.darkGrey} onPress={() => {
             navigation.navigate("sinpeScreen", {
               orderNbr: bbOrderNbr,
             })
