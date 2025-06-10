@@ -14,6 +14,7 @@ extend type Query {
   hasPromptedSetDefaultAccount: Boolean!
   introducingCirclesModalShown: Boolean!
   innerCircleValue: Int!
+  accountMetadata: [AccountMetadataEntry!]!
 }
 
 extend type Region {
@@ -31,4 +32,10 @@ extend type Account {
 extend type ConsumerAccount {
   usdWallet: UsdWallet
   btcWallet: BTCWallet
+}
+
+type AccountMetadataEntry {
+  accountId: String!
+  sessionCount: Int!
+  upgradeModalShown: Int!
 }

@@ -1000,6 +1000,15 @@ query accountLimits {
   }
 }
 
+query accountMetadata {
+  accountMetadata @client {
+    accountId
+    sessionCount
+    upgradeModalShown
+    __typename
+  }
+}
+
 query addressScreen {
   me {
     id
@@ -1016,23 +1025,6 @@ query analytics {
   }
   globals {
     network
-    __typename
-  }
-}
-
-query balanceHeader {
-  me {
-    id
-    defaultAccount {
-      id
-      wallets {
-        id
-        balance
-        walletCurrency
-        __typename
-      }
-      __typename
-    }
     __typename
   }
 }
