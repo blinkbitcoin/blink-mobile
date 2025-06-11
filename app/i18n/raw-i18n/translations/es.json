@@ -2362,7 +2362,8 @@
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
-        "error": "No se pudo obtener la información de los perfiles en este momento"
+        "error": "No se pudo obtener la información de los perfiles en este momento",
+        "fromThisDevice": "desde este dispositivo?"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",

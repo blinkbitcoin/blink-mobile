@@ -24,6 +24,7 @@ export const SwitchAccount: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [profiles, setProfiles] = useState<ProfileProps[]>([])
+  const [nextProfileToken, setNextProfileToken] = useState<string>()
 
   useEffect(() => {
     const loadProfiles = async () => {
@@ -33,6 +34,7 @@ export const SwitchAccount: React.FC = () => {
         profilesList = await fetchProfiles(currentToken)
       }
       setProfiles(profilesList)
+      setNextProfileToken(profilesList.find((profile) => !profile.selected)?.token)
     }
 
     loadProfiles()
@@ -46,7 +48,12 @@ export const SwitchAccount: React.FC = () => {
     <Screen keyboardShouldPersistTaps="handled" style={styles.containerScreen}>
       <ScrollView contentContainerStyle={styles.outer}>
         {profiles.map((profile, index) => (
-          <ProfileScreen key={index} {...profile} isFirstItem={index === 0} />
+          <ProfileScreen
+            key={index}
+            {...profile}
+            isFirstItem={index === 0}
+            nextProfileToken={nextProfileToken}
+          />
         ))}
       </ScrollView>
       <GaloyPrimaryButton

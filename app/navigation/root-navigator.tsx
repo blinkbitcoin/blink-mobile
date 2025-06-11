@@ -369,6 +369,7 @@ export const RootStack = () => {
         component={SwitchAccount}
         options={{
           title: LL.common.profile(),
+          headerShadowVisible: false,
         }}
       />
       <RootNavigator.Screen

@@ -75,7 +75,7 @@ export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { currentLevel, isAtLeastLevelOne } = useLevel()
+  const { isAtLeastLevelOne } = useLevel()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     fetchPolicy: "cache-and-network",
   })
@@ -121,7 +121,7 @@ export const SettingsScreen: React.FC = () => {
   return (
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
-        {currentLevel === AccountLevel.NonAuth && <AccountBanner />}
+        <AccountBanner showSwitchAccountIcon={isAtLeastLevelOne} />
         <SettingsGroup name={LL.common.account()} items={items.account} />
         {isAtLeastLevelOne && (
           <SettingsGroup
@@ -148,7 +148,7 @@ export const SettingsScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   outer: {
-    marginTop: 12,
+    marginTop: 5,
     paddingHorizontal: 12,
     paddingBottom: 20,
     display: "flex",

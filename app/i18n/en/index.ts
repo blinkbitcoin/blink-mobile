@@ -2444,6 +2444,7 @@ const en: BaseTranslation = {
   ProfileScreen: {
     addAccount: "Add Account",
     error: "Unable to fetch profiles at this time",
+    fromThisDevice: "from this device?",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",

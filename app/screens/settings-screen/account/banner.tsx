@@ -17,7 +17,9 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rneui/themed"
 
-export const AccountBanner = () => {
+export const AccountBanner: React.FC<{ showSwitchAccountIcon?: boolean }> = ({
+  showSwitchAccountIcon = false,
+}) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const {
@@ -54,7 +56,7 @@ export const AccountBanner = () => {
         <Text type="p2">
           {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
         </Text>
-        {isUserLoggedIn && (
+        {isUserLoggedIn && showSwitchAccountIcon && (
           <TouchableOpacity style={styles.switch} onPress={handleSwitchPress}>
             <GaloyIcon name="transfer" size={27} color={colors.primary} />
           </TouchableOpacity>
