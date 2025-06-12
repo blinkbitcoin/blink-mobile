@@ -368,7 +368,7 @@ export const RootStack = () => {
         name="profileScreen"
         component={SwitchAccount}
         options={{
-          title: LL.common.profile(),
+          title: LL.common.profiles(),
           headerShadowVisible: false,
         }}
       />

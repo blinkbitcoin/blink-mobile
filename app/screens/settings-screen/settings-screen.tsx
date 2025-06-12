@@ -10,7 +10,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 

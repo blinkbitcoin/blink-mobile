@@ -8820,7 +8820,7 @@ type RootTranslation = {
 		/**
 		 * P​r​o​f​i​l​e​s
 		 */
-		profile: string
+		profiles: string
 	}
 	errors: {
 		/**
@@ -9005,6 +9005,12 @@ type RootTranslation = {
 		 * B​y​e​!
 		 */
 		bye: string
+		/**
+		 * A​t​t​e​n​t​i​o​n​:​ ​A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
+	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​d​e​l​e​t​i​n​g​.​
+	​D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.
+		 */
+		deleteAccountWarning: string
 	}
 	lnurl: {
 		/**
@@ -18098,7 +18104,7 @@ export type TranslationFunctions = {
 		/**
 		 * Profiles
 		 */
-		profile: () => LocalizedString
+		profiles: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -18274,6 +18280,12 @@ export type TranslationFunctions = {
 		 * Bye!
 		 */
 		bye: () => LocalizedString
+		/**
+		 * Attention: Account deletion is permanent!
+	Make sure wallets have no funds before deleting.
+	Deleted account cannot be reinstated.
+		 */
+		deleteAccountWarning: () => LocalizedString
 	}
 	lnurl: {
 		/**
