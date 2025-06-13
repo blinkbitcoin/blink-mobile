@@ -28,16 +28,19 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+const mockSaveProfile = jest.fn()
+
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
     appConfig: {
       galoyInstance: {
         authUrl: "https://api.blink.sv",
       },
+      token: "mock-token-1",
     },
   }),
   useSaveSessionProfile: () => ({
-    saveProfile: jest.fn(),
+    saveProfile: mockSaveProfile,
   }),
 }))
 

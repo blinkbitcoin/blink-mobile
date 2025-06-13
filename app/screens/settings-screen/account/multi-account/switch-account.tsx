@@ -27,6 +27,7 @@ export const SwitchAccount: React.FC = () => {
   const [nextProfileToken, setNextProfileToken] = useState<string>()
 
   useEffect(() => {
+    if (!currentToken) return
     const loadProfiles = async () => {
       let profilesList = await fetchProfiles(currentToken)
       if (profilesList.length === 0) {
