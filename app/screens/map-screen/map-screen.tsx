@@ -3,7 +3,6 @@ import * as React from "react"
 // eslint-disable-next-line react-native/split-platform-components
 import { Alert, Dimensions } from "react-native"
 import { Region, MapMarker as MapMarkerType } from "react-native-maps"
-import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
 import { gql } from "@apollo/client"
 import MapComponent from "@app/components/map-component"
@@ -23,7 +22,11 @@ import countryCodes from "../../../utils/countryInfo.json"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { toastShow } from "../../utils/toast"
-import { LOCATION_PERMISSION, getUserRegion } from "./functions"
+import mockBtcMapaData from "./mock.json"
+import { IbtcmapElement, IMarker } from "./btc-map-interface"
+import { useMemo } from "react"
+
+const btcMapElements: IbtcmapElement[] = mockBtcMapaData as IbtcmapElement[]
 
 const EL_ZONTE_COORDS = {
   latitude: 13.496743,
@@ -80,7 +83,6 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
   const [isRefreshed, setIsRefreshed] = React.useState(false)
   const [focusedMarker, setFocusedMarker] = React.useState<MapMarker | null>(null)
   const [isInitializing, setInitializing] = React.useState(true)
-  const [permissionsStatus, setPermissionsStatus] = React.useState<PermissionStatus>()
 
   useFocusEffect(() => {
     if (!isRefreshed) {
@@ -93,23 +95,8 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     toastShow({ message: error.message, LL })
   }
 
-  // On screen load, check (NOT request) if location permissions are given
   React.useEffect(() => {
-    ;(async () => {
-      const status = await check(LOCATION_PERMISSION)
-      setPermissionsStatus(status)
-      if (status === RESULTS.GRANTED) {
-        getUserRegion(async (region) => {
-          if (region) {
-            setInitialLocation(region)
-          } else {
-            setInitializing(false)
-          }
-        })
-      } else {
-        setInitializing(false)
-      }
-    })()
+    setInitializing(false)
   }, [])
 
   const alertOnLocationError = React.useCallback(() => {
@@ -181,20 +168,37 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     focusedMarkerRef.current = null
   }
 
+  const formattedData = useMemo<IMarker[]>(() => {
+    if (!btcMapElements) return []
+    return btcMapElements
+      .filter(
+        ({ osm_json }) =>
+          osm_json &&
+          typeof osm_json.lat === "number" &&
+          typeof osm_json.lon === "number",
+      )
+      .map(({ id, osm_json, tags }) => ({
+        id,
+        location: {
+          latitude: osm_json.lat,
+          longitude: osm_json.lon,
+          tags: osm_json.tags,
+        },
+        tags,
+      }))
+  }, [btcMapElements])
+
   return (
     <Screen>
       {initialLocation && (
         <MapComponent
-          data={data}
+          data={formattedData}
           userLocation={initialLocation}
-          permissionsStatus={permissionsStatus}
-          setPermissionsStatus={setPermissionsStatus}
           handleMapPress={handleMapPress}
           handleMarkerPress={handleMarkerPress}
           focusedMarker={focusedMarker}
           focusedMarkerRef={focusedMarkerRef}
           handleCalloutPress={handleCalloutPress}
-          alertOnLocationError={alertOnLocationError}
         />
       )}
     </Screen>
