@@ -46,7 +46,9 @@ describe("Settings Screen", () => {
     LL = i18nObject("en")
   })
 
-  it("Renders switch account component correctly when beta is enabled", async () => {
+  it("Renders switch account component when beta is enabled", async () => {
+    ;(useBetaQuery as jest.Mock).mockReturnValue({ data: { beta: true } })
+
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
@@ -60,14 +62,12 @@ describe("Settings Screen", () => {
         }),
     )
 
-    const switchAccountRight = screen.getByTestId("Switch Account-right")
-
-    expect(switchAccountRight.props.accessibilityLabel).toBe("Switch Account-right")
-    expect(screen.getByText(LL.AccountScreen.switchAccount())).toBeTruthy()
     expect(screen.getByTestId("Switch Account")).toBeTruthy()
+    expect(screen.getByTestId("Switch Account-right")).toBeTruthy()
+    expect(screen.getByText(LL.AccountScreen.switchAccount())).toBeTruthy()
   })
 
-  it("Does not render switch account component when beta is disabled", async () => {
+  it("Renders switch account component when beta is disabled", async () => {
     ;(useBetaQuery as jest.Mock).mockReturnValue({ data: { beta: false } })
 
     render(
@@ -83,7 +83,8 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(screen.queryByTestId("Switch Account")).toBeNull()
-    expect(screen.queryByTestId("Switch Account-right")).toBeNull()
+    expect(screen.getByTestId("Switch Account")).toBeTruthy()
+    expect(screen.getByTestId("Switch Account-right")).toBeTruthy()
+    expect(screen.getByText(LL.AccountScreen.switchAccount())).toBeTruthy()
   })
 })

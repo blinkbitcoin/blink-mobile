@@ -32,8 +32,7 @@ type Props = {
 }
 
 export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
-  const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "emailRegistrationValidate">>()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [errorMessage, setErrorMessage] = React.useState<string>("")
 
@@ -42,7 +41,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const [emailVerify] = useUserEmailRegistrationValidateMutation()
 
   const [loading, setLoading] = useState(false)
-  const { emailRegistrationId, email } = route.params
+  const { emailRegistrationId, email, onboarding } = route.params
 
   const send = useCallback(
     async (code: string) => {
@@ -67,6 +66,14 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
               {
                 text: LL.common.ok(),
                 onPress: () => {
+                  if (onboarding) {
+                    navigation.replace("onboarding", {
+                      screen: "lightningBenefits",
+                      params: { onboarding },
+                    })
+                    return
+                  }
+
                   navigation.navigate("settings")
                 },
               },
@@ -81,7 +88,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         setLoading(false)
       }
     },
-    [emailVerify, emailRegistrationId, navigation, LL, email],
+    [emailVerify, emailRegistrationId, navigation, LL, email, onboarding],
   )
 
   const header = LL.EmailRegistrationValidateScreen.header({ email })

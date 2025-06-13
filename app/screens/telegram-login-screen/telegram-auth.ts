@@ -6,7 +6,7 @@ import analytics from "@react-native-firebase/analytics"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { PhoneValidationStackParamList } from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { BLINK_DEEP_LINK_PREFIX, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { formatPublicKey } from "@app/utils/format-public-key"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
@@ -26,8 +26,8 @@ type TelegramAuthData = {
   nonce: string
 }
 
-export const useTelegramLogin = (phone: string) => {
-  const navigation = useNavigation<StackNavigationProp<PhoneValidationStackParamList>>()
+export const useTelegramLogin = (phone: string, onboarding: boolean = false) => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { saveProfile } = useSaveSessionProfile()
 
   const [loading, setLoading] = useState(false)
@@ -107,6 +107,16 @@ export const useTelegramLogin = (phone: string) => {
         }
 
         saveProfile(result.authToken)
+
+        // Redirect to onboarding flow if applicable
+        if (onboarding) {
+          navigation.replace("onboarding", {
+            screen: "welcomeLevel1",
+            params: { onboarding },
+          })
+          return
+        }
+
         navigation.replace("Primary")
       } catch (e) {
         const message = (e as Error).message
@@ -116,7 +126,7 @@ export const useTelegramLogin = (phone: string) => {
         setError(message)
       }
     },
-    [navigation, saveProfile, loginWithTelegramPassport],
+    [navigation, onboarding, saveProfile, loginWithTelegramPassport],
   )
 
   useFocusEffect(

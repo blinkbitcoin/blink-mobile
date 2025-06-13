@@ -28,7 +28,10 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Input } from "@rneui/themed"
 
 import { Screen } from "../../components/screen"
-import type { PhoneValidationStackParamList } from "../../navigation/stack-param-lists"
+import type {
+  PhoneValidationStackParamList,
+  RootStackParamList,
+} from "../../navigation/stack-param-lists"
 import { parseTimer } from "../../utils/timer"
 import { PhoneCodeChannelToFriendlyName } from "./request-phone-code-login"
 
@@ -166,10 +169,7 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
   route,
 }) => {
   const styles = useStyles()
-  const navigation =
-    useNavigation<
-      StackNavigationProp<PhoneValidationStackParamList, "phoneLoginValidate">
-    >()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [status, setStatus] = useState<ValidatePhoneCodeStatusType>(
     ValidatePhoneCodeStatus.WaitingForCode,
@@ -202,7 +202,7 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
   const [code, _setCode] = useState("")
   // Wait 2.5 minutes before allowing another code request
   const [secondsRemaining, setSecondsRemaining] = useState<number>(150)
-  const { phone, channel } = route.params
+  const { phone, channel, onboarding } = route.params
   const {
     theme: { colors },
   } = useTheme()
@@ -232,6 +232,15 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
 
             if (authToken) {
               saveProfile(authToken)
+            }
+
+            // Redirect to onboarding flow if applicable
+            if (onboarding) {
+              navigation.replace("onboarding", {
+                screen: "welcomeLevel1",
+                params: { onboarding },
+              })
+              return
             }
 
             navigation.replace("Primary")
@@ -295,6 +304,7 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
       _setCode,
       navigation,
       isUpgradeFlow,
+      onboarding,
     ],
   )
 

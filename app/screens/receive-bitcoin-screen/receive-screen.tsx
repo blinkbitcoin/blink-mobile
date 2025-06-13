@@ -11,6 +11,8 @@ import { CustomIcon } from "@app/components/custom-icon"
 import { ModalNfc } from "@app/components/modal-nfc"
 import { NoteInput } from "@app/components/note-input"
 import { Screen } from "@app/components/screen"
+import { useLevel, AccountLevel } from "@app/graphql/level-context"
+import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -37,10 +39,16 @@ const ReceiveScreen = () => {
 
   const isAuthed = useIsAuthed()
   const isFocused = useIsFocused()
+  const { currentLevel } = useLevel()
+  const isLevelZero = currentLevel === AccountLevel.Zero
 
   const request = useReceiveBitcoin()
 
+  const [isTrialAccountModalVisible, setIsTrialAccountModalVisible] = useState(false)
   const [displayReceiveNfc, setDisplayReceiveNfc] = useState(false)
+
+  const closeTrialAccountModal = () => setIsTrialAccountModalVisible(false)
+  const openTrialAccountModal = () => setIsTrialAccountModalVisible(true)
 
   const nfcText = LL.ReceiveScreen.nfc()
   useEffect(() => {
@@ -250,9 +258,21 @@ const ReceiveScreen = () => {
               id: Invoice.OnChain,
               text: "Onchain",
               icon: "logo-bitcoin",
+              disabled: isLevelZero,
             },
           ]}
-          onPress={(id) => isReady && request.setType(id as InvoiceType)}
+          onPress={(id) => {
+            const isBlockedOnchain = id === Invoice.OnChain && isLevelZero
+
+            if (isBlockedOnchain) {
+              openTrialAccountModal()
+              return
+            }
+
+            if (isReady) {
+              request.setType(id as InvoiceType)
+            }
+          }}
           style={styles.invoiceTypePicker}
         />
         <AmountInput
@@ -285,6 +305,11 @@ const ReceiveScreen = () => {
           setIsActive={setDisplayReceiveNfc}
           settlementAmount={request.settlementAmount}
           receiveViaNFC={request.receiveViaNFC}
+        />
+
+        <TrialAccountLimitsModal
+          isVisible={isTrialAccountModalVisible}
+          closeModal={closeTrialAccountModal}
         />
       </Screen>
     </>

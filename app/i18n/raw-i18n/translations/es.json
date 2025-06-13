@@ -2010,7 +2010,9 @@
         "createAccount": "Crear nueva cuenta",
         "exploreWallet": "Explora la wallet",
         "logBackInWith": "Reinicia sesión con",
+        "login": "Iniciar sesión",
         "headline": "El banco con dinero sólido",
+        "upgradeYourAccount": "Actualiza tu cuenta",
         "startTrialAccount": "Empieza con una cuenta de prueba.",
         "startWithTrialAccount": "Empezar con la cuenta de prueba",
         "registerPhoneAccount": "Registra cuenta de teléfono",
@@ -2018,9 +2020,13 @@
         "trialAccountCreationFailedMessage": "Desafortunadamente, no pudimos crear tu cuenta de prueba. Vuelve a intentarlo más tarde o crea una cuenta con un número de teléfono.",
         "trialAccountHasLimits": "La cuenta de prueba tiene límites",
         "trialAccountLimits": {
+            "modalTitle": "Mejora tu cuenta para más beneficios",
             "noBackup": "Sin opción de copia de seguridad",
             "sendingLimit": "Límite de envíos diarios reducido",
-            "noOnchain": "No recibir bitcoin onchain"
+            "noOnchain": "No recibir bitcoin onchain",
+            "recoveryOption": "Recupera fondos por SMS o correo",
+            "dailyLimit": "Límite de transacciones diarias de $1000",
+            "onchainReceive": "Recibir bitcoin en cadena"
         }
     },
     "MapScreen": {
@@ -2440,10 +2446,14 @@
         "receiveOnchain": "Recibir bitcoin onchain",
         "onlyAPhoneNumber": "Verificación de número de teléfono rápida y fácil",
         "letsGo": "¡Vamos!",
-        "stayInTrialMode": "Permanecer en modo de prueba"
+        "stayInTrialMode": "Permanecer en modo de prueba",
+        "upgradeToLevel": "Actualizar al Nivel {level: number}",
+        "notNow": "Ahora no",
+        "setUpLevelAccount": "Configurar cuenta Nivel {level: number}"
     },
     "SetAddressModal": {
         "title": "Establece tu dirección de {bankName: string}",
+        "mainTitle": "Elegir dirección Lightning",
         "setLightningAddress": "Establecer dirección de Lightning",
         "Errors": {
             "tooShort": "La dirección debe tener al menos 3 caracteres",
@@ -2453,7 +2463,7 @@
             "unknownError": "Se produjo un error desconocido, inténtelo de nuevo más tarde"
         },
         "receiveMoney": "Reciba dinero de otras billeteras lightning y  de usuarios de {bankName: string} con esta dirección.",
-        "itCannotBeChanged": "No podrá ser cambiado posteriormente."
+        "itCannotBeChanged": "Elígela bien – ¡no se puede cambiar después!"
     },
     "WelcomeFirstScreen": {
         "bank": "Bitcoin está diseñado para permitirle almacenar, enviar y recibir dinero, sin depender de un banco o tarjeta de crédito.",
@@ -2476,6 +2486,58 @@
         "sms": "Envia por SMS",
         "whatsapp": "Enviar a través de WhatsApp",
         "telegram": "Enviar a través de Telegram"
+    },
+    "LoginMethodScreen": {
+        "title": "Seleccione cómo desea iniciar sesión en su cuenta.",
+        "useTelegram": "Usar Telegram",
+        "useSms": "Usar SMS",
+        "useWhatsapp": "Usar WhatsApp",
+        "useEmail": "Usar Correo Electrónico",
+        "setupTelegram": "Configurar inicio con Telegram",
+        "setupSms": "Configurar inicio con SMS",
+        "setupWhatsapp": "Configurar inicio con WhatsApp",
+        "setupEmail": "Configurar inicio con Correo"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "Bienvenido al Nivel 1",
+            "title": "Nuevas funciones desbloqueadas para tu cuenta:",
+            "receiveBitcoinDescription": "Recibe Bitcoin usando tu número de teléfono",
+            "dailyLimitDescription": "Envía hasta $1,000 USD por día",
+            "onchainDescription": "Recibe pagos on-chain"
+        },
+        "emailBenefits": {
+            "mainTitle": "Agregar inicio de sesión con email",
+            "title": "El inicio de sesión con email te permite:",
+            "backupDescription": "Tener un respaldo para acceder a tu cuenta",
+            "supportDescription": "Facilitar que podamos darte soporte",
+            "securityDescription": "Incrementar la seguridad de tu cuenta",
+            "primaryButton": "Configurar inicio de sesión con email"
+        },
+        "emailConfirmed": {
+            "mainTitle": "Inicio de sesión por correo añadido",
+            "title": "Nuevas funciones desbloqueadas para tu cuenta:"
+        },
+        "lightningBenefits": {
+            "mainTitle": "Configura la dirección Lightning",
+            "title": "Beneficios de la dirección Lightning:",
+            "staticAddressDescription": "Una dirección estática para recibir pagos",
+            "easyToShareDescription": "Fácil de memorizar y compartir pública o privadamente",
+            "blinkToolsDescription": "Desbloquea varias herramientas de Blink útiles para el comercio",
+            "primaryButton": "Configurar dirección Lightning"
+        },
+        "lightningConfirmed": {
+          "mainTitle": "Dirección Lightning configurada",
+          "title": "Nuevas funciones desbloqueadas para tu cuenta:"
+        },
+        "supportScreen": {
+          "mainTitle": "Comentarios sobre Blink",
+          "title": "Una cosa más:",
+          "description": "Estamos en una misión para hacer que bitcoin sea accesible para todos, y nos encantaría saber de ti.",
+          "contactInfo": "No dudes en contactarnos en {email} y cuéntanos cómo podemos mejorar Blink para ti y para los demás.",
+          "primaryButton": "Hecho",
+          "secondaryButton": "Dar comentarios ahora"
+        }
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Error al inciar sesión. ¿Usó el código correcto?",
@@ -2638,7 +2700,8 @@
         "thisMonth": "Este mes",
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
-        "warning": "Advertencia"
+        "warning": "Advertencia",
+        "recommended": "Recomendado"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2668,6 +2731,7 @@
         "joinTheCommunity": "Únete a la comunidad",
         "whatsapp": "WhatsApp",
         "email": "Correo electrónico",
+        "sms": "SMS",
         "faq": "Preguntas Frecuentes - FAQ",
         "enjoyingApp": "¿Disfrutas de la aplicación?",
         "statusPage": "Página de Estado",

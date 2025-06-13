@@ -223,11 +223,8 @@ export const TransactionLimitsScreen = () => {
         <GaloyPrimaryButton
           title={LL.TransactionLimitsScreen.increaseLimits()}
           onPress={() =>
-            navigation.navigate("phoneFlow", {
-              screen: "phoneLoginInitiate",
-              params: {
-                type: PhoneLoginInitiateType.CreateAccount,
-              },
+            navigation.navigate("login", {
+              type: PhoneLoginInitiateType.CreateAccount,
             })
           }
           containerStyle={styles.increaseLimitsButtonContainer}

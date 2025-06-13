@@ -1,16 +1,19 @@
 import * as React from "react"
 import { useMemo } from "react"
 import { RefreshControl, View, Alert } from "react-native"
+import { gql } from "@apollo/client"
+import Modal from "react-native-modal"
+import { LocalizedString } from "typesafe-i18n"
+import Icon from "react-native-vector-icons/Ionicons"
+import { useNavigation, useIsFocused } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { Text, makeStyles, useTheme } from "@rneui/themed"
 import {
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler"
-import Modal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
-import { LocalizedString } from "typesafe-i18n"
 
-import { gql } from "@apollo/client"
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { icons } from "@app/components/atomic/galoy-icon"
@@ -20,6 +23,18 @@ import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
+import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
+import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
+import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import { Screen } from "@app/components/screen"
+
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { getErrorMessages } from "@app/graphql/utils"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
+import { isIos } from "@app/utils/helper"
+import { useAppConfig } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -32,20 +47,9 @@ import {
   useRealtimePriceQuery,
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getErrorMessages } from "@app/graphql/utils"
-import { useAppConfig } from "@app/hooks"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { isIos } from "@app/utils/helper"
-import { useNavigation, useIsFocused } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
 
-import { BalanceHeader } from "../../components/balance-header"
-import { Screen } from "../../components/screen"
-import { MemoizedTransactionItem } from "../../components/transaction-item"
-import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { testProps } from "../../utils/testProps"
+// import { triggerUpgradeModal } from "./trigger-upgrade-modal"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 
@@ -137,8 +141,8 @@ export const HomeScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { balanceLimitToTriggerUpgradeModal } = useRemoteConfig()
 
   const { data: { hasPromptedSetDefaultAccount } = {} } =
     useHasPromptedSetDefaultAccountQuery()
@@ -212,15 +216,11 @@ export const HomeScreen: React.FC = () => {
 
   const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
-  const refetch = React.useCallback(() => {
-    if (isAuthed) {
-      refetchRealtimePrice()
-      refetchAuthed()
-      refetchUnauthed()
-      refetchBulletins()
-    }
-  }, [isAuthed, refetchAuthed, refetchBulletins, refetchRealtimePrice, refetchUnauthed])
+  const wallets = dataAuthed?.me?.defaultAccount?.wallets
+  const { formattedBalance, satsBalance } = useTotalBalance(wallets)
 
+  const accountId = dataAuthed?.me?.defaultAccount?.id
+  const levelAccount = dataAuthed?.me?.defaultAccount.level
   const pendingIncomingTransactions =
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
@@ -242,6 +242,46 @@ export const HomeScreen: React.FC = () => {
 
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
+  const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
+
+  const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
+  const openUpgradeModal = React.useCallback(() => {
+    setIsUpgradeModalVisible(true)
+  }, [])
+
+  const triggerUpgradeModal = React.useCallback(() => {
+    if (!accountId || levelAccount !== AccountLevel.Zero) return
+    if (satsBalance > balanceLimitToTriggerUpgradeModal) {
+      openUpgradeModal()
+    }
+  }, [
+    accountId,
+    levelAccount,
+    satsBalance,
+    balanceLimitToTriggerUpgradeModal,
+    openUpgradeModal,
+  ])
+
+  const refetch = React.useCallback(() => {
+    if (!isAuthed) return
+
+    Promise.all([
+      refetchRealtimePrice(),
+      refetchAuthed(),
+      refetchUnauthed(),
+      refetchBulletins(),
+    ]).then(() => {
+      // Triggers the upgrade trial account modal after refetch
+      triggerUpgradeModal()
+    })
+  }, [
+    isAuthed,
+    refetchAuthed,
+    refetchBulletins,
+    refetchRealtimePrice,
+    refetchUnauthed,
+    triggerUpgradeModal,
+  ])
 
   const numberOfTxs = transactions.length
 
@@ -274,13 +314,15 @@ export const HomeScreen: React.FC = () => {
   // debug code. verify that we have 2 wallets. mobile doesn't work well with only one wallet
   // TODO: add this code in a better place
   React.useEffect(() => {
-    if (
-      dataAuthed?.me?.defaultAccount?.wallets?.length !== undefined &&
-      dataAuthed?.me?.defaultAccount?.wallets?.length !== 2
-    ) {
+    if (wallets?.length !== undefined && wallets?.length !== 2) {
       Alert.alert(LL.HomeScreen.walletCountNotTwo())
     }
-  }, [dataAuthed, LL])
+  }, [wallets, LL])
+
+  // Triggers the upgrade trial account modal to load screen
+  React.useEffect(() => {
+    triggerUpgradeModal()
+  }, [triggerUpgradeModal])
 
   let recentTransactionsData:
     | {
@@ -344,8 +386,8 @@ export const HomeScreen: React.FC = () => {
   if (
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
-    dataAuthed?.me?.defaultAccount.level === AccountLevel.Two ||
-    dataAuthed?.me?.defaultAccount.level === AccountLevel.Three
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three
   ) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.title(),
@@ -389,6 +431,10 @@ export const HomeScreen: React.FC = () => {
         isVisible={isStablesatModalVisible}
         setIsVisible={setIsStablesatModalVisible}
       />
+      <TrialAccountLimitsModal
+        isVisible={isUpgradeModalVisible}
+        closeModal={closeUpgradeModal}
+      />
       <View style={[styles.header, styles.container]}>
         <GaloyIconButton
           onPress={() => navigation.navigate("priceHistory")}
@@ -396,7 +442,7 @@ export const HomeScreen: React.FC = () => {
           name="graph"
           iconOnly={true}
         />
-        <BalanceHeader loading={loading} />
+        <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
         <GaloyIconButton
           onPress={() => navigation.navigate("settings")}
           size={"medium"}
