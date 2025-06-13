@@ -99,14 +99,11 @@ export const BalanceHeader: React.FC<Props> = ({ loading }) => {
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity
-          onPress={switchMemoryHideAmount}
-          style={styles.hiddenBalanceTouchableOpacity}
-        >
+        <TouchableOpacity onPress={switchMemoryHideAmount}>
           <Text style={styles.balanceHiddenText}>****</Text>
         </TouchableOpacity>
       ) : (
-        <View style={styles.balancesContainer}>
+        <View>
           <TouchableOpacity onPress={switchMemoryHideAmount}>
             <View style={styles.marginBottom}>
               {loading ? (
@@ -128,11 +125,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  balancesContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   headerText: {
     fontSize: 16,
     fontWeight: "bold",
@@ -140,11 +132,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   marginBottom: {
     marginBottom: 4,
-  },
-  hiddenBalanceTouchableOpacity: {
-    alignItems: "center",
-    flexGrow: 1,
-    justifyContent: "center",
   },
   primaryBalanceText: {
     fontSize: 32,

@@ -7637,6 +7637,10 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​p​r​o​f​i​l​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
 		 */
 		error: string
+		/**
+		 * f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		fromThisDevice: string
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -8630,6 +8634,10 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * P​r​o​f​i​l​e​s
+		 */
+		profiles: string
 	}
 	errors: {
 		/**
@@ -8810,6 +8818,12 @@ type RootTranslation = {
 		 * B​y​e​!
 		 */
 		bye: string
+		/**
+		 * A​t​t​e​n​t​i​o​n​:​ ​A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
+	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​d​e​l​e​t​i​n​g​.​
+	​D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.
+		 */
+		deleteAccountWarning: string
 	}
 	lnurl: {
 		/**
@@ -16738,6 +16752,10 @@ export type TranslationFunctions = {
 		 * Unable to fetch profiles at this time
 		 */
 		error: () => LocalizedString
+		/**
+		 * from this device?
+		 */
+		fromThisDevice: () => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -17716,6 +17734,10 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Profiles
+		 */
+		profiles: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -17887,6 +17909,12 @@ export type TranslationFunctions = {
 		 * Bye!
 		 */
 		bye: () => LocalizedString
+		/**
+		 * Attention: Account deletion is permanent!
+	Make sure wallets have no funds before deleting.
+	Deleted account cannot be reinstated.
+		 */
+		deleteAccountWarning: () => LocalizedString
 	}
 	lnurl: {
 		/**
