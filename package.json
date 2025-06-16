@@ -83,7 +83,7 @@
     "@ronradtke/react-native-markdown-display": "^8.0.0",
     "@shopify/react-native-skia": "^1.2.3",
     "apollo3-cache-persist": "^0.15.0",
-    "axios": "^1.6.8",
+    "axios": "^1.10.0",
     "bech32": "^2.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "graphql": "^16.8.1",
