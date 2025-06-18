@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 
 import { useApolloClient } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input"
+import { ExpirationTimeChooser } from "@app/components/expiration-time-chooser"
 import { GaloyCurrencyBubble } from "@app/components/atomic/galoy-currency-bubble"
 import { ButtonGroup } from "@app/components/button-group"
 import { CustomIcon } from "@app/components/custom-icon"
@@ -114,7 +115,17 @@ const ReceiveScreen = () => {
     ) : undefined
 
   const isReady = request.state !== PaymentRequestState.Loading
+  const expiresAt =
+    request.info?.data?.invoiceType === Invoice.Lightning && request.info?.data?.expiresAt
+      ? request.info.data.expiresAt
+      : null
 
+  const handlePressWallet = (id: string) => {
+    if (isReady) {
+      request.setReceivingWallet(id as WalletCurrency)
+      request.setExpirationTime(0)
+    }
+  }
   return (
     <>
       <Screen
@@ -148,7 +159,7 @@ const ReceiveScreen = () => {
               },
             },
           ]}
-          onPress={(id) => isReady && request.setReceivingWallet(id as WalletCurrency)}
+          onPress={handlePressWallet}
           style={styles.receivingWalletPicker}
           disabled={!request.canSetReceivingWalletDescriptor}
         />
@@ -271,6 +282,14 @@ const ReceiveScreen = () => {
           editable={request.canSetMemo}
           style={styles.note}
           big={false}
+        />
+        <ExpirationTimeChooser
+          expirationTime={request?.expirationTime ?? 0}
+          expiresAt={expiresAt}
+          setExpirationTime={request.setExpirationTime}
+          walletCurrency={request.receivingWalletDescriptor.currency}
+          disabled={!request.canSetExpirationTime}
+          style={styles.note}
         />
 
         {OnChainCharge}

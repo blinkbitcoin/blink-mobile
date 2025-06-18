@@ -124,6 +124,11 @@ type BasePaymentRequestCreationData<T extends WalletCurrency> = {
   unitOfAccountAmount?: MoneyAmount<WalletOrDisplayCurrency>
   settlementAmount?: WalletAmount<T>
 
+  // Invoice Expiration Time
+  canSetExpirationTime: boolean
+  expirationTime?: number
+  setExpirationTime?: (expirationTime: number) => PaymentRequestCreationData<T>
+
   // For money conversion in case amount is given
   convertMoneyAmount: ConvertMoneyAmount
   setConvertMoneyAmount: (
@@ -152,6 +157,7 @@ export type BaseCreatePaymentRequestCreationDataParams<T extends WalletCurrency>
   memo?: string
   unitOfAccountAmount?: MoneyAmount<WalletOrDisplayCurrency>
   network: Network
+  expirationTime?: number
 }
 
 // ------------------------ QUOTATION ------------------------

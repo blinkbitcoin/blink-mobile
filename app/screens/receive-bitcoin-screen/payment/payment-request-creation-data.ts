@@ -31,6 +31,7 @@ export const createPaymentRequestCreationData = <T extends WalletCurrency>(
     bitcoinWalletDescriptor,
     convertMoneyAmount,
     memo,
+    expirationTime,
   } = params
 
   // Permissions for the specified type
@@ -38,11 +39,13 @@ export const createPaymentRequestCreationData = <T extends WalletCurrency>(
     canSetReceivingWalletDescriptor: false,
     canSetMemo: false,
     canSetAmount: true,
+    canSetExpirationTime: false,
   }
   if (type === Invoice.Lightning || type === Invoice.OnChain) {
     permissions.canSetReceivingWalletDescriptor = true
     permissions.canSetMemo = true
   }
+  if (type === Invoice.Lightning) permissions.canSetExpirationTime = true
 
   // Permission based sets
   let setReceivingWalletDescriptor:
@@ -64,6 +67,14 @@ export const createPaymentRequestCreationData = <T extends WalletCurrency>(
   if (permissions.canSetAmount) {
     setAmount = (unitOfAccountAmount) =>
       createPaymentRequestCreationData({ ...params, unitOfAccountAmount })
+  }
+
+  let setExpirationTime:
+    | ((expirationTime: number) => PaymentRequestCreationData<T>)
+    | undefined = undefined
+  if (permissions.canSetExpirationTime) {
+    setExpirationTime = (expirationTime) =>
+      createPaymentRequestCreationData({ ...params, expirationTime })
   }
 
   // Set default receiving wallet descriptor
@@ -110,11 +121,13 @@ export const createPaymentRequestCreationData = <T extends WalletCurrency>(
     setReceivingWalletDescriptor,
     setMemo,
     setAmount,
+    setExpirationTime,
 
     // optional data
     unitOfAccountAmount,
     settlementAmount,
     memo,
+    expirationTime,
 
     canUsePaycode: Boolean(params.username),
   }
