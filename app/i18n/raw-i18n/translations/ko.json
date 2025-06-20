@@ -2231,7 +2231,7 @@
         "lnurlInvoiceIncorrectAmount": "LNURL 서버가 잘못된 수량의 인보이스를 반환했습니다.",
         "confirmFeesModal": {
             "title": "높은 수수료 경고!",
-            "content": "수수료가 송금 수량보다 50% 이상 높습니다. 진행하시겠습니까?\n\n수수료를 줄이려면 받는 사람에게 라이트닝 거래를 요청하세요",
+            "content": "수수료가 전송 수량보다 50% 이상 높습니다. 진행하시겠습니까?\n\n수수료를 줄이려면 받는 사람에게 라이트닝 거래를 요청하세요",
             "confirmButton": "충분히 확인했습니다."
         },
         "copiedDestination": "받는 대상 주소가 클립보드에 복사되었습니다.",
