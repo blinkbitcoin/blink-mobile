@@ -2402,7 +2402,7 @@
     },
     "TransactionDetailScreen": {
         "paid": "결제 상대",
-        "received": "입금 완료",
+        "received": "입금 수량",
         "spent": "출금 수량",
         "sending": "보내는 중",
         "receivingAccount": "받는 계좌",
