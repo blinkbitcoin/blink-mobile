@@ -2192,7 +2192,7 @@
         "lnAddressAdvice": "철자를 확인하시거나, 대신 인보이스나 BTC 주소를 요청해 주세요.",
         "unknownLightning": "이 라이트닝 주소를 해석할 수 없습니다. 다시 시도해 주세요.",
         "unknownOnchain": "이 비트코인 주소를 해석할 수 없습니다. 다시 시도해 주세요.",
-        "newBankAddressUsername": "{lnAddress: string} 주소는 {bankName: string} 주소이지만 아직 송금한 적이 없습니다.",
+        "newBankAddressUsername": "{lnAddress: string} 주소는 {bankName: string} 주소이지만 아직 전송한 적이 없습니다.",
         "confirmUsernameModal": {
             "title": "이 주소로는 처음 전송합니다",
             "body1": "받는 분이 {bankName: string} 주소를 알려주셨는지,",
