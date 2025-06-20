@@ -2228,7 +2228,7 @@
         "maxAmount": "최대 수량",
         "title": "비트코인 송금",
         "failedToFetchLnurlInvoice": "LNURL 인보이스를 가져오지 못했습니다",
-        "lnurlInvoiceIncorrectAmount": "LNURL 서버가 잘못된 금액의 인보이스를 반환했습니다.",
+        "lnurlInvoiceIncorrectAmount": "LNURL 서버가 잘못된 수량의 인보이스를 반환했습니다.",
         "confirmFeesModal": {
             "title": "높은 수수료 경고!",
             "content": "수수료가 송금 수량보다 50% 이상 높습니다. 진행하시겠습니까?\n\n수수료를 줄이려면 받는 사람에게 라이트닝 거래를 요청하세요",
