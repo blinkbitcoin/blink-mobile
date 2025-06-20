@@ -2197,7 +2197,7 @@
             "title": "이 주소로는 처음 송금합니다",
             "body1": "받는 분이 {bankName: string} 주소를 알려주셨는지,",
             "bold2bold": "다른 지갑의 사용자 이름이 아닌지",
-            "body3": "반드시 확인해 주세요. 그렇지 않으면 “{lnAddress: string}” 주소를 가진 {bankName: string} 계좌로 자금이 전송됩니다.\n\n또한 jackie와 jack1e처럼 철자가 비슷한 다른 주소일 수 있으니 앞부분도 꼭 확인해 주세요.",
+            "body3": "반드시 확인해 주세요. 그렇지 않으면 “{lnAddress: string}” 주소를 가진 {bankName: string} 계좌로 자금이 전송됩니다.\n\n또한 다음 2가지 jackie와 jack1e처럼 철자가 비슷한 다른 주소일 수 있으니 앞부분도 꼭 확인해 주세요.",
             "warning": "{bankName: string} 주소를 잘못 입력하면 {bankName: string} 에서는 거래를 취소할 수 없습니다.",
             "checkBox": "{lnAddress: string} 주소가 맞습니다.",
             "confirmButton": "충분히 확인했습니다."
