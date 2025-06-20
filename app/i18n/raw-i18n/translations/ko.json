@@ -1997,7 +1997,7 @@
         "satsEarned": "{formattedNumber | sats} 획득",
         "sectionsCompleted": "완료했습니다",
         "title": "비트코인 얻기",
-        "unlockQuestion": "잠금 해제를 위해, 질문에 답해주세요:",
+        "unlockQuestion": "잠금 해제를 위해, 질문에 답해 주세요:",
         "youEarned": "획득했습니다",
         "registerTitle": "계정 업그레이드가 필요합니다",
         "registerContent": "전화번호를 등록하시면 sats를 받으실 수 있습니다",
