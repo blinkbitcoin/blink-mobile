@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "결제창 사용 방법",
         "howToUseYourAddressExplainer": "다음과 같이 호환 지갑을 가진 사람과 공유하세요:",
         "howToUseYourPaycodeExplainer": "페이코드(기술적으로 LNURL-Pay 주소)를 출력해 매장에 비치하면 결제를 받을 수 있습니다. 고객은 라이트닝 지원 지갑으로 코드를 스캔해 결제할 수 있습니다.\n\n단, 일부 지갑에서는 페이코드 스캔이 불가능할 수 있습니다. 예시:",
-        "howToUseYourCashRegisterExplainer": "결제창 링크를 통해 상대방이 내 지갑에 접근하지 않고 결제를 받을 수 있습니다.\n\n상대방이 인보이스를 생성하면 결제 금액이 {bankName: string} 지갑으로 바로 입금됩니다."
+        "howToUseYourCashRegisterExplainer": "결제창 링크를 통해 상대방이 내 지갑에 접근하지 않고 결제를 받을 수 있습니다.\n\n상대방이 인보이스를 생성하면 결제 수량이 {bankName: string} 지갑으로 바로 입금됩니다."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "이용 약관",
