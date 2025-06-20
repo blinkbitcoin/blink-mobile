@@ -2019,7 +2019,7 @@
         "trialAccountHasLimits": "체험 계정에는 제한이 있습니다",
         "trialAccountLimits": {
             "noBackup": "백업 옵션 없음",
-            "sendingLimit": "일일 송금 한도 축소",
+            "sendingLimit": "일일 전송 한도 축소",
             "noOnchain": "비트코인 온체인 수신 불가"
         }
     },
@@ -2226,7 +2226,7 @@
         "suggestionInput": "제안 내용을 입력하세요",
         "max": "최대",
         "maxAmount": "최대 수량",
-        "title": "비트코인 송금",
+        "title": "비트코인 전송",
         "failedToFetchLnurlInvoice": "LNURL 인보이스를 가져오지 못했습니다",
         "lnurlInvoiceIncorrectAmount": "LNURL 서버가 잘못된 수량의 인보이스를 반환했습니다.",
         "confirmFeesModal": {
@@ -2236,7 +2236,7 @@
         },
         "copiedDestination": "받는 대상 주소가 클립보드에 복사되었습니다.",
         "pendingPayment": "결제가 전송되었지만 아직 확인되지 않았습니다.\n\n확인되지 않으면 자금이 계좌로 되돌아갈 수 있습니다.",
-        "copySuccessMessage": "송금 성공 메시지를 클립보드에 복사",
+        "copySuccessMessage": "전송 성공 메시지를 클립보드에 복사",
         "openSuccessUrl": "송금 성공 URL을 브라우저에서 열기",
         "copySecretMessage": "비밀 메시지를 클립보드에 복사",
         "copiedSuccessMessage": "메시지가 성공적으로 복사되었습니다",
