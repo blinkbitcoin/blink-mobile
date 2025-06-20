@@ -2125,7 +2125,7 @@
         "submissionError": "출금 요청 제출에 실패했습니다. 문제가 지속되면 고객 지원팀에 문의해 주세요.",
         "minMaxRange": "최소: {minimumAmount: string}, 최대: {maximumAmount: string}",
         "redeemBitcoin": "비트코인 전환",
-        "amountToRedeemFrom": " {domain: string} 에서 전환할 금액",
+        "amountToRedeemFrom": " {domain: string} 에서 전환할 수량",
         "redeemAmountFrom": "{domain: string} 에서 {amountToRedeem: string} 전환"
     },
     "ScanningQRCodeScreen": {
