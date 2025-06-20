@@ -2569,7 +2569,7 @@
         "currencySyncIssue": "통화 오류입니다. 새로고침이 필요합니다",
         "csvExport": "거래 내역 CSV로 내보내기",
         "date": "날짜",
-        "description": "내용",
+        "description": "상세 정보",
         "domain": "도메인",
         "email": "이메일",
         "error": "오류",
