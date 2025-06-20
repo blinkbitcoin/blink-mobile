@@ -2180,7 +2180,7 @@
         "usernameNowAddress": "{bankName: string} 사용자 이름이 이제 {bankName: string} 주소가 되었습니다.",
         "usernameNowAddressInfo": "{bankName: string} 사용자 이름을 입력하면 \"@{lnDomain: string}\" (예: maria@{lnDomain: string}) 가 자동으로 붙어 주소로 변환됩니다. 나의 사용자 이름도 이미 {bankName: string} 주소입니다.\n\n설정에서 {bankName: string} 주소 페이지로 이동해 사용 방법을 확인하거나 주소를 공유해 결제를 받아 보세요.",
         "enterValidDestination": "유효한 받는 대상을 입력해 주세요.",
-        "destinationOptions": "{bankName: string} 주소, LN 주소, LN 인보이스 또는 BTC 주소로 송금할 수 있습니다.",
+        "destinationOptions": "{bankName: string} 주소, LN 주소, LN 인보이스 또는 BTC 주소로 전송할 수 있습니다.",
         "expiredInvoice": "이 인보이스는 만료되었습니다. 새 인보이스를 생성해 주세요.",
         "wrongNetwork": "이 인보이스는 다른 네트워크용입니다. 새 인보이스를 생성해 주세요.",
         "invalidAmount": "잘못된 수량이 포함돼 있습니다. 올바른 수량으로 다시 생성해 주세요.",
