@@ -2289,7 +2289,7 @@
             },
             "Payments": {
                 "title": "결제",
-                "description": "송금과 입금에 관련된 알림입니다."
+                "description": "전송과 입금에 관련된 알림입니다."
             },
             "Marketing": {
                 "title": "새 기능 및 업데이트",
