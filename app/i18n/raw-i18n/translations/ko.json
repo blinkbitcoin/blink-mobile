@@ -2115,7 +2115,7 @@
         "receiveViaPaycode": "페이코드로 받기",
         "receiveViaOnchain": "온체인으로 받기",
         "payCodeOrLNURL": "페이코드 / LNURL",
-        "cantReceiveZeroSats": "0 sats 는 받을 수 없습니다. 1 sats 이상으로 입력해 주세요."
+        "cantReceiveZeroSats": "0 sats는 받을 수 없습니다. 1 sats 이상으로 입력해 주세요."
     },
     "RedeemBitcoinScreen": {
         "title": "비트코인 전환",
