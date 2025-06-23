@@ -2701,7 +2701,7 @@
     "AmountInputScreen": {
         "enterAmount": "수량 입력",
         "setAmount": "수량 설정",
-        "maxAmountExceeded": "수량은 {maxAmount: string}을 초과할 수 없습니다.",
+        "maxAmountExceeded": "수량은 {maxAmount: string} 을 초과할 수 없습니다.",
         "minAmountNotMet": "수량은 최소 {minAmount: string}이어야 합니다."
     },
     "AmountInputButton": {
