@@ -2557,7 +2557,7 @@
         "bankAdvice": "{bankName: string} 안내",
         "bankInfo": "{bankName: string} 정보",
         "beta": "베타",
-        "bitcoin": "비트코인",
+        "bitcoin": "Bitcoin",
         "bitcoinPrice": "비트코인 가격",
         "btcAccount": "BTC 계좌",
         "cancel": "취소",
