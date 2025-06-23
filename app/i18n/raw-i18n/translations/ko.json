@@ -2043,7 +2043,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN이 틀렸습니다. {attemptsRemaining: number} 회 남았습니다.",
-        "oneAttemptRemaining": " PIN이 틀렸습니다. 1회 남았습니다.",
+        "oneAttemptRemaining": "PIN이 틀렸습니다. 1회 남았습니다.",
         "setPin": "PIN 코드를 설정하세요",
         "setPinFailedMatch": "PIN이 일치하지 않습니다 – PIN 코드를 다시 설정하세요",
         "storePinFailed": "PIN을 저장할 수 없습니다.",
