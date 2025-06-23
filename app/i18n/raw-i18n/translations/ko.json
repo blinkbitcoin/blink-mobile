@@ -2337,7 +2337,7 @@
         "addEmailFirst": "먼저 이메일을 추가하세요",
         "addPhoneFirst": "먼저 전화번호를 추가하세요",
         "phoneNumberAuthentication": "전화번호(로그인용)",
-        "emailAuthentication": "이메일(로그인용)",
+        "emailAuthentication": "이메일 (로그인용)",
         "removePhone": "전화번호 제거",
         "removeEmail": "이메일 제거",
         "unverified": "이메일이 인증되지 않음",
