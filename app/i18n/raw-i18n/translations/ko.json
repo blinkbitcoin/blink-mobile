@@ -1307,7 +1307,7 @@
                 }
             },
             "LightningWhatDoesItSolve": {
-                "title": "라이트닝: 무엇을 해결하나요?",
+                "title": "라이트닝: 무엇을 해결할까요?",
                 "questions": {
                     "bitcoinDrawbacks": {
                         "answers": [
