@@ -60,7 +60,7 @@
     },
     "ConversionDetailsScreen": {
         "title": "환전",
-        "percentageToConvert": "환전 비율"
+        "percentageToConvert": "환전 비율(%)"
     },
     "ConversionConfirmationScreen": {
         "title": "환전 내역 확인",
