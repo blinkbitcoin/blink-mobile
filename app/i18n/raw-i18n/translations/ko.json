@@ -56,7 +56,7 @@
         "frequentContacts": "자주 사용하는 연락처"
     },
     "ContactDetailsScreen": {
-        "title": "{username: string}님과의 거래 내역"
+        "title": "{username: string} 님과의 거래 내역"
     },
     "ConversionDetailsScreen": {
         "title": "환전",
