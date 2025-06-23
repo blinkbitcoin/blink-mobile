@@ -2158,7 +2158,7 @@
         "amountLabel": "수량:",
         "confirmPayment": "결제 승인",
         "confirmPaymentQuestion": "이 결제를 승인하시겠습니까?",
-        "destinationLabel": "받는 주소:",
+        "destinationLabel": "받는 대상:",
         "feeLabel": "수수료",
         "memoLabel": "메모:",
         "paymentFinal": "결제는 최종 승인됩니다.",
