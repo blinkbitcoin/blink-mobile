@@ -2659,7 +2659,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "방금 {value: string} sats를 받았습니다",
+            "body": "방금 {value: string} sats 를 받았습니다",
             "title": "결제 수신"
         }
     },
