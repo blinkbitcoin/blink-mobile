@@ -2409,7 +2409,7 @@
         "sendingAccount": "보내는 계좌",
         "txNotBroadcast": "거래가 대기열에 있습니다. {countdown: string} 내에 멤풀에 나타날 예정입니다.",
         "momentarily": "곧",
-        "hasBeenCopiedToClipboard": "{type: string}이 클립보드에 복사되었습니다"
+        "hasBeenCopiedToClipboard": "{type: string} 이 클립보드에 복사되었습니다"
     },
     "TransactionLimitsScreen": {
         "receive": "입금",
