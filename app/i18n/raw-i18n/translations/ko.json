@@ -2643,7 +2643,7 @@
     "errors": {
         "generic": "오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.",
         "invalidEmail": "유효하지 않은 이메일입니다",
-        "invalidPhoneNumber": "유효한 전화번호가 아닙니다",
+        "invalidPhoneNumber": "은(는) 유효한 전화번호가 아닙니다",
         "tooManyRequestsPhoneCode": "요청이 너무 많습니다. 다른 문자 메시지를 요청하시기 전에 잠시 기다려 주세요.",
         "network": {
             "server": "서버 오류입니다. 잠시 후 다시 시도해 주세요",
