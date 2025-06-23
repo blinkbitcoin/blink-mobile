@@ -2401,7 +2401,7 @@
         "update": "앱 버전이 오래되었습니다. 앱을 사용하려면 업데이트가 필요합니다.\n\nAndroid는 Play 스토어, iOS는 TestFlight에서 업데이트하실 수 있습니다."
     },
     "TransactionDetailScreen": {
-        "paid": "결제 상대",
+        "paid": "보낸/받은 상대",
         "received": "입금 수량",
         "spent": "출금 수량",
         "sending": "보내는 중",
