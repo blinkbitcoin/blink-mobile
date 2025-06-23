@@ -6,7 +6,7 @@
         "notAbleToChange": "한 번 설정하면 {bankName: string} 주소는 변경할 수 없습니다.",
         "addressNotAvailable": "이 {bankName: string} 주소는 이미 사용 중입니다.",
         "somethingWentWrong": "문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
-        "merchantTitle": "가맹점용",
+        "merchantTitle": "상인용",
         "yourCashRegister": "내 라이트닝 결제창",
         "yourPaycode": "내 페이코드",
         "copiedLightningAddressToClipboard": "라이트닝 주소가 클립보드에 복사되었습니다.",
