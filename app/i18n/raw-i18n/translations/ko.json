@@ -2483,7 +2483,7 @@
         "errorIpNotAllowed": "이 IP는 지원되지 않는 국가에 속해 계정을 만들 수 없습니다. 지원 국가에서 VPN을 사용 중이시라면 비활성화해 보세요.",
         "errorPhoneNotAllowed": "이 전화번호로는 계정을 만들 수 없습니다.",
         "errorCannotUpgradeToExistingAccount": "해당 전화 계정이 이미 존재합니다. 체험 계정에서 로그아웃 후 전화번호로 로그인해 주세요.",
-        "header": "{channel: string}로 {phoneNumber: string}에 방금 보낸 코드를 입력해 전화번호를 확인해 주세요",
+        "header": "{channel: string} 로 {phoneNumber: string} 에 방금 보낸 코드를 입력해 전화번호를 확인해 주세요",
         "placeholder": "6자리 코드",
         "sendAgain": "다시 보내기",
         "tryAgain": "다시 시도",
