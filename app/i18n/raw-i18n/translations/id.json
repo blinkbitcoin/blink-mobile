@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "Cara menggunakan Mesin Kasir anda",
         "howToUseYourAddressExplainer": "Bagikan dengan seseorang yang memiliki dompet yang kompatibel, seperti:",
         "howToUseYourPaycodeExplainer": "Anda dapat mencetak Paycode Anda (secara teknis, ini adalah alamat lnurl-pay) dan tampilkan di bisnis anda untuk menerima pembayaran. Seseorang dapat membayar anda dengan memindainya menggunakan dompet yang mendukung Lightning.\n\nNamun, perlu diketahui bahwa beberapa dompet tidak bisa memindai Paycode, seperti:",
-        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {bankName: string} Dompet anda."
+        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {BankName: string} Dompet anda."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Syarat dan Ketentuan",
@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "mendapatkan {formatNumber | sats: string}",
+        "earnSats": "mendapatkan {formatNumber | sats}",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "Bitcoin: Apa itu?",
@@ -782,7 +782,7 @@
                         ],
                         "feedback": [
                             "Selamat! Sangat menarik untuk memikirkan bagaimana uang telah berkembang seiring waktu, dari penggunaannya yang awal sebagai sarana untuk memfasilitasi perdagangan dalam komunitas kecil hingga perannya saat ini sebagai alat tukar dalam ekonomi modern.",
-                            "Maaf, sepertinya anda salah menebaknya! Semoga beruntung dengan tebakan anda berikutnya",
+                            "Maaf, sepertinya Anda salah menebaknya! Semoga berhasil dengan tebakan Anda berikutnya",
                             "Salah! Kredit sudah ada hampir selama uang itu ada, dan kemungkinan akan tetap ada. Semoga lebih beruntung dengan jawabanmu berikutnya."
                         ],
                         "question": "Apa fungsi utama dari uang",
@@ -1256,7 +1256,7 @@
                             "Wow, itu tujuan yang ambisius! Meskipun benar bahwa penambangan memerlukan daya komputasi yang signifikan, saya cukup yakin tujuan utamanya bukan untuk menciptakan pasukan penguasa AI. Semoga lebih beruntung lain kali!"
                         ],
                         "question": "Apa tujuan utama dari penambangan di jaringan bitcoin",
-                        "text": "Ketika seorang pengguna ingin mengirimkan transaksi di jaringan bitcoin, mereka perlu menandatangani transaksi dengan kunci privat mereka untuk membuktikan bahwa mereka adalah pemilik dana yang akan ditransfer. Setelah transaksi ditandatangani, transaksi tersebut disiarkan ke jaringan peer-to-peer.\n\nPenambangan adalah proses menambahkan transaksi ke blockchain bitcoin. Ketika sebuah transaksi disiarkan ke jaringan, transaksi tersebut diambil oleh penambang, yang memverifikasi bahwa transaksi tersebut valid (yaitu, pengguna memiliki dana yang diperlukan dan kunci privat yang digunakan untuk menandatangani transaksi sesuai dengan kunci publik yang terkait dengan dana tersebut).\n\nSetelah transaksi diverifikasi, transaksi tersebut ditambahkan ke sebuah blok transaksi, bersama dengan sebuah teka-teki matematika. Penambang bersaing untuk menyelesaikan teka-teki tersebut, dan siapa pun yang pertama kali menyelesaikannya mendapatkan hak untuk menambahkan blok ke blockchain dan mengklaim hadiah dalam bentuk bitcoin. Saat ini hadiahnya adalah 6,25 bitcoin, ditambah biaya transaksi yang disertakan dalam blok.\n\nSelain menambahkan transaksi ke blockchain, penambangan juga berfungsi untuk mengamankan jaringan bitcoin. Hal ini karena menyelesaikan teka-teki memerlukan daya komputasi yang signifikan, dan menambahkan blok ke blockchain memerlukan penambang lain untuk memverifikasi solusinya. Ini membuat sangat sulit bagi satu orang atau kelompok untuk memanipulasi blockchain.\n",
+                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
                         "title": "Penambangan"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "Dikurangi setengahnya",
-                            "Dilipatgandakan",
-                            "Dikalikan dengan angka acak yang dipilih oleh perangkat lunak bitcoin"
+                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+                            "It adjusts once a year based on market price",
+                            "It is randomly changed by miners through consensus"
                         ],
                         "feedback": [
-                            "Benar! Satoshi menentukan pengurangan pasokan bitcoin baru hingga setengahnya dalam rilis pertama perangkat lunak Bitcoin pada tahun 2009 dan hampir mustahil untuk mengubahnya",
-                            "Maaf, tetapi hadiah blok tidak dilipatgandakan setiap empat tahun. Anda mungkin bingung antara Bitcoin dan pasokan mata uang fiat yang terus berkembang dengan kecepatan lebih cepat. Coba lagi",
-                            "Sangat kreatif, tetapi salah. Jadwal pasokan Bitcoin tidak acak. Kepastiannya memberikan kejelasan bagi pelaku ekonomi, sesuatu yang belum pernah ada dalam sejarah umat manusia. Coba lagi!"
+                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
+                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
                         ],
-                        "question": "Apa yang terjadi pada hadiah blok di jaringan bitcoin setiap empat tahun",
-                        "text": "Elemen penting dari protokol Bitcoin adalah Penyesuaian Kesulitan. Algoritma ini memastikan bahwa blok baru ditemukan setiap 10 menit rata-rata.\n\nKetika lebih banyak penambang bergabung dengan jaringan, waktu rata-rata yang diperlukan untuk menemukan blok baru berkurang. Sebaliknya, ketika penambang meninggalkan jaringan, waktu yang diperlukan untuk menambahkan blok baru menjadi lebih lama. Algoritma Penyesuaian Kesulitan menyesuaikan tingkat kesulitan teka-teki matematika agar sesuai dengan perubahan daya komputasi gabungan semua penambang. Ini mencegah penciptaan lebih banyak (atau lebih sedikit) unit bitcoin daripada jadwal pasokan yang telah ditentukan.\n\nHal ini sangat berbeda dengan penambangan fisik logam mulia seperti emas, di mana menambahkan lebih banyak penambang emas menghasilkan pasokan emas yang lebih tinggi dan karenanya penurunan harganya. Namun, dalam Bitcoin, penambahan penambang baru hanya menambah keamanan jaringan.\n",
+                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
                         "title": "Penyesuaian Kesulitan"
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Sangat kreatif, tetapi salah. Jadwal pasokan Bitcoin tidak acak. Kepastiannya memberikan kejelasan bagi pelaku ekonomi, sesuatu yang belum pernah ada dalam sejarah umat manusia. Coba lagi!"
                         ],
                         "question": "Apa yang terjadi pada hadiah blok di jaringan bitcoin setiap empat tahun",
-                        "text": "Satu elemen terakhir yang penting untuk dipahami adalah bahwa hadiah blok di jaringan bitcoin dikurangi setengahnya setiap empat tahun, atau setiap 210.000 blok.\n\nPeristiwa ini, yang dikenal sebagai \"halving\", diprogram ke dalam perangkat lunak bitcoin yang dijalankan oleh semua pengguna. Ketika bitcoin pertama kali diluncurkan, penambang menerima 50 bitcoin baru untuk setiap blok yang mereka tambahkan ke blockchain. Saat ini, hadiah blok adalah 6,25 bitcoin, tetapi akan dikurangi menjadi 3,125 bitcoin pada tahun 2024 saat halving berikutnya terjadi.\n\nPengurangan ini akan terus terjadi hingga tahun 2140, di mana jumlah total bitcoin yang telah ditambang akan dibatasi pada 21 juta. Pada tahun 2023, sekitar 92% dari semua bitcoin (~19,3 juta) telah ditambang.\n\nBerbeda dengan mata uang fiat, yang bisa bersifat inflasi, bitcoin bersifat disinflasi. Ini membuatnya lebih langka dibandingkan mata uang fiat dan logam mulia seperti emas dan perak, atau apa pun yang dikenal di alam semesta.\n",
+                        "text": "One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.\n\nThis event, known as the \"halving\", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 3.125 bitcoins, but it will be reduced to 1.5625 bitcoins in 2028 when the next halving occurs.\n\nThese halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\\~19.3 million) have already been mined.\n\nUnlike fiat currencies, which can be inflationary, bitcoin is disinflationary in nature. This makes it more scarce than fiat and precious metals such as gold and silver, or anything else known in the universe.\n",
                         "title": "Pengurangan Separuh"
                     }
                 }
@@ -2079,7 +2079,7 @@
         "tapQrCodeCopy": "Ketuk Kode QR untuk Menyalin",
         "title": "Terima Bitcoin",
         "usdTitle": "Terima USD",
-        "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
+        "error": "Gagal membuat faktur. Silakan hubungi support jika masalah ini berlanjut.",
         "copyInvoice": "Salin",
         "shareInvoice": "Bagikan",
         "addAmount": "Minta Jumlah Tertentu",
@@ -2162,7 +2162,7 @@
         "feeLabel": "Biaya",
         "memoLabel": "Catatan:",
         "paymentFinal": "Pembayaran bersifat final.",
-        "stalePrice": "Harga bitcoin Anda sudah lama dan terakhir diperbarui {timePeriod: string} yang lalu. Silakan mulai ulang aplikasi sebelum melakukan pembayaran.",
+        "stalePrice": "Harga bitcoin Anda sudah lama dan terakhir diperbarui {timePeriod} yang lalu. Silakan mulai ulang aplikasi sebelum melakukan pembayaran.",
         "title": "Konfirmasi Pembayaran",
         "totalLabel": "Total:",
         "totalExceed": "Total melebihi saldo Anda sebesar {balance: string}",
@@ -2178,7 +2178,7 @@
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",
-        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {bankName: string} juga.\n\nBuka halaman alamat {bankName: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
+        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {namaBank: string} juga.\n\nBuka halaman alamat {namaBank: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
         "enterValidDestination": "Silakan masukkan tujuan yang valid",
         "destinationOptions": "Anda dapat mengirim ke alamat {bankName: string}, alamat LN, faktur LN, atau alamat BTC.",
         "expiredInvoice": "Faktur ini telah kedaluwarsa. Silakan buat faktur baru.",
@@ -2273,7 +2273,11 @@
         "nfcOnlyReceive": "Hanya menerima dari NFC yang tersedia untuk saat ini",
         "nfcScanNow": "Pindai NFC Sekarang",
         "nfcNotSupported": "NFC tidak didukung pada perangkat ini",
-        "logInOrCreateAccount": "Masuk atau buat akun"
+        "logInOrCreateAccount": "Masuk atau buat akun",
+        "logOutFromOneAccount": "Log out from this account",
+        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
+        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
+        "logoutOneAccountConfirm": "I understand. Please log out."
     },
     "NotificationSettingsScreen": {
         "title": "Pengaturan Notifikasi",
@@ -2307,6 +2311,8 @@
         "tapToAddPhoneNumber": "Ketuk untuk menambahkan nomor telepon",
         "loginMethods": "Metode Masuk",
         "level": "Level {level: string}",
+        "switchAccount": "Switch Account",
+        "pleaseWait": "Please Wait.",
         "accountLevel": "Level Akun",
         "upgrade": "Tingkatkan akun Anda",
         "logOutAndDeleteLocalData": "Keluar dan hapus semua data lokal",
@@ -2347,6 +2353,10 @@
         "yourAccountId": "ID Akun Anda",
         "accountId": "ID Akun",
         "copy": "Salin"
+    },
+    "ProfileScreen": {
+        "addAccount": "Add Account",
+        "error": "Unable to fetch profiles at this time"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Otentikasi dua faktor",
@@ -2464,7 +2474,8 @@
         "placeholder": "Nomor Telepon",
         "verify": "Klik untuk Verifikasi",
         "sms": "Kirim melalui SMS",
-        "whatsapp": "Kirim melalui WhatsApp"
+        "whatsapp": "Kirim melalui WhatsApp",
+        "telegram": "Send via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Kesalahan saat masuk. Apakah Anda menggunakan kode yang benar?",
@@ -2477,6 +2488,16 @@
         "sendAgain": "Kirim Ulang",
         "tryAgain": "Coba Lagi",
         "sendViaOtherChannel": "Anda memilih untuk menerima kode melalui {channel: string}. Anda dapat mencoba menerima melalui {other: string} sebagai gantinya"
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "After authorizing in Telegram, you will be automatically logged in",
+        "loginWithTelegram": "Log in with Telegram",
+        "waitingForAuthorization": "Waiting for authorization in Telegram...",
+        "errorFetchParams": "Failed to fetch Telegram auth params",
+        "errorFetchLogin": "Failed to fetch Telegram login",
+        "errorAuthTimeout": "Authorization timed out. Please try again.",
+        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Pengaturan Telepon",
