@@ -151,11 +151,7 @@
                             "Nesprávne. Neexistuje spôsob, ako by niekto mohol bitcoin kopírovať alebo vytvoriť jeho duplikát."
                         ],
                         "question": "Ak je Bitcoin digitálnymi peniazmi, nemôže ho niekto jednoducho kopírovať - a vytvoriť tak peniaze zadarmo?",
-                        "text": "Hodnotu bitcoinu nikdy nemožno kopírovať. To je práve dôvod, prečo je bitcoin tak mocným novým vynálezom!!
-
-Väčšinu digitálnych súborov - napríklad fotografiu z iPhonu, skladbu vo formáte MP3 alebo dokument Microsoft Word - možno ľahko duplikovať a zdieľať. 
-
-Softvér Bitcoinu jedinečne zabraňuje duplikácii - čiže \"dvojnásobnému utrácaniu\" - digitálnych peňazí. O tom, ako presne to funguje, sa podelíme neskôr!",
+                        "text": "Hodnotu bitcoinu nikdy nemožno kopírovať. To je práve dôvod, prečo je bitcoin tak mocným novým vynálezom!! \n\nVäčšinu digitálnych súborov - napríklad fotografiu z iPhonu, skladbu vo formáte MP3 alebo dokument Microsoft Word - možno ľahko duplikovať a zdieľať. \n\nSoftvér Bitcoinu jedinečne zabraňuje duplikácii - čiže \\\"dvojnásobnému utrácaniu\\\" - digitálnych peňazí. O tom, ako presne to funguje, sa podelíme neskôr!",
                         "title": "Ak je Bitcoin digitálnymi peniazmi, nemôže ho niekto jednoducho kopírovať - a vytvoriť tak peniaze zadarmo?"
                     }
                 }
@@ -2749,8 +2745,8 @@ Softvér Bitcoinu jedinečne zabraňuje duplikácii - čiže \"dvojnásobnému u
         "peopleWelcomedByMyCircle": "ľudia pozvaní mojim kruhom",
         "yourSphere": "Vaša Sféra",
         "mySphere": "Moja Sféra",
-        "yourRankMessage": "Tento mesiac ste #{thisMonthRank: číslo} a #{allTimeRank: number} za celú dobu!",
-        "rankMessage": "#{thisMonthRank: číslo} tento mesiac a #{allTimeRank: number} za celú dobu!",
+        "yourRankMessage": "Tento mesiac ste #{thisMonthRank: number} a #{allTimeRank: number} za celú dobu!",
+        "rankMessage": "#{thisMonthRank: number} tento mesiac a #{allTimeRank: number} za celú dobu!",
         "inviteFriends": "Pozvite priateľa do Blink",
         "buildYourCircle": "Budujte svoje kruhy",
         "myBlinkCircles": "Moje Blink Kruhy",
