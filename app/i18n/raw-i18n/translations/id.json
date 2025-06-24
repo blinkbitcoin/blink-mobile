@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "Cara menggunakan Mesin Kasir anda",
         "howToUseYourAddressExplainer": "Bagikan dengan seseorang yang memiliki dompet yang kompatibel, seperti:",
         "howToUseYourPaycodeExplainer": "Anda dapat mencetak Paycode Anda (secara teknis, ini adalah alamat lnurl-pay) dan tampilkan di bisnis anda untuk menerima pembayaran. Seseorang dapat membayar anda dengan memindainya menggunakan dompet yang mendukung Lightning.\n\nNamun, perlu diketahui bahwa beberapa dompet tidak bisa memindai Paycode, seperti:",
-        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {BankName: string} Dompet anda."
+        "howToUseYourCashRegisterExplainer": "Izinkan orang untuk mengumpulkan pembayaran melalui tautan Mesin Kasir, tanpa mengakses dompet anda. \n\nMereka dapat membuat invoice dan pembayaran akan dikirim langsung ke {bankName: string} Dompet anda."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Syarat dan Ketentuan",
@@ -56,7 +56,7 @@
         "frequentContacts": "Kontak yang sering dihubungi"
     },
     "ContactDetailsScreen": {
-        "title": "Transaksi dengan {nama pengguna: string}"
+        "title": "Transaksi dengan {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Konversi",
@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "mendapatkan {formatNumber | sats}",
+        "earnSats": "mendapatkan {formattedNumber | sats}",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "Bitcoin: Apa itu?",
@@ -98,7 +98,7 @@
                         "answers": [
                             "Unit terkecil dari Bitcoin",
                             "Sebuah satelit kecil",
-                            "Sebuah kucing angkasa"
+                            "Sebuah kucing angkasa 🐱🚀"
                         ],
                         "feedback": [
                             "Benar. Anda baru saja mendapatkan dua sat lainnya!!",
@@ -121,7 +121,7 @@
                             "Salah. Silakan coba lagi."
                         ],
                         "question": "Di mana bitcoin eksis?",
-                        "text": "Bitcoin adalah bentuk uang yang baru. Bitcoin dapat digunakan oleh siapa saja, kapan saja - di mana saja di seluruh dunia. Tidak terikat pada pemerintah atau wilayah tertentu (seperti Dolar AS). Juga tidak ada uang kertas, koin logam, atau kartu plastik. Semuanya 100% digital. Bitcoin adalah jaringan komputer yang beroprasi di internet. Bitcoin anda dapat dikelola dengan mudah menggunakan perangkat lunak di ponsel  atau komputer anda!",
+                        "text": "Bitcoin adalah bentuk uang yang baru. Bitcoin dapat digunakan oleh siapa saja, kapan saja - di mana saja di seluruh dunia. Tidak terikat pada pemerintah atau wilayah tertentu (seperti Dolar AS). Juga tidak ada uang kertas, koin logam, atau kartu plastik. Semuanya 100% digital. Bitcoin adalah jaringan komputer yang beroperasi di internet. Bitcoin anda dapat dikelola dengan mudah menggunakan perangkat lunak di ponsel atau komputer anda!",
                         "title": "Di mana bitcoin eksis?"
                     },
                     "whoControlsBitcoin": {
@@ -522,7 +522,7 @@
                         ],
                         "question": "Atribut-atribut apa saja yang membuat sesuatu bagus sebagai tempat penyimpanan bernilai",
                         "text": "Ketika tempat penyimpanan nilai bersaing satu sama lain, atribut yang membuat tempat penyimpanan nilai yang bagus memungkinkannya untuk mengungguli para pesaingnya dan meningkatkan permintaan dari waktu ke waktu. \n\nBanyak barang yang telah digunakan sebagai tempat penyimpanan nilai, tetapi atribut tertentu secara khusus diinginkan dan membuat barang-barang ini lebih sukses. \n\nTempat penyimpanan nilai yang ideal haruslah tahan lama, mudah dibawa, dapat diverifikasi, dapat dibagi-bagi, langka, memiliki sejarah yang panjang, dan tahan terhadap pencekalan.\n",
-                        "title": "Beberapa tempat penyimpanan nilai ebih baik daripada tempat penyimpanan nilai lainnya"
+                        "title": "Beberapa tempat penyimpanan nilai lebih baik daripada tempat penyimpanan nilai lainnya"
                     },
                     "durability": {
                         "answers": [
@@ -688,7 +688,7 @@
                         "feedback": [
                             "Kerja yang bagus! Daya beli dari sebuah tempat penyimpan nilai ditentukan oleh jumlah orang yang ingin menggunakannya sebagai cara untuk menyimpan nilai. Semakin banyak orang yang ingin menggunakannya untuk tujuan ini, nilai penyimpan nilai meningkat",
                             "Maaf, cuaca memang merupakan faktor dalam banyak hal, tetapi bukan jawaban yang tepat untuk pertanyaan ini. Mungkin coba lihat faktor lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai ",
-                            "I'm sorry to say that the color of a store of value probably doesn't have much of an effect on its purchasing power. It's definitely an interesting idea though! Maybe try considering other characteristics that could affect the value of a store of value."
+                            "Maaf, warna dari sebuah tempat penyimpanan nilai mungkin tidak terlalu berpengaruh pada daya belinya. Ide yang menarik! Mungkin coba pertimbangkan karakteristik lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai."
                         ],
                         "question": "Apa yang menentukan daya beli dari sebuah tempat penyimpanan nilai",
                         "text": "Tempat Penyimpan nilai adalah tahap kedua dari evolusi uang. Ketika cukup banyak orang menginginkan uang karena kualitas istimewanya, uang menjadi metode penyimpanan nilai dari waktu ke waktu, untuk memindahkan kekayaan yang diperoleh dengan susah payah ke masa depan. \n\nSemakin banyak orang yang mengenali suatu barang sebagai cara yang baik untuk menyimpan nilai, maka nilai barang tersebut akan meningkat seiring dengan semakin banyaknya orang yang menginginkannya. \n\nAkhirnya, nilai sebuah alat penyimpan nilai akan berhenti berkembang seiring dengan semakin banyaknya barang tersebut yang dimiliki oleh masyarakat luas dan semakin sedikitnya orang yang baru yang menginginkannya sebagai alat penyimpan nilai.\n",
@@ -746,7 +746,7 @@
                             "Bitcoin telah melalui proses untuk diterima secara luas sebagai uang dan sekarang digunakan sebagai bentuk mata uang."
                         ],
                         "feedback": [
-                            "Bingo! Anda benar sekali dengan jawaban ini (Punintended). Tahukah Anda bahwa proses Bitcoin menjadi lebih diterima secara luas sebagai uang mirip dengan proses yang dilalui emas untuk menjadi bentuk mata uang yang diterima secara luas",
+                            "Bingo! Anda benar sekali dengan jawaban ini (pun intended). Tahukah Anda bahwa proses Bitcoin menjadi lebih diterima secara luas sebagai uang mirip dengan proses yang dilalui emas untuk menjadi bentuk mata uang yang diterima secara luas",
                             "Ha! Anda pasti melewatkan bagian tentang butuh waktu beberapa tahun bagi Bitcoin untuk mencapai tahap ini. Teruslah membaca",
                             "Maaf, kami sampaikan kepada Anda, tetapi Bitcoin masih dalam proses untuk diterima secara luas sebagai uang. Semoga lebih beruntung di lain waktu!"
                         ],
@@ -1486,7 +1486,7 @@
                             "Mari kita realistis - siapa yang akan menemukan mata uang digital yang lebih langka dari kelangkaan absolut? Itu seperti mencoba menemukan lingkaran yang lebih bulat dari bulat"
                         ],
                         "feedback": [
-                            "bitcoin tidak mungkin menjadi usang karena mewakili kelangkaan absolut dan memiliki posisi dominan di pasar.",
+                            "Tidak, bitcoin tidak mungkin menjadi usang karena mewakili kelangkaan absolut dan memiliki posisi dominan di pasar.",
                             "Yah, Anda tidak salah tentang itu, tapi mari kita realistis - siapa yang akan menemukan mata uang digital yang lebih langka dari kelangkaan absolut? Itu seperti mencoba menemukan lingkaran yang lebih bulat dari bulat",
                             "Ups, sepertinya Anda bermain aman tapi tidak cukup tepat sasaran. Meskipun tidak ada yang bisa memprediksi masa depan, sudah jelas bahwa bitcoin memiliki pegangan yang kuat dalam permainan jaringan moneter digital. Coba lagi."
                         ],
@@ -1851,7 +1851,7 @@
                             "Pemerintah akan membatasi diskusi tentang Trilema Mundell-Fleming karena pidato lebih mudah disensor dibandingkan dengan pembayaran lintas batas."
                         ],
                         "feedback": [
-                            "Benar!",
+                            "Benar! Sebagai modal yang sepenuhnya mobile, Bitcoin mengubah logika negara berdaulat untuk mengarahkan kebijakan moneter internasional dengan membuat kontrol modal tidak mungkin diberlakukan.",
                             "Batas 21 juta memang sangat menarik, tetapi keberadaan Bitcoin sebenarnya membuat negara lebih sulit menetapkan nilai tukar tetap. Coba lagi.",
                             "Meskipun itu tentu saja mungkin, itu bukan hasil yang paling mungkin terjadi di sini. Coba lagi!"
                         ],
@@ -2178,7 +2178,7 @@
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",
-        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {namaBank: string} juga.\n\nBuka halaman alamat {namaBank: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
+        "usernameNowAddressInfo": "Saat Anda memasukkan nama pengguna {bankName: string}, kami akan menambahkan \"@{lnDomain: string}\" padanya (misalnya maria@{lnDomain: string}) untuk menjadikannya sebuah alamat. Nama pengguna Anda sekarang menjadi alamat {bankName: string} juga.\n\nBuka halaman alamat {bankName: string} Anda dari Pengaturan untuk mempelajari cara menggunakannya atau membagikannya untuk menerima pembayaran.",
         "enterValidDestination": "Silakan masukkan tujuan yang valid",
         "destinationOptions": "Anda dapat mengirim ke alamat {bankName: string}, alamat LN, faktur LN, atau alamat BTC.",
         "expiredInvoice": "Faktur ini telah kedaluwarsa. Silakan buat faktur baru.",
