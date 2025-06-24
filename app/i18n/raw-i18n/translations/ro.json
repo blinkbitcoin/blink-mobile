@@ -1256,7 +1256,7 @@
                             "Uau, acesta este un obiectiv ambițios! Deși este adevărat că mineritul necesită o cantitate semnificativă de putere de calcul, sunt destul de sigur că scopul principal nu este de a crea o armată de stăpâni AI. Mai mult noroc data viitoare!"
                         ],
                         "question": "Care este scopul principal al mineritului în rețeaua bitcoin",
-                        "text": "Atunci când un utilizator dorește să trimită o tranzacție în rețeaua bitcoin, trebuie să semneze tranzacția cu cheia privată pentru a dovedi că este proprietarul fondurilor transferate. Odată ce tranzacția este semnată, aceasta este difuzată în rețeaua peer-to-peer.\n\nMinarea este procesul de adăugare a tranzacțiilor la blockchain-ul bitcoin. Atunci când o tranzacție este difuzată în rețea, aceasta este preluată de mineri, care verifică dacă tranzacția este validă (adică utilizatorul are fondurile necesare, iar cheia privată utilizată pentru a semna tranzacția corespunde cheii publice asociate fondurilor).\n\nOdată ce o tranzacție a fost verificată, aceasta este adăugată la un bloc de tranzacții, împreună cu un puzzle matematic. Minerii concurează pentru a rezolva puzzle-ul, iar primul care îl rezolvă ajunge să adauge blocul la blockchain și să solicite o recompensă în bitcoin. Recompensa este în prezent de 6,25 bitcoini, plus orice taxe de tranzacție care au fost incluse în bloc.\n\nÎn plus față de adăugarea tranzacțiilor la blockchain, mineritul servește și la securizarea rețelei bitcoin. Acest lucru se datorează faptului că rezolvarea puzzle-ului necesită o cantitate semnificativă de putere de calcul, iar adăugarea unui bloc la blockchain necesită alți mineri pentru a verifica soluția. Acest lucru face foarte dificil pentru orice persoană sau grup să manipuleze blockchain-ul.\n",
+                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
                         "title": "Mineritul"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "Se reduce la jumătate",
-                            "Se dublează",
-                            "Acesta este înmulțit cu un număr aleatoriu ales de software-ul bitcoin"
+                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+                            "It adjusts once a year based on market price",
+                            "It is randomly changed by miners through consensus"
                         ],
                         "feedback": [
-                            "Asta e corect! Satoshi a determinat reducerea ofertei noi de bitcoin la jumătate în prima versiune a software-ului Bitcoin în 2009 și este practic imposibil de schimbat",
-                            "Ne pare rău, dar recompensa blocului nu este dublată la fiecare patru ani. Trebuie să confundați Bitcoin cu livrările de monede fiat care se extind într-un ritm mai rapid. Încearcă din nou",
-                            "Foarte creativ, dar greșit. Programul de aprovizionare Bitcoin este orice altceva decât aleatoriu. Predictibilitatea sa oferă certitudine actorilor economici spre deosebire de orice altceva din istoria omenirii. Încearcă din nou!"
+                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
+                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
                         ],
-                        "question": "Ce se întâmplă cu recompensa blocului în rețeaua bitcoin la fiecare patru ani",
-                        "text": "Un element crucial al protocolului Bitcoin este ajustarea dificultății. Acest algoritm asigură că blocurile noi sunt găsite în medie la fiecare 10 minute.\n\nCând mai mulți mineri se alătură rețelei, timpul mediu necesar pentru a găsi un nou bloc scade. În caz contrar, atunci când minerii părăsesc rețeaua, este nevoie de mai mult timp pentru a adăuga un nou bloc. Algoritmul de ajustare a dificultății ajustează dificultatea puzzle-ului matematic pentru a se potrivi cu schimbările în puterea de calcul combinată a tuturor minerilor. Acest lucru împiedică crearea mai multor (sau mai puține) unități bitcoin decât programul de aprovizionare predeterminat.\n\nAcest lucru este în contrast puternic cu mineritul fizic al metalelor prețioase, cum ar fi aurul, unde adăugarea mai multor mineri de aur duce la o ofertă mai mare de aur și, prin urmare, la o scădere a prețului său. Cu toate acestea, în Bitcoin, adăugarea de noi mineri adaugă doar mai multă securitate rețelei.\n",
+                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
                         "title": "Ajustarea dificultății"
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Foarte creativ, dar greșit. Programul de aprovizionare Bitcoin este orice altceva decât aleatoriu. Predictibilitatea sa oferă certitudine actorilor economici spre deosebire de orice altceva din istoria omenirii. Încearcă din nou!"
                         ],
                         "question": "Ce se întâmplă cu recompensa blocului în rețeaua bitcoin la fiecare patru ani",
-                        "text": "Un ultim element care este important de înțeles este că recompensa blocului în rețeaua bitcoin este redusă la jumătate la fiecare patru ani sau la fiecare 210.000 de blocuri.\n\nAcest eveniment, cunoscut sub numele de \"înjumătățire\", este programat în software-ul bitcoin pe care toți utilizatorii îl rulează. Când bitcoin a fost lansat pentru prima dată, minerii au primit 50 de bitcoini noi pentru fiecare bloc pe care l-au adăugat la blockchain. În prezent, recompensa blocului este de 6,25 bitcoini, dar va fi redusă la 3,125 bitcoini în 2024, când va avea loc următoarea înjumătățire.\n\nAceste înjumătățiri vor continua să aibă loc până în anul 2140, moment în care numărul total de bitcoini care vor fi minați va fi limitat la 21 de milioane. Începând cu 2023, aproximativ 92% din toți bitcoinii (~19,3 milioane) au fost deja minați.\n\nSpre deosebire de monedele fiat, care pot fi inflaționiste, bitcoin este de natură dezinflaționistă. Acest lucru îl face mai rar decât fiat și metale prețioase, cum ar fi aurul și argintul, sau orice altceva cunoscut în univers.\n",
+                        "text": "One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.\n\nThis event, known as the \"halving\", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 3.125 bitcoins, but it will be reduced to 1.5625 bitcoins in 2028 when the next halving occurs.\n\nThese halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\\~19.3 million) have already been mined.\n\nUnlike fiat currencies, which can be inflationary, bitcoin is disinflationary in nature. This makes it more scarce than fiat and precious metals such as gold and silver, or anything else known in the universe.\n",
                         "title": "Înjumătățirea"
                     }
                 }
@@ -2162,10 +2162,10 @@
         "feeLabel": "Taxă",
         "memoLabel": "Notă:",
         "paymentFinal": "Plățile sunt finale.",
-        "stalePrice": "Prețul bitcoin este vechi și a fost actualizat ultima dată {timePeriod: string} în urmă. Vă rugăm să reporniți aplicația înainte de a efectua o plată.",
+        "stalePrice": "Prețul bitcoin este vechi și a fost actualizat ultima dată {timePeriod} în urmă. Vă rugăm să reporniți aplicația înainte de a efectua o plată.",
         "title": "Confirmați plata",
         "totalLabel": "Total:",
-        "totalExceed": "Total depășește soldul {sold: string}",
+        "totalExceed": "Total depășește soldul {sold: șir}",
         "maxFeeSelected": "Aceasta este taxa maximă care vi se va percepe pentru această tranzacție. Poate ajunge să fie mai mică odată ce plata a fost efectuată.",
         "feeError": "Nu se poate calcula taxa",
         "invoiceAlreadyPaid": "Această factură a fost deja plătită",
@@ -2677,7 +2677,7 @@
         "thankYouText": "Vă mulțumim pentru feedback, doriți să sugerați o îmbunătățire?",
         "defaultEmailSubject": "{bankName: string} - Asistență",
         "defaultSupportMessage": "Bună! Am nevoie de ajutor cu {bankName: string}, folosesc versiunea {version: string} pe {os: string}.",
-        "emailCopied": "e-mail {email: string} copiat în clipboard",
+        "emailCopied": "e-mail {email: șir} copiat în clipboard",
         "deleteAccount": "Ștergeți contul",
         "delete": "delete",
         "typeDelete": "Tastați \"{delete: string}\" pentru a confirma ștergerea contului",
