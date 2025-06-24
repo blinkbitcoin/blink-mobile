@@ -21,6 +21,7 @@ export type Locales =
 	| 'hy'
 	| 'it'
 	| 'ja'
+	| 'ko'
 	| 'lg'
 	| 'ms'
 	| 'nl'
