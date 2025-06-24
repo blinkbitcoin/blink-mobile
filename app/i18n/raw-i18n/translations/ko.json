@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "{formattedNumber} sats 획득",
+        "earnSats": "{formattedNumber | sats} 획득",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "비트코인: 무엇일까요?",
