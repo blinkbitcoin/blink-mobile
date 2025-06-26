@@ -6,6 +6,7 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { gql } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { PayoutSpeedSelector } from "@app/components/payout-speed/payout-speed-selector"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import {
@@ -71,7 +72,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const { hideAmount } = useHideAmount()
 
-  const { paymentDetail } = route.params
+  const { paymentDetail, payoutSpeedLabel } = route.params
 
   const {
     destination,
@@ -84,6 +85,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     unitOfAccountAmount,
     convertMoneyAmount,
     isSendingMax,
+    payoutSpeed,
   } = paymentDetail
 
   const { formatDisplayAndWalletAmount } = useDisplayCurrency()
@@ -386,6 +388,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </Text>
           </View>
         </View>
+        {payoutSpeed && (
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldTitleText}>
+              {LL.SendBitcoinScreen.feeSettings()}
+            </Text>
+            <PayoutSpeedSelector value={payoutSpeedLabel} readOnly />
+          </View>
+        )}
         {note ? (
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>

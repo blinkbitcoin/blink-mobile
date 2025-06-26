@@ -2953,6 +2953,11 @@ export type SendBitcoinInternalLimitsQueryVariables = Exact<{ [key: string]: nev
 
 export type SendBitcoinInternalLimitsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly limits: { readonly __typename: 'AccountLimits', readonly internalSend: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }> } } } | null };
 
+export type PayoutSpeedsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PayoutSpeedsQuery = { readonly __typename: 'Query', readonly payoutSpeeds: ReadonlyArray<{ readonly __typename: 'PayoutSpeeds', readonly speed: PayoutSpeed, readonly displayName: string, readonly description: string }> };
+
 export type FeedbackSubmitMutationVariables = Exact<{
   input: FeedbackSubmitInput;
 }>;
@@ -6284,6 +6289,47 @@ export type SendBitcoinInternalLimitsQueryHookResult = ReturnType<typeof useSend
 export type SendBitcoinInternalLimitsLazyQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsLazyQuery>;
 export type SendBitcoinInternalLimitsSuspenseQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsSuspenseQuery>;
 export type SendBitcoinInternalLimitsQueryResult = Apollo.QueryResult<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>;
+export const PayoutSpeedsDocument = gql`
+    query payoutSpeeds {
+  payoutSpeeds {
+    speed
+    displayName
+    description
+  }
+}
+    `;
+
+/**
+ * __usePayoutSpeedsQuery__
+ *
+ * To run a query within a React component, call `usePayoutSpeedsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePayoutSpeedsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePayoutSpeedsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePayoutSpeedsQuery(baseOptions?: Apollo.QueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+      }
+export function usePayoutSpeedsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export function usePayoutSpeedsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export type PayoutSpeedsQueryHookResult = ReturnType<typeof usePayoutSpeedsQuery>;
+export type PayoutSpeedsLazyQueryHookResult = ReturnType<typeof usePayoutSpeedsLazyQuery>;
+export type PayoutSpeedsSuspenseQueryHookResult = ReturnType<typeof usePayoutSpeedsSuspenseQuery>;
+export type PayoutSpeedsQueryResult = Apollo.QueryResult<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>;
 export const FeedbackSubmitDocument = gql`
     mutation feedbackSubmit($input: FeedbackSubmitInput!) {
   feedbackSubmit(input: $input) {

@@ -1,4 +1,4 @@
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import {
   BtcMoneyAmount,
   MoneyAmount,
@@ -23,6 +23,7 @@ export type CreateNoAmountOnchainPaymentDetailsParams<T extends WalletCurrency> 
   address: string
   isSendingMax?: boolean
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
+  payoutSpeed?: PayoutSpeed
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -36,6 +37,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     senderSpecifiedMemo,
     isSendingMax,
     address,
+    payoutSpeed,
   } = params
 
   const settlementAmount = convertMoneyAmount(
@@ -57,6 +59,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             walletId: sendingWalletDescriptor.id,
             address,
             memo,
+            speed: payoutSpeed,
           },
         },
       })
@@ -133,6 +136,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             address,
             amount: settlementAmount.amount,
             memo,
+            speed: payoutSpeed,
           },
         },
       })
@@ -196,6 +200,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
               walletId: sendingWalletDescriptor.id,
               address,
               amount: settlementAmount.amount,
+              speed: payoutSpeed,
             },
           },
         })
@@ -236,6 +241,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
               walletId: sendingWalletDescriptor.id,
               address,
               amount: settlementAmount.amount,
+              speed: payoutSpeed,
             },
           },
         })
@@ -316,6 +322,13 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  const setPayoutSpeed = (speed: PayoutSpeed) => {
+    return createNoAmountOnchainPaymentDetails({
+      ...params,
+      payoutSpeed: speed,
+    })
+  }
+
   return {
     destination: address,
     settlementAmount,
@@ -330,6 +343,8 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...setMemo,
     setAmount,
     canSetAmount: true,
+    setPayoutSpeed,
+    payoutSpeed: params.payoutSpeed,
     ...sendPaymentAndGetFee,
     canSendMax: true,
     isSendingMax,
