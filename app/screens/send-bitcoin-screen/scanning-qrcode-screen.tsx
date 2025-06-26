@@ -4,7 +4,7 @@ import { Alert, Dimensions, Pressable, View, ViewStyle } from "react-native"
 import { RNCamera } from "react-native-camera"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { launchImageLibrary } from "react-native-image-picker"
-import Svg, { Circle } from "react-native-svg"
+import Svg, { Circle, Path } from "react-native-svg"
 import { Icon } from 'react-native-elements'
 // import Icon from "react-native-vector-icons/Ionicons"
 import { Screen } from "../../components/screen"
@@ -44,7 +44,7 @@ const styles = EStyleSheet.create({
     left: 32,
     position: "absolute",
     top: screenHeight - 96,
-    width: screenWidth,
+    width: 128,
   },
 
   // eslint-disable-next-line react-native/no-color-literals
@@ -223,13 +223,13 @@ export const ScanningQRCodeScreen: ScreenType = ({
             <View style={styles.close}>
               <Svg viewBox="0 0 100 100">
                 <Circle cx={50} cy={50} r={50} fill={palette.white} opacity={0.5} />
+                <Path 
+                  d="M30 30 L70 70 M70 30 L30 70"
+                  stroke="black"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
               </Svg>
-              <Icon
-                name="close"
-                size={64}
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{ position: "absolute", top: -2 }}
-              />
             </View>
           </Pressable>
           <View style={styles.openGallery}>
@@ -242,16 +242,16 @@ export const ScanningQRCodeScreen: ScreenType = ({
                 style={{ opacity: 0.8 }}
               />
             </Pressable>
-            <Pressable onPress={handleInvoicePaste}>
-              <Icon
-                name="content-paste"
-                size={64}
-                color={palette.lightGrey}
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{ opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" }}
-              />
-            </Pressable>
           </View>
+          <Pressable onPress={handleInvoicePaste} style={{ position: "absolute", bottom: 32, right: 32 }}>
+            <Icon
+              name="content-paste"
+              size={64}
+              color={palette.lightGrey}
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{ opacity: 0.8 }}
+            />
+          </Pressable>
         </RNCamera>
       )}
     </Screen>

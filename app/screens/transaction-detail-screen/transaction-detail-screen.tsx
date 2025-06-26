@@ -100,7 +100,7 @@ const Row = ({
           <Icon name="open-outline" size={18} color={palette.darkGrey} />
         )}
         {bbOrderNbr && (
-          <Icon name="information-circle-outline" size={18} color={palette.darkGrey} onPress={() => {
+          <Icon name="info-outline" size={18} color={palette.darkGrey} onPress={() => {
             navigation.navigate("sinpeScreen", {
               orderNbr: bbOrderNbr,
             })

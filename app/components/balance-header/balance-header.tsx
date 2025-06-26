@@ -159,7 +159,7 @@ export const BalanceHeaderDisplay: React.FC<BalanceHeaderProps> = ({
             }}
             style={styles.hiddenBalanceTouchableHighlight}
           >
-            <Icon style={styles.hiddenBalanceIcon} name="eye" />
+            <Icon style={styles.hiddenBalanceIcon} name="eye" type="ionicon" />
           </TouchableHighlight>
         </Tooltip>
       </>

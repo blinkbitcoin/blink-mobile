@@ -33,13 +33,13 @@ const configByType = {
     copyToClipboardLabel: "ReceiveBitcoinScreen.copyClipboard",
     shareButtonLabel: "common.shareLightning",
     ecl: "L" as const,
-    icon: "bolt",
+    icon: "flash",
   },
   [TYPE_BITCOIN]: {
     copyToClipboardLabel: "ReceiveBitcoinScreen.copyClipboardBitcoin",
     shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "currency-bitcoin",
+    icon: "logo-bitcoin",
   },
 }
 
@@ -165,7 +165,7 @@ export const QRView = ({
             ecl={configByType[type].ecl}
             // __DEV__ workaround for https://github.com/facebook/react-native/issues/26705
             logo={
-              !__DEV__ &&
+              // !__DEV__ &&
               Icon.getImageSourceSync(configByType[type].icon, 28, palette.orange)
             }
           />

@@ -592,7 +592,8 @@ export const SendBitcoinScreenJSX: ScreenType = ({
     } else if (destination.length === 0) {
       return (
         <Icon
-          name="camera"
+          name="camera-outline"
+          type="ionicon"
           onPress={() => navigation.navigate("scanningQRCode")}
           size={30}
           style={styles.iconColor}

@@ -546,7 +546,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                   buttonStyle={(!swiperIndex ? styles.buttonStyleActive : styles.buttonStyleInactive)}
                   title={
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
-                      <Icon style={{color: "white"}} size={20} name="bolt" />
+                      <Icon color="white" size={20} name="bolt" />
                       <Text style={{fontWeight: "bold", color: "white"}}>Lightning</Text>
                     </View>
                   }
@@ -563,7 +563,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                   buttonContainer={{flex: 1}}
                   title={
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
-                      <Icon style={{color: "white"}} size={20} name="currency-bitcoin" />
+                      <Icon color="white" size={20} name="currency-bitcoin" />
                       <Text style={{fontWeight: "bold", color: "white"}}>On-Chain</Text>
                     </View>
                   }
@@ -609,15 +609,15 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
                 />
               )}
               {!btcAddressRequested && !lastOnChainAddress && (
-                <Text style={styles.textButtonWrapper}>
+                <View style={styles.textButtonWrapper}>
                   <Button
                     buttonStyle={styles.buttonStyle}
-                    containerStyle={styles.buttonContainer}
+                    containerStyle={{ marginHorizontal: 52, paddingVertical: 18 }}
                     title={translate("ReceiveBitcoinScreen.generateQr")}
                     onPress={onBtcAddressRequestClick}
                     titleStyle={styles.buttonTitle}
                   />
-                </Text>
+                </View>
               )}
             </Swiper>
           </View>

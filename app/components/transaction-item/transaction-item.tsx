@@ -159,7 +159,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
       {txHideBalance ? (
-        <Icon style={styles.hiddenBalanceContainer} name="eye" onPress={pressTxAmount} />
+        <Icon style={styles.hiddenBalanceContainer} name="eye" type="ionicon" onPress={pressTxAmount} />
       ) : (
         <Text
           style={amountDisplayStyle({ isReceive, isPending })}
