@@ -1399,6 +1399,15 @@ query paymentRequest {
   }
 }
 
+query payoutSpeeds {
+  payoutSpeeds {
+    speed
+    displayName
+    description
+    __typename
+  }
+}
+
 query priceHistoryScreen {
   me {
     id
