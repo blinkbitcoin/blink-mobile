@@ -676,21 +676,21 @@
                             "Salah! Tapi setidaknya Anda berpikir tentang bentuk uang yang lebih modern. Uang kertas dengan gambar-gambar pemimpin terkenal tidak digunakan pada awal evolusi uang."
                         ],
                         "question": "Apa saja contoh bentuk awal uang yang dihargai karena penampilan atau kualitas spesialnya",
-                        "text": "Throughout history, money has gone through four stages of development. In the very beginning, people only wanted money because of its special qualities, and it was mostly seen as a decorative item or a collectible.;\n\nExamples of this include shells, beads, and gold, which were all collectibles before becoming widely used as money.\n",
+                        "text": "Sepanjang sejarah, uang telah melalui empat tahap perkembangan. Pada awalnya, orang hanya menginginkan uang karena kualitas khususnya, dan sebagian besar dianggap sebagai barang dekoratif atau koleksi.;\n\nContohnya termasuk kerang, manik-manik, dan emas, yang semuanya merupakan barang koleksi sebelum digunakan secara luas sebagai uang.\n",
                         "title": "Empat Tahapan Uang: Koleksi"
                     },
                     "storeOfValue": {
                         "answers": [
-                            "The number of people who want it as a store of value",
+                            "Jumlah orang yang menginginkannya sebagai penyimpan nilai",
                             "Cuaca",
-                            "The color of the store of value"
+                            "Warna dari penyimpan nilai"
                         ],
                         "feedback": [
                             "Kerja yang bagus! Daya beli dari sebuah tempat penyimpan nilai ditentukan oleh jumlah orang yang ingin menggunakannya sebagai cara untuk menyimpan nilai. Semakin banyak orang yang ingin menggunakannya untuk tujuan ini, nilai penyimpan nilai meningkat",
                             "Maaf, cuaca memang merupakan faktor dalam banyak hal, tetapi bukan jawaban yang tepat untuk pertanyaan ini. Mungkin coba lihat faktor lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai ",
                             "Maaf, warna dari sebuah tempat penyimpanan nilai mungkin tidak terlalu berpengaruh pada daya belinya. Ide yang menarik! Mungkin coba pertimbangkan karakteristik lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai."
                         ],
-                        "question": "Apa yang menentukan daya beli dari sebuah tempat penyimpanan nilai",
+                        "question": "Apa yang menentukan daya beli dari sebuah tempat penyimpanan nilai?",
                         "text": "Tempat Penyimpan nilai adalah tahap kedua dari evolusi uang. Ketika cukup banyak orang menginginkan uang karena kualitas istimewanya, uang menjadi metode penyimpanan nilai dari waktu ke waktu, untuk memindahkan kekayaan yang diperoleh dengan susah payah ke masa depan. \n\nSemakin banyak orang yang mengenali suatu barang sebagai cara yang baik untuk menyimpan nilai, maka nilai barang tersebut akan meningkat seiring dengan semakin banyaknya orang yang menginginkannya. \n\nAkhirnya, nilai sebuah alat penyimpan nilai akan berhenti berkembang seiring dengan semakin banyaknya barang tersebut yang dimiliki oleh masyarakat luas dan semakin sedikitnya orang yang baru yang menginginkannya sebagai alat penyimpan nilai.\n",
                         "title": "Empat Tahapan Uang: Tempat Penyimpan Nilai"
                     },
@@ -1256,7 +1256,7 @@
                             "Wow, itu tujuan yang ambisius! Meskipun benar bahwa penambangan memerlukan daya komputasi yang signifikan, saya cukup yakin tujuan utamanya bukan untuk menciptakan pasukan penguasa AI. Semoga lebih beruntung lain kali!"
                         ],
                         "question": "Apa tujuan utama dari penambangan di jaringan bitcoin",
-                        "text": "Ketika seorang pengguna ingin mengirimkan transaksi di jaringan bitcoin, mereka perlu menandatangani transaksi tersebut dengan kunci privat mereka untuk membuktikan bahwa mereka adalah pemilik dana yang akan ditransfer. Setelah transaksi ditandatangani, transaksi tersebut disiarkan ke jaringan peer-to-peer.\n\nPenambangan adalah proses menambahkan transaksi ke blockchain bitcoin. Ketika sebuah transaksi disiarkan ke jaringan, transaksi tersebut diambil oleh penambang, yang memverifikasi bahwa transaksi tersebut valid (yaitu, pengguna memiliki dana yang diperlukan dan kunci privat yang digunakan untuk menandatangani transaksi sesuai dengan kunci publik yang terkait dengan dana tersebut).\n\nSetelah transaksi diverifikasi, transaksi tersebut ditambahkan ke sebuah blok transaksi, bersama dengan sebuah teka-teki matematika. Penambang bersaing untuk menyelesaikan teka-teki tersebut, dan yang pertama menyelesaikannya berhak menambahkan blok tersebut ke blockchain dan mengklaim hadiah dalam bentuk bitcoin. Hadiahnya saat ini adalah 3,125 bitcoin, ditambah biaya transaksi apa pun yang disertakan dalam blok tersebut.\n\nSelain menambahkan transaksi ke blockchain, penambangan juga berfungsi untuk mengamankan jaringan bitcoin. Hal ini karena menyelesaikan teka-teki memerlukan daya komputasi yang signifikan, dan menambahkan blok ke blockchain memerlukan penambang lain untuk memverifikasi solusinya. Ini membuat sangat sulit bagi satu orang atau kelompok mana pun untuk memanipulasi blockchain.\n"
+                        "text": "Ketika seorang pengguna ingin mengirimkan transaksi di jaringan bitcoin, mereka perlu menandatangani transaksi tersebut dengan kunci privat mereka untuk membuktikan bahwa mereka adalah pemilik dana yang akan ditransfer. Setelah transaksi ditandatangani, transaksi tersebut disiarkan ke jaringan peer-to-peer.\n\nPenambangan adalah proses menambahkan transaksi ke blockchain bitcoin. Ketika sebuah transaksi disiarkan ke jaringan, transaksi tersebut diambil oleh penambang, yang memverifikasi bahwa transaksi tersebut valid (yaitu, pengguna memiliki dana yang diperlukan dan kunci privat yang digunakan untuk menandatangani transaksi sesuai dengan kunci publik yang terkait dengan dana tersebut).\n\nSetelah transaksi diverifikasi, transaksi tersebut ditambahkan ke sebuah blok transaksi, bersama dengan sebuah teka-teki matematika. Penambang bersaing untuk menyelesaikan teka-teki tersebut, dan yang pertama menyelesaikannya berhak menambahkan blok tersebut ke blockchain dan mengklaim hadiah dalam bentuk bitcoin. Hadiahnya saat ini adalah 3,125 bitcoin, ditambah biaya transaksi apa pun yang disertakan dalam blok tersebut.\n\nSelain menambahkan transaksi ke blockchain, penambangan juga berfungsi untuk mengamankan jaringan bitcoin. Hal ini karena menyelesaikan teka-teki memerlukan daya komputasi yang signifikan, dan menambahkan blok ke blockchain memerlukan penambang lain untuk memverifikasi solusinya. Ini membuat sangat sulit bagi satu orang atau kelompok mana pun untuk memanipulasi blockchain.\n",
                         "title": "Penambangan"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
-                            "It adjusts once a year based on market price",
-                            "It is randomly changed by miners through consensus"
+                            "Dikurangi setengahnya",
+                            "Dilipatgandakan",
+                            "Dikalikan dengan angka acak yang dipilih oleh perangkat lunak bitcoin"
                         ],
                         "feedback": [
-                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
-                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
-                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
+                            "Benar! Satoshi menentukan pengurangan pasokan bitcoin baru hingga setengahnya dalam rilis pertama perangkat lunak Bitcoin pada tahun 2009 dan hampir mustahil untuk mengubahnya",
+                            "Maaf, tetapi hadiah blok tidak dilipatgandakan setiap empat tahun. Anda mungkin bingung antara Bitcoin dan pasokan mata uang fiat yang terus berkembang dengan kecepatan lebih cepat. Coba lagi",
+                            "Sangat kreatif, tetapi salah. Jadwal pasokan Bitcoin tidak acak. Kepastiannya memberikan kejelasan bagi pelaku ekonomi, sesuatu yang belum pernah ada dalam sejarah umat manusia. Coba lagi!"
                         ],
-                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
-                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
+                        "question": "Apa yang terjadi pada hadiah blok di jaringan bitcoin setiap empat tahun",
+                        "text": "Elemen penting dari protokol Bitcoin adalah Penyesuaian Kesulitan. Algoritma ini memastikan bahwa blok baru ditemukan setiap 10 menit rata-rata.\n\nKetika lebih banyak penambang bergabung dengan jaringan, waktu rata-rata yang diperlukan untuk menemukan blok baru berkurang. Sebaliknya, ketika penambang meninggalkan jaringan, waktu yang diperlukan untuk menambahkan blok baru menjadi lebih lama. Algoritma Penyesuaian Kesulitan menyesuaikan tingkat kesulitan teka-teki matematika agar sesuai dengan perubahan daya komputasi gabungan semua penambang. Ini mencegah penciptaan lebih banyak (atau lebih sedikit) unit bitcoin daripada jadwal pasokan yang telah ditentukan.\n\nHal ini sangat berbeda dengan penambangan fisik logam mulia seperti emas, di mana menambahkan lebih banyak penambang emas menghasilkan pasokan emas yang lebih tinggi dan karenanya penurunan harganya. Namun, dalam Bitcoin, penambahan penambang baru hanya menambah keamanan jaringan.\n",
                         "title": "Penyesuaian Kesulitan"
                     },
                     "halving": {
@@ -2236,12 +2236,12 @@
         },
         "copiedDestination": "Tujuan disalin ke papan klip",
         "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "copySuccessMessage": "Salin pesan sukses ke papan klip",
+        "openSuccessUrl": "Buka URL sukses di browser",
+        "copySecretMessage": "Salin pesan rahasia ke papan klip",
+        "copiedSuccessMessage": "Pesan berhasil disalin",
+        "copiedSecretMessage": "Pesan rahasia berhasil disalin",
+        "pendingDecryptionMessage": "Pesan terenkripsi. Menunggu konfirmasi pembayaran."
     },
     "SettingsScreen": {
         "staticQr": "Kode QR Statis yang Dapat Dicetak",
@@ -2274,10 +2274,10 @@
         "nfcScanNow": "Pindai NFC Sekarang",
         "nfcNotSupported": "NFC tidak didukung pada perangkat ini",
         "logInOrCreateAccount": "Masuk atau buat akun",
-        "logOutFromOneAccount": "Log out from this account",
-        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
-        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
-        "logoutOneAccountConfirm": "I understand. Please log out."
+        "logOutFromOneAccount": "Keluar dari akun ini",
+        "logoutOneAccountAlertTitle": "Anda yakin ingin keluar dari akun ini?",
+        "logoutOneAccountAlertContent": "Anda akan keluar dari sesi yang terhubung dengan {identifier: string}.\nPastikan Anda memiliki akses untuk masuk kembali di masa mendatang.",
+        "logoutOneAccountConfirm": "Saya mengerti. Silakan keluarkan saya."
     },
     "NotificationSettingsScreen": {
         "title": "Pengaturan Notifikasi",
@@ -2311,8 +2311,8 @@
         "tapToAddPhoneNumber": "Ketuk untuk menambahkan nomor telepon",
         "loginMethods": "Metode Masuk",
         "level": "Level {level: string}",
-        "switchAccount": "Switch Account",
-        "pleaseWait": "Please Wait.",
+        "switchAccount": "Ganti Akun",
+        "pleaseWait": "Mohon tunggu.",
         "accountLevel": "Level Akun",
         "upgrade": "Tingkatkan akun Anda",
         "logOutAndDeleteLocalData": "Keluar dan hapus semua data lokal",
@@ -2355,8 +2355,8 @@
         "copy": "Salin"
     },
     "ProfileScreen": {
-        "addAccount": "Add Account",
-        "error": "Unable to fetch profiles at this time"
+        "addAccount": "Tambah Akun",
+        "error": "Tidak dapat mengambil profil saat ini"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Otentikasi dua faktor",
@@ -2475,7 +2475,7 @@
         "verify": "Klik untuk Verifikasi",
         "sms": "Kirim melalui SMS",
         "whatsapp": "Kirim melalui WhatsApp",
-        "telegram": "Send via Telegram"
+        "telegram": "Kirim via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Kesalahan saat masuk. Apakah Anda menggunakan kode yang benar?",
@@ -2491,13 +2491,13 @@
     },
     "TelegramValidationScreen": {
         "text": "Telegram Passport",
-        "description": "After authorizing in Telegram, you will be automatically logged in",
-        "loginWithTelegram": "Log in with Telegram",
-        "waitingForAuthorization": "Waiting for authorization in Telegram...",
-        "errorFetchParams": "Failed to fetch Telegram auth params",
-        "errorFetchLogin": "Failed to fetch Telegram login",
-        "errorAuthTimeout": "Authorization timed out. Please try again.",
-        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
+        "description": "Setelah otorisasi di Telegram, Anda akan secara otomatis masuk",
+        "loginWithTelegram": "Masuk dengan Telegram",
+        "waitingForAuthorization": "Menunggu otorisasi di Telegram...",
+        "errorFetchParams": "Gagal mengambil parameter otentikasi Telegram",
+        "errorFetchLogin": "Gagal mengambil data masuk Telegram",
+        "errorAuthTimeout": "Otorisasi habis waktu. Silakan coba lagi.",
+        "errorOpenAppError": "Gagal membuka Telegram. Pastikan aplikasi sudah terinstal."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Pengaturan Telepon",
@@ -2665,12 +2665,12 @@
     },
     "support": {
         "contactUs": "Butuh bantuan? Hubungi kami.",
-        "joinTheCommunity": "Join the community",
+        "joinTheCommunity": "Gabung komunitas",
         "whatsapp": "WhatsApp",
         "email": "Email",
         "faq": "FAQ",
-        "enjoyingApp": "Enjoying the app?",
-        "statusPage": "Status Page",
+        "enjoyingApp": "Menikmati aplikasi ini?",
+        "statusPage": "Halaman Status",
         "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
