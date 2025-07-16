@@ -2038,7 +2038,7 @@ const en: BaseTranslation = {
     registerTitle: "Need to upgrade your account",
     registerContent: "Register with your phone number to receive sats",
     oneSectionADay: "One section a day!",
-    availableTomorrow: "Come back tomorrow to continue learning about Bitcoin!",
+    availableTomorrow: "Come back tomorrow to continue earning rewards.\nOR, click on continue, to keep learning without rewards",
     motivatingBadger: "Dig your way through these lessons and earn as you learn",
   },
   GetStartedScreen: {
@@ -2742,6 +2742,8 @@ const en: BaseTranslation = {
     problemMaybeReauth:
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
+    continue: "Continue",
+    correct: "Correct",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

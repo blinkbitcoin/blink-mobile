@@ -6299,7 +6299,8 @@ type RootTranslation = {
 		 */
 		oneSectionADay: string
 		/**
-		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n​!
+		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​e​a​r​n​i​n​g​ ​r​e​w​a​r​d​s​.​
+	​O​R​,​ ​c​l​i​c​k​ ​o​n​ ​c​o​n​t​i​n​u​e​,​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s
 		 */
 		availableTomorrow: string
 		/**
@@ -8630,6 +8631,14 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		'continue': string
+		/**
+		 * C​o​r​r​e​c​t
+		 */
+		correct: string
 	}
 	errors: {
 		/**
@@ -15442,7 +15451,8 @@ export type TranslationFunctions = {
 		 */
 		oneSectionADay: () => LocalizedString
 		/**
-		 * Come back tomorrow to continue learning about Bitcoin!
+		 * Come back tomorrow to continue earning rewards.
+	OR, click on continue, to keep learning without rewards
 		 */
 		availableTomorrow: () => LocalizedString
 		/**
@@ -17716,6 +17726,14 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		'continue': () => LocalizedString
+		/**
+		 * Correct
+		 */
+		correct: () => LocalizedString
 	}
 	errors: {
 		/**

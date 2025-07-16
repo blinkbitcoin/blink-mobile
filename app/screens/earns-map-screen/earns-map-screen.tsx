@@ -123,7 +123,7 @@ export const EarnMapScreen: React.FC = () => {
       currSection += 1
     } else if (isNaN(progress)) {
       // get progress of the current section
-      progress = cards?.filter((item) => item?.completed).length / cards.length ?? 0
+      progress = cards?.filter((item) => item?.completed).length / cards.length || 0
 
       const notBefore = cards[cards.length - 1]?.notBefore
       canDoNextSection = !notBefore || new Date() > notBefore
@@ -188,8 +188,23 @@ export const EarnMapScreen: React.FC = () => {
 
     const onPress = () => {
       nextSectionNotYetAvailable
-        ? Alert.alert(LL.EarnScreen.oneSectionADay(), LL.EarnScreen.availableTomorrow())
-        : navigation.navigate("earnsSection", { section })
+        ? Alert.alert("Oops!", LL.EarnScreen.availableTomorrow(), [
+            {
+              text: LL.common.cancel(),
+            },
+            {
+              text: LL.common.continue(),
+              onPress: () =>
+                navigation.navigate("earnsSection", {
+                  section,
+                  isAvailable: false,
+                }),
+            },
+          ])
+        : navigation.navigate("earnsSection", {
+            section,
+            isAvailable: true,
+          })
     }
 
     // rework this to pass props into the style object
@@ -270,7 +285,11 @@ export const EarnMapScreen: React.FC = () => {
           }
         }}
       >
-        <MountainHeader amount={earnedSats.toString()} color={backgroundColor} />
+        <MountainHeader
+          amount={earnedSats.toString()}
+          color={backgroundColor}
+          isAvailable
+        />
         <View style={styles.mainView}>
           <Finish currSection={currSection} length={sectionsData.length} />
           {SectionsComp}

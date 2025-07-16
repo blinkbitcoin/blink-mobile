@@ -89,3 +89,13 @@ export const getQuizQuestionsContent = ({
   )
   return quizSectionContent
 }
+
+type ValidateQuizCodeErrorsType = "INVALID_INPUT" | "QUIZ_CLAIMED_TOO_EARLY"
+
+const skipRewardErrorCodesList: ValidateQuizCodeErrorsType[] = [
+  "INVALID_INPUT",
+  "QUIZ_CLAIMED_TOO_EARLY",
+]
+
+export const skipRewardErrorCodes = (code?: string | null): boolean =>
+  Boolean(code) && skipRewardErrorCodesList.includes(code as ValidateQuizCodeErrorsType)
