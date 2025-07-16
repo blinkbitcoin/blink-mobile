@@ -4197,6 +4197,22 @@
     shell-quote "^1.7.3"
     sudo-prompt "^9.0.0"
 
+"@react-native-community/cli-tools@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/cli-tools/-/cli-tools-17.0.0.tgz#c46bae5e5ffeee7067d0e55d2ee1de128e310ac3"
+  integrity sha512-mVXH7U/uXd7yizqm2iE+W4SSVc4FGYYEafAu29HihA+FHttonqdg35zVAnIX2FKbyla+TotR1ACNSgo7KFDq+w==
+  dependencies:
+    "@vscode/sudo-prompt" "^9.0.0"
+    appdirsjs "^1.2.4"
+    chalk "^4.1.2"
+    execa "^5.0.0"
+    find-up "^5.0.0"
+    launch-editor "^2.9.1"
+    mime "^2.4.1"
+    ora "^5.4.1"
+    prompts "^2.4.2"
+    semver "^7.5.2"
+
 "@react-native-community/cli-types@13.6.8":
   version "13.6.8"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-types/-/cli-types-13.6.8.tgz#1c357d3290a48232e3e639d48e43e31e422ce436"
@@ -4234,7 +4250,7 @@
   dependencies:
     invariant "^2.2.4"
 
-"@react-native-community/geolocation@^3.2.1":
+"@react-native-community/geolocation@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/geolocation/-/geolocation-3.4.0.tgz#8b6ee024a71cf94526ab796af1e9ae140684802c"
   integrity sha512-bzZH89/cwmpkPMKKveoC72C4JH0yF4St5Ceg/ZM9pA1SqX9MlRIrIrrOGZ/+yi++xAvFDiYfihtn9TvXWU9/rA==
@@ -4278,6 +4294,22 @@
   version "19.3.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/remote-config/-/remote-config-19.3.0.tgz#c151d555dc03348049cb33abd6cf9cf741a8e2cc"
   integrity sha512-CB3FScM2jZY+niCT8qR45Ypw9sbBud1Lt800ehf+H0rg9tGA7kpTo4CUSMP/0bY6aMjLuSJ+xzXEKtocYW9dDg==
+
+"@react-native-vector-icons/common@^12.1.0":
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-vector-icons/common/-/common-12.1.0.tgz#34f4f62e3ed440529283a045c0ad464841f87911"
+  integrity sha512-H2OUxGYEStmLFKOI/zjiq8XCmZOTR9vqWt9tKv7pqpW9QTPEFR93y6dnc1PIaEjdqb1yNh9AUGTee4aG1ivCTA==
+  dependencies:
+    "@react-native-community/cli-tools" "^17.0.0"
+    picocolors "^1.1.1"
+    plist "^3.1.0"
+
+"@react-native-vector-icons/ionicons@^12.1.0":
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-vector-icons/ionicons/-/ionicons-12.1.0.tgz#de6b29635346baf37635b2dd43021833564f8b73"
+  integrity sha512-zvYBUNyz6NzT1rslGlSS86hfZjBfwiFoKaX6bXHgtef3z9LjbjdaeIl7wOxYntTq9s+q/jYHCJxsFSFkAFiorQ==
+  dependencies:
+    "@react-native-vector-icons/common" "^12.1.0"
 
 "@react-native/assets-registry@0.74.84":
   version "0.74.84"
@@ -6619,7 +6651,7 @@
     "@types/react" "*"
     react-native "*"
 
-"@types/react-native-vector-icons@^6.4.10", "@types/react-native-vector-icons@^6.4.18":
+"@types/react-native-vector-icons@^6.4.10":
   version "6.4.18"
   resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.18.tgz#18671c617b9d0958747bc959903470dde91a8c79"
   integrity sha512-YGlNWb+k5laTBHd7+uZowB9DpIK3SXUneZqAiKQaj1jnJCZM0x71GDim5JCTMi4IFkhc9m8H/Gm28T5BjyivUw==
@@ -7071,6 +7103,11 @@
     "@vitest/pretty-format" "2.1.9"
     magic-string "^0.30.12"
     pathe "^1.1.2"
+
+"@vscode/sudo-prompt@^9.0.0":
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/@vscode/sudo-prompt/-/sudo-prompt-9.3.1.tgz#c562334bc6647733649fd42afc96c0eea8de3b65"
+  integrity sha512-9ORTwwS74VaTn38tNbQhsA5U44zkJfcb0BdTSyyG6frP4e8KMtHuTXYmwefe5dpL8XB1aGSIVTaLjD3BbWb5iA==
 
 "@wdio/cli@^8.36.0":
   version "8.45.0"
@@ -16587,6 +16624,14 @@ latest-version@^5.0.0:
   dependencies:
     package-json "^6.3.0"
 
+launch-editor@^2.9.1:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/launch-editor/-/launch-editor-2.10.0.tgz#5ca3edfcb9667df1e8721310f3a40f1127d4bc42"
+  integrity sha512-D7dBRJo/qcGX9xlvt/6wUYzQxjh5G1RvZPgPv8vi4KRU99DVQL/oW7tnVOCCTm2HGeo3C5HvGE5Yrh6UBoZ0vA==
+  dependencies:
+    picocolors "^1.0.0"
+    shell-quote "^1.8.1"
+
 lazy-universal-dotenv@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/lazy-universal-dotenv/-/lazy-universal-dotenv-3.0.1.tgz#a6c8938414bca426ab8c9463940da451a911db38"
@@ -19859,7 +19904,7 @@ playwright@^1.14.0:
   optionalDependencies:
     fsevents "2.3.2"
 
-plist@^3.0.1, plist@^3.0.5:
+plist@^3.0.1, plist@^3.0.5, plist@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/plist/-/plist-3.1.0.tgz#797a516a93e62f5bde55e0b9cc9c967f860893c9"
   integrity sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==
@@ -20922,14 +20967,6 @@ react-native-url-polyfill@^2.0.0:
   integrity sha512-My330Do7/DvKnEvwQc0WdcBnFPploYKp9CYlefDXzIdEaA+PAhDYllkvGeEroEzvc4Kzzj2O4yVdz8v6fjRvhA==
   dependencies:
     whatwg-url-without-unicode "8.0.0-3"
-
-react-native-vector-icons@^10.0.3:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.2.0.tgz#f438f2ca16f7d6be658fd6ec8f0d2b7e2132b91c"
-  integrity sha512-n5HGcxUuVaTf9QJPs/W22xQpC2Z9u0nb0KgLPnVltP8vdUvOp6+R26gF55kilP/fV4eL4vsAHUqUjewppJMBOQ==
-  dependencies:
-    prop-types "^15.7.2"
-    yargs "^16.1.1"
 
 react-native-view-shot@^3.7.0:
   version "3.8.0"
@@ -22465,7 +22502,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shell-quote@^1.6.1, shell-quote@^1.7.2, shell-quote@^1.7.3:
+shell-quote@^1.6.1, shell-quote@^1.7.2, shell-quote@^1.7.3, shell-quote@^1.8.1:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.8.3.tgz#55e40ef33cf5c689902353a3d8cd1a6725f08b4b"
   integrity sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==

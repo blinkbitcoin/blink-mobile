@@ -4,7 +4,7 @@ import { Dimensions, Text, View, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 import Carousel from "react-native-reanimated-carousel"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { PaginationItem } from "@app/components/pagination"
 import { useLevel } from "@app/graphql/level-context"

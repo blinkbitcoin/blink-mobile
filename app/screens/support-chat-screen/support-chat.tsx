@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"

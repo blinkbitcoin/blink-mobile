@@ -11,7 +11,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { useQuizClaimMutation } from "@app/graphql/generated"

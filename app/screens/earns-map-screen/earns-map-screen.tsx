@@ -123,7 +123,7 @@ export const EarnMapScreen: React.FC = () => {
       currSection += 1
     } else if (isNaN(progress)) {
       // get progress of the current section
-      progress = cards?.filter((item) => item?.completed).length / cards.length ?? 0
+      progress = cards?.filter((item) => item?.completed).length / cards.length
 
       const notBefore = cards[cards.length - 1]?.notBefore
       canDoNextSection = !notBefore || new Date() > notBefore

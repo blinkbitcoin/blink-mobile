@@ -1,6 +1,6 @@
 import * as React from "react"
 import { View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"

@@ -1,6 +1,6 @@
 import React from "react"
 import { ActivityIndicator, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { testProps } from "@app/utils/testProps"
 import { ListItem, ListItemProps, makeStyles, useTheme } from "@rneui/themed"

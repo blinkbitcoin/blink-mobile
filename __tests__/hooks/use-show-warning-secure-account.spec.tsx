@@ -188,8 +188,7 @@ const mockLevelOneHighBalance = [
 export const wrapWithCache =
   // @ts-ignore-next-line no-implicit-any error
 
-
-    (mocks) =>
+  (mocks) =>
     ({ children }: PropsWithChildren) => {
       return (
         <IsAuthedContextProvider value={true}>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import ScanIcon from "@app/assets/icons/scan.svg"

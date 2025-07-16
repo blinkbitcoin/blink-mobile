@@ -2,7 +2,7 @@ import { Region } from "react-native-maps"
 import { PERMISSIONS } from "react-native-permissions"
 
 import { isIos } from "@app/utils/helper"
-import Geolocation from "@react-native-community/geolocation"
+import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation"
 
 export const LOCATION_PERMISSION = isIos
   ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
@@ -11,11 +11,11 @@ export const LOCATION_PERMISSION = isIos
 export const getUserRegion = (callback: (region?: Region) => void) => {
   try {
     Geolocation.getCurrentPosition(
-      (data: GeolocationPosition) => {
-        if (data) {
+      (position: GeolocationResponse) => {
+        if (position) {
           const region: Region = {
-            latitude: data.coords.latitude,
-            longitude: data.coords.longitude,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
             latitudeDelta: 0.02,
             longitudeDelta: 0.02,
           }

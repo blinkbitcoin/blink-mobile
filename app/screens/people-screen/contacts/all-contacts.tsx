@@ -2,7 +2,7 @@ import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, Text, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"

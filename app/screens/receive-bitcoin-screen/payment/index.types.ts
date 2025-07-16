@@ -5,7 +5,7 @@
  * PaymentRequest - Generated quotation which contains the finalized invoice data
  * Invoice - (not specific to LN) The quoted invoice that contains invoice type specific data
  */
-import { GraphQLError } from "graphql"
+import { GraphQLError, GraphQLFormattedError } from "graphql"
 
 import {
   GraphQlApplicationError,
@@ -186,7 +186,7 @@ export type PaymentRequest = {
 export type PaymentRequestInformation = {
   data: InvoiceData | undefined
   applicationErrors: readonly GraphQlApplicationError[] | undefined
-  gqlErrors: readonly GraphQLError[] | undefined
+  gqlErrors: readonly GraphQLError[] | readonly GraphQLFormattedError[] | undefined
 }
 
 export type CreatePaymentRequestParams = {

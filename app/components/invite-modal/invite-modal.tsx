@@ -9,7 +9,7 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import Logo from "@app/assets/logo/blink-logo-icon.png"

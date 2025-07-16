@@ -125,8 +125,7 @@ const mocksJpy = [
 const wrapWithMocks =
   // @ts-ignore-next-line no-implicit-any error
 
-
-    (mocks) =>
+  (mocks) =>
     ({ children }: PropsWithChildren) => (
       <IsAuthedContextProvider value={true}>
         <MockedProvider mocks={mocks}>{children}</MockedProvider>

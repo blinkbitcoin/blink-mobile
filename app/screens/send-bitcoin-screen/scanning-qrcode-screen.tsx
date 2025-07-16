@@ -2,7 +2,7 @@ import * as React from "react"
 import { Alert, Dimensions, Linking, Pressable, StyleSheet, View } from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 import {
   Camera,
   CameraRuntimeError,

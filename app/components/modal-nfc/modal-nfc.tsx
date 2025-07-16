@@ -3,7 +3,7 @@ import { Alert, Pressable, View } from "react-native"
 import Modal from "react-native-modal"
 import NfcManager, { Ndef, NdefRecord, NfcTech } from "react-native-nfc-manager"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { LNURL_DOMAINS } from "@app/config"
 import {

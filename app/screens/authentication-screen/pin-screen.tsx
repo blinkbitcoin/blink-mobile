@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, Text, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"

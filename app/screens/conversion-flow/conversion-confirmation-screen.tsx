@@ -1,4 +1,4 @@
-import { GraphQLError } from "graphql"
+import { GraphQLError, GraphQLFormattedError } from "graphql"
 import React, { useState } from "react"
 import { Text, View } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
@@ -86,7 +86,11 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const handlePaymentReturn = (
     status: PaymentSendResult,
-    errorsMessage: readonly GraphQLError[] | string | undefined,
+    errorsMessage:
+      | readonly GraphQLError[]
+      | readonly GraphQLFormattedError[]
+      | string
+      | undefined,
   ) => {
     if (status === "SUCCESS") {
       // navigate to next screen

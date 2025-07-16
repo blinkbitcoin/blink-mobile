@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 import { LocalizedString } from "typesafe-i18n"
 
 import { gql } from "@apollo/client"

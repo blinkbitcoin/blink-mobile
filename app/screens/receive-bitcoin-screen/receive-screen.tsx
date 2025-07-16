@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import nfcManager from "react-native-nfc-manager"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { useApolloClient } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input"

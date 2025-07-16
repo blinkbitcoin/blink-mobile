@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useCallback } from "react"
 import { ActivityIndicator, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
