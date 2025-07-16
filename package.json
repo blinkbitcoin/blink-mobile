@@ -137,6 +137,7 @@
     "react-native-svg": "^15.1.0",
     "react-native-toast-message": "^2.2.0",
     "react-native-url-polyfill": "^2.0.0",
+    "react-native-vector-icons": "^10.0.3",
     "react-native-view-shot": "^3.7.0",
     "react-native-vision-camera": "^4.3.2",
     "react-native-webln": "^0.1.11",
@@ -250,7 +251,6 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.1.2",
     "tsx": "^4.7.2",
-    "ttsc": "^0.3.1",
     "typescript": "^5.4.5",
     "webdriverio": "^8.36.0",
     "yalc": "^1.0.0-pre.53"
