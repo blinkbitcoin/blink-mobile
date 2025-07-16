@@ -804,6 +804,7 @@ export type LnInvoicePaymentInput = {
 export type LnInvoicePaymentStatus = {
   readonly __typename: 'LnInvoicePaymentStatus';
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -824,6 +825,7 @@ export type LnInvoicePaymentStatusPayload = {
   readonly __typename: 'LnInvoicePaymentStatusPayload';
   readonly errors: ReadonlyArray<Error>;
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -1586,10 +1588,19 @@ export const PaymentSendResult = {
 
 export type PaymentSendResult = typeof PaymentSendResult[keyof typeof PaymentSendResult];
 export const PayoutSpeed = {
-  Fast: 'FAST'
+  Fast: 'FAST',
+  Medium: 'MEDIUM',
+  Slow: 'SLOW'
 } as const;
 
 export type PayoutSpeed = typeof PayoutSpeed[keyof typeof PayoutSpeed];
+export type PayoutSpeeds = {
+  readonly __typename: 'PayoutSpeeds';
+  readonly description: Scalars['String']['output'];
+  readonly displayName: Scalars['String']['output'];
+  readonly speed: PayoutSpeed;
+};
+
 export const PhoneCodeChannelType = {
   Sms: 'SMS',
   Telegram: 'TELEGRAM',
@@ -1709,6 +1720,8 @@ export type Query = {
   readonly onChainTxFee: OnChainTxFee;
   readonly onChainUsdTxFee: OnChainUsdTxFee;
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
+  /** Returns the list of available speeds for on-chain payments */
+  readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -1806,6 +1819,7 @@ export type Quiz = {
 
 export type QuizClaimInput = {
   readonly id: Scalars['ID']['input'];
+  readonly skipRewards?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QuizClaimPayload = {
@@ -3262,8 +3276,8 @@ export function useMobileUpdateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<MobileUpdateQuery, MobileUpdateQueryVariables>(MobileUpdateDocument, options);
         }
-export function useMobileUpdateSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MobileUpdateQuery, MobileUpdateQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useMobileUpdateSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MobileUpdateQuery, MobileUpdateQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<MobileUpdateQuery, MobileUpdateQueryVariables>(MobileUpdateDocument, options);
         }
 export type MobileUpdateQueryHookResult = ReturnType<typeof useMobileUpdateQuery>;
@@ -3309,8 +3323,8 @@ export function useBalanceHeaderLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<BalanceHeaderQuery, BalanceHeaderQueryVariables>(BalanceHeaderDocument, options);
         }
-export function useBalanceHeaderSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BalanceHeaderQuery, BalanceHeaderQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useBalanceHeaderSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BalanceHeaderQuery, BalanceHeaderQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<BalanceHeaderQuery, BalanceHeaderQueryVariables>(BalanceHeaderDocument, options);
         }
 export type BalanceHeaderQueryHookResult = ReturnType<typeof useBalanceHeaderQuery>;
@@ -3349,8 +3363,8 @@ export function useInviteLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Inv
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<InviteQuery, InviteQueryVariables>(InviteDocument, options);
         }
-export function useInviteSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<InviteQuery, InviteQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useInviteSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<InviteQuery, InviteQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<InviteQuery, InviteQueryVariables>(InviteDocument, options);
         }
 export type InviteQueryHookResult = ReturnType<typeof useInviteQuery>;
@@ -3394,8 +3408,8 @@ export function useBtcPriceListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<BtcPriceListQuery, BtcPriceListQueryVariables>(BtcPriceListDocument, options);
         }
-export function useBtcPriceListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BtcPriceListQuery, BtcPriceListQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useBtcPriceListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BtcPriceListQuery, BtcPriceListQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<BtcPriceListQuery, BtcPriceListQueryVariables>(BtcPriceListDocument, options);
         }
 export type BtcPriceListQueryHookResult = ReturnType<typeof useBtcPriceListQuery>;
@@ -3442,8 +3456,8 @@ export function useSetDefaultAccountModalLazyQuery(baseOptions?: Apollo.LazyQuer
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SetDefaultAccountModalQuery, SetDefaultAccountModalQueryVariables>(SetDefaultAccountModalDocument, options);
         }
-export function useSetDefaultAccountModalSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SetDefaultAccountModalQuery, SetDefaultAccountModalQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSetDefaultAccountModalSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SetDefaultAccountModalQuery, SetDefaultAccountModalQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SetDefaultAccountModalQuery, SetDefaultAccountModalQueryVariables>(SetDefaultAccountModalDocument, options);
         }
 export type SetDefaultAccountModalQueryHookResult = ReturnType<typeof useSetDefaultAccountModalQuery>;
@@ -3520,8 +3534,8 @@ export function useMyUserIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<M
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<MyUserIdQuery, MyUserIdQueryVariables>(MyUserIdDocument, options);
         }
-export function useMyUserIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MyUserIdQuery, MyUserIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useMyUserIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyUserIdQuery, MyUserIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<MyUserIdQuery, MyUserIdQueryVariables>(MyUserIdDocument, options);
         }
 export type MyUserIdQueryHookResult = ReturnType<typeof useMyUserIdQuery>;
@@ -3567,8 +3581,8 @@ export function useWalletOverviewScreenLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>(WalletOverviewScreenDocument, options);
         }
-export function useWalletOverviewScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useWalletOverviewScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>(WalletOverviewScreenDocument, options);
         }
 export type WalletOverviewScreenQueryHookResult = ReturnType<typeof useWalletOverviewScreenQuery>;
@@ -3610,8 +3624,8 @@ export function useAnalyticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AnalyticsQuery, AnalyticsQueryVariables>(AnalyticsDocument, options);
         }
-export function useAnalyticsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AnalyticsQuery, AnalyticsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useAnalyticsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AnalyticsQuery, AnalyticsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<AnalyticsQuery, AnalyticsQueryVariables>(AnalyticsDocument, options);
         }
 export type AnalyticsQueryHookResult = ReturnType<typeof useAnalyticsQuery>;
@@ -3665,8 +3679,8 @@ export function useRealtimePriceLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<RealtimePriceQuery, RealtimePriceQueryVariables>(RealtimePriceDocument, options);
         }
-export function useRealtimePriceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RealtimePriceQuery, RealtimePriceQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useRealtimePriceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<RealtimePriceQuery, RealtimePriceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<RealtimePriceQuery, RealtimePriceQueryVariables>(RealtimePriceDocument, options);
         }
 export type RealtimePriceQueryHookResult = ReturnType<typeof useRealtimePriceQuery>;
@@ -3702,8 +3716,8 @@ export function useHideBalanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<HideBalanceQuery, HideBalanceQueryVariables>(HideBalanceDocument, options);
         }
-export function useHideBalanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HideBalanceQuery, HideBalanceQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useHideBalanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<HideBalanceQuery, HideBalanceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<HideBalanceQuery, HideBalanceQueryVariables>(HideBalanceDocument, options);
         }
 export type HideBalanceQueryHookResult = ReturnType<typeof useHideBalanceQuery>;
@@ -3739,8 +3753,8 @@ export function useHiddenBalanceToolTipLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
         }
-export function useHiddenBalanceToolTipSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useHiddenBalanceToolTipSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
         }
 export type HiddenBalanceToolTipQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipQuery>;
@@ -3776,8 +3790,8 @@ export function useBetaLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BetaQ
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<BetaQuery, BetaQueryVariables>(BetaDocument, options);
         }
-export function useBetaSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BetaQuery, BetaQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useBetaSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BetaQuery, BetaQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<BetaQuery, BetaQueryVariables>(BetaDocument, options);
         }
 export type BetaQueryHookResult = ReturnType<typeof useBetaQuery>;
@@ -3813,8 +3827,8 @@ export function useColorSchemeLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
         }
-export function useColorSchemeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useColorSchemeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
         }
 export type ColorSchemeQueryHookResult = ReturnType<typeof useColorSchemeQuery>;
@@ -3850,8 +3864,8 @@ export function useCountryCodeLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<CountryCodeQuery, CountryCodeQueryVariables>(CountryCodeDocument, options);
         }
-export function useCountryCodeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CountryCodeQuery, CountryCodeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useCountryCodeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CountryCodeQuery, CountryCodeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<CountryCodeQuery, CountryCodeQueryVariables>(CountryCodeDocument, options);
         }
 export type CountryCodeQueryHookResult = ReturnType<typeof useCountryCodeQuery>;
@@ -3892,8 +3906,8 @@ export function useRegionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Reg
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<RegionQuery, RegionQueryVariables>(RegionDocument, options);
         }
-export function useRegionSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RegionQuery, RegionQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useRegionSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<RegionQuery, RegionQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<RegionQuery, RegionQueryVariables>(RegionDocument, options);
         }
 export type RegionQueryHookResult = ReturnType<typeof useRegionQuery>;
@@ -3929,8 +3943,8 @@ export function useFeedbackModalShownLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>(FeedbackModalShownDocument, options);
         }
-export function useFeedbackModalShownSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useFeedbackModalShownSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>(FeedbackModalShownDocument, options);
         }
 export type FeedbackModalShownQueryHookResult = ReturnType<typeof useFeedbackModalShownQuery>;
@@ -3966,8 +3980,8 @@ export function useHasPromptedSetDefaultAccountLazyQuery(baseOptions?: Apollo.La
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
         }
-export function useHasPromptedSetDefaultAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useHasPromptedSetDefaultAccountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
         }
 export type HasPromptedSetDefaultAccountQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountQuery>;
@@ -4003,8 +4017,8 @@ export function useIntroducingCirclesModalShownLazyQuery(baseOptions?: Apollo.La
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<IntroducingCirclesModalShownQuery, IntroducingCirclesModalShownQueryVariables>(IntroducingCirclesModalShownDocument, options);
         }
-export function useIntroducingCirclesModalShownSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<IntroducingCirclesModalShownQuery, IntroducingCirclesModalShownQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useIntroducingCirclesModalShownSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<IntroducingCirclesModalShownQuery, IntroducingCirclesModalShownQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<IntroducingCirclesModalShownQuery, IntroducingCirclesModalShownQueryVariables>(IntroducingCirclesModalShownDocument, options);
         }
 export type IntroducingCirclesModalShownQueryHookResult = ReturnType<typeof useIntroducingCirclesModalShownQuery>;
@@ -4040,8 +4054,8 @@ export function useInnerCircleValueLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<InnerCircleValueQuery, InnerCircleValueQueryVariables>(InnerCircleValueDocument, options);
         }
-export function useInnerCircleValueSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<InnerCircleValueQuery, InnerCircleValueQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useInnerCircleValueSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<InnerCircleValueQuery, InnerCircleValueQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<InnerCircleValueQuery, InnerCircleValueQueryVariables>(InnerCircleValueDocument, options);
         }
 export type InnerCircleValueQueryHookResult = ReturnType<typeof useInnerCircleValueQuery>;
@@ -4079,8 +4093,8 @@ export function useNetworkLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ne
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<NetworkQuery, NetworkQueryVariables>(NetworkDocument, options);
         }
-export function useNetworkSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<NetworkQuery, NetworkQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useNetworkSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<NetworkQuery, NetworkQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<NetworkQuery, NetworkQueryVariables>(NetworkDocument, options);
         }
 export type NetworkQueryHookResult = ReturnType<typeof useNetworkQuery>;
@@ -4122,8 +4136,8 @@ export function useLevelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Leve
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<LevelQuery, LevelQueryVariables>(LevelDocument, options);
         }
-export function useLevelSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<LevelQuery, LevelQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useLevelSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LevelQuery, LevelQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<LevelQuery, LevelQueryVariables>(LevelDocument, options);
         }
 export type LevelQueryHookResult = ReturnType<typeof useLevelQuery>;
@@ -4165,8 +4179,8 @@ export function useDisplayCurrencyLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DisplayCurrencyQuery, DisplayCurrencyQueryVariables>(DisplayCurrencyDocument, options);
         }
-export function useDisplayCurrencySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DisplayCurrencyQuery, DisplayCurrencyQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useDisplayCurrencySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DisplayCurrencyQuery, DisplayCurrencyQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<DisplayCurrencyQuery, DisplayCurrencyQueryVariables>(DisplayCurrencyDocument, options);
         }
 export type DisplayCurrencyQueryHookResult = ReturnType<typeof useDisplayCurrencyQuery>;
@@ -4209,8 +4223,8 @@ export function useCurrencyListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<CurrencyListQuery, CurrencyListQueryVariables>(CurrencyListDocument, options);
         }
-export function useCurrencyListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CurrencyListQuery, CurrencyListQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useCurrencyListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CurrencyListQuery, CurrencyListQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<CurrencyListQuery, CurrencyListQueryVariables>(CurrencyListDocument, options);
         }
 export type CurrencyListQueryHookResult = ReturnType<typeof useCurrencyListQuery>;
@@ -4329,8 +4343,8 @@ export function useGetUsernamesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUsernamesQuery, GetUsernamesQueryVariables>(GetUsernamesDocument, options);
         }
-export function useGetUsernamesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUsernamesQuery, GetUsernamesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useGetUsernamesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUsernamesQuery, GetUsernamesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<GetUsernamesQuery, GetUsernamesQueryVariables>(GetUsernamesDocument, options);
         }
 export type GetUsernamesQueryHookResult = ReturnType<typeof useGetUsernamesQuery>;
@@ -4376,8 +4390,8 @@ export function useConversionScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ConversionScreenQuery, ConversionScreenQueryVariables>(ConversionScreenDocument, options);
         }
-export function useConversionScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ConversionScreenQuery, ConversionScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useConversionScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ConversionScreenQuery, ConversionScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ConversionScreenQuery, ConversionScreenQueryVariables>(ConversionScreenDocument, options);
         }
 export type ConversionScreenQueryHookResult = ReturnType<typeof useConversionScreenQuery>;
@@ -4418,8 +4432,8 @@ export function useDebugScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DebugScreenQuery, DebugScreenQueryVariables>(DebugScreenDocument, options);
         }
-export function useDebugScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DebugScreenQuery, DebugScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useDebugScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DebugScreenQuery, DebugScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<DebugScreenQuery, DebugScreenQueryVariables>(DebugScreenDocument, options);
         }
 export type DebugScreenQueryHookResult = ReturnType<typeof useDebugScreenQuery>;
@@ -4468,8 +4482,8 @@ export function useMyQuizQuestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<MyQuizQuestionsQuery, MyQuizQuestionsQueryVariables>(MyQuizQuestionsDocument, options);
         }
-export function useMyQuizQuestionsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MyQuizQuestionsQuery, MyQuizQuestionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useMyQuizQuestionsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyQuizQuestionsQuery, MyQuizQuestionsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<MyQuizQuestionsQuery, MyQuizQuestionsQueryVariables>(MyQuizQuestionsDocument, options);
         }
 export type MyQuizQuestionsQueryHookResult = ReturnType<typeof useMyQuizQuestionsQuery>;
@@ -4673,8 +4687,8 @@ export function useFullOnboardingScreenLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<FullOnboardingScreenQuery, FullOnboardingScreenQueryVariables>(FullOnboardingScreenDocument, options);
         }
-export function useFullOnboardingScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FullOnboardingScreenQuery, FullOnboardingScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useFullOnboardingScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FullOnboardingScreenQuery, FullOnboardingScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<FullOnboardingScreenQuery, FullOnboardingScreenQueryVariables>(FullOnboardingScreenDocument, options);
         }
 export type FullOnboardingScreenQueryHookResult = ReturnType<typeof useFullOnboardingScreenQuery>;
@@ -4713,8 +4727,8 @@ export function useAddressScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AddressScreenQuery, AddressScreenQueryVariables>(AddressScreenDocument, options);
         }
-export function useAddressScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AddressScreenQuery, AddressScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useAddressScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AddressScreenQuery, AddressScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<AddressScreenQuery, AddressScreenQueryVariables>(AddressScreenDocument, options);
         }
 export type AddressScreenQueryHookResult = ReturnType<typeof useAddressScreenQuery>;
@@ -4776,8 +4790,8 @@ export function useHomeAuthedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<HomeAuthedQuery, HomeAuthedQueryVariables>(HomeAuthedDocument, options);
         }
-export function useHomeAuthedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HomeAuthedQuery, HomeAuthedQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useHomeAuthedSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<HomeAuthedQuery, HomeAuthedQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<HomeAuthedQuery, HomeAuthedQueryVariables>(HomeAuthedDocument, options);
         }
 export type HomeAuthedQueryHookResult = ReturnType<typeof useHomeAuthedQuery>;
@@ -4822,8 +4836,8 @@ export function useHomeUnauthedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<HomeUnauthedQuery, HomeUnauthedQueryVariables>(HomeUnauthedDocument, options);
         }
-export function useHomeUnauthedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HomeUnauthedQuery, HomeUnauthedQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useHomeUnauthedSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<HomeUnauthedQuery, HomeUnauthedQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<HomeUnauthedQuery, HomeUnauthedQueryVariables>(HomeUnauthedDocument, options);
         }
 export type HomeUnauthedQueryHookResult = ReturnType<typeof useHomeUnauthedQuery>;
@@ -4894,8 +4908,8 @@ export function useBulletinsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<BulletinsQuery, BulletinsQueryVariables>(BulletinsDocument, options);
         }
-export function useBulletinsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BulletinsQuery, BulletinsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useBulletinsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BulletinsQuery, BulletinsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<BulletinsQuery, BulletinsQueryVariables>(BulletinsDocument, options);
         }
 export type BulletinsQueryHookResult = ReturnType<typeof useBulletinsQuery>;
@@ -4940,8 +4954,8 @@ export function useBusinessMapMarkersLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>(BusinessMapMarkersDocument, options);
         }
-export function useBusinessMapMarkersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useBusinessMapMarkersSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>(BusinessMapMarkersDocument, options);
         }
 export type BusinessMapMarkersQueryHookResult = ReturnType<typeof useBusinessMapMarkersQuery>;
@@ -5004,8 +5018,8 @@ export function useStatefulNotificationsLazyQuery(baseOptions?: Apollo.LazyQuery
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<StatefulNotificationsQuery, StatefulNotificationsQueryVariables>(StatefulNotificationsDocument, options);
         }
-export function useStatefulNotificationsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<StatefulNotificationsQuery, StatefulNotificationsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useStatefulNotificationsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StatefulNotificationsQuery, StatefulNotificationsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<StatefulNotificationsQuery, StatefulNotificationsQueryVariables>(StatefulNotificationsDocument, options);
         }
 export type StatefulNotificationsQueryHookResult = ReturnType<typeof useStatefulNotificationsQuery>;
@@ -5094,8 +5108,8 @@ export function useCirclesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ci
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<CirclesQuery, CirclesQueryVariables>(CirclesDocument, options);
         }
-export function useCirclesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CirclesQuery, CirclesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useCirclesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CirclesQuery, CirclesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<CirclesQuery, CirclesQueryVariables>(CirclesDocument, options);
         }
 export type CirclesQueryHookResult = ReturnType<typeof useCirclesQuery>;
@@ -5139,8 +5153,8 @@ export function useContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
         }
-export function useContactsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ContactsQuery, ContactsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useContactsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ContactsQuery, ContactsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
         }
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
@@ -5188,8 +5202,8 @@ export function useTransactionListForContactLazyQuery(baseOptions?: Apollo.LazyQ
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<TransactionListForContactQuery, TransactionListForContactQueryVariables>(TransactionListForContactDocument, options);
         }
-export function useTransactionListForContactSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionListForContactQuery, TransactionListForContactQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useTransactionListForContactSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TransactionListForContactQuery, TransactionListForContactQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<TransactionListForContactQuery, TransactionListForContactQueryVariables>(TransactionListForContactDocument, options);
         }
 export type TransactionListForContactQueryHookResult = ReturnType<typeof useTransactionListForContactQuery>;
@@ -5233,8 +5247,8 @@ export function useContactsCardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ContactsCardQuery, ContactsCardQueryVariables>(ContactsCardDocument, options);
         }
-export function useContactsCardSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ContactsCardQuery, ContactsCardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useContactsCardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ContactsCardQuery, ContactsCardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ContactsCardQuery, ContactsCardQueryVariables>(ContactsCardDocument, options);
         }
 export type ContactsCardQueryHookResult = ReturnType<typeof useContactsCardQuery>;
@@ -5471,8 +5485,8 @@ export function useSupportedCountriesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SupportedCountriesQuery, SupportedCountriesQueryVariables>(SupportedCountriesDocument, options);
         }
-export function useSupportedCountriesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SupportedCountriesQuery, SupportedCountriesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSupportedCountriesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SupportedCountriesQuery, SupportedCountriesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SupportedCountriesQuery, SupportedCountriesQueryVariables>(SupportedCountriesDocument, options);
         }
 export type SupportedCountriesQueryHookResult = ReturnType<typeof useSupportedCountriesQuery>;
@@ -5549,8 +5563,8 @@ export function usePriceHistoryScreenLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>(PriceHistoryScreenDocument, options);
         }
-export function usePriceHistoryScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function usePriceHistoryScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>(PriceHistoryScreenDocument, options);
         }
 export type PriceHistoryScreenQueryHookResult = ReturnType<typeof usePriceHistoryScreenQuery>;
@@ -5644,8 +5658,8 @@ export function usePaymentRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
         }
-export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
         }
 export type PaymentRequestQueryHookResult = ReturnType<typeof usePaymentRequestQuery>;
@@ -5860,8 +5874,8 @@ export function useScanningQrCodeScreenLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ScanningQrCodeScreenQuery, ScanningQrCodeScreenQueryVariables>(ScanningQrCodeScreenDocument, options);
         }
-export function useScanningQrCodeScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ScanningQrCodeScreenQuery, ScanningQrCodeScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useScanningQrCodeScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ScanningQrCodeScreenQuery, ScanningQrCodeScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ScanningQrCodeScreenQuery, ScanningQrCodeScreenQueryVariables>(ScanningQrCodeScreenDocument, options);
         }
 export type ScanningQrCodeScreenQueryHookResult = ReturnType<typeof useScanningQrCodeScreenQuery>;
@@ -5907,8 +5921,8 @@ export function useSendBitcoinConfirmationScreenLazyQuery(baseOptions?: Apollo.L
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SendBitcoinConfirmationScreenQuery, SendBitcoinConfirmationScreenQueryVariables>(SendBitcoinConfirmationScreenDocument, options);
         }
-export function useSendBitcoinConfirmationScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SendBitcoinConfirmationScreenQuery, SendBitcoinConfirmationScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSendBitcoinConfirmationScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SendBitcoinConfirmationScreenQuery, SendBitcoinConfirmationScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SendBitcoinConfirmationScreenQuery, SendBitcoinConfirmationScreenQueryVariables>(SendBitcoinConfirmationScreenDocument, options);
         }
 export type SendBitcoinConfirmationScreenQueryHookResult = ReturnType<typeof useSendBitcoinConfirmationScreenQuery>;
@@ -5961,8 +5975,8 @@ export function useSendBitcoinDestinationLazyQuery(baseOptions?: Apollo.LazyQuer
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SendBitcoinDestinationQuery, SendBitcoinDestinationQueryVariables>(SendBitcoinDestinationDocument, options);
         }
-export function useSendBitcoinDestinationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SendBitcoinDestinationQuery, SendBitcoinDestinationQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSendBitcoinDestinationSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SendBitcoinDestinationQuery, SendBitcoinDestinationQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SendBitcoinDestinationQuery, SendBitcoinDestinationQueryVariables>(SendBitcoinDestinationDocument, options);
         }
 export type SendBitcoinDestinationQueryHookResult = ReturnType<typeof useSendBitcoinDestinationQuery>;
@@ -6002,8 +6016,8 @@ export function useAccountDefaultWalletLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AccountDefaultWalletQuery, AccountDefaultWalletQueryVariables>(AccountDefaultWalletDocument, options);
         }
-export function useAccountDefaultWalletSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountDefaultWalletQuery, AccountDefaultWalletQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useAccountDefaultWalletSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AccountDefaultWalletQuery, AccountDefaultWalletQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<AccountDefaultWalletQuery, AccountDefaultWalletQueryVariables>(AccountDefaultWalletDocument, options);
         }
 export type AccountDefaultWalletQueryHookResult = ReturnType<typeof useAccountDefaultWalletQuery>;
@@ -6053,8 +6067,8 @@ export function useSendBitcoinDetailsScreenLazyQuery(baseOptions?: Apollo.LazyQu
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SendBitcoinDetailsScreenQuery, SendBitcoinDetailsScreenQueryVariables>(SendBitcoinDetailsScreenDocument, options);
         }
-export function useSendBitcoinDetailsScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SendBitcoinDetailsScreenQuery, SendBitcoinDetailsScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSendBitcoinDetailsScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SendBitcoinDetailsScreenQuery, SendBitcoinDetailsScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SendBitcoinDetailsScreenQuery, SendBitcoinDetailsScreenQueryVariables>(SendBitcoinDetailsScreenDocument, options);
         }
 export type SendBitcoinDetailsScreenQueryHookResult = ReturnType<typeof useSendBitcoinDetailsScreenQuery>;
@@ -6102,8 +6116,8 @@ export function useSendBitcoinWithdrawalLimitsLazyQuery(baseOptions?: Apollo.Laz
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SendBitcoinWithdrawalLimitsQuery, SendBitcoinWithdrawalLimitsQueryVariables>(SendBitcoinWithdrawalLimitsDocument, options);
         }
-export function useSendBitcoinWithdrawalLimitsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SendBitcoinWithdrawalLimitsQuery, SendBitcoinWithdrawalLimitsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSendBitcoinWithdrawalLimitsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SendBitcoinWithdrawalLimitsQuery, SendBitcoinWithdrawalLimitsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SendBitcoinWithdrawalLimitsQuery, SendBitcoinWithdrawalLimitsQueryVariables>(SendBitcoinWithdrawalLimitsDocument, options);
         }
 export type SendBitcoinWithdrawalLimitsQueryHookResult = ReturnType<typeof useSendBitcoinWithdrawalLimitsQuery>;
@@ -6151,8 +6165,8 @@ export function useSendBitcoinInternalLimitsLazyQuery(baseOptions?: Apollo.LazyQ
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>(SendBitcoinInternalLimitsDocument, options);
         }
-export function useSendBitcoinInternalLimitsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSendBitcoinInternalLimitsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>(SendBitcoinInternalLimitsDocument, options);
         }
 export type SendBitcoinInternalLimitsQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsQuery>;
@@ -6375,8 +6389,8 @@ export function useOnChainTxFeeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>(OnChainTxFeeDocument, options);
         }
-export function useOnChainTxFeeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useOnChainTxFeeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>(OnChainTxFeeDocument, options);
         }
 export type OnChainTxFeeQueryHookResult = ReturnType<typeof useOnChainTxFeeQuery>;
@@ -6417,8 +6431,8 @@ export function useOnChainUsdTxFeeLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>(OnChainUsdTxFeeDocument, options);
         }
-export function useOnChainUsdTxFeeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useOnChainUsdTxFeeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>(OnChainUsdTxFeeDocument, options);
         }
 export type OnChainUsdTxFeeQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeQuery>;
@@ -6463,8 +6477,8 @@ export function useOnChainUsdTxFeeAsBtcDenominatedLazyQuery(baseOptions?: Apollo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<OnChainUsdTxFeeAsBtcDenominatedQuery, OnChainUsdTxFeeAsBtcDenominatedQueryVariables>(OnChainUsdTxFeeAsBtcDenominatedDocument, options);
         }
-export function useOnChainUsdTxFeeAsBtcDenominatedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OnChainUsdTxFeeAsBtcDenominatedQuery, OnChainUsdTxFeeAsBtcDenominatedQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useOnChainUsdTxFeeAsBtcDenominatedSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OnChainUsdTxFeeAsBtcDenominatedQuery, OnChainUsdTxFeeAsBtcDenominatedQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<OnChainUsdTxFeeAsBtcDenominatedQuery, OnChainUsdTxFeeAsBtcDenominatedQueryVariables>(OnChainUsdTxFeeAsBtcDenominatedDocument, options);
         }
 export type OnChainUsdTxFeeAsBtcDenominatedQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeAsBtcDenominatedQuery>;
@@ -6973,8 +6987,8 @@ export function useWarningSecureAccountLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<WarningSecureAccountQuery, WarningSecureAccountQueryVariables>(WarningSecureAccountDocument, options);
         }
-export function useWarningSecureAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WarningSecureAccountQuery, WarningSecureAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useWarningSecureAccountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WarningSecureAccountQuery, WarningSecureAccountQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<WarningSecureAccountQuery, WarningSecureAccountQueryVariables>(WarningSecureAccountDocument, options);
         }
 export type WarningSecureAccountQueryHookResult = ReturnType<typeof useWarningSecureAccountQuery>;
@@ -7060,8 +7074,8 @@ export function useSetDefaultWalletScreenLazyQuery(baseOptions?: Apollo.LazyQuer
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SetDefaultWalletScreenQuery, SetDefaultWalletScreenQueryVariables>(SetDefaultWalletScreenDocument, options);
         }
-export function useSetDefaultWalletScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SetDefaultWalletScreenQuery, SetDefaultWalletScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSetDefaultWalletScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SetDefaultWalletScreenQuery, SetDefaultWalletScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SetDefaultWalletScreenQuery, SetDefaultWalletScreenQueryVariables>(SetDefaultWalletScreenDocument, options);
         }
 export type SetDefaultWalletScreenQueryHookResult = ReturnType<typeof useSetDefaultWalletScreenQuery>;
@@ -7139,8 +7153,8 @@ export function useLanguageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<L
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<LanguageQuery, LanguageQueryVariables>(LanguageDocument, options);
         }
-export function useLanguageSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<LanguageQuery, LanguageQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useLanguageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LanguageQuery, LanguageQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<LanguageQuery, LanguageQueryVariables>(LanguageDocument, options);
         }
 export type LanguageQueryHookResult = ReturnType<typeof useLanguageQuery>;
@@ -7226,8 +7240,8 @@ export function useNotificationSettingsLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<NotificationSettingsQuery, NotificationSettingsQueryVariables>(NotificationSettingsDocument, options);
         }
-export function useNotificationSettingsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<NotificationSettingsQuery, NotificationSettingsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useNotificationSettingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<NotificationSettingsQuery, NotificationSettingsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<NotificationSettingsQuery, NotificationSettingsQueryVariables>(NotificationSettingsDocument, options);
         }
 export type NotificationSettingsQueryHookResult = ReturnType<typeof useNotificationSettingsQuery>;
@@ -7442,8 +7456,8 @@ export function useUnacknowledgedNotificationCountLazyQuery(baseOptions?: Apollo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<UnacknowledgedNotificationCountQuery, UnacknowledgedNotificationCountQueryVariables>(UnacknowledgedNotificationCountDocument, options);
         }
-export function useUnacknowledgedNotificationCountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UnacknowledgedNotificationCountQuery, UnacknowledgedNotificationCountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useUnacknowledgedNotificationCountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<UnacknowledgedNotificationCountQuery, UnacknowledgedNotificationCountQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<UnacknowledgedNotificationCountQuery, UnacknowledgedNotificationCountQueryVariables>(UnacknowledgedNotificationCountDocument, options);
         }
 export type UnacknowledgedNotificationCountQueryHookResult = ReturnType<typeof useUnacknowledgedNotificationCountQuery>;
@@ -7498,8 +7512,8 @@ export function useSettingsScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SettingsScreenQuery, SettingsScreenQueryVariables>(SettingsScreenDocument, options);
         }
-export function useSettingsScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SettingsScreenQuery, SettingsScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSettingsScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SettingsScreenQuery, SettingsScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SettingsScreenQuery, SettingsScreenQueryVariables>(SettingsScreenDocument, options);
         }
 export type SettingsScreenQueryHookResult = ReturnType<typeof useSettingsScreenQuery>;
@@ -7542,8 +7556,8 @@ export function useExportCsvSettingLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
         }
-export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
         }
 export type ExportCsvSettingQueryHookResult = ReturnType<typeof useExportCsvSettingQuery>;
@@ -7644,8 +7658,8 @@ export function useAccountLimitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AccountLimitsQuery, AccountLimitsQueryVariables>(AccountLimitsDocument, options);
         }
-export function useAccountLimitsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountLimitsQuery, AccountLimitsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useAccountLimitsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AccountLimitsQuery, AccountLimitsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<AccountLimitsQuery, AccountLimitsQueryVariables>(AccountLimitsDocument, options);
         }
 export type AccountLimitsQueryHookResult = ReturnType<typeof useAccountLimitsQuery>;
@@ -7689,8 +7703,8 @@ export function useSupportChatLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SupportChatQuery, SupportChatQueryVariables>(SupportChatDocument, options);
         }
-export function useSupportChatSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SupportChatQuery, SupportChatQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useSupportChatSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SupportChatQuery, SupportChatQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<SupportChatQuery, SupportChatQueryVariables>(SupportChatDocument, options);
         }
 export type SupportChatQueryHookResult = ReturnType<typeof useSupportChatQuery>;
@@ -7802,8 +7816,8 @@ export function useTotpRegistrationScreenLazyQuery(baseOptions?: Apollo.LazyQuer
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<TotpRegistrationScreenQuery, TotpRegistrationScreenQueryVariables>(TotpRegistrationScreenDocument, options);
         }
-export function useTotpRegistrationScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TotpRegistrationScreenQuery, TotpRegistrationScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useTotpRegistrationScreenSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TotpRegistrationScreenQuery, TotpRegistrationScreenQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<TotpRegistrationScreenQuery, TotpRegistrationScreenQueryVariables>(TotpRegistrationScreenDocument, options);
         }
 export type TotpRegistrationScreenQueryHookResult = ReturnType<typeof useTotpRegistrationScreenQuery>;
@@ -7935,8 +7949,8 @@ export function useTransactionListForDefaultAccountLazyQuery(baseOptions?: Apoll
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<TransactionListForDefaultAccountQuery, TransactionListForDefaultAccountQueryVariables>(TransactionListForDefaultAccountDocument, options);
         }
-export function useTransactionListForDefaultAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionListForDefaultAccountQuery, TransactionListForDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useTransactionListForDefaultAccountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TransactionListForDefaultAccountQuery, TransactionListForDefaultAccountQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<TransactionListForDefaultAccountQuery, TransactionListForDefaultAccountQueryVariables>(TransactionListForDefaultAccountDocument, options);
         }
 export type TransactionListForDefaultAccountQueryHookResult = ReturnType<typeof useTransactionListForDefaultAccountQuery>;
@@ -8017,8 +8031,8 @@ export function useWalletsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Wa
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<WalletsQuery, WalletsQueryVariables>(WalletsDocument, options);
         }
-export function useWalletsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WalletsQuery, WalletsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useWalletsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WalletsQuery, WalletsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<WalletsQuery, WalletsQueryVariables>(WalletsDocument, options);
         }
 export type WalletsQueryHookResult = ReturnType<typeof useWalletsQuery>;
@@ -8093,21 +8107,21 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 /** Mapping of union types */
-export type ResolversUnionTypes<RefType extends Record<string, unknown>> = {
+export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
   InitiationVia: ( InitiationViaIntraLedger ) | ( InitiationViaLn ) | ( InitiationViaOnChain );
   NotificationAction: ( OpenDeepLinkAction ) | ( OpenExternalLinkAction );
   SettlementVia: ( SettlementViaIntraLedger ) | ( SettlementViaLn ) | ( SettlementViaOnChain );
-  UserUpdate: ( IntraLedgerUpdate ) | ( LnUpdate ) | ( OnChainUpdate ) | ( Price ) | ( RealtimePrice );
+  UserUpdate: ( Omit<IntraLedgerUpdate, 'transaction'> & { transaction: _RefType['Transaction'] } ) | ( Omit<LnUpdate, 'transaction'> & { transaction: _RefType['Transaction'] } ) | ( Omit<OnChainUpdate, 'transaction'> & { transaction: _RefType['Transaction'] } ) | ( Price ) | ( RealtimePrice );
 };
 
 /** Mapping of interface types */
-export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
-  Account: ( ConsumerAccount );
+export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
+  Account: ( Omit<ConsumerAccount, 'btcWallet' | 'invoices' | 'limits' | 'pendingIncomingTransactions' | 'transactions' | 'usdWallet' | 'walletById' | 'wallets'> & { btcWallet?: Maybe<_RefType['BTCWallet']>, invoices?: Maybe<_RefType['InvoiceConnection']>, limits: _RefType['AccountLimits'], pendingIncomingTransactions: ReadonlyArray<_RefType['Transaction']>, transactions?: Maybe<_RefType['TransactionConnection']>, usdWallet?: Maybe<_RefType['UsdWallet']>, walletById: _RefType['Wallet'], wallets: ReadonlyArray<_RefType['Wallet']> } );
   AccountLimit: ( OneDayAccountLimit );
   Error: ( GraphQlApplicationError );
   Invoice: ( LnInvoice ) | ( LnNoAmountInvoice );
   PriceInterface: ( PriceOfOneSatInMinorUnit ) | ( PriceOfOneSettlementMinorUnitInDisplayMinorUnit ) | ( PriceOfOneUsdCentInMinorUnit );
-  Wallet: ( BtcWallet ) | ( UsdWallet );
+  Wallet: ( Omit<BtcWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: _RefType['Invoice'], invoices?: Maybe<_RefType['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<_RefType['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<_RefType['Transaction']>, transactionById: _RefType['Transaction'], transactions?: Maybe<_RefType['TransactionConnection']>, transactionsByAddress?: Maybe<_RefType['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<_RefType['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<_RefType['Transaction']> } ) | ( Omit<UsdWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: _RefType['Invoice'], invoices?: Maybe<_RefType['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<_RefType['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<_RefType['Transaction']>, transactionById: _RefType['Transaction'], transactions?: Maybe<_RefType['TransactionConnection']>, transactionsByAddress?: Maybe<_RefType['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<_RefType['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<_RefType['Transaction']> } );
 };
 
 /** Mapping between all available schema types and the resolvers types */
@@ -8116,7 +8130,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  AccountDeletePayload: ResolverTypeWrapper<AccountDeletePayload>;
+  AccountDeletePayload: ResolverTypeWrapper<Omit<AccountDeletePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   AccountDisableNotificationCategoryInput: AccountDisableNotificationCategoryInput;
   AccountDisableNotificationChannelInput: AccountDisableNotificationChannelInput;
@@ -8124,32 +8138,32 @@ export type ResolversTypes = {
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
   AccountLevel: AccountLevel;
   AccountLimit: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['AccountLimit']>;
-  AccountLimits: ResolverTypeWrapper<AccountLimits>;
+  AccountLimits: ResolverTypeWrapper<Omit<AccountLimits, 'convert' | 'internalSend' | 'withdrawal'> & { convert: ReadonlyArray<ResolversTypes['AccountLimit']>, internalSend: ReadonlyArray<ResolversTypes['AccountLimit']>, withdrawal: ReadonlyArray<ResolversTypes['AccountLimit']> }>;
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
-  AccountUpdateDefaultWalletIdPayload: ResolverTypeWrapper<AccountUpdateDefaultWalletIdPayload>;
+  AccountUpdateDefaultWalletIdPayload: ResolverTypeWrapper<Omit<AccountUpdateDefaultWalletIdPayload, 'account' | 'errors'> & { account?: Maybe<ResolversTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversTypes['Error']> }>;
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
-  AccountUpdateDisplayCurrencyPayload: ResolverTypeWrapper<AccountUpdateDisplayCurrencyPayload>;
-  AccountUpdateNotificationSettingsPayload: ResolverTypeWrapper<AccountUpdateNotificationSettingsPayload>;
+  AccountUpdateDisplayCurrencyPayload: ResolverTypeWrapper<Omit<AccountUpdateDisplayCurrencyPayload, 'account' | 'errors'> & { account?: Maybe<ResolversTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversTypes['Error']> }>;
+  AccountUpdateNotificationSettingsPayload: ResolverTypeWrapper<Omit<AccountUpdateNotificationSettingsPayload, 'account' | 'errors'> & { account?: Maybe<ResolversTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversTypes['Error']> }>;
   ApiKey: ResolverTypeWrapper<ApiKey>;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ResolverTypeWrapper<ApiKeyCreatePayload>;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ResolverTypeWrapper<ApiKeyRevokePayload>;
   AuthToken: ResolverTypeWrapper<Scalars['AuthToken']['output']>;
-  AuthTokenPayload: ResolverTypeWrapper<AuthTokenPayload>;
+  AuthTokenPayload: ResolverTypeWrapper<Omit<AuthTokenPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   Authorization: ResolverTypeWrapper<Authorization>;
-  BTCWallet: ResolverTypeWrapper<BtcWallet>;
+  BTCWallet: ResolverTypeWrapper<Omit<BtcWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: ResolversTypes['Invoice'], invoices?: Maybe<ResolversTypes['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<ResolversTypes['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<ResolversTypes['Transaction']>, transactionById: ResolversTypes['Transaction'], transactions?: Maybe<ResolversTypes['TransactionConnection']>, transactionsByAddress?: Maybe<ResolversTypes['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<ResolversTypes['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<ResolversTypes['Transaction']> }>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
-  CallbackEndpointAddPayload: ResolverTypeWrapper<CallbackEndpointAddPayload>;
+  CallbackEndpointAddPayload: ResolverTypeWrapper<Omit<CallbackEndpointAddPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   CallbackEndpointDeleteInput: CallbackEndpointDeleteInput;
-  CaptchaCreateChallengePayload: ResolverTypeWrapper<CaptchaCreateChallengePayload>;
+  CaptchaCreateChallengePayload: ResolverTypeWrapper<Omit<CaptchaCreateChallengePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   CaptchaCreateChallengeResult: ResolverTypeWrapper<CaptchaCreateChallengeResult>;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
-  CentAmountPayload: ResolverTypeWrapper<CentAmountPayload>;
-  ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
+  CentAmountPayload: ResolverTypeWrapper<Omit<CentAmountPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
+  ConsumerAccount: ResolverTypeWrapper<Omit<ConsumerAccount, 'btcWallet' | 'invoices' | 'limits' | 'pendingIncomingTransactions' | 'transactions' | 'usdWallet' | 'walletById' | 'wallets'> & { btcWallet?: Maybe<ResolversTypes['BTCWallet']>, invoices?: Maybe<ResolversTypes['InvoiceConnection']>, limits: ResolversTypes['AccountLimits'], pendingIncomingTransactions: ReadonlyArray<ResolversTypes['Transaction']>, transactions?: Maybe<ResolversTypes['TransactionConnection']>, usdWallet?: Maybe<ResolversTypes['UsdWallet']>, walletById: ResolversTypes['Wallet'], wallets: ReadonlyArray<ResolversTypes['Wallet']> }>;
   Contact: ResolverTypeWrapper<Contact>;
   ContactAlias: ResolverTypeWrapper<Scalars['ContactAlias']['output']>;
   Coordinates: ResolverTypeWrapper<Coordinates>;
@@ -8180,11 +8194,11 @@ export type ResolversTypes = {
   InitiationViaLn: ResolverTypeWrapper<InitiationViaLn>;
   InitiationViaOnChain: ResolverTypeWrapper<InitiationViaOnChain>;
   IntraLedgerPaymentSendInput: IntraLedgerPaymentSendInput;
-  IntraLedgerUpdate: ResolverTypeWrapper<IntraLedgerUpdate>;
+  IntraLedgerUpdate: ResolverTypeWrapper<Omit<IntraLedgerUpdate, 'transaction'> & { transaction: ResolversTypes['Transaction'] }>;
   IntraLedgerUsdPaymentSendInput: IntraLedgerUsdPaymentSendInput;
   Invoice: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Invoice']>;
-  InvoiceConnection: ResolverTypeWrapper<InvoiceConnection>;
-  InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
+  InvoiceConnection: ResolverTypeWrapper<Omit<InvoiceConnection, 'edges'> & { edges?: Maybe<ReadonlyArray<ResolversTypes['InvoiceEdge']>> }>;
+  InvoiceEdge: ResolverTypeWrapper<Omit<InvoiceEdge, 'node'> & { node: ResolversTypes['Invoice'] }>;
   InvoicePaymentStatus: InvoicePaymentStatus;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
@@ -8196,25 +8210,25 @@ export type ResolversTypes = {
   LnInvoiceCreateInput: LnInvoiceCreateInput;
   LnInvoiceCreateOnBehalfOfRecipientInput: LnInvoiceCreateOnBehalfOfRecipientInput;
   LnInvoiceFeeProbeInput: LnInvoiceFeeProbeInput;
-  LnInvoicePayload: ResolverTypeWrapper<LnInvoicePayload>;
+  LnInvoicePayload: ResolverTypeWrapper<Omit<LnInvoicePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   LnInvoicePaymentInput: LnInvoicePaymentInput;
   LnInvoicePaymentStatus: ResolverTypeWrapper<LnInvoicePaymentStatus>;
   LnInvoicePaymentStatusByHashInput: LnInvoicePaymentStatusByHashInput;
   LnInvoicePaymentStatusByPaymentRequestInput: LnInvoicePaymentStatusByPaymentRequestInput;
   LnInvoicePaymentStatusInput: LnInvoicePaymentStatusInput;
-  LnInvoicePaymentStatusPayload: ResolverTypeWrapper<LnInvoicePaymentStatusPayload>;
+  LnInvoicePaymentStatusPayload: ResolverTypeWrapper<Omit<LnInvoicePaymentStatusPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   LnNoAmountInvoice: ResolverTypeWrapper<LnNoAmountInvoice>;
   LnNoAmountInvoiceCreateInput: LnNoAmountInvoiceCreateInput;
   LnNoAmountInvoiceCreateOnBehalfOfRecipientInput: LnNoAmountInvoiceCreateOnBehalfOfRecipientInput;
   LnNoAmountInvoiceFeeProbeInput: LnNoAmountInvoiceFeeProbeInput;
-  LnNoAmountInvoicePayload: ResolverTypeWrapper<LnNoAmountInvoicePayload>;
+  LnNoAmountInvoicePayload: ResolverTypeWrapper<Omit<LnNoAmountInvoicePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   LnNoAmountInvoicePaymentInput: LnNoAmountInvoicePaymentInput;
   LnNoAmountUsdInvoiceFeeProbeInput: LnNoAmountUsdInvoiceFeeProbeInput;
   LnNoAmountUsdInvoicePaymentInput: LnNoAmountUsdInvoicePaymentInput;
   LnPaymentPreImage: ResolverTypeWrapper<Scalars['LnPaymentPreImage']['output']>;
   LnPaymentRequest: ResolverTypeWrapper<Scalars['LnPaymentRequest']['output']>;
   LnPaymentSecret: ResolverTypeWrapper<Scalars['LnPaymentSecret']['output']>;
-  LnUpdate: ResolverTypeWrapper<LnUpdate>;
+  LnUpdate: ResolverTypeWrapper<Omit<LnUpdate, 'transaction'> & { transaction: ResolversTypes['Transaction'] }>;
   LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput: LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput;
   LnUsdInvoiceCreateInput: LnUsdInvoiceCreateInput;
   LnUsdInvoiceCreateOnBehalfOfRecipientInput: LnUsdInvoiceCreateOnBehalfOfRecipientInput;
@@ -8225,11 +8239,11 @@ export type ResolversTypes = {
   Memo: ResolverTypeWrapper<Scalars['Memo']['output']>;
   Merchant: ResolverTypeWrapper<Merchant>;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
-  MerchantPayload: ResolverTypeWrapper<MerchantPayload>;
+  MerchantPayload: ResolverTypeWrapper<Omit<MerchantPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   Minutes: ResolverTypeWrapper<Scalars['Minutes']['output']>;
   MobileVersions: ResolverTypeWrapper<MobileVersions>;
   Mutation: ResolverTypeWrapper<{}>;
-  MyUpdatesPayload: ResolverTypeWrapper<Omit<MyUpdatesPayload, 'update'> & { update?: Maybe<ResolversTypes['UserUpdate']> }>;
+  MyUpdatesPayload: ResolverTypeWrapper<Omit<MyUpdatesPayload, 'errors' | 'me' | 'update'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']>, update?: Maybe<ResolversTypes['UserUpdate']> }>;
   Network: Network;
   NotificationAction: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NotificationAction']>;
   NotificationCategory: ResolverTypeWrapper<Scalars['NotificationCategory']['output']>;
@@ -8239,12 +8253,12 @@ export type ResolversTypes = {
   OnChainAddress: ResolverTypeWrapper<Scalars['OnChainAddress']['output']>;
   OnChainAddressCreateInput: OnChainAddressCreateInput;
   OnChainAddressCurrentInput: OnChainAddressCurrentInput;
-  OnChainAddressPayload: ResolverTypeWrapper<OnChainAddressPayload>;
+  OnChainAddressPayload: ResolverTypeWrapper<Omit<OnChainAddressPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   OnChainPaymentSendAllInput: OnChainPaymentSendAllInput;
   OnChainPaymentSendInput: OnChainPaymentSendInput;
   OnChainTxFee: ResolverTypeWrapper<OnChainTxFee>;
   OnChainTxHash: ResolverTypeWrapper<Scalars['OnChainTxHash']['output']>;
-  OnChainUpdate: ResolverTypeWrapper<OnChainUpdate>;
+  OnChainUpdate: ResolverTypeWrapper<Omit<OnChainUpdate, 'transaction'> & { transaction: ResolversTypes['Transaction'] }>;
   OnChainUsdPaymentSendAsBtcDenominatedInput: OnChainUsdPaymentSendAsBtcDenominatedInput;
   OnChainUsdPaymentSendInput: OnChainUsdPaymentSendInput;
   OnChainUsdTxFee: ResolverTypeWrapper<OnChainUsdTxFee>;
@@ -8257,9 +8271,10 @@ export type ResolversTypes = {
   OpenExternalLinkAction: ResolverTypeWrapper<OpenExternalLinkAction>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaymentHash: ResolverTypeWrapper<Scalars['PaymentHash']['output']>;
-  PaymentSendPayload: ResolverTypeWrapper<PaymentSendPayload>;
+  PaymentSendPayload: ResolverTypeWrapper<Omit<PaymentSendPayload, 'errors' | 'transaction'> & { errors: ReadonlyArray<ResolversTypes['Error']>, transaction?: Maybe<ResolversTypes['Transaction']> }>;
   PaymentSendResult: PaymentSendResult;
   PayoutSpeed: PayoutSpeed;
+  PayoutSpeeds: ResolverTypeWrapper<PayoutSpeeds>;
   Phone: ResolverTypeWrapper<Scalars['Phone']['output']>;
   PhoneCodeChannelType: PhoneCodeChannelType;
   Price: ResolverTypeWrapper<Price>;
@@ -8269,20 +8284,20 @@ export type ResolversTypes = {
   PriceOfOneSatInMinorUnit: ResolverTypeWrapper<PriceOfOneSatInMinorUnit>;
   PriceOfOneSettlementMinorUnitInDisplayMinorUnit: ResolverTypeWrapper<PriceOfOneSettlementMinorUnitInDisplayMinorUnit>;
   PriceOfOneUsdCentInMinorUnit: ResolverTypeWrapper<PriceOfOneUsdCentInMinorUnit>;
-  PricePayload: ResolverTypeWrapper<PricePayload>;
+  PricePayload: ResolverTypeWrapper<Omit<PricePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   PricePoint: ResolverTypeWrapper<PricePoint>;
   PublicWallet: ResolverTypeWrapper<PublicWallet>;
   Query: ResolverTypeWrapper<{}>;
   Quiz: ResolverTypeWrapper<Quiz>;
   QuizClaimInput: QuizClaimInput;
-  QuizClaimPayload: ResolverTypeWrapper<QuizClaimPayload>;
+  QuizClaimPayload: ResolverTypeWrapper<Omit<QuizClaimPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   RealtimePrice: ResolverTypeWrapper<RealtimePrice>;
   RealtimePriceInput: RealtimePriceInput;
-  RealtimePricePayload: ResolverTypeWrapper<RealtimePricePayload>;
+  RealtimePricePayload: ResolverTypeWrapper<Omit<RealtimePricePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   Region: ResolverTypeWrapper<Region>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']['output']>;
   SatAmount: ResolverTypeWrapper<Scalars['SatAmount']['output']>;
-  SatAmountPayload: ResolverTypeWrapper<SatAmountPayload>;
+  SatAmountPayload: ResolverTypeWrapper<Omit<SatAmountPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   Scope: Scope;
   Seconds: ResolverTypeWrapper<Scalars['Seconds']['output']>;
   SettlementVia: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['SettlementVia']>;
@@ -8293,13 +8308,13 @@ export type ResolversTypes = {
   SignedDisplayMajorAmount: ResolverTypeWrapper<Scalars['SignedDisplayMajorAmount']['output']>;
   StatefulNotification: ResolverTypeWrapper<Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversTypes['NotificationAction']> }>;
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
-  StatefulNotificationAcknowledgePayload: ResolverTypeWrapper<StatefulNotificationAcknowledgePayload>;
-  StatefulNotificationConnection: ResolverTypeWrapper<StatefulNotificationConnection>;
-  StatefulNotificationEdge: ResolverTypeWrapper<StatefulNotificationEdge>;
+  StatefulNotificationAcknowledgePayload: ResolverTypeWrapper<Omit<StatefulNotificationAcknowledgePayload, 'notification'> & { notification: ResolversTypes['StatefulNotification'] }>;
+  StatefulNotificationConnection: ResolverTypeWrapper<Omit<StatefulNotificationConnection, 'edges' | 'nodes'> & { edges: ReadonlyArray<ResolversTypes['StatefulNotificationEdge']>, nodes: ReadonlyArray<ResolversTypes['StatefulNotification']> }>;
+  StatefulNotificationEdge: ResolverTypeWrapper<Omit<StatefulNotificationEdge, 'node'> & { node: ResolversTypes['StatefulNotification'] }>;
   Subscription: ResolverTypeWrapper<{}>;
-  SuccessPayload: ResolverTypeWrapper<SuccessPayload>;
+  SuccessPayload: ResolverTypeWrapper<Omit<SuccessPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   SupportChatMessageAddInput: SupportChatMessageAddInput;
-  SupportChatMessageAddPayload: ResolverTypeWrapper<SupportChatMessageAddPayload>;
+  SupportChatMessageAddPayload: ResolverTypeWrapper<Omit<SupportChatMessageAddPayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   SupportMessage: ResolverTypeWrapper<SupportMessage>;
   SupportRole: SupportRole;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']['output']>;
@@ -8307,39 +8322,39 @@ export type ResolversTypes = {
   TotpRegistrationId: ResolverTypeWrapper<Scalars['TotpRegistrationId']['output']>;
   TotpSecret: ResolverTypeWrapper<Scalars['TotpSecret']['output']>;
   Transaction: ResolverTypeWrapper<Omit<Transaction, 'initiationVia' | 'settlementVia'> & { initiationVia: ResolversTypes['InitiationVia'], settlementVia: ResolversTypes['SettlementVia'] }>;
-  TransactionConnection: ResolverTypeWrapper<TransactionConnection>;
-  TransactionEdge: ResolverTypeWrapper<TransactionEdge>;
+  TransactionConnection: ResolverTypeWrapper<Omit<TransactionConnection, 'edges'> & { edges?: Maybe<ReadonlyArray<ResolversTypes['TransactionEdge']>> }>;
+  TransactionEdge: ResolverTypeWrapper<Omit<TransactionEdge, 'node'> & { node: ResolversTypes['Transaction'] }>;
   TxDirection: TxDirection;
   TxExternalId: ResolverTypeWrapper<Scalars['TxExternalId']['output']>;
   TxNotificationType: TxNotificationType;
   TxStatus: TxStatus;
-  UpgradePayload: ResolverTypeWrapper<UpgradePayload>;
-  UsdWallet: ResolverTypeWrapper<UsdWallet>;
-  User: ResolverTypeWrapper<User>;
-  UserContact: ResolverTypeWrapper<UserContact>;
+  UpgradePayload: ResolverTypeWrapper<Omit<UpgradePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
+  UsdWallet: ResolverTypeWrapper<Omit<UsdWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: ResolversTypes['Invoice'], invoices?: Maybe<ResolversTypes['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<ResolversTypes['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<ResolversTypes['Transaction']>, transactionById: ResolversTypes['Transaction'], transactions?: Maybe<ResolversTypes['TransactionConnection']>, transactionsByAddress?: Maybe<ResolversTypes['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<ResolversTypes['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<ResolversTypes['Transaction']> }>;
+  User: ResolverTypeWrapper<Omit<User, 'contactByUsername' | 'contacts' | 'defaultAccount' | 'statefulNotifications' | 'statefulNotificationsWithoutBulletinEnabled' | 'unacknowledgedStatefulNotificationsWithBulletinEnabled'> & { contactByUsername: ResolversTypes['UserContact'], contacts: ReadonlyArray<ResolversTypes['UserContact']>, defaultAccount: ResolversTypes['Account'], statefulNotifications: ResolversTypes['StatefulNotificationConnection'], statefulNotificationsWithoutBulletinEnabled: ResolversTypes['StatefulNotificationConnection'], unacknowledgedStatefulNotificationsWithBulletinEnabled: ResolversTypes['StatefulNotificationConnection'] }>;
+  UserContact: ResolverTypeWrapper<Omit<UserContact, 'transactions'> & { transactions?: Maybe<ResolversTypes['TransactionConnection']> }>;
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
-  UserContactUpdateAliasPayload: ResolverTypeWrapper<UserContactUpdateAliasPayload>;
-  UserEmailDeletePayload: ResolverTypeWrapper<UserEmailDeletePayload>;
+  UserContactUpdateAliasPayload: ResolverTypeWrapper<Omit<UserContactUpdateAliasPayload, 'contact' | 'errors'> & { contact?: Maybe<ResolversTypes['UserContact']>, errors: ReadonlyArray<ResolversTypes['Error']> }>;
+  UserEmailDeletePayload: ResolverTypeWrapper<Omit<UserEmailDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
-  UserEmailRegistrationInitiatePayload: ResolverTypeWrapper<UserEmailRegistrationInitiatePayload>;
+  UserEmailRegistrationInitiatePayload: ResolverTypeWrapper<Omit<UserEmailRegistrationInitiatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
   UserEmailRegistrationValidateInput: UserEmailRegistrationValidateInput;
-  UserEmailRegistrationValidatePayload: ResolverTypeWrapper<UserEmailRegistrationValidatePayload>;
+  UserEmailRegistrationValidatePayload: ResolverTypeWrapper<Omit<UserEmailRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
   UserLoginInput: UserLoginInput;
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLogoutInput: UserLogoutInput;
-  UserPhoneDeletePayload: ResolverTypeWrapper<UserPhoneDeletePayload>;
+  UserPhoneDeletePayload: ResolverTypeWrapper<Omit<UserPhoneDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
-  UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<UserPhoneRegistrationValidatePayload>;
-  UserTotpDeletePayload: ResolverTypeWrapper<UserTotpDeletePayload>;
-  UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<UserTotpRegistrationInitiatePayload>;
+  UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<Omit<UserPhoneRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
+  UserTotpDeletePayload: ResolverTypeWrapper<Omit<UserTotpDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
+  UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<Omit<UserTotpRegistrationInitiatePayload, 'errors'> & { errors: ReadonlyArray<ResolversTypes['Error']> }>;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
-  UserTotpRegistrationValidatePayload: ResolverTypeWrapper<UserTotpRegistrationValidatePayload>;
+  UserTotpRegistrationValidatePayload: ResolverTypeWrapper<Omit<UserTotpRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversTypes['Error']>, me?: Maybe<ResolversTypes['User']> }>;
   UserUpdate: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserUpdate']>;
   UserUpdateLanguageInput: UserUpdateLanguageInput;
-  UserUpdateLanguagePayload: ResolverTypeWrapper<UserUpdateLanguagePayload>;
+  UserUpdateLanguagePayload: ResolverTypeWrapper<Omit<UserUpdateLanguagePayload, 'errors' | 'user'> & { errors: ReadonlyArray<ResolversTypes['Error']>, user?: Maybe<ResolversTypes['User']> }>;
   UserUpdateUsernameInput: UserUpdateUsernameInput;
-  UserUpdateUsernamePayload: ResolverTypeWrapper<UserUpdateUsernamePayload>;
+  UserUpdateUsernamePayload: ResolverTypeWrapper<Omit<UserUpdateUsernamePayload, 'errors' | 'user'> & { errors: ReadonlyArray<ResolversTypes['Error']>, user?: Maybe<ResolversTypes['User']> }>;
   Username: ResolverTypeWrapper<Scalars['Username']['output']>;
   Wallet: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Wallet']>;
   WalletCurrency: WalletCurrency;
@@ -8355,39 +8370,39 @@ export type ResolversParentTypes = {
   String: Scalars['String']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  AccountDeletePayload: AccountDeletePayload;
+  AccountDeletePayload: Omit<AccountDeletePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   Boolean: Scalars['Boolean']['output'];
   AccountDisableNotificationCategoryInput: AccountDisableNotificationCategoryInput;
   AccountDisableNotificationChannelInput: AccountDisableNotificationChannelInput;
   AccountEnableNotificationCategoryInput: AccountEnableNotificationCategoryInput;
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
   AccountLimit: ResolversInterfaceTypes<ResolversParentTypes>['AccountLimit'];
-  AccountLimits: AccountLimits;
+  AccountLimits: Omit<AccountLimits, 'convert' | 'internalSend' | 'withdrawal'> & { convert: ReadonlyArray<ResolversParentTypes['AccountLimit']>, internalSend: ReadonlyArray<ResolversParentTypes['AccountLimit']>, withdrawal: ReadonlyArray<ResolversParentTypes['AccountLimit']> };
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
-  AccountUpdateDefaultWalletIdPayload: AccountUpdateDefaultWalletIdPayload;
+  AccountUpdateDefaultWalletIdPayload: Omit<AccountUpdateDefaultWalletIdPayload, 'account' | 'errors'> & { account?: Maybe<ResolversParentTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversParentTypes['Error']> };
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
-  AccountUpdateDisplayCurrencyPayload: AccountUpdateDisplayCurrencyPayload;
-  AccountUpdateNotificationSettingsPayload: AccountUpdateNotificationSettingsPayload;
+  AccountUpdateDisplayCurrencyPayload: Omit<AccountUpdateDisplayCurrencyPayload, 'account' | 'errors'> & { account?: Maybe<ResolversParentTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversParentTypes['Error']> };
+  AccountUpdateNotificationSettingsPayload: Omit<AccountUpdateNotificationSettingsPayload, 'account' | 'errors'> & { account?: Maybe<ResolversParentTypes['ConsumerAccount']>, errors: ReadonlyArray<ResolversParentTypes['Error']> };
   ApiKey: ApiKey;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ApiKeyCreatePayload;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ApiKeyRevokePayload;
   AuthToken: Scalars['AuthToken']['output'];
-  AuthTokenPayload: AuthTokenPayload;
+  AuthTokenPayload: Omit<AuthTokenPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   Authorization: Authorization;
-  BTCWallet: BtcWallet;
+  BTCWallet: Omit<BtcWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: ResolversParentTypes['Invoice'], invoices?: Maybe<ResolversParentTypes['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<ResolversParentTypes['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<ResolversParentTypes['Transaction']>, transactionById: ResolversParentTypes['Transaction'], transactions?: Maybe<ResolversParentTypes['TransactionConnection']>, transactionsByAddress?: Maybe<ResolversParentTypes['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<ResolversParentTypes['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<ResolversParentTypes['Transaction']> };
   BuildInformation: BuildInformation;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
-  CallbackEndpointAddPayload: CallbackEndpointAddPayload;
+  CallbackEndpointAddPayload: Omit<CallbackEndpointAddPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   CallbackEndpointDeleteInput: CallbackEndpointDeleteInput;
-  CaptchaCreateChallengePayload: CaptchaCreateChallengePayload;
+  CaptchaCreateChallengePayload: Omit<CaptchaCreateChallengePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   CaptchaCreateChallengeResult: CaptchaCreateChallengeResult;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   CentAmount: Scalars['CentAmount']['output'];
-  CentAmountPayload: CentAmountPayload;
-  ConsumerAccount: ConsumerAccount;
+  CentAmountPayload: Omit<CentAmountPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
+  ConsumerAccount: Omit<ConsumerAccount, 'btcWallet' | 'invoices' | 'limits' | 'pendingIncomingTransactions' | 'transactions' | 'usdWallet' | 'walletById' | 'wallets'> & { btcWallet?: Maybe<ResolversParentTypes['BTCWallet']>, invoices?: Maybe<ResolversParentTypes['InvoiceConnection']>, limits: ResolversParentTypes['AccountLimits'], pendingIncomingTransactions: ReadonlyArray<ResolversParentTypes['Transaction']>, transactions?: Maybe<ResolversParentTypes['TransactionConnection']>, usdWallet?: Maybe<ResolversParentTypes['UsdWallet']>, walletById: ResolversParentTypes['Wallet'], wallets: ReadonlyArray<ResolversParentTypes['Wallet']> };
   Contact: Contact;
   ContactAlias: Scalars['ContactAlias']['output'];
   Coordinates: Coordinates;
@@ -8416,11 +8431,11 @@ export type ResolversParentTypes = {
   InitiationViaLn: InitiationViaLn;
   InitiationViaOnChain: InitiationViaOnChain;
   IntraLedgerPaymentSendInput: IntraLedgerPaymentSendInput;
-  IntraLedgerUpdate: IntraLedgerUpdate;
+  IntraLedgerUpdate: Omit<IntraLedgerUpdate, 'transaction'> & { transaction: ResolversParentTypes['Transaction'] };
   IntraLedgerUsdPaymentSendInput: IntraLedgerUsdPaymentSendInput;
   Invoice: ResolversInterfaceTypes<ResolversParentTypes>['Invoice'];
-  InvoiceConnection: InvoiceConnection;
-  InvoiceEdge: InvoiceEdge;
+  InvoiceConnection: Omit<InvoiceConnection, 'edges'> & { edges?: Maybe<ReadonlyArray<ResolversParentTypes['InvoiceEdge']>> };
+  InvoiceEdge: Omit<InvoiceEdge, 'node'> & { node: ResolversParentTypes['Invoice'] };
   Language: Scalars['Language']['output'];
   Leader: Leader;
   Leaderboard: Leaderboard;
@@ -8431,25 +8446,25 @@ export type ResolversParentTypes = {
   LnInvoiceCreateInput: LnInvoiceCreateInput;
   LnInvoiceCreateOnBehalfOfRecipientInput: LnInvoiceCreateOnBehalfOfRecipientInput;
   LnInvoiceFeeProbeInput: LnInvoiceFeeProbeInput;
-  LnInvoicePayload: LnInvoicePayload;
+  LnInvoicePayload: Omit<LnInvoicePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   LnInvoicePaymentInput: LnInvoicePaymentInput;
   LnInvoicePaymentStatus: LnInvoicePaymentStatus;
   LnInvoicePaymentStatusByHashInput: LnInvoicePaymentStatusByHashInput;
   LnInvoicePaymentStatusByPaymentRequestInput: LnInvoicePaymentStatusByPaymentRequestInput;
   LnInvoicePaymentStatusInput: LnInvoicePaymentStatusInput;
-  LnInvoicePaymentStatusPayload: LnInvoicePaymentStatusPayload;
+  LnInvoicePaymentStatusPayload: Omit<LnInvoicePaymentStatusPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   LnNoAmountInvoice: LnNoAmountInvoice;
   LnNoAmountInvoiceCreateInput: LnNoAmountInvoiceCreateInput;
   LnNoAmountInvoiceCreateOnBehalfOfRecipientInput: LnNoAmountInvoiceCreateOnBehalfOfRecipientInput;
   LnNoAmountInvoiceFeeProbeInput: LnNoAmountInvoiceFeeProbeInput;
-  LnNoAmountInvoicePayload: LnNoAmountInvoicePayload;
+  LnNoAmountInvoicePayload: Omit<LnNoAmountInvoicePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   LnNoAmountInvoicePaymentInput: LnNoAmountInvoicePaymentInput;
   LnNoAmountUsdInvoiceFeeProbeInput: LnNoAmountUsdInvoiceFeeProbeInput;
   LnNoAmountUsdInvoicePaymentInput: LnNoAmountUsdInvoicePaymentInput;
   LnPaymentPreImage: Scalars['LnPaymentPreImage']['output'];
   LnPaymentRequest: Scalars['LnPaymentRequest']['output'];
   LnPaymentSecret: Scalars['LnPaymentSecret']['output'];
-  LnUpdate: LnUpdate;
+  LnUpdate: Omit<LnUpdate, 'transaction'> & { transaction: ResolversParentTypes['Transaction'] };
   LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput: LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput;
   LnUsdInvoiceCreateInput: LnUsdInvoiceCreateInput;
   LnUsdInvoiceCreateOnBehalfOfRecipientInput: LnUsdInvoiceCreateOnBehalfOfRecipientInput;
@@ -8460,11 +8475,11 @@ export type ResolversParentTypes = {
   Memo: Scalars['Memo']['output'];
   Merchant: Merchant;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
-  MerchantPayload: MerchantPayload;
+  MerchantPayload: Omit<MerchantPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   Minutes: Scalars['Minutes']['output'];
   MobileVersions: MobileVersions;
   Mutation: {};
-  MyUpdatesPayload: Omit<MyUpdatesPayload, 'update'> & { update?: Maybe<ResolversParentTypes['UserUpdate']> };
+  MyUpdatesPayload: Omit<MyUpdatesPayload, 'errors' | 'me' | 'update'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']>, update?: Maybe<ResolversParentTypes['UserUpdate']> };
   NotificationAction: ResolversUnionTypes<ResolversParentTypes>['NotificationAction'];
   NotificationCategory: Scalars['NotificationCategory']['output'];
   NotificationChannelSettings: NotificationChannelSettings;
@@ -8472,12 +8487,12 @@ export type ResolversParentTypes = {
   OnChainAddress: Scalars['OnChainAddress']['output'];
   OnChainAddressCreateInput: OnChainAddressCreateInput;
   OnChainAddressCurrentInput: OnChainAddressCurrentInput;
-  OnChainAddressPayload: OnChainAddressPayload;
+  OnChainAddressPayload: Omit<OnChainAddressPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   OnChainPaymentSendAllInput: OnChainPaymentSendAllInput;
   OnChainPaymentSendInput: OnChainPaymentSendInput;
   OnChainTxFee: OnChainTxFee;
   OnChainTxHash: Scalars['OnChainTxHash']['output'];
-  OnChainUpdate: OnChainUpdate;
+  OnChainUpdate: Omit<OnChainUpdate, 'transaction'> & { transaction: ResolversParentTypes['Transaction'] };
   OnChainUsdPaymentSendAsBtcDenominatedInput: OnChainUsdPaymentSendAsBtcDenominatedInput;
   OnChainUsdPaymentSendInput: OnChainUsdPaymentSendInput;
   OnChainUsdTxFee: OnChainUsdTxFee;
@@ -8489,7 +8504,8 @@ export type ResolversParentTypes = {
   OpenExternalLinkAction: OpenExternalLinkAction;
   PageInfo: PageInfo;
   PaymentHash: Scalars['PaymentHash']['output'];
-  PaymentSendPayload: PaymentSendPayload;
+  PaymentSendPayload: Omit<PaymentSendPayload, 'errors' | 'transaction'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, transaction?: Maybe<ResolversParentTypes['Transaction']> };
+  PayoutSpeeds: PayoutSpeeds;
   Phone: Scalars['Phone']['output'];
   Price: Price;
   PriceInput: PriceInput;
@@ -8497,20 +8513,20 @@ export type ResolversParentTypes = {
   PriceOfOneSatInMinorUnit: PriceOfOneSatInMinorUnit;
   PriceOfOneSettlementMinorUnitInDisplayMinorUnit: PriceOfOneSettlementMinorUnitInDisplayMinorUnit;
   PriceOfOneUsdCentInMinorUnit: PriceOfOneUsdCentInMinorUnit;
-  PricePayload: PricePayload;
+  PricePayload: Omit<PricePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   PricePoint: PricePoint;
   PublicWallet: PublicWallet;
   Query: {};
   Quiz: Quiz;
   QuizClaimInput: QuizClaimInput;
-  QuizClaimPayload: QuizClaimPayload;
+  QuizClaimPayload: Omit<QuizClaimPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   RealtimePrice: RealtimePrice;
   RealtimePriceInput: RealtimePriceInput;
-  RealtimePricePayload: RealtimePricePayload;
+  RealtimePricePayload: Omit<RealtimePricePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   Region: Region;
   SafeInt: Scalars['SafeInt']['output'];
   SatAmount: Scalars['SatAmount']['output'];
-  SatAmountPayload: SatAmountPayload;
+  SatAmountPayload: Omit<SatAmountPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   Seconds: Scalars['Seconds']['output'];
   SettlementVia: ResolversUnionTypes<ResolversParentTypes>['SettlementVia'];
   SettlementViaIntraLedger: SettlementViaIntraLedger;
@@ -8520,49 +8536,49 @@ export type ResolversParentTypes = {
   SignedDisplayMajorAmount: Scalars['SignedDisplayMajorAmount']['output'];
   StatefulNotification: Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversParentTypes['NotificationAction']> };
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
-  StatefulNotificationAcknowledgePayload: StatefulNotificationAcknowledgePayload;
-  StatefulNotificationConnection: StatefulNotificationConnection;
-  StatefulNotificationEdge: StatefulNotificationEdge;
+  StatefulNotificationAcknowledgePayload: Omit<StatefulNotificationAcknowledgePayload, 'notification'> & { notification: ResolversParentTypes['StatefulNotification'] };
+  StatefulNotificationConnection: Omit<StatefulNotificationConnection, 'edges' | 'nodes'> & { edges: ReadonlyArray<ResolversParentTypes['StatefulNotificationEdge']>, nodes: ReadonlyArray<ResolversParentTypes['StatefulNotification']> };
+  StatefulNotificationEdge: Omit<StatefulNotificationEdge, 'node'> & { node: ResolversParentTypes['StatefulNotification'] };
   Subscription: {};
-  SuccessPayload: SuccessPayload;
+  SuccessPayload: Omit<SuccessPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   SupportChatMessageAddInput: SupportChatMessageAddInput;
-  SupportChatMessageAddPayload: SupportChatMessageAddPayload;
+  SupportChatMessageAddPayload: Omit<SupportChatMessageAddPayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   SupportMessage: SupportMessage;
   Timestamp: Scalars['Timestamp']['output'];
   TotpCode: Scalars['TotpCode']['output'];
   TotpRegistrationId: Scalars['TotpRegistrationId']['output'];
   TotpSecret: Scalars['TotpSecret']['output'];
   Transaction: Omit<Transaction, 'initiationVia' | 'settlementVia'> & { initiationVia: ResolversParentTypes['InitiationVia'], settlementVia: ResolversParentTypes['SettlementVia'] };
-  TransactionConnection: TransactionConnection;
-  TransactionEdge: TransactionEdge;
+  TransactionConnection: Omit<TransactionConnection, 'edges'> & { edges?: Maybe<ReadonlyArray<ResolversParentTypes['TransactionEdge']>> };
+  TransactionEdge: Omit<TransactionEdge, 'node'> & { node: ResolversParentTypes['Transaction'] };
   TxExternalId: Scalars['TxExternalId']['output'];
-  UpgradePayload: UpgradePayload;
-  UsdWallet: UsdWallet;
-  User: User;
-  UserContact: UserContact;
+  UpgradePayload: Omit<UpgradePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
+  UsdWallet: Omit<UsdWallet, 'invoiceByPaymentHash' | 'invoices' | 'pendingIncomingTransactions' | 'pendingIncomingTransactionsByAddress' | 'transactionById' | 'transactions' | 'transactionsByAddress' | 'transactionsByPaymentHash' | 'transactionsByPaymentRequest'> & { invoiceByPaymentHash: ResolversParentTypes['Invoice'], invoices?: Maybe<ResolversParentTypes['InvoiceConnection']>, pendingIncomingTransactions: ReadonlyArray<ResolversParentTypes['Transaction']>, pendingIncomingTransactionsByAddress: ReadonlyArray<ResolversParentTypes['Transaction']>, transactionById: ResolversParentTypes['Transaction'], transactions?: Maybe<ResolversParentTypes['TransactionConnection']>, transactionsByAddress?: Maybe<ResolversParentTypes['TransactionConnection']>, transactionsByPaymentHash: ReadonlyArray<ResolversParentTypes['Transaction']>, transactionsByPaymentRequest: ReadonlyArray<ResolversParentTypes['Transaction']> };
+  User: Omit<User, 'contactByUsername' | 'contacts' | 'defaultAccount' | 'statefulNotifications' | 'statefulNotificationsWithoutBulletinEnabled' | 'unacknowledgedStatefulNotificationsWithBulletinEnabled'> & { contactByUsername: ResolversParentTypes['UserContact'], contacts: ReadonlyArray<ResolversParentTypes['UserContact']>, defaultAccount: ResolversParentTypes['Account'], statefulNotifications: ResolversParentTypes['StatefulNotificationConnection'], statefulNotificationsWithoutBulletinEnabled: ResolversParentTypes['StatefulNotificationConnection'], unacknowledgedStatefulNotificationsWithBulletinEnabled: ResolversParentTypes['StatefulNotificationConnection'] };
+  UserContact: Omit<UserContact, 'transactions'> & { transactions?: Maybe<ResolversParentTypes['TransactionConnection']> };
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
-  UserContactUpdateAliasPayload: UserContactUpdateAliasPayload;
-  UserEmailDeletePayload: UserEmailDeletePayload;
+  UserContactUpdateAliasPayload: Omit<UserContactUpdateAliasPayload, 'contact' | 'errors'> & { contact?: Maybe<ResolversParentTypes['UserContact']>, errors: ReadonlyArray<ResolversParentTypes['Error']> };
+  UserEmailDeletePayload: Omit<UserEmailDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
-  UserEmailRegistrationInitiatePayload: UserEmailRegistrationInitiatePayload;
+  UserEmailRegistrationInitiatePayload: Omit<UserEmailRegistrationInitiatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
   UserEmailRegistrationValidateInput: UserEmailRegistrationValidateInput;
-  UserEmailRegistrationValidatePayload: UserEmailRegistrationValidatePayload;
+  UserEmailRegistrationValidatePayload: Omit<UserEmailRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
   UserLoginInput: UserLoginInput;
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLogoutInput: UserLogoutInput;
-  UserPhoneDeletePayload: UserPhoneDeletePayload;
+  UserPhoneDeletePayload: Omit<UserPhoneDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
-  UserPhoneRegistrationValidatePayload: UserPhoneRegistrationValidatePayload;
-  UserTotpDeletePayload: UserTotpDeletePayload;
-  UserTotpRegistrationInitiatePayload: UserTotpRegistrationInitiatePayload;
+  UserPhoneRegistrationValidatePayload: Omit<UserPhoneRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
+  UserTotpDeletePayload: Omit<UserTotpDeletePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
+  UserTotpRegistrationInitiatePayload: Omit<UserTotpRegistrationInitiatePayload, 'errors'> & { errors: ReadonlyArray<ResolversParentTypes['Error']> };
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
-  UserTotpRegistrationValidatePayload: UserTotpRegistrationValidatePayload;
+  UserTotpRegistrationValidatePayload: Omit<UserTotpRegistrationValidatePayload, 'errors' | 'me'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, me?: Maybe<ResolversParentTypes['User']> };
   UserUpdate: ResolversUnionTypes<ResolversParentTypes>['UserUpdate'];
   UserUpdateLanguageInput: UserUpdateLanguageInput;
-  UserUpdateLanguagePayload: UserUpdateLanguagePayload;
+  UserUpdateLanguagePayload: Omit<UserUpdateLanguagePayload, 'errors' | 'user'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, user?: Maybe<ResolversParentTypes['User']> };
   UserUpdateUsernameInput: UserUpdateUsernameInput;
-  UserUpdateUsernamePayload: UserUpdateUsernamePayload;
+  UserUpdateUsernamePayload: Omit<UserUpdateUsernamePayload, 'errors' | 'user'> & { errors: ReadonlyArray<ResolversParentTypes['Error']>, user?: Maybe<ResolversParentTypes['User']> };
   Username: Scalars['Username']['output'];
   Wallet: ResolversInterfaceTypes<ResolversParentTypes>['Wallet'];
   WalletId: Scalars['WalletId']['output'];
@@ -8970,6 +8986,7 @@ export type LnInvoicePayloadResolvers<ContextType = any, ParentType extends Reso
 
 export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatus'] = ResolversParentTypes['LnInvoicePaymentStatus']> = {
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -8978,6 +8995,7 @@ export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extend
 export type LnInvoicePaymentStatusPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatusPayload'] = ResolversParentTypes['LnInvoicePaymentStatusPayload']> = {
   errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -9235,6 +9253,13 @@ export type PaymentSendPayloadResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PayoutSpeedsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PayoutSpeeds'] = ResolversParentTypes['PayoutSpeeds']> = {
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  speed?: Resolver<ResolversTypes['PayoutSpeed'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface PhoneScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Phone'], any> {
   name: 'Phone';
 }
@@ -9320,6 +9345,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainTxFee?: Resolver<ResolversTypes['OnChainTxFee'], ParentType, ContextType, RequireFields<QueryOnChainTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
+  payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
@@ -9784,6 +9810,7 @@ export type Resolvers<ContextType = any> = {
   PageInfo?: PageInfoResolvers<ContextType>;
   PaymentHash?: GraphQLScalarType;
   PaymentSendPayload?: PaymentSendPayloadResolvers<ContextType>;
+  PayoutSpeeds?: PayoutSpeedsResolvers<ContextType>;
   Phone?: GraphQLScalarType;
   Price?: PriceResolvers<ContextType>;
   PriceInterface?: PriceInterfaceResolvers<ContextType>;
