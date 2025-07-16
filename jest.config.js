@@ -43,7 +43,6 @@ module.exports = {
       "|react-native-size-matters" +
       "|react-native-splash-screen" +
       "|react-native-toast-message" +
-      "|react-native-vector-icons" +
       "|react-navigation-tabs" +
       "|@rneui" +
       "|rn-qr-generator" +
