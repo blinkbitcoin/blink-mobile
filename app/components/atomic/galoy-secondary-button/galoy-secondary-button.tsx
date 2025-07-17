@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren } from "react"
-import { TouchableHighlight } from "react-native"
+import { TouchableHighlight, TouchableHighlightProps } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
 import { Button, ButtonProps, makeStyles, useTheme } from "@rneui/themed"
@@ -15,6 +15,12 @@ declare module "@rneui/themed" {
 type GaloySecondaryButtonProps = PropsWithChildren<ButtonProps> & {
   iconName?: IconNamesType
   grey?: boolean
+}
+
+class TouchableHighlightWrapper extends React.Component<TouchableHighlightProps> {
+  render() {
+    return <TouchableHighlight {...this.props} />
+  }
 }
 
 export const GaloySecondaryButton: FunctionComponent<GaloySecondaryButtonProps> = (
@@ -42,7 +48,7 @@ export const GaloySecondaryButton: FunctionComponent<GaloySecondaryButtonProps> 
       underlayColor={colors.transparent}
       activeOpacity={0.7}
       {...(icon ? { icon } : {})}
-      TouchableComponent={TouchableHighlight}
+      TouchableComponent={TouchableHighlightWrapper}
       buttonStyle={styles.buttonStyle}
       disabledStyle={styles.disabledStyle}
       titleStyle={[styles.buttonTitleStyle, props.titleStyle]}

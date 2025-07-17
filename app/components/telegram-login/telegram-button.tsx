@@ -1,10 +1,16 @@
 import React, { FC, PropsWithChildren } from "react"
-import { TouchableHighlight } from "react-native"
+import { TouchableHighlight, TouchableHighlightProps } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 
 import { Button, ButtonProps, makeStyles } from "@rneui/themed"
+
+class TouchableHighlightWrapper extends React.Component<TouchableHighlightProps> {
+  render() {
+    return <TouchableHighlight {...this.props} />
+  }
+}
 
 export const TelegramLoginButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()
@@ -22,7 +28,7 @@ export const TelegramLoginButton: FC<PropsWithChildren<ButtonProps>> = (props) =
     <Button
       {...(typeof props.title === "string" ? testProps(props.title) : {})}
       activeOpacity={0.85}
-      TouchableComponent={TouchableHighlight}
+      TouchableComponent={TouchableHighlightWrapper}
       icon={icon}
       iconRight={false}
       buttonStyle={[styles.buttonStyle, props.buttonStyle]}
