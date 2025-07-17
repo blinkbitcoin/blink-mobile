@@ -8,6 +8,10 @@ import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { Screen } from "@app/components/screen"
+import {
+  validateUsername,
+  SetUsernameError,
+} from "@app/components/set-lightning-address-modal"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -17,8 +21,6 @@ import {
   MyUserIdDocument,
   MyUserIdQuery,
 } from "@app/graphql/generated"
-
-import { validateLightningAddress, SetAddressError } from "./lightning-address-validation"
 
 gql`
   mutation userUpdateUsername($input: UserUpdateUsernameInput!) {
@@ -52,7 +54,7 @@ export const SetLightningAddressScreen: React.FC<{
   const styles = useStyles()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const [error, setError] = useState<SetAddressError | undefined>()
+  const [error, setError] = useState<SetUsernameError | undefined>()
   const [username, setUsername] = useState("")
   const { onboarding } = route.params
 
@@ -94,7 +96,7 @@ export const SetLightningAddressScreen: React.FC<{
   }
 
   const onSetLightningAddress = async () => {
-    const validationResult = validateLightningAddress(username)
+    const validationResult = validateUsername(username)
     if (!validationResult.valid) {
       setError(validationResult.error)
       return
@@ -106,11 +108,11 @@ export const SetLightningAddressScreen: React.FC<{
 
     if ((data?.userUpdateUsername?.errors ?? []).length > 0) {
       if (data?.userUpdateUsername?.errors[0]?.code === "USERNAME_ERROR") {
-        setError(SetAddressError.ADDRESS_UNAVAILABLE)
+        setError(SetUsernameError.ADDRESS_UNAVAILABLE)
         return
       }
 
-      setError(SetAddressError.UNKNOWN_ERROR)
+      setError(SetUsernameError.UNKNOWN_ERROR)
       return
     }
 
@@ -127,19 +129,19 @@ export const SetLightningAddressScreen: React.FC<{
 
   let errorMessage = ""
   switch (error) {
-    case SetAddressError.TOO_SHORT:
+    case SetUsernameError.TOO_SHORT:
       errorMessage = LL.SetAddressModal.Errors.tooShort()
       break
-    case SetAddressError.TOO_LONG:
+    case SetUsernameError.TOO_LONG:
       errorMessage = LL.SetAddressModal.Errors.tooLong()
       break
-    case SetAddressError.INVALID_CHARACTER:
+    case SetUsernameError.INVALID_CHARACTER:
       errorMessage = LL.SetAddressModal.Errors.invalidCharacter()
       break
-    case SetAddressError.ADDRESS_UNAVAILABLE:
+    case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
-    case SetAddressError.UNKNOWN_ERROR:
+    case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
   }
