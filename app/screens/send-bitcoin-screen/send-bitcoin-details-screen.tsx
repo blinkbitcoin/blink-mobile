@@ -241,11 +241,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert(
+  const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
-    btcWallet?.id as string,
+    walletId: btcWallet?.id as string,
     network,
-  )
+    speed: selectedPayoutSpeedOption?.speed,
+  })
 
   if (!paymentDetail) {
     return <></>
@@ -511,7 +512,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       <PayoutSpeedModal
         isVisible={isPayoutSpeedModalVisible}
         toggleModal={() => setIsPayoutSpeedModalVisible(false)}
-        options={payoutSpeedsData?.payoutSpeeds ?? []}
+        options={
+          payoutSpeedsData?.payoutSpeeds.map(({ speed, displayName, description }) => ({
+            speed,
+            displayName,
+            description,
+          })) ?? []
+        }
         selectedSpeed={selectedPayoutSpeedOption?.speed}
         onSelect={(selected) => {
           setPayoutSpeed(selected.speed)
@@ -805,11 +812,17 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-const useOnchainFeeAlert = (
-  paymentDetail: PaymentDetail<WalletCurrency> | null,
-  walletId: string,
-  network: Network | undefined,
-) => {
+const useOnchainFeeAlert = ({
+  paymentDetail,
+  walletId,
+  network,
+  speed = PayoutSpeed.Fast,
+}: {
+  paymentDetail: PaymentDetail<WalletCurrency> | null
+  walletId: string
+  network?: Network
+  speed?: PayoutSpeed
+}) => {
   const dummyAddress =
     network === "mainnet"
       ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
@@ -831,6 +844,7 @@ const useOnchainFeeAlert = (
       walletId,
       amount: 1000,
       address: dummyAddress,
+      speed,
     },
   })
 
