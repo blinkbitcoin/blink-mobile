@@ -37,7 +37,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     senderSpecifiedMemo,
     isSendingMax,
     address,
-    payoutSpeed,
+    payoutSpeed = PayoutSpeed.Fast,
   } = params
 
   const settlementAmount = convertMoneyAmount(
@@ -77,6 +77,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             walletId: sendingWalletDescriptor.id,
             address,
             amount: settlementAmount.amount,
+            speed: payoutSpeed,
           },
         })
 
@@ -98,6 +99,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             walletId: sendingWalletDescriptor.id,
             address,
             amount: settlementAmount.amount,
+            speed: payoutSpeed,
           },
         })
 
@@ -162,6 +164,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
           walletId: sendingWalletDescriptor.id,
           address,
           amount: settlementAmount.amount,
+          speed: payoutSpeed,
         },
       })
 
@@ -217,6 +220,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             walletId: sendingWalletDescriptor.id,
             address,
             amount: settlementAmount.amount,
+            speed: payoutSpeed,
           },
         })
 
@@ -258,6 +262,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
             walletId: sendingWalletDescriptor.id,
             address,
             amount: settlementAmount.amount,
+            speed: payoutSpeed,
           },
         })
 
@@ -354,6 +359,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
 export type CreateAmountOnchainPaymentDetailsParams<T extends WalletCurrency> = {
   address: string
   destinationSpecifiedAmount: BtcMoneyAmount
+  payoutSpeed?: PayoutSpeed
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -366,6 +372,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
     address,
+    payoutSpeed = PayoutSpeed.Fast,
   } = params
 
   const settlementAmount = convertMoneyAmount(
@@ -409,6 +416,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
           walletId: sendingWalletDescriptor.id,
           address,
           amount: settlementAmount.amount,
+          speed: payoutSpeed,
         },
       })
 
@@ -457,6 +465,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
           walletId: sendingWalletDescriptor.id,
           address,
           amount: unitOfAccountAmount.amount,
+          speed: payoutSpeed,
         },
       })
 
