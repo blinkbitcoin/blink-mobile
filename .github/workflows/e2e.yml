@@ -11,7 +11,7 @@ concurrency:
 jobs:
   e2e-android:
     name: Android
-    runs-on: self-hosted
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -145,7 +145,7 @@ jobs:
 
   e2e-ios:
     name: iOS
-    runs-on: self-hosted
+    runs-on: macos-latest-large
 
     steps:
       - uses: actions/checkout@v2
