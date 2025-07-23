@@ -1355,25 +1355,36 @@ query notificationSettings {
   }
 }
 
-query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
-  onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
+  onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
     __typename
   }
 }
 
-query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!) {
-  onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $speed: PayoutSpeed!) {
+  onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
     __typename
   }
 }
 
-query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
   onChainUsdTxFeeAsBtcDenominated(
     walletId: $walletId
     address: $address
     amount: $amount
+    speed: $speed
   ) {
     amount
     __typename

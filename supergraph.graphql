@@ -379,17 +379,19 @@ type CentAmountPayload
 type ConsumerAccount implements Account
   @join__implements(graph: BLINK, interface: "Account")
   @join__type(graph: BLINK)
+  @join__type(graph: CIRCLES, key: "id")
+  @join__type(graph: KYC, key: "id")
 {
-  callbackEndpoints: [CallbackEndpoint!]!
-  callbackPortalUrl: String!
+  callbackEndpoints: [CallbackEndpoint!]! @join__field(graph: BLINK)
+  callbackPortalUrl: String! @join__field(graph: BLINK)
 
   """
   return CSV stream, base64 encoded, of the list of transactions in the wallet
   """
-  csvTransactions(walletIds: [WalletId!]!): String!
-  defaultWallet: PublicWallet!
-  defaultWalletId: WalletId!
-  displayCurrency: DisplayCurrency!
+  csvTransactions(walletIds: [WalletId!]!): String! @join__field(graph: BLINK)
+  defaultWallet: PublicWallet! @join__field(graph: BLINK)
+  defaultWalletId: WalletId! @join__field(graph: BLINK)
+  displayCurrency: DisplayCurrency! @join__field(graph: BLINK)
   id: ID!
 
   """A list of all invoices associated with walletIds optionally passed."""
@@ -406,15 +408,15 @@ type ConsumerAccount implements Account
     """Returns the last n items from the list."""
     last: Int
     walletIds: [WalletId]
-  ): InvoiceConnection
-  level: AccountLevel!
-  limits: AccountLimits!
-  notificationSettings: NotificationSettings!
-  pendingIncomingTransactions(walletIds: [WalletId]): [Transaction!]!
+  ): InvoiceConnection @join__field(graph: BLINK)
+  level: AccountLevel! @join__field(graph: BLINK)
+  limits: AccountLimits! @join__field(graph: BLINK)
+  notificationSettings: NotificationSettings! @join__field(graph: BLINK)
+  pendingIncomingTransactions(walletIds: [WalletId]): [Transaction!]! @join__field(graph: BLINK)
 
   """List the quiz questions of the consumer account"""
-  quiz: [Quiz!]!
-  realtimePrice: RealtimePrice!
+  quiz: [Quiz!]! @join__field(graph: BLINK)
+  realtimePrice: RealtimePrice! @join__field(graph: BLINK)
 
   """
   A list of all transactions associated with walletIds optionally passed.
@@ -432,9 +434,13 @@ type ConsumerAccount implements Account
     """Returns the last n items from the list."""
     last: Int
     walletIds: [WalletId]
-  ): TransactionConnection
-  walletById(walletId: WalletId!): Wallet!
-  wallets: [Wallet!]!
+  ): TransactionConnection @join__field(graph: BLINK)
+  walletById(walletId: WalletId!): Wallet! @join__field(graph: BLINK)
+  wallets: [Wallet!]! @join__field(graph: BLINK)
+  welcomeProfile: WelcomeProfile @join__field(graph: CIRCLES)
+  onboardingStatus: OnboardingStatus @join__field(graph: KYC)
+  firstName: String @join__field(graph: KYC)
+  lastName: String @join__field(graph: KYC)
 }
 
 type Contact
@@ -847,10 +853,30 @@ scalar join__FieldSet
 
 enum join__Graph {
   BLINK @join__graph(name: "blink", url: "url")
+  CIRCLES @join__graph(name: "circles", url: "url")
+  KYC @join__graph(name: "kyc", url: "url")
 }
 
 scalar Language
   @join__type(graph: BLINK)
+
+type Leader
+  @join__type(graph: CIRCLES)
+{
+  rank: Int!
+  name: LeaderboardName
+  points: Int!
+}
+
+type Leaderboard
+  @join__type(graph: CIRCLES)
+{
+  range: WelcomeRange!
+  leaders: [Leader!]!
+}
+
+scalar LeaderboardName
+  @join__type(graph: CIRCLES)
 
 scalar link__Import
 
@@ -1267,95 +1293,96 @@ type MobileVersions
 
 type Mutation
   @join__type(graph: BLINK)
+  @join__type(graph: KYC)
 {
-  apiKeyCreate(input: ApiKeyCreateInput!): ApiKeyCreatePayload!
-  apiKeyRevoke(input: ApiKeyRevokeInput!): ApiKeyRevokePayload!
-  statefulNotificationAcknowledge(input: StatefulNotificationAcknowledgeInput!): StatefulNotificationAcknowledgePayload!
-  accountDelete: AccountDeletePayload!
-  accountDisableNotificationCategory(input: AccountDisableNotificationCategoryInput!): AccountUpdateNotificationSettingsPayload!
-  accountDisableNotificationChannel(input: AccountDisableNotificationChannelInput!): AccountUpdateNotificationSettingsPayload!
-  accountEnableNotificationCategory(input: AccountEnableNotificationCategoryInput!): AccountUpdateNotificationSettingsPayload!
-  accountEnableNotificationChannel(input: AccountEnableNotificationChannelInput!): AccountUpdateNotificationSettingsPayload!
-  accountUpdateDefaultWalletId(input: AccountUpdateDefaultWalletIdInput!): AccountUpdateDefaultWalletIdPayload!
-  accountUpdateDisplayCurrency(input: AccountUpdateDisplayCurrencyInput!): AccountUpdateDisplayCurrencyPayload!
-  callbackEndpointAdd(input: CallbackEndpointAddInput!): CallbackEndpointAddPayload!
-  callbackEndpointDelete(input: CallbackEndpointDeleteInput!): SuccessPayload!
-  captchaCreateChallenge: CaptchaCreateChallengePayload!
-  captchaRequestAuthCode(input: CaptchaRequestAuthCodeInput!): SuccessPayload!
-  deviceNotificationTokenCreate(input: DeviceNotificationTokenCreateInput!): SuccessPayload!
-  feedbackSubmit(input: FeedbackSubmitInput!): SuccessPayload!
+  apiKeyCreate(input: ApiKeyCreateInput!): ApiKeyCreatePayload! @join__field(graph: BLINK)
+  apiKeyRevoke(input: ApiKeyRevokeInput!): ApiKeyRevokePayload! @join__field(graph: BLINK)
+  statefulNotificationAcknowledge(input: StatefulNotificationAcknowledgeInput!): StatefulNotificationAcknowledgePayload! @join__field(graph: BLINK)
+  accountDelete: AccountDeletePayload! @join__field(graph: BLINK)
+  accountDisableNotificationCategory(input: AccountDisableNotificationCategoryInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: BLINK)
+  accountDisableNotificationChannel(input: AccountDisableNotificationChannelInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: BLINK)
+  accountEnableNotificationCategory(input: AccountEnableNotificationCategoryInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: BLINK)
+  accountEnableNotificationChannel(input: AccountEnableNotificationChannelInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: BLINK)
+  accountUpdateDefaultWalletId(input: AccountUpdateDefaultWalletIdInput!): AccountUpdateDefaultWalletIdPayload! @join__field(graph: BLINK)
+  accountUpdateDisplayCurrency(input: AccountUpdateDisplayCurrencyInput!): AccountUpdateDisplayCurrencyPayload! @join__field(graph: BLINK)
+  callbackEndpointAdd(input: CallbackEndpointAddInput!): CallbackEndpointAddPayload! @join__field(graph: BLINK)
+  callbackEndpointDelete(input: CallbackEndpointDeleteInput!): SuccessPayload! @join__field(graph: BLINK)
+  captchaCreateChallenge: CaptchaCreateChallengePayload! @join__field(graph: BLINK)
+  captchaRequestAuthCode(input: CaptchaRequestAuthCodeInput!): SuccessPayload! @join__field(graph: BLINK)
+  deviceNotificationTokenCreate(input: DeviceNotificationTokenCreateInput!): SuccessPayload! @join__field(graph: BLINK)
+  feedbackSubmit(input: FeedbackSubmitInput!): SuccessPayload! @join__field(graph: BLINK)
 
   """
   Actions a payment which is internal to the ledger e.g. it does
   not use onchain/lightning. Returns payment status (success,
   failed, pending, already_paid).
   """
-  intraLedgerPaymentSend(input: IntraLedgerPaymentSendInput!): PaymentSendPayload!
+  intraLedgerPaymentSend(input: IntraLedgerPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
 
   """
   Actions a payment which is internal to the ledger e.g. it does
   not use onchain/lightning. Returns payment status (success,
   failed, pending, already_paid).
   """
-  intraLedgerUsdPaymentSend(input: IntraLedgerUsdPaymentSendInput!): PaymentSendPayload!
+  intraLedgerUsdPaymentSend(input: IntraLedgerUsdPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
 
   """Sends a payment to a lightning address."""
-  lnAddressPaymentSend(input: LnAddressPaymentSendInput!): PaymentSendPayload!
+  lnAddressPaymentSend(input: LnAddressPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
 
   """Cancel an unpaid lightning invoice for an associated wallet."""
-  lnInvoiceCancel(input: LnInvoiceCancelInput!): SuccessPayload!
+  lnInvoiceCancel(input: LnInvoiceCancelInput!): SuccessPayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice for an associated wallet.
   When invoice is paid the value will be credited to a BTC wallet.
   Expires after 'expiresIn' or 24 hours.
   """
-  lnInvoiceCreate(input: LnInvoiceCreateInput!): LnInvoicePayload!
+  lnInvoiceCreate(input: LnInvoiceCreateInput!): LnInvoicePayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice for an associated wallet.
   When invoice is paid the value will be credited to a BTC wallet.
   Expires after 'expiresIn' or 24 hours.
   """
-  lnInvoiceCreateOnBehalfOfRecipient(input: LnInvoiceCreateOnBehalfOfRecipientInput!): LnInvoicePayload!
-  lnInvoiceFeeProbe(input: LnInvoiceFeeProbeInput!): SatAmountPayload!
+  lnInvoiceCreateOnBehalfOfRecipient(input: LnInvoiceCreateOnBehalfOfRecipientInput!): LnInvoicePayload! @join__field(graph: BLINK)
+  lnInvoiceFeeProbe(input: LnInvoiceFeeProbeInput!): SatAmountPayload! @join__field(graph: BLINK)
 
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet can be USD or BTC and must have sufficient balance to cover amount in lightning invoice.
   Returns payment status (success, failed, pending, already_paid).
   """
-  lnInvoicePaymentSend(input: LnInvoicePaymentInput!): PaymentSendPayload!
+  lnInvoicePaymentSend(input: LnInvoicePaymentInput!): PaymentSendPayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice for an associated wallet.
   Can be used to receive any supported currency value (currently USD or BTC).
   Expires after 'expiresIn' or 24 hours for BTC invoices or 5 minutes for USD invoices.
   """
-  lnNoAmountInvoiceCreate(input: LnNoAmountInvoiceCreateInput!): LnNoAmountInvoicePayload!
+  lnNoAmountInvoiceCreate(input: LnNoAmountInvoiceCreateInput!): LnNoAmountInvoicePayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice for an associated wallet.
   Can be used to receive any supported currency value (currently USD or BTC).
   Expires after 'expiresIn' or 24 hours for BTC invoices or 5 minutes for USD invoices.
   """
-  lnNoAmountInvoiceCreateOnBehalfOfRecipient(input: LnNoAmountInvoiceCreateOnBehalfOfRecipientInput!): LnNoAmountInvoicePayload!
-  lnNoAmountInvoiceFeeProbe(input: LnNoAmountInvoiceFeeProbeInput!): SatAmountPayload!
+  lnNoAmountInvoiceCreateOnBehalfOfRecipient(input: LnNoAmountInvoiceCreateOnBehalfOfRecipientInput!): LnNoAmountInvoicePayload! @join__field(graph: BLINK)
+  lnNoAmountInvoiceFeeProbe(input: LnNoAmountInvoiceFeeProbeInput!): SatAmountPayload! @join__field(graph: BLINK)
 
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet must be BTC and must have sufficient balance to cover amount specified in mutation request.
   Returns payment status (success, failed, pending, already_paid).
   """
-  lnNoAmountInvoicePaymentSend(input: LnNoAmountInvoicePaymentInput!): PaymentSendPayload!
-  lnNoAmountUsdInvoiceFeeProbe(input: LnNoAmountUsdInvoiceFeeProbeInput!): CentAmountPayload!
+  lnNoAmountInvoicePaymentSend(input: LnNoAmountInvoicePaymentInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  lnNoAmountUsdInvoiceFeeProbe(input: LnNoAmountUsdInvoiceFeeProbeInput!): CentAmountPayload! @join__field(graph: BLINK)
 
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet must be USD and have sufficient balance to cover amount specified in mutation request.
   Returns payment status (success, failed, pending, already_paid).
   """
-  lnNoAmountUsdInvoicePaymentSend(input: LnNoAmountUsdInvoicePaymentInput!): PaymentSendPayload!
+  lnNoAmountUsdInvoicePaymentSend(input: LnNoAmountUsdInvoicePaymentInput!): PaymentSendPayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice denominated in satoshis for an associated wallet.
@@ -1363,7 +1390,7 @@ type Mutation
   Expires after 'expiresIn' or 5 minutes (short expiry time because there is a USD/BTC exchange rate
     associated with the amount).
   """
-  lnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipient(input: LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput!): LnInvoicePayload!
+  lnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipient(input: LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput!): LnInvoicePayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice denominated in satoshis for an associated wallet.
@@ -1371,7 +1398,7 @@ type Mutation
   Expires after 'expiresIn' or 5 minutes (short expiry time because there is a USD/BTC exchange rate
   associated with the amount).
   """
-  lnUsdInvoiceCreate(input: LnUsdInvoiceCreateInput!): LnInvoicePayload!
+  lnUsdInvoiceCreate(input: LnUsdInvoiceCreateInput!): LnInvoicePayload! @join__field(graph: BLINK)
 
   """
   Returns a lightning invoice denominated in satoshis for an associated wallet.
@@ -1379,36 +1406,37 @@ type Mutation
   Expires after 'expiresIn' or 5 minutes (short expiry time because there is a USD/BTC exchange rate
     associated with the amount).
   """
-  lnUsdInvoiceCreateOnBehalfOfRecipient(input: LnUsdInvoiceCreateOnBehalfOfRecipientInput!): LnInvoicePayload!
-  lnUsdInvoiceFeeProbe(input: LnUsdInvoiceFeeProbeInput!): SatAmountPayload!
+  lnUsdInvoiceCreateOnBehalfOfRecipient(input: LnUsdInvoiceCreateOnBehalfOfRecipientInput!): LnInvoicePayload! @join__field(graph: BLINK)
+  lnUsdInvoiceFeeProbe(input: LnUsdInvoiceFeeProbeInput!): SatAmountPayload! @join__field(graph: BLINK)
 
   """Sends a payment to a lightning address."""
-  lnurlPaymentSend(input: LnurlPaymentSendInput!): PaymentSendPayload!
-  merchantMapSuggest(input: MerchantMapSuggestInput!): MerchantPayload!
-  onChainAddressCreate(input: OnChainAddressCreateInput!): OnChainAddressPayload!
-  onChainAddressCurrent(input: OnChainAddressCurrentInput!): OnChainAddressPayload!
-  onChainPaymentSend(input: OnChainPaymentSendInput!): PaymentSendPayload!
-  onChainPaymentSendAll(input: OnChainPaymentSendAllInput!): PaymentSendPayload!
-  onChainUsdPaymentSend(input: OnChainUsdPaymentSendInput!): PaymentSendPayload!
-  onChainUsdPaymentSendAsBtcDenominated(input: OnChainUsdPaymentSendAsBtcDenominatedInput!): PaymentSendPayload!
-  quizClaim(input: QuizClaimInput!): QuizClaimPayload!
-  supportChatMessageAdd(input: SupportChatMessageAddInput!): SupportChatMessageAddPayload!
-  supportChatReset: SuccessPayload!
-  userContactUpdateAlias(input: UserContactUpdateAliasInput!): UserContactUpdateAliasPayload! @deprecated(reason: "will be moved to AccountContact")
-  userEmailDelete: UserEmailDeletePayload!
-  userEmailRegistrationInitiate(input: UserEmailRegistrationInitiateInput!): UserEmailRegistrationInitiatePayload!
-  userEmailRegistrationValidate(input: UserEmailRegistrationValidateInput!): UserEmailRegistrationValidatePayload!
-  userLogin(input: UserLoginInput!): AuthTokenPayload!
-  userLoginUpgrade(input: UserLoginUpgradeInput!): UpgradePayload!
-  userLogout(input: UserLogoutInput): SuccessPayload!
-  userPhoneDelete: UserPhoneDeletePayload!
-  userPhoneRegistrationInitiate(input: UserPhoneRegistrationInitiateInput!): SuccessPayload!
-  userPhoneRegistrationValidate(input: UserPhoneRegistrationValidateInput!): UserPhoneRegistrationValidatePayload!
-  userTotpDelete: UserTotpDeletePayload!
-  userTotpRegistrationInitiate: UserTotpRegistrationInitiatePayload!
-  userTotpRegistrationValidate(input: UserTotpRegistrationValidateInput!): UserTotpRegistrationValidatePayload!
-  userUpdateLanguage(input: UserUpdateLanguageInput!): UserUpdateLanguagePayload!
-  userUpdateUsername(input: UserUpdateUsernameInput!): UserUpdateUsernamePayload! @deprecated(reason: "Username will be moved to @Handle in Accounts. Also SetUsername naming should be used instead of UpdateUsername to reflect the idempotency of Handles")
+  lnurlPaymentSend(input: LnurlPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  merchantMapSuggest(input: MerchantMapSuggestInput!): MerchantPayload! @join__field(graph: BLINK)
+  onChainAddressCreate(input: OnChainAddressCreateInput!): OnChainAddressPayload! @join__field(graph: BLINK)
+  onChainAddressCurrent(input: OnChainAddressCurrentInput!): OnChainAddressPayload! @join__field(graph: BLINK)
+  onChainPaymentSend(input: OnChainPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  onChainPaymentSendAll(input: OnChainPaymentSendAllInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  onChainUsdPaymentSend(input: OnChainUsdPaymentSendInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  onChainUsdPaymentSendAsBtcDenominated(input: OnChainUsdPaymentSendAsBtcDenominatedInput!): PaymentSendPayload! @join__field(graph: BLINK)
+  quizClaim(input: QuizClaimInput!): QuizClaimPayload! @join__field(graph: BLINK)
+  supportChatMessageAdd(input: SupportChatMessageAddInput!): SupportChatMessageAddPayload! @join__field(graph: BLINK)
+  supportChatReset: SuccessPayload! @join__field(graph: BLINK)
+  userContactUpdateAlias(input: UserContactUpdateAliasInput!): UserContactUpdateAliasPayload! @join__field(graph: BLINK) @deprecated(reason: "will be moved to AccountContact")
+  userEmailDelete: UserEmailDeletePayload! @join__field(graph: BLINK)
+  userEmailRegistrationInitiate(input: UserEmailRegistrationInitiateInput!): UserEmailRegistrationInitiatePayload! @join__field(graph: BLINK)
+  userEmailRegistrationValidate(input: UserEmailRegistrationValidateInput!): UserEmailRegistrationValidatePayload! @join__field(graph: BLINK)
+  userLogin(input: UserLoginInput!): AuthTokenPayload! @join__field(graph: BLINK)
+  userLoginUpgrade(input: UserLoginUpgradeInput!): UpgradePayload! @join__field(graph: BLINK)
+  userLogout(input: UserLogoutInput): SuccessPayload! @join__field(graph: BLINK)
+  userPhoneDelete: UserPhoneDeletePayload! @join__field(graph: BLINK)
+  userPhoneRegistrationInitiate(input: UserPhoneRegistrationInitiateInput!): SuccessPayload! @join__field(graph: BLINK)
+  userPhoneRegistrationValidate(input: UserPhoneRegistrationValidateInput!): UserPhoneRegistrationValidatePayload! @join__field(graph: BLINK)
+  userTotpDelete: UserTotpDeletePayload! @join__field(graph: BLINK)
+  userTotpRegistrationInitiate: UserTotpRegistrationInitiatePayload! @join__field(graph: BLINK)
+  userTotpRegistrationValidate(input: UserTotpRegistrationValidateInput!): UserTotpRegistrationValidatePayload! @join__field(graph: BLINK)
+  userUpdateLanguage(input: UserUpdateLanguageInput!): UserUpdateLanguagePayload! @join__field(graph: BLINK)
+  userUpdateUsername(input: UserUpdateUsernameInput!): UserUpdateUsernamePayload! @join__field(graph: BLINK) @deprecated(reason: "Username will be moved to @Handle in Accounts. Also SetUsername naming should be used instead of UpdateUsername to reflect the idempotency of Handles")
+  onboardingFlowStart(input: OnboardingFlowStartInput!): OnboardingFlowStartResult! @join__field(graph: KYC)
 }
 
 type MyUpdatesPayload
@@ -1778,13 +1806,15 @@ type PublicWallet
 
 type Query
   @join__type(graph: BLINK)
+  @join__type(graph: CIRCLES)
+  @join__type(graph: KYC)
 {
-  accountDefaultWallet(username: Username!, walletCurrency: WalletCurrency): PublicWallet!
+  accountDefaultWallet(username: Username!, walletCurrency: WalletCurrency): PublicWallet! @join__field(graph: BLINK)
 
   """Retrieve the list of scopes permitted for the user's token or API key"""
-  authorization: Authorization!
-  btcPriceList(range: PriceGraphRange!): [PricePoint]
-  businessMapMarkers: [MapMarker!]!
+  authorization: Authorization! @join__field(graph: BLINK)
+  btcPriceList(range: PriceGraphRange!): [PricePoint] @join__field(graph: BLINK)
+  businessMapMarkers: [MapMarker!]! @join__field(graph: BLINK)
 
   """Returns an estimated conversion rate for the given amount and currency"""
   currencyConversionEstimation(
@@ -1793,20 +1823,20 @@ type Query
 
     """Currency of the amount to be converted."""
     currency: DisplayCurrency!
-  ): CurrencyConversionEstimation!
-  currencyList: [Currency!]!
-  globals: Globals
-  lnInvoicePaymentStatus(input: LnInvoicePaymentStatusInput!): LnInvoicePaymentStatusPayload! @deprecated(reason: "Deprecated in favor of lnInvoicePaymentStatusByPaymentRequest")
-  lnInvoicePaymentStatusByHash(input: LnInvoicePaymentStatusByHashInput!): LnInvoicePaymentStatus!
-  lnInvoicePaymentStatusByPaymentRequest(input: LnInvoicePaymentStatusByPaymentRequestInput!): LnInvoicePaymentStatus!
-  me: User
-  mobileVersions: [MobileVersions]
-  onChainTxFee(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainTxFee!
-  onChainUsdTxFee(address: OnChainAddress!, amount: CentAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee!
-  onChainUsdTxFeeAsBtcDenominated(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee!
+  ): CurrencyConversionEstimation! @join__field(graph: BLINK)
+  currencyList: [Currency!]! @join__field(graph: BLINK)
+  globals: Globals @join__field(graph: BLINK)
+  lnInvoicePaymentStatus(input: LnInvoicePaymentStatusInput!): LnInvoicePaymentStatusPayload! @join__field(graph: BLINK) @deprecated(reason: "Deprecated in favor of lnInvoicePaymentStatusByPaymentRequest")
+  lnInvoicePaymentStatusByHash(input: LnInvoicePaymentStatusByHashInput!): LnInvoicePaymentStatus! @join__field(graph: BLINK)
+  lnInvoicePaymentStatusByPaymentRequest(input: LnInvoicePaymentStatusByPaymentRequestInput!): LnInvoicePaymentStatus! @join__field(graph: BLINK)
+  me: User @join__field(graph: BLINK)
+  mobileVersions: [MobileVersions] @join__field(graph: BLINK)
+  onChainTxFee(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainTxFee! @join__field(graph: BLINK)
+  onChainUsdTxFee(address: OnChainAddress!, amount: CentAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
+  onChainUsdTxFeeAsBtcDenominated(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
 
-  """Returns the list of available payout queues for on-chain payouts"""
-  payoutSpeeds: [PayoutSpeeds!]!
+  """Returns the list of available speeds for on-chain payments"""
+  payoutSpeeds: [PayoutSpeeds!]! @join__field(graph: BLINK)
 
   """Returns the list of available speeds for on-chain payments"""
   payoutSpeeds: [PayoutSpeeds!]! @join__field(graph: BLINK)
@@ -1814,9 +1844,10 @@ type Query
   """
   Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit
   """
-  realtimePrice(currency: DisplayCurrency = "USD"): RealtimePrice!
-  userDefaultWalletId(username: Username!): WalletId! @deprecated(reason: "will be migrated to AccountDefaultWalletId")
-  usernameAvailable(username: Username!): Boolean
+  realtimePrice(currency: DisplayCurrency = "USD"): RealtimePrice! @join__field(graph: BLINK)
+  userDefaultWalletId(username: Username!): WalletId! @join__field(graph: BLINK) @deprecated(reason: "will be migrated to AccountDefaultWalletId")
+  usernameAvailable(username: Username!): Boolean @join__field(graph: BLINK)
+  welcomeLeaderboard(input: WelcomeLeaderboardInput!): Leaderboard! @join__field(graph: CIRCLES)
 }
 
 type Quiz
@@ -2597,3 +2628,30 @@ enum WalletCurrency
 """Unique identifier of a wallet"""
 scalar WalletId
   @join__type(graph: BLINK)
+
+input WelcomeLeaderboardInput
+  @join__type(graph: CIRCLES)
+{
+  range: WelcomeRange!
+}
+
+type WelcomeProfile
+  @join__type(graph: CIRCLES)
+{
+  leaderboardName: LeaderboardName
+  innerCircleThisMonthCount: Int!
+  innerCircleAllTimeCount: Int!
+  outerCircleThisMonthCount: Int!
+  outerCircleAllTimeCount: Int!
+  thisMonthPoints: Int!
+  thisMonthRank: Int!
+  allTimePoints: Int!
+  allTimeRank: Int!
+}
+
+enum WelcomeRange
+  @join__type(graph: CIRCLES)
+{
+  ThisMonth @join__enumValue(graph: CIRCLES)
+  AllTime @join__enumValue(graph: CIRCLES)
+}
