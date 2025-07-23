@@ -937,6 +937,7 @@ type LnInvoicePaymentStatus
   @join__type(graph: BLINK)
 {
   paymentHash: PaymentHash
+  paymentPreimage: LnPaymentPreImage
   paymentRequest: LnPaymentRequest
   status: InvoicePaymentStatus
 }
@@ -964,6 +965,7 @@ type LnInvoicePaymentStatusPayload
 {
   errors: [Error!]!
   paymentHash: PaymentHash
+  paymentPreimage: LnPaymentPreImage
   paymentRequest: LnPaymentRequest
   status: InvoicePaymentStatus
 }
@@ -1617,6 +1619,16 @@ enum PayoutSpeed
   @join__type(graph: BLINK)
 {
   FAST @join__enumValue(graph: BLINK)
+  MEDIUM @join__enumValue(graph: BLINK)
+  SLOW @join__enumValue(graph: BLINK)
+}
+
+type PayoutSpeeds
+  @join__type(graph: BLINK)
+{
+  description: String!
+  displayName: String!
+  speed: PayoutSpeed!
 }
 
 """Phone number which includes country code"""
@@ -1765,6 +1777,9 @@ type Query
   onChainUsdTxFee(address: OnChainAddress!, amount: CentAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
   onChainUsdTxFeeAsBtcDenominated(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
 
+  """Returns the list of available speeds for on-chain payments"""
+  payoutSpeeds: [PayoutSpeeds!]! @join__field(graph: BLINK)
+
   """
   Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit
   """
@@ -1788,6 +1803,7 @@ input QuizClaimInput
   @join__type(graph: BLINK)
 {
   id: ID!
+  skipRewards: Boolean = false
 }
 
 type QuizClaimPayload

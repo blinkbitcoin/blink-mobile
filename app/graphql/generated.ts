@@ -804,6 +804,7 @@ export type LnInvoicePaymentInput = {
 export type LnInvoicePaymentStatus = {
   readonly __typename: 'LnInvoicePaymentStatus';
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -824,6 +825,7 @@ export type LnInvoicePaymentStatusPayload = {
   readonly __typename: 'LnInvoicePaymentStatusPayload';
   readonly errors: ReadonlyArray<Error>;
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -1586,10 +1588,19 @@ export const PaymentSendResult = {
 
 export type PaymentSendResult = typeof PaymentSendResult[keyof typeof PaymentSendResult];
 export const PayoutSpeed = {
-  Fast: 'FAST'
+  Fast: 'FAST',
+  Medium: 'MEDIUM',
+  Slow: 'SLOW'
 } as const;
 
 export type PayoutSpeed = typeof PayoutSpeed[keyof typeof PayoutSpeed];
+export type PayoutSpeeds = {
+  readonly __typename: 'PayoutSpeeds';
+  readonly description: Scalars['String']['output'];
+  readonly displayName: Scalars['String']['output'];
+  readonly speed: PayoutSpeed;
+};
+
 export const PhoneCodeChannelType = {
   Sms: 'SMS',
   Telegram: 'TELEGRAM',
@@ -1709,6 +1720,8 @@ export type Query = {
   readonly onChainTxFee: OnChainTxFee;
   readonly onChainUsdTxFee: OnChainUsdTxFee;
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
+  /** Returns the list of available speeds for on-chain payments */
+  readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -1806,6 +1819,7 @@ export type Quiz = {
 
 export type QuizClaimInput = {
   readonly id: Scalars['ID']['input'];
+  readonly skipRewards?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QuizClaimPayload = {
@@ -8260,6 +8274,7 @@ export type ResolversTypes = {
   PaymentSendPayload: ResolverTypeWrapper<PaymentSendPayload>;
   PaymentSendResult: PaymentSendResult;
   PayoutSpeed: PayoutSpeed;
+  PayoutSpeeds: ResolverTypeWrapper<PayoutSpeeds>;
   Phone: ResolverTypeWrapper<Scalars['Phone']['output']>;
   PhoneCodeChannelType: PhoneCodeChannelType;
   Price: ResolverTypeWrapper<Price>;
@@ -8490,6 +8505,7 @@ export type ResolversParentTypes = {
   PageInfo: PageInfo;
   PaymentHash: Scalars['PaymentHash']['output'];
   PaymentSendPayload: PaymentSendPayload;
+  PayoutSpeeds: PayoutSpeeds;
   Phone: Scalars['Phone']['output'];
   Price: Price;
   PriceInput: PriceInput;
@@ -8970,6 +8986,7 @@ export type LnInvoicePayloadResolvers<ContextType = any, ParentType extends Reso
 
 export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatus'] = ResolversParentTypes['LnInvoicePaymentStatus']> = {
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -8978,6 +8995,7 @@ export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extend
 export type LnInvoicePaymentStatusPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatusPayload'] = ResolversParentTypes['LnInvoicePaymentStatusPayload']> = {
   errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -9235,6 +9253,13 @@ export type PaymentSendPayloadResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PayoutSpeedsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PayoutSpeeds'] = ResolversParentTypes['PayoutSpeeds']> = {
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  speed?: Resolver<ResolversTypes['PayoutSpeed'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface PhoneScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Phone'], any> {
   name: 'Phone';
 }
@@ -9320,6 +9345,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainTxFee?: Resolver<ResolversTypes['OnChainTxFee'], ParentType, ContextType, RequireFields<QueryOnChainTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
+  payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
@@ -9784,6 +9810,7 @@ export type Resolvers<ContextType = any> = {
   PageInfo?: PageInfoResolvers<ContextType>;
   PaymentHash?: GraphQLScalarType;
   PaymentSendPayload?: PaymentSendPayloadResolvers<ContextType>;
+  PayoutSpeeds?: PayoutSpeedsResolvers<ContextType>;
   Phone?: GraphQLScalarType;
   Price?: PriceResolvers<ContextType>;
   PriceInterface?: PriceInterfaceResolvers<ContextType>;
