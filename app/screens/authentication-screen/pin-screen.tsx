@@ -1,14 +1,14 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, Text, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Button } from "@rneui/base"
-import { makeStyles } from "@rneui/themed"
+import { Button } from "@rn-vui/base"
+import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"

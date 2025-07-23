@@ -3,7 +3,7 @@ import { View } from "react-native"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { PressableCard } from "@app/components/pressable-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useCirclesCard } from "./use-circles-card"
 

@@ -11,7 +11,7 @@ import { MayChallengeCard } from "@app/components/may-challenge"
 import { useCirclesQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../../components/screen"
 import { InviteFriendsCard } from "./invite-friends-card"

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import nfcManager from "react-native-nfc-manager"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { useApolloClient } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input"
@@ -18,7 +18,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { addDeviceToken, requestNotificationPermission } from "@app/utils/notifications"
 import messaging from "@react-native-firebase/messaging"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"

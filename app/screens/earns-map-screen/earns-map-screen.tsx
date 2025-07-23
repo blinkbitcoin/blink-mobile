@@ -6,7 +6,7 @@ import { SvgProps } from "react-native-svg"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { MountainHeader } from "../../components/mountain-header"
 import { Screen } from "../../components/screen"
@@ -123,7 +123,7 @@ export const EarnMapScreen: React.FC = () => {
       currSection += 1
     } else if (isNaN(progress)) {
       // get progress of the current section
-      progress = cards?.filter((item) => item?.completed).length / cards.length ?? 0
+      progress = cards?.filter((item) => item?.completed).length / cards.length
 
       const notBefore = cards[cards.length - 1]?.notBefore
       canDoNextSection = !notBefore || new Date() > notBefore

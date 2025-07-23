@@ -16,7 +16,7 @@ import {
   toUsdMoneyAmount,
 } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 const Loader = () => {
   const styles = useStyles()

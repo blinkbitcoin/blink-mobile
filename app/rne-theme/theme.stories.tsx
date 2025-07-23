@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 
 import { MockedProvider } from "@apollo/client/testing"
-import { Button, Text, useThemeMode } from "@rneui/themed"
+import { Button, Text, useThemeMode } from "@rn-vui/themed"
 import { Meta } from "@storybook/react-native"
 
 import { StoryScreen } from "../../.storybook/views"

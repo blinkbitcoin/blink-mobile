@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Linking, TouchableWithoutFeedback, View } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { useFragment } from "@apollo/client"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
@@ -26,7 +26,7 @@ import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"

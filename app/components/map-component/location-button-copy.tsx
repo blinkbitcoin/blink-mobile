@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from "react-native"
 import { PermissionStatus, RESULTS } from "react-native-permissions"
 
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
 

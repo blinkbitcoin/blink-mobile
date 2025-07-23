@@ -6,11 +6,11 @@ module.exports = {
     "\\.(ts|tsx)$": [
       "ts-jest",
       {
-        compiler: "ttsc",
         tsconfig: "tsconfig.jest.json",
       },
     ],
     "^.+\\.svg$": "jest-transform-stub",
+    "\\.(ttf|otf|eot|woff|woff2)$": "jest-transform-stub",
   },
   testRegex: "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
@@ -18,6 +18,7 @@ module.exports = {
   moduleNameMapper: {
     "^@app/(.*)$": ["<rootDir>app/$1"],
     "^@mocks/(.*)$": ["<rootDir>__mocks__/$1"],
+    "react-native-haptic-feedback": "<rootDir>/__mocks__/react-native-haptic-feedback.js",
   },
   transformIgnorePatterns: [
     "node_modules/(?!(react-native" +
@@ -26,6 +27,8 @@ module.exports = {
       "|@react-native-firebase/auth" +
       "|@react-native" +
       "|@react-navigation" +
+      "|@react-native-vector-icons/ionicons" +
+      "|react-native-gesture-handler" +
       "|react-native-animatable" +
       "|react-native-secure-key-store" +
       "|react-native-country-picker-modal" +
@@ -45,7 +48,7 @@ module.exports = {
       "|react-native-toast-message" +
       "|react-native-vector-icons" +
       "|react-navigation-tabs" +
-      "|@rneui" +
+      "|@rn-vui" +
       "|rn-qr-generator" +
       "|react-native-image-crop-picker" +
       "|react-native-currency-picker" +

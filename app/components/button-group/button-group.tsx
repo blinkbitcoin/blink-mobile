@@ -1,15 +1,16 @@
 import React from "react"
 import { StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { testProps } from "@app/utils/testProps"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
+type IconName = React.ComponentProps<typeof Icon>["name"]
 type ButtonForButtonGroupProps = {
   id: string
   text: string
   icon:
-    | string
+    | IconName
     | {
         selected: React.ReactElement
         normal: React.ReactElement

@@ -3,7 +3,7 @@ import { Alert, Pressable, View } from "react-native"
 import Modal from "react-native-modal"
 import NfcManager, { Ndef, NdefRecord, NfcTech } from "react-native-nfc-manager"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { LNURL_DOMAINS } from "@app/config"
 import {
@@ -21,8 +21,8 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { WalletAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { logParseDestinationResult } from "@app/utils/analytics"
-import { isIOS } from "@rneui/base"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { isIOS } from "@rn-vui/base"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
 

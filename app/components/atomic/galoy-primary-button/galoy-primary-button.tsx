@@ -1,8 +1,14 @@
 import React, { FC, PropsWithChildren } from "react"
-import { TouchableHighlight } from "react-native"
+import { TouchableHighlight, TouchableHighlightProps } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { Button, ButtonProps, makeStyles } from "@rneui/themed"
+import { Button, ButtonProps, makeStyles } from "@rn-vui/themed"
+
+class TouchableHighlightWrapper extends React.Component<TouchableHighlightProps> {
+  render() {
+    return <TouchableHighlight {...this.props} />
+  }
+}
 
 export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()
@@ -11,7 +17,7 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
     <Button
       {...(typeof props.title === "string" ? testProps(props.title) : {})}
       activeOpacity={0.85}
-      TouchableComponent={TouchableHighlight}
+      TouchableComponent={TouchableHighlightWrapper}
       buttonStyle={styles.buttonStyle}
       titleStyle={styles.titleStyle}
       disabledStyle={styles.disabledStyle}

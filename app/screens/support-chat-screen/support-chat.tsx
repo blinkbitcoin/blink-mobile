@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"
@@ -23,7 +23,7 @@ import {
 } from "@app/graphql/generated"
 import { useActionSheet } from "@expo/react-native-action-sheet"
 import Clipboard from "@react-native-clipboard/clipboard"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import Markdown from "@ronradtke/react-native-markdown-display"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useNavigation } from "@react-navigation/native"

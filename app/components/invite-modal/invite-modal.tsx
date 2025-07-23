@@ -9,7 +9,7 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "@react-native-vector-icons/ionicons"
 
 import { gql } from "@apollo/client"
 import Logo from "@app/assets/logo/blink-logo-icon.png"
@@ -22,7 +22,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { GaloyToast } from "../galoy-toast"
