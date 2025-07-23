@@ -804,6 +804,7 @@ export type LnInvoicePaymentInput = {
 export type LnInvoicePaymentStatus = {
   readonly __typename: 'LnInvoicePaymentStatus';
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -824,6 +825,7 @@ export type LnInvoicePaymentStatusPayload = {
   readonly __typename: 'LnInvoicePaymentStatusPayload';
   readonly errors: ReadonlyArray<Error>;
   readonly paymentHash?: Maybe<Scalars['PaymentHash']['output']>;
+  readonly paymentPreimage?: Maybe<Scalars['LnPaymentPreImage']['output']>;
   readonly paymentRequest?: Maybe<Scalars['LnPaymentRequest']['output']>;
   readonly status?: Maybe<InvoicePaymentStatus>;
 };
@@ -1586,10 +1588,19 @@ export const PaymentSendResult = {
 
 export type PaymentSendResult = typeof PaymentSendResult[keyof typeof PaymentSendResult];
 export const PayoutSpeed = {
-  Fast: 'FAST'
+  Fast: 'FAST',
+  Medium: 'MEDIUM',
+  Slow: 'SLOW'
 } as const;
 
 export type PayoutSpeed = typeof PayoutSpeed[keyof typeof PayoutSpeed];
+export type PayoutSpeeds = {
+  readonly __typename: 'PayoutSpeeds';
+  readonly description: Scalars['String']['output'];
+  readonly displayName: Scalars['String']['output'];
+  readonly speed: PayoutSpeed;
+};
+
 export const PhoneCodeChannelType = {
   Sms: 'SMS',
   Telegram: 'TELEGRAM',
@@ -1709,6 +1720,8 @@ export type Query = {
   readonly onChainTxFee: OnChainTxFee;
   readonly onChainUsdTxFee: OnChainUsdTxFee;
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
+  /** Returns the list of available speeds for on-chain payments */
+  readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -1806,6 +1819,7 @@ export type Quiz = {
 
 export type QuizClaimInput = {
   readonly id: Scalars['ID']['input'];
+  readonly skipRewards?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QuizClaimPayload = {
@@ -2872,6 +2886,11 @@ export type SendBitcoinInternalLimitsQueryVariables = Exact<{ [key: string]: nev
 
 export type SendBitcoinInternalLimitsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly limits: { readonly __typename: 'AccountLimits', readonly internalSend: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }> } } } | null };
 
+export type PayoutSpeedsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PayoutSpeedsQuery = { readonly __typename: 'Query', readonly payoutSpeeds: ReadonlyArray<{ readonly __typename: 'PayoutSpeeds', readonly speed: PayoutSpeed, readonly displayName: string, readonly description: string }> };
+
 export type FeedbackSubmitMutationVariables = Exact<{
   input: FeedbackSubmitInput;
 }>;
@@ -2911,6 +2930,7 @@ export type OnChainTxFeeQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['SatAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -2920,6 +2940,7 @@ export type OnChainUsdTxFeeQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['CentAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -2929,6 +2950,7 @@ export type OnChainUsdTxFeeAsBtcDenominatedQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['SatAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -6159,6 +6181,47 @@ export type SendBitcoinInternalLimitsQueryHookResult = ReturnType<typeof useSend
 export type SendBitcoinInternalLimitsLazyQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsLazyQuery>;
 export type SendBitcoinInternalLimitsSuspenseQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsSuspenseQuery>;
 export type SendBitcoinInternalLimitsQueryResult = Apollo.QueryResult<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>;
+export const PayoutSpeedsDocument = gql`
+    query payoutSpeeds {
+  payoutSpeeds {
+    speed
+    displayName
+    description
+  }
+}
+    `;
+
+/**
+ * __usePayoutSpeedsQuery__
+ *
+ * To run a query within a React component, call `usePayoutSpeedsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePayoutSpeedsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePayoutSpeedsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePayoutSpeedsQuery(baseOptions?: Apollo.QueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+      }
+export function usePayoutSpeedsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export function usePayoutSpeedsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export type PayoutSpeedsQueryHookResult = ReturnType<typeof usePayoutSpeedsQuery>;
+export type PayoutSpeedsLazyQueryHookResult = ReturnType<typeof usePayoutSpeedsLazyQuery>;
+export type PayoutSpeedsSuspenseQueryHookResult = ReturnType<typeof usePayoutSpeedsSuspenseQuery>;
+export type PayoutSpeedsQueryResult = Apollo.QueryResult<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>;
 export const FeedbackSubmitDocument = gql`
     mutation feedbackSubmit($input: FeedbackSubmitInput!) {
   feedbackSubmit(input: $input) {
@@ -6342,8 +6405,13 @@ export type LnNoAmountUsdInvoiceFeeProbeMutationHookResult = ReturnType<typeof u
 export type LnNoAmountUsdInvoiceFeeProbeMutationResult = Apollo.MutationResult<LnNoAmountUsdInvoiceFeeProbeMutation>;
 export type LnNoAmountUsdInvoiceFeeProbeMutationOptions = Apollo.BaseMutationOptions<LnNoAmountUsdInvoiceFeeProbeMutation, LnNoAmountUsdInvoiceFeeProbeMutationVariables>;
 export const OnChainTxFeeDocument = gql`
-    query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
-  onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
+  onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
   }
 }
@@ -6364,6 +6432,7 @@ export const OnChainTxFeeDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */
@@ -6384,8 +6453,13 @@ export type OnChainTxFeeLazyQueryHookResult = ReturnType<typeof useOnChainTxFeeL
 export type OnChainTxFeeSuspenseQueryHookResult = ReturnType<typeof useOnChainTxFeeSuspenseQuery>;
 export type OnChainTxFeeQueryResult = Apollo.QueryResult<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>;
 export const OnChainUsdTxFeeDocument = gql`
-    query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!) {
-  onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $speed: PayoutSpeed!) {
+  onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
   }
 }
@@ -6406,6 +6480,7 @@ export const OnChainUsdTxFeeDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */
@@ -6426,11 +6501,12 @@ export type OnChainUsdTxFeeLazyQueryHookResult = ReturnType<typeof useOnChainUsd
 export type OnChainUsdTxFeeSuspenseQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeSuspenseQuery>;
 export type OnChainUsdTxFeeQueryResult = Apollo.QueryResult<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>;
 export const OnChainUsdTxFeeAsBtcDenominatedDocument = gql`
-    query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+    query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
   onChainUsdTxFeeAsBtcDenominated(
     walletId: $walletId
     address: $address
     amount: $amount
+    speed: $speed
   ) {
     amount
   }
@@ -6452,6 +6528,7 @@ export const OnChainUsdTxFeeAsBtcDenominatedDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */
@@ -8260,6 +8337,7 @@ export type ResolversTypes = {
   PaymentSendPayload: ResolverTypeWrapper<PaymentSendPayload>;
   PaymentSendResult: PaymentSendResult;
   PayoutSpeed: PayoutSpeed;
+  PayoutSpeeds: ResolverTypeWrapper<PayoutSpeeds>;
   Phone: ResolverTypeWrapper<Scalars['Phone']['output']>;
   PhoneCodeChannelType: PhoneCodeChannelType;
   Price: ResolverTypeWrapper<Price>;
@@ -8490,6 +8568,7 @@ export type ResolversParentTypes = {
   PageInfo: PageInfo;
   PaymentHash: Scalars['PaymentHash']['output'];
   PaymentSendPayload: PaymentSendPayload;
+  PayoutSpeeds: PayoutSpeeds;
   Phone: Scalars['Phone']['output'];
   Price: Price;
   PriceInput: PriceInput;
@@ -8970,6 +9049,7 @@ export type LnInvoicePayloadResolvers<ContextType = any, ParentType extends Reso
 
 export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatus'] = ResolversParentTypes['LnInvoicePaymentStatus']> = {
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -8978,6 +9058,7 @@ export type LnInvoicePaymentStatusResolvers<ContextType = any, ParentType extend
 export type LnInvoicePaymentStatusPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['LnInvoicePaymentStatusPayload'] = ResolversParentTypes['LnInvoicePaymentStatusPayload']> = {
   errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
   paymentHash?: Resolver<Maybe<ResolversTypes['PaymentHash']>, ParentType, ContextType>;
+  paymentPreimage?: Resolver<Maybe<ResolversTypes['LnPaymentPreImage']>, ParentType, ContextType>;
   paymentRequest?: Resolver<Maybe<ResolversTypes['LnPaymentRequest']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoicePaymentStatus']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -9235,6 +9316,13 @@ export type PaymentSendPayloadResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PayoutSpeedsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PayoutSpeeds'] = ResolversParentTypes['PayoutSpeeds']> = {
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  speed?: Resolver<ResolversTypes['PayoutSpeed'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface PhoneScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Phone'], any> {
   name: 'Phone';
 }
@@ -9320,6 +9408,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainTxFee?: Resolver<ResolversTypes['OnChainTxFee'], ParentType, ContextType, RequireFields<QueryOnChainTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
+  payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
@@ -9784,6 +9873,7 @@ export type Resolvers<ContextType = any> = {
   PageInfo?: PageInfoResolvers<ContextType>;
   PaymentHash?: GraphQLScalarType;
   PaymentSendPayload?: PaymentSendPayloadResolvers<ContextType>;
+  PayoutSpeeds?: PayoutSpeedsResolvers<ContextType>;
   Phone?: GraphQLScalarType;
   Price?: PriceResolvers<ContextType>;
   PriceInterface?: PriceInterfaceResolvers<ContextType>;
