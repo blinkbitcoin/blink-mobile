@@ -11,7 +11,7 @@ pipeline_git_branch: main
 git_build_number_branch: build-numbers
 
 github_private_key: ((github-blinkbitcoin.private_key))
-github_api_token: ((github.api_token))
+github_api_token: ((github-blinkbitcoin.api_token))
 
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
