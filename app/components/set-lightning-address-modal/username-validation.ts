@@ -6,6 +6,8 @@ export const SetUsernameError = {
   UNKNOWN_ERROR: "UNKNOWN_ERROR",
 } as const
 
+const UsernameRegex = /^(?![13_]|bc1|lnbc1)(?=.*[a-z])[0-9a-z_]{3,50}$/i
+
 export type SetUsernameError = (typeof SetUsernameError)[keyof typeof SetUsernameError]
 
 type ValidateUsernameResult = { valid: true } | { valid: false; error: SetUsernameError }
@@ -25,7 +27,7 @@ export const validateUsername = (username: string): ValidateUsernameResult => {
     }
   }
 
-  if (!/^[A-Za-z0-9_]+$/.test(username)) {
+  if (!UsernameRegex.test(username)) {
     return {
       valid: false,
       error: SetUsernameError.INVALID_CHARACTER,

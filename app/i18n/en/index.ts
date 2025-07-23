@@ -2624,12 +2624,12 @@ const en: BaseTranslation = {
       title: "New features unlocked for your account:",
     },
     supportScreen: {
-      mainTitle: "Blink Feedback",
+      mainTitle: "Blink feedback",
       title: "One more thing:",
       description: "We are on a mission to make bitcoin accessible to all, and we would love to hear from you.",
       contactInfo: "Don't hesitate to contact us at {email} and share how we can make Blink better for you and others.",
       primaryButton: "Done",
-      secondaryButton: "Give Feedback Now",
+      secondaryButton: "Give feedback now",
     }
   },
   PhoneLoginValidationScreen: {
@@ -2657,7 +2657,7 @@ const en: BaseTranslation = {
     errorFetchLogin: "Failed to fetch Telegram login",
     errorAuthTimeout: "Authorization timed out. Please try again.",
     errorOpenAppError: "Failed to open Telegram. Please make sure the app is installed.",
-  },  
+  },
   PhoneRegistrationInitiateScreen: {
     title: "Phone set up",
     header: "Enter your phone number, and we'll text you an access code.",
