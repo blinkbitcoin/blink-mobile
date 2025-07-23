@@ -11,7 +11,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { testProps } from "../../utils/testProps"

@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, useTheme, Text, Divider } from "@rneui/themed"
+import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
 export const SettingsGroup: React.FC<{
   name?: string

@@ -2,7 +2,7 @@ import React, { FC, PropsWithChildren } from "react"
 import { TouchableHighlight, TouchableHighlightProps } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { Button, ButtonProps, makeStyles } from "@rneui/themed"
+import { Button, ButtonProps, makeStyles } from "@rn-vui/themed"
 
 class TouchableHighlightWrapper extends React.Component<TouchableHighlightProps> {
   render() {

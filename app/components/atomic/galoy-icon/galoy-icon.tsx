@@ -53,7 +53,7 @@ import Note from "@app/assets/icons/note.svg"
 import People from "@app/assets/icons/people.svg"
 import Rank from "@app/assets/icons/rank.svg"
 import Refresh from "@app/assets/icons/refresh.svg"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
   "arrow-right": ArrowRight,

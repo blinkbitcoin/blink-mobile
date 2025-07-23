@@ -14,8 +14,8 @@ import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { SearchBar } from "@rneui/base"
-import { ListItem, makeStyles, useTheme } from "@rneui/themed"
+import { SearchBar } from "@rn-vui/base"
+import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 
 gql`
   query contacts {

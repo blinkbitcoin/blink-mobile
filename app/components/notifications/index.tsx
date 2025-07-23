@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext, useCallback, useMemo } from "react"
 
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import CustomModal from "../custom-modal/custom-modal"

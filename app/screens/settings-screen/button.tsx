@@ -1,6 +1,6 @@
 import React from "react"
 import { testProps } from "@app/utils/testProps"
-import { Button, Skeleton, makeStyles } from "@rneui/themed"
+import { Button, Skeleton, makeStyles } from "@rn-vui/themed"
 
 type Props = {
   title: string

@@ -18,7 +18,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { addDeviceToken, requestNotificationPermission } from "@app/utils/notifications"
 import messaging from "@react-native-firebase/messaging"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"

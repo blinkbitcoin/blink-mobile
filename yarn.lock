@@ -4625,22 +4625,27 @@
   resolved "https://registry.yarnpkg.com/@repeaterjs/repeater/-/repeater-3.0.6.tgz#be23df0143ceec3c69f8b6c2517971a5578fdaa2"
   integrity sha512-Javneu5lsuhwNCryN+pXH93VPQ8g0dBX7wItHFgYiwQmzE1sVdg5tWHiOgHywzL2W21XQopa7IwIEnNbmeUJYA==
 
-"@rneui/base@^4.0.0-rc.8":
-  version "4.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@rneui/base/-/base-4.0.0-rc.8.tgz#6fbf9b3049a9207d47c3c53b70c0f68f3627a170"
-  integrity sha512-teJ6bUki+TQ+r+abefEWYb2wRUaMgRhp1oxtKa84UfDqTiCF0ItyJ0L8FhMb6AAkTOkWC34301T7j3H4df6ueA==
+"@rn-vui/base@^5.1.8":
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/@rn-vui/base/-/base-5.1.8.tgz#813e638764a6804eaae1a1ba6dc9613b058b3fd7"
+  integrity sha512-wuTrd6hYzDleSutjgD5aCkIlR6PvxH7jNNvF8CickGub4vLqAXGd3ZsFvXHgq+oY/ysllmHqAC7h1Qw7/JW+GA==
   dependencies:
+    "@rn-vui/ratings" "^0.5.0"
     "@types/react-native-vector-icons" "^6.4.10"
     color "^3.2.1"
     deepmerge "^4.2.2"
     hoist-non-react-statics "^3.3.2"
-    react-native-ratings "^8.1.0"
     react-native-size-matters "^0.4.0"
 
-"@rneui/themed@^4.0.0-rc.8":
-  version "4.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@rneui/themed/-/themed-4.0.0-rc.8.tgz#5c0e1aaa3d190ead88936693c5cef50ec404cd05"
-  integrity sha512-8L/XOrL9OK/r+/iBLvx63TbIdZOXF8SIjN9eArMYm6kRbMr8m4BitXllDN8nBhBsSPNYvL6EAgjk+i2MfY4sBA==
+"@rn-vui/ratings@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@rn-vui/ratings/-/ratings-0.5.0.tgz#6fe805f5d38cc9b897ce738447403936e5dfb6b0"
+  integrity sha512-hEZyIQLjQbtUYj8MZ6a0+88kJCFlOwLSGFJc56R/z8PR3RCmRWyU8ml6i1xoh+9WJz0ZbZ/wBckQ1lI8T/cmGQ==
+
+"@rn-vui/themed@^5.1.8":
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/@rn-vui/themed/-/themed-5.1.8.tgz#f1555beb5cb9099aab8dd26cef8508fa06f3c7d8"
+  integrity sha512-nnGKLi8tvaQAOziPlWd+Dj6QdI1UJdCCYhHq6f/Lpfa6P0TaP7gx5iFy6zEq6loKdzcSBLVPpPAmv8FtvT+ktA==
 
 "@rnx-kit/align-deps@^3.0.8":
   version "3.0.8"
@@ -20469,13 +20474,6 @@ react-native-randombytes@^3.5.1:
   dependencies:
     buffer "^4.9.1"
     sjcl "^1.0.3"
-
-react-native-ratings@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-ratings/-/react-native-ratings-8.1.0.tgz#3fa9ad29128dc3a88e59518ba151e61c59dd0647"
-  integrity sha512-+QOJ4G3NjVkI1D+tk4EGx1dCvVfbD2nQdkrj9cXrcAoEiwmbep4z4bZbCKmWMpQ5h2dqbxABU8/eBnbDmvAc3g==
-  dependencies:
-    lodash "^4.17.15"
 
 react-native-reanimated-carousel@^3.5.1:
   version "3.5.1"

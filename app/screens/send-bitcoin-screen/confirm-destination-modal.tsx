@@ -5,7 +5,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { CheckBox, Text, makeStyles, useTheme } from "@rneui/themed"
+import { CheckBox, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
 import {

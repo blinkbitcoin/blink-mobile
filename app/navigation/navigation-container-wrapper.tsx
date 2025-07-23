@@ -11,7 +11,7 @@ import {
   PartialState,
   DarkTheme,
 } from "@react-navigation/native"
-import { useTheme } from "@rneui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { useIsAuthed } from "../graphql/is-authed-context"
 import { RootStackParamList } from "./stack-param-lists"

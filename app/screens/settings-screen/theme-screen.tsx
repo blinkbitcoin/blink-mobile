@@ -7,7 +7,7 @@ import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
 import { updateColorScheme } from "@app/graphql/client-only-query"
 import { useColorSchemeQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 

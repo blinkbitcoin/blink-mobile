@@ -16,7 +16,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 

@@ -6,7 +6,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { UpgradeAccountModal } from "@app/components/upgrade-account-modal"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useShowWarningSecureAccount } from "../show-warning-secure-account-hook"
 
