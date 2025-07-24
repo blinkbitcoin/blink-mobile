@@ -8,6 +8,7 @@ import ScanIcon from "@app/assets/icons/scan.svg"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { LNURL_DOMAINS } from "@app/config"
+import { useAppConfig } from "@app/hooks"
 import {
   UserContact,
   useAccountDefaultWalletLazyQuery,
@@ -161,6 +162,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       }),
     [contacts],
   )
+
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
   const [selectedId, setSelectedId] = useState("")
 
@@ -540,7 +547,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             >
               <Icon name={"person-outline"} size={24} color={colors.primary} />
               <ListItem.Content>
-                <ListItem.Title style={styles.itemText}>{item.username}</ListItem.Title>
+                <ListItem.Title
+                  style={styles.itemText}
+                >{`${item.username}@${lnAddressHostname}`}</ListItem.Title>
               </ListItem.Content>
             </ListItem>
           )}
