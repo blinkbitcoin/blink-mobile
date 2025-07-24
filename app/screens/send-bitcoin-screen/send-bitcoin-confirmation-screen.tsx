@@ -40,6 +40,7 @@ import { makeStyles, Text, useTheme } from "@rneui/themed"
 import { testProps } from "../../utils/testProps"
 import useFee from "./use-fee"
 import { useSendPayment } from "./use-send-payment"
+import { ellipsizeMiddle } from "@app/utils/helper"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -110,6 +111,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { LL } = useI18nContext()
 
   const fee = useFee(getFee)
+  let formatAmount = ""
 
   const {
     loading: sendPaymentLoading,
@@ -138,7 +140,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         paymentType: paymentDetail.paymentType,
         sendingWallet: sendingWalletDescriptor.currency,
       })
-      const { status, errorsMessage, extraInfo } = await sendPayment()
+      const { status, errorsMessage, extraInfo, transaction } = await sendPayment()
+
       logPaymentResult({
         paymentType: paymentDetail.paymentType,
         paymentStatus: status,
@@ -156,6 +159,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 status,
                 successAction: paymentDetail?.successAction,
                 preimage: extraInfo?.preimage,
+                formatAmount,
+                feeDisplayText,
+                destination:
+                  paymentDetail?.paymentType === "intraledger"
+                    ? destination
+                    : ellipsizeMiddle(destination, {
+                        maxLength: 50,
+                        maxResultLeft: 10,
+                        maxResultRight: 6,
+                      }),
+                paymentType: paymentDetail?.paymentType,
+                createdAt: transaction?.createdAt,
               },
             },
           ]
@@ -206,6 +221,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     sendPayment,
     setPaymentError,
     sendingWalletDescriptor?.currency,
+    formatAmount,
+    feeDisplayText,
+    destination,
   ])
 
   let validAmount = true
@@ -260,6 +278,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const errorMessage = paymentError || invalidAmountErrorMessage
 
   const displayAmount = convertMoneyAmount(settlementAmount, DisplayCurrency)
+  formatAmount = formatDisplayAndWalletAmount({
+    displayAmount,
+    walletAmount: settlementAmount,
+  })
 
   const transactionType = () => {
     if (paymentType === "intraledger") return LL.common.intraledger()
