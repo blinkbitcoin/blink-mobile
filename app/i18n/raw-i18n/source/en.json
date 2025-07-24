@@ -2246,7 +2246,9 @@
         "copySecretMessage": "Copy secret message to clipboard",
         "copiedSuccessMessage": "Message copied successfully",
         "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
+        "feeSettings": "Fee settings",
+        "selectFee": "Select fee"
     },
     "SettingsScreen": {
         "staticQr": "Printable Static QR Code",
