@@ -2619,10 +2619,6 @@ const en: BaseTranslation = {
       blinkToolsDescription: "Unlocks various Blink tools useful for commerce",
       primaryButton: "Set up Lightning Address",
     },
-    lightningConfirmed: {
-      mainTitle: "Lightning Address set",
-      title: "New features unlocked for your account:",
-    },
     supportScreen: {
       mainTitle: "Blink feedback",
       title: "One more thing:",

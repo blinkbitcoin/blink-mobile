@@ -1,7 +1,6 @@
 import React, { useEffect } from "react"
 import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import { Text, makeStyles, useTheme, Icon } from "@rneui/themed"
-
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 export type Option = {
@@ -17,6 +16,7 @@ export type OptionSelectorProps = {
   selected?: string
   onSelect: (value: string) => void
   style?: StyleProp<ViewStyle>
+  loading?: boolean
 }
 
 export const OptionSelector: React.FC<OptionSelectorProps> = ({
@@ -24,6 +24,7 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
   selected,
   onSelect,
   style,
+  loading = false,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -32,13 +33,19 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
   } = useTheme()
 
   useEffect(() => {
-    if (!selected) {
-      const recommended = options.find((o) => o.active !== false && o.recommended)
+    if (!selected && !loading) {
+      const activeOptions = options.filter((o) => o.active !== false)
+      const recommended = activeOptions.find((o) => o.recommended)
       if (recommended) {
         onSelect(recommended.value)
+        return
+      }
+
+      if (activeOptions.length > 0) {
+        onSelect(activeOptions[0].value)
       }
     }
-  }, [selected, options, onSelect])
+  }, [selected, options, onSelect, loading])
 
   return (
     <View style={[styles.fieldContainer, style]}>

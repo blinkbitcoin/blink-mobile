@@ -5,6 +5,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rneui/themed"
 import { gql } from "@apollo/client"
 
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { Screen } from "@app/components/screen"
@@ -95,6 +96,12 @@ export const SetLightningAddressScreen: React.FC<{
     setError(undefined)
   }
 
+  const onboardingNavigate = () => {
+    navigation.replace("onboarding", {
+      screen: "supportScreen",
+    })
+  }
+
   const onSetLightningAddress = async () => {
     const validationResult = validateUsername(username)
     if (!validationResult.valid) {
@@ -117,10 +124,7 @@ export const SetLightningAddressScreen: React.FC<{
     }
 
     if (onboarding) {
-      navigation.replace("onboarding", {
-        screen: "lightningConfirmed",
-        params: { onboarding },
-      })
+      onboardingNavigate()
       return
     }
 
@@ -178,6 +182,12 @@ export const SetLightningAddressScreen: React.FC<{
           onPress={onSetLightningAddress}
           containerStyle={styles.buttonContainer}
         />
+        {onboarding && (
+          <GaloySecondaryButton
+            title={LL.UpgradeAccountModal.notNow()}
+            onPress={onboardingNavigate}
+          />
+        )}
       </View>
     </Screen>
   )

@@ -7,7 +7,6 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
 
 import { OnboardingLayout } from "./onboarding-layout"
 
@@ -18,10 +17,8 @@ type EmailBenefitsScreenProps = {
 export const EmailBenefitsScreen: React.FC<EmailBenefitsScreenProps> = ({ route }) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { data, loading } = useSettingsScreenQuery()
 
-  const { onboarding } = route.params
-  const hasUsername = Boolean(data?.me?.username)
+  const { onboarding, hasUsername = false } = route.params
 
   const handlePrimaryAction = () => {
     navigation.navigate("emailRegistrationInitiate", {
@@ -53,10 +50,8 @@ export const EmailBenefitsScreen: React.FC<EmailBenefitsScreenProps> = ({ route 
       ]}
       primaryLabel={LL.OnboardingScreen.emailBenefits.primaryButton()}
       onPrimaryAction={handlePrimaryAction}
-      primaryLoading={loading}
       secondaryLabel={LL.UpgradeAccountModal.notNow()}
       onSecondaryAction={handleSecondaryAction}
-      secondaryLoading={loading}
       iconName="email-question"
     />
   )

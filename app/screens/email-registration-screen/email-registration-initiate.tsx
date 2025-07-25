@@ -13,6 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { Screen } from "@app/components/screen"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useUserEmailRegistrationInitiateMutation } from "@app/graphql/generated"
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -82,10 +83,9 @@ export const EmailRegistrationInitiateScreen: React.FC<
   const [emailInput, setEmailInput] = React.useState<string>("")
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [loading, setLoading] = React.useState<boolean>(false)
-  const { onboarding = false } = route.params ?? {}
+  const { onboarding = false, hasUsername = false } = route.params ?? {}
 
   const { LL } = useI18nContext()
-
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
 
   const submit = async () => {
@@ -129,6 +129,20 @@ export const EmailRegistrationInitiateScreen: React.FC<
     }
   }
 
+  const onboardingNavigate = () => {
+    if (hasUsername) {
+      navigation.navigate("onboarding", {
+        screen: "supportScreen",
+      })
+      return
+    }
+
+    navigation.navigate("onboarding", {
+      screen: "lightningBenefits",
+      params: { onboarding },
+    })
+  }
+
   return (
     <Screen
       preset="scroll"
@@ -168,6 +182,12 @@ export const EmailRegistrationInitiateScreen: React.FC<
             disabled={!emailInput}
             onPress={submit}
           />
+          {onboarding && (
+            <GaloySecondaryButton
+              title={LL.UpgradeAccountModal.notNow()}
+              onPress={onboardingNavigate}
+            />
+          )}
         </View>
       </View>
     </Screen>

@@ -8182,16 +8182,6 @@ type RootTranslation = {
 			 */
 			primaryButton: string
 		}
-		lightningConfirmed: {
-			/**
-			 * L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s​ ​s​e​t
-			 */
-			mainTitle: string
-			/**
-			 * N​e​w​ ​f​e​a​t​u​r​e​s​ ​u​n​l​o​c​k​e​d​ ​f​o​r​ ​y​o​u​r​ ​a​c​c​o​u​n​t​:
-			 */
-			title: string
-		}
 		supportScreen: {
 			/**
 			 * B​l​i​n​k​ ​f​e​e​d​b​a​c​k
@@ -17482,16 +17472,6 @@ export type TranslationFunctions = {
 			 * Set up Lightning Address
 			 */
 			primaryButton: () => LocalizedString
-		}
-		lightningConfirmed: {
-			/**
-			 * Lightning Address set
-			 */
-			mainTitle: () => LocalizedString
-			/**
-			 * New features unlocked for your account:
-			 */
-			title: () => LocalizedString
 		}
 		supportScreen: {
 			/**

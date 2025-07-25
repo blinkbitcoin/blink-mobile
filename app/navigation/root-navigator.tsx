@@ -84,7 +84,6 @@ import {
   EmailBenefitsScreen,
   EmailConfirmedScreen,
   LightningBenefitsScreen,
-  LightningConfirmedScreen,
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
@@ -523,14 +522,6 @@ export const OnboardingNavigator = () => {
         component={LightningBenefitsScreen}
         options={{
           title: LL.OnboardingScreen.lightningBenefits.mainTitle(),
-        }}
-      />
-      <Onboarding.Screen
-        name="lightningConfirmed"
-        component={LightningConfirmedScreen}
-        options={{
-          title: LL.OnboardingScreen.lightningConfirmed.mainTitle(),
-          headerLeft: () => null,
         }}
       />
       <Onboarding.Screen

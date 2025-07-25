@@ -10,6 +10,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { OptionSelector, Option } from "@app/components/option-selector"
 import AppLogoLightMode from "@app/assets/logo/app-logo-light.svg"
 import AppLogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
+import BlinkLogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import { PhoneCodeChannelType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Screen } from "@app/components/screen"
@@ -35,12 +36,17 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
   } = useTheme()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { isTelegramSupported, isSmsSupported, isWhatsAppSupported } =
-    useRequestPhoneCodeLogin()
+  const {
+    isTelegramSupported,
+    isSmsSupported,
+    isWhatsAppSupported,
+    loadingSupportedCountries,
+  } = useRequestPhoneCodeLogin()
 
   const [selected, setSelected] = useState<LoginChannels | undefined>()
 
   const AppLogo = mode === "dark" ? AppLogoDarkMode : AppLogoLightMode
+  const OnboardAppLogo = mode === "dark" ? AppLogoDarkMode : BlinkLogoLightMode
   const { type, onboarding } = route.params
 
   const loginChanneltitles: Record<LoginChannels, string> = {
@@ -105,20 +111,36 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
         label: LL.support.email(),
         value: LoginChannels.Email,
         icon: "mail-outline",
-        active: type === PhoneLoginInitiateType.Login,
+        active: type === PhoneLoginInitiateType.Login || onboarding,
       },
     ],
-    [LL.support, isTelegramSupported, isSmsSupported, isWhatsAppSupported, type],
+    [
+      LL.support,
+      isTelegramSupported,
+      isSmsSupported,
+      isWhatsAppSupported,
+      type,
+      onboarding,
+    ],
   )
 
   return (
     <Screen>
       <View style={styles.header}>
-        <AppLogo style={styles.logo} />
+        {onboarding ? (
+          <OnboardAppLogo style={styles.logo} />
+        ) : (
+          <AppLogo style={styles.logo} />
+        )}
         <Text type="h1" style={styles.title}>
           {LL.LoginMethodScreen.title()}
         </Text>
-        <OptionSelector selected={selected} onSelect={handleSelect} options={options} />
+        <OptionSelector
+          selected={selected}
+          onSelect={handleSelect}
+          options={options}
+          loading={loadingSupportedCountries}
+        />
       </View>
 
       <View style={styles.bottom}>

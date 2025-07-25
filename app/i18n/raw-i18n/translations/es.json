@@ -2526,10 +2526,6 @@
             "blinkToolsDescription": "Desbloquea varias herramientas de Blink útiles para el comercio",
             "primaryButton": "Configurar dirección Lightning"
         },
-        "lightningConfirmed": {
-          "mainTitle": "Dirección Lightning configurada",
-          "title": "Nuevas funciones desbloqueadas para tu cuenta:"
-        },
         "supportScreen": {
           "mainTitle": "Comentarios sobre Blink",
           "title": "Una cosa más:",

@@ -7,7 +7,6 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
 
 import { OnboardingLayout } from "./onboarding-layout"
 
@@ -18,11 +17,8 @@ type EmailConfirmedScreenProps = {
 export const EmailConfirmedScreen: React.FC<EmailConfirmedScreenProps> = ({ route }) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { data, loading } = useSettingsScreenQuery()
 
-  const { onboarding } = route.params
-  const hasUsername = Boolean(data?.me?.username)
-
+  const { onboarding, hasUsername = false } = route.params
   const handlePrimaryAction = () => {
     if (hasUsername) {
       navigation.navigate("onboarding", {
@@ -47,7 +43,6 @@ export const EmailConfirmedScreen: React.FC<EmailConfirmedScreenProps> = ({ rout
       ]}
       primaryLabel={LL.common.next()}
       onPrimaryAction={handlePrimaryAction}
-      primaryLoading={loading}
       iconName="email-check"
     />
   )
