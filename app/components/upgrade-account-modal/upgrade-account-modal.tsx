@@ -25,11 +25,8 @@ export const UpgradeAccountModal: React.FC<UpgradeAccountModalProps> = ({
     useNavigation<StackNavigationProp<RootStackParamList, "getStarted">>()
 
   const navigateToPhoneLogin = () => {
-    navigation.navigate("phoneFlow", {
-      screen: "phoneLoginInitiate",
-      params: {
-        type: PhoneLoginInitiateType.CreateAccount,
-      },
+    navigation.navigate("login", {
+      type: PhoneLoginInitiateType.CreateAccount,
     })
     closeModal()
   }

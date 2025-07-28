@@ -36,6 +36,7 @@ export type CustomModalProps = {
   minHeight?: DimensionValue
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
+  titleFontSize?: number
   backgroundModalColor?: string
 }
 
@@ -60,6 +61,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonOnPress,
   secondaryButtonLoading,
   showCloseIconButton = true,
+  titleFontSize,
   backgroundModalColor,
 }) => {
   const styles = useStyles({
@@ -68,6 +70,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
     titleMaxWidth,
     titleTextAlignment,
     showCloseIconButton,
+    titleFontSize,
     backgroundModalColor,
     /* eslint @typescript-eslint/ban-ts-comment: "off" */
     // @ts-ignore-next-line no-implicit-any error
@@ -156,6 +159,7 @@ type UseStylesProps = {
   minHeight?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
   titleMaxWidth?: DimensionValue
+  titleFontSize?: number
   backgroundModalColor?: string
 }
 
@@ -182,7 +186,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     paddingBottom: 10,
   },
   modalTitleText: {
-    fontSize: 24,
+    fontSize: props.titleFontSize ?? 24,
     fontWeight: Platform.OS === "ios" ? "600" : "700",
     lineHeight: 32,
     maxWidth: props.titleMaxWidth || "80%",

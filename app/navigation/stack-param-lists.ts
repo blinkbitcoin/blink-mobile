@@ -20,6 +20,11 @@ export type RootStackParamList = {
     appCheckToken: string
   }
   developerScreen: undefined
+  login: {
+    type: PhoneLoginInitiateType
+    title?: string
+    onboarding?: boolean
+  }
   authenticationCheck: undefined
   authentication: {
     screenPurpose: AuthenticationScreenPurpose
@@ -56,6 +61,7 @@ export type RootStackParamList = {
     successAction?: LNURLPaySuccessAction
     preimage?: string
   }
+  setLightningAddress: { onboarding?: boolean }
   language: undefined
   currency: undefined
   security: {
@@ -91,8 +97,12 @@ export type RootStackParamList = {
   notificationSettingsScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
-  emailRegistrationInitiate: undefined
-  emailRegistrationValidate: { email: string; emailRegistrationId: string }
+  emailRegistrationInitiate?: { onboarding?: boolean }
+  emailRegistrationValidate: {
+    email: string
+    emailRegistrationId: string
+    onboarding?: boolean
+  }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
   totpRegistrationInitiate: undefined
@@ -102,6 +112,16 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   supportChat: undefined
   notificationHistory: undefined
+  onboarding: NavigatorScreenParams<OnboardingStackParamList>
+}
+
+export type OnboardingStackParamList = {
+  welcomeLevel1: { onboarding?: boolean }
+  emailBenefits: { onboarding?: boolean }
+  emailConfirmed: { onboarding?: boolean }
+  lightningBenefits: { onboarding?: boolean }
+  lightningConfirmed: { onboarding?: boolean }
+  supportScreen: undefined
 }
 
 export type PeopleStackParamList = {
@@ -115,15 +135,20 @@ export type PhoneValidationStackParamList = {
   Primary: undefined
   phoneLoginInitiate: {
     type: PhoneLoginInitiateType
+    channel: PhoneCodeChannelType
+    title?: string
+    onboarding?: boolean
   }
   telegramLoginValidate: {
     phone: string
     type: PhoneLoginInitiateType
+    onboarding?: boolean
   }
   phoneLoginValidate: {
     phone: string
     channel: PhoneCodeChannelType
     type: PhoneLoginInitiateType
+    onboarding?: boolean
   }
   authentication: {
     screenPurpose: AuthenticationScreenPurpose

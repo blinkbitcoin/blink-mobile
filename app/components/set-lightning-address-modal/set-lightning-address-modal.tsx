@@ -13,6 +13,7 @@ import {
 } from "../../graphql/generated"
 import { GaloyErrorBox } from "../atomic/galoy-error-box"
 import CustomModal from "../custom-modal/custom-modal"
+import { SetUsernameError, validateUsername } from "./username-validation"
 
 gql`
   mutation userUpdateUsername($input: UserUpdateUsernameInput!) {
@@ -40,7 +41,7 @@ export const SetLightningAddressModal = ({
   isVisible,
   toggleModal,
 }: SetLightningAddressModalProps) => {
-  const [error, setError] = useState<SetAddressError | undefined>()
+  const [error, setError] = useState<SetUsernameError | undefined>()
   const [lnAddress, setLnAddress] = useState("")
 
   const onChangeLnAddress = (lightningAddress: string) => {
@@ -75,7 +76,7 @@ export const SetLightningAddressModal = ({
   })
 
   const onSetLightningAddress = async () => {
-    const validationResult = validateLightningAddress(lnAddress)
+    const validationResult = validateUsername(lnAddress)
     if (!validationResult.valid) {
       setError(validationResult.error)
       return
@@ -91,9 +92,9 @@ export const SetLightningAddressModal = ({
 
     if ((data?.userUpdateUsername?.errors ?? []).length > 0) {
       if (data?.userUpdateUsername?.errors[0]?.code === "USERNAME_ERROR") {
-        setError(SetAddressError.ADDRESS_UNAVAILABLE)
+        setError(SetUsernameError.ADDRESS_UNAVAILABLE)
       } else {
-        setError(SetAddressError.UNKNOWN_ERROR)
+        setError(SetUsernameError.UNKNOWN_ERROR)
       }
       return
     }
@@ -124,7 +125,7 @@ export type SetLightningAddressModalUIProps = {
   toggleModal: () => void
   onSetLightningAddress: () => void
   loading: boolean
-  error?: SetAddressError
+  error?: SetUsernameError
   lnAddress: string
   setLnAddress?: (lightningAddress: string) => void
 }
@@ -156,19 +157,19 @@ export const SetLightningAddressModalUI = ({
 
   let errorMessage = ""
   switch (error) {
-    case SetAddressError.TOO_SHORT:
+    case SetUsernameError.TOO_SHORT:
       errorMessage = LL.SetAddressModal.Errors.tooShort()
       break
-    case SetAddressError.TOO_LONG:
+    case SetUsernameError.TOO_LONG:
       errorMessage = LL.SetAddressModal.Errors.tooLong()
       break
-    case SetAddressError.INVALID_CHARACTER:
+    case SetUsernameError.INVALID_CHARACTER:
       errorMessage = LL.SetAddressModal.Errors.invalidCharacter()
       break
-    case SetAddressError.ADDRESS_UNAVAILABLE:
+    case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
-    case SetAddressError.UNKNOWN_ERROR:
+    case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
   }
@@ -209,54 +210,6 @@ export const SetLightningAddressModalUI = ({
       }
     />
   )
-}
-
-const SetAddressError = {
-  TOO_SHORT: "TOO_SHORT",
-  TOO_LONG: "TOO_LONG",
-  INVALID_CHARACTER: "INVALID_CHARACTER",
-  ADDRESS_UNAVAILABLE: "ADDRESS_UNAVAILABLE",
-  UNKNOWN_ERROR: "UNKNOWN_ERROR",
-} as const
-
-type SetAddressError = (typeof SetAddressError)[keyof typeof SetAddressError]
-
-type ValidateLightningAddressResult =
-  | {
-      valid: true
-    }
-  | {
-      valid: false
-      error: SetAddressError
-    }
-
-const validateLightningAddress = (
-  lightningAddress: string,
-): ValidateLightningAddressResult => {
-  if (lightningAddress.length < 3) {
-    return {
-      valid: false,
-      error: SetAddressError.TOO_SHORT,
-    }
-  }
-
-  if (lightningAddress.length > 50) {
-    return {
-      valid: false,
-      error: SetAddressError.TOO_LONG,
-    }
-  }
-
-  if (!/^[A-Za-z0-9_]+$/.test(lightningAddress)) {
-    return {
-      valid: false,
-      error: SetAddressError.INVALID_CHARACTER,
-    }
-  }
-
-  return {
-    valid: true,
-  }
 }
 
 const useStyles = makeStyles(({ colors }) => ({

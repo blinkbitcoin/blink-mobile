@@ -14,6 +14,7 @@ type ButtonForButtonGroupProps = {
         selected: React.ReactElement
         normal: React.ReactElement
       }
+  disabled?: boolean
 }
 
 const ButtonForButtonGroup: React.FC<
@@ -21,8 +22,8 @@ const ButtonForButtonGroup: React.FC<
     selected: boolean
     onPress: () => void
   }
-> = ({ text, icon, selected, onPress }) => {
-  const styles = useStyles({ selected: Boolean(selected) })
+> = ({ text, icon, selected, onPress, disabled }) => {
+  const styles = useStyles({ selected: Boolean(selected), disabled: Boolean(disabled) })
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.button}>
@@ -86,26 +87,29 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }, { selected }: { selected: boolean }) => ({
-  button: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 10,
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: colors.grey5,
-    height: "100%",
-  },
-  text: {
-    fontSize: 16,
-    color: selected ? colors.primary : colors.grey1,
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    columnGap: 10,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-}))
+const useStyles = makeStyles(
+  ({ colors }, { selected, disabled }: { selected: boolean; disabled: boolean }) => ({
+    button: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: 10,
+      paddingVertical: 14,
+      borderRadius: 8,
+      opacity: disabled ? 0.4 : 1,
+      backgroundColor: colors.grey5,
+      height: "100%",
+    },
+    text: {
+      fontSize: 16,
+      color: selected ? colors.primary : colors.grey1,
+    },
+    buttonGroup: {
+      flexDirection: "row",
+      columnGap: 10,
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+  }),
+)

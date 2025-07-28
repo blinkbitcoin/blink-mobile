@@ -1,5 +1,4 @@
 import {
-  BalanceHeaderDocument,
   CurrencyListDocument,
   DisplayCurrencyDocument,
   HomeAuthedDocument,
@@ -13,6 +12,8 @@ import {
   SendBitcoinConfirmationScreenDocument,
   SendBitcoinDestinationDocument,
   SendBitcoinDetailsScreenDocument,
+  UserUpdateUsernameDocument,
+  MyUserIdDocument,
 } from "./generated"
 
 // TODO: put in __tests__ folder?
@@ -289,6 +290,56 @@ const mocks = [
     },
   },
   {
+    request: { query: MyUserIdDocument },
+    result: {
+      data: {
+        me: {
+          id: "user-id-123",
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: UserUpdateUsernameDocument,
+      variables: {
+        input: { username: "validAddress" },
+      },
+    },
+    result: {
+      data: {
+        userUpdateUsername: {
+          errors: [],
+          user: {
+            id: "user-id-123",
+            username: "validAddress",
+            __typename: "User",
+          },
+          __typename: "UserPayload",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: DisplayCurrencyDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "user-id-123",
+          __typename: "User",
+          defaultAccount: {
+            id: "account-id-123",
+            displayCurrency: "USD",
+            __typename: "ConsumerAccount",
+          },
+        },
+      },
+    },
+  },
+  {
     request: {
       query: LnNoAmountInvoiceCreateDocument,
       variables: {
@@ -467,23 +518,6 @@ const mocks = [
               __typename: "RealtimePrice",
             },
           },
-        },
-      },
-    },
-  },
-  {
-    request: {
-      query: BalanceHeaderDocument,
-    },
-    result: {
-      data: {
-        me: {
-          id: "70df9822-efe0-419c-b864-c9efa99872ea",
-          defaultAccount: {
-            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
-            __typename: "ConsumerAccount",
-          },
-          __typename: "User",
         },
       },
     },

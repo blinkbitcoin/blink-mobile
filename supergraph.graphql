@@ -937,6 +937,7 @@ type LnInvoicePaymentStatus
   @join__type(graph: BLINK)
 {
   paymentHash: PaymentHash
+  paymentPreimage: LnPaymentPreImage
   paymentRequest: LnPaymentRequest
   status: InvoicePaymentStatus
 }
@@ -964,6 +965,7 @@ type LnInvoicePaymentStatusPayload
 {
   errors: [Error!]!
   paymentHash: PaymentHash
+  paymentPreimage: LnPaymentPreImage
   paymentRequest: LnPaymentRequest
   status: InvoicePaymentStatus
 }
@@ -1801,6 +1803,7 @@ input QuizClaimInput
   @join__type(graph: BLINK)
 {
   id: ID!
+  skipRewards: Boolean = false
 }
 
 type QuizClaimPayload
