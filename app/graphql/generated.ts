@@ -2934,6 +2934,11 @@ export type SendBitcoinInternalLimitsQueryVariables = Exact<{ [key: string]: nev
 
 export type SendBitcoinInternalLimitsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly limits: { readonly __typename: 'AccountLimits', readonly internalSend: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }> } } } | null };
 
+export type PayoutSpeedsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PayoutSpeedsQuery = { readonly __typename: 'Query', readonly payoutSpeeds: ReadonlyArray<{ readonly __typename: 'PayoutSpeeds', readonly speed: PayoutSpeed, readonly displayName: string, readonly description: string }> };
+
 export type FeedbackSubmitMutationVariables = Exact<{
   input: FeedbackSubmitInput;
 }>;
@@ -2973,6 +2978,7 @@ export type OnChainTxFeeQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['SatAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -2982,6 +2988,7 @@ export type OnChainUsdTxFeeQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['CentAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -2991,6 +2998,7 @@ export type OnChainUsdTxFeeAsBtcDenominatedQueryVariables = Exact<{
   walletId: Scalars['WalletId']['input'];
   address: Scalars['OnChainAddress']['input'];
   amount: Scalars['SatAmount']['input'];
+  speed: PayoutSpeed;
 }>;
 
 
@@ -6215,6 +6223,47 @@ export type SendBitcoinInternalLimitsQueryHookResult = ReturnType<typeof useSend
 export type SendBitcoinInternalLimitsLazyQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsLazyQuery>;
 export type SendBitcoinInternalLimitsSuspenseQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsSuspenseQuery>;
 export type SendBitcoinInternalLimitsQueryResult = Apollo.QueryResult<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>;
+export const PayoutSpeedsDocument = gql`
+    query payoutSpeeds {
+  payoutSpeeds {
+    speed
+    displayName
+    description
+  }
+}
+    `;
+
+/**
+ * __usePayoutSpeedsQuery__
+ *
+ * To run a query within a React component, call `usePayoutSpeedsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePayoutSpeedsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePayoutSpeedsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePayoutSpeedsQuery(baseOptions?: Apollo.QueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+      }
+export function usePayoutSpeedsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export function usePayoutSpeedsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>(PayoutSpeedsDocument, options);
+        }
+export type PayoutSpeedsQueryHookResult = ReturnType<typeof usePayoutSpeedsQuery>;
+export type PayoutSpeedsLazyQueryHookResult = ReturnType<typeof usePayoutSpeedsLazyQuery>;
+export type PayoutSpeedsSuspenseQueryHookResult = ReturnType<typeof usePayoutSpeedsSuspenseQuery>;
+export type PayoutSpeedsQueryResult = Apollo.QueryResult<PayoutSpeedsQuery, PayoutSpeedsQueryVariables>;
 export const FeedbackSubmitDocument = gql`
     mutation feedbackSubmit($input: FeedbackSubmitInput!) {
   feedbackSubmit(input: $input) {
@@ -6398,8 +6447,13 @@ export type LnNoAmountUsdInvoiceFeeProbeMutationHookResult = ReturnType<typeof u
 export type LnNoAmountUsdInvoiceFeeProbeMutationResult = Apollo.MutationResult<LnNoAmountUsdInvoiceFeeProbeMutation>;
 export type LnNoAmountUsdInvoiceFeeProbeMutationOptions = Apollo.BaseMutationOptions<LnNoAmountUsdInvoiceFeeProbeMutation, LnNoAmountUsdInvoiceFeeProbeMutationVariables>;
 export const OnChainTxFeeDocument = gql`
-    query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
-  onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
+  onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
   }
 }
@@ -6420,6 +6474,7 @@ export const OnChainTxFeeDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */
@@ -6440,8 +6495,13 @@ export type OnChainTxFeeLazyQueryHookResult = ReturnType<typeof useOnChainTxFeeL
 export type OnChainTxFeeSuspenseQueryHookResult = ReturnType<typeof useOnChainTxFeeSuspenseQuery>;
 export type OnChainTxFeeQueryResult = Apollo.QueryResult<OnChainTxFeeQuery, OnChainTxFeeQueryVariables>;
 export const OnChainUsdTxFeeDocument = gql`
-    query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!) {
-  onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $speed: PayoutSpeed!) {
+  onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
   }
 }
@@ -6462,6 +6522,7 @@ export const OnChainUsdTxFeeDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */
@@ -6482,11 +6543,12 @@ export type OnChainUsdTxFeeLazyQueryHookResult = ReturnType<typeof useOnChainUsd
 export type OnChainUsdTxFeeSuspenseQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeSuspenseQuery>;
 export type OnChainUsdTxFeeQueryResult = Apollo.QueryResult<OnChainUsdTxFeeQuery, OnChainUsdTxFeeQueryVariables>;
 export const OnChainUsdTxFeeAsBtcDenominatedDocument = gql`
-    query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+    query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
   onChainUsdTxFeeAsBtcDenominated(
     walletId: $walletId
     address: $address
     amount: $amount
+    speed: $speed
   ) {
     amount
   }
@@ -6508,6 +6570,7 @@ export const OnChainUsdTxFeeAsBtcDenominatedDocument = gql`
  *      walletId: // value for 'walletId'
  *      address: // value for 'address'
  *      amount: // value for 'amount'
+ *      speed: // value for 'speed'
  *   },
  * });
  */

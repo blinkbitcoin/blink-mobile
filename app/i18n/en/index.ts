@@ -2317,6 +2317,8 @@ const en: BaseTranslation = {
     copiedSuccessMessage: "Message copied successfully",
     copiedSecretMessage: "Secret message copied successfully",
     pendingDecryptionMessage: "Encrypted message. Waiting for payment confirmation.",
+    feeSettings: "Fee settings",
+    selectFee: "Select fee",
   },
   SettingsScreen: {
     staticQr: "Printable Static QR Code",

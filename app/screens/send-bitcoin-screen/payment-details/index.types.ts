@@ -22,6 +22,7 @@ import {
   useOnChainUsdTxFeeAsBtcDenominatedLazyQuery,
   useOnChainUsdTxFeeLazyQuery,
   WalletCurrency,
+  PayoutSpeed,
 } from "@app/graphql/generated"
 import {
   BtcMoneyAmount,
@@ -99,6 +100,10 @@ export type SetAmount<T extends WalletCurrency> = (
 
 export type SetMemo<T extends WalletCurrency> = (memo: string) => PaymentDetail<T>
 
+export type SetPayoutSpeed<T extends WalletCurrency> = (
+  payoutSpeed: PayoutSpeed,
+) => PaymentDetail<T>
+
 export type SetInvoice<T extends WalletCurrency> = (params: {
   paymentRequest: string
   paymentRequestAmount: BtcMoneyAmount
@@ -134,6 +139,7 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency> // destinationSpecifiedAmount if the invoice has an amount, otherwise the amount that the user is denominating the payment in
   settlementAmount: WalletAmount<T> // the amount that will be subtracted from the sending wallet
   settlementAmountIsEstimated: boolean
+  payoutSpeed?: PayoutSpeed
 }
 
 // memo is defined if canSetMemo is true
@@ -162,6 +168,10 @@ export type PaymentDetailSetAmount<T extends WalletCurrency> =
 export type PaymentDetailSetSuccessAction<T extends WalletCurrency> = {
   setSuccessAction?: SetSuccessAction<T>
   successAction?: LNURLPaySuccessAction
+}
+
+export type PaymentDetailSetPayoutSpeed<T extends WalletCurrency> = {
+  setPayoutSpeed?: SetPayoutSpeed<T>
 }
 
 // sendPayment and getFee are defined together
@@ -200,7 +210,8 @@ export type PaymentDetail<T extends WalletCurrency> = BasePaymentDetail<T> &
   PaymentDetailSetMemo<T> &
   PaymentDetailSetAmount<T> &
   PaymentDetailSendPaymentGetFee<T> &
-  PaymentDetailSetSuccessAction<T>
+  PaymentDetailSetSuccessAction<T> &
+  PaymentDetailSetPayoutSpeed<T>
 
 export const AmountInvalidReason = {
   InsufficientBalance: "InsufficientBalance",
