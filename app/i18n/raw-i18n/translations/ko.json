@@ -2513,10 +2513,6 @@
             "securityDescription": "계정 보안을 강화할 수 있어요",
             "primaryButton": "이메일 로그인 설정하기"
         },
-        "emailConfirmed": {
-            "mainTitle": "이메일 로그인 추가 완료",
-            "title": "계정에 새로운 기능이 열렸습니다:"
-        },
         "lightningBenefits": {
             "mainTitle": "라이트닝 주소 설정하기",
             "title": "라이트닝 주소의 장점:",
@@ -2524,10 +2520,6 @@
             "easyToShareDescription": "외우기 쉽고 공개/비공개 공유도 간편해요",
             "blinkToolsDescription": "상거래에 유용한 Blink 도구들이 열립니다",
             "primaryButton": "라이트닝 주소 설정하기"
-        },
-        "lightningConfirmed": {
-            "mainTitle": "라이트닝 주소가 설정되었습니다",
-            "title": "계정에 새로운 기능이 열렸습니다:"
         },
         "supportScreen": {
             "mainTitle": "Blink 피드백",
