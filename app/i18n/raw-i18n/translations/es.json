@@ -2002,8 +2002,10 @@
         "registerTitle": "Necesitas actualizar tu cuenta",
         "registerContent": "Regístrate con tu número de teléfono para recibir sats",
         "oneSectionADay": "¡Una sección al día!",
-        "availableTomorrow": "¡Vuelve mañana para seguir aprendiendo sobre Bitcoin!",
-        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes"
+        "availableTomorrow": "Regresa mañana para seguir ganando recompensas.\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
+        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "continueNoRewards": "Continuar (Sin Recompensas)",
+        "somethingNotRight": "Algo no está bien..."
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / Crear Cuenta",
@@ -2693,7 +2695,9 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
         "warning": "Advertencia",
-        "recommended": "Recomendado"
+        "recommended": "Recomendado",
+        "continue": "Continuar",
+        "correct": "Correcto"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

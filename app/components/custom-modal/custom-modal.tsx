@@ -9,7 +9,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, TextProps, useTheme } from "@rneui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
@@ -19,7 +19,9 @@ export type CustomModalProps = {
   isVisible: boolean
   toggleModal: () => void
   image?: ReactNode
-  title: string
+  headerTitle?: string
+  headerTitleSize?: TextProps["type"]
+  title?: string
   body: ReactNode
   primaryButtonTitle: string
   primaryButtonTextAbove?: string
@@ -35,12 +37,15 @@ export type CustomModalProps = {
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
   titleFontSize?: number
+  backgroundModalColor?: string
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({
   isVisible,
   toggleModal,
   image,
+  headerTitle,
+  headerTitleSize,
   title,
   body,
   minHeight,
@@ -57,6 +62,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonLoading,
   showCloseIconButton = true,
   titleFontSize,
+  backgroundModalColor,
 }) => {
   const styles = useStyles({
     hasPrimaryButtonTextAbove: Boolean(primaryButtonTextAbove),
@@ -65,6 +71,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
     titleTextAlignment,
     showCloseIconButton,
     titleFontSize,
+    backgroundModalColor,
     /* eslint @typescript-eslint/ban-ts-comment: "off" */
     // @ts-ignore-next-line no-implicit-any error
   }) as StyleSheet.NamedStyles
@@ -81,11 +88,26 @@ const CustomModal: React.FC<CustomModalProps> = ({
       onBackdropPress={toggleModal}
     >
       <View style={styles.container}>
-        {showCloseIconButton && (
-          <TouchableOpacity style={styles.closeIcon} onPress={toggleModal}>
-            <GaloyIcon name="close" size={30} color={colors.grey0} />
-          </TouchableOpacity>
-        )}
+        <View style={styles.headerContainer}>
+          {headerTitle ? (
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={styles.headerTitle}
+              type={headerTitleSize || "h1"}
+            >
+              {headerTitle}
+            </Text>
+          ) : (
+            <View></View>
+          )}
+
+          {showCloseIconButton && (
+            <TouchableOpacity onPress={toggleModal}>
+              <GaloyIcon name="close" size={30} color={colors.grey0} />
+            </TouchableOpacity>
+          )}
+        </View>
         <ScrollView
           style={styles.modalCard}
           persistentScrollbar={true}
@@ -94,9 +116,11 @@ const CustomModal: React.FC<CustomModalProps> = ({
           contentContainerStyle={styles.scrollViewContainer}
         >
           {image && <View style={styles.imageContainer}>{image}</View>}
-          <View style={styles.modalTitleContainer}>
-            <Text style={styles.modalTitleText}>{title}</Text>
-          </View>
+          {title && (
+            <View style={styles.modalTitleContainer}>
+              <Text style={styles.modalTitleText}>{title}</Text>
+            </View>
+          )}
           <View style={styles.modalBodyContainer}>{body}</View>
         </ScrollView>
         {nonScrollingContent}
@@ -136,11 +160,12 @@ type UseStylesProps = {
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
   titleMaxWidth?: DimensionValue
   titleFontSize?: number
+  backgroundModalColor?: string
 }
 
 const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: props.backgroundModalColor ?? colors.grey5,
     maxHeight: "95%",
     minHeight: props.minHeight || "auto",
     borderRadius: 16,
@@ -191,9 +216,14 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     rowGap: 12,
     marginTop: props.hasPrimaryButtonTextAbove ? 0 : 20,
   },
-  closeIcon: {
-    width: "100%",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+  headerContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  headerTitle: {
+    flexShrink: 1,
+    flexGrow: 1,
+    marginRight: 10,
   },
 }))

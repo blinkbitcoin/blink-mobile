@@ -30,7 +30,15 @@ import { shuffle } from "../../utils/helper"
 import { sleep } from "../../utils/sleep"
 import { useQuizServer } from "../earns-map-screen/use-quiz-server"
 import { SVGs } from "./earn-svg-factory"
-import { augmentCardWithGqlData, getQuizQuestionsContent } from "./earns-utils"
+import {
+  augmentCardWithGqlData,
+  errorCodeAlertAlreadyShown,
+  getQuizQuestionsContent,
+  markErrorCodeAlertAsShown,
+  skipRewardErrorCodes,
+  ValidateQuizCodeErrorsType,
+} from "./earns-utils"
+import CustomModal from "@app/components/custom-modal/custom-modal"
 
 const useStyles = makeStyles(({ colors }) => ({
   answersViewInner: {
@@ -183,6 +191,17 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 10,
     flex: 1,
   },
+
+  modalBodyText: {
+    fontSize: 17,
+    color: colors.grey3,
+    textAlign: "center",
+  },
+
+  modalBody: {
+    textAlign: "center",
+    marginTop: 20,
+  },
 }))
 
 const mappingLetter = { 0: "A", 1: "B", 2: "C" }
@@ -196,6 +215,7 @@ gql`
     quizClaim(input: $input) {
       errors {
         message
+        code
       }
       quizzes {
         id
@@ -221,7 +241,7 @@ export const EarnQuiz = ({ route }: Props) => {
 
   const { quizServerData } = useQuizServer()
 
-  const { id } = route.params
+  const { id, isAvailable } = route.params
 
   const allCards = React.useMemo(
     () => quizQuestionsContent.map((item) => item.content).flatMap((item) => item),
@@ -244,21 +264,53 @@ export const EarnQuiz = ({ route }: Props) => {
   const [quizClaim, { loading: quizClaimLoading }] = useQuizClaimMutation()
   const [quizVisible, setQuizVisible] = useState(false)
   const [recordedAnswer, setRecordedAnswer] = useState<number[]>([])
+  const [hasTriedClaim, setHasTriedClaim] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [quizErrorMessage, setQuizErrorMessage] = useState<string>()
+  const [quizErrorCode, setQuizErrorCode] = useState<string | null>()
 
   const addRecordedAnswer = (value: number) => {
     setRecordedAnswer([...recordedAnswer, value])
   }
 
+  const claimQuizWithoutRewards = React.useCallback(async () => {
+    markErrorCodeAlertAsShown(quizErrorCode)
+    await quizClaim({
+      variables: { input: { id, skipRewards: true } },
+    })
+    setShowModal(false)
+  }, [quizClaim, id, quizErrorCode])
+
   const answersShuffled: Array<React.ReactNode> = []
 
   useEffect(() => {
     ;(async () => {
+      if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
+        setHasTriedClaim(true)
         const { data } = await quizClaim({
           variables: { input: { id } },
         })
 
         if (data?.quizClaim?.errors?.length) {
+          const errorCode = data.quizClaim.errors[0]?.code as ValidateQuizCodeErrorsType
+          const defualtErrorMessage = `${getErrorMessages(data.quizClaim.errors)} Please try again later.\nOr, click to continue to keep learning without rewards.`
+          const customErrorMessage = `It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.`
+
+          if (skipRewardErrorCodes(errorCode)) {
+            if (!errorCodeAlertAlreadyShown(errorCode)) {
+              setQuizErrorMessage(
+                errorCode === "INVALID_INPUT" ? customErrorMessage : defualtErrorMessage,
+              )
+              setQuizErrorCode(errorCode)
+              setShowModal(true)
+              return
+            }
+            await claimQuizWithoutRewards()
+            return
+          }
+
+          navigation.goBack()
           // FIXME: message is hidden by the modal
           toastShow({
             message: getErrorMessages(data.quizClaim.errors),
@@ -267,7 +319,22 @@ export const EarnQuiz = ({ route }: Props) => {
         }
       }
     })()
-  }, [recordedAnswer, id, quizClaim, LL, completed, quizClaimLoading])
+  }, [
+    recordedAnswer,
+    id,
+    quizClaim,
+    LL,
+    completed,
+    quizClaimLoading,
+    navigation,
+    hasTriedClaim,
+    claimQuizWithoutRewards,
+  ])
+
+  const closeModal = () => {
+    setShowModal(false)
+    navigation.navigate("Earn")
+  }
 
   const close = async () => {
     if (quizVisible) {
@@ -373,7 +440,9 @@ export const EarnQuiz = ({ route }: Props) => {
           {(completed && (
             <>
               <Text style={styles.textEarn}>
-                {LL.EarnScreen.quizComplete({ formattedNumber: amount })}
+                {isAvailable
+                  ? LL.EarnScreen.quizComplete({ formattedNumber: amount })
+                  : LL.EarnScreen.sectionsCompleted()}
               </Text>
               <Button
                 title={LL.EarnScreen.reviewQuiz()}
@@ -384,9 +453,13 @@ export const EarnQuiz = ({ route }: Props) => {
             </>
           )) || (
             <Button
-              title={LL.EarnScreen.earnSats({
-                formattedNumber: amount,
-              })}
+              title={
+                isAvailable
+                  ? LL.EarnScreen.earnSats({
+                      formattedNumber: amount,
+                    })
+                  : LL.common.continue()
+              }
               buttonStyle={styles.buttonStyle}
               titleStyle={styles.titleStyle}
               onPress={() => setQuizVisible(true)}
@@ -394,6 +467,21 @@ export const EarnQuiz = ({ route }: Props) => {
           )}
         </View>
       </SafeAreaView>
+      <CustomModal
+        isVisible={showModal}
+        toggleModal={closeModal}
+        title={LL.EarnScreen.somethingNotRight()}
+        backgroundModalColor={colors.white}
+        body={
+          <View style={styles.modalBody}>
+            <Text style={styles.modalBodyText}>{quizErrorMessage}</Text>
+          </View>
+        }
+        primaryButtonOnPress={claimQuizWithoutRewards}
+        primaryButtonTitle={LL.EarnScreen.continueNoRewards()}
+        secondaryButtonTitle={LL.common.close()}
+        secondaryButtonOnPress={closeModal}
+      />
     </Screen>
   )
 }

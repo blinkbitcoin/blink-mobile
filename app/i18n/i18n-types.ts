@@ -6299,13 +6299,22 @@ type RootTranslation = {
 		 */
 		oneSectionADay: string
 		/**
-		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n​!
+		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​e​a​r​n​i​n​g​ ​r​e​w​a​r​d​s​.​
+	​O​R​,​ ​c​l​i​c​k​ ​o​n​ ​c​o​n​t​i​n​u​e​,​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s
 		 */
 		availableTomorrow: string
 		/**
 		 * D​i​g​ ​y​o​u​r​ ​w​a​y​ ​t​h​r​o​u​g​h​ ​t​h​e​s​e​ ​l​e​s​s​o​n​s​ ​a​n​d​ ​e​a​r​n​ ​a​s​ ​y​o​u​ ​l​e​a​r​n
 		 */
 		motivatingBadger: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​(​N​o​ ​R​e​w​a​r​d​s​)
+		 */
+		continueNoRewards: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​'​s​ ​N​o​t​ ​R​i​g​h​t​.​.​.
+		 */
+		somethingNotRight: string
 	}
 	GetStartedScreen: {
 		/**
@@ -8813,6 +8822,14 @@ type RootTranslation = {
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		'continue': string
+		/**
+		 * C​o​r​r​e​c​t
+		 */
+		correct: string
 	}
 	errors: {
 		/**
@@ -15629,13 +15646,22 @@ export type TranslationFunctions = {
 		 */
 		oneSectionADay: () => LocalizedString
 		/**
-		 * Come back tomorrow to continue learning about Bitcoin!
+		 * Come back tomorrow to continue earning rewards.
+	OR, click on continue, to keep learning without rewards
 		 */
 		availableTomorrow: () => LocalizedString
 		/**
 		 * Dig your way through these lessons and earn as you learn
 		 */
 		motivatingBadger: () => LocalizedString
+		/**
+		 * Continue (No Rewards)
+		 */
+		continueNoRewards: () => LocalizedString
+		/**
+		 * Something's Not Right...
+		 */
+		somethingNotRight: () => LocalizedString
 	}
 	GetStartedScreen: {
 		/**
@@ -18083,6 +18109,14 @@ export type TranslationFunctions = {
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		'continue': () => LocalizedString
+		/**
+		 * Correct
+		 */
+		correct: () => LocalizedString
 	}
 	errors: {
 		/**

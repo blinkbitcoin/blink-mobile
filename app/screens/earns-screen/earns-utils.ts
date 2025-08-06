@@ -89,3 +89,24 @@ export const getQuizQuestionsContent = ({
   )
   return quizSectionContent
 }
+
+export type ValidateQuizCodeErrorsType = "INVALID_INPUT" | "QUIZ_CLAIMED_TOO_EARLY"
+const shownErrorCodes = new Set<ValidateQuizCodeErrorsType>()
+
+const skipRewardErrorCodesList: ValidateQuizCodeErrorsType[] = [
+  "INVALID_INPUT",
+  "QUIZ_CLAIMED_TOO_EARLY",
+]
+
+export const skipRewardErrorCodes = (code?: string | null): boolean =>
+  Boolean(code) && skipRewardErrorCodesList.includes(code as ValidateQuizCodeErrorsType)
+
+export const errorCodeAlertAlreadyShown = (code?: string | null): boolean =>
+  Boolean(code) &&
+  skipRewardErrorCodes(code) &&
+  shownErrorCodes.has(code as ValidateQuizCodeErrorsType)
+
+export const markErrorCodeAlertAsShown = (code?: string | null): void => {
+  if (!code) return
+  shownErrorCodes.add(code as ValidateQuizCodeErrorsType)
+}
