@@ -213,7 +213,7 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
     paymentRequest: string
   } | null>(null)
   const [err, setErr] = useState("")
-  const { lnUpdate } = useMySubscription()
+  const { lnUpdate, convertCurrencyAmount } = useMySubscription()
   const [brightnessInitial, setBrightnessInitial] = useState(null)
 
   const updateInvoice = useMemo(
@@ -300,13 +300,21 @@ export const ReceiveBitcoinScreen: ScreenType = ({ navigation, route }: Props) =
         setMemo(lnurlParams.defaultDescription)
       }
 
-      if (primaryAmount.currency === "USD") {
-        toggleCurrency()
-      }
-
       if (lnurlParams.minWithdrawable == lnurlParams.maxWithdrawable) {
         setTimeout(() => {
-          setPrimaryAmountValue(lnurlParams.minWithdrawable)
+          if (primaryAmount.currency === "USD") {
+            // Set BTC value and also update USD value
+            const btcValue = lnurlParams.minWithdrawable
+            setSecondaryAmount({ currency: "BTC", value: btcValue })
+            const usdValue = convertCurrencyAmount({ amount: btcValue, from: "BTC", to: "USD" })
+            setPrimaryAmountValue(usdValue)
+          } else {
+            // Set BTC value and also update USD value
+            const btcValue = lnurlParams.minWithdrawable
+            setPrimaryAmountValue(btcValue)
+            const usdValue = convertCurrencyAmount({ amount: btcValue, from: "BTC", to: "USD" })
+            setSecondaryAmount({ currency: "USD", value: usdValue })
+          }
         }, 100)
       }
     }

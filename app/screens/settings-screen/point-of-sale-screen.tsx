@@ -371,8 +371,8 @@ export const PointOfSaleScreen: ScreenType = ({ route }: Props) => {
           storeData.map((el) => {
             return (
              <ListItem key={el.id} bottomDivider>
-              <Icon name="qr-code" size={20} onPress={() => setQrCodeToShow(qrCodeToShow === el.id ? null : el.id)} />
-              <Icon name={"compass-outline"} size={20} onPress={() => copyToClipboard(el.id, true)} />
+              <Icon name="qr-code" type="ionicon" size={20} onPress={() => setQrCodeToShow(qrCodeToShow === el.id ? null : el.id)} />
+              <Icon name={"compass-outline"} type="ionicon" size={20} onPress={() => copyToClipboard(el.id, true)} />
               <ListItem.Content>
                 <ListItem.Title>{el.name}</ListItem.Title>
                 {el.id === qrCodeToShow &&

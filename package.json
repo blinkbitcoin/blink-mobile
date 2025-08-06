@@ -114,7 +114,7 @@
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^3.9.0",
     "react-native-secure-key-store": "^2.0.9",
-    "react-native-share": "^7.3.0",
+    "react-native-share": "^12.1.0",
     "react-native-sms": "^1.11.0",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^15.11.2",

@@ -304,7 +304,7 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
           <View style={styles.container}>
             <View style={styles.optionsContainer}>
               <View style={styles.optionCard}>
-                <Icon name="phone-portrait" size={40} color="#2089dc" style={styles.optionIcon} />
+                <Icon name="phone-portrait" type="ionicon" size={40} color="#2089dc" style={styles.optionIcon} />
                 <Text style={styles.optionTitle}>{translate('BoltCardScreen.programCardThisDevice')}</Text>
                 <Text style={styles.optionDescription}>
                   {translate('BoltCardScreen.programCardDescriptionThisDevice')}
@@ -313,7 +313,7 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
                   title={translate('BoltCardScreen.programCard')}
                   onPress={programCard}
                   buttonStyle={styles.button}
-                  icon={<Icon name="flash" size={20} color="white" style={{marginRight: 10}} />}
+                  icon={<Icon name="flash" type="ionicon" size={20} color="white" style={{marginRight: 10}} />}
                 />
               </View>
               
@@ -414,7 +414,7 @@ const SetupBoltcard: React.FC<SetupBoltcardProps> = ({
                 title="Copy URL"
                 onPress={copyUrl}
                 buttonStyle={[styles.button, styles.buttonSmall]}
-                icon={<Icon name="copy" size={20} color="white" style={{marginRight: 10}} />}
+                icon={<Icon name="copy" type="ionicon" size={20} color="white" style={{marginRight: 10}} />}
               />
               <Button
                 title="Share URL"
