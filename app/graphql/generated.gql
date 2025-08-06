@@ -868,6 +868,7 @@ query ContactsCard {
     id
     contacts {
       id
+      handle
       username
       alias
       transactionsCount
@@ -1062,6 +1063,7 @@ query contacts {
     id
     contacts {
       id
+      handle
       username
       alias
       transactionsCount
@@ -1444,6 +1446,7 @@ query scanningQRCodeScreen {
     }
     contacts {
       id
+      handle
       username
       __typename
     }
@@ -1485,6 +1488,7 @@ query sendBitcoinDestination {
     }
     contacts {
       id
+      handle
       username
       alias
       transactionsCount

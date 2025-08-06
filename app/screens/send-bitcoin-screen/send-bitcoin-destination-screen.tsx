@@ -57,6 +57,7 @@ gql`
       }
       contacts {
         id
+        handle
         username
         alias
         transactionsCount

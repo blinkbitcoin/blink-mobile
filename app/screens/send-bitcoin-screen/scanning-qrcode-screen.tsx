@@ -53,6 +53,7 @@ gql`
       }
       contacts {
         id
+        handle
         username
       }
     }
