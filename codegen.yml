@@ -67,3 +67,6 @@ generates:
         NotificationCategory: "string"
         DateTime: "string"
         TxExternalId: "string"
+        ContactDisplayName: "string"
+        ContactHandle: "string"
+        ContactId: "string"

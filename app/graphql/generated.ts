@@ -26,6 +26,12 @@ export type Scalars = {
   CentAmount: { input: number; output: number; }
   /** An alias name that a user can set for a wallet (with which they have transactions) */
   ContactAlias: { input: string; output: string; }
+  /** A display name that a user can assign to a contact */
+  ContactDisplayName: { input: string; output: string; }
+  /** Unique handle used to identify a contact (e.g., username or lnAddress) */
+  ContactHandle: { input: string; output: string; }
+  /** Unique identifier of a contact */
+  ContactId: { input: string; output: string; }
   /** A CCA2 country code (ex US, FR, etc) */
   CountryCode: { input: string; output: string; }
   /** Display currency of an account */
@@ -467,9 +473,39 @@ export type ConsumerAccountWalletByIdArgs = {
 
 export type Contact = {
   readonly __typename: 'Contact';
+  /** Unix timestamp (number of seconds elapsed since January 1, 1970 00:00:00 UTC) */
+  readonly createdAt: Scalars['Timestamp']['output'];
+  /** DisplayName name the user assigns to the contact. */
+  readonly displayName?: Maybe<Scalars['ContactDisplayName']['output']>;
+  /** Username or lnAddress that identifies the contact. */
+  readonly handle: Scalars['ContactHandle']['output'];
+  /** ID of the contact user or external handle. */
+  readonly id: Scalars['ContactId']['output'];
   readonly prettyName: Scalars['String']['output'];
+  /** Total number of transactions with this contact. */
+  readonly transactionsCount: Scalars['Int']['output'];
+  /** Type of the contact (intraledger, lnaddress, etc.). */
+  readonly type: ContactType;
 };
 
+export type ContactCreateInput = {
+  readonly displayName?: InputMaybe<Scalars['ContactAlias']['input']>;
+  readonly handle?: InputMaybe<Scalars['ContactHandle']['input']>;
+  readonly type: ContactType;
+};
+
+export type ContactPayload = {
+  readonly __typename: 'ContactPayload';
+  readonly contact?: Maybe<Contact>;
+  readonly errors: ReadonlyArray<Error>;
+};
+
+export const ContactType = {
+  Intraledger: 'INTRALEDGER',
+  Lnaddress: 'LNADDRESS'
+} as const;
+
+export type ContactType = typeof ContactType[keyof typeof ContactType];
 export type Coordinates = {
   readonly __typename: 'Coordinates';
   readonly latitude: Scalars['Float']['output'];
@@ -1022,6 +1058,7 @@ export type Mutation = {
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly contactCreate: ContactPayload;
   readonly deviceNotificationTokenCreate: SuccessPayload;
   readonly feedbackSubmit: SuccessPayload;
   /**
@@ -1193,6 +1230,11 @@ export type MutationCallbackEndpointDeleteArgs = {
 
 export type MutationCaptchaRequestAuthCodeArgs = {
   input: CaptchaRequestAuthCodeInput;
+};
+
+
+export type MutationContactCreateArgs = {
+  input: ContactCreateInput;
 };
 
 
@@ -2233,11 +2275,16 @@ export type UserContact = {
    * Only the user can see the alias attached to their contact.
    */
   readonly alias?: Maybe<Scalars['ContactAlias']['output']>;
-  readonly id: Scalars['Username']['output'];
+  /** Identifier of the contact (username or Lightning address). */
+  readonly handle: Scalars['ContactHandle']['output'];
+  readonly id: Scalars['ContactHandle']['output'];
   /** Paginated list of transactions sent to/from this contact. */
   readonly transactions?: Maybe<TransactionConnection>;
   readonly transactionsCount: Scalars['Int']['output'];
-  /** Actual identifier of the contact. */
+  /**
+   * Actual identifier of the contact. Deprecated: use `handle` instead.
+   * @deprecated Use `handle` field; this will be removed in a future release.
+   */
   readonly username: Scalars['Username']['output'];
 };
 
@@ -8157,6 +8204,12 @@ export type ResolversTypes = {
   ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
   Contact: ResolverTypeWrapper<Contact>;
   ContactAlias: ResolverTypeWrapper<Scalars['ContactAlias']['output']>;
+  ContactCreateInput: ContactCreateInput;
+  ContactDisplayName: ResolverTypeWrapper<Scalars['ContactDisplayName']['output']>;
+  ContactHandle: ResolverTypeWrapper<Scalars['ContactHandle']['output']>;
+  ContactId: ResolverTypeWrapper<Scalars['ContactId']['output']>;
+  ContactPayload: ResolverTypeWrapper<ContactPayload>;
+  ContactType: ContactType;
   Coordinates: ResolverTypeWrapper<Coordinates>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Country: ResolverTypeWrapper<Country>;
@@ -8396,6 +8449,11 @@ export type ResolversParentTypes = {
   ConsumerAccount: ConsumerAccount;
   Contact: Contact;
   ContactAlias: Scalars['ContactAlias']['output'];
+  ContactCreateInput: ContactCreateInput;
+  ContactDisplayName: Scalars['ContactDisplayName']['output'];
+  ContactHandle: Scalars['ContactHandle']['output'];
+  ContactId: Scalars['ContactId']['output'];
+  ContactPayload: ContactPayload;
   Coordinates: Coordinates;
   Float: Scalars['Float']['output'];
   Country: Country;
@@ -8772,13 +8830,37 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
 };
 
 export type ContactResolvers<ContextType = any, ParentType extends ResolversParentTypes['Contact'] = ResolversParentTypes['Contact']> = {
+  createdAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  displayName?: Resolver<Maybe<ResolversTypes['ContactDisplayName']>, ParentType, ContextType>;
+  handle?: Resolver<ResolversTypes['ContactHandle'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ContactId'], ParentType, ContextType>;
   prettyName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  transactionsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['ContactType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface ContactAliasScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ContactAlias'], any> {
   name: 'ContactAlias';
 }
+
+export interface ContactDisplayNameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ContactDisplayName'], any> {
+  name: 'ContactDisplayName';
+}
+
+export interface ContactHandleScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ContactHandle'], any> {
+  name: 'ContactHandle';
+}
+
+export interface ContactIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ContactId'], any> {
+  name: 'ContactId';
+}
+
+export type ContactPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ContactPayload'] = ResolversParentTypes['ContactPayload']> = {
+  contact?: Resolver<Maybe<ResolversTypes['Contact']>, ParentType, ContextType>;
+  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type CoordinatesResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coordinates'] = ResolversParentTypes['Coordinates']> = {
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -9085,6 +9167,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
@@ -9592,7 +9675,8 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type UserContactResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserContact'] = ResolversParentTypes['UserContact']> = {
   alias?: Resolver<Maybe<ResolversTypes['ContactAlias']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Username'], ParentType, ContextType>;
+  handle?: Resolver<ResolversTypes['ContactHandle'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ContactHandle'], ParentType, ContextType>;
   transactions?: Resolver<Maybe<ResolversTypes['TransactionConnection']>, ParentType, ContextType, Partial<UserContactTransactionsArgs>>;
   transactionsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['Username'], ParentType, ContextType>;
@@ -9735,6 +9819,10 @@ export type Resolvers<ContextType = any> = {
   ConsumerAccount?: ConsumerAccountResolvers<ContextType>;
   Contact?: ContactResolvers<ContextType>;
   ContactAlias?: GraphQLScalarType;
+  ContactDisplayName?: GraphQLScalarType;
+  ContactHandle?: GraphQLScalarType;
+  ContactId?: GraphQLScalarType;
+  ContactPayload?: ContactPayloadResolvers<ContextType>;
   Coordinates?: CoordinatesResolvers<ContextType>;
   Country?: CountryResolvers<ContextType>;
   CountryCode?: GraphQLScalarType;

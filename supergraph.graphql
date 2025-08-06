@@ -443,11 +443,69 @@ type ConsumerAccount implements Account
   lastName: String @join__field(graph: KYC)
 }
 
+type Contact
+  @join__type(graph: BLINK)
+{
+  """
+  Unix timestamp (number of seconds elapsed since January 1, 1970 00:00:00 UTC)
+  """
+  createdAt: Timestamp!
+
+  """DisplayName name the user assigns to the contact."""
+  displayName: ContactDisplayName
+
+  """Username or lnAddress that identifies the contact."""
+  handle: ContactHandle!
+
+  """ID of the contact user or external handle."""
+  id: ContactId!
+
+  """Total number of transactions with this contact."""
+  transactionsCount: Int!
+
+  """Type of the contact (intraledger, lnaddress, etc.)."""
+  type: ContactType!
+}
+
 """
 An alias name that a user can set for a wallet (with which they have transactions)
 """
 scalar ContactAlias
   @join__type(graph: BLINK)
+
+input ContactCreateInput
+  @join__type(graph: BLINK)
+{
+  displayName: ContactAlias
+  handle: ContactHandle
+  type: ContactType!
+}
+
+"""A display name that a user can assign to a contact"""
+scalar ContactDisplayName
+  @join__type(graph: BLINK)
+
+"""Unique handle used to identify a contact (e.g., username or lnAddress)"""
+scalar ContactHandle
+  @join__type(graph: BLINK)
+
+"""Unique identifier of a contact"""
+scalar ContactId
+  @join__type(graph: BLINK)
+
+type ContactPayload
+  @join__type(graph: BLINK)
+{
+  contact: Contact
+  errors: [Error!]!
+}
+
+enum ContactType
+  @join__type(graph: BLINK)
+{
+  INTRALEDGER @join__enumValue(graph: BLINK)
+  LNADDRESS @join__enumValue(graph: BLINK)
+}
 
 type Coordinates
   @join__type(graph: BLINK)
@@ -1251,6 +1309,7 @@ type Mutation
   callbackEndpointDelete(input: CallbackEndpointDeleteInput!): SuccessPayload! @join__field(graph: BLINK)
   captchaCreateChallenge: CaptchaCreateChallengePayload! @join__field(graph: BLINK)
   captchaRequestAuthCode(input: CaptchaRequestAuthCodeInput!): SuccessPayload! @join__field(graph: BLINK)
+  contactCreate(input: ContactCreateInput!): ContactPayload! @join__field(graph: BLINK)
   deviceNotificationTokenCreate(input: DeviceNotificationTokenCreateInput!): SuccessPayload! @join__field(graph: BLINK)
   feedbackSubmit(input: FeedbackSubmitInput!): SuccessPayload! @join__field(graph: BLINK)
 
@@ -2250,7 +2309,10 @@ type UserContact
   Only the user can see the alias attached to their contact.
   """
   alias: ContactAlias
-  id: Username!
+
+  """Identifier of the contact (username or Lightning address)."""
+  handle: ContactHandle!
+  id: ContactHandle!
 
   """Paginated list of transactions sent to/from this contact."""
   transactions(
@@ -2268,8 +2330,8 @@ type UserContact
   ): TransactionConnection
   transactionsCount: Int!
 
-  """Actual identifier of the contact."""
-  username: Username!
+  """Actual identifier of the contact. Deprecated: use `handle` instead."""
+  username: Username! @deprecated(reason: "Use `handle` field; this will be removed in a future release.")
 }
 
 input UserContactUpdateAliasInput
