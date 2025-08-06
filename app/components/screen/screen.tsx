@@ -4,8 +4,9 @@ import {
   ScrollView,
   StatusBar,
   View,
-  SafeAreaView,
 } from "react-native"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { useHeaderHeight } from "@react-navigation/elements"
 
 import { ScreenProps } from "./screen.props"
 import { isNonScrolling, offsets, presets } from "./screen.presets"
@@ -19,7 +20,17 @@ function ScreenWithoutScrolling(props: ScreenProps) {
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
     : {}
-  const Wrapper = props.unsafe ? View : SafeAreaView
+  
+  let headerHeight = 0
+  try {
+    headerHeight = useHeaderHeight()
+  } catch {
+    // No header present
+    headerHeight = 0
+  }
+  
+  // If there's a header, only apply bottom safe area. Otherwise apply both.
+  const safeAreaEdges = headerHeight > 0 ? ['bottom'] : ['top', 'bottom']
 
   return (
     <KeyboardAvoidingView
@@ -34,7 +45,13 @@ function ScreenWithoutScrolling(props: ScreenProps) {
       {/* modalClipboard requires StoreContext which requiere being inside a navigator */}
       <ModalClipboard />
       <ModalNfc />
-      <Wrapper style={[preset.inner, style]}>{props.children}</Wrapper>
+      {props.unsafe ? (
+        <View style={[preset.inner, style]}>{props.children}</View>
+      ) : (
+        <SafeAreaView edges={safeAreaEdges} style={[preset.inner, style]}>
+          {props.children}
+        </SafeAreaView>
+      )}
     </KeyboardAvoidingView>
   )
 }
@@ -45,7 +62,17 @@ function ScreenWithScrolling(props: ScreenProps) {
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
     : {}
-  const Wrapper = props.unsafe ? View : SafeAreaView
+  
+  let headerHeight = 0
+  try {
+    headerHeight = useHeaderHeight()
+  } catch {
+    // No header present
+    headerHeight = 0
+  }
+  
+  // If there's a header, only apply bottom safe area. Otherwise apply both.
+  const safeAreaEdges = headerHeight > 0 ? ['bottom'] : ['top', 'bottom']
 
   return (
     <KeyboardAvoidingView
@@ -59,14 +86,25 @@ function ScreenWithScrolling(props: ScreenProps) {
       />
       <ModalClipboard />
       <ModalNfc />
-      <Wrapper style={[preset.outer, backgroundStyle]}>
-        <ScrollView
-          style={[preset.outer, backgroundStyle]}
-          contentContainerStyle={[preset.inner, style]}
-        >
-          {props.children}
-        </ScrollView>
-      </Wrapper>
+      {props.unsafe ? (
+        <View style={[preset.outer, backgroundStyle]}>
+          <ScrollView
+            style={[preset.outer, backgroundStyle]}
+            contentContainerStyle={[preset.inner, style]}
+          >
+            {props.children}
+          </ScrollView>
+        </View>
+      ) : (
+        <SafeAreaView edges={safeAreaEdges} style={[preset.outer, backgroundStyle]}>
+          <ScrollView
+            style={[preset.outer, backgroundStyle]}
+            contentContainerStyle={[preset.inner, style]}
+          >
+            {props.children}
+          </ScrollView>
+        </SafeAreaView>
+      )}
     </KeyboardAvoidingView>
   )
 }

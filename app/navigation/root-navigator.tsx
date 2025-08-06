@@ -14,6 +14,7 @@ import * as RNLocalize from "react-native-localize"
 import { Icon } from 'react-native-elements'
 // import Icon from "react-native-vector-icons/Ionicons"
 import analytics from "@react-native-firebase/analytics"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { translate } from "../i18n"
 import {
@@ -576,6 +577,7 @@ type TabProps = {
 
 export const PrimaryNavigator: NavigatorType = () => {
   const { tokenNetwork } = useToken()
+  const insets = useSafeAreaInsets()
 
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
@@ -593,7 +595,13 @@ export const PrimaryNavigator: NavigatorType = () => {
         tabBarActiveTintColor:
           tokenNetwork === "mainnet" ? palette.lightBlue : palette.orange,
         tabBarInactiveTintColor: palette.midGrey,
-        tabBarStyle: styles.bottomNavigatorStyle,
+        tabBarStyle: [
+          styles.bottomNavigatorStyle,
+          {
+            paddingBottom: insets.bottom,
+            height: 60 + insets.bottom, // Base height + safe area
+          }
+        ],
         tabBarLabelStyle: { paddingBottom: 6 },
         tabBarHideOnKeyboard: true,
       }}

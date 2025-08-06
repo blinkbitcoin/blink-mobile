@@ -16,6 +16,7 @@ import useToken from "../../utils/use-token"
 import { useMySubscription } from "../../hooks/user-hooks"
 import Share from "react-native-share"
 import RNFS from 'react-native-fs'
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 // import analytics from "@react-native-firebase/analytics"
 
 import { translate } from "../../i18n"
@@ -63,6 +64,7 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
   const [canGoBack, setCanGoBack] = useState(false)
   const otcBaseUri = getOtcBaseUri()
   const { orderNbr } = route?.params || {}
+  const insets = useSafeAreaInsets()
 
   const handleBackButtonPress = () => {
     try {

@@ -47,6 +47,7 @@ import { loadAuthToken, networkVar } from "./graphql/client-only-query"
 import { INetwork } from "./types/network"
 import ErrorBoundary from "react-native-error-boundary"
 import { ErrorScreen } from "./screens/error-screen"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 export const BUILD_VERSION = "build_version"
 
@@ -271,30 +272,32 @@ export const App = (): JSX.Element => {
   }
 
   return (
-    <ApolloProvider client={apolloClient}>
-      <ErrorBoundary FallbackComponent={ErrorScreen}>
-        <NavigationContainer
-          key={token}
-          linking={linking}
-          // fallback={<Text>Loading...</Text>}
-          onStateChange={(state) => {
-            const currentRouteName = getActiveRouteName(state)
+    <SafeAreaProvider>
+      <ApolloProvider client={apolloClient}>
+        <ErrorBoundary FallbackComponent={ErrorScreen}>
+          <NavigationContainer
+            key={token}
+            linking={linking}
+            // fallback={<Text>Loading...</Text>}
+            onStateChange={(state) => {
+              const currentRouteName = getActiveRouteName(state)
 
-            if (routeName !== currentRouteName) {
-              analytics().logScreenView({
-                screen_name: currentRouteName,
-                screen_class: currentRouteName,
-              })
-              setRouteName(currentRouteName)
-            }
-          }}
-        >
-          <RootSiblingParent>
-            <GlobalErrorToast />
-            <RootStack />
-          </RootSiblingParent>
-        </NavigationContainer>
-      </ErrorBoundary>
-    </ApolloProvider>
+              if (routeName !== currentRouteName) {
+                analytics().logScreenView({
+                  screen_name: currentRouteName,
+                  screen_class: currentRouteName,
+                })
+                setRouteName(currentRouteName)
+              }
+            }}
+          >
+            <RootSiblingParent>
+              <GlobalErrorToast />
+              <RootStack />
+            </RootSiblingParent>
+          </NavigationContainer>
+        </ErrorBoundary>
+      </ApolloProvider>
+    </SafeAreaProvider>
   )
 }
