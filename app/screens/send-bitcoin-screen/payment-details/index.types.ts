@@ -22,6 +22,7 @@ import {
   useOnChainUsdTxFeeAsBtcDenominatedLazyQuery,
   useOnChainUsdTxFeeLazyQuery,
   WalletCurrency,
+  Transaction,
 } from "@app/graphql/generated"
 import {
   BtcMoneyAmount,
@@ -83,6 +84,7 @@ export type SendPaymentMutation = (
   SendPaymentMutationParams: SendPaymentMutationParams,
 ) => Promise<{
   status: PaymentSendResult | null | undefined
+  transaction?: Partial<Transaction> | null | undefined
   errors?: readonly GraphQlApplicationError[]
   extraInfo?: PaymentSendExtraInfo
 }>

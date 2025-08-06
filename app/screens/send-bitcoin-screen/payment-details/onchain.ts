@@ -64,6 +64,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
       return {
         status: data?.onChainPaymentSendAll.status,
         errors: data?.onChainPaymentSendAll.errors,
+        transaction: data?.onChainPaymentSendAll.transaction,
       }
     }
 
@@ -140,6 +141,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
       return {
         status: data?.onChainPaymentSend.status,
         errors: data?.onChainPaymentSend.errors,
+        transaction: data?.onChainPaymentSend.transaction,
         extraInfo: {
           arrivalAtMempoolEstimate:
             data?.onChainPaymentSend.transaction?.settlementVia.__typename ===
@@ -203,6 +205,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         return {
           status: data?.onChainUsdPaymentSend.status,
           errors: data?.onChainUsdPaymentSend.errors,
+          transaction: data?.onChainUsdPaymentSend.transaction,
         }
       }
 
@@ -243,6 +246,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         return {
           status: data?.onChainUsdPaymentSendAsBtcDenominated.status,
           errors: data?.onChainUsdPaymentSendAsBtcDenominated.errors,
+          transaction: data?.onChainUsdPaymentSendAsBtcDenominated.transaction,
         }
       }
 
