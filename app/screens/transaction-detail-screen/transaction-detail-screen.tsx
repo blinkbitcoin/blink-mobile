@@ -97,7 +97,7 @@ const Row = ({
       <Text style={styles.entry}>
         {entry + " "}
         {type === "SettlementViaOnChain" && (
-          <Icon name="open-outline" size={18} color={palette.darkGrey} />
+          <Icon name="open-outline" size={18} type="ionicon" color={palette.darkGrey} />
         )}
         {bbOrderNbr && (
           <Icon name="info-outline" size={18} color={palette.darkGrey} onPress={() => {

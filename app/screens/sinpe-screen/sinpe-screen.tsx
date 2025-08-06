@@ -15,6 +15,7 @@ import { validPayment } from "../../utils/parsing"
 import useToken from "../../utils/use-token"
 import { useMySubscription } from "../../hooks/user-hooks"
 import Share from "react-native-share"
+import RNFS from 'react-native-fs'
 // import analytics from "@react-native-firebase/analytics"
 
 import { translate } from "../../i18n"
@@ -293,9 +294,9 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
 
   useEffect(() => {
     if(Platform.OS === 'android') {
-      BackHandler.addEventListener("hardwareBackPress", handleBackButtonPress)
+      const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackButtonPress)
       return () => {
-        BackHandler.removeEventListener("hardwareBackPress", handleBackButtonPress)
+        backHandler.remove()
       }
     }
   }, [canGoBack])
@@ -353,6 +354,44 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
 
                 case "downloadFile":
                   await downloadFile(data.data, data.filename, data.mimeType)
+                  break;
+
+                case "shareImage":
+                  try {
+                    if (Platform.OS === 'android') {
+                      // For Android, write base64 to file first, then share the file
+                      const base64Data = data.dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
+                      const tempPath = `${RNFS.CachesDirectoryPath}/${data.filename}`;
+                      
+                      await RNFS.writeFile(tempPath, base64Data, 'base64');
+                      
+                      await Share.open({
+                        url: `file://${tempPath}`,
+                        type: data.mimeType,
+                        filename: data.filename,
+                        failOnCancel: false,
+                        showAppsToView: true,
+                        saveToFiles: true,
+                      });
+                      
+                      // Clean up temp file
+                      setTimeout(() => {
+                        RNFS.unlink(tempPath).catch(console.warn);
+                      }, 5000);
+                    } else {
+                      // iOS can handle data URLs directly
+                      await Share.open({
+                        url: data.dataUrl,
+                        type: data.mimeType,
+                        filename: data.filename,
+                        failOnCancel: false,
+                        showAppsToView: true,
+                        saveToFiles: true,
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Share error:', error);
+                  }
                   break;
               }
             }}
