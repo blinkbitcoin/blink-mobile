@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Linking } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles } from "@rneui/themed"
@@ -21,10 +20,6 @@ export const SupportOnboardingScreen: React.FC = () => {
     navigation.replace("Primary")
   }
 
-  const handleSecondaryAction = () => {
-    Linking.openURL(`mailto:${feedbackEmailAddress}`)
-  }
-
   const contactInfoString = LL.OnboardingScreen.supportScreen.contactInfo({
     email: feedbackEmailAddress,
   })
@@ -33,25 +28,20 @@ export const SupportOnboardingScreen: React.FC = () => {
 
   return (
     <OnboardingLayout
-      title={LL.OnboardingScreen.supportScreen.title()}
       customContent={
         <>
-          <Text style={styles.descriptionText}>
+          <Text type="h2" style={styles.descriptionText}>
             {LL.OnboardingScreen.supportScreen.description()}
           </Text>
-          <Text style={styles.descriptionText}>
+          <Text type="h2" style={styles.descriptionText}>
             {prefix}
-            <Text style={styles.linkText} onPress={handleSecondaryAction}>
-              {feedbackEmailAddress}
-            </Text>
+            <Text style={styles.linkText}>{feedbackEmailAddress}</Text>
             {suffix}
           </Text>
         </>
       }
       primaryLabel={LL.OnboardingScreen.supportScreen.primaryButton()}
       onPrimaryAction={handlePrimaryAction}
-      secondaryLabel={LL.OnboardingScreen.supportScreen.secondaryButton()}
-      onSecondaryAction={handleSecondaryAction}
       iconName="support"
     />
   )
@@ -60,11 +50,9 @@ export const SupportOnboardingScreen: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   descriptionText: {
     color: colors.grey2,
-    fontSize: 16,
     marginBottom: 8,
   },
   linkText: {
     color: colors.primary3,
-    textDecorationLine: "underline",
   },
 }))

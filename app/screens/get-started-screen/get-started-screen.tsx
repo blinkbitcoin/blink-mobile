@@ -94,9 +94,12 @@ export const GetStartedScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.GetStartedScreen.createAccount()}
           onPress={() => handleCreateAccount()}
-          containerStyle={styles.buttonContainer}
         />
-        <GaloySecondaryButton title={LL.GetStartedScreen.login()} onPress={handleLogin} />
+        <GaloySecondaryButton
+          title={LL.GetStartedScreen.login()}
+          onPress={handleLogin}
+          containerStyle={styles.secondaryButtonContainer}
+        />
       </View>
     </Screen>
   )
@@ -107,13 +110,11 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     paddingHorizontal: 24,
     justifyContent: "flex-end",
-    marginBottom: 36,
   },
 
-  buttonContainer: {
-    marginVertical: 6,
+  secondaryButtonContainer: {
+    marginVertical: 15,
   },
-
   logoContainer: { width: "100%", height: "50%", marginTop: 50 },
 
   textInstance: {

@@ -58,7 +58,6 @@ const getStories = () => {
     "./app/components/set-lightning-address-modal/set-lightning-address-modal.stories.tsx": require("../app/components/set-lightning-address-modal/set-lightning-address-modal.stories.tsx"),
     "./app/components/totp-export/totp-copy.stories.tsx": require("../app/components/totp-export/totp-copy.stories.tsx"),
     "./app/components/totp-export/totp-qr.stories.tsx": require("../app/components/totp-export/totp-qr.stories.tsx"),
-    "./app/components/upgrade-account-modal/upgrade-account-modal.stories.tsx": require("../app/components/upgrade-account-modal/upgrade-account-modal.stories.tsx"),
     "./app/components/wallet-overview/wallet-overview.stories.tsx": require("../app/components/wallet-overview/wallet-overview.stories.tsx"),
     "./app/components/wallet-summary/wallet-summary.stories.tsx": require("../app/components/wallet-summary/wallet-summary.stories.tsx"),
     "./app/rne-theme/colors.stories.tsx": require("../app/rne-theme/colors.stories.tsx"),

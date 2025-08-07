@@ -71,6 +71,11 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     flex: 1,
   },
+  bottom: {
+    flex: 1,
+    justifyContent: "flex-end",
+    marginBottom: 14,
+  },
   inputComponentContainerStyle: {
     flex: 1,
     marginLeft: 20,
@@ -93,10 +98,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   contactSupportButton: {
     marginTop: 10,
-  },
-  buttonSpacer: {
-    height: 40,
-    marginBottom: 25,
   },
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
 }))
@@ -311,8 +312,8 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
           captchaLoading={captchaLoading}
           isDisabled={isDisabledCountryAndCreateAccount}
           submit={userSubmitPhoneNumber}
+          customStyle={styles.bottom}
         />
-        <View style={styles.buttonSpacer} />
       </View>
     </Screen>
   )

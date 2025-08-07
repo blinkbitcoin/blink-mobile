@@ -116,7 +116,7 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
   )
 
   return (
-    <Screen>
+    <Screen style={styles.screenStyle}>
       <View style={styles.header}>
         <AppLogo style={styles.logo} />
         <Text type="h1" style={styles.title}>
@@ -139,16 +139,18 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
             containerStyle={styles.buttonContainer}
           />
         )}
-        <View style={styles.buttonSpacer} />
       </View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  screenStyle: {
+    padding: 20,
+    flexGrow: 1,
+  },
   header: {
-    paddingTop: 40,
-    paddingHorizontal: 24,
+    paddingTop: 20,
   },
   logo: {
     alignSelf: "center",
@@ -167,11 +169,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   bottom: {
     flex: 1,
-    paddingHorizontal: 24,
     justifyContent: "flex-end",
-    marginBottom: 36,
-  },
-  buttonSpacer: {
-    height: 40,
+    marginBottom: 10,
   },
 }))

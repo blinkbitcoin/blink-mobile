@@ -2581,7 +2581,7 @@ const en: BaseTranslation = {
     telegram: "Send via Telegram",
   },
   LoginMethodScreen: {
-    title: "Select how you want to login to your account.",
+    title: "Select preferred login method.",
     useTelegram: "Use Telegram",
     useSms: "Use SMS",
     useWhatsapp: "Use WhatsApp",
@@ -2608,12 +2608,12 @@ const en: BaseTranslation = {
       primaryButton: "Set up email login",
     },
     lightningBenefits: {
-      mainTitle: "Set up Lightning Address",
+      mainTitle: "Set up Custom Lightning Address",
       title: "Lightning Address benefits:",
       staticAddressDescription: "A static address to receive payments",
       easyToShareDescription: "Easy to memorize and share publicly or privately",
       blinkToolsDescription: "Unlocks various Blink tools useful for commerce",
-      primaryButton: "Set up Lightning Address",
+      primaryButton: "Set up Custom Address",
     },
     supportScreen: {
       mainTitle: "Blink feedback",

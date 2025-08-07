@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
-import { View, TextInput, StyleSheet } from "react-native"
+import { View, TextInput, StyleSheet, Keyboard } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rneui/themed"
@@ -131,6 +131,7 @@ export const SetLightningAddressScreen: React.FC<{
       return
     }
 
+    Keyboard.dismiss()
     setShowSuccess(true)
   }
 
@@ -209,15 +210,13 @@ export const SetLightningAddressScreen: React.FC<{
           loading={loading}
           disabled={!username}
           onPress={onSetLightningAddress}
-          containerStyle={styles.buttonContainer}
         />
-        {onboarding ? (
+        {onboarding && (
           <GaloySecondaryButton
             title={LL.UpgradeAccountModal.notNow()}
             onPress={onboardingNavigate}
+            containerStyle={styles.secondaryButtonContainer}
           />
-        ) : (
-          <View style={styles.buttonSpacer} />
         )}
       </View>
     </Screen>
@@ -237,18 +236,19 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 36,
     rowGap: 20,
   },
   bottom: {
     flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 36,
+    marginBottom: 30,
     paddingHorizontal: 24,
   },
-  buttonContainer: {
-    marginVertical: 6,
+  secondaryButtonContainer: {
+    marginTop: 15,
+    marginBottom: -15,
   },
   textInputContainerStyle: {
     flexDirection: "row",
@@ -266,8 +266,5 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 18,
     color: colors.black,
-  },
-  buttonSpacer: {
-    height: 40,
   },
 }))

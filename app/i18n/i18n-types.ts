@@ -8061,7 +8061,7 @@ type RootTranslation = {
 	}
 	LoginMethodScreen: {
 		/**
-		 * S​e​l​e​c​t​ ​h​o​w​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​l​o​g​i​n​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​.
+		 * S​e​l​e​c​t​ ​p​r​e​f​e​r​r​e​d​ ​l​o​g​i​n​ ​m​e​t​h​o​d​.
 		 */
 		title: string
 		/**
@@ -8148,7 +8148,7 @@ type RootTranslation = {
 		}
 		lightningBenefits: {
 			/**
-			 * S​e​t​ ​u​p​ ​L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s
+			 * S​e​t​ ​u​p​ ​C​u​s​t​o​m​ ​L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s
 			 */
 			mainTitle: string
 			/**
@@ -8168,7 +8168,7 @@ type RootTranslation = {
 			 */
 			blinkToolsDescription: string
 			/**
-			 * S​e​t​ ​u​p​ ​L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s
+			 * S​e​t​ ​u​p​ ​C​u​s​t​o​m​ ​A​d​d​r​e​s​s
 			 */
 			primaryButton: string
 		}
@@ -17342,7 +17342,7 @@ export type TranslationFunctions = {
 	}
 	LoginMethodScreen: {
 		/**
-		 * Select how you want to login to your account.
+		 * Select preferred login method.
 		 */
 		title: () => LocalizedString
 		/**
@@ -17429,7 +17429,7 @@ export type TranslationFunctions = {
 		}
 		lightningBenefits: {
 			/**
-			 * Set up Lightning Address
+			 * Set up Custom Lightning Address
 			 */
 			mainTitle: () => LocalizedString
 			/**
@@ -17449,7 +17449,7 @@ export type TranslationFunctions = {
 			 */
 			blinkToolsDescription: () => LocalizedString
 			/**
-			 * Set up Lightning Address
+			 * Set up Custom Address
 			 */
 			primaryButton: () => LocalizedString
 		}

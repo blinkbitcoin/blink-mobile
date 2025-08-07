@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useCallback, useState, useEffect } from "react"
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, Keyboard } from "react-native"
 import { Text, makeStyles } from "@rneui/themed"
 
 import { gql } from "@apollo/client"
@@ -83,6 +83,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         }
 
         if (res.data?.userEmailRegistrationValidate.me?.email?.verified) {
+          Keyboard.dismiss()
           setShowSuccess(true)
         } else {
           throw new Error(LL.common.errorAuthToken())

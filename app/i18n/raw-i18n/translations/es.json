@@ -2488,7 +2488,7 @@
         "telegram": "Enviar a través de Telegram"
     },
     "LoginMethodScreen": {
-        "title": "Seleccione cómo desea iniciar sesión en su cuenta.",
+        "title": "Seleccione su método de inicio preferido.",
         "useTelegram": "Usar Telegram",
         "useSms": "Usar SMS",
         "useWhatsapp": "Usar WhatsApp",
@@ -2515,12 +2515,12 @@
             "primaryButton": "Configurar inicio de sesión con email"
         },
         "lightningBenefits": {
-            "mainTitle": "Configura la dirección Lightning",
+            "mainTitle": "Configurar dirección Lightning personalizada",
             "title": "Beneficios de la dirección Lightning:",
             "staticAddressDescription": "Una dirección estática para recibir pagos",
             "easyToShareDescription": "Fácil de memorizar y compartir pública o privadamente",
             "blinkToolsDescription": "Desbloquea varias herramientas de Blink útiles para el comercio",
-            "primaryButton": "Configurar dirección Lightning"
+            "primaryButton": "Configurar dirección personalizada"
         },
         "supportScreen": {
           "mainTitle": "Comentarios sobre Blink",

@@ -8,7 +8,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 export type OnboardingLayoutProps = {
-  title: string
+  title?: string
   descriptions?: string[]
   customContent?: React.ReactNode
   iconName?: IconNamesType
@@ -38,14 +38,20 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
   const styles = useStyles()
 
   return (
-    <Screen>
+    <Screen style={styles.screenStyle}>
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
+        {title && (
+          <Text type="h2" style={styles.title}>
+            {title}
+          </Text>
+        )}
 
         <View style={styles.descriptionList}>
           {descriptions?.map((line, index) => (
             <View key={index} style={styles.descriptionItem}>
-              <Text style={styles.descriptionText}>- {line}</Text>
+              <Text type="h2" style={styles.descriptionText}>
+                - {line}
+              </Text>
             </View>
           ))}
           {customContent && <View>{customContent}</View>}
@@ -63,16 +69,14 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
           title={primaryLabel}
           onPress={onPrimaryAction}
           loading={primaryLoading}
-          containerStyle={styles.buttonContainer}
         />
-        {secondaryLabel && onSecondaryAction ? (
+        {secondaryLabel && onSecondaryAction && (
           <GaloySecondaryButton
             title={secondaryLabel}
             onPress={onSecondaryAction}
             loading={secondaryLoading}
+            containerStyle={styles.secondaryButtonContainer}
           />
-        ) : (
-          <View style={styles.buttonSpacer} />
         )}
       </View>
     </Screen>
@@ -80,15 +84,23 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  screenStyle: {
+    padding: 20,
+    paddingBottom: 20,
+    flexGrow: 1,
+  },
+  secondaryButtonContainer: {
+    marginTop: 15,
+    marginBottom: -15,
+  },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 4,
     paddingTop: 36,
   },
   title: {
     paddingHorizontal: 5,
     marginBottom: 10,
-    fontSize: 18,
   },
   descriptionList: {
     paddingHorizontal: 5,
@@ -99,22 +111,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   descriptionText: {
     color: colors.grey2,
-    fontSize: 16,
   },
   bottom: {
+    flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 36,
-    paddingHorizontal: 24,
-  },
-  buttonSpacer: {
-    height: 40,
-  },
-  buttonContainer: {
-    marginVertical: 6,
+    marginBottom: 10,
   },
   iconWrapper: {
     alignItems: "center",
     marginTop: 40,
-    position: "relative",
   },
 }))
