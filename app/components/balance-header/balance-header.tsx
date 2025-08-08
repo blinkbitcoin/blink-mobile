@@ -2,10 +2,10 @@ import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
 import { TouchableOpacity, View } from "react-native"
 
+import { makeStyles, Text } from "@rneui/themed"
 
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Text } from "@rneui/themed"
 
 const Loader = () => {
   const styles = useStyles()
@@ -34,46 +34,17 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
 
   // TODO: use suspense for this component with the apollo suspense hook (in beta)
   // so there is no need to pass loading from parent?
-  const { data } = useBalanceHeaderQuery({ skip: !isAuthed })
-
-  // TODO: check that there are 2 wallets.
-  // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
-  // some tests accounts have only 1 wallet
-
-  let balanceInDisplayCurrency = "$0.00"
-
-  if (isAuthed) {
-    const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-    const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
-
-    const usdWalletBalance = toUsdMoneyAmount(usdWallet?.balance)
-
-    const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance)
-
-    const btcBalanceInDisplayCurrency =
-      convertMoneyAmount && convertMoneyAmount(btcWalletBalance, DisplayCurrency)
-
-    const usdBalanceInDisplayCurrency =
-      convertMoneyAmount && convertMoneyAmount(usdWalletBalance, DisplayCurrency)
-
-    if (usdBalanceInDisplayCurrency && btcBalanceInDisplayCurrency) {
-      balanceInDisplayCurrency = formatMoneyAmount({
-        moneyAmount: addMoneyAmounts({
-          a: usdBalanceInDisplayCurrency,
-          b: btcBalanceInDisplayCurrency,
-        }),
-      })
-    }
-  }
-
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
+        <TouchableOpacity
+          onPress={switchMemoryHideAmount}
+          style={styles.hiddenBalanceTouchableOpacity}
+        >
           <Text style={styles.balanceHiddenText}>****</Text>
         </TouchableOpacity>
       ) : (
-        <View>
+        <View style={styles.balancesContainer}>
           <TouchableOpacity onPress={switchMemoryHideAmount}>
             <View style={styles.marginBottom}>
               {loading ? (
@@ -95,6 +66,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     alignItems: "center",
   },
+  balancesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   headerText: {
     fontSize: 16,
     fontWeight: "bold",
@@ -102,6 +78,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   marginBottom: {
     marginBottom: 4,
+  },
+  hiddenBalanceTouchableOpacity: {
+    alignItems: "center",
+    flexGrow: 1,
+    justifyContent: "center",
   },
   primaryBalanceText: {
     fontSize: 32,

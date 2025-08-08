@@ -32,10 +32,12 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { setUpgradeModalShown } from "@app/graphql/client-only-query"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getErrorMessages } from "@app/graphql/utils"
+import { useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fetchProfiles } from "@app/utils/multi-account"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -50,22 +52,6 @@ import {
   useUpgradeModalShownQuery,
 } from "@app/graphql/generated"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getErrorMessages } from "@app/graphql/utils"
-import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { isIos } from "@app/utils/helper"
-import { useNavigation, useIsFocused } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
-
-import { BalanceHeader } from "../../components/balance-header"
-import { Screen } from "../../components/screen"
-import { MemoizedTransactionItem } from "../../components/transaction-item"
-import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { testProps } from "../../utils/testProps"
-import { fetchProfiles } from "@app/utils/multi-account"
-import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 
