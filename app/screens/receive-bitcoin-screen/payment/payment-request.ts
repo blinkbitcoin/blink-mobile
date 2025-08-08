@@ -84,6 +84,7 @@ export const createPaymentRequest = (
           input: {
             walletId: pr.receivingWalletDescriptor.id,
             memo: pr.memo,
+            expiresIn: pr.expirationTime?.toString(),
           },
         },
       })
@@ -130,6 +131,7 @@ export const createPaymentRequest = (
             walletId: pr.receivingWalletDescriptor.id,
             amount: pr.settlementAmount.amount,
             memo: pr.memo,
+            expiresIn: pr.expirationTime?.toString(),
           },
         },
       })
@@ -175,6 +177,7 @@ export const createPaymentRequest = (
             walletId: pr.receivingWalletDescriptor.id,
             amount: pr.settlementAmount.amount,
             memo: pr.memo,
+            expiresIn: pr.expirationTime?.toString(),
           },
         },
       })

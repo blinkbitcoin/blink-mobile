@@ -8813,6 +8813,24 @@ type RootTranslation = {
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
+		/**
+		 * E​x​p​i​r​a​t​i​o​n​ ​T​i​m​e
+		 */
+		expirationTime: string
+		/**
+		 * M​i​n​u​t​e
+		 */
+		minute: string
+		day: {
+			/**
+			 * D​a​y
+			 */
+			one: string
+			/**
+			 * D​a​y​s
+			 */
+			other: string
+		}
 	}
 	errors: {
 		/**
@@ -18083,6 +18101,24 @@ export type TranslationFunctions = {
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
+		/**
+		 * Expiration Time
+		 */
+		expirationTime: () => LocalizedString
+		/**
+		 * Minute
+		 */
+		minute: () => LocalizedString
+		day: {
+			/**
+			 * Day
+			 */
+			one: () => LocalizedString
+			/**
+			 * Days
+			 */
+			other: () => LocalizedString
+		}
 	}
 	errors: {
 		/**

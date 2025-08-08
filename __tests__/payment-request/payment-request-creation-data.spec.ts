@@ -95,4 +95,46 @@ describe("create payment request creation data", () => {
     expect(prcd.canSetMemo).toBe(true)
     expect(prcd.canSetReceivingWalletDescriptor).toBe(true)
   })
+
+  it("ln on btc wallet with expiration time", () => {
+    const prcd = createPaymentRequestCreationData({
+      ...defaultParams,
+      defaultWalletDescriptor: btcWalletDescriptor,
+      expirationTime: 60,
+    })
+
+    expect(prcd.receivingWalletDescriptor).toBe(btcWalletDescriptor)
+    expect(prcd.canSetAmount).toBe(true)
+    expect(prcd.canSetMemo).toBe(true)
+    expect(prcd.canSetReceivingWalletDescriptor).toBe(true)
+    expect(prcd.canSetExpirationTime).toBe(true)
+  })
+
+  it("ln on usd wallet with expiration time", () => {
+    const prcd = createPaymentRequestCreationData({
+      ...defaultParams,
+      defaultWalletDescriptor: usdWalletDescriptor,
+      expirationTime: 5,
+    })
+
+    expect(prcd.receivingWalletDescriptor).toBe(usdWalletDescriptor)
+    expect(prcd.canSetAmount).toBe(true)
+    expect(prcd.canSetMemo).toBe(true)
+    expect(prcd.canSetReceivingWalletDescriptor).toBe(true)
+    expect(prcd.canSetExpirationTime).toBe(true)
+  })
+
+  it("onchain can't set expiration time", () => {
+    const prcd = createPaymentRequestCreationData({
+      ...defaultParams,
+      type: Invoice.OnChain,
+      defaultWalletDescriptor: usdWalletDescriptor,
+    })
+
+    expect(prcd.receivingWalletDescriptor).toBe(usdWalletDescriptor)
+    expect(prcd.canSetAmount).toBe(false)
+    expect(prcd.canSetMemo).toBe(true)
+    expect(prcd.canSetReceivingWalletDescriptor).toBe(true)
+    expect(prcd.canSetExpirationTime).toBe(false)
+  })
 })
