@@ -7,6 +7,8 @@ type ProfileProps = {
   phone?: string | null
   email?: string | null
   accountId?: string
+  isFirstItem?: boolean
+  nextProfileToken?: string
 }
 
 type FetchUsername = LazyQueryExecFunction<GetUsernamesQuery, Record<string, never>>
