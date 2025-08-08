@@ -8813,6 +8813,18 @@ type RootTranslation = {
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
+		/**
+		 * D​o​l​l​a​r
+		 */
+		dollar: string
+		/**
+		 * A​L​L
+		 */
+		all: string
+		/**
+		 * A​l​l​ ​a​c​c​o​u​n​t​s
+		 */
+		allAccounts: string
 	}
 	errors: {
 		/**
@@ -18083,6 +18095,18 @@ export type TranslationFunctions = {
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
+		/**
+		 * Dollar
+		 */
+		dollar: () => LocalizedString
+		/**
+		 * ALL
+		 */
+		all: () => LocalizedString
+		/**
+		 * All accounts
+		 */
+		allAccounts: () => LocalizedString
 	}
 	errors: {
 		/**

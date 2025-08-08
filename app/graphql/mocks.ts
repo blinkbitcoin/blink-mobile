@@ -14,6 +14,7 @@ import {
   SendBitcoinDetailsScreenDocument,
   UserUpdateUsernameDocument,
   MyUserIdDocument,
+  TransactionListForDefaultAccountDocument,
 } from "./generated"
 
 // TODO: put in __tests__ folder?
@@ -1384,6 +1385,169 @@ const mocks = [
             __typename: "ConsumerAccount",
           },
           __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: TransactionListForDefaultAccountDocument,
+      variables: {},
+    },
+    result: {
+      data: {
+        me: {
+          __typename: "User",
+          id: "user-id",
+          defaultAccount: {
+            __typename: "ConsumerAccount",
+            id: "account-id",
+            wallets: [
+              {
+                __typename: "BTCWallet",
+                id: "e821e124-1c70-4aab-9416-074ee5be21f6",
+                walletCurrency: "BTC",
+              },
+              {
+                __typename: "UsdWallet",
+                id: "5b54bf9a-46cc-4344-b638-b5e5e157a892",
+                walletCurrency: "USD",
+              },
+            ],
+            pendingIncomingTransactions: [],
+            transactions: {
+              __typename: "TransactionConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: "cursor-1",
+                endCursor: "cursor-1",
+              },
+              edges: [
+                {
+                  __typename: "TransactionEdge",
+                  cursor: "cursor-1",
+                  node: {
+                    __typename: "Transaction",
+                    id: "tx-1",
+                    status: "SUCCESS",
+                    direction: "RECEIVE",
+                    memo: null,
+                    createdAt: 1700000000,
+                    settlementAmount: 1000,
+                    settlementFee: 0,
+                    settlementDisplayFee: "0.00",
+                    settlementCurrency: "BTC",
+                    settlementDisplayAmount: "0.10",
+                    settlementDisplayCurrency: "USD",
+                    settlementPrice: {
+                      __typename: "PriceOfOneSettlementMinorUnitInDisplayMinorUnit",
+                      base: 105000000000,
+                      offset: 12,
+                      currencyUnit: "MINOR",
+                      formattedAmount: "0.105",
+                    },
+                    initiationVia: {
+                      __typename: "InitiationViaLn",
+                      paymentHash: "hash-1",
+                      paymentRequest: "payment-request-1",
+                    },
+                    settlementVia: {
+                      __typename: "SettlementViaIntraLedger",
+                      counterPartyWalletId: null,
+                      counterPartyUsername: "user_btc",
+                      preImage: null,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: TransactionListForDefaultAccountDocument,
+      variables: {
+        walletIds: [
+          "e821e124-1c70-4aab-9416-074ee5be21f6",
+          "5b54bf9a-46cc-4344-b638-b5e5e157a892",
+        ],
+      },
+    },
+    result: {
+      data: {
+        me: {
+          __typename: "User",
+          id: "user-id-mock",
+          defaultAccount: {
+            __typename: "ConsumerAccount",
+            id: "account-id-mock",
+            wallets: [
+              {
+                __typename: "BTCWallet",
+                id: "e821e124-1c70-4aab-9416-074ee5be21f6",
+                walletCurrency: "BTC",
+              },
+              {
+                __typename: "UsdWallet",
+                id: "5b54bf9a-46cc-4344-b638-b5e5e157a892",
+                walletCurrency: "USD",
+              },
+            ],
+            pendingIncomingTransactions: [],
+            transactions: {
+              __typename: "TransactionConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: "mock-cursor-start",
+                endCursor: "mock-cursor-end",
+              },
+              edges: [
+                {
+                  __typename: "TransactionEdge",
+                  cursor: "mock-cursor-start",
+                  node: {
+                    __typename: "Transaction",
+                    id: "mock-tx-1",
+                    status: "SUCCESS",
+                    direction: "RECEIVE",
+                    memo: null,
+                    createdAt: 1700000000,
+                    settlementAmount: 1000,
+                    settlementFee: 0,
+                    settlementDisplayFee: "0.00",
+                    settlementCurrency: "BTC",
+                    settlementDisplayAmount: "0.10",
+                    settlementDisplayCurrency: "USD",
+                    settlementPrice: {
+                      __typename: "PriceOfOneSettlementMinorUnitInDisplayMinorUnit",
+                      base: 105000000000,
+                      offset: 12,
+                      currencyUnit: "MINOR",
+                      formattedAmount: "0.105",
+                    },
+                    initiationVia: {
+                      __typename: "InitiationViaLn",
+                      paymentHash: "mock-hash-1",
+                      paymentRequest: "mock-payment-request-1",
+                    },
+                    settlementVia: {
+                      __typename: "SettlementViaIntraLedger",
+                      counterPartyWalletId: null,
+                      counterPartyUsername: "user_btc",
+                      preImage: null,
+                    },
+                  },
+                },
+              ],
+            },
+          },
         },
       },
     },
