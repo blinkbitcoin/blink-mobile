@@ -5,7 +5,7 @@ import SendSMS from 'react-native-sms'
 import { Screen } from "../../components/screen"
 import type { ScreenType } from "../../types/jsx"
 import useMainQuery from "@app/hooks/use-main-query"
-import { ActivityIndicator, Text, View, Alert, Button, Platform, BackHandler, Linking } from "react-native"
+import { ActivityIndicator, Text, View, Alert, Button, Platform, BackHandler, Linking, Share as RNShare } from "react-native"
 import { WebView } from 'react-native-webview'
 import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { useWalletBalance } from "../../hooks"
@@ -239,25 +239,88 @@ export const SinpeScreen: ScreenType = ({route, navigation}: SinpeScreenProps) =
   const downloadFile = async (data, filename, mimeType) => {
     try {
       console.log('downloadFile', data, filename, mimeType)
+      
+      // Validate inputs
+      if (!data) {
+        throw new Error('No data provided for file download')
+      }
+      if (!filename) {
+        throw new Error('No filename provided for file download')
+      }
+      
       const fileBase64 = btoa(data)
       
       // Set default MIME type if not provided
       const fileType = mimeType || 'text/plain'
       
-      const url = `data:${fileType};base64,${fileBase64}`
+      // Sanitize filename for Android file system
+      const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
       
-      await Share.open({
-        title: filename,
-        message: filename,
-        url: url,
-        type: fileType,
-        filename: filename,
-        failOnCancel: false,
-        showAppsToView: true,
-        saveToFiles: true,
-      })
+      if (Platform.OS === 'android') {
+        try {
+          // For Android, write base64 to file first, then share the file
+          const tempPath = `${RNFS.CachesDirectoryPath}/${sanitizedFilename}`
+          
+          console.log('Android: Writing file to', tempPath)
+          
+          await RNFS.writeFile(tempPath, fileBase64, 'base64')
+          
+          // Verify file was written
+          const fileExists = await RNFS.exists(tempPath)
+          if (!fileExists) {
+            throw new Error('Failed to write temporary file')
+          }
+          
+          console.log('Android: File written successfully, sharing...')
+          
+          await Share.open({
+            title: filename,
+            message: filename,
+            url: `file://${tempPath}`,
+            type: fileType,
+            filename: sanitizedFilename,
+            failOnCancel: false,
+            showAppsToView: true,
+            saveToFiles: true,
+          })
+          
+          // Clean up temp file
+          setTimeout(() => {
+            RNFS.unlink(tempPath).catch(console.warn)
+          }, 5000)
+        } catch (androidError) {
+          console.log('Android file approach failed, trying fallback:', androidError.message)
+          
+          // Fallback: try using react-native's built-in Share.share (no file, just text)
+          const textContent = atob(fileBase64) // Convert back to text for sharing
+          
+          await RNShare.share({
+            title: filename,
+            message: `File: ${filename}\n\n${textContent}`,
+          })
+        }
+      } else {
+        // iOS can handle data URLs directly
+        const url = `data:${fileType};base64,${fileBase64}`
+        
+        await Share.open({
+          title: filename,
+          message: filename,
+          url: url,
+          type: fileType,
+          filename: filename,
+          failOnCancel: false,
+          showAppsToView: true,
+          saveToFiles: true,
+        })
+      }
     } catch (error) {
       console.error("Error downloading file:", error)
+      Alert.alert(
+        "Download Error", 
+        `Failed to download file: ${error.message}`,
+        [{ text: "OK" }]
+      )
     }
   }
 

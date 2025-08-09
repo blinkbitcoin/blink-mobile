@@ -7,6 +7,7 @@ import {
 } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
 import { ScreenProps } from "./screen.props"
 import { isNonScrolling, offsets, presets } from "./screen.presets"
@@ -29,8 +30,26 @@ function ScreenWithoutScrolling(props: ScreenProps) {
     headerHeight = 0
   }
   
-  // If there's a header, only apply bottom safe area. Otherwise apply both.
-  const safeAreaEdges = headerHeight > 0 ? ['bottom'] : ['top', 'bottom']
+  let tabBarHeight = 0
+  try {
+    tabBarHeight = useBottomTabBarHeight()
+  } catch {
+    // No tab bar present
+    tabBarHeight = 0
+  }
+  
+  // Determine which edges need safe area
+  let safeAreaEdges = []
+  
+  // Add top edge if no header
+  if (headerHeight === 0) {
+    safeAreaEdges.push('top')
+  }
+  
+  // Add bottom edge only if no tab bar (tab bar handles its own safe area)
+  if (tabBarHeight === 0) {
+    safeAreaEdges.push('bottom')
+  }
 
   return (
     <KeyboardAvoidingView
@@ -71,8 +90,26 @@ function ScreenWithScrolling(props: ScreenProps) {
     headerHeight = 0
   }
   
-  // If there's a header, only apply bottom safe area. Otherwise apply both.
-  const safeAreaEdges = headerHeight > 0 ? ['bottom'] : ['top', 'bottom']
+  let tabBarHeight = 0
+  try {
+    tabBarHeight = useBottomTabBarHeight()
+  } catch {
+    // No tab bar present
+    tabBarHeight = 0
+  }
+  
+  // Determine which edges need safe area
+  let safeAreaEdges = []
+  
+  // Add top edge if no header
+  if (headerHeight === 0) {
+    safeAreaEdges.push('top')
+  }
+  
+  // Add bottom edge only if no tab bar (tab bar handles its own safe area)
+  if (tabBarHeight === 0) {
+    safeAreaEdges.push('bottom')
+  }
 
   return (
     <KeyboardAvoidingView

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from "react-native"
 import { gql, useLazyQuery } from "@apollo/client"
 import { Screen } from "../../components/screen"
 import { palette } from "../../theme/palette"
@@ -9,6 +9,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import Share from "react-native-share"
 import * as currency_fmt from "currency.js"
 import { select } from "@storybook/addon-knobs"
+import RNFS from "react-native-fs"
 
 const GET_CSV_TRANSACTIONS = gql`
   query getWalletCSVTransactions($defaultWalletId: WalletId!) {
@@ -50,15 +51,38 @@ export const TransactionStatsScreen: React.FC = () => {
       // Use the csvData state that was already fetched
       const csvTransactions = csvData?.me?.defaultAccount?.csvTransactions
       if (csvTransactions) {
-        await Share.open({
-          title: "bj-transactions.csv",
-          message: "bj-transactions.csv",
-          url: `data:text/csv;base64,${csvTransactions}`,
-          type: "text/csv",
-          filename: "bj-transactions.csv",
-          failOnCancel: false,
-          saveToFiles: true,
-        })
+        if (Platform.OS === 'android') {
+          // For Android, write base64 CSV to file first, then share the file
+          const tempPath = `${RNFS.CachesDirectoryPath}/bj-transactions.csv`
+          
+          await RNFS.writeFile(tempPath, csvTransactions, 'base64')
+          
+          await Share.open({
+            title: "bj-transactions.csv",
+            message: "bj-transactions.csv",
+            url: `file://${tempPath}`,
+            type: "text/csv",
+            filename: "bj-transactions.csv",
+            failOnCancel: false,
+            saveToFiles: true,
+          })
+          
+          // Clean up temp file after a delay
+          setTimeout(() => {
+            RNFS.unlink(tempPath).catch(console.warn)
+          }, 5000)
+        } else {
+          // iOS can handle data URLs directly
+          await Share.open({
+            title: "bj-transactions.csv",
+            message: "bj-transactions.csv",
+            url: `data:text/csv;base64,${csvTransactions}`,
+            type: "text/csv",
+            filename: "bj-transactions.csv",
+            failOnCancel: false,
+            saveToFiles: true,
+          })
+        }
       } else {
         throw new Error("CSV data not available")
       }
