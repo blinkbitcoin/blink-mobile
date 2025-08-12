@@ -58,7 +58,6 @@ const getStories = () => {
     "./app/components/set-lightning-address-modal/set-lightning-address-modal.stories.tsx": require("../app/components/set-lightning-address-modal/set-lightning-address-modal.stories.tsx"),
     "./app/components/totp-export/totp-copy.stories.tsx": require("../app/components/totp-export/totp-copy.stories.tsx"),
     "./app/components/totp-export/totp-qr.stories.tsx": require("../app/components/totp-export/totp-qr.stories.tsx"),
-    "./app/components/upgrade-account-modal/upgrade-account-modal.stories.tsx": require("../app/components/upgrade-account-modal/upgrade-account-modal.stories.tsx"),
     "./app/components/wallet-overview/wallet-overview.stories.tsx": require("../app/components/wallet-overview/wallet-overview.stories.tsx"),
     "./app/components/wallet-summary/wallet-summary.stories.tsx": require("../app/components/wallet-summary/wallet-summary.stories.tsx"),
     "./app/rne-theme/colors.stories.tsx": require("../app/rne-theme/colors.stories.tsx"),
@@ -103,8 +102,10 @@ const getStories = () => {
     "./app/screens/settings-screen/language-screen.stories.tsx": require("../app/screens/settings-screen/language-screen.stories.tsx"),
     "./app/screens/settings-screen/settings-screen.stories.tsx": require("../app/screens/settings-screen/settings-screen.stories.tsx"),
     "./app/screens/settings-screen/settings.stories.tsx": require("../app/screens/settings-screen/settings.stories.tsx"),
+    "./app/screens/settings-screen/settings/multi-account/switch-account.stories.tsx": require("../app/screens/settings-screen/settings/multi-account/switch-account.stories.tsx"),
     "./app/screens/settings-screen/theme-screen.stories.tsx": require("../app/screens/settings-screen/theme-screen.stories.tsx"),
     "./app/screens/support-chat-screen/support-chat.stories.tsx": require("../app/screens/support-chat-screen/support-chat.stories.tsx"),
+    "./app/screens/telegram-login-screen/telegram-login-validate.stories.tsx": require("../app/screens/telegram-login-screen/telegram-login-validate.stories.tsx"),
     "./app/screens/transaction-detail-screen/transaction-detail-screen.stories.tsx": require("../app/screens/transaction-detail-screen/transaction-detail-screen.stories.tsx"),
   };
 };
