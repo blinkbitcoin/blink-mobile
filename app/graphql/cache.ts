@@ -113,5 +113,10 @@ export const createCache = () =>
           transactions: relayStylePagination(),
         },
       },
+      User: {
+        fields: {
+          statefulNotificationsWithoutBulletinEnabled: relayStylePagination(),
+        },
+      },
     },
   })
