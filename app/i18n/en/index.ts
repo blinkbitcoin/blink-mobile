@@ -2444,6 +2444,7 @@ const en: BaseTranslation = {
   ProfileScreen: {
     addAccount: "Add Account",
     error: "Unable to fetch profiles at this time",
+    fromThisDevice: "from this device?",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
@@ -2796,6 +2797,7 @@ const en: BaseTranslation = {
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
     recommended: "Recommended",
+    profiles: "Profiles",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -2854,6 +2856,7 @@ const en: BaseTranslation = {
     deleteAccountError:
       "Something went wrong. Contact {email: string} for further assistance.",
     bye: "Bye!",
+    deleteAccountWarning: "Attention: Account deletion is permanent!\nMake sure wallets have no funds before deleting.\nDeleted account cannot be reinstated.",
   },
   lnurl: {
     overLimit: "You can't send more than max amount",

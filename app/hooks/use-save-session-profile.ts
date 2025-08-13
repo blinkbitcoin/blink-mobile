@@ -30,6 +30,7 @@ export const useSaveSessionProfile = () => {
   const { saveToken } = useAppConfig()
   const client = useApolloClient()
   const [fetchUsername] = useGetUsernamesLazyQuery({ fetchPolicy: "no-cache" })
+  const blinkUserText = LL.common.blinkUser()
 
   const tryFetchUserProps = useCallback(
     async ({
@@ -49,7 +50,7 @@ export const useSaveSessionProfile = () => {
           username ||
           phone ||
           email?.address ||
-          `${LL.common.blinkUser()} - ${defaultAccount.id.slice(-6)}`
+          `${blinkUserText} - ${defaultAccount.id.slice(-6)}`
 
         return {
           userId: id,
@@ -64,7 +65,7 @@ export const useSaveSessionProfile = () => {
         if (err instanceof Error) crashlytics().recordError(err)
       }
     },
-    [LL.common],
+    [blinkUserText],
   )
 
   const saveProfile = useCallback(
@@ -84,10 +85,18 @@ export const useSaveSessionProfile = () => {
       if (profile.accountId) setUpgradeModalShown(client, false)
 
       const exists = profiles.some((p) => p.accountId === profile.accountId)
+      const cleaned = profiles.map((p) => ({ ...p, selected: false }))
       if (!exists) {
-        const cleaned = profiles.map((p) => ({ ...p, selected: false }))
         await KeyStoreWrapper.saveSessionProfiles([{ ...profile }, ...cleaned])
+        return
       }
+
+      // Update token for the previously saved session
+      const updatedProfiles = cleaned.map((p) =>
+        p.accountId === profile.accountId ? { ...p, token: profile.token } : p,
+      )
+
+      await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
     },
     [saveToken, tryFetchUserProps, fetchUsername, client],
   )
