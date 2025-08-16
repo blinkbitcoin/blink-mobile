@@ -7238,6 +7238,14 @@ type RootTranslation = {
 		 * E​n​c​r​y​p​t​e​d​ ​m​e​s​s​a​g​e​.​ ​W​a​i​t​i​n​g​ ​f​o​r​ ​p​a​y​m​e​n​t​ ​c​o​n​f​i​r​m​a​t​i​o​n​.
 		 */
 		pendingDecryptionMessage: string
+		/**
+		 * F​e​e​ ​s​e​t​t​i​n​g​s
+		 */
+		feeSettings: string
+		/**
+		 * S​e​l​e​c​t​ ​f​e​e
+		 */
+		selectFee: string
 	}
 	SettingsScreen: {
 		/**
@@ -16565,6 +16573,14 @@ export type TranslationFunctions = {
 		 * Encrypted message. Waiting for payment confirmation.
 		 */
 		pendingDecryptionMessage: () => LocalizedString
+		/**
+		 * Fee settings
+		 */
+		feeSettings: () => LocalizedString
+		/**
+		 * Select fee
+		 */
+		selectFee: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
