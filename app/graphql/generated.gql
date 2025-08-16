@@ -524,6 +524,7 @@ mutation quizClaim($input: QuizClaimInput!) {
   quizClaim(input: $input) {
     errors {
       message
+      code
       __typename
     }
     quizzes {
