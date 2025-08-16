@@ -109,7 +109,7 @@ export const createCache = () =>
       },
       Account: {
         fields: {
-          transactions: relayStylePagination(),
+          transactions: relayStylePagination(["walletIds"]),
         },
       },
     },

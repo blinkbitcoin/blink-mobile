@@ -306,6 +306,11 @@ export const HomeScreen: React.FC = () => {
         return
       }
 
+      if (target === "transactionHistory" && wallets) {
+        navigation.navigate("transactionHistory", { wallets })
+        return
+      }
+
       // we are using any because Typescript complain on the fact we are not passing any params
       // but there is no need for a params and the types should not necessitate it
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

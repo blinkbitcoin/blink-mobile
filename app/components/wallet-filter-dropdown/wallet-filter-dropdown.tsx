@@ -10,10 +10,10 @@ import { WalletCurrency } from "@app/graphql/generated"
 export type WalletValues = WalletCurrency | "ALL"
 
 export const WalletFilterDropdown: React.FC<{
-  selected: WalletValues
-  onSelect: (value: WalletValues) => void
+  selected?: WalletValues
+  onSelectionChange?: (value: WalletValues) => void
   loading?: boolean
-}> = ({ selected, onSelect, loading = false }) => {
+}> = ({ selected = "ALL", onSelectionChange, loading = false }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const {
@@ -21,7 +21,20 @@ export const WalletFilterDropdown: React.FC<{
   } = useTheme()
 
   const [isModalVisible, setModalVisible] = useState(false)
+  const [pendingSelection, setPendingSelection] = useState<WalletValues | null>(null)
   const toggleModal = () => setModalVisible((visible) => !visible)
+
+  const handleSelect = (selectedValue: WalletValues) => {
+    toggleModal()
+    setPendingSelection(selectedValue)
+  }
+
+  const handleModalHide = () => {
+    if (pendingSelection !== null) {
+      onSelectionChange?.(pendingSelection)
+      setPendingSelection(null)
+    }
+  }
 
   const walletOptions = [
     {
@@ -47,7 +60,9 @@ export const WalletFilterDropdown: React.FC<{
     },
   ] as const
 
-  const current = walletOptions.find((opt) => opt.value === selected)
+  const current = walletOptions.find(
+    (opt) => opt.value === (pendingSelection || selected),
+  )
   if (!current) return null
 
   return (
@@ -77,19 +92,21 @@ export const WalletFilterDropdown: React.FC<{
 
       <ReactNativeModal
         style={styles.modal}
+        animationInTiming={200}
+        animationOutTiming={200}
         animationIn="fadeInDown"
         animationOut="fadeOutUp"
         isVisible={isModalVisible}
         onBackdropPress={toggleModal}
         onBackButtonPress={toggleModal}
+        onModalHide={handleModalHide}
       >
         <View>
           {walletOptions.map((opt) => (
             <TouchableOpacity
               key={opt.value}
               onPress={() => {
-                onSelect(opt.value)
-                toggleModal()
+                handleSelect(opt.value)
               }}
             >
               <View style={styles.walletContainer}>
@@ -180,6 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
   walletCurrencyText: {
     fontWeight: "bold",
     fontSize: 18,
+    color: colors.black,
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

@@ -1657,27 +1657,16 @@ query transactionListForContact($username: Username!, $first: Int, $after: Strin
   }
 }
 
-query transactionListForDefaultAccount($first: Int, $after: String, $last: Int, $before: String, $walletIds: [WalletId!]) {
+query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: [WalletId!]) {
   me {
     id
     defaultAccount {
       id
-      wallets {
-        id
-        walletCurrency
-        __typename
-      }
       pendingIncomingTransactions {
         ...Transaction
         __typename
       }
-      transactions(
-        first: $first
-        after: $after
-        last: $last
-        before: $before
-        walletIds: $walletIds
-      ) {
+      transactions(first: $first, after: $after, walletIds: $walletIds) {
         ...TransactionList
         __typename
       }
