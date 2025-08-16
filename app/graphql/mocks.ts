@@ -1392,7 +1392,13 @@ const mocks = [
   {
     request: {
       query: TransactionListForDefaultAccountDocument,
-      variables: {},
+      variables: {
+        first: 21,
+        walletIds: [
+          "e821e124-1c70-4aab-9416-074ee5be21f6",
+          "5b54bf9a-46cc-4344-b638-b5e5e157a892",
+        ],
+      },
     },
     result: {
       data: {
@@ -1472,6 +1478,7 @@ const mocks = [
     request: {
       query: TransactionListForDefaultAccountDocument,
       variables: {
+        first: 21,
         walletIds: [
           "e821e124-1c70-4aab-9416-074ee5be21f6",
           "5b54bf9a-46cc-4344-b638-b5e5e157a892",
@@ -1536,6 +1543,76 @@ const mocks = [
                       __typename: "InitiationViaLn",
                       paymentHash: "mock-hash-1",
                       paymentRequest: "mock-payment-request-1",
+                    },
+                    settlementVia: {
+                      __typename: "SettlementViaIntraLedger",
+                      counterPartyWalletId: null,
+                      counterPartyUsername: "user_btc",
+                      preImage: null,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: TransactionListForDefaultAccountDocument,
+      variables: {
+        first: 21,
+        walletIds: ["e821e124-1c70-4aab-9416-074ee5be21f6"],
+      },
+    },
+    result: {
+      data: {
+        me: {
+          __typename: "User",
+          id: "user-id-btc",
+          defaultAccount: {
+            __typename: "ConsumerAccount",
+            id: "account-id-btc",
+            pendingIncomingTransactions: [],
+            transactions: {
+              __typename: "TransactionConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: "btc-cursor-start",
+                endCursor: "btc-cursor-end",
+              },
+              edges: [
+                {
+                  __typename: "TransactionEdge",
+                  cursor: "btc-cursor-start",
+                  node: {
+                    __typename: "Transaction",
+                    id: "btc-tx-1",
+                    status: "SUCCESS",
+                    direction: "RECEIVE",
+                    memo: null,
+                    createdAt: 1700000000,
+                    settlementAmount: 1000,
+                    settlementFee: 0,
+                    settlementDisplayFee: "0.00",
+                    settlementCurrency: "BTC",
+                    settlementDisplayAmount: "0.10",
+                    settlementDisplayCurrency: "USD",
+                    settlementPrice: {
+                      __typename: "PriceOfOneSettlementMinorUnitInDisplayMinorUnit",
+                      base: 105000000000,
+                      offset: 12,
+                      currencyUnit: "MINOR",
+                      formattedAmount: "0.105",
+                    },
+                    initiationVia: {
+                      __typename: "InitiationViaLn",
+                      paymentHash: "btc-hash-1",
+                      paymentRequest: "btc-payment-request-1",
                     },
                     settlementVia: {
                       __typename: "SettlementViaIntraLedger",

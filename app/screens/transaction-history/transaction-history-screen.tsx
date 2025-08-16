@@ -3,13 +3,10 @@ import { ActivityIndicator, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, useTheme } from "@rneui/themed"
 import { gql } from "@apollo/client"
-import { RouteProp, useRoute } from "@react-navigation/native"
+import { RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
-import {
-  WalletCurrency,
-  useTransactionListForDefaultAccountQuery,
-} from "@app/graphql/generated"
+import { useTransactionListForDefaultAccountQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -47,13 +44,18 @@ const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
 const QUERY_BATCH_SIZE = INITIAL_ITEMS_TO_RENDER * 1.5
 
-export const TransactionHistoryScreen: React.FC = () => {
+type TransactionHistoryScreenProps = {
+  route: RouteProp<RootStackParamList, "transactionHistory">
+}
+
+export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> = ({
+  route,
+}) => {
   const {
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
-  const route = useRoute<RouteProp<RootStackParamList, "transactionHistory">>()
   const [walletFilter, setWalletFilter] = React.useState<WalletValues>("ALL")
 
   const walletIdsByCurrency = React.useMemo(() => {

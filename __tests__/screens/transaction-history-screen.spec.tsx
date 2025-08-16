@@ -1,9 +1,28 @@
 import React from "react"
+import { RouteProp } from "@react-navigation/native"
 import { act, fireEvent, render, waitFor, cleanup } from "@testing-library/react-native"
 
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
 
 import { ContextForScreen } from "./helper"
+
+const mockRoute: RouteProp<RootStackParamList, "transactionHistory"> = {
+  key: "transactionHistory-test",
+  name: "transactionHistory",
+  params: {
+    wallets: [
+      {
+        id: "e821e124-1c70-4aab-9416-074ee5be21f6",
+        walletCurrency: "BTC",
+      },
+      {
+        id: "5b54bf9a-46cc-4344-b638-b5e5e157a892",
+        walletCurrency: "USD",
+      },
+    ],
+  },
+}
 
 describe("TransactionHistoryScreen", () => {
   afterEach(cleanup)
@@ -11,7 +30,7 @@ describe("TransactionHistoryScreen", () => {
   it("shows all transactions by default", async () => {
     const { findByTestId } = render(
       <ContextForScreen>
-        <TransactionHistoryScreen />
+        <TransactionHistoryScreen route={mockRoute} />
       </ContextForScreen>,
     )
 
@@ -21,7 +40,7 @@ describe("TransactionHistoryScreen", () => {
   it("filters only BTC transactions", async () => {
     const screen = render(
       <ContextForScreen>
-        <TransactionHistoryScreen />
+        <TransactionHistoryScreen route={mockRoute} />
       </ContextForScreen>,
     )
 

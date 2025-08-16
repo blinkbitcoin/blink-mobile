@@ -91,8 +91,11 @@ export type RootStackParamList = {
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
   transactionDetail: { txid: string }
-  transactionHistory?: { 
-    wallets?: Array<{ id: string; walletCurrency: WalletCurrency }>
+  transactionHistory?: {
+    wallets?: ReadonlyArray<{
+      readonly id: string
+      readonly walletCurrency: WalletCurrency
+    }>
   }
   Earn: undefined
   accountScreen: undefined
