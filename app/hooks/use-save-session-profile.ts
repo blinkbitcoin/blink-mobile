@@ -8,6 +8,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { useAppConfig } from "./use-app-config"
+import { useAutoShowUpgradeModal } from "./use-show-upgrade-modal"
 
 gql`
   query getUsernames {
@@ -27,8 +28,9 @@ gql`
 
 export const useSaveSessionProfile = () => {
   const { LL } = useI18nContext()
-  const { saveToken } = useAppConfig()
   const client = useApolloClient()
+  const { saveToken } = useAppConfig()
+  const { resetUpgradeModal } = useAutoShowUpgradeModal()
   const [fetchUsername] = useGetUsernamesLazyQuery({ fetchPolicy: "no-cache" })
 
   const tryFetchUserProps = useCallback(
@@ -81,7 +83,9 @@ export const useSaveSessionProfile = () => {
       const profile = await tryFetchUserProps({ token, fetchUsername })
       if (!profile) return
 
-      if (profile.accountId) updateSessionCount(client, true)
+      // reset upgrade modal state
+      resetUpgradeModal()
+      updateSessionCount(client, true)
 
       const exists = profiles.some((p) => p.accountId === profile.accountId)
       if (!exists) {
@@ -89,7 +93,7 @@ export const useSaveSessionProfile = () => {
         await KeyStoreWrapper.saveSessionProfiles([{ ...profile }, ...cleaned])
       }
     },
-    [saveToken, tryFetchUserProps, fetchUsername, client],
+    [saveToken, tryFetchUserProps, fetchUsername, resetUpgradeModal, client],
   )
 
   return {

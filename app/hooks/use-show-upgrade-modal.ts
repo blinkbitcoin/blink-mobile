@@ -11,6 +11,7 @@ interface UseAutoShowUpgradeModalReturn {
   canShowUpgradeModal: boolean
   lastShownUpgradeModalAt: string | null
   markShownUpgradeModal: () => void
+  resetUpgradeModal: () => void
 }
 
 interface UseAutoShowUpgradeModalOptions {
@@ -51,9 +52,16 @@ export const useAutoShowUpgradeModal = (
     setUpgradeModalLastShownAt(client, new Date().toISOString())
   }, [client, enabled])
 
+  const resetUpgradeModal = React.useCallback(() => {
+    if (!enabled) return
+
+    setUpgradeModalLastShownAt(client, null)
+  }, [client, enabled])
+
   return {
     canShowUpgradeModal,
     lastShownUpgradeModalAt: lastShownAt,
     markShownUpgradeModal,
+    resetUpgradeModal,
   }
 }
