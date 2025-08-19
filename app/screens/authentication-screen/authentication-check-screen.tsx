@@ -1,11 +1,14 @@
 import * as React from "react"
 import { useEffect } from "react"
 
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, useTheme } from "@rneui/themed"
+
+import { useApolloClient } from "@apollo/client"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { updateSessionCount } from "@app/graphql/client-only-query"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/app-logo-light.svg"
@@ -16,6 +19,7 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../../utils/enum"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
 export const AuthenticationCheckScreen: React.FC = () => {
+  const client = useApolloClient()
   const styles = useStyles()
   const {
     theme: { mode },
@@ -43,10 +47,11 @@ export const AuthenticationCheckScreen: React.FC = () => {
         navigation.replace("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
       } else {
         setAppUnlocked()
+        updateSessionCount(client)
         navigation.replace("Primary")
       }
     })()
-  }, [isAuthed, navigation, setAppUnlocked])
+  }, [isAuthed, navigation, setAppUnlocked, client])
 
   return (
     <Screen style={styles.container}>

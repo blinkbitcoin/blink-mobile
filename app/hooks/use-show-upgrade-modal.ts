@@ -1,14 +1,16 @@
 import * as React from "react"
 import { useApolloClient } from "@apollo/client"
 
-import { useUpgradeModalLastShownAtQuery } from "@app/graphql/generated"
+import {
+  useUpgradeModalLastShownAtQuery,
+  useSessionCountQuery,
+} from "@app/graphql/generated"
 import { setUpgradeModalLastShownAt } from "@app/graphql/client-only-query"
 
 interface UseAutoShowUpgradeModalReturn {
   canShowUpgradeModal: boolean
   lastShownUpgradeModalAt: string | null
   markShownUpgradeModal: () => void
-  resetUpgradeModal: () => void
 }
 
 interface UseAutoShowUpgradeModalOptions {
@@ -27,14 +29,21 @@ export const useAutoShowUpgradeModal = (
     skip: !enabled,
   })
 
+  const { data: sessionData } = useSessionCountQuery({
+    fetchPolicy: "cache-first",
+    skip: !enabled,
+  })
+
   const lastShownAt = data?.upgradeModalLastShownAt ?? null
+  const sessions = sessionData?.sessionCount ?? 0
+
   const canShowUpgradeModal = React.useMemo(() => {
-    if (!enabled) return false
+    if (!enabled || sessions < 2) return false
     if (!lastShownAt) return true
 
     const last = new Date(lastShownAt).getTime()
     return Date.now() - last >= cooldownDays * 24 * 60 * 60 * 1000
-  }, [enabled, lastShownAt, cooldownDays])
+  }, [enabled, sessions, lastShownAt, cooldownDays])
 
   const markShownUpgradeModal = React.useCallback(() => {
     if (!enabled) return
@@ -42,16 +51,9 @@ export const useAutoShowUpgradeModal = (
     setUpgradeModalLastShownAt(client, new Date().toISOString())
   }, [client, enabled])
 
-  const resetUpgradeModal = React.useCallback(() => {
-    if (!enabled) return
-
-    setUpgradeModalLastShownAt(client, null)
-  }, [client, enabled])
-
   return {
     canShowUpgradeModal,
     lastShownUpgradeModalAt: lastShownAt,
     markShownUpgradeModal,
-    resetUpgradeModal,
   }
 }

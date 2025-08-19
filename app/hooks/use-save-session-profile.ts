@@ -1,13 +1,13 @@
 import { useCallback } from "react"
-import { gql } from "@apollo/client"
+import { gql, useApolloClient } from "@apollo/client"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { updateSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { useAppConfig } from "./use-app-config"
-import { useAutoShowUpgradeModal } from "./use-show-upgrade-modal"
 
 gql`
   query getUsernames {
@@ -28,7 +28,7 @@ gql`
 export const useSaveSessionProfile = () => {
   const { LL } = useI18nContext()
   const { saveToken } = useAppConfig()
-  const { resetUpgradeModal } = useAutoShowUpgradeModal()
+  const client = useApolloClient()
   const [fetchUsername] = useGetUsernamesLazyQuery({ fetchPolicy: "no-cache" })
 
   const tryFetchUserProps = useCallback(
@@ -81,7 +81,7 @@ export const useSaveSessionProfile = () => {
       const profile = await tryFetchUserProps({ token, fetchUsername })
       if (!profile) return
 
-      if (profile.accountId) resetUpgradeModal()
+      if (profile.accountId) updateSessionCount(client, true)
 
       const exists = profiles.some((p) => p.accountId === profile.accountId)
       if (!exists) {
@@ -89,7 +89,7 @@ export const useSaveSessionProfile = () => {
         await KeyStoreWrapper.saveSessionProfiles([{ ...profile }, ...cleaned])
       }
     },
-    [saveToken, tryFetchUserProps, fetchUsername, resetUpgradeModal],
+    [saveToken, tryFetchUserProps, fetchUsername, client],
   )
 
   return {

@@ -1574,6 +1574,10 @@ query sendBitcoinWithdrawalLimits {
   }
 }
 
+query sessionCount {
+  sessionCount @client
+}
+
 query setDefaultAccountModal {
   me {
     id

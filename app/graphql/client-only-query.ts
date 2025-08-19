@@ -25,6 +25,8 @@ import {
   RegionQuery,
   UpgradeModalLastShownAtDocument,
   UpgradeModalLastShownAtQuery,
+  SessionCountDocument,
+  SessionCountQuery,
 } from "./generated"
 
 export default gql`
@@ -75,6 +77,10 @@ export default gql`
 
   query upgradeModalLastShownAt {
     upgradeModalLastShownAt @client
+  }
+
+  query sessionCount {
+    sessionCount @client
   }
 `
 
@@ -251,4 +257,34 @@ export const setUpgradeModalLastShownAt = (
   } catch {
     return null
   }
+}
+
+export const setSessionCount = (
+  client: ApolloClient<unknown>,
+  count: number,
+): number | null => {
+  try {
+    client.writeQuery<SessionCountQuery>({
+      query: SessionCountDocument,
+      data: { __typename: "Query", sessionCount: count },
+    })
+    return count
+  } catch {
+    return null
+  }
+}
+
+export const updateSessionCount = (
+  client: ApolloClient<unknown>,
+  firstSession = false,
+): number | null => {
+  if (firstSession) {
+    return setSessionCount(client, 1)
+  }
+
+  const prev =
+    client.readQuery<SessionCountQuery>({ query: SessionCountDocument })?.sessionCount ??
+    0
+
+  return setSessionCount(client, prev + 1)
 }
