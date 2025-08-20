@@ -20,7 +20,7 @@ export const SupportOnboardingScreen: React.FC = () => {
     navigation.replace("Primary")
   }
 
-  const contactInfoString = LL.OnboardingScreen.supportScreen.contactInfo({
+  const contactInfoString = LL.OnboardingScreen.supportScreen.description({
     email: feedbackEmailAddress,
   })
 
@@ -40,17 +40,13 @@ export const SupportOnboardingScreen: React.FC = () => {
 
   return (
     <OnboardingLayout
+      title={LL.OnboardingScreen.supportScreen.title()}
       customContent={
-        <>
-          <Text type="h2" style={styles.descriptionText}>
-            {LL.OnboardingScreen.supportScreen.description()}
-          </Text>
-          <Text type="h2" style={styles.descriptionText}>
-            {prefix}
-            <Text style={styles.linkText}>{feedbackEmailAddress}</Text>
-            {suffix}
-          </Text>
-        </>
+        <Text type="h2" style={styles.descriptionText}>
+          {prefix}
+          <Text style={styles.linkText}>{feedbackEmailAddress}</Text>
+          {suffix}
+        </Text>
       }
       primaryLabel={LL.OnboardingScreen.supportScreen.primaryButton()}
       onPrimaryAction={handlePrimaryAction}

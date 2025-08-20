@@ -44,7 +44,11 @@ describe("SupportOnboardingScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.OnboardingScreen.supportScreen.description())).toBeTruthy()
+    expect(
+      getByText(
+        LL.OnboardingScreen.supportScreen.description({ email: FEEDBACK_EMAIL_ADDRESS }),
+      ),
+    ).toBeTruthy()
     expect(getByText(FEEDBACK_EMAIL_ADDRESS)).toBeTruthy()
   })
 
