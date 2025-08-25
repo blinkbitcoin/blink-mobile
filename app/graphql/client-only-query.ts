@@ -279,7 +279,7 @@ export const updateSessionCount = (
   firstSession = false,
 ): number | null => {
   if (firstSession) {
-    return setSessionCount(client, 1)
+    return setSessionCount(client, 0)
   }
 
   const prev =

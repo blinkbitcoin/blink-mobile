@@ -31,7 +31,6 @@ export const useAutoShowUpgradeModal = (
   })
 
   const { data: sessionData } = useSessionCountQuery({
-    fetchPolicy: "cache-first",
     skip: !enabled,
   })
 
@@ -39,7 +38,7 @@ export const useAutoShowUpgradeModal = (
   const sessions = sessionData?.sessionCount ?? 0
 
   const canShowUpgradeModal = React.useMemo(() => {
-    if (!enabled || sessions < 2) return false
+    if (!enabled || sessions < 1) return false
     if (!lastShownAt) return true
 
     const last = new Date(lastShownAt).getTime()
