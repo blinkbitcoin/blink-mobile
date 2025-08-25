@@ -276,11 +276,9 @@ export const setDeviceSessionCount = (
 
 export const updateDeviceSessionCount = (
   client: ApolloClient<unknown>,
-  firstSession = false,
+  { reset = false }: { reset?: boolean } = {},
 ): number | null => {
-  if (firstSession) {
-    return setDeviceSessionCount(client, 0)
-  }
+  if (reset) return setDeviceSessionCount(client, 0)
 
   const prev =
     client.readQuery<DeviceSessionCountQuery>({

@@ -84,7 +84,7 @@ export const useSaveSessionProfile = () => {
       if (!profile) return
 
       resetUpgradeModal()
-      updateDeviceSessionCount(client, true)
+      updateDeviceSessionCount(client, { reset: true })
 
       const exists = profiles.some((p) => p.accountId === profile.accountId)
       if (!exists) {
