@@ -181,6 +181,7 @@ const route = {
   name: "earnsSection",
   params: {
     section: "bitcoinWhatIsIt",
+    isAvailable: true,
   },
 } as const
 
