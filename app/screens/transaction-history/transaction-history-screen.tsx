@@ -56,7 +56,9 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   } = useTheme()
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
-  const [walletFilter, setWalletFilter] = React.useState<WalletValues>("ALL")
+  const [walletFilter, setWalletFilter] = React.useState<WalletValues>(
+    route.params?.currencyFilter ?? "ALL",
+  )
 
   const walletIdsByCurrency = React.useMemo(() => {
     const wallets = route.params?.wallets ?? []
