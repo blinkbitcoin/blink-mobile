@@ -6,6 +6,7 @@ import {
   useDeviceSessionCountQuery,
 } from "@app/graphql/generated"
 import { setUpgradeModalLastShownAt } from "@app/graphql/client-only-query"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 
 interface UseAutoShowUpgradeModalReturn {
   canShowUpgradeModal: boolean
@@ -25,6 +26,8 @@ export const useAutoShowUpgradeModal = (
   const { cooldownDays = 7, enabled = true } = options
   const client = useApolloClient()
 
+  const { upgradeModalShowAtSessionNumber } = useRemoteConfig()
+
   const { data } = useUpgradeModalLastShownAtQuery({
     fetchPolicy: "cache-first",
     skip: !enabled,
@@ -38,12 +41,12 @@ export const useAutoShowUpgradeModal = (
   const sessions = sessionData?.deviceSessionCount ?? 0
 
   const canShowUpgradeModal = React.useMemo(() => {
-    if (!enabled || sessions < 1) return false
+    if (!enabled || sessions < upgradeModalShowAtSessionNumber) return false
     if (!lastShownAt) return true
 
     const last = new Date(lastShownAt).getTime()
     return Date.now() - last >= cooldownDays * 24 * 60 * 60 * 1000
-  }, [enabled, sessions, lastShownAt, cooldownDays])
+  }, [enabled, sessions, lastShownAt, cooldownDays, upgradeModalShowAtSessionNumber])
 
   const markShownUpgradeModal = React.useCallback(() => {
     if (!enabled) return
