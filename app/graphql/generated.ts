@@ -1746,6 +1746,7 @@ export type Query = {
   /** Returns an estimated conversion rate for the given amount and currency */
   readonly currencyConversionEstimation: CurrencyConversionEstimation;
   readonly currencyList: ReadonlyArray<Currency>;
+  readonly deviceSessionCount: Scalars['Int']['output'];
   readonly feedbackModalShown: Scalars['Boolean']['output'];
   readonly globals?: Maybe<Globals>;
   readonly hasPromptedSetDefaultAccount: Scalars['Boolean']['output'];
@@ -1768,7 +1769,6 @@ export type Query = {
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
   readonly region?: Maybe<Region>;
-  readonly sessionCount: Scalars['Int']['output'];
   readonly upgradeModalLastShownAt?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be migrated to AccountDefaultWalletId */
   readonly userDefaultWalletId: Scalars['WalletId']['output'];
@@ -2650,10 +2650,10 @@ export type UpgradeModalLastShownAtQueryVariables = Exact<{ [key: string]: never
 
 export type UpgradeModalLastShownAtQuery = { readonly __typename: 'Query', readonly upgradeModalLastShownAt?: string | null };
 
-export type SessionCountQueryVariables = Exact<{ [key: string]: never; }>;
+export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SessionCountQuery = { readonly __typename: 'Query', readonly sessionCount: number };
+export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
 
 export type TransactionFragment = { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } };
 
@@ -4112,43 +4112,43 @@ export type UpgradeModalLastShownAtQueryHookResult = ReturnType<typeof useUpgrad
 export type UpgradeModalLastShownAtLazyQueryHookResult = ReturnType<typeof useUpgradeModalLastShownAtLazyQuery>;
 export type UpgradeModalLastShownAtSuspenseQueryHookResult = ReturnType<typeof useUpgradeModalLastShownAtSuspenseQuery>;
 export type UpgradeModalLastShownAtQueryResult = Apollo.QueryResult<UpgradeModalLastShownAtQuery, UpgradeModalLastShownAtQueryVariables>;
-export const SessionCountDocument = gql`
-    query sessionCount {
-  sessionCount @client
+export const DeviceSessionCountDocument = gql`
+    query deviceSessionCount {
+  deviceSessionCount @client
 }
     `;
 
 /**
- * __useSessionCountQuery__
+ * __useDeviceSessionCountQuery__
  *
- * To run a query within a React component, call `useSessionCountQuery` and pass it any options that fit your needs.
- * When your component renders, `useSessionCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useDeviceSessionCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDeviceSessionCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSessionCountQuery({
+ * const { data, loading, error } = useDeviceSessionCountQuery({
  *   variables: {
  *   },
  * });
  */
-export function useSessionCountQuery(baseOptions?: Apollo.QueryHookOptions<SessionCountQuery, SessionCountQueryVariables>) {
+export function useDeviceSessionCountQuery(baseOptions?: Apollo.QueryHookOptions<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SessionCountQuery, SessionCountQueryVariables>(SessionCountDocument, options);
+        return Apollo.useQuery<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>(DeviceSessionCountDocument, options);
       }
-export function useSessionCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SessionCountQuery, SessionCountQueryVariables>) {
+export function useDeviceSessionCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SessionCountQuery, SessionCountQueryVariables>(SessionCountDocument, options);
+          return Apollo.useLazyQuery<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>(DeviceSessionCountDocument, options);
         }
-export function useSessionCountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SessionCountQuery, SessionCountQueryVariables>) {
+export function useDeviceSessionCountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<SessionCountQuery, SessionCountQueryVariables>(SessionCountDocument, options);
+          return Apollo.useSuspenseQuery<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>(DeviceSessionCountDocument, options);
         }
-export type SessionCountQueryHookResult = ReturnType<typeof useSessionCountQuery>;
-export type SessionCountLazyQueryHookResult = ReturnType<typeof useSessionCountLazyQuery>;
-export type SessionCountSuspenseQueryHookResult = ReturnType<typeof useSessionCountSuspenseQuery>;
-export type SessionCountQueryResult = Apollo.QueryResult<SessionCountQuery, SessionCountQueryVariables>;
+export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessionCountQuery>;
+export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
+export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
+export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
 export const NetworkDocument = gql`
     query network {
   globals {
@@ -9494,6 +9494,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currencyConversionEstimation?: Resolver<ResolversTypes['CurrencyConversionEstimation'], ParentType, ContextType, RequireFields<QueryCurrencyConversionEstimationArgs, 'amount' | 'currency'>>;
   currencyList?: Resolver<ReadonlyArray<ResolversTypes['Currency']>, ParentType, ContextType>;
+  deviceSessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   feedbackModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   globals?: Resolver<Maybe<ResolversTypes['Globals']>, ParentType, ContextType>;
   hasPromptedSetDefaultAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -9513,7 +9514,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
-  sessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;

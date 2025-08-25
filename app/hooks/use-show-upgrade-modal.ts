@@ -3,7 +3,7 @@ import { useApolloClient } from "@apollo/client"
 
 import {
   useUpgradeModalLastShownAtQuery,
-  useSessionCountQuery,
+  useDeviceSessionCountQuery,
 } from "@app/graphql/generated"
 import { setUpgradeModalLastShownAt } from "@app/graphql/client-only-query"
 
@@ -30,12 +30,12 @@ export const useAutoShowUpgradeModal = (
     skip: !enabled,
   })
 
-  const { data: sessionData } = useSessionCountQuery({
+  const { data: sessionData } = useDeviceSessionCountQuery({
     skip: !enabled,
   })
 
   const lastShownAt = data?.upgradeModalLastShownAt ?? null
-  const sessions = sessionData?.sessionCount ?? 0
+  const sessions = sessionData?.deviceSessionCount ?? 0
 
   const canShowUpgradeModal = React.useMemo(() => {
     if (!enabled || sessions < 1) return false

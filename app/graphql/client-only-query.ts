@@ -25,8 +25,8 @@ import {
   RegionQuery,
   UpgradeModalLastShownAtDocument,
   UpgradeModalLastShownAtQuery,
-  SessionCountDocument,
-  SessionCountQuery,
+  DeviceSessionCountDocument,
+  DeviceSessionCountQuery,
 } from "./generated"
 
 export default gql`
@@ -79,8 +79,8 @@ export default gql`
     upgradeModalLastShownAt @client
   }
 
-  query sessionCount {
-    sessionCount @client
+  query deviceSessionCount {
+    deviceSessionCount @client
   }
 `
 
@@ -259,14 +259,14 @@ export const setUpgradeModalLastShownAt = (
   }
 }
 
-export const setSessionCount = (
+export const setDeviceSessionCount = (
   client: ApolloClient<unknown>,
   count: number,
 ): number | null => {
   try {
-    client.writeQuery<SessionCountQuery>({
-      query: SessionCountDocument,
-      data: { __typename: "Query", sessionCount: count },
+    client.writeQuery<DeviceSessionCountQuery>({
+      query: DeviceSessionCountDocument,
+      data: { __typename: "Query", deviceSessionCount: count },
     })
     return count
   } catch {
@@ -274,17 +274,18 @@ export const setSessionCount = (
   }
 }
 
-export const updateSessionCount = (
+export const updateDeviceSessionCount = (
   client: ApolloClient<unknown>,
   firstSession = false,
 ): number | null => {
   if (firstSession) {
-    return setSessionCount(client, 0)
+    return setDeviceSessionCount(client, 0)
   }
 
   const prev =
-    client.readQuery<SessionCountQuery>({ query: SessionCountDocument })?.sessionCount ??
-    0
+    client.readQuery<DeviceSessionCountQuery>({
+      query: DeviceSessionCountDocument,
+    })?.deviceSessionCount ?? 0
 
-  return setSessionCount(client, prev + 1)
+  return setDeviceSessionCount(client, prev + 1)
 }

@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { gql, useApolloClient } from "@apollo/client"
 import crashlytics from "@react-native-firebase/crashlytics"
 
-import { updateSessionCount } from "@app/graphql/client-only-query"
+import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -84,7 +84,7 @@ export const useSaveSessionProfile = () => {
       if (!profile) return
 
       resetUpgradeModal()
-      updateSessionCount(client, true)
+      updateDeviceSessionCount(client, true)
 
       const exists = profiles.some((p) => p.accountId === profile.accountId)
       if (!exists) {

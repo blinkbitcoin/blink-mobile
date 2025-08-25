@@ -1130,6 +1130,10 @@ query debugScreen {
   }
 }
 
+query deviceSessionCount {
+  deviceSessionCount @client
+}
+
 query displayCurrency {
   me {
     id
@@ -1572,10 +1576,6 @@ query sendBitcoinWithdrawalLimits {
     }
     __typename
   }
-}
-
-query sessionCount {
-  sessionCount @client
 }
 
 query setDefaultAccountModal {

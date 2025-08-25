@@ -7,7 +7,7 @@ import { makeStyles, useTheme } from "@rneui/themed"
 
 import { useApolloClient } from "@apollo/client"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { updateSessionCount } from "@app/graphql/client-only-query"
+import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
@@ -47,7 +47,7 @@ export const AuthenticationCheckScreen: React.FC = () => {
         navigation.replace("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
       } else {
         setAppUnlocked()
-        updateSessionCount(client)
+        updateDeviceSessionCount(client)
         navigation.replace("Primary")
       }
     })()
