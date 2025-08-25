@@ -78,6 +78,8 @@ import { LanguageScreen } from "../screens/settings-screen/language-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
+
+import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   WelcomeLevel1Screen,
@@ -497,7 +499,7 @@ export const OnboardingNavigator = () => {
         component={WelcomeLevel1Screen}
         options={{
           title: LL.OnboardingScreen.welcomeLevel1.mainTitle(),
-          headerLeft: () => null,
+          headerLeft: headerBackControl({ canGoBack: false }),
         }}
       />
       <Onboarding.Screen
@@ -510,18 +512,18 @@ export const OnboardingNavigator = () => {
       <Onboarding.Screen
         name="lightningBenefits"
         component={LightningBenefitsScreen}
-        options={{
+        options={({ route }) => ({
           title: LL.OnboardingScreen.lightningBenefits.mainTitle(),
-          headerLeft: () => null,
-        }}
+          headerLeft: headerBackControl({ canGoBack: route.params?.canGoBack }),
+        })}
       />
       <Onboarding.Screen
         name="supportScreen"
         component={SupportOnboardingScreen}
-        options={{
+        options={({ route }) => ({
           title: LL.OnboardingScreen.supportScreen.mainTitle(),
-          headerLeft: () => null,
-        }}
+          headerLeft: headerBackControl({ canGoBack: route.params?.canGoBack }),
+        })}
       />
     </Onboarding.Navigator>
   )

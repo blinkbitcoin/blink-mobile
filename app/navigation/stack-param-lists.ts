@@ -124,8 +124,8 @@ export type RootStackParamList = {
 export type OnboardingStackParamList = {
   welcomeLevel1: { onboarding?: boolean }
   emailBenefits: { onboarding?: boolean; hasUsername?: boolean }
-  lightningBenefits: { onboarding?: boolean }
-  supportScreen: undefined
+  lightningBenefits: { onboarding?: boolean; canGoBack?: boolean }
+  supportScreen?: { canGoBack?: boolean }
 }
 
 export type PeopleStackParamList = {

@@ -1130,6 +1130,10 @@ query debugScreen {
   }
 }
 
+query deviceSessionCount {
+  deviceSessionCount @client
+}
+
 query displayCurrency {
   me {
     id

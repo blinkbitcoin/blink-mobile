@@ -83,7 +83,7 @@ describe("LightningBenefitsScreen", () => {
   it("navigates to supportScreen on secondary button press", () => {
     const mockNavigate = jest.fn()
     ;(useNavigation as jest.Mock).mockReturnValue({
-      replace: mockNavigate,
+      navigate: mockNavigate,
       addListener: mockAddListener,
     })
 
