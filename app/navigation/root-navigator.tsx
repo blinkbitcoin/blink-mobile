@@ -226,7 +226,7 @@ export const RootStack = () => {
         name="conversionConfirmation"
         component={ConversionConfirmationScreen}
         options={{
-          title: LL.ConversionConfirmationScreen.title(),
+          title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
@@ -234,7 +234,7 @@ export const RootStack = () => {
         component={ConversionSuccessScreen}
         options={{
           headerShown: false,
-          title: LL.ConversionSuccessScreen.title(),
+          title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen

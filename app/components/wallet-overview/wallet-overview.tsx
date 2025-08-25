@@ -13,7 +13,7 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rneui/themed"
 
-import { GaloyCurrencyBubble } from "../atomic/galoy-currency-bubble"
+import { GaloyCurrencyBubbleText } from "../atomic/galoy-currency-bubble-text"
 import { GaloyIcon } from "../atomic/galoy-icon"
 
 const Loader = () => {
@@ -111,8 +111,7 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
       <View style={[styles.separator, styles.titleSeparator]}></View>
       <View style={styles.displayTextView}>
         <View style={styles.currency}>
-          <GaloyCurrencyBubble currency="BTC" />
-          <Text type="p1">Bitcoin</Text>
+          <GaloyCurrencyBubbleText currency="BTC" textSize="p2" containerSize="medium" />
         </View>
         {loading ? (
           <Loader />
@@ -130,8 +129,7 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
       <View style={styles.separator}></View>
       <View style={styles.displayTextView}>
         <View style={styles.currency}>
-          <GaloyCurrencyBubble currency="USD" />
-          <Text type="p1">Dollar</Text>
+          <GaloyCurrencyBubbleText currency="USD" textSize="p2" containerSize="medium" />
           <Pressable onPress={() => setIsStablesatModalVisible(true)}>
             <GaloyIcon color={colors.grey1} name="question" size={18} />
           </Pressable>
