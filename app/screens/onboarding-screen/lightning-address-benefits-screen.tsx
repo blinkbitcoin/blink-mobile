@@ -20,7 +20,7 @@ export const LightningBenefitsScreen: React.FC<LightningBenefitsScreenProps> = (
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const { onboarding } = route.params
+  const { onboarding, canGoBack = true } = route.params
 
   const handlePrimaryAction = () => {
     navigation.navigate("setLightningAddress", {
@@ -29,7 +29,7 @@ export const LightningBenefitsScreen: React.FC<LightningBenefitsScreenProps> = (
   }
 
   const handleSecondaryAction = () => {
-    navigation.replace("onboarding", {
+    navigation.navigate("onboarding", {
       screen: "supportScreen",
     })
   }
@@ -37,13 +37,15 @@ export const LightningBenefitsScreen: React.FC<LightningBenefitsScreenProps> = (
   // Prevent back navigation
   useFocusEffect(
     React.useCallback(() => {
+      if (canGoBack) return
+
       const unsubscribe = navigation.addListener("beforeRemove", (e) => {
         if (e.data.action.type === "POP" || e.data.action.type === "GO_BACK") {
           e.preventDefault()
         }
       })
       return unsubscribe
-    }, [navigation]),
+    }, [navigation, canGoBack]),
   )
 
   return (

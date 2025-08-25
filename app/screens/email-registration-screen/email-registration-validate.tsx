@@ -54,13 +54,14 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     if (hasUsername) {
       navigation.replace("onboarding", {
         screen: "supportScreen",
+        params: { canGoBack: false },
       })
       return
     }
 
     navigation.replace("onboarding", {
       screen: "lightningBenefits",
-      params: { onboarding },
+      params: { onboarding, canGoBack: false },
     })
   }, [navigation, onboarding, hasUsername])
 

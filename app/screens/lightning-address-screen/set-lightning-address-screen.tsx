@@ -101,9 +101,16 @@ export const SetLightningAddressScreen: React.FC<{
     setError(undefined)
   }
 
-  const onboardingNavigate = useCallback(() => {
+  const navigateSupportAllowBack = useCallback(() => {
+    navigation.navigate("onboarding", {
+      screen: "supportScreen",
+    })
+  }, [navigation])
+
+  const navigateSupportNoBackAllow = useCallback(() => {
     navigation.replace("onboarding", {
       screen: "supportScreen",
+      params: { canGoBack: false },
     })
   }, [navigation])
 
@@ -137,14 +144,14 @@ export const SetLightningAddressScreen: React.FC<{
 
     const time = setTimeout(() => {
       if (onboarding) {
-        onboardingNavigate()
+        navigateSupportNoBackAllow()
         return
       }
       navigation.navigate("settings")
     }, SUCCESS_DELAY)
 
     return () => clearTimeout(time)
-  }, [showSuccess, onboarding, navigation, onboardingNavigate])
+  }, [showSuccess, onboarding, navigation, navigateSupportNoBackAllow])
 
   let errorMessage = ""
   switch (error) {
@@ -209,7 +216,7 @@ export const SetLightningAddressScreen: React.FC<{
         {onboarding && (
           <GaloySecondaryButton
             title={LL.UpgradeAccountModal.notNow()}
-            onPress={onboardingNavigate}
+            onPress={navigateSupportAllowBack}
             containerStyle={styles.secondaryButtonContainer}
           />
         )}
