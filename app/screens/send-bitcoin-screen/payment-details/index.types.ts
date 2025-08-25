@@ -1,7 +1,4 @@
-import {
-  LnUrlPayServiceResponse,
-  LNURLPaySuccessAction,
-} from "lnurl-pay/dist/types/types"
+import { LnUrlPayServiceResponse, LNURLPaySuccessAction } from "lnurl-pay"
 import {
   GraphQlApplicationError,
   IntraLedgerPaymentSendMutationHookResult,

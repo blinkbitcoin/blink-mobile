@@ -1,4 +1,4 @@
-import { LnUrlPayServiceResponse } from "lnurl-pay/dist/types/types"
+import { LnUrlPayServiceResponse } from "lnurl-pay"
 
 import {
   AccountDefaultWalletLazyQueryHookResult,

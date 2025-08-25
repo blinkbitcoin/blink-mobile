@@ -1,6 +1,5 @@
 import { LNURLResponse, LNURLWithdrawParams, getParams } from "js-lnurl"
-import { requestPayServiceParams } from "lnurl-pay"
-import { LnUrlPayServiceResponse, Satoshis } from "lnurl-pay/dist/types/types"
+import { requestPayServiceParams, LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
 
 import {
   createLnurlPaymentDestination,

@@ -17341,10 +17341,10 @@ listr@^0.14.3:
     p-map "^2.0.0"
     rxjs "^6.3.3"
 
-lnurl-pay@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/lnurl-pay/-/lnurl-pay-5.0.0.tgz#50c424371465b076a29e0a05c6152a73eeae0f7a"
-  integrity sha512-5sFunbHyvydpYM4t+zgFPy2o+4ffzvnusYAMtqBWVBUi6l08zlvqbeBIhKSNhp7/o02OrUm4pNVqWYU+hQFKrQ==
+lnurl-pay@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/lnurl-pay/-/lnurl-pay-5.0.2.tgz#ead71e45f40abbdfa0fc5a19fa97035e97f00d33"
+  integrity sha512-IlDpfx/DCXcK2O7q+xWYHIw+QLjyILSPc50ApivVxgPcRQpIRStywkjkg5ddfWyYhTzQzARqbuBNkqcyuzPXxA==
   dependencies:
     "@aws-crypto/sha256-js" "^5.2.0"
     aes-js "^3.1.2"

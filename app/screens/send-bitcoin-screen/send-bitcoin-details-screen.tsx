@@ -1,5 +1,4 @@
-import { requestInvoice, utils } from "lnurl-pay"
-import { Satoshis } from "lnurl-pay/dist/types/types"
+import { requestInvoice, utils, Satoshis } from "lnurl-pay"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import ReactNativeModal from "react-native-modal"

@@ -1,4 +1,4 @@
-import { LNURLPaySuccessAction } from "lnurl-pay/dist/types/types"
+import { LNURLPaySuccessAction } from "lnurl-pay"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"

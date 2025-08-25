@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, Text } from "react-native"
-import { Satoshis } from "lnurl-pay/dist/types/types"
+import { Satoshis } from "lnurl-pay"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"

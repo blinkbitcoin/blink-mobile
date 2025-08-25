@@ -1,4 +1,4 @@
-import { LnUrlPayServiceResponse, Satoshis } from "lnurl-pay/dist/types/types"
+import { LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/lightning"
