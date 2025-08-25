@@ -83,7 +83,6 @@ export const useSaveSessionProfile = () => {
       const profile = await tryFetchUserProps({ token, fetchUsername })
       if (!profile) return
 
-      // reset upgrade modal state
       resetUpgradeModal()
       updateSessionCount(client, true)
 
