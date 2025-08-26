@@ -25,6 +25,7 @@ export type CustomInstance = {
   posUrl: string
   lnAddressHostname: string
   blockExplorer: string
+  fiatUrl: string
 }
 
 export type GaloyInstanceInput = StandardInstance | CustomInstance
@@ -39,6 +40,7 @@ export type GaloyInstance = {
   posUrl: string
   lnAddressHostname: string
   blockExplorer: string
+  fiatUrl: string
 }
 
 export const resolveGaloyInstanceOrDefault = (
@@ -70,6 +72,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.blink.sv",
     lnAddressHostname: "blink.sv",
     blockExplorer: "https://mempool.space/tx/",
+    fiatUrl: "https://fiat.blink.sv",
   },
   {
     id: "Staging",
@@ -81,6 +84,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.staging.blink.sv",
     lnAddressHostname: "pay.staging.blink.sv",
     blockExplorer: "https://mempool.space/signet/tx/",
+    fiatUrl: "https://fiat.staging.blink.sv",
   },
   {
     id: "Local",
@@ -92,5 +96,6 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: `http://${scriptHostname()}:3000`,
     lnAddressHostname: `${scriptHostname()}:3000`,
     blockExplorer: "https://mempool.space/signet/tx/",
+    fiatUrl: `http://${scriptHostname()}:3000`,
   },
 ] as const
