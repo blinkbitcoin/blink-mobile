@@ -2524,7 +2524,7 @@
         "supportScreen": {
             "mainTitle": "Blink 피드백",
             "title": "모든 준비 완료!",
-            "description": "피드백은 언제나 환영합니다. {email} 로 편하게 알려주세요.",
+            "description": "피드백은 언제나 환영합니다. {email}로 편하게 알려주세요.",
             "primaryButton": "완료"
         }
     },
