@@ -12,6 +12,21 @@ type UseConvertMoneyDetailsParams = {
   initialFromWallet: WalletFragment
   initialToWallet: WalletFragment
 }
+export type TInputCurrency = "fromInput" | "toInput" | "currencyInput"
+export interface InputField {
+  id: TInputCurrency
+  currency: WalletOrDisplayCurrency
+  amount: MoneyAmount<WalletOrDisplayCurrency>
+  isFocused: boolean
+  formattedAmount: string
+}
+
+export interface IInputValues {
+  fromInput: InputField
+  toInput: InputField
+  currencyInput: InputField
+  formattedAmount: string
+}
 
 export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) => {
   const { convertMoneyAmount } = usePriceConversion()
