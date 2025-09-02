@@ -1,6 +1,6 @@
 import React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { Pressable, StyleProp, TouchableOpacity, View, ViewStyle } from "react-native"
+import { Pressable, TouchableOpacity, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
