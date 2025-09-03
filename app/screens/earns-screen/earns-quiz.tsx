@@ -13,8 +13,8 @@ import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
 import Icon from "react-native-vector-icons/Ionicons"
 
-import { gql } from "@apollo/client"
-import { useQuizClaimMutation } from "@app/graphql/generated"
+import { FetchResult, gql } from "@apollo/client"
+import { QuizClaimMutation, useQuizClaimMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
@@ -30,7 +30,15 @@ import { shuffle } from "../../utils/helper"
 import { sleep } from "../../utils/sleep"
 import { useQuizServer } from "../earns-map-screen/use-quiz-server"
 import { SVGs } from "./earn-svg-factory"
-import { augmentCardWithGqlData, getQuizQuestionsContent } from "./earns-utils"
+import {
+  augmentCardWithGqlData,
+  errorCodeAlertAlreadyShown,
+  getQuizQuestionsContent,
+  markErrorCodeAlertAsShown,
+  skipRewardErrorCodes,
+} from "./helpers"
+import CustomModal from "@app/components/custom-modal/custom-modal"
+import { ValidateQuizCodeErrorsType } from "./sections"
 
 const useStyles = makeStyles(({ colors }) => ({
   answersViewInner: {
@@ -183,6 +191,17 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 10,
     flex: 1,
   },
+
+  modalBodyText: {
+    fontSize: 17,
+    color: colors.grey3,
+    textAlign: "center",
+  },
+
+  modalBody: {
+    textAlign: "center",
+    marginTop: 20,
+  },
 }))
 
 const mappingLetter = { 0: "A", 1: "B", 2: "C" }
@@ -196,6 +215,7 @@ gql`
     quizClaim(input: $input) {
       errors {
         message
+        code
       }
       quizzes {
         id
@@ -221,7 +241,7 @@ export const EarnQuiz = ({ route }: Props) => {
 
   const { quizServerData } = useQuizServer()
 
-  const { id } = route.params
+  const { id, isAvailable } = route.params
 
   const allCards = React.useMemo(
     () => quizQuestionsContent.map((item) => item.content).flatMap((item) => item),
@@ -244,30 +264,85 @@ export const EarnQuiz = ({ route }: Props) => {
   const [quizClaim, { loading: quizClaimLoading }] = useQuizClaimMutation()
   const [quizVisible, setQuizVisible] = useState(false)
   const [recordedAnswer, setRecordedAnswer] = useState<number[]>([])
+  const [hasTriedClaim, setHasTriedClaim] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [quizErrorMessage, setQuizErrorMessage] = useState<string>()
+  const [quizErrorCode, setQuizErrorCode] = useState<string | null>()
 
   const addRecordedAnswer = (value: number) => {
     setRecordedAnswer([...recordedAnswer, value])
   }
 
+  const claimQuizWrapper = React.useCallback(
+    async (skipRewards?: boolean): Promise<FetchResult<QuizClaimMutation>> => {
+      const result = await quizClaim({
+        variables: { input: { id, skipRewards } },
+      })
+      const errorCode = result.data?.quizClaim?.errors[0]
+        ?.code as ValidateQuizCodeErrorsType
+
+      if (!skipRewardErrorCodes(errorCode) && result.data?.quizClaim?.errors?.length) {
+        navigation.goBack()
+        toastShow({
+          message: getErrorMessages(result.data.quizClaim.errors),
+          LL,
+        })
+      }
+      return result
+    },
+    [quizClaim, id, LL, navigation],
+  )
+
+  const handleClaimWithoutRewards = React.useCallback(async () => {
+    markErrorCodeAlertAsShown(quizErrorCode)
+    await claimQuizWrapper(true)
+    setShowModal(false)
+  }, [claimQuizWrapper, quizErrorCode])
+
   const answersShuffled: Array<React.ReactNode> = []
 
   useEffect(() => {
     ;(async () => {
+      if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
-        const { data } = await quizClaim({
-          variables: { input: { id } },
-        })
+        setHasTriedClaim(true)
+        const { data } = await claimQuizWrapper(false)
 
         if (data?.quizClaim?.errors?.length) {
-          // FIXME: message is hidden by the modal
-          toastShow({
-            message: getErrorMessages(data.quizClaim.errors),
-            LL,
+          const errorCode = data.quizClaim.errors[0]?.code as ValidateQuizCodeErrorsType
+          const defaultErrorMessage = LL.EarnScreen.defaultErrorMessage({
+            errorMessage: getErrorMessages(data.quizClaim.errors),
           })
+          const customErrorMessage = LL.EarnScreen.customErrorMessage()
+
+          if (skipRewardErrorCodes(errorCode)) {
+            if (errorCodeAlertAlreadyShown(errorCode)) {
+              await handleClaimWithoutRewards()
+              return
+            }
+            setQuizErrorMessage(
+              errorCode === "INVALID_INPUT" ? customErrorMessage : defaultErrorMessage,
+            )
+            setQuizErrorCode(errorCode)
+            setShowModal(true)
+          }
         }
       }
     })()
-  }, [recordedAnswer, id, quizClaim, LL, completed, quizClaimLoading])
+  }, [
+    recordedAnswer,
+    claimQuizWrapper,
+    LL,
+    completed,
+    quizClaimLoading,
+    hasTriedClaim,
+    handleClaimWithoutRewards,
+  ])
+
+  const closeModal = () => {
+    setShowModal(false)
+    navigation.navigate("Earn")
+  }
 
   const close = async () => {
     if (quizVisible) {
@@ -373,7 +448,9 @@ export const EarnQuiz = ({ route }: Props) => {
           {(completed && (
             <>
               <Text style={styles.textEarn}>
-                {LL.EarnScreen.quizComplete({ formattedNumber: amount })}
+                {isAvailable
+                  ? LL.EarnScreen.quizComplete({ formattedNumber: amount })
+                  : LL.EarnScreen.sectionsCompleted()}
               </Text>
               <Button
                 title={LL.EarnScreen.reviewQuiz()}
@@ -384,9 +461,13 @@ export const EarnQuiz = ({ route }: Props) => {
             </>
           )) || (
             <Button
-              title={LL.EarnScreen.earnSats({
-                formattedNumber: amount,
-              })}
+              title={
+                isAvailable
+                  ? LL.EarnScreen.earnSats({
+                      formattedNumber: amount,
+                    })
+                  : LL.common.continue()
+              }
               buttonStyle={styles.buttonStyle}
               titleStyle={styles.titleStyle}
               onPress={() => setQuizVisible(true)}
@@ -394,6 +475,21 @@ export const EarnQuiz = ({ route }: Props) => {
           )}
         </View>
       </SafeAreaView>
+      <CustomModal
+        isVisible={showModal}
+        toggleModal={closeModal}
+        title={LL.EarnScreen.somethingNotRight()}
+        backgroundModalColor={colors.white}
+        body={
+          <View style={styles.modalBody}>
+            <Text style={styles.modalBodyText}>{quizErrorMessage}</Text>
+          </View>
+        }
+        primaryButtonOnPress={handleClaimWithoutRewards}
+        primaryButtonTitle={LL.EarnScreen.continueNoRewards()}
+        secondaryButtonTitle={LL.common.close()}
+        secondaryButtonOnPress={closeModal}
+      />
     </Screen>
   )
 }

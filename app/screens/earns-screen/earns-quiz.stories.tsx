@@ -71,6 +71,7 @@ const route = {
   name: "earnsQuiz",
   params: {
     id: "WhatIsFiat",
+    isAvailable: true,
   },
 } as const
 
