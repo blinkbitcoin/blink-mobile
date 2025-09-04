@@ -84,11 +84,11 @@
           android-sdk = android.sdk.${system} (sdkPkgs:
             with sdkPkgs;
               [
-                build-tools-34-0-0
+                build-tools-35-0-0
                 cmdline-tools-latest
                 emulator
                 platform-tools
-                platforms-android-34
+                platforms-android-35
                 ndk-25-1-8937393
                 ndk-26-1-10909125
                 cmake-3-22-1
@@ -100,12 +100,12 @@
                 platforms-android-33
               ]
               ++ lib.optionals (system == "aarch64-darwin") [
-                system-images-android-34-google-apis-arm64-v8a
-                system-images-android-34-google-apis-playstore-arm64-v8a
+                system-images-android-35-google-apis-arm64-v8a
+                system-images-android-35-google-apis-playstore-arm64-v8a
               ]
               ++ lib.optionals (system == "x86_64-darwin" || system == "x86_64-linux") [
-                system-images-android-34-google-apis-x86-64
-                system-images-android-34-google-apis-playstore-x86-64
+                system-images-android-35-google-apis-x86-64
+                system-images-android-35-google-apis-playstore-x86-64
               ]);
         };
 
@@ -123,10 +123,10 @@
             export GALOY_QUICKSTART_PATH="dev/vendor/galoy-quickstart"
 
             # Check if the AVD already exists
-            if ! avdmanager list avd -c | grep -q Pixel_API_34; then
-              # Determine ABI based on system architecture and create Pixel_API_34 Android Device
+            if ! avdmanager list avd -c | grep -q Pixel_API_35; then
+              # Determine ABI based on system architecture and create Pixel_API_35 Android Device
               if [ "${pkgs.stdenv.targetPlatform.system}" = "aarch64-darwin" ]; then ARCH="arm64-v8a"; else ARCH="x86_64"; fi
-              echo no | avdmanager create avd --force -n Pixel_API_34 --abi "google_apis_playstore/$ARCH" --package "system-images;android-34;google_apis_playstore;$ARCH" --device 'pixel_6a'
+              echo no | avdmanager create avd --force -n Pixel_API_35 --abi "google_apis_playstore/$ARCH" --package "system-images;android-35;google_apis_playstore;$ARCH" --device 'pixel_8'
             fi
 
             XCODE_VERSION="16.2"
