@@ -1,0 +1,56 @@
+diff --git a/node_modules/react-native-webview/apple/RNCWebViewImpl.m b/node_modules/react-native-webview/apple/RNCWebViewImpl.m
+index 97d9780..d1cefae 100644
+--- a/node_modules/react-native-webview/apple/RNCWebViewImpl.m
++++ b/node_modules/react-native-webview/apple/RNCWebViewImpl.m
+@@ -30,6 +30,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
+ // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
+ @interface _SwizzleHelperWK : UIView
+ @property (nonatomic, copy) WKWebView *webView;
++@property (strong, nonatomic) NSTimer *keepWebViewActiveTimer;
+ @end
+ @implementation _SwizzleHelperWK
+ -(id)inputAccessoryView
+@@ -122,6 +123,7 @@ UIGestureRecognizerDelegate,
+ RCTAutoInsetsProtocol>
+ 
+ @property (nonatomic, copy) RNCWKWebView *webView;
++@property (strong, nonatomic) NSTimer *keepWebViewActiveTimer;
+ @property (nonatomic, strong) WKUserScript *postMessageScript;
+ @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
+ @property (nonatomic, strong) WKUserScript *atStartScript;
+@@ -162,6 +164,13 @@ RCTAutoInsetsProtocol>
+ #else
+     super.backgroundColor = [RCTUIColor clearColor];
+ #endif // !TARGET_OS_OSX
++
++    self.keepWebViewActiveTimer = [NSTimer scheduledTimerWithTimeInterval:0.2
++                                   target:self
++                                   selector:@selector(_keepWKWebViewActive:)
++                                   userInfo:nil
++                                   repeats:YES];
++
+     _bounces = YES;
+     _scrollEnabled = YES;
+     _showsHorizontalScrollIndicator = YES;
+@@ -237,6 +246,12 @@ RCTAutoInsetsProtocol>
+   return self;
+ }
+ 
++-(void) _keepWKWebViewActive:(NSTimer*) timer{
++    if(self.webView) {
++        [self.webView evaluateJavaScript:@"1+1" completionHandler:nil];
++    }
++}
++
+ #if !TARGET_OS_OSX
+ - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+   // Only allow long press gesture
+@@ -306,6 +321,8 @@ RCTAutoInsetsProtocol>
+   if (@available(iOS 11.0, *)) {
+     [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
+   }
++  [self.keepWebViewActiveTimer invalidate];
++  self.keepWebViewActiveTimer = nil;
+ }
+ 
+ - (void)tappedMenuItem:(NSString *)eventType

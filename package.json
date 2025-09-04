@@ -140,7 +140,7 @@
     "react-native-view-shot": "^3.7.0",
     "react-native-vision-camera": "^4.3.2",
     "react-native-webln": "^0.1.11",
-    "react-native-webview": "^13.8.6",
+    "react-native-webview": "13.12.3",
     "rn-qr-generator": "^1.4.0",
     "typesafe-i18n": "^5.26.2",
     "use-count-up": "^3.0.1",
