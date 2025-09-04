@@ -14,6 +14,8 @@ import { PaymentDestinationDisplay } from "@app/components/payment-destination-d
 import { Screen } from "@app/components/screen"
 import {
   Network,
+  PayoutSpeed,
+  usePayoutSpeedsQuery,
   useOnChainTxFeeLazyQuery,
   useSendBitcoinDetailsScreenQuery,
   useSendBitcoinInternalLimitsQuery,
@@ -30,6 +32,11 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
+  PayoutSpeedSelector,
+  PayoutSpeedModal,
+  PayoutSpeedOption,
+} from "@app/components/payout-speed"
+import {
   DisplayCurrency,
   MoneyAmount,
   toBtcMoneyAmount,
@@ -40,6 +47,7 @@ import { toastShow } from "@app/utils/toast"
 import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
+  PaymentType,
 } from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -100,6 +108,14 @@ gql`
           }
         }
       }
+    }
+  }
+
+  query payoutSpeeds {
+    payoutSpeeds {
+      speed
+      displayName
+      description
     }
   }
 `
@@ -167,8 +183,18 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       paymentDetail.paymentType !== "intraledger",
   })
 
+  const isOnchain = paymentDetail?.paymentType === PaymentType.Onchain
+  const { data: payoutSpeedsData, loading: payoutSpeedsLoading } = usePayoutSpeedsQuery({
+    skip: !isOnchain,
+  })
+
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
+
+  const [isPayoutSpeedModalVisible, setIsPayoutSpeedModalVisible] = useState(false)
+  const [selectedPayoutSpeedOption, setSelectedPayoutSpeedOption] = useState<
+    PayoutSpeedOption | undefined
+  >()
 
   // we are caching the _convertMoneyAmount when the screen loads.
   // this is because the _convertMoneyAmount can change while the user is on this screen
@@ -215,11 +241,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert(
+  const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
-    btcWallet?.id as string,
+    walletId: btcWallet?.id as string,
     network,
-  )
+    speed: selectedPayoutSpeedOption?.speed,
+  })
 
   if (!paymentDetail) {
     return <></>
@@ -420,6 +447,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
+            payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
           })
         }
       }
@@ -428,6 +456,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const setAmount = (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
+    )
+  }
+
+  const setPayoutSpeed = (payoutSpeed: PayoutSpeed) => {
+    setPaymentDetail((paymentDetail) =>
+      paymentDetail?.setPayoutSpeed
+        ? paymentDetail.setPayoutSpeed(payoutSpeed)
+        : paymentDetail,
     )
   }
 
@@ -465,11 +501,32 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       <ConfirmFeesModal
         action={() => {
           setModalHighFeesVisible(false)
-          navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
+          navigation.navigate("sendBitcoinConfirmation", {
+            paymentDetail,
+            payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
+          })
         }}
         isVisible={modalHighFeesVisible}
         cancel={() => setModalHighFeesVisible(false)}
       />
+      <PayoutSpeedModal
+        isVisible={isPayoutSpeedModalVisible}
+        toggleModal={() => setIsPayoutSpeedModalVisible(false)}
+        options={
+          payoutSpeedsData?.payoutSpeeds.map(({ speed, displayName, description }) => ({
+            speed,
+            displayName,
+            description,
+          })) ?? []
+        }
+        selectedSpeed={selectedPayoutSpeedOption?.speed}
+        onSelect={(selected) => {
+          setPayoutSpeed(selected.speed)
+          setSelectedPayoutSpeedOption(selected)
+          setIsPayoutSpeedModalVisible(false)
+        }}
+      />
+
       <View style={styles.sendBitcoinAmountContainer}>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>
@@ -576,6 +633,20 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             />
           </View>
         </View>
+        {isOnchain && (
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldTitleText}>
+              {LL.SendBitcoinScreen.feeSettings()}
+            </Text>
+            <PayoutSpeedSelector
+              value={
+                selectedPayoutSpeedOption?.displayName || LL.SendBitcoinScreen.selectFee()
+              }
+              loading={payoutSpeedsLoading}
+              onPress={() => setIsPayoutSpeedModalVisible(true)}
+            />
+          </View>
+        )}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
           <NoteInput
@@ -594,8 +665,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.buttonContainer}>
           <GaloyPrimaryButton
             onPress={goToNextScreen || undefined}
-            loading={isLoadingLnurl}
-            disabled={!goToNextScreen || !amountStatus.validAmount}
+            loading={isLoadingLnurl || payoutSpeedsLoading}
+            disabled={
+              !goToNextScreen ||
+              !amountStatus.validAmount ||
+              (isOnchain && !selectedPayoutSpeedOption)
+            }
             title={LL.common.next()}
           />
         </View>
@@ -737,11 +812,17 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-const useOnchainFeeAlert = (
-  paymentDetail: PaymentDetail<WalletCurrency> | null,
-  walletId: string,
-  network: Network | undefined,
-) => {
+const useOnchainFeeAlert = ({
+  paymentDetail,
+  walletId,
+  network,
+  speed = PayoutSpeed.Fast,
+}: {
+  paymentDetail: PaymentDetail<WalletCurrency> | null
+  walletId: string
+  network?: Network
+  speed?: PayoutSpeed
+}) => {
   const dummyAddress =
     network === "mainnet"
       ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
@@ -763,6 +844,7 @@ const useOnchainFeeAlert = (
       walletId,
       amount: 1000,
       address: dummyAddress,
+      speed,
     },
   })
 
