@@ -72,7 +72,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const { hideAmount } = useHideAmount()
 
-  const { paymentDetail, payoutSpeedLabel } = route.params
+  const { paymentDetail, payoutSpeedLabel, payoutEstimateLabel } = route.params
 
   const {
     destination,
@@ -393,7 +393,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <Text style={styles.fieldTitleText}>
               {LL.SendBitcoinScreen.feeSettings()}
             </Text>
-            <PayoutSpeedSelector value={payoutSpeedLabel} readOnly />
+            <PayoutSpeedSelector
+              label={payoutSpeedLabel}
+              estimate={payoutEstimateLabel}
+              readOnly
+            />
           </View>
         )}
         {note ? (

@@ -12,10 +12,11 @@ export type PayoutSpeedOption = {
 
 type PayoutSpeedModalProps = {
   options: PayoutSpeedOption[]
-  selectedSpeed?: string
+  selectedSpeed?: PayoutSpeed
   isVisible: boolean
   toggleModal: () => void
   onSelect: (option: PayoutSpeedOption) => void
+  estimatedFeeBySpeed?: Partial<Record<PayoutSpeed, string>>
 }
 
 export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
@@ -24,6 +25,7 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
   options,
   selectedSpeed,
   onSelect,
+  estimatedFeeBySpeed,
 }) => {
   const styles = useStyles()
   const {
@@ -40,6 +42,7 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
     >
       {options.map((option) => {
         const isSelected = option.speed === selectedSpeed
+        const estimatedFeeText = estimatedFeeBySpeed?.[option.speed]
 
         return (
           <ListItem
@@ -60,12 +63,20 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
               <ListItem.Title style={styles.listItemTitle}>
                 {option.displayName}
               </ListItem.Title>
-              {option.description && (
+
+              {option.description ? (
                 <ListItem.Subtitle style={styles.listItemSubtitle}>
                   {option.description}
                 </ListItem.Subtitle>
-              )}
+              ) : null}
+
+              {estimatedFeeText ? (
+                <ListItem.Subtitle style={styles.estimateFee}>
+                  ~ {estimatedFeeText}
+                </ListItem.Subtitle>
+              ) : null}
             </ListItem.Content>
+
             <ListItem.Chevron name={"chevron-forward"} type="ionicon" />
           </ListItem>
         )
@@ -90,5 +101,9 @@ const useStyles = makeStyles(({ colors }) => ({
   listItemSubtitle: {
     color: colors.grey1,
     marginTop: 4,
+  },
+  estimateFee: {
+    color: colors.grey1,
+    marginTop: 6,
   },
 }))

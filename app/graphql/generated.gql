@@ -1355,6 +1355,66 @@ query notificationSettings {
   }
 }
 
+query onChainFeeEstimatesPayoutQueueBtc($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $skipFast: Boolean! = false, $skipMedium: Boolean! = false, $skipSlow: Boolean! = false) {
+  fast: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) @skip(if: $skipFast) {
+    amount
+    __typename
+  }
+  medium: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) @skip(if: $skipMedium) {
+    amount
+    __typename
+  }
+  slow: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) @skip(if: $skipSlow) {
+    amount
+    __typename
+  }
+}
+
+query onChainFeeEstimatesPayoutQueueUsd($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $skipFast: Boolean! = false, $skipMedium: Boolean! = false, $skipSlow: Boolean! = false) {
+  fast: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) @skip(if: $skipFast) {
+    amount
+    __typename
+  }
+  medium: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) @skip(if: $skipMedium) {
+    amount
+    __typename
+  }
+  slow: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) @skip(if: $skipSlow) {
+    amount
+    __typename
+  }
+}
+
 query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
   onChainTxFee(
     walletId: $walletId

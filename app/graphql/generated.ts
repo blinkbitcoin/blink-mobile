@@ -3023,6 +3023,30 @@ export type OnChainUsdTxFeeAsBtcDenominatedQueryVariables = Exact<{
 
 export type OnChainUsdTxFeeAsBtcDenominatedQuery = { readonly __typename: 'Query', readonly onChainUsdTxFeeAsBtcDenominated: { readonly __typename: 'OnChainUsdTxFee', readonly amount: number } };
 
+export type OnChainFeeEstimatesPayoutQueueBtcQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  address: Scalars['OnChainAddress']['input'];
+  amount: Scalars['SatAmount']['input'];
+  skipFast?: Scalars['Boolean']['input'];
+  skipMedium?: Scalars['Boolean']['input'];
+  skipSlow?: Scalars['Boolean']['input'];
+}>;
+
+
+export type OnChainFeeEstimatesPayoutQueueBtcQuery = { readonly __typename: 'Query', readonly fast?: { readonly __typename: 'OnChainTxFee', readonly amount: number }, readonly medium?: { readonly __typename: 'OnChainTxFee', readonly amount: number }, readonly slow?: { readonly __typename: 'OnChainTxFee', readonly amount: number } };
+
+export type OnChainFeeEstimatesPayoutQueueUsdQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  address: Scalars['OnChainAddress']['input'];
+  amount: Scalars['CentAmount']['input'];
+  skipFast?: Scalars['Boolean']['input'];
+  skipMedium?: Scalars['Boolean']['input'];
+  skipSlow?: Scalars['Boolean']['input'];
+}>;
+
+
+export type OnChainFeeEstimatesPayoutQueueUsdQuery = { readonly __typename: 'Query', readonly fast?: { readonly __typename: 'OnChainUsdTxFee', readonly amount: number }, readonly medium?: { readonly __typename: 'OnChainUsdTxFee', readonly amount: number }, readonly slow?: { readonly __typename: 'OnChainUsdTxFee', readonly amount: number } };
+
 export type ContactCreateMutationVariables = Exact<{
   input: ContactCreateInput;
 }>;
@@ -6659,6 +6683,138 @@ export type OnChainUsdTxFeeAsBtcDenominatedQueryHookResult = ReturnType<typeof u
 export type OnChainUsdTxFeeAsBtcDenominatedLazyQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeAsBtcDenominatedLazyQuery>;
 export type OnChainUsdTxFeeAsBtcDenominatedSuspenseQueryHookResult = ReturnType<typeof useOnChainUsdTxFeeAsBtcDenominatedSuspenseQuery>;
 export type OnChainUsdTxFeeAsBtcDenominatedQueryResult = Apollo.QueryResult<OnChainUsdTxFeeAsBtcDenominatedQuery, OnChainUsdTxFeeAsBtcDenominatedQueryVariables>;
+export const OnChainFeeEstimatesPayoutQueueBtcDocument = gql`
+    query onChainFeeEstimatesPayoutQueueBtc($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $skipFast: Boolean! = false, $skipMedium: Boolean! = false, $skipSlow: Boolean! = false) {
+  fast: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) @skip(if: $skipFast) {
+    amount
+  }
+  medium: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) @skip(if: $skipMedium) {
+    amount
+  }
+  slow: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) @skip(if: $skipSlow) {
+    amount
+  }
+}
+    `;
+
+/**
+ * __useOnChainFeeEstimatesPayoutQueueBtcQuery__
+ *
+ * To run a query within a React component, call `useOnChainFeeEstimatesPayoutQueueBtcQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOnChainFeeEstimatesPayoutQueueBtcQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOnChainFeeEstimatesPayoutQueueBtcQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      address: // value for 'address'
+ *      amount: // value for 'amount'
+ *      skipFast: // value for 'skipFast'
+ *      skipMedium: // value for 'skipMedium'
+ *      skipSlow: // value for 'skipSlow'
+ *   },
+ * });
+ */
+export function useOnChainFeeEstimatesPayoutQueueBtcQuery(baseOptions: Apollo.QueryHookOptions<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables> & ({ variables: OnChainFeeEstimatesPayoutQueueBtcQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>(OnChainFeeEstimatesPayoutQueueBtcDocument, options);
+      }
+export function useOnChainFeeEstimatesPayoutQueueBtcLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>(OnChainFeeEstimatesPayoutQueueBtcDocument, options);
+        }
+export function useOnChainFeeEstimatesPayoutQueueBtcSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>(OnChainFeeEstimatesPayoutQueueBtcDocument, options);
+        }
+export type OnChainFeeEstimatesPayoutQueueBtcQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueBtcQuery>;
+export type OnChainFeeEstimatesPayoutQueueBtcLazyQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueBtcLazyQuery>;
+export type OnChainFeeEstimatesPayoutQueueBtcSuspenseQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueBtcSuspenseQuery>;
+export type OnChainFeeEstimatesPayoutQueueBtcQueryResult = Apollo.QueryResult<OnChainFeeEstimatesPayoutQueueBtcQuery, OnChainFeeEstimatesPayoutQueueBtcQueryVariables>;
+export const OnChainFeeEstimatesPayoutQueueUsdDocument = gql`
+    query onChainFeeEstimatesPayoutQueueUsd($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $skipFast: Boolean! = false, $skipMedium: Boolean! = false, $skipSlow: Boolean! = false) {
+  fast: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) @skip(if: $skipFast) {
+    amount
+  }
+  medium: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) @skip(if: $skipMedium) {
+    amount
+  }
+  slow: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) @skip(if: $skipSlow) {
+    amount
+  }
+}
+    `;
+
+/**
+ * __useOnChainFeeEstimatesPayoutQueueUsdQuery__
+ *
+ * To run a query within a React component, call `useOnChainFeeEstimatesPayoutQueueUsdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOnChainFeeEstimatesPayoutQueueUsdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOnChainFeeEstimatesPayoutQueueUsdQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      address: // value for 'address'
+ *      amount: // value for 'amount'
+ *      skipFast: // value for 'skipFast'
+ *      skipMedium: // value for 'skipMedium'
+ *      skipSlow: // value for 'skipSlow'
+ *   },
+ * });
+ */
+export function useOnChainFeeEstimatesPayoutQueueUsdQuery(baseOptions: Apollo.QueryHookOptions<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables> & ({ variables: OnChainFeeEstimatesPayoutQueueUsdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>(OnChainFeeEstimatesPayoutQueueUsdDocument, options);
+      }
+export function useOnChainFeeEstimatesPayoutQueueUsdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>(OnChainFeeEstimatesPayoutQueueUsdDocument, options);
+        }
+export function useOnChainFeeEstimatesPayoutQueueUsdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>(OnChainFeeEstimatesPayoutQueueUsdDocument, options);
+        }
+export type OnChainFeeEstimatesPayoutQueueUsdQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueUsdQuery>;
+export type OnChainFeeEstimatesPayoutQueueUsdLazyQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueUsdLazyQuery>;
+export type OnChainFeeEstimatesPayoutQueueUsdSuspenseQueryHookResult = ReturnType<typeof useOnChainFeeEstimatesPayoutQueueUsdSuspenseQuery>;
+export type OnChainFeeEstimatesPayoutQueueUsdQueryResult = Apollo.QueryResult<OnChainFeeEstimatesPayoutQueueUsdQuery, OnChainFeeEstimatesPayoutQueueUsdQueryVariables>;
 export const ContactCreateDocument = gql`
     mutation contactCreate($input: ContactCreateInput!) {
   contactCreate(input: $input) {

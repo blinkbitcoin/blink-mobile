@@ -5,7 +5,8 @@ import { makeStyles, useTheme, Icon } from "@rneui/themed"
 import { testProps } from "@app/utils/testProps"
 
 type PayoutSpeedSelectorProps = {
-  value?: string
+  label?: string
+  estimate?: string
   loading?: boolean
   readOnly?: boolean
   onPress?: () => void
@@ -13,7 +14,8 @@ type PayoutSpeedSelectorProps = {
 
 export const PayoutSpeedSelector: React.FC<PayoutSpeedSelectorProps> = ({
   onPress,
-  value,
+  label,
+  estimate,
   loading,
   readOnly = false,
 }) => {
@@ -31,18 +33,23 @@ export const PayoutSpeedSelector: React.FC<PayoutSpeedSelectorProps> = ({
       activeOpacity={readOnly ? 1 : 0.2}
     >
       <View style={styles.feeContainer}>
-        <View style={styles.feeInline}>
-          {loading ? (
-            <ActivityIndicator size="small" color={colors.black} />
-          ) : (
-            <Text style={styles.feeText}>{value}</Text>
-          )}
-        </View>
+        <Text style={styles.feePrimary} numberOfLines={1} ellipsizeMode="tail">
+          {label}
+        </Text>
+        {estimate ? (
+          <Text style={styles.feeSecondary} numberOfLines={1} ellipsizeMode="tail">
+            ~ {estimate}
+          </Text>
+        ) : null}
       </View>
 
       {!readOnly && (
         <View style={styles.iconContainer}>
-          <Icon name="chevron-down" type="ionicon" size={24} color={colors.black} />
+          {loading ? (
+            <ActivityIndicator size="small" color={colors.black} />
+          ) : (
+            <Icon name="chevron-down" type="ionicon" size={24} color={colors.black} />
+          )}
         </View>
       )}
     </TouchableOpacity>
@@ -55,8 +62,9 @@ const useStyles = makeStyles(({ colors }) => ({
     borderStyle: "solid",
     overflow: "hidden",
     backgroundColor: colors.grey5,
-    paddingHorizontal: 10,
-    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     alignItems: "center",
     minHeight: 60,
   },
@@ -64,21 +72,21 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.8,
     backgroundColor: colors.grey4,
   },
-  feeInline: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   feeContainer: {
     flex: 1,
     justifyContent: "center",
   },
-  feeText: {
+  feePrimary: {
     color: colors.black,
     fontSize: 16,
+  },
+  feeSecondary: {
+    color: colors.grey1,
+    marginTop: 4,
+    fontSize: 12,
   },
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingLeft: 20,
   },
 }))
