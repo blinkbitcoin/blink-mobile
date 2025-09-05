@@ -89,7 +89,7 @@
                 emulator
                 platform-tools
                 platforms-android-35
-                ndk-26-1-10909125
+                ndk-27-3-13750724
                 cmake-3-22-1
               ]
               ++ lib.optionals (system == "aarch64-darwin") [
