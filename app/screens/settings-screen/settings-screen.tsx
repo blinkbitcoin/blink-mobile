@@ -3,7 +3,7 @@ import React, { useEffect } from "react"
 import { TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
-import { Icon, makeStyles, Text } from "@rneui/themed"
+import { Icon, makeStyles, Text } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 

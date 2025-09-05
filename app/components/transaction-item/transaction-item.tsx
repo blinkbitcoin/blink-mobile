@@ -16,7 +16,7 @@ import { toWalletAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, ListItem } from "@rneui/themed"
+import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 
 import { IconTransaction } from "../icon-transactions"
 import { TransactionDate } from "../transaction-date"

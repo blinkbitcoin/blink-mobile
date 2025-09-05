@@ -8,7 +8,7 @@ import { useHideBalanceQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, Switch } from "@rneui/themed"
+import { Text, makeStyles, Switch } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import {

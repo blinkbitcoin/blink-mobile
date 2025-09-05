@@ -6,7 +6,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { timing } from "@app/rne-theme/timing"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { AmountInputScreen } from "../amount-input-screen"
 

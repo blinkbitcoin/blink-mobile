@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useContext, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 type AccountDeleteContextType = {
   setAccountIsBeingDeleted: React.Dispatch<React.SetStateAction<boolean>>

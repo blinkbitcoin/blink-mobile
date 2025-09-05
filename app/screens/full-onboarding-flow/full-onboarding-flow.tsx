@@ -14,7 +14,7 @@ import {
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
-import { Input, Text, makeStyles, useTheme } from "@rneui/themed"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 gql`
   mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {

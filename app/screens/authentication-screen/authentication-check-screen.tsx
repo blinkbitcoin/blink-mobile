@@ -4,7 +4,7 @@ import { View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useApolloClient } from "@apollo/client"
 import { useIsAuthed } from "@app/graphql/is-authed-context"

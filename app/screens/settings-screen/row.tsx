@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Icon, Text, Skeleton } from "@rneui/themed"
+import { makeStyles, Icon, Text, Skeleton } from "@rn-vui/themed"
 
 type Props = {
   title: string

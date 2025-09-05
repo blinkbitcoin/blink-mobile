@@ -16,7 +16,7 @@ import { logAddPhoneAttempt, logValidateAuthCodeFailure } from "@app/utils/analy
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Input, Text, makeStyles, useTheme } from "@rneui/themed"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"

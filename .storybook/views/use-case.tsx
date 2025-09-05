@@ -1,4 +1,4 @@
-import { Text, useTheme } from "@rneui/themed"
+import { Text, useTheme } from "@rn-vui/themed"
 import * as React from "react"
 import { View, TextStyle, ViewStyle } from "react-native"
 

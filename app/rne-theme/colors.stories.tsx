@@ -3,7 +3,7 @@ import { View } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 
 import { light, dark } from "@app/rne-theme/colors"
-import { createTheme, makeStyles, Text } from "@rneui/themed"
+import { createTheme, makeStyles, Text } from "@rn-vui/themed"
 
 const theme = createTheme({ lightColors: light, darkColors: dark })
 

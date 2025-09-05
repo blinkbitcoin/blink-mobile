@@ -2,7 +2,7 @@ import React from "react"
 import { ActivityIndicator } from "react-native"
 
 import { useAppConfig } from "@app/hooks"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 const useStyles = makeStyles(() => ({
   highlight: {

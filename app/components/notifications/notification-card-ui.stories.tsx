@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 
 import { MockedProvider } from "@apollo/client/testing"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { StoryScreen } from "../../../.storybook/views"
 import { createCache } from "../../graphql/cache"

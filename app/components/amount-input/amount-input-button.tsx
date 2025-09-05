@@ -3,7 +3,7 @@ import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-nat
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
-import { useTheme, Text, makeStyles } from "@rneui/themed"
+import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 export type AmountInputButtonProps = {
   placeholder?: string

@@ -25,7 +25,7 @@ import analytics from "@react-native-firebase/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme, Input } from "@rneui/themed"
+import { Text, makeStyles, useTheme, Input } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import type {

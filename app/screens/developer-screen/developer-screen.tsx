@@ -17,7 +17,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Button, Text, makeStyles } from "@rneui/themed"
+import { Button, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"

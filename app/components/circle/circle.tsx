@@ -4,7 +4,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { useCountUp } from "use-count-up"
 
 import { testProps } from "@app/utils/testProps"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 type CircleProps = {
   heading: string

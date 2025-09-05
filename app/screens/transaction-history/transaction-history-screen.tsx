@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ActivityIndicator, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 import { RouteProp } from "@react-navigation/native"
 

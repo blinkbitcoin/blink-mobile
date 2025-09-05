@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"

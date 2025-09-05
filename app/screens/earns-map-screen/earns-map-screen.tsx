@@ -6,7 +6,7 @@ import { SvgProps } from "react-native-svg"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { MountainHeader } from "../../components/mountain-header"
 import { Screen } from "../../components/screen"

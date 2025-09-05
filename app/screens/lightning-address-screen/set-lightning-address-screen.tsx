@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import { View, TextInput, Keyboard, Modal } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"

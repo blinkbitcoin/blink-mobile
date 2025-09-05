@@ -40,7 +40,8 @@
       android:allowBackup="false"
       android:usesCleartextTraffic="true"
       android:networkSecurityConfig="@xml/network_security_config"
-      android:theme="@style/AppTheme"> <!-- Apply @style/AppTheme on .MainApplication -->
+      android:theme="@style/AppTheme"
+      android:supportsRtl="true"> <!-- Apply @style/AppTheme on .MainApplication -->
       <receiver android:name=".BitcoinPriceWidget" android:exported="false">
         <intent-filter>
           <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

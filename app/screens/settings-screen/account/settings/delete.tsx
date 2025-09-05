@@ -16,7 +16,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { useTheme, Text, makeStyles } from "@rneui/themed"
+import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"

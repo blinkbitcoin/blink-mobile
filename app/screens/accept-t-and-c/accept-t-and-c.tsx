@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Alert, View } from "react-native"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"

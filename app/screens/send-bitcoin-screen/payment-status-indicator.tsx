@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 type Props = {
   errs: { message: string }[]

@@ -20,7 +20,7 @@ import {
 import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 type Prop = {
   route: RouteProp<RootStackParamList, "redeemBitcoinDetail">

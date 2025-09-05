@@ -5,7 +5,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { useIsFocused } from "@react-navigation/native"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { FlatList, RefreshControl } from "react-native-gesture-handler"
 import { Notification } from "./notification"
 

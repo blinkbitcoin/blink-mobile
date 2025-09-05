@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { View } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 type GaloyInfoProps = {
   highlight?: boolean

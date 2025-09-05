@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { ListItem, Icon, makeStyles } from "@rneui/themed"
+import { ListItem, Icon, makeStyles } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsRow } from "@app/screens/settings-screen/row"

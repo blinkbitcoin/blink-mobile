@@ -1,7 +1,7 @@
 import React from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"

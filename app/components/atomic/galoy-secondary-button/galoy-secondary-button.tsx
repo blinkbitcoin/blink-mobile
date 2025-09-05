@@ -1,12 +1,12 @@
 import React, { FunctionComponent, PropsWithChildren } from "react"
-import { TouchableHighlight } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { Button, ButtonProps, makeStyles, useTheme } from "@rneui/themed"
+import { TouchableHighlight } from "@app/utils/touchable-wrapper"
+import { Button, ButtonProps, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../galoy-icon"
 
-declare module "@rneui/themed" {
+declare module "@rn-vui/themed" {
   interface ButtonProps {
     underlayColor?: string
   }
