@@ -686,10 +686,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                   </Text>
                 </View>
               </View>
-
-              <View style={styles.pickWalletIcon}>
-                <Icon name={"chevron-down"} size={24} color={colors.black} />
-              </View>
+              <Icon name={"chevron-down"} size={24} color={colors.primary} />
             </View>
           </TouchableWithoutFeedback>
           {ChooseWalletModal}
