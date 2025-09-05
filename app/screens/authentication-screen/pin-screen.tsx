@@ -196,12 +196,13 @@ const useStyles = makeStyles(({ colors }) => ({
   circleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    width: 32,
+    width: "25%",
   },
 
   circles: {
     flex: 2,
     flexDirection: "row",
+    width: "33.33%",
   },
 
   container: {
@@ -244,36 +245,29 @@ const useStyles = makeStyles(({ colors }) => ({
 
   pinPadButton: {
     backgroundColor: colors.primary,
-    flex: 1,
-    height: "95%",
-    width: "95%",
   },
 
   pinPadButtonContainer: {
     alignItems: "center",
     justifyContent: "center",
-    width: 100,
+    width: "33.33%",
   },
 
   pinPadButtonIcon: {
     color: colors.white,
     fontSize: 32,
-    marginRight: "20%",
   },
 
   pinPadButtonTitle: {
     color: colors.white,
     fontSize: 26,
-    fontWeight: "bold",
-    marginLeft: "40%",
-    marginRight: "40%",
+    fontWeight: "500",
   },
 
   pinPadRow: {
     flex: 1,
     flexDirection: "row",
-    marginLeft: 32,
-    marginRight: 32,
+    paddingHorizontal: "10%",
   },
 
   topSpacer: {
