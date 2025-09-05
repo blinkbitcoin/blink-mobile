@@ -76,8 +76,6 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
                 </ListItem.Subtitle>
               ) : null}
             </ListItem.Content>
-
-            <ListItem.Chevron name={"chevron-forward"} type="ionicon" />
           </ListItem>
         )
       })}
