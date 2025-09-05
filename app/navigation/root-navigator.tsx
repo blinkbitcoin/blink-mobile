@@ -651,7 +651,12 @@ export const PrimaryNavigator = () => {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.grey2,
         tabBarStyle: styles.bottomNavigatorStyle,
-        tabBarLabelStyle: { paddingBottom: 6, fontSize: 12, fontWeight: "bold" },
+        tabBarLabelStyle: {
+          paddingBottom: 6,
+          fontSize: 12,
+          fontWeight: "bold",
+          width: "100%",
+        },
         tabBarHideOnKeyboard: true,
       }}
     >
