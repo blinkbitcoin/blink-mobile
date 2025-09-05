@@ -777,7 +777,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 10,
     alignItems: "center",
-    padding: 14,
+    padding: 12,
     minHeight: 60,
   },
   destinationFieldContainer: {
@@ -787,7 +787,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 10,
     alignItems: "center",
-    padding: 14,
+    padding: 12,
     minHeight: 60,
   },
   disabledFieldBackground: {
@@ -801,7 +801,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderStyle: "solid",
     overflow: "hidden",
     backgroundColor: colors.grey5,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
@@ -874,9 +874,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modal: {
     marginBottom: "90%",
-  },
-  pickWalletIcon: {
-    marginRight: 12,
   },
   screenStyle: {
     padding: 20,
