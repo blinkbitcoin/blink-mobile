@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { PhoneCodeChannelType } from "@app/graphql/generated"

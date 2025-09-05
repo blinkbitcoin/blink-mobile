@@ -1,7 +1,7 @@
 import React from "react"
 
 import { MockedProvider } from "@apollo/client/testing"
-import { Text, useTheme } from "@rneui/themed"
+import { Text, useTheme } from "@rn-vui/themed"
 import { Meta } from "@storybook/react-native"
 
 import { Story, StoryScreen, UseCase } from "../../.storybook/views"

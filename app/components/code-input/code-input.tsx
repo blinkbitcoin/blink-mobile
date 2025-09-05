@@ -5,7 +5,7 @@ import { ActivityIndicator, View } from "react-native"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { testProps } from "@app/utils/testProps"
 import { useTheme } from "@react-navigation/native"
-import { Input, Text, makeStyles } from "@rneui/themed"
+import { Input, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../screen"
 

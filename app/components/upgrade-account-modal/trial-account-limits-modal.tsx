@@ -10,7 +10,7 @@ import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 export type TrialAccountLimitsModalProps = {
   isVisible: boolean

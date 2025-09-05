@@ -13,7 +13,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { makeStyles, Text, ThemeProvider, useTheme } from "@rneui/themed"
+import { makeStyles, Text, ThemeProvider, useTheme } from "@rn-vui/themed"
 
 export const useCirclesCard = () => {
   const shareImgRef = useRef<View | null>(null)

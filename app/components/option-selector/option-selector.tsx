@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { IconNamesType } from "../atomic/galoy-icon"

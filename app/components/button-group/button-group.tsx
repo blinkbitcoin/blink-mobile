@@ -3,7 +3,7 @@ import { StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-nati
 import Icon from "react-native-vector-icons/Ionicons"
 
 import { testProps } from "@app/utils/testProps"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 type ButtonForButtonGroupProps = {
   id: string

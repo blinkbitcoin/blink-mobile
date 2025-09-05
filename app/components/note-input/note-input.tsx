@@ -3,7 +3,7 @@ import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-n
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 

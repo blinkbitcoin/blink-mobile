@@ -8,7 +8,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openWhatsApp } from "@app/utils/external"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Icon, ListItem, makeStyles, useTheme } from "@rneui/themed"
+import { Icon, ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 
 import TelegramOutline from "./telegram.svg"
 

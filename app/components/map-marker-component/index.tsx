@@ -10,7 +10,7 @@ import {
 import { MapMarker } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 /*
   In order to increase performance, markers are initially rendered without content in the callout.

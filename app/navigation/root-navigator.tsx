@@ -55,7 +55,7 @@ import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import {
   AuthenticationCheckScreen,
@@ -122,17 +122,17 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="authenticationCheck"
         component={AuthenticationCheckScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="authentication"
         component={AuthenticationScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="login"
@@ -156,7 +156,6 @@ export const RootStack = () => {
         component={PrimaryNavigator}
         options={{
           headerShown: false,
-          animationEnabled: false,
           title: LL.PrimaryScreen.title(),
         }}
       />
@@ -663,7 +662,7 @@ export const PrimaryNavigator = () => {
           title: LL.HomeScreen.title(),
           tabBarAccessibilityLabel: LL.HomeScreen.title(),
           tabBarTestID: LL.HomeScreen.title(),
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color }: { color: string }) => (
             <HomeIcon {...testProps("Home")} fill={color} color={color} />
           ),
           headerShown: false,
@@ -677,7 +676,7 @@ export const PrimaryNavigator = () => {
           title: LL.PeopleScreen.title(),
           tabBarAccessibilityLabel: LL.PeopleScreen.title(),
           tabBarTestID: LL.PeopleScreen.title(),
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
             <PeopleTabIcon color={color} focused={focused} />
           ),
         }}
@@ -690,7 +689,7 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           tabBarAccessibilityLabel: LL.MapScreen.title(),
           tabBarTestID: LL.MapScreen.title(),
-          tabBarIcon: ({ color }) => <MapIcon color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
         }}
       />
       <Tab.Screen
@@ -701,7 +700,9 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           tabBarAccessibilityLabel: LL.EarnScreen.title(),
           tabBarTestID: LL.EarnScreen.title(),
-          tabBarIcon: ({ color }) => <LearnIcon {...testProps("Earn")} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => (
+            <LearnIcon {...testProps("Earn")} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
