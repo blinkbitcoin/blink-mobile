@@ -48,7 +48,7 @@ export const PayoutSpeedSelector: React.FC<PayoutSpeedSelectorProps> = ({
           {loading ? (
             <ActivityIndicator size="small" color={colors.black} />
           ) : (
-            <Icon name="chevron-down" type="ionicon" size={24} color={colors.black} />
+            <Icon name="chevron-down" type="ionicon" size={24} color={colors.primary} />
           )}
         </View>
       )}
