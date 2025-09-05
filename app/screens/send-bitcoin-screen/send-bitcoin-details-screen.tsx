@@ -59,6 +59,7 @@ import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { isValidAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
+import { useOnChainPayoutQueueFeeEstimates } from "./use-fee"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -241,11 +242,53 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
+  useEffect(() => {
+    if (!isOnchain || selectedPayoutSpeedOption || !payoutSpeedsData?.payoutSpeeds) {
+      return
+    }
+
+    const priority = payoutSpeedsData.payoutSpeeds.find(
+      ({ speed }) => speed === PayoutSpeed.Fast,
+    )
+    if (!priority) return
+
+    const option: PayoutSpeedOption = {
+      speed: priority.speed,
+      displayName: priority.displayName,
+      description: priority.description,
+    }
+    setSelectedPayoutSpeedOption(option)
+    setPayoutSpeed(priority.speed)
+  }, [isOnchain, payoutSpeedsData, selectedPayoutSpeedOption])
+
   const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
     walletId: btcWallet?.id as string,
     network,
     speed: selectedPayoutSpeedOption?.speed,
+  })
+
+  const availableSet = new Set((payoutSpeedsData?.payoutSpeeds ?? []).map((p) => p.speed))
+  const skipFast = !availableSet.has(PayoutSpeed.Fast)
+  const skipMedium = !availableSet.has(PayoutSpeed.Medium)
+  const skipSlow = !availableSet.has(PayoutSpeed.Slow)
+
+  const destinationStr = paymentDetail?.destination as string | undefined
+  const estimateAddress =
+    destinationStr && destinationStr.length > 10
+      ? destinationStr
+      : fallbackOnchainAddress(network)
+
+  const feeEstimates = useOnChainPayoutQueueFeeEstimates({
+    walletId: paymentDetail?.sendingWalletDescriptor?.id,
+    address: estimateAddress,
+    amount: paymentDetail?.settlementAmount?.amount,
+    currency: paymentDetail?.sendingWalletDescriptor?.currency as
+      | WalletCurrency
+      | undefined,
+    skipFast,
+    skipMedium,
+    skipSlow,
   })
 
   if (!paymentDetail) {
@@ -448,6 +491,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
             payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
+            payoutEstimateLabel: selectedPayoutSpeedOption?.description,
           })
         }
       }
@@ -491,6 +535,47 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     )
   }
 
+  const speeds = [PayoutSpeed.Fast, PayoutSpeed.Medium, PayoutSpeed.Slow] as const
+  const estimateLabelBySpeed = speeds.reduce<Partial<Record<PayoutSpeed, string>>>(
+    (result, speed) => {
+      const amount = feeEstimates.estimates?.[speed]
+      if (!amount) return result
+
+      const walletAmount =
+        sendingWalletDescriptor.currency === WalletCurrency.Btc
+          ? {
+              amount,
+              currency: WalletCurrency.Btc,
+              currencyCode: WalletCurrency.Btc,
+            }
+          : {
+              amount,
+              currency: WalletCurrency.Usd,
+              currencyCode: WalletCurrency.Usd,
+            }
+
+      const displayAmount = paymentDetail.convertMoneyAmount(
+        walletAmount,
+        DisplayCurrency,
+      )
+      result[speed] = formatDisplayAndWalletAmount({ displayAmount, walletAmount })
+      return result
+    },
+    {},
+  )
+
+  const selectedLabel =
+    selectedPayoutSpeedOption?.displayName || LL.SendBitcoinScreen.selectFee()
+
+  const selectedEstimate =
+    selectedPayoutSpeedOption?.speed &&
+    estimateLabelBySpeed[selectedPayoutSpeedOption.speed]
+      ? estimateLabelBySpeed[selectedPayoutSpeedOption.speed]
+      : undefined
+
+  const feeErrorMessage =
+    feeEstimates.status === "error" ? feeEstimates.errorMessage : undefined
+
   return (
     <Screen
       preset="scroll"
@@ -504,6 +589,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail,
             payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
+            payoutEstimateLabel: selectedPayoutSpeedOption?.description,
           })
         }}
         isVisible={modalHighFeesVisible}
@@ -519,6 +605,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             description,
           })) ?? []
         }
+        estimatedFeeBySpeed={estimateLabelBySpeed}
         selectedSpeed={selectedPayoutSpeedOption?.speed}
         onSelect={(selected) => {
           setPayoutSpeed(selected.speed)
@@ -639,10 +726,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               {LL.SendBitcoinScreen.feeSettings()}
             </Text>
             <PayoutSpeedSelector
-              value={
-                selectedPayoutSpeedOption?.displayName || LL.SendBitcoinScreen.selectFee()
-              }
-              loading={payoutSpeedsLoading}
+              label={selectedLabel}
+              estimate={selectedEstimate}
+              loading={payoutSpeedsLoading || feeEstimates.status === "loading"}
+              readOnly={feeEstimates.status === "error"}
               onPress={() => setIsPayoutSpeedModalVisible(true)}
             />
           </View>
@@ -658,18 +745,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           />
         </View>
         <SendBitcoinDetailsExtraInfo
-          errorMessage={asyncErrorMessage}
+          errorMessage={asyncErrorMessage || feeErrorMessage}
           amountStatus={amountStatus}
           currentLevel={currentLevel}
         />
         <View style={styles.buttonContainer}>
           <GaloyPrimaryButton
             onPress={goToNextScreen || undefined}
-            loading={isLoadingLnurl || payoutSpeedsLoading}
+            loading={isLoadingLnurl || feeEstimates.status === "loading"}
             disabled={
               !goToNextScreen ||
               !amountStatus.validAmount ||
-              (isOnchain && !selectedPayoutSpeedOption)
+              (isOnchain &&
+                (!selectedPayoutSpeedOption || feeEstimates.status === "error"))
             }
             title={LL.common.next()}
           />
@@ -812,6 +900,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
+const fallbackOnchainAddress = (network?: Network) =>
+  network === "mainnet"
+    ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
+    : "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+
 const useOnchainFeeAlert = ({
   paymentDetail,
   walletId,
@@ -823,10 +916,7 @@ const useOnchainFeeAlert = ({
   network?: Network
   speed?: PayoutSpeed
 }) => {
-  const dummyAddress =
-    network === "mainnet"
-      ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
-      : "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+  const dummyAddress = fallbackOnchainAddress(network)
 
   const isOnchainPayment =
     walletId && paymentDetail && paymentDetail.paymentType === "onchain"
