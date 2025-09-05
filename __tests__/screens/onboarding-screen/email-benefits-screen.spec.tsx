@@ -60,7 +60,11 @@ describe("EmailBenefitsScreen", () => {
 
   it("Triggers primary action and navigates to emailRegistrationInitiate", () => {
     const mockNavigate = jest.fn()
-    ;(useNavigation as jest.Mock).mockReturnValue({ navigate: mockNavigate })
+    const mockAddListener = jest.fn()
+    ;(useNavigation as jest.Mock).mockReturnValue({
+      navigate: mockNavigate,
+      addListener: mockAddListener,
+    })
 
     const { getByText } = render(
       <ContextForScreen>
@@ -78,7 +82,11 @@ describe("EmailBenefitsScreen", () => {
 
   it("Triggers secondary action and navigates to supportScreen when username exists", () => {
     const mockNavigate = jest.fn()
-    ;(useNavigation as jest.Mock).mockReturnValue({ navigate: mockNavigate })
+    const mockAddListener = jest.fn()
+    ;(useNavigation as jest.Mock).mockReturnValue({
+      navigate: mockNavigate,
+      addListener: mockAddListener,
+    })
 
     const { getByText } = render(
       <ContextForScreen>
@@ -95,7 +103,11 @@ describe("EmailBenefitsScreen", () => {
 
   it("Triggers secondary action and navigates to lightningBenefits when no username", () => {
     const mockNavigate = jest.fn()
-    ;(useNavigation as jest.Mock).mockReturnValue({ navigate: mockNavigate })
+    const mockAddListener = jest.fn()
+    ;(useNavigation as jest.Mock).mockReturnValue({
+      navigate: mockNavigate,
+      addListener: mockAddListener,
+    })
     const mockRoute: RouteProp<OnboardingStackParamList, "emailBenefits"> = {
       ...route,
       params: {

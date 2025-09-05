@@ -2,7 +2,7 @@ import { ScrollView } from "react-native-gesture-handler"
 
 import { Screen } from "@app/components/screen"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { SettingsGroup } from "../group"
 import { AccountDeleteContextProvider } from "./account-delete-context"

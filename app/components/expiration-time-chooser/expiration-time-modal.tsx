@@ -3,7 +3,7 @@ import { SafeAreaView, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
 
 import { timing } from "@app/rne-theme/timing"
-import { ListItem, makeStyles, useTheme, Text } from "@rneui/themed"
+import { ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { WalletCurrency } from "@app/graphql/generated"

@@ -2,7 +2,7 @@ import * as React from "react"
 import { KeyboardAvoidingView, StatusBar, View, SafeAreaView } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 
-import { useTheme } from "@rneui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { isIos } from "../../utils/helper"
 import { isNonScrolling, offsets, presets } from "./screen.presets"

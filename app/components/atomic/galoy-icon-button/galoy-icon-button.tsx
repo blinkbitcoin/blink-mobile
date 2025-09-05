@@ -2,7 +2,7 @@ import React from "react"
 import { Pressable, PressableProps, TextStyle, ViewStyle, StyleProp } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { useTheme, Text } from "@rneui/themed"
+import { useTheme, Text } from "@rn-vui/themed"
 
 import {
   GaloyIcon,

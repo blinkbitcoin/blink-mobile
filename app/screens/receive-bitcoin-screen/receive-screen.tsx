@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import messaging from "@react-native-firebase/messaging"
 
 import { useApolloClient } from "@apollo/client"

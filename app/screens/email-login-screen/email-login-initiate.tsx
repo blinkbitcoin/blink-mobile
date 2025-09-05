@@ -11,7 +11,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Input, Text, makeStyles } from "@rneui/themed"
+import { Input, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 

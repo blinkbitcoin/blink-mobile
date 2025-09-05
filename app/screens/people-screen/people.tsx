@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { CirclesCardPeopleHome } from "./circles/circles-card-people-home"

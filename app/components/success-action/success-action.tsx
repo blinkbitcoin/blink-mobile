@@ -1,7 +1,7 @@
 import React from "react"
 import { utils } from "lnurl-pay"
 import { View, Text, TouchableOpacity, Linking } from "react-native"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SuccessActionComponentProps, SuccessActionTag } from "./success-action.props"
 import { FieldWithCopy } from "./field-with-copy"

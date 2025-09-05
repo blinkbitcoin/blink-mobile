@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { View } from "react-native"
 import { RouteProp } from "@react-navigation/native"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Screen } from "@app/components/screen"

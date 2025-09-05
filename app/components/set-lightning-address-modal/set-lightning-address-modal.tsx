@@ -4,7 +4,7 @@ import { View, TextInput } from "react-native"
 import { gql } from "@apollo/client"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import {
   useUserUpdateUsernameMutation,

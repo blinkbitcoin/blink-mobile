@@ -2,7 +2,7 @@ import { useRef, useState, useCallback } from "react"
 import { View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"

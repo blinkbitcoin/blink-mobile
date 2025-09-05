@@ -1,7 +1,7 @@
 import * as React from "react"
 import { TextInput } from "react-native"
 
-import { Input, InputProps, makeStyles } from "@rneui/themed"
+import { Input, InputProps, makeStyles } from "@rn-vui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
   inputContainerFocused: {

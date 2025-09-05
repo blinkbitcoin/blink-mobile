@@ -4,7 +4,7 @@ import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import StablesatsImage from "../../assets/images/stable-sats.png"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"

@@ -9,7 +9,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"

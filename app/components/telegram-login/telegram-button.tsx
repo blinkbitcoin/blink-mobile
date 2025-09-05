@@ -1,10 +1,10 @@
 import React, { FC, PropsWithChildren } from "react"
-import { TouchableHighlight } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 
-import { Button, ButtonProps, makeStyles } from "@rneui/themed"
+import { Button, ButtonProps, makeStyles } from "@rn-vui/themed"
 
 export const TelegramLoginButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()

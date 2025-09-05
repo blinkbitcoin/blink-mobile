@@ -32,7 +32,7 @@ import {
   RouteProp,
   useNavigation,
 } from "@react-navigation/native"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
