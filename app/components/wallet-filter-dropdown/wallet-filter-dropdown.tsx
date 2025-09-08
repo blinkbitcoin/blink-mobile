@@ -6,6 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
+import { GaloyCurrencyBubbleText } from "../atomic/galoy-currency-bubble-text"
 
 export type WalletValues = WalletCurrency | "ALL"
 
@@ -39,24 +40,18 @@ export const WalletFilterDropdown: React.FC<{
   const walletOptions = [
     {
       value: "ALL",
-      label: LL.common.all(),
+      label: LL.common.all() as WalletValues,
       description: LL.common.allAccounts(),
-      containerStyle: styles.walletSelectorTypeLabelAll,
-      textStyle: styles.walletSelectorTypeLabelAllText,
     },
     {
       value: "BTC",
-      label: WalletCurrency.Btc,
+      label: WalletCurrency.Btc as WalletValues,
       description: LL.common.bitcoin(),
-      containerStyle: styles.walletSelectorTypeLabelBitcoin,
-      textStyle: styles.walletSelectorTypeLabelBtcText,
     },
     {
       value: "USD",
-      label: WalletCurrency.Usd,
+      label: WalletCurrency.Usd as WalletValues,
       description: LL.common.dollar(),
-      containerStyle: styles.walletSelectorTypeLabelUsd,
-      textStyle: styles.walletSelectorTypeLabelUsdText,
     },
   ] as const
 
@@ -73,15 +68,15 @@ export const WalletFilterDropdown: React.FC<{
       >
         <View style={[styles.fieldBackground, loading && styles.disabled]}>
           <View style={styles.walletSelectorTypeContainer}>
-            <View style={current.containerStyle}>
-              <Text style={current.textStyle}>{current.label}</Text>
-            </View>
+            <GaloyCurrencyBubbleText
+              currency={current.label}
+              textSize="p2"
+              containerSize="medium"
+            />
           </View>
 
-          <View style={styles.walletSelectorInfoContainer}>
-            <View style={styles.walletSelectorTypeTextContainer}>
-              <Text style={styles.walletCurrencyText}>{current.description}</Text>
-            </View>
+          <View style={styles.walletSelectorTypeTextContainer}>
+            <Text style={styles.walletCurrencyText}>{current.description}</Text>
           </View>
 
           <View style={styles.pickWalletIcon}>
@@ -111,15 +106,13 @@ export const WalletFilterDropdown: React.FC<{
             >
               <View style={styles.walletContainer}>
                 <View style={styles.walletSelectorTypeContainer}>
-                  <View style={opt.containerStyle}>
-                    <Text style={opt.textStyle}>{opt.label}</Text>
-                  </View>
+                  <GaloyCurrencyBubbleText
+                    currency={opt.label}
+                    textSize="p2"
+                    containerSize="medium"
+                  />
                 </View>
-                <View style={styles.walletSelectorInfoContainer}>
-                  <View style={styles.walletSelectorTypeTextContainer}>
-                    <Text style={styles.walletCurrencyText}>{opt.description}</Text>
-                  </View>
-                </View>
+                <Text style={styles.walletCurrencyText}>{opt.description}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -147,26 +140,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 60,
   },
   walletSelectorTypeContainer: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: 50,
     marginRight: 20,
-  },
-  walletSelectorTypeLabelBitcoin: {
-    height: 30,
-    width: 50,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsd: {
-    height: 30,
-    width: 50,
-    backgroundColor: colors._green,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
   },
   walletSelectorTypeLabelAll: {
     height: 30,
@@ -178,10 +152,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  walletSelectorTypeLabelUsdText: {
-    fontWeight: "bold",
-    color: colors.black,
-  },
   walletSelectorTypeLabelBtcText: {
     fontWeight: "bold",
     color: colors.white,
@@ -190,14 +160,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "bold",
     color: colors.primary3,
   },
-  walletSelectorInfoContainer: {
-    flex: 1,
-    flexDirection: "column",
-  },
   walletCurrencyText: {
     fontWeight: "bold",
     fontSize: 18,
     color: colors.black,
+    marginBottom: 1,
   },
   walletSelectorTypeTextContainer: {
     flex: 1,
