@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     android.url = "github:tadfisher/android-nixpkgs";
     ruby-nix.url = "github:bobvanderlinden/nixpkgs-ruby";
@@ -73,11 +73,10 @@
             gcc
           ]
           ++ lib.optionals stdenv.isDarwin [
-            pkgsStable.cocoapods
+            cocoapods
             watchman
             xcodes
-            darwin.apple_sdk.frameworks.SystemConfiguration
-            pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+            apple-sdk
           ];
       in {
         packages = {
