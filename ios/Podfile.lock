@@ -1598,7 +1598,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-slider (4.5.2):
+  - react-native-slider (4.5.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1611,7 +1611,7 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-slider/common (= 4.5.2)
+    - react-native-slider/common (= 4.5.7)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -1620,7 +1620,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-slider/common (4.5.2):
+  - react-native-slider/common (4.5.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2278,14 +2278,27 @@ PODS:
     - Yoga
   - RNSecureRandom (1.0.1):
     - React
-  - RNShare (10.1.0):
-    - RCT-Folly
+  - RNShare (11.1.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.10.14.00)
     - RCTRequired
     - RCTTypeSafety
-    - React-Codegen
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
     - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
+    - Yoga
   - RNSVG (15.12.1):
     - DoubleConversion
     - glog
@@ -2783,7 +2796,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 276e89d3c4f33b07a982e97638d2f67590010af3
   react-native-secure-key-store: 910e6df6bc33cb790aba6ee24bc7818df1fe5898
   react-native-skia: 6fc40d061dbc9950e24623ac4b908f16599f6d4b
-  react-native-slider: 93efc678d4831755032c178e8ca716b6c2b95c93
+  react-native-slider: b7f4ad900ac6355b30552bfba999f90959beda3f
   react-native-view-shot: c963e170455e4d450de8addf3285be5800ecd270
   react-native-webview: fe9f9567ed2b0be8359a8c5236c9f310eaa68830
   React-nativeconfig: 415626a63057638759bcc75e0a96e2e07771a479
@@ -2834,7 +2847,7 @@ SPEC CHECKSUMS:
   RNReanimated: 3db30c743775821c4cae7bc5b76cad3642630236
   RNScreens: a09a20dc045ca372549fccd0537e2ced95e90aea
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
-  RNShare: 81213d0388e7fd4c2890a9bb88a46af7f72442cc
+  RNShare: afd26c1063b7712b9b3490ca7d7080d71797bdfe
   RNSVG: d6b7d000b864f018410da5b8d6bc89a730e6444b
   RNVectorIcons: 868aab98ef2079a4a3ddc58770ab1ff01360278a
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
