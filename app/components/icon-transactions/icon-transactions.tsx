@@ -5,7 +5,7 @@ import OnchainIcon from "@app/assets/icons-redesign/bitcoin.svg"
 import DollarIcon from "@app/assets/icons-redesign/dollar.svg"
 import LightningIcon from "@app/assets/icons-redesign/lightning.svg"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rneui/themed"
 
 type Props = {
   isReceive: boolean

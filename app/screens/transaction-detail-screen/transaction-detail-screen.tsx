@@ -26,7 +26,7 @@ import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rneui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"

@@ -1,6 +1,6 @@
-import "@rn-vui/themed"
+import "@rneui/themed"
 
-declare module "@rn-vui/themed" {
+declare module "@rneui/themed" {
   export interface Colors {
     red: string
     transparent: string

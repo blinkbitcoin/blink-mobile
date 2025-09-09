@@ -10,7 +10,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isIos } from "@app/utils/helper"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles } from "@rneui/themed"
 
 import { PriceHistory } from "../../components/price-history"
 import { Screen } from "../../components/screen"

@@ -2,7 +2,7 @@ import React, { FC } from "react"
 import { Text, View } from "react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rneui/themed"
 
 const useStyles = makeStyles(() => ({
   currencyTag: {

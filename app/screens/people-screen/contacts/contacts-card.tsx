@@ -19,7 +19,7 @@ import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rneui/themed"
 
 gql`
   query ContactsCard {

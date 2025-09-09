@@ -35,7 +35,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rneui/themed"
 
 import { testProps } from "../../utils/testProps"
 import useFee from "./use-fee"

@@ -1,8 +1,8 @@
 import React, { FC, PropsWithChildren } from "react"
+import { TouchableHighlight } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { TouchableHighlight } from "@app/utils/touchable-wrapper"
-import { Button, ButtonProps, makeStyles } from "@rn-vui/themed"
+import { Button, ButtonProps, makeStyles } from "@rneui/themed"
 
 export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()

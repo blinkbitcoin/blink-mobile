@@ -12,7 +12,7 @@ import { testProps } from "@app/utils/testProps"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rneui/themed"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"

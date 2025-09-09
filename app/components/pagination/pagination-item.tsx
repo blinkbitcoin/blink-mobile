@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated"
 
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles } from "@rneui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {

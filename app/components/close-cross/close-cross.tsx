@@ -2,7 +2,7 @@ import * as React from "react"
 import { View } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles } from "@rneui/themed"
 
 const useStyles = makeStyles(() => ({
   icon: {

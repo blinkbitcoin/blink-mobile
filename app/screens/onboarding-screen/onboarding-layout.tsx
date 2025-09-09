@@ -1,6 +1,6 @@
 import * as React from "react"
 import { View, FlatList } from "react-native"
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rneui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Screen } from "@app/components/screen"

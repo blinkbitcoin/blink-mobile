@@ -7,7 +7,7 @@ import { LocalizedString } from "typesafe-i18n"
 import Icon from "react-native-vector-icons/Ionicons"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rneui/themed"
 import {
   ScrollView,
   TouchableOpacity,

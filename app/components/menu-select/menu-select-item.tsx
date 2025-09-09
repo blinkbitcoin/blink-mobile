@@ -2,7 +2,7 @@
 // See ./item.ts for the correct item
 import React from "react"
 
-import { ListItemProps } from "@rn-vui/base"
+import { ListItemProps } from "@rneui/base"
 
 export type MenuSelectItemProps = {
   children: React.ReactNode

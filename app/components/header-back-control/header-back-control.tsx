@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 import { HeaderBackButton } from "@react-navigation/elements"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles } from "@rneui/themed"
 
 export const InvisibleBackButton: React.FC = () => {
   const styles = useStyles()

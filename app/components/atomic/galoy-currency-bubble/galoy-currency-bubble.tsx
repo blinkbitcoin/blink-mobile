@@ -1,7 +1,7 @@
 import React from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rneui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 

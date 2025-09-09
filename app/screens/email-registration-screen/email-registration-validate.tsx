@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useCallback, useState, useEffect } from "react"
 import { View, Keyboard, Modal } from "react-native"
-import { Text, makeStyles } from "@rn-vui/themed"
+import { Text, makeStyles } from "@rneui/themed"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"

@@ -7,8 +7,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Button } from "@rn-vui/base"
-import { makeStyles } from "@rn-vui/themed"
+import { Button } from "@rneui/base"
+import { makeStyles } from "@rneui/themed"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
@@ -196,13 +196,12 @@ const useStyles = makeStyles(({ colors }) => ({
   circleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    width: "25%",
+    width: 32,
   },
 
   circles: {
     flex: 2,
     flexDirection: "row",
-    width: "33.33%",
   },
 
   container: {
@@ -245,29 +244,36 @@ const useStyles = makeStyles(({ colors }) => ({
 
   pinPadButton: {
     backgroundColor: colors.primary,
+    flex: 1,
+    height: "95%",
+    width: "95%",
   },
 
   pinPadButtonContainer: {
     alignItems: "center",
     justifyContent: "center",
-    width: "33.33%",
+    width: 100,
   },
 
   pinPadButtonIcon: {
     color: colors.white,
     fontSize: 32,
+    marginRight: "20%",
   },
 
   pinPadButtonTitle: {
     color: colors.white,
     fontSize: 26,
-    fontWeight: "500",
+    fontWeight: "bold",
+    marginLeft: "40%",
+    marginRight: "40%",
   },
 
   pinPadRow: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: "10%",
+    marginLeft: 32,
+    marginRight: 32,
   },
 
   topSpacer: {
