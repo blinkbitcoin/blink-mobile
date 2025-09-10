@@ -25,6 +25,7 @@ interface Account
   @join__type(graph: PUBLIC)
 {
   callbackEndpoints: [CallbackEndpoint!]!
+  callbackPortalUrl: String!
   csvTransactions(walletIds: [WalletId!]!): String!
   defaultWallet: PublicWallet!
   defaultWalletId: WalletId! @deprecated(reason: "Shifting property to 'defaultWallet.id'")
@@ -104,6 +105,7 @@ enum AccountLevel
   @join__type(graph: PUBLIC)
 {
   ONE @join__enumValue(graph: PUBLIC)
+  THREE @join__enumValue(graph: PUBLIC)
   TWO @join__enumValue(graph: PUBLIC)
   ZERO @join__enumValue(graph: PUBLIC)
 }
@@ -379,6 +381,7 @@ type ConsumerAccount implements Account
   @join__type(graph: PUBLIC)
 {
   callbackEndpoints: [CallbackEndpoint!]!
+  callbackPortalUrl: String!
 
   """
   return CSV stream, base64 encoded, of the list of transactions in the wallet
@@ -604,6 +607,62 @@ type GraphQLApplicationError implements Error
 scalar Hex32Bytes
   @join__type(graph: PUBLIC)
 
+enum Icon
+  @join__type(graph: NOTIFICATIONS)
+{
+  ARROW_RIGHT @join__enumValue(graph: NOTIFICATIONS)
+  ARROW_LEFT @join__enumValue(graph: NOTIFICATIONS)
+  BACK_SPACE @join__enumValue(graph: NOTIFICATIONS)
+  BANK @join__enumValue(graph: NOTIFICATIONS)
+  BITCOIN @join__enumValue(graph: NOTIFICATIONS)
+  BOOK @join__enumValue(graph: NOTIFICATIONS)
+  BTC_BOOK @join__enumValue(graph: NOTIFICATIONS)
+  CARET_DOWN @join__enumValue(graph: NOTIFICATIONS)
+  CARET_LEFT @join__enumValue(graph: NOTIFICATIONS)
+  CARET_RIGHT @join__enumValue(graph: NOTIFICATIONS)
+  CARET_UP @join__enumValue(graph: NOTIFICATIONS)
+  CHECK_CIRCLE @join__enumValue(graph: NOTIFICATIONS)
+  CHECK @join__enumValue(graph: NOTIFICATIONS)
+  CLOSE @join__enumValue(graph: NOTIFICATIONS)
+  CLOSE_CROSS_WITH_BACKGROUND @join__enumValue(graph: NOTIFICATIONS)
+  COINS @join__enumValue(graph: NOTIFICATIONS)
+  PEOPLE @join__enumValue(graph: NOTIFICATIONS)
+  COPY_PASTE @join__enumValue(graph: NOTIFICATIONS)
+  DOLLAR @join__enumValue(graph: NOTIFICATIONS)
+  EYE_SLASH @join__enumValue(graph: NOTIFICATIONS)
+  EYE @join__enumValue(graph: NOTIFICATIONS)
+  FILTER @join__enumValue(graph: NOTIFICATIONS)
+  GLOBE @join__enumValue(graph: NOTIFICATIONS)
+  GRAPH @join__enumValue(graph: NOTIFICATIONS)
+  IMAGE @join__enumValue(graph: NOTIFICATIONS)
+  INFO @join__enumValue(graph: NOTIFICATIONS)
+  LIGHTNING @join__enumValue(graph: NOTIFICATIONS)
+  LINK @join__enumValue(graph: NOTIFICATIONS)
+  LOADING @join__enumValue(graph: NOTIFICATIONS)
+  MAGNIFYING_GLASS @join__enumValue(graph: NOTIFICATIONS)
+  MAP @join__enumValue(graph: NOTIFICATIONS)
+  MENU @join__enumValue(graph: NOTIFICATIONS)
+  PENCIL @join__enumValue(graph: NOTIFICATIONS)
+  NOTE @join__enumValue(graph: NOTIFICATIONS)
+  RANK @join__enumValue(graph: NOTIFICATIONS)
+  QR_CODE @join__enumValue(graph: NOTIFICATIONS)
+  QUESTION @join__enumValue(graph: NOTIFICATIONS)
+  RECEIVE @join__enumValue(graph: NOTIFICATIONS)
+  SEND @join__enumValue(graph: NOTIFICATIONS)
+  SETTINGS @join__enumValue(graph: NOTIFICATIONS)
+  SHARE @join__enumValue(graph: NOTIFICATIONS)
+  TRANSFER @join__enumValue(graph: NOTIFICATIONS)
+  USER @join__enumValue(graph: NOTIFICATIONS)
+  VIDEO @join__enumValue(graph: NOTIFICATIONS)
+  WARNING @join__enumValue(graph: NOTIFICATIONS)
+  WARNING_WITH_BACKGROUND @join__enumValue(graph: NOTIFICATIONS)
+  PAYMENT_SUCCESS @join__enumValue(graph: NOTIFICATIONS)
+  PAYMENT_PENDING @join__enumValue(graph: NOTIFICATIONS)
+  PAYMENT_ERROR @join__enumValue(graph: NOTIFICATIONS)
+  BELL @join__enumValue(graph: NOTIFICATIONS)
+  REFRESH @join__enumValue(graph: NOTIFICATIONS)
+}
+
 union InitiationVia
   @join__type(graph: PUBLIC)
   @join__unionMember(graph: PUBLIC, member: "InitiationViaIntraLedger")
@@ -794,6 +853,7 @@ input LnInvoiceCreateInput
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -811,6 +871,7 @@ input LnInvoiceCreateOnBehalfOfRecipientInput
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -900,6 +961,7 @@ input LnNoAmountInvoiceCreateInput
 {
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -915,6 +977,7 @@ input LnNoAmountInvoiceCreateOnBehalfOfRecipientInput
 {
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -1025,6 +1088,7 @@ input LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """
   Optional memo for the lightning invoice. Acts as a note to the recipient.
@@ -1043,6 +1107,7 @@ input LnUsdInvoiceCreateInput
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -1060,6 +1125,7 @@ input LnUsdInvoiceCreateOnBehalfOfRecipientInput
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """
   Optional memo for the lightning invoice. Acts as a note to the recipient.
@@ -1148,10 +1214,7 @@ type Mutation
 {
   apiKeyCreate(input: ApiKeyCreateInput!): ApiKeyCreatePayload! @join__field(graph: API_KEYS)
   apiKeyRevoke(input: ApiKeyRevokeInput!): ApiKeyRevokePayload! @join__field(graph: API_KEYS)
-  userDisableNotificationChannel(input: UserDisableNotificationChannelInput!): UserUpdateNotificationSettingsPayload! @join__field(graph: NOTIFICATIONS)
-  userEnableNotificationChannel(input: UserEnableNotificationChannelInput!): UserUpdateNotificationSettingsPayload! @join__field(graph: NOTIFICATIONS)
-  userDisableNotificationCategory(input: UserDisableNotificationCategoryInput!): UserUpdateNotificationSettingsPayload! @join__field(graph: NOTIFICATIONS)
-  userEnableNotificationCategory(input: UserEnableNotificationCategoryInput!): UserUpdateNotificationSettingsPayload! @join__field(graph: NOTIFICATIONS)
+  statefulNotificationAcknowledge(input: StatefulNotificationAcknowledgeInput!): StatefulNotificationAcknowledgePayload! @join__field(graph: NOTIFICATIONS)
   accountDelete: AccountDeletePayload! @join__field(graph: PUBLIC)
   accountDisableNotificationCategory(input: AccountDisableNotificationCategoryInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: PUBLIC)
   accountDisableNotificationChannel(input: AccountDisableNotificationChannelInput!): AccountUpdateNotificationSettingsPayload! @join__field(graph: PUBLIC)
@@ -1274,6 +1337,7 @@ type Mutation
   onChainUsdPaymentSendAsBtcDenominated(input: OnChainUsdPaymentSendAsBtcDenominatedInput!): PaymentSendPayload! @join__field(graph: PUBLIC)
   quizClaim(input: QuizClaimInput!): QuizClaimPayload! @join__field(graph: PUBLIC)
   supportChatMessageAdd(input: SupportChatMessageAddInput!): SupportChatMessageAddPayload! @join__field(graph: PUBLIC)
+  supportChatReset: SuccessPayload! @join__field(graph: PUBLIC)
   userContactUpdateAlias(input: UserContactUpdateAliasInput!): UserContactUpdateAliasPayload! @join__field(graph: PUBLIC) @deprecated(reason: "will be moved to AccountContact")
   userEmailDelete: UserEmailDeletePayload! @join__field(graph: PUBLIC)
   userEmailRegistrationInitiate(input: UserEmailRegistrationInitiateInput!): UserEmailRegistrationInitiatePayload! @join__field(graph: PUBLIC)
@@ -1307,6 +1371,12 @@ enum Network
   signet @join__enumValue(graph: PUBLIC)
   testnet @join__enumValue(graph: PUBLIC)
 }
+
+union NotificationAction
+  @join__type(graph: NOTIFICATIONS)
+  @join__unionMember(graph: NOTIFICATIONS, member: "OpenDeepLinkAction")
+  @join__unionMember(graph: NOTIFICATIONS, member: "OpenExternalLinkAction")
+ = OpenDeepLinkAction | OpenExternalLinkAction
 
 scalar NotificationCategory
   @join__type(graph: PUBLIC)
@@ -1441,21 +1511,34 @@ type OneDayAccountLimit implements AccountLimit
 scalar OneTimeAuthCode
   @join__type(graph: PUBLIC)
 
-"""Information about pagination in a connection."""
+type OpenDeepLinkAction
+  @join__type(graph: NOTIFICATIONS)
+{
+  deepLink: String!
+}
+
+type OpenExternalLinkAction
+  @join__type(graph: NOTIFICATIONS)
+{
+  url: String!
+}
+
+"""Information about pagination in a connection"""
 type PageInfo
+  @join__type(graph: NOTIFICATIONS)
   @join__type(graph: PUBLIC)
 {
-  """When paginating forwards, the cursor to continue."""
-  endCursor: String
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
 
   """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
   """When paginating backwards, the cursor to continue."""
   startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
 }
 
 scalar PaymentHash
@@ -1761,6 +1844,56 @@ A string amount (of a currency) that can be negative (e.g. in a transaction)
 scalar SignedDisplayMajorAmount
   @join__type(graph: PUBLIC)
 
+type StatefulNotification
+  @join__type(graph: NOTIFICATIONS)
+{
+  id: ID!
+  title: String!
+  body: String!
+  deepLink: String
+  action: NotificationAction
+  createdAt: Timestamp!
+  acknowledgedAt: Timestamp
+  bulletinEnabled: Boolean!
+  icon: Icon
+}
+
+input StatefulNotificationAcknowledgeInput
+  @join__type(graph: NOTIFICATIONS)
+{
+  notificationId: ID!
+}
+
+type StatefulNotificationAcknowledgePayload
+  @join__type(graph: NOTIFICATIONS)
+{
+  notification: StatefulNotification!
+}
+
+type StatefulNotificationConnection
+  @join__type(graph: NOTIFICATIONS)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [StatefulNotificationEdge!]!
+
+  """A list of nodes."""
+  nodes: [StatefulNotification!]!
+}
+
+"""An edge in a connection."""
+type StatefulNotificationEdge
+  @join__type(graph: NOTIFICATIONS)
+{
+  """The item at the end of the edge"""
+  node: StatefulNotification!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 type Subscription
   @join__type(graph: PUBLIC)
 {
@@ -1815,6 +1948,7 @@ Timestamp field, serialized as Unix time (the number of seconds since the Unix e
 """
 scalar Timestamp
   @join__type(graph: API_KEYS)
+  @join__type(graph: NOTIFICATIONS)
   @join__type(graph: PUBLIC)
 
 """A time-based one-time password"""
@@ -2004,7 +2138,10 @@ type User
 {
   id: ID!
   apiKeys: [ApiKey!]! @join__field(graph: API_KEYS)
-  notificationSettings: UserNotificationSettings! @join__field(graph: NOTIFICATIONS)
+  statefulNotifications(first: Int!, after: String): StatefulNotificationConnection! @join__field(graph: NOTIFICATIONS)
+  statefulNotificationsWithoutBulletinEnabled(first: Int!, after: String): StatefulNotificationConnection! @join__field(graph: NOTIFICATIONS)
+  unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount: Int! @join__field(graph: NOTIFICATIONS)
+  unacknowledgedStatefulNotificationsWithBulletinEnabled(first: Int!, after: String): StatefulNotificationConnection! @join__field(graph: NOTIFICATIONS)
 
   """
   Get single contact details.
@@ -2084,19 +2221,6 @@ type UserContactUpdateAliasPayload
   errors: [Error!]!
 }
 
-input UserDisableNotificationCategoryInput
-  @join__type(graph: NOTIFICATIONS)
-{
-  channel: UserNotificationChannel!
-  category: UserNotificationCategory!
-}
-
-input UserDisableNotificationChannelInput
-  @join__type(graph: NOTIFICATIONS)
-{
-  channel: UserNotificationChannel!
-}
-
 type UserEmailDeletePayload
   @join__type(graph: PUBLIC)
 {
@@ -2132,19 +2256,6 @@ type UserEmailRegistrationValidatePayload
   me: User
 }
 
-input UserEnableNotificationCategoryInput
-  @join__type(graph: NOTIFICATIONS)
-{
-  channel: UserNotificationChannel!
-  category: UserNotificationCategory!
-}
-
-input UserEnableNotificationChannelInput
-  @join__type(graph: NOTIFICATIONS)
-{
-  channel: UserNotificationChannel!
-}
-
 input UserLoginInput
   @join__type(graph: PUBLIC)
 {
@@ -2168,36 +2279,6 @@ input UserLogoutInput
 """Unique identifier of a user"""
 scalar Username
   @join__type(graph: PUBLIC)
-
-enum UserNotificationCategory
-  @join__type(graph: NOTIFICATIONS)
-{
-  CIRCLES @join__enumValue(graph: NOTIFICATIONS)
-  PAYMENTS @join__enumValue(graph: NOTIFICATIONS)
-  ADMIN_NOTIFICATION @join__enumValue(graph: NOTIFICATIONS)
-  MARKETING @join__enumValue(graph: NOTIFICATIONS)
-  PRICE @join__enumValue(graph: NOTIFICATIONS)
-  SECURITY @join__enumValue(graph: NOTIFICATIONS)
-}
-
-enum UserNotificationChannel
-  @join__type(graph: NOTIFICATIONS)
-{
-  PUSH @join__enumValue(graph: NOTIFICATIONS)
-}
-
-type UserNotificationChannelSettings
-  @join__type(graph: NOTIFICATIONS)
-{
-  enabled: Boolean!
-  disabledCategories: [UserNotificationCategory!]!
-}
-
-type UserNotificationSettings
-  @join__type(graph: NOTIFICATIONS)
-{
-  push: UserNotificationChannelSettings!
-}
 
 type UserPhoneDeletePayload
   @join__type(graph: PUBLIC)
@@ -2277,12 +2358,6 @@ type UserUpdateLanguagePayload
 {
   errors: [Error!]!
   user: User
-}
-
-type UserUpdateNotificationSettingsPayload
-  @join__type(graph: NOTIFICATIONS)
-{
-  notificationSettings: UserNotificationSettings!
 }
 
 input UserUpdateUsernameInput
