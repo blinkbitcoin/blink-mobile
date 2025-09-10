@@ -1,106 +1,48 @@
 import debounce from "lodash.debounce"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { View } from "react-native"
-import MapView, { MapMarker as MapMarkerType, Region } from "react-native-maps"
-import { PermissionStatus, RESULTS, request } from "react-native-permissions"
+import MapView, { MapMarker as MapMarkerType, Marker, Region } from "react-native-maps"
 
 import { useApolloClient } from "@apollo/client"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
-import { BusinessMapMarkersQuery, MapMarker } from "@app/graphql/generated"
-import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
-import { isIOS } from "@rneui/base"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { MapMarker } from "@app/graphql/generated"
+import { ListItem, makeStyles, useTheme, Text } from "@rneui/themed"
 
-import MapMarkerComponent from "../map-marker-component"
-import LocationButtonCopy from "./location-button-copy"
+import ButtonMapsContainer from "./button-maps-container"
 import MapStyles from "./map-styles.json"
-import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { OpenBottomModal, OpenBottomModalElement, TModal } from "./modals/modal-container"
+import Icon from "react-native-vector-icons/Ionicons"
+import { ICluster, IMarker } from "@app/screens/map-screen/btc-map-interface"
+import SuperCluster from "react-native-maps-super-cluster"
+import iconMap from "./iconMap"
+import PinIcon from "./pinIcon"
 
 type Props = {
-  data?: BusinessMapMarkersQuery
+  data?: IMarker[]
   userLocation?: Region
-  permissionsStatus?: PermissionStatus
-  setPermissionsStatus: (_: PermissionStatus) => void
-  handleMapPress: () => void
-  handleMarkerPress: (_: MapMarker) => void
-  focusedMarker: MapMarker | null
-  focusedMarkerRef: React.MutableRefObject<MapMarkerType | null>
   handleCalloutPress: (_: MapMarker) => void
-  alertOnLocationError: () => void
+}
+interface SuperClusterRef {
+  getMapRef: () => MapView | null
 }
 
-export default function MapComponent({
-  data,
-  userLocation,
-  permissionsStatus,
-  setPermissionsStatus,
-  handleMapPress,
-  handleMarkerPress,
-  focusedMarker,
-  focusedMarkerRef,
-  handleCalloutPress,
-  alertOnLocationError,
-}: Props) {
+export default function MapComponent({ data, userLocation, handleCalloutPress }: Props) {
   const {
     theme: { colors, mode: themeMode },
   } = useTheme()
   const styles = useStyles()
   const client = useApolloClient()
 
-  const mapViewRef = useRef<MapView>(null)
-  const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
-  const isAndroidSecondPermissionRequest = React.useRef(false)
+  const mapViewRef = useRef<SuperClusterRef>(null)
+  const [focusedMarker, setFocusedMarker] = React.useState<IMarker | null>(null)
 
-  // toggle modal from inside modal component instead of here in the parent
+  const openBottomModalRef = React.useRef<OpenBottomModalElement>(null)
+
+  // Toggle modal from inside modal component instead of here in the parent
   const toggleModal = React.useCallback(
-    () => openSettingsModalRef.current?.toggleVisibility(),
+    (type: TModal) => openBottomModalRef.current?.toggleVisibility(type),
     [],
   )
-
-  const respondToBlocked = (status: PermissionStatus) => {
-    // iOS will only ever ask once for permission, and initial checks can differentiate between BLOCKED vs DENIED
-    if (isIOS) {
-      if (permissionsStatus === RESULTS.BLOCKED && status === RESULTS.BLOCKED) {
-        toggleModal()
-      }
-      // Android can ask twice for permission, and initial checks cannot differentiate between BLOCKED vs DENIED
-    } else {
-      !isAndroidSecondPermissionRequest.current && toggleModal()
-    }
-  }
-
-  const centerOnUser = async () => {
-    getUserRegion(async (region) => {
-      if (region && mapViewRef.current) {
-        mapViewRef.current.animateToRegion(region)
-      } else {
-        alertOnLocationError()
-      }
-    })
-  }
-
-  const requestLocationPermission = async () => {
-    try {
-      const status = await request(
-        LOCATION_PERMISSION,
-        () =>
-          new Promise((resolve) => {
-            // This will only trigger on Android if it's the 2nd request ever
-            isAndroidSecondPermissionRequest.current = true
-            resolve(true)
-          }),
-      )
-      if (status === RESULTS.GRANTED) {
-        centerOnUser()
-      } else if (status === RESULTS.BLOCKED) {
-        respondToBlocked(status)
-      }
-      isAndroidSecondPermissionRequest.current = false
-      setPermissionsStatus(status)
-    } catch {
-      alertOnLocationError()
-    }
-  }
 
   const debouncedHandleRegionChange = React.useRef(
     debounce((region: Region) => updateMapLastCoords(client, region), 1000, {
@@ -108,17 +50,80 @@ export default function MapComponent({
     }),
   ).current
 
+  const moveToFocusedMarker = () => {
+    const map = mapViewRef.current?.getMapRef()
+    // console.log("Métodos disponibles:", mapViewRef.current?.getMapRef().animateToRegion);
+
+    if (focusedMarker) {
+      map?.animateToRegion(
+        {
+          latitude: focusedMarker.location.latitude,
+          longitude: focusedMarker.location.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000,
+      )
+    }
+  }
+
+  const renderCluster = (cluster: ICluster) => {
+    const pointCount = cluster.pointCount,
+      coordinate = cluster.coordinate,
+      clusterId = cluster.clusterId
+
+    return (
+      <Marker identifier={`cluster-${clusterId}`} coordinate={coordinate}>
+        <View style={styles.clusterContainer}>
+          <Text style={styles.clusterText}>{pointCount}</Text>
+        </View>
+      </Marker>
+    )
+  }
+
+  const renderMarker = (pin: IMarker) => {
+    const iconName: string = pin?.tags?.["icon:android"]
+    return (
+      <Marker
+        identifier={`pin-${pin.id}`}
+        key={pin.id}
+        coordinate={pin.location}
+        onPress={() => {
+          setFocusedMarker(pin)
+          toggleModal("locationEvent")
+        }}
+      >
+        <View style={styles.iconContainer}>
+          <PinIcon
+            size={35}
+            color={focusedMarker?.id == pin.id ? colors.primary : "#4f378c"}
+          />
+          <Icon
+            name={iconMap[iconName]}
+            size={18}
+            color={"#FFFFFF"}
+            style={styles.iconOverlay}
+          />
+        </View>
+      </Marker>
+    )
+  }
+
   return (
     <View style={styles.viewContainer}>
-      <MapView
+      <SuperCluster
         ref={mapViewRef}
-        style={styles.map}
-        showsUserLocation={permissionsStatus === RESULTS.GRANTED}
-        showsMyLocationButton={false}
-        initialRegion={userLocation}
-        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
-        onPress={handleMapPress}
+        data={data}
+        renderMarker={renderMarker}
+        renderCluster={renderCluster}
         onRegionChange={debouncedHandleRegionChange}
+        style={styles.map}
+        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+        accessor="location"
+        initialRegion={userLocation}
+      />
+      {/* <MapView
+        onPress={handleMapPress}
         onMarkerSelect={(e) => {
           // react-native-maps has a very annoying error on iOS
           // When two markers are almost on top of each other onSelect will get called for a nearby Marker
@@ -136,26 +141,45 @@ export default function MapComponent({
           }
         }}
       >
-        {(data?.businessMapMarkers ?? []).map((item: MapMarker) => (
-          <MapMarkerComponent
-            key={item.username}
-            item={item}
-            color={colors._orange}
-            handleCalloutPress={handleCalloutPress}
-            handleMarkerPress={handleMarkerPress}
-            isFocused={focusedMarker?.username === item.username}
-          />
-        ))}
-      </MapView>
-      {permissionsStatus !== RESULTS.UNAVAILABLE &&
-        permissionsStatus !== RESULTS.LIMITED && (
-          <LocationButtonCopy
-            requestPermissions={requestLocationPermission}
-            permissionStatus={permissionsStatus}
-            centerOnUser={centerOnUser}
-          />
-        )}
-      <OpenSettingsModal ref={openSettingsModalRef} />
+        
+      </MapView> */}
+
+      <ButtonMapsContainer
+        key={focusedMarker?.id}
+        position="topCenter"
+        event={() => {
+          moveToFocusedMarker()
+          toggleModal("locationEvent")
+        }}
+      >
+        <ListItem containerStyle={styles.list}>
+          <Icon name="location-outline" color="white" size={15} />
+          <ListItem.Title
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            style={{ maxWidth: 200 }}
+          >
+            {`${
+              focusedMarker?.location?.tags["addr:street"] ||
+              focusedMarker?.location?.tags["addr:city"] ||
+              focusedMarker?.location?.tags["name"] ||
+              ""
+            }`}
+          </ListItem.Title>
+          <Icon name="chevron-down-outline" color="white" />
+        </ListItem>
+      </ButtonMapsContainer>
+      <ButtonMapsContainer
+        event={() => toggleModal("filter")}
+        position="LeftLv1"
+        iconName="options-outline"
+      />
+      <ButtonMapsContainer
+        event={() => toggleModal("search")}
+        position="LeftLv2"
+        iconName="search"
+      />
+      <OpenBottomModal ref={openBottomModalRef} focusedMarker={focusedMarker} />
     </View>
   )
 }
@@ -165,6 +189,41 @@ const useStyles = makeStyles(() => ({
     height: "100%",
     width: "100%",
   },
-
+  list: {
+    padding: 0,
+    margin: 0,
+    fontSize: "0.5rem",
+    backgroundColor: "transparent",
+  },
   viewContainer: { flex: 1 },
+
+  clusterContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#4f378c",
+    justifyContent: "center",
+    alignItems: "center",
+    // borderWidth: 6,
+    // borderColor: "#4f378cb3"
+  },
+  clusterBubble: {
+    backgroundColor: "white",
+    padding: 5,
+    borderRadius: 15,
+  },
+  clusterText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  iconContainer: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconOverlay: {
+    position: "absolute",
+    top: 10, // ajusta según el pin
+    alignSelf: "center",
+  },
 }))
