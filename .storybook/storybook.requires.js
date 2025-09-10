@@ -102,7 +102,7 @@ const getStories = () => {
     "./app/screens/settings-screen/language-screen.stories.tsx": require("../app/screens/settings-screen/language-screen.stories.tsx"),
     "./app/screens/settings-screen/settings-screen.stories.tsx": require("../app/screens/settings-screen/settings-screen.stories.tsx"),
     "./app/screens/settings-screen/settings.stories.tsx": require("../app/screens/settings-screen/settings.stories.tsx"),
-    "./app/screens/settings-screen/settings/multi-account/switch-account.stories.tsx": require("../app/screens/settings-screen/settings/multi-account/switch-account.stories.tsx"),
+    "./app/screens/settings-screen/account/multi-account/switch-account.stories.tsx": require("../app/screens/settings-screen/account/multi-account/switch-account.stories.tsx"),
     "./app/screens/settings-screen/theme-screen.stories.tsx": require("../app/screens/settings-screen/theme-screen.stories.tsx"),
     "./app/screens/support-chat-screen/support-chat.stories.tsx": require("../app/screens/support-chat-screen/support-chat.stories.tsx"),
     "./app/screens/telegram-login-screen/telegram-login-validate.stories.tsx": require("../app/screens/telegram-login-screen/telegram-login-validate.stories.tsx"),
