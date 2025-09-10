@@ -13,6 +13,7 @@ import { RootSiblingParent } from "react-native-root-siblings"
 // for URL; need a polyfill on react native
 import "react-native-url-polyfill/auto"
 
+import "@react-native-firebase/app"
 import "@react-native-firebase/crashlytics"
 
 import { GaloyThemeProvider } from "./components/galoy-theme-provider"

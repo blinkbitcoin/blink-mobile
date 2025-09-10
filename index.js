@@ -7,7 +7,13 @@
 // side effect of breaking other tooling like mobile-center and react-native-rename.
 //
 // It's easier just to leave it here.
+import "@react-native-firebase/app"
 import * as React from "react"
+
+// Silence modular API deprecation warnings for now
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true
+// Enable strict mode to catch any missed deprecations
+// globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true
 import { AppRegistry, LogBox } from "react-native"
 
 import { App } from "./app/app.tsx"
