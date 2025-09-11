@@ -12,8 +12,37 @@ jobs:
   e2e-android:
     name: Android
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GRADLE_USER_HOME: /nix/gradle
+      GRADLE_OPTS: >-
+        -Dorg.gradle.internal.http.socketTimeout=120000
+        -Dorg.gradle.internal.http.connectionTimeout=120000
+        -Dorg.gradle.workers.max=2
+      RUNNER_TOOL_CACHE: /nix/toolcache
+      RUNNER_TEMP: /nix/tmp
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          build-mount-path: /nix
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Prepare /nix for Nix installer
+        shell: bash
+        run: |
+          sudo mkdir -p /nix
+          sudo chown root:root /nix
+          sudo chmod 0755 /nix
+          echo "Ownership after fix:"
+          ls -ld /nix
+
       - uses: actions/checkout@v4
 
       # Install Nix + enable cache
@@ -22,6 +51,30 @@ jobs:
 
       - name: Run the Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          use-flakehub: false
+
+      # Move runner toolcache/temp to /nix and bind-mount defaults that still write to /
+      - name: Bind runner caches/temp to /nix
+        run: |
+          set -e
+          sudo mkdir -p /nix/toolcache /nix/tmp
+          sudo chown -R $USER:$USER /nix/toolcache /nix/tmp
+          # Toolcache (used by setup-* actions and preinstalled tool updates)
+          if [ -d /opt/hostedtoolcache ]; then
+            sudo rm -rf /opt/hostedtoolcache/* || true
+            sudo mount --bind /nix/toolcache /opt/hostedtoolcache
+          fi
+          # Runner temp
+          sudo mkdir -p /home/runner/_temp
+          sudo mount --bind /nix/tmp /home/runner/_temp || true
+          # Runner diag (si existe en este host)
+          if [ -d /home/runner/actions-runner ]; then
+            sudo mkdir -p /nix/actions-runner
+            sudo rsync -a --delete /home/runner/actions-runner/ /nix/actions-runner/ || true
+            sudo mount --bind /nix/actions-runner /home/runner/actions-runner || true
+          fi
+          df -h / /nix "$GITHUB_WORKSPACE" || true
 
       # Caching
       - uses: actions/cache@v4
@@ -32,6 +85,43 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock', '**/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-deps-
+
+      - name: Move Docker data-root to /nix/docker
+        run: |
+          sudo systemctl stop docker
+          sudo mkdir -p /nix/docker
+          echo '{"data-root":"/nix/docker"}' | sudo tee /etc/docker/daemon.json
+          sudo rsync -aH --delete /var/lib/docker/ /nix/docker/ || true
+          sudo systemctl start docker
+          docker info
+
+      - name: Relocate caches to /nix
+        run: |
+          sudo mkdir -p /nix/{tmp,yarn-cache,npm-cache,gradle,avd}
+          sudo chown -R $USER:$USER /nix/{tmp,yarn-cache,npm-cache,gradle,avd}
+          {
+            echo "TMPDIR=/nix/tmp"
+            echo "YARN_CACHE_FOLDER=/nix/yarn-cache"
+            echo "NPM_CONFIG_CACHE=/nix/npm-cache"
+            echo "GRADLE_USER_HOME=/nix/gradle"
+            echo "ANDROID_AVD_HOME=/nix/avd"
+            echo "ANDROID_PREFS_ROOT=/nix/avd"
+          } >> $GITHUB_ENV
+
+      - name: Move workspace to /nix (bind mount)
+        run: |
+          set -e
+          echo "== Before bind =="
+          df -h / "$GITHUB_WORKSPACE" /nix || true
+
+          sudo mkdir -p /nix/workspace
+          sudo rsync -a --delete "$GITHUB_WORKSPACE/" /nix/workspace/
+          sudo chown -R $USER:$USER /nix/workspace
+          sudo rm -rf "$GITHUB_WORKSPACE"/*
+          sudo mount --bind /nix/workspace "$GITHUB_WORKSPACE"
+
+          echo "== After bind =="
+          df -h / "$GITHUB_WORKSPACE" /nix || true
 
       # Installations
       - name: Install Node Modules and Pods
@@ -44,6 +134,60 @@ jobs:
         run: |
           nix develop -c sh -c 'yarn start' &
           echo "METRO_PID=$!" >> $GITHUB_ENV
+
+      - name: Free disk space for Android build
+        run: |
+          set -e
+          echo "== Disk BEFORE =="
+          df -h / /nix || true
+
+          sudo docker system prune -af || true
+          sudo rm -rf /usr/local/lib/android || true
+
+          for d in /opt/hostedtoolcache/Java/*; do
+            case "$d" in
+              *-17*) echo "keeping $d" ;;
+              *) sudo rm -rf "$d" || true ;;
+            esac
+          done
+
+          sudo apt-get clean || true
+          sudo rm -rf /var/lib/apt/lists/* || true
+
+          echo "== Disk AFTER =="
+          df -h / /nix || true
+
+      # Builds
+      - name: Android build
+        timeout-minutes: 30
+        run: |
+          cat >> android/gradle.properties <<'EOF'
+          org.gradle.console=plain
+          org.gradle.logging.level=warn
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          org.gradle.caching=true
+          org.gradle.parallel=true
+          org.gradle.daemon=false
+          EOF
+
+          # Keep the step alive
+          ( while sleep 60; do echo "[build] running..."; done ) & HB=$!
+
+          set +e
+          timeout 30m nix develop -c yarn e2e:build android.emu.debug
+          CODE=$?
+
+          # If it failed or hung out, cleanup locks and retry with safer settings
+          if [ $CODE -ne 0 ]; then
+            pkill -f GradleDaemon || true
+            rm -rf "$GRADLE_USER_HOME"/caches/*/file-locks || true
+            sed -i 's/^org\.gradle\.parallel=true/org.gradle.parallel=false/' android/gradle.properties || true
+            timeout 20m nix develop -c yarn e2e:build android.emu.debug
+            CODE=$?
+          fi
+
+          kill $HB || true
+          exit $CODE
 
       # Start Tilt
       - name: Tilt CI
@@ -58,9 +202,6 @@ jobs:
           lsof -ti:10350 | xargs kill -9 || true
           nix develop -c sh -c 'cd dev && tilt up' &
           echo "TILT_SERVER_PID=$!" >> $GITHUB_ENV
-
-      # Builds
-      - run: nix develop -c yarn e2e:build android.emu.debug
 
       # Tests on Android Emulator
       - name: Start Android Emulator
@@ -129,6 +270,22 @@ jobs:
 
             echo "- $TEST_NAME" >> $GITHUB_STEP_SUMMARY
           done
+
+      - name: Disk usage (report)
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          echo "== root =="
+          df -h /
+          echo "== /mnt =="
+          df -h /mnt
+          echo "== workspace =="
+          df -h "$GITHUB_WORKSPACE"
+          if [ -d /nix ]; then
+            echo "== /nix =="
+            df -h /nix
+          fi
 
       # Cleanup
       - name: Terminate Metro
