@@ -14,6 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          build-mount-path: /nix
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Prepare /nix for Nix installer
+        shell: bash
+        run: |
+          sudo mkdir -p /nix
+          sudo chown root:root /nix
+          sudo chmod 0755 /nix
+          echo "Ownership after fix:"
+          ls -ld /nix
+
       - uses: actions/checkout@v4
 
       # Install Nix + enable cache
@@ -129,6 +149,22 @@ jobs:
 
             echo "- $TEST_NAME" >> $GITHUB_STEP_SUMMARY
           done
+
+      - name: Disk usage (report)
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          echo "== root =="
+          df -h /
+          echo "== /mnt =="
+          df -h /mnt
+          echo "== workspace =="
+          df -h "$GITHUB_WORKSPACE"
+          if [ -d /nix ]; then
+            echo "== /nix =="
+            df -h /nix
+          fi
 
       # Cleanup
       - name: Terminate Metro
