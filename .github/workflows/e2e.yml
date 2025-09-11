@@ -16,9 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # In case this is run on a runner without nix
-      # - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      # Install Nix + enable cache
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
 
       # Caching
       - uses: actions/cache@v4
