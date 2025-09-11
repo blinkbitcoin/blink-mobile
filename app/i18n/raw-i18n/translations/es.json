@@ -2228,7 +2228,7 @@
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
         "note": "Nota",
-        "success": "El pago se ha enviado correctamente.",
+        "success": "Transacción enviada exitosamente",
         "suggestionInput": "Introduce tu sugerencia",
         "max": "Max",
         "maxAmount": "Monto máximo",

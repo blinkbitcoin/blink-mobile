@@ -9,6 +9,7 @@ const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
 const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
+const SuccessIconDurationKey = "successIconDuration"
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -20,6 +21,7 @@ type RemoteConfig = {
   [FeedbackEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
+  [SuccessIconDurationKey]: number
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -28,6 +30,7 @@ const defaultRemoteConfig: RemoteConfig = {
   feedbackEmailAddress: "feedback@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
+  successIconDuration: 2300,
 }
 
 const defaultFeatureFlags = {
@@ -80,12 +83,17 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(UpgradeModalShowAtSessionNumberKey)
           .asNumber()
 
+        const successIconDuration = remoteConfigInstance()
+          .getValue(SuccessIconDurationKey)
+          .asNumber()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
           feedbackEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
+          successIconDuration,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
