@@ -66,6 +66,8 @@
             android-sdk
             nodejs
             pkgs."ruby-3.3.0"
+            bundler
+            fastlane
             scrcpy
 
             # Fix for `unf_ext` build issue
