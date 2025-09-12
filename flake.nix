@@ -61,7 +61,6 @@
             vendir
             jq
             ytt
-            fastlane
 
             # Overlays
             android-sdk
