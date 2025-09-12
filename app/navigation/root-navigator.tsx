@@ -356,6 +356,7 @@ export const RootStack = () => {
         component={PriceHistoryScreen}
         options={{
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          gestureDirection: "horizontal-inverted",
           title: LL.common.bitcoinPrice(),
         }}
       />
