@@ -639,9 +639,6 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     paddingTop: 6,
     paddingBottom: 10,
   },
-  rowHighlight: {
-    backgroundColor: colors.grey6,
-  },
   walletSeparator: {
     flexDirection: "row",
     justifyContent: "center",

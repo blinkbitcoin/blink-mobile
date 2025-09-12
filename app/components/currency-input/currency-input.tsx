@@ -75,7 +75,7 @@ export const CurrencyInput = forwardRef<TextInput, CurrencyInputProps>(
               showSoftInputOnFocus={false}
               inputStyle={styles.inputText}
               placeholder={placeholder}
-              placeholderTextColor={colors.grey3}
+              placeholderTextColor={colors.grey2}
               inputContainerStyle={styles.inputContainer}
               renderErrorMessage={false}
               selection={getEndSelection()}
@@ -156,13 +156,13 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 30,
   },
   currencyBadge: {
-    borderColor: colors.grey2,
+    borderColor: colors.grey1,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 10,
   },
   currencyText: {
-    color: colors.grey2,
+    color: colors.grey1,
   },
 }))
