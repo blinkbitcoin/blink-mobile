@@ -560,8 +560,8 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
   noTransaction: {
     alignItems: "center",
@@ -606,10 +606,8 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   button: {
-    display: "flex",
-    justifyContent: "space-between",
-    width: "100%",
-    maxWidth: 74,
+    maxWidth: "25%",
+    flexGrow: 1,
   },
   header: {
     flexDirection: "row",
