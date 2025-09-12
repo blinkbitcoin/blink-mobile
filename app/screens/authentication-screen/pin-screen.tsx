@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
-import { RouteProp, useNavigation, CommonActions } from "@react-navigation/native"
+import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles } from "@rn-vui/themed"
@@ -104,7 +104,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     if (previousPIN === newEnteredPIN) {
       if (await KeyStoreWrapper.setPin(previousPIN)) {
         KeyStoreWrapper.resetPinAttempts()
-        navigation.dispatch(CommonActions.goBack())
+        navigation.goBack()
       } else {
         returnToSetPin()
         Alert.alert(LL.PinScreen.storePinFailed())

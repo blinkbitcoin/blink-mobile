@@ -116,6 +116,7 @@ export const RootStack = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerMode: "screen",
       }}
       initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
     >
