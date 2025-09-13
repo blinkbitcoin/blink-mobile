@@ -37,10 +37,12 @@ platform :android do
         "./app/build/outputs/apk/release/app-x86-release.apk",
         "./app/build/outputs/apk/release/app-x86_64-release.apk",
       ],
-      metadata_path: "./app/build/outputs/apk/release",
+      # metadata_path: "./app/build/outputs/apk/release",
       track: "internal",
       skip_upload_changelogs: true,
       skip_upload_images: true,
+      skip_upload_metadata: true,
+      skip_upload_screenshots: true
     )
   end
 
