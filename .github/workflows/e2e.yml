@@ -11,17 +11,40 @@ concurrency:
 jobs:
   e2e-android:
     name: Android
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          build-mount-path: /nix
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
 
-      # In case this is run on a runner without nix
-      # - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Prepare /nix for Nix installer
+        shell: bash
+        run: |
+          sudo mkdir -p /nix
+          sudo chown root:root /nix
+          sudo chmod 0755 /nix
+          echo "Ownership after fix:"
+          ls -ld /nix
+
+      - uses: actions/checkout@v4
+
+      # Install Nix + enable cache
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -127,6 +150,22 @@ jobs:
             echo "- $TEST_NAME" >> $GITHUB_STEP_SUMMARY
           done
 
+      - name: Disk usage (report)
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          echo "== root =="
+          df -h /
+          echo "== /mnt =="
+          df -h /mnt
+          echo "== workspace =="
+          df -h "$GITHUB_WORKSPACE"
+          if [ -d /nix ]; then
+            echo "== /nix =="
+            df -h /nix
+          fi
+
       # Cleanup
       - name: Terminate Metro
         if: always()
@@ -148,14 +187,14 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # In case this is run on a runner without nix
       # - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
