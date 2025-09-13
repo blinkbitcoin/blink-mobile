@@ -29,9 +29,9 @@ git checkout $GIT_REF
 echo "    --> Installing dependencies"
 nix develop -c yarn install
 echo "    --> Installing Android dependencies"
-nix develop -c sh -c 'cd android && bundle config set --local path 'vendor/bundle' && bundle install'
+nix develop -c sh -c 'cd android && bundle install'
 echo "    --> Installing iOS dependencies"
-nix develop -c sh -c 'cd ios && bundle config set --local path 'vendor/bundle' && bundle install'
+nix develop -c sh -c 'cd ios && bundle install'
 
 echo "    --> Starting metro"
 lsof -ti:8080,8081 | xargs kill -9 || true

@@ -49,7 +49,6 @@ buck-out/
 # ios
 **/Pods
 ios/Xcode.app
-ios/.bundle
 ios/vendor
 ios/vendor/bundle
 
