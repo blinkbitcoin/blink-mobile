@@ -196,7 +196,6 @@ PODS:
     - React-RCTText (= 0.76.9)
     - React-RCTVibration (= 0.76.9)
   - React-callinvoker (0.76.9)
-  - React-Codegen (0.1.0)
   - React-Core (0.76.9):
     - glog
     - hermes-engine
@@ -2124,13 +2123,27 @@ PODS:
   - RNQrGenerator (1.4.0):
     - React
     - ZXingObjC
-  - RNReactNativeHapticFeedback (2.2.0):
-    - RCT-Folly
+  - RNReactNativeHapticFeedback (2.3.3):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.10.14.00)
     - RCTRequired
     - RCTTypeSafety
-    - React-Codegen
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
+    - Yoga
   - RNReanimated (3.16.7):
     - DoubleConversion
     - glog
@@ -2495,7 +2508,6 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - PromisesSwift
-    - React-Codegen
     - SocketRocket
     - ZXingObjC
 
@@ -2748,7 +2760,6 @@ SPEC CHECKSUMS:
   RCTTypeSafety: e7678bd60850ca5a41df9b8dc7154638cb66871f
   React: 4641770499c39f45d4e7cde1eba30e081f9d8a3d
   React-callinvoker: 4bef67b5c7f3f68db5929ab6a4d44b8a002998ea
-  React-Codegen: 4b8b4817cea7a54b83851d4c1f91f79aa73de30a
   React-Core: 0a06707a0b34982efc4a556aff5dae4b22863455
   React-CoreModules: 907334e94314189c2e5eed4877f3efe7b26d85b0
   React-cxxreact: 3a1d5e8f4faa5e09be26614e9c8bbcae8d11b73d
@@ -2830,7 +2841,7 @@ SPEC CHECKSUMS:
   RNLocalize: 435cdf408549c96a7f06a0040a2812a4f349b384
   RNPermissions: 7d4a6acd8f3dac91435c3537ff2e7fdca5622b0e
   RNQrGenerator: 1676221c08bfabec978242989c733810dad20959
-  RNReactNativeHapticFeedback: 616c35bdec7d20d4c524a7949ca9829c09e35f37
+  RNReactNativeHapticFeedback: 2bd51b056c80544bee803447255d56d296f79f79
   RNReanimated: 3db30c743775821c4cae7bc5b76cad3642630236
   RNScreens: a09a20dc045ca372549fccd0537e2ced95e90aea
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
