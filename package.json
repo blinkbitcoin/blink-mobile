@@ -115,7 +115,7 @@
     "react-native-error-boundary": "^1.2.4",
     "react-native-fingerprint-scanner": "git+https://github.com/hieuvp/react-native-fingerprint-scanner.git#9cecc0db326471c571553ea85f7c016fee2f803d",
     "react-native-gesture-handler": "2.25.0",
-    "react-native-haptic-feedback": "^2.0.3",
+    "react-native-haptic-feedback": "^2.3.3",
     "react-native-image-picker": "^7.1.2",
     "react-native-in-app-review": "^4.3.3",
     "react-native-inappbrowser-reborn": "^3.7.0",

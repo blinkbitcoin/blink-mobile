@@ -22470,10 +22470,10 @@ react-native-gesture-handler@2.25.0:
     hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
 
-react-native-haptic-feedback@^2.0.3:
-  version "2.2.0"
-  resolved "https://registry.npmjs.org/react-native-haptic-feedback/-/react-native-haptic-feedback-2.2.0.tgz#bc46edd1f053265bfbe6c32487cbce074e099429"
-  integrity sha512-3tqJOjCguWhIrX0nkURn4yw6kXdsSDjjrvZCRjKXYGlL28hdQmoW2okAHduDTD9FWj9lA+lHgwFWgGs4aFNN7A==
+react-native-haptic-feedback@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/react-native-haptic-feedback/-/react-native-haptic-feedback-2.3.3.tgz#88b6876e91399a69bd1b551fe1681b2f3dc1214e"
+  integrity sha512-svS4D5PxfNv8o68m9ahWfwje5NqukM3qLS48+WTdhbDkNUkOhP9rDfDSRHzlhk4zq+ISjyw95EhLeh8NkKX5vQ==
 
 react-native-image-picker@^7.1.2:
   version "7.1.2"
