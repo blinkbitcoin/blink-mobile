@@ -122,8 +122,8 @@
               echo no | avdmanager create avd --force -n Pixel_API_35 --abi "google_apis_playstore/$ARCH" --package "system-images;android-35;google_apis_playstore;$ARCH" --device 'pixel_8'
             fi
 
-            XCODE_VERSION="16.2"
-            XCODE_BUILD="16C5032a" # When updating xcode version, get it by running xcodes installed
+            XCODE_VERSION="16.4"
+            XCODE_BUILD="16F6" # When updating xcode version, get it by running xcodes installed
             if [[ $(uname) == "Darwin" ]] && [ -z "$CI" ]; then
               sudo xcodes install $XCODE_VERSION 2>/dev/null
               sudo xcodes installed
