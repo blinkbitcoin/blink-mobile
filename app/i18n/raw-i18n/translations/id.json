@@ -56,7 +56,7 @@
         "frequentContacts": "Kontak yang sering dihubungi"
     },
     "ContactDetailsScreen": {
-        "title": "Transaksi dengan {nama pengguna: string}"
+        "title": "Transaksi dengan {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Konversi",
@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "mendapatkan {formatNumber | sats: string}",
+        "earnSats": "mendapatkan {formattedNumber | sats}",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "Bitcoin: Apa itu?",
@@ -98,7 +98,7 @@
                         "answers": [
                             "Unit terkecil dari Bitcoin",
                             "Sebuah satelit kecil",
-                            "Sebuah kucing angkasa"
+                            "Sebuah kucing angkasa 🐱🚀"
                         ],
                         "feedback": [
                             "Benar. Anda baru saja mendapatkan dua sat lainnya!!",
@@ -121,7 +121,7 @@
                             "Salah. Silakan coba lagi."
                         ],
                         "question": "Di mana bitcoin eksis?",
-                        "text": "Bitcoin adalah bentuk uang yang baru. Bitcoin dapat digunakan oleh siapa saja, kapan saja - di mana saja di seluruh dunia. Tidak terikat pada pemerintah atau wilayah tertentu (seperti Dolar AS). Juga tidak ada uang kertas, koin logam, atau kartu plastik. Semuanya 100% digital. Bitcoin adalah jaringan komputer yang beroprasi di internet. Bitcoin anda dapat dikelola dengan mudah menggunakan perangkat lunak di ponsel  atau komputer anda!",
+                        "text": "Bitcoin adalah bentuk uang yang baru. Bitcoin dapat digunakan oleh siapa saja, kapan saja - di mana saja di seluruh dunia. Tidak terikat pada pemerintah atau wilayah tertentu (seperti Dolar AS). Juga tidak ada uang kertas, koin logam, atau kartu plastik. Semuanya 100% digital. Bitcoin adalah jaringan komputer yang beroperasi di internet. Bitcoin anda dapat dikelola dengan mudah menggunakan perangkat lunak di ponsel atau komputer anda!",
                         "title": "Di mana bitcoin eksis?"
                     },
                     "whoControlsBitcoin": {
@@ -522,7 +522,7 @@
                         ],
                         "question": "Atribut-atribut apa saja yang membuat sesuatu bagus sebagai tempat penyimpanan bernilai",
                         "text": "Ketika tempat penyimpanan nilai bersaing satu sama lain, atribut yang membuat tempat penyimpanan nilai yang bagus memungkinkannya untuk mengungguli para pesaingnya dan meningkatkan permintaan dari waktu ke waktu. \n\nBanyak barang yang telah digunakan sebagai tempat penyimpanan nilai, tetapi atribut tertentu secara khusus diinginkan dan membuat barang-barang ini lebih sukses. \n\nTempat penyimpanan nilai yang ideal haruslah tahan lama, mudah dibawa, dapat diverifikasi, dapat dibagi-bagi, langka, memiliki sejarah yang panjang, dan tahan terhadap pencekalan.\n",
-                        "title": "Beberapa tempat penyimpanan nilai ebih baik daripada tempat penyimpanan nilai lainnya"
+                        "title": "Beberapa tempat penyimpanan nilai lebih baik daripada tempat penyimpanan nilai lainnya"
                     },
                     "durability": {
                         "answers": [
@@ -676,21 +676,21 @@
                             "Salah! Tapi setidaknya Anda berpikir tentang bentuk uang yang lebih modern. Uang kertas dengan gambar-gambar pemimpin terkenal tidak digunakan pada awal evolusi uang."
                         ],
                         "question": "Apa saja contoh bentuk awal uang yang dihargai karena penampilan atau kualitas spesialnya",
-                        "text": "Throughout history, money has gone through four stages of development. In the very beginning, people only wanted money because of its special qualities, and it was mostly seen as a decorative item or a collectible.;\n\nExamples of this include shells, beads, and gold, which were all collectibles before becoming widely used as money.\n",
+                        "text": "Sepanjang sejarah, uang telah melalui empat tahap perkembangan. Pada awalnya, orang hanya menginginkan uang karena kualitas khususnya, dan sebagian besar dianggap sebagai barang dekoratif atau koleksi.;\n\nContohnya termasuk kerang, manik-manik, dan emas, yang semuanya merupakan barang koleksi sebelum digunakan secara luas sebagai uang.\n",
                         "title": "Empat Tahapan Uang: Koleksi"
                     },
                     "storeOfValue": {
                         "answers": [
-                            "The number of people who want it as a store of value",
+                            "Jumlah orang yang menginginkannya sebagai penyimpan nilai",
                             "Cuaca",
-                            "The color of the store of value"
+                            "Warna dari penyimpan nilai"
                         ],
                         "feedback": [
                             "Kerja yang bagus! Daya beli dari sebuah tempat penyimpan nilai ditentukan oleh jumlah orang yang ingin menggunakannya sebagai cara untuk menyimpan nilai. Semakin banyak orang yang ingin menggunakannya untuk tujuan ini, nilai penyimpan nilai meningkat",
                             "Maaf, cuaca memang merupakan faktor dalam banyak hal, tetapi bukan jawaban yang tepat untuk pertanyaan ini. Mungkin coba lihat faktor lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai ",
-                            "I'm sorry to say that the color of a store of value probably doesn't have much of an effect on its purchasing power. It's definitely an interesting idea though! Maybe try considering other characteristics that could affect the value of a store of value."
+                            "Maaf, warna dari sebuah tempat penyimpanan nilai mungkin tidak terlalu berpengaruh pada daya belinya. Ide yang menarik! Mungkin coba pertimbangkan karakteristik lain yang dapat memengaruhi nilai dari suatu tempat penyimpanan nilai."
                         ],
-                        "question": "Apa yang menentukan daya beli dari sebuah tempat penyimpanan nilai",
+                        "question": "Apa yang menentukan daya beli dari sebuah tempat penyimpanan nilai?",
                         "text": "Tempat Penyimpan nilai adalah tahap kedua dari evolusi uang. Ketika cukup banyak orang menginginkan uang karena kualitas istimewanya, uang menjadi metode penyimpanan nilai dari waktu ke waktu, untuk memindahkan kekayaan yang diperoleh dengan susah payah ke masa depan. \n\nSemakin banyak orang yang mengenali suatu barang sebagai cara yang baik untuk menyimpan nilai, maka nilai barang tersebut akan meningkat seiring dengan semakin banyaknya orang yang menginginkannya. \n\nAkhirnya, nilai sebuah alat penyimpan nilai akan berhenti berkembang seiring dengan semakin banyaknya barang tersebut yang dimiliki oleh masyarakat luas dan semakin sedikitnya orang yang baru yang menginginkannya sebagai alat penyimpan nilai.\n",
                         "title": "Empat Tahapan Uang: Tempat Penyimpan Nilai"
                     },
@@ -746,7 +746,7 @@
                             "Bitcoin telah melalui proses untuk diterima secara luas sebagai uang dan sekarang digunakan sebagai bentuk mata uang."
                         ],
                         "feedback": [
-                            "Bingo! Anda benar sekali dengan jawaban ini (Punintended). Tahukah Anda bahwa proses Bitcoin menjadi lebih diterima secara luas sebagai uang mirip dengan proses yang dilalui emas untuk menjadi bentuk mata uang yang diterima secara luas",
+                            "Bingo! Anda benar sekali dengan jawaban ini (pun intended). Tahukah Anda bahwa proses Bitcoin menjadi lebih diterima secara luas sebagai uang mirip dengan proses yang dilalui emas untuk menjadi bentuk mata uang yang diterima secara luas",
                             "Ha! Anda pasti melewatkan bagian tentang butuh waktu beberapa tahun bagi Bitcoin untuk mencapai tahap ini. Teruslah membaca",
                             "Maaf, kami sampaikan kepada Anda, tetapi Bitcoin masih dalam proses untuk diterima secara luas sebagai uang. Semoga lebih beruntung di lain waktu!"
                         ],
@@ -782,7 +782,7 @@
                         ],
                         "feedback": [
                             "Selamat! Sangat menarik untuk memikirkan bagaimana uang telah berkembang seiring waktu, dari penggunaannya yang awal sebagai sarana untuk memfasilitasi perdagangan dalam komunitas kecil hingga perannya saat ini sebagai alat tukar dalam ekonomi modern.",
-                            "Maaf, sepertinya anda salah menebaknya! Semoga beruntung dengan tebakan anda berikutnya",
+                            "Maaf, sepertinya Anda salah menebaknya! Semoga berhasil dengan tebakan Anda berikutnya",
                             "Salah! Kredit sudah ada hampir selama uang itu ada, dan kemungkinan akan tetap ada. Semoga lebih beruntung dengan jawabanmu berikutnya."
                         ],
                         "question": "Apa fungsi utama dari uang",
@@ -1256,7 +1256,7 @@
                             "Wow, itu tujuan yang ambisius! Meskipun benar bahwa penambangan memerlukan daya komputasi yang signifikan, saya cukup yakin tujuan utamanya bukan untuk menciptakan pasukan penguasa AI. Semoga lebih beruntung lain kali!"
                         ],
                         "question": "Apa tujuan utama dari penambangan di jaringan bitcoin",
-                        "text": "Ketika seorang pengguna ingin mengirimkan transaksi di jaringan bitcoin, mereka perlu menandatangani transaksi dengan kunci privat mereka untuk membuktikan bahwa mereka adalah pemilik dana yang akan ditransfer. Setelah transaksi ditandatangani, transaksi tersebut disiarkan ke jaringan peer-to-peer.\n\nPenambangan adalah proses menambahkan transaksi ke blockchain bitcoin. Ketika sebuah transaksi disiarkan ke jaringan, transaksi tersebut diambil oleh penambang, yang memverifikasi bahwa transaksi tersebut valid (yaitu, pengguna memiliki dana yang diperlukan dan kunci privat yang digunakan untuk menandatangani transaksi sesuai dengan kunci publik yang terkait dengan dana tersebut).\n\nSetelah transaksi diverifikasi, transaksi tersebut ditambahkan ke sebuah blok transaksi, bersama dengan sebuah teka-teki matematika. Penambang bersaing untuk menyelesaikan teka-teki tersebut, dan siapa pun yang pertama kali menyelesaikannya mendapatkan hak untuk menambahkan blok ke blockchain dan mengklaim hadiah dalam bentuk bitcoin. Saat ini hadiahnya adalah 6,25 bitcoin, ditambah biaya transaksi yang disertakan dalam blok.\n\nSelain menambahkan transaksi ke blockchain, penambangan juga berfungsi untuk mengamankan jaringan bitcoin. Hal ini karena menyelesaikan teka-teki memerlukan daya komputasi yang signifikan, dan menambahkan blok ke blockchain memerlukan penambang lain untuk memverifikasi solusinya. Ini membuat sangat sulit bagi satu orang atau kelompok untuk memanipulasi blockchain.\n",
+                        "text": "Ketika seorang pengguna ingin mengirimkan transaksi di jaringan bitcoin, mereka perlu menandatangani transaksi tersebut dengan kunci privat mereka untuk membuktikan bahwa mereka adalah pemilik dana yang akan ditransfer. Setelah transaksi ditandatangani, transaksi tersebut disiarkan ke jaringan peer-to-peer.\n\nPenambangan adalah proses menambahkan transaksi ke blockchain bitcoin. Ketika sebuah transaksi disiarkan ke jaringan, transaksi tersebut diambil oleh penambang, yang memverifikasi bahwa transaksi tersebut valid (yaitu, pengguna memiliki dana yang diperlukan dan kunci privat yang digunakan untuk menandatangani transaksi sesuai dengan kunci publik yang terkait dengan dana tersebut).\n\nSetelah transaksi diverifikasi, transaksi tersebut ditambahkan ke sebuah blok transaksi, bersama dengan sebuah teka-teki matematika. Penambang bersaing untuk menyelesaikan teka-teki tersebut, dan yang pertama menyelesaikannya berhak menambahkan blok tersebut ke blockchain dan mengklaim hadiah dalam bentuk bitcoin. Hadiahnya saat ini adalah 3,125 bitcoin, ditambah biaya transaksi apa pun yang disertakan dalam blok tersebut.\n\nSelain menambahkan transaksi ke blockchain, penambangan juga berfungsi untuk mengamankan jaringan bitcoin. Hal ini karena menyelesaikan teka-teki memerlukan daya komputasi yang signifikan, dan menambahkan blok ke blockchain memerlukan penambang lain untuk memverifikasi solusinya. Ini membuat sangat sulit bagi satu orang atau kelompok mana pun untuk memanipulasi blockchain.\n",
                         "title": "Penambangan"
                     },
                     "proofOfWork": {
@@ -1301,7 +1301,7 @@
                             "Sangat kreatif, tetapi salah. Jadwal pasokan Bitcoin tidak acak. Kepastiannya memberikan kejelasan bagi pelaku ekonomi, sesuatu yang belum pernah ada dalam sejarah umat manusia. Coba lagi!"
                         ],
                         "question": "Apa yang terjadi pada hadiah blok di jaringan bitcoin setiap empat tahun",
-                        "text": "Satu elemen terakhir yang penting untuk dipahami adalah bahwa hadiah blok di jaringan bitcoin dikurangi setengahnya setiap empat tahun, atau setiap 210.000 blok.\n\nPeristiwa ini, yang dikenal sebagai \"halving\", diprogram ke dalam perangkat lunak bitcoin yang dijalankan oleh semua pengguna. Ketika bitcoin pertama kali diluncurkan, penambang menerima 50 bitcoin baru untuk setiap blok yang mereka tambahkan ke blockchain. Saat ini, hadiah blok adalah 6,25 bitcoin, tetapi akan dikurangi menjadi 3,125 bitcoin pada tahun 2024 saat halving berikutnya terjadi.\n\nPengurangan ini akan terus terjadi hingga tahun 2140, di mana jumlah total bitcoin yang telah ditambang akan dibatasi pada 21 juta. Pada tahun 2023, sekitar 92% dari semua bitcoin (~19,3 juta) telah ditambang.\n\nBerbeda dengan mata uang fiat, yang bisa bersifat inflasi, bitcoin bersifat disinflasi. Ini membuatnya lebih langka dibandingkan mata uang fiat dan logam mulia seperti emas dan perak, atau apa pun yang dikenal di alam semesta.\n",
+                        "text": "Satu elemen terakhir yang penting untuk dipahami adalah bahwa hadiah blok di jaringan bitcoin dikurangi setengahnya setiap empat tahun, atau setiap 210.000 blok.\n\nPeristiwa ini, yang dikenal sebagai \"halving\", diprogram ke dalam perangkat lunak bitcoin yang dijalankan oleh semua pengguna. Ketika bitcoin pertama kali diluncurkan, penambang menerima 50 bitcoin baru untuk setiap blok yang mereka tambahkan ke blockchain. Saat ini, hadiah blok adalah 3,125 bitcoin, tetapi akan dikurangi menjadi 1.5625 bitcoin pada tahun 2028 saat halving berikutnya terjadi.\n\nPengurangan ini akan terus terjadi hingga tahun 2140, di mana jumlah total bitcoin yang telah ditambang akan dibatasi pada 21 juta. Pada tahun 2023, sekitar 92% dari semua bitcoin (~19,3 juta) telah ditambang.\n\nBerbeda dengan mata uang fiat, yang bisa bersifat inflasi, bitcoin bersifat disinflasi. Ini membuatnya lebih langka dibandingkan mata uang fiat dan logam mulia seperti emas dan perak, atau apa pun yang dikenal di alam semesta.\n",
                         "title": "Pengurangan Separuh"
                     }
                 }
@@ -1486,7 +1486,7 @@
                             "Mari kita realistis - siapa yang akan menemukan mata uang digital yang lebih langka dari kelangkaan absolut? Itu seperti mencoba menemukan lingkaran yang lebih bulat dari bulat"
                         ],
                         "feedback": [
-                            "bitcoin tidak mungkin menjadi usang karena mewakili kelangkaan absolut dan memiliki posisi dominan di pasar.",
+                            "Tidak, bitcoin tidak mungkin menjadi usang karena mewakili kelangkaan absolut dan memiliki posisi dominan di pasar.",
                             "Yah, Anda tidak salah tentang itu, tapi mari kita realistis - siapa yang akan menemukan mata uang digital yang lebih langka dari kelangkaan absolut? Itu seperti mencoba menemukan lingkaran yang lebih bulat dari bulat",
                             "Ups, sepertinya Anda bermain aman tapi tidak cukup tepat sasaran. Meskipun tidak ada yang bisa memprediksi masa depan, sudah jelas bahwa bitcoin memiliki pegangan yang kuat dalam permainan jaringan moneter digital. Coba lagi."
                         ],
@@ -1851,7 +1851,7 @@
                             "Pemerintah akan membatasi diskusi tentang Trilema Mundell-Fleming karena pidato lebih mudah disensor dibandingkan dengan pembayaran lintas batas."
                         ],
                         "feedback": [
-                            "Benar!",
+                            "Benar! Sebagai modal yang sepenuhnya mobile, Bitcoin mengubah logika negara berdaulat untuk mengarahkan kebijakan moneter internasional dengan membuat kontrol modal tidak mungkin diberlakukan.",
                             "Batas 21 juta memang sangat menarik, tetapi keberadaan Bitcoin sebenarnya membuat negara lebih sulit menetapkan nilai tukar tetap. Coba lagi.",
                             "Meskipun itu tentu saja mungkin, itu bukan hasil yang paling mungkin terjadi di sini. Coba lagi!"
                         ],
@@ -2079,7 +2079,7 @@
         "tapQrCodeCopy": "Ketuk Kode QR untuk Menyalin",
         "title": "Terima Bitcoin",
         "usdTitle": "Terima USD",
-        "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
+        "error": "Gagal membuat faktur. Silakan hubungi support jika masalah ini berlanjut.",
         "copyInvoice": "Salin",
         "shareInvoice": "Bagikan",
         "addAmount": "Minta Jumlah Tertentu",
@@ -2236,12 +2236,12 @@
         },
         "copiedDestination": "Tujuan disalin ke papan klip",
         "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "copySuccessMessage": "Salin pesan sukses ke papan klip",
+        "openSuccessUrl": "Buka URL sukses di browser",
+        "copySecretMessage": "Salin pesan rahasia ke papan klip",
+        "copiedSuccessMessage": "Pesan berhasil disalin",
+        "copiedSecretMessage": "Pesan rahasia berhasil disalin",
+        "pendingDecryptionMessage": "Pesan terenkripsi. Menunggu konfirmasi pembayaran."
     },
     "SettingsScreen": {
         "staticQr": "Kode QR Statis yang Dapat Dicetak",
@@ -2273,7 +2273,11 @@
         "nfcOnlyReceive": "Hanya menerima dari NFC yang tersedia untuk saat ini",
         "nfcScanNow": "Pindai NFC Sekarang",
         "nfcNotSupported": "NFC tidak didukung pada perangkat ini",
-        "logInOrCreateAccount": "Masuk atau buat akun"
+        "logInOrCreateAccount": "Masuk atau buat akun",
+        "logOutFromOneAccount": "Keluar dari akun ini",
+        "logoutOneAccountAlertTitle": "Anda yakin ingin keluar dari akun ini?",
+        "logoutOneAccountAlertContent": "Anda akan keluar dari sesi yang terhubung dengan {identifier: string}.\nPastikan Anda memiliki akses untuk masuk kembali di masa mendatang.",
+        "logoutOneAccountConfirm": "Saya mengerti. Silakan keluarkan saya."
     },
     "NotificationSettingsScreen": {
         "title": "Pengaturan Notifikasi",
@@ -2307,6 +2311,8 @@
         "tapToAddPhoneNumber": "Ketuk untuk menambahkan nomor telepon",
         "loginMethods": "Metode Masuk",
         "level": "Level {level: string}",
+        "switchAccount": "Ganti Akun",
+        "pleaseWait": "Mohon tunggu.",
         "accountLevel": "Level Akun",
         "upgrade": "Tingkatkan akun Anda",
         "logOutAndDeleteLocalData": "Keluar dan hapus semua data lokal",
@@ -2347,6 +2353,10 @@
         "yourAccountId": "ID Akun Anda",
         "accountId": "ID Akun",
         "copy": "Salin"
+    },
+    "ProfileScreen": {
+        "addAccount": "Tambah Akun",
+        "error": "Tidak dapat mengambil profil saat ini"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Otentikasi dua faktor",
@@ -2464,7 +2474,8 @@
         "placeholder": "Nomor Telepon",
         "verify": "Klik untuk Verifikasi",
         "sms": "Kirim melalui SMS",
-        "whatsapp": "Kirim melalui WhatsApp"
+        "whatsapp": "Kirim melalui WhatsApp",
+        "telegram": "Kirim via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Kesalahan saat masuk. Apakah Anda menggunakan kode yang benar?",
@@ -2477,6 +2488,16 @@
         "sendAgain": "Kirim Ulang",
         "tryAgain": "Coba Lagi",
         "sendViaOtherChannel": "Anda memilih untuk menerima kode melalui {channel: string}. Anda dapat mencoba menerima melalui {other: string} sebagai gantinya"
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "Setelah otorisasi di Telegram, Anda akan secara otomatis masuk",
+        "loginWithTelegram": "Masuk dengan Telegram",
+        "waitingForAuthorization": "Menunggu otorisasi di Telegram...",
+        "errorFetchParams": "Gagal mengambil parameter otentikasi Telegram",
+        "errorFetchLogin": "Gagal mengambil data masuk Telegram",
+        "errorAuthTimeout": "Otorisasi habis waktu. Silakan coba lagi.",
+        "errorOpenAppError": "Gagal membuka Telegram. Pastikan aplikasi sudah terinstal."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Pengaturan Telepon",
@@ -2644,12 +2665,12 @@
     },
     "support": {
         "contactUs": "Butuh bantuan? Hubungi kami.",
-        "joinTheCommunity": "Join the community",
+        "joinTheCommunity": "Gabung komunitas",
         "whatsapp": "WhatsApp",
         "email": "Email",
         "faq": "FAQ",
-        "enjoyingApp": "Enjoying the app?",
-        "statusPage": "Status Page",
+        "enjoyingApp": "Menikmati aplikasi ini?",
+        "statusPage": "Halaman Status",
         "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
