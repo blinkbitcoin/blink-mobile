@@ -115,5 +115,10 @@ export const createCache = () =>
           transactions: relayStylePagination(["walletIds"]),
         },
       },
+      User: {
+        fields: {
+          statefulNotificationsWithoutBulletinEnabled: relayStylePagination(),
+        },
+      },
     },
   })
