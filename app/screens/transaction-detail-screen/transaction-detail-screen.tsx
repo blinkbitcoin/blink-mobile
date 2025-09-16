@@ -49,12 +49,14 @@ const Row = ({
   return (
     <View style={styles.description}>
       <View style={styles.container}>
-        <Text style={styles.entry} selectable={false}>
+        <Text
+          style={styles.entry}
+          selectable={false}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {entry}
         </Text>
-        {icons.map((icon, index) => (
-          <React.Fragment key={index}>{icon}</React.Fragment>
-        ))}
       </View>
       {content ? (
         content
@@ -63,6 +65,11 @@ const Row = ({
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
+          <View style={styles.valueIcons}>
+            {icons.map((icon, index) => (
+              <React.Fragment key={index}>{icon}</React.Fragment>
+            ))}
+          </View>
         </View>
       )}
     </View>
@@ -181,8 +188,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     }
   }, [tx, refetch, timer, timeDiff])
 
-  // FIXME doesn't work with storybook
-  // TODO: translation
   if (!tx || Object.keys(tx).length === 0)
     return <Text>{"No transaction found with this ID (should not happen)"}</Text>
 
@@ -236,7 +241,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     }),
   })
 
-  // only show a secondary amount if it is in a different currency than the primary amount
   const formattedSecondaryFeeAmount =
     tx.settlementDisplayCurrency === tx.settlementCurrency
       ? undefined
@@ -558,33 +562,51 @@ const useStyles = makeStyles(({ colors }) => ({
 
   entry: {
     marginVertical: 4,
+    marginRight: 8,
+    flexShrink: 1,
+    minWidth: 0,
   },
 
   transactionDetailView: {
     marginHorizontal: 24,
     paddingVertical: 12,
   },
+
   valueContainer: {
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
+    paddingRight: 48,
     backgroundColor: colors.grey5,
     alignItems: "center",
     borderRadius: 8,
   },
+
   value: {
     alignItems: "center",
     justifyContent: "center",
     fontSize: 14,
     fontWeight: "bold",
+    flexShrink: 1,
   },
+
+  valueIcons: {
+    position: "absolute",
+    right: 12,
+    top: 0,
+    bottom: 0,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+
   txNotBroadcast: {
     marginBottom: 16,
   },
 
   icon: {
-    marginBottom: 2,
-    marginHorizontal: 12,
+    marginVertical: 8,
   },
 
   container: {
