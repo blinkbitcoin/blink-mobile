@@ -34,6 +34,8 @@ import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
 import "./utils/logs"
 import { ActionModals, ActionsProvider } from "./components/actions"
+import { enableScreens } from "react-native-screens"
+import { Platform } from "react-native"
 
 // FIXME should we only load the currently used local?
 // this would help to make the app load faster
@@ -42,6 +44,9 @@ import { ActionModals, ActionsProvider } from "./components/actions"
 //
 // alternatively, could try loadAllLocalesAsync()
 loadAllLocales()
+if (Platform.OS === "ios") {
+  enableScreens(false)
+}
 
 /**
  * This is the root component of our app.
