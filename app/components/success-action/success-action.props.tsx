@@ -1,8 +1,8 @@
-import { LNURLPaySuccessAction } from "lnurl-pay"
-
 export type SuccessActionComponentProps = {
-  successAction?: LNURLPaySuccessAction
-  preimage?: string
+  visible?: boolean
+  title: string
+  text?: string | null
+  subText?: string
 }
 
 export enum SuccessActionTag {

@@ -60,6 +60,13 @@ export type RootStackParamList = {
     status: PaymentSendCompletedStatus
     successAction?: LNURLPaySuccessAction
     preimage?: string
+    currencyAmount?: string
+    satAmount?: string
+    currencyFeeAmount?: string
+    satFeeAmount?: string
+    destination?: string
+    paymentType?: string
+    createdAt?: number
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined

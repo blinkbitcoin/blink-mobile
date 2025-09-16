@@ -41,6 +41,7 @@ import { testProps } from "../../utils/testProps"
 import useFee from "./use-fee"
 import { useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
+import { ellipsizeMiddle } from "@app/utils/helper"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -86,7 +87,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     isSendingMax,
   } = paymentDetail
 
-  const { formatDisplayAndWalletAmount } = useDisplayCurrency()
+  const {
+    formatDisplayAndWalletAmount,
+    getSecondaryAmountIfCurrencyIsDifferent,
+    formatMoneyAmount,
+  } = useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
 
   const { data } = useSendBitcoinConfirmationScreenQuery({ skip: !useIsAuthed() })
@@ -112,6 +117,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { LL } = useI18nContext()
 
   const fee = useFee(getFee)
+  let currencyAmount = ""
+  let satAmount = ""
+
+  let currencyFeeAmount = ""
+  let satFeeAmount = ""
 
   const {
     loading: sendPaymentLoading,
@@ -126,8 +136,23 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       displayAmount: feeDisplayAmount,
       walletAmount: fee.amount,
     })
+
+    currencyFeeAmount = formatMoneyAmount({
+      moneyAmount: feeDisplayAmount,
+    })
+
+    const secondaryFeeAmount = getSecondaryAmountIfCurrencyIsDifferent({
+      primaryAmount: feeDisplayAmount,
+      walletAmount: convertMoneyAmount(feeDisplayAmount, WalletCurrency.Btc),
+      displayAmount: convertMoneyAmount(feeDisplayAmount, DisplayCurrency),
+    })
+    satFeeAmount = formatMoneyAmount({
+      moneyAmount: secondaryFeeAmount ?? ZeroUsdMoneyAmount,
+    })
   } else {
     feeDisplayText = LL.SendBitcoinConfirmationScreen.feeError()
+    currencyFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
+    satFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
   }
 
   const handleSendPayment = React.useCallback(async () => {
@@ -140,7 +165,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         paymentType: paymentDetail.paymentType,
         sendingWallet: sendingWalletDescriptor.currency,
       })
-      const { status, errorsMessage, extraInfo } = await sendPayment()
+      const { status, errorsMessage, extraInfo, transaction } = await sendPayment()
+
       logPaymentResult({
         paymentType: paymentDetail.paymentType,
         paymentStatus: status,
@@ -161,6 +187,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 status,
                 successAction: paymentDetail?.successAction,
                 preimage: extraInfo?.preimage,
+                currencyAmount,
+                satAmount,
+                currencyFeeAmount,
+                satFeeAmount,
+                destination:
+                  paymentDetail?.paymentType === "intraledger"
+                    ? destination
+                    : ellipsizeMiddle(destination, {
+                        maxLength: 50,
+                        maxResultLeft: 13,
+                        maxResultRight: 8,
+                      }),
+                paymentType: paymentDetail?.paymentType,
+                createdAt: transaction?.createdAt,
               },
             },
           ]
@@ -214,6 +254,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     paymentType,
     destination,
     saveLnAddressContact,
+    currencyAmount,
+    satAmount,
+    currencyFeeAmount,
+    satFeeAmount,
   ])
 
   let validAmount = true
@@ -268,6 +312,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const errorMessage = paymentError || invalidAmountErrorMessage
 
   const displayAmount = convertMoneyAmount(settlementAmount, DisplayCurrency)
+
+  currencyAmount = formatMoneyAmount({
+    moneyAmount: displayAmount,
+  })
+
+  const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
+    primaryAmount: displayAmount,
+    walletAmount: convertMoneyAmount(unitOfAccountAmount, WalletCurrency.Btc),
+    displayAmount: convertMoneyAmount(unitOfAccountAmount, DisplayCurrency),
+  })
+
+  satAmount = formatMoneyAmount({
+    moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
+  })
 
   const transactionType = () => {
     if (paymentType === "intraledger") return LL.common.intraledger()
