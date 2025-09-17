@@ -102,7 +102,7 @@ export const EmailRegistrationInitiateScreen: React.FC<
 
     try {
       const { data } = await setEmailMutation({
-        variables: { input: { email: emailInput } },
+        variables: { input: { email: emailInput, enforceUniqueEmail: onboarding } },
       })
 
       const errors = data?.userEmailRegistrationInitiate.errors
