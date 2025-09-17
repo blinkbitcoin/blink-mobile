@@ -132,6 +132,10 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
     theme: { colors, mode: themeMode },
   } = useTheme()
 
+  const screenType = route.params.type
+  const phoneChannel = route.params.channel
+  const onboarding = route.params.onboarding
+
   const {
     userSubmitPhoneNumber,
     captchaLoading,
@@ -148,13 +152,9 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
     setCountryCode,
     supportedCountries,
     loadingSupportedCountries,
-  } = useRequestPhoneCodeLogin()
+  } = useRequestPhoneCodeLogin({ onboarding })
 
   const { LL } = useI18nContext()
-
-  const screenType = route.params.type
-  const phoneChannel = route.params.channel
-  const onboarding = route.params.onboarding
 
   const isDisabledCountryAndCreateAccount =
     screenType === PhoneLoginInitiateType.CreateAccount &&
