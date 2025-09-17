@@ -93,7 +93,11 @@ gql`
   }
 `
 
-export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
+export const useRequestPhoneCodeLogin = (opts?: {
+  onboarding?: boolean
+}): UseRequestPhoneCodeReturn => {
+  const onboarding = Boolean(opts?.onboarding)
+
   const [status, setStatus] = useState<RequestPhoneCodeStatus>(
     RequestPhoneCodeStatus.LoadingCountryCode,
   )
@@ -192,6 +196,7 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
           validationCode: geetestValidationData.geetestValidate,
           secCode: geetestValidationData.geetestSecCode,
           channel: phoneCodeChannel,
+          enforceUniquePhone: onboarding,
         } as const
         resetValidationData()
         logRequestAuthCode({
@@ -233,6 +238,7 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
           {
             phone: validatedPhoneNumber,
             channel: phoneCodeChannel,
+            enforceUniquePhone: onboarding,
           },
           {
             headers: {
@@ -279,6 +285,7 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
     registerCaptcha,
     appCheckToken,
     authUrl,
+    onboarding,
   ])
 
   const setPhoneNumber = (number: string) => {
