@@ -60,6 +60,7 @@ import { isValidAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 import { useOnChainPayoutQueueFeeEstimates } from "./use-fee"
+import { useEstimatedPayoutTime } from "@app/config/feature-flags-context"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -242,6 +243,76 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
+  const mediumPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Medium)
+  const slowPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Slow)
+
+  const getExpirationTimeFormat = React.useCallback(
+    (timeIn: { minutes?: number }) => {
+      const minutes = timeIn.minutes ?? 0
+      if (minutes === 0) return ""
+
+      const unidades = [
+        { umbral: 1440, singular: LL.common.day.one(), plural: LL.common.day.other() },
+        { umbral: 60, singular: LL.common.hour(), plural: LL.common.hours() },
+        { umbral: 1, singular: LL.common.minute(), plural: LL.common.minutes() },
+      ]
+
+      for (const unidad of unidades) {
+        if (minutes >= unidad.umbral) {
+          const cantidad = Math.floor(minutes / unidad.umbral)
+          return `${cantidad} ${cantidad === 1 ? unidad.singular : unidad.plural}`
+        }
+      }
+
+      return `${minutes} ${LL.common.minutes()}`
+    },
+    [LL.common],
+  )
+
+  const getPayoutSpeedDescription = React.useCallback(
+    (speed: PayoutSpeed): string => {
+      switch (speed) {
+        case PayoutSpeed.Fast:
+          return LL.SendBitcoinScreen.estimatedPayoutTime({
+            time: `${10} ${LL.common.minutes()} (${LL.common.nextBlock()})`,
+          })
+        case PayoutSpeed.Medium:
+          return LL.SendBitcoinScreen.estimatedPayoutTime({
+            time: getExpirationTimeFormat({
+              minutes: mediumPayoutTime,
+            }),
+          })
+        case PayoutSpeed.Slow:
+          return LL.SendBitcoinScreen.estimatedPayoutTime({
+            time: getExpirationTimeFormat({
+              minutes: slowPayoutTime,
+            }),
+          })
+      }
+    },
+    [
+      LL.SendBitcoinScreen,
+      LL.common,
+      getExpirationTimeFormat,
+      mediumPayoutTime,
+      slowPayoutTime,
+    ],
+  )
+
+  const getPayoutSpeedLabel = React.useCallback(
+    (speed: PayoutSpeed) => {
+      switch (speed) {
+        case PayoutSpeed.Fast:
+          return LL.common.payoutSpeed.fast.name()
+        case PayoutSpeed.Medium:
+          return LL.common.payoutSpeed.medium.name()
+        case PayoutSpeed.Slow:
+          return LL.common.payoutSpeed.slow.name()
+      }
+    },
+    [LL.common.payoutSpeed],
+  )
+
   useEffect(() => {
     if (!isOnchain || selectedPayoutSpeedOption || !payoutSpeedsData?.payoutSpeeds) {
       return
@@ -254,12 +325,18 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
     const option: PayoutSpeedOption = {
       speed: priority.speed,
-      displayName: priority.displayName,
-      description: priority.description,
+      displayName: getPayoutSpeedLabel(priority.speed),
+      description: getPayoutSpeedDescription(priority.speed),
     }
     setSelectedPayoutSpeedOption(option)
     setPayoutSpeed(priority.speed)
-  }, [isOnchain, payoutSpeedsData, selectedPayoutSpeedOption])
+  }, [
+    getPayoutSpeedDescription,
+    getPayoutSpeedLabel,
+    isOnchain,
+    payoutSpeedsData,
+    selectedPayoutSpeedOption,
+  ])
 
   const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
@@ -491,7 +568,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
             payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
-            payoutEstimateLabel: selectedPayoutSpeedOption?.description,
+            payoutEstimateLabel: selectedPayoutSpeedOption?.speed
+              ? getPayoutSpeedDescription(selectedPayoutSpeedOption.speed)
+              : undefined,
           })
         }
       }
@@ -558,14 +637,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         walletAmount,
         DisplayCurrency,
       )
-      result[speed] = formatDisplayAndWalletAmount({ displayAmount, walletAmount })
+      result[speed] = `~ ${formatDisplayAndWalletAmount({ displayAmount, walletAmount })}`
       return result
     },
     {},
   )
 
-  const selectedLabel =
-    selectedPayoutSpeedOption?.displayName || LL.SendBitcoinScreen.selectFee()
+  const selectedLabel = selectedPayoutSpeedOption?.speed
+    ? getPayoutSpeedLabel(selectedPayoutSpeedOption.speed)
+    : LL.SendBitcoinScreen.selectFee()
 
   const selectedEstimate =
     selectedPayoutSpeedOption?.speed &&
@@ -589,7 +669,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail,
             payoutSpeedLabel: selectedPayoutSpeedOption?.displayName,
-            payoutEstimateLabel: selectedPayoutSpeedOption?.description,
+            payoutEstimateLabel: selectedPayoutSpeedOption?.speed
+              ? getPayoutSpeedDescription(selectedPayoutSpeedOption.speed)
+              : undefined,
           })
         }}
         isVisible={modalHighFeesVisible}
@@ -599,17 +681,21 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         isVisible={isPayoutSpeedModalVisible}
         toggleModal={() => setIsPayoutSpeedModalVisible(false)}
         options={
-          payoutSpeedsData?.payoutSpeeds.map(({ speed, displayName, description }) => ({
+          payoutSpeedsData?.payoutSpeeds.map(({ speed }) => ({
             speed,
-            displayName,
-            description,
+            displayName: getPayoutSpeedLabel(speed),
+            description: getPayoutSpeedDescription(speed),
           })) ?? []
         }
         estimatedFeeBySpeed={estimateLabelBySpeed}
         selectedSpeed={selectedPayoutSpeedOption?.speed}
         onSelect={(selected) => {
           setPayoutSpeed(selected.speed)
-          setSelectedPayoutSpeedOption(selected)
+          setSelectedPayoutSpeedOption({
+            speed: selected.speed,
+            displayName: getPayoutSpeedLabel(selected.speed),
+            description: getPayoutSpeedDescription(selected.speed),
+          })
           setIsPayoutSpeedModalVisible(false)
         }}
       />

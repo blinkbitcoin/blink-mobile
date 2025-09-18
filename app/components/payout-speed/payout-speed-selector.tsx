@@ -38,7 +38,7 @@ export const PayoutSpeedSelector: React.FC<PayoutSpeedSelectorProps> = ({
         </Text>
         {estimate ? (
           <Text style={styles.feeSecondary} numberOfLines={1} ellipsizeMode="tail">
-            ~ {estimate}
+            {estimate}
           </Text>
         ) : null}
       </View>

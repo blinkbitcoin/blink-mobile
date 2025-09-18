@@ -2249,7 +2249,8 @@
         "copiedSecretMessage": "Secret message copied successfully",
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
         "feeSettings": "Configuración de tarifa",
-        "selectFee": "Seleccionar tarifa"
+        "selectFee": "Seleccionar tarifa",
+        "estimatedPayoutTime": "Tiempo estimado ~ {time: string}"
     },
     "SettingsScreen": {
         "staticQr": "Código QR estático imprimible",
@@ -2702,7 +2703,19 @@
         },
         "dollar": "Dólar",
         "all": "TODAS",
-        "allAccounts": "Todas las cuentas"
+        "allAccounts": "Todas las cuentas",
+        "nextBlock": "Próximo bloque",
+        "payoutSpeed": {
+            "fast": {
+                "name": "Prioridad"
+            },
+            "medium": {
+                "name": "Estándar"
+            },
+            "slow": {
+                "name": "Económico"
+            }
+        }
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

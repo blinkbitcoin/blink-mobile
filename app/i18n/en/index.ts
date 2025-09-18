@@ -2319,6 +2319,7 @@ const en: BaseTranslation = {
     pendingDecryptionMessage: "Encrypted message. Waiting for payment confirmation.",
     feeSettings: "Fee settings",
     selectFee: "Select fee",
+    estimatedPayoutTime: "Estimated time ~ {time: string}",
   },
   SettingsScreen: {
     staticQr: "Printable Static QR Code",
@@ -2805,6 +2806,18 @@ const en: BaseTranslation = {
     dollar: "Dollar",
     all: "ALL",
     allAccounts: "All accounts",
+    nextBlock: "Next block",
+    payoutSpeed: {
+      fast: {
+        name: "Priority",
+      },
+      medium: {
+        name: "Standard",
+      },
+      slow: {
+        name: "Economy",
+      }
+    },
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

@@ -72,7 +72,7 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
 
               {estimatedFeeText ? (
                 <ListItem.Subtitle style={styles.estimateFee}>
-                  ~ {estimatedFeeText}
+                  {estimatedFeeText}
                 </ListItem.Subtitle>
               ) : null}
             </ListItem.Content>
