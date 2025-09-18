@@ -11,9 +11,10 @@ const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 
-const PayoutEstimatedTimeFastKey = "payoutEstimatedTimeFast"
 const PayoutEstimatedTimeMediumKey = "payoutEstimatedTimeMedium"
 const PayoutEstimatedTimeSlowKey = "payoutEstimatedTimeSlow"
+
+type PayoutSpeedConfig = Exclude<PayoutSpeed, "FAST">
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -25,7 +26,6 @@ type RemoteConfig = {
   [FeedbackEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
-  [PayoutEstimatedTimeFastKey]: number
   [PayoutEstimatedTimeMediumKey]: number
   [PayoutEstimatedTimeSlowKey]: number
 }
@@ -36,7 +36,6 @@ const defaultRemoteConfig: RemoteConfig = {
   feedbackEmailAddress: "feedback@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
-  payoutEstimatedTimeFast: 10,
   payoutEstimatedTimeMedium: 240,
   payoutEstimatedTimeSlow: 1440,
 }
@@ -91,10 +90,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(UpgradeModalShowAtSessionNumberKey)
           .asNumber()
 
-        const payoutEstimatedTimeFast = remoteConfigInstance()
-          .getValue(PayoutEstimatedTimeFastKey)
-          .asNumber()
-
         const payoutEstimatedTimeMedium = remoteConfigInstance()
           .getValue(PayoutEstimatedTimeMediumKey)
           .asNumber()
@@ -109,7 +104,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           feedbackEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
-          payoutEstimatedTimeFast,
           payoutEstimatedTimeMedium,
           payoutEstimatedTimeSlow,
         })
@@ -141,12 +135,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
 export const useFeatureFlags = () => useContext(FeatureFlagContext)
 export const useRemoteConfig = () => useContext(RemoteConfigContext)
-export const useEstimatedPayoutTime = (speed: PayoutSpeed) => {
-  const { payoutEstimatedTimeFast, payoutEstimatedTimeMedium, payoutEstimatedTimeSlow } =
-    useRemoteConfig()
 
-  const bySpeed: Record<PayoutSpeed, number> = {
-    FAST: payoutEstimatedTimeFast,
+export const useEstimatedPayoutTime = (speed: PayoutSpeedConfig) => {
+  const { payoutEstimatedTimeMedium, payoutEstimatedTimeSlow } = useRemoteConfig()
+
+  const bySpeed: Record<PayoutSpeedConfig, number> = {
     MEDIUM: payoutEstimatedTimeMedium,
     SLOW: payoutEstimatedTimeSlow,
   }
