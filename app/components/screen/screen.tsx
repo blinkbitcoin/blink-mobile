@@ -1,5 +1,6 @@
 import * as React from "react"
-import { KeyboardAvoidingView, StatusBar, View, SafeAreaView } from "react-native"
+import { KeyboardAvoidingView, StatusBar, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 
 import { useTheme } from "@rn-vui/themed"

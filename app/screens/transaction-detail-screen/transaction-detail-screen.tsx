@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Linking, TouchableWithoutFeedback, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import Icon from "react-native-vector-icons/Ionicons"
 
@@ -21,7 +22,6 @@ import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
-import { isIos } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -276,14 +276,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <Screen unsafe preset="fixed">
-      <View
-        style={[
-          styles.amountDetailsContainer,
-          {
-            backgroundColor: colors.grey5,
-          },
-        ]}
-      >
+      <SafeAreaView style={styles.amountDetailsContainer}>
         <View accessible={false} style={styles.closeIconContainer}>
           <GaloyIconButton
             name="close"
@@ -302,7 +295,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           <Text type="h2">{spendOrReceiveText}</Text>
           <Text type="h1">{displayAmount}</Text>
         </View>
-      </View>
+      </SafeAreaView>
 
       <ScrollView contentContainerStyle={styles.transactionDetailView}>
         {onChainTxNotBroadcasted && (
@@ -546,7 +539,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   amountDetailsContainer: {
-    paddingTop: isIos ? 36 : 0,
+    backgroundColor: colors.grey5,
   },
 
   amountView: {
