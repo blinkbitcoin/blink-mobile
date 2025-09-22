@@ -1,6 +1,6 @@
 import * as React from "react"
-import { KeyboardAvoidingView, StatusBar, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { KeyboardAvoidingView, StatusBar, View, SafeAreaView } from "react-native"
+import { SafeAreaView as SafeAreaViewContext } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 
 import { useTheme } from "@rn-vui/themed"
@@ -21,7 +21,12 @@ function ScreenWithoutScrolling(props: ScreenProps) {
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
     : { backgroundColor: colors.white }
-  const Wrapper = props.unsafe ? View : SafeAreaView
+
+  const safeView =
+    props.headerShown === undefined || props.headerShown
+      ? SafeAreaView
+      : SafeAreaViewContext
+  const Wrapper = props.unsafe ? View : safeView
 
   return (
     <KeyboardAvoidingView

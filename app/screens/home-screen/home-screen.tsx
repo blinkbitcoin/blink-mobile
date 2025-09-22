@@ -454,7 +454,7 @@ export const HomeScreen: React.FC = () => {
   )
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}

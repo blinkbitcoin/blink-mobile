@@ -81,7 +81,7 @@ export const GetStartedScreen: React.FC = () => {
     )
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
       <View style={styles.container}>
         {NonProdInstanceHint}
         <View style={styles.logoWrapper} pointerEvents="box-none">
