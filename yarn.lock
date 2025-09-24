@@ -2381,10 +2381,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@blinkbitcoin/blink-client@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.3.0.tgz#38872a6b7da406d14bd342efbf053cc8ff444bca"
-  integrity sha512-maBnRjjSgDoojA2HQD4OLh6tvR4OidUmgVKxlYUbCPweJ4w/fT3BapaexMDCpNQMkJ4sbahF3UyI3mJqP0xdbg==
+"@blinkbitcoin/blink-client@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.4.0.tgz#17cbfd4f06769c4ec04cbc3db90e9af9ea6610bb"
+  integrity sha512-KOLzr8KMOULWi1t8Xy59+MueEEynJW/Z7zooC0TxYCBJK73PCae7cjOmKu9fuSz3GPRZZnKDVtpXtIQJ3zv4sQ==
 
 "@callstack/react-theme-provider@3.0.3":
   version "3.0.3"
