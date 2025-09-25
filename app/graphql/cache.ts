@@ -64,6 +64,9 @@ export const createCache = () =>
           },
         },
       },
+      TxLastSeen: {
+        keyFields: [],
+      },
       Query: {
         fields: {
           // local only fields
@@ -99,6 +102,12 @@ export const createCache = () =>
           },
           upgradeModalLastShownAt: {
             read: (value) => value ?? null,
+          },
+          txLastSeen: {
+            read(existing) {
+              if (existing) return existing
+              return { btcId: "", usdId: "" }
+            },
           },
         },
       },
