@@ -16,6 +16,12 @@ extend type Query {
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
   deviceSessionCount: Int!
+  txLastSeen: TxLastSeen!
+}
+
+type TxLastSeen {
+  btcId: String!
+  usdId: String!
 }
 
 extend type Region {
