@@ -27,6 +27,9 @@ import {
   UpgradeModalLastShownAtQuery,
   DeviceSessionCountDocument,
   DeviceSessionCountQuery,
+  TxLastSeenDocument,
+  TxLastSeenQuery,
+  WalletCurrency,
 } from "./generated"
 
 export default gql`
@@ -43,7 +46,7 @@ export default gql`
   }
 
   query colorScheme {
-    colorScheme @client # "system" | "light" | "dark"
+    colorScheme @client
   }
 
   query countryCode {
@@ -81,6 +84,13 @@ export default gql`
 
   query deviceSessionCount {
     deviceSessionCount @client
+  }
+
+  query txLastSeen {
+    txLastSeen @client {
+      btcId
+      usdId
+    }
   }
 `
 
@@ -286,4 +296,55 @@ export const updateDeviceSessionCount = (
     })?.deviceSessionCount ?? 0
 
   return setDeviceSessionCount(client, prev + 1)
+}
+
+export const setTxLastSeen = (
+  client: ApolloClient<unknown>,
+  patch: { btcId?: string | null; usdId?: string | null },
+): { btcId: string; usdId: string } | null => {
+  try {
+    const prev = client.readQuery<TxLastSeenQuery>({ query: TxLastSeenDocument })
+
+    const data = {
+      __typename: "Query" as const,
+      txLastSeen: {
+        __typename: "TxLastSeen" as const,
+        btcId: patch.btcId === null ? "" : patch.btcId ?? prev?.txLastSeen?.btcId ?? "",
+        usdId: patch.usdId === null ? "" : patch.usdId ?? prev?.txLastSeen?.usdId ?? "",
+      },
+    }
+
+    client.writeQuery<TxLastSeenQuery>({ query: TxLastSeenDocument, data })
+    return { btcId: data.txLastSeen.btcId, usdId: data.txLastSeen.usdId }
+  } catch {
+    return null
+  }
+}
+
+export const markTxLastSeenId = (
+  client: ApolloClient<unknown>,
+  currency: WalletCurrency,
+  id: string,
+): string | null => {
+  try {
+    if (!id) return null
+
+    const prev = client.readQuery<TxLastSeenQuery>({ query: TxLastSeenDocument })
+
+    client.writeQuery<TxLastSeenQuery>({
+      query: TxLastSeenDocument,
+      data: {
+        __typename: "Query",
+        txLastSeen: {
+          __typename: "TxLastSeen",
+          btcId: currency === WalletCurrency.Btc ? id : prev?.txLastSeen?.btcId ?? "",
+          usdId: currency === WalletCurrency.Usd ? id : prev?.txLastSeen?.usdId ?? "",
+        },
+      },
+    })
+
+    return id
+  } catch {
+    return null
+  }
 }
