@@ -29,7 +29,7 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal, useUnseenTransactions } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -227,19 +227,19 @@ export const HomeScreen: React.FC = () => {
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
   const transactions = useMemo(() => {
-    const transactions: TransactionFragment[] = []
-    if (pendingIncomingTransactions) {
-      transactions.push(...pendingIncomingTransactions)
-    }
-    const settledTransactions =
+    const txs: TransactionFragment[] = []
+    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
+    const settled =
       transactionsEdges
-        ?.map((edge) => edge.node)
+        ?.map((e) => e.node)
         .filter(
           (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
         ) ?? []
-    transactions.push(...settledTransactions)
-    return transactions
+    txs.push(...settled)
+    return txs
   }, [pendingIncomingTransactions, transactionsEdges])
+
+  const { showBtc, showUsd, markSeen } = useUnseenTransactions(transactions)
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
@@ -471,6 +471,9 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           wallets={wallets}
+          showBtcNotification={showBtc}
+          showUsdNotification={showUsd}
+          onWalletPress={markSeen}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>

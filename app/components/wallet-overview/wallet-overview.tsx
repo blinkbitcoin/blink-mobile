@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useState } from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { Pressable, TouchableOpacity, View } from "react-native"
+import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
@@ -16,6 +16,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyCurrencyBubbleText } from "../atomic/galoy-currency-bubble-text"
 
@@ -56,12 +57,18 @@ type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
   wallets?: readonly WalletBalance[]
+  showBtcNotification?: boolean
+  showUsdNotification?: boolean
+  onWalletPress?: (currency: WalletCurrency) => void
 }
 
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
   wallets,
+  showBtcNotification = false,
+  showUsdNotification = false,
+  onWalletPress,
 }) => {
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
@@ -110,6 +117,9 @@ const WalletOverview: React.FC<Props> = ({
   const openTransactionHistory = (currencyFilter: WalletCurrency) =>
     wallets && navigation.navigate("transactionHistory", { wallets, currencyFilter })
 
+  const [pressedBtc, setPressedBtc] = useState(false)
+  const [pressedUsd, setPressedUsd] = useState(false)
+
   return (
     <View style={styles.container}>
       <View style={styles.myAccounts}>
@@ -120,25 +130,36 @@ const WalletOverview: React.FC<Props> = ({
           <GaloyIcon name={hideAmount ? "eye-slash" : "eye"} size={24} />
         </Pressable>
       </View>
-      <View style={[styles.separator, styles.titleSeparator]}></View>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => openTransactionHistory(WalletCurrency.Btc)}
+
+      <View style={[styles.separator, styles.titleSeparator]} />
+
+      <Pressable
+        onPressIn={() => setPressedBtc(true)}
+        onPressOut={() => setPressedBtc(false)}
+        onPress={() => {
+          onWalletPress?.(WalletCurrency.Btc)
+          openTransactionHistory(WalletCurrency.Btc)
+        }}
       >
         <View style={styles.displayTextView}>
           <View style={styles.currency}>
-            <GaloyCurrencyBubbleText
-              currency={WalletCurrency.Btc}
-              textSize="p2"
-              containerSize="medium"
-            />
+            <View style={styles.bubbleWrapper} pointerEvents="box-none">
+              <View style={pressedBtc && styles.pressedOpacity}>
+                <GaloyCurrencyBubbleText
+                  currency={WalletCurrency.Btc}
+                  textSize="p2"
+                  containerSize="medium"
+                />
+              </View>
+              <NotificationBadge visible={showBtcNotification} />
+            </View>
           </View>
           {loading ? (
             <Loader />
           ) : hideAmount ? (
             <Text>****</Text>
           ) : (
-            <View style={styles.hideableArea}>
+            <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
               <Text type="p1" bold {...testProps("bitcoin-balance")}>
                 {btcInUnderlyingCurrency}
               </Text>
@@ -146,19 +167,30 @@ const WalletOverview: React.FC<Props> = ({
             </View>
           )}
         </View>
-      </TouchableOpacity>
-      <View style={styles.separator}></View>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => openTransactionHistory(WalletCurrency.Usd)}
+      </Pressable>
+
+      <View style={styles.separator} />
+
+      <Pressable
+        onPressIn={() => setPressedUsd(true)}
+        onPressOut={() => setPressedUsd(false)}
+        onPress={() => {
+          onWalletPress?.(WalletCurrency.Usd)
+          openTransactionHistory(WalletCurrency.Usd)
+        }}
       >
         <View style={styles.displayTextView}>
           <View style={styles.currency}>
-            <GaloyCurrencyBubbleText
-              currency={WalletCurrency.Usd}
-              textSize="p2"
-              containerSize="medium"
-            />
+            <View style={styles.bubbleWrapper} pointerEvents="box-none">
+              <View style={pressedUsd && styles.pressedOpacity}>
+                <GaloyCurrencyBubbleText
+                  currency={WalletCurrency.Usd}
+                  textSize="p2"
+                  containerSize="medium"
+                />
+              </View>
+              <NotificationBadge visible={showUsdNotification} />
+            </View>
             <Pressable onPress={() => setIsStablesatModalVisible(true)}>
               <GaloyIcon color={colors.grey1} name="question" size={18} />
             </Pressable>
@@ -166,7 +198,7 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : (
-            <View style={styles.hideableArea}>
+            <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
               {!hideAmount && (
                 <>
                   {usdInUnderlyingCurrency ? (
@@ -187,7 +219,7 @@ const WalletOverview: React.FC<Props> = ({
             </View>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   )
 }
@@ -237,6 +269,9 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 10,
   },
+  bubbleWrapper: {
+    position: "relative",
+  },
   hideableArea: {
     alignItems: "flex-end",
   },
@@ -247,4 +282,5 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 45,
     marginTop: 5,
   },
+  pressedOpacity: { opacity: 0.7 },
 }))
