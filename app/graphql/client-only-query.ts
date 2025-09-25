@@ -44,7 +44,7 @@ export default gql`
   }
 
   query colorScheme {
-    colorScheme @client
+    colorScheme @client # "system" | "light" | "dark"
   }
 
   query countryCode {
