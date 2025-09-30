@@ -15,9 +15,9 @@ type NotificationProps = {
 export const NotificationBadge: React.FC<NotificationProps> = ({
   visible = false,
   text,
-  size = 18,
-  top = -6,
-  right = -8,
+  size = 12,
+  top = -5,
+  right = -4,
   style,
   maxWidth = 48,
 }) => {
