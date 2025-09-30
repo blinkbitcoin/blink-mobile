@@ -1,6 +1,10 @@
 import React from "react"
-import { View, Text as RNText, ViewStyle } from "react-native"
+import { Text as RNText, ViewStyle } from "react-native"
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { makeStyles } from "@rneui/themed"
+import { useIsFocused } from "@react-navigation/native"
+
+import { useBounceInAnimation } from "./bounce-in-animation"
 
 type NotificationProps = {
   visible?: boolean
@@ -12,6 +16,9 @@ type NotificationProps = {
   maxWidth?: number
 }
 
+const BOUNCE_DELAY = 300
+const BOUNCE_DURATION = 120
+
 export const NotificationBadge: React.FC<NotificationProps> = ({
   visible = false,
   text,
@@ -22,20 +29,35 @@ export const NotificationBadge: React.FC<NotificationProps> = ({
   maxWidth = 48,
 }) => {
   const styles = useStyles({ size, top, right, maxWidth })
-  if (!visible) return null
+  const isFocused = useIsFocused()
+  const scale = useSharedValue(1)
+  const rendered = useBounceInAnimation({
+    isFocused,
+    visible,
+    scale,
+    delay: BOUNCE_DELAY,
+    duration: BOUNCE_DURATION,
+  })
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }))
+
+  if (!rendered) return null
   const hasText = typeof text === "string" && text.trim().length > 0
 
   if (!hasText) {
-    return <View pointerEvents="none" style={[styles.dot, style]} />
+    return (
+      <Animated.View pointerEvents="none" style={[styles.dot, animatedStyle, style]} />
+    )
   }
 
   return (
-    <View pointerEvents="none" style={[styles.pill, style]}>
+    <Animated.View pointerEvents="none" style={[styles.pill, animatedStyle, style]}>
       <RNText numberOfLines={1} ellipsizeMode="tail" style={styles.pillText}>
         {text}
       </RNText>
-    </View>
+    </Animated.View>
   )
 }
 
