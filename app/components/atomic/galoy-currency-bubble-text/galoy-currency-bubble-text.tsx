@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import { useTheme, TextProps, Text, makeStyles } from "@rneui/themed"
+import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
