@@ -5,6 +5,7 @@ import {
   TxLastSeenDocument,
   TxLastSeenQuery,
   WalletCurrency,
+  TxDirection,
 } from "@app/graphql/generated"
 import { markTxLastSeenId } from "@app/graphql/client-only-query"
 
@@ -21,7 +22,9 @@ const latestId = (
   currency: WalletCurrency,
 ) =>
   transactions
-    .filter((tx) => tx.settlementCurrency === currency)
+    .filter(
+      (tx) => tx.settlementCurrency === currency && tx.direction === TxDirection.Receive,
+    )
     .reduce(
       (acc, tx) =>
         tx.createdAt > acc.createdAt ? { createdAt: tx.createdAt, id: tx.id } : acc,
