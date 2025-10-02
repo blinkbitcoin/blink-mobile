@@ -481,7 +481,10 @@ export const HomeScreen: React.FC = () => {
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
-            <View key={item.icon} style={styles.button}>
+            <View
+              key={item.icon}
+              style={[styles.button, item.icon === "qr-code" && styles.scanButton]}
+            >
               <GaloyIconButton
                 name={item.icon}
                 size="large"
@@ -590,5 +593,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+  scanButton: {
+    borderLeftWidth: 1,
+    borderLeftColor: colors.grey4,
+    paddingLeft: 10,
   },
 }))
