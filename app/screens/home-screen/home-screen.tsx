@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMemo } from "react"
-import { RefreshControl, View, Alert } from "react-native"
+import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
 import { LocalizedString } from "typesafe-i18n"
@@ -16,7 +16,7 @@ import {
 
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { icons } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
@@ -35,7 +35,7 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal, useSaveSessionProfile } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -48,6 +48,8 @@ import {
   useRealtimePriceQuery,
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
+import { useLevel } from "@app/graphql/level-context"
+import { fetchProfiles } from "@app/utils/multi-account"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
@@ -151,12 +153,17 @@ export const HomeScreen: React.FC = () => {
   const reopenUpgradeModal = React.useRef(false)
   const toggleSetDefaultAccountModal = () =>
     setSetDefaultAccountModalVisible(!setDefaultAccountModalVisible)
+  const [currentProfile, setCurrentProfile] = React.useState<ProfileProps>()
+
+  const { saveProfile } = useSaveSessionProfile()
+  const { isAtLeastLevelOne } = useLevel()
 
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
   const {
     appConfig: {
       galoyInstance: { id: galoyInstanceId },
+      token: currentToken,
     },
   } = useAppConfig()
 
@@ -453,6 +460,26 @@ export const HomeScreen: React.FC = () => {
     </Modal>
   )
 
+  React.useEffect(() => {
+    const loadProfiles = async () => {
+      let profilesList = await fetchProfiles(currentToken)
+
+      if (profilesList.length === 0) {
+        await saveProfile(currentToken)
+        profilesList = await fetchProfiles(currentToken)
+      }
+      setCurrentProfile(profilesList.find((profile) => profile.selected))
+    }
+
+    if (!loading && currentToken) {
+      loadProfiles()
+    }
+  }, [saveProfile, currentToken, loading])
+
+  const handleSwitchPress = () => {
+    navigation.navigate("profileScreen")
+  }
+
   return (
     <Screen headerShown={false}>
       {AccountCreationNeededModal}
@@ -467,20 +494,39 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
-      <View style={[styles.header, styles.container]}>
-        <GaloyIconButton
-          onPress={() => navigation.navigate("priceHistory")}
-          size={"medium"}
-          name="graph"
-          iconOnly={true}
-        />
-        <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
-        <GaloyIconButton
-          onPress={() => navigation.navigate("settings")}
-          size={"medium"}
-          name="menu"
-          iconOnly={true}
-        />
+      <View style={[styles.balanceContainer, loading ? styles.balanceLoading : null]}>
+        <View
+          style={[
+            styles.header,
+            isAtLeastLevelOne && currentProfile?.identifier
+              ? styles.headerWithProfile
+              : styles.headerCentered,
+          ]}
+        >
+          <GaloyIconButton
+            onPress={() => navigation.navigate("priceHistory")}
+            size={"medium"}
+            name="graph"
+            iconOnly={true}
+          />
+          <View style={styles.balanceHeader}>
+            {!loading && currentProfile?.identifier && (
+              <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
+                <View style={styles.profileContainer}>
+                  <Text type="p2">{currentProfile?.identifier}</Text>
+                  {isAtLeastLevelOne && <GaloyIcon name={"caret-down"} size={18} />}
+                </View>
+              </Pressable>
+            )}
+            <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
+          </View>
+          <GaloyIconButton
+            onPress={() => navigation.navigate("settings")}
+            size={"medium"}
+            name="menu"
+            iconOnly={true}
+          />
+        </View>
       </View>
       <ScrollView
         {...testProps("home-screen")}
@@ -609,16 +655,41 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: "25%",
     flexGrow: 1,
   },
+  balanceContainer: {
+    marginBottom: 30,
+    marginTop: 7,
+    display: "flex",
+    flexDirection: "row",
+  },
+  balanceLoading: {
+    marginBottom: 67,
+  },
   header: {
     flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: 6,
+  },
+  headerWithProfile: {
+    alignItems: "flex-start",
+  },
+  headerCentered: {
     alignItems: "center",
-    height: 120,
   },
   error: {
     alignSelf: "center",
     color: colors.error,
   },
-  container: {
-    marginHorizontal: 20,
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4,
+  },
+  balanceHeader: {
+    alignItems: "center",
+    flexDirection: "column",
+    gap: 6,
   },
 }))

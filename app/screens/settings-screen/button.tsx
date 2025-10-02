@@ -5,7 +5,7 @@ import { Button, Skeleton, makeStyles } from "@rn-vui/themed"
 type Props = {
   title: string
   onPress: () => void
-  variant: "warning" | "danger"
+  variant: "warning" | "danger" | "critical"
   loading?: boolean
 }
 
@@ -26,17 +26,24 @@ export const SettingsButton: React.FC<Props> = ({ title, onPress, variant, loadi
   )
 }
 
-const useStyles = makeStyles(({ colors }, variant: "warning" | "danger") => ({
-  containerStyle: {
-    height: 42,
-    borderRadius: 12,
-  },
-  buttonStyle: {
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
-  },
-  titleStyle: {
-    color: variant === "warning" ? colors.primary : colors.red,
-  },
-}))
+const useStyles = makeStyles(
+  ({ colors }, variant: "warning" | "danger" | "critical") => ({
+    containerStyle: {
+      height: 42,
+      borderRadius: 12,
+    },
+    buttonStyle: {
+      height: 42,
+      borderRadius: 12,
+      backgroundColor: variant === "critical" ? colors.red : colors.grey5,
+    },
+    titleStyle: {
+      color:
+        variant === "critical"
+          ? "white"
+          : variant === "warning"
+            ? colors.primary
+            : colors.red,
+    },
+  }),
+)

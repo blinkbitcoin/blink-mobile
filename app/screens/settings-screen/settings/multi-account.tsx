@@ -5,21 +5,16 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { SettingsRow } from "../row"
-import { useLevel } from "@app/graphql/level-context"
 
-export const AccountLevelSetting: React.FC = () => {
+export const SwitchAccountSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { currentLevel: level } = useLevel()
 
   return (
     <SettingsRow
-      title={LL.common.account()}
-      subtitle={LL.AccountScreen.level({ level })}
-      leftGaloyIcon="user"
-      action={() => {
-        navigate("accountScreen")
-      }}
+      title={LL.AccountScreen.switchAccount()}
+      leftGaloyIcon="refresh"
+      action={() => navigate("profileScreen")}
     />
   )
 }
