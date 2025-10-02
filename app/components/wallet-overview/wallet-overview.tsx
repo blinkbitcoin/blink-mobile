@@ -68,7 +68,6 @@ const WalletOverview: React.FC<Props> = ({
   wallets,
   showBtcNotification = false,
   showUsdNotification = false,
-  onWalletPress,
 }) => {
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
@@ -137,7 +136,6 @@ const WalletOverview: React.FC<Props> = ({
         onPressIn={() => setPressedBtc(true)}
         onPressOut={() => setPressedBtc(false)}
         onPress={() => {
-          onWalletPress?.(WalletCurrency.Btc)
           openTransactionHistory(WalletCurrency.Btc)
         }}
       >
@@ -175,7 +173,6 @@ const WalletOverview: React.FC<Props> = ({
         onPressIn={() => setPressedUsd(true)}
         onPressOut={() => setPressedUsd(false)}
         onPress={() => {
-          onWalletPress?.(WalletCurrency.Usd)
           openTransactionHistory(WalletCurrency.Usd)
         }}
       >

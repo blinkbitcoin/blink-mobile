@@ -6,7 +6,11 @@ import { gql } from "@apollo/client"
 import { RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
-import { useTransactionListForDefaultAccountQuery } from "@app/graphql/generated"
+import {
+  TransactionFragment,
+  useTransactionListForDefaultAccountQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -15,6 +19,7 @@ import {
   WalletValues,
 } from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useTransactionsNotification } from "@app/hooks"
 
 import { MemoizedTransactionItem } from "../../components/transaction-item"
 import { toastShow } from "../../utils/toast"
@@ -60,6 +65,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     route.params?.currencyFilter ?? "ALL",
   )
 
+  const currencyFilter: WalletCurrency | undefined = route.params?.currencyFilter
   const walletIdsByCurrency = React.useMemo(() => {
     const wallets = route.params?.wallets ?? []
     return wallets
@@ -81,17 +87,59 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     data?.me?.defaultAccount?.pendingIncomingTransactions
   const transactions = data?.me?.defaultAccount?.transactions
 
+  const settledTxs = React.useMemo(
+    () => transactions?.edges?.map((e) => e.node) ?? [],
+    [transactions],
+  )
+
+  const pendingTxs = React.useMemo<TransactionFragment[]>(
+    () => (pendingIncomingTransactions ? [...pendingIncomingTransactions] : []),
+    [pendingIncomingTransactions],
+  )
+
   const sections = React.useMemo(
     () =>
       groupTransactionsByDate({
-        pendingIncomingTxs: pendingIncomingTransactions
-          ? [...pendingIncomingTransactions]
-          : [],
-        txs: transactions?.edges?.map((edge) => edge.node) ?? [],
+        pendingIncomingTxs: pendingTxs,
+        txs: settledTxs,
         LL,
         locale,
       }),
-    [pendingIncomingTransactions, transactions, LL, locale],
+    [pendingTxs, settledTxs, LL, locale],
+  )
+
+  const allTransactions = React.useMemo(() => {
+    const transactions: TransactionFragment[] = []
+    transactions.push(...pendingTxs)
+    transactions.push(...settledTxs)
+    return transactions
+  }, [pendingTxs, settledTxs])
+
+  const { latestBtcTxId, latestUsdTxId, hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } =
+    useTransactionsNotification({ transactions: allTransactions })
+
+  const newTxId = React.useMemo(() => {
+    if (!currencyFilter) return ""
+    if (currencyFilter === WalletCurrency.Btc) return latestBtcTxId
+
+    return latestUsdTxId
+  }, [currencyFilter, latestBtcTxId, latestUsdTxId])
+
+  const hasUnseenTx = React.useMemo(() => {
+    if (!currencyFilter) return false
+    if (currencyFilter === WalletCurrency.Btc) return hasUnseenBtcTx
+
+    return hasUnseenUsdTx
+  }, [currencyFilter, hasUnseenBtcTx, hasUnseenUsdTx])
+
+  const onPressTxAction = React.useCallback(
+    (txid: string) => {
+      if (!currencyFilter) return
+      if (txid === newTxId) {
+        markTxSeen(currencyFilter)
+      }
+    },
+    [currencyFilter, newTxId, markTxSeen],
   )
 
   if (error) {
@@ -144,6 +192,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
             txid={item.id}
             subtitle
             testId={`transaction-by-index-${index}`}
+            highlight={hasUnseenTx && item.id === newTxId}
+            onPressHighlight={onPressTxAction}
           />
         )}
         renderSectionHeader={({ section: { title } }) => (

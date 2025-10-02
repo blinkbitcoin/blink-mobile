@@ -29,7 +29,11 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal, useUnseenTransactions } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useTransactionsNotification,
+} from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -233,7 +237,7 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { showBtc, showUsd, markSeen } = useUnseenTransactions(transactions)
+  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionsNotification(transactions)
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
@@ -440,8 +444,8 @@ export const HomeScreen: React.FC = () => {
           <RefreshControl
             refreshing={loading && isFocused}
             onRefresh={refetch}
-            colors={[colors.primary]} // Android refresh indicator colors
-            tintColor={colors.primary} // iOS refresh indicator color
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
       >
@@ -449,9 +453,8 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           wallets={wallets}
-          showBtcNotification={showBtc}
-          showUsdNotification={showUsd}
-          onWalletPress={markSeen}
+          showBtcNotification={hasUnseenBtcTx}
+          showUsdNotification={hasUnseenUsdTx}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
