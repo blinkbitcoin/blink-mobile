@@ -298,29 +298,6 @@ export const updateDeviceSessionCount = (
   return setDeviceSessionCount(client, prev + 1)
 }
 
-export const setTxLastSeen = (
-  client: ApolloClient<unknown>,
-  patch: { btcId?: string | null; usdId?: string | null },
-): { btcId: string; usdId: string } | null => {
-  try {
-    const prev = client.readQuery<TxLastSeenQuery>({ query: TxLastSeenDocument })
-
-    const data = {
-      __typename: "Query" as const,
-      txLastSeen: {
-        __typename: "TxLastSeen" as const,
-        btcId: patch.btcId === null ? "" : patch.btcId ?? prev?.txLastSeen?.btcId ?? "",
-        usdId: patch.usdId === null ? "" : patch.usdId ?? prev?.txLastSeen?.usdId ?? "",
-      },
-    }
-
-    client.writeQuery<TxLastSeenQuery>({ query: TxLastSeenDocument, data })
-    return { btcId: data.txLastSeen.btcId, usdId: data.txLastSeen.usdId }
-  } catch {
-    return null
-  }
-}
-
 export const markTxLastSeenId = (
   client: ApolloClient<unknown>,
   currency: WalletCurrency,
