@@ -578,7 +578,6 @@ export const ContactNavigator = () => {
         component={CirclesDashboardScreen}
         options={{
           title: LL.Circles.title(),
-          headerShown: false,
         }}
       />
     </StackContacts.Navigator>
