@@ -76,7 +76,7 @@ export const CirclesDashboardScreen: React.FC = () => {
   const Logo = mode === "dark" ? LogoDarkMode : LogoLightMode
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={

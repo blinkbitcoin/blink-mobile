@@ -61,7 +61,11 @@ function ScreenWithScrolling(props: ScreenProps) {
     : { backgroundColor: colors.white }
   const Wrapper = props.unsafe ? View : SafeAreaView
 
-  const edges: Edge[] | undefined = props.unsafe ? undefined : ["left", "right", "bottom"]
+  const edges: Edge[] | undefined = props.unsafe
+    ? undefined
+    : props.headerShown === false
+      ? ["top", "left", "right", "bottom"]
+      : ["left", "right", "bottom"]
 
   return (
     <KeyboardAvoidingView
