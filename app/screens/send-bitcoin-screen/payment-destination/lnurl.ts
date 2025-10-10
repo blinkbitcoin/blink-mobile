@@ -156,6 +156,7 @@ export const createLnurlPaymentDestination = (
       destinationSpecifiedMemo: resolvedLnurlPaymentDestination.lnurlParams.description,
       convertMoneyAmount,
       unitOfAccountAmount: toBtcMoneyAmount(minAmount),
+      isMerchant: resolvedLnurlPaymentDestination.isMerchant,
     })
   }
   return {

@@ -39,6 +39,7 @@ const defaultParamsWithoutInvoice = {
   convertMoneyAmount: convertMoneyAmountMock,
   sendingWalletDescriptor: btcSendingWalletDescriptor,
   unitOfAccountAmount: testAmount,
+  isMerchant: false,
 }
 
 const defaultParamsWithInvoice = {
