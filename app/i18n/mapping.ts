@@ -16,6 +16,7 @@ import "@formatjs/intl-relativetimeformat/locale-data/ja"
 import "@formatjs/intl-relativetimeformat/locale-data/hr"
 import "@formatjs/intl-relativetimeformat/locale-data/hu"
 import "@formatjs/intl-relativetimeformat/locale-data/hy"
+import "@formatjs/intl-relativetimeformat/locale-data/id"
 import "@formatjs/intl-relativetimeformat/locale-data/it"
 import "@formatjs/intl-relativetimeformat/locale-data/lg"
 import "@formatjs/intl-relativetimeformat/locale-data/nl"
@@ -47,6 +48,7 @@ export const LocaleToTranslateLanguageSelector = {
   hr: "Hrvatski",
   hu: "Magyar",
   hy: "Հայերեն",
+  id: "Indonesia",
   it: "Italiano",
   lg: "Luganda", // "Ganda
   nl: "Nederlands",
