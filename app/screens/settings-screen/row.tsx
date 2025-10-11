@@ -3,12 +3,14 @@ import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Icon, Text, Skeleton } from "@rn-vui/themed"
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 type Props = {
   title: string
   subtitle?: string
   subtitleShorter?: boolean
-  leftIcon: string
+  leftIcon?: string
+  leftGaloyIcon?: IconNamesType
   rightIcon?: string | null | React.ReactElement
   extraComponentBesideTitle?: React.ReactElement
   action: (() => void | Promise<void>) | null
@@ -23,6 +25,7 @@ export const SettingsRow: React.FC<Props> = ({
   subtitle,
   subtitleShorter,
   leftIcon,
+  leftGaloyIcon,
   rightIcon = "",
   action,
   rightIconAction = action,
@@ -60,7 +63,11 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          <Icon name={leftIcon} type="ionicon" />
+          {leftGaloyIcon ? (
+            <GaloyIcon name={leftGaloyIcon} size={24} />
+          ) : (
+            <Icon name={leftIcon ?? ""} type="ionicon" />
+          )}
           <View>
             <View style={styles.sidetoside}>
               <Text type="p2">{title}</Text>
