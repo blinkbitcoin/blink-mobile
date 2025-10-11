@@ -1256,7 +1256,7 @@
                             "Wow, è un obiettivo ambizioso! Sebbene sia vero che il mining richiede una notevole quantità di potenza di calcolo, sono abbastanza sicuro che lo scopo principale non sia quello di creare un esercito di signori dell'intelligenza artificiale. La prossima volta sarai più fortunato!"
                         ],
                         "question": "Qual è lo scopo principale del mining nella rete bitcoin",
-                        "text": "Quando un utente desidera inviare una transazione nella rete bitcoin, deve firmare la transazione con la propria chiave privata per dimostrare di essere il proprietario dei fondi trasferiti. Una volta firmata la transazione, viene trasmessa alla rete peer-to-peer.\n\nIl mining è il processo di aggiunta di transazioni alla blockchain bitcoin. Quando una transazione viene trasmessa alla rete, viene rilevata dai minatori, che verificano che la transazione sia valida (ad esempio, l'utente ha i fondi necessari e la chiave privata utilizzata per firmare la transazione corrisponde alla chiave pubblica associata ai fondi).\n\nUna volta verificata una transazione, viene aggiunta a un blocco di transazioni, insieme a un puzzle matematico. I minatori competono per risolvere il puzzle e il primo a risolverlo può aggiungere il blocco alla blockchain e richiedere una ricompensa in bitcoin. La ricompensa è attualmente di 6,25 bitcoin, più eventuali commissioni di transazione incluse nel blocco.\n\nOltre ad aggiungere transazioni alla blockchain, il mining serve anche a proteggere la rete bitcoin. Questo perché risolvere il puzzle richiede una notevole quantità di potenza di calcolo e aggiungere un blocco alla blockchain richiede che altri minatori verifichino la soluzione. Ciò rende molto difficile per una persona o un gruppo manipolare la blockchain.\n",
+                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
                         "title": "Mining"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "Si riduce della metà",
-                            "È raddoppiato",
-                            "Viene moltiplicato per un numero casuale scelto dal software bitcoin"
+                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+                            "It adjusts once a year based on market price",
+                            "It is randomly changed by miners through consensus"
                         ],
                         "feedback": [
-                            "Esatto! Satoshi ha determinato la riduzione della fornitura di nuovi bitcoin della metà nella primissima versione del software Bitcoin nel 2009 ed è praticamente impossibile cambiare",
-                            "Mi dispiace, ma la ricompensa del blocco non raddoppia ogni quattro anni. Devi confondere Bitcoin con le scorte di valute fiat che si espandono sempre più velocemente. Riprova",
-                            "Molto creativo, ma sbagliato. Il programma di fornitura di Bitcoin è tutt'altro che casuale. La sua prevedibilità fornisce certezza agli attori economici come non mai nella storia dell'umanità. Riprova!"
+                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
+                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
                         ],
-                        "question": "Cosa succede alla ricompensa in blocchi nella rete bitcoin ogni quattro anni",
-                        "text": "Un elemento cruciale del protocollo Bitcoin è il Difficulty Adjustment. Questo algoritmo assicura che nuovi blocchi vengano trovati in media ogni 10 minuti.\n\nQuando più minatori si uniscono alla rete, il tempo medio necessario per trovare un nuovo blocco diminuisce. Nel caso opposto, quando i minatori lasciano la rete, ci vuole più tempo per aggiungere un nuovo blocco. L'algoritmo Difficulty Adjustment regola la difficoltà del puzzle matematico per adattarla ai cambiamenti nella potenza di calcolo combinata di tutti i minatori. Ciò impedisce la creazione di più (o meno) unità bitcoin rispetto al programma di fornitura predeterminato.\n\nCiò è in netto contrasto con l'estrazione fisica di metalli preziosi come l'oro, dove l'aggiunta di più minatori d'oro porta a una maggiore fornitura di oro e quindi a una diminuzione del suo prezzo. In Bitcoin, tuttavia, l'aggiunta di nuovi minatori aggiunge solo più sicurezza alla rete.\n",
+                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
                         "title": "Regolazione della difficoltà"
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Molto creativo, ma sbagliato. Il programma di fornitura di Bitcoin è tutt'altro che casuale. La sua prevedibilità fornisce certezza agli attori economici come non mai nella storia dell'umanità. Riprova!"
                         ],
                         "question": "Cosa succede alla ricompensa in blocchi nella rete bitcoin ogni quattro anni",
-                        "text": "Un ultimo elemento importante da comprendere è che la ricompensa in blocchi nella rete bitcoin si riduce della metà ogni quattro anni, ovvero ogni 210.000 blocchi.\n\nQuesto evento, noto come \"halving\", è programmato nel software bitcoin che tutti gli utenti eseguono. Quando bitcoin è stato lanciato per la prima volta, i minatori hanno ricevuto 50 nuovi bitcoin per ogni blocco aggiunto alla blockchain. Attualmente, la ricompensa in blocchi è di 6,25 bitcoin, ma verrà ridotta a 3,125 bitcoin nel 2024, quando si verificherà il prossimo dimezzamento.\n\nQuesti dimezzamenti continueranno a verificarsi fino all'anno 2140, quando il numero totale di bitcoin estratti sarà limitato a 21 milioni. A partire dal 2023, circa il 92% di tutti i bitcoin (\\~19,3 milioni) è già stato estratto.\n\nA differenza delle valute fiat, che possono essere inflazionistiche, bitcoin è di natura disinflazionistica. Ciò lo rende più raro dei metalli preziosi e fiat come l'oro e l'argento, o di qualsiasi altra cosa conosciuta nell'universo.\n",
+                        "text": "Un ultimo elemento importante da comprendere è che la ricompensa in blocchi nella rete bitcoin si riduce della metà ogni quattro anni, ovvero ogni 210.000 blocchi.\n\nQuesto evento, noto come \"halving\", è programmato nel software bitcoin che tutti gli utenti eseguono. Quando bitcoin è stato lanciato per la prima volta, i minatori hanno ricevuto 50 nuovi bitcoin per ogni blocco aggiunto alla blockchain. Attualmente, la ricompensa in blocchi è di 3,125 bitcoin, ma verrà ridotta a 1,5625 bitcoin nel 2028, quando si verificherà il prossimo dimezzamento.\n\nQuesti dimezzamenti continueranno a verificarsi fino all'anno 2140, quando il numero totale di bitcoin estratti sarà limitato a 21 milioni. A partire dal 2023, circa il 92% di tutti i bitcoin (\\~19,3 milioni) è già stato estratto.\n\nA differenza delle valute fiat, che possono essere inflazionistiche, bitcoin è di natura disinflazionistica. Ciò lo rende più raro dei metalli preziosi e fiat come l'oro e l'argento, o di qualsiasi altra cosa conosciuta nell'universo.\n",
                         "title": "Il dimezzamento"
                     }
                 }
@@ -2173,7 +2173,7 @@
         "paymentAlreadyAttempted": "Pagamento già tentato.\n\nSe vuoi inviare di nuovo questo pagamento, ricomincia da zero.",
         "slideToConfirm": "Scorri per confermare",
         "slideConfirming": "Confermando...",
-        "copiedDestination": "Destinazione copiata negli appunti",
+        "copiedDestination": "Destinazione copiata negli apDestinazione copiata negli appuntipunti",
         "lightningRecommended": "Tariffa elevata! Consigliamo Lightning"
     },
     "SendBitcoinDestinationScreen": {
@@ -2273,7 +2273,11 @@
         "nfcOnlyReceive": "Per ora è disponibile solo la ricezione tramite NFC",
         "nfcScanNow": "Scansiona NFC ora",
         "nfcNotSupported": "NFC non è supportato su questo dispositivo",
-        "logInOrCreateAccount": "Accedi o crea un account"
+        "logInOrCreateAccount": "Accedi o crea un account",
+        "logOutFromOneAccount": "Log out from this account",
+        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
+        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
+        "logoutOneAccountConfirm": "I understand. Please log out."
     },
     "NotificationSettingsScreen": {
         "title": "Impostazioni di notifica",
@@ -2307,6 +2311,8 @@
         "tapToAddPhoneNumber": "Tocca per aggiungere il numero di telefono",
         "loginMethods": "Metodi di accesso",
         "level": "Livello {level: string}",
+        "switchAccount": "Switch Account",
+        "pleaseWait": "Please Wait.",
         "accountLevel": "Livello account",
         "upgrade": "Aggiorna il tuo account",
         "logOutAndDeleteLocalData": "Esci e cancella tutti i dati locali",
@@ -2347,6 +2353,10 @@
         "yourAccountId": "Il tuo ID account",
         "accountId": "ID account",
         "copy": "Copia"
+    },
+    "ProfileScreen": {
+        "addAccount": "Add Account",
+        "error": "Unable to fetch profiles at this time"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticazione a due fattori",
@@ -2458,13 +2468,14 @@
         "headerVerify": "Verifica di essere un umano",
         "errorRequestingCaptcha": "Si è verificato un errore durante la verifica che sei un essere umano. Riprova più tardi.",
         "errorRequestingCode": "Si è verificato un errore durante la richiesta del codice telefonico. Riprova più tardi.",
-        "errorInvalidPhoneNumber": "Numero di telefono non valido. Sei sicuro di aver inserito il numero corretto?",
+        "errorInvalidPhoneNumber": "Numero di telefono non valido. Sei sicuro di aver inserito il numero corretto?Numero di telefono non valido. Sei sicuro di aver inserito il numero corretto?",
         "errorUnsupportedCountry": "Non siamo in grado di fornire assistenza ai clienti nel tuo Paese.",
         "infoArgentina": "Per chiamare i numeri di telefono argentini è necessario aggiungere un 9 all'inizio del numero.",
         "placeholder": "Numero di telefono",
         "verify": "Clicca per verificare",
         "sms": "Invio via SMS",
-        "whatsapp": "Invia tramite WhatsApp"
+        "whatsapp": "Invia tramite WhatsApp",
+        "telegram": "Send via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Errore di accesso. Hai usato il codice corretto?",
@@ -2477,6 +2488,16 @@
         "sendAgain": "Invia di nuovo",
         "tryAgain": "Riprova",
         "sendViaOtherChannel": "Hai scelto di ricevere il codice tramite {channel: string}. Puoi provare a riceverlo tramite {other: string}"
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "After authorizing in Telegram, you will be automatically logged in",
+        "loginWithTelegram": "Log in with Telegram",
+        "waitingForAuthorization": "Waiting for authorization in Telegram...",
+        "errorFetchParams": "Failed to fetch Telegram auth params",
+        "errorFetchLogin": "Failed to fetch Telegram login",
+        "errorAuthTimeout": "Authorization timed out. Please try again.",
+        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Impostazione del telefono",
