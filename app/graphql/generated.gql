@@ -1680,6 +1680,14 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
   }
 }
 
+query txLastSeen {
+  txLastSeen @client {
+    btcId
+    usdId
+    __typename
+  }
+}
+
 query upgradeModalLastShownAt {
   upgradeModalLastShownAt @client
 }

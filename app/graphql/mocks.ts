@@ -1400,7 +1400,7 @@ const mocks = [
         ],
       },
     },
-    result: {
+    newData: () => ({
       data: {
         me: {
           __typename: "User",
@@ -1472,7 +1472,7 @@ const mocks = [
           },
         },
       },
-    },
+    }),
   },
   {
     request: {
@@ -1485,7 +1485,7 @@ const mocks = [
         ],
       },
     },
-    result: {
+    newData: () => ({
       data: {
         me: {
           __typename: "User",
@@ -1557,7 +1557,7 @@ const mocks = [
           },
         },
       },
-    },
+    }),
   },
   {
     request: {
@@ -1567,7 +1567,7 @@ const mocks = [
         walletIds: ["e821e124-1c70-4aab-9416-074ee5be21f6"],
       },
     },
-    result: {
+    newData: () => ({
       data: {
         me: {
           __typename: "User",
@@ -1627,7 +1627,7 @@ const mocks = [
           },
         },
       },
-    },
+    }),
   },
 ]
 

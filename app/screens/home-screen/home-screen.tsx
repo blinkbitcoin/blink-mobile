@@ -3,16 +3,11 @@ import { useMemo } from "react"
 import { RefreshControl, View, Alert } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
-import { LocalizedString } from "typesafe-i18n"
 import Icon from "react-native-vector-icons/Ionicons"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
-import {
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from "react-native-gesture-handler"
+import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -25,7 +20,6 @@ import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { Screen } from "@app/components/screen"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -35,7 +29,11 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useTransactionsNotification,
+} from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -227,19 +225,19 @@ export const HomeScreen: React.FC = () => {
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
   const transactions = useMemo(() => {
-    const transactions: TransactionFragment[] = []
-    if (pendingIncomingTransactions) {
-      transactions.push(...pendingIncomingTransactions)
-    }
-    const settledTransactions =
+    const txs: TransactionFragment[] = []
+    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
+    const settled =
       transactionsEdges
-        ?.map((edge) => edge.node)
+        ?.map((e) => e.node)
         .filter(
           (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
         ) ?? []
-    transactions.push(...settledTransactions)
-    return transactions
+    txs.push(...settled)
+    return txs
   }, [pendingIncomingTransactions, transactionsEdges])
+
+  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionsNotification(transactions)
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
@@ -306,11 +304,6 @@ export const HomeScreen: React.FC = () => {
         return
       }
 
-      if (target === "transactionHistory" && wallets) {
-        navigation.navigate("transactionHistory", { wallets })
-        return
-      }
-
       // we are using any because Typescript complain on the fact we are not passing any params
       // but there is no need for a params and the types should not necessitate it
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -350,45 +343,7 @@ export const HomeScreen: React.FC = () => {
     }, [openUpgradeModal, triggerUpgradeModal]),
   )
 
-  let recentTransactionsData:
-    | {
-        title: LocalizedString
-        details: React.ReactNode
-      }
-    | undefined = undefined
-
-  const TRANSACTIONS_TO_SHOW = 1
-
-  if (isAuthed && transactions.length > 0) {
-    recentTransactionsData = {
-      title: LL.TransactionScreen.title(),
-      details: (
-        <>
-          {transactions
-            .slice(0, TRANSACTIONS_TO_SHOW)
-            .map(
-              (tx, index, array) =>
-                tx && (
-                  <MemoizedTransactionItem
-                    key={`transaction-${tx.id}`}
-                    txid={tx.id}
-                    subtitle
-                    isOnHomeScreen={true}
-                    isLast={index === array.length - 1}
-                    testId={`transaction-by-index-${index}`}
-                  />
-                ),
-            )}
-        </>
-      ),
-    }
-  }
-
-  type Target =
-    | "scanningQRCode"
-    | "sendBitcoinDestination"
-    | "receiveBitcoin"
-    | "transactionHistory"
+  type Target = "scanningQRCode" | "sendBitcoinDestination" | "receiveBitcoin"
   type IconNamesType = keyof typeof icons
 
   const buttons = [
@@ -489,19 +444,25 @@ export const HomeScreen: React.FC = () => {
           <RefreshControl
             refreshing={loading && isFocused}
             onRefresh={refetch}
-            colors={[colors.primary]} // Android refresh indicator colors
-            tintColor={colors.primary} // iOS refresh indicator color
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
       >
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
+          wallets={wallets}
+          showBtcNotification={hasUnseenBtcTx}
+          showUsdNotification={hasUnseenUsdTx}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
-            <View key={item.icon} style={styles.button}>
+            <View
+              key={item.icon}
+              style={[styles.button, item.icon === "qr-code" && styles.scanButton]}
+            >
               <GaloyIconButton
                 name={item.icon}
                 size="large"
@@ -512,28 +473,6 @@ export const HomeScreen: React.FC = () => {
           ))}
         </View>
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
-        <View>
-          {recentTransactionsData && (
-            <>
-              <TouchableOpacity
-                style={styles.recentTransaction}
-                onPress={() => onMenuClick("transactionHistory")}
-                activeOpacity={0.6}
-              >
-                <Text
-                  type="p1"
-                  style={{ color: colors.primary }}
-                  bold
-                  {...testProps(recentTransactionsData.title)}
-                >
-                  {recentTransactionsData?.title}
-                </Text>
-              </TouchableOpacity>
-              {recentTransactionsData?.details}
-            </>
-          )}
-        </View>
-
         <AppUpdate />
         <SetDefaultAccountModal
           isVisible={setDefaultAccountModalVisible}
@@ -620,5 +559,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   container: {
     marginHorizontal: 20,
+  },
+  scanButton: {
+    borderLeftWidth: 1,
+    borderLeftColor: colors.grey4,
+    paddingLeft: 10,
   },
 }))
