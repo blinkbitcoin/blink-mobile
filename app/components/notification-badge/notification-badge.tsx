@@ -39,9 +39,10 @@ export const NotificationBadge: React.FC<NotificationProps> = ({
     duration: BOUNCE_DURATION,
   })
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }))
+  const animatedStyle = useAnimatedStyle(
+    () => ({ transform: [{ scale: scale.value }] }),
+    [scale],
+  )
 
   if (!rendered) return null
   const hasText = typeof text === "string" && text.trim().length > 0

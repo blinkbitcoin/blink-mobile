@@ -119,9 +119,10 @@ const TransactionItem: React.FC<Props> = ({
     delay: 300,
     duration: 120,
   })
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }))
+  const animatedStyle = useAnimatedStyle(
+    () => ({ transform: [{ scale: scale.value }] }),
+    [scale],
+  )
 
   if (!tx || Object.keys(tx).length === 0) {
     return null
