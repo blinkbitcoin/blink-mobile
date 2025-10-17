@@ -96,6 +96,16 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import {
+  BitcoinCard,
+  CardDetails,
+  WelcomeCard,
+  CardPayment,
+  LoadingCard,
+  VisaCard,
+  CreditCardLimit,
+  SelectCreditLimit,
+} from "../screens/bitcoin-card"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
@@ -471,6 +481,76 @@ export const RootStack = () => {
         component={OnboardingNavigator}
         options={{ headerShown: false }}
       />
+      <RootNavigator.Screen
+        name="bitcoinCard"
+        component={BitcoinCard}
+        options={{
+          title: LL.BitcoinCardScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardDetails"
+        component={CardDetails}
+        options={{
+          title: LL.CardDetailsScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="welcomeCard"
+        component={WelcomeCard}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardSubscribe"
+        component={CardPayment}
+        options={{
+          title: LL.CardSubscribeScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardPayment"
+        component={CardPayment}
+        options={{
+          title: LL.CardPaymentScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="loadingCard"
+        component={LoadingCard}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="loadingCardMonkey"
+        component={LoadingCard}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="visaCard"
+        component={VisaCard}
+        options={{
+          title: LL.VisaCardScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="creditCardLimit"
+        component={CreditCardLimit}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="selectCreditLimit"
+        component={SelectCreditLimit}
+        options={{
+          title: "",
+        }}
+      />
     </RootNavigator.Navigator>
   )
 }
@@ -726,6 +806,8 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomNavigatorStyle: {
+    height: "10%",
+    minHeight: 90,
     paddingTop: 4,
     backgroundColor: colors.white,
     borderTopColor: colors.grey4,
