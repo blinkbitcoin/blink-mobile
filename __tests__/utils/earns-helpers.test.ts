@@ -1,4 +1,9 @@
-import { getQuizQuestionsContent } from "@app/screens/earns-screen/earns-utils"
+import {
+  errorCodeAlertAlreadyShown,
+  getQuizQuestionsContent,
+  markErrorCodeAlertAsShown,
+  skipRewardErrorCodes,
+} from "@app/screens/earns-screen/helpers"
 
 import { i18nObject } from "../../app/i18n/i18n-util"
 import { loadLocale } from "../../app/i18n/i18n-util.sync"
@@ -2111,5 +2116,36 @@ describe("Earn utils test", () => {
     const LL = i18nObject("en")
     const quizSectionContent = getQuizQuestionsContent({ LL })
     expect(quizSectionContent).toStrictEqual(expectedEnglishQuizSections)
+  })
+
+  describe("skipRewardErrorCodes", () => {
+    it("returns true for codes in skipRewardErrorCodesList", () => {
+      expect(skipRewardErrorCodes("INVALID_INPUT")).toBe(true)
+      expect(skipRewardErrorCodes("QUIZ_CLAIMED_TOO_EARLY")).toBe(true)
+    })
+
+    it("returns false for unknown or null codes", () => {
+      expect(skipRewardErrorCodes("UNKNOWN_CODE")).toBe(false)
+      expect(skipRewardErrorCodes(null)).toBe(false)
+      expect(skipRewardErrorCodes(undefined)).toBe(false)
+    })
+  })
+
+  describe("errorCodeAlertAlreadyShown & markErrorCodeAlertAsShown", () => {
+    it("returns false if code has not been marked yet", () => {
+      expect(errorCodeAlertAlreadyShown("INVALID_INPUT")).toBe(false)
+    })
+
+    it("returns true after marking the code", () => {
+      markErrorCodeAlertAsShown("INVALID_INPUT")
+      expect(errorCodeAlertAlreadyShown("INVALID_INPUT")).toBe(true)
+    })
+
+    it("ignores null or undefined codes", () => {
+      markErrorCodeAlertAsShown(null)
+      markErrorCodeAlertAsShown(undefined)
+      expect(errorCodeAlertAlreadyShown(null)).toBe(false)
+      expect(errorCodeAlertAlreadyShown(undefined)).toBe(false)
+    })
   })
 })
