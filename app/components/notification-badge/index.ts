@@ -1,2 +1,2 @@
 export * from "./notification-badge"
-export * from "./bounce-in-animation"
+export * from "../animations/bounce-in-animation"
