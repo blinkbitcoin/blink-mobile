@@ -459,17 +459,17 @@ export const HomeScreen: React.FC = () => {
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
-            <View
-              key={item.icon}
-              style={[styles.button, item.icon === "qr-code" && styles.scanButton]}
-            >
-              <GaloyIconButton
-                name={item.icon}
-                size="large"
-                text={item.title}
-                onPress={() => onMenuClick(item.target)}
-              />
-            </View>
+            <React.Fragment key={item.icon}>
+              {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
+              <View style={styles.button}>
+                <GaloyIconButton
+                  name={item.icon}
+                  size="large"
+                  text={item.title}
+                  onPress={() => onMenuClick(item.target)}
+                />
+              </View>
+            </React.Fragment>
           ))}
         </View>
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
@@ -499,8 +499,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
+    columnGap: 12,
   },
   noTransaction: {
     alignItems: "center",
@@ -547,6 +548,7 @@ const useStyles = makeStyles(({ colors }) => ({
   button: {
     maxWidth: "25%",
     flexGrow: 1,
+    alignItems: "center",
   },
   header: {
     flexDirection: "row",
@@ -560,9 +562,9 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     marginHorizontal: 20,
   },
-  scanButton: {
-    borderLeftWidth: 1,
-    borderLeftColor: colors.grey4,
-    paddingLeft: 10,
+  actionsSeparator: {
+    width: 1,
+    alignSelf: "stretch",
+    backgroundColor: colors.grey4,
   },
 }))
