@@ -53,6 +53,8 @@ type TransactionHistoryScreenProps = {
   route: RouteProp<RootStackParamList, "transactionHistory">
 }
 
+const lastHighlightedByCurrency: Partial<Record<WalletCurrency, string>> = {}
+
 export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> = ({
   route,
 }) => {
@@ -115,8 +117,9 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return transactions
   }, [pendingTxs, settledTxs])
 
-  const { latestBtcTxId, latestUsdTxId, hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } =
-    useTransactionsNotification({ transactions: allTransactions })
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification({
+    transactions: allTransactions,
+  })
 
   const newTxId = React.useMemo(() => {
     if (!currencyFilter) return ""
@@ -125,22 +128,16 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return latestUsdTxId
   }, [currencyFilter, latestBtcTxId, latestUsdTxId])
 
-  const hasUnseenTx = React.useMemo(() => {
-    if (!currencyFilter) return false
-    if (currencyFilter === WalletCurrency.Btc) return hasUnseenBtcTx
+  const [stickyHighlightId, setStickyHighlightId] = React.useState<string | null>(null)
 
-    return hasUnseenUsdTx
-  }, [currencyFilter, hasUnseenBtcTx, hasUnseenUsdTx])
-
-  const onPressTxAction = React.useCallback(
-    (txid: string) => {
-      if (!currencyFilter) return
-      if (txid === newTxId) {
-        markTxSeen(currencyFilter)
-      }
-    },
-    [currencyFilter, newTxId, markTxSeen],
-  )
+  React.useEffect(() => {
+    if (!currencyFilter || !newTxId) return
+    if (lastHighlightedByCurrency[currencyFilter] !== newTxId) {
+      setStickyHighlightId(newTxId)
+      markTxSeen(currencyFilter)
+      lastHighlightedByCurrency[currencyFilter] = newTxId
+    }
+  }, [currencyFilter, newTxId, markTxSeen])
 
   if (error) {
     console.error(error)
@@ -192,8 +189,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
             txid={item.id}
             subtitle
             testId={`transaction-by-index-${index}`}
-            highlight={hasUnseenTx && item.id === newTxId}
-            onPressHighlight={onPressTxAction}
+            highlight={item.id === stickyHighlightId}
           />
         )}
         renderSectionHeader={({ section: { title } }) => (

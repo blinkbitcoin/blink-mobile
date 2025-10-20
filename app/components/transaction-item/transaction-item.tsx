@@ -67,7 +67,6 @@ type Props = {
   isOnHomeScreen?: boolean
   testId?: string
   highlight?: boolean
-  onPressHighlight?: (txid: string) => void
 }
 
 const TransactionItem: React.FC<Props> = ({
@@ -78,7 +77,6 @@ const TransactionItem: React.FC<Props> = ({
   isOnHomeScreen = false,
   testId = "transaction-item",
   highlight = false,
-  onPressHighlight,
 }) => {
   const styles = useStyles({
     isFirst,
@@ -173,8 +171,6 @@ const TransactionItem: React.FC<Props> = ({
         {...testProps(testId)}
         containerStyle={styles.container}
         onPress={() => {
-          if (highlight && onPressHighlight) onPressHighlight(txid)
-
           navigation.navigate("transactionDetail", {
             txid,
           })
