@@ -1,7 +1,11 @@
 import React from "react"
 import { View } from "react-native"
-
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { useNavigation, useIsFocused } from "@react-navigation/native"
+import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 import { useFragment } from "@apollo/client"
+
 import {
   TransactionFragment,
   TransactionFragmentDoc,
@@ -12,17 +16,13 @@ import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useBounceInAnimation } from "@app/components/animations"
 import { toWalletAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
-import { useNavigation, useIsFocused } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, ListItem } from "@rn-vui/themed"
-import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 
 import { IconTransaction } from "../icon-transactions"
 import { TransactionDate } from "../transaction-date"
 import { DeepPartialObject } from "./index.types"
-import { useBounceInAnimation } from "@app/components/notification-badge/bounce-in-animation"
 
 // This should extend the Transaction directly from the cache
 export const useDescriptionDisplay = ({

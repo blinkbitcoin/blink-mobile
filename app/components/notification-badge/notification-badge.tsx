@@ -4,7 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanima
 import { makeStyles } from "@rn-vui/themed"
 import { useIsFocused } from "@react-navigation/native"
 
-import { useBounceInAnimation } from "./bounce-in-animation"
+import { useBounceInAnimation } from "../animations/bounce-in-animation"
 
 type NotificationProps = {
   visible?: boolean
