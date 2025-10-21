@@ -20,6 +20,7 @@ import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
+import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
 import {
   IncomingAmountBadge,
@@ -499,6 +500,10 @@ export const HomeScreen: React.FC = () => {
           }}
         />
       </ScrollView>
+      <SlideUpHandle
+        bottomOffset={15}
+        onPullUp={() => navigation.navigate("transactionHistory")}
+      />
     </Screen>
   )
 }
