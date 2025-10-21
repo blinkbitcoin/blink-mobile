@@ -2,7 +2,6 @@ import { useMemo } from "react"
 import { useApolloClient, useQuery } from "@apollo/client"
 import {
   TransactionFragment,
-  TxDirection,
   TxLastSeenDocument,
   TxLastSeenQuery,
   WalletCurrency,
@@ -22,9 +21,7 @@ const latestTxId = (
   currency: WalletCurrency,
 ) =>
   transactions
-    .filter(
-      (tx) => tx.settlementCurrency === currency && tx.direction === TxDirection.Receive,
-    )
+    .filter((tx) => tx.settlementCurrency === currency)
     .reduce(
       (acc, tx) =>
         tx.createdAt > acc.createdAt ? { createdAt: tx.createdAt, id: tx.id } : acc,

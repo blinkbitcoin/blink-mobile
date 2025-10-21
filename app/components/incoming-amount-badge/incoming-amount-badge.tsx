@@ -18,14 +18,16 @@ type IncomingBadgeProps = {
   text: string
   visible?: boolean
   onPress?: () => void
+  outgoing?: boolean
 }
 
 export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
   text,
   visible = true,
   onPress,
+  outgoing,
 }) => {
-  const styles = useStyles()
+  const styles = useStyles({ outgoing })
   const { opacity, translateY } = useDropInAnimation({
     visible,
     delay: INCOMING_BADGE_ANIMATION.delay,
@@ -55,7 +57,7 @@ export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { outgoing }: { outgoing?: boolean }) => ({
   touch: {
     alignSelf: "center",
   },
@@ -66,7 +68,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   text: {
     fontSize: 20,
-    fontWeight: "600",
-    color: colors._green,
+    color: outgoing ? colors.grey2 : colors._green,
   },
 }))

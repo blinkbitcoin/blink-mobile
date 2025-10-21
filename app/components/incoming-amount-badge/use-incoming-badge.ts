@@ -31,10 +31,7 @@ export const useIncomingAmountBadge = ({
         : null
     if (!wantedCurrency) return
 
-    return transactions.find(
-      (t) =>
-        t.direction === TxDirection.Receive && t.settlementCurrency === wantedCurrency,
-    )
+    return transactions.find((t) => t.settlementCurrency === wantedCurrency)
   }, [transactions, hasUnseenUsdTx, hasUnseenBtcTx])
 
   const incomingAmountText = useMemo(() => {
@@ -70,8 +67,7 @@ export const useIncomingAmountBadge = ({
     const formatted = formattedFromDisplay ?? formattedFromRaw
     if (!formatted) return null
 
-    const sign = direction === TxDirection.Receive ? "+" : "-"
-    return `${sign}${formatted}`
+    return direction === TxDirection.Receive ? `+${formatted}` : formatted
   }, [latestIncomingTx, formatCurrency, formatMoneyAmount])
 
   const handleIncomingBadgePress = useCallback(() => {
@@ -84,5 +80,6 @@ export const useIncomingAmountBadge = ({
     latestIncomingTx,
     incomingAmountText,
     handleIncomingBadgePress,
+    isOutgoing: latestIncomingTx?.direction === TxDirection.Send,
   }
 }

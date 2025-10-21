@@ -255,11 +255,12 @@ export const HomeScreen: React.FC = () => {
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { incomingAmountText, handleIncomingBadgePress } = useIncomingAmountBadge({
-    transactions,
-    hasUnseenBtcTx,
-    hasUnseenUsdTx,
-  })
+  const { incomingAmountText, handleIncomingBadgePress, isOutgoing } =
+    useIncomingAmountBadge({
+      transactions,
+      hasUnseenBtcTx,
+      hasUnseenUsdTx,
+    })
 
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
@@ -474,6 +475,7 @@ export const HomeScreen: React.FC = () => {
           text={incomingAmountText ?? ""}
           visible={Boolean(incomingAmountText)}
           onPress={handleIncomingBadgePress}
+          outgoing={isOutgoing}
         />
       </View>
       <ScrollView
