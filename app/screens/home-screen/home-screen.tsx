@@ -21,6 +21,10 @@ import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { Screen } from "@app/components/screen"
+import {
+  IncomingAmountBadge,
+  useIncomingAmountBadge,
+} from "@app/components/incoming-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -250,6 +254,12 @@ export const HomeScreen: React.FC = () => {
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
+  const { incomingAmountText, handleIncomingBadgePress } = useIncomingAmountBadge({
+    transactions,
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+  })
+
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
@@ -458,7 +468,13 @@ export const HomeScreen: React.FC = () => {
           />
         </View>
       </View>
-      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
+      <View style={styles.badgeSlot}>
+        <IncomingAmountBadge
+          text={incomingAmountText ?? ""}
+          visible={Boolean(incomingAmountText)}
+          onPress={handleIncomingBadgePress}
+        />
+      </View>
       <ScrollView
         {...testProps("home-screen")}
         contentContainerStyle={styles.scrollViewContainer}
@@ -584,8 +600,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 6,
+    marginTop: 40,
   },
   error: {
     alignSelf: "center",
@@ -600,5 +615,10 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 1,
     alignSelf: "stretch",
     backgroundColor: colors.grey4,
+  },
+  badgeSlot: {
+    height: 65,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }))

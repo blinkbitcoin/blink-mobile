@@ -1,6 +1,7 @@
 export * from "./use-geetest-captcha"
 export * from "./use-save-session-profile"
 export * from "./use-price-conversion"
+export * from "./use-display-currency"
 export * from "./use-app-config"
 export * from "./use-show-upgrade-modal"
 export * from "./use-transactions-notification"
