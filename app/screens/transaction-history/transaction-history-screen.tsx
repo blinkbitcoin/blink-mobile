@@ -3,7 +3,7 @@ import { ActivityIndicator, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
-import { RouteProp } from "@react-navigation/native"
+import { RouteProp, useFocusEffect } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 import {
@@ -129,6 +129,12 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   }, [currencyFilter, latestBtcTxId, latestUsdTxId])
 
   const [stickyHighlightId, setStickyHighlightId] = React.useState<string | null>(null)
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setStickyHighlightId(null)
+    }, []),
+  )
 
   React.useEffect(() => {
     if (!currencyFilter || !newTxId) return
