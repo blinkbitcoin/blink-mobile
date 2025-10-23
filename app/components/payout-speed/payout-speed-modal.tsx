@@ -1,6 +1,6 @@
 import React from "react"
 import ReactNativeModal from "react-native-modal"
-import { ListItem, makeStyles, useTheme, Icon } from "@rneui/themed"
+import { ListItem, makeStyles, useTheme, Icon } from "@rn-vui/themed"
 
 import { PayoutSpeed } from "@app/graphql/generated"
 

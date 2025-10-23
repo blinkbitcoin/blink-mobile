@@ -1,6 +1,6 @@
 import React from "react"
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native"
-import { makeStyles, useTheme, Icon } from "@rneui/themed"
+import { makeStyles, useTheme, Icon } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 
