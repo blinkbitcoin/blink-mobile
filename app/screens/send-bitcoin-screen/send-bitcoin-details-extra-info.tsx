@@ -1,4 +1,5 @@
 import React, { useRef, useCallback, useState } from "react"
+import { View } from "react-native"
 
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -45,7 +46,11 @@ export const SendBitcoinDetailsExtraInfo = ({
   const styles = useStyles()
 
   if (errorMessage) {
-    return <GaloyErrorBox errorMessage={errorMessage} />
+    return (
+      <View style={styles.errorBoxSpacer}>
+        <GaloyErrorBox errorMessage={errorMessage} />
+      </View>
+    )
   }
 
   if (amountStatus.validAmount) {
@@ -56,13 +61,15 @@ export const SendBitcoinDetailsExtraInfo = ({
     case AmountInvalidReason.InsufficientLimit:
       return (
         <>
-          <GaloyErrorBox
-            errorMessage={LL.SendBitcoinScreen.amountExceedsLimit({
-              limit: formatMoneyAmount({
-                moneyAmount: amountStatus.remainingLimit,
-              }),
-            })}
-          />
+          <View style={styles.errorBoxSpacer}>
+            <GaloyErrorBox
+              errorMessage={LL.SendBitcoinScreen.amountExceedsLimit({
+                limit: formatMoneyAmount({
+                  moneyAmount: amountStatus.remainingLimit,
+                }),
+              })}
+            />
+          </View>
           <TrialAccountLimitsModal
             closeModal={closeModal}
             isVisible={isUpgradeAccountModalVisible}
@@ -85,11 +92,13 @@ export const SendBitcoinDetailsExtraInfo = ({
       )
     case AmountInvalidReason.InsufficientBalance:
       return (
-        <GaloyErrorBox
-          errorMessage={LL.SendBitcoinScreen.amountExceed({
-            balance: formatMoneyAmount({ moneyAmount: amountStatus.balance }),
-          })}
-        />
+        <View style={styles.errorBoxSpacer}>
+          <GaloyErrorBox
+            errorMessage={LL.SendBitcoinScreen.amountExceed({
+              balance: formatMoneyAmount({ moneyAmount: amountStatus.balance }),
+            })}
+          />
+        </View>
       )
     default:
       return null
@@ -101,6 +110,9 @@ const useStyles = makeStyles(() => {
     upgradeAccountText: {
       marginTop: 5,
       textDecorationLine: "underline",
+    },
+    errorBoxSpacer: {
+      marginBottom: 10,
     },
   }
 })
