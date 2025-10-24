@@ -63,6 +63,7 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
     const sizeStyles = {
       paddingVertical: 8,
       paddingHorizontal: 12,
+      paddingRight: 40,
       borderRadius: 8,
       minHeight: big ? 60 : 50,
       justifyContent: "center",
@@ -92,18 +93,20 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
         >
           {primaryText}
         </Text>
-        {iconName && (
-          <GaloyIcon
-            name={iconName}
-            size={20}
-            color={error ? colors.error : colors.primary}
-          />
-        )}
       </View>
       {secondaryValue && (
         <Text type="p4" color={error ? colors.error : undefined}>
           {secondaryValue}
         </Text>
+      )}
+      {iconName && (
+        <View style={styles.iconWrapper}>
+          <GaloyIcon
+            name={iconName}
+            size={20}
+            color={error ? colors.error : colors.primary}
+          />
+        </View>
       )}
     </Pressable>
   )
@@ -114,5 +117,12 @@ const useStyles = makeStyles(() => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  iconWrapper: {
+    position: "absolute",
+    right: 12,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
   },
 }))
