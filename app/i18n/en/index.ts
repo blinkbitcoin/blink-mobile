@@ -2046,9 +2046,13 @@ const en: BaseTranslation = {
     customErrorMessage: "It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.",
     customMessages: {
       claimedToEarly:{
-        title: "Daily rewards depleted",
-        message: "Try again tomorrow or click to continue to keep learning without rewards.",
-      }
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      oneSectionADay:{
+        title: "Continue without rewards?",
+        message: "You can only do one section per day while earning sats rewards.",
+      },
     },
   },
   GetStartedScreen: {

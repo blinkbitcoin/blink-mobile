@@ -6330,11 +6330,21 @@ type RootTranslation = {
 		customMessages: {
 			claimedToEarly: {
 				/**
-				 * D​a​i​l​y​ ​r​e​w​a​r​d​s​ ​d​e​p​l​e​t​e​d
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
 				 */
 				title: string
 				/**
-				 * T​r​y​ ​a​g​a​i​n​ ​t​o​m​o​r​r​o​w​ ​o​r​ ​c​l​i​c​k​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			oneSectionADay: {
+				/**
+				 * C​o​n​t​i​n​u​e​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​?
+				 */
+				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​o​n​l​y​ ​d​o​ ​o​n​e​ ​s​e​c​t​i​o​n​ ​p​e​r​ ​d​a​y​ ​w​h​i​l​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​r​e​w​a​r​d​s​.
 				 */
 				message: string
 			}
@@ -15722,11 +15732,21 @@ export type TranslationFunctions = {
 		customMessages: {
 			claimedToEarly: {
 				/**
-				 * Daily rewards depleted
+				 * Reward wallet empty
 				 */
 				title: () => LocalizedString
 				/**
-				 * Try again tomorrow or click to continue to keep learning without rewards.
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			oneSectionADay: {
+				/**
+				 * Continue without rewards?
+				 */
+				title: () => LocalizedString
+				/**
+				 * You can only do one section per day while earning sats rewards.
 				 */
 				message: () => LocalizedString
 			}
