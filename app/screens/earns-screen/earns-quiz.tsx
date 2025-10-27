@@ -481,7 +481,7 @@ export const EarnQuiz = ({ route }: Props) => {
         isVisible={showModal}
         toggleModal={closeModal}
         title={
-          quizErrorCode == "QUIZ_CLAIMED_TOO_EARLY"
+          quizErrorCode === "QUIZ_CLAIMED_TOO_EARLY"
             ? LL.EarnScreen.customMessages.claimedToEarly.title()
             : LL.EarnScreen.somethingNotRight()
         }
@@ -489,7 +489,7 @@ export const EarnQuiz = ({ route }: Props) => {
         body={
           <View style={styles.modalBody}>
             <Text style={styles.modalBodyText}>
-              {quizErrorCode == "QUIZ_CLAIMED_TOO_EARLY"
+              {quizErrorCode === "QUIZ_CLAIMED_TOO_EARLY"
                 ? LL.EarnScreen.customMessages.claimedToEarly.message()
                 : quizErrorMessage}
             </Text>
