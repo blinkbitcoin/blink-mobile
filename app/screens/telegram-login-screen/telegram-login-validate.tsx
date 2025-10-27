@@ -20,6 +20,7 @@ export const TelegramLoginScreen: React.FC<{
 
   const { loading, error, isPollingForAuth, handleTelegramLogin } = useTelegramLogin(
     route.params.phone,
+    route.params.onboarding,
   )
 
   // Map useTelegramLogin errors
