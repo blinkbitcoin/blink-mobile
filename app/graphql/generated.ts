@@ -1777,6 +1777,7 @@ export type Query = {
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
   readonly region?: Maybe<Region>;
+  readonly txLastSeen: TxLastSeen;
   readonly upgradeModalLastShownAt?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be migrated to AccountDefaultWalletId */
   readonly userDefaultWalletId: Scalars['WalletId']['output'];
@@ -2110,6 +2111,12 @@ export const TxDirection = {
 } as const;
 
 export type TxDirection = typeof TxDirection[keyof typeof TxDirection];
+export type TxLastSeen = {
+  readonly __typename: 'TxLastSeen';
+  readonly btcId: Scalars['String']['output'];
+  readonly usdId: Scalars['String']['output'];
+};
+
 export const TxNotificationType = {
   IntraLedgerPayment: 'IntraLedgerPayment',
   IntraLedgerReceipt: 'IntraLedgerReceipt',
@@ -2667,6 +2674,11 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
+
+export type TxLastSeenQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TxLastSeenQuery = { readonly __typename: 'Query', readonly txLastSeen: { readonly __typename: 'TxLastSeen', readonly btcId: string, readonly usdId: string } };
 
 export type TransactionFragment = { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } };
 
@@ -4169,6 +4181,46 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const TxLastSeenDocument = gql`
+    query txLastSeen {
+  txLastSeen @client {
+    btcId
+    usdId
+  }
+}
+    `;
+
+/**
+ * __useTxLastSeenQuery__
+ *
+ * To run a query within a React component, call `useTxLastSeenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTxLastSeenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTxLastSeenQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTxLastSeenQuery(baseOptions?: Apollo.QueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+      }
+export function useTxLastSeenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export function useTxLastSeenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export type TxLastSeenQueryHookResult = ReturnType<typeof useTxLastSeenQuery>;
+export type TxLastSeenLazyQueryHookResult = ReturnType<typeof useTxLastSeenLazyQuery>;
+export type TxLastSeenSuspenseQueryHookResult = ReturnType<typeof useTxLastSeenSuspenseQuery>;
+export type TxLastSeenQueryResult = Apollo.QueryResult<TxLastSeenQuery, TxLastSeenQueryVariables>;
 export const NetworkDocument = gql`
     query network {
   globals {
@@ -8518,6 +8570,7 @@ export type ResolversTypes = {
   TransactionEdge: ResolverTypeWrapper<TransactionEdge>;
   TxDirection: TxDirection;
   TxExternalId: ResolverTypeWrapper<Scalars['TxExternalId']['output']>;
+  TxLastSeen: ResolverTypeWrapper<TxLastSeen>;
   TxNotificationType: TxNotificationType;
   TxStatus: TxStatus;
   UpgradePayload: ResolverTypeWrapper<UpgradePayload>;
@@ -8751,6 +8804,7 @@ export type ResolversParentTypes = {
   TransactionConnection: TransactionConnection;
   TransactionEdge: TransactionEdge;
   TxExternalId: Scalars['TxExternalId']['output'];
+  TxLastSeen: TxLastSeen;
   UpgradePayload: UpgradePayload;
   UsdWallet: UsdWallet;
   User: User;
@@ -9576,6 +9630,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
+  txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;
@@ -9784,6 +9839,12 @@ export type TransactionEdgeResolvers<ContextType = any, ParentType extends Resol
 export interface TxExternalIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['TxExternalId'], any> {
   name: 'TxExternalId';
 }
+
+export type TxLastSeenResolvers<ContextType = any, ParentType extends ResolversParentTypes['TxLastSeen'] = ResolversParentTypes['TxLastSeen']> = {
+  btcId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  usdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type UpgradePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpgradePayload'] = ResolversParentTypes['UpgradePayload']> = {
   authToken?: Resolver<Maybe<ResolversTypes['AuthToken']>, ParentType, ContextType>;
@@ -10090,6 +10151,7 @@ export type Resolvers<ContextType = any> = {
   TransactionConnection?: TransactionConnectionResolvers<ContextType>;
   TransactionEdge?: TransactionEdgeResolvers<ContextType>;
   TxExternalId?: GraphQLScalarType;
+  TxLastSeen?: TxLastSeenResolvers<ContextType>;
   UpgradePayload?: UpgradePayloadResolvers<ContextType>;
   UsdWallet?: UsdWalletResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

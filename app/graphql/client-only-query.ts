@@ -27,6 +27,9 @@ import {
   UpgradeModalLastShownAtQuery,
   DeviceSessionCountDocument,
   DeviceSessionCountQuery,
+  TxLastSeenDocument,
+  TxLastSeenQuery,
+  WalletCurrency,
 } from "./generated"
 
 export default gql`
@@ -81,6 +84,13 @@ export default gql`
 
   query deviceSessionCount {
     deviceSessionCount @client
+  }
+
+  query txLastSeen {
+    txLastSeen @client {
+      btcId
+      usdId
+    }
   }
 `
 
@@ -286,4 +296,32 @@ export const updateDeviceSessionCount = (
     })?.deviceSessionCount ?? 0
 
   return setDeviceSessionCount(client, prev + 1)
+}
+
+export const markTxLastSeenId = (
+  client: ApolloClient<unknown>,
+  currency: WalletCurrency,
+  id: string,
+): string | null => {
+  try {
+    if (!id) return null
+
+    const prev = client.readQuery<TxLastSeenQuery>({ query: TxLastSeenDocument })
+
+    client.writeQuery<TxLastSeenQuery>({
+      query: TxLastSeenDocument,
+      data: {
+        __typename: "Query",
+        txLastSeen: {
+          __typename: "TxLastSeen",
+          btcId: currency === WalletCurrency.Btc ? id : prev?.txLastSeen?.btcId ?? "",
+          usdId: currency === WalletCurrency.Usd ? id : prev?.txLastSeen?.usdId ?? "",
+        },
+      },
+    })
+
+    return id
+  } catch {
+    return null
+  }
 }
