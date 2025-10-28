@@ -31,12 +31,11 @@ import { usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useEstimatedPayoutTime } from "@app/config/feature-flags-context"
-import { useExpirationTimeLabel } from "@app/components/expiration-time-chooser"
 import {
   PayoutSpeedSelector,
   PayoutSpeedModal,
   PayoutSpeedOption,
+  usePayoutSpeedText,
 } from "@app/components/payout-speed"
 import {
   DisplayCurrency,
@@ -126,8 +125,6 @@ gql`
 type Props = {
   route: RouteProp<RootStackParamList, "sendBitcoinDetails">
 }
-
-const DEFAULT_FAST_PAYOUT_MINUTES = 10
 
 const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const {
@@ -246,54 +243,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const mediumPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Medium)
-  const slowPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Slow)
-
-  const getExpirationTimeLabel = useExpirationTimeLabel(LL)
-
-  const getPayoutSpeedDescription = React.useCallback(
-    (speed: PayoutSpeed): string => {
-      switch (speed) {
-        case PayoutSpeed.Fast:
-          return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: `${DEFAULT_FAST_PAYOUT_MINUTES} ${LL.common.minutes()} (${LL.common.nextBlock()})`,
-          })
-        case PayoutSpeed.Medium:
-          return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: getExpirationTimeLabel({
-              minutes: mediumPayoutTime,
-            }),
-          })
-        case PayoutSpeed.Slow:
-          return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: getExpirationTimeLabel({
-              minutes: slowPayoutTime,
-            }),
-          })
-      }
-    },
-    [
-      LL.SendBitcoinScreen,
-      LL.common,
-      getExpirationTimeLabel,
-      mediumPayoutTime,
-      slowPayoutTime,
-    ],
-  )
-
-  const getPayoutSpeedLabel = React.useCallback(
-    (speed: PayoutSpeed) => {
-      switch (speed) {
-        case PayoutSpeed.Fast:
-          return LL.common.payoutSpeed.fast.name()
-        case PayoutSpeed.Medium:
-          return LL.common.payoutSpeed.medium.name()
-        case PayoutSpeed.Slow:
-          return LL.common.payoutSpeed.slow.name()
-      }
-    },
-    [LL.common.payoutSpeed],
-  )
+  const { getPayoutSpeedDescription, getPayoutSpeedName } = usePayoutSpeedText(LL)
 
   useEffect(() => {
     if (!isOnchain || selectedPayoutSpeedOption || !payoutSpeedsData?.payoutSpeeds) {
@@ -307,14 +257,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
     const option: PayoutSpeedOption = {
       speed: priority.speed,
-      displayName: getPayoutSpeedLabel(priority.speed),
+      displayName: getPayoutSpeedName(priority.speed),
       description: getPayoutSpeedDescription(priority.speed),
     }
     setSelectedPayoutSpeedOption(option)
     setPayoutSpeed(priority.speed)
   }, [
     getPayoutSpeedDescription,
-    getPayoutSpeedLabel,
+    getPayoutSpeedName,
     isOnchain,
     payoutSpeedsData,
     selectedPayoutSpeedOption,
@@ -625,10 +575,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     {},
   )
 
-  const selectedLabel = selectedPayoutSpeedOption?.speed
-    ? getPayoutSpeedLabel(selectedPayoutSpeedOption.speed)
-    : LL.SendBitcoinScreen.selectFee()
-
   const selectedEstimate =
     selectedPayoutSpeedOption?.speed &&
     estimateLabelBySpeed[selectedPayoutSpeedOption.speed]
@@ -665,7 +611,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         options={
           payoutSpeedsData?.payoutSpeeds.map(({ speed }) => ({
             speed,
-            displayName: getPayoutSpeedLabel(speed),
+            displayName: getPayoutSpeedName(speed),
             description: getPayoutSpeedDescription(speed),
           })) ?? []
         }
@@ -675,7 +621,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           setPayoutSpeed(selected.speed)
           setSelectedPayoutSpeedOption({
             speed: selected.speed,
-            displayName: getPayoutSpeedLabel(selected.speed),
+            displayName: getPayoutSpeedName(selected.speed),
             description: getPayoutSpeedDescription(selected.speed),
           })
           setIsPayoutSpeedModalVisible(false)
@@ -791,7 +737,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               {LL.SendBitcoinScreen.feeSettings()}
             </Text>
             <PayoutSpeedSelector
-              label={selectedLabel}
+              label={getPayoutSpeedName(selectedPayoutSpeedOption?.speed)}
               estimate={selectedEstimate}
               loading={payoutSpeedsLoading || feeEstimates.status === "loading"}
               readOnly={feeEstimates.status === "error"}

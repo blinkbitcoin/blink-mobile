@@ -64,17 +64,17 @@ export const PayoutSpeedModal: React.FC<PayoutSpeedModalProps> = ({
                 {option.displayName}
               </ListItem.Title>
 
-              {option.description ? (
+              {option.description && (
                 <ListItem.Subtitle style={styles.listItemSubtitle}>
                   {option.description}
                 </ListItem.Subtitle>
-              ) : null}
+              )}
 
-              {estimatedFeeText ? (
+              {estimatedFeeText && (
                 <ListItem.Subtitle style={styles.estimateFee}>
                   {estimatedFeeText}
                 </ListItem.Subtitle>
-              ) : null}
+              )}
             </ListItem.Content>
           </ListItem>
         )

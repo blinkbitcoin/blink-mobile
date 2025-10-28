@@ -140,8 +140,8 @@ export const useEstimatedPayoutTime = (speed: PayoutSpeedConfig) => {
   const { payoutEstimatedTimeMedium, payoutEstimatedTimeSlow } = useRemoteConfig()
 
   const bySpeed: Record<PayoutSpeedConfig, number> = {
-    MEDIUM: payoutEstimatedTimeMedium,
-    SLOW: payoutEstimatedTimeSlow,
+    [PayoutSpeed.Medium]: payoutEstimatedTimeMedium,
+    [PayoutSpeed.Slow]: payoutEstimatedTimeSlow,
   }
 
   return bySpeed[speed]
