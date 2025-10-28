@@ -282,7 +282,8 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
 }
 
 const extractApolloErrorMessage = (error?: ApolloError): string | undefined => {
-  if (!error) return undefined
+  if (!error) return
+
   const gqlMsg = error.graphQLErrors && error.graphQLErrors[0]?.message
   return gqlMsg || error.message
 }
