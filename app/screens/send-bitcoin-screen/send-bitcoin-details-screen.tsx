@@ -31,6 +31,8 @@ import { usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useEstimatedPayoutTime } from "@app/config/feature-flags-context"
+import { useExpirationTimeLabel } from "@app/components/expiration-time-chooser"
 import {
   PayoutSpeedSelector,
   PayoutSpeedModal,
@@ -60,7 +62,6 @@ import { isValidAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 import { useOnChainPayoutQueueFeeEstimates } from "./use-fee"
-import { useEstimatedPayoutTime } from "@app/config/feature-flags-context"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -125,6 +126,8 @@ gql`
 type Props = {
   route: RouteProp<RootStackParamList, "sendBitcoinDetails">
 }
+
+const DEFAULT_FAST_PAYOUT_MINUTES = 10
 
 const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const {
@@ -246,45 +249,24 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const mediumPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Medium)
   const slowPayoutTime = useEstimatedPayoutTime(PayoutSpeed.Slow)
 
-  const getExpirationTimeFormat = React.useCallback(
-    (timeIn: { minutes?: number }) => {
-      const minutes = timeIn.minutes ?? 0
-      if (minutes === 0) return ""
-
-      const unidades = [
-        { umbral: 1440, singular: LL.common.day.one(), plural: LL.common.day.other() },
-        { umbral: 60, singular: LL.common.hour(), plural: LL.common.hours() },
-        { umbral: 1, singular: LL.common.minute(), plural: LL.common.minutes() },
-      ]
-
-      for (const unidad of unidades) {
-        if (minutes >= unidad.umbral) {
-          const cantidad = Math.floor(minutes / unidad.umbral)
-          return `${cantidad} ${cantidad === 1 ? unidad.singular : unidad.plural}`
-        }
-      }
-
-      return `${minutes} ${LL.common.minutes()}`
-    },
-    [LL.common],
-  )
+  const getExpirationTimeLabel = useExpirationTimeLabel(LL)
 
   const getPayoutSpeedDescription = React.useCallback(
     (speed: PayoutSpeed): string => {
       switch (speed) {
         case PayoutSpeed.Fast:
           return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: `${10} ${LL.common.minutes()} (${LL.common.nextBlock()})`,
+            time: `${DEFAULT_FAST_PAYOUT_MINUTES} ${LL.common.minutes()} (${LL.common.nextBlock()})`,
           })
         case PayoutSpeed.Medium:
           return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: getExpirationTimeFormat({
+            time: getExpirationTimeLabel({
               minutes: mediumPayoutTime,
             }),
           })
         case PayoutSpeed.Slow:
           return LL.SendBitcoinScreen.estimatedPayoutTime({
-            time: getExpirationTimeFormat({
+            time: getExpirationTimeLabel({
               minutes: slowPayoutTime,
             }),
           })
@@ -293,7 +275,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     [
       LL.SendBitcoinScreen,
       LL.common,
-      getExpirationTimeFormat,
+      getExpirationTimeLabel,
       mediumPayoutTime,
       slowPayoutTime,
     ],

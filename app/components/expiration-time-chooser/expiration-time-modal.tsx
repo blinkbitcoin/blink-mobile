@@ -1,13 +1,14 @@
 import * as React from "react"
 import { SafeAreaView, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
-
-import { timing } from "@app/rne-theme/timing"
-import { ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
-import { GaloyIconButton } from "../atomic/galoy-icon-button"
+import { ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { timing } from "@app/rne-theme/timing"
+
+import { GaloyIconButton } from "../atomic/galoy-icon-button"
 
 export type ExpirationTimeModalProps = {
   value?: string | number
