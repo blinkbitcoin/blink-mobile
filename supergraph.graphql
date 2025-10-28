@@ -1309,7 +1309,6 @@ type Mutation
   callbackEndpointDelete(input: CallbackEndpointDeleteInput!): SuccessPayload! @join__field(graph: BLINK)
   captchaCreateChallenge: CaptchaCreateChallengePayload! @join__field(graph: BLINK)
   captchaRequestAuthCode(input: CaptchaRequestAuthCodeInput!): SuccessPayload! @join__field(graph: BLINK)
-  contactCreate(input: ContactCreateInput!): ContactPayload! @join__field(graph: BLINK)
   deviceNotificationTokenCreate(input: DeviceNotificationTokenCreateInput!): SuccessPayload! @join__field(graph: BLINK)
   feedbackSubmit(input: FeedbackSubmitInput!): SuccessPayload! @join__field(graph: BLINK)
 
@@ -1428,7 +1427,6 @@ type Mutation
   userEmailRegistrationValidate(input: UserEmailRegistrationValidateInput!): UserEmailRegistrationValidatePayload! @join__field(graph: BLINK)
   userLogin(input: UserLoginInput!): AuthTokenPayload! @join__field(graph: BLINK)
   userLoginUpgrade(input: UserLoginUpgradeInput!): UpgradePayload! @join__field(graph: BLINK)
-  userLoginUpgradeTelegram(input: UserLoginUpgradeTelegramInput!): UpgradePayload! @join__field(graph: BLINK)
   userLogout(input: UserLogoutInput): SuccessPayload! @join__field(graph: BLINK)
   userPhoneDelete: UserPhoneDeletePayload! @join__field(graph: BLINK)
   userPhoneRegistrationInitiate(input: UserPhoneRegistrationInitiateInput!): SuccessPayload! @join__field(graph: BLINK)
@@ -1836,6 +1834,9 @@ type Query
   onChainTxFee(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainTxFee! @join__field(graph: BLINK)
   onChainUsdTxFee(address: OnChainAddress!, amount: CentAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
   onChainUsdTxFeeAsBtcDenominated(address: OnChainAddress!, amount: SatAmount!, speed: PayoutSpeed! = FAST, walletId: WalletId!): OnChainUsdTxFee! @join__field(graph: BLINK)
+
+  """Returns the list of available speeds for on-chain payments"""
+  payoutSpeeds: [PayoutSpeeds!]! @join__field(graph: BLINK)
 
   """Returns the list of available speeds for on-chain payments"""
   payoutSpeeds: [PayoutSpeeds!]! @join__field(graph: BLINK)

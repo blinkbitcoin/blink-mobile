@@ -1,12 +1,13 @@
 import * as React from "react"
+import { StyleProp, ViewStyle } from "react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
 import { ExpirationTimeButton } from "./expiration-time-button"
 import { ExpirationTimeModal } from "./expiration-time-modal"
-import { StyleProp, ViewStyle } from "react-native"
-import { WalletCurrency } from "@app/graphql/generated"
+import { useExpirationTimeLabel } from "./expiration-time-format"
 
 export type ExpirationTimeInputProps = {
   expirationTime: number
@@ -27,9 +28,10 @@ export const ExpirationTimeChooser: React.FC<ExpirationTimeInputProps> = ({
 }) => {
   const [openModal, setOpenModal] = React.useState(false)
   const { LL } = useI18nContext()
+  const getExpirationTimeLabel = useExpirationTimeLabel(LL)
 
-  const onSetExpirationTime = (expirationTime: number) => {
-    setExpirationTime && setExpirationTime(expirationTime)
+  const onSetExpirationTime = (next: number) => {
+    setExpirationTime && setExpirationTime(next)
     setOpenModal(false)
   }
 
@@ -45,26 +47,6 @@ export const ExpirationTimeChooser: React.FC<ExpirationTimeInputProps> = ({
     )
   }
 
-  const getExpirationTimeFormat = (timeIn: { minutes?: number }) => {
-    const minutes = timeIn.minutes ?? 0
-    if (minutes === 0) return null
-
-    const unidades = [
-      { umbral: 1440, singular: LL.common.day.one(), plural: LL.common.day.other() },
-      { umbral: 60, singular: LL.common.hour(), plural: LL.common.hours() },
-      { umbral: 1, singular: LL.common.minute(), plural: LL.common.minutes() },
-    ]
-
-    for (const unidad of unidades) {
-      if (minutes >= unidad.umbral) {
-        const cantidad = Math.floor(minutes / unidad.umbral)
-        return `${cantidad} ${cantidad === 1 ? unidad.singular : unidad.plural}`
-      }
-    }
-
-    return `${minutes} ${LL.common.minutes()}`
-  }
-
   const onPressInputButton = () => {
     if (disabled) return
     setOpenModal(true)
@@ -74,7 +56,7 @@ export const ExpirationTimeChooser: React.FC<ExpirationTimeInputProps> = ({
     <ExpirationTimeButton
       placeholder={LL.common.expirationTime()}
       onPress={onPressInputButton}
-      value={getExpirationTimeFormat({ minutes: expirationTime })}
+      value={getExpirationTimeLabel({ minutes: expirationTime })}
       disabled={disabled}
       iconName="pencil"
       primaryTextTestProps={"Expiration time input button"}

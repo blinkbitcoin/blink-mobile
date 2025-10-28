@@ -7,7 +7,7 @@ import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 export type ExpirationTimeButtonProps = {
   placeholder?: string
-  value: string | number | null
+  value?: string | number
   iconName?: "pencil" | "info"
   error?: boolean
   disabled?: boolean

@@ -1,14 +1,20 @@
 import React, { useState, createContext, useContext, useEffect } from "react"
+import remoteConfigInstance from "@react-native-firebase/remote-config"
 
 import { useLevel } from "@app/graphql/level-context"
-import { useAppConfig } from "@app/hooks/use-app-config"
-import remoteConfigInstance from "@react-native-firebase/remote-config"
+import { PayoutSpeed } from "@app/graphql/generated"
+import { useAppConfig } from "@app/hooks"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
 const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
+
+const PayoutEstimatedTimeMediumKey = "payoutEstimatedTimeMedium"
+const PayoutEstimatedTimeSlowKey = "payoutEstimatedTimeSlow"
+
+type PayoutSpeedConfig = Exclude<PayoutSpeed, "FAST">
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -20,6 +26,8 @@ type RemoteConfig = {
   [FeedbackEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
+  [PayoutEstimatedTimeMediumKey]: number
+  [PayoutEstimatedTimeSlowKey]: number
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -28,6 +36,8 @@ const defaultRemoteConfig: RemoteConfig = {
   feedbackEmailAddress: "feedback@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
+  payoutEstimatedTimeMedium: 240,
+  payoutEstimatedTimeSlow: 1440,
 }
 
 const defaultFeatureFlags = {
@@ -80,12 +90,22 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(UpgradeModalShowAtSessionNumberKey)
           .asNumber()
 
+        const payoutEstimatedTimeMedium = remoteConfigInstance()
+          .getValue(PayoutEstimatedTimeMediumKey)
+          .asNumber()
+
+        const payoutEstimatedTimeSlow = remoteConfigInstance()
+          .getValue(PayoutEstimatedTimeSlowKey)
+          .asNumber()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
           feedbackEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
+          payoutEstimatedTimeMedium,
+          payoutEstimatedTimeSlow,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
@@ -115,3 +135,14 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
 export const useFeatureFlags = () => useContext(FeatureFlagContext)
 export const useRemoteConfig = () => useContext(RemoteConfigContext)
+
+export const useEstimatedPayoutTime = (speed: PayoutSpeedConfig) => {
+  const { payoutEstimatedTimeMedium, payoutEstimatedTimeSlow } = useRemoteConfig()
+
+  const bySpeed: Record<PayoutSpeedConfig, number> = {
+    [PayoutSpeed.Medium]: payoutEstimatedTimeMedium,
+    [PayoutSpeed.Slow]: payoutEstimatedTimeSlow,
+  }
+
+  return bySpeed[speed]
+}

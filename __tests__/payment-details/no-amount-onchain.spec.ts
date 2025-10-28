@@ -1,4 +1,4 @@
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/onchain"
 
 import {
@@ -75,6 +75,7 @@ describe("no amount lightning payment details", () => {
         variables: {
           address: defaultParams.address,
           amount: settlementAmount.amount,
+          speed: PayoutSpeed.Fast,
           walletId: btcSendingWalletParams.sendingWalletDescriptor.id,
         },
       })
@@ -97,6 +98,7 @@ describe("no amount lightning payment details", () => {
           input: {
             address: defaultParams.address,
             amount: settlementAmount.amount,
+            speed: PayoutSpeed.Fast,
             walletId: btcSendingWalletParams.sendingWalletDescriptor.id,
           },
         },
@@ -132,6 +134,7 @@ describe("no amount lightning payment details", () => {
         variables: {
           address: defaultParams.address,
           amount: settlementAmount.amount,
+          speed: PayoutSpeed.Fast,
           walletId: usdSendingWalletParams.sendingWalletDescriptor.id,
         },
       })
@@ -154,6 +157,7 @@ describe("no amount lightning payment details", () => {
           input: {
             address: defaultParams.address,
             amount: settlementAmount.amount,
+            speed: PayoutSpeed.Fast,
             walletId: usdSendingWalletParams.sendingWalletDescriptor.id,
           },
         },
