@@ -37,7 +37,6 @@ gql`
         code
       }
       success
-      authToken
     }
   }
 `
@@ -121,6 +120,7 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
       if (authToken) {
         saveProfile(authToken)
       }
+
       if (onboarding) {
         navigation.replace("onboarding", {
           screen: "welcomeLevel1",
@@ -139,18 +139,11 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
         variables: { input: { phone, nonce } },
       })
       const success = data?.userLoginUpgradeTelegram?.success
-      const authToken = data?.userLoginUpgradeTelegram?.authToken
-      if (!success) {
-        const msg =
-          data?.userLoginUpgradeTelegram?.errors?.[0]?.message ||
-          ErrorType.FetchLoginError
-        clearPolling()
-        setError(msg)
-        return null
-      }
-      setHasLoggedInTrue()
-      clearPolling()
-      return authToken
+      if (success) return success
+
+      const message =
+        data?.userLoginUpgradeTelegram?.errors?.[0]?.message || ErrorType.FetchLoginError
+      throw new Error(message)
     },
     [userLoginUpgradeTelegramMutation, phone],
   )
@@ -161,10 +154,12 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
 
       try {
         if (isUpgradeFlow) {
-          const authToken = await upgradeLoginWithTelegram(nonce)
-          if (!authToken) return
+          const success = await upgradeLoginWithTelegram(nonce)
+          if (!success) return
 
-          navigateAfterAuth(authToken)
+          setHasLoggedInTrue()
+          clearPolling()
+          navigateAfterAuth()
           return
         }
 
@@ -183,7 +178,7 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
         navigateAfterAuth(result.authToken)
       } catch (e) {
         const message = (e as Error).message
-        if (message.includes("Authorization data from Telegram is still pending.")) return
+        if (message.includes("Authorization data from Telegram is still pending")) return
 
         clearPolling()
         setError(message)

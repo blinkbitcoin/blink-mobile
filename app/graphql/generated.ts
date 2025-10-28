@@ -3218,7 +3218,7 @@ export type UserLoginUpgradeTelegramMutationVariables = Exact<{
 }>;
 
 
-export type UserLoginUpgradeTelegramMutation = { readonly __typename: 'Mutation', readonly userLoginUpgradeTelegram: { readonly __typename: 'UpgradePayload', readonly success: boolean, readonly authToken?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
+export type UserLoginUpgradeTelegramMutation = { readonly __typename: 'Mutation', readonly userLoginUpgradeTelegram: { readonly __typename: 'UpgradePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type TotpRegistrationScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7941,7 +7941,6 @@ export const UserLoginUpgradeTelegramDocument = gql`
       code
     }
     success
-    authToken
   }
 }
     `;

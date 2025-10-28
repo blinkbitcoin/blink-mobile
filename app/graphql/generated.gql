@@ -670,7 +670,6 @@ mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
       __typename
     }
     success
-    authToken
     __typename
   }
 }
