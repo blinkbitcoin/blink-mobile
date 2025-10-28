@@ -150,7 +150,7 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
       }
       setHasLoggedInTrue()
       clearPolling()
-      return authToken ?? null
+      return authToken
     },
     [userLoginUpgradeTelegramMutation, phone],
   )
@@ -162,7 +162,7 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
       try {
         if (isUpgradeFlow) {
           const authToken = await upgradeLoginWithTelegram(nonce)
-          if (authToken === null) return
+          if (!authToken) return
 
           navigateAfterAuth(authToken)
           return
