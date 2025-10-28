@@ -1428,6 +1428,7 @@ type Mutation
   userEmailRegistrationValidate(input: UserEmailRegistrationValidateInput!): UserEmailRegistrationValidatePayload! @join__field(graph: BLINK)
   userLogin(input: UserLoginInput!): AuthTokenPayload! @join__field(graph: BLINK)
   userLoginUpgrade(input: UserLoginUpgradeInput!): UpgradePayload! @join__field(graph: BLINK)
+  userLoginUpgradeTelegram(input: UserLoginUpgradeTelegramInput!): UpgradePayload! @join__field(graph: BLINK)
   userLogout(input: UserLogoutInput): SuccessPayload! @join__field(graph: BLINK)
   userPhoneDelete: UserPhoneDeletePayload! @join__field(graph: BLINK)
   userPhoneRegistrationInitiate(input: UserPhoneRegistrationInitiateInput!): SuccessPayload! @join__field(graph: BLINK)
@@ -2071,6 +2072,10 @@ enum SupportRole
   USER @join__enumValue(graph: BLINK)
 }
 
+"""Nonce provided by Telegram Passport to validate the login/upgrade flow"""
+scalar TelegramPassportNonce
+  @join__type(graph: BLINK)
+
 """
 Timestamp field, serialized as Unix time (the number of seconds since the Unix epoch)
 """
@@ -2394,6 +2399,13 @@ input UserLoginUpgradeInput
   @join__type(graph: BLINK)
 {
   code: OneTimeAuthCode!
+  phone: Phone!
+}
+
+input UserLoginUpgradeTelegramInput
+  @join__type(graph: BLINK)
+{
+  nonce: TelegramPassportNonce!
   phone: Phone!
 }
 
