@@ -2251,7 +2251,7 @@
         "copiedSecretMessage": "Secret message copied successfully",
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
         "destinationScreenTitle": "Enviar a",
-        "orBySMS": "O Por Número De Teléfono",
+        "orBySMS": "O Número De Teléfono",
         "orSaved": "O Guardado"
     },
     "SettingsScreen": {
