@@ -169,7 +169,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const activeInputRef = useRef<TInputType>("search")
 
   const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("null")
-  const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true) // to no update de country code just while we tiping
+  const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
   const [defaultPhoneInputInfo, setDefaultPhoneInputInfo] =
     useState<PhoneInputInfo | null>(null)
 
@@ -217,20 +217,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
 
   const [selectedId, setSelectedId] = useState("")
 
-  const handleSelection = (id: string) => {
-    if (selectedId === id) setSelectedId("")
-    else setSelectedId(id)
-  }
-
-  const reset = useCallback(() => {
-    dispatchDestinationStateAction({
-      type: "set-unparsed-destination",
-      payload: { unparsedDestination: "" },
-    })
-    setGoToNextScreenWhenValid(false)
-    setSelectedId("")
-    updateMatchingContacts("")
-  }, [allContacts])
+  const handleSelection = useCallback((id: string) => {
+    setSelectedId((currentId) => (currentId === id ? "" : id))
+  }, [])
 
   let ListEmptyContent: React.ReactNode
 
@@ -272,10 +261,20 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       const matching = matchCheck(newSearchText, allContacts, activeInputRef.current)
       setMatchingContacts(matching)
     },
-    [allContacts, activeInputRef.current],
+    [allContacts],
   )
 
-  const willInitiateValidation = React.useCallback(() => {
+  const reset = useCallback(() => {
+    dispatchDestinationStateAction({
+      type: "set-unparsed-destination",
+      payload: { unparsedDestination: "" },
+    })
+    setGoToNextScreenWhenValid(false)
+    setSelectedId("")
+    updateMatchingContacts("")
+  }, [updateMatchingContacts])
+
+  const willInitiateValidation = useCallback(() => {
     if (!bitcoinNetwork || !wallets || !contacts) {
       return false
     }
@@ -287,14 +286,33 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     return true
   }, [bitcoinNetwork, wallets, contacts])
 
-  const validateDestination = React.useCallback(
+  const parseValidPhone = useCallback(
+    (input: string) => {
+      if (!defaultPhoneInputInfo) return null
+      try {
+        const parsed = parsePhoneNumber(
+          input,
+          defaultPhoneInputInfo.countryCode as CountryCode,
+        )
+        if (parsed && parsed.isValid()) {
+          return parsed
+        }
+      } catch {
+        return null
+      }
+      return null
+    },
+    [defaultPhoneInputInfo],
+  )
+
+  const validateDestination = useCallback(
     async (rawInput: string) => {
       // extra check for typescript even though these were checked in willInitiateValidation
       if (!bitcoinNetwork || !wallets || !contacts) {
         return
       }
 
-      const isValidPhone = useParseValidPhone(rawInput)
+      const isValidPhone = parseValidPhone(rawInput)
 
       if (activeInputRef.current === "phone") {
         if (!isValidPhone?.isValid()) {
@@ -386,7 +404,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       bitcoinNetwork,
       wallets,
       contacts,
-      defaultPhoneInputInfo,
+      parseValidPhone,
     ],
   )
 
@@ -401,32 +419,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     [dispatchDestinationStateAction, setGoToNextScreenWhenValid],
   )
 
-  const useParseValidPhone = useCallback(
-    (input: string) => {
-      if (!defaultPhoneInputInfo) return null
-      try {
-        const parsed = parsePhoneNumber(
-          input,
-          defaultPhoneInputInfo.countryCode as CountryCode,
-        )
-        if (parsed && parsed.isValid()) {
-          return parsed
-        }
-      } catch {
-        return null
-      }
-      return null
-    },
-    [defaultPhoneInputInfo],
-  )
-
   useEffect(() => {
     const filteredContacts = matchCheck("", allContacts, activeInputRef.current)
     setMatchingContacts(filteredContacts)
-  }, [allContacts, activeInputRef.current])
+  }, [allContacts])
 
   useEffect(() => {
-    if (destinationState.destinationState == DestinationState.Entering) {
+    if (destinationState.destinationState === DestinationState.Entering) {
       setSelectedId("")
     }
     if (
@@ -439,7 +438,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     if (
       destinationState?.destination?.destinationDirection === DestinationDirection.Send
     ) {
-      // go to send bitcoin details screen
       setGoToNextScreenWhenValid(false)
       navigation.navigate("sendBitcoinDetails", {
         paymentDestination: destinationState.destination,
@@ -450,7 +448,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     if (
       destinationState?.destination?.destinationDirection === DestinationDirection.Receive
     ) {
-      // go to redeem bitcoin screen
       setGoToNextScreenWhenValid(false)
       navigation.navigate("redeemBitcoinDetail", {
         receiveDestination: destinationState.destination,
@@ -459,14 +456,14 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   }, [destinationState, goToNextScreenWhenValid, navigation, setGoToNextScreenWhenValid])
 
   // setTimeout here allows for the main JS thread to update the UI before the long validateDestination call
-  const waitAndValidateDestination = React.useCallback(
+  const waitAndValidateDestination = useCallback(
     (input: string) => {
       setTimeout(() => validateDestination(input), 0)
     },
     [validateDestination],
   )
 
-  const initiateGoToNextScreen = React.useCallback(
+  const initiateGoToNextScreen = useCallback(
     async (input: string) => {
       if (willInitiateValidation()) {
         setGoToNextScreenWhenValid(true)
@@ -476,10 +473,19 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     [willInitiateValidation, waitAndValidateDestination],
   )
 
+  const onFocusedInput = useCallback(
+    (inputType: TInputType) => {
+      if (activeInputRef.current === inputType) return
+      activeInputRef.current = inputType
+      reset()
+    },
+    [reset],
+  )
+
   useEffect(() => {
     if (route.params?.payment) {
       const text = route.params?.payment
-      const isPhoneNumberValid = useParseValidPhone(text)
+      const isPhoneNumberValid = parseValidPhone(text)
       if (isPhoneNumberValid && isPhoneNumberValid?.isValid()) {
         onFocusedInput("phone")
         setRawPhoneNumber(isPhoneNumberValid.number)
@@ -489,14 +495,20 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       handleChangeText(route.params?.payment)
       initiateGoToNextScreen(route.params?.payment)
     }
-  }, [route.params?.payment, initiateGoToNextScreen, handleChangeText])
+  }, [
+    route.params?.payment,
+    initiateGoToNextScreen,
+    handleChangeText,
+    onFocusedInput,
+    parseValidPhone,
+  ])
 
   useEffect(() => {
     // If we scan a QR code encoded with a payment url for a specific user e.g. https://{domain}/{username}
     // then we want to detect the username as the destination
     if (route.params?.username) {
       const text = route.params?.username
-      const isPhoneNumberValid = useParseValidPhone(text)
+      const isPhoneNumberValid = parseValidPhone(text)
       if (isPhoneNumberValid && isPhoneNumberValid?.isValid()) {
         onFocusedInput("phone")
         setRawPhoneNumber(isPhoneNumberValid.number)
@@ -505,20 +517,30 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       onFocusedInput("search")
       handleChangeText(route.params?.username)
     }
-  }, [route.params?.username, handleChangeText])
+  }, [route.params?.username, handleChangeText, onFocusedInput, parseValidPhone])
+
+  const handleScanPress = useCallback(() => {
+    setSelectedId("")
+    navigation.setParams({ scanPressed: undefined })
+    dispatchDestinationStateAction({
+      type: SendBitcoinActions.SetUnparsedDestination,
+      payload: { unparsedDestination: "" },
+    })
+    navigation.navigate("scanningQRCode")
+  }, [navigation])
 
   useEffect(() => {
     if (route.params?.scanPressed) {
       handleScanPress()
     }
-  }, [route.params?.scanPressed])
+  }, [route.params?.scanPressed, handleScanPress])
 
   useEffect(() => {
     if (!defaultPhoneInputInfo) return
     if (activeInputRef.current === "search") return
     if (
-      destinationState.destinationState == DestinationState.Validating ||
-      destinationState.destinationState == DestinationState.Pasting
+      destinationState.destinationState === DestinationState.Validating ||
+      destinationState.destinationState === DestinationState.Pasting
     )
       return
 
@@ -527,18 +549,23 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
 
     handleChangeText(rawInput)
     updateMatchingContacts(rawPhoneNumber)
-  }, [defaultPhoneInputInfo])
+  }, [
+    defaultPhoneInputInfo,
+    destinationState.destinationState,
+    handleChangeText,
+    updateMatchingContacts,
+  ])
 
   // Clear countryCallingCode from input value after pasting or selecting one
   useEffect(() => {
     if (!rawPhoneNumber) return
     if (activeInputRef.current === "search") return
     if (
-      destinationState.destinationState == DestinationState.Validating ||
-      destinationState.destinationState == DestinationState.Pasting ||
-      destinationState.destinationState == DestinationState.Entering
+      destinationState.destinationState === DestinationState.Validating ||
+      destinationState.destinationState === DestinationState.Pasting ||
+      destinationState.destinationState === DestinationState.Entering
     ) {
-      const parse = useParseValidPhone(rawPhoneNumber)
+      const parse = parseValidPhone(rawPhoneNumber)
       if (
         parse &&
         parse?.isValid() &&
@@ -551,10 +578,15 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         setRawPhoneNumber(phoneNumberWithoutArea)
       }
     }
-  }, [rawPhoneNumber, defaultPhoneInputInfo])
+  }, [
+    rawPhoneNumber,
+    defaultPhoneInputInfo,
+    destinationState.destinationState,
+    parseValidPhone,
+  ])
 
-  const handlePaste = async () => {
-    if (destinationState.destinationState == DestinationState.Validating) return
+  const handlePaste = useCallback(async () => {
+    if (destinationState.destinationState === DestinationState.Validating) return
     onFocusedInput("search")
     try {
       const clipboard = await Clipboard.getString()
@@ -579,10 +611,17 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         LL,
       })
     }
-  }
+  }, [
+    destinationState.destinationState,
+    onFocusedInput,
+    updateMatchingContacts,
+    willInitiateValidation,
+    waitAndValidateDestination,
+    LL,
+  ])
 
-  const handlePastePhone = async () => {
-    if (destinationState.destinationState == DestinationState.Validating) return
+  const handlePastePhone = useCallback(async () => {
+    if (destinationState.destinationState === DestinationState.Validating) return
     onFocusedInput("phone")
     setKeepCountryCode(false)
 
@@ -590,7 +629,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       const clipboard = await Clipboard.getString()
 
       let parsed = null
-      parsed = useParseValidPhone(clipboard)
+      parsed = parseValidPhone(clipboard)
       const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
 
       updateMatchingContacts(parseNumber)
@@ -619,68 +658,71 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         LL,
       })
     }
-  }
+  }, [
+    destinationState.destinationState,
+    onFocusedInput,
+    parseValidPhone,
+    updateMatchingContacts,
+    willInitiateValidation,
+    waitAndValidateDestination,
+    LL,
+  ])
 
-  const handleContactPress = async (item: UserContact) => {
-    if (destinationState.destinationState == DestinationState.Validating) return
-    const handle = item?.handle?.trim() ?? ""
-    const displayHandle =
-      handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
-    const parsePhone = useParseValidPhone(displayHandle)
+  const handleContactPress = useCallback(
+    async (item: UserContact) => {
+      if (destinationState.destinationState === DestinationState.Validating) return
+      const handle = item?.handle?.trim() ?? ""
+      const displayHandle =
+        handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
+      const parsePhone = parseValidPhone(displayHandle)
 
-    if (parsePhone?.isValid() && activeInputRef.current == "search") {
-      onFocusedInput("phone")
-    }
-    updateMatchingContacts(handle)
-    handleSelection(item.id)
+      if (parsePhone?.isValid() && activeInputRef.current === "search") {
+        onFocusedInput("phone")
+      }
+      updateMatchingContacts(handle)
+      handleSelection(item.id)
 
-    if (activeInputRef.current == "phone") {
-      setKeepCountryCode(false)
-      const international = parsePhone?.number
+      if (activeInputRef.current === "phone") {
+        setKeepCountryCode(false)
+        const international = parsePhone?.number
+        dispatchDestinationStateAction({
+          type: SendBitcoinActions.SetUnparsedDestination,
+          payload: { unparsedDestination: international || displayHandle },
+        })
+        initiateGoToNextScreen(international || displayHandle)
+
+        setRawPhoneNumber(international || displayHandle)
+
+        setTimeout(() => {
+          setKeepCountryCode(true)
+        }, 100)
+        return
+      }
+
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetUnparsedDestination,
-        payload: { unparsedDestination: international || displayHandle },
+        payload: { unparsedDestination: displayHandle },
       })
-      initiateGoToNextScreen(international || displayHandle)
+      initiateGoToNextScreen(displayHandle)
+    },
+    [
+      destinationState.destinationState,
+      lnAddressHostname,
+      parseValidPhone,
+      onFocusedInput,
+      updateMatchingContacts,
+      handleSelection,
+      initiateGoToNextScreen,
+    ],
+  )
 
-      setRawPhoneNumber(international || displayHandle)
-
-      setTimeout(() => {
-        setKeepCountryCode(true)
-      }, 100)
-      return
-    }
-
-    dispatchDestinationStateAction({
-      type: SendBitcoinActions.SetUnparsedDestination,
-      payload: { unparsedDestination: displayHandle },
-    })
-    initiateGoToNextScreen(displayHandle)
-  }
-
-  const handleScanPress = () => {
-    setSelectedId("")
-    navigation.setParams({ scanPressed: undefined })
-    dispatchDestinationStateAction({
-      type: SendBitcoinActions.SetUnparsedDestination,
-      payload: { unparsedDestination: "" },
-    })
-    navigation.navigate("scanningQRCode")
-  }
-
-  const resetInput = () => {
+  const resetInput = useCallback(() => {
     reset()
     setDefaultPhoneInputInfo(null)
     setRawPhoneNumber("")
-  }
+  }, [reset])
 
-  const onFocusedInput = (inputType: TInputType) => {
-    if (activeInputRef.current === inputType) return
-    activeInputRef.current = inputType
-    resetInput()
-  }
-
-  const inputContainerStyle = React.useMemo(() => {
+  const inputContainerStyle = useMemo(() => {
     switch (destinationState.destinationState) {
       case DestinationState.Validating:
         return styles.enteringInputContainer
@@ -781,7 +823,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         <PhoneInput
           key={1}
           rightIcon={
-            rawPhoneNumber && activeInputRef.current == "phone" ? (
+            rawPhoneNumber && activeInputRef.current === "phone" ? (
               <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
             ) : (
               <TouchableOpacity
@@ -882,7 +924,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
               destinationState.destinationState === DestinationState.Invalid ||
               destinationState.destinationState === DestinationState.PhoneInvalid ||
               !destinationState.unparsedDestination ||
-              (activeInputRef.current == "phone" && rawPhoneNumber == "")
+              (activeInputRef.current === "phone" && rawPhoneNumber === "")
             }
             onPress={() => initiateGoToNextScreen(destinationState.unparsedDestination)}
           />

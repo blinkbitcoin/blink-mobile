@@ -75,7 +75,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     return {
       allSupportedCountries,
     }
-  }, [data?.globals, detectedCountryCode])
+  }, [data?.globals])
 
   // setting default country code from IP
   useEffect(() => {
@@ -92,7 +92,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         setCountryCode(parsedPhoneNumber.country)
       }
     }
-  }, [value, countryCode])
+  }, [value, countryCode, keepCountryCode])
 
   const handleCountrySelect = (country: { cca2: string }) => {
     setCountryCode(country.cca2 as PhoneNumberCountryCode)

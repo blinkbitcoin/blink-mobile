@@ -186,7 +186,7 @@ export const RootStack = () => {
           headerRight: () => (
             <TouchableOpacity
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
-              style={{ marginRight: 20 }}
+              style={styles.SendBitcoinScreenScanIcon}
             >
               <ScanIcon fill={colors.black} />
             </TouchableOpacity>
@@ -747,5 +747,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     color: colors.black,
+  },
+  SendBitcoinScreenScanIcon: {
+    marginRight: 20,
   },
 }))
