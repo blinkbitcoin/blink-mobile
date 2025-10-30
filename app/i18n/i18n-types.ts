@@ -8835,6 +8835,10 @@ type RootTranslation = {
 		 * A​l​l​ ​a​c​c​o​u​n​t​s
 		 */
 		allAccounts: string
+		/**
+		 * V​a​l​i​d​ ​t​h​r​u
+		 */
+		validThru: string
 	}
 	errors: {
 		/**
@@ -9394,6 +9398,228 @@ type RootTranslation = {
 		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​r​e​s​e​t​t​i​n​g​ ​t​h​e​ ​c​h​a​t
 		 */
 		errorResettingChat: string
+	}
+	BitcoinCardScreen: {
+		/**
+		 * B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+		 */
+		title: string
+		cardInfo: {
+			/**
+			 * T​h​e​ ​B​i​t​c​o​i​n​ ​C​r​e​d​i​t​ ​C​a​r​d
+			 */
+			bitcoinCard: string
+			/**
+			 * f​o​r
+			 */
+			'for': string
+			/**
+			 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t
+			 */
+			maximalist: string
+		}
+		/**
+		 * N​i​c​e
+		 */
+		buttonText: string
+	}
+	CardDetailsScreen: {
+		/**
+		 * A​d​d​i​t​i​o​n​a​l​ ​P​e​r​k​s
+		 */
+		title: string
+		features: {
+			/**
+			 * P​e​r​s​o​n​a​l​ ​A​c​c​o​u​n​t​ ​M​a​n​a​g​e​r
+			 */
+			accountManager: string
+			/**
+			 * 5​0​%​ ​B​a​c​k​ ​O​n​ ​L​i​g​h​t​n​i​n​g​ ​F​e​e​s
+			 */
+			lightningTransactions: string
+			/**
+			 * 5​0​%​ ​B​a​c​k​ ​O​n​ ​O​n​c​h​a​i​n​ ​F​e​e​s
+			 */
+			onchainDeposits: string
+			/**
+			 * $​1​0​0​ ​t​o​ ​C​i​r​c​u​l​a​r​ ​E​c​o​n​o​m​i​e​s
+			 */
+			circularEconomies: string
+			/**
+			 * $​1​,​0​0​0​ ​C​r​e​d​i​t​ ​L​i​m​i​t
+			 */
+			creditLimit: string
+		}
+		/**
+		 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+		 */
+		andMore: string
+		/**
+		 * C​o​o​l
+		 */
+		buttonText: string
+	}
+	CardWelcomeScreen: {
+		welcomeMessage: {
+			/**
+			 * W​e​l​c​o​m​e​ ​O​n​b​o​a​r​d​!
+			 */
+			title: string
+			/**
+			 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+			 */
+			subtitle: string
+			paragraphs: {
+				/**
+				 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​h​u​m​a​n​ ​a​n​d​ ​B​i​t​c​o​i​n​e​r​.
+				 */
+				body1: string
+				/**
+				 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​a​n​d​ ​g​o​o​d​ ​v​i​b​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * L​e​t​'​s​ ​G​o​!
+		 */
+		buttonText: string
+	}
+	CardSubscribeScreen: {
+		/**
+		 * S​u​b​s​c​r​i​b​e
+		 */
+		title: string
+		/**
+		 * A​c​c​e​p​t​ ​&​ ​C​o​n​t​i​n​u​e
+		 */
+		acceptButton: string
+	}
+	CardPaymentScreen: {
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		title: string
+		/**
+		 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+		 */
+		cardTitle: string
+		/**
+		 * p​e​r​ ​y​e​a​r
+		 */
+		perYear: string
+		status: {
+			/**
+			 * S​t​a​t​u​s
+			 */
+			label: string
+			/**
+			 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
+			 */
+			paymentPending: string
+		}
+		renewalDate: {
+			/**
+			 * R​e​n​e​w​a​l​ ​D​a​t​e
+			 */
+			label: string
+		}
+		agreement: {
+			/**
+			 * I​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
+			 */
+			text: string
+			/**
+			 * T​e​r​m​s​ ​o​f​ ​S​e​r​v​i​c​e
+			 */
+			termsOfService: string
+			/**
+			 * P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+			 */
+			privacyPolicy: string
+			/**
+			 * C​a​r​d​h​o​l​d​e​r​ ​A​g​r​e​e​m​e​n​t
+			 */
+			cardholderAgreement: string
+			/**
+			 * a​n​d
+			 */
+			and: string
+		}
+		/**
+		 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​t​h​a​t​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​1​ ​y​e​a​r
+		 */
+		renew: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​&​ ​P​a​y
+		 */
+		acceptButton: string
+	}
+	LoadinCardScreen: {
+		/**
+		 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
+		 */
+		title: string
+		/**
+		 * W​e​'​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​'​s​ ​h​e​r​e
+		 */
+		subtitle: string
+		/**
+		 * .​.​.​c​o​d​i​n​g​ ​t​h​e​ ​b​a​c​k​e​n​d
+		 */
+		codingBackend: string
+		/**
+		 * N​i​c​e
+		 */
+		buttonText: string
+	}
+	VisaCardScreen: {
+		/**
+		 * V​i​s​a​ ​C​a​r​d
+		 */
+		title: string
+		/**
+		 * C​o​n​g​r​a​t​u​l​a​t​i​o​n​s​!
+		 */
+		cardTitle: string
+		/**
+		 * Y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
+		 */
+		cardSubTitle: string
+		/**
+		 * A​d​d​ ​t​o
+		 */
+		VisaButtonText: string
+		/**
+		 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+		 */
+		buttonText: string
+	}
+	CardCreditLimit: {
+		welcomeMessage: {
+			/**
+			 * I​n​c​r​e​a​s​e​ ​y​o​u​r​ ​c​a​r​d​ ​c​r​e​d​i​t​ ​l​i​m​i​t
+			 */
+			title: string
+			paragraphs: {
+				/**
+				 * Y​o​u​ ​h​a​v​e​ ​p​a​i​d​ ​$​1​,​0​0​0​ ​f​o​r​ ​y​o​u​r​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​h​i​c​h​ ​c​o​m​e​s​ ​w​i​t​h​ ​a​ ​$​1​,​0​0​0​ ​c​a​r​d​ ​c​r​e​d​i​t​ ​l​i​m​i​t​.​ ​I​f​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​t​h​e​ ​c​r​e​d​i​t​ ​l​i​m​i​t​ ​a​b​o​v​e​ ​$​1​,​0​0​0​ ​y​o​u​ ​c​a​n​ ​p​a​r​t​i​c​i​p​a​t​e​ ​i​n​ ​t​h​e​ ​B​l​i​n​k​ ​c​r​o​w​d​f​u​n​d​i​n​g​ ​r​o​u​n​d​.
+				 */
+				body1: string
+				/**
+				 * Y​o​u​r​ ​c​r​e​d​i​t​ ​l​i​m​i​t​ ​w​i​l​l​ ​i​n​c​r​e​a​s​e​ ​w​i​t​h​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​ ​i​n​v​e​s​t​ ​a​n​d​ ​w​i​l​l​ ​c​a​r​r​y​ ​f​o​r​w​a​r​d​ ​f​o​r​ ​a​s​ ​l​o​n​g​ ​a​s​ ​y​o​u​ ​c​o​n​t​i​n​u​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * S​e​l​e​c​t​ ​D​e​s​i​r​e​d​ ​C​r​e​d​i​t​ ​L​i​m​i​t
+		 */
+		desiredCreditLimit: string
+		/**
+		 * I​n​c​r​e​a​s​e
+		 */
+		buttonText: string
 	}
 }
 
@@ -18127,6 +18353,10 @@ export type TranslationFunctions = {
 		 * All accounts
 		 */
 		allAccounts: () => LocalizedString
+		/**
+		 * Valid thru
+		 */
+		validThru: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -18666,6 +18896,228 @@ export type TranslationFunctions = {
 		 * An error occurred while resetting the chat
 		 */
 		errorResettingChat: () => LocalizedString
+	}
+	BitcoinCardScreen: {
+		/**
+		 * Blink Visa Card
+		 */
+		title: () => LocalizedString
+		cardInfo: {
+			/**
+			 * The Bitcoin Credit Card
+			 */
+			bitcoinCard: () => LocalizedString
+			/**
+			 * for
+			 */
+			'for': () => LocalizedString
+			/**
+			 * Bitcoin Maximalist
+			 */
+			maximalist: () => LocalizedString
+		}
+		/**
+		 * Nice
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardDetailsScreen: {
+		/**
+		 * Additional Perks
+		 */
+		title: () => LocalizedString
+		features: {
+			/**
+			 * Personal Account Manager
+			 */
+			accountManager: () => LocalizedString
+			/**
+			 * 50% Back On Lightning Fees
+			 */
+			lightningTransactions: () => LocalizedString
+			/**
+			 * 50% Back On Onchain Fees
+			 */
+			onchainDeposits: () => LocalizedString
+			/**
+			 * $100 to Circular Economies
+			 */
+			circularEconomies: () => LocalizedString
+			/**
+			 * $1,000 Credit Limit
+			 */
+			creditLimit: () => LocalizedString
+		}
+		/**
+		 * ... and more coming in 2026
+		 */
+		andMore: () => LocalizedString
+		/**
+		 * Cool
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardWelcomeScreen: {
+		welcomeMessage: {
+			/**
+			 * Welcome Onboard!
+			 */
+			title: () => LocalizedString
+			/**
+			 * To Blink Private
+			 */
+			subtitle: () => LocalizedString
+			paragraphs: {
+				/**
+				 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome human and Bitcoiner.
+				 */
+				body1: () => LocalizedString
+				/**
+				 * Our goal for 2026 is to stuff the program with so much goodies and good vibes that it will be obvious to renew next year.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * Let's Go!
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardSubscribeScreen: {
+		/**
+		 * Subscribe
+		 */
+		title: () => LocalizedString
+		/**
+		 * Accept & Continue
+		 */
+		acceptButton: () => LocalizedString
+	}
+	CardPaymentScreen: {
+		/**
+		 * Payment
+		 */
+		title: () => LocalizedString
+		/**
+		 * Blink Private
+		 */
+		cardTitle: () => LocalizedString
+		/**
+		 * per year
+		 */
+		perYear: () => LocalizedString
+		status: {
+			/**
+			 * Status
+			 */
+			label: () => LocalizedString
+			/**
+			 * Payment Pending
+			 */
+			paymentPending: () => LocalizedString
+		}
+		renewalDate: {
+			/**
+			 * Renewal Date
+			 */
+			label: () => LocalizedString
+		}
+		agreement: {
+			/**
+			 * I agree to the
+			 */
+			text: () => LocalizedString
+			/**
+			 * Terms of Service
+			 */
+			termsOfService: () => LocalizedString
+			/**
+			 * Privacy Policy
+			 */
+			privacyPolicy: () => LocalizedString
+			/**
+			 * Cardholder Agreement
+			 */
+			cardholderAgreement: () => LocalizedString
+			/**
+			 * and
+			 */
+			and: () => LocalizedString
+		}
+		/**
+		 * I understand that my subscription will automatically renew in 1 year
+		 */
+		renew: () => LocalizedString
+		/**
+		 * Continue & Pay
+		 */
+		acceptButton: () => LocalizedString
+	}
+	LoadinCardScreen: {
+		/**
+		 * We're working on your card
+		 */
+		title: () => LocalizedString
+		/**
+		 * We'll notify you once it's here
+		 */
+		subtitle: () => LocalizedString
+		/**
+		 * ...coding the backend
+		 */
+		codingBackend: () => LocalizedString
+		/**
+		 * Nice
+		 */
+		buttonText: () => LocalizedString
+	}
+	VisaCardScreen: {
+		/**
+		 * Visa Card
+		 */
+		title: () => LocalizedString
+		/**
+		 * Congratulations!
+		 */
+		cardTitle: () => LocalizedString
+		/**
+		 * Your Blink Visa Card has been activated.
+		 */
+		cardSubTitle: () => LocalizedString
+		/**
+		 * Add to
+		 */
+		VisaButtonText: () => LocalizedString
+		/**
+		 * Order physical card
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardCreditLimit: {
+		welcomeMessage: {
+			/**
+			 * Increase your card credit limit
+			 */
+			title: () => LocalizedString
+			paragraphs: {
+				/**
+				 * You have paid $1,000 for your Blink Private subscription which comes with a $1,000 card credit limit. If you wish to increase the credit limit above $1,000 you can participate in the Blink crowdfunding round.
+				 */
+				body1: () => LocalizedString
+				/**
+				 * Your credit limit will increase with the amount you invest and will carry forward for as long as you continue your Blink Private subscription.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * Select Desired Credit Limit
+		 */
+		desiredCreditLimit: () => LocalizedString
+		/**
+		 * Increase
+		 */
+		buttonText: () => LocalizedString
 	}
 }
 

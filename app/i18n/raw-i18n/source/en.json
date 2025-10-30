@@ -2699,7 +2699,8 @@
         },
         "dollar": "Dollar",
         "all": "ALL",
-        "allAccounts": "All accounts"
+        "allAccounts": "All accounts",
+        "validThru": "Valid thru"
     },
     "errors": {
         "generic": "There was an error.\nPlease try again later.",
@@ -2854,5 +2855,86 @@
         "errorSendingMessage": "An error occurred while sending the message",
         "confirmChatReset": "Are you sure you want to reset the chat?",
         "errorResettingChat": "An error occurred while resetting the chat"
+    },
+    "BitcoinCardScreen": {
+        "title": "Blink Visa Card",
+        "cardInfo": {
+            "bitcoinCard": "The Bitcoin Credit Card",
+            "for": "for",
+            "maximalist": "Bitcoin Maximalist"
+        },
+        "buttonText": "Nice"
+    },
+    "CardDetailsScreen": {
+        "title": "Additional Perks",
+        "features": {
+            "accountManager": "Personal Account Manager",
+            "lightningTransactions": "50% Back On Lightning Fees",
+            "onchainDeposits": "50% Back On Onchain Fees",
+            "circularEconomies": "$100 to Circular Economies",
+            "creditLimit": "$1,000 Credit Limit"
+        },
+        "andMore": "... and more coming in 2026",
+        "buttonText": "Cool"
+    },
+    "CardWelcomeScreen": {
+        "welcomeMessage": {
+            "title": "Welcome Onboard!",
+            "subtitle": "To Blink Private",
+            "paragraphs": {
+                "body1": "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome human and Bitcoiner.",
+                "body2": "Our goal for 2026 is to stuff the program with so much goodies and good vibes that it will be obvious to renew next year."
+            }
+        },
+        "buttonText": "Let's Go!"
+    },
+    "CardSubscribeScreen": {
+        "title": "Subscribe",
+        "acceptButton": "Accept & Continue"
+    },
+    "CardPaymentScreen": {
+        "title": "Payment",
+        "cardTitle": "Blink Private",
+        "perYear": "per year",
+        "status": {
+            "label": "Status",
+            "paymentPending": "Payment Pending"
+        },
+        "renewalDate": {
+            "label": "Renewal Date"
+        },
+        "agreement": {
+            "text": "I agree to the",
+            "termsOfService": "Terms of Service",
+            "privacyPolicy": "Privacy Policy",
+            "cardholderAgreement": "Cardholder Agreement",
+            "and": "and"
+        },
+        "renew": "I understand that my subscription will automatically renew in 1 year",
+        "acceptButton": "Continue & Pay"
+    },
+    "LoadinCardScreen": {
+        "title": "We're working on your card",
+        "subtitle": "We'll notify you once it's here",
+        "codingBackend": "...coding the backend",
+        "buttonText": "Nice"
+    },
+    "VisaCardScreen": {
+        "title": "Visa Card",
+        "cardTitle": "Congratulations!",
+        "cardSubTitle": "Your Blink Visa Card has been activated.",
+        "VisaButtonText": "Add to",
+        "buttonText": "Order physical card"
+    },
+    "CardCreditLimit": {
+        "welcomeMessage": {
+            "title": "Increase your card credit limit",
+            "paragraphs": {
+                "body1": "You have paid $1,000 for your Blink Private subscription which comes with a $1,000 card credit limit. If you wish to increase the credit limit above $1,000 you can participate in the Blink crowdfunding round.",
+                "body2": "Your credit limit will increase with the amount you invest and will carry forward for as long as you continue your Blink Private subscription."
+            }
+        },
+        "desiredCreditLimit": "Select Desired Credit Limit",
+        "buttonText": "Increase"
     }
 }

@@ -9,6 +9,8 @@ const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
 const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
+const SumsubSuccessUrlKey = "sumsubSuccessUrl"
+const SumsubRejectUrlKey = "sumsubRejectUrl"
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -20,6 +22,8 @@ type RemoteConfig = {
   [FeedbackEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
+  [SumsubSuccessUrlKey]: string
+  [SumsubRejectUrlKey]: string
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -28,6 +32,8 @@ const defaultRemoteConfig: RemoteConfig = {
   feedbackEmailAddress: "feedback@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
+  sumsubSuccessUrl: "https://blink.sv/sumsub/status/success",
+  sumsubRejectUrl: "https://blink.sv/sumsub/status/reject",
 }
 
 const defaultFeatureFlags = {
@@ -80,12 +86,22 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(UpgradeModalShowAtSessionNumberKey)
           .asNumber()
 
+        const sumsubSuccessUrl = remoteConfigInstance()
+          .getValue(SumsubSuccessUrlKey)
+          .asString()
+
+        const sumsubRejectUrl = remoteConfigInstance()
+          .getValue(SumsubRejectUrlKey)
+          .asString()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
           feedbackEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
+          sumsubSuccessUrl,
+          sumsubRejectUrl,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
