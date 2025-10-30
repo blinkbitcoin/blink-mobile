@@ -23,16 +23,26 @@ export const LoadingCard: React.FC = () => {
   React.useEffect(() => {
     if (route.name === "loadingCard") {
       Animated.timing(progressAnim, {
-        toValue: 1,
-        duration: 1500,
+        toValue: 3,
+        duration: 4500,
         useNativeDriver: false,
       }).start()
     }
   }, [route.name, progressAnim])
 
-  const progressWidth = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
+  const progressWidth1 = progressAnim.interpolate({
+    inputRange: [0, 1, 1, 3],
+    outputRange: ["0%", "100%", "100%", "100%"],
+  })
+
+  const progressWidth2 = progressAnim.interpolate({
+    inputRange: [0, 1, 1, 2, 2, 3],
+    outputRange: ["0%", "0%", "0%", "100%", "100%", "100%"],
+  })
+
+  const progressWidth3 = progressAnim.interpolate({
+    inputRange: [0, 2, 2, 3],
+    outputRange: ["0%", "0%", "0%", "100%"],
   })
 
   const handleNext = () => {
@@ -72,10 +82,22 @@ export const LoadingCard: React.FC = () => {
           <View style={[styles.loadingContainer]}>
             <View style={styles.loadingWrapper}>
               <View style={[styles.loading]} />
-              <Animated.View style={[styles.loadingAnimated, { width: progressWidth }]} />
+              <Animated.View
+                style={[styles.loadingAnimated, { width: progressWidth1 }]}
+              />
             </View>
-            <View style={styles.loading}></View>
-            <View style={styles.loading}></View>
+            <View style={styles.loadingWrapper}>
+              <View style={[styles.loading]} />
+              <Animated.View
+                style={[styles.loadingAnimated, { width: progressWidth2 }]}
+              />
+            </View>
+            <View style={styles.loadingWrapper}>
+              <View style={[styles.loading]} />
+              <Animated.View
+                style={[styles.loadingAnimated, { width: progressWidth3 }]}
+              />
+            </View>
           </View>
           <Text type="h2" style={styles.bodySubText}>
             {LL.LoadinCardScreen.codingBackend()}
