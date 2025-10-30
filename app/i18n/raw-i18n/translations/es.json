@@ -2915,7 +2915,7 @@
         "acceptButton": "Continuar y Pagar"
     },
     "LoadinCardScreen": {
-        "title": "Estamos trabajando diligentemente en tu tarjeta",
+        "title": "Estamos trabajando en tu tarjeta",
         "subtitle": "Te notificaremos cuando esté lista",
         "codingBackend": "...programando el backend",
         "buttonText": "Genial"

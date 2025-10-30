@@ -9557,11 +9557,11 @@ type RootTranslation = {
 	}
 	LoadinCardScreen: {
 		/**
-		 * W​e​ ​a​r​e​ ​d​i​l​i​g​e​n​t​l​y​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
+		 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
 		 */
 		title: string
 		/**
-		 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​s​ ​h​e​r​e
+		 * W​e​'​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​'​s​ ​h​e​r​e
 		 */
 		subtitle: string
 		/**
@@ -19055,11 +19055,11 @@ export type TranslationFunctions = {
 	}
 	LoadinCardScreen: {
 		/**
-		 * We are diligently working on your card
+		 * We're working on your card
 		 */
 		title: () => LocalizedString
 		/**
-		 * We will notify you once its here
+		 * We'll notify you once it's here
 		 */
 		subtitle: () => LocalizedString
 		/**

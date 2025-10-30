@@ -3040,8 +3040,8 @@ const en: BaseTranslation = {
     acceptButton: "Continue & Pay",
   },
   LoadinCardScreen: {
-    title: "We are diligently working on your card",
-    subtitle: "We will notify you once its here",
+    title: "We're working on your card",
+    subtitle: "We'll notify you once it's here",
     codingBackend: "...coding the backend",
     buttonText: "Nice",
   },
