@@ -18,7 +18,7 @@ import {
   useTransactionListForDefaultAccountLazyQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useTransactionsNotification } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
@@ -155,6 +155,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification({
+    transactions: [] as TransactionFragment[],
+  })
+
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout
 
@@ -180,6 +184,16 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       }
     }
   }, [tx, refetch, timer, timeDiff])
+
+  React.useEffect(() => {
+    if (!txid || !tx.settlementCurrency) return
+    const latestId =
+      tx.settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
+
+    if (latestId && latestId === txid) {
+      markTxSeen(tx.settlementCurrency as WalletCurrency)
+    }
+  }, [txid, tx.settlementCurrency, latestBtcTxId, latestUsdTxId, markTxSeen])
 
   // FIXME doesn't work with storybook
   // TODO: translation
