@@ -20,7 +20,7 @@ type UseStylesProps = {
 }
 
 const DRAG_THRESHOLD = -120
-const SPRING_BACK_MS = 120
+const SPRING_BACK_MS = 100
 
 export const SlideUpHandle: React.FC<PullUpHandleProps> = ({
   onPullUp,
@@ -45,8 +45,9 @@ export const SlideUpHandle: React.FC<PullUpHandleProps> = ({
     })
     .onEnd((e) => {
       const shouldOpen = y.value < DRAG_THRESHOLD || e.velocityY < -500
-      y.value = withTiming(0, { duration: SPRING_BACK_MS })
       if (shouldOpen) runOnJS(trigger)()
+
+      y.value = withTiming(0, { duration: SPRING_BACK_MS })
     })
     .onFinalize(() => {
       active.value = withTiming(0, { duration: 120 })
@@ -68,6 +69,7 @@ export const SlideUpHandle: React.FC<PullUpHandleProps> = ({
           <Animated.View style={[styles.highlightBg, aHighlight]} />
           <Pressable
             hitSlop={12}
+            onPress={() => trigger()}
             onPressIn={() => (active.value = withTiming(1, { duration: 80 }))}
             onPressOut={() => (active.value = withTiming(0, { duration: 120 }))}
             style={styles.press}

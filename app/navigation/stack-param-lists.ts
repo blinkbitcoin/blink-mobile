@@ -97,6 +97,7 @@ export type RootStackParamList = {
       readonly walletCurrency: WalletCurrency
     }>
     currencyFilter?: WalletCurrency
+    showLoading?: boolean
   }
   Earn: undefined
   accountScreen: undefined

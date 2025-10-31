@@ -58,6 +58,7 @@ const lastHighlightedByCurrency: Partial<Record<WalletCurrency, string>> = {}
 export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> = ({
   route,
 }) => {
+  const showLoading = route.params?.showLoading === true
   const {
     theme: { colors },
   } = useTheme()
@@ -155,7 +156,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return <></>
   }
 
-  if (!transactions) {
+  if (!transactions || (showLoading && loading)) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator color={colors.primary} size={"large"} />
