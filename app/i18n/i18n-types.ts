@@ -6328,7 +6328,49 @@ type RootTranslation = {
 		 */
 		customErrorMessage: string
 		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * T​e​l​c​o​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​t​e​l​c​o​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​e​l​c​o​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			invalidIpMetadata: {
+				/**
+				 * I​P​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​I​P​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​I​P​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
 			claimedToEarly: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			invalidQuizQuestionId: {
 				/**
 				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
 				 */
@@ -15730,7 +15772,49 @@ export type TranslationFunctions = {
 		 */
 		customErrorMessage: () => LocalizedString
 		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * Telco restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this telco.
+			We've disabled rewards for this telco until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			invalidIpMetadata: {
+				/**
+				 * IP restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this IP.
+			We've disabled rewards for this IP until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
 			claimedToEarly: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			invalidQuizQuestionId: {
 				/**
 				 * Reward wallet empty
 				 */

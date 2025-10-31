@@ -1,5 +1,10 @@
 export type EarnSectionType = keyof typeof earnSections
-export type ValidateQuizCodeErrorsType = "INVALID_INPUT" | "QUIZ_CLAIMED_TOO_EARLY"
+export type ValidateQuizCodeErrorsType =
+  | "INVALID_PHONE_FOR_QUIZ"
+  | "INVALID_IP_METADATA"
+  | "QUIZ_CLAIMED_TOO_EARLY"
+  | "NOT_ENOUGH_BALANCE_FOR_QUIZ"
+  | "INVALID_QUIZ_QUESTION_ID"
 
 export const earnSections = {
   bitcoinWhatIsIt: {

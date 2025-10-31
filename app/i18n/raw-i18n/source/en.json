@@ -2009,7 +2009,23 @@
         "defaultErrorMessage": "{errorMessage: string} Please try again later.\nOr, click to continue to keep learning without rewards.",
         "customErrorMessage": "It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.",
         "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "Telco restricted",
+                "message": "We're experiencing an attack from users with this telco.\nWe've disabled rewards for this telco until further notice. Apologies!"
+            },
+            "invalidIpMetadata": {
+                "title": "IP restricted",
+                "message": "We're experiencing an attack from users with this IP.\nWe've disabled rewards for this IP until further notice. Apologies!"
+            },
             "claimedToEarly": {
+                "title": "Reward wallet empty",
+                "message": "We'll add funds soon. Sorry!"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "Reward wallet empty",
+                "message": "We'll add funds soon. Sorry!"
+            },
+            "invalidQuizQuestionId": {
                 "title": "Reward wallet empty",
                 "message": "We'll add funds soon. Sorry!"
             },

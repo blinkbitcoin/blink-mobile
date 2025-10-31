@@ -295,6 +295,49 @@ export const EarnQuiz = ({ route }: Props) => {
     [quizClaim, id, LL, navigation],
   )
 
+  const getModalErrorMessages = React.useCallback(
+    (
+      quizErrorCode: ValidateQuizCodeErrorsType,
+    ): {
+      title: string
+      message: string
+    } => {
+      switch (quizErrorCode) {
+        case "INVALID_PHONE_FOR_QUIZ":
+          return {
+            title: LL.EarnScreen.customMessages.invalidPhoneForQuiz.title(),
+            message: LL.EarnScreen.customMessages.invalidPhoneForQuiz.message(),
+          }
+        case "INVALID_IP_METADATA":
+          return {
+            title: LL.EarnScreen.customMessages.invalidIpMetadata.title(),
+            message: LL.EarnScreen.customMessages.invalidIpMetadata.message(),
+          }
+        case "QUIZ_CLAIMED_TOO_EARLY":
+          return {
+            title: LL.EarnScreen.customMessages.claimedToEarly.title(),
+            message: LL.EarnScreen.customMessages.claimedToEarly.message(),
+          }
+        case "NOT_ENOUGH_BALANCE_FOR_QUIZ":
+          return {
+            title: LL.EarnScreen.customMessages.notEnoughBalanceForQuiz.title(),
+            message: LL.EarnScreen.customMessages.notEnoughBalanceForQuiz.message(),
+          }
+        case "INVALID_QUIZ_QUESTION_ID":
+          return {
+            title: LL.EarnScreen.customMessages.invalidQuizQuestionId.title(),
+            message: LL.EarnScreen.customMessages.invalidQuizQuestionId.message(),
+          }
+        default:
+          return {
+            title: LL.EarnScreen.somethingNotRight(),
+            message: quizErrorMessage ?? LL.EarnScreen.customErrorMessage(),
+          }
+      }
+    },
+    [LL, quizErrorMessage],
+  )
+
   const handleClaimWithoutRewards = React.useCallback(async () => {
     markErrorCodeAlertAsShown(quizErrorCode)
     await claimQuizWrapper(true)
@@ -315,16 +358,13 @@ export const EarnQuiz = ({ route }: Props) => {
           const defaultErrorMessage = LL.EarnScreen.defaultErrorMessage({
             errorMessage: getErrorMessages(data.quizClaim.errors),
           })
-          const customErrorMessage = LL.EarnScreen.customErrorMessage()
 
           if (skipRewardErrorCodes(errorCode)) {
             if (errorCodeAlertAlreadyShown(errorCode)) {
               await handleClaimWithoutRewards()
               return
             }
-            setQuizErrorMessage(
-              errorCode === "INVALID_INPUT" ? customErrorMessage : defaultErrorMessage,
-            )
+            setQuizErrorMessage(defaultErrorMessage)
             setQuizErrorCode(errorCode)
             setShowModal(true)
           }
@@ -480,18 +520,12 @@ export const EarnQuiz = ({ route }: Props) => {
       <CustomModal
         isVisible={showModal}
         toggleModal={closeModal}
-        title={
-          quizErrorCode === "QUIZ_CLAIMED_TOO_EARLY"
-            ? LL.EarnScreen.customMessages.claimedToEarly.title()
-            : LL.EarnScreen.somethingNotRight()
-        }
+        title={getModalErrorMessages(quizErrorCode as ValidateQuizCodeErrorsType).title}
         backgroundModalColor={colors.white}
         body={
           <View style={styles.modalBody}>
             <Text style={styles.modalBodyText}>
-              {quizErrorCode === "QUIZ_CLAIMED_TOO_EARLY"
-                ? LL.EarnScreen.customMessages.claimedToEarly.message()
-                : quizErrorMessage}
+              {getModalErrorMessages(quizErrorCode as ValidateQuizCodeErrorsType).message}
             </Text>
           </View>
         }

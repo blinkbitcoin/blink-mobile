@@ -2009,9 +2009,25 @@
         "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
         "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
         "customMessages": {
+            "invalidPhoneForQuiz":{
+                "title": "Operadora restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
+            },
+            "invalidIpMetadata":{
+                "title": "IP restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
+            },
             "claimedToEarly":{
-                "title": "Cartera de recompensas vacía",
-                "message": "Agregaremos fondos pronto. ¡Lo sentimos!"
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "notEnoughBalanceForQuiz":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "invalidQuizQuestionId":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
             },
             "oneSectionADay":{
                 "title": "¿Continuar sin recompensas?",
