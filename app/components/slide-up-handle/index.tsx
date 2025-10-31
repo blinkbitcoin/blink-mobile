@@ -90,10 +90,11 @@ const useStyles = makeStyles(({ colors }, { bottomOffset }: UseStylesProps) => (
     bottom: bottomOffset,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
   pill: {
-    width: 42,
     height: 24,
+    width: "100%",
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
