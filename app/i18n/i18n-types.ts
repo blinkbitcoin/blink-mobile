@@ -9659,6 +9659,26 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	TransferInvestment: {
+		/**
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
+		 */
+		title: string
+		paragraphs: {
+			/**
+			 * Y​o​u​ ​h​a​v​e​ ​s​i​g​n​e​d​ ​t​h​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​a​g​r​e​e​m​e​n​t​ ​f​o​r​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​i​n​ ​B​l​i​n​k​.
+			 */
+			body1: string
+			/**
+			 * T​i​m​e​ ​t​o​ ​t​r​a​n​s​f​e​r​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​$​1​0​,​0​0​0​.​ ​Y​o​u​ ​w​i​l​l​ ​p​a​y​ ​w​i​t​h​ ​B​i​t​c​o​i​n​.
+			 */
+			body2: string
+		}
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19192,6 +19212,26 @@ export type TranslationFunctions = {
 		}
 		/**
 		 * Proceed to Sign
+		 */
+		buttonText: () => LocalizedString
+	}
+	TransferInvestment: {
+		/**
+		 * Transfer your investment
+		 */
+		title: () => LocalizedString
+		paragraphs: {
+			/**
+			 * You have signed the subscription agreement for 10,000 units in Blink.
+			 */
+			body1: () => LocalizedString
+			/**
+			 * Time to transfer the investment amount of $10,000. You will pay with Bitcoin.
+			 */
+			body2: () => LocalizedString
+		}
+		/**
+		 * Continue
 		 */
 		buttonText: () => LocalizedString
 	}

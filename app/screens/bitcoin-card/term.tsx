@@ -69,7 +69,7 @@ export const TermSheetScreen: React.FC = () => {
   ]
 
   const handleNext = () => {
-    navigation.navigate("cardSubscribe")
+    navigation.navigate("tranferInvest")
   }
 
   return (

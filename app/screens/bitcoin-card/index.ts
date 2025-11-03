@@ -7,4 +7,5 @@ export * from "./visa-card"
 export * from "./credit-card-limit"
 export * from "./select-credit-limit"
 export * from "./term"
+export * from "./transfer-invest"
 

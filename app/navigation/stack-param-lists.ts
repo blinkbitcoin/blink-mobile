@@ -135,6 +135,7 @@ export type RootStackParamList = {
   creditCardLimit: undefined
   selectCreditLimit: undefined
   termSheetScreem: undefined
+  tranferInvest: undefined
 }
 
 export type OnboardingStackParamList = {

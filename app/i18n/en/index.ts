@@ -3077,6 +3077,14 @@ const en: BaseTranslation = {
     },
     buttonText: "Proceed to Sign",
   },
+  TransferInvestment: {
+    title: "Transfer your investment",
+    paragraphs: {
+        body1: "You have signed the subscription agreement for 10,000 units in Blink.",
+        body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
+    },
+    buttonText: "Continue",
+  },
 }
 
 export default en

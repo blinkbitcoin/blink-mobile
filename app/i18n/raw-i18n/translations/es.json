@@ -2951,5 +2951,13 @@
             "totalCredit": "Crédito Total de $11,000"
         },
         "buttonText": "Proceder a Firmar"
+    },
+    "TransferInvestment": {
+        "title": "Transfiere tu inversión",
+        "paragraphs": {
+            "body1": "Has firmado el acuerdo de suscripción por 10,000 unidades en Blink.",
+            "body2": "Es momento de transferir el monto de inversión de $10,000. Pagarás con Bitcoin."
+        },
+        "buttonText": "Continuar"
     }
 }
