@@ -75,7 +75,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   }
 
   return (
-    <Screen unsafe>
+    <Screen headerShown={false}>
       <View style={styles.aliasView}>
         <Icon
           {...testProps("contact-detail-icon")}

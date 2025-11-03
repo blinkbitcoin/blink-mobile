@@ -378,6 +378,7 @@ export type CreateLnurlPaymentDetailsParams<T extends WalletCurrency> = {
   paymentRequestAmount?: BtcMoneyAmount
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   successAction?: LNURLPaySuccessAction
+  isMerchant: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createLnurlPaymentDetails = <T extends WalletCurrency>(
@@ -394,6 +395,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
     successAction,
+    isMerchant,
   } = params
 
   const destinationSpecifiedAmount =
@@ -508,6 +510,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
     setConvertMoneyAmount,
     successAction,
     setSuccessAction,
+    isMerchant,
     ...setAmount,
     ...setMemo,
     ...sendPaymentAndGetFee,

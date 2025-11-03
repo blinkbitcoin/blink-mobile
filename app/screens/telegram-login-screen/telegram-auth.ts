@@ -10,6 +10,9 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { BLINK_DEEP_LINK_PREFIX, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { formatPublicKey } from "@app/utils/format-public-key"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
+import { gql } from "@apollo/client"
+import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useUserLoginUpgradeTelegramMutation } from "@app/graphql/generated"
 
 export const ErrorType = {
   FetchParamsError: "FetchParamsError",
@@ -25,6 +28,18 @@ type TelegramAuthData = {
   publicKey: string
   nonce: string
 }
+
+gql`
+  mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
+    userLoginUpgradeTelegram(input: $input) {
+      errors {
+        message
+        code
+      }
+      success
+    }
+  }
+`
 
 export const useTelegramLogin = (phone: string, onboarding: boolean = false) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -50,6 +65,13 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
       galoyInstance: { authUrl },
     },
   } = useAppConfig()
+
+  const { currentLevel } = useLevel()
+  const isUpgradeFlow = onboarding || currentLevel === AccountLevel.Zero
+
+  const [userLoginUpgradeTelegramMutation] = useUserLoginUpgradeTelegramMutation({
+    fetchPolicy: "no-cache",
+  })
 
   const clearPolling = () => {
     if (pollingIntervalRef.current) {
@@ -89,15 +111,62 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
     [authUrl, phone],
   )
 
+  const setHasLoggedInTrue = () => {
+    hasLoggedInRef.current = true
+  }
+
+  const navigateAfterAuth = useCallback(
+    (authToken?: string) => {
+      if (authToken) {
+        saveProfile(authToken)
+      }
+
+      if (onboarding) {
+        navigation.replace("onboarding", {
+          screen: "welcomeLevel1",
+          params: { onboarding },
+        })
+        return
+      }
+      navigation.replace("Primary")
+    },
+    [navigation, onboarding, saveProfile],
+  )
+
+  const upgradeLoginWithTelegram = useCallback(
+    async (nonce: string) => {
+      const { data } = await userLoginUpgradeTelegramMutation({
+        variables: { input: { phone, nonce } },
+      })
+      const success = data?.userLoginUpgradeTelegram?.success
+      if (success) return success
+
+      const message =
+        data?.userLoginUpgradeTelegram?.errors?.[0]?.message || ErrorType.FetchLoginError
+      throw new Error(message)
+    },
+    [userLoginUpgradeTelegramMutation, phone],
+  )
+
   const checkIfAuthorized = useCallback(
     async (nonce: string) => {
       if (hasLoggedInRef.current) return
 
       try {
+        if (isUpgradeFlow) {
+          const success = await upgradeLoginWithTelegram(nonce)
+          if (!success) return
+
+          setHasLoggedInTrue()
+          clearPolling()
+          navigateAfterAuth()
+          return
+        }
+
         const result = await loginWithTelegramPassport(nonce)
         if (!result?.authToken || hasLoggedInRef.current) return
 
-        hasLoggedInRef.current = true
+        setHasLoggedInTrue()
         clearPolling()
         analytics().logLogin({ method: "telegram" })
 
@@ -106,27 +175,22 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
           return
         }
 
-        saveProfile(result.authToken)
-
-        // Redirect to onboarding flow if applicable
-        if (onboarding) {
-          navigation.replace("onboarding", {
-            screen: "welcomeLevel1",
-            params: { onboarding },
-          })
-          return
-        }
-
-        navigation.replace("Primary")
+        navigateAfterAuth(result.authToken)
       } catch (e) {
         const message = (e as Error).message
-        if (message.includes("Authorization data from Telegram is still pending.")) return
+        if (message.includes("Authorization data from Telegram is still pending")) return
 
         clearPolling()
         setError(message)
       }
     },
-    [navigation, onboarding, saveProfile, loginWithTelegramPassport],
+    [
+      navigateAfterAuth,
+      loginWithTelegramPassport,
+      isUpgradeFlow,
+      upgradeLoginWithTelegram,
+      navigation,
+    ],
   )
 
   useFocusEffect(

@@ -13,6 +13,7 @@ import {
   OnchainPaymentDestination,
   ParsedPaymentDestination,
   PaymentType,
+  InputSource,
 } from "@blinkbitcoin/blink-client"
 
 import { ConvertMoneyAmount, PaymentDetail } from "../payment-details"
@@ -25,6 +26,8 @@ export type ParseDestinationParams = {
   bitcoinNetwork: Network
   lnurlDomains: string[]
   accountDefaultWalletQuery: AccountDefaultWalletLazyQueryHookResult[0]
+  inputSource?: InputSource
+  displayCurrency?: string
 }
 
 export const DestinationDirection = {

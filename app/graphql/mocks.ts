@@ -15,6 +15,7 @@ import {
   UserUpdateUsernameDocument,
   MyUserIdDocument,
   TransactionListForDefaultAccountDocument,
+  UserLoginUpgradeTelegramDocument,
 } from "./generated"
 
 // TODO: put in __tests__ folder?
@@ -1625,6 +1626,23 @@ const mocks = [
               ],
             },
           },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: UserLoginUpgradeTelegramDocument,
+      variables: { input: { phone: "+50375000000", nonce: "mocked_nonce" } },
+    },
+    result: {
+      data: {
+        userLoginUpgradeTelegram: {
+          success: true,
+          authToken: "test-token",
+          totpRequired: false,
+          errors: [],
+          __typename: "UserLoginUpgradeTelegramPayload",
         },
       },
     },

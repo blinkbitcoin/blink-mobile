@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
+import React from "react"
 import axios from "axios"
 import { Linking } from "react-native"
+import { renderHook, act } from "@testing-library/react-hooks"
 
 import {
   useTelegramLogin,
@@ -9,7 +11,7 @@ import {
 import { formatPublicKey } from "@app/utils/format-public-key"
 import { BLINK_DEEP_LINK_PREFIX, TELEGRAM_CALLBACK_PATH } from "@app/config"
 
-import { renderHook, act } from "@testing-library/react-hooks"
+import { ContextForScreen } from "./helper"
 
 // Mocks
 jest.mock("@react-navigation/native", () => {
@@ -54,6 +56,10 @@ jest.mock("react-native/Libraries/Linking/Linking", () => ({
   })),
 }))
 
+const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ContextForScreen>{children}</ContextForScreen>
+)
+
 describe("useTelegramLogin", () => {
   const mockPhone = "+50376543210"
   const mockData = {
@@ -72,7 +78,7 @@ describe("useTelegramLogin", () => {
     ;(Linking.canOpenURL as jest.Mock).mockResolvedValueOnce(true)
     ;(Linking.openURL as jest.Mock).mockResolvedValueOnce(undefined)
 
-    const { result } = renderHook(() => useTelegramLogin(mockPhone))
+    const { result } = renderHook(() => useTelegramLogin(mockPhone), { wrapper: Wrapper })
 
     await act(async () => {
       await result.current.handleTelegramLogin()
@@ -92,7 +98,7 @@ describe("useTelegramLogin", () => {
     ;(axios.post as jest.Mock).mockResolvedValueOnce({ data: mockData })
     ;(Linking.canOpenURL as jest.Mock).mockResolvedValueOnce(false)
 
-    const { result } = renderHook(() => useTelegramLogin(mockPhone))
+    const { result } = renderHook(() => useTelegramLogin(mockPhone), { wrapper: Wrapper })
 
     await act(async () => {
       await result.current.handleTelegramLogin()
@@ -108,7 +114,7 @@ describe("useTelegramLogin", () => {
       response: { data: {} },
     })
 
-    const { result } = renderHook(() => useTelegramLogin(mockPhone))
+    const { result } = renderHook(() => useTelegramLogin(mockPhone), { wrapper: Wrapper })
 
     await act(async () => {
       await result.current.handleTelegramLogin()
@@ -120,7 +126,7 @@ describe("useTelegramLogin", () => {
   it("should handle general errors", async () => {
     ;(axios.post as jest.Mock).mockRejectedValueOnce(new Error("network failed"))
 
-    const { result } = renderHook(() => useTelegramLogin(mockPhone))
+    const { result } = renderHook(() => useTelegramLogin(mockPhone), { wrapper: Wrapper })
 
     await act(async () => {
       await result.current.handleTelegramLogin()
@@ -133,7 +139,7 @@ describe("useTelegramLogin", () => {
     ;(axios.post as jest.Mock).mockResolvedValueOnce({ data: mockData })
     ;(Linking.canOpenURL as jest.Mock).mockResolvedValueOnce(true)
 
-    const { result } = renderHook(() => useTelegramLogin(mockPhone))
+    const { result } = renderHook(() => useTelegramLogin(mockPhone), { wrapper: Wrapper })
 
     await act(async () => {
       await result.current.handleTelegramLogin()
