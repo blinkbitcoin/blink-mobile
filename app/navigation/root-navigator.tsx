@@ -110,6 +110,7 @@ import {
   VisaCard,
   CreditCardLimit,
   SelectCreditLimit,
+  TermSheetScreen,
 } from "../screens/bitcoin-card"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 
@@ -577,6 +578,22 @@ export const RootStack = () => {
         component={SelectCreditLimit}
         options={{
           title: "",
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="termSheetScreem"
+        component={TermSheetScreen}
+        options={{
+          title: LL.TermSheetScreen.title(),
           headerRight: () => (
             <GaloyIconButton
               onPress={() => navigation.navigate("Primary")}

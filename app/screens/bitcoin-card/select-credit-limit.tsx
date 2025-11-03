@@ -23,7 +23,7 @@ export const SelectCreditLimit: React.FC = () => {
 
   const handleNext = () => {
     if (selectedLimit) {
-      navigation.navigate("Primary")
+      navigation.navigate("termSheetScreem")
     }
   }
 

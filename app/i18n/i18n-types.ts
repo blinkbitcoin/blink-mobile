@@ -9621,6 +9621,44 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	TermSheetScreen: {
+		/**
+		 * T​e​r​m​ ​S​h​e​e​t
+		 */
+		title: string
+		equitySection: {
+			/**
+			 * E​q​u​i​t​y​ ​i​n​ ​B​l​i​n​k
+			 */
+			title: string
+			/**
+			 * $​1​0​,​0​0​0​ ​I​n​v​e​s​t​m​e​n​t
+			 */
+			investment: string
+			/**
+			 * A​t​ ​$​1​0​M​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n
+			 */
+			valuation: string
+			/**
+			 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​2​%​ ​o​f​ ​B​l​i​n​k
+			 */
+			units: string
+		}
+		creditBoostSection: {
+			/**
+			 * C​r​e​d​i​t​ ​B​o​o​s​t
+			 */
+			title: string
+			/**
+			 * $​1​1​,​0​0​0​ ​T​o​t​a​l​ ​C​r​e​d​i​t
+			 */
+			totalCredit: string
+		}
+		/**
+		 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19116,6 +19154,44 @@ export type TranslationFunctions = {
 		desiredCreditLimit: () => LocalizedString
 		/**
 		 * Increase
+		 */
+		buttonText: () => LocalizedString
+	}
+	TermSheetScreen: {
+		/**
+		 * Term Sheet
+		 */
+		title: () => LocalizedString
+		equitySection: {
+			/**
+			 * Equity in Blink
+			 */
+			title: () => LocalizedString
+			/**
+			 * $10,000 Investment
+			 */
+			investment: () => LocalizedString
+			/**
+			 * At $10M pre-money valuation
+			 */
+			valuation: () => LocalizedString
+			/**
+			 * You receive 10,000 units ~0.2% of Blink
+			 */
+			units: () => LocalizedString
+		}
+		creditBoostSection: {
+			/**
+			 * Credit Boost
+			 */
+			title: () => LocalizedString
+			/**
+			 * $11,000 Total Credit
+			 */
+			totalCredit: () => LocalizedString
+		}
+		/**
+		 * Proceed to Sign
 		 */
 		buttonText: () => LocalizedString
 	}

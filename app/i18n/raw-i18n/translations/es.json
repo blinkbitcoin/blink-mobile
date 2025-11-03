@@ -2937,5 +2937,19 @@
         },
         "desiredCreditLimit": "Seleccionar Límite De Crédito Deseado",
         "buttonText": "Aumentar"
+    },
+    "TermSheetScreen": {
+        "title": "Hoja de Términos",
+        "equitySection": {
+            "title": "Participación en Blink",
+            "investment": "Inversión de $10,000",
+            "valuation": "Con valoración pre-money de $10M",
+            "units": "Recibes 10,000 unidades ~0.2% de Blink"
+        },
+        "creditBoostSection": {
+            "title": "Impulso de Crédito",
+            "totalCredit": "Crédito Total de $11,000"
+        },
+        "buttonText": "Proceder a Firmar"
     }
 }

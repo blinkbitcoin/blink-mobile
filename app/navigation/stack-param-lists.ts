@@ -134,6 +134,7 @@ export type RootStackParamList = {
   visaCard: undefined
   creditCardLimit: undefined
   selectCreditLimit: undefined
+  termSheetScreem: undefined
 }
 
 export type OnboardingStackParamList = {

@@ -3063,6 +3063,20 @@ const en: BaseTranslation = {
     desiredCreditLimit: "Select Desired Credit Limit",
     buttonText: "Increase",
   },
+  TermSheetScreen: {
+    title: "Term Sheet",
+    equitySection: {
+      title: "Equity in Blink",
+      investment: "$10,000 Investment",
+      valuation: "At $10M pre-money valuation",
+      units: "You receive 10,000 units ~0.2% of Blink"
+    },
+    creditBoostSection: {
+      title: "Credit Boost",
+      totalCredit: "$11,000 Total Credit"
+    },
+    buttonText: "Proceed to Sign",
+  },
 }
 
 export default en
