@@ -9679,6 +9679,28 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	TopUpScreen: {
+		/**
+		 * T​o​p​ ​U​p
+		 */
+		title: string
+		/**
+		 * P​l​e​a​s​e​ ​t​o​p​ ​u​p​ ​y​o​u​r​ ​B​l​i​n​k​ ​w​a​l​l​e​t​ ​v​i​a​ ​L​i​g​h​t​n​i​n​g​ ​o​r​ ​O​n​c​h​a​i​n​.
+		 */
+		qrTitle: string
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * S​h​a​r​e
+		 */
+		share: string
+		/**
+		 * A​n​y​ ​A​m​o​u​n​t
+		 */
+		placeholder: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19234,6 +19256,28 @@ export type TranslationFunctions = {
 		 * Continue
 		 */
 		buttonText: () => LocalizedString
+	}
+	TopUpScreen: {
+		/**
+		 * Top Up
+		 */
+		title: () => LocalizedString
+		/**
+		 * Please top up your Blink wallet via Lightning or Onchain.
+		 */
+		qrTitle: () => LocalizedString
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Share
+		 */
+		share: () => LocalizedString
+		/**
+		 * Any Amount
+		 */
+		placeholder: () => LocalizedString
 	}
 }
 

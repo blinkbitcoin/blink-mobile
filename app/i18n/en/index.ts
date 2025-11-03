@@ -3054,11 +3054,11 @@ const en: BaseTranslation = {
   },
   CardCreditLimit: {
     welcomeMessage: {
-        title: "Increase your card credit limit",
-        paragraphs: {
-            body1: "You have paid $1,000 for your Blink Private subscription which comes with a $1,000 card credit limit. If you wish to increase the credit limit above $1,000 you can participate in the Blink crowdfunding round.",
-            body2: "Your credit limit will increase with the amount you invest and will carry forward for as long as you continue your Blink Private subscription.",
-        },
+      title: "Increase your card credit limit",
+      paragraphs: {
+        body1: "You have paid $1,000 for your Blink Private subscription which comes with a $1,000 card credit limit. If you wish to increase the credit limit above $1,000 you can participate in the Blink crowdfunding round.",
+        body2: "Your credit limit will increase with the amount you invest and will carry forward for as long as you continue your Blink Private subscription.",
+      },
     },
     desiredCreditLimit: "Select Desired Credit Limit",
     buttonText: "Increase",
@@ -3080,10 +3080,17 @@ const en: BaseTranslation = {
   TransferInvestment: {
     title: "Transfer your investment",
     paragraphs: {
-        body1: "You have signed the subscription agreement for 10,000 units in Blink.",
-        body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
+      body1: "You have signed the subscription agreement for 10,000 units in Blink.",
+      body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
     },
     buttonText: "Continue",
+  },
+  TopUpScreen: {
+    title: "Top Up",
+    qrTitle: "Please top up your Blink wallet via Lightning or Onchain.",
+    copy: "Copy",
+    share: "Share",
+    placeholder: "Any Amount"
   },
 }
 

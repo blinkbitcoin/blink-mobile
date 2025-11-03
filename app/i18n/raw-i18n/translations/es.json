@@ -2959,5 +2959,12 @@
             "body2": "Es momento de transferir el monto de inversión de $10,000. Pagarás con Bitcoin."
         },
         "buttonText": "Continuar"
+    },
+    "TopUpScreen": {
+        "title": "Recargar",
+        "qrTitle": "Por favor recarga tu billetera Blink vía Lightning u Onchain.",
+        "copy": "Copiar",
+        "share": "Compartir",
+        "placeholder": "Cualquier Monto"
     }
 }

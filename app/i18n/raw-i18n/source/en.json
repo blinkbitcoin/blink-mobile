@@ -2958,5 +2958,12 @@
             "body2": "Time to transfer the investment amount of $10,000. You will pay with Bitcoin."
         },
         "buttonText": "Continue"
+    },
+    "TopUpScreen": {
+        "title": "Top Up",
+        "qrTitle": "Please top up your Blink wallet via Lightning or Onchain.",
+        "copy": "Copy",
+        "share": "Share",
+        "placeholder": "Any Amount"
     }
 }
