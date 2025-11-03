@@ -112,6 +112,7 @@ import {
   SelectCreditLimit,
   TermSheetScreen,
   TranferInvest,
+  TopUpScreen,
 } from "../screens/bitcoin-card"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 
@@ -612,6 +613,22 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="topUpScreen"
+        component={TopUpScreen}
+        options={{
+          title: LL.TopUpScreen.title(),
           headerRight: () => (
             <GaloyIconButton
               onPress={() => navigation.navigate("Primary")}

@@ -136,6 +136,7 @@ export type RootStackParamList = {
   selectCreditLimit: undefined
   termSheetScreem: undefined
   tranferInvest: undefined
+  topUpScreen: undefined
 }
 
 export type OnboardingStackParamList = {
