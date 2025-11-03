@@ -93,7 +93,10 @@ export const getQuizQuestionsContent = ({
 const shownErrorCodes = new Set<ValidateQuizCodeErrorsType>()
 
 const skipRewardErrorCodesList: ValidateQuizCodeErrorsType[] = [
-  "INVALID_INPUT",
+  "INVALID_IP_METADATA",
+  "INVALID_PHONE_FOR_QUIZ",
+  "INVALID_QUIZ_QUESTION_ID",
+  "NOT_ENOUGH_BALANCE_FOR_QUIZ",
   "QUIZ_CLAIMED_TOO_EARLY",
 ]
 
