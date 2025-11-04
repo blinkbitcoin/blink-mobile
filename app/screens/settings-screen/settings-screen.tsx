@@ -76,15 +76,15 @@ export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { currentLevel, isAtLeastLevelOne } = useLevel()
+  const { isAtLeastLevelOne } = useLevel()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     fetchPolicy: "cache-and-network",
   })
 
   const items = {
     account: [AccountLevelSetting, TxLimits, SwitchAccount],
-    loginMethods: [EmailSetting, PhoneSetting],
     waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
+    loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,
       DefaultWallet,
@@ -122,16 +122,16 @@ export const SettingsScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.outer}>
         <AccountBanner />
         <SettingsGroup name={LL.common.account()} items={items.account} />
+        <SettingsGroup
+          name={LL.SettingsScreen.addressScreen()}
+          items={items.waysToGetPaid}
+        />
         {isAtLeastLevelOne && (
           <SettingsGroup
             name={LL.AccountScreen.loginMethods()}
             items={items.loginMethods}
           />
         )}
-        <SettingsGroup
-          name={LL.SettingsScreen.addressScreen()}
-          items={items.waysToGetPaid}
-        />
         <SettingsGroup name={LL.common.preferences()} items={items.preferences} />
         <SettingsGroup
           name={LL.common.securityAndPrivacy()}
