@@ -118,16 +118,42 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return transactions
   }, [pendingTxs, settledTxs])
 
-  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification({
-    transactions: allTransactions,
-  })
+  const { latestBtcTxId, latestUsdTxId, hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } =
+    useTransactionsNotification({
+      transactions: allTransactions,
+    })
 
-  const newTxId = React.useMemo(() => {
-    if (!currencyFilter) return ""
-    if (currencyFilter === WalletCurrency.Btc) return latestBtcTxId
+  const newTx = React.useMemo(() => {
+    if (walletFilter === "ALL") {
+      const currency =
+        (hasUnseenBtcTx && latestBtcTxId && WalletCurrency.Btc) ||
+        (hasUnseenUsdTx && latestUsdTxId && WalletCurrency.Usd)
+      if (!currency) return
 
-    return latestUsdTxId
-  }, [currencyFilter, latestBtcTxId, latestUsdTxId])
+      const id = currency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
+      return { id: id ?? "", currency }
+    }
+
+    const selectedCurrency =
+      walletFilter === WalletCurrency.Btc || walletFilter === WalletCurrency.Usd
+        ? walletFilter
+        : currencyFilter
+
+    if (selectedCurrency === WalletCurrency.Btc) {
+      return { id: latestBtcTxId, currency: WalletCurrency.Btc }
+    }
+
+    if (selectedCurrency === WalletCurrency.Usd) {
+      return { id: latestUsdTxId, currency: WalletCurrency.Usd }
+    }
+  }, [
+    walletFilter,
+    currencyFilter,
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    latestBtcTxId,
+    latestUsdTxId,
+  ])
 
   const [stickyHighlightId, setStickyHighlightId] = React.useState<string | null>(null)
 
@@ -138,13 +164,19 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   )
 
   React.useEffect(() => {
-    if (!currencyFilter || !newTxId) return
-    if (lastHighlightedByCurrency[currencyFilter] !== newTxId) {
-      setStickyHighlightId(newTxId)
-      markTxSeen(currencyFilter)
-      lastHighlightedByCurrency[currencyFilter] = newTxId
+    if (loading || !newTx || !newTx.id || !newTx.currency) return
+
+    const isUnseen =
+      (newTx.currency === WalletCurrency.Btc && hasUnseenBtcTx) ||
+      (newTx.currency === WalletCurrency.Usd && hasUnseenUsdTx)
+    if (!isUnseen) return
+
+    if (lastHighlightedByCurrency[newTx.currency] !== newTx.id) {
+      setStickyHighlightId(newTx.id)
+      markTxSeen(newTx.currency)
+      lastHighlightedByCurrency[newTx.currency] = newTx.id
     }
-  }, [currencyFilter, newTxId, markTxSeen])
+  }, [loading, newTx, markTxSeen, hasUnseenBtcTx, hasUnseenUsdTx])
 
   if (error) {
     console.error(error)
