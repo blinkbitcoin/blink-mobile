@@ -504,7 +504,7 @@ export const HomeScreen: React.FC = () => {
       </ScrollView>
       <SlideUpHandle
         bottomOffset={15}
-        onPullUp={() => navigation.navigate("transactionHistory", { showLoading: true })}
+        onAction={() => navigation.navigate("transactionHistory", { showLoading: true })}
       />
     </Screen>
   )
