@@ -8424,6 +8424,10 @@ type RootTranslation = {
 		 */
 		account: string
 		/**
+		 * Y​o​u​r​ ​A​c​c​o​u​n​t
+		 */
+		yourAccount: string
+		/**
 		 * T​r​i​a​l​ ​A​c​c​o​u​n​t
 		 */
 		trialAccount: string
@@ -17717,6 +17721,10 @@ export type TranslationFunctions = {
 		 * Account
 		 */
 		account: () => LocalizedString
+		/**
+		 * Your Account
+		 */
+		yourAccount: () => LocalizedString
 		/**
 		 * Trial Account
 		 */

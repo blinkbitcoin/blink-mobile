@@ -2698,6 +2698,7 @@ const en: BaseTranslation = {
     advanced: "Advanced",
     community: "Community",
     account: "Account",
+    yourAccount: "Your Account",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
     transactionLimits: "Transaction Limits",
