@@ -1,92 +1,126 @@
-import { useMemo } from "react"
+import { useMemo, useCallback } from "react"
 import { useApolloClient, useQuery } from "@apollo/client"
+
+import { markTxLastSeenId } from "@app/graphql/client-only-query"
 import {
   TransactionFragment,
   TxLastSeenDocument,
   TxLastSeenQuery,
   WalletCurrency,
+  HomeAuthedDocument,
+  HomeAuthedQuery,
+  TxStatus,
+  TxDirection,
 } from "@app/graphql/generated"
-import { markTxLastSeenId } from "@app/graphql/client-only-query"
 
-type TxDigest = {
+type TransactionDigest = {
   transactions?: ReadonlyArray<TransactionFragment>
   latestBtcTxId?: string | null
   latestUsdTxId?: string | null
 }
 
-type TxSource = ReadonlyArray<TransactionFragment> | TxDigest
+type TransactionSource = ReadonlyArray<TransactionFragment> | TransactionDigest
 
-const latestTxId = (
+const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
   currency: WalletCurrency,
-) =>
-  transactions
-    .filter((tx) => tx.settlementCurrency === currency)
-    .reduce(
-      (acc, tx) =>
-        tx.createdAt > acc.createdAt ? { createdAt: tx.createdAt, id: tx.id } : acc,
-      { createdAt: 0, id: "" },
-    ).id
+): string => {
+  const filteredTransactions = transactions.filter(
+    (transaction) => transaction.settlementCurrency === currency,
+  )
+  if (filteredTransactions.length === 0) return ""
 
-const isTxDigest = (value: TxSource): value is TxDigest => !Array.isArray(value)
+  const latestTransaction = filteredTransactions.reduce((latest, transaction) =>
+    transaction.createdAt > latest.createdAt ? transaction : latest,
+  )
+  return latestTransaction.id
+}
 
-export const useTransactionsNotification = (txSource: TxSource) => {
+const isTransactionDigest = (value: TransactionSource): value is TransactionDigest =>
+  !Array.isArray(value)
+
+export const useTransactionsNotification = (transactionSource: TransactionSource) => {
   const client = useApolloClient()
 
-  const latestTxIds = useMemo(() => {
-    if (isTxDigest(txSource)) {
+  const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
+    const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
+    const pendingTransactions =
+      data?.me?.defaultAccount?.pendingIncomingTransactions || []
+    const transactionEdges = data?.me?.defaultAccount?.transactions?.edges
+    if (!transactionEdges?.length) return pendingTransactions
+
+    const settledTransactions = transactionEdges
+      .map((edge) => edge.node)
+      .filter(
+        (transaction) =>
+          transaction.status !== TxStatus.Pending ||
+          transaction.direction === TxDirection.Send,
+      )
+    if (pendingTransactions.length === 0) return settledTransactions
+    return [...pendingTransactions, ...settledTransactions]
+  }, [client])
+
+  const latestTransactionIds = useMemo(() => {
+    const baseTransactions = isTransactionDigest(transactionSource)
+      ? transactionSource.transactions && transactionSource.transactions.length > 0
+        ? transactionSource.transactions
+        : readCachedTransactions()
+      : transactionSource.length > 0
+        ? transactionSource
+        : readCachedTransactions()
+
+    if (isTransactionDigest(transactionSource)) {
       return {
         btcId:
-          txSource.latestBtcTxId ??
-          latestTxId(txSource.transactions ?? [], WalletCurrency.Btc) ??
-          "",
+          transactionSource.latestBtcTxId ||
+          getLatestTransactionId(baseTransactions, WalletCurrency.Btc),
         usdId:
-          txSource.latestUsdTxId ??
-          latestTxId(txSource.transactions ?? [], WalletCurrency.Usd) ??
-          "",
+          transactionSource.latestUsdTxId ||
+          getLatestTransactionId(baseTransactions, WalletCurrency.Usd),
       }
     }
     return {
-      btcId: latestTxId(txSource, WalletCurrency.Btc),
-      usdId: latestTxId(txSource, WalletCurrency.Usd),
+      btcId: getLatestTransactionId(baseTransactions, WalletCurrency.Btc),
+      usdId: getLatestTransactionId(baseTransactions, WalletCurrency.Usd),
     }
-  }, [txSource])
+  }, [readCachedTransactions, transactionSource])
 
   const { data: lastSeenData } = useQuery<TxLastSeenQuery>(TxLastSeenDocument, {
     fetchPolicy: "cache-only",
     returnPartialData: true,
   })
 
-  const seenBtc = lastSeenData?.txLastSeen?.btcId ?? ""
-  const seenUsd = lastSeenData?.txLastSeen?.usdId ?? ""
-
-  const latestBtcTxId = latestTxIds.btcId
-  const latestUsdTxId = latestTxIds.usdId
+  const lastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
+  const lastSeenUsdId = lastSeenData?.txLastSeen?.usdId || ""
+  const latestBtcTxId = latestTransactionIds.btcId
+  const latestUsdTxId = latestTransactionIds.usdId
 
   const hasUnseenBtcTx = useMemo(
-    () => latestBtcTxId !== "" && latestBtcTxId !== seenBtc,
-    [latestBtcTxId, seenBtc],
+    () => latestBtcTxId !== "" && latestBtcTxId !== lastSeenBtcId,
+    [latestBtcTxId, lastSeenBtcId],
   )
+
   const hasUnseenUsdTx = useMemo(
-    () => latestUsdTxId !== "" && latestUsdTxId !== seenUsd,
-    [latestUsdTxId, seenUsd],
+    () => latestUsdTxId !== "" && latestUsdTxId !== lastSeenUsdId,
+    [latestUsdTxId, lastSeenUsdId],
   )
 
-  const markTxSeen = (currency: WalletCurrency) => {
-    if (currency === WalletCurrency.Btc) {
-      const id = latestBtcTxId
-      if (id) {
-        markTxLastSeenId(client, WalletCurrency.Btc, id)
+  const markTransactionAsSeen = useCallback(
+    (currency: WalletCurrency) => {
+      const transactionIdToMark =
+        currency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
+      if (transactionIdToMark) {
+        markTxLastSeenId(client, currency, transactionIdToMark)
       }
-      return
-    }
-    if (currency === WalletCurrency.Usd) {
-      const id = latestUsdTxId
-      if (id) {
-        markTxLastSeenId(client, WalletCurrency.Usd, id)
-      }
-    }
-  }
+    },
+    [client, latestBtcTxId, latestUsdTxId],
+  )
 
-  return { hasUnseenBtcTx, hasUnseenUsdTx, latestBtcTxId, latestUsdTxId, markTxSeen }
+  return {
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    latestBtcTxId,
+    latestUsdTxId,
+    markTxSeen: markTransactionAsSeen,
+  }
 }
