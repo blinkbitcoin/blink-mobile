@@ -120,7 +120,7 @@ export const SettingsScreen: React.FC = () => {
   return (
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
-        {currentLevel === AccountLevel.NonAuth && <AccountBanner />}
+        <AccountBanner />
         <SettingsGroup name={LL.common.account()} items={items.account} />
         {isAtLeastLevelOne && (
           <SettingsGroup
