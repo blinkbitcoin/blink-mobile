@@ -1,126 +1,176 @@
-import React, { useCallback } from "react"
-import { Pressable, View } from "react-native"
-import { Gesture, GestureDetector } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import React from "react"
+import { Dimensions, View, Pressable } from "react-native"
+import { PanGestureHandler } from "react-native-gesture-handler"
 import Animated, {
+  Extrapolate,
+  interpolate,
   runOnJS,
+  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated"
+import Icon from "react-native-vector-icons/Ionicons"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
-type PullUpHandleProps = {
-  onPullUp: () => void
+const SCREEN_WIDTH = Dimensions.get("screen").width
+const TOUCH_AREA_HEIGHT = 82
+const MAX_SWIPE_DISTANCE = 80
+const SWIPE_COMPLETION_TOLERANCE = 5
+
+type SlideUpHandleProps = {
+  onAction: () => void
   bottomOffset?: number
+  disabled?: boolean
 }
 
-type UseStylesProps = {
-  bottomOffset: number
-}
-
-const DRAG_THRESHOLD = -120
-const SPRING_BACK_MS = 100
-
-export const SlideUpHandle: React.FC<PullUpHandleProps> = ({
-  onPullUp,
+const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
+  onAction,
   bottomOffset = 20,
+  disabled = false,
 }) => {
   const {
     theme: { colors },
   } = useTheme()
   const styles = useStyles({ bottomOffset })
 
-  const y = useSharedValue(0)
-  const active = useSharedValue(0)
-  const trigger = useCallback(() => onPullUp(), [onPullUp])
+  const dragDistance = useSharedValue(0)
+  const isActive = useSharedValue(0)
 
-  const pan = Gesture.Pan()
-    .hitSlop({ top: 12, bottom: 24, left: 40, right: 40 })
-    .onBegin(() => {
-      active.value = withTiming(1, { duration: 100 })
-    })
-    .onUpdate((e) => {
-      y.value = Math.min(0, e.translationY)
-    })
-    .onEnd((e) => {
-      const shouldOpen = y.value < DRAG_THRESHOLD || e.velocityY < -500
-      if (shouldOpen) runOnJS(trigger)()
+  const gestureHandler = useAnimatedGestureHandler({
+    onStart: () => {
+      if (disabled) return
+      isActive.value = withTiming(1, { duration: 100 })
+    },
+    onActive: (event) => {
+      if (disabled) return
+      if (event.translationY >= 0) {
+        dragDistance.value = 0
+        return
+      }
 
-      y.value = withTiming(0, { duration: SPRING_BACK_MS })
-    })
-    .onFinalize(() => {
-      active.value = withTiming(0, { duration: 120 })
-    })
+      const distance = Math.abs(event.translationY)
+      dragDistance.value = Math.min(distance, MAX_SWIPE_DISTANCE)
+    },
+    onEnd: (event) => {
+      if (disabled) {
+        dragDistance.value = withSpring(0)
+        isActive.value = withTiming(0, { duration: 120 })
+        return
+      }
 
-  const aTranslate = useAnimatedStyle(() => ({
-    transform: [{ translateY: y.value * 0.35 }],
+      const isSwipingUp = event.translationY < 0
+      const isFullSwipe =
+        isSwipingUp &&
+        dragDistance.value >= MAX_SWIPE_DISTANCE - SWIPE_COMPLETION_TOLERANCE
+
+      if (isFullSwipe) {
+        runOnJS(onAction)()
+      }
+
+      dragDistance.value = withSpring(0)
+      isActive.value = withTiming(0, { duration: 120 })
+    },
+    onCancel: () => {
+      dragDistance.value = withSpring(0)
+      isActive.value = withTiming(0, { duration: 120 })
+    },
+    onFail: () => {
+      dragDistance.value = withSpring(0)
+      isActive.value = withTiming(0, { duration: 120 })
+    },
+  })
+
+  const containerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: isActive.value,
   }))
 
-  const aHighlight = useAnimatedStyle(() => ({
-    opacity: active.value,
-    transform: [{ scale: 1 + active.value * 0.06 }],
+  const progressBarStyle = useAnimatedStyle(() => {
+    const progress = dragDistance.value / MAX_SWIPE_DISTANCE
+    return {
+      height: interpolate(progress, [0, 1], [0, 64], Extrapolate.CLAMP),
+    }
+  })
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: -dragDistance.value * 0.35 },
+      { scale: interpolate(isActive.value, [0, 1], [1, 1.06], Extrapolate.CLAMP) },
+    ],
   }))
 
   return (
     <View pointerEvents="box-none" style={styles.overlay}>
-      <GestureDetector gesture={pan}>
-        <Animated.View style={[styles.pill, aTranslate]}>
-          <Animated.View style={[styles.highlightBg, aHighlight]} />
+      <PanGestureHandler enabled={!disabled} onGestureEvent={gestureHandler}>
+        <Animated.View style={styles.touchArea}>
+          <Animated.View style={[styles.progressContainer, containerAnimatedStyle]}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                { backgroundColor: colors.grey3 },
+                progressBarStyle,
+              ]}
+            />
+          </Animated.View>
           <Pressable
-            hitSlop={12}
-            onPress={() => trigger()}
-            onPressIn={() => (active.value = withTiming(1, { duration: 80 }))}
-            onPressOut={() => (active.value = withTiming(0, { duration: 120 }))}
-            style={styles.press}
+            disabled={disabled}
+            onPress={() => {
+              if (!disabled) onAction()
+            }}
+            style={styles.iconPressable}
           >
-            <Icon name="chevron-up-outline" size={18} color={colors.grey2} />
+            <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
+              <Icon name="chevron-up-outline" size={18} color={colors.black} />
+            </Animated.View>
           </Pressable>
         </Animated.View>
-      </GestureDetector>
+      </PanGestureHandler>
     </View>
   )
 }
 
-const useStyles = makeStyles(({ colors }, { bottomOffset }: UseStylesProps) => ({
-  overlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: bottomOffset,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  pill: {
-    height: 24,
-    width: "100%",
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  highlightBg: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
-    borderColor: colors.grey4,
-    borderWidth: 1,
-    shadowColor: colors.black,
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  press: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-}))
+const useStyles = makeStyles(
+  ({ colors }, { bottomOffset }: { bottomOffset: number }) => ({
+    overlay: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: bottomOffset,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    touchArea: {
+      width: SCREEN_WIDTH - 40,
+      height: TOUCH_AREA_HEIGHT,
+      alignItems: "center",
+      justifyContent: "flex-end",
+    },
+    progressContainer: {
+      position: "absolute",
+      bottom: 10,
+      width: 46,
+      height: 64,
+      borderRadius: 23,
+      backgroundColor: colors.grey5,
+      overflow: "hidden",
+      alignItems: "center",
+      justifyContent: "flex-end",
+    },
+    progressFill: {
+      width: "100%",
+      borderRadius: 23,
+    },
+    iconPressable: {
+      marginBottom: 4,
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  }),
+)
 
 export default SlideUpHandle
