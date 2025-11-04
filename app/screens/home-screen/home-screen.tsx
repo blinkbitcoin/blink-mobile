@@ -249,7 +249,7 @@ export const HomeScreen: React.FC = () => {
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { incomingAmountText, handleIncomingBadgePress, isOutgoing } =
+  const { latestIncomingTx, incomingAmountText, handleIncomingBadgePress, isOutgoing } =
     useIncomingAmountBadge({
       transactions,
       hasUnseenBtcTx,
@@ -451,6 +451,7 @@ export const HomeScreen: React.FC = () => {
       </View>
       <View style={styles.badgeSlot}>
         <IncomingAmountBadge
+          key={latestIncomingTx?.id}
           text={incomingAmountText ?? ""}
           visible={Boolean(incomingAmountText)}
           onPress={handleIncomingBadgePress}

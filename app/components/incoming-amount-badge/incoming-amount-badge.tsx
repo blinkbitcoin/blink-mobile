@@ -44,6 +44,7 @@ export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
       style={styles.touch}
     >
       <Animated.View
+        key={text}
         style={[
           styles.badge,
           visible ? { opacity, transform: [{ translateY }] } : HIDDEN_STYLE,
