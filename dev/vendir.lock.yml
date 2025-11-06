@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'chore(release): [ci skip] bump quickstart image to sha256@e06d6381813012d3abcf129d9eb10e8e7fae7c9cfd9a6857b726a9cbba238f93'
-      sha: 14743a8178f215f429608615db872ceb3b114bdb
+      commitTitle: 'chore(release): [ci skip] bump quickstart image to sha256@d946a4de44c88dc188f5f416176c350acfecce8173b034bde75d7360b6865454'
+      sha: 43b1037676b141ab1c7721a3a0b1561cd9ccc31f
       tags:
-      - 0.20.151
+      - 0.21.18
     path: galoy-quickstart
   path: vendor
 kind: LockConfig
