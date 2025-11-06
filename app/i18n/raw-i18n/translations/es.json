@@ -2701,7 +2701,8 @@
         },
         "dollar": "Dólar",
         "all": "TODAS",
-        "allAccounts": "Todas las cuentas"
+        "allAccounts": "Todas las cuentas",
+        "some": "Algunos"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

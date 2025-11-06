@@ -8839,6 +8839,10 @@ type RootTranslation = {
 		 * A​l​l​ ​a​c​c​o​u​n​t​s
 		 */
 		allAccounts: string
+		/**
+		 * S​o​m​e
+		 */
+		some: string
 	}
 	errors: {
 		/**
@@ -18135,6 +18139,10 @@ export type TranslationFunctions = {
 		 * All accounts
 		 */
 		allAccounts: () => LocalizedString
+		/**
+		 * Some
+		 */
+		some: () => LocalizedString
 	}
 	errors: {
 		/**
