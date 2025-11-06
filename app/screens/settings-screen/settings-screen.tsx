@@ -106,12 +106,8 @@ export const SettingsScreen: React.FC = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
-          <Icon style={styles.headerRight} name="notifications" type="ionicon" />
-          {count !== 0 && (
-            <Text type="p4" style={styles.notificationCount}>
-              {count}
-            </Text>
-          )}
+          <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
+          {count !== 0 && <Text type="p4" style={styles.notificationCount}></Text>}
         </TouchableOpacity>
       ),
     })
@@ -162,11 +158,11 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 9,
     top: -3,
     color: colors._darkGrey,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.black,
     textAlign: "center",
     verticalAlign: "middle",
-    height: 18,
-    width: 18,
+    height: 14,
+    width: 14,
     borderRadius: 9,
     overflow: "hidden",
   },
