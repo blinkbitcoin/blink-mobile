@@ -2114,13 +2114,13 @@ describe("Earn utils test", () => {
   it("Converts quiz sections to proper types", () => {
     loadLocale("en")
     const LL = i18nObject("en")
-    const quizSectionContent = getQuizQuestionsContent({ LL })
+    const quizSectionContent = getQuizQuestionsContent({ LL }) 
     expect(quizSectionContent).toStrictEqual(expectedEnglishQuizSections)
   })
 
   describe("skipRewardErrorCodes", () => {
     it("returns true for codes in skipRewardErrorCodesList", () => {
-      expect(skipRewardErrorCodes("INVALID_INPUT")).toBe(true)
+      expect(skipRewardErrorCodes("NOT_ENOUGH_BALANCE_FOR_QUIZ")).toBe(true)
       expect(skipRewardErrorCodes("QUIZ_CLAIMED_TOO_EARLY")).toBe(true)
     })
 
@@ -2133,12 +2133,12 @@ describe("Earn utils test", () => {
 
   describe("errorCodeAlertAlreadyShown & markErrorCodeAlertAsShown", () => {
     it("returns false if code has not been marked yet", () => {
-      expect(errorCodeAlertAlreadyShown("INVALID_INPUT")).toBe(false)
+      expect(errorCodeAlertAlreadyShown("NOT_ENOUGH_BALANCE_FOR_QUIZ")).toBe(false)
     })
 
     it("returns true after marking the code", () => {
-      markErrorCodeAlertAsShown("INVALID_INPUT")
-      expect(errorCodeAlertAlreadyShown("INVALID_INPUT")).toBe(true)
+      markErrorCodeAlertAsShown("NOT_ENOUGH_BALANCE_FOR_QUIZ")
+      expect(errorCodeAlertAlreadyShown("NOT_ENOUGH_BALANCE_FOR_QUIZ")).toBe(true)
     })
 
     it("ignores null or undefined codes", () => {
