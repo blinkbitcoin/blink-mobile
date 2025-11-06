@@ -27,12 +27,7 @@ export const AccountLNAddress: React.FC = () => {
     <>
       <SettingsRow
         loading={loading}
-        title={
-          hasUsername
-            ? LL.GaloyAddressScreen.yourLightningAddress()
-            : LL.SettingsScreen.setYourLightningAddress()
-        }
-        subtitle={hasUsername ? lnAddress : undefined}
+        title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(data?.me?.username || "").length > 22}
         leftIcon="at-outline"
         rightIcon={hasUsername ? "copy-outline" : undefined}
