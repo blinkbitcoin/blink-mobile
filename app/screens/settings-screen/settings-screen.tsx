@@ -21,6 +21,7 @@ import { SettingsGroup } from "./group"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
+import { PhoneNAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
@@ -83,7 +84,7 @@ export const SettingsScreen: React.FC = () => {
 
   const items = {
     account: [AccountLevelSetting, TxLimits, SwitchAccount],
-    waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
+    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, /*AccountStaticQR*/],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,

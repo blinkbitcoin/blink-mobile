@@ -9,7 +9,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 
 import { SettingsRow } from "../row"
 
-export const AccountLNAddress: React.FC = () => {
+export const PhoneNAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
   const hostName = appConfig.galoyInstance.lnAddressHostname
 
@@ -20,8 +20,8 @@ export const AccountLNAddress: React.FC = () => {
 
   const { LL } = useI18nContext()
 
-  const hasUsername = Boolean(data?.me?.username)
-  const lnAddress = `${data?.me?.username}@${hostName}`
+  const hasUsername = Boolean(data?.me?.phone)
+  const lnAddress = `${data?.me?.phone}@${hostName}`
 
   return (
     <>
@@ -29,7 +29,7 @@ export const AccountLNAddress: React.FC = () => {
         loading={loading}
         title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(data?.me?.username || "").length > 22}
-        leftGaloyIcon="lightning-address"
+        leftIcon="phone-portrait-outline"
         rightIcon={hasUsername ? "copy-outline" : undefined}
         action={() => {
           if (hasUsername) {
