@@ -76,12 +76,7 @@ export const PhoneSetting: React.FC = () => {
   return (
     <SettingsRow
       loading={loading}
-      title={
-        phoneVerified
-          ? LL.AccountScreen.phoneNumber()
-          : LL.AccountScreen.tapToAddPhoneNumber()
-      }
-      subtitle={phone || undefined}
+      title={phoneVerified ? phone || "" : LL.AccountScreen.tapToAddPhoneNumber()}
       leftIcon="call-outline"
       action={phoneVerified ? null : () => navigate("phoneRegistrationInitiate")}
       spinner={phoneDeleteLoading}
