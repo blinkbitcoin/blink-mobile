@@ -2114,7 +2114,7 @@ describe("Earn utils test", () => {
   it("Converts quiz sections to proper types", () => {
     loadLocale("en")
     const LL = i18nObject("en")
-    const quizSectionContent = getQuizQuestionsContent({ LL }) 
+    const quizSectionContent = getQuizQuestionsContent({ LL })
     expect(quizSectionContent).toStrictEqual(expectedEnglishQuizSections)
   })
 
