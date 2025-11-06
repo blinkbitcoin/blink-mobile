@@ -59,7 +59,7 @@ const title = (
   LL: TranslationFunctions,
 ): string => {
   if (email) {
-    if (emailVerified) return LL.AccountScreen.email()
+    if (emailVerified) return email?.toString()
     return LL.AccountScreen.unverifiedEmail()
   }
   return LL.AccountScreen.tapToAddEmail()
@@ -178,7 +178,6 @@ export const EmailSetting: React.FC = () => {
       loading={loading}
       spinner={emDelLoading || emRegLoading}
       title={title(email, emailVerified, LL)}
-      subtitle={emailVerified ? email?.toString() : email}
       leftIcon="mail-outline"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
