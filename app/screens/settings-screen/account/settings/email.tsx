@@ -13,7 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
@@ -67,6 +67,9 @@ const title = (
 
 export const EmailSetting: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -159,7 +162,13 @@ export const EmailSetting: React.FC = () => {
         <GaloyIconButton name="refresh" size="medium" onPress={reVerifyEmailPrompt} />
       )}
       {(bothEmailAndPhoneVerified || (email && !emailVerified)) && (
-        <GaloyIconButton name="close" size="medium" onPress={deleteEmailPrompt} />
+        <GaloyIconButton
+          name="close"
+          size="medium"
+          iconOnly
+          onPress={deleteEmailPrompt}
+          color={colors.red}
+        />
       )}
     </View>
   ) : undefined

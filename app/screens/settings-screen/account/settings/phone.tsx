@@ -12,6 +12,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
+import { useTheme } from "@rn-vui/themed"
 
 gql`
   mutation userPhoneDelete {
@@ -34,6 +35,9 @@ gql`
 
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { loading, phone, emailVerified, phoneVerified } = useLoginMethods()
@@ -84,7 +88,13 @@ export const PhoneSetting: React.FC = () => {
       rightIcon={
         phoneVerified ? (
           emailVerified ? (
-            <GaloyIconButton name="close" size="medium" onPress={deletePhonePrompt} />
+            <GaloyIconButton
+              name="close"
+              size="medium"
+              color={colors.red}
+              iconOnly
+              onPress={deletePhonePrompt}
+            />
           ) : null
         ) : (
           "chevron-forward"
