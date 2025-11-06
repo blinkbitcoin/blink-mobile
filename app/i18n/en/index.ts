@@ -2356,6 +2356,7 @@ const en: BaseTranslation = {
     logoutOneAccountAlertTitle: "Are you sure you want to log out from this account?",
     logoutOneAccountAlertContent: "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
     logoutOneAccountConfirm: "I understand. Please log out.",
+    receiveCurrency: "Receive Currency",
   },
   NotificationSettingsScreen: {
     title: "Notification Settings",

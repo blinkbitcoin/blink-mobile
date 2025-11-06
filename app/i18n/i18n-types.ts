@@ -7379,6 +7379,10 @@ type RootTranslation = {
 		 * I​ ​u​n​d​e​r​s​t​a​n​d​.​ ​P​l​e​a​s​e​ ​l​o​g​ ​o​u​t​.
 		 */
 		logoutOneAccountConfirm: string
+		/**
+		 * R​e​c​e​i​v​e​ ​C​u​r​r​e​n​c​y
+		 */
+		receiveCurrency: string
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -16704,6 +16708,10 @@ export type TranslationFunctions = {
 		 * I understand. Please log out.
 		 */
 		logoutOneAccountConfirm: () => LocalizedString
+		/**
+		 * Receive Currency
+		 */
+		receiveCurrency: () => LocalizedString
 	}
 	NotificationSettingsScreen: {
 		/**
