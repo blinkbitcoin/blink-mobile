@@ -2284,7 +2284,8 @@
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
-        "receiveCurrency": "Recibir Moneda"
+        "receiveCurrency": "Recibir Moneda",
+        "displayCurrency": "Mostrar Moneda"
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de Notificaciones ",

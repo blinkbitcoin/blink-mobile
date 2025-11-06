@@ -89,8 +89,8 @@ export const SettingsScreen: React.FC = () => {
     preferences: [
       NotificationSetting,
       DefaultWallet,
-      LanguageSetting,
       CurrencySetting,
+      LanguageSetting,
       ThemeSetting,
     ],
     securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],

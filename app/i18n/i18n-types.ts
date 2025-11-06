@@ -7383,6 +7383,10 @@ type RootTranslation = {
 		 * R​e​c​e​i​v​e​ ​C​u​r​r​e​n​c​y
 		 */
 		receiveCurrency: string
+		/**
+		 * D​i​s​p​l​a​y​ ​C​u​r​r​e​n​c​y
+		 */
+		displayCurrency: string
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -16712,6 +16716,10 @@ export type TranslationFunctions = {
 		 * Receive Currency
 		 */
 		receiveCurrency: () => LocalizedString
+		/**
+		 * Display Currency
+		 */
+		displayCurrency: () => LocalizedString
 	}
 	NotificationSettingsScreen: {
 		/**
