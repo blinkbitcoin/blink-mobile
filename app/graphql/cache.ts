@@ -64,6 +64,9 @@ export const createCache = () =>
           },
         },
       },
+      TxLastSeen: {
+        keyFields: [],
+      },
       Query: {
         fields: {
           // local only fields
@@ -102,6 +105,12 @@ export const createCache = () =>
           },
           deviceSessionCount: {
             read: (value) => value ?? 0,
+          },
+          txLastSeen: {
+            read(existing) {
+              if (existing) return existing
+              return { btcId: "", usdId: "" }
+            },
           },
         },
       },

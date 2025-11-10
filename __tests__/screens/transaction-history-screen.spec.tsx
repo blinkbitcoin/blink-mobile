@@ -7,8 +7,10 @@ import { TransactionHistoryScreen } from "@app/screens/transaction-history"
 
 import { ContextForScreen } from "./helper"
 
-const mockRoute: RouteProp<RootStackParamList, "transactionHistory"> = {
-  key: "transactionHistory-test",
+const mockRouteWithCurrencyFilter = (
+  currency?: "BTC" | "USD",
+): RouteProp<RootStackParamList, "transactionHistory"> => ({
+  key: `transactionHistory-test`,
   name: "transactionHistory",
   params: {
     wallets: [
@@ -21,8 +23,9 @@ const mockRoute: RouteProp<RootStackParamList, "transactionHistory"> = {
         walletCurrency: "USD",
       },
     ],
+    ...(currency ? { currencyFilter: currency } : {}),
   },
-}
+})
 
 describe("TransactionHistoryScreen", () => {
   afterEach(cleanup)
@@ -30,7 +33,7 @@ describe("TransactionHistoryScreen", () => {
   it("shows all transactions by default", async () => {
     const { findByTestId } = render(
       <ContextForScreen>
-        <TransactionHistoryScreen route={mockRoute} />
+        <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
       </ContextForScreen>,
     )
 
@@ -40,7 +43,7 @@ describe("TransactionHistoryScreen", () => {
   it("filters only BTC transactions", async () => {
     const screen = render(
       <ContextForScreen>
-        <TransactionHistoryScreen route={mockRoute} />
+        <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
       </ContextForScreen>,
     )
 
@@ -59,5 +62,20 @@ describe("TransactionHistoryScreen", () => {
       expect(screen.queryByText("user_btc")).toBeTruthy()
       expect(screen.queryByText("user_usd")).toBeNull()
     })
+  })
+
+  it("filters only BTC by route param", async () => {
+    const screen = render(
+      <ContextForScreen>
+        <TransactionHistoryScreen route={mockRouteWithCurrencyFilter("BTC")} />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
+    })
+
+    expect(screen.queryByText("user_btc")).toBeTruthy()
+    expect(screen.queryByText("user_usd")).toBeNull()
   })
 })
