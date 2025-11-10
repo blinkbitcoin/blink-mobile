@@ -15,6 +15,7 @@ extend type Query {
   introducingCirclesModalShown: Boolean!
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
+  deviceSessionCount: Int!
 }
 
 extend type Region {

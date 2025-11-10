@@ -1,6 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
-import { ThemeProvider } from "@rneui/themed"
+import { ThemeProvider } from "@rn-vui/themed"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import theme from "@app/rne-theme/theme"

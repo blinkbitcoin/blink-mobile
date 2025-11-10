@@ -12,7 +12,7 @@ import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import HoneyBadgerShovel from "./honey-badger-shovel-01.svg"
 

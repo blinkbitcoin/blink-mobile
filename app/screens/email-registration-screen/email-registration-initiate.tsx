@@ -5,7 +5,7 @@ import validator from "validator"
 import { gql } from "@apollo/client"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Input, Text, makeStyles } from "@rneui/themed"
+import { Input, Text, makeStyles } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -184,7 +184,7 @@ export const EmailRegistrationInitiateScreen: React.FC<
           <GaloyPrimaryButton
             title={LL.EmailRegistrationInitiateScreen.send()}
             loading={loading}
-            disabled={!emailInput}
+            disabled={!validator.isEmail(emailInput)}
             onPress={submit}
           />
           {onboarding && (

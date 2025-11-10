@@ -7,7 +7,7 @@ import theme from "@app/rne-theme/theme"
 import { detectDefaultLocale } from "@app/utils/locale-detector"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { ThemeProvider } from "@rneui/themed"
+import { ThemeProvider } from "@rn-vui/themed"
 
 import { StoryScreen } from "../../.storybook/views"
 import { createCache } from "../../app/graphql/cache"

@@ -15,7 +15,7 @@ import Animated, {
 } from "react-native-reanimated"
 
 import { testProps } from "@app/utils/testProps"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 

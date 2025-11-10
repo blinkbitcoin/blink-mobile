@@ -1,6 +1,5 @@
 import { getParams } from "js-lnurl"
-import { requestPayServiceParams } from "lnurl-pay"
-import { LnUrlPayServiceResponse } from "lnurl-pay/dist/types/types"
+import { requestPayServiceParams, LnUrlPayServiceResponse } from "lnurl-pay"
 
 import {
   AccountDefaultWalletLazyQueryHookResult,
@@ -157,6 +156,7 @@ export const createLnurlPaymentDestination = (
       destinationSpecifiedMemo: resolvedLnurlPaymentDestination.lnurlParams.description,
       convertMoneyAmount,
       unitOfAccountAmount: toBtcMoneyAmount(minAmount),
+      isMerchant: resolvedLnurlPaymentDestination.isMerchant,
     })
   }
   return {

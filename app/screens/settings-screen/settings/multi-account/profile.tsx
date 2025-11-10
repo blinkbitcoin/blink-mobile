@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, Alert } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { ListItem, Avatar, Overlay, Text, makeStyles } from "@rneui/themed"
+import { ListItem, Avatar, Overlay, Text, makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"

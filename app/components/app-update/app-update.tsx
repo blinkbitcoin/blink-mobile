@@ -8,7 +8,7 @@ import { VersionComponent } from "@app/components/version"
 import { APP_STORE_LINK, PLAY_STORE_LINK } from "@app/config"
 import { useMobileUpdateQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { isIos } from "../../utils/helper"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"

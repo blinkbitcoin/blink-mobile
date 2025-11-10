@@ -1,6 +1,6 @@
 import React from "react"
 import { ActivityIndicator, TouchableHighlight, ViewStyle, StyleProp } from "react-native"
-import { useTheme, makeStyles } from "@rneui/themed"
+import { useTheme, makeStyles } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 
 export type WalletToggleButtonProps = {

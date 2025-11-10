@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { View, TextInput, Animated, Easing } from "react-native"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
 import {

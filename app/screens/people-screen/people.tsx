@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { CirclesCardPeopleHome } from "./circles/circles-card-people-home"
@@ -11,7 +11,7 @@ export const PeopleScreen: React.FC = () => {
   const styles = useStyles()
 
   return (
-    <Screen style={styles.screen} preset="scroll">
+    <Screen style={styles.screen} preset="scroll" headerShown={false}>
       <CirclesCardPeopleHome />
       <ContactsCard />
       <InviteFriendsCard />

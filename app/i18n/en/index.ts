@@ -2620,12 +2620,10 @@ const en: BaseTranslation = {
       primaryButton: "Set up Custom Address",
     },
     supportScreen: {
-      mainTitle: "Blink feedback",
-      title: "One more thing:",
-      description: "We are on a mission to make bitcoin accessible to all, and we would love to hear from you.",
-      contactInfo: "Don't hesitate to contact us at {email} and share how we can make Blink better for you and others.",
+      mainTitle: "We love feedback",
+      title: "All set!",
+      description: "Any feedback is most welcome, feel free to ping us at {email}",
       primaryButton: "Done",
-      secondaryButton: "Give feedback now",
     }
   },
   PhoneLoginValidationScreen: {

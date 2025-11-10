@@ -1,26 +1,37 @@
 import * as React from "react"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import {
+  OnboardingStackParamList,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 
 import { OnboardingLayout } from "./onboarding-layout"
 
-export const SupportOnboardingScreen: React.FC = () => {
+type SupportOnboardingScreenProps = {
+  route: RouteProp<OnboardingStackParamList, "supportScreen">
+}
+
+export const SupportOnboardingScreen: React.FC<SupportOnboardingScreenProps> = ({
+  route,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { feedbackEmailAddress } = useRemoteConfig()
 
+  const canGoBack = route.params?.canGoBack ?? true
+
   const handlePrimaryAction = () => {
     navigation.replace("Primary")
   }
 
-  const contactInfoString = LL.OnboardingScreen.supportScreen.contactInfo({
+  const contactInfoString = LL.OnboardingScreen.supportScreen.description({
     email: feedbackEmailAddress,
   })
 
@@ -29,28 +40,26 @@ export const SupportOnboardingScreen: React.FC = () => {
   // Prevent back navigation
   useFocusEffect(
     React.useCallback(() => {
+      if (canGoBack) return
+
       const unsubscribe = navigation.addListener("beforeRemove", (e) => {
         if (e.data.action.type === "POP" || e.data.action.type === "GO_BACK") {
           e.preventDefault()
         }
       })
       return unsubscribe
-    }, [navigation]),
+    }, [navigation, canGoBack]),
   )
 
   return (
     <OnboardingLayout
+      title={LL.OnboardingScreen.supportScreen.title()}
       customContent={
-        <>
-          <Text type="h2" style={styles.descriptionText}>
-            {LL.OnboardingScreen.supportScreen.description()}
-          </Text>
-          <Text type="h2" style={styles.descriptionText}>
-            {prefix}
-            <Text style={styles.linkText}>{feedbackEmailAddress}</Text>
-            {suffix}
-          </Text>
-        </>
+        <Text type="h2" style={styles.descriptionText}>
+          {prefix}
+          <Text style={styles.linkText}>{feedbackEmailAddress}</Text>
+          {suffix}
+        </Text>
       }
       primaryLabel={LL.OnboardingScreen.supportScreen.primaryButton()}
       onPrimaryAction={handlePrimaryAction}

@@ -17,7 +17,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Button, Text, makeStyles } from "@rneui/themed"
+import { Button, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
@@ -57,20 +57,22 @@ export const DeveloperScreen: React.FC = () => {
   const { data: dataDebug } = useDebugScreenQuery()
   const accountId = dataDebug?.me?.defaultAccount?.id
 
-  const [urlWebView, setUrlWebView] = React.useState("https://fiat.blink.sv")
-  const [urlInAppBrowser, setUrlInAppBrowser] = React.useState("https://kyc.blink.sv")
+  const currentGaloyInstance = appConfig.galoyInstance
+
+  const [urlWebView, setUrlWebView] = React.useState(currentGaloyInstance.fiatUrl)
+  const [urlInAppBrowser, setUrlInAppBrowser] = React.useState(
+    currentGaloyInstance.kycUrl,
+  )
 
   React.useEffect(() => {
-    setUrlWebView(`https://fiat.blink.sv?accountId=${accountId}`)
-    setUrlInAppBrowser(`https://kyc.blink.sv?accountId=${accountId}`)
-  }, [accountId])
+    setUrlWebView(`${currentGaloyInstance.fiatUrl}?accountId=${accountId}`)
+    setUrlInAppBrowser(`${currentGaloyInstance.kycUrl}?accountId=${accountId}`)
+  }, [accountId, currentGaloyInstance.fiatUrl, currentGaloyInstance.kycUrl])
 
   const [newToken, setNewToken] = React.useState(token)
   const [hasFlowFinishedSuccessfully, setHasFlowFinishedSuccessfully] = React.useState<
     undefined | boolean
   >(undefined)
-
-  const currentGaloyInstance = appConfig.galoyInstance
 
   const [newGraphqlUri, setNewGraphqlUri] = React.useState(
     currentGaloyInstance.id === "Custom" ? currentGaloyInstance.graphqlUri : "",
@@ -84,6 +86,10 @@ export const DeveloperScreen: React.FC = () => {
 
   const [newKycUrl, setNewKycUrl] = React.useState(
     currentGaloyInstance.id === "Custom" ? currentGaloyInstance.kycUrl : "",
+  )
+
+  const [newFiatUrl, setNewFiatUrl] = React.useState(
+    currentGaloyInstance.id === "Custom" ? currentGaloyInstance.fiatUrl : "",
   )
 
   const [newRestUrl, setNewRestUrl] = React.useState(
@@ -112,6 +118,7 @@ export const DeveloperScreen: React.FC = () => {
         newGraphqlWslUri !== currentGaloyInstance.graphqlWsUri ||
         newPosUrl !== currentGaloyInstance.posUrl ||
         newKycUrl !== currentGaloyInstance.kycUrl ||
+        newFiatUrl !== currentGaloyInstance.fiatUrl ||
         newRestUrl !== currentGaloyInstance.authUrl ||
         newLnAddressHostname !== currentGaloyInstance.lnAddressHostname))
 
@@ -183,6 +190,7 @@ export const DeveloperScreen: React.FC = () => {
           authUrl: newRestUrl,
           posUrl: newPosUrl,
           kycUrl: newKycUrl,
+          fiatUrl: newFiatUrl,
           lnAddressHostname: newLnAddressHostname,
           name: "Custom", // TODO: make configurable
           blockExplorer: "https://mempool.space/tx/", // TODO make configurable
@@ -409,6 +417,15 @@ export const DeveloperScreen: React.FC = () => {
                   autoCorrect={false}
                   value={newKycUrl}
                   onChangeText={setNewKycUrl}
+                  selectTextOnFocus
+                />
+                <GaloyInput
+                  label="Fiat Url"
+                  placeholder={"Fiat Url"}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={newFiatUrl}
+                  onChangeText={setNewFiatUrl}
                   selectTextOnFocus
                 />
                 <GaloyInput

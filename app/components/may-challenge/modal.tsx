@@ -4,7 +4,7 @@ import Modal from "react-native-modal"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useCirclesCard } from "@app/screens/people-screen/circles/use-circles-card"
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"

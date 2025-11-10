@@ -1,6 +1,6 @@
 import React from "react"
 import { View, StyleProp, ViewStyle } from "react-native"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 

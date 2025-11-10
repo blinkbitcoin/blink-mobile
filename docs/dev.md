@@ -98,8 +98,8 @@ You can download XCode and Simulator blazingly fast and let the CLI do all of th
 Here are the commands that do it:
 
 ```bash
-xcodes install 16.2 # Or whatever version direnv tells you about
-xcodes runtimes install "iOS 18.2" # Or the latest iOS out there
+xcodes install 16.4 # Or whatever version direnv tells you about
+xcodes runtimes install "iOS 18.5" # Or the latest iOS out there
 ```
 
 Xcodes install for the first time prompts you for Apple ID and Password. This is because Apple's license for XCode prohibits distribution of XCode from other servers than their own. And downloads from it can only work if you are authenticated. Hence, to use XCode, you need an Apple ID.

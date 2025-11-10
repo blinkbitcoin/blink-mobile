@@ -15,7 +15,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, SearchBar, Text } from "@rneui/themed"
+import { makeStyles, SearchBar, Text } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 

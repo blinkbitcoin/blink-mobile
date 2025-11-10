@@ -35,7 +35,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
 import useFee from "./use-fee"
@@ -148,8 +148,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
 
       if (status === "SUCCESS" || status === "PENDING") {
-        // Save contact if payment type is lnurl and destination is a valid ln address
-        await saveLnAddressContact({ paymentType, destination })
+        await saveLnAddressContact({
+          paymentType,
+          destination,
+          isMerchant:
+            paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
+        })
 
         navigation.dispatch((state) => {
           const routes = [
@@ -206,8 +210,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }, [
     LL,
     navigation,
-    paymentDetail.paymentType,
-    paymentDetail?.successAction,
+    paymentDetail,
     sendPayment,
     setPaymentError,
     sendingWalletDescriptor?.currency,

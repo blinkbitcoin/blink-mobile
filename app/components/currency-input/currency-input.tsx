@@ -10,7 +10,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native"
-import { Input, Text, useTheme, makeStyles } from "@rneui/themed"
+import { Input, Text, useTheme, makeStyles } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 

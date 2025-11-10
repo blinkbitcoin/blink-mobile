@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 

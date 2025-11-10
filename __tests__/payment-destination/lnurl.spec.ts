@@ -1,6 +1,5 @@
 import { LNURLResponse, LNURLWithdrawParams, getParams } from "js-lnurl"
-import { requestPayServiceParams } from "lnurl-pay"
-import { LnUrlPayServiceResponse, Satoshis } from "lnurl-pay/dist/types/types"
+import { requestPayServiceParams, LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
 
 import {
   createLnurlPaymentDestination,
@@ -84,6 +83,7 @@ describe("resolve lnurl destination", () => {
         paymentType: PaymentType.Lnurl,
         valid: true,
         lnurl: "test@domain.com",
+        isMerchant: false,
       } as const,
       lnurlDomains: ["ourdomain.com"],
       accountDefaultWalletQuery: jest.fn(),
@@ -120,6 +120,7 @@ describe("resolve lnurl destination", () => {
         paymentType: PaymentType.Lnurl,
         valid: true,
         lnurl: "lnurlrandomstring",
+        isMerchant: false,
       } as const,
       lnurlDomains: ["ourdomain.com"],
       accountDefaultWalletQuery: jest.fn(),
@@ -155,6 +156,7 @@ describe("resolve lnurl destination", () => {
         paymentType: PaymentType.Lnurl,
         valid: true,
         lnurl: "lnurlrandomstring",
+        isMerchant: false,
       } as const,
       lnurlDomains: ["ourdomain.com"],
       accountDefaultWalletQuery: jest.fn(),
@@ -222,6 +224,7 @@ describe("create lnurl destination", () => {
       paymentType: "lnurl",
       valid: true,
       lnurl: "testlnurl",
+      isMerchant: false,
       lnurlParams: manualMockLnUrlPayServiceResponse,
     } as const
 
@@ -238,6 +241,7 @@ describe("create lnurl destination", () => {
       convertMoneyAmount: defaultPaymentDetailParams.convertMoneyAmount,
       sendingWalletDescriptor: defaultPaymentDetailParams.sendingWalletDescriptor,
       destinationSpecifiedMemo: lnurlPaymentDestinationParams.lnurlParams.description,
+      isMerchant: false,
     })
   })
 })

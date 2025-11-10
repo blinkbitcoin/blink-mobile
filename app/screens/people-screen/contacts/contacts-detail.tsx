@@ -9,7 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme, Input } from "@rneui/themed"
+import { makeStyles, Text, useTheme, Input } from "@rn-vui/themed"
 
 import { CloseCross } from "../../../components/close-cross"
 import { Screen } from "../../../components/screen"
@@ -75,7 +75,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   }
 
   return (
-    <Screen unsafe>
+    <Screen headerShown={false}>
       <View style={styles.aliasView}>
         <Icon
           {...testProps("contact-detail-icon")}

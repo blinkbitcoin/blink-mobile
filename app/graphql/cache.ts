@@ -100,6 +100,9 @@ export const createCache = () =>
           upgradeModalLastShownAt: {
             read: (value) => value ?? null,
           },
+          deviceSessionCount: {
+            read: (value) => value ?? 0,
+          },
         },
       },
       Wallet: {

@@ -1,9 +1,9 @@
 import React from "react"
 import { View, TouchableOpacity, TextInput, StyleProp, ViewStyle } from "react-native"
-import { Input, Text, makeStyles, useTheme } from "@rneui/themed"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { WalletCurrency } from "@app/graphql/generated"
 import { GaloyCurrencyBubbleText } from "@app/components/atomic/galoy-currency-bubble-text"
-import { IconNode } from "@rneui/base"
+import { IconNode } from "@rn-vui/base"
 
 export type WalletAmountRowProps = {
   inputRef: React.RefObject<TextInput>

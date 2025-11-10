@@ -2,7 +2,7 @@ import React from "react"
 import { getStorybookUI } from "@storybook/react-native"
 
 import { NavigationContainer } from "@react-navigation/native"
-import { ThemeProvider } from "@rneui/themed"
+import { ThemeProvider } from "@rn-vui/themed"
 import { createStackNavigator } from "@react-navigation/stack"
 import theme from "@app/rne-theme/theme"
 import TypesafeI18n from "@app/i18n/i18n-react"

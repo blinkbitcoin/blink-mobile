@@ -45,7 +45,7 @@ module.exports = {
       "|react-native-toast-message" +
       "|react-native-vector-icons" +
       "|react-navigation-tabs" +
-      "|@rneui" +
+      "|@rn-vui" +
       "|rn-qr-generator" +
       "|react-native-image-crop-picker" +
       "|react-native-currency-picker" +

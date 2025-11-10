@@ -6,7 +6,7 @@ import { useApolloClient } from "@apollo/client"
 import { setIntroducingCirclesModalShown } from "@app/graphql/client-only-query"
 import { useIntroducingCirclesModalShownQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"

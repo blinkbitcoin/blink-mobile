@@ -1,7 +1,7 @@
 import * as React from "react"
 import { StyleProp, TextInput, TextStyle, View } from "react-native"
 
-import { Input, InputProps, Text, makeStyles, useTheme } from "@rneui/themed"
+import { Input, InputProps, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 const useStyles = makeStyles(
   ({ colors }, { props, isFocused }: { props: GaloyInputProps; isFocused: boolean }) => ({

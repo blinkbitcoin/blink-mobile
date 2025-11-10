@@ -22,7 +22,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme, Text, Input } from "@rneui/themed"
+import { makeStyles, useTheme, Text, Input } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { PhoneChannelButton } from "./phone-channel-buttons"

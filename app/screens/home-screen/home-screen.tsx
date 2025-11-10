@@ -7,7 +7,7 @@ import { LocalizedString } from "typesafe-i18n"
 import Icon from "react-native-vector-icons/Ionicons"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import {
   ScrollView,
   TouchableOpacity,
@@ -218,7 +218,7 @@ export const HomeScreen: React.FC = () => {
   const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const wallets = dataAuthed?.me?.defaultAccount?.wallets
-  const { formattedBalance, satsBalance, numericBalance } = useTotalBalance(wallets)
+  const { formattedBalance, satsBalance } = useTotalBalance(wallets)
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount.level
@@ -409,7 +409,7 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && numericBalance > 0
+  const isIosWithBalance = isIos && satsBalance > 0
 
   if (
     !isIos ||
@@ -454,7 +454,7 @@ export const HomeScreen: React.FC = () => {
   )
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}
@@ -560,8 +560,8 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
   noTransaction: {
     alignItems: "center",
@@ -606,10 +606,8 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   button: {
-    display: "flex",
-    justifyContent: "space-between",
-    width: "100%",
-    maxWidth: 74,
+    maxWidth: "25%",
+    flexGrow: 1,
   },
   header: {
     flexDirection: "row",

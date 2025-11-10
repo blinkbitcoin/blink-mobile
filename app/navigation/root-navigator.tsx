@@ -55,7 +55,8 @@ import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -78,6 +79,8 @@ import { LanguageScreen } from "../screens/settings-screen/language-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
+
+import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   WelcomeLevel1Screen,
@@ -114,23 +117,24 @@ export const RootStack = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerMode: "screen",
       }}
       initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
     >
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="authenticationCheck"
         component={AuthenticationCheckScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="authentication"
         component={AuthenticationScreen}
-        options={{ headerShown: false, animationEnabled: false }}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="login"
@@ -154,7 +158,6 @@ export const RootStack = () => {
         component={PrimaryNavigator}
         options={{
           headerShown: false,
-          animationEnabled: false,
           title: LL.PrimaryScreen.title(),
         }}
       />
@@ -354,6 +357,7 @@ export const RootStack = () => {
         component={PriceHistoryScreen}
         options={{
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          gestureDirection: "horizontal-inverted",
           title: LL.common.bitcoinPrice(),
         }}
       />
@@ -497,7 +501,7 @@ export const OnboardingNavigator = () => {
         component={WelcomeLevel1Screen}
         options={{
           title: LL.OnboardingScreen.welcomeLevel1.mainTitle(),
-          headerLeft: () => null,
+          headerLeft: headerBackControl({ canGoBack: false }),
         }}
       />
       <Onboarding.Screen
@@ -510,18 +514,18 @@ export const OnboardingNavigator = () => {
       <Onboarding.Screen
         name="lightningBenefits"
         component={LightningBenefitsScreen}
-        options={{
+        options={({ route }) => ({
           title: LL.OnboardingScreen.lightningBenefits.mainTitle(),
-          headerLeft: () => null,
-        }}
+          headerLeft: headerBackControl({ canGoBack: route.params?.canGoBack }),
+        })}
       />
       <Onboarding.Screen
         name="supportScreen"
         component={SupportOnboardingScreen}
-        options={{
+        options={({ route }) => ({
           title: LL.OnboardingScreen.supportScreen.mainTitle(),
-          headerLeft: () => null,
-        }}
+          headerLeft: headerBackControl({ canGoBack: route.params?.canGoBack }),
+        })}
       />
     </Onboarding.Navigator>
   )
@@ -638,6 +642,7 @@ export const PrimaryNavigator = () => {
   const {
     theme: { colors },
   } = useTheme()
+  const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
@@ -649,8 +654,19 @@ export const PrimaryNavigator = () => {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: styles.bottomNavigatorStyle,
-        tabBarLabelStyle: { paddingBottom: 6, fontSize: 12, fontWeight: "bold" },
+        tabBarStyle: [
+          styles.bottomNavigatorStyle,
+          {
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom,
+          },
+        ],
+        tabBarLabelStyle: {
+          paddingBottom: 6,
+          fontSize: 12,
+          fontWeight: "bold",
+          width: "100%",
+        },
         tabBarHideOnKeyboard: true,
       }}
     >
@@ -661,7 +677,7 @@ export const PrimaryNavigator = () => {
           title: LL.HomeScreen.title(),
           tabBarAccessibilityLabel: LL.HomeScreen.title(),
           tabBarTestID: LL.HomeScreen.title(),
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color }: { color: string }) => (
             <HomeIcon {...testProps("Home")} fill={color} color={color} />
           ),
           headerShown: false,
@@ -675,7 +691,7 @@ export const PrimaryNavigator = () => {
           title: LL.PeopleScreen.title(),
           tabBarAccessibilityLabel: LL.PeopleScreen.title(),
           tabBarTestID: LL.PeopleScreen.title(),
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
             <PeopleTabIcon color={color} focused={focused} />
           ),
         }}
@@ -688,7 +704,7 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           tabBarAccessibilityLabel: LL.MapScreen.title(),
           tabBarTestID: LL.MapScreen.title(),
-          tabBarIcon: ({ color }) => <MapIcon color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
         }}
       />
       <Tab.Screen
@@ -699,7 +715,9 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           tabBarAccessibilityLabel: LL.EarnScreen.title(),
           tabBarTestID: LL.EarnScreen.title(),
-          tabBarIcon: ({ color }) => <LearnIcon {...testProps("Earn")} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => (
+            <LearnIcon {...testProps("Earn")} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -708,7 +726,6 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomNavigatorStyle: {
-    height: "10%",
     paddingTop: 4,
     backgroundColor: colors.white,
     borderTopColor: colors.grey4,

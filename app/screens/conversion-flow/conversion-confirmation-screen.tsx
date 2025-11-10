@@ -1,10 +1,9 @@
 import { GraphQLError } from "graphql"
 import React, { useMemo, useState } from "react"
-import { Platform, TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { PanGestureHandler, ScrollView } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import {
   HomeAuthedDocument,
@@ -21,7 +20,7 @@ import { SATS_PER_BTC, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { DisplayCurrency, toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
@@ -32,7 +31,7 @@ import {
   RouteProp,
   useNavigation,
 } from "@react-navigation/native"
-import { makeStyles, useTheme, Text } from "@rneui/themed"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import { GaloyCurrencyBubbleText } from "@app/components/atomic/galoy-currency-bubble-text"
 import Icon from "react-native-vector-icons/Ionicons"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"

@@ -3,7 +3,7 @@ import {
   StatefulNotificationsDocument,
   useStatefulNotificationAcknowledgeMutation,
 } from "@app/graphql/generated"
-import { Icon, Text, makeStyles, useTheme } from "@rneui/themed"
+import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { View, Linking } from "react-native"
 import { timeAgo } from "./utils"
 import { gql } from "@apollo/client"

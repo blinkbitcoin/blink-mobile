@@ -1,6 +1,6 @@
 import * as React from "react"
 import { View } from "react-native"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"

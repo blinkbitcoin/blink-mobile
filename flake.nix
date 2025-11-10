@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     android.url = "github:tadfisher/android-nixpkgs";
     ruby-nix.url = "github:bobvanderlinden/nixpkgs-ruby";
@@ -61,51 +61,44 @@
             vendir
             jq
             ytt
-            fastlane
 
             # Overlays
             android-sdk
             nodejs
             pkgs."ruby-3.3.0"
+            bundler
+            fastlane
             scrcpy
 
             # Fix for `unf_ext` build issue
             gcc
           ]
           ++ lib.optionals stdenv.isDarwin [
-            pkgsStable.cocoapods
+            cocoapods
             watchman
             xcodes
-            darwin.apple_sdk.frameworks.SystemConfiguration
-            pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+            apple-sdk
           ];
       in {
         packages = {
           android-sdk = android.sdk.${system} (sdkPkgs:
             with sdkPkgs;
               [
-                build-tools-34-0-0
+                build-tools-35-0-0
                 cmdline-tools-latest
                 emulator
                 platform-tools
-                platforms-android-34
-                ndk-25-1-8937393
-                ndk-26-1-10909125
+                platforms-android-35
+                ndk-27-3-13750724
                 cmake-3-22-1
-
-                # Some dependencies we use are on old versions
-                # TODO: Update these obsolete dependencies
-                build-tools-30-0-3
-                build-tools-33-0-1
-                platforms-android-33
               ]
               ++ lib.optionals (system == "aarch64-darwin") [
-                system-images-android-34-google-apis-arm64-v8a
-                system-images-android-34-google-apis-playstore-arm64-v8a
+                system-images-android-35-google-apis-arm64-v8a
+                system-images-android-35-google-apis-playstore-arm64-v8a
               ]
               ++ lib.optionals (system == "x86_64-darwin" || system == "x86_64-linux") [
-                system-images-android-34-google-apis-x86-64
-                system-images-android-34-google-apis-playstore-x86-64
+                system-images-android-35-google-apis-x86-64
+                system-images-android-35-google-apis-playstore-x86-64
               ]);
         };
 
@@ -123,14 +116,14 @@
             export GALOY_QUICKSTART_PATH="dev/vendor/galoy-quickstart"
 
             # Check if the AVD already exists
-            if ! avdmanager list avd -c | grep -q Pixel_API_34; then
-              # Determine ABI based on system architecture and create Pixel_API_34 Android Device
+            if ! avdmanager list avd -c | grep -q Pixel_API_35; then
+              # Determine ABI based on system architecture and create Pixel_API_35 Android Device
               if [ "${pkgs.stdenv.targetPlatform.system}" = "aarch64-darwin" ]; then ARCH="arm64-v8a"; else ARCH="x86_64"; fi
-              echo no | avdmanager create avd --force -n Pixel_API_34 --abi "google_apis_playstore/$ARCH" --package "system-images;android-34;google_apis_playstore;$ARCH" --device 'pixel_6a'
+              echo no | avdmanager create avd --force -n Pixel_API_35 --abi "google_apis_playstore/$ARCH" --package "system-images;android-35;google_apis_playstore;$ARCH" --device 'pixel_8'
             fi
 
-            XCODE_VERSION="16.2"
-            XCODE_BUILD="16C5032a" # When updating xcode version, get it by running xcodes installed
+            XCODE_VERSION="16.4"
+            XCODE_BUILD="16F6" # When updating xcode version, get it by running xcodes installed
             if [[ $(uname) == "Darwin" ]] && [ -z "$CI" ]; then
               sudo xcodes install $XCODE_VERSION 2>/dev/null
               sudo xcodes installed

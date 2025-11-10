@@ -1,7 +1,4 @@
-import {
-  LnUrlPayServiceResponse,
-  LNURLPaySuccessAction,
-} from "lnurl-pay/dist/types/types"
+import { LnUrlPayServiceResponse, LNURLPaySuccessAction } from "lnurl-pay"
 import {
   GraphQlApplicationError,
   IntraLedgerPaymentSendMutationHookResult,
@@ -192,6 +189,7 @@ type LnurlSpecificProperties<T extends WalletCurrency> =
       lnurlParams: LnUrlPayServiceResponse
       setInvoice: SetInvoice<T>
       setSuccessAction: SetSuccessAction<T>
+      isMerchant: boolean
     }
 
 // combine all rules together with base type

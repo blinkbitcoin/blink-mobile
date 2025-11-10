@@ -7,7 +7,7 @@ import { setInnerCircleCachedValue } from "@app/graphql/client-only-query"
 import { useCirclesQuery, useInnerCircleValueQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 type TabIconProps = {
   color: string

@@ -7,10 +7,10 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
-import AppLogoLightMode from "../../assets/logo/app-logo-light.svg"
+import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -137,26 +137,29 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <Screen>
-      <AppLogo width={"100%"} height={"60%"} />
-      <View style={styles.bottom}>
-        <GaloyPrimaryButton
-          title={buttonTitle}
-          onPress={attemptAuthentication}
-          containerStyle={styles.buttonContainer}
-        />
-        {AlternateContent}
+      <View style={styles.container}>
+        <View style={styles.logoWrapper}>
+          <View style={styles.logoContainer}>
+            <AppLogo width={"100%"} height={"100%"} />
+          </View>
+        </View>
+        <View style={styles.bottom}>
+          <GaloyPrimaryButton
+            title={buttonTitle}
+            onPress={attemptAuthentication}
+            containerStyle={styles.buttonContainer}
+          />
+          {AlternateContent}
+        </View>
       </View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  logo: {
-    marginTop: 24,
-    maxHeight: "50%",
-    maxWidth: "50%",
+  container: {
+    flex: 1,
   },
-
   bottom: {
     alignItems: "center",
     flex: 1,
@@ -164,8 +167,21 @@ const useStyles = makeStyles(() => ({
     marginBottom: 36,
     width: "100%",
   },
-
   buttonContainer: {
     marginVertical: 12,
+  },
+  logoWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  logoContainer: {
+    width: 288,
+    height: 288,
   },
 }))

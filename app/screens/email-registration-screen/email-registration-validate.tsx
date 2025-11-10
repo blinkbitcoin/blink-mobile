@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useCallback, useState, useEffect } from "react"
-import { View, StyleSheet, Keyboard } from "react-native"
-import { Text, makeStyles } from "@rneui/themed"
+import { View, Keyboard, Modal } from "react-native"
+import { Text, makeStyles } from "@rn-vui/themed"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
@@ -54,13 +54,14 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     if (hasUsername) {
       navigation.replace("onboarding", {
         screen: "supportScreen",
+        params: { canGoBack: false },
       })
       return
     }
 
     navigation.replace("onboarding", {
       screen: "lightningBenefits",
-      params: { onboarding },
+      params: { onboarding, canGoBack: false },
     })
   }, [navigation, onboarding, hasUsername])
 
@@ -120,16 +121,22 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <>
-      {showSuccess && (
-        <View style={styles.successOverlay}>
+      <Modal
+        visible={showSuccess}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSuccess(false)}
+      >
+        <View style={styles.successAnimationContainer}>
           <SuccessIconAnimation>
-            <GaloyIcon name="email-add" size={128} />
+            <GaloyIcon name="email-add" size={110} />
             <Text type="h2" style={styles.successText}>
               {LL.common.success()}
             </Text>
           </SuccessIconAnimation>
         </View>
-      )}
+      </Modal>
+
       <CodeInput
         send={send}
         header={header}
@@ -147,11 +154,10 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
     alignSelf: "center",
   },
-  successOverlay: {
-    ...StyleSheet.absoluteFillObject,
+  successAnimationContainer: {
+    flex: 1,
     backgroundColor: colors.white,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 10,
   },
 }))

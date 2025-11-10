@@ -1,14 +1,18 @@
 import * as React from "react"
 import { useEffect } from "react"
+import { View } from "react-native"
 
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rneui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
+
+import { useApolloClient } from "@apollo/client"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
-import AppLogoLightMode from "../../assets/logo/app-logo-light.svg"
+import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import BiometricWrapper from "../../utils/biometricAuthentication"
@@ -16,6 +20,7 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../../utils/enum"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
 export const AuthenticationCheckScreen: React.FC = () => {
+  const client = useApolloClient()
   const styles = useStyles()
   const {
     theme: { mode },
@@ -43,22 +48,41 @@ export const AuthenticationCheckScreen: React.FC = () => {
         navigation.replace("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
       } else {
         setAppUnlocked()
+        updateDeviceSessionCount(client)
         navigation.replace("Primary")
       }
     })()
-  }, [isAuthed, navigation, setAppUnlocked])
+  }, [isAuthed, navigation, setAppUnlocked, client])
 
   return (
-    <Screen style={styles.container}>
-      <AppLogo width={"100%"} height={"60%"} />
+    <Screen>
+      <View style={styles.container}>
+        <View style={styles.logoWrapper}>
+          <View style={styles.logoContainer}>
+            <AppLogo width={"100%"} height={"100%"} />
+          </View>
+        </View>
+      </View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(() => ({
   container: {
-    alignItems: "center",
     flex: 1,
-    width: "100%",
+  },
+  logoWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  logoContainer: {
+    width: 288,
+    height: 288,
   },
 }))

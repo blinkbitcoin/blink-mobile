@@ -7,7 +7,7 @@ import {
   JUNE_1_2024_12_AM_UTC_MINUS_6,
   getTimeLeft,
 } from "@app/utils/date"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { PressableCard } from "../pressable-card"

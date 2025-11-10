@@ -1,10 +1,11 @@
 import React from "react"
 import { render, fireEvent } from "@testing-library/react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation } from "@react-navigation/native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { SupportOnboardingScreen } from "@app/screens/onboarding-screen"
+import { OnboardingStackParamList } from "@app/navigation/stack-param-lists"
 
 import { ContextForScreen } from "../helper"
 
@@ -20,6 +21,14 @@ jest.mock("react-native/Libraries/Linking/Linking", () => ({
   getInitialURL: jest.fn(),
   canOpenURL: jest.fn(),
 }))
+
+const route: RouteProp<OnboardingStackParamList, "supportScreen"> = {
+  key: "test-key",
+  name: "supportScreen",
+  params: {
+    canGoBack: true,
+  },
+}
 
 const FEEDBACK_EMAIL_ADDRESS = "feedback@blink.sv"
 
@@ -40,18 +49,22 @@ describe("SupportOnboardingScreen", () => {
   it("renders title and description", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SupportOnboardingScreen />
+        <SupportOnboardingScreen route={route} />
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.OnboardingScreen.supportScreen.description())).toBeTruthy()
+    expect(
+      getByText(
+        LL.OnboardingScreen.supportScreen.description({ email: FEEDBACK_EMAIL_ADDRESS }),
+      ),
+    ).toBeTruthy()
     expect(getByText(FEEDBACK_EMAIL_ADDRESS)).toBeTruthy()
   })
 
   it("renders icon with correct testID", () => {
     const { getByTestId } = render(
       <ContextForScreen>
-        <SupportOnboardingScreen />
+        <SupportOnboardingScreen route={route} />
       </ContextForScreen>,
     )
 
@@ -68,7 +81,7 @@ describe("SupportOnboardingScreen", () => {
 
     const { getByText } = render(
       <ContextForScreen>
-        <SupportOnboardingScreen />
+        <SupportOnboardingScreen route={route} />
       </ContextForScreen>,
     )
 

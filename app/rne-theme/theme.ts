@@ -1,6 +1,6 @@
 import { StyleProp, TextStyle } from "react-native"
 
-import { createTheme } from "@rneui/themed"
+import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 

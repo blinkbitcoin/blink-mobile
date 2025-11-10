@@ -2,7 +2,7 @@ import * as React from "react"
 import { View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Input, makeStyles, Text, useTheme } from "@rneui/themed"
+import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyErrorBox } from "../atomic/galoy-error-box"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"

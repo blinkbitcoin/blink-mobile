@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import { makeStyles, useTheme, Icon } from "@rneui/themed"
+import { makeStyles, useTheme, Icon } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 export const OptionIcon = ({

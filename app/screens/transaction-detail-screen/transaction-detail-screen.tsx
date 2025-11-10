@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Linking, TouchableWithoutFeedback, View } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import Icon from "react-native-vector-icons/Ionicons"
 
@@ -21,12 +22,11 @@ import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
-import { isIos } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rneui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"
@@ -95,6 +95,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
+  const insets = useSafeAreaInsets()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
@@ -276,244 +277,114 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <Screen unsafe preset="fixed">
-      <View
-        style={[
-          styles.amountDetailsContainer,
-          {
-            backgroundColor: colors.grey5,
-          },
-        ]}
-      >
-        <View accessible={false} style={styles.closeIconContainer}>
-          <GaloyIconButton
-            name="close"
-            onPress={navigation.goBack}
-            iconOnly={true}
-            size={"large"}
-          />
-        </View>
-        <View style={styles.amountView}>
-          <IconTransaction
-            isReceive={isReceive}
-            walletCurrency={walletCurrency}
-            pending={false}
-            onChain={settlementVia?.__typename === "SettlementViaOnChain"}
-          />
-          <Text type="h2">{spendOrReceiveText}</Text>
-          <Text type="h1">{displayAmount}</Text>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.transactionDetailView}>
-        {onChainTxNotBroadcasted && (
-          <View style={styles.txNotBroadcast}>
-            <GaloyInfo>
-              {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
-            </GaloyInfo>
+      <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
+        <View style={[styles.amountDetailsContainer, { paddingTop: insets.top }]}>
+          <View accessible={false} style={styles.closeIconContainer}>
+            <GaloyIconButton
+              name="close"
+              onPress={navigation.goBack}
+              iconOnly={true}
+              size={"large"}
+            />
           </View>
-        )}
-        {onChainTxBroadcasted && (
-          <View>
-            <Row
-              entry="Transaction Hash"
-              value={
-                ("transactionHash" in settlementVia && settlementVia?.transactionHash) ||
-                ""
-              }
-              icons={[
-                <View key="explorer">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      viewInExplorer(
-                        ("transactionHash" in settlementVia &&
-                          settlementVia?.transactionHash) ||
-                          "",
-                      )
-                    }
-                  >
-                    <Icon
-                      name="open-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-                <View key="copy">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      copyToClipboard({
-                        content:
+          <View style={styles.amountView}>
+            <IconTransaction
+              isReceive={isReceive}
+              walletCurrency={walletCurrency}
+              pending={false}
+              onChain={settlementVia?.__typename === "SettlementViaOnChain"}
+            />
+            <Text type="h2">{spendOrReceiveText}</Text>
+            <Text type="h1">{displayAmount}</Text>
+          </View>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.transactionDetailView}>
+          {onChainTxNotBroadcasted && (
+            <View style={styles.txNotBroadcast}>
+              <GaloyInfo>
+                {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
+              </GaloyInfo>
+            </View>
+          )}
+          {onChainTxBroadcasted && (
+            <View>
+              <Row
+                entry="Transaction Hash"
+                value={
+                  ("transactionHash" in settlementVia &&
+                    settlementVia?.transactionHash) ||
+                  ""
+                }
+                icons={[
+                  <View key="explorer">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        viewInExplorer(
                           ("transactionHash" in settlementVia &&
                             settlementVia?.transactionHash) ||
-                          "",
-                        type: "Transaction Hash",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="copy-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-              ]}
-            />
-          </View>
-        )}
-        <Row
-          entry={
-            isReceive
-              ? LL.TransactionDetailScreen.receivingAccount()
-              : LL.TransactionDetailScreen.sendingAccount()
-          }
-          content={Wallet}
-        />
-
-        <Row
-          entry={LL.common.date()}
-          value={
-            <TransactionDate createdAt={createdAt} status={status} includeTime={true} />
-          }
-        />
-        {!isReceive && <Row entry={LL.common.fees()} value={formattedFeeText} />}
-        <Row
-          entry={LL.common.description()}
-          value={description}
-          icons={[
-            <View key="copy">
-              <TouchableWithoutFeedback
-                onPress={() =>
-                  copyToClipboard({
-                    content: description || "",
-                    type: LL.common.description(),
-                  })
-                }
-              >
-                <Icon
-                  name="copy-outline"
-                  size={22}
-                  color={colors.primary}
-                  style={styles.icon}
-                />
-              </TouchableWithoutFeedback>
-            </View>,
-          ]}
-        />
-        {settlementVia?.__typename === "SettlementViaIntraLedger" && (
+                            "",
+                        )
+                      }
+                    >
+                      <Icon
+                        name="open-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                  <View key="copy">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        copyToClipboard({
+                          content:
+                            ("transactionHash" in settlementVia &&
+                              settlementVia?.transactionHash) ||
+                            "",
+                          type: "Transaction Hash",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="copy-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                ]}
+              />
+            </View>
+          )}
           <Row
-            entry={LL.TransactionDetailScreen.paid()}
-            value={settlementVia.counterPartyUsername || galoyInstance.name}
+            entry={
+              isReceive
+                ? LL.TransactionDetailScreen.receivingAccount()
+                : LL.TransactionDetailScreen.sendingAccount()
+            }
+            content={Wallet}
           />
-        )}
-        <Row entry={LL.common.type()} value={typeDisplay(settlementVia)} />
-        {initiationVia?.__typename === "InitiationViaLn" &&
-          initiationVia?.paymentHash && (
-            <Row
-              entry="Hash"
-              value={initiationVia?.paymentHash}
-              icons={[
-                <View key="copy">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      copyToClipboard({
-                        content: initiationVia?.paymentHash ?? "",
-                        type: "Hash",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="copy-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-              ]}
-            />
-          )}
 
-        {(settlementVia?.__typename === "SettlementViaLn" ||
-          settlementVia?.__typename === "SettlementViaIntraLedger") &&
-          settlementVia?.preImage && (
-            <Row
-              entry={LL.common.preimageProofOfPayment()}
-              value={settlementVia?.preImage}
-              icons={[
-                <View key="copy">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      copyToClipboard({
-                        content: settlementVia?.preImage || "",
-                        type: LL.common.preimageProofOfPayment(),
-                      })
-                    }
-                  >
-                    <Icon
-                      name="copy-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-              ]}
-            />
-          )}
-        {initiationVia?.__typename === "InitiationViaLn" &&
-          initiationVia?.paymentRequest && (
-            <Row
-              entry={LL.common.paymentRequest()}
-              value={initiationVia?.paymentRequest}
-              icons={[
-                <View key="explorer">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      viewInLightningDecoder(initiationVia?.paymentRequest || "")
-                    }
-                  >
-                    <Icon
-                      name="open-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-                <View key="copy">
-                  <TouchableWithoutFeedback
-                    onPress={() =>
-                      copyToClipboard({
-                        content: initiationVia?.paymentRequest ?? "",
-                        type: LL.common.paymentRequest(),
-                      })
-                    }
-                  >
-                    <Icon
-                      name="copy-outline"
-                      size={22}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>,
-              ]}
-            />
-          )}
-        {id && (
           <Row
-            entry="Blink Internal Id"
-            value={id}
+            entry={LL.common.date()}
+            value={
+              <TransactionDate createdAt={createdAt} status={status} includeTime={true} />
+            }
+          />
+          {!isReceive && <Row entry={LL.common.fees()} value={formattedFeeText} />}
+          <Row
+            entry={LL.common.description()}
+            value={description}
             icons={[
               <View key="copy">
                 <TouchableWithoutFeedback
                   onPress={() =>
                     copyToClipboard({
-                      content: id,
-                      type: "Blink Internal Id",
+                      content: description || "",
+                      type: LL.common.description(),
                     })
                   }
                 >
@@ -527,8 +398,134 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               </View>,
             ]}
           />
-        )}
-      </ScrollView>
+          {settlementVia?.__typename === "SettlementViaIntraLedger" && (
+            <Row
+              entry={LL.TransactionDetailScreen.paid()}
+              value={settlementVia.counterPartyUsername || galoyInstance.name}
+            />
+          )}
+          <Row entry={LL.common.type()} value={typeDisplay(settlementVia)} />
+          {initiationVia?.__typename === "InitiationViaLn" &&
+            initiationVia?.paymentHash && (
+              <Row
+                entry="Hash"
+                value={initiationVia?.paymentHash}
+                icons={[
+                  <View key="copy">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        copyToClipboard({
+                          content: initiationVia?.paymentHash ?? "",
+                          type: "Hash",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="copy-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                ]}
+              />
+            )}
+
+          {(settlementVia?.__typename === "SettlementViaLn" ||
+            settlementVia?.__typename === "SettlementViaIntraLedger") &&
+            settlementVia?.preImage && (
+              <Row
+                entry={LL.common.preimageProofOfPayment()}
+                value={settlementVia?.preImage}
+                icons={[
+                  <View key="copy">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        copyToClipboard({
+                          content: settlementVia?.preImage || "",
+                          type: LL.common.preimageProofOfPayment(),
+                        })
+                      }
+                    >
+                      <Icon
+                        name="copy-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                ]}
+              />
+            )}
+          {initiationVia?.__typename === "InitiationViaLn" &&
+            initiationVia?.paymentRequest && (
+              <Row
+                entry={LL.common.paymentRequest()}
+                value={initiationVia?.paymentRequest}
+                icons={[
+                  <View key="explorer">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        viewInLightningDecoder(initiationVia?.paymentRequest || "")
+                      }
+                    >
+                      <Icon
+                        name="open-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                  <View key="copy">
+                    <TouchableWithoutFeedback
+                      onPress={() =>
+                        copyToClipboard({
+                          content: initiationVia?.paymentRequest ?? "",
+                          type: LL.common.paymentRequest(),
+                        })
+                      }
+                    >
+                      <Icon
+                        name="copy-outline"
+                        size={22}
+                        color={colors.primary}
+                        style={styles.icon}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>,
+                ]}
+              />
+            )}
+          {id && (
+            <Row
+              entry="Blink Internal Id"
+              value={id}
+              icons={[
+                <View key="copy">
+                  <TouchableWithoutFeedback
+                    onPress={() =>
+                      copyToClipboard({
+                        content: id,
+                        type: "Blink Internal Id",
+                      })
+                    }
+                  >
+                    <Icon
+                      name="copy-outline"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>,
+              ]}
+            />
+          )}
+        </ScrollView>
+      </View>
     </Screen>
   )
 }
@@ -546,7 +543,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   amountDetailsContainer: {
-    paddingTop: isIos ? 36 : 0,
+    backgroundColor: colors.grey5,
   },
 
   amountView: {
@@ -595,5 +592,9 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     justifyContent: "space-between",
     verticalAlign: "top",
+  },
+
+  outerContainer: {
+    flex: 1,
   },
 }))

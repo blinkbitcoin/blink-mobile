@@ -16,9 +16,10 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
+import { useAppConfig } from "@app/hooks"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 gql`
   query ContactsCard {
@@ -39,10 +40,19 @@ const Contact = ({ contact }: { contact: UserContact }) => {
   const styles = useStyles()
   const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
   const rootNavigation = navigation.getParent<StackNavigationProp<RootStackParamList>>()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
+
+  const handle = contact?.handle?.trim() ?? ""
+  const displayHandle =
+    handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
 
   return (
     <View style={styles.contactContainer}>
-      <Text type="p1">{contact.handle}</Text>
+      <Text type="p1">{displayHandle}</Text>
       <GaloyIconButton
         onPress={() =>
           rootNavigation.navigate("sendBitcoinDestination", {

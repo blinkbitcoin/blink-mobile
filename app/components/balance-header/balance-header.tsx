@@ -2,7 +2,7 @@ import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
 import { TouchableOpacity, View } from "react-native"
 
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"

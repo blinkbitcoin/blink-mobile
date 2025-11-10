@@ -1,8 +1,9 @@
 import * as React from "react"
-import { KeyboardAvoidingView, StatusBar, View, SafeAreaView } from "react-native"
+import { KeyboardAvoidingView, StatusBar, View } from "react-native"
+import { SafeAreaView, Edge } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 
-import { useTheme } from "@rneui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { isIos } from "../../utils/helper"
 import { isNonScrolling, offsets, presets } from "./screen.presets"
@@ -20,7 +21,14 @@ function ScreenWithoutScrolling(props: ScreenProps) {
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
     : { backgroundColor: colors.white }
+
   const Wrapper = props.unsafe ? View : SafeAreaView
+
+  const edges: Edge[] | undefined = props.unsafe
+    ? undefined
+    : props.headerShown === false
+      ? ["top", "left", "right", "bottom"]
+      : ["left", "right", "bottom"]
 
   return (
     <KeyboardAvoidingView
@@ -32,7 +40,9 @@ function ScreenWithoutScrolling(props: ScreenProps) {
         barStyle={props.statusBar || statusBarContent}
         backgroundColor={colors.white}
       />
-      <Wrapper style={[preset.inner, style]}>{props.children}</Wrapper>
+      <Wrapper style={[preset.inner, style]} edges={edges}>
+        {props.children}
+      </Wrapper>
     </KeyboardAvoidingView>
   )
 }
@@ -51,6 +61,12 @@ function ScreenWithScrolling(props: ScreenProps) {
     : { backgroundColor: colors.white }
   const Wrapper = props.unsafe ? View : SafeAreaView
 
+  const edges: Edge[] | undefined = props.unsafe
+    ? undefined
+    : props.headerShown === false
+      ? ["top", "left", "right", "bottom"]
+      : ["left", "right", "bottom"]
+
   return (
     <KeyboardAvoidingView
       style={[preset.outer, backgroundStyle]}
@@ -61,7 +77,7 @@ function ScreenWithScrolling(props: ScreenProps) {
         barStyle={props.statusBar || statusBarContent}
         backgroundColor={colors.white}
       />
-      <Wrapper style={[preset.outer, backgroundStyle]}>
+      <Wrapper style={[preset.outer, backgroundStyle]} edges={edges}>
         <ScrollView
           {...props}
           style={[preset.outer, backgroundStyle]}

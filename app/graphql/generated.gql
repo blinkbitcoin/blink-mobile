@@ -662,6 +662,18 @@ mutation userLoginUpgrade($input: UserLoginUpgradeInput!) {
   }
 }
 
+mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
+  userLoginUpgradeTelegram(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    success
+    __typename
+  }
+}
+
 mutation userLogout($input: UserLogoutInput!) {
   userLogout(input: $input) {
     success
@@ -1128,6 +1140,10 @@ query debugScreen {
     }
     __typename
   }
+}
+
+query deviceSessionCount {
+  deviceSessionCount @client
 }
 
 query displayCurrency {

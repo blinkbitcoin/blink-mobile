@@ -1,11 +1,32 @@
-import { NativeModules } from "react-native"
+import { TurboModuleRegistry, NativeModules } from "react-native"
+
+interface SourceCodeTurboModule {
+  getConstants(): {
+    scriptURL: string
+  }
+}
 
 // this is used for local development
 // will typically return localhost
 const scriptHostname = (): string => {
-  const { scriptURL } = NativeModules.SourceCode
-  const scriptHostname = scriptURL?.split("://")[1].split(":")[0] ?? ""
-  return scriptHostname
+  const turboModule =
+    TurboModuleRegistry.getEnforcing<SourceCodeTurboModule>("SourceCode")
+  const turboScriptURL = turboModule?.getConstants?.()?.scriptURL
+
+  const { scriptURL } = NativeModules.SourceCode || {}
+  const urlToUse = turboScriptURL || scriptURL
+
+  if (!urlToUse) {
+    return "localhost"
+  }
+
+  const parts = urlToUse.split("://")
+  if (parts.length < 2) {
+    return "localhost"
+  }
+
+  const hostPart = parts[1]?.split(":")[0]
+  return hostPart ?? "localhost"
 }
 
 export const possibleGaloyInstanceNames = ["Main", "Staging", "Local", "Custom"] as const
@@ -25,6 +46,7 @@ export type CustomInstance = {
   posUrl: string
   lnAddressHostname: string
   blockExplorer: string
+  fiatUrl: string
 }
 
 export type GaloyInstanceInput = StandardInstance | CustomInstance
@@ -39,6 +61,7 @@ export type GaloyInstance = {
   posUrl: string
   lnAddressHostname: string
   blockExplorer: string
+  fiatUrl: string
 }
 
 export const resolveGaloyInstanceOrDefault = (
@@ -70,6 +93,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.blink.sv",
     lnAddressHostname: "blink.sv",
     blockExplorer: "https://mempool.space/tx/",
+    fiatUrl: "https://fiat.blink.sv",
   },
   {
     id: "Staging",
@@ -81,6 +105,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.staging.blink.sv",
     lnAddressHostname: "pay.staging.blink.sv",
     blockExplorer: "https://mempool.space/signet/tx/",
+    fiatUrl: "https://fiat.staging.blink.sv",
   },
   {
     id: "Local",
@@ -92,5 +117,6 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: `http://${scriptHostname()}:3000`,
     lnAddressHostname: `${scriptHostname()}:3000`,
     blockExplorer: "https://mempool.space/signet/tx/",
+    fiatUrl: `http://${scriptHostname()}:3000`,
   },
 ] as const

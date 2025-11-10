@@ -1,7 +1,7 @@
 import { View } from "react-native"
 import QRCode from "react-native-qrcode-svg"
 
-import { makeStyles } from "@rneui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 export const QrCodeComponent = ({ otpauth }: { otpauth: string }) => {
   const styles = useStyles()

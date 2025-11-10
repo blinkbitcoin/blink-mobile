@@ -11,7 +11,7 @@ import {
   getPosUrl,
   getPrintableQrCodeUrl,
 } from "@app/utils/pay-links"
-import { makeStyles, Text } from "@rneui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useAddressScreenQuery } from "../../graphql/generated"
 import AddressComponent from "./address-component"

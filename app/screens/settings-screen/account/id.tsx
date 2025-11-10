@@ -6,7 +6,7 @@ import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
-import { Skeleton, Text, makeStyles } from "@rneui/themed"
+import { Skeleton, Text, makeStyles } from "@rn-vui/themed"
 
 export const AccountId: React.FC = () => {
   const { data, loading } = useSettingsScreenQuery()

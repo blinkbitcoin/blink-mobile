@@ -2527,12 +2527,10 @@
             "primaryButton": "Configurar dirección personalizada"
         },
         "supportScreen": {
-          "mainTitle": "Comentarios sobre Blink",
-          "title": "Una cosa más:",
-          "description": "Estamos en una misión para hacer que bitcoin sea accesible para todos, y nos encantaría saber de ti.",
-          "contactInfo": "No dudes en contactarnos en {email} y cuéntanos cómo podemos mejorar Blink para ti y para los demás.",
-          "primaryButton": "Hecho",
-          "secondaryButton": "Dar comentarios ahora"
+            "mainTitle": "Apreciamos sus comentarios",
+            "title": "¡Todo listo!",
+            "description": "Cualquier comentario es bienvenido, no dude en escribirnos a {email}",
+            "primaryButton": "Hecho"
         }
     },
     "PhoneLoginValidationScreen": {

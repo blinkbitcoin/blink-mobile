@@ -1,6 +1,7 @@
 import * as React from "react"
 import { View, FlatList } from "react-native"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Screen } from "@app/components/screen"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -35,45 +36,48 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
+  const insets = useSafeAreaInsets()
+  const styles = useStyles(insets)
   const hasDescriptions = Boolean(descriptions?.length)
 
   return (
     <Screen style={styles.screenStyle}>
-      <View>
-        {title && (
-          <Text type="h2" style={styles.title}>
-            {title}
-          </Text>
-        )}
-
-        <View style={styles.descriptionList}>
-          {hasDescriptions && (
-            <FlatList
-              accessibilityRole="list"
-              data={descriptions!}
-              keyExtractor={(_, i) => String(i)}
-              scrollEnabled={false}
-              renderItem={({ item }) => (
-                <View
-                  accessible
-                  accessibilityLabel={`• ${item}`}
-                  style={styles.descriptionItem}
-                >
-                  <Text type="h2" style={styles.descriptionBullet}>
-                    •
-                  </Text>
-                  <Text type="h2" style={styles.descriptionText}>
-                    {item}
-                  </Text>
-                </View>
-              )}
-            />
+      <View style={styles.content}>
+        <View>
+          {title && (
+            <Text type="h2" style={styles.title}>
+              {title}
+            </Text>
           )}
 
-          {customContent && (
-            <View style={hasDescriptions && styles.customContent}>{customContent}</View>
-          )}
+          <View style={styles.descriptionList}>
+            {hasDescriptions && (
+              <FlatList
+                accessibilityRole="list"
+                data={descriptions!}
+                keyExtractor={(_, i) => String(i)}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <View
+                    accessible
+                    accessibilityLabel={`• ${item}`}
+                    style={styles.descriptionItem}
+                  >
+                    <Text type="h2" style={styles.descriptionBullet}>
+                      •
+                    </Text>
+                    <Text type="h2" style={styles.descriptionText}>
+                      {item}
+                    </Text>
+                  </View>
+                )}
+              />
+            )}
+
+            {customContent && (
+              <View style={hasDescriptions && styles.customContent}>{customContent}</View>
+            )}
+          </View>
         </View>
 
         {iconName && (
@@ -81,22 +85,22 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
             <GaloyIcon name={iconName} color={colors.primary} size={110} />
           </View>
         )}
-      </View>
 
-      <View style={styles.bottom}>
-        <GaloyPrimaryButton
-          title={primaryLabel}
-          onPress={onPrimaryAction}
-          loading={primaryLoading}
-        />
-        {secondaryLabel && onSecondaryAction && (
-          <GaloySecondaryButton
-            title={secondaryLabel}
-            onPress={onSecondaryAction}
-            loading={secondaryLoading}
-            containerStyle={styles.secondaryButtonContainer}
+        <View style={styles.bottom}>
+          <GaloyPrimaryButton
+            title={primaryLabel}
+            onPress={onPrimaryAction}
+            loading={primaryLoading}
           />
-        )}
+          {secondaryLabel && onSecondaryAction && (
+            <GaloySecondaryButton
+              title={secondaryLabel}
+              onPress={onSecondaryAction}
+              loading={secondaryLoading}
+              containerStyle={styles.secondaryButtonContainer}
+            />
+          )}
+        </View>
       </View>
     </Screen>
   )
@@ -104,8 +108,11 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
     padding: 20,
-    flexGrow: 1,
   },
   secondaryButtonContainer: {
     marginTop: 15,
@@ -141,10 +148,15 @@ const useStyles = makeStyles(({ colors }) => ({
   bottom: {
     flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 10,
+    paddingBottom: 10,
   },
   iconWrapper: {
+    position: "absolute",
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 }))

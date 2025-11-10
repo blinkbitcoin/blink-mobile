@@ -3,7 +3,7 @@ import { View } from "react-native"
 
 import { MockedProvider } from "@apollo/client/testing"
 import { WalletCurrency } from "@app/graphql/generated"
-import { Text, makeStyles } from "@rneui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
 import { Meta } from "@storybook/react-native"
 
 import { StoryScreen } from "../../../.storybook/views"

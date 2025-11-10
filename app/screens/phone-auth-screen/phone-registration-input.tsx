@@ -19,7 +19,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { ContactSupportButton } from "@app/components/contact-support-button/contact-support-button"
 import { PhoneCodeChannelType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, useTheme, Text, Input } from "@rneui/themed"
+import { makeStyles, useTheme, Text, Input } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import {

@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, Text } from "react-native"
-import { Satoshis } from "lnurl-pay/dist/types/types"
+import { Satoshis } from "lnurl-pay"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
@@ -119,9 +119,15 @@ const defaultLightningParams: PaymentDetailsLightning.CreateLnurlPaymentDetailsP
     successAction: successActionMessageMock,
     convertMoneyAmount: convertMoneyAmountMock,
     sendingWalletDescriptor: btcSendingWalletDescriptor,
+    isMerchant: false,
   }
 
-const saveLnAddressContactMock = jest.fn()
+const saveLnAddressContactMock = jest.fn(({ isMerchant }) => {
+  if (isMerchant) {
+    return Promise.resolve({ saved: false })
+  }
+  return Promise.resolve({ saved: true, handle: "user@example.com" })
+})
 jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => ({
   useSaveLnAddressContact: () => saveLnAddressContactMock,
 }))
@@ -242,6 +248,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     expect(saveLnAddressContactMock).toHaveBeenCalledWith({
       paymentType: "lnurl",
       destination: defaultLightningParams.lnurl,
+      isMerchant: false,
     })
   })
 
@@ -274,6 +281,45 @@ describe("SendBitcoinConfirmationScreen", () => {
     expect(saveLnAddressContactMock).toHaveBeenCalledWith({
       paymentType: "lnurl",
       destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
+  })
+
+  it("Does not call saveLnAddressContact when LNURL payment is to a merchant", async () => {
+    const merchantParams = {
+      ...defaultLightningParams,
+      isMerchant: true,
+    }
+
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    const paymentDetailMerchant = createLnurlPaymentDetails(merchantParams)
+    const routeMerchant = {
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: { paymentDetail: paymentDetailMerchant },
+    } as const
+
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "SUCCESS",
+      extraInfo: { preimage: "preimagetest" },
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={routeMerchant} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: merchantParams.lnurl,
+      isMerchant: true,
     })
   })
 })

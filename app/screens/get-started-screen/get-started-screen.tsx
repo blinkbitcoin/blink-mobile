@@ -12,10 +12,10 @@ import { testProps } from "@app/utils/testProps"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
-import AppLogoLightMode from "../../assets/logo/app-logo-light.svg"
+import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import useAppCheckToken from "./use-device-token"
@@ -81,31 +81,38 @@ export const GetStartedScreen: React.FC = () => {
     )
 
   return (
-    <Screen>
-      {NonProdInstanceHint}
-      <Pressable
-        onPress={() => setSecretMenuCounter(secretMenuCounter + 1)}
-        style={styles.logoContainer}
-        {...testProps("logo-button")}
-      >
-        <AppLogo width={"100%"} height={"100%"} />
-      </Pressable>
-      <View style={styles.bottom}>
-        <GaloyPrimaryButton
-          title={LL.GetStartedScreen.createAccount()}
-          onPress={() => handleCreateAccount()}
-        />
-        <GaloySecondaryButton
-          title={LL.GetStartedScreen.login()}
-          onPress={handleLogin}
-          containerStyle={styles.secondaryButtonContainer}
-        />
+    <Screen headerShown={false}>
+      <View style={styles.container}>
+        {NonProdInstanceHint}
+        <View style={styles.logoWrapper} pointerEvents="box-none">
+          <Pressable
+            onPress={() => setSecretMenuCounter(secretMenuCounter + 1)}
+            style={styles.logoContainer}
+            {...testProps("logo-button")}
+          >
+            <AppLogo width={"100%"} height={"100%"} />
+          </Pressable>
+        </View>
+        <View style={styles.bottom}>
+          <GaloyPrimaryButton
+            title={LL.GetStartedScreen.createAccount()}
+            onPress={handleCreateAccount}
+          />
+          <GaloySecondaryButton
+            title={LL.GetStartedScreen.login()}
+            onPress={handleLogin}
+            containerStyle={styles.secondaryButtonContainer}
+          />
+        </View>
       </View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(() => ({
+  container: {
+    flex: 1,
+  },
   bottom: {
     flex: 1,
     paddingHorizontal: 24,
@@ -115,8 +122,21 @@ const useStyles = makeStyles(() => ({
   secondaryButtonContainer: {
     marginVertical: 15,
   },
-  logoContainer: { width: "100%", height: "50%", marginTop: 50 },
-
+  logoWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+  logoContainer: {
+    width: 288,
+    height: 288,
+  },
   textInstance: {
     justifyContent: "center",
     flexDirection: "row",

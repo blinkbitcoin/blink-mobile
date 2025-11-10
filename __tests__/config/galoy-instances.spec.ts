@@ -21,6 +21,7 @@ it("get a full object with Custom", () => {
     authUrl: "https://api.custom.com",
     posUrl: "https://pay.custom.com/",
     kycUrl: "https://kyc.custom.com/",
+    fiatUrl: "https://fiat.custom.com/",
     lnAddressHostname: "custom.com",
     blockExplorer: "https://mempool.space/tx/",
   } as const

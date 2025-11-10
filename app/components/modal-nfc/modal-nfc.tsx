@@ -21,8 +21,8 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { WalletAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { logParseDestinationResult } from "@app/utils/analytics"
-import { isIOS } from "@rneui/base"
-import { Text, makeStyles, useTheme } from "@rneui/themed"
+import { isIOS } from "@rn-vui/base"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
 

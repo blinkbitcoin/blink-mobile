@@ -49,8 +49,8 @@ buck-out/
 # ios
 **/Pods
 ios/Xcode.app
-ios/.bundle
 ios/vendor
+ios/vendor/bundle
 
 # Bundle artifact
 *.jsbundle
@@ -64,6 +64,7 @@ android/api-8350101450647692243-59029-b9bec84a7e5a.json
 android/fastlane/report.xml
 android/fastlane/metadata/android/en-US/
 android/app/release/
+android/vendor/bundle
 
 galoy.code-workspace
 

@@ -1,4 +1,4 @@
-import { LNURLPaySuccessAction } from "lnurl-pay/dist/types/types"
+import { LNURLPaySuccessAction } from "lnurl-pay"
 
 export type SuccessActionComponentProps = {
   successAction?: LNURLPaySuccessAction

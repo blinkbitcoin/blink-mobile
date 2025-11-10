@@ -8192,30 +8192,22 @@ type RootTranslation = {
 		}
 		supportScreen: {
 			/**
-			 * B​l​i​n​k​ ​f​e​e​d​b​a​c​k
+			 * W​e​ ​l​o​v​e​ ​f​e​e​d​b​a​c​k
 			 */
 			mainTitle: string
 			/**
-			 * O​n​e​ ​m​o​r​e​ ​t​h​i​n​g​:
+			 * A​l​l​ ​s​e​t​!
 			 */
 			title: string
 			/**
-			 * W​e​ ​a​r​e​ ​o​n​ ​a​ ​m​i​s​s​i​o​n​ ​t​o​ ​m​a​k​e​ ​b​i​t​c​o​i​n​ ​a​c​c​e​s​s​i​b​l​e​ ​t​o​ ​a​l​l​,​ ​a​n​d​ ​w​e​ ​w​o​u​l​d​ ​l​o​v​e​ ​t​o​ ​h​e​a​r​ ​f​r​o​m​ ​y​o​u​.
-			 */
-			description: string
-			/**
-			 * D​o​n​'​t​ ​h​e​s​i​t​a​t​e​ ​t​o​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​{​e​m​a​i​l​}​ ​a​n​d​ ​s​h​a​r​e​ ​h​o​w​ ​w​e​ ​c​a​n​ ​m​a​k​e​ ​B​l​i​n​k​ ​b​e​t​t​e​r​ ​f​o​r​ ​y​o​u​ ​a​n​d​ ​o​t​h​e​r​s​.
+			 * A​n​y​ ​f​e​e​d​b​a​c​k​ ​i​s​ ​m​o​s​t​ ​w​e​l​c​o​m​e​,​ ​f​e​e​l​ ​f​r​e​e​ ​t​o​ ​p​i​n​g​ ​u​s​ ​a​t​ ​{​e​m​a​i​l​}
 			 * @param {unknown} email
 			 */
-			contactInfo: RequiredParams<'email'>
+			description: RequiredParams<'email'>
 			/**
 			 * D​o​n​e
 			 */
 			primaryButton: string
-			/**
-			 * G​i​v​e​ ​f​e​e​d​b​a​c​k​ ​n​o​w
-			 */
-			secondaryButton: string
 		}
 	}
 	PhoneLoginValidationScreen: {
@@ -17519,29 +17511,21 @@ export type TranslationFunctions = {
 		}
 		supportScreen: {
 			/**
-			 * Blink feedback
+			 * We love feedback
 			 */
 			mainTitle: () => LocalizedString
 			/**
-			 * One more thing:
+			 * All set!
 			 */
 			title: () => LocalizedString
 			/**
-			 * We are on a mission to make bitcoin accessible to all, and we would love to hear from you.
+			 * Any feedback is most welcome, feel free to ping us at {email}
 			 */
-			description: () => LocalizedString
-			/**
-			 * Don't hesitate to contact us at {email} and share how we can make Blink better for you and others.
-			 */
-			contactInfo: (arg: { email: unknown }) => LocalizedString
+			description: (arg: { email: unknown }) => LocalizedString
 			/**
 			 * Done
 			 */
 			primaryButton: () => LocalizedString
-			/**
-			 * Give feedback now
-			 */
-			secondaryButton: () => LocalizedString
 		}
 	}
 	PhoneLoginValidationScreen: {
