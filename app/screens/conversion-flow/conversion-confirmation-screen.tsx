@@ -88,17 +88,15 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     return null
   }
 
-  const [fromWallet, setFromWallet] = useState<WalletDescriptor<WalletCurrency>>(
+  const fromWallet: WalletDescriptor<WalletCurrency> =
     fromWalletCurrency === WalletCurrency.Btc
       ? { id: btcWallet.id, currency: WalletCurrency.Btc }
-      : { id: usdWallet.id, currency: WalletCurrency.Usd },
-  )
+      : { id: usdWallet.id, currency: WalletCurrency.Usd }
 
-  const [toWallet, setToWallet] = useState<WalletDescriptor<WalletCurrency>>(
+  const toWallet: WalletDescriptor<WalletCurrency> =
     fromWalletCurrency === WalletCurrency.Btc
       ? { id: usdWallet.id, currency: WalletCurrency.Usd }
-      : { id: btcWallet.id, currency: WalletCurrency.Btc },
-  )
+      : { id: btcWallet.id, currency: WalletCurrency.Btc }
 
   const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
   const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
@@ -170,8 +168,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         const { data, errors } = await intraLedgerPaymentSend({
           variables: {
             input: {
-              walletId: fromWallet?.id,
-              recipientWalletId: toWallet?.id,
+              walletId: fromWallet.id,
+              recipientWalletId: toWallet.id,
               amount: fromAmount.amount,
             },
           },
@@ -209,8 +207,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         const { data, errors } = await intraLedgerUsdPaymentSend({
           variables: {
             input: {
-              walletId: fromWallet?.id,
-              recipientWalletId: toWallet?.id,
+              walletId: fromWallet.id,
+              recipientWalletId: toWallet.id,
               amount: fromAmount.amount,
             },
           },
