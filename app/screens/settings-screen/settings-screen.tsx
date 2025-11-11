@@ -10,7 +10,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 
@@ -23,7 +23,6 @@ import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneNAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
-import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
 import { SwitchAccount } from "./settings/multi-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
@@ -84,7 +83,7 @@ export const SettingsScreen: React.FC = () => {
 
   const items = {
     account: [AccountLevelSetting, TxLimits, SwitchAccount],
-    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, /*AccountStaticQR*/],
+    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS /*AccountStaticQR*/],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,
