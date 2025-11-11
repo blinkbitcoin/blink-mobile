@@ -37,19 +37,24 @@ const useStyles = makeStyles(({ colors }) => ({
 type Props = {
   amount: string
   color: string
+  isAvailable: boolean
 }
 
-export const MountainHeader = ({ amount, color }: Props) => {
+export const MountainHeader = ({ amount, color, isAvailable }: Props) => {
   const styles = useStyles()
 
   const { LL } = useI18nContext()
   return (
     <View style={{ backgroundColor: color }}>
       <View style={styles.topView}>
-        <View style={styles.amountContainer}>
-          <Text style={styles.headerSection}>{LL.EarnScreen.youEarned()}</Text>
-          <Text style={styles.titleSection}>{amount} sats</Text>
-        </View>
+        {isAvailable ? (
+          <View style={styles.amountContainer}>
+            <Text style={styles.headerSection}>{LL.EarnScreen.youEarned()}</Text>
+            <Text style={styles.titleSection}>{amount} sats</Text>
+          </View>
+        ) : (
+          <></>
+        )}
       </View>
       <View style={styles.mountainView}>
         <Montain />
