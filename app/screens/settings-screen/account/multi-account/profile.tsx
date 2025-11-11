@@ -45,12 +45,6 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
     setSwitchLoading(true)
     await saveToken(nextToken ?? token)
 
-    // Small delay to ensure the new session token is processed and updated in the global state before navigating.
-    // This prevents the "Primary" screen from initially loading data using the old session token.
-    await new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), 100)
-    })
-
     setSwitchLoading(false)
     toastShow({
       type: "success",
