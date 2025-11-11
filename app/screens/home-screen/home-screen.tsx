@@ -35,7 +35,7 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal, useSaveSessionProfile } from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -49,7 +49,6 @@ import {
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
 import { useLevel } from "@app/graphql/level-context"
-import { fetchProfiles } from "@app/utils/multi-account"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
@@ -153,9 +152,7 @@ export const HomeScreen: React.FC = () => {
   const reopenUpgradeModal = React.useRef(false)
   const toggleSetDefaultAccountModal = () =>
     setSetDefaultAccountModalVisible(!setDefaultAccountModalVisible)
-  const [currentProfile, setCurrentProfile] = React.useState<ProfileProps>()
 
-  const { saveProfile } = useSaveSessionProfile()
   const { isAtLeastLevelOne } = useLevel()
 
   const isAuthed = useIsAuthed()
@@ -163,7 +160,6 @@ export const HomeScreen: React.FC = () => {
   const {
     appConfig: {
       galoyInstance: { id: galoyInstanceId },
-      token: currentToken,
     },
   } = useAppConfig()
 
@@ -204,7 +200,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   // keep settings info cached and ignore network call if it's already cached
-  const { loading: loadingSettings } = useSettingsScreenQuery({
+  const { data: currentUser, loading: loadingSettings } = useSettingsScreenQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-first",
     // this enables offline mode use-case
@@ -223,6 +219,9 @@ export const HomeScreen: React.FC = () => {
   })
 
   const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
+
+  const { username, phone } = currentUser?.me ?? {}
+  const usernameTitle = username || phone || LL.common.blinkUser()
 
   const wallets = dataAuthed?.me?.defaultAccount?.wallets
   const { formattedBalance, satsBalance } = useTotalBalance(wallets)
@@ -460,22 +459,6 @@ export const HomeScreen: React.FC = () => {
     </Modal>
   )
 
-  React.useEffect(() => {
-    const loadProfiles = async () => {
-      let profilesList = await fetchProfiles(currentToken)
-
-      if (profilesList.length === 0) {
-        await saveProfile(currentToken)
-        profilesList = await fetchProfiles(currentToken)
-      }
-      setCurrentProfile(profilesList.find((profile) => profile.selected))
-    }
-
-    if (!loading && currentToken) {
-      loadProfiles()
-    }
-  }, [saveProfile, currentToken, loading])
-
   const handleSwitchPress = () => {
     navigation.navigate("profileScreen")
   }
@@ -498,7 +481,7 @@ export const HomeScreen: React.FC = () => {
         <View
           style={[
             styles.header,
-            isAtLeastLevelOne && currentProfile?.identifier
+            isAtLeastLevelOne && usernameTitle
               ? styles.headerWithProfile
               : styles.headerCentered,
           ]}
@@ -510,10 +493,10 @@ export const HomeScreen: React.FC = () => {
             iconOnly={true}
           />
           <View style={styles.balanceHeader}>
-            {!loading && currentProfile?.identifier && (
+            {!loading && usernameTitle && (
               <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
-                  <Text type="p2">{currentProfile?.identifier}</Text>
+                  <Text type="p2">{usernameTitle}</Text>
                   {isAtLeastLevelOne && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
