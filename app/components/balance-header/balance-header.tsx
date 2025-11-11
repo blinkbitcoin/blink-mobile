@@ -1,8 +1,8 @@
 import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View, Text } from "react-native"
 
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
@@ -41,17 +41,21 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
           <Text style={styles.balanceHiddenText}>****</Text>
         </TouchableOpacity>
       ) : (
-        <View>
-          <TouchableOpacity onPress={switchMemoryHideAmount}>
-            <View style={styles.marginBottom}>
-              {loading ? (
-                <Loader />
-              ) : (
-                <Text style={styles.primaryBalanceText}>{formattedBalance}</Text>
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={switchMemoryHideAmount}>
+          <View>
+            {loading ? (
+              <Loader />
+            ) : (
+              <Text
+                style={styles.primaryBalanceText}
+                allowFontScaling
+                adjustsFontSizeToFit
+              >
+                {formattedBalance}
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
       )}
     </View>
   )
@@ -59,19 +63,19 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
 
 const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
-    flexDirection: "column",
     alignItems: "center",
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: "bold",
     textAlign: "center",
-  },
-  marginBottom: {
-    marginBottom: 4,
+    justifyContent: "center",
+    flex: 1,
+    marginHorizontal: 20,
+    marginBottom: 30,
+    height: 60,
+    maxHeight: 60,
+    marginTop: -15,
   },
   primaryBalanceText: {
     fontSize: 32,
+    color: colors.black,
   },
   loaderBackground: {
     color: colors.loaderBackground,
@@ -82,5 +86,6 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHiddenText: {
     fontSize: 32,
     fontWeight: "bold",
+    color: colors.black,
   },
 }))

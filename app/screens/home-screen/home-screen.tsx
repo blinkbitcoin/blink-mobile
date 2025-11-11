@@ -477,22 +477,15 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
-      <View style={[styles.balanceContainer, loading ? styles.balanceLoading : null]}>
-        <View
-          style={[
-            styles.header,
-            isAtLeastLevelOne && usernameTitle
-              ? styles.headerWithProfile
-              : styles.headerCentered,
-          ]}
-        >
+      <View style={styles.balanceContainer}>
+        <View style={styles.header}>
           <GaloyIconButton
             onPress={() => navigation.navigate("priceHistory")}
             size={"medium"}
             name="graph"
             iconOnly={true}
           />
-          <View style={styles.balanceHeader}>
+          <View>
             {!loading && usernameTitle && (
               <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
@@ -501,7 +494,6 @@ export const HomeScreen: React.FC = () => {
                 </View>
               </Pressable>
             )}
-            <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
           </View>
           <GaloyIconButton
             onPress={() => navigation.navigate("settings")}
@@ -511,6 +503,7 @@ export const HomeScreen: React.FC = () => {
           />
         </View>
       </View>
+      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
       <ScrollView
         {...testProps("home-screen")}
         contentContainerStyle={styles.scrollViewContainer}
@@ -639,26 +632,19 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
   },
   balanceContainer: {
-    marginBottom: 30,
     marginTop: 7,
-    display: "flex",
-    flexDirection: "row",
-  },
-  balanceLoading: {
-    marginBottom: 67,
+    flexDirection: "column",
+    flex: 1,
+    height: 40,
+    maxHeight: 40,
   },
   header: {
     flexDirection: "row",
     flex: 1,
     justifyContent: "space-between",
+    alignItems: "center",
     marginHorizontal: 20,
     marginTop: 6,
-  },
-  headerWithProfile: {
-    alignItems: "flex-start",
-  },
-  headerCentered: {
-    alignItems: "center",
   },
   error: {
     alignSelf: "center",
@@ -667,12 +653,6 @@ const useStyles = makeStyles(({ colors }) => ({
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    marginTop: 4,
-  },
-  balanceHeader: {
-    alignItems: "center",
-    flexDirection: "column",
     gap: 6,
   },
 }))
