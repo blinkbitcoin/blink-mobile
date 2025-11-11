@@ -117,13 +117,13 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
         </View>
         <View style={styles.actionButtons}>
           <GaloyPrimaryButton
-            title="Confirm"
+            title={LL.common.confirm()}
             onPress={async () => {
               await handleLogout()
               setLogoutLoading(false)
             }}
           />
-          <GaloySecondaryButton title="Cancel" onPress={closeModal} />
+          <GaloySecondaryButton title={LL.common.cancel()} onPress={closeModal} />
         </View>
       </View>
     </Modal>
