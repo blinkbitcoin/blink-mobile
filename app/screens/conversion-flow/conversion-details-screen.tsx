@@ -29,16 +29,16 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 
-import { ErrorBanner } from "@app/components/error-banner"
 import { Screen } from "@app/components/screen"
+import { ErrorBanner } from "@app/components/error-banner"
 import { CurrencyInput } from "@app/components/currency-input"
+import { PercentageSelector } from "@app/components/percentage-selector"
+import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import {
   AmountInputScreen,
   ConvertInputType,
 } from "@app/components/transfer-amount-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
-import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 
 import { useConversionFormatting, useConversionOverlayFocus } from "./hooks"
 

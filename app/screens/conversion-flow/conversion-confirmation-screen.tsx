@@ -1,10 +1,18 @@
 import { GraphQLError } from "graphql"
 import React, { useMemo, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
+import Icon from "react-native-vector-icons/Ionicons"
 import { PanGestureHandler, ScrollView } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+import crashlytics from "@react-native-firebase/crashlytics"
+import {
+  CommonActions,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from "@react-navigation/native"
 
-import { Screen } from "@app/components/screen"
 import {
   HomeAuthedDocument,
   PaymentSendResult,
@@ -24,16 +32,9 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
-import crashlytics from "@react-native-firebase/crashlytics"
-import {
-  CommonActions,
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-} from "@react-navigation/native"
-import { makeStyles, useTheme, Text } from "@rn-vui/themed"
+
+import { Screen } from "@app/components/screen"
 import { GaloyCurrencyBubbleText } from "@app/components/atomic/galoy-currency-bubble-text"
-import Icon from "react-native-vector-icons/Ionicons"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {
