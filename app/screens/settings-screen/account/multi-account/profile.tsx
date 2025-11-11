@@ -43,7 +43,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 
   const handleProfileSwitch = async (nextToken?: string) => {
     setSwitchLoading(true)
-    await saveToken(nextToken ?? token)
+    await saveToken(nextToken || token)
 
     setSwitchLoading(false)
     toastShow({
