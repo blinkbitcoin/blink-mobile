@@ -117,11 +117,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { LL } = useI18nContext()
 
   const fee = useFee(getFee)
-  let currencyAmount = ""
-  let satAmount = ""
 
-  let currencyFeeAmount = ""
-  let satFeeAmount = ""
+  const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
+  let currencyAmount = defaultAmount
+  let satAmount = defaultAmount
+  let currencyFeeAmount = defaultAmount
+  let satFeeAmount = defaultAmount
 
   const {
     loading: sendPaymentLoading,
