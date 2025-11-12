@@ -70,17 +70,21 @@ const en: BaseTranslation = {
     title: "Transactions with {username: string}",
   },
   ConversionDetailsScreen: {
-    title: "Convert",
+    title: "Transfer funds",
+    transfer: "Transfer",
     percentageToConvert: "% to convert",
+    reviewTransfer: "Review transfer",
   },
   ConversionConfirmationScreen: {
-    title: "Review conversion",
+    title: "Confirm transfer",
     youreConverting: "You're converting",
     receivingAccount: "Receiving account",
+    infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
+    infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
+    transferButtonText: "Transfer {fromWallet} to {toWallet}",
   },
   ConversionSuccessScreen: {
-    title: "Conversion Success",
-    message: "Conversion successful",
+    message: "Transfer successful",
   },
   EarnScreen: {
     satoshi: "sat",

@@ -6,13 +6,12 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
 
-const useStyles = makeStyles(({ colors }) => ({
-  container: {},
+const useStyles = makeStyles(({ colors }, compact: boolean) => ({
   keyRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 30,
+    alignItems: "center",
+    marginBottom: compact ? 15 : 30,
   },
   lastKeyRow: {
     flexDirection: "row",
@@ -36,31 +35,97 @@ const useStyles = makeStyles(({ colors }) => ({
 
 type CurrencyKeyboardProps = {
   onPress: (pressed: KeyType) => void
+  compact?: boolean
+  safeMode?: boolean
 }
 
-export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({ onPress }) => {
-  const styles = useStyles()
+export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
+  onPress,
+  compact = false,
+  safeMode = false,
+}) => {
+  const styles = useStyles(compact)
   return (
-    <View style={styles.container}>
+    <View>
       <View style={styles.keyRow}>
-        <Key numberPadKey={KeyType[1]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[2]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[3]} handleKeyPress={onPress} />
+        <Key
+          numberPadKey={KeyType[1]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[2]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[3]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
       </View>
       <View style={styles.keyRow}>
-        <Key numberPadKey={KeyType[4]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[5]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[6]} handleKeyPress={onPress} />
+        <Key
+          numberPadKey={KeyType[4]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[5]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[6]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
       </View>
       <View style={styles.keyRow}>
-        <Key numberPadKey={KeyType[7]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[8]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[9]} handleKeyPress={onPress} />
+        <Key
+          numberPadKey={KeyType[7]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[8]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[9]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
       </View>
       <View style={styles.lastKeyRow}>
-        <Key numberPadKey={KeyType.Decimal} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType[0]} handleKeyPress={onPress} />
-        <Key numberPadKey={KeyType.Backspace} handleKeyPress={onPress} />
+        <Key
+          numberPadKey={KeyType.Decimal}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType[0]}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
+        <Key
+          numberPadKey={KeyType.Backspace}
+          handleKeyPress={onPress}
+          compact={compact}
+          safeMode={safeMode}
+        />
       </View>
     </View>
   )
@@ -69,19 +134,25 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({ onPress }) =
 const Key = ({
   handleKeyPress,
   numberPadKey,
+  compact,
+  safeMode,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => void
+  compact?: boolean
+  safeMode?: boolean
 }) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
+  const styles = useStyles(compact)
   const pressableStyle = ({ pressed }: { pressed: boolean }): StyleProp<ViewStyle> => {
     const baseStyle: StyleProp<ViewStyle> = {
       height: 40,
       width: 40,
       borderRadius: 40,
+      maxWidth: 40,
+      maxHeight: 40,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -99,6 +170,7 @@ const Key = ({
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
 
   const handleBackSpacePressIn = (numberPadKey: KeyType) => {
+    if (safeMode) return
     const id = setInterval(() => {
       if (numberPadKey === KeyType.Backspace) {
         handleKeyPress(numberPadKey)
