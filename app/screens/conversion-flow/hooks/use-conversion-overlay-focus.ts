@@ -4,6 +4,7 @@ import { TextInput } from "react-native"
 import { ConvertInputType } from "@app/components/transfer-amount-input"
 
 import { InputValues, InputField } from "../use-convert-money-details"
+import { findBtcSuffixIndex } from "../btc-format"
 
 type Params = {
   uiLocked: boolean
@@ -16,11 +17,6 @@ type Params = {
   fromInputRef: React.RefObject<TextInput>
   toInputRef: React.RefObject<TextInput>
   setFocusedInputValues: React.Dispatch<React.SetStateAction<InputField | null>>
-}
-
-const findSatIndex = (value: string): number => {
-  const idx = value.toUpperCase().indexOf(" SAT")
-  return idx >= 0 ? idx : value.length
 }
 
 export const useConversionOverlayFocus = ({
@@ -46,7 +42,7 @@ export const useConversionOverlayFocus = ({
 
       const ref = id === ConvertInputType.FROM ? fromInputRef : toInputRef
       const value = renderValue(id) ?? ""
-      const pos = findSatIndex(value)
+      const pos = findBtcSuffixIndex(value)
       const inputToFocus =
         id === ConvertInputType.FROM
           ? inputFormattedValues?.fromInput ?? inputValues.fromInput
@@ -74,7 +70,7 @@ export const useConversionOverlayFocus = ({
     (id: InputField["id"]) => {
       const ref = id === ConvertInputType.FROM ? fromInputRef : toInputRef
       const value = renderValue(id) ?? ""
-      const pos = findSatIndex(value)
+      const pos = findBtcSuffixIndex(value)
       ref.current?.focus()
       ref.current?.setNativeProps({ selection: { start: pos, end: pos } })
     },
