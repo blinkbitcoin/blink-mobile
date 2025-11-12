@@ -28,6 +28,10 @@ export const ellipsizeMiddle = (
     maxLength: number
     maxResultLeft: number
     maxResultRight: number
+  } = {
+    maxLength: 50,
+    maxResultLeft: 13,
+    maxResultRight: 8,
   },
 ) => {
   const { maxLength, maxResultLeft, maxResultRight } = options
