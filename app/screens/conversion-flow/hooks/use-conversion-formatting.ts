@@ -3,6 +3,7 @@ import { useCallback } from "react"
 import { DisplayCurrency } from "@app/types/amounts"
 import { WalletCurrency } from "@app/graphql/generated"
 
+import { ConvertInputType } from "@app/components/transfer-amount-input"
 import { IInputValues, InputField } from "../use-convert-money-details"
 
 type GetCurrencySymbol = (p: { currency: WalletCurrency | DisplayCurrency }) => string
@@ -32,12 +33,15 @@ export const useConversionFormatting = ({
   getCurrencySymbol,
 }: Params) => {
   const fieldFormatted = useCallback(
-    (id: InputField["id"]) =>
-      id === "fromInput"
-        ? inputFormattedValues?.fromInput.formattedAmount || ""
-        : id === "toInput"
-          ? inputFormattedValues?.toInput.formattedAmount || ""
-          : inputFormattedValues?.currencyInput.formattedAmount || "",
+    (id: InputField["id"]) => {
+      if (id === ConvertInputType.FROM) {
+        return inputFormattedValues?.fromInput.formattedAmount || ""
+      }
+      if (id === ConvertInputType.TO) {
+        return inputFormattedValues?.toInput.formattedAmount || ""
+      }
+      return inputFormattedValues?.currencyInput.formattedAmount || ""
+    },
     [inputFormattedValues],
   )
 
@@ -45,15 +49,15 @@ export const useConversionFormatting = ({
     (id: InputField["id"]) => {
       const digits = inputFormattedValues?.formattedAmount ?? ""
       if (!digits) return ""
-      const curr =
-        id === "fromInput"
+      const currency =
+        id === ConvertInputType.FROM
           ? inputValues.fromInput.currency
-          : id === "toInput"
+          : id === ConvertInputType.TO
             ? inputValues.toInput.currency
             : displayCurrency
-      if (curr === WalletCurrency.Btc) return `${digits} SAT`
+      if (currency === WalletCurrency.Btc) return `${digits} SAT`
 
-      return `${getCurrencySymbol({ currency: curr })}${digits}`
+      return `${getCurrencySymbol({ currency })}${digits}`
     },
     [inputFormattedValues, inputValues, displayCurrency, getCurrencySymbol],
   )

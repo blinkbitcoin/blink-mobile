@@ -47,7 +47,6 @@ export const useConversionOverlayFocus = ({
       const ref = id === ConvertInputType.FROM ? fromInputRef : toInputRef
       const value = renderValue(id) ?? ""
       const pos = findSatIndex(value)
-
       const inputToFocus =
         id === ConvertInputType.FROM
           ? inputFormattedValues?.fromInput ?? inputValues.fromInput
