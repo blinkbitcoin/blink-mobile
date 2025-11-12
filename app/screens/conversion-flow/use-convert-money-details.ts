@@ -22,7 +22,7 @@ export interface InputField {
   formattedAmount: string
 }
 
-export interface IInputValues {
+export interface InputValues {
   fromInput: InputField
   toInput: InputField
   currencyInput: InputField

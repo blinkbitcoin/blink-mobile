@@ -4,23 +4,19 @@ import { DisplayCurrency } from "@app/types/amounts"
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { ConvertInputType } from "@app/components/transfer-amount-input"
-import { IInputValues, InputField } from "../use-convert-money-details"
+import { InputValues, InputField } from "../use-convert-money-details"
+import { formatBtcWithSuffix, findBtcSuffixIndex } from "../btc-format"
 
 type GetCurrencySymbol = (p: { currency: WalletCurrency | DisplayCurrency }) => string
 
 type Params = {
-  inputValues: IInputValues
-  inputFormattedValues: IInputValues | null
+  inputValues: InputValues
+  inputFormattedValues: InputValues | null
   isTyping: boolean
   typingInputId: InputField["id"] | null
   lockFormattingInputId: InputField["id"] | null
   displayCurrency: DisplayCurrency
   getCurrencySymbol: GetCurrencySymbol
-}
-
-const findSatIndex = (value: string): number => {
-  const idx = value.toUpperCase().indexOf(" SAT")
-  return idx >= 0 ? idx : value.length
 }
 
 export const useConversionFormatting = ({
@@ -55,7 +51,7 @@ export const useConversionFormatting = ({
           : id === ConvertInputType.TO
             ? inputValues.toInput.currency
             : displayCurrency
-      if (currency === WalletCurrency.Btc) return `${digits} SAT`
+      if (currency === WalletCurrency.Btc) return formatBtcWithSuffix(digits)
 
       return `${getCurrencySymbol({ currency })}${digits}`
     },
@@ -73,7 +69,7 @@ export const useConversionFormatting = ({
   const caretSelectionFor = useCallback(
     (id: InputField["id"]) => {
       const value = renderValue(id) ?? ""
-      const pos = findSatIndex(value)
+      const pos = findBtcSuffixIndex(value)
       return { start: pos, end: pos } as const
     },
     [renderValue],

@@ -14,7 +14,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
-  IInputValues,
+  InputValues,
   InputField,
   useConvertMoneyDetails,
 } from "@app/screens/conversion-flow/use-convert-money-details"
@@ -41,6 +41,7 @@ import {
 } from "@app/components/transfer-amount-input"
 
 import { useConversionFormatting, useConversionOverlayFocus } from "./hooks"
+import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
 
 gql`
   query conversionScreen {
@@ -111,10 +112,10 @@ export const ConversionDetailsScreen = () => {
   const [focusedInputValues, setFocusedInputValues] = useState<InputField | null>(null)
   const [initialAmount, setInitialAmount] =
     useState<MoneyAmount<WalletOrDisplayCurrency>>()
-  const [inputFormattedValues, setInputFormattedValues] = useState<IInputValues | null>(
+  const [inputFormattedValues, setInputFormattedValues] = useState<InputValues | null>(
     null,
   )
-  const [inputValues, setInputValues] = useState<IInputValues>({
+  const [inputValues, setInputValues] = useState<InputValues>({
     fromInput: {
       id: ConvertInputType.FROM,
       currency: WalletCurrency.Btc,
@@ -235,8 +236,7 @@ export const ConversionDetailsScreen = () => {
 
     if (initialId === ConvertInputType.FROM && fromInputRef.current) {
       const value = (baseTarget.formattedAmount ?? "") as string
-      const idx = value.toUpperCase().indexOf(" SAT")
-      const pos = idx >= 0 ? idx : value.length
+      const pos = findBtcSuffixIndex(value)
       setTimeout(() => {
         fromInputRef.current?.focus()
         fromInputRef.current?.setNativeProps({ selection: { start: pos, end: pos } })
@@ -287,9 +287,9 @@ export const ConversionDetailsScreen = () => {
     }
   }, [fromWallet, fromWallet?.walletCurrency, toWallet, toWallet?.walletCurrency])
 
-  const onSetFormattedValues = useCallback((values: IInputValues | null) => {
+  const onSetFormattedValues = useCallback((values: InputValues | null) => {
     if (!values) return
-    setInputFormattedValues((prev): IInputValues | null => {
+    setInputFormattedValues((prev): InputValues | null => {
       if (!prev) return values
       const sameSnapshot =
         prev.formattedAmount === values.formattedAmount &&
@@ -306,11 +306,7 @@ export const ConversionDetailsScreen = () => {
   useEffect(() => {
     if (displayCurrency === WalletCurrency.Usd && fromInputRef.current) {
       const value = renderValue(ConvertInputType.FROM) ?? ""
-      const satIdx =
-        value.indexOf(" SAT") >= 0
-          ? value.indexOf(" SAT")
-          : value.toUpperCase().indexOf(" SAT")
-      const pos = satIdx >= 0 ? satIdx : value.length
+      const pos = findBtcSuffixIndex(value)
       setTimeout(() => {
         fromInputRef.current?.setNativeProps({ selection: { start: pos, end: pos } })
       }, 100)
@@ -368,7 +364,7 @@ export const ConversionDetailsScreen = () => {
       },
     }))
 
-    setInputFormattedValues((prev: IInputValues | null): IInputValues | null => {
+    setInputFormattedValues((prev: InputValues | null): InputValues | null => {
       if (!prev) return prev
 
       const swappedFrom: InputField = {
@@ -461,7 +457,7 @@ export const ConversionDetailsScreen = () => {
               inputRef={fromInputRef}
               value={renderValue(ConvertInputType.FROM)}
               placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd ? "$0" : "0 SAT"
+                fromWallet.walletCurrency === WalletCurrency.Usd ? "$0" : `0${BTC_SUFFIX}`
               }
               selection={caretSelectionFor(ConvertInputType.FROM)}
               isLocked={uiLocked}
@@ -504,7 +500,7 @@ export const ConversionDetailsScreen = () => {
               inputRef={toInputRef}
               value={renderValue(ConvertInputType.TO)}
               placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd ? "0 SAT" : "$0"
+                fromWallet.walletCurrency === WalletCurrency.Usd ? `0${BTC_SUFFIX}` : "$0"
               }
               selection={caretSelectionFor(ConvertInputType.TO)}
               isLocked={uiLocked}

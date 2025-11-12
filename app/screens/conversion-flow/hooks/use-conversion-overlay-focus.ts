@@ -3,15 +3,15 @@ import { TextInput } from "react-native"
 
 import { ConvertInputType } from "@app/components/transfer-amount-input"
 
-import { IInputValues, InputField } from "../use-convert-money-details"
+import { InputValues, InputField } from "../use-convert-money-details"
 
 type Params = {
   uiLocked: boolean
   lockFormattingInputId: InputField["id"] | null
   setLockFormattingInputId: (id: InputField["id"] | null) => void
   setIsTyping: (v: boolean) => void
-  inputFormattedValues: IInputValues | null
-  inputValues: IInputValues
+  inputFormattedValues: InputValues | null
+  inputValues: InputValues
   renderValue: (id: InputField["id"]) => string | undefined
   fromInputRef: React.RefObject<TextInput>
   toInputRef: React.RefObject<TextInput>

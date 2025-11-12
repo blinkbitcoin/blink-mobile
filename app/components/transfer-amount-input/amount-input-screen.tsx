@@ -22,18 +22,18 @@ import {
   NumberPadReducerState,
 } from "../amount-input-screen/number-pad-reducer"
 import {
-  IInputValues,
+  InputValues,
   InputField,
 } from "@app/screens/conversion-flow/use-convert-money-details"
 
 export type AmountInputScreenProps = {
-  inputValues: IInputValues
+  inputValues: InputValues
   onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
   walletCurrency?: WalletCurrency
   convertMoneyAmount: ConvertMoneyAmount
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
-  onSetFormattedAmount: (InputValue: IInputValues) => void
+  onSetFormattedAmount: (InputValue: InputValues) => void
   initialAmount?: MoneyAmount<WalletOrDisplayCurrency>
   focusedInput: InputField | null
   compact?: boolean
@@ -117,7 +117,7 @@ const moneyAmountToNumberPadReducerState = ({
   }
 }
 
-const snapshotKey = (v: IInputValues) =>
+const snapshotKey = (v: InputValues) =>
   [
     v.formattedAmount,
     v.fromInput.formattedAmount,
@@ -149,7 +149,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   const { currencyInfo, formatMoneyAmount, zeroDisplayAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
 
-  const lastValuesRef = useRef<IInputValues | null>(null)
+  const lastValuesRef = useRef<InputValues | null>(null)
   const lastSnapshotRef = useRef<string | null>(null)
   const skipNextRecalcRef = useRef(false)
   const focusedIdRef = useRef<InputField["id"] | null>(null)
@@ -280,7 +280,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     const strip = (s?: string) => (s ? s.replace(/^\s*~\s*/, "") : s)
     const ensure = (s?: string) => (s ? (s.trim().startsWith("~") ? s : `~ ${s}`) : s)
 
-    const updatedValues: IInputValues = {
+    const updatedValues: InputValues = {
       ...baseValues,
       formattedAmount: formattedOnFocus,
       fromInput: {
@@ -331,7 +331,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     const formattedAmount = formatNumberPadNumber(numberPadNumber)
     const baseValues = lastValuesRef.current || inputValues
 
-    const payload: IInputValues = {
+    const payload: InputValues = {
       ...baseValues,
       formattedAmount,
     }
@@ -420,7 +420,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       const approxTo = inputValues.toInput.amount.currency !== primaryCurrency
       const approxCurrency = inputValues.currencyInput.amount.currency !== primaryCurrency
 
-      const payload: IInputValues = {
+      const payload: InputValues = {
         formattedAmount: digitsEmpty ? "" : formattedForParent,
         fromInput: {
           id: ConvertInputType.FROM,
