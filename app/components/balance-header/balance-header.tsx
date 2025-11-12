@@ -16,6 +16,7 @@ const Loader = () => {
       speed={1.2}
       backgroundColor={styles.loaderBackground.color}
       foregroundColor={styles.loaderForefound.color}
+      viewBox="0 0 100 40"
     >
       <Rect x="0" y="0" rx="4" ry="4" width="100" height="40" />
     </ContentLoader>
@@ -71,7 +72,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 30,
     height: 60,
     maxHeight: 60,
-    marginTop: -15,
+    marginTop: -10,
   },
   primaryBalanceText: {
     fontSize: 32,
