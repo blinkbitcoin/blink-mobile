@@ -70,3 +70,4 @@ generates:
         ContactDisplayName: "string"
         ContactHandle: "string"
         ContactId: "string"
+        TelegramPassportNonce: "string"
