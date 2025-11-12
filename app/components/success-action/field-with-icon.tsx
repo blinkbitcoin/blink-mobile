@@ -26,6 +26,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
   }
 
   const textData = handleTextWithUrl(value)
+  const valueData = textData.url ? `${textData.text} ` : textData.text
 
   return (
     <View style={styles.successActionFieldContainer}>
@@ -35,8 +36,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
       <View style={styles.fieldBackground}>
         <View>
           <Text style={styles.inputStyle} type={"p3"}>
-            {textData.text}
-            {textData.url && " "}
+            {valueData}
             {textData.url && (
               <Text
                 {...testProps(LL.ScanningQRCodeScreen.openLinkTitle())}
