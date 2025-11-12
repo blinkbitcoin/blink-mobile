@@ -143,8 +143,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
     const secondaryFeeAmount = getSecondaryAmountIfCurrencyIsDifferent({
       primaryAmount: feeDisplayAmount,
-      walletAmount: convertMoneyAmount(feeDisplayAmount, WalletCurrency.Btc),
-      displayAmount: convertMoneyAmount(feeDisplayAmount, DisplayCurrency),
+      walletAmount: paymentDetail.convertMoneyAmount(fee.amount, WalletCurrency.Btc),
+      displayAmount: paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency),
     })
     satFeeAmount = formatMoneyAmount({
       moneyAmount: secondaryFeeAmount ?? ZeroUsdMoneyAmount,
@@ -311,7 +311,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const errorMessage = paymentError || invalidAmountErrorMessage
 
-  const displayAmount = convertMoneyAmount(settlementAmount, DisplayCurrency)
+  const displayAmount = paymentDetail.convertMoneyAmount(
+    settlementAmount,
+    DisplayCurrency,
+  )
 
   currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -319,8 +322,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: convertMoneyAmount(unitOfAccountAmount, WalletCurrency.Btc),
-    displayAmount: convertMoneyAmount(unitOfAccountAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
   })
 
   satAmount = formatMoneyAmount({
