@@ -2,7 +2,7 @@ export type SuccessActionComponentProps = {
   visible?: boolean
   title: string
   text?: string | null
-  subText?: string
+  subValue?: string
 }
 
 export enum SuccessActionTag {

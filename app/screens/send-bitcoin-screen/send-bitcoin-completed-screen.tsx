@@ -246,14 +246,14 @@ const PaymentDetailsSection: React.FC<{
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.amount()}
           text={currencyAmount}
-          subText={satAmount}
+          subValue={satAmount}
           key="amount"
           visible={Boolean(currencyAmount)}
         />
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.feeLabel()}
           text={currencyFeeAmount}
-          subText={satFeeAmount}
+          subValue={satFeeAmount}
           key="fee"
           visible={Boolean(currencyFeeAmount)}
         />
