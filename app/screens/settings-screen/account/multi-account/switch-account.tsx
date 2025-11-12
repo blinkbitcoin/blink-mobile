@@ -71,9 +71,7 @@ export const useStyles = makeStyles(() => ({
   outer: {
     marginTop: 4,
     paddingBottom: 20,
-    display: "flex",
     flexDirection: "column",
-    // rowGap: 2,
   },
   buttonsContainer: {
     justifyContent: "flex-end",
