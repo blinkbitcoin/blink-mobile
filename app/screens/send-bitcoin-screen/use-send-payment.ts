@@ -27,7 +27,7 @@ type UseSendPaymentResult = {
   sendPayment:
     | (() => Promise<{
         status: PaymentSendResult | null | undefined
-        transaction?: Partial<Transaction> | null | undefined
+        transaction?: Partial<Transaction> | null
         errorsMessage?: string
         extraInfo?: PaymentSendExtraInfo
       }>)
