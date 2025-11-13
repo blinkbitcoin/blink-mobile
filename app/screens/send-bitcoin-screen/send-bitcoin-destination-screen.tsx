@@ -169,6 +169,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const activeInputRef = useRef<TInputType>("search")
 
   const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("null")
+  // Don't update the country code as we type
   const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
   const [defaultPhoneInputInfo, setDefaultPhoneInputInfo] =
     useState<PhoneInputInfo | null>(null)
@@ -473,13 +474,19 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     [willInitiateValidation, waitAndValidateDestination],
   )
 
+  const resetInput = useCallback(() => {
+    reset()
+    setDefaultPhoneInputInfo(null)
+    setRawPhoneNumber("")
+  }, [reset])
+
   const onFocusedInput = useCallback(
     (inputType: TInputType) => {
       if (activeInputRef.current === inputType) return
       activeInputRef.current = inputType
-      reset()
+      resetInput()
     },
-    [reset],
+    [resetInput],
   )
 
   useEffect(() => {
@@ -538,6 +545,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   useEffect(() => {
     if (!defaultPhoneInputInfo) return
     if (activeInputRef.current === "search") return
+
     if (
       destinationState.destinationState === DestinationState.Validating ||
       destinationState.destinationState === DestinationState.Pasting
@@ -549,12 +557,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
 
     handleChangeText(rawInput)
     updateMatchingContacts(rawPhoneNumber)
-  }, [
-    defaultPhoneInputInfo,
-    destinationState.destinationState,
-    handleChangeText,
-    updateMatchingContacts,
-  ])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts])
 
   // Clear countryCallingCode from input value after pasting or selecting one
   useEffect(() => {
@@ -715,12 +720,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       initiateGoToNextScreen,
     ],
   )
-
-  const resetInput = useCallback(() => {
-    reset()
-    setDefaultPhoneInputInfo(null)
-    setRawPhoneNumber("")
-  }, [reset])
 
   const inputContainerStyle = useMemo(() => {
     switch (destinationState.destinationState) {
