@@ -63,7 +63,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.11",
     "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@blinkbitcoin/blink-client": "0.4.0",
+    "@blinkbitcoin/blink-client": "0.5.2",
     "@expo/react-native-action-sheet": "^4.0.1",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
     "@formatjs/intl-locale": "^3.4.5",
@@ -97,7 +97,7 @@
     "intl-pluralrules": "^2.0.1",
     "js-lnurl": "0.6.0",
     "js-sha256": "^0.11.0",
-    "libphonenumber-js": "^1.10.60",
+    "libphonenumber-js": "^1.12.25",
     "lnurl-pay": "^5.0.2",
     "lodash.debounce": "^4.0.8",
     "lodash.merge": "^4.6.2",

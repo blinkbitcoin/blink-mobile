@@ -21,6 +21,7 @@ import {
   useScanningQrCodeScreenQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
@@ -83,6 +84,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   })
 
   const { LL } = useI18nContext()
+  const { displayCurrency } = useDisplayCurrency()
   const device = useCameraDevice("back")
   const { hasPermission, requestPermission } = useCameraPermission()
 
@@ -134,6 +136,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
           bitcoinNetwork,
           lnurlDomains: LNURL_DOMAINS,
           accountDefaultWalletQuery,
+          inputSource: "qr",
+          displayCurrency,
         })
         logParseDestinationResult(destination)
 
@@ -244,6 +248,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
     bitcoinNetwork,
     wallets,
     accountDefaultWalletQuery,
+    displayCurrency,
   ])
   const styles = useStyles()
 
@@ -251,7 +256,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
     codeTypes: ["qr", "ean-13"],
     onCodeScanned: (codes) => {
       codes.forEach((code) => processInvoice(code.value))
-      console.log(`Scanned ${codes.length} codes!`)
+      console.debug(`Scanned ${codes.length} codes!`)
     },
   })
 

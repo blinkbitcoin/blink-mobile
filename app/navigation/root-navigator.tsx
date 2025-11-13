@@ -62,6 +62,7 @@ import {
 } from "@react-navigation/stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -660,6 +661,7 @@ export const PrimaryNavigator = () => {
   const {
     theme: { colors },
   } = useTheme()
+  const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
@@ -671,7 +673,13 @@ export const PrimaryNavigator = () => {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: styles.bottomNavigatorStyle,
+        tabBarStyle: [
+          styles.bottomNavigatorStyle,
+          {
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom,
+          },
+        ],
         tabBarLabelStyle: {
           paddingBottom: 6,
           fontSize: 12,
@@ -737,7 +745,6 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomNavigatorStyle: {
-    height: "10%",
     paddingTop: 4,
     backgroundColor: colors.white,
     borderTopColor: colors.grey4,

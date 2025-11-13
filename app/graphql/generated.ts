@@ -76,6 +76,8 @@ export type Scalars = {
   SignedAmount: { input: number; output: number; }
   /** A string amount (of a currency) that can be negative (e.g. in a transaction) */
   SignedDisplayMajorAmount: { input: string; output: string; }
+  /** Nonce provided by Telegram Passport to validate the login/upgrade flow */
+  TelegramPassportNonce: { input: string; output: string; }
   /** Timestamp field, serialized as Unix time (the number of seconds since the Unix epoch) */
   Timestamp: { input: number; output: number; }
   /** A time-based one-time password */
@@ -1165,6 +1167,7 @@ export type Mutation = {
   readonly userEmailRegistrationValidate: UserEmailRegistrationValidatePayload;
   readonly userLogin: AuthTokenPayload;
   readonly userLoginUpgrade: UpgradePayload;
+  readonly userLoginUpgradeTelegram: UpgradePayload;
   readonly userLogout: SuccessPayload;
   readonly userPhoneDelete: UserPhoneDeletePayload;
   readonly userPhoneRegistrationInitiate: SuccessPayload;
@@ -1420,6 +1423,11 @@ export type MutationUserLoginArgs = {
 
 export type MutationUserLoginUpgradeArgs = {
   input: UserLoginUpgradeInput;
+};
+
+
+export type MutationUserLoginUpgradeTelegramArgs = {
+  input: UserLoginUpgradeTelegramInput;
 };
 
 
@@ -2346,6 +2354,11 @@ export type UserLoginUpgradeInput = {
   readonly phone: Scalars['Phone']['input'];
 };
 
+export type UserLoginUpgradeTelegramInput = {
+  readonly nonce: Scalars['TelegramPassportNonce']['input'];
+  readonly phone: Scalars['Phone']['input'];
+};
+
 export type UserLogoutInput = {
   readonly deviceToken: Scalars['String']['input'];
 };
@@ -3199,6 +3212,13 @@ export type SupportChatResetMutationVariables = Exact<{ [key: string]: never; }>
 
 
 export type SupportChatResetMutation = { readonly __typename: 'Mutation', readonly supportChatReset: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
+
+export type UserLoginUpgradeTelegramMutationVariables = Exact<{
+  input: UserLoginUpgradeTelegramInput;
+}>;
+
+
+export type UserLoginUpgradeTelegramMutation = { readonly __typename: 'Mutation', readonly userLoginUpgradeTelegram: { readonly __typename: 'UpgradePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type TotpRegistrationScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7913,6 +7933,43 @@ export function useSupportChatResetMutation(baseOptions?: Apollo.MutationHookOpt
 export type SupportChatResetMutationHookResult = ReturnType<typeof useSupportChatResetMutation>;
 export type SupportChatResetMutationResult = Apollo.MutationResult<SupportChatResetMutation>;
 export type SupportChatResetMutationOptions = Apollo.BaseMutationOptions<SupportChatResetMutation, SupportChatResetMutationVariables>;
+export const UserLoginUpgradeTelegramDocument = gql`
+    mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
+  userLoginUpgradeTelegram(input: $input) {
+    errors {
+      message
+      code
+    }
+    success
+  }
+}
+    `;
+export type UserLoginUpgradeTelegramMutationFn = Apollo.MutationFunction<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>;
+
+/**
+ * __useUserLoginUpgradeTelegramMutation__
+ *
+ * To run a mutation, you first call `useUserLoginUpgradeTelegramMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserLoginUpgradeTelegramMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userLoginUpgradeTelegramMutation, { data, loading, error }] = useUserLoginUpgradeTelegramMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserLoginUpgradeTelegramMutation(baseOptions?: Apollo.MutationHookOptions<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>(UserLoginUpgradeTelegramDocument, options);
+      }
+export type UserLoginUpgradeTelegramMutationHookResult = ReturnType<typeof useUserLoginUpgradeTelegramMutation>;
+export type UserLoginUpgradeTelegramMutationResult = Apollo.MutationResult<UserLoginUpgradeTelegramMutation>;
+export type UserLoginUpgradeTelegramMutationOptions = Apollo.BaseMutationOptions<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>;
 export const TotpRegistrationScreenDocument = gql`
     query totpRegistrationScreen {
   me {
@@ -8451,6 +8508,7 @@ export type ResolversTypes = {
   SupportChatMessageAddPayload: ResolverTypeWrapper<SupportChatMessageAddPayload>;
   SupportMessage: ResolverTypeWrapper<SupportMessage>;
   SupportRole: SupportRole;
+  TelegramPassportNonce: ResolverTypeWrapper<Scalars['TelegramPassportNonce']['output']>;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']['output']>;
   TotpCode: ResolverTypeWrapper<Scalars['TotpCode']['output']>;
   TotpRegistrationId: ResolverTypeWrapper<Scalars['TotpRegistrationId']['output']>;
@@ -8475,6 +8533,7 @@ export type ResolversTypes = {
   UserEmailRegistrationValidatePayload: ResolverTypeWrapper<UserEmailRegistrationValidatePayload>;
   UserLoginInput: UserLoginInput;
   UserLoginUpgradeInput: UserLoginUpgradeInput;
+  UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
   UserPhoneDeletePayload: ResolverTypeWrapper<UserPhoneDeletePayload>;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
@@ -8683,6 +8742,7 @@ export type ResolversParentTypes = {
   SupportChatMessageAddInput: SupportChatMessageAddInput;
   SupportChatMessageAddPayload: SupportChatMessageAddPayload;
   SupportMessage: SupportMessage;
+  TelegramPassportNonce: Scalars['TelegramPassportNonce']['output'];
   Timestamp: Scalars['Timestamp']['output'];
   TotpCode: Scalars['TotpCode']['output'];
   TotpRegistrationId: Scalars['TotpRegistrationId']['output'];
@@ -8704,6 +8764,7 @@ export type ResolversParentTypes = {
   UserEmailRegistrationValidatePayload: UserEmailRegistrationValidatePayload;
   UserLoginInput: UserLoginInput;
   UserLoginUpgradeInput: UserLoginUpgradeInput;
+  UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
   UserPhoneDeletePayload: UserPhoneDeletePayload;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
@@ -9297,6 +9358,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   userEmailRegistrationValidate?: Resolver<ResolversTypes['UserEmailRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationValidateArgs, 'input'>>;
   userLogin?: Resolver<ResolversTypes['AuthTokenPayload'], ParentType, ContextType, RequireFields<MutationUserLoginArgs, 'input'>>;
   userLoginUpgrade?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeArgs, 'input'>>;
+  userLoginUpgradeTelegram?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeTelegramArgs, 'input'>>;
   userLogout?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, Partial<MutationUserLogoutArgs>>;
   userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
@@ -9668,6 +9730,10 @@ export type SupportMessageResolvers<ContextType = any, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export interface TelegramPassportNonceScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['TelegramPassportNonce'], any> {
+  name: 'TelegramPassportNonce';
+}
+
 export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Timestamp'], any> {
   name: 'Timestamp';
 }
@@ -10015,6 +10081,7 @@ export type Resolvers<ContextType = any> = {
   SuccessPayload?: SuccessPayloadResolvers<ContextType>;
   SupportChatMessageAddPayload?: SupportChatMessageAddPayloadResolvers<ContextType>;
   SupportMessage?: SupportMessageResolvers<ContextType>;
+  TelegramPassportNonce?: GraphQLScalarType;
   Timestamp?: GraphQLScalarType;
   TotpCode?: GraphQLScalarType;
   TotpRegistrationId?: GraphQLScalarType;

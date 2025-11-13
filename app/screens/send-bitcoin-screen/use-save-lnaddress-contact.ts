@@ -18,7 +18,11 @@ gql`
   }
 `
 
-type SaveLnAddressContactParams = { paymentType: PaymentType; destination: string }
+type SaveLnAddressContactParams = {
+  paymentType: PaymentType
+  destination: string
+  isMerchant?: boolean
+}
 type SaveLnAddressContactResult = { saved: boolean; handle?: string }
 
 export const useSaveLnAddressContact = () => {
@@ -28,8 +32,10 @@ export const useSaveLnAddressContact = () => {
     async ({
       paymentType,
       destination,
+      isMerchant,
     }: SaveLnAddressContactParams): Promise<SaveLnAddressContactResult> => {
       if (paymentType !== PaymentType.Lnurl) return { saved: false }
+      if (isMerchant) return { saved: false }
 
       const parsed = lnurlUtils.parseLightningAddress(destination)
       if (!parsed) return { saved: false }

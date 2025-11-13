@@ -11,7 +11,7 @@ export const PeopleScreen: React.FC = () => {
   const styles = useStyles()
 
   return (
-    <Screen style={styles.screen} preset="scroll">
+    <Screen style={styles.screen} preset="scroll" headerShown={false}>
       <CirclesCardPeopleHome />
       <ContactsCard />
       <InviteFriendsCard />
