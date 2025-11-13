@@ -46,6 +46,7 @@ import {
 import {
   DestinationState,
   SendBitcoinActions,
+  SendBitcoinDestinationAction,
   sendBitcoinDestinationReducer,
   SendBitcoinDestinationState,
 } from "./send-bitcoin-reducer"
@@ -169,7 +170,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const activeInputRef = useRef<TInputType>("search")
 
   const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("null")
-  // Don't update the country code as we type
+  // To don't update the country code as we type
   const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
   const [defaultPhoneInputInfo, setDefaultPhoneInputInfo] =
     useState<PhoneInputInfo | null>(null)
@@ -542,54 +543,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     }
   }, [route.params?.scanPressed, handleScanPress])
 
-  useEffect(() => {
-    if (!defaultPhoneInputInfo) return
-    if (activeInputRef.current === "search") return
-
-    if (
-      destinationState.destinationState === DestinationState.Validating ||
-      destinationState.destinationState === DestinationState.Pasting
-    )
-      return
-
-    const { rawPhoneNumber } = defaultPhoneInputInfo
-    const rawInput = `+${defaultPhoneInputInfo?.countryCallingCode}${rawPhoneNumber}`
-
-    handleChangeText(rawInput)
-    updateMatchingContacts(rawPhoneNumber)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts])
-
-  // Clear countryCallingCode from input value after pasting or selecting one
-  useEffect(() => {
-    if (!rawPhoneNumber) return
-    if (activeInputRef.current === "search") return
-    if (
-      destinationState.destinationState === DestinationState.Validating ||
-      destinationState.destinationState === DestinationState.Pasting ||
-      destinationState.destinationState === DestinationState.Entering
-    ) {
-      const parse = parseValidPhone(rawPhoneNumber)
-      if (
-        parse &&
-        parse?.isValid() &&
-        rawPhoneNumber.includes(`+${defaultPhoneInputInfo?.countryCallingCode}`)
-      ) {
-        const phoneNumberWithoutArea = rawPhoneNumber.replace(
-          `+${defaultPhoneInputInfo?.countryCallingCode}`,
-          "",
-        )
-        setRawPhoneNumber(phoneNumberWithoutArea)
-      }
-    }
-  }, [
-    rawPhoneNumber,
-    defaultPhoneInputInfo,
-    destinationState.destinationState,
-    parseValidPhone,
-  ])
-
   const handlePaste = useCallback(async () => {
     if (destinationState.destinationState === DestinationState.Validating) return
     onFocusedInput("search")
@@ -619,54 +572,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   }, [
     destinationState.destinationState,
     onFocusedInput,
-    updateMatchingContacts,
-    willInitiateValidation,
-    waitAndValidateDestination,
-    LL,
-  ])
-
-  const handlePastePhone = useCallback(async () => {
-    if (destinationState.destinationState === DestinationState.Validating) return
-    onFocusedInput("phone")
-    setKeepCountryCode(false)
-
-    try {
-      const clipboard = await Clipboard.getString()
-
-      let parsed = null
-      parsed = parseValidPhone(clipboard)
-      const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
-
-      updateMatchingContacts(parseNumber)
-      dispatchDestinationStateAction({
-        type: SendBitcoinActions.SetUnparsedPastedDestination,
-        payload: {
-          unparsedDestination: parseNumber,
-        },
-      })
-
-      if (willInitiateValidation()) {
-        waitAndValidateDestination(parseNumber)
-        setRawPhoneNumber(parseNumber)
-      }
-      setTimeout(() => {
-        setKeepCountryCode(true)
-      }, 100)
-    } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
-      toastShow({
-        type: "error",
-        message: (translations) =>
-          translations.SendBitcoinDestinationScreen.clipboardError(),
-        LL,
-      })
-    }
-  }, [
-    destinationState.destinationState,
-    onFocusedInput,
-    parseValidPhone,
     updateMatchingContacts,
     willInitiateValidation,
     waitAndValidateDestination,
@@ -780,7 +685,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             platform="default"
             showLoading={false}
             containerStyle={[styles.searchBarContainer]}
-            inputContainerStyle={[styles.searchBarInputContainerStyle]}
+            inputContainerStyle={styles.searchBarInputContainerStyle}
             inputStyle={styles.searchBarText}
             searchIcon={<></>}
             autoCapitalize="none"
@@ -813,59 +718,26 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         ) : (
           <View style={styles.spacerStyle}></View>
         )}
-        <View style={styles.textSeparator}>
-          <View style={styles.line}></View>
-          <View style={styles.textInformationWrapper}>
-            <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orBySMS()}</Text>
-          </View>
-        </View>
-        <PhoneInput
-          key={1}
-          rightIcon={
-            rawPhoneNumber && activeInputRef.current === "phone" ? (
-              <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
-            ) : (
-              <TouchableOpacity
-                onPress={handlePastePhone}
-                disabled={activeInputRef.current === "search"}
-              >
-                <Text color={colors.primary} type="p2">
-                  {LL.common.paste()}
-                </Text>
-              </TouchableOpacity>
-            )
-          }
-          onChangeText={(text) => {
-            onFocusedInput("phone")
-            setRawPhoneNumber(text)
-          }}
-          onChangeInfo={(e) => {
-            setDefaultPhoneInputInfo(e)
-          }}
-          value={activeInputRef.current === "phone" ? rawPhoneNumber : ""}
-          isDisabled={activeInputRef.current === "search"}
-          onFocus={() => onFocusedInput("phone")}
-          onSubmitEditing={() =>
-            willInitiateValidation() &&
-            waitAndValidateDestination(destinationState.unparsedDestination)
-          }
-          inputContainerStyle={activeInputRef.current === "phone" && inputContainerStyle}
-          bgColor={colors.grey6}
+        <PhoneInputSection
+          rawPhoneNumber={rawPhoneNumber}
+          setRawPhoneNumber={setRawPhoneNumber}
+          activeInputRef={activeInputRef}
+          destinationState={destinationState}
+          onFocusedInput={onFocusedInput}
+          parseValidPhone={parseValidPhone}
+          updateMatchingContacts={updateMatchingContacts}
+          willInitiateValidation={willInitiateValidation}
+          waitAndValidateDestination={waitAndValidateDestination}
+          resetInput={resetInput}
+          setDefaultPhoneInputInfo={setDefaultPhoneInputInfo}
+          inputContainerStyle={inputContainerStyle}
+          matchingContacts={matchingContacts}
           keepCountryCode={keepCountryCode}
+          setKeepCountryCode={setKeepCountryCode}
+          dispatchDestinationStateAction={dispatchDestinationStateAction}
+          defaultPhoneInputInfo={defaultPhoneInputInfo}
+          handleChangeText={handleChangeText}
         />
-        {activeInputRef.current === "phone" ? (
-          <DestinationInformation destinationState={destinationState} />
-        ) : (
-          <View style={styles.spacerStyle}></View>
-        )}
-        {matchingContacts.length > 0 && (
-          <View style={[styles.textSeparator, styles.lastInfoTextStyle]}>
-            <View style={styles.line}></View>
-            <View style={styles.textInformationWrapper}>
-              <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orSaved()}</Text>
-            </View>
-          </View>
-        )}
         <FlatList
           style={styles.flatList}
           contentContainerStyle={styles.flatListContainer}
@@ -934,6 +806,208 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
 }
 
 export default SendBitcoinDestinationScreen
+
+interface PhoneInputSectionProps {
+  rawPhoneNumber: string
+  setRawPhoneNumber: (value: string) => void
+  activeInputRef: React.MutableRefObject<TInputType>
+  destinationState: SendBitcoinDestinationState
+  onFocusedInput: (inputType: TInputType) => void
+  parseValidPhone: (input: string) => ReturnType<typeof parsePhoneNumber> | null
+  updateMatchingContacts: (newSearchText: string) => void
+  willInitiateValidation: () => boolean
+  waitAndValidateDestination: (input: string) => void
+  keepCountryCode: boolean
+  setKeepCountryCode: (value: boolean) => void
+  dispatchDestinationStateAction: React.Dispatch<SendBitcoinDestinationAction>
+  resetInput: () => void
+  setDefaultPhoneInputInfo: (info: PhoneInputInfo | null) => void
+  inputContainerStyle?: object
+  matchingContacts: UserContact[]
+  defaultPhoneInputInfo: PhoneInputInfo | null
+  handleChangeText: (newDestination: string) => void
+}
+
+const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
+  rawPhoneNumber,
+  setRawPhoneNumber,
+  activeInputRef,
+  destinationState,
+  onFocusedInput,
+  parseValidPhone,
+  updateMatchingContacts,
+  willInitiateValidation,
+  waitAndValidateDestination,
+  keepCountryCode,
+  setKeepCountryCode,
+  dispatchDestinationStateAction,
+  resetInput,
+  setDefaultPhoneInputInfo,
+  inputContainerStyle,
+  matchingContacts,
+  defaultPhoneInputInfo,
+  handleChangeText,
+}) => {
+  const styles = usestyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const { LL } = useI18nContext()
+
+  const handlePastePhone = useCallback(async () => {
+    if (destinationState.destinationState === DestinationState.Validating) return
+    onFocusedInput("phone")
+    setKeepCountryCode(false)
+
+    try {
+      const clipboard = await Clipboard.getString()
+
+      let parsed = null
+      parsed = parseValidPhone(clipboard)
+      const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
+
+      updateMatchingContacts(parseNumber)
+      dispatchDestinationStateAction({
+        type: SendBitcoinActions.SetUnparsedPastedDestination,
+        payload: {
+          unparsedDestination: parseNumber,
+        },
+      })
+
+      if (willInitiateValidation()) {
+        waitAndValidateDestination(parseNumber)
+        setRawPhoneNumber(parseNumber)
+      }
+      setTimeout(() => {
+        setKeepCountryCode(true)
+      }, 100)
+    } catch (err) {
+      if (err instanceof Error) {
+        crashlytics().recordError(err)
+      }
+      toastShow({
+        type: "error",
+        message: (translations) =>
+          translations.SendBitcoinDestinationScreen.clipboardError(),
+        LL,
+      })
+    }
+  }, [
+    destinationState.destinationState,
+    onFocusedInput,
+    parseValidPhone,
+    updateMatchingContacts,
+    willInitiateValidation,
+    waitAndValidateDestination,
+    LL,
+  ])
+
+  useEffect(() => {
+    if (!defaultPhoneInputInfo) return
+    if (activeInputRef.current === "search") return
+
+    if (
+      destinationState.destinationState === DestinationState.Validating ||
+      destinationState.destinationState === DestinationState.Pasting
+    )
+      return
+
+    const { rawPhoneNumber } = defaultPhoneInputInfo
+    const rawInput = `+${defaultPhoneInputInfo?.countryCallingCode}${rawPhoneNumber}`
+
+    handleChangeText(rawInput)
+    updateMatchingContacts(rawPhoneNumber)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts])
+
+  // Clear countryCallingCode from input value after pasting or selecting one
+  useEffect(() => {
+    if (!rawPhoneNumber) return
+    if (activeInputRef.current === "search") return
+    if (
+      destinationState.destinationState === DestinationState.Validating ||
+      destinationState.destinationState === DestinationState.Pasting ||
+      destinationState.destinationState === DestinationState.Entering
+    ) {
+      const parse = parseValidPhone(rawPhoneNumber)
+      if (
+        parse &&
+        parse?.isValid() &&
+        rawPhoneNumber.includes(`+${defaultPhoneInputInfo?.countryCallingCode}`)
+      ) {
+        const phoneNumberWithoutArea = rawPhoneNumber.replace(
+          `+${defaultPhoneInputInfo?.countryCallingCode}`,
+          "",
+        )
+        setRawPhoneNumber(phoneNumberWithoutArea)
+      }
+    }
+  }, [
+    rawPhoneNumber,
+    defaultPhoneInputInfo,
+    destinationState.destinationState,
+    parseValidPhone,
+  ])
+
+  return (
+    <>
+      <View style={styles.textSeparator}>
+        <View style={styles.line}></View>
+        <View style={styles.textInformationWrapper}>
+          <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orBySMS()}</Text>
+        </View>
+      </View>
+      <PhoneInput
+        key={1}
+        rightIcon={
+          rawPhoneNumber && activeInputRef.current === "phone" ? (
+            <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
+          ) : (
+            <TouchableOpacity
+              onPress={handlePastePhone}
+              disabled={activeInputRef.current === "search"}
+            >
+              <Text color={colors.primary} type="p2">
+                {LL.common.paste()}
+              </Text>
+            </TouchableOpacity>
+          )
+        }
+        onChangeText={(text) => {
+          onFocusedInput("phone")
+          setRawPhoneNumber(text)
+        }}
+        onChangeInfo={(e) => {
+          setDefaultPhoneInputInfo(e)
+        }}
+        value={activeInputRef.current === "phone" ? rawPhoneNumber : ""}
+        isDisabled={activeInputRef.current === "search"}
+        onFocus={() => onFocusedInput("phone")}
+        onSubmitEditing={() =>
+          willInitiateValidation() &&
+          waitAndValidateDestination(destinationState.unparsedDestination)
+        }
+        inputContainerStyle={activeInputRef.current === "phone" && inputContainerStyle}
+        bgColor={colors.grey6}
+        keepCountryCode={keepCountryCode}
+      />
+      {activeInputRef.current === "phone" ? (
+        <DestinationInformation destinationState={destinationState} />
+      ) : (
+        <View style={styles.spacerStyle}></View>
+      )}
+      {matchingContacts.length > 0 && (
+        <View style={[styles.textSeparator, styles.lastInfoTextStyle]}>
+          <View style={styles.line}></View>
+          <View style={styles.textInformationWrapper}>
+            <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orSaved()}</Text>
+          </View>
+        </View>
+      )}
+    </>
+  )
+}
 
 const usestyles = makeStyles(({ colors }) => ({
   sendBitcoinDestinationContainer: {
