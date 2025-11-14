@@ -36,6 +36,17 @@ const destinationStateToInformation = (
     return {}
   }
 
+  if (sendBitcoinReducerState.destinationState === DestinationState.PhoneInvalid) {
+    return {
+      error: translate.SendBitcoinDestinationScreen.invalidPhoneNumber(),
+    }
+  }
+  if (sendBitcoinReducerState.destinationState === DestinationState.PhoneNotAllowed) {
+    return {
+      error: translate.SendBitcoinDestinationScreen.phoneNotAllowed(),
+    }
+  }
+
   if (sendBitcoinReducerState.destinationState === DestinationState.Invalid) {
     switch (sendBitcoinReducerState?.invalidDestination?.invalidReason) {
       case InvalidDestinationReason.InvoiceExpired:
@@ -146,9 +157,9 @@ export const DestinationInformation = ({
           text={information.infoTooltip.text}
         />
       )}
-      {information.adviceTooltip && (
+      {/* {information.adviceTooltip && (
         <ModalTooltip type="advice" size={20} text={information.adviceTooltip.text} />
-      )}
+      )} */}
       <View style={styles.textContainer}>
         {information.information && (
           <Text style={styles.informationText}>{information.information}</Text>

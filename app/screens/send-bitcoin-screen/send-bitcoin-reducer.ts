@@ -7,6 +7,8 @@ export const DestinationState = {
   Valid: "valid",
   RequiresUsernameConfirmation: "requires-destination-confirmation",
   Invalid: "invalid",
+  PhoneInvalid: "phone-invalid",
+  PhoneNotAllowed: "phone-not-allowed",
 } as const
 
 export type DestinationState = (typeof DestinationState)[keyof typeof DestinationState]
@@ -33,6 +35,8 @@ export const SendBitcoinActions = {
   SetInvalid: "set-invalid",
   SetRequiresUsernameConfirmation: "set-requires-destination-confirmation",
   SetConfirmed: "set-confirmed",
+  SetPhoneInvalid: "set-phone-invalid",
+  SetPhoneNotAllowed: "set-phone-not-allowed",
 } as const
 
 export type SendBitcoinActions =
@@ -77,6 +81,14 @@ export type SendBitcoinDestinationAction =
       type: typeof SendBitcoinActions.SetConfirmed
       payload: { unparsedDestination: string }
     }
+  | {
+      type: typeof SendBitcoinActions.SetPhoneInvalid
+      payload: Record<string, never>
+    }
+  | {
+      type: typeof SendBitcoinActions.SetPhoneNotAllowed
+      payload: Record<string, never>
+    }
 
 export const sendBitcoinDestinationReducer = (
   state: SendBitcoinDestinationState,
@@ -99,7 +111,7 @@ export const sendBitcoinDestinationReducer = (
         destinationState: DestinationState.Validating,
       }
     case SendBitcoinActions.SetValid:
-      return state.unparsedDestination === action.payload?.unparsedDestination
+      return state.unparsedDestination === action.payload?.unparsedDestination //
         ? {
             unparsedDestination: state.unparsedDestination,
             destinationState: DestinationState.Valid,
@@ -141,6 +153,16 @@ export const sendBitcoinDestinationReducer = (
           : state
       }
       throw new Error("Invalid state transition")
+    case SendBitcoinActions.SetPhoneInvalid:
+      return {
+        ...state,
+        destinationState: DestinationState.PhoneInvalid,
+      }
+    case SendBitcoinActions.SetPhoneNotAllowed:
+      return {
+        ...state,
+        destinationState: DestinationState.PhoneNotAllowed,
+      }
     default:
       return state
   }
