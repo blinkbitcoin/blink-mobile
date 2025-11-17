@@ -94,6 +94,7 @@ import {
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
+  CardDashboardStackParamList,
   OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
@@ -113,6 +114,7 @@ import {
   TermSheetScreen,
   TranferInvest,
   TopUpScreen,
+  CardDashboardScreen,
 } from "../screens/bitcoin-card"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 
@@ -644,6 +646,49 @@ export const RootStack = () => {
   )
 }
 
+const CardDashboard = createStackNavigator<CardDashboardStackParamList>()
+
+export const CardDashboardNavigator = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
+  return (
+    <CardDashboard.Navigator
+      screenOptions={{
+        gestureEnabled: true,
+        headerBackTitle: LL.common.back(),
+        headerBackTestID: LL.common.back(),
+        headerStyle: styles.headerStyle,
+        headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.title,
+        headerTintColor: colors.black,
+      }}
+      initialRouteName="cardDashboardScreen"
+    >
+      <CardDashboard.Screen
+        name="cardDashboardScreen"
+        component={CardDashboardScreen}
+        options={{
+          title: LL.VisaCardScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() =>{}}
+              size={"medium"}
+              name="settings"
+              backgroundColor={colors.transparent}
+              color={colors.black}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+    </CardDashboard.Navigator>
+  )
+}
+
 const Onboarding = createStackNavigator<OnboardingStackParamList>()
 
 export const OnboardingNavigator = () => {
@@ -887,6 +932,14 @@ export const PrimaryNavigator = () => {
           tabBarIcon: ({ color }: { color: string }) => (
             <LearnIcon {...testProps("Earn")} color={color} />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="CardDashboard"
+        component={CardDashboardNavigator}
+        options={{
+          tabBarButton: () => null,
+          headerShown: false,
         }}
       />
     </Tab.Navigator>
