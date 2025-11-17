@@ -7253,7 +7253,7 @@ type RootTranslation = {
 		 */
 		setByOs: string
 		/**
-		 * A​P​I​ ​A​c​c​e​s​s
+		 * A​P​I​ ​i​n​t​e​g​r​a​t​i​o​n
 		 */
 		apiAcess: string
 		/**
@@ -16588,7 +16588,7 @@ export type TranslationFunctions = {
 		 */
 		setByOs: () => LocalizedString
 		/**
-		 * API Access
+		 * API integration
 		 */
 		apiAcess: () => LocalizedString
 		/**

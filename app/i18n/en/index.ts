@@ -2322,7 +2322,7 @@ const en: BaseTranslation = {
     staticQr: "Printable Static QR Code",
     staticQrCopied: "Your static QR code link has been copied",
     setByOs: "Set by OS",
-    apiAcess: "API Access",
+    apiAcess: "API integration",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     setYourLightningAddress: "Set Your Lightning Address",
