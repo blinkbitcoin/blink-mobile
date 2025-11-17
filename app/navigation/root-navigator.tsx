@@ -655,6 +655,8 @@ export const CardDashboardNavigator = () => {
     theme: { colors },
   } = useTheme()
 
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
   return (
     <CardDashboard.Navigator
       screenOptions={{
@@ -673,13 +675,23 @@ export const CardDashboardNavigator = () => {
         component={CardDashboardScreen}
         options={{
           title: LL.VisaCardScreen.title(),
+          headerLeft: () => (
+            <GaloyIconButton
+              onPress={() => navigation.goBack()}
+              size={"medium"}
+              name="arrow-left"
+              color={colors.black}
+              iconOnly
+              style={{ marginLeft: 10 }}
+            />
+          ),
           headerRight: () => (
             <GaloyIconButton
-              onPress={() =>{}}
+              onPress={() => {}}
               size={"medium"}
               name="settings"
-              backgroundColor={colors.transparent}
               color={colors.black}
+              iconOnly
               style={{ marginRight: 20 }}
             />
           ),
