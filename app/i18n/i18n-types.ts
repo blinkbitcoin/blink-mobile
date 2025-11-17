@@ -7659,6 +7659,10 @@ type RootTranslation = {
 		 * C​o​p​y
 		 */
 		copy: string
+		/**
+		 * I​d​e​n​t​i​f​y​ ​V​e​r​i​f​i​c​a​t​i​o​n
+		 */
+		identifyVerification: string
 	}
 	ProfileScreen: {
 		/**
@@ -16989,6 +16993,10 @@ export type TranslationFunctions = {
 		 * Copy
 		 */
 		copy: () => LocalizedString
+		/**
+		 * Identify Verification
+		 */
+		identifyVerification: () => LocalizedString
 	}
 	ProfileScreen: {
 		/**

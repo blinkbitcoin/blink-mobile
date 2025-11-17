@@ -2361,7 +2361,8 @@
         "copiedAccountId": "Copiaste la ID de tu cuenta al portapapeles",
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "identifyVerification": "Verificación de identidad"
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",

@@ -2360,7 +2360,8 @@
         "copiedAccountId": "Copied your account ID to clipboard",
         "yourAccountId": "Your Account ID",
         "accountId": "Account ID",
-        "copy": "Copy"
+        "copy": "Copy",
+        "identifyVerification": "Identify Verification"
     },
     "ProfileScreen": {
         "addAccount": "Add Account",
