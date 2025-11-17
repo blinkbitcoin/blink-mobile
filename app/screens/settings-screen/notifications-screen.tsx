@@ -17,9 +17,18 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Switch, Text } from "@rn-vui/themed"
+import {
+  Divider,
+  Icon,
+  ListItem,
+  makeStyles,
+  Switch,
+  Text,
+  useTheme,
+} from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 gql`
   query notificationSettings {
@@ -115,11 +124,18 @@ gql`
 `
 
 const NotificationCategories = {
-  Circles: "Circles",
   Payments: "Payments",
+  Circles: "Circles",
   Price: "Price",
   Marketing: "Marketing",
 } as const
+
+const CategoryIcons: Record<NotificationCategoryType, IconNamesType> = {
+  Payments: "receive",
+  Circles: "people",
+  Price: "graph",
+  Marketing: "upgrade",
+}
 
 type NotificationCategoryType =
   (typeof NotificationCategories)[keyof typeof NotificationCategories]
@@ -127,6 +143,10 @@ type NotificationCategoryType =
 export const NotificationSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
   const isAuthed = useIsAuthed()
   const { data } = useNotificationSettingsQuery({
     fetchPolicy: "cache-first",
@@ -214,27 +234,39 @@ export const NotificationSettingsScreen: React.FC = () => {
     }
   }
 
-  const pushNotificationSettings = Object.values(NotificationCategories).map(
-    (category) => {
-      return (
-        <View style={styles.settingsRow} key={category}>
+  const categoriesArray = Object.values(NotificationCategories)
+
+  const pushNotificationSettings = categoriesArray.map((category, index) => {
+    const isLast = index === categoriesArray.length - 1
+
+    return (
+      <React.Fragment key={category}>
+        <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name={CategoryIcons[category]} size={22} />
+          <ListItem.Content>
+            <ListItem.Title>
+              {LL.NotificationSettingsScreen.notificationCategories[category].title()}
+            </ListItem.Title>
+          </ListItem.Content>
           <Switch
             value={pushNotificationCategoryEnabled(category)}
             onValueChange={(value) =>
               toggleCategory(category, value, NotificationChannel.Push)
             }
           />
-          <Text type="h2">
-            {LL.NotificationSettingsScreen.notificationCategories[category].title()}
-          </Text>
-        </View>
-      )
-    },
-  )
+        </ListItem>
+        {!isLast && <Divider color={colors.grey4} />}
+      </React.Fragment>
+    )
+  })
 
   return (
     <Screen style={styles.container} preset="scroll">
       <View style={styles.settingsHeader}>
+        <View style={styles.notificationHeader}>
+          <Icon name={"notifications-outline"} size={22} type="ionicon" />
+          <Text type="p2">{LL.NotificationSettingsScreen.pushNotifications()}</Text>
+        </View>
         <Switch
           value={pushNotificationsEnabled}
           onValueChange={async (enabled) => {
@@ -257,35 +289,46 @@ export const NotificationSettingsScreen: React.FC = () => {
             }
           }}
         />
-        <Text type="h1">{LL.NotificationSettingsScreen.pushNotifications()}</Text>
       </View>
+
       {pushNotificationsEnabled && (
-        <View style={styles.settingsBody}>{pushNotificationSettings}</View>
+        <>
+          <Text type="p3" style={styles.preferencesText}>{LL.common.preferences()}</Text>
+          <View style={styles.settingsBody}>{pushNotificationSettings}</View>
+        </>
       )}
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     padding: 20,
-    rowGap: 20,
   },
   settingsHeader: {
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
+    padding: 20,
+    alignItems: "center",
     flexDirection: "row",
-    justifyContent: "flex-start",
-    columnGap: 10,
+    justifyContent: "space-between",
+  },
+  preferencesText: {
+    marginTop: 20,
+    marginBottom: 10,
   },
   settingsBody: {
-    marginLeft: 40,
-    columnGap: 10,
-    rowGap: 20,
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
+    paddingHorizontal: 5,
   },
-  settingsRow: {
+  listItemContainer: {
+    backgroundColor: colors.transparent,
+  },
+  notificationHeader: {
     flexDirection: "row",
-    justifyContent: "flex-start",
     alignItems: "center",
-    columnGap: 10,
+    gap: 15,
   },
 }))
 

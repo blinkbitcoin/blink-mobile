@@ -7394,7 +7394,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * P​u​s​h​ ​N​o​t​i​f​i​c​a​t​i​o​n​s
+		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
 		notificationCategories: {
@@ -7410,7 +7410,7 @@ type RootTranslation = {
 			}
 			Payments: {
 				/**
-				 * P​a​y​m​e​n​t​s
+				 * T​r​a​n​s​a​c​t​i​o​n​s​ ​a​l​e​r​t​s
 				 */
 				title: string
 				/**
@@ -16727,7 +16727,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Push Notifications
+		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
 		notificationCategories: {
@@ -16743,7 +16743,7 @@ export type TranslationFunctions = {
 			}
 			Payments: {
 				/**
-				 * Payments
+				 * Transactions alerts
 				 */
 				title: () => LocalizedString
 				/**

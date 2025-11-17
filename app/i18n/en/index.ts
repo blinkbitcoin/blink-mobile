@@ -2361,14 +2361,14 @@ const en: BaseTranslation = {
   },
   NotificationSettingsScreen: {
     title: "Notification Settings",
-    pushNotifications: "Push Notifications",
+    pushNotifications: "Enable all",
     notificationCategories: {
       Circles: {
         title: "Circles",
         description: "Notifications about your circles.",
       },
       Payments: {
-        title: "Payments",
+        title: "Transactions alerts",
         description: "Notifications related to sending and receiving payments.",
       },
       Marketing: {

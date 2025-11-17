@@ -2289,14 +2289,14 @@
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de Notificaciones ",
-        "pushNotifications": "Notificaciones push",
+        "pushNotifications": "Habilitar todas",
         "notificationCategories": {
             "Circles": {
                 "title": "Círculos",
                 "description": "Notificaciones sobre tus círculos."
             },
             "Payments": {
-                "title": "Pagos",
+                "title": "Alerta de transacciones",
                 "description": "Notificaciones relacionadas con el envío y recepción de pagos."
             },
             "Marketing": {
