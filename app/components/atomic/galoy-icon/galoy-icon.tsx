@@ -60,6 +60,7 @@ import Refresh from "@app/assets/icons/refresh.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
 import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -122,6 +123,7 @@ export const icons = {
   "upgrade": Upgrade,
   "welcome": Welcome,
   "calculator": Calculator,
+  "document-outline": DocumentIcon
 } as const
 
 export type IconNamesType = keyof typeof icons
