@@ -293,7 +293,9 @@ export const NotificationSettingsScreen: React.FC = () => {
 
       {pushNotificationsEnabled && (
         <>
-          <Text type="p3" style={styles.preferencesText}>{LL.common.preferences()}</Text>
+          <Text type="p3" style={styles.preferencesText}>
+            {LL.common.preferences()}
+          </Text>
           <View style={styles.settingsBody}>{pushNotificationSettings}</View>
         </>
       )}

@@ -303,7 +303,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="security"
         component={SecurityScreen}
-        options={{ title: LL.common.security() }}
+        options={{ title: LL.SecurityScreen.title() }}
       />
       <RootNavigator.Screen
         name="developerScreen"

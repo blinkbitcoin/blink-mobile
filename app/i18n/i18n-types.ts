@@ -6842,6 +6842,10 @@ type RootTranslation = {
 	}
 	SecurityScreen: {
 		/**
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​P​r​i​v​a​c​y
+		 */
+		title: string
+		/**
 		 * U​n​l​o​c​k​ ​w​i​t​h​ ​f​i​n​g​e​r​p​r​i​n​t​ ​o​r​ ​f​a​c​i​a​l​ ​r​e​c​o​g​n​i​t​i​o​n​.
 		 */
 		biometricDescription: string
@@ -6864,15 +6868,15 @@ type RootTranslation = {
 		 */
 		hideBalanceDescription: string
 		/**
-		 * H​i​d​e​ ​B​a​l​a​n​c​e
+		 * A​l​w​a​y​s​ ​h​i​d​e​ ​b​a​l​a​n​c​e
 		 */
 		hideBalanceTitle: string
 		/**
-		 * P​I​N​ ​i​s​ ​u​s​e​d​ ​a​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​m​e​t​h​o​d​ ​f​o​r​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
+		 * S​e​t​ ​a​ ​4​-​d​i​g​i​t​ ​n​u​m​e​r​i​c​a​l​ ​P​I​N​ ​t​o​ ​u​n​l​o​c​k
 		 */
 		pinDescription: string
 		/**
-		 * P​I​N​ ​C​o​d​e
+		 * P​I​N​ ​c​o​d​e
 		 */
 		pinTitle: string
 		/**
@@ -16196,6 +16200,10 @@ export type TranslationFunctions = {
 	}
 	SecurityScreen: {
 		/**
+		 * Security and Privacy
+		 */
+		title: () => LocalizedString
+		/**
 		 * Unlock with fingerprint or facial recognition.
 		 */
 		biometricDescription: () => LocalizedString
@@ -16218,15 +16226,15 @@ export type TranslationFunctions = {
 		 */
 		hideBalanceDescription: () => LocalizedString
 		/**
-		 * Hide Balance
+		 * Always hide balance
 		 */
 		hideBalanceTitle: () => LocalizedString
 		/**
-		 * PIN is used as the backup authentication method for biometric authentication.
+		 * Set a 4-digit numerical PIN to unlock
 		 */
 		pinDescription: () => LocalizedString
 		/**
-		 * PIN Code
+		 * PIN code
 		 */
 		pinTitle: () => LocalizedString
 		/**
