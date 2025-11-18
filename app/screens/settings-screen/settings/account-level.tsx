@@ -11,7 +11,7 @@ export const AccountLevelSetting: React.FC = () => {
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
   return (
     <SettingsRow
-      title={LL.common.yourAccount()}
+      title={/*LL.common.yourAccount()*/ "Your account"}
       leftGaloyIcon="user"
       action={() => {
         navigate("accountScreen")

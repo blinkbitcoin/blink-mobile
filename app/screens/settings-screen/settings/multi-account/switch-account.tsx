@@ -46,7 +46,7 @@ export const SwitchAccount: React.FC = () => {
   return (
     <>
       <SettingsRow
-        title={LL.AccountScreen.switchAccount()}
+        title={/*LL.AccountScreen.switchAccount()*/ "Switch account"}
         leftGaloyIcon="refresh"
         action={() => setExpanded(!expanded)}
         expanded={expanded}

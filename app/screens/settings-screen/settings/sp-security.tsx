@@ -23,7 +23,7 @@ export const OnDeviceSecuritySetting: React.FC = () => {
 
   return (
     <SettingsRow
-      title={LL.common.onDeviceSecurity()}
+      title={/*LL.common.onDeviceSecurity()*/"Security and privacy"}
       leftIcon="shield-outline"
       action={securityAction}
     />

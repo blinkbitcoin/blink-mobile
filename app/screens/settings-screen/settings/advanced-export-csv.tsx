@@ -67,7 +67,7 @@ export const ExportCsvSetting: React.FC = () => {
     <SettingsRow
       loading={loading}
       spinner={spinner}
-      title={LL.common.csvExport()}
+      title={/*LL.common.csvExport()*/"Export all transactions"}
       leftIcon="list-outline"
       rightIcon={"download-outline"}
       action={fetchCsvTransactions}
