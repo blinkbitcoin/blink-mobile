@@ -7746,15 +7746,15 @@ type RootTranslation = {
 		 */
 		info: string
 		/**
-		 * U​s​e​ ​S​y​s​t​e​m​ ​s​e​t​t​i​n​g
+		 * S​y​s​t​e​m​ ​S​e​t​t​i​n​g
 		 */
 		system: string
 		/**
-		 * U​s​e​ ​L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​M​o​d​e
 		 */
 		light: string
 		/**
-		 * U​s​e​ ​D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​M​o​d​e
 		 */
 		dark: string
 		/**
@@ -17084,15 +17084,15 @@ export type TranslationFunctions = {
 		 */
 		info: () => LocalizedString
 		/**
-		 * Use System setting
+		 * System Setting
 		 */
 		system: () => LocalizedString
 		/**
-		 * Use Light Mode
+		 * Light Mode
 		 */
 		light: () => LocalizedString
 		/**
-		 * Use Dark Mode
+		 * Dark Mode
 		 */
 		dark: () => LocalizedString
 		/**

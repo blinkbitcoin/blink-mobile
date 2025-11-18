@@ -2478,9 +2478,9 @@ const en: BaseTranslation = {
   ThemeScreen: {
     title: "Theme",
     info: "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
-    system: "Use System setting",
-    light: "Use Light Mode",
-    dark: "Use Dark Mode",
+    system: "System Setting",
+    light: "Light Mode",
+    dark: "Dark Mode",
     setToDark: "Dark Mode",
     setToLight: "Light Mode",
   },
