@@ -33,7 +33,7 @@ export const JoinCommunitySetting: React.FC = () => {
     <>
       <SettingsRow
         title={LL.support.joinTheCommunity()}
-        leftIcon="people-outline"
+        leftGaloyIcon="people"
         rightIcon={null}
         action={toggleModal}
       />

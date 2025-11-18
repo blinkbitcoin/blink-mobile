@@ -29,7 +29,7 @@ export const PhoneNAddress: React.FC = () => {
         loading={loading}
         title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(data?.me?.username || "").length > 22}
-        leftIcon="phone-portrait-outline"
+        leftIcon="call-outline"
         rightIcon={hasUsername ? "copy-outline" : undefined}
         action={() => {
           if (hasUsername) {

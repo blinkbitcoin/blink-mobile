@@ -63,6 +63,7 @@ import Calculator from "@app/assets/icons-redesign/calculator.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
 import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
+import Headset from "@app/assets/icons-redesign/headset.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -128,6 +129,7 @@ export const icons = {
   "document-outline": DocumentIcon,
   "key-outline": KeyIcon,
   "house-outline": HouseIcon,
+  "headset": Headset,
 } as const
 
 export type IconNamesType = keyof typeof icons
