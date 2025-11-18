@@ -7384,11 +7384,11 @@ type RootTranslation = {
 		 */
 		logoutOneAccountConfirm: string
 		/**
-		 * R​e​c​e​i​v​e​ ​C​u​r​r​e​n​c​y
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
 		 */
 		receiveCurrency: string
 		/**
-		 * D​i​s​p​l​a​y​ ​C​u​r​r​e​n​c​y
+		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
 		 */
 		displayCurrency: string
 	}
@@ -7474,7 +7474,7 @@ type RootTranslation = {
 		 */
 		tapToAddPhoneNumber: string
 		/**
-		 * L​o​g​i​n​ ​M​e​t​h​o​d​s
+		 * L​o​g​i​n​ ​m​e​t​h​o​d​s
 		 */
 		loginMethods: string
 		/**
@@ -7483,7 +7483,7 @@ type RootTranslation = {
 		 */
 		level: RequiredParams<'level'>
 		/**
-		 * S​w​i​t​c​h​ ​A​c​c​o​u​n​t
+		 * S​w​i​t​c​h​ ​a​c​c​o​u​n​t
 		 */
 		switchAccount: string
 		/**
@@ -7732,11 +7732,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * P​i​c​k​ ​w​h​i​c​h​ ​a​c​c​o​u​n​t​ ​t​o​ ​s​e​t​ ​a​s​ ​d​e​f​a​u​l​t​ ​f​o​r​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​a​d​j​u​s​t​ ​t​h​e​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​i​n​d​i​v​i​d​u​a​l​ ​p​a​y​m​e​n​t​s​ ​i​n​ ​t​h​e​ ​m​o​b​i​l​e​ ​a​p​p​.​ ​P​a​y​m​e​n​t​s​ ​r​e​c​e​i​v​e​d​ ​t​h​r​o​u​g​h​ ​t​h​e​ ​c​a​s​h​ ​r​e​g​i​s​t​e​r​ ​o​r​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​w​i​l​l​ ​a​l​w​a​y​s​ ​g​o​ ​t​o​ ​t​h​e​ ​d​e​f​a​u​l​t​ ​a​c​c​o​u​n​t​.​
-	​
-	​T​o​ ​a​v​o​i​d​ ​B​i​t​c​o​i​n​'​s​ ​v​o​l​a​t​i​l​i​t​y​,​ ​c​h​o​o​s​e​ ​S​t​a​b​l​e​s​a​t​s​.​ ​T​h​i​s​ ​a​l​l​o​w​s​ ​y​o​u​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​a​b​l​e​ ​a​m​o​u​n​t​ ​o​f​ ​m​o​n​e​y​ ​w​h​i​l​e​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​a​b​l​e​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​s​.​
-	​
-	​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​i​s​ ​s​e​t​t​i​n​g​ ​a​t​ ​a​n​y​ ​t​i​m​e​,​ ​a​n​d​ ​i​t​ ​w​o​n​'​t​ ​a​f​f​e​c​t​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​b​a​l​a​n​c​e​.
+		 * U​s​e​ ​y​o​u​r​ ​S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​i​n​ ​B​l​i​n​k​ ​t​o​ ​k​e​e​p​ ​t​h​e​ ​m​o​n​e​y​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​s​t​a​b​l​e​ ​i​n​ ​f​i​a​t​ ​(​d​o​l​l​a​r​)​ ​t​e​r​m​s​.​ ​U​s​e​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​f​ ​y​o​u​'​r​e​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​ ​a​n​d​ ​a​r​e​ ​o​k​a​y​ ​w​i​t​h​ ​y​o​u​r​ ​f​i​a​t​ ​b​a​l​a​n​c​e​ ​c​h​a​n​g​i​n​g​ ​a​l​l​ ​t​h​e​ ​t​i​m​e​.
 		 */
 		info: string
 	}
@@ -8424,7 +8420,7 @@ type RootTranslation = {
 		 */
 		preferences: string
 		/**
-		 * O​n​-​D​e​v​i​c​e​ ​S​e​c​u​r​i​t​y
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​p​r​i​v​a​c​y
 		 */
 		onDeviceSecurity: string
 		/**
@@ -8444,7 +8440,7 @@ type RootTranslation = {
 		 */
 		account: string
 		/**
-		 * Y​o​u​r​ ​A​c​c​o​u​n​t
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t
 		 */
 		yourAccount: string
 		/**
@@ -8456,7 +8452,7 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
-		 * T​r​a​n​s​a​c​t​i​o​n​ ​L​i​m​i​t​s
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
 		transactionLimits: string
 		/**
@@ -8538,7 +8534,7 @@ type RootTranslation = {
 		 */
 		currencySyncIssue: string
 		/**
-		 * E​x​p​o​r​t​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​s​ ​C​S​V
+		 * E​x​p​o​r​t​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s
 		 */
 		csvExport: string
 		/**
@@ -8863,6 +8859,10 @@ type RootTranslation = {
 		 * S​o​m​e
 		 */
 		some: string
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		support: string
 	}
 	errors: {
 		/**
@@ -16729,11 +16729,11 @@ export type TranslationFunctions = {
 		 */
 		logoutOneAccountConfirm: () => LocalizedString
 		/**
-		 * Receive Currency
+		 * Receive currency
 		 */
 		receiveCurrency: () => LocalizedString
 		/**
-		 * Display Currency
+		 * Display currency
 		 */
 		displayCurrency: () => LocalizedString
 	}
@@ -16819,7 +16819,7 @@ export type TranslationFunctions = {
 		 */
 		tapToAddPhoneNumber: () => LocalizedString
 		/**
-		 * Login Methods
+		 * Login methods
 		 */
 		loginMethods: () => LocalizedString
 		/**
@@ -16827,7 +16827,7 @@ export type TranslationFunctions = {
 		 */
 		level: (arg: { level: string }) => LocalizedString
 		/**
-		 * Switch Account
+		 * Switch account
 		 */
 		switchAccount: () => LocalizedString
 		/**
@@ -17070,11 +17070,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.
-
-	To avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.
-
-	You can change this setting at any time, and it won't affect your current balance.
+		 * Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.
 		 */
 		info: () => LocalizedString
 	}
@@ -17746,7 +17742,7 @@ export type TranslationFunctions = {
 		 */
 		preferences: () => LocalizedString
 		/**
-		 * On-Device Security
+		 * Security and privacy
 		 */
 		onDeviceSecurity: () => LocalizedString
 		/**
@@ -17766,7 +17762,7 @@ export type TranslationFunctions = {
 		 */
 		account: () => LocalizedString
 		/**
-		 * Your Account
+		 * Your account
 		 */
 		yourAccount: () => LocalizedString
 		/**
@@ -17778,7 +17774,7 @@ export type TranslationFunctions = {
 		 */
 		blinkUser: () => LocalizedString
 		/**
-		 * Transaction Limits
+		 * Transaction limits
 		 */
 		transactionLimits: () => LocalizedString
 		/**
@@ -17858,7 +17854,7 @@ export type TranslationFunctions = {
 		 */
 		currencySyncIssue: () => LocalizedString
 		/**
-		 * Export transactions as CSV
+		 * Export all transactions
 		 */
 		csvExport: () => LocalizedString
 		/**
@@ -18183,6 +18179,10 @@ export type TranslationFunctions = {
 		 * Some
 		 */
 		some: () => LocalizedString
+		/**
+		 * Support
+		 */
+		support: () => LocalizedString
 	}
 	errors: {
 		/**

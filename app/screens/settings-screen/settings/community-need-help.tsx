@@ -32,7 +32,7 @@ export const NeedHelpSetting: React.FC = () => {
   return (
     <>
       <SettingsRow
-        title={/*LL.support.contactUs()*/ "Need help? Contact us."}
+        title={LL.support.contactUs()}
         leftGaloyIcon="headset"
         rightIcon={null}
         action={toggleModal}

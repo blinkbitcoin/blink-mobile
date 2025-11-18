@@ -124,7 +124,7 @@ export const SettingsScreen: React.FC = () => {
         />
         {isAtLeastLevelOne && (
           <SettingsGroup
-            name={/*LL.AccountScreen.loginMethods()*/ "Login methods"}
+            name={LL.AccountScreen.loginMethods()}
             items={items.loginMethods}
           />
         )}
@@ -134,7 +134,7 @@ export const SettingsScreen: React.FC = () => {
           items={items.securityAndPrivacy}
         />
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        <SettingsGroup name={/*LL.common.community()*/ "Support"} items={items.community} />
+        <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
     </Screen>

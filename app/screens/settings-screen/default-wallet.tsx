@@ -13,6 +13,7 @@ import { Divider, Text, makeStyles, useTheme, ListItem, Icon } from "@rn-vui/the
 
 import { Screen } from "../../components/screen"
 import { testProps } from "../../utils/testProps"
+import { GaloyInfo } from "@app/components/atomic/galoy-info"
 
 gql`
   mutation accountUpdateDefaultWalletId($input: AccountUpdateDefaultWalletIdInput!) {
@@ -165,13 +166,7 @@ export const DefaultWalletScreen: React.FC = () => {
       </View>
 
       <View style={styles.containerInfo}>
-        <View style={[styles.infoBox, { backgroundColor: colors.grey5 }]}>
-          <Text type="p3" style={styles.infoText}>
-            Use your Stablesats account in Blink to keep the money in your wallet stable
-            in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and
-            are okay with your fiat balance changing all the time.
-          </Text>
-        </View>
+        <GaloyInfo>{LL.DefaultWalletScreen.info()}</GaloyInfo>
       </View>
     </Screen>
   )
@@ -212,14 +207,5 @@ const useStyles = makeStyles(({ colors }) => ({
   chartImage: {
     width: "100%",
     height: 100,
-  },
-  infoBox: {
-    padding: 16,
-    borderRadius: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.grey3,
-  },
-  infoText: {
-    lineHeight: 20,
   },
 }))

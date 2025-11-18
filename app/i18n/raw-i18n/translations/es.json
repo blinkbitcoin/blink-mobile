@@ -2285,8 +2285,8 @@
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
-        "receiveCurrency": "Recibir Moneda",
-        "displayCurrency": "Mostrar Moneda"
+        "receiveCurrency": "Recibir moneda",
+        "displayCurrency": "Mostrar moneda"
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de Notificaciones ",
@@ -2388,7 +2388,7 @@
     },
     "DefaultWalletScreen": {
         "title": "Cuenta predeterminada",
-        "info": "Elige qué cuenta establecer como predeterminada para recibir y enviar. Puedes ajustar la cuenta de envío y recepción para pagos individuales en la app móvil. Los pagos recibidos a través de la caja o de su dirección Lightning siempre irán a la cuenta predeterminada.\n\nPara evitar la volatilidad de Bitcoin, elige Stablesats. Esto te permite mantener una cantidad estable de dinero sin dejar de poder enviar y recibir pagos.\n\nPuedes cambiar esta configuración en cualquier momento, y no afectará a tu saldo actual."
+        "info": "Usa tu cuenta de Stablesats en Blink para mantener la estabilidad de tu saldo en dólares fiduciarios. Usa tu cuenta de Bitcoin si acumulas sats y no te importa que tu saldo en dólares fiduciarios fluctúe constantemente."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2597,12 +2597,12 @@
         "enabled": "Activado",
         "notifications": "Notificaciones ",
         "preferences": "Preferencias",
-        "onDeviceSecurity": "Seguridad en los dispositivos",
+        "onDeviceSecurity": "Seguridad y privacidad",
         "securityAndPrivacy": "Seguridad y privacidad",
         "advanced": "Avanzado",
         "community": "Comunidad",
         "account": "Cuenta",
-        "yourAccount": "Tu Cuenta",
+        "yourAccount": "Tu cuenta",
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
         "transactionLimits": "Límites de la transacción",
@@ -2625,7 +2625,7 @@
         "codeConfirmation": "Confirmación de código",
         "currency": "Moneda",
         "currencySyncIssue": "Problema con la moneda predeterminada. Es necesario actualizar la pantalla",
-        "csvExport": "Exportar transacciones como archivo CSV",
+        "csvExport": "Exportar todas las transacciones",
         "date": "Fecha ",
         "description": "Descripción",
         "domain": "Dominio",
@@ -2707,7 +2707,8 @@
         "dollar": "Dólar",
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
-        "some": "Algunos"
+        "some": "Algunos",
+        "support": "Soporte"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
