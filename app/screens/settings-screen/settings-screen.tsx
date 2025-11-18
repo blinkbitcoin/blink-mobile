@@ -35,6 +35,7 @@ import { ThemeSetting } from "./settings/preferences-theme"
 import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
+import { AccountStaticQR } from "./settings/account-static-qr"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -83,7 +84,7 @@ export const SettingsScreen: React.FC = () => {
 
   const items = {
     account: [AccountLevelSetting, TxLimits, SwitchAccount],
-    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS /*AccountStaticQR*/],
+    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,
