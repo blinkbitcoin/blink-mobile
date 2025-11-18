@@ -1,10 +1,10 @@
 import React from "react"
-
+import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { Text, useTheme } from "@rn-vui/themed"
+import Clipboard from "@react-native-clipboard/clipboard"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
-
-import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
 
 type Props = {
   secret: string
@@ -12,6 +12,9 @@ type Props = {
 
 export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
   const { LL } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const copyToClipboard = () => {
     Clipboard.setString(secret)
@@ -23,9 +26,50 @@ export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
   }
 
   return (
-    <GaloySecondaryButton
-      title={LL.CopySecretComponent.button()}
-      onPress={copyToClipboard}
-    />
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text type="p1">{LL.TotpRegistrationInitiateScreen.secret()}</Text>
+        <TouchableOpacity
+          style={[styles.secretContainer, { backgroundColor: colors.grey5 }]}
+          onPress={copyToClipboard}
+          activeOpacity={0.7}
+        >
+          <Text
+            type="p2"
+            style={[styles.secretText, { color: colors.grey0 }]}
+            numberOfLines={1}
+            ellipsizeMode="middle"
+          >
+            {secret}
+          </Text>
+          <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    width: "100%",
+  },
+  content: {
+    gap: 8,
+  },
+  secretContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 8,
+    gap: 12,
+  },
+  secretText: {
+    flex: 1,
+    fontFamily: "monospace",
+    letterSpacing: 0.5,
+  },
+})

@@ -7680,7 +7680,11 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 * S​e​c​r​e​t​/​b​a​c​k​u​p
+		 */
+		secret: string
+		/**
+		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​.
 		 */
 		content: string
 	}
@@ -17014,7 +17018,11 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app.
+		 * Secret/backup
+		 */
+		secret: () => LocalizedString
+		/**
+		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.
 		 */
 		content: () => LocalizedString
 	}

@@ -2370,7 +2370,8 @@
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
-        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto en su aplicación de autenticación."
+        "secret": "código secreto/respaldo",
+        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto."
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticación de dos factores",

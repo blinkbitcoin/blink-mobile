@@ -2451,8 +2451,9 @@ const en: BaseTranslation = {
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
+    secret: "Secret/backup",
     content:
-      "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app.",
+      "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.",
   },
   TotpRegistrationValidateScreen: {
     title: "Two-factor authentication",
