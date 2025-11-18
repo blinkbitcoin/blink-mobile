@@ -103,7 +103,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     color: colors.primary,
     fontWeight: "bold",
-    fontSize: 55,
+    fontSize: 50,
     includeFontPadding: false,
   },
 }))
