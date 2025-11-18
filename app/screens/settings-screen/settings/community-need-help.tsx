@@ -34,7 +34,6 @@ export const NeedHelpSetting: React.FC = () => {
       <SettingsRow
         title={LL.support.contactUs()}
         leftGaloyIcon="headset"
-        rightIcon={null}
         action={toggleModal}
       />
       <ContactModal
