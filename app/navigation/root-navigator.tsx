@@ -96,6 +96,7 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
@@ -373,6 +374,13 @@ export const RootStack = () => {
         component={NotificationSettingsScreen}
         options={{
           title: LL.NotificationSettingsScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="apiScreen"
+        component={ApiScreen}
+        options={{
+          title: LL.SettingsScreen.apiAcess(),
         }}
       />
       <RootNavigator.Screen
