@@ -2047,7 +2047,7 @@ const en: BaseTranslation = {
     exploreWallet: "Explore wallet",
     login: "Login",
     logBackInWith: "Log back in with",
-    headline: "Wallet powered by Galoy",
+    headline: "Wallet powered by Blink",
     startTrialAccount: "Start with a trial account",
     startWithTrialAccount: "Start with trial account",
     registerPhoneAccount: "Register phone account",

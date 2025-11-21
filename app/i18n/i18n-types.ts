@@ -6329,7 +6329,7 @@ type RootTranslation = {
 		 */
 		logBackInWith: string
 		/**
-		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​G​a​l​o​y
+		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​B​l​i​n​k
 		 */
 		headline: string
 		/**
@@ -15709,7 +15709,7 @@ export type TranslationFunctions = {
 		 */
 		logBackInWith: () => LocalizedString
 		/**
-		 * Wallet powered by Galoy
+		 * Wallet powered by Blink
 		 */
 		headline: () => LocalizedString
 		/**
