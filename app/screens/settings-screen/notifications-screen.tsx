@@ -242,10 +242,12 @@ export const NotificationSettingsScreen: React.FC = () => {
     return (
       <React.Fragment key={category}>
         <ListItem containerStyle={styles.listItemContainer}>
-          <GaloyIcon name={CategoryIcons[category]} size={22} />
+          <GaloyIcon name={CategoryIcons[category]} size={24} />
           <ListItem.Content>
             <ListItem.Title>
-              {LL.NotificationSettingsScreen.notificationCategories[category].title()}
+              <Text type="p2">
+                {LL.NotificationSettingsScreen.notificationCategories[category].title()}
+              </Text>
             </ListItem.Title>
           </ListItem.Content>
           <Switch
@@ -264,7 +266,7 @@ export const NotificationSettingsScreen: React.FC = () => {
     <Screen style={styles.container} preset="scroll">
       <View style={styles.settingsHeader}>
         <View style={styles.notificationHeader}>
-          <Icon name={"notifications-outline"} size={22} type="ionicon" />
+          <Icon name={"notifications-outline"} size={24} type="ionicon" />
           <Text type="p2">{LL.NotificationSettingsScreen.pushNotifications()}</Text>
         </View>
         <Switch
@@ -293,7 +295,7 @@ export const NotificationSettingsScreen: React.FC = () => {
 
       {pushNotificationsEnabled && (
         <>
-          <Text type="p3" style={styles.preferencesText}>
+          <Text type="p2" style={styles.preferencesText}>
             {LL.common.preferences()}
           </Text>
           <View style={styles.settingsBody}>{pushNotificationSettings}</View>
