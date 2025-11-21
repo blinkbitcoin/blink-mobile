@@ -142,7 +142,11 @@ const ContactModal: React.FC<Props> = ({
               <ListItem.Content>
                 <ListItem.Title style={styles.listItemTitle}>{item.name}</ListItem.Title>
               </ListItem.Content>
-              <ListItem.Chevron name={"chevron-forward"} type="ionicon" />
+              <ListItem.Chevron
+                name={"chevron-forward"}
+                type="ionicon"
+                color={colors.primary}
+              />
             </ListItem>
           )
         })}
