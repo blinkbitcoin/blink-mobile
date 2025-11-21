@@ -66,7 +66,7 @@ export const ApiScreen: React.FC = () => {
   return (
     <Screen>
       <View style={styles.container}>
-        <Text type="p3" style={styles.preferencesText}>
+        <Text type="p2" style={styles.preferencesText}>
           {LL.common.preferences()}
         </Text>
         <View style={styles.settingsBody}>
@@ -79,14 +79,14 @@ export const ApiScreen: React.FC = () => {
                   onPress={() => handleItemPress(item)}
                 >
                   <View style={styles.iconContainer}>
-                    <GaloyIcon name={item.leftIcon} size={20} color={colors.grey0} />
+                    <GaloyIcon name={item.leftIcon} size={24} color={colors.grey0} />
                   </View>
                   <ListItem.Content>
                     <ListItem.Title style={styles.itemTitle}>
                       <View
                         style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
                       >
-                        <Text type="p3">{item.title}</Text>
+                        <Text type="p2">{item.title}</Text>
                         {item.infoIcon && (
                           <GaloyIcon
                             name={item.infoIcon}
@@ -97,7 +97,7 @@ export const ApiScreen: React.FC = () => {
                       </View>
                     </ListItem.Title>
                   </ListItem.Content>
-                  <GaloyIcon name={item.rightIcon} size={20} color={colors.warning} />
+                  <GaloyIcon name={item.rightIcon} size={24} color={colors.warning} />
                 </ListItem>
                 {!isLast && <Divider color={colors.grey4} />}
               </React.Fragment>
@@ -117,7 +117,6 @@ const useStyles = makeStyles((theme) => ({
   },
   preferencesText: {
     marginBottom: 12,
-    color: theme.colors.grey2,
   },
   settingsBody: {
     backgroundColor: theme.colors.grey5,
