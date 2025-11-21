@@ -162,7 +162,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   containerInfo: {
     marginHorizontal: 20,
-    marginTop: 14,
+    marginTop: 34,
     marginBottom: 32,
   },
 }))
