@@ -140,31 +140,6 @@ export const DefaultWalletScreen: React.FC = () => {
           )
         })}
       </View>
-
-      <View style={styles.chartsContainer}>
-        <View style={styles.chartItem}>
-          <Text type="p2" style={styles.chartLabel}>
-            Bitcoin
-          </Text>
-          <Image
-            source={require("@app/assets/images/bitcoin-chart.png")}
-            style={styles.chartImage}
-            resizeMode="stretch"
-          />
-        </View>
-
-        <View style={styles.chartItem}>
-          <Text type="p2" style={styles.chartLabel}>
-            Stablesats
-          </Text>
-          <Image
-            source={require("@app/assets/images/stablesats-chart.png")}
-            style={styles.chartImage}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
-
       <View style={styles.containerInfo}>
         <GaloyInfo>{LL.DefaultWalletScreen.info()}</GaloyInfo>
       </View>
@@ -189,23 +164,5 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 20,
     marginTop: 14,
     marginBottom: 32,
-  },
-  chartsContainer: {
-    marginTop: 32,
-    marginHorizontal: 20,
-    gap: 32,
-  },
-  chartItem: {
-    gap: 12,
-    position: "relative",
-  },
-  chartLabel: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
-  chartImage: {
-    width: "100%",
-    height: 100,
   },
 }))
