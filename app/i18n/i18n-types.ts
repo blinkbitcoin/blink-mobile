@@ -7245,7 +7245,7 @@ type RootTranslation = {
 	}
 	SettingsScreen: {
 		/**
-		 * P​r​i​n​t​a​b​l​e​ ​S​t​a​t​i​c​ ​Q​R​ ​C​o​d​e
+		 * P​r​i​n​t​a​b​l​e​ ​S​t​a​t​i​c​ ​Q​R
 		 */
 		staticQr: string
 		/**
@@ -16592,7 +16592,7 @@ export type TranslationFunctions = {
 	}
 	SettingsScreen: {
 		/**
-		 * Printable Static QR Code
+		 * Printable Static QR
 		 */
 		staticQr: () => LocalizedString
 		/**

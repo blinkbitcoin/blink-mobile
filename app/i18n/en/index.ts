@@ -2320,7 +2320,7 @@ const en: BaseTranslation = {
     pendingDecryptionMessage: "Encrypted message. Waiting for payment confirmation.",
   },
   SettingsScreen: {
-    staticQr: "Printable Static QR Code",
+    staticQr: "Printable Static QR",
     staticQrCopied: "Your static QR code link has been copied",
     setByOs: "Set by OS",
     apiAcess: "API integration",

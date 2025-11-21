@@ -2251,7 +2251,7 @@
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
     },
     "SettingsScreen": {
-        "staticQr": "Código QR estático imprimible",
+        "staticQr": "QR estático imprimible",
         "staticQrCopied": "Tu enlace de código QR estático se ha copiado",
         "setByOs": "Establecido por OS",
         "apiAcess": "Integración de API",
