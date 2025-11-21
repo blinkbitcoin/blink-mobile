@@ -28,7 +28,7 @@ export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text type="p1">{LL.TotpRegistrationInitiateScreen.secret()}</Text>
+        <Text type="p2">{LL.TotpRegistrationInitiateScreen.secret()}</Text>
         <TouchableOpacity
           style={[styles.secretContainer, { backgroundColor: colors.grey5 }]}
           onPress={copyToClipboard}
