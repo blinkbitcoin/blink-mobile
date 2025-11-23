@@ -2860,20 +2860,20 @@
     "BitcoinCardScreen": {
         "title": "Tarjeta Visa Blink",
         "cardInfo": {
-            "bitcoinCard": "La tarjeta de crédito Bitcoin",
+            "bitcoinCard": "La tarjeta Visa de Bitcoin",
             "for": "para",
             "maximalist": "Bitcoin Maximalista"
         },
         "buttonText": "Bien"
     },
     "CardDetailsScreen": {
-        "title": "Beneficios Adicionales",
+        "title": "Beneficios adicionales",
         "features":{
-            "accountManager": "Gerente de Cuenta Personal",
-            "lightningTransactions": "50% de Reembolso en Tarifas Lightning",
-            "onchainDeposits": "50% de Reembolso en Tarifas Onchain",
-            "circularEconomies": "$100 para Economías Circulares",
-            "creditLimit": "$1,000 Límite de Crédito"
+            "accountManager": "Gestor de cuentas dedicado",
+            "support": "Apoyo prioritario",
+            "startup": "flujo de acuerdos de startups de Bitcoin",
+            "onchainDeposits": "Reembolso del 50% en las comisiones de transacción",
+            "circularEconomies": "$100 para economías circulares"
         },
         "andMore": "... y más próximamente en 2026",
         "buttonText": "Genial"

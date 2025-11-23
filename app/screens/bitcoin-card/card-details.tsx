@@ -49,19 +49,19 @@ export const CardDetails: React.FC = () => {
 
   const FEATURES: Feature[] = [
     {
-      icon: "headset",
+      icon: "graph",
       title: LL.CardDetailsScreen.features.accountManager(),
     },
     {
-      icon: "bank",
-      title: LL.CardDetailsScreen.features.creditLimit(),
+      icon: "headset",
+      title: LL.CardDetailsScreen.features.support(),
     },
     {
-      icon: "flash-outline",
-      title: LL.CardDetailsScreen.features.lightningTransactions(),
+      icon: "bitcoin",
+      title: LL.CardDetailsScreen.features.startup(),
     },
     {
-      icon: "link-outline",
+      icon: "refresh",
       title: LL.CardDetailsScreen.features.onchainDeposits(),
     },
     {

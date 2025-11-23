@@ -9401,12 +9401,12 @@ type RootTranslation = {
 	}
 	BitcoinCardScreen: {
 		/**
-		 * B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+		 * B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
 		 */
 		title: string
 		cardInfo: {
 			/**
-			 * T​h​e​ ​B​i​t​c​o​i​n​ ​C​r​e​d​i​t​ ​C​a​r​d
+			 * T​h​e​ ​B​i​t​c​o​i​n​ ​V​i​s​a​ ​c​a​r​d
 			 */
 			bitcoinCard: string
 			/**
@@ -9425,30 +9425,30 @@ type RootTranslation = {
 	}
 	CardDetailsScreen: {
 		/**
-		 * A​d​d​i​t​i​o​n​a​l​ ​P​e​r​k​s
+		 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
 		 */
 		title: string
 		features: {
 			/**
-			 * P​e​r​s​o​n​a​l​ ​A​c​c​o​u​n​t​ ​M​a​n​a​g​e​r
+			 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
 			 */
 			accountManager: string
 			/**
-			 * 5​0​%​ ​B​a​c​k​ ​O​n​ ​L​i​g​h​t​n​i​n​g​ ​F​e​e​s
+			 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
 			 */
-			lightningTransactions: string
+			support: string
 			/**
-			 * 5​0​%​ ​B​a​c​k​ ​O​n​ ​O​n​c​h​a​i​n​ ​F​e​e​s
+			 * B​i​t​c​o​i​n​ ​s​t​a​r​t​u​p​ ​d​e​a​l​ ​f​l​o​w
+			 */
+			startup: string
+			/**
+			 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
 			 */
 			onchainDeposits: string
 			/**
-			 * $​1​0​0​ ​t​o​ ​C​i​r​c​u​l​a​r​ ​E​c​o​n​o​m​i​e​s
+			 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
 			 */
 			circularEconomies: string
-			/**
-			 * $​1​,​0​0​0​ ​C​r​e​d​i​t​ ​L​i​m​i​t
-			 */
-			creditLimit: string
 		}
 		/**
 		 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
@@ -18979,12 +18979,12 @@ export type TranslationFunctions = {
 	}
 	BitcoinCardScreen: {
 		/**
-		 * Blink Visa Card
+		 * Blink Visa card
 		 */
 		title: () => LocalizedString
 		cardInfo: {
 			/**
-			 * The Bitcoin Credit Card
+			 * The Bitcoin Visa card
 			 */
 			bitcoinCard: () => LocalizedString
 			/**
@@ -19003,30 +19003,30 @@ export type TranslationFunctions = {
 	}
 	CardDetailsScreen: {
 		/**
-		 * Additional Perks
+		 * Additional perks
 		 */
 		title: () => LocalizedString
 		features: {
 			/**
-			 * Personal Account Manager
+			 * Dedicated account manager
 			 */
 			accountManager: () => LocalizedString
 			/**
-			 * 50% Back On Lightning Fees
+			 * Priority support
 			 */
-			lightningTransactions: () => LocalizedString
+			support: () => LocalizedString
 			/**
-			 * 50% Back On Onchain Fees
+			 * Bitcoin startup deal flow
+			 */
+			startup: () => LocalizedString
+			/**
+			 * 50% back on transaction fees
 			 */
 			onchainDeposits: () => LocalizedString
 			/**
-			 * $100 to Circular Economies
+			 * $100 to circular economies
 			 */
 			circularEconomies: () => LocalizedString
-			/**
-			 * $1,000 Credit Limit
-			 */
-			creditLimit: () => LocalizedString
 		}
 		/**
 		 * ... and more coming in 2026
