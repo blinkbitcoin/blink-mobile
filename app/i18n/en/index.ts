@@ -2443,7 +2443,7 @@ const en: BaseTranslation = {
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
     copy: "Copy",
-    identifyVerification: "Identify Verification",
+    identityVerification: "Identity Verification",
   },
   ProfileScreen: {
     addAccount: "Add Account",

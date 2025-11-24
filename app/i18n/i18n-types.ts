@@ -7660,9 +7660,9 @@ type RootTranslation = {
 		 */
 		copy: string
 		/**
-		 * I​d​e​n​t​i​f​y​ ​V​e​r​i​f​i​c​a​t​i​o​n
+		 * I​d​e​n​t​i​t​y​ ​V​e​r​i​f​i​c​a​t​i​o​n
 		 */
-		identifyVerification: string
+		identityVerification: string
 	}
 	ProfileScreen: {
 		/**
@@ -16998,9 +16998,9 @@ export type TranslationFunctions = {
 		 */
 		copy: () => LocalizedString
 		/**
-		 * Identify Verification
+		 * Identity Verification
 		 */
-		identifyVerification: () => LocalizedString
+		identityVerification: () => LocalizedString
 	}
 	ProfileScreen: {
 		/**

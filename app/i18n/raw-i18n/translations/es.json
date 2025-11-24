@@ -2362,7 +2362,7 @@
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
         "copy": "Copiar",
-        "identifyVerification": "Verificación de identidad"
+        "identityVerification": "Verificación de identidad"
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
