@@ -9685,13 +9685,15 @@ type RootTranslation = {
 	}
 	TopUpScreen: {
 		/**
-		 * T​o​p​ ​U​p
+		 * T​o​p​-​u​p
 		 */
 		title: string
 		/**
-		 * P​l​e​a​s​e​ ​t​o​p​ ​u​p​ ​y​o​u​r​ ​B​l​i​n​k​ ​w​a​l​l​e​t​ ​v​i​a​ ​L​i​g​h​t​n​i​n​g​ ​o​r​ ​O​n​c​h​a​i​n​.
+		 * I​n​s​u​f​f​i​e​n​t​ ​f​u​n​d​s​ ​i​n​ ​y​o​u​r​ ​B​l​i​n​k​ ​w​a​l​l​e​t​.​
+	​T​o​p​-​u​p​ ​m​i​n​i​m​u​m​ ​o​f​ ​{​m​i​n​A​m​o​u​n​t​}​.
+		 * @param {string} minAmount
 		 */
-		qrTitle: string
+		qrTitle: RequiredParams<'minAmount'>
 		/**
 		 * C​o​p​y
 		 */
@@ -9701,7 +9703,7 @@ type RootTranslation = {
 		 */
 		share: string
 		/**
-		 * A​n​y​ ​A​m​o​u​n​t
+		 * S​e​t​ ​a​m​o​u​n​t
 		 */
 		placeholder: string
 	}
@@ -19267,13 +19269,14 @@ export type TranslationFunctions = {
 	}
 	TopUpScreen: {
 		/**
-		 * Top Up
+		 * Top-up
 		 */
 		title: () => LocalizedString
 		/**
-		 * Please top up your Blink wallet via Lightning or Onchain.
+		 * Insuffient funds in your Blink wallet.
+	Top-up minimum of {minAmount}.
 		 */
-		qrTitle: () => LocalizedString
+		qrTitle: (arg: { minAmount: string }) => LocalizedString
 		/**
 		 * Copy
 		 */
@@ -19283,7 +19286,7 @@ export type TranslationFunctions = {
 		 */
 		share: () => LocalizedString
 		/**
-		 * Any Amount
+		 * Set amount
 		 */
 		placeholder: () => LocalizedString
 	}

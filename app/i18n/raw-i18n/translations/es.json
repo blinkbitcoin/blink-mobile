@@ -2963,9 +2963,9 @@
     },
     "TopUpScreen": {
         "title": "Recargar",
-        "qrTitle": "Por favor recarga tu billetera Blink vía Lightning u Onchain.",
+        "qrTitle": "Fondos insuficientes en tu billetera Blink.\nRecarga un mínimo de {minAmount: string}.",
         "copy": "Copiar",
         "share": "Compartir",
-        "placeholder": "Cualquier Monto"
+        "placeholder": "Establecer monto"
     }
 }

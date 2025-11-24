@@ -10,14 +10,11 @@ import {
   Dimensions,
   ViewToken,
 } from "react-native"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import QRCode from "react-native-qrcode-svg"
 import Logo from "@app/assets/logo/blink-logo-icon.png"
 import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 const { width } = Dimensions.get("window")
 const QR_ITEM_WIDTH = width * 0.7
@@ -83,7 +80,7 @@ export const TopUpScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.contentContainer}>
           <Text type="p1" style={styles.instructionText}>
-            {LL.TopUpScreen.qrTitle()}
+            {LL.TopUpScreen.qrTitle({ minAmount: "$999" })}
           </Text>
 
           <FlatList
@@ -112,7 +109,7 @@ export const TopUpScreen: React.FC = () => {
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={handleCopy}>
               <Text type="p3">{LL.TopUpScreen.copy()}</Text>
-              <Icon name="copy-outline" size={15} color={colors.primary} />
+              <GaloyIcon name="copy-paste" size={15} color={colors.primary} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
@@ -124,8 +121,7 @@ export const TopUpScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Any Amount"
-              placeholderTextColor={colors.grey3}
+              placeholder={LL.TopUpScreen.placeholder()}
               keyboardType="numeric"
             />
             <View style={styles.currencyBadge}>
@@ -155,7 +151,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 30,
     textAlign: "center",
     color: colors.black,
-    paddingHorizontal: 70,
+    paddingHorizontal: 50,
   },
   qrList: {
     paddingHorizontal: (width + 10 - QR_ITEM_WIDTH) / 2,
@@ -181,7 +177,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 12,
     backgroundColor: colors.grey5,
     borderRadius: 8,
   },
@@ -194,7 +190,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 12,
     paddingHorizontal: 20,
-    paddingVertical: 13,
+    paddingVertical: 15,
     color: colors.white,
     fontSize: 16,
     width: "100%",

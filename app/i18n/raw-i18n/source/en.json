@@ -2961,10 +2961,10 @@
         "buttonText": "Continue"
     },
     "TopUpScreen": {
-        "title": "Top Up",
-        "qrTitle": "Please top up your Blink wallet via Lightning or Onchain.",
+        "title": "Top-up",
+        "qrTitle": "Insuffient funds in your Blink wallet.\nTop-up minimum of {minAmount: string}.",
         "copy": "Copy",
         "share": "Share",
-        "placeholder": "Any Amount"
+        "placeholder": "Set amount"
     }
 }
