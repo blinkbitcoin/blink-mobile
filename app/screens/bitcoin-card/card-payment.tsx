@@ -84,9 +84,15 @@ export const CardPayment: React.FC = () => {
             <Text type="p3" style={styles.label}>
               {LL.CardPaymentScreen.status.label()}
             </Text>
-            <Text type="p3" style={styles.statusPending}>
-              {LL.CardPaymentScreen.status.paymentPending()}
-            </Text>
+            {route.name === "cardSubscribe" ? (
+              <Text type="p3" style={styles.statusSubscribe}>
+                {LL.CardPaymentScreen.status.firstYearFree()}
+              </Text>
+            ) : (
+              <Text type="p3" style={styles.statusPending}>
+                {LL.CardPaymentScreen.status.paymentPending()}
+              </Text>
+            )}
           </View>
 
           <View style={styles.infoRow}>
@@ -198,6 +204,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   statusPending: {
     color: colors.primary,
+    fontWeight: "500",
+  },
+  statusSubscribe: {
+    color: colors._green,
     fontWeight: "500",
   },
   value: {

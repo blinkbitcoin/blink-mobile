@@ -2987,7 +2987,7 @@ const en: BaseTranslation = {
     cardInfo: {
       bitcoinCard: "The Bitcoin Visa card",
       for: "for",
-      maximalist: "Bitcoin Maximalist",
+      maximalist: "Bitcoin Maximalists",
     },
     buttonText: "Nice",
   },
@@ -3025,6 +3025,7 @@ const en: BaseTranslation = {
     status: {
       label: "Status",
       paymentPending: "Payment Pending",
+      firstYearFree: "First year free",
     },
     renewalDate: {
       label: "Renewal Date",

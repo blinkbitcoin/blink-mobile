@@ -2862,7 +2862,7 @@
         "cardInfo": {
             "bitcoinCard": "La tarjeta Visa de Bitcoin",
             "for": "para",
-            "maximalist": "Bitcoin Maximalista"
+            "maximalist": "Bitcoin Maximalistas"
         },
         "buttonText": "Bien"
     },
@@ -2899,7 +2899,8 @@
         "perYear": "por año",
         "status": {
             "label": "Estado",
-            "paymentPending": "Pago Pendiente"
+            "paymentPending": "Pago Pendiente",
+            "firstYearFree": "Primer año gratis"
         },
         "renewalDate": {
             "label": "Fecha de Renovación"

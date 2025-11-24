@@ -9414,7 +9414,7 @@ type RootTranslation = {
 			 */
 			'for': string
 			/**
-			 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t
+			 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
 			 */
 			maximalist: string
 		}
@@ -9517,6 +9517,10 @@ type RootTranslation = {
 			 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
 			 */
 			paymentPending: string
+			/**
+			 * F​i​r​s​t​ ​y​e​a​r​ ​f​r​e​e
+			 */
+			firstYearFree: string
 		}
 		renewalDate: {
 			/**
@@ -18992,7 +18996,7 @@ export type TranslationFunctions = {
 			 */
 			'for': () => LocalizedString
 			/**
-			 * Bitcoin Maximalist
+			 * Bitcoin Maximalists
 			 */
 			maximalist: () => LocalizedString
 		}
@@ -19095,6 +19099,10 @@ export type TranslationFunctions = {
 			 * Payment Pending
 			 */
 			paymentPending: () => LocalizedString
+			/**
+			 * First year free
+			 */
+			firstYearFree: () => LocalizedString
 		}
 		renewalDate: {
 			/**

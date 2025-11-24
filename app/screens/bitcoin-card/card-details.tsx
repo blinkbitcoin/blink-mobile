@@ -56,10 +56,10 @@ export const CardDetails: React.FC = () => {
       icon: "headset",
       title: LL.CardDetailsScreen.features.support(),
     },
-    {
-      icon: "bitcoin",
-      title: LL.CardDetailsScreen.features.startup(),
-    },
+    // {
+    //   icon: "bitcoin",
+    //   title: LL.CardDetailsScreen.features.startup(),
+    // },
     {
       icon: "refresh",
       title: LL.CardDetailsScreen.features.onchainDeposits(),
