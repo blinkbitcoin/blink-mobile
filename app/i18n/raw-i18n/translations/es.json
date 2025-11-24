@@ -2930,14 +2930,14 @@
     },
     "CardCreditLimit": {
         "welcomeMessage": {
-            "title": "Aumenta el límite de crédito de tu tarjeta",
+            "title": "Bienvenido a ser parte de Blink",
             "paragraphs": {
-                "body1": "Has pagado $1,000 por tu suscripción Blink Private que viene con un límite de crédito de tarjeta de $1,000. Si deseas aumentar el límite de crédito por encima de $1,000 puedes participar en la ronda de crowdfunding de Blink",
-                "body2": "Tu límite de crédito aumentará con la cantidad que inviertas y se mantendrá mientras continúes tu suscripción Blink Private."
+                "body1": "Antes de recaudar más fondos de inversores profesionales, decidimos extender una invitación a la familia extendida de Blink, nuestros superusuarios y seguidores. ¿Por qué incorporar a extraños cuando podemos invitar primero a alguien como tú?",
+                "body2": "Esta es una invitación personal. Por favor, no la reenvíes ni compartas públicamente."
             }
         },
-        "desiredCreditLimit": "Seleccionar Límite De Crédito Deseado",
-        "buttonText": "Aumentar"
+        "desiredCreditLimit": "¿Cuánto te gustaría invertir?",
+        "buttonText": "Continuar"
     },
     "TermSheetScreen": {
         "title": "Hoja de Términos",

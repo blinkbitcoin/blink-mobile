@@ -9602,26 +9602,26 @@ type RootTranslation = {
 	CardCreditLimit: {
 		welcomeMessage: {
 			/**
-			 * I​n​c​r​e​a​s​e​ ​y​o​u​r​ ​c​a​r​d​ ​c​r​e​d​i​t​ ​l​i​m​i​t
+			 * W​e​l​c​o​m​e​ ​t​o​ ​b​e​c​o​m​e​ ​p​a​r​t​ ​o​f​ ​B​l​i​n​k
 			 */
 			title: string
 			paragraphs: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​p​a​i​d​ ​$​1​,​0​0​0​ ​f​o​r​ ​y​o​u​r​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​h​i​c​h​ ​c​o​m​e​s​ ​w​i​t​h​ ​a​ ​$​1​,​0​0​0​ ​c​a​r​d​ ​c​r​e​d​i​t​ ​l​i​m​i​t​.​ ​I​f​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​t​h​e​ ​c​r​e​d​i​t​ ​l​i​m​i​t​ ​a​b​o​v​e​ ​$​1​,​0​0​0​ ​y​o​u​ ​c​a​n​ ​p​a​r​t​i​c​i​p​a​t​e​ ​i​n​ ​t​h​e​ ​B​l​i​n​k​ ​c​r​o​w​d​f​u​n​d​i​n​g​ ​r​o​u​n​d​.
+				 * B​e​f​o​r​e​ ​w​e​ ​r​a​i​s​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​f​r​o​m​ ​p​r​o​f​e​s​s​i​o​n​a​l​ ​i​n​v​e​s​t​o​r​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​e​x​t​e​n​d​ ​a​n​ ​i​n​v​i​t​a​t​i​o​n​ ​t​o​ ​t​h​e​ ​B​l​i​n​k​ ​e​x​t​e​n​d​e​d​ ​f​a​m​i​l​y​,​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​ ​a​n​d​ ​s​u​p​p​o​r​t​e​r​s​.​ ​W​h​y​ ​b​r​i​n​g​ ​o​n​b​o​a​r​d​ ​s​t​r​a​n​g​e​r​s​ ​w​h​e​n​ ​w​e​ ​c​a​n​ ​f​i​r​s​t​ ​i​n​v​i​t​e​ ​s​o​m​e​o​n​e​ ​l​i​k​e​ ​y​o​u​?
 				 */
 				body1: string
 				/**
-				 * Y​o​u​r​ ​c​r​e​d​i​t​ ​l​i​m​i​t​ ​w​i​l​l​ ​i​n​c​r​e​a​s​e​ ​w​i​t​h​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​ ​i​n​v​e​s​t​ ​a​n​d​ ​w​i​l​l​ ​c​a​r​r​y​ ​f​o​r​w​a​r​d​ ​f​o​r​ ​a​s​ ​l​o​n​g​ ​a​s​ ​y​o​u​ ​c​o​n​t​i​n​u​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​.
+				 * T​h​i​s​ ​i​s​ ​a​ ​p​e​r​s​o​n​a​l​ ​i​n​v​i​t​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​d​o​ ​n​o​t​ ​f​o​r​w​a​r​d​ ​o​r​ ​s​h​a​r​e​ ​p​u​b​l​i​c​l​y​.
 				 */
 				body2: string
 			}
 		}
 		/**
-		 * S​e​l​e​c​t​ ​D​e​s​i​r​e​d​ ​C​r​e​d​i​t​ ​L​i​m​i​t
+		 * H​o​w​ ​m​u​c​h​ ​w​o​u​l​d​ ​y​o​u​ ​l​i​k​e​ ​t​o​ ​i​n​v​e​s​t​?
 		 */
 		desiredCreditLimit: string
 		/**
-		 * I​n​c​r​e​a​s​e
+		 * C​o​n​t​i​n​u​e
 		 */
 		buttonText: string
 	}
@@ -19184,26 +19184,26 @@ export type TranslationFunctions = {
 	CardCreditLimit: {
 		welcomeMessage: {
 			/**
-			 * Increase your card credit limit
+			 * Welcome to become part of Blink
 			 */
 			title: () => LocalizedString
 			paragraphs: {
 				/**
-				 * You have paid $1,000 for your Blink Private subscription which comes with a $1,000 card credit limit. If you wish to increase the credit limit above $1,000 you can participate in the Blink crowdfunding round.
+				 * Before we raise more funds from professional investors we decided to extend an invitation to the Blink extended family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?
 				 */
 				body1: () => LocalizedString
 				/**
-				 * Your credit limit will increase with the amount you invest and will carry forward for as long as you continue your Blink Private subscription.
+				 * This is a personal invitation. Please do not forward or share publicly.
 				 */
 				body2: () => LocalizedString
 			}
 		}
 		/**
-		 * Select Desired Credit Limit
+		 * How much would you like to invest?
 		 */
 		desiredCreditLimit: () => LocalizedString
 		/**
-		 * Increase
+		 * Continue
 		 */
 		buttonText: () => LocalizedString
 	}
