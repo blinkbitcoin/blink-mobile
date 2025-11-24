@@ -19,7 +19,7 @@ export const TranferInvest: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const handleNext = () => {
-    navigation.navigate("selectCreditLimit")
+    navigation.navigate("topUpScreen")
   }
 
   return (

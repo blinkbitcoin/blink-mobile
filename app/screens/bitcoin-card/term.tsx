@@ -49,7 +49,7 @@ export const TermSheetScreen: React.FC = () => {
 
   const EQUITYS: Feature[] = [
     {
-      icon: "caret-up",
+      icon: "upgrade",
       title: LL.TermSheetScreen.equitySection.investment(),
     },
     {
@@ -86,12 +86,12 @@ export const TermSheetScreen: React.FC = () => {
               <FeatureItem key={`feature-${index}`} feature={feature} />
             ))}
           </View>
-          <View style={styles.cardContainer}>
+          {/* <View style={styles.cardContainer}>
             <Text type="p2">{LL.TermSheetScreen.creditBoostSection.title()}</Text>
             {CREDITS.map((feature, index) => (
               <FeatureItem key={`feature-${index}`} feature={feature} />
             ))}
-          </View>
+          </View> */}
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
