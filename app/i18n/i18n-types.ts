@@ -7245,7 +7245,7 @@ type RootTranslation = {
 	}
 	SettingsScreen: {
 		/**
-		 * P​r​i​n​t​a​b​l​e​ ​S​t​a​t​i​c​ ​Q​R
+		 * P​r​i​n​t​a​b​l​e​ ​s​t​a​t​i​c​ ​Q​R
 		 */
 		staticQr: string
 		/**
@@ -7746,23 +7746,23 @@ type RootTranslation = {
 		 */
 		info: string
 		/**
-		 * S​y​s​t​e​m​ ​S​e​t​t​i​n​g
+		 * S​y​s​t​e​m​ ​s​e​t​t​i​n​g
 		 */
 		system: string
 		/**
-		 * L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		light: string
 		/**
-		 * D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		dark: string
 		/**
-		 * D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		setToDark: string
 		/**
-		 * L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		setToLight: string
 	}
@@ -7864,11 +7864,11 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​ ​T​r​a​n​s​f​e​r​s
+		 * S​t​a​b​l​e​s​a​t​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
-		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​U​s​e​r
+		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​u​s​e​r
 		 * @param {string} bankName
 		 */
 		internalSend: RequiredParams<'bankName'>
@@ -8966,7 +8966,7 @@ type RootTranslation = {
 		 */
 		enjoyingApp: string
 		/**
-		 * S​t​a​t​u​s​ ​P​a​g​e
+		 * S​t​a​t​u​s​ ​p​a​g​e
 		 */
 		statusPage: string
 		/**
@@ -16592,7 +16592,7 @@ export type TranslationFunctions = {
 	}
 	SettingsScreen: {
 		/**
-		 * Printable Static QR
+		 * Printable static QR
 		 */
 		staticQr: () => LocalizedString
 		/**
@@ -17084,23 +17084,23 @@ export type TranslationFunctions = {
 		 */
 		info: () => LocalizedString
 		/**
-		 * System Setting
+		 * System setting
 		 */
 		system: () => LocalizedString
 		/**
-		 * Light Mode
+		 * Light mode
 		 */
 		light: () => LocalizedString
 		/**
-		 * Dark Mode
+		 * Dark mode
 		 */
 		dark: () => LocalizedString
 		/**
-		 * Dark Mode
+		 * Dark mode
 		 */
 		setToDark: () => LocalizedString
 		/**
-		 * Light Mode
+		 * Light mode
 		 */
 		setToLight: () => LocalizedString
 	}
@@ -17200,11 +17200,11 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesat Transfers
+		 * Stablesat transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
-		 * Send to {bankName} User
+		 * Send to {bankName} user
 		 */
 		internalSend: (arg: { bankName: string }) => LocalizedString
 		/**
@@ -18285,7 +18285,7 @@ export type TranslationFunctions = {
 		 */
 		enjoyingApp: () => LocalizedString
 		/**
-		 * Status Page
+		 * Status page
 		 */
 		statusPage: () => LocalizedString
 		/**

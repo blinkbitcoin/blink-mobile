@@ -299,7 +299,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="currency"
         component={DisplayCurrencyScreen}
-        options={{ title: LL.common.currency() }}
+        options={{ title: LL.SettingsScreen.displayCurrency() }}
       />
       <RootNavigator.Screen
         name="security"

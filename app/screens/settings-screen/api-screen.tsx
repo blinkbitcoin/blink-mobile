@@ -66,9 +66,6 @@ export const ApiScreen: React.FC = () => {
   return (
     <Screen>
       <View style={styles.container}>
-        <Text type="p2" style={styles.preferencesText}>
-          {LL.common.preferences()}
-        </Text>
         <View style={styles.settingsBody}>
           {apiItems.map((item, index) => {
             const isLast = index === apiItems.length - 1

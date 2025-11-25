@@ -2393,11 +2393,11 @@
     "ThemeScreen": {
         "title": "Tema",
         "info": "Elige el tema que más te guste para usar Blink o manténlo sincronizado con la configuración de tu sistema.",
-        "system": "Configuración del Sistema",
-        "light": "Modo Claro",
-        "dark": "Modo Oscuro",
+        "system": "Configuración del sistema",
+        "light": "Modo claro",
+        "dark": "Modo oscuro",
         "setToDark": "Modo oscuro.",
-        "setToLight": "Modo Luz"
+        "setToLight": "Modo luz"
     },
     "Languages": {
         "DEFAULT": "Predeterminado (OS)"
@@ -2429,8 +2429,8 @@
         "perWeek": "por semana",
         "unlimited": "ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferencias de Stablesats",
-        "internalSend": "Enviar a Usuario {bankName: string}",
+        "stablesatTransfers": "Transferencias de stablesats",
+        "internalSend": "Enviar a usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
     },
@@ -2741,7 +2741,7 @@
         "sms": "SMS",
         "faq": "Preguntas Frecuentes - FAQ",
         "enjoyingApp": "¿Disfrutas de la aplicación?",
-        "statusPage": "Página de Estado",
+        "statusPage": "Página de estado",
         "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
