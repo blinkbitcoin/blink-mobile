@@ -115,6 +115,7 @@ import {
   TranferInvest,
   TopUpScreen,
   CardDashboardScreen,
+  CompanyValuationScreen,
 } from "../screens/bitcoin-card"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 
@@ -573,6 +574,13 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="creditCardLimit"
         component={CreditCardLimit}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="companyValuation"
+        component={CompanyValuationScreen}
         options={{
           title: "",
         }}

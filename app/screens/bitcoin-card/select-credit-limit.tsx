@@ -8,8 +8,6 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-const CREDIT_LIMITS = [1000, 2500, 5000, 10000, 50000]
-
 export const SelectCreditLimit: React.FC = () => {
   const styles = useStyles()
   const {
@@ -18,6 +16,33 @@ export const SelectCreditLimit: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
+  const CREDIT_LIMITS = [
+    {
+      value: 1000,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.01 })}`,
+    },
+    {
+      value: 2500,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.025 })}`,
+    },
+    {
+      value: 5000,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.05 })}`,
+    },
+    {
+      value: 10000,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.1 })}`,
+    },
+    {
+      value: 25000,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.25 })}`,
+    },
+    {
+      value: 50000,
+      percent: `${LL.CardCreditLimit.percent({ percent: 0.5 })}`,
+    },
+  ]
 
   const [selectedLimit, setSelectedLimit] = React.useState<number | null>(null)
 
@@ -47,17 +72,17 @@ export const SelectCreditLimit: React.FC = () => {
           </Text>
 
           <View style={styles.limitsContainer}>
-            {CREDIT_LIMITS.map((limit, index) => (
+            {CREDIT_LIMITS.map((item, index) => (
               <TouchableOpacity
-                key={limit}
+                key={item.value}
                 style={[
                   styles.limitOption,
-                  selectedLimit === limit && styles.limitOptionSelected,
+                  selectedLimit === item.value && styles.limitOptionSelected,
                 ]}
-                onPress={() => setSelectedLimit(limit)}
+                onPress={() => setSelectedLimit(item.value)}
               >
                 <Text type="p2" style={[styles.limitText]}>
-                  ${limit.toLocaleString()}
+                  ${item.value.toLocaleString()} {item.percent}
                 </Text>
                 {index < CREDIT_LIMITS.length - 1 && (
                   <View style={styles.limitBgOptionSelected}></View>

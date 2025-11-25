@@ -2937,7 +2937,18 @@
             }
         },
         "desiredCreditLimit": "¿Cuánto te gustaría invertir?",
-        "buttonText": "Continuar"
+        "buttonText": "Continuar",
+        "percent": "para ~{percent: number}%"
+    },
+    "CompanyValuationScreen": {
+        "welcomeMessage": {
+            "title": "Valoración de la empresa",
+            "paragraphs": {
+                "body1": "En esta ronda de inversión, la valoración pre-money de Blink es de $10 millones.",
+                "body2": "Creemos que podríamos recaudar con una valoración más alta de VCs. No estás invitado para maximizar nuestra valoración a corto plazo, vemos valor a largo plazo en asociarnos con nuestros superusuarios."
+            }
+        },
+        "buttonText": "Entendido"
     },
     "TermSheetScreen": {
         "title": "Hoja de Términos",
@@ -2945,7 +2956,7 @@
             "title": "Participación en Blink",
             "investment": "Inversión de $10,000",
             "valuation": "Con valoración pre-money de $10M",
-            "units": "Recibes 10,000 unidades ~0.2% de Blink"
+            "units": "Recibes 10,000 unidades ~0.1% de Blink"
         },
         "creditBoostSection": {
             "title": "Impulso de Crédito",

@@ -137,6 +137,7 @@ export type RootStackParamList = {
   termSheetScreem: undefined
   tranferInvest: undefined
   topUpScreen: undefined
+  companyValuation: undefined
 }
 
 export type CardDashboardStackParamList = {

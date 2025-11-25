@@ -3063,6 +3063,17 @@ const en: BaseTranslation = {
     },
     desiredCreditLimit: "How much would you like to invest?",
     buttonText: "Continue",
+    percent: "for ~{percent: number}%",
+  },
+  CompanyValuationScreen: {
+    welcomeMessage: {
+      title: "Company valuation",
+      paragraphs: {
+        body1: "In this investment round the pre-money valuation of Blink is $10 million.",
+        body2: "We believe that we could raise at a higher valuation from VCs. You are not invited to maximize our short-term valuation, we see long-term value in partnering with our superusers.",
+      },
+    },
+    buttonText: "Got it",
   },
   TermSheetScreen: {
     title: "Term Sheet",
@@ -3070,7 +3081,7 @@ const en: BaseTranslation = {
       title: "Equity in Blink",
       investment: "$10,000 Investment",
       valuation: "At $10M pre-money valuation",
-      units: "You receive 10,000 units ~0.2% of Blink"
+      units: "You receive 10,000 units ~0.1% of Blink"
     },
     creditBoostSection: {
       title: "Credit Boost",

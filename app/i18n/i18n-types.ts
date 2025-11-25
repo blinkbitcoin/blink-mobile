@@ -9624,6 +9624,33 @@ type RootTranslation = {
 		 * C​o​n​t​i​n​u​e
 		 */
 		buttonText: string
+		/**
+		 * f​o​r​ ​~​{​p​e​r​c​e​n​t​}​%
+		 * @param {number} percent
+		 */
+		percent: RequiredParams<'percent'>
+	}
+	CompanyValuationScreen: {
+		welcomeMessage: {
+			/**
+			 * C​o​m​p​a​n​y​ ​v​a​l​u​a​t​i​o​n
+			 */
+			title: string
+			paragraphs: {
+				/**
+				 * I​n​ ​t​h​i​s​ ​i​n​v​e​s​t​m​e​n​t​ ​r​o​u​n​d​ ​t​h​e​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n​ ​o​f​ ​B​l​i​n​k​ ​i​s​ ​$​1​0​ ​m​i​l​l​i​o​n​.
+				 */
+				body1: string
+				/**
+				 * W​e​ ​b​e​l​i​e​v​e​ ​t​h​a​t​ ​w​e​ ​c​o​u​l​d​ ​r​a​i​s​e​ ​a​t​ ​a​ ​h​i​g​h​e​r​ ​v​a​l​u​a​t​i​o​n​ ​f​r​o​m​ ​V​C​s​.​ ​Y​o​u​ ​a​r​e​ ​n​o​t​ ​i​n​v​i​t​e​d​ ​t​o​ ​m​a​x​i​m​i​z​e​ ​o​u​r​ ​s​h​o​r​t​-​t​e​r​m​ ​v​a​l​u​a​t​i​o​n​,​ ​w​e​ ​s​e​e​ ​l​o​n​g​-​t​e​r​m​ ​v​a​l​u​e​ ​i​n​ ​p​a​r​t​n​e​r​i​n​g​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * G​o​t​ ​i​t
+		 */
+		buttonText: string
 	}
 	TermSheetScreen: {
 		/**
@@ -9644,7 +9671,7 @@ type RootTranslation = {
 			 */
 			valuation: string
 			/**
-			 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​2​%​ ​o​f​ ​B​l​i​n​k
+			 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​1​%​ ​o​f​ ​B​l​i​n​k
 			 */
 			units: string
 		}
@@ -19208,6 +19235,32 @@ export type TranslationFunctions = {
 		 * Continue
 		 */
 		buttonText: () => LocalizedString
+		/**
+		 * for ~{percent}%
+		 */
+		percent: (arg: { percent: number }) => LocalizedString
+	}
+	CompanyValuationScreen: {
+		welcomeMessage: {
+			/**
+			 * Company valuation
+			 */
+			title: () => LocalizedString
+			paragraphs: {
+				/**
+				 * In this investment round the pre-money valuation of Blink is $10 million.
+				 */
+				body1: () => LocalizedString
+				/**
+				 * We believe that we could raise at a higher valuation from VCs. You are not invited to maximize our short-term valuation, we see long-term value in partnering with our superusers.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * Got it
+		 */
+		buttonText: () => LocalizedString
 	}
 	TermSheetScreen: {
 		/**
@@ -19228,7 +19281,7 @@ export type TranslationFunctions = {
 			 */
 			valuation: () => LocalizedString
 			/**
-			 * You receive 10,000 units ~0.2% of Blink
+			 * You receive 10,000 units ~0.1% of Blink
 			 */
 			units: () => LocalizedString
 		}
