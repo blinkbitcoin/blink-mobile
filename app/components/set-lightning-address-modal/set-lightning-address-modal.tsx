@@ -100,11 +100,6 @@ export const SetLightningAddressModal = ({
       return
     }
 
-    // Short delay to ensure GraphQL updates propagate before refreshing the current profile
-    await new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), 100)
-    })
-
     await updateCurrentProfile()
     toggleModal()
   }
