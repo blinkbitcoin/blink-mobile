@@ -9,7 +9,7 @@ import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { ProfileScreen } from "./profile"
-import { fetchProfiles } from "@app/utils/multi-account"
+import { fetchProfiles } from "./utils"
 import { ScrollView, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 
