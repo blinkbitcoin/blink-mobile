@@ -11,4 +11,5 @@ export * from "./term"
 export * from "./transfer-invest"
 export * from "./top-up"
 export * from "./card-dashboard"
+export * from "./completed-screen"
 

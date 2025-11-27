@@ -9734,6 +9734,24 @@ type RootTranslation = {
 		 */
 		placeholder: string
 	}
+	CardCompletedScreen: {
+		welcomeMessage: {
+			/**
+			 * W​e​ ​n​e​e​d​ ​s​o​m​e​ ​m​o​r​e​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			title: string
+			paragraphs: {
+				/**
+				 * B​e​f​o​r​e​ ​y​o​u​ ​c​a​n​ ​h​o​p​ ​o​n​b​o​a​r​d​,​ ​w​e​ ​n​e​e​d​ ​j​u​s​t​ ​a​ ​c​o​u​p​l​e​ ​m​o​r​e​ ​p​i​e​c​e​s​ ​o​f​ ​i​n​f​o​r​m​a​t​i​o​n​ ​a​b​o​u​t​ ​y​o​u​.
+				 */
+				body1: string
+			}
+		}
+		/**
+		 * A​l​r​i​g​h​t
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19342,6 +19360,24 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		placeholder: () => LocalizedString
+	}
+	CardCompletedScreen: {
+		welcomeMessage: {
+			/**
+			 * We need some more information
+			 */
+			title: () => LocalizedString
+			paragraphs: {
+				/**
+				 * Before you can hop onboard, we need just a couple more pieces of information about you.
+				 */
+				body1: () => LocalizedString
+			}
+		}
+		/**
+		 * Alright
+		 */
+		buttonText: () => LocalizedString
 	}
 }
 
