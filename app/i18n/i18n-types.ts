@@ -9804,6 +9804,16 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	CardPreapprovedScreen: {
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​V​i​s​a​ ​c​a​r​d​!
+		 */
+		title: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19478,6 +19488,16 @@ export type TranslationFunctions = {
 				placeholder: () => LocalizedString
 			}
 		}
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardPreapprovedScreen: {
+		/**
+		 * You have been preapproved for the Bitcoin Visa card!
+		 */
+		title: () => LocalizedString
 		/**
 		 * Continue
 		 */

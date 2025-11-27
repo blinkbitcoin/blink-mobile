@@ -36,7 +36,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
   ]
 
   const handleNext = () => {
-    //navigation.navigate("bitcoinCard")
+    navigation.navigate("cardPreapprovedScreen")
   }
 
   return (

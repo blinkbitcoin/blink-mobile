@@ -3135,6 +3135,10 @@ const en: BaseTranslation = {
     },
     buttonText: "Continue",
   },
+  CardPreapprovedScreen: {
+    title: "You have been preapproved for the Bitcoin Visa card!",
+    buttonText: "Continue",
+  },
 }
 
 export default en

@@ -140,6 +140,7 @@ export type RootStackParamList = {
   companyValuation: undefined
   cardCompletedScreen: undefined
   cardPersonalInformationScreen: undefined
+  cardPreapprovedScreen: undefined
 }
 
 export type CardDashboardStackParamList = {

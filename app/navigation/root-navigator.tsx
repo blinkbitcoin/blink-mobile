@@ -118,6 +118,7 @@ import {
   CompanyValuationScreen,
   CardCompletedScreen,
   CardPersonalInformationScreen,
+  CardPreapprovedScreen,
 } from "../screens/bitcoin-card"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 
@@ -674,6 +675,23 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.PersonalInformationScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardPreapprovedScreen"
+        component={CardPreapprovedScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
           headerRight: () => (
             <GaloyIconButton
               onPress={() => navigation.navigate("Primary")}

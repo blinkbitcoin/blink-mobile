@@ -3009,5 +3009,9 @@
             }
         },
         "buttonText": "Continuar"
+    },
+    "CardPreapprovedScreen": {
+        "title": "¡Has sido preaprobado para la tarjeta Bitcoin Visa!",
+        "buttonText": "Continuar"
     }
 }
