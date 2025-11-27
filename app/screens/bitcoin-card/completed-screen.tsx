@@ -19,7 +19,7 @@ export const CardCompletedScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const handleNext = () => {
-    //navigation.navigate("bitcoinCard")
+    navigation.navigate("cardPersonalInformationScreen")
   }
 
   return (

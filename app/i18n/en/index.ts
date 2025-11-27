@@ -3113,6 +3113,28 @@ const en: BaseTranslation = {
     },
     buttonText: "Alright",
   },
+  PersonalInformationScreen: {
+    title: "Personal information",
+    fields: {
+        occupation: {
+            label: "Occupation",
+            placeholder: "Select your occupation",
+        },
+        annualSalaryRange: {
+            label: "Annual salary range",
+            placeholder: "Less than $25,000",
+        },
+        accountPurpose: {
+            label: "Account purpose",
+            placeholder: "Personal spending",
+        },
+        expectedMonthlyVolume: {
+            label: "Expected monthly volume",
+            placeholder: "Less than $1,000",
+        }
+    },
+    buttonText: "Continue",
+  },
 }
 
 export default en

@@ -2987,5 +2987,27 @@
             }
         },
         "buttonText": "De acuerdo"
+    },
+    "PersonalInformationScreen": {
+        "title": "Información personal",
+        "fields": {
+            "occupation": {
+                "label": "Ocupación",
+                "placeholder": "Selecciona tu ocupación"
+            },
+            "annualSalaryRange": {
+                "label": "Rango de salario anual",
+                "placeholder": "Menos de $25,000"
+            },
+            "accountPurpose": {
+                "label": "Propósito de la cuenta",
+                "placeholder": "Gastos personales"
+            },
+            "expectedMonthlyVolume": {
+                "label": "Volumen mensual esperado",
+                "placeholder": "Menos de $1,000"
+            }
+        },
+        "buttonText": "Continuar"
     }
 }

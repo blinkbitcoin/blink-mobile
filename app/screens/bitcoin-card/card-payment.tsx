@@ -32,13 +32,13 @@ export const CardPayment: React.FC = () => {
 
       if (urlWithoutQuery === sumsubSuccessUrl) {
         // TODO: navigate to Sumsub success screen
-        navigation.navigate("cardPayment")
+        navigation.navigate("cardCompletedScreen")
         return false
       }
 
       if (urlWithoutQuery === sumsubRejectUrl) {
         // TODO: navigate to Sumsub reject screen
-        navigation.navigate("cardPayment")
+        navigation.navigate("cardCompletedScreen")
         return false
       }
 

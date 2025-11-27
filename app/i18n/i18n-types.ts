@@ -9752,6 +9752,58 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	PersonalInformationScreen: {
+		/**
+		 * P​e​r​s​o​n​a​l​ ​i​n​f​o​r​m​a​t​i​o​n
+		 */
+		title: string
+		fields: {
+			occupation: {
+				/**
+				 * O​c​c​u​p​a​t​i​o​n
+				 */
+				label: string
+				/**
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+				 */
+				placeholder: string
+			}
+			annualSalaryRange: {
+				/**
+				 * A​n​n​u​a​l​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+				 */
+				label: string
+				/**
+				 * L​e​s​s​ ​t​h​a​n​ ​$​2​5​,​0​0​0
+				 */
+				placeholder: string
+			}
+			accountPurpose: {
+				/**
+				 * A​c​c​o​u​n​t​ ​p​u​r​p​o​s​e
+				 */
+				label: string
+				/**
+				 * P​e​r​s​o​n​a​l​ ​s​p​e​n​d​i​n​g
+				 */
+				placeholder: string
+			}
+			expectedMonthlyVolume: {
+				/**
+				 * E​x​p​e​c​t​e​d​ ​m​o​n​t​h​l​y​ ​v​o​l​u​m​e
+				 */
+				label: string
+				/**
+				 * L​e​s​s​ ​t​h​a​n​ ​$​1​,​0​0​0
+				 */
+				placeholder: string
+			}
+		}
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19376,6 +19428,58 @@ export type TranslationFunctions = {
 		}
 		/**
 		 * Alright
+		 */
+		buttonText: () => LocalizedString
+	}
+	PersonalInformationScreen: {
+		/**
+		 * Personal information
+		 */
+		title: () => LocalizedString
+		fields: {
+			occupation: {
+				/**
+				 * Occupation
+				 */
+				label: () => LocalizedString
+				/**
+				 * Select your occupation
+				 */
+				placeholder: () => LocalizedString
+			}
+			annualSalaryRange: {
+				/**
+				 * Annual salary range
+				 */
+				label: () => LocalizedString
+				/**
+				 * Less than $25,000
+				 */
+				placeholder: () => LocalizedString
+			}
+			accountPurpose: {
+				/**
+				 * Account purpose
+				 */
+				label: () => LocalizedString
+				/**
+				 * Personal spending
+				 */
+				placeholder: () => LocalizedString
+			}
+			expectedMonthlyVolume: {
+				/**
+				 * Expected monthly volume
+				 */
+				label: () => LocalizedString
+				/**
+				 * Less than $1,000
+				 */
+				placeholder: () => LocalizedString
+			}
+		}
+		/**
+		 * Continue
 		 */
 		buttonText: () => LocalizedString
 	}
