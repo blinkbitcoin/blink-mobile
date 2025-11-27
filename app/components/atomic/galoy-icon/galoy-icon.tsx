@@ -66,6 +66,7 @@ import flashOutline from "@app/assets/icons-redesign/flash-outline.svg"
 import linkOutline from "@app/assets/icons-redesign/link-outline.svg"
 import btcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
+import checkBadge from "@app/assets/icons-redesign/check-badge.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -133,7 +134,8 @@ export const icons = {
   "flash-outline": flashOutline,
   "link-outline": linkOutline,
   "btc-hand": btcHand,
-  "document": DocumentIcon
+  "document": DocumentIcon,
+  "check-badge": checkBadge,
 } as const
 
 export type IconNamesType = keyof typeof icons
