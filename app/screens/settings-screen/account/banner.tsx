@@ -10,7 +10,6 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
