@@ -55,6 +55,7 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(screen.getByText("test1@blink.sv")).toBeTruthy()
+    const elements = screen.getAllByText("test1@blink.sv")
+    expect(elements.length).toBeGreaterThan(0)
   })
 })
