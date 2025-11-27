@@ -12,6 +12,8 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { AmountInvalidReason, AmountStatus } from "./payment-details"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes"
 
 export type SendBitcoinDetailsExtraInfoProps = {
   errorMessage?: string
@@ -24,6 +26,7 @@ export const SendBitcoinDetailsExtraInfo = ({
   amountStatus,
   currentLevel,
 }: SendBitcoinDetailsExtraInfoProps) => {
+  const { sumsubSuccessUrl, sumsubRejectUrl } = useRemoteConfig()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [isUpgradeAccountModalVisible, setIsUpgradeAccountModalVisible] = useState(false)
@@ -50,6 +53,42 @@ export const SendBitcoinDetailsExtraInfo = ({
 
   if (amountStatus.validAmount) {
     return null
+  }
+  const onShouldStartLoad = React.useCallback(
+    (request: ShouldStartLoadRequest) => {
+      const requestUrl = request?.url ?? ""
+      if (!requestUrl) return true
+
+      const parsed = new URL(requestUrl)
+      const urlWithoutQuery = `${parsed.origin}${parsed.pathname}`
+
+      if (urlWithoutQuery === sumsubSuccessUrl) {
+        // TODO: navigate to Sumsub success screen
+        navigation.goBack()
+        return false
+      }
+
+      if (urlWithoutQuery === sumsubRejectUrl) {
+        // TODO: navigate to Sumsub reject screen
+        navigation.goBack()
+        return false
+      }
+
+      return true
+    },
+    [navigation, sumsubSuccessUrl, sumsubRejectUrl],
+  )
+
+  const handleSumsubFlow = () => {
+    /**
+     * TODO: temporary until backend provides the url
+     */
+    const url = ""
+    navigation.navigate("webView", {
+      url,
+      hideHeader: true,
+      onShouldStartLoad,
+    })
   }
 
   switch (amountStatus.invalidReason) {
@@ -78,7 +117,7 @@ export const SendBitcoinDetailsExtraInfo = ({
           {currentLevel === "ONE" ? (
             <GaloyPrimaryButton
               title={LL.TransactionLimitsScreen.increaseLimits()}
-              onPress={() => navigation.navigate("fullOnboardingFlow")}
+              onPress={handleSumsubFlow}
             />
           ) : null}
         </>

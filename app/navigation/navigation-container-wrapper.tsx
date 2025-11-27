@@ -143,6 +143,10 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         transactionDetail: {
           path: "transaction/:txid",
         },
+        welcomeCard: "welcomeCard",
+        loadingCard: "loadingCard",
+        visaCard: "visaCard",
+        creditCardLimit: "creditCardLimit",
         sendBitcoinDestination: ":payment",
       },
     },
