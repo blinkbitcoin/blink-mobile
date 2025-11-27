@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, TextInput } from "react-native"
 
 import { gql } from "@apollo/client"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -43,6 +43,7 @@ export const SetLightningAddressModal = ({
 }: SetLightningAddressModalProps) => {
   const [error, setError] = useState<SetUsernameError | undefined>()
   const [lnAddress, setLnAddress] = useState("")
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const onChangeLnAddress = (lightningAddress: string) => {
     setLnAddress(lightningAddress)
@@ -99,6 +100,7 @@ export const SetLightningAddressModal = ({
       return
     }
 
+    await updateCurrentProfile()
     toggleModal()
   }
 

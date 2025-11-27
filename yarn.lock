@@ -2381,10 +2381,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@blinkbitcoin/blink-client@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.5.1.tgz#36f711e48b1ca0106acf474e5f5859d145c2fec2"
-  integrity sha512-a4wSyAls7ATWJ7XdXy+3vMRi86u8cx8sUTiHKDP2b5nTtmNe9YBEGZKIXrrjuN487uS24yKqF3Gwch1pOze3Eg==
+"@blinkbitcoin/blink-client@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.5.2.tgz#bddb60818ba0c3be6c6b42c00b912d0e58ef3fe7"
+  integrity sha512-IiW7YEUxMmeSWfIiwN6ahNC/qvOvAD03B2cs2YLDtOwNBUc+6hkykAN0E7sSeOAfWbPLsPczEl/wJ+fiWJLqYg==
 
 "@callstack/react-theme-provider@3.0.3":
   version "3.0.3"
@@ -18578,10 +18578,10 @@ libnpmconfig@^1.0.0:
     find-up "^3.0.0"
     ini "^1.3.5"
 
-libphonenumber-js@^1.10.60:
-  version "1.10.60"
-  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.10.60.tgz#1160ec5b390d46345032aa52be7ffa7a1950214b"
-  integrity sha512-Ctgq2lXUpEJo5j1762NOzl2xo7z7pqmVWYai0p07LvAkQ32tbPv3wb+tcUeHEiXhKU5buM4H9MXsXo6OlM6C2g==
+libphonenumber-js@^1.12.25:
+  version "1.12.25"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.12.25.tgz#1af48b816082100bf88f47d342387fbac1f1a773"
+  integrity sha512-u90tUu/SEF8b+RaDKCoW7ZNFDakyBtFlX1ex3J+VH+ElWes/UaitJLt/w4jGu8uAE41lltV/s+kMVtywcMEg7g==
 
 lighthouse-logger@^1.0.0, lighthouse-logger@^1.3.0:
   version "1.4.2"

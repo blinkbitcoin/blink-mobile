@@ -10,7 +10,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 
@@ -24,7 +24,6 @@ import { AccountLNAddress } from "./settings/account-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
-import { SwitchAccount } from "./settings/multi-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -35,6 +34,7 @@ import { ThemeSetting } from "./settings/preferences-theme"
 import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
+import { SwitchAccountSetting } from "./settings/multi-account"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -76,13 +76,15 @@ export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { currentLevel, isAtLeastLevelOne } = useLevel()
+  const { isAtLeastLevelOne } = useLevel()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     fetchPolicy: "cache-and-network",
   })
 
+  const accountItems = [AccountLevelSetting, TxLimits, SwitchAccountSetting]
+
   const items = {
-    account: [AccountLevelSetting, TxLimits, SwitchAccount],
+    account: [...accountItems],
     loginMethods: [EmailSetting, PhoneSetting],
     waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
     preferences: [
@@ -120,8 +122,8 @@ export const SettingsScreen: React.FC = () => {
   return (
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
-        {currentLevel === AccountLevel.NonAuth && <AccountBanner />}
-        <SettingsGroup name={LL.common.account()} items={items.account} />
+        <AccountBanner />
+        <SettingsGroup name={LL.common.accountInformation()} items={items.account} />
         {isAtLeastLevelOne && (
           <SettingsGroup
             name={LL.AccountScreen.loginMethods()}
@@ -147,7 +149,7 @@ export const SettingsScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   outer: {
-    marginTop: 12,
+    marginTop: 5,
     paddingHorizontal: 12,
     paddingBottom: 20,
     display: "flex",

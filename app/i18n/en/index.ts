@@ -2444,6 +2444,9 @@ const en: BaseTranslation = {
   ProfileScreen: {
     addAccount: "Add Account",
     error: "Unable to fetch profiles at this time",
+    fromThisDevice: "from this device?",
+    switchAccount: "You switched to another account",
+    removedAccount: "You removed account {identifier: string}.",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
@@ -2698,6 +2701,8 @@ const en: BaseTranslation = {
     advanced: "Advanced",
     community: "Community",
     account: "Account",
+    accounts: "Accounts",
+    accountInformation: "Account Information",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
     transactionLimits: "Transaction Limits",
@@ -2862,6 +2867,7 @@ const en: BaseTranslation = {
     deleteAccountError:
       "Something went wrong. Contact {email: string} for further assistance.",
     bye: "Bye!",
+    deleteAccountWarning: "Attention: Account deletion is permanent!\nMake sure wallets have no funds before deleting.\nDeleted account cannot be reinstated.",
   },
   lnurl: {
     overLimit: "You can't send more than max amount",
