@@ -4,7 +4,6 @@ import { Screen } from "@app/components/screen"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles } from "@rn-vui/themed"
 
-import { SettingsGroup } from "../group"
 import { AccountDeleteContextProvider } from "./account-delete-context"
 import { AccountId } from "./id"
 import { DangerZoneSettings } from "./settings/danger-zone"
@@ -12,6 +11,7 @@ import { UpgradeAccountLevelOne } from "./settings/upgrade"
 import { UpgradeTrialAccount } from "./settings/upgrade-trial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { AccountBannerVertical } from "./banner-vertical"
+import { SettingsGroup } from "../group"
 
 export const AccountScreen: React.FC = () => {
   const styles = useStyles()

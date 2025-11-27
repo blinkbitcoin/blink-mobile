@@ -24,7 +24,6 @@ import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneNAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { TxLimits } from "./settings/account-tx-limits"
-import { SwitchAccount } from "./settings/multi-account"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -36,6 +35,7 @@ import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
+import { SwitchAccountSetting } from "./settings/multi-account"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -83,7 +83,7 @@ export const SettingsScreen: React.FC = () => {
   })
 
   const items = {
-    account: [AccountLevelSetting, TxLimits, SwitchAccount],
+    account: [AccountLevelSetting, TxLimits, SwitchAccountSetting],
     waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
@@ -144,7 +144,7 @@ export const SettingsScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   outer: {
-    marginTop: 12,
+    marginTop: 5,
     paddingHorizontal: 12,
     paddingBottom: 20,
     display: "flex",

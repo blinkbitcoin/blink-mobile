@@ -99,6 +99,7 @@ export type RootStackParamList = {
   }
   Earn: undefined
   accountScreen: undefined
+  profileScreen: undefined
   notificationSettingsScreen: undefined
   apiScreen: undefined
   transactionLimitsScreen: undefined

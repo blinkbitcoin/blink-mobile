@@ -7673,6 +7673,19 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​p​r​o​f​i​l​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
 		 */
 		error: string
+		/**
+		 * f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		fromThisDevice: string
+		/**
+		 * Y​o​u​ ​s​w​i​t​c​h​e​d​ ​t​o​ ​a​n​o​t​h​e​r​ ​a​c​c​o​u​n​t
+		 */
+		switchAccount: string
+		/**
+		 * Y​o​u​ ​r​e​m​o​v​e​d​ ​a​c​c​o​u​n​t​ ​{​i​d​e​n​t​i​f​i​e​r​}​.
+		 * @param {string} identifier
+		 */
+		removedAccount: RequiredParams<'identifier'>
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -8444,6 +8457,14 @@ type RootTranslation = {
 		 */
 		yourAccount: string
 		/**
+		 * A​c​c​o​u​n​t​s
+		 */
+		accounts: string
+		/**
+		 * A​c​c​o​u​n​t​ ​I​n​f​o​r​m​a​t​i​o​n
+		 */
+		accountInformation: string
+		/**
 		 * T​r​i​a​l​ ​A​c​c​o​u​n​t
 		 */
 		trialAccount: string
@@ -8863,6 +8884,10 @@ type RootTranslation = {
 		 * S​u​p​p​o​r​t
 		 */
 		support: string
+		/**
+		 * P​r​o​f​i​l​e​s
+		 */
+		profiles: string
 	}
 	errors: {
 		/**
@@ -9047,6 +9072,12 @@ type RootTranslation = {
 		 * B​y​e​!
 		 */
 		bye: string
+		/**
+		 * A​t​t​e​n​t​i​o​n​:​ ​A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
+	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​d​e​l​e​t​i​n​g​.​
+	​D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.
+		 */
+		deleteAccountWarning: string
 	}
 	lnurl: {
 		/**
@@ -17011,6 +17042,18 @@ export type TranslationFunctions = {
 		 * Unable to fetch profiles at this time
 		 */
 		error: () => LocalizedString
+		/**
+		 * from this device?
+		 */
+		fromThisDevice: () => LocalizedString
+		/**
+		 * You switched to another account
+		 */
+		switchAccount: () => LocalizedString
+		/**
+		 * You removed account {identifier}.
+		 */
+		removedAccount: (arg: { identifier: string }) => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -17766,6 +17809,14 @@ export type TranslationFunctions = {
 		 */
 		yourAccount: () => LocalizedString
 		/**
+		 * Accounts
+		 */
+		accounts: () => LocalizedString
+		/**
+		 * Account Information
+		 */
+		accountInformation: () => LocalizedString
+		/**
 		 * Trial Account
 		 */
 		trialAccount: () => LocalizedString
@@ -18183,6 +18234,10 @@ export type TranslationFunctions = {
 		 * Support
 		 */
 		support: () => LocalizedString
+		/**
+		 * Profiles
+		 */
+		profiles: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -18358,6 +18413,12 @@ export type TranslationFunctions = {
 		 * Bye!
 		 */
 		bye: () => LocalizedString
+		/**
+		 * Attention: Account deletion is permanent!
+	Make sure wallets have no funds before deleting.
+	Deleted account cannot be reinstated.
+		 */
+		deleteAccountWarning: () => LocalizedString
 	}
 	lnurl: {
 		/**
