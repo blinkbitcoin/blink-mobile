@@ -65,6 +65,7 @@ import headset from "@app/assets/icons-redesign/headset.svg"
 import flashOutline from "@app/assets/icons-redesign/flash-outline.svg"
 import linkOutline from "@app/assets/icons-redesign/link-outline.svg"
 import btcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -131,7 +132,8 @@ export const icons = {
   "headset": headset,
   "flash-outline": flashOutline,
   "link-outline": linkOutline,
-  "btc-hand": btcHand
+  "btc-hand": btcHand,
+  "document": DocumentIcon
 } as const
 
 export type IconNamesType = keyof typeof icons
