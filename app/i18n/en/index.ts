@@ -3028,7 +3028,7 @@ const en: BaseTranslation = {
       firstYearFree: "First year free",
     },
     renewalDate: {
-      label: "Renewal Date",
+      label: "Renewal date",
     },
     agreement: {
       text: "I agree to the",

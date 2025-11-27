@@ -9524,7 +9524,7 @@ type RootTranslation = {
 		}
 		renewalDate: {
 			/**
-			 * R​e​n​e​w​a​l​ ​D​a​t​e
+			 * R​e​n​e​w​a​l​ ​d​a​t​e
 			 */
 			label: string
 		}
@@ -19135,7 +19135,7 @@ export type TranslationFunctions = {
 		}
 		renewalDate: {
 			/**
-			 * Renewal Date
+			 * Renewal date
 			 */
 			label: () => LocalizedString
 		}

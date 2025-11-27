@@ -169,24 +169,25 @@ const useStyles = makeStyles(({ colors }) => ({
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 30,
   },
   cardContainer: {
     backgroundColor: colors.grey5,
     borderRadius: 16,
-    padding: 10,
+    padding: 18,
     paddingBottom: 5,
   },
   cardTitle: {
     color: colors.black,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 5,
     fontWeight: "semibold",
   },
   price: {
     color: colors.primary,
     textAlign: "center",
     fontWeight: "semibold",
+    marginBottom: 5,
   },
   perYear: {
     color: colors.grey2,
@@ -218,7 +219,6 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 17,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
   },
   checkboxStyle: {
     padding: 0,
