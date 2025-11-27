@@ -96,6 +96,7 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import { AcademyScreen } from "@app/screens/academy-screen/academy-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
@@ -715,12 +716,13 @@ export const PrimaryNavigator = () => {
           tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
         }}
       />
-      <Tab.Screen
-        name="Earn"
-        component={EarnMapScreen}
+       <Tab.Screen
+        name="Academy"
+        component={AcademyScreen}
         options={{
-          title: LL.EarnScreen.title(),
+          title: "Academy",
           headerShown: false,
+          lazy: false,
           tabBarAccessibilityLabel: LL.EarnScreen.title(),
           tabBarTestID: LL.EarnScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => (
