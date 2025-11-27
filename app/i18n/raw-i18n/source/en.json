@@ -2361,7 +2361,10 @@
     },
     "ProfileScreen": {
         "addAccount": "Add Account",
-        "error": "Unable to fetch profiles at this time"
+        "error": "Unable to fetch profiles at this time",
+        "fromThisDevice": "from this device?",
+        "switchAccount": "You switched to another account",
+        "removedAccount": "You removed account {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Two-factor authentication",
@@ -2596,6 +2599,8 @@
         "advanced": "Advanced",
         "community": "Community",
         "account": "Account",
+        "accounts": "Accounts",
+        "accountInformation": "Account Information",
         "trialAccount": "Trial Account",
         "blinkUser": "Blink User",
         "transactionLimits": "Transaction Limits",
@@ -2700,7 +2705,8 @@
         "dollar": "Dollar",
         "all": "ALL",
         "allAccounts": "All accounts",
-        "validThru": "Valid thru"
+        "validThru": "Valid thru",
+        "profiles": "Profiles"
     },
     "errors": {
         "generic": "There was an error.\nPlease try again later.",
@@ -2750,7 +2756,8 @@
         "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
         "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
         "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
-        "bye": "Bye!"
+        "bye": "Bye!",
+        "deleteAccountWarning": "Attention: Account deletion is permanent!\nMake sure wallets have no funds before deleting.\nDeleted account cannot be reinstated."
     },
     "lnurl": {
         "overLimit": "You can't send more than max amount",
