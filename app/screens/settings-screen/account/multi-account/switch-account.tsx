@@ -28,17 +28,24 @@ export const SwitchAccount: React.FC = () => {
 
   useEffect(() => {
     if (!currentToken) return
+    let isMounted = true
+
     const loadProfiles = async () => {
       let profilesList = await fetchProfiles(currentToken)
       if (profilesList.length === 0) {
         await saveProfile(currentToken)
         profilesList = await fetchProfiles(currentToken)
       }
-      setProfiles(profilesList)
-      setNextProfileToken(profilesList.find((profile) => !profile.selected)?.token)
+      if (isMounted) {
+        setProfiles(profilesList)
+        setNextProfileToken(profilesList.find((profile) => !profile.selected)?.token)
+      }
     }
 
     loadProfiles()
+    return () => {
+      isMounted = false
+    }
   }, [saveProfile, currentToken])
 
   const handleAddNew = () => {
@@ -50,7 +57,7 @@ export const SwitchAccount: React.FC = () => {
       <ScrollView contentContainerStyle={styles.outer}>
         {profiles.map((profile, index) => (
           <ProfileScreen
-            key={index}
+            key={profile.accountId || profile.userId || index}
             {...profile}
             isFirstItem={index === 0}
             nextProfileToken={nextProfileToken}

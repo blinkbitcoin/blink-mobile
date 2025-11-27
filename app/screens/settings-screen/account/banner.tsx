@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
 import { useAppConfig } from "@app/hooks"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 
 export const AccountBanner: React.FC = () => {
   const styles = useStyles()
@@ -29,10 +30,14 @@ export const AccountBanner: React.FC = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const { currentLevel } = useLevel()
-  const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
+  const isUserLoggedIn = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
+  const { data, loading } = useSettingsScreenQuery({
+    skip: !isUserLoggedIn,
+    fetchPolicy: "cache-first",
+    // this enables offline mode use-case
+    nextFetchPolicy: "cache-and-network",
+  })
 
   const hasUsername = Boolean(data?.me?.username)
   const lnAddress = `${data?.me?.username}@${lnAddressHostname}`

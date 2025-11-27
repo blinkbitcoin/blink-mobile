@@ -66,13 +66,12 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
     textAlign: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     flex: 1,
     marginHorizontal: 20,
-    marginBottom: 30,
+    marginBottom: 20,
     height: 60,
     maxHeight: 60,
-    marginTop: -10,
   },
   primaryBalanceText: {
     fontSize: 32,
