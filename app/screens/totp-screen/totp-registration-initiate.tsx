@@ -109,7 +109,7 @@ export const TotpRegistrationInitiateScreen = () => {
             <QrCodeComponent otpauth={otpauth} />
           </View>
           <CopySecretComponent secret={secret} />
-          <Text style={styles.textStyle} type="h2">
+          <Text style={styles.textStyle} type="p1">
             {LL.TotpRegistrationInitiateScreen.content()}
           </Text>
 
