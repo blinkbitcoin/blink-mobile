@@ -90,6 +90,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const isFocused = useIsFocused()
 
+  const [zoom, setZoom] = React.useState(1.5)
+
   // const requestCameraPermission = React.useCallback(async () => {
   //   const permission = await Camera.requestCameraPermission()
   //   if (permission === "denied") await Linking.openSettings()
@@ -254,6 +256,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const codeScanner = useCodeScanner({
     codeTypes: ["qr", "ean-13"],
+    regionOfInterest: { x: 0.125, y: 0.2, width: 0.75, height: 0.75 },
     onCodeScanned: (codes) => {
       codes.forEach((code) => processInvoice(code.value))
       console.debug(`Scanned ${codes.length} codes!`)
@@ -344,6 +347,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
           isActive={isFocused}
           onError={onError}
           codeScanner={codeScanner}
+          zoom={zoom}
+          enableZoomGesture={true}
         />
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle} />
@@ -400,8 +405,8 @@ const useStyles = makeStyles(({ colors }) => ({
   rectangle: {
     borderColor: colors.primary,
     borderWidth: 2,
-    height: screenWidth * 0.65,
-    width: screenWidth * 0.65,
+    height: screenWidth * 0.75,
+    width: screenWidth * 0.75,
   },
 
   rectangleContainer: {
