@@ -90,7 +90,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const isFocused = useIsFocused()
 
-  const [zoom, setZoom] = React.useState(1.5)
+  const zoom = 1.5
 
   // const requestCameraPermission = React.useCallback(async () => {
   //   const permission = await Camera.requestCameraPermission()
