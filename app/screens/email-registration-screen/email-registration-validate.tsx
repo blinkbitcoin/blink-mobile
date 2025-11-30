@@ -12,6 +12,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SuccessIconAnimation } from "@app/components/success-animation"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
   mutation userEmailRegistrationValidate($input: UserEmailRegistrationValidateInput!) {
@@ -43,6 +44,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const [errorMessage, setErrorMessage] = React.useState<string>("")
 
   const { LL } = useI18nContext()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [emailVerify] = useUserEmailRegistrationValidateMutation()
 
@@ -81,6 +83,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         }
 
         if (res.data?.userEmailRegistrationValidate.me?.email?.verified) {
+          await updateCurrentProfile()
           Keyboard.dismiss()
           setShowSuccess(true)
         } else {
@@ -92,7 +95,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         setLoading(false)
       }
     },
-    [emailVerify, emailRegistrationId, LL.common],
+    [emailVerify, emailRegistrationId, LL.common, updateCurrentProfile],
   )
 
   useEffect(() => {

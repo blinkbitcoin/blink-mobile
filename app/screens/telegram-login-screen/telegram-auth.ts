@@ -43,7 +43,7 @@ gql`
 
 export const useTelegramLogin = (phone: string, onboarding: boolean = false) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { saveProfile } = useSaveSessionProfile()
+  const { saveProfile, updateCurrentProfile } = useSaveSessionProfile()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ErrorType | string | null>(null)
@@ -117,9 +117,10 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
 
   const navigateAfterAuth = useCallback(
     (authToken?: string) => {
-      if (authToken) {
-        saveProfile(authToken)
-      }
+      const createOrUpdateProfile = authToken
+        ? () => saveProfile(authToken)
+        : updateCurrentProfile
+      createOrUpdateProfile()
 
       if (onboarding) {
         navigation.replace("onboarding", {
@@ -130,7 +131,7 @@ export const useTelegramLogin = (phone: string, onboarding: boolean = false) => 
       }
       navigation.replace("Primary")
     },
-    [navigation, onboarding, saveProfile],
+    [navigation, onboarding, saveProfile, updateCurrentProfile],
   )
 
   const upgradeLoginWithTelegram = useCallback(

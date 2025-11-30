@@ -17,6 +17,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -168,6 +169,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
   >()
 
   const { LL } = useI18nContext()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneValidate] = useUserPhoneRegistrationValidateMutation()
 
@@ -207,6 +209,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
           _setCode("")
           setStatus(ValidatePhoneCodeStatus.ReadyToRegenerate)
         } else {
+          await updateCurrentProfile()
           setStatus(ValidatePhoneCodeStatus.Success)
           Alert.alert(LL.PhoneRegistrationValidateScreen.successTitle(), undefined, [
             {
@@ -225,7 +228,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
         setStatus(ValidatePhoneCodeStatus.ReadyToRegenerate)
       }
     },
-    [status, phoneValidate, phone, _setCode, navigation, LL],
+    [status, phoneValidate, phone, _setCode, navigation, LL, updateCurrentProfile],
   )
 
   const setCode = (code: string) => {

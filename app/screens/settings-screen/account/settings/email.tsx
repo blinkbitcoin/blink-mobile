@@ -17,6 +17,7 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
   mutation userEmailDelete {
@@ -72,6 +73,7 @@ export const EmailSetting: React.FC = () => {
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { loading, email, emailVerified, bothEmailAndPhoneVerified } = useLoginMethods()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [emailDeleteMutation, { loading: emDelLoading }] = useUserEmailDeleteMutation()
   const [setEmailMutation, { loading: emRegLoading }] =
@@ -80,6 +82,7 @@ export const EmailSetting: React.FC = () => {
   const deleteEmail = async () => {
     try {
       await emailDeleteMutation()
+      await updateCurrentProfile()
       toastShow({
         type: "success",
         message: LL.AccountScreen.emailDeletedSuccessfully(),
