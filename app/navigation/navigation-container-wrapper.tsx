@@ -147,6 +147,8 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         loadingCard: "loadingCard",
         visaCard: "visaCard",
         creditCardLimit: "creditCardLimit",
+        cardPersonalInformationScreen: "cardPersonalInformationScreen",
+        cardProcessingScreen: "cardProcessingScreen",
         sendBitcoinDestination: ":payment",
       },
     },

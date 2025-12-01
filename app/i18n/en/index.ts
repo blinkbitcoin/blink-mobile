@@ -3136,6 +3136,11 @@ const en: BaseTranslation = {
     title: "You have been preapproved for the Bitcoin Visa card!",
     buttonText: "Continue",
   },
+  CardProcessingScreen: {
+    title: "Processing your application",
+    subtitle: "Estimated wait time: {waitTime: string}",
+    buttonText: "Close",
+  },
 }
 
 export default en

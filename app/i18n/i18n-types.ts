@@ -9823,6 +9823,21 @@ type RootTranslation = {
 		 */
 		buttonText: string
 	}
+	CardProcessingScreen: {
+		/**
+		 * P​r​o​c​e​s​s​i​n​g​ ​y​o​u​r​ ​a​p​p​l​i​c​a​t​i​o​n
+		 */
+		title: string
+		/**
+		 * E​s​t​i​m​a​t​e​d​ ​w​a​i​t​ ​t​i​m​e​:​ ​{​w​a​i​t​T​i​m​e​}
+		 * @param {string} waitTime
+		 */
+		subtitle: RequiredParams<'waitTime'>
+		/**
+		 * C​l​o​s​e
+		 */
+		buttonText: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -19517,6 +19532,20 @@ export type TranslationFunctions = {
 		title: () => LocalizedString
 		/**
 		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardProcessingScreen: {
+		/**
+		 * Processing your application
+		 */
+		title: () => LocalizedString
+		/**
+		 * Estimated wait time: {waitTime}
+		 */
+		subtitle: (arg: { waitTime: string }) => LocalizedString
+		/**
+		 * Close
 		 */
 		buttonText: () => LocalizedString
 	}

@@ -13,4 +13,5 @@ export * from "./top-up"
 export * from "./card-dashboard"
 export * from "./personal-information"
 export * from "./preapproved-screen"
+export * from "./processing-screen"
 

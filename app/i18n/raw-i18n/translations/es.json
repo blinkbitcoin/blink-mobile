@@ -3011,5 +3011,10 @@
     "CardPreapprovedScreen": {
         "title": "¡Has sido preaprobado para la tarjeta Bitcoin Visa!",
         "buttonText": "Continuar"
+    },
+    "CardProcessingScreen": {
+        "title": "Procesando tu solicitud",
+        "subtitle": "Tiempo estimado de espera: {waitTime: string}",
+        "buttonText": "Cerrar"
     }
 }

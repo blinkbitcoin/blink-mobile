@@ -36,7 +36,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
   ]
 
   const handleNext = () => {
-    navigation.navigate("cardPreapprovedScreen")
+    navigation.navigate("cardProcessingScreen")
   }
 
   return (
