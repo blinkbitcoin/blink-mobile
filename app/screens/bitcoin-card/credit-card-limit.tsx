@@ -7,6 +7,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 export const CreditCardLimit: React.FC = () => {
   const styles = useStyles()
@@ -27,12 +28,7 @@ export const CreditCardLimit: React.FC = () => {
         <View style={styles.contentContainer}>
           <View style={styles.iconContainer}>
             <View style={styles.iconCircle}>
-              <Icon
-                name={"arrow-up-circle-outline"}
-                type="ionicon"
-                color={colors._green}
-                size={35}
-              />
+              <GaloyIcon name={"family-outline"} color={colors._green} size={35} />
             </View>
           </View>
 
@@ -40,11 +36,11 @@ export const CreditCardLimit: React.FC = () => {
             {LL.CardCreditLimit.welcomeMessage.title()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CardCreditLimit.welcomeMessage.paragraphs.body1()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CardCreditLimit.welcomeMessage.paragraphs.body2()}
           </Text>
         </View>
@@ -66,7 +62,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -85,6 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
   welcomeTitle: {
     marginBottom: 40,
     textAlign: "center",
+    fontWeight: "bold",
   },
   bodyText: {
     marginBottom: 24,

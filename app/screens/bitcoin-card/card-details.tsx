@@ -121,7 +121,7 @@ const useStyles = makeStyles(({ colors }) => {
     cardContainer: {
       backgroundColor: colors.grey5,
       borderRadius: 12,
-      padding: 20,
+      padding: 15,
     },
     featureContainer: {
       flexDirection: "row",

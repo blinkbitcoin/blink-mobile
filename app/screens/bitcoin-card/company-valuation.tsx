@@ -36,11 +36,11 @@ export const CompanyValuationScreen: React.FC = () => {
             {LL.CompanyValuationScreen.welcomeMessage.title()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CompanyValuationScreen.welcomeMessage.paragraphs.body1()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CompanyValuationScreen.welcomeMessage.paragraphs.body2()}
           </Text>
         </View>
@@ -62,7 +62,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -81,6 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
   welcomeTitle: {
     marginBottom: 40,
     textAlign: "center",
+    fontWeight: "bold"
   },
   bodyText: {
     marginBottom: 24,

@@ -30,13 +30,13 @@ export const LoadingCard: React.FC = () => {
               <Icon
                 name={"time-outline"}
                 type="ionicon"
-                color={colors.primary}
-                size={45}
+                color={colors._green}
+                size={40}
               />
             </View>
           </View>
 
-          <Text type="h1" style={styles.welcomeTitle}>
+          <Text type="h2" style={styles.welcomeTitle}>
             {LL.LoadinCardScreen.title()}
           </Text>
 
@@ -44,7 +44,7 @@ export const LoadingCard: React.FC = () => {
             <Image
               source={require("../../assets/images/monkey-typing.gif")}
               style={styles.typingMonkeyImage}
-              resizeMode="contain"
+              resizeMode="cover"
             />
           </View>
           <Text type="p1" style={styles.bodySubText}>
@@ -70,7 +70,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -79,32 +79,33 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 15,
   },
   iconCircle: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 50,
     backgroundColor: colors.grey5,
     justifyContent: "center",
     alignItems: "center",
   },
   welcomeTitle: {
-    marginBottom: 5,
     paddingHorizontal: 20,
     textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   bodySubText: {
     lineHeight: 26,
     textAlign: "center",
-    marginTop: 25,
+    marginTop: 20,
   },
   imageContainer: {
     width: "100%",
-    alignItems: "center",
+    aspectRatio: 17 / 13,
+    marginTop: 20,
+    overflow: "hidden",
   },
   typingMonkeyImage: {
     width: "100%",
-    height: undefined,
-    aspectRatio: 1,
-    resizeMode: "contain",
+    height: "100%",
   },
   buttonsContainer: {
     justifyContent: "flex-end",

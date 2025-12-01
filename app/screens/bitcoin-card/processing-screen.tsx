@@ -30,16 +30,16 @@ export const CardProcessingScreen: React.FC = () => {
               <Icon
                 name={"time-outline"}
                 color={colors._green}
-                size={45}
+                size={40}
                 type="ionicon"
               />
             </View>
           </View>
 
-          <Text type="h1" style={styles.title}>
+          <Text type="h2" style={styles.title}>
             {LL.CardProcessingScreen.title()}
           </Text>
-          <Text type="p3">
+          <Text type="p3" color={colors.grey3}>
             {LL.CardProcessingScreen.subtitle({ waitTime: "1 day" })}
           </Text>
         </View>
@@ -61,7 +61,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -70,15 +70,15 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 15,
   },
   iconCircle: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 50,
     backgroundColor: colors.grey5,
     justifyContent: "center",
     alignItems: "center",
   },
   title: {
-    marginBottom: 16,
+    marginBottom: 10,
     textAlign: "center",
     fontWeight: "bold",
   },

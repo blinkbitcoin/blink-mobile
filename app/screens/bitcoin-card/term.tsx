@@ -126,7 +126,7 @@ const useStyles = makeStyles(({ colors }) => {
     cardContainer: {
       backgroundColor: colors.grey5,
       borderRadius: 12,
-      padding: 30,
+      padding: 15,
       gap: 25,
     },
     featureContainer: {

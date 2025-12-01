@@ -31,24 +31,24 @@ export const WelcomeCard: React.FC = () => {
                 name={"heart-outline"}
                 type="ionicon"
                 color={colors._green}
-                size={45}
+                size={40}
               />
             </View>
           </View>
 
-          <Text type="h1" style={styles.welcomeTitle}>
+          <Text type="h2" style={styles.welcomeTitle}>
             {LL.CardWelcomeScreen.welcomeMessage.title()}
           </Text>
 
-          <Text type="h2" style={styles.subtitle}>
+          <Text type="p1" style={styles.subtitle}>
             — {LL.CardWelcomeScreen.welcomeMessage.subtitle()} —
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CardWelcomeScreen.welcomeMessage.paragraphs.body1()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText}>
+          <Text type="p2" style={styles.bodyText}>
             {LL.CardWelcomeScreen.welcomeMessage.paragraphs.body2()}
           </Text>
         </View>
@@ -70,7 +70,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -79,22 +79,21 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 15,
   },
   iconCircle: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 50,
     backgroundColor: colors.grey5,
     justifyContent: "center",
     alignItems: "center",
   },
   welcomeTitle: {
-    marginBottom: 16,
+    marginBottom: 10,
     textAlign: "center",
     fontWeight: "bold",
   },
   subtitle: {
     marginBottom: 40,
     textAlign: "center",
-    fontStyle: "italic",
   },
   bodyText: {
     marginBottom: 24,

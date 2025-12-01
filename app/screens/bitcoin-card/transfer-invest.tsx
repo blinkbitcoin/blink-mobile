@@ -62,7 +62,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   contentContainer: {
     alignItems: "center",
@@ -81,6 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
   welcomeTitle: {
     marginBottom: 40,
     textAlign: "center",
+    fontWeight: "bold",
   },
   bodyText: {
     marginBottom: 24,

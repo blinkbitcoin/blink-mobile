@@ -30,7 +30,7 @@ export const BitcoinCard: React.FC = () => {
           </Text>
           <View style={styles.forContainer}>
             <View style={styles.lineStyle} />
-            <Text type="p1" style={styles.italicText}>
+            <Text type="p1">
               {LL.BitcoinCardScreen.cardInfo.for()}
             </Text>
             <View style={styles.lineStyle} />
@@ -86,9 +86,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     gap: 5,
     justifyContent: "center",
-  },
-  italicText: {
-    fontStyle: "italic",
   },
   lineStyle: {
     height: 1,
