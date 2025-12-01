@@ -9518,7 +9518,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * A​c​c​e​p​t​ ​&​ ​C​o​n​t​i​n​u​e
+		 * A​c​c​e​p​t
 		 */
 		acceptButton: string
 	}
@@ -19235,7 +19235,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Accept & Continue
+		 * Accept
 		 */
 		acceptButton: () => LocalizedString
 	}

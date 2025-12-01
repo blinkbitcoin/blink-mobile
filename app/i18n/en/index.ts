@@ -3022,7 +3022,7 @@ const en: BaseTranslation = {
   },
   CardSubscribeScreen: {
     title: "Subscribe",
-    acceptButton: "Accept & Continue",
+    acceptButton: "Accept",
   },
   CardPaymentScreen: {
     title: "Payment",

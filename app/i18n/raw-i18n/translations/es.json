@@ -2898,7 +2898,7 @@
     },
      "CardSubscribeScreen": {
         "title": "Suscribir",
-        "acceptButton": "Aceptar y Continuar"
+        "acceptButton": "Aceptar"
     },
     "CardPaymentScreen": {
         "title": "Pago",
