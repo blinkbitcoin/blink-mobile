@@ -9634,7 +9634,7 @@ type RootTranslation = {
 			title: string
 			paragraphs: {
 				/**
-				 * B​e​f​o​r​e​ ​w​e​ ​r​a​i​s​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​f​r​o​m​ ​p​r​o​f​e​s​s​i​o​n​a​l​ ​i​n​v​e​s​t​o​r​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​e​x​t​e​n​d​ ​a​n​ ​i​n​v​i​t​a​t​i​o​n​ ​t​o​ ​t​h​e​ ​B​l​i​n​k​ ​e​x​t​e​n​d​e​d​ ​f​a​m​i​l​y​,​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​ ​a​n​d​ ​s​u​p​p​o​r​t​e​r​s​.​ ​W​h​y​ ​b​r​i​n​g​ ​o​n​b​o​a​r​d​ ​s​t​r​a​n​g​e​r​s​ ​w​h​e​n​ ​w​e​ ​c​a​n​ ​f​i​r​s​t​ ​i​n​v​i​t​e​ ​s​o​m​e​o​n​e​ ​l​i​k​e​ ​y​o​u​?
+				 * B​e​f​o​r​e​ ​w​e​ ​r​a​i​s​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​f​r​o​m​ ​p​r​o​f​e​s​s​i​o​n​a​l​ ​i​n​v​e​s​t​o​r​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​e​x​t​e​n​d​ ​a​n​ ​i​n​v​i​t​a​t​i​o​n​ ​t​o​ ​t​h​e​ ​B​l​i​n​k​ ​f​a​m​i​l​y​,​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​ ​a​n​d​ ​s​u​p​p​o​r​t​e​r​s​.​ ​W​h​y​ ​b​r​i​n​g​ ​o​n​b​o​a​r​d​ ​s​t​r​a​n​g​e​r​s​ ​w​h​e​n​ ​w​e​ ​c​a​n​ ​f​i​r​s​t​ ​i​n​v​i​t​e​ ​s​o​m​e​o​n​e​ ​l​i​k​e​ ​y​o​u​?
 				 */
 				body1: string
 				/**
@@ -19348,7 +19348,7 @@ export type TranslationFunctions = {
 			title: () => LocalizedString
 			paragraphs: {
 				/**
-				 * Before we raise more funds from professional investors we decided to extend an invitation to the Blink extended family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?
+				 * Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?
 				 */
 				body1: () => LocalizedString
 				/**
