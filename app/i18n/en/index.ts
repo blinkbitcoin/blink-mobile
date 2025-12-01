@@ -3111,26 +3111,26 @@ const en: BaseTranslation = {
     placeholder: "Set amount"
   },
   PersonalInformationScreen: {
-    title: "Personal information",
+    title: "Final step",
     fields: {
         occupation: {
             label: "Occupation",
             placeholder: "Select your occupation",
         },
         annualSalaryRange: {
-            label: "Annual salary range",
-            placeholder: "Less than $25,000",
+            label: "Annual salary",
+            placeholder: "Select your salary range",
         },
         accountPurpose: {
             label: "Account purpose",
-            placeholder: "Personal spending",
+            placeholder: "Select purpose",
         },
         expectedMonthlyVolume: {
-            label: "Expected monthly volume",
-            placeholder: "Less than $1,000",
+            label: "Expected monthly spending",
+            placeholder: "Select your spending range",
         }
     },
-    buttonText: "Continue",
+    buttonText: "Submit aplication",
   },
   CardPreapprovedScreen: {
     title: "You have been preapproved for the Bitcoin Visa card!",

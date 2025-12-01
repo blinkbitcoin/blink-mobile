@@ -2987,26 +2987,26 @@
         "placeholder": "Establecer monto"
     },
     "PersonalInformationScreen": {
-        "title": "Información personal",
+        "title": "Paso final",
         "fields": {
             "occupation": {
                 "label": "Ocupación",
                 "placeholder": "Selecciona tu ocupación"
             },
             "annualSalaryRange": {
-                "label": "Rango de salario anual",
-                "placeholder": "Menos de $25,000"
+                "label": "Salario anual",
+                "placeholder": "Selecciona tu rango salarial"
             },
             "accountPurpose": {
                 "label": "Propósito de la cuenta",
-                "placeholder": "Gastos personales"
+                "placeholder": "Selecciona el propósito"
             },
             "expectedMonthlyVolume": {
-                "label": "Volumen mensual esperado",
-                "placeholder": "Menos de $1,000"
+                "label": "Gasto mensual esperado",
+                "placeholder": "Selecciona tu rango de gastos"
             }
         },
-        "buttonText": "Continuar"
+        "buttonText": "Enviar solicitud"
     },
     "CardPreapprovedScreen": {
         "title": "¡Has sido preaprobado para la tarjeta Bitcoin Visa!",

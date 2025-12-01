@@ -9763,7 +9763,7 @@ type RootTranslation = {
 	}
 	PersonalInformationScreen: {
 		/**
-		 * P​e​r​s​o​n​a​l​ ​i​n​f​o​r​m​a​t​i​o​n
+		 * F​i​n​a​l​ ​s​t​e​p
 		 */
 		title: string
 		fields: {
@@ -9779,11 +9779,11 @@ type RootTranslation = {
 			}
 			annualSalaryRange: {
 				/**
-				 * A​n​n​u​a​l​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+				 * A​n​n​u​a​l​ ​s​a​l​a​r​y
 				 */
 				label: string
 				/**
-				 * L​e​s​s​ ​t​h​a​n​ ​$​2​5​,​0​0​0
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
 				 */
 				placeholder: string
 			}
@@ -9793,23 +9793,23 @@ type RootTranslation = {
 				 */
 				label: string
 				/**
-				 * P​e​r​s​o​n​a​l​ ​s​p​e​n​d​i​n​g
+				 * S​e​l​e​c​t​ ​p​u​r​p​o​s​e
 				 */
 				placeholder: string
 			}
 			expectedMonthlyVolume: {
 				/**
-				 * E​x​p​e​c​t​e​d​ ​m​o​n​t​h​l​y​ ​v​o​l​u​m​e
+				 * E​x​p​e​c​t​e​d​ ​m​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g
 				 */
 				label: string
 				/**
-				 * L​e​s​s​ ​t​h​a​n​ ​$​1​,​0​0​0
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​p​e​n​d​i​n​g​ ​r​a​n​g​e
 				 */
 				placeholder: string
 			}
 		}
 		/**
-		 * C​o​n​t​i​n​u​e
+		 * S​u​b​m​i​t​ ​a​p​l​i​c​a​t​i​o​n
 		 */
 		buttonText: string
 	}
@@ -19460,7 +19460,7 @@ export type TranslationFunctions = {
 	}
 	PersonalInformationScreen: {
 		/**
-		 * Personal information
+		 * Final step
 		 */
 		title: () => LocalizedString
 		fields: {
@@ -19476,11 +19476,11 @@ export type TranslationFunctions = {
 			}
 			annualSalaryRange: {
 				/**
-				 * Annual salary range
+				 * Annual salary
 				 */
 				label: () => LocalizedString
 				/**
-				 * Less than $25,000
+				 * Select your salary range
 				 */
 				placeholder: () => LocalizedString
 			}
@@ -19490,23 +19490,23 @@ export type TranslationFunctions = {
 				 */
 				label: () => LocalizedString
 				/**
-				 * Personal spending
+				 * Select purpose
 				 */
 				placeholder: () => LocalizedString
 			}
 			expectedMonthlyVolume: {
 				/**
-				 * Expected monthly volume
+				 * Expected monthly spending
 				 */
 				label: () => LocalizedString
 				/**
-				 * Less than $1,000
+				 * Select your spending range
 				 */
 				placeholder: () => LocalizedString
 			}
 		}
 		/**
-		 * Continue
+		 * Submit aplication
 		 */
 		buttonText: () => LocalizedString
 	}
