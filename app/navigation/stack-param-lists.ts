@@ -139,7 +139,6 @@ export type RootStackParamList = {
   tranferInvest: undefined
   topUpScreen: undefined
   companyValuation: undefined
-  cardCompletedScreen: undefined
   cardPersonalInformationScreen: undefined
   cardPreapprovedScreen: undefined
 }

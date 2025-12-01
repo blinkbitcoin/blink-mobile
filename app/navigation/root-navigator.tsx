@@ -116,7 +116,6 @@ import {
   TopUpScreen,
   CardDashboardScreen,
   CompanyValuationScreen,
-  CardCompletedScreen,
   CardPersonalInformationScreen,
   CardPreapprovedScreen,
 } from "../screens/bitcoin-card"
@@ -650,23 +649,6 @@ export const RootStack = () => {
         component={TopUpScreen}
         options={{
           title: LL.TopUpScreen.title(),
-          headerRight: () => (
-            <GaloyIconButton
-              onPress={() => navigation.navigate("Primary")}
-              size={"medium"}
-              name="close"
-              backgroundColor={colors.grey5}
-              style={{ marginRight: 20 }}
-            />
-          ),
-        }}
-      />
-      <RootNavigator.Screen
-        name="cardCompletedScreen"
-        component={CardCompletedScreen}
-        options={{
-          title: "",
-          headerLeft: () => <></>,
           headerRight: () => (
             <GaloyIconButton
               onPress={() => navigation.navigate("Primary")}

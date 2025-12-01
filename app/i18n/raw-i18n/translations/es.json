@@ -2986,15 +2986,6 @@
         "share": "Compartir",
         "placeholder": "Establecer monto"
     },
-    "CardCompletedScreen": {
-        "welcomeMessage": {
-            "title": "Necesitamos un poco más de información",
-            "paragraphs": {
-                "body1": "Antes de que puedas comenzar, necesitamos solo un par de datos más sobre ti."
-            }
-        },
-        "buttonText": "De acuerdo"
-    },
     "PersonalInformationScreen": {
         "title": "Información personal",
         "fields": {

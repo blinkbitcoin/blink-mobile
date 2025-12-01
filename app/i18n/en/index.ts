@@ -3110,15 +3110,6 @@ const en: BaseTranslation = {
     share: "Share",
     placeholder: "Set amount"
   },
-  CardCompletedScreen: {
-    welcomeMessage: {
-        title: "We need some more information",
-        paragraphs: {
-            body1: "Before you can hop onboard, we need just a couple more pieces of information about you.",
-        },
-    },
-    buttonText: "Alright",
-  },
   PersonalInformationScreen: {
     title: "Personal information",
     fields: {
