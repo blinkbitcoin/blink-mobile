@@ -2887,14 +2887,14 @@
     },
     "CardWelcomeScreen": {
         "welcomeMessage": {
-            "title": "¡Bienvenido a Bordo!",
+            "title": "Bienvenido a Bordo",
             "subtitle": "A Blink Private",
             "paragraphs": {
-                "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un humano increíble y Bitcoiner.",
-                "body2": "Nuestra meta para 2026 es llenar el programa con tantas cosas buenas y buenas vibras que será obvio renovar el próximo año."
+                "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un increíble Bitcoiner.",
+                "body2": "Nuestra meta para 2026 es llenar el programa con tantas cosas buenas que será obvio renovar el próximo año."
             }
         },
-        "buttonText": "¡Vamos!"
+        "buttonText": "Vamos"
     },
      "CardSubscribeScreen": {
         "title": "Suscribir",

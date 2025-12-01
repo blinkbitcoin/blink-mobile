@@ -3011,14 +3011,14 @@ const en: BaseTranslation = {
   },
   CardWelcomeScreen: {
     welcomeMessage: {
-        title: "Welcome Onboard!",
+        title: "Welcome Onboard",
         subtitle: "To Blink Private",
         paragraphs: {
-            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome human and Bitcoiner.",
-            body2: "Our goal for 2026 is to stuff the program with so much goodies and good vibes that it will be obvious to renew next year.",
+            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
+            body2: "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
         },
     },
-    buttonText: "Let's Go!",
+    buttonText: "Let's Go",
   },
   CardSubscribeScreen: {
     title: "Subscribe",

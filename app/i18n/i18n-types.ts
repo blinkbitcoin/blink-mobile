@@ -8860,10 +8860,6 @@ type RootTranslation = {
 		 * V​a​l​i​d​ ​t​h​r​u
 		 */
 		validThru: string
-		/**
-		 * P​r​o​f​i​l​e​s
-		 */
-		profiles: string
 	}
 	errors: {
 		/**
@@ -9493,7 +9489,7 @@ type RootTranslation = {
 	CardWelcomeScreen: {
 		welcomeMessage: {
 			/**
-			 * W​e​l​c​o​m​e​ ​O​n​b​o​a​r​d​!
+			 * W​e​l​c​o​m​e​ ​O​n​b​o​a​r​d
 			 */
 			title: string
 			/**
@@ -9502,17 +9498,17 @@ type RootTranslation = {
 			subtitle: string
 			paragraphs: {
 				/**
-				 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​h​u​m​a​n​ ​a​n​d​ ​B​i​t​c​o​i​n​e​r​.
+				 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
 				 */
 				body1: string
 				/**
-				 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​a​n​d​ ​g​o​o​d​ ​v​i​b​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+				 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
 				 */
 				body2: string
 			}
 		}
 		/**
-		 * L​e​t​'​s​ ​G​o​!
+		 * L​e​t​'​s​ ​G​o
 		 */
 		buttonText: string
 	}
@@ -18601,10 +18597,6 @@ export type TranslationFunctions = {
 		 * Valid thru
 		 */
 		validThru: () => LocalizedString
-		/**
-		 * Profiles
-		 */
-		profiles: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -19214,7 +19206,7 @@ export type TranslationFunctions = {
 	CardWelcomeScreen: {
 		welcomeMessage: {
 			/**
-			 * Welcome Onboard!
+			 * Welcome Onboard
 			 */
 			title: () => LocalizedString
 			/**
@@ -19223,17 +19215,17 @@ export type TranslationFunctions = {
 			subtitle: () => LocalizedString
 			paragraphs: {
 				/**
-				 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome human and Bitcoiner.
+				 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
 				 */
 				body1: () => LocalizedString
 				/**
-				 * Our goal for 2026 is to stuff the program with so much goodies and good vibes that it will be obvious to renew next year.
+				 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
 				 */
 				body2: () => LocalizedString
 			}
 		}
 		/**
-		 * Let's Go!
+		 * Let's Go
 		 */
 		buttonText: () => LocalizedString
 	}
