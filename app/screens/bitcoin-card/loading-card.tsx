@@ -1,10 +1,10 @@
 import * as React from "react"
 import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { Screen } from "../../components/screen"
-import { View, Image, ScrollView, Animated } from "react-native"
+import { View, Image, ScrollView } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -16,34 +16,6 @@ export const LoadingCard: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const route = useRoute<RouteProp<RootStackParamList>>()
-
-  const progressAnim = React.useRef(new Animated.Value(0)).current
-
-  React.useEffect(() => {
-    if (route.name === "loadingCard") {
-      Animated.timing(progressAnim, {
-        toValue: 3,
-        duration: 4500,
-        useNativeDriver: false,
-      }).start()
-    }
-  }, [route.name, progressAnim])
-
-  const progressWidth1 = progressAnim.interpolate({
-    inputRange: [0, 1, 1, 3],
-    outputRange: ["0%", "100%", "100%", "100%"],
-  })
-
-  const progressWidth2 = progressAnim.interpolate({
-    inputRange: [0, 1, 1, 2, 2, 3],
-    outputRange: ["0%", "0%", "0%", "100%", "100%", "100%"],
-  })
-
-  const progressWidth3 = progressAnim.interpolate({
-    inputRange: [0, 2, 2, 3],
-    outputRange: ["0%", "0%", "0%", "100%"],
-  })
 
   const handleNext = () => {
     navigation.navigate("Primary")
@@ -68,10 +40,6 @@ export const LoadingCard: React.FC = () => {
             {LL.LoadinCardScreen.title()}
           </Text>
 
-          <Text type="p1" style={styles.bodyText} color={colors.grey3}>
-            {LL.LoadinCardScreen.subtitle()}
-          </Text>
-
           <View style={styles.imageContainer}>
             <Image
               source={require("../../assets/images/monkey-typing.gif")}
@@ -79,27 +47,7 @@ export const LoadingCard: React.FC = () => {
               resizeMode="contain"
             />
           </View>
-          <View style={[styles.loadingContainer]}>
-            <View style={styles.loadingWrapper}>
-              <View style={[styles.loading]} />
-              <Animated.View
-                style={[styles.loadingAnimated, { width: progressWidth1 }]}
-              />
-            </View>
-            <View style={styles.loadingWrapper}>
-              <View style={[styles.loading]} />
-              <Animated.View
-                style={[styles.loadingAnimated, { width: progressWidth2 }]}
-              />
-            </View>
-            <View style={styles.loadingWrapper}>
-              <View style={[styles.loading]} />
-              <Animated.View
-                style={[styles.loadingAnimated, { width: progressWidth3 }]}
-              />
-            </View>
-          </View>
-          <Text type="h2" style={styles.bodySubText}>
+          <Text type="p1" style={styles.bodySubText}>
             {LL.LoadinCardScreen.codingBackend()}
           </Text>
         </View>
@@ -143,10 +91,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     textAlign: "center",
   },
-  bodyText: {
-    lineHeight: 26,
-    textAlign: "center",
-  },
   bodySubText: {
     lineHeight: 26,
     textAlign: "center",
@@ -155,32 +99,6 @@ const useStyles = makeStyles(({ colors }) => ({
   imageContainer: {
     width: "100%",
     alignItems: "center",
-  },
-  loadingContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    alignContent: "center",
-    gap: 12,
-    marginTop: 5,
-  },
-  loadingWrapper: {
-    flex: 1,
-    height: 4,
-    position: "relative",
-  },
-  loading: {
-    flex: 1,
-    height: 4,
-    backgroundColor: colors.grey4,
-  },
-  loadingAnimated: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    height: 4,
-    backgroundColor: colors.primary,
   },
   typingMonkeyImage: {
     width: "100%",
