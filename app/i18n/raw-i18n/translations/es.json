@@ -2865,13 +2865,13 @@
         "errorResettingChat": "Se ha producido un error al restablecer el chat"
     },
     "BitcoinCardScreen": {
-        "title": "Tarjeta Visa Blink",
+        "title": "Presentando",
         "cardInfo": {
-            "bitcoinCard": "La tarjeta Visa de Bitcoin",
+            "bitcoinCard": "La tarjeta Visa de Blink",
             "for": "para",
             "maximalist": "Bitcoin Maximalistas"
         },
-        "buttonText": "Bien"
+        "buttonText": "Continuar"
     },
     "CardDetailsScreen": {
         "title": "Beneficios adicionales",

@@ -2989,13 +2989,13 @@ const en: BaseTranslation = {
     errorResettingChat: "An error occurred while resetting the chat",
   },
   BitcoinCardScreen: {
-    title: "Blink Visa card",
+    title: "Introducing",
     cardInfo: {
-      bitcoinCard: "The Bitcoin Visa card",
+      bitcoinCard: "The Blink Visa card",
       for: "for",
       maximalist: "Bitcoin Maximalists",
     },
-    buttonText: "Nice",
+    buttonText: "Continue",
   },
   CardDetailsScreen: {
     title: "Additional perks",

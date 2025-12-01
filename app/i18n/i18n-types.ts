@@ -9428,12 +9428,12 @@ type RootTranslation = {
 	}
 	BitcoinCardScreen: {
 		/**
-		 * B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+		 * I​n​t​r​o​d​u​c​i​n​g
 		 */
 		title: string
 		cardInfo: {
 			/**
-			 * T​h​e​ ​B​i​t​c​o​i​n​ ​V​i​s​a​ ​c​a​r​d
+			 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
 			 */
 			bitcoinCard: string
 			/**
@@ -9446,7 +9446,7 @@ type RootTranslation = {
 			maximalist: string
 		}
 		/**
-		 * N​i​c​e
+		 * C​o​n​t​i​n​u​e
 		 */
 		buttonText: string
 	}
@@ -19145,12 +19145,12 @@ export type TranslationFunctions = {
 	}
 	BitcoinCardScreen: {
 		/**
-		 * Blink Visa card
+		 * Introducing
 		 */
 		title: () => LocalizedString
 		cardInfo: {
 			/**
-			 * The Bitcoin Visa card
+			 * The Blink Visa card
 			 */
 			bitcoinCard: () => LocalizedString
 			/**
@@ -19163,7 +19163,7 @@ export type TranslationFunctions = {
 			maximalist: () => LocalizedString
 		}
 		/**
-		 * Nice
+		 * Continue
 		 */
 		buttonText: () => LocalizedString
 	}
