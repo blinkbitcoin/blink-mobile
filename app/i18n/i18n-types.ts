@@ -9482,7 +9482,7 @@ type RootTranslation = {
 		 */
 		andMore: string
 		/**
-		 * C​o​o​l
+		 * C​o​n​t​i​n​u​e
 		 */
 		buttonText: string
 	}
@@ -19199,7 +19199,7 @@ export type TranslationFunctions = {
 		 */
 		andMore: () => LocalizedString
 		/**
-		 * Cool
+		 * Continue
 		 */
 		buttonText: () => LocalizedString
 	}

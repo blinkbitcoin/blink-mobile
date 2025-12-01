@@ -3007,7 +3007,7 @@ const en: BaseTranslation = {
       circularEconomies: "$100 to circular economies",
     },
     andMore: "... and more coming in 2026",
-    buttonText: "Cool",
+    buttonText: "Continue",
   },
   CardWelcomeScreen: {
     welcomeMessage: {
