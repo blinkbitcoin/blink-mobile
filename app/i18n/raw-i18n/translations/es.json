@@ -2707,7 +2707,8 @@
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
         "validThru": "Válido hasta",
-        "profiles": "Perfiles"
+        "profiles": "Perfiles",
+        "fieldRequired": "Este campo es requerido"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -3006,7 +3007,8 @@
                 "placeholder": "Selecciona tu rango de gastos"
             }
         },
-        "buttonText": "Enviar solicitud"
+        "buttonText": "Enviar solicitud",
+        "select": "seleccionar"
     },
     "CardPreapprovedScreen": {
         "title": "¡Has sido preaprobado para la tarjeta Bitcoin Visa!",

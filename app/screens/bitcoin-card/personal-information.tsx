@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "../../components/screen"
 import { ScrollView, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -7,15 +7,11 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { DropdownComponent, DropdownOption } from "@app/components/dropdown"
 import { useState } from "react"
 
 export const CardPersonalInformationScreen: React.FC = () => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -26,16 +22,46 @@ export const CardPersonalInformationScreen: React.FC = () => {
   const [expectedMonthlyVolume, setExpectedMonthlyVolume] = useState<string>()
 
   const occupationOptions: DropdownOption[] = [
-    { value: "Test 0", label: "Test 0" },
-    { value: "Test 1", label: "Test 1" },
-    {
-      value: "Test 2",
-      label: "Test 2",
-    },
-    { value: "Test 3", label: "Test 3" },
+    { value: "15-1132", label: "Software Developers, Applications" },
+    { value: "11-1021", label: "General and Operations Managers" },
+    { value: "29-1141", label: "Registered Nurses" },
+    { value: "25-2021", label: "Elementary School Teachers" },
+    { value: "41-3099", label: "Sales Representatives, Services" },
+    { value: "13-2011", label: "Accountants and Auditors" },
+    { value: "43-6014", label: "Secretaries and Administrative Assistants" },
+    { value: "47-2031", label: "Carpenters" },
+    { value: "53-3032", label: "Heavy and Tractor-Trailer Truck Drivers" },
+    { value: "35-3031", label: "Waiters and Waitresses" },
   ]
 
+  const annualSalaryOptions: DropdownOption[] = [
+    { value: "Less than 25,000", label: "Less than $25,000" },
+    { value: "25,000 - 49,999", label: "$25,000 - $49,999" },
+    { value: "50,000 - 74,999", label: "$50,000 - $74,999" },
+    { value: "75,000 - 99,999", label: "$75,000 - $99,999" },
+    { value: "100,000 - 149,999", label: "$100,000 - $149,999" },
+    { value: "150,000 - 249,999", label: "$150,000 - $249,999" },
+    { value: "250,000 or more", label: "$250,000 or more" },
+  ]
+
+  const accountPurposeOptions: DropdownOption[] = [
+    { value: "Personal spending", label: "Personal spending" },
+    { value: "Business card", label: "Business card" },
+    { value: "Other", label: "Other" },
+  ]
+
+  const expectedMonthlyVolumeOptions: DropdownOption[] = [
+    { value: "Less than 1,000", label: "Less than $1,000" },
+    { value: "1,000 - 1,999", label: "$1,000 - $1,999" },
+    { value: "2,000 - 2,999", label: "$2,000 - $2,999" },
+    { value: "3,000 or more", label: "$3,000 or more" },
+  ]
+
+  const allFieldsSelected =
+    selectedOccupation && annualSalaryRange && accountPurpose && expectedMonthlyVolume
+
   const handleNext = () => {
+    if (!allFieldsSelected) return
     navigation.navigate("cardProcessingScreen")
   }
 
@@ -60,7 +86,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
               {LL.PersonalInformationScreen.fields.annualSalaryRange.label()}
             </Text>
             <DropdownComponent
-              options={occupationOptions}
+              options={annualSalaryOptions}
               selectedValue={annualSalaryRange}
               onValueChange={setAnnualSalaryRange}
               placeholder={LL.PersonalInformationScreen.fields.annualSalaryRange.placeholder()}
@@ -72,7 +98,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
               {LL.PersonalInformationScreen.fields.accountPurpose.label()}
             </Text>
             <DropdownComponent
-              options={occupationOptions}
+              options={accountPurposeOptions}
               selectedValue={accountPurpose}
               onValueChange={setAccountPurpose}
               placeholder={LL.PersonalInformationScreen.fields.accountPurpose.placeholder()}
@@ -84,7 +110,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
               {LL.PersonalInformationScreen.fields.expectedMonthlyVolume.label()}
             </Text>
             <DropdownComponent
-              options={occupationOptions}
+              options={expectedMonthlyVolumeOptions}
               selectedValue={expectedMonthlyVolume}
               onValueChange={setExpectedMonthlyVolume}
               placeholder={LL.PersonalInformationScreen.fields.expectedMonthlyVolume.placeholder()}
@@ -95,8 +121,13 @@ export const CardPersonalInformationScreen: React.FC = () => {
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
-          title={LL.PersonalInformationScreen.buttonText()}
+          title={
+            !allFieldsSelected
+              ? LL.PersonalInformationScreen.select()
+              : LL.PersonalInformationScreen.buttonText()
+          }
           onPress={handleNext}
+          disabled={!allFieldsSelected}
         />
       </View>
     </Screen>

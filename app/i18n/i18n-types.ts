@@ -8860,6 +8860,10 @@ type RootTranslation = {
 		 * V​a​l​i​d​ ​t​h​r​u
 		 */
 		validThru: string
+		/**
+		 * T​h​i​s​ ​f​i​e​l​d​ ​i​s​ ​r​e​q​u​i​r​e​d
+		 */
+		fieldRequired: string
 	}
 	errors: {
 		/**
@@ -9812,6 +9816,10 @@ type RootTranslation = {
 		 * S​u​b​m​i​t​ ​a​p​l​i​c​a​t​i​o​n
 		 */
 		buttonText: string
+		/**
+		 * S​e​l​e​c​t
+		 */
+		select: string
 	}
 	CardPreapprovedScreen: {
 		/**
@@ -18594,6 +18602,10 @@ export type TranslationFunctions = {
 		 * Valid thru
 		 */
 		validThru: () => LocalizedString
+		/**
+		 * This field is required
+		 */
+		fieldRequired: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -19524,6 +19536,10 @@ export type TranslationFunctions = {
 		 * Submit aplication
 		 */
 		buttonText: () => LocalizedString
+		/**
+		 * Select
+		 */
+		select: () => LocalizedString
 	}
 	CardPreapprovedScreen: {
 		/**

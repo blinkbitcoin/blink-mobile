@@ -2808,7 +2808,8 @@ const en: BaseTranslation = {
     dollar: "Dollar",
     all: "ALL",
     allAccounts: "All accounts",
-    validThru: "Valid thru"
+    validThru: "Valid thru",
+    fieldRequired: "This field is required"
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -3131,6 +3132,7 @@ const en: BaseTranslation = {
         }
     },
     buttonText: "Submit aplication",
+    select: "Select",
   },
   CardPreapprovedScreen: {
     title: "You have been preapproved for the Bitcoin Visa card!",

@@ -3,6 +3,7 @@ import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
+import { useI18nContext } from "@app/i18n/i18n-react"
 
 export interface DropdownOption<T = string> {
   value: T
@@ -17,6 +18,7 @@ interface DropdownProps<T = string> {
   placeholder?: string
   loading?: boolean
   disabled?: boolean
+  required?: boolean
   testID?: string
 }
 
@@ -27,12 +29,14 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
   placeholder,
   loading = false,
   disabled = false,
+  required = false,
   testID,
 }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
 
   const [isModalVisible, setModalVisible] = useState(false)
   const [pendingSelection, setPendingSelection] = useState<string | null>(null)
@@ -62,21 +66,37 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
         onPress={isDisabled ? undefined : toggleModal}
         testID={testID}
       >
-        <View style={[styles.fieldBackground, isDisabled && styles.disabled]}>
-          <View style={styles.contentContainer}>
-            <Text type="p2" style={[currentOption?.label ? {} : styles.placeholderText]}>
-              {displayText}
-            </Text>
-            {currentOption?.description && (
-              <Text style={styles.descriptionText} type="p3">
-                {currentOption.description}
+        <View>
+          <View
+            style={[
+              styles.fieldBackground,
+              isDisabled && styles.disabled,
+              required && styles.required,
+            ]}
+          >
+            <View style={styles.contentContainer}>
+              <Text
+                type="p2"
+                style={[currentOption?.label ? {} : styles.placeholderText]}
+              >
+                {displayText}
               </Text>
-            )}
-          </View>
+              {currentOption?.description && (
+                <Text style={styles.descriptionText} type="p3">
+                  {currentOption.description}
+                </Text>
+              )}
+            </View>
 
-          <View style={styles.iconContainer}>
-            <Icon name="chevron-down" size={24} color={colors.primary} />
+            <View style={styles.iconContainer}>
+              <Icon name="chevron-down" size={24} color={colors.primary} />
+            </View>
           </View>
+          {required && (
+            <Text style={styles.errorText} type="p4">
+              {LL.common.fieldRequired()}
+            </Text>
+          )}
         </View>
       </TouchableWithoutFeedback>
 
@@ -137,6 +157,14 @@ const useStyles = makeStyles(({ colors }) => ({
   descriptionText: {
     color: colors.grey1,
     marginTop: 2,
+  },
+  errorText: {
+    color: colors.red,
+    marginTop: 2,
+  },
+  required: {
+    borderColor: colors.red,
+    borderWidth: 1,
   },
   placeholderText: {
     color: colors.grey3,
