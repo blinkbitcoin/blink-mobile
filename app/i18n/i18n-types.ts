@@ -9489,7 +9489,7 @@ type RootTranslation = {
 	CardWelcomeScreen: {
 		welcomeMessage: {
 			/**
-			 * W​e​l​c​o​m​e​ ​O​n​b​o​a​r​d
+			 * W​e​l​c​o​m​e​ ​o​n​b​o​a​r​d
 			 */
 			title: string
 			/**
@@ -9508,7 +9508,7 @@ type RootTranslation = {
 			}
 		}
 		/**
-		 * L​e​t​'​s​ ​G​o
+		 * L​e​t​'​s​ ​g​o
 		 */
 		buttonText: string
 	}
@@ -19203,7 +19203,7 @@ export type TranslationFunctions = {
 	CardWelcomeScreen: {
 		welcomeMessage: {
 			/**
-			 * Welcome Onboard
+			 * Welcome onboard
 			 */
 			title: () => LocalizedString
 			/**
@@ -19222,7 +19222,7 @@ export type TranslationFunctions = {
 			}
 		}
 		/**
-		 * Let's Go
+		 * Let's go
 		 */
 		buttonText: () => LocalizedString
 	}

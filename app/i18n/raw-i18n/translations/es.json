@@ -2887,7 +2887,7 @@
     },
     "CardWelcomeScreen": {
         "welcomeMessage": {
-            "title": "Bienvenido a Bordo",
+            "title": "Bienvenido a bordo",
             "subtitle": "A Blink Private",
             "paragraphs": {
                 "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un increíble Bitcoiner.",
