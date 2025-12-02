@@ -1,15 +1,18 @@
 import * as React from "react"
-import { Alert, Dimensions, Linking, Pressable, StyleSheet, View } from "react-native"
+import {
+  Alert,
+  Dimensions,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
 import Icon from "react-native-vector-icons/Ionicons"
-import {
-  Camera,
-  CameraRuntimeError,
-  useCameraDevice,
-  useCameraPermission,
-  useCodeScanner,
-} from "react-native-vision-camera"
+import { Camera, CameraType } from "react-native-camera-kit"
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
 
 import { gql } from "@apollo/client"
@@ -27,7 +30,7 @@ import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -75,6 +78,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
   } = useTheme()
 
   const [pending, setPending] = React.useState(false)
+  const [scannedCache, setScannedCache] = React.useState(new Set<string>())
+  const [hasPermission, setHasPermission] = React.useState(false)
 
   const { data } = useScanningQrCodeScreenQuery({ skip: !useIsAuthed() })
   const wallets = data?.me?.defaultAccount.wallets
@@ -85,28 +90,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const { displayCurrency } = useDisplayCurrency()
-  const device = useCameraDevice("back")
-  const { hasPermission, requestPermission } = useCameraPermission()
-
-  const isFocused = useIsFocused()
-
-  const zoom = 1.5
-
-  // const requestCameraPermission = React.useCallback(async () => {
-  //   const permission = await Camera.requestCameraPermission()
-  //   if (permission === "denied") await Linking.openSettings()
-  // }, [])
-
-  // React.useEffect(() => {
-  //   if (cameraPermissionStatus !== "authorized") {
-  //     requestCameraPermission()
-  //   }
-  // }, [cameraPermissionStatus, navigation, requestCameraPermission])
   React.useEffect(() => {
-    if (!hasPermission) {
-      requestPermission()
+    const checkPermission = async () => {
+      const permission =
+        Platform.OS === "ios" ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA
+      const result = await check(permission)
+      if (result === RESULTS.GRANTED) {
+        setHasPermission(true)
+        return
+      }
+      const requestResult = await request(permission)
+      setHasPermission(requestResult === RESULTS.GRANTED)
     }
-  }, [hasPermission, requestPermission])
+    checkPermission()
+  }, [])
 
   const loadInBrowser = (url: string) => {
     Linking.openURL(url).catch((err) => Alert.alert(err.toString()))
@@ -252,16 +249,18 @@ export const ScanningQRCodeScreen: React.FC = () => {
     accountDefaultWalletQuery,
     displayCurrency,
   ])
-  const styles = useStyles()
 
-  const codeScanner = useCodeScanner({
-    codeTypes: ["qr", "ean-13"],
-    regionOfInterest: { x: 0.125, y: 0.2, width: 0.75, height: 0.75 },
-    onCodeScanned: (codes) => {
-      codes.forEach((code) => processInvoice(code.value))
-      console.debug(`Scanned ${codes.length} codes!`)
+  const handleCodeScanned = React.useCallback(
+    (data: string) => {
+      if (!scannedCache.has(data)) {
+        setScannedCache(new Set(scannedCache).add(data))
+        processInvoice(data)
+      }
     },
-  })
+    [scannedCache, processInvoice],
+  )
+
+  const styles = useStyles()
 
   const handleInvoicePaste = async () => {
     try {
@@ -285,13 +284,14 @@ export const ScanningQRCodeScreen: React.FC = () => {
           LL,
         })
       }
-      if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
-        const qrCodeValues = await RNQRGenerator.detect({ uri: result.assets[0].uri })
+      if (result.assets && result.assets.length > 0) {
+        const { uri } = result.assets[0]
+        const qrCodeValues = await RNQRGenerator.detect({ uri })
         if (qrCodeValues && qrCodeValues.values.length > 0) {
           processInvoice(qrCodeValues.values[0])
-        } else {
-          Alert.alert(LL.ScanningQRCodeScreen.noQrCode())
+          return
         }
+        Alert.alert(LL.ScanningQRCodeScreen.noQrCode())
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -301,9 +301,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
     }
   }
 
-  const onError = React.useCallback((error: CameraRuntimeError) => {
-    console.error(error)
-  }, [])
+  const onError = React.useCallback(
+    (event: { nativeEvent: { errorMessage: string } }) => {
+      console.error(event.nativeEvent.errorMessage)
+    },
+    [],
+  )
 
   if (!hasPermission) {
     const openSettings = () => {
@@ -327,29 +330,18 @@ export const ScanningQRCodeScreen: React.FC = () => {
     )
   }
 
-  if (device === null || device === undefined)
-    return (
-      <Screen>
-        <View style={styles.permissionMissing}>
-          <Text type="h1" style={styles.permissionMissingText}>
-            {LL.ScanningQRCodeScreen.noCamera()}
-          </Text>
-        </View>
-      </Screen>
-    )
-
   return (
     <Screen unsafe>
+      <Camera
+        cameraType={CameraType.Back}
+        focusMode="on"
+        zoomMode="on"
+        scanBarcode={true}
+        onReadCode={(event) => handleCodeScanned(event.nativeEvent.codeStringValue)}
+        onError={onError}
+        style={StyleSheet.absoluteFill}
+      />
       <View style={StyleSheet.absoluteFill}>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={isFocused}
-          onError={onError}
-          codeScanner={codeScanner}
-          zoom={zoom}
-          enableZoomGesture={true}
-        />
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle} />
         </View>
