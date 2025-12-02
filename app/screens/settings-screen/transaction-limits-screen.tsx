@@ -17,8 +17,6 @@ import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes"
 
 const useStyles = makeStyles(({ colors }) => ({
   limitWrapper: {
@@ -120,7 +118,6 @@ gql`
 `
 
 export const TransactionLimitsScreen = () => {
-  const { sumsubSuccessUrl, sumsubRejectUrl } = useRemoteConfig()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const styles = useStyles()
@@ -152,43 +149,6 @@ export const TransactionLimitsScreen = () => {
       }
     }, []),
   )
-
-  const onShouldStartLoad = React.useCallback(
-    (request: ShouldStartLoadRequest) => {
-      const requestUrl = request?.url ?? ""
-      if (!requestUrl) return true
-
-      const parsed = new URL(requestUrl)
-      const urlWithoutQuery = `${parsed.origin}${parsed.pathname}`
-
-      if (urlWithoutQuery === sumsubSuccessUrl) {
-        // TODO: navigate to Sumsub success screen
-        navigation.goBack()
-        return false
-      }
-
-      if (urlWithoutQuery === sumsubRejectUrl) {
-        // TODO: navigate to Sumsub reject screen
-        navigation.goBack()
-        return false
-      }
-
-      return true
-    },
-    [navigation, sumsubSuccessUrl, sumsubRejectUrl],
-  )
-
-  const handleSumsubFlow = () => {
-    /**
-     * TODO: temporary until backend provides the url
-     */
-    const url = ""
-    navigation.navigate("webView", {
-      url,
-      hideHeader: true,
-      onShouldStartLoad,
-    })
-  }
 
   if (error) {
     return (
@@ -277,7 +237,7 @@ export const TransactionLimitsScreen = () => {
       {currentLevel === AccountLevel.One && (
         <GaloyPrimaryButton
           title={LL.TransactionLimitsScreen.increaseLimits()}
-          onPress={handleSumsubFlow}
+          onPress={() => navigation.navigate("fullOnboardingFlow")}
           containerStyle={styles.increaseLimitsButtonContainer}
         />
       )}
