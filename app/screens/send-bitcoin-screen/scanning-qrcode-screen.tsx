@@ -106,11 +106,11 @@ export const ScanningQRCodeScreen: React.FC = () => {
         setHasPermission(true)
         return
       }
-      if (result === RESULTS.UNAVAILABLE) {
+      const requestResult = await request(permission)
+      if (requestResult === RESULTS.UNAVAILABLE) {
         setIsCameraUnavailable(true)
         return
       }
-      const requestResult = await request(permission)
       setHasPermission(requestResult === RESULTS.GRANTED)
     }
     checkPermission()
