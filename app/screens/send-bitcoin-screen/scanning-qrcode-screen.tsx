@@ -30,7 +30,7 @@ import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useIsFocused } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -67,11 +67,10 @@ gql`
 export const ScanningQRCodeScreen: React.FC = () => {
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+  const isFocused = useIsFocused()
 
   // forcing price refresh
-  useRealtimePriceQuery({
-    fetchPolicy: "network-only",
-  })
+  useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
   const {
     theme: { colors },
@@ -80,6 +79,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   const [pending, setPending] = React.useState(false)
   const [scannedCache, setScannedCache] = React.useState(new Set<string>())
   const [hasPermission, setHasPermission] = React.useState(false)
+  const [isCameraUnavailable, setIsCameraUnavailable] = React.useState(false)
 
   const { data } = useScanningQrCodeScreenQuery({ skip: !useIsAuthed() })
   const wallets = data?.me?.defaultAccount.wallets
@@ -90,6 +90,13 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const { displayCurrency } = useDisplayCurrency()
+
+  React.useEffect(() => {
+    if (!isFocused) {
+      setScannedCache(new Set<string>())
+    }
+  }, [isFocused])
+
   React.useEffect(() => {
     const checkPermission = async () => {
       const permission =
@@ -97,6 +104,10 @@ export const ScanningQRCodeScreen: React.FC = () => {
       const result = await check(permission)
       if (result === RESULTS.GRANTED) {
         setHasPermission(true)
+        return
+      }
+      if (result === RESULTS.UNAVAILABLE) {
+        setIsCameraUnavailable(true)
         return
       }
       const requestResult = await request(permission)
@@ -308,6 +319,18 @@ export const ScanningQRCodeScreen: React.FC = () => {
     [],
   )
 
+  if (isCameraUnavailable) {
+    return (
+      <Screen>
+        <View style={styles.permissionMissing}>
+          <Text type="h1" style={styles.permissionMissingText}>
+            {LL.ScanningQRCodeScreen.noCamera()}
+          </Text>
+        </View>
+      </Screen>
+    )
+  }
+
   if (!hasPermission) {
     const openSettings = () => {
       Linking.openSettings().catch(() => {
@@ -332,15 +355,17 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   return (
     <Screen unsafe>
-      <Camera
-        cameraType={CameraType.Back}
-        focusMode="on"
-        zoomMode="on"
-        scanBarcode={true}
-        onReadCode={(event) => handleCodeScanned(event.nativeEvent.codeStringValue)}
-        onError={onError}
-        style={StyleSheet.absoluteFill}
-      />
+      {isFocused && (
+        <Camera
+          cameraType={CameraType.Back}
+          focusMode="on"
+          zoomMode="on"
+          scanBarcode={true}
+          onReadCode={(event) => handleCodeScanned(event.nativeEvent.codeStringValue)}
+          onError={onError}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View style={StyleSheet.absoluteFill}>
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle} />
