@@ -103,3 +103,5 @@ android-recordings
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.bmad
+.claude
