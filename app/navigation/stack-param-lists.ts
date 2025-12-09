@@ -144,10 +144,6 @@ export type RootStackParamList = {
   cardProcessingScreen: undefined
 }
 
-export type CardDashboardStackParamList = {
-  cardDashboardScreen: undefined
-}
-
 export type OnboardingStackParamList = {
   welcomeLevel1: { onboarding?: boolean }
   emailBenefits: { onboarding?: boolean; hasUsername?: boolean }
@@ -194,7 +190,6 @@ export type PrimaryStackParamList = {
   Map: undefined
   Earn: undefined
   Web: undefined
-  CardDashboard: NavigatorScreenParams<CardDashboardStackParamList>
 }
 
 export type NewAccountFlowParamsList = { flow: "phone" | "trial" }

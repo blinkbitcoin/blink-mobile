@@ -40,7 +40,7 @@ export const CardProcessingScreen: React.FC = () => {
             {LL.CardProcessingScreen.title()}
           </Text>
           <Text type="p3" color={colors.grey3}>
-            {LL.CardProcessingScreen.subtitle({ waitTime: "1 day" })}
+            We will notify you once we are ready
           </Text>
         </View>
       </ScrollView>

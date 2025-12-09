@@ -94,7 +94,6 @@ import {
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
-  CardDashboardStackParamList,
   OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
@@ -114,7 +113,6 @@ import {
   TermSheetScreen,
   TranferInvest,
   TopUpScreen,
-  CardDashboardScreen,
   CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardPreapprovedScreen,
@@ -716,61 +714,6 @@ export const RootStack = () => {
   )
 }
 
-const CardDashboard = createStackNavigator<CardDashboardStackParamList>()
-
-export const CardDashboardNavigator = () => {
-  const { LL } = useI18nContext()
-  const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
-
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-
-  return (
-    <CardDashboard.Navigator
-      screenOptions={{
-        gestureEnabled: true,
-        headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
-        headerStyle: styles.headerStyle,
-        headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
-        headerTintColor: colors.black,
-      }}
-      initialRouteName="cardDashboardScreen"
-    >
-      <CardDashboard.Screen
-        name="cardDashboardScreen"
-        component={CardDashboardScreen}
-        options={{
-          title: LL.VisaCardScreen.title(),
-          headerLeft: () => (
-            <GaloyIconButton
-              onPress={() => navigation.goBack()}
-              size={"medium"}
-              name="arrow-left"
-              color={colors.black}
-              iconOnly
-              style={{ marginLeft: 10 }}
-            />
-          ),
-          headerRight: () => (
-            <GaloyIconButton
-              onPress={() => {}}
-              size={"medium"}
-              name="settings"
-              color={colors.black}
-              iconOnly
-              style={{ marginRight: 20 }}
-            />
-          ),
-        }}
-      />
-    </CardDashboard.Navigator>
-  )
-}
-
 const Onboarding = createStackNavigator<OnboardingStackParamList>()
 
 export const OnboardingNavigator = () => {
@@ -1014,14 +957,6 @@ export const PrimaryNavigator = () => {
           tabBarIcon: ({ color }: { color: string }) => (
             <LearnIcon {...testProps("Earn")} color={color} />
           ),
-        }}
-      />
-      <Tab.Screen
-        name="CardDashboard"
-        component={CardDashboardNavigator}
-        options={{
-          tabBarButton: () => null,
-          headerShown: false,
         }}
       />
     </Tab.Navigator>

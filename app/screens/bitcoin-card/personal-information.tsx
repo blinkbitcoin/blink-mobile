@@ -20,6 +20,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
   const [annualSalaryRange, setAnnualSalaryRange] = useState<string>()
   const [accountPurpose, setAccountPurpose] = useState<string>()
   const [expectedMonthlyVolume, setExpectedMonthlyVolume] = useState<string>()
+  const [loading, setLoading] = useState(false)
 
   const occupationOptions: DropdownOption[] = [
     { value: "15-1132", label: "Software Developers, Applications" },
@@ -62,7 +63,12 @@ export const CardPersonalInformationScreen: React.FC = () => {
 
   const handleNext = () => {
     if (!allFieldsSelected) return
-    navigation.navigate("cardProcessingScreen")
+    setLoading(true)
+
+    setTimeout(() => {
+      setLoading(false)
+      navigation.navigate("cardProcessingScreen")
+    }, 500) // 0.5s
   }
 
   return (
@@ -127,7 +133,8 @@ export const CardPersonalInformationScreen: React.FC = () => {
               : LL.PersonalInformationScreen.buttonText()
           }
           onPress={handleNext}
-          disabled={!allFieldsSelected}
+          disabled={!allFieldsSelected || loading}
+          loading={loading}
         />
       </View>
     </Screen>
