@@ -10,25 +10,38 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
+import { useAppConfig } from "@app/hooks"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 
-export const AccountBanner = () => {
+export const AccountBanner: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const { currentLevel } = useLevel()
-  const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
+  const isUserLoggedIn = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
+  const { data, loading } = useSettingsScreenQuery({
+    skip: !isUserLoggedIn,
+    fetchPolicy: "cache-first",
+    // this enables offline mode use-case
+    nextFetchPolicy: "cache-and-network",
+  })
 
-  const usernameTitle = data?.me?.username || LL.common.blinkUser()
+  const hasUsername = Boolean(data?.me?.username)
+  const lnAddress = `${data?.me?.username}@${lnAddressHostname}`
+
+  const usernameTitle = hasUsername ? lnAddress : LL.common.blinkUser()
 
   if (loading) return <Skeleton style={styles.outer} animation="pulse" />
 
@@ -43,7 +56,9 @@ export const AccountBanner = () => {
       }
     >
       <View style={styles.outer}>
-        <AccountIcon size={30} />
+        <View style={styles.iconContainer}>
+          <AccountIcon size={22} />
+        </View>
         <Text type="p2">
           {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
         </Text>
@@ -59,7 +74,7 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
   return <GaloyIcon name="user" size={size} backgroundColor={colors.grey4} />
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   outer: {
     height: 70,
     padding: 4,
@@ -67,5 +82,16 @@ const useStyles = makeStyles(() => ({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 12,
+  },
+  switch: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  iconContainer: {
+    backgroundColor: theme.colors.grey4,
+    borderRadius: 100,
+    padding: 3,
   },
 }))
