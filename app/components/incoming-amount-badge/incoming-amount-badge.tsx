@@ -61,6 +61,7 @@ export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
 const useStyles = makeStyles(({ colors }, { outgoing }: { outgoing?: boolean }) => ({
   touch: {
     alignSelf: "center",
+    marginBottom: 8,
   },
   badge: {
     borderRadius: 8,

@@ -101,6 +101,7 @@ export type RootStackParamList = {
   }
   Earn: undefined
   accountScreen: undefined
+  profileScreen: undefined
   notificationSettingsScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList

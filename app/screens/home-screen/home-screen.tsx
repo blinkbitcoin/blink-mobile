@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMemo } from "react"
-import { RefreshControl, View, Alert } from "react-native"
+import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
@@ -11,7 +11,7 @@ import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handl
 
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { icons } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
@@ -51,6 +51,7 @@ import {
   useRealtimePriceQuery,
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
+import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
@@ -155,6 +156,8 @@ export const HomeScreen: React.FC = () => {
   const toggleSetDefaultAccountModal = () =>
     setSetDefaultAccountModalVisible(!setDefaultAccountModalVisible)
 
+  const { isAtLeastLevelOne } = useLevel()
+
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
   const {
@@ -200,7 +203,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   // keep settings info cached and ignore network call if it's already cached
-  const { loading: loadingSettings } = useSettingsScreenQuery({
+  const { data: currentUser, loading: loadingSettings } = useSettingsScreenQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-first",
     // this enables offline mode use-case
@@ -219,6 +222,9 @@ export const HomeScreen: React.FC = () => {
   })
 
   const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
+
+  const { username, phone } = currentUser?.me ?? {}
+  const usernameTitle = username || phone || LL.common.blinkUser()
 
   const wallets = dataAuthed?.me?.defaultAccount?.wallets
   const { formattedBalance, satsBalance } = useTotalBalance(wallets)
@@ -420,6 +426,10 @@ export const HomeScreen: React.FC = () => {
     </Modal>
   )
 
+  const handleSwitchPress = () => {
+    navigation.navigate("profileScreen")
+  }
+
   return (
     <Screen headerShown={false}>
       {AccountCreationNeededModal}
@@ -434,21 +444,33 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
-      <View style={[styles.header, styles.container]}>
-        <GaloyIconButton
-          onPress={() => navigation.navigate("priceHistory")}
-          size={"medium"}
-          name="graph"
-          iconOnly={true}
-        />
-        <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
-        <GaloyIconButton
-          onPress={() => navigation.navigate("settings")}
-          size={"medium"}
-          name="menu"
-          iconOnly={true}
-        />
+      <View style={styles.balanceContainer}>
+        <View style={styles.header}>
+          <GaloyIconButton
+            onPress={() => navigation.navigate("priceHistory")}
+            size={"medium"}
+            name="graph"
+            iconOnly={true}
+          />
+          <View>
+            {!loading && usernameTitle && (
+              <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
+                <View style={styles.profileContainer}>
+                  <Text type="p2">{usernameTitle}</Text>
+                  {isAtLeastLevelOne && <GaloyIcon name={"caret-down"} size={18} />}
+                </View>
+              </Pressable>
+            )}
+          </View>
+          <GaloyIconButton
+            onPress={() => navigation.navigate("settings")}
+            size={"medium"}
+            name="menu"
+            iconOnly={true}
+          />
+        </View>
       </View>
+      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
       <View style={styles.badgeSlot}>
         <IncomingAmountBadge
           key={latestIncomingTx?.id}
@@ -575,17 +597,29 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
     alignItems: "center",
   },
+  balanceContainer: {
+    marginTop: 7,
+    flexDirection: "column",
+    flex: 1,
+    height: 40,
+    maxHeight: 40,
+  },
   header: {
     flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 40,
+    marginHorizontal: 20,
+    marginTop: 6,
   },
   error: {
     alignSelf: "center",
     color: colors.error,
   },
-  container: {
-    marginHorizontal: 20,
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   actionsSeparator: {
     width: 1,
@@ -593,7 +627,8 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
   },
   badgeSlot: {
-    height: 65,
+    height: 35,
+    marginVertical: 3,
     justifyContent: "center",
     alignItems: "center",
   },
