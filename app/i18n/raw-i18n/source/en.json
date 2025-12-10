@@ -2227,7 +2227,7 @@
         "noAmount": "This invoice doesn't have an amount, so you need to manually specify how much money you want to send",
         "notConfirmed": "Payment has been sent\nbut is not confirmed yet\n\nYou can check the status\nof the payment in Transactions",
         "note": "Note or label",
-        "success": "Payment has been sent successfully",
+        "success": "Payment successful",
         "suggestionInput": "Enter your suggestion",
         "max": "Max",
         "maxAmount": "Max Amount",
@@ -2246,7 +2246,12 @@
         "copySecretMessage": "Copy secret message to clipboard",
         "copiedSuccessMessage": "Message copied successfully",
         "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
+        "feeLabel": "Fee",
+        "noteLabel": "Note",
+        "sender": "Sender",
+        "recipient": "Recipient",
+        "time": "Time"
     },
     "SettingsScreen": {
         "staticQr": "Printable Static QR Code",

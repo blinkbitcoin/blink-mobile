@@ -53,3 +53,8 @@ export const getTimeLeft = ({ after, until }: { after: number; until: number }) 
   const sLeft = (until - dateNow) / 1000
   return secondsToDDMMSS(sLeft)
 }
+
+// e.g. 1747691078 -> "2025-05-19 15:44"
+export function formatUnixTimestampYMDHM(timestampInSeconds: number) {
+  return new Date(timestampInSeconds * 1000).toISOString().slice(0, 16).replace("T", " ")
+}

@@ -451,7 +451,6 @@ export type Card = {
   readonly status: CardStatus;
 };
 
-/** Input for creating a consumer application using Sumsub share token */
 export type CardConsumerApplicationCreateInput = {
   /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
@@ -459,16 +458,14 @@ export type CardConsumerApplicationCreateInput = {
   readonly annualSalary: Scalars['String']['input'];
   /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Whether the user has completed L2 KYC verification */
+  readonly isL2Verified: Scalars['Boolean']['input'];
   /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
+  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for creating a consumer application using manual KYC */
@@ -503,8 +500,6 @@ export type CardConsumerApplicationManualCreateInput = {
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating an existing consumer application */
@@ -537,8 +532,6 @@ export type CardConsumerApplicationUpdateInput = {
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
@@ -3295,63 +3288,63 @@ export type IntraLedgerPaymentSendMutationVariables = Exact<{
 }>;
 
 
-export type IntraLedgerPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type IntraLedgerPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type IntraLedgerUsdPaymentSendMutationVariables = Exact<{
   input: IntraLedgerUsdPaymentSendInput;
 }>;
 
 
-export type IntraLedgerUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type IntraLedgerUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type LnNoAmountInvoicePaymentSendMutationVariables = Exact<{
   input: LnNoAmountInvoicePaymentInput;
 }>;
 
 
-export type LnNoAmountInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type LnNoAmountInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type LnInvoicePaymentSendMutationVariables = Exact<{
   input: LnInvoicePaymentInput;
 }>;
 
 
-export type LnInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain' } } | null } };
+export type LnInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain' } } | null } };
 
 export type LnNoAmountUsdInvoicePaymentSendMutationVariables = Exact<{
   input: LnNoAmountUsdInvoicePaymentInput;
 }>;
 
 
-export type LnNoAmountUsdInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountUsdInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type LnNoAmountUsdInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountUsdInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainPaymentSendMutationVariables = Exact<{
   input: OnChainPaymentSendInput;
 }>;
 
 
-export type OnChainPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly transaction?: { readonly __typename: 'Transaction', readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain', readonly arrivalInMempoolEstimatedAt?: number | null } } | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain', readonly arrivalInMempoolEstimatedAt?: number | null } } | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
 export type OnChainPaymentSendAllMutationVariables = Exact<{
   input: OnChainPaymentSendAllInput;
 }>;
 
 
-export type OnChainPaymentSendAllMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSendAll: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainPaymentSendAllMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSendAll: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainUsdPaymentSendMutationVariables = Exact<{
   input: OnChainUsdPaymentSendInput;
 }>;
 
 
-export type OnChainUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainUsdPaymentSendAsBtcDenominatedMutationVariables = Exact<{
   input: OnChainUsdPaymentSendAsBtcDenominatedInput;
 }>;
 
 
-export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSendAsBtcDenominated: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSendAsBtcDenominated: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -6909,6 +6902,9 @@ export const IntraLedgerPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -6945,6 +6941,9 @@ export const IntraLedgerUsdPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -6981,6 +6980,9 @@ export const LnNoAmountInvoicePaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7018,6 +7020,7 @@ export const LnInvoicePaymentSendDocument = gql`
     }
     status
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaLn {
           preImage
@@ -7063,6 +7066,9 @@ export const LnNoAmountUsdInvoicePaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7096,6 +7102,7 @@ export const OnChainPaymentSendDocument = gql`
     mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
   onChainPaymentSend(input: $input) {
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaOnChain {
           arrivalInMempoolEstimatedAt
@@ -7142,6 +7149,9 @@ export const OnChainPaymentSendAllDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7178,6 +7188,9 @@ export const OnChainUsdPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7214,6 +7227,9 @@ export const OnChainUsdPaymentSendAsBtcDenominatedDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;

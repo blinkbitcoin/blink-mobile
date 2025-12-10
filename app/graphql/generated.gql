@@ -285,6 +285,10 @@ mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -296,6 +300,10 @@ mutation intraLedgerUsdPaymentSend($input: IntraLedgerUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -338,6 +346,7 @@ mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
     }
     status
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaLn {
           preImage
@@ -391,6 +400,10 @@ mutation lnNoAmountInvoicePaymentSend($input: LnNoAmountInvoicePaymentInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -413,6 +426,10 @@ mutation lnNoAmountUsdInvoicePaymentSend($input: LnNoAmountUsdInvoicePaymentInpu
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -461,6 +478,7 @@ mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
 mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
   onChainPaymentSend(input: $input) {
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaOnChain {
           arrivalInMempoolEstimatedAt
@@ -486,6 +504,10 @@ mutation onChainPaymentSendAll($input: OnChainPaymentSendAllInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -497,6 +519,10 @@ mutation onChainUsdPaymentSend($input: OnChainUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -508,6 +534,10 @@ mutation onChainUsdPaymentSendAsBtcDenominated($input: OnChainUsdPaymentSendAsBt
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
