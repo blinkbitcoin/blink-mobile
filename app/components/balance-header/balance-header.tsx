@@ -1,8 +1,8 @@
 import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View, Text } from "react-native"
 
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
@@ -16,6 +16,7 @@ const Loader = () => {
       speed={1.2}
       backgroundColor={styles.loaderBackground.color}
       foregroundColor={styles.loaderForefound.color}
+      viewBox="0 0 100 40"
     >
       <Rect x="0" y="0" rx="4" ry="4" width="100" height="40" />
     </ContentLoader>
@@ -37,24 +38,25 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity
-          onPress={switchMemoryHideAmount}
-          style={styles.hiddenBalanceTouchableOpacity}
-        >
+        <TouchableOpacity onPress={switchMemoryHideAmount}>
           <Text style={styles.balanceHiddenText}>****</Text>
         </TouchableOpacity>
       ) : (
-        <View style={styles.balancesContainer}>
-          <TouchableOpacity onPress={switchMemoryHideAmount}>
-            <View style={styles.marginBottom}>
-              {loading ? (
-                <Loader />
-              ) : (
-                <Text style={styles.primaryBalanceText}>{formattedBalance}</Text>
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={switchMemoryHideAmount}>
+          <View>
+            {loading ? (
+              <Loader />
+            ) : (
+              <Text
+                style={styles.primaryBalanceText}
+                allowFontScaling
+                adjustsFontSizeToFit
+              >
+                {formattedBalance}
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
       )}
     </View>
   )
@@ -62,30 +64,18 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
 
 const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
-    flex: 1,
-    flexDirection: "column",
     alignItems: "center",
-  },
-  balancesContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: "bold",
     textAlign: "center",
-  },
-  marginBottom: {
-    marginBottom: 4,
-  },
-  hiddenBalanceTouchableOpacity: {
-    alignItems: "center",
-    flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flex: 1,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    height: 60,
+    maxHeight: 60,
   },
   primaryBalanceText: {
     fontSize: 32,
+    color: colors.black,
   },
   loaderBackground: {
     color: colors.loaderBackground,
@@ -96,5 +86,6 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHiddenText: {
     fontSize: 32,
     fontWeight: "bold",
+    color: colors.black,
   },
 }))

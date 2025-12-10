@@ -2392,7 +2392,10 @@
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
-        "error": "No se pudo obtener la información de los perfiles en este momento"
+        "error": "No se pudo obtener la información de los perfiles en este momento",
+        "fromThisDevice": "desde este dispositivo?",
+        "switchAccount": "Cambiaste a otra cuenta",
+        "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
@@ -2627,6 +2630,8 @@
         "advanced": "Avanzado",
         "community": "Comunidad",
         "account": "Cuenta",
+        "accounts": "Cuentas",
+        "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
         "transactionLimits": "Límites de la transacción",
@@ -2732,7 +2737,8 @@
         },
         "dollar": "Dólar",
         "all": "TODAS",
-        "allAccounts": "Todas las cuentas"
+        "allAccounts": "Todas las cuentas",
+        "profiles": "Perfiles"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2782,7 +2788,8 @@
         "deleteAccountConfirmation": "Tu cuenta ha sido designada para su eliminación.\n\nCuando finalice el período de prueba relacionado con los requisitos reglamentarios, los datos restantes relacionados con tu cuenta se eliminarán de forma permanente.",
         "deleteAccountFromPhone": "¡Hola! Por favor, elimina mi cuenta. Mi número de teléfono es {phoneNumber: string}.",
         "deleteAccountError": "Algo salió mal. Ponte en contacto con {email: string} para obtener más ayuda.",
-        "bye": "¡Adiós!"
+        "bye": "¡Adiós!",
+        "deleteAccountWarning": "Atención: ¡La eliminación de la cuenta es permanente!\nAsegúrate de que las billeteras no tengan fondos antes de eliminarla.\nUna cuenta eliminada no se puede restaurar."
     },
     "lnurl": {
         "overLimit": "No se puede enviar más de la cantidad máxima",

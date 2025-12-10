@@ -233,21 +233,15 @@ export type AccountUpdateNotificationSettingsPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
-/** Address input */
+/** Address input (used for consumer application addresses and card billing addresses) */
 export type AddressInput = {
-  /** City */
   readonly city: Scalars['String']['input'];
-  /** Full country name (optional) */
   readonly country?: InputMaybe<Scalars['String']['input']>;
   /** 2-letter country code */
   readonly countryCode: Scalars['String']['input'];
-  /** Address line 1 */
   readonly line1: Scalars['String']['input'];
-  /** Address line 2 (optional) */
   readonly line2?: InputMaybe<Scalars['String']['input']>;
-  /** Postal code */
   readonly postalCode: Scalars['String']['input'];
-  /** State/region */
   readonly region: Scalars['String']['input'];
 };
 
@@ -285,7 +279,6 @@ export type ApiKeyRevokePayload = {
   readonly apiKey: ApiKey;
 };
 
-/** Application status enum */
 export const ApplicationStatus = {
   Approved: 'APPROVED',
   Canceled: 'CANCELED',
@@ -392,15 +385,10 @@ export type BtcWalletTransactionsByPaymentRequestArgs = {
   paymentRequest: Scalars['LnPaymentRequest']['input'];
 };
 
-/** Billing address input for cards */
-export type BillingAddressInput = {
-  readonly city: Scalars['String']['input'];
-  readonly country?: InputMaybe<Scalars['String']['input']>;
-  readonly countryCode: Scalars['String']['input'];
-  readonly line1: Scalars['String']['input'];
-  readonly line2?: InputMaybe<Scalars['String']['input']>;
-  readonly postalCode: Scalars['String']['input'];
-  readonly region: Scalars['String']['input'];
+export type BlockInfo = {
+  readonly __typename: 'BlockInfo';
+  readonly blockHash?: Maybe<Scalars['String']['output']>;
+  readonly blockHeight?: Maybe<Scalars['Int']['output']>;
 };
 
 export type BuildInformation = {
@@ -450,6 +438,162 @@ export type CaptchaRequestAuthCodeInput = {
   readonly phone: Scalars['Phone']['input'];
   readonly secCode: Scalars['String']['input'];
   readonly validationCode: Scalars['String']['input'];
+};
+
+export type Card = {
+  readonly __typename: 'Card';
+  readonly cardType: CardType;
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly dailyLimitCents?: Maybe<Scalars['Int']['output']>;
+  readonly id: Scalars['ID']['output'];
+  readonly lastFour: Scalars['String']['output'];
+  readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
+  readonly status: CardStatus;
+};
+
+/** Input for creating a consumer application using Sumsub share token */
+export type CardConsumerApplicationCreateInput = {
+  /** Account purpose */
+  readonly accountPurpose: Scalars['String']['input'];
+  /** Annual salary range */
+  readonly annualSalary: Scalars['String']['input'];
+  /** Expected monthly volume */
+  readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Terms of service acceptance (must be true) */
+  readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
+  /** Occupation */
+  readonly occupation: Scalars['String']['input'];
+  /** Source key for tracking (optional) */
+  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
+  /** Sumsub share token */
+  readonly sumsubShareToken: Scalars['String']['input'];
+  /** EVM wallet address (optional) */
+  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Input for creating a consumer application using manual KYC */
+export type CardConsumerApplicationManualCreateInput = {
+  /** Account purpose */
+  readonly accountPurpose: Scalars['String']['input'];
+  /** Address information */
+  readonly address: AddressInput;
+  /** Annual salary range */
+  readonly annualSalary: Scalars['String']['input'];
+  /** Birth date in YYYY-MM-DD format */
+  readonly birthDate: Scalars['String']['input'];
+  /** 2-letter country code of ID issuing country */
+  readonly countryOfIssue: Scalars['String']['input'];
+  /** Email address */
+  readonly email: Scalars['String']['input'];
+  /** Expected monthly volume */
+  readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** First name */
+  readonly firstName: Scalars['String']['input'];
+  /** Terms of service acceptance (must be true) */
+  readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
+  /** Last name */
+  readonly lastName: Scalars['String']['input'];
+  /** National ID (SSN for US) */
+  readonly nationalId: Scalars['String']['input'];
+  /** Occupation */
+  readonly occupation: Scalars['String']['input'];
+  /** Phone country code (optional) */
+  readonly phoneCountryCode?: InputMaybe<Scalars['String']['input']>;
+  /** Phone number (optional) */
+  readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
+  /** Source key for tracking (optional) */
+  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
+  /** EVM wallet address (optional) */
+  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Input for updating an existing consumer application */
+export type CardConsumerApplicationUpdateInput = {
+  /** Account purpose (optional) */
+  readonly accountPurpose?: InputMaybe<Scalars['String']['input']>;
+  /** Address information (optional) */
+  readonly address?: InputMaybe<AddressInput>;
+  /** Annual salary range (optional) */
+  readonly annualSalary?: InputMaybe<Scalars['String']['input']>;
+  /** Application ID to update */
+  readonly applicationId: Scalars['ID']['input'];
+  /** Birth date in YYYY-MM-DD format (optional) */
+  readonly birthDate?: InputMaybe<Scalars['String']['input']>;
+  /** 2-letter country code of ID issuing country (optional) */
+  readonly countryOfIssue?: InputMaybe<Scalars['String']['input']>;
+  /** Expected monthly volume (optional) */
+  readonly expectedMonthlyVolume?: InputMaybe<Scalars['String']['input']>;
+  /** First name (optional) */
+  readonly firstName?: InputMaybe<Scalars['String']['input']>;
+  /** Whether to use existing documents for additional verification (optional) */
+  readonly hasExistingDocuments?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Terms of service acceptance (optional) */
+  readonly isTermsOfServiceAccepted?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Last name (optional) */
+  readonly lastName?: InputMaybe<Scalars['String']['input']>;
+  /** National ID (SSN for US) (optional) */
+  readonly nationalId?: InputMaybe<Scalars['String']['input']>;
+  /** Occupation (optional) */
+  readonly occupation?: InputMaybe<Scalars['String']['input']>;
+  /** Source key for tracking (optional) */
+  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
+  /** EVM wallet address (optional) */
+  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CardCreateInput = {
+  /** Application ID - references the approved consumer application */
+  readonly applicationId: Scalars['ID']['input'];
+  readonly billingAddress?: InputMaybe<AddressInput>;
+  readonly cardType: CardType;
+  readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
+  /** Display name on the card (max 26 characters) */
+  readonly displayName?: InputMaybe<Scalars['String']['input']>;
+  readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
+  readonly shippingAddress?: InputMaybe<ShippingAddressInput>;
+  /** Initial card status (defaults to Active if not provided) */
+  readonly status?: InputMaybe<CardStatus>;
+};
+
+export const CardStatus = {
+  Active: 'ACTIVE',
+  Canceled: 'CANCELED',
+  Failed: 'FAILED',
+  Locked: 'LOCKED',
+  NotActivated: 'NOT_ACTIVATED',
+  Requested: 'REQUESTED'
+} as const;
+
+export type CardStatus = typeof CardStatus[keyof typeof CardStatus];
+export type CardTransaction = {
+  readonly __typename: 'CardTransaction';
+  readonly amount: Scalars['Float']['output'];
+  readonly cardId: Scalars['String']['output'];
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly currency: Scalars['String']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly merchantName: Scalars['String']['output'];
+  readonly status: TransactionStatus;
+};
+
+export const CardType = {
+  Physical: 'PHYSICAL',
+  Virtual: 'VIRTUAL'
+} as const;
+
+export type CardType = typeof CardType[keyof typeof CardType];
+export type CardUpdateInput = {
+  /** Billing address (optional) */
+  readonly billingAddress?: InputMaybe<AddressInput>;
+  readonly cardId: Scalars['ID']['input'];
+  /** Daily spending limit in cents (optional, mutually exclusive with monthly_limit_cents) */
+  readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
+  /** Monthly spending limit in cents (optional, mutually exclusive with daily_limit_cents) */
+  readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
+  /** New card status (optional) */
+  readonly status?: InputMaybe<CardStatus>;
+  /** Virtual card art identifier (optional) */
+  readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Card = {
@@ -567,22 +711,15 @@ export type ConsumerAccountWalletByIdArgs = {
   walletId: Scalars['WalletId']['input'];
 };
 
-/** Consumer application response */
 export type ConsumerApplication = {
   readonly __typename: 'ConsumerApplication';
   /** Application completion link with params (if additional verification needed) */
   readonly applicationCompletionLink?: Maybe<Scalars['String']['output']>;
-  /** Application status reason from Rain API */
   readonly applicationReason?: Maybe<Scalars['String']['output']>;
-  /** Application status */
   readonly applicationStatus: ApplicationStatus;
-  /** Creation timestamp */
   readonly createdAt: Scalars['DateTime']['output'];
   /** Application ID */
   readonly id: Scalars['ID']['output'];
-  /** Rain user ID (if assigned) */
-  readonly rainUserId?: Maybe<Scalars['String']['output']>;
-  /** Last updated timestamp */
   readonly updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -774,6 +911,8 @@ export type FeesInformation = {
 /** Provides global settings for the application which might have an impact for the user. */
 export type Globals = {
   readonly __typename: 'Globals';
+  /** Current block height and block hash */
+  readonly blockInfo?: Maybe<BlockInfo>;
   readonly buildInformation: BuildInformation;
   readonly feesInformation: FeesInformation;
   /** The domain name for lightning addresses accepted by this Galoy instance */
@@ -1251,6 +1390,11 @@ export type Mutation = {
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly cardConsumerApplicationCreate: ConsumerApplication;
+  readonly cardConsumerApplicationManualCreate: ConsumerApplication;
+  readonly cardConsumerApplicationUpdate: ConsumerApplication;
+  readonly cardCreate: Card;
+  readonly cardUpdate: Card;
   readonly contactCreate: ContactPayload;
   /** Create a consumer application using manual KYC */
   readonly createConsumerApplication: ConsumerApplication;
@@ -1432,6 +1576,31 @@ export type MutationCallbackEndpointDeleteArgs = {
 
 export type MutationCaptchaRequestAuthCodeArgs = {
   input: CaptchaRequestAuthCodeInput;
+};
+
+
+export type MutationCardConsumerApplicationCreateArgs = {
+  input: CardConsumerApplicationCreateInput;
+};
+
+
+export type MutationCardConsumerApplicationManualCreateArgs = {
+  input: CardConsumerApplicationManualCreateInput;
+};
+
+
+export type MutationCardConsumerApplicationUpdateArgs = {
+  input: CardConsumerApplicationUpdateInput;
+};
+
+
+export type MutationCardCreateArgs = {
+  input: CardCreateInput;
+};
+
+
+export type MutationCardUpdateArgs = {
+  input: CardUpdateInput;
 };
 
 
@@ -2181,6 +2350,7 @@ export type SettlementViaOnChain = {
 export type ShippingAddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
+  /** 2-letter country code */
   readonly countryCode: Scalars['String']['input'];
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
@@ -8627,7 +8797,7 @@ export type ResolversTypes = {
   AuthTokenPayload: ResolverTypeWrapper<AuthTokenPayload>;
   Authorization: ResolverTypeWrapper<Authorization>;
   BTCWallet: ResolverTypeWrapper<BtcWallet>;
-  BillingAddressInput: BillingAddressInput;
+  BlockInfo: ResolverTypeWrapper<BlockInfo>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -8637,10 +8807,15 @@ export type ResolversTypes = {
   CaptchaCreateChallengeResult: ResolverTypeWrapper<CaptchaCreateChallengeResult>;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
+  CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
+  CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
+  CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
+  CardCreateInput: CardCreateInput;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardType: CardType;
+  CardUpdateInput: CardUpdateInput;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
   CentAmountPayload: ResolverTypeWrapper<CentAmountPayload>;
   ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
@@ -8889,7 +9064,7 @@ export type ResolversParentTypes = {
   AuthTokenPayload: AuthTokenPayload;
   Authorization: Authorization;
   BTCWallet: BtcWallet;
-  BillingAddressInput: BillingAddressInput;
+  BlockInfo: BlockInfo;
   BuildInformation: BuildInformation;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -8899,8 +9074,13 @@ export type ResolversParentTypes = {
   CaptchaCreateChallengeResult: CaptchaCreateChallengeResult;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
+  CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
+  CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
+  CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
+  CardCreateInput: CardCreateInput;
   CardTransaction: CardTransaction;
   Float: Scalars['Float']['output'];
+  CardUpdateInput: CardUpdateInput;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
   ConsumerAccount: ConsumerAccount;
@@ -9226,6 +9406,12 @@ export type BtcWalletResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BlockInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['BlockInfo'] = ResolversParentTypes['BlockInfo']> = {
+  blockHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  blockHeight?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BuildInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['BuildInformation'] = ResolversParentTypes['BuildInformation']> = {
   commitHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   helmRevision?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -9261,9 +9447,10 @@ export type CaptchaCreateChallengeResultResolvers<ContextType = any, ParentType 
 export type CardResolvers<ContextType = any, ParentType extends ResolversParentTypes['Card'] = ResolversParentTypes['Card']> = {
   cardType?: Resolver<ResolversTypes['CardType'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  dailyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  rainCardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9325,7 +9512,6 @@ export type ConsumerApplicationResolvers<ContextType = any, ParentType extends R
   applicationStatus?: Resolver<ResolversTypes['ApplicationStatus'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  rainUserId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9450,6 +9636,7 @@ export type FeesInformationResolvers<ContextType = any, ParentType extends Resol
 };
 
 export type GlobalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Globals'] = ResolversParentTypes['Globals']> = {
+  blockInfo?: Resolver<Maybe<ResolversTypes['BlockInfo']>, ParentType, ContextType>;
   buildInformation?: Resolver<ResolversTypes['BuildInformation'], ParentType, ContextType>;
   feesInformation?: Resolver<ResolversTypes['FeesInformation'], ParentType, ContextType>;
   lightningAddressDomain?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -9672,6 +9859,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
+  cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
+  cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
+  cardCreate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardCreateArgs, 'input'>>;
+  cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   createConsumerApplication?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCreateConsumerApplicationArgs, 'input'>>;
   createConsumerApplicationSumsub?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCreateConsumerApplicationSumsubArgs, 'input'>>;
@@ -10326,6 +10518,7 @@ export type Resolvers<ContextType = any> = {
   AuthTokenPayload?: AuthTokenPayloadResolvers<ContextType>;
   Authorization?: AuthorizationResolvers<ContextType>;
   BTCWallet?: BtcWalletResolvers<ContextType>;
+  BlockInfo?: BlockInfoResolvers<ContextType>;
   BuildInformation?: BuildInformationResolvers<ContextType>;
   CallbackEndpoint?: CallbackEndpointResolvers<ContextType>;
   CallbackEndpointAddPayload?: CallbackEndpointAddPayloadResolvers<ContextType>;

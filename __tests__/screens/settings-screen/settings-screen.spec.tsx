@@ -1,15 +1,13 @@
 import React from "react"
 import { act, render, screen } from "@testing-library/react-native"
-import { SettingsScreenDocument, useBetaQuery } from "@app/graphql/generated"
+import { SettingsScreenDocument } from "@app/graphql/generated"
 import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-screen.stories"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import { i18nObject } from "@app/i18n/i18n-util"
 import mocks from "@app/graphql/mocks"
 import { ContextForScreen } from "../helper"
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useBetaQuery: jest.fn(() => ({ data: { beta: true } })),
 }))
 
 const mocksWithUsername = [
@@ -39,16 +37,11 @@ const mocksWithUsername = [
 ]
 
 describe("Settings Screen", () => {
-  let LL: ReturnType<typeof i18nObject>
-
   beforeEach(() => {
     loadLocale("en")
-    LL = i18nObject("en")
   })
 
-  it("Renders switch account component when beta is enabled", async () => {
-    ;(useBetaQuery as jest.Mock).mockReturnValue({ data: { beta: true } })
-
+  it("Renders user info", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
@@ -62,29 +55,7 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(screen.getByTestId("Switch Account")).toBeTruthy()
-    expect(screen.getByTestId("Switch Account-right")).toBeTruthy()
-    expect(screen.getByText(LL.AccountScreen.switchAccount())).toBeTruthy()
-  })
-
-  it("Renders switch account component when beta is disabled", async () => {
-    ;(useBetaQuery as jest.Mock).mockReturnValue({ data: { beta: false } })
-
-    render(
-      <ContextForScreen>
-        <LoggedInWithUsername mock={mocksWithUsername} />
-      </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
-    expect(screen.getByTestId("Switch Account")).toBeTruthy()
-    expect(screen.getByTestId("Switch Account-right")).toBeTruthy()
-    expect(screen.getByText(LL.AccountScreen.switchAccount())).toBeTruthy()
+    const elements = screen.getAllByText("test1@blink.sv")
+    expect(elements.length).toBeGreaterThan(0)
   })
 })

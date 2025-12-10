@@ -232,6 +232,13 @@ type AuthTokenPayload
   totpRequired: Boolean
 }
 
+type BlockInfo
+  @join__type(graph: BLINK)
+{
+  blockHash: String
+  blockHeight: Int
+}
+
 """
 A wallet belonging to an account which contains a BTC balance and a list of transactions.
 """
@@ -634,6 +641,8 @@ Provides global settings for the application which might have an impact for the 
 type Globals
   @join__type(graph: BLINK)
 {
+  """Current block height and block hash"""
+  blockInfo: BlockInfo
   buildInformation: BuildInformation!
   feesInformation: FeesInformation!
 
