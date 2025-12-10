@@ -197,9 +197,12 @@ export const Delete = () => {
       <SettingsButton
         loading={loading}
         title={LL.support.deleteAccount()}
-        variant="danger"
+        variant="critical"
         onPress={deleteAccountAction}
       />
+      <Text type="p2" bold style={styles.warningText}>
+        {LL.support.deleteAccountWarning()}
+      </Text>
       {AccountDeletionModal}
     </>
   )
@@ -227,5 +230,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  warningText: {
+    color: colors.primary,
   },
 }))

@@ -25,11 +25,15 @@ export const parseDestination = async ({
   bitcoinNetwork,
   lnurlDomains,
   accountDefaultWalletQuery,
+  inputSource,
+  displayCurrency,
 }: ParseDestinationParams): Promise<ParseDestinationResult> => {
   const parsedDestination = parsePaymentDestination({
     destination: rawInput,
     network: bitcoinNetwork as NetworkGaloyClient,
     lnAddressDomains: lnurlDomains,
+    inputSource,
+    displayCurrency,
   })
 
   switch (parsedDestination.paymentType) {

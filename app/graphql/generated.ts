@@ -385,6 +385,12 @@ export type BtcWalletTransactionsByPaymentRequestArgs = {
   paymentRequest: Scalars['LnPaymentRequest']['input'];
 };
 
+export type BlockInfo = {
+  readonly __typename: 'BlockInfo';
+  readonly blockHash?: Maybe<Scalars['String']['output']>;
+  readonly blockHeight?: Maybe<Scalars['Int']['output']>;
+};
+
 export type BuildInformation = {
   readonly __typename: 'BuildInformation';
   readonly commitHash?: Maybe<Scalars['String']['output']>;
@@ -438,8 +444,10 @@ export type Card = {
   readonly __typename: 'Card';
   readonly cardType: CardType;
   readonly createdAt: Scalars['DateTime']['output'];
+  readonly dailyLimitCents?: Maybe<Scalars['Int']['output']>;
   readonly id: Scalars['ID']['output'];
   readonly lastFour: Scalars['String']['output'];
+  readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
   readonly status: CardStatus;
 };
 
@@ -788,6 +796,8 @@ export type FeesInformation = {
 /** Provides global settings for the application which might have an impact for the user. */
 export type Globals = {
   readonly __typename: 'Globals';
+  /** Current block height and block hash */
+  readonly blockInfo?: Maybe<BlockInfo>;
   readonly buildInformation: BuildInformation;
   readonly feesInformation: FeesInformation;
   /** The domain name for lightning addresses accepted by this Galoy instance */
@@ -3470,6 +3480,13 @@ export type SupportChatResetMutationVariables = Exact<{ [key: string]: never; }>
 
 
 export type SupportChatResetMutation = { readonly __typename: 'Mutation', readonly supportChatReset: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
+
+export type UserLoginUpgradeTelegramMutationVariables = Exact<{
+  input: UserLoginUpgradeTelegramInput;
+}>;
+
+
+export type UserLoginUpgradeTelegramMutation = { readonly __typename: 'Mutation', readonly userLoginUpgradeTelegram: { readonly __typename: 'UpgradePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type TotpRegistrationScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -8207,6 +8224,43 @@ export function useSupportChatResetMutation(baseOptions?: Apollo.MutationHookOpt
 export type SupportChatResetMutationHookResult = ReturnType<typeof useSupportChatResetMutation>;
 export type SupportChatResetMutationResult = Apollo.MutationResult<SupportChatResetMutation>;
 export type SupportChatResetMutationOptions = Apollo.BaseMutationOptions<SupportChatResetMutation, SupportChatResetMutationVariables>;
+export const UserLoginUpgradeTelegramDocument = gql`
+    mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
+  userLoginUpgradeTelegram(input: $input) {
+    errors {
+      message
+      code
+    }
+    success
+  }
+}
+    `;
+export type UserLoginUpgradeTelegramMutationFn = Apollo.MutationFunction<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>;
+
+/**
+ * __useUserLoginUpgradeTelegramMutation__
+ *
+ * To run a mutation, you first call `useUserLoginUpgradeTelegramMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserLoginUpgradeTelegramMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userLoginUpgradeTelegramMutation, { data, loading, error }] = useUserLoginUpgradeTelegramMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserLoginUpgradeTelegramMutation(baseOptions?: Apollo.MutationHookOptions<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>(UserLoginUpgradeTelegramDocument, options);
+      }
+export type UserLoginUpgradeTelegramMutationHookResult = ReturnType<typeof useUserLoginUpgradeTelegramMutation>;
+export type UserLoginUpgradeTelegramMutationResult = Apollo.MutationResult<UserLoginUpgradeTelegramMutation>;
+export type UserLoginUpgradeTelegramMutationOptions = Apollo.BaseMutationOptions<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>;
 export const TotpRegistrationScreenDocument = gql`
     query totpRegistrationScreen {
   me {
@@ -8577,6 +8631,7 @@ export type ResolversTypes = {
   AuthTokenPayload: ResolverTypeWrapper<AuthTokenPayload>;
   Authorization: ResolverTypeWrapper<Authorization>;
   BTCWallet: ResolverTypeWrapper<BtcWallet>;
+  BlockInfo: ResolverTypeWrapper<BlockInfo>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -8838,6 +8893,7 @@ export type ResolversParentTypes = {
   AuthTokenPayload: AuthTokenPayload;
   Authorization: Authorization;
   BTCWallet: BtcWallet;
+  BlockInfo: BlockInfo;
   BuildInformation: BuildInformation;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -9174,6 +9230,12 @@ export type BtcWalletResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BlockInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['BlockInfo'] = ResolversParentTypes['BlockInfo']> = {
+  blockHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  blockHeight?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BuildInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['BuildInformation'] = ResolversParentTypes['BuildInformation']> = {
   commitHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   helmRevision?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -9209,8 +9271,10 @@ export type CaptchaCreateChallengeResultResolvers<ContextType = any, ParentType 
 export type CardResolvers<ContextType = any, ParentType extends ResolversParentTypes['Card'] = ResolversParentTypes['Card']> = {
   cardType?: Resolver<ResolversTypes['CardType'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  dailyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9396,6 +9460,7 @@ export type FeesInformationResolvers<ContextType = any, ParentType extends Resol
 };
 
 export type GlobalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Globals'] = ResolversParentTypes['Globals']> = {
+  blockInfo?: Resolver<Maybe<ResolversTypes['BlockInfo']>, ParentType, ContextType>;
   buildInformation?: Resolver<ResolversTypes['BuildInformation'], ParentType, ContextType>;
   feesInformation?: Resolver<ResolversTypes['FeesInformation'], ParentType, ContextType>;
   lightningAddressDomain?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -10271,6 +10336,7 @@ export type Resolvers<ContextType = any> = {
   AuthTokenPayload?: AuthTokenPayloadResolvers<ContextType>;
   Authorization?: AuthorizationResolvers<ContextType>;
   BTCWallet?: BtcWalletResolvers<ContextType>;
+  BlockInfo?: BlockInfoResolvers<ContextType>;
   BuildInformation?: BuildInformationResolvers<ContextType>;
   CallbackEndpoint?: CallbackEndpointResolvers<ContextType>;
   CallbackEndpointAddPayload?: CallbackEndpointAddPayloadResolvers<ContextType>;

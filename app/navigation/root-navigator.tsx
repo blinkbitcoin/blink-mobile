@@ -40,7 +40,7 @@ import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
-import { AccountScreen } from "@app/screens/settings-screen/account"
+import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
 import { DisplayCurrencyScreen } from "@app/screens/settings-screen/display-currency-screen"
 import { NotificationSettingsScreen } from "@app/screens/settings-screen/notifications-screen"
@@ -56,6 +56,7 @@ import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -368,6 +369,14 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="profileScreen"
+        component={SwitchAccount}
+        options={{
+          title: LL.common.accounts(),
+          headerShadowVisible: false,
+        }}
+      />
+      <RootNavigator.Screen
         name="notificationSettingsScreen"
         component={NotificationSettingsScreen}
         options={{
@@ -641,6 +650,7 @@ export const PrimaryNavigator = () => {
   const {
     theme: { colors },
   } = useTheme()
+  const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
@@ -652,7 +662,13 @@ export const PrimaryNavigator = () => {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: styles.bottomNavigatorStyle,
+        tabBarStyle: [
+          styles.bottomNavigatorStyle,
+          {
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom,
+          },
+        ],
         tabBarLabelStyle: {
           paddingBottom: 6,
           fontSize: 12,
@@ -718,7 +734,6 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomNavigatorStyle: {
-    height: "10%",
     paddingTop: 4,
     backgroundColor: colors.white,
     borderTopColor: colors.grey4,

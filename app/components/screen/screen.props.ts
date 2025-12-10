@@ -33,6 +33,8 @@ export interface ScreenProps {
    */
   unsafe?: boolean
 
+  headerShown?: boolean
+
   /**
    * By how much should we offset the keyboard? Defaults to none.
    */

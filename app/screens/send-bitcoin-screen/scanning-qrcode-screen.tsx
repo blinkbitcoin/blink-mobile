@@ -1,15 +1,18 @@
 import * as React from "react"
-import { Alert, Dimensions, Linking, Pressable, StyleSheet, View } from "react-native"
+import {
+  Alert,
+  Dimensions,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
 import Icon from "react-native-vector-icons/Ionicons"
-import {
-  Camera,
-  CameraRuntimeError,
-  useCameraDevice,
-  useCameraPermission,
-  useCodeScanner,
-} from "react-native-vision-camera"
+import { Camera, CameraType } from "react-native-camera-kit"
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
 
 import { gql } from "@apollo/client"
@@ -21,6 +24,7 @@ import {
   useScanningQrCodeScreenQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
@@ -63,17 +67,19 @@ gql`
 export const ScanningQRCodeScreen: React.FC = () => {
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+  const isFocused = useIsFocused()
 
   // forcing price refresh
-  useRealtimePriceQuery({
-    fetchPolicy: "network-only",
-  })
+  useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
   const {
     theme: { colors },
   } = useTheme()
 
   const [pending, setPending] = React.useState(false)
+  const [scannedCache, setScannedCache] = React.useState(new Set<string>())
+  const [hasPermission, setHasPermission] = React.useState(false)
+  const [isCameraUnavailable, setIsCameraUnavailable] = React.useState(false)
 
   const { data } = useScanningQrCodeScreenQuery({ skip: !useIsAuthed() })
   const wallets = data?.me?.defaultAccount.wallets
@@ -83,26 +89,32 @@ export const ScanningQRCodeScreen: React.FC = () => {
   })
 
   const { LL } = useI18nContext()
-  const device = useCameraDevice("back")
-  const { hasPermission, requestPermission } = useCameraPermission()
+  const { displayCurrency } = useDisplayCurrency()
 
-  const isFocused = useIsFocused()
-
-  // const requestCameraPermission = React.useCallback(async () => {
-  //   const permission = await Camera.requestCameraPermission()
-  //   if (permission === "denied") await Linking.openSettings()
-  // }, [])
-
-  // React.useEffect(() => {
-  //   if (cameraPermissionStatus !== "authorized") {
-  //     requestCameraPermission()
-  //   }
-  // }, [cameraPermissionStatus, navigation, requestCameraPermission])
   React.useEffect(() => {
-    if (!hasPermission) {
-      requestPermission()
+    if (!isFocused) {
+      setScannedCache(new Set<string>())
     }
-  }, [hasPermission, requestPermission])
+  }, [isFocused])
+
+  React.useEffect(() => {
+    const checkPermission = async () => {
+      const permission =
+        Platform.OS === "ios" ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA
+      const result = await check(permission)
+      if (result === RESULTS.GRANTED) {
+        setHasPermission(true)
+        return
+      }
+      const requestResult = await request(permission)
+      if (requestResult === RESULTS.UNAVAILABLE) {
+        setIsCameraUnavailable(true)
+        return
+      }
+      setHasPermission(requestResult === RESULTS.GRANTED)
+    }
+    checkPermission()
+  }, [])
 
   const loadInBrowser = (url: string) => {
     Linking.openURL(url).catch((err) => Alert.alert(err.toString()))
@@ -134,6 +146,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
           bitcoinNetwork,
           lnurlDomains: LNURL_DOMAINS,
           accountDefaultWalletQuery,
+          inputSource: "qr",
+          displayCurrency,
         })
         logParseDestinationResult(destination)
 
@@ -244,16 +258,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
     bitcoinNetwork,
     wallets,
     accountDefaultWalletQuery,
+    displayCurrency,
   ])
-  const styles = useStyles()
 
-  const codeScanner = useCodeScanner({
-    codeTypes: ["qr", "ean-13"],
-    onCodeScanned: (codes) => {
-      codes.forEach((code) => processInvoice(code.value))
-      console.log(`Scanned ${codes.length} codes!`)
+  const handleCodeScanned = React.useCallback(
+    (data: string) => {
+      if (!scannedCache.has(data)) {
+        setScannedCache(new Set(scannedCache).add(data))
+        processInvoice(data)
+      }
     },
-  })
+    [scannedCache, processInvoice],
+  )
+
+  const styles = useStyles()
 
   const handleInvoicePaste = async () => {
     try {
@@ -277,13 +295,14 @@ export const ScanningQRCodeScreen: React.FC = () => {
           LL,
         })
       }
-      if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
-        const qrCodeValues = await RNQRGenerator.detect({ uri: result.assets[0].uri })
+      if (result.assets && result.assets.length > 0) {
+        const { uri } = result.assets[0]
+        const qrCodeValues = await RNQRGenerator.detect({ uri })
         if (qrCodeValues && qrCodeValues.values.length > 0) {
           processInvoice(qrCodeValues.values[0])
-        } else {
-          Alert.alert(LL.ScanningQRCodeScreen.noQrCode())
+          return
         }
+        Alert.alert(LL.ScanningQRCodeScreen.noQrCode())
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -293,9 +312,24 @@ export const ScanningQRCodeScreen: React.FC = () => {
     }
   }
 
-  const onError = React.useCallback((error: CameraRuntimeError) => {
-    console.error(error)
-  }, [])
+  const onError = React.useCallback(
+    (event: { nativeEvent: { errorMessage: string } }) => {
+      console.error(event.nativeEvent.errorMessage)
+    },
+    [],
+  )
+
+  if (isCameraUnavailable) {
+    return (
+      <Screen>
+        <View style={styles.permissionMissing}>
+          <Text type="h1" style={styles.permissionMissingText}>
+            {LL.ScanningQRCodeScreen.noCamera()}
+          </Text>
+        </View>
+      </Screen>
+    )
+  }
 
   if (!hasPermission) {
     const openSettings = () => {
@@ -319,27 +353,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
     )
   }
 
-  if (device === null || device === undefined)
-    return (
-      <Screen>
-        <View style={styles.permissionMissing}>
-          <Text type="h1" style={styles.permissionMissingText}>
-            {LL.ScanningQRCodeScreen.noCamera()}
-          </Text>
-        </View>
-      </Screen>
-    )
-
   return (
     <Screen unsafe>
-      <View style={StyleSheet.absoluteFill}>
+      {isFocused && (
         <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={isFocused}
+          cameraType={CameraType.Back}
+          focusMode="on"
+          zoomMode="on"
+          scanBarcode={true}
+          onReadCode={(event) => handleCodeScanned(event.nativeEvent.codeStringValue)}
           onError={onError}
-          codeScanner={codeScanner}
+          style={StyleSheet.absoluteFill}
         />
+      )}
+      <View style={StyleSheet.absoluteFill}>
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle} />
         </View>
@@ -395,8 +422,8 @@ const useStyles = makeStyles(({ colors }) => ({
   rectangle: {
     borderColor: colors.primary,
     borderWidth: 2,
-    height: screenWidth * 0.65,
-    width: screenWidth * 0.65,
+    height: screenWidth * 0.75,
+    width: screenWidth * 0.75,
   },
 
   rectangleContainer: {
