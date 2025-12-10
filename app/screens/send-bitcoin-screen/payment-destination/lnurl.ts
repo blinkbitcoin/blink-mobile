@@ -1,5 +1,6 @@
 import { getParams } from "js-lnurl"
 import { requestPayServiceParams, LnUrlPayServiceResponse } from "lnurl-pay"
+import parsePhoneNumber from "libphonenumber-js/mobile"
 
 import {
   AccountDefaultWalletLazyQueryHookResult,
@@ -126,6 +127,15 @@ const tryGetIntraLedgerDestinationFromLnurl = ({
   return undefined
 }
 
+const isPhoneNumber = (phoneNumber: string): boolean => {
+  try {
+    const parsed = parsePhoneNumber(phoneNumber)
+    return parsed?.isValid() ?? false
+  } catch {
+    return false
+  }
+}
+
 const getIntraLedgerHandleIfLnurlIsOurOwn = ({
   lnurlPayParams,
   lnurlDomains,
@@ -135,6 +145,7 @@ const getIntraLedgerHandleIfLnurlIsOurOwn = ({
 }) => {
   const [username, domain] = lnurlPayParams.identifier.split("@")
   if (domain && lnurlDomains.includes(domain)) {
+    if (isPhoneNumber(username)) return undefined
     return username
   }
   return undefined
