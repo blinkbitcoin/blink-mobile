@@ -451,7 +451,6 @@ export type Card = {
   readonly status: CardStatus;
 };
 
-/** Input for creating a consumer application using Sumsub share token */
 export type CardConsumerApplicationCreateInput = {
   /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
@@ -459,16 +458,14 @@ export type CardConsumerApplicationCreateInput = {
   readonly annualSalary: Scalars['String']['input'];
   /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Whether the user has completed L2 KYC verification */
+  readonly isL2Verified: Scalars['Boolean']['input'];
   /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
+  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for creating a consumer application using manual KYC */
@@ -503,8 +500,6 @@ export type CardConsumerApplicationManualCreateInput = {
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating an existing consumer application */
@@ -537,8 +532,6 @@ export type CardConsumerApplicationUpdateInput = {
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
@@ -2997,7 +2990,7 @@ export type QuizClaimMutationVariables = Exact<{
 }>;
 
 
-export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
+export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
 
 export type UserEmailRegistrationInitiateMutationVariables = Exact<{
   input: UserEmailRegistrationInitiateInput;
@@ -4870,6 +4863,7 @@ export const QuizClaimDocument = gql`
   quizClaim(input: $input) {
     errors {
       message
+      code
     }
     quizzes {
       id
