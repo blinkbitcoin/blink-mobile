@@ -451,7 +451,6 @@ export type Card = {
   readonly status: CardStatus;
 };
 
-/** Input for creating a consumer application using Sumsub share token */
 export type CardConsumerApplicationCreateInput = {
   /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
@@ -459,16 +458,14 @@ export type CardConsumerApplicationCreateInput = {
   readonly annualSalary: Scalars['String']['input'];
   /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Whether the user has completed L2 KYC verification */
+  readonly isL2Verified: Scalars['Boolean']['input'];
   /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
+  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for creating a consumer application using manual KYC */
@@ -503,8 +500,6 @@ export type CardConsumerApplicationManualCreateInput = {
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating an existing consumer application */
@@ -537,8 +532,6 @@ export type CardConsumerApplicationUpdateInput = {
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
@@ -731,84 +724,6 @@ export type Country = {
   readonly __typename: 'Country';
   readonly id: Scalars['CountryCode']['output'];
   readonly supportedAuthChannels: ReadonlyArray<PhoneCodeChannelType>;
-};
-
-/** Input for creating a virtual card */
-export type CreateCardInput = {
-  /** Daily spending limit in cents */
-  readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Display name on the card (max 26 characters) */
-  readonly displayName?: InputMaybe<Scalars['String']['input']>;
-  /** Monthly spending limit in cents */
-  readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Rain user ID - must match the account's approved application */
-  readonly rainUserId: Scalars['String']['input'];
-};
-
-/** Input for creating a consumer application using manual KYC */
-export type CreateConsumerApplicationInput = {
-  /** Account purpose */
-  readonly accountPurpose: Scalars['String']['input'];
-  /** Address information */
-  readonly address: AddressInput;
-  /** Annual salary range */
-  readonly annualSalary: Scalars['String']['input'];
-  /** Birth date in YYYY-MM-DD format */
-  readonly birthDate: Scalars['String']['input'];
-  /** 2-letter country code of ID issuing country */
-  readonly countryOfIssue: Scalars['String']['input'];
-  /** Email address */
-  readonly email: Scalars['String']['input'];
-  /** Expected monthly volume */
-  readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** First name */
-  readonly firstName: Scalars['String']['input'];
-  /** Terms of service acceptance (must be true) */
-  readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Last name */
-  readonly lastName: Scalars['String']['input'];
-  /** National ID (SSN for US) */
-  readonly nationalId: Scalars['String']['input'];
-  /** Occupation */
-  readonly occupation: Scalars['String']['input'];
-  /** Phone country code (optional) */
-  readonly phoneCountryCode?: InputMaybe<Scalars['String']['input']>;
-  /** Phone number (optional) */
-  readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
-  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** Input for creating a consumer application using Sumsub share token */
-export type CreateConsumerApplicationSumsubInput = {
-  /** Account purpose */
-  readonly accountPurpose: Scalars['String']['input'];
-  /** Annual salary range */
-  readonly annualSalary: Scalars['String']['input'];
-  /** Expected monthly volume */
-  readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** Terms of service acceptance (must be true) */
-  readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
-  readonly occupation: Scalars['String']['input'];
-  /** Source key for tracking (optional) */
-  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** Input for creating a physical card */
-export type CreatePhysicalCardInput = {
-  /** Optional billing address (defaults to shipping address) */
-  readonly billingAddress?: InputMaybe<BillingAddressInput>;
-  /** Basic card configuration */
-  readonly cardInput: CreateCardInput;
-  /** Shipping address for physical card delivery */
-  readonly shippingAddress: ShippingAddressInput;
 };
 
 export type Currency = {
@@ -1359,12 +1274,6 @@ export type Mutation = {
   readonly cardCreate: Card;
   readonly cardUpdate: Card;
   readonly contactCreate: ContactPayload;
-  /** Create a consumer application using manual KYC */
-  readonly createConsumerApplication: ConsumerApplication;
-  /** Create a consumer application using Sumsub share token */
-  readonly createConsumerApplicationSumsub: ConsumerApplication;
-  readonly createPhysicalCard: Card;
-  readonly createVirtualCard: Card;
   readonly deviceNotificationTokenCreate: SuccessPayload;
   readonly feedbackSubmit: SuccessPayload;
   /**
@@ -1464,8 +1373,6 @@ export type Mutation = {
   readonly statefulNotificationAcknowledge: StatefulNotificationAcknowledgePayload;
   readonly supportChatMessageAdd: SupportChatMessageAddPayload;
   readonly supportChatReset: SuccessPayload;
-  readonly updateCardStatus: Card;
-  readonly updateConsumerApplication: ConsumerApplication;
   /** @deprecated will be moved to AccountContact */
   readonly userContactUpdateAlias: UserContactUpdateAliasPayload;
   readonly userEmailDelete: UserEmailDeletePayload;
@@ -1569,26 +1476,6 @@ export type MutationCardUpdateArgs = {
 
 export type MutationContactCreateArgs = {
   input: ContactCreateInput;
-};
-
-
-export type MutationCreateConsumerApplicationArgs = {
-  input: CreateConsumerApplicationInput;
-};
-
-
-export type MutationCreateConsumerApplicationSumsubArgs = {
-  input: CreateConsumerApplicationSumsubInput;
-};
-
-
-export type MutationCreatePhysicalCardArgs = {
-  input: CreatePhysicalCardInput;
-};
-
-
-export type MutationCreateVirtualCardArgs = {
-  input: CreateCardInput;
 };
 
 
@@ -1749,17 +1636,6 @@ export type MutationStatefulNotificationAcknowledgeArgs = {
 
 export type MutationSupportChatMessageAddArgs = {
   input: SupportChatMessageAddInput;
-};
-
-
-export type MutationUpdateCardStatusArgs = {
-  cardId: Scalars['ID']['input'];
-  status: CardStatus;
-};
-
-
-export type MutationUpdateConsumerApplicationArgs = {
-  input: UpdateConsumerApplicationInput;
 };
 
 
@@ -2519,40 +2395,6 @@ export const TxStatus = {
 } as const;
 
 export type TxStatus = typeof TxStatus[keyof typeof TxStatus];
-/** Input for updating an existing consumer application */
-export type UpdateConsumerApplicationInput = {
-  /** Account purpose (optional) */
-  readonly accountPurpose?: InputMaybe<Scalars['String']['input']>;
-  /** Address information (optional) */
-  readonly address?: InputMaybe<AddressInput>;
-  /** Annual salary range (optional) */
-  readonly annualSalary?: InputMaybe<Scalars['String']['input']>;
-  /** Application ID to update */
-  readonly applicationId: Scalars['ID']['input'];
-  /** Birth date in YYYY-MM-DD format (optional) */
-  readonly birthDate?: InputMaybe<Scalars['String']['input']>;
-  /** 2-letter country code of ID issuing country (optional) */
-  readonly countryOfIssue?: InputMaybe<Scalars['String']['input']>;
-  /** Expected monthly volume (optional) */
-  readonly expectedMonthlyVolume?: InputMaybe<Scalars['String']['input']>;
-  /** First name (optional) */
-  readonly firstName?: InputMaybe<Scalars['String']['input']>;
-  /** Whether to use existing documents for additional verification (optional) */
-  readonly hasExistingDocuments?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Terms of service acceptance (optional) */
-  readonly isTermsOfServiceAccepted?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Last name (optional) */
-  readonly lastName?: InputMaybe<Scalars['String']['input']>;
-  /** National ID (SSN for US) (optional) */
-  readonly nationalId?: InputMaybe<Scalars['String']['input']>;
-  /** Occupation (optional) */
-  readonly occupation?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
-  readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type UpgradePayload = {
   readonly __typename: 'UpgradePayload';
   readonly authToken?: Maybe<Scalars['AuthToken']['output']>;
@@ -8845,10 +8687,6 @@ export type ResolversTypes = {
   Coordinates: ResolverTypeWrapper<Coordinates>;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']['output']>;
-  CreateCardInput: CreateCardInput;
-  CreateConsumerApplicationInput: CreateConsumerApplicationInput;
-  CreateConsumerApplicationSumsubInput: CreateConsumerApplicationSumsubInput;
-  CreatePhysicalCardInput: CreatePhysicalCardInput;
   Currency: ResolverTypeWrapper<Currency>;
   CurrencyConversionEstimation: ResolverTypeWrapper<CurrencyConversionEstimation>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
@@ -9012,7 +8850,6 @@ export type ResolversTypes = {
   TxLastSeen: ResolverTypeWrapper<TxLastSeen>;
   TxNotificationType: TxNotificationType;
   TxStatus: TxStatus;
-  UpdateConsumerApplicationInput: UpdateConsumerApplicationInput;
   UpgradePayload: ResolverTypeWrapper<UpgradePayload>;
   UsdWallet: ResolverTypeWrapper<UsdWallet>;
   User: ResolverTypeWrapper<User>;
@@ -9110,10 +8947,6 @@ export type ResolversParentTypes = {
   Coordinates: Coordinates;
   Country: Country;
   CountryCode: Scalars['CountryCode']['output'];
-  CreateCardInput: CreateCardInput;
-  CreateConsumerApplicationInput: CreateConsumerApplicationInput;
-  CreateConsumerApplicationSumsubInput: CreateConsumerApplicationSumsubInput;
-  CreatePhysicalCardInput: CreatePhysicalCardInput;
   Currency: Currency;
   CurrencyConversionEstimation: CurrencyConversionEstimation;
   DateTime: Scalars['DateTime']['output'];
@@ -9261,7 +9094,6 @@ export type ResolversParentTypes = {
   TransactionEdge: TransactionEdge;
   TxExternalId: Scalars['TxExternalId']['output'];
   TxLastSeen: TxLastSeen;
-  UpdateConsumerApplicationInput: UpdateConsumerApplicationInput;
   UpgradePayload: UpgradePayload;
   UsdWallet: UsdWallet;
   User: User;
@@ -9881,10 +9713,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   cardCreate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardCreateArgs, 'input'>>;
   cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
-  createConsumerApplication?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCreateConsumerApplicationArgs, 'input'>>;
-  createConsumerApplicationSumsub?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCreateConsumerApplicationSumsubArgs, 'input'>>;
-  createPhysicalCard?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCreatePhysicalCardArgs, 'input'>>;
-  createVirtualCard?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCreateVirtualCardArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
@@ -9918,8 +9746,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   statefulNotificationAcknowledge?: Resolver<ResolversTypes['StatefulNotificationAcknowledgePayload'], ParentType, ContextType, RequireFields<MutationStatefulNotificationAcknowledgeArgs, 'input'>>;
   supportChatMessageAdd?: Resolver<ResolversTypes['SupportChatMessageAddPayload'], ParentType, ContextType, RequireFields<MutationSupportChatMessageAddArgs, 'input'>>;
   supportChatReset?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType>;
-  updateCardStatus?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationUpdateCardStatusArgs, 'cardId' | 'status'>>;
-  updateConsumerApplication?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationUpdateConsumerApplicationArgs, 'input'>>;
   userContactUpdateAlias?: Resolver<ResolversTypes['UserContactUpdateAliasPayload'], ParentType, ContextType, RequireFields<MutationUserContactUpdateAliasArgs, 'input'>>;
   userEmailDelete?: Resolver<ResolversTypes['UserEmailDeletePayload'], ParentType, ContextType>;
   userEmailRegistrationInitiate?: Resolver<ResolversTypes['UserEmailRegistrationInitiatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationInitiateArgs, 'input'>>;
