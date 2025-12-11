@@ -43,13 +43,11 @@ export const FullOnboardingFlowScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
   const { navigate, goBack } = navigation
 
-  const { LL } = useI18nContext()
-
-  const {
-    theme: { colors },
-  } = useTheme()
-
+  const { LL, locale } = useI18nContext()
   const styles = useStyles()
+  const {
+    theme: { colors, mode },
+  } = useTheme()
 
   const { data, loading } = useFullOnboardingScreenQuery({ fetchPolicy: "network-only" })
 
@@ -73,9 +71,17 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         variables: { input: { firstName: "", lastName: "" } },
       })
 
-      const tokenWeb = res.data?.onboardingFlowStart?.tokenWeb
+      const token = res.data?.onboardingFlowStart?.tokenWeb ?? ""
 
-      const url = `${kycUrl}/webflow?token=${tokenWeb}`
+      const theme = mode === "dark" || mode === "light" ? mode : ""
+
+      const query = new URLSearchParams({
+        token,
+        ...(locale && { lang: locale }),
+        ...(theme && { theme }),
+      }).toString()
+
+      const url = `${kycUrl}/webflow?${query}`
 
       navigate("webView", {
         url,
@@ -109,7 +115,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     } finally {
       setLoadingSumsub(false)
     }
-  }, [LL, navigate, goBack, onboardingFlowStart, kycUrl])
+  }, [LL, locale, mode, navigate, goBack, onboardingFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
