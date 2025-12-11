@@ -188,10 +188,11 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
 const useStyles = makeStyles(() => ({
   screenStyle: {
-    flexGrow: 1,
+    flex: 1,
   },
 
   innerView: {
+    flex: 1,
     padding: 20,
   },
 
@@ -202,6 +203,7 @@ const useStyles = makeStyles(() => ({
   buttonContainer: {
     flex: 1,
     justifyContent: "flex-end",
+    paddingBottom: 15,
   },
 
   verticalAlignment: { flex: 1, justifyContent: "center", alignItems: "center" },
