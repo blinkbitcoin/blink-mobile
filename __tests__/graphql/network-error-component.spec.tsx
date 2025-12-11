@@ -12,11 +12,6 @@ import { useNetworkError } from "@app/graphql/network-error-context"
 import { NetworkErrorCode } from "@app/graphql/error-code"
 import { NetworkErrorComponent } from "@app/graphql/network-error-component"
 
-type TestNetworkError =
-  | null
-  | { statusCode: number; result?: { errors?: { code?: NetworkErrorCode }[] } }
-  | { message: string }
-
 jest.mock("@app/graphql/network-error-context")
 jest.mock("@app/i18n/i18n-react")
 jest.mock("@app/hooks/use-logout")
