@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react"
-import { ActivityIndicator, Alert, Linking, View } from "react-native"
-import InAppBrowser from "react-native-inappbrowser-reborn"
-
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { ActivityIndicator, Alert, View } from "react-native"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
+
+import { Screen } from "@app/components/screen"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { ContactSupportButton } from "@app/components/contact-support-button/contact-support-button"
-import { Screen } from "@app/components/screen"
+
+import { useAppConfig } from "@app/hooks"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   OnboardingStatus,
   useFullOnboardingScreenQuery,
   useOnboardingFlowStartMutation,
 } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { useNavigation } from "@react-navigation/native"
-import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 gql`
   mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
@@ -38,7 +40,8 @@ gql`
 `
 
 export const FullOnboardingFlowScreen: React.FC = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
+  const { navigate, goBack } = navigation
 
   const { LL } = useI18nContext()
 
@@ -52,16 +55,12 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
   const onboardingStatus = data?.me?.defaultAccount?.onboardingStatus
 
-  const [loadingOnfido, setLoadingOnfido] = useState(false)
+  const [loadingSumsub, setLoadingSumsub] = useState(false)
 
   const [onboardingFlowStart] = useOnboardingFlowStartMutation()
 
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-
-  useEffect(() => {
-    InAppBrowser.warmup()
-  }, [])
 
   const {
     appConfig: {
@@ -77,43 +76,29 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         { text: LL.common.cancel(), onPress: () => {} },
         {
           text: LL.common.yes(),
-          onPress: onfidoStart,
+          onPress: sumsubStart,
         },
       ],
     )
   }
 
-  const onfidoStart = React.useCallback(async () => {
-    setLoadingOnfido(true)
+  const sumsubStart = React.useCallback(async () => {
+    setLoadingSumsub(true)
 
     try {
-      console.log("onfidoStart", firstName, lastName)
+      console.log("sumsubStart", firstName, lastName)
       const res = await onboardingFlowStart({
         variables: { input: { firstName, lastName } },
       })
 
-      const workflowRunId = res.data?.onboardingFlowStart?.workflowRunId
-      if (!workflowRunId) {
-        Alert.alert("no workflowRunId")
-        setLoadingOnfido(false)
-        return
-      }
-
       const tokenWeb = res.data?.onboardingFlowStart?.tokenWeb
 
-      const page = `${kycUrl}/webflow?token=${tokenWeb}&workflow_run_id=${workflowRunId}`
+      const url = `${kycUrl}/webflow?token=${tokenWeb}`
 
-      if (await InAppBrowser.isAvailable()) {
-        await InAppBrowser.open(page, {
-          dismissButtonStyle: "done",
-          enableDefaultShare: false,
-          hasBackButton: false,
-          showInRecents: false,
-        })
-        navigation.goBack()
-      } else {
-        Linking.openURL(page)
-      }
+      navigate("webView", {
+        url,
+        headerTitle: LL.UpgradeAccountModal.title(),
+      })
     } catch (err) {
       console.error(err, "error")
       let message = ""
@@ -122,8 +107,8 @@ export const FullOnboardingFlowScreen: React.FC = () => {
       }
 
       if (message.match(/canceled/i)) {
-        navigation.goBack()
-        setLoadingOnfido(false)
+        goBack()
+        setLoadingSumsub(false)
         return
       }
 
@@ -134,21 +119,21 @@ export const FullOnboardingFlowScreen: React.FC = () => {
           {
             text: LL.common.ok(),
             onPress: () => {
-              navigation.goBack()
+              goBack()
             },
           },
         ],
       )
     } finally {
-      setLoadingOnfido(false)
+      setLoadingSumsub(false)
     }
-  }, [LL, firstName, lastName, navigation, onboardingFlowStart, kycUrl])
+  }, [LL, firstName, lastName, navigate, goBack, onboardingFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
-      onfidoStart()
+      sumsubStart()
     }
-  }, [onboardingStatus, onfidoStart])
+  }, [onboardingStatus, sumsubStart])
 
   if (loading) {
     return (
@@ -217,7 +202,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
             onPress={confirmNames}
             title={LL.common.next()}
             disabled={!firstName || !lastName}
-            loading={loadingOnfido}
+            loading={loadingSumsub}
           />
         </View>
       </View>
