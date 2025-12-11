@@ -8,7 +8,7 @@ import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 
 import { NetworkErrorCode } from "./error-code"
 import { useNetworkError } from "./network-error-context"
@@ -19,7 +19,8 @@ export const NetworkErrorComponent: React.FC = () => {
   const { networkError, clearNetworkError, token: networkErrorToken } = useNetworkError()
   const { LL } = useI18nContext()
   const { logout } = useLogout()
-  const { appConfig, saveToken } = useAppConfig()
+  const { appConfig } = useAppConfig()
+  const { switchToNextProfile } = useSwitchToNextProfile()
 
   const [showedAlert, setShowedAlert] = useState(false)
   const isHandlingTokenExpiry = useRef(false)
@@ -55,23 +56,8 @@ export const NetworkErrorComponent: React.FC = () => {
     }
 
     try {
-      const profiles = await KeyStoreWrapper.getSessionProfiles()
-      const nextProfile = profiles.find((profile) => profile.token !== networkErrorToken)
-
-      await logout({
-        stateToDefault: false,
-        token: networkErrorToken,
-        isValidToken: false,
-      })
-
+      const nextProfile = await switchToNextProfile(networkErrorToken)
       if (nextProfile) {
-        await saveToken(nextProfile.token)
-        toastShow({
-          type: "success",
-          message: LL.ProfileScreen.switchAccount(),
-          LL,
-        })
-        navigation.navigate("Primary")
         return
       }
 
@@ -102,12 +88,12 @@ export const NetworkErrorComponent: React.FC = () => {
   }, [
     appConfig.token,
     logout,
-    saveToken,
     LL,
     showedAlert,
     setShowedAlert,
     navigation,
     networkErrorToken,
+    switchToNextProfile,
   ])
 
   React.useEffect(() => {

@@ -18,8 +18,8 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
-import { toastShow } from "@app/utils/toast"
+
+import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
@@ -40,7 +40,8 @@ export const Delete = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
-  const { appConfig, saveToken } = useAppConfig()
+  const { appConfig } = useAppConfig()
+  const { switchToNextProfile } = useSwitchToNextProfile()
 
   const { LL } = useI18nContext()
 
@@ -110,10 +111,6 @@ export const Delete = () => {
   const deleteUserAccount = async () => {
     try {
       const accountToDeleteToken = appConfig.token
-      const profiles = await KeyStoreWrapper.getSessionProfiles()
-      const nextProfile = profiles.find(
-        (profile) => profile.token !== accountToDeleteToken,
-      )
 
       navigation.setOptions({
         headerLeft: () => null, // Hides the default back button
@@ -126,19 +123,8 @@ export const Delete = () => {
       if (res.data?.accountDelete?.success) {
         setAccountIsBeingDeleted(false)
 
+        const nextProfile = await switchToNextProfile(accountToDeleteToken)
         if (nextProfile) {
-          await logout({
-            stateToDefault: false,
-            token: accountToDeleteToken,
-            isValidToken: false,
-          })
-          await saveToken(nextProfile.token)
-          toastShow({
-            type: "success",
-            message: LL.ProfileScreen.switchAccount(),
-            LL,
-          })
-          navigation.navigate("Primary")
           return
         }
 
