@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { ActivityIndicator, Alert, View } from "react-native"
-import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
 import { Screen } from "@app/components/screen"
@@ -59,36 +59,18 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
   const [onboardingFlowStart] = useOnboardingFlowStartMutation()
 
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-
   const {
     appConfig: {
       galoyInstance: { kycUrl },
     },
   } = useAppConfig()
 
-  const confirmNames = async () => {
-    Alert.alert(
-      LL.FullOnboarding.confirmNameTitle(),
-      LL.FullOnboarding.confirmNameContent({ firstName, lastName }),
-      [
-        { text: LL.common.cancel(), onPress: () => {} },
-        {
-          text: LL.common.yes(),
-          onPress: sumsubStart,
-        },
-      ],
-    )
-  }
-
   const sumsubStart = React.useCallback(async () => {
     setLoadingSumsub(true)
 
     try {
-      console.log("sumsubStart", firstName, lastName)
       const res = await onboardingFlowStart({
-        variables: { input: { firstName, lastName } },
+        variables: { input: { firstName: "", lastName: "" } },
       })
 
       const tokenWeb = res.data?.onboardingFlowStart?.tokenWeb
@@ -127,7 +109,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     } finally {
       setLoadingSumsub(false)
     }
-  }, [LL, firstName, lastName, navigate, goBack, onboardingFlowStart, kycUrl])
+  }, [LL, navigate, goBack, onboardingFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
@@ -185,23 +167,11 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         <Text type="h2" style={styles.textStyle}>
           {LL.FullOnboarding.requirements()}
         </Text>
-        <>
-          <Input
-            placeholder={LL.FullOnboarding.firstName()}
-            value={firstName}
-            onChangeText={(text) => setFirstName(text)}
-          />
-          <Input
-            placeholder={LL.FullOnboarding.lastName()}
-            value={lastName}
-            onChangeText={(text) => setLastName(text)}
-          />
-        </>
         <View style={styles.buttonContainer}>
           <GaloyPrimaryButton
-            onPress={confirmNames}
+            onPress={sumsubStart}
             title={LL.common.next()}
-            disabled={!firstName || !lastName}
+            disabled={false}
             loading={loadingSumsub}
           />
         </View>

@@ -2752,7 +2752,7 @@
         "firstName": "Nome",
         "lastName": "Cognome",
         "confirmNameContent": "Il tuo nome è scritto correttamente?\n\n{firstName: string} {lastName: string}\n\nDeve corrispondere al nome sul tuo documento d'identità.",
-        "requirements": "L'aggiornamento del tuo account aumenterà i tuoi limiti e ti darà funzionalità aggiuntive come il trasferimento a conti bancari in paesi selezionati.\n\nDovrai fornire il tuo nome, un documento d'identità rilasciato dal governo e un selfie. Inizieremo con il tuo nome.",
+        "requirements": "L'aggiornamento del tuo account aumenterà i tuoi limiti e ti darà funzionalità aggiuntive come il trasferimento a conti bancari in paesi selezionati.",
         "success": "I documenti sono stati ricevuti con successo e saranno elaborati a breve. Puoi tornare a questa pagina per avere un aggiornamento sullo stato del tuo onboarding",
         "error": "Si è verificato un errore con l'invio dei tuoi documenti. Puoi contattare il supporto se il problema persiste.",
         "status": "Il tuo stato di onboarding è:",
