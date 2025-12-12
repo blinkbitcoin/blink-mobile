@@ -1,6 +1,5 @@
 import * as React from "react"
 import { View, Linking } from "react-native"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme, Divider, ListItem } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
@@ -18,7 +17,6 @@ type ApiItem = {
 const DASHBOARD_LINK = "https://dashboard.blink.sv"
 
 export const ApiScreen: React.FC = () => {
-  const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
@@ -71,9 +69,7 @@ export const ApiScreen: React.FC = () => {
                   </View>
                   <ListItem.Content>
                     <ListItem.Title style={styles.itemTitle}>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-                      >
+                      <View style={styles.listContent}>
                         <Text type="p2">{item.title}</Text>
                         {item.infoIcon && (
                           <GaloyIcon
@@ -121,5 +117,10 @@ const useStyles = makeStyles((theme) => ({
   },
   itemTitle: {
     fontSize: 16,
+  },
+  listContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
 }))

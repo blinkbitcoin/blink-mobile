@@ -3,12 +3,11 @@ import { useState } from "react"
 import { View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
-import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { useHideBalanceQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, Switch, ListItem } from "@rn-vui/themed"
+import { makeStyles, Switch, ListItem } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import {

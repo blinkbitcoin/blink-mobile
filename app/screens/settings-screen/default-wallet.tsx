@@ -1,5 +1,5 @@
 import * as React from "react"
-import { View, Image, TouchableOpacity } from "react-native"
+import { View, TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -125,7 +125,7 @@ export const DefaultWalletScreen: React.FC = () => {
                         type="ionicon"
                       />
                     ) : (
-                      <View style={{ width: 20, height: 20 }}></View>
+                      <View style={styles.listSeparator}></View>
                     )}
                   </View>
                   <ListItem.Content>
@@ -164,5 +164,9 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 20,
     marginTop: 34,
     marginBottom: 32,
+  },
+  listSeparator: {
+    width: 20,
+    height: 20,
   },
 }))

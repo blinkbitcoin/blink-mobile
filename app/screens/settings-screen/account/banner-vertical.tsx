@@ -8,22 +8,18 @@ import React from "react"
 import { View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme, Skeleton, Avatar } from "@rn-vui/themed"
+import { Text, makeStyles, Skeleton, Avatar } from "@rn-vui/themed"
 import { useAppConfig } from "@app/hooks"
 
 export const AccountBannerVertical: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const {
-    theme: { colors },
-  } = useTheme()
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },

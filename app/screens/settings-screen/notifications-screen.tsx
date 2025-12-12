@@ -13,15 +13,7 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  Divider,
-  Icon,
-  ListItem,
-  makeStyles,
-  Switch,
-  Text,
-  useTheme,
-} from "@rn-vui/themed"
+import { Divider, ListItem, makeStyles, Switch, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
