@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react"
+import React, { useState, useCallback, useEffect, useRef } from "react"
 import { Alert } from "react-native"
 
 import useLogout from "@app/hooks/use-logout"
@@ -30,32 +30,31 @@ export const NetworkErrorComponent: React.FC = () => {
       console.debug("Already handling token expiry, skipping")
       return
     }
-
     isHandlingTokenExpiry.current = true
-    const currentToken = appConfig.token
 
-    if (!currentToken) {
+    const resetSyncFlag = () => {
       isHandlingTokenExpiry.current = false
-      await logout()
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
-      return
-    }
-
-    // Only handle token expiry if the 401 error is for the currently active token
-    // If the tokens don't match, it means this is likely a stale request from before an account switch
-    if (networkErrorToken !== currentToken) {
-      isHandlingTokenExpiry.current = false
-      console.debug("Ignoring 401 error for non-active token", {
-        networkErrorToken,
-        currentToken,
-      })
-      return
     }
 
     try {
+      const currentToken = appConfig.token
+      if (!currentToken) {
+        await logout()
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "getStarted" }],
+        })
+        return
+      }
+
+      if (networkErrorToken !== currentToken) {
+        console.debug("Ignoring 401 for non-active token", {
+          networkErrorToken,
+          currentToken,
+        })
+        return
+      }
+
       const nextProfile = await switchToNextProfile(networkErrorToken)
       if (nextProfile) {
         return
@@ -84,19 +83,20 @@ export const NetworkErrorComponent: React.FC = () => {
         index: 0,
         routes: [{ name: "getStarted" }],
       })
+    } finally {
+      resetSyncFlag()
     }
   }, [
     appConfig.token,
     logout,
     LL,
-    showedAlert,
-    setShowedAlert,
     navigation,
     networkErrorToken,
+    showedAlert,
     switchToNextProfile,
   ])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!networkError) {
       return
     }

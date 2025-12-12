@@ -124,20 +124,21 @@ export const Delete = () => {
         setAccountIsBeingDeleted(false)
 
         const nextProfile = await switchToNextProfile(accountToDeleteToken)
-        if (nextProfile) {
-          return
+        if (!nextProfile) {
+          await logout({ stateToDefault: true })
         }
-
-        await logout({ stateToDefault: true })
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "getStarted" }],
-        })
 
         Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
           {
             text: LL.common.ok(),
-            onPress: () => {},
+            onPress: () => {
+              if (!nextProfile) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "getStarted" }],
+                })
+              }
+            },
           },
         ])
       } else {

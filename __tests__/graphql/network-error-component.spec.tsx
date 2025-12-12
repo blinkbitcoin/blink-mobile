@@ -134,6 +134,11 @@ describe("NetworkErrorComponent", () => {
     rerender(<NetworkErrorComponent />)
 
     await waitFor(() => {
+      expect(mockLogout).toHaveBeenCalledWith({
+        stateToDefault: false,
+        token: "current-token",
+        isValidToken: false,
+      })
       expect(mockSaveToken).toHaveBeenCalledWith("other-token")
       expect(mockToastShow).toHaveBeenCalledWith({
         type: "success",
@@ -218,6 +223,26 @@ describe("NetworkErrorComponent", () => {
       },
       { timeout: 1000 },
     )
+  })
+
+  it("ignores InvalidAuthentication when networkErrorToken differs from current token", async () => {
+    const { rerender } = render(<NetworkErrorComponent />)
+
+    ;(useNetworkError as jest.Mock).mockReturnValue({
+      networkError: {
+        statusCode: 401,
+        result: { errors: [{ code: NetworkErrorCode.InvalidAuthentication }] },
+      },
+      token: "stale-token",
+      clearNetworkError: mockClearNetworkError,
+    })
+
+    rerender(<NetworkErrorComponent />)
+
+    await waitFor(() => {
+      expect(mockLogout).not.toHaveBeenCalled()
+      expect(mockClearNetworkError).toHaveBeenCalled()
+    })
   })
 
   it("falls back to logout on error during token expiry handling", async () => {
