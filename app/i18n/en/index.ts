@@ -2446,7 +2446,7 @@ const en: BaseTranslation = {
     identityVerification: "Identity Verification",
   },
   ProfileScreen: {
-    addAccount: "Add Account",
+    addAccount: "Add account",
     error: "Unable to fetch profiles at this time",
     fromThisDevice: "from this device?",
     switchAccount: "You switched to another account",

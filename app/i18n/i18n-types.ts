@@ -7666,7 +7666,7 @@ type RootTranslation = {
 	}
 	ProfileScreen: {
 		/**
-		 * A​d​d​ ​A​c​c​o​u​n​t
+		 * A​d​d​ ​a​c​c​o​u​n​t
 		 */
 		addAccount: string
 		/**
@@ -17035,7 +17035,7 @@ export type TranslationFunctions = {
 	}
 	ProfileScreen: {
 		/**
-		 * Add Account
+		 * Add account
 		 */
 		addAccount: () => LocalizedString
 		/**
