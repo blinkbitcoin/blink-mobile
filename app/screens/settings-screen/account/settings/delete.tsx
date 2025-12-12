@@ -10,6 +10,7 @@ import { CONTACT_EMAIL_ADDRESS } from "@app/config"
 import { useAccountDeleteMutation, useSettingsScreenQuery } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -17,6 +18,8 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
+
+import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
@@ -37,6 +40,8 @@ export const Delete = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
+  const { appConfig } = useAppConfig()
+  const { switchToNextProfile } = useSwitchToNextProfile()
 
   const { LL } = useI18nContext()
 
@@ -105,6 +110,8 @@ export const Delete = () => {
 
   const deleteUserAccount = async () => {
     try {
+      const accountToDeleteToken = appConfig.token
+
       navigation.setOptions({
         headerLeft: () => null, // Hides the default back button
         gestureEnabled: false, // Disables swipe to go back gesture
@@ -114,16 +121,24 @@ export const Delete = () => {
       const res = await deleteAccount()
 
       if (res.data?.accountDelete?.success) {
-        await logout({ stateToDefault: true })
         setAccountIsBeingDeleted(false)
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "getStarted" }],
-        })
+
+        const nextProfile = await switchToNextProfile(accountToDeleteToken)
+        if (!nextProfile) {
+          await logout({ stateToDefault: true })
+        }
+
         Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
           {
             text: LL.common.ok(),
-            onPress: () => {},
+            onPress: () => {
+              if (!nextProfile) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "getStarted" }],
+                })
+              }
+            },
           },
         ])
       } else {

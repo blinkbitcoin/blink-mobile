@@ -105,9 +105,9 @@ export const useSaveSessionProfile = () => {
         return
       }
 
-      // Update token for the previously saved session
+      // Update profile for the previously saved session
       const updatedProfiles = cleaned.map((p) =>
-        p.accountId === profile.accountId ? { ...p, token: profile.token } : p,
+        p.accountId === profile.accountId ? { ...profile, selected: true } : p,
       )
 
       await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)

@@ -13,6 +13,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
   mutation userPhoneDelete {
@@ -42,6 +43,7 @@ export const PhoneSetting: React.FC = () => {
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { loading, phone, emailVerified, phoneVerified } = useLoginMethods()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneDeleteMutation, { loading: phoneDeleteLoading }] =
     useUserPhoneDeleteMutation()
@@ -49,6 +51,7 @@ export const PhoneSetting: React.FC = () => {
   const deletePhone = async () => {
     try {
       await phoneDeleteMutation()
+      await updateCurrentProfile()
       toastShow({
         message: LL.AccountScreen.phoneDeletedSuccessfully(),
         LL,

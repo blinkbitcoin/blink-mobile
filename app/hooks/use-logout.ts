@@ -14,6 +14,7 @@ import KeyStoreWrapper from "../utils/storage/secureStorage"
 type LogoutOptions = {
   stateToDefault?: boolean
   token?: string
+  isValidToken?: boolean
 }
 
 gql`
@@ -31,7 +32,11 @@ const useLogout = () => {
   })
 
   const logout = useCallback(
-    async ({ stateToDefault = true, token }: LogoutOptions = {}): Promise<void> => {
+    async ({
+      stateToDefault = true,
+      token,
+      isValidToken = true,
+    }: LogoutOptions = {}): Promise<void> => {
       try {
         let context
         const deviceToken = await messaging().getToken()
@@ -49,19 +54,21 @@ const useLogout = () => {
 
         logLogout()
 
-        await Promise.race([
-          userLogoutMutation({
-            context,
-            variables: { input: { deviceToken } },
-          }),
-          // Create a promise that rejects after 2 seconds
-          // this is handy for the case where the server is down, or in dev mode
-          new Promise((_, reject) => {
-            setTimeout(() => {
-              reject(new Error("Logout mutation timeout"))
-            }, 2000)
-          }),
-        ])
+        if (token && isValidToken) {
+          await Promise.race([
+            userLogoutMutation({
+              context,
+              variables: { input: { deviceToken } },
+            }),
+            // Create a promise that rejects after 2 seconds
+            // this is handy for the case where the server is down, or in dev mode
+            new Promise((_, reject) => {
+              setTimeout(() => {
+                reject(new Error("Logout mutation timeout"))
+              }, 2000)
+            }),
+          ])
+        }
       } catch (err: unknown) {
         if (err instanceof Error) {
           crashlytics().recordError(err)
