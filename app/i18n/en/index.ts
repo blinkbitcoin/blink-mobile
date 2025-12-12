@@ -2324,6 +2324,8 @@ const en: BaseTranslation = {
     staticQrCopied: "Your static QR code link has been copied",
     setByOs: "Set by OS",
     apiAcess: "API integration",
+    apiDocumentation: "API documentation",
+    apiDashboard: "API access and dashboard",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     setYourLightningAddress: "Set your lightning address",
@@ -2369,7 +2371,7 @@ const en: BaseTranslation = {
         description: "Notifications about your circles.",
       },
       Payments: {
-        title: "Transactions alerts",
+        title: "Transaction alerts",
         description: "Notifications related to sending and receiving payments.",
       },
       Marketing: {
@@ -2519,7 +2521,7 @@ const en: BaseTranslation = {
     perWeek: "per week",
     unlimited: "Unlimited",
     remaining: "Remaining",
-    stablesatTransfers: "Stablesat transfers",
+    stablesatTransfers: "Stablesats transfers",
     internalSend: "Send to {bankName: string} user",
     error: "Unable to fetch limits at this time",
     increaseLimits: "Increase your limits",

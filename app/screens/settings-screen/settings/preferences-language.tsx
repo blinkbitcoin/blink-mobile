@@ -16,9 +16,9 @@ export const LanguageSetting: React.FC = () => {
   const { data, loading } = useSettingsScreenQuery()
   const language = getLanguageFromString(data?.me?.language)
   const languageValue =
-    language === "DEFAULT"
+    !language || language === "DEFAULT"
       ? LL.SettingsScreen.setByOs()
-      : LocaleToTranslateLanguageSelector[language]
+      : LocaleToTranslateLanguageSelector[language] ?? language
 
   return (
     <SettingsRow

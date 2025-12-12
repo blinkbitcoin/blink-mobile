@@ -7261,6 +7261,14 @@ type RootTranslation = {
 		 */
 		apiAcess: string
 		/**
+		 * A​P​I​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
+		 */
+		apiDocumentation: string
+		/**
+		 * A​P​I​ ​a​c​c​e​s​s​ ​a​n​d​ ​d​a​s​h​b​o​a​r​d
+		 */
+		apiDashboard: string
+		/**
 		 * P​o​i​n​t​ ​o​f​ ​S​a​l​e
 		 */
 		pos: string
@@ -7414,7 +7422,7 @@ type RootTranslation = {
 			}
 			Payments: {
 				/**
-				 * T​r​a​n​s​a​c​t​i​o​n​s​ ​a​l​e​r​t​s
+				 * T​r​a​n​s​a​c​t​i​o​n​ ​a​l​e​r​t​s
 				 */
 				title: string
 				/**
@@ -7877,7 +7885,7 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​ ​t​r​a​n​s​f​e​r​s
+		 * S​t​a​b​l​e​s​a​t​s​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
@@ -16639,6 +16647,14 @@ export type TranslationFunctions = {
 		 */
 		apiAcess: () => LocalizedString
 		/**
+		 * API documentation
+		 */
+		apiDocumentation: () => LocalizedString
+		/**
+		 * API access and dashboard
+		 */
+		apiDashboard: () => LocalizedString
+		/**
 		 * Point of Sale
 		 */
 		pos: () => LocalizedString
@@ -16790,7 +16806,7 @@ export type TranslationFunctions = {
 			}
 			Payments: {
 				/**
-				 * Transactions alerts
+				 * Transaction alerts
 				 */
 				title: () => LocalizedString
 				/**
@@ -17243,7 +17259,7 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesat transfers
+		 * Stablesats transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**

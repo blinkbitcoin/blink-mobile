@@ -3,13 +3,13 @@ import { View, Linking } from "react-native"
 import { makeStyles, Text, useTheme, Divider, ListItem } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
+import { useI18nContext } from "@app/i18n/i18n-react"
 
 type ApiItem = {
   id: string
   title: string
   leftIcon: IconNamesType
   rightIcon: IconNamesType
-  action: "external" | "copy" | "info"
   link: string
   infoIcon?: IconNamesType
 }
@@ -17,6 +17,7 @@ type ApiItem = {
 const DASHBOARD_LINK = "https://dashboard.blink.sv"
 
 export const ApiScreen: React.FC = () => {
+  const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
@@ -25,31 +26,23 @@ export const ApiScreen: React.FC = () => {
   const apiItems: ApiItem[] = [
     {
       id: "documentation",
-      title: "API documentation",
+      title: LL.SettingsScreen.apiDocumentation(),
       leftIcon: "document-outline",
       rightIcon: "link",
-      action: "external",
       link: DASHBOARD_LINK,
     },
     {
       id: "dashboard",
-      title: "API access and dashboard",
+      title: LL.SettingsScreen.apiDashboard(),
       leftIcon: "house-outline",
       rightIcon: "link",
-      action: "external",
       link: DASHBOARD_LINK,
       infoIcon: "question",
     },
   ]
 
   const handleItemPress = (item: ApiItem) => {
-    switch (item.action) {
-      case "external":
-        Linking.openURL(item.link)
-        break
-      case "copy":
-        break
-    }
+    Linking.openURL(item.link)
   }
 
   return (

@@ -2255,6 +2255,8 @@
         "staticQrCopied": "Tu enlace de código QR estático se ha copiado",
         "setByOs": "Establecido por OS",
         "apiAcess": "Integración de API",
+        "apiDocumentation": "Documentación de la API",
+        "apiDashboard": "Acceso a la API y panel de control",
         "pos": "Punto de venta",
         "posCopied": "Su enlace de punto de venta ha sido copiado",
         "setYourLightningAddress": "Establezca su dirección lightning",
