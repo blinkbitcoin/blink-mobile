@@ -2752,7 +2752,7 @@
         "firstName": "Vorname",
         "lastName": "Nachname",
         "confirmNameContent": "Ist die Schreibweise Ihres Namens korrekt?\n\n{firstName: string} {lastName: string}\n\nEr muss mit dem Namen in Ihrem Ausweis übereinstimmen.",
-        "requirements": "Mit der Hochstufung Ihres Kontos erhöhen sich Ihre Limits und Sie erhalten zusätzliche Funktionen wie Überweisungen auf Bankkonten in ausgewählten Ländern.\n\nSie müssen Ihren Namen, einen von der Regierung ausgestellten Ausweis und ein Selfie angeben. Wir werden mit ihrem Namen anfangen.",
+        "requirements": "Mit der Hochstufung Ihres Kontos erhöhen sich Ihre Limits und Sie erhalten zusätzliche Funktionen wie Überweisungen auf Bankkonten in ausgewählten Ländern.",
         "success": "Die Dokumente wurden erfolgreich empfangen und werden in Kürze bearbeitet. Sie können auf diese Seite zurückkehren, um sich über den Status Ihrer Registrierung zu informieren.",
         "error": "Bei der Einreichung Ihrer Dokumente ist ein Fehler aufgetreten. Sie können sich an den Support wenden, wenn das Problem weiterhin besteht.",
         "status": "Dein Onboarding-Status ist: ",

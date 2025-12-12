@@ -2752,7 +2752,7 @@
         "firstName": "Erinnya erisooka",
         "lastName": "Erinnya erisemba",
         "confirmNameContent": "Enjatula y’erinnya lyo ntuufu?\n\n{firstName: string} {lastName: string}\n\nLirina okukwatagana n’erinnya eriri ku ndagamuntu yo.",
-        "requirements": "Okulongoosa akawunti yo kijja kwongera ku kkomo lyo n’okukuwa emirimu emirala ng’okukyusa ku akawunti za bbanka mu nsi ezirondeddwa.\n\nOjja kuba olina okuwaayo amannya go, endagamuntu efulumiziddwa gavumenti n’okwekubya ebifaananyi. Tujja kutandika n'erinnya lyo.",
+        "requirements": "Okulongoosa akawunti yo kijja kwongera ku kkomo lyo n’okukuwa emirimu emirala ng’okukyusa ku akawunti za bbanka mu nsi ezirondeddwa.",
         "success": "Ebiwandiiko biwanuliddwa bulungi era mu bbanga ttono bigenda kukolebwako. osobola okudda oluvanyuma okufuna okutegezebwa ku nyimirira yo ey'okuberako",
         "error": "Wabaddewo ensobi mu kuwaayo ebiwandiiko byo. Osobola okutuukirira abayambi singa ekizibu kisigalawo.",
         "status": "Embeera yo ey'okutwegatako eri:",
