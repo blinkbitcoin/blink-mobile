@@ -4,15 +4,11 @@ import { View } from "react-native"
 import { gql } from "@apollo/client"
 import {
   AccountDisableNotificationCategoryMutation,
-  AccountDisableNotificationChannelMutation,
   AccountEnableNotificationCategoryMutation,
-  AccountEnableNotificationChannelMutation,
   NotificationChannel,
   NotificationSettings,
   useAccountDisableNotificationCategoryMutation,
-  useAccountDisableNotificationChannelMutation,
   useAccountEnableNotificationCategoryMutation,
-  useAccountEnableNotificationChannelMutation,
   useNotificationSettingsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -156,28 +152,6 @@ export const NotificationSettingsScreen: React.FC = () => {
   const accountId = data?.me?.defaultAccount?.id
   const notificationSettings = data?.me?.defaultAccount?.notificationSettings
 
-  const [enableNotificationChannel] = useAccountEnableNotificationChannelMutation({
-    optimisticResponse:
-      accountId && notificationSettings
-        ? () =>
-            optimisticEnableChannelResponse({
-              notificationSettings,
-              accountId,
-            })
-        : undefined,
-  })
-
-  const [disableNotificationChannel] = useAccountDisableNotificationChannelMutation({
-    optimisticResponse:
-      accountId && notificationSettings
-        ? () =>
-            optimisticDisableChannelResponse({
-              notificationSettings,
-              accountId,
-            })
-        : undefined,
-  })
-
   const [enableNotificationCategory] = useAccountEnableNotificationCategoryMutation({
     optimisticResponse:
       accountId && notificationSettings
@@ -201,8 +175,6 @@ export const NotificationSettingsScreen: React.FC = () => {
             })
         : undefined,
   })
-
-  const pushNotificationsEnabled = notificationSettings?.push.enabled
 
   const pushNotificationCategoryEnabled = (category: NotificationCategoryType) => {
     return !notificationSettings?.push.disabledCategories.includes(category)
@@ -264,43 +236,7 @@ export const NotificationSettingsScreen: React.FC = () => {
 
   return (
     <Screen style={styles.container} preset="scroll">
-      <View style={styles.settingsHeader}>
-        <View style={styles.notificationHeader}>
-          <Icon name={"notifications-outline"} size={24} type="ionicon" />
-          <Text type="p2">{LL.NotificationSettingsScreen.pushNotifications()}</Text>
-        </View>
-        <Switch
-          value={pushNotificationsEnabled}
-          onValueChange={async (enabled) => {
-            if (enabled) {
-              await enableNotificationChannel({
-                variables: {
-                  input: {
-                    channel: NotificationChannel.Push,
-                  },
-                },
-              })
-            } else {
-              await disableNotificationChannel({
-                variables: {
-                  input: {
-                    channel: NotificationChannel.Push,
-                  },
-                },
-              })
-            }
-          }}
-        />
-      </View>
-
-      {pushNotificationsEnabled && (
-        <>
-          <Text type="p2" style={styles.preferencesText}>
-            {LL.common.preferences()}
-          </Text>
-          <View style={styles.settingsBody}>{pushNotificationSettings}</View>
-        </>
-      )}
+      <View style={styles.settingsBody}>{pushNotificationSettings}</View>
     </Screen>
   )
 }
@@ -308,18 +244,6 @@ export const NotificationSettingsScreen: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     padding: 20,
-  },
-  settingsHeader: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  preferencesText: {
-    marginTop: 20,
-    marginBottom: 10,
   },
   settingsBody: {
     backgroundColor: colors.grey5,
@@ -329,68 +253,7 @@ const useStyles = makeStyles(({ colors }) => ({
   listItemContainer: {
     backgroundColor: colors.transparent,
   },
-  notificationHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-  },
 }))
-
-const optimisticEnableChannelResponse = ({
-  notificationSettings,
-  accountId,
-}: {
-  notificationSettings: NotificationSettings
-  accountId: string
-}) => {
-  return {
-    accountEnableNotificationChannel: {
-      account: {
-        id: accountId,
-        notificationSettings: {
-          push: {
-            enabled: true,
-            disabledCategories: notificationSettings.push.disabledCategories,
-            __typename: "NotificationChannelSettings",
-          },
-          __typename: "NotificationSettings",
-        },
-        __typename: "ConsumerAccount",
-      },
-      errors: [],
-      __typename: "AccountUpdateNotificationSettingsPayload",
-    },
-    __typename: "Mutation",
-  } as AccountEnableNotificationChannelMutation
-}
-
-const optimisticDisableChannelResponse = ({
-  notificationSettings,
-  accountId,
-}: {
-  notificationSettings: NotificationSettings
-  accountId: string
-}) => {
-  return {
-    accountDisableNotificationChannel: {
-      account: {
-        id: accountId,
-        notificationSettings: {
-          push: {
-            enabled: false,
-            disabledCategories: notificationSettings.push.disabledCategories,
-            __typename: "NotificationChannelSettings",
-          },
-          __typename: "NotificationSettings",
-        },
-        __typename: "ConsumerAccount",
-      },
-      errors: [],
-      __typename: "AccountUpdateNotificationSettingsPayload",
-    },
-    __typename: "Mutation",
-  } as AccountDisableNotificationChannelMutation
-}
 
 const optimisticEnableCategoryResponse = ({
   notificationSettings,

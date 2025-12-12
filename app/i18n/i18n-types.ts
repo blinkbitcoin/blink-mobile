@@ -7458,7 +7458,7 @@ type RootTranslation = {
 		 */
 		accountBeingDeleted: string
 		/**
-		 * D​a​n​g​e​r​ ​Z​o​n​e
+		 * D​a​n​g​e​r​ ​z​o​n​e
 		 */
 		dangerZone: string
 		/**
@@ -16834,7 +16834,7 @@ export type TranslationFunctions = {
 		 */
 		accountBeingDeleted: () => LocalizedString
 		/**
-		 * Danger Zone
+		 * Danger zone
 		 */
 		dangerZone: () => LocalizedString
 		/**

@@ -190,5 +190,6 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "row",
     columnGap: 10,
+    marginRight: -5,
   },
 }))

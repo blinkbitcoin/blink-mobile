@@ -42,15 +42,6 @@ export const ApiScreen: React.FC = () => {
       link: DASHBOARD_LINK,
       infoIcon: "question",
     },
-    {
-      id: "key",
-      title: "Read/Receive key",
-      leftIcon: "key-outline",
-      rightIcon: "copy-paste",
-      action: "copy",
-      link: "",
-      infoIcon: "question",
-    },
   ]
 
   const handleItemPress = (item: ApiItem) => {

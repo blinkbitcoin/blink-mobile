@@ -142,6 +142,7 @@ const useStyles = makeStyles(() => ({
   textStyle: {
     textAlign: "center",
     marginTop: 20,
+    marginHorizontal: 20,
   },
   buttonContainer: {
     marginTop: 20,

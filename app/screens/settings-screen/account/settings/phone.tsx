@@ -12,7 +12,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
-import { useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 gql`
   mutation userPhoneDelete {
@@ -35,6 +35,7 @@ gql`
 
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -89,6 +90,7 @@ export const PhoneSetting: React.FC = () => {
               color={colors.red}
               iconOnly
               onPress={deletePhonePrompt}
+              style={styles.buttonStyle}
             />
           ) : null
         ) : (
@@ -98,3 +100,9 @@ export const PhoneSetting: React.FC = () => {
     />
   )
 }
+
+const useStyles = makeStyles(() => ({
+  buttonStyle: {
+    marginRight: -5,
+  },
+}))

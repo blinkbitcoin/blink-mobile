@@ -2387,7 +2387,7 @@ const en: BaseTranslation = {
     itsATrialAccount:
       "Trial accounts have reduced transaction limits and no recovery method. If you lose your phone or uninstall the app, your funds will be unrecoverable.",
     accountBeingDeleted: "Your account is being deleted, please wait...",
-    dangerZone: "Danger Zone",
+    dangerZone: "Danger zone",
     phoneDeletedSuccessfully: "Phone deleted successfully",
     phoneNumber: "Phone Number",
     tapToAddPhoneNumber: "Tap to add phone number",
