@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Icon, Text, Skeleton } from "@rn-vui/themed"
+import { makeStyles, Icon, Text, Skeleton, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 type Props = {
@@ -36,6 +36,9 @@ export const SettingsRow: React.FC<Props> = ({
 }) => {
   const [hovering, setHovering] = useState(false)
   const styles = useStyles({ hovering })
+  const {
+    theme: { colors },
+  } = useTheme()
 
   if (loading) return <Skeleton style={styles.container} animation="pulse" />
   if (spinner)
@@ -49,7 +52,11 @@ export const SettingsRow: React.FC<Props> = ({
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
-      <Icon name={rightIcon ? rightIcon : defaultIcon} type="ionicon" />
+      <Icon
+        name={rightIcon ? rightIcon : defaultIcon}
+        type="ionicon"
+        color={colors.primary}
+      />
     ) : (
       rightIcon
     ))

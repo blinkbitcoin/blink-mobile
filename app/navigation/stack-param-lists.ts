@@ -101,6 +101,7 @@ export type RootStackParamList = {
   accountScreen: undefined
   profileScreen: undefined
   notificationSettingsScreen: undefined
+  apiScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
   emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }

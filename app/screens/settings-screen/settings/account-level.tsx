@@ -14,8 +14,7 @@ export const AccountLevelSetting: React.FC = () => {
 
   return (
     <SettingsRow
-      title={LL.common.account()}
-      subtitle={LL.AccountScreen.level({ level })}
+      title={`${LL.common.yourAccount()}: ${LL.AccountScreen.level({ level })}`}
       leftGaloyIcon="user"
       action={() => {
         navigate("accountScreen")

@@ -13,7 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
@@ -60,7 +60,7 @@ const title = (
   LL: TranslationFunctions,
 ): string => {
   if (email) {
-    if (emailVerified) return LL.AccountScreen.email()
+    if (emailVerified) return email?.toString()
     return LL.AccountScreen.unverifiedEmail()
   }
   return LL.AccountScreen.tapToAddEmail()
@@ -68,6 +68,9 @@ const title = (
 
 export const EmailSetting: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -162,7 +165,13 @@ export const EmailSetting: React.FC = () => {
         <GaloyIconButton name="refresh" size="medium" onPress={reVerifyEmailPrompt} />
       )}
       {(bothEmailAndPhoneVerified || (email && !emailVerified)) && (
-        <GaloyIconButton name="close" size="medium" onPress={deleteEmailPrompt} />
+        <GaloyIconButton
+          name="close"
+          size="medium"
+          iconOnly
+          onPress={deleteEmailPrompt}
+          color={colors.red}
+        />
       )}
     </View>
   ) : undefined
@@ -172,7 +181,6 @@ export const EmailSetting: React.FC = () => {
       loading={loading}
       spinner={emDelLoading || emRegLoading}
       title={title(email, emailVerified, LL)}
-      subtitle={emailVerified ? email?.toString() : email}
       leftIcon="mail-outline"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
@@ -185,5 +193,6 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "row",
     columnGap: 10,
+    marginRight: -5,
   },
 }))
