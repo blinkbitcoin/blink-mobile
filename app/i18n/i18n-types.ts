@@ -7402,7 +7402,7 @@ type RootTranslation = {
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​S​e​t​t​i​n​g​s
+		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
 		 */
 		title: string
 		/**
@@ -16786,7 +16786,7 @@ export type TranslationFunctions = {
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * Notification Settings
+		 * Notification settings
 		 */
 		title: () => LocalizedString
 		/**

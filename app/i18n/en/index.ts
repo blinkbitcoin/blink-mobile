@@ -2363,7 +2363,7 @@ const en: BaseTranslation = {
     displayCurrency: "Display currency",
   },
   NotificationSettingsScreen: {
-    title: "Notification Settings",
+    title: "Notification settings",
     pushNotifications: "Enable all",
     notificationCategories: {
       Circles: {

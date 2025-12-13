@@ -2291,7 +2291,7 @@
         "displayCurrency": "Mostrar moneda"
     },
     "NotificationSettingsScreen": {
-        "title": "Configuración de Notificaciones ",
+        "title": "Configuración de notificaciones",
         "pushNotifications": "Habilitar todas",
         "notificationCategories": {
             "Circles": {
