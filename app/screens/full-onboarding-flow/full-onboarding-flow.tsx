@@ -15,12 +15,12 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   OnboardingStatus,
   useFullOnboardingScreenQuery,
-  useOnboardingFlowStartMutation,
+  useKycFlowStartMutation,
 } from "@app/graphql/generated"
 
 gql`
-  mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-    onboardingFlowStart(input: $input) {
+  mutation kycFlowStart {
+    kycFlowStart {
       workflowRunId
       tokenWeb
     }
@@ -55,7 +55,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
   const [loadingSumsub, setLoadingSumsub] = useState(false)
 
-  const [onboardingFlowStart] = useOnboardingFlowStartMutation()
+  const [kycFlowStart] = useKycFlowStartMutation()
 
   const {
     appConfig: {
@@ -67,11 +67,9 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     setLoadingSumsub(true)
 
     try {
-      const res = await onboardingFlowStart({
-        variables: { input: { firstName: "", lastName: "" } },
-      })
+      const res = await kycFlowStart()
 
-      const token = res.data?.onboardingFlowStart?.tokenWeb ?? ""
+      const token = res.data?.kycFlowStart?.tokenWeb ?? ""
 
       const theme = mode === "dark" || mode === "light" ? mode : ""
 
@@ -115,7 +113,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     } finally {
       setLoadingSumsub(false)
     }
-  }, [LL, locale, mode, navigate, goBack, onboardingFlowStart, kycUrl])
+  }, [LL, locale, mode, navigate, goBack, kycFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
