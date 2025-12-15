@@ -6350,7 +6350,7 @@ type RootTranslation = {
 				 */
 				message: string
 			}
-			claimedToEarly: {
+			claimedTooEarly: {
 				/**
 				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
 				 */
@@ -15825,7 +15825,7 @@ export type TranslationFunctions = {
 				 */
 				message: () => LocalizedString
 			}
-			claimedToEarly: {
+			claimedTooEarly: {
 				/**
 				 * Reward wallet empty
 				 */

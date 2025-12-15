@@ -2053,7 +2053,7 @@ const en: BaseTranslation = {
         title: "IP restricted",
         message: "We're experiencing an attack from users with this IP.\nWe've disabled rewards for this IP until further notice. Apologies!",
       },
-      claimedToEarly:{
+      claimedTooEarly:{
         title: "Reward wallet empty",
         message: "We'll add funds soon. Sorry!",
       },

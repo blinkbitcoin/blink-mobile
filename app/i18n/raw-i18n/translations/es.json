@@ -2017,7 +2017,7 @@
                 "title": "IP restringida",
                 "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
             },
-            "claimedToEarly":{
+            "claimedTooEarly":{
                 "title": "Billetera de recompensas vacía",
                 "message": "Agregaremos fondos pronto. ¡Disculpa!"
             },

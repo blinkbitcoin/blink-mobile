@@ -315,8 +315,8 @@ export const EarnQuiz = ({ route }: Props) => {
           }
         case "QUIZ_CLAIMED_TOO_EARLY":
           return {
-            title: LL.EarnScreen.customMessages.claimedToEarly.title(),
-            message: LL.EarnScreen.customMessages.claimedToEarly.message(),
+            title: LL.EarnScreen.customMessages.claimedTooEarly.title(),
+            message: LL.EarnScreen.customMessages.claimedTooEarly.message(),
           }
         case "NOT_ENOUGH_BALANCE_FOR_QUIZ":
           return {
