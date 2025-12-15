@@ -169,7 +169,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
 
   const activeInputRef = useRef<TInputType>("search")
 
-  const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("null")
+  const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("")
   // To don't update the country code as we type
   const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
   const [defaultPhoneInputInfo, setDefaultPhoneInputInfo] =
