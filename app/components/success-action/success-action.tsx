@@ -13,12 +13,12 @@ export const SuccessActionComponent: React.FC<SuccessActionComponentProps> = ({
 }) => {
   const styles = useStyles()
 
-  if (!visible) {
+  if (!visible || !text) {
     return <></>
   }
   return (
     <View style={styles.fieldContainer}>
-      <FieldWithEvent title={title} value={text!} subValue={subValue} />
+      <FieldWithEvent title={title} value={text} subValue={subValue} />
     </View>
   )
 }

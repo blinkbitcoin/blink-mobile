@@ -2251,7 +2251,8 @@
         "noteLabel": "Note",
         "sender": "Sender",
         "recipient": "Recipient",
-        "time": "Time"
+        "time": "Time",
+        "type": "Type"
     },
     "SettingsScreen": {
         "staticQr": "Printable Static QR Code",

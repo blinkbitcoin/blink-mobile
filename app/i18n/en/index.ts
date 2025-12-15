@@ -2322,6 +2322,7 @@ const en: BaseTranslation = {
     sender: "Sender",
     recipient: "Recipient",
     time: "Time",
+    type: "Type",
   },
   SettingsScreen: {
     staticQr: "Printable Static QR Code",

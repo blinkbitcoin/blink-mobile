@@ -40,7 +40,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
             {textData.url && (
               <Text
                 {...testProps(LL.ScanningQRCodeScreen.openLinkTitle())}
-                style={styles.inputUlr}
+                style={styles.inputUrl}
                 onPress={() => Linking.openURL(textData.url!)}
               >
                 {textData.url}
@@ -81,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
     textAlign: "right",
   },
-  inputUlr: {
+  inputUrl: {
     color: colors.primary,
   },
   subValueStyle: {

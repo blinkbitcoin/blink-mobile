@@ -7258,6 +7258,10 @@ type RootTranslation = {
 		 * T​i​m​e
 		 */
 		time: string
+		/**
+		 * T​y​p​e
+		 */
+		type: string
 	}
 	SettingsScreen: {
 		/**
@@ -16628,6 +16632,10 @@ export type TranslationFunctions = {
 		 * Time
 		 */
 		time: () => LocalizedString
+		/**
+		 * Type
+		 */
+		type: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
