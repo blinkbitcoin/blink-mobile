@@ -1288,6 +1288,7 @@ export type Mutation = {
    * failed, pending, already_paid).
    */
   readonly intraLedgerUsdPaymentSend: PaymentSendPayload;
+  readonly kycFlowStart: OnboardingFlowStartResult;
   /** Sends a payment to a lightning address. */
   readonly lnAddressPaymentSend: PaymentSendPayload;
   /** Cancel an unpaid lightning invoice for an associated wallet. */
@@ -9664,6 +9665,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
   intraLedgerUsdPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerUsdPaymentSendArgs, 'input'>>;
+  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType>;
   lnAddressPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnAddressPaymentSendArgs, 'input'>>;
   lnInvoiceCancel?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCancelArgs, 'input'>>;
   lnInvoiceCreate?: Resolver<ResolversTypes['LnInvoicePayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCreateArgs, 'input'>>;
