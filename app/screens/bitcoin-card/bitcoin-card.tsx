@@ -30,9 +30,7 @@ export const BitcoinCard: React.FC = () => {
           </Text>
           <View style={styles.forContainer}>
             <View style={styles.lineStyle} />
-            <Text type="p1">
-              {LL.BitcoinCardScreen.cardInfo.for()}
-            </Text>
+            <Text type="p1">{LL.BitcoinCardScreen.cardInfo.for()}</Text>
             <View style={styles.lineStyle} />
           </View>
           <Text type="h2" style={styles.boldText}>
