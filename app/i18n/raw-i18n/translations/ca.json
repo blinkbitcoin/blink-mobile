@@ -1256,7 +1256,7 @@
                             "Wow, aquest és un objectiu ambiciós! Tot i que és cert que la mineria requereix una quantitat significativa de potència computacional, estic bastant segur que el propòsit principal no és crear un exèrcit de senyors de l'IA. Més sort la propera vegada!"
                         ],
                         "question": "Quin és l'objectiu principal de la mineria a la xarxa bitcoin?",
-                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
+                        "text": "Quan un usuari vol enviar una transacció a la xarxa bitcoin, ha de signar la transacció amb la seva clau privada per demostrar que és el propietari dels fons que es transfereixen. Un cop signada la transacció, es transmet a la xarxa usuari-a-usuari.\n\nLa mineria és el procés d'afegir transaccions a la cadena de blocs de bitcoin. Quan una transacció es transmet a la xarxa, els miners la capten i verifiquen que la transacció és vàlida (és a dir, que l'usuari té els fons necessaris i que la clau privada utilitzada per signar la transacció correspon a la clau pública associada als fons).\n\nUn cop verificada una transacció, s'afegeix a un bloc de transaccions, juntament amb un trencaclosques matemàtic. Els miners competeixen per resoldre el trencaclosques, i el primer que el resolgui afegeix el bloc a la cadena de blocs i reclama una recompensa en bitcoins. La recompensa actualment és de 3,125 bitcoins, més les comissions de transacció que s'havien inclòs al bloc.\n\nA més d'afegir transaccions a la cadena de blocs, la mineria també serveix per assegurar la xarxa de bitcoin. Això és degut a que resoldre el trencaclosques requereix una quantitat significativa de potència computacional, i afegir un bloc a la cadena de blocs requereix que altres miners verifiquin la solució. Això fa que sigui molt difícil que qualsevol persona o grup manipuli la cadena de blocs.\n",
                         "title": "La mineria."
                     },
                     "proofOfWork": {
@@ -1281,12 +1281,12 @@
                             "Els miners ho canvien aleatòriament per consens."
                         ],
                         "feedback": [
-                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
-                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
-                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
+                            "Així és! El programari de Bitcoin ajusta automàticament la dificultat de la mineria cada 2016 blocs -aproximadament cada dues setmanes- per aconseguir un ritme constant d'un bloc cada 10 minuts. Aquesta és una de les característiques més elegants del protocol.",
+                            "No exactament. Tot i que el preu influeix en quants miners estan actius, l'ajust de dificultat no té res a veure amb el preu. Es basa únicament en el temps, concretament, en quant de temps va trigar a minar els darrers 2016 blocs. Torna-ho a intentar!",
+                            "Bon intent, però no. Els miners no poden canviar la dificultat aleatòriament. Està integrat al protocol i passa automàticament. Això evita la manipulació i garanteix un calendari d'emissió coherent. Torna-ho a intentar!"
                         ],
-                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
-                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
+                        "question": "Com garanteix la xarxa Bitcoin que s'afegeixin nous blocs aproximadament cada 10 minuts?",
+                        "text": "Un altre component crític de la xarxa Bitcoin és l'\"Ajust de Dificultat\", un mecanisme de recalibratge automàtic que garanteix que els blocs es trobin a intervals regulars d'uns 10 minuts, independentment de quants miners hi participin.\n\nCada 2016 blocs -aproximadament cada dues setmanes-, el programari Bitcoin comprova quant de temps ha trigat a minar el lot anterior. Si els blocs s'estaven minant massa ràpid, el trencaclosques criptogràfic es fa més difícil. Si eren massa lents, el trencaclosques es fa més fàcil. Això manté l'emissió de nous bitcoins en un calendari predictible.\n\nAquest mecanisme no s'assembla a res del món físic. Per exemple, quan més miners d'or s'uneixen a la recerca d'or, l'oferta augmenta. En Bitcoin, més miners simplement augmenten la seguretat de la xarxa, no la taxa d'emissió. L'ajust de dificultat és el que manté la màquina Bitcoin funcionant a temps.",
                         "title": "Ajust de dificultat."
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Molt creatiu, però equivocat. El calendari de subministrament de Bitcoin és qualsevol cosa menys aleatori. La seva predictibilitat proporciona certesa als actors econòmics com res en la història de la humanitat. Torna-ho a provar!"
                         ],
                         "question": "Què passa amb la recompensa de bloc a la xarxa bitcoin cada quatre anys?",
-                        "text": "One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.\n\nThis event, known as the \"halving\", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 3.125 bitcoins, but it will be reduced to 1.5625 bitcoins in 2028 when the next halving occurs.\n\nThese halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\\~19.3 million) have already been mined.\n\nUnlike fiat currencies, which can be inflationary, bitcoin is disinflationary in nature. This makes it more scarce than fiat and precious metals such as gold and silver, or anything else known in the universe.\n",
+                        "text": "Un últim element que és important entendre és que la recompensa per bloc a la xarxa bitcoin es redueix a la meitat cada quatre anys, o cada 210.000 blocs.\n\nAquest esdeveniment, conegut com a \"halving\", està programat al programari de bitcoin que executen tots els usuaris. Quan es va llançar bitcoin per primera vegada, els miners rebien 50 bitcoins nous per cada bloc que afegien a la cadena de blocs. Actualment, la recompensa del bloc és de 3,125 bitcoins, però es reduirà a 1,5625 bitcoins el 2028 quan es produeixi el proper halving.\n\nAquests \"halvings\" continuaran tenint lloc fins a l'any 2140, moment en què el nombre total de bitcoins que s'hauran minat es limitarà a 21 milions. A partir del 2023, al voltant del 92% de tots els bitcoins (~19,3 milions) ja s'havien minat.\n\nA diferència de les monedes fiduciàries, que poden ser inflacionistes, el bitcoin és de naturalesa desinflacionista. Això el fa més escàs que les monedes fiduciàries i els metalls preciosos com l'or i la plata, o qualsevol altra cosa coneguda a l'univers.\n",
                         "title": "El \"halving\" - La reducció a la mitat."
                     }
                 }
@@ -2009,6 +2009,7 @@
         "logInCreateAccount": "Iniciar sessió / crear un compte",
         "createAccount": "Crea un nou compte",
         "exploreWallet": "Explora el moneder",
+        "login": "Iniciar sessió",
         "logBackInWith": "Torna a iniciar sessió amb",
         "headline": "Moneder desenvolupat per Galoy",
         "startTrialAccount": "Comença amb un compte de prova",
@@ -2018,9 +2019,13 @@
         "trialAccountCreationFailedMessage": "Malauradament, no hem pogut crear el teu compte de prova. Torna-ho a provar més tard o crea un compte amb un número de telèfon.",
         "trialAccountHasLimits": "El compte de prova té limits",
         "trialAccountLimits": {
+            "modalTitle": "Actualitza per a més avantatges",
             "noBackup": "No hi ha opció de còpia de seguretat",
             "sendingLimit": "Límit diari d'enviament reduït",
-            "noOnchain": "No rebre bitcoin \"onchain\""
+            "noOnchain": "No rebre bitcoin \"onchain\"",
+            "recoveryOption": "Recuperar fons per SMS o correu electrònic",
+            "dailyLimit": "Límit de transacció diari de 1000 $",
+            "onchainReceive": "Rep bitcoin onchain"
         }
     },
     "MapScreen": {
@@ -2274,10 +2279,10 @@
         "nfcScanNow": "Escaneja NFC ara",
         "nfcNotSupported": "NFC no és compatible amb aquest dispositiu",
         "logInOrCreateAccount": "Iniciar sessió o crear un compte",
-        "logOutFromOneAccount": "Log out from this account",
-        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
-        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
-        "logoutOneAccountConfirm": "I understand. Please log out."
+        "logOutFromOneAccount": "Tanca la sessió d'aquest compte",
+        "logoutOneAccountAlertTitle": "Estas segur que vols tancar la sessió d'aquest compte?",
+        "logoutOneAccountAlertContent": "Es tancarà la sessió enllaçada a {identifier: string}.\nAssegura't que tens accés per tornar a iniciar la sessió en el futur.",
+        "logoutOneAccountConfirm": "Ho entenc. Si us plau, tanca la sessió."
     },
     "NotificationSettingsScreen": {
         "title": "Configuració de notificacions",
@@ -2311,7 +2316,7 @@
         "tapToAddPhoneNumber": "Prem per afegir el número de telèfon",
         "loginMethods": "Mètodes d'inici de sessió",
         "level": "Nivell {level: string}",
-        "switchAccount": "Switch Account",
+        "switchAccount": "Canvia de compte",
         "pleaseWait": "Si us plau, espereu.",
         "accountLevel": "Nivell de compte",
         "upgrade": "Millora el teu compte",
@@ -2356,7 +2361,10 @@
     },
     "ProfileScreen": {
         "addAccount": "Afegir un compte",
-        "error": "Unable to fetch profiles at this time"
+        "error": "No es poden obtenir els perfils en aquest moment",
+        "fromThisDevice": "des d'aquest dispositiu?",
+        "switchAccount": "Has canviat a un altre compte",
+        "removedAccount": "Has eliminat el compte {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autentificació de dos factors",
@@ -2440,10 +2448,14 @@
         "receiveOnchain": "Rep bitcoin onchain",
         "onlyAPhoneNumber": "Verificació ràpida i senzilla del número de telèfon",
         "letsGo": "Anem!",
-        "stayInTrialMode": "Mantenir-se en mode de prova"
+        "stayInTrialMode": "Mantenir-se en mode de prova",
+        "upgradeToLevel": "Millora de nivell {level: number}",
+        "notNow": "Ara no",
+        "setUpLevelAccount": "Configura un compte de nivell {level: number}"
     },
     "SetAddressModal": {
         "title": "Estableix la teva adreça {bankName: string} ",
+        "mainTitle": "Tria l'adreça Lightning",
         "setLightningAddress": "Configura la adreça Lightning",
         "Errors": {
             "tooShort": "L'adreça ha de tenir almenys 3 caràcters",
@@ -2453,7 +2465,7 @@
             "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard"
         },
         "receiveMoney": "Rep diners d'altres moneders lightning i usuaris de {bankName: string} amb aquesta adreça.",
-        "itCannotBeChanged": "No es pot canviar més endavant."
+        "itCannotBeChanged": "Tria bé, no es pot canviar més tard!"
     },
     "WelcomeFirstScreen": {
         "bank": "Bitcoin està dissenyat per permetre guardar, enviar i rebre diners, sense dependre d'un banc o targeta de crèdit.",
@@ -2477,6 +2489,48 @@
         "whatsapp": "Envia per WhatsApp",
         "telegram": "Enviar per Telegram"
     },
+    "LoginMethodScreen": {
+        "title": "Selecciona el mètode d'inici de sessió preferit.",
+        "useTelegram": "Utilitza Telegram",
+        "useSms": "Utilitza SMS",
+        "useWhatsapp": "Utilitza WhatsApp",
+        "useEmail": "Utilitza el correu electrònic",
+        "setupTelegram": "Configura l'inici de sessió amb Telegram",
+        "setupSms": "Configura l'inici de sessió per SMS",
+        "setupWhatsapp": "Configura l'inici de sessió amb WhatsApp",
+        "setupEmail": "Configura l'inici de sessió per correu electrònic"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "Benvingut al Nivell 1",
+            "title": "Noves funcions desbloquejades per al teu compte:",
+            "receiveBitcoinDescription": "Rep Bitcoin amb el teu número de telèfon",
+            "dailyLimitDescription": "Envia fins a 1.000 dòlars al dia",
+            "onchainDescription": "Rebre pagaments en cadena"
+        },
+        "emailBenefits": {
+            "mainTitle": "Afegeix un inici de sessió per correu electrònic",
+            "title": "L'inici de sessió per correu electrònic et permet:",
+            "backupDescription": "Tinguis una còpia de seguretat per accedir al teu compte",
+            "supportDescription": "Facilita'ns que et puguem donar suport",
+            "securityDescription": "Augmenta la seguretat del compte",
+            "primaryButton": "Configura l'inici de sessió amb correu electrònic"
+        },
+        "lightningBenefits": {
+            "mainTitle": "Configura una adreça Lightning personalitzada",
+            "title": "Beneficis de l'adreça Lightning:",
+            "staticAddressDescription": "Una adreça fixa per rebre pagaments",
+            "easyToShareDescription": "Fàcil de memoritzar i compartir públicament o en privat",
+            "blinkToolsDescription": "Desbloqueja diverses eines de Blink útils per al comerç",
+            "primaryButton": "Configura una adreça personalitzada"
+        },
+        "supportScreen": {
+            "mainTitle": "Ens encanten els comentaris",
+            "title": "Tot a punt!",
+            "description": "Qualsevol comentari és benvingut, no dubtis a enviar-nos un correu electrònic a {email}",
+            "primaryButton": "Fet"
+        }
+    },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Error en iniciar la sessió. Has utilitzat el codi correcte?",
         "errorTooManyAttempts": "Massa intents, intenta-ho més tard.",
@@ -2491,13 +2545,13 @@
     },
     "TelegramValidationScreen": {
         "text": "Passaport de Telegram",
-        "description": "After authorizing in Telegram, you will be automatically logged in",
+        "description": "Després d'autoritzar-ho a Telegram, iniciaràs la sessió automàticament.",
         "loginWithTelegram": "Inicia la sessió amb Telegram",
         "waitingForAuthorization": "Esperant l' autorització de Telegram...",
-        "errorFetchParams": "Failed to fetch Telegram auth params",
-        "errorFetchLogin": "Failed to fetch Telegram login",
-        "errorAuthTimeout": "Authorization timed out. Please try again.",
-        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
+        "errorFetchParams": "No s'han pogut obtenir els paràmetres d'identificació de Telegram.",
+        "errorFetchLogin": "No s'ha pogut obtenir l'inici de sessió de Telegram",
+        "errorAuthTimeout": "S'ha esgotat el temps d'autorització. Torna-ho a intentar.",
+        "errorOpenAppError": "No s'ha pogut obrir Telegram. Assegura't que l'aplicació estigui instal·lada."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Configuració del telèfon",
@@ -2545,6 +2599,8 @@
         "advanced": "Avançat",
         "community": "Comunitat",
         "account": "Compte",
+        "accounts": "Comptes",
+        "accountInformation": "Informació del compte",
         "trialAccount": "Compte de prova",
         "blinkUser": "Usuari Blink",
         "transactionLimits": "Límits de transacció",
@@ -2638,7 +2694,18 @@
         "thisMonth": "Aquest mes",
         "prevMonths": "Mesos anteriors",
         "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
-        "warning": "Advertència"
+        "warning": "Advertència",
+        "recommended": "Recomanat",
+        "expirationTime": "Temps de caducitat",
+        "minute": "Minut",
+        "day": {
+            "one": "Dia",
+            "other": "Dies"
+        },
+        "dollar": "Dòlar",
+        "all": "Tot",
+        "allAccounts": "Tots els comptes",
+        "profiles": "Perfils"
     },
     "errors": {
         "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",
@@ -2668,6 +2735,7 @@
         "joinTheCommunity": "Uneix-te a la comunitat",
         "whatsapp": "WhatsApp",
         "email": "Correu electrònic",
+        "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Gaudint de l'aplicació?",
         "statusPage": "Pàgina d'estat",
@@ -2687,7 +2755,8 @@
         "deleteAccountConfirmation": "El seu compte ha estat marcat per a la supressió.\n\nQuan finalitzi el període de prova relacionat amb els requisits normatius, les dades restants relacionades amb el seu compte seran eliminades de manera permanent.",
         "deleteAccountFromPhone": "Hola!, si us plau, esborra el meu compte. El meu número de telèfon és {phoneNumber: string}.",
         "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
-        "bye": "Adéu!"
+        "bye": "Adéu!",
+        "deleteAccountWarning": "Atenció: L'eliminació del compte és permanent!\nAssegura't que els moneders no tinguin fons abans d'eliminar-los.\nEl compte eliminat no es pot restablir."
     },
     "lnurl": {
         "overLimit": "No pots enviar més que l'import màxim",
