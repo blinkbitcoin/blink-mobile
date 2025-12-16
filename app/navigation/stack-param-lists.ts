@@ -1,4 +1,5 @@
 import { LNURLPaySuccessAction } from "lnurl-pay"
+import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
@@ -115,11 +116,32 @@ export type RootStackParamList = {
   totpRegistrationInitiate: undefined
   totpRegistrationValidate: { totpRegistrationId: string }
   totpLoginValidate: { authToken: string }
-  webView: { url: string; initialTitle?: string }
+  webView: {
+    url: string
+    initialTitle?: string
+    hideHeader?: boolean
+    onShouldStartLoad?: (req: ShouldStartLoadRequest) => boolean
+  }
   fullOnboardingFlow: undefined
   supportChat: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
+  bitcoinCard: undefined
+  cardDetails: undefined
+  welcomeCard: undefined
+  cardSubscribe: undefined
+  cardPayment: undefined
+  loadingCard: undefined
+  visaCard: undefined
+  creditCardLimit: undefined
+  selectCreditLimit: undefined
+  termSheetScreem: undefined
+  tranferInvest: undefined
+  topUpScreen: undefined
+  companyValuation: undefined
+  cardPersonalInformationScreen: undefined
+  cardPreapprovedScreen: undefined
+  cardProcessingScreen: undefined
 }
 
 export type OnboardingStackParamList = {

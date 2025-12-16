@@ -555,7 +555,6 @@ export const HomeScreen: React.FC = () => {
             </>
           )}
         </View>
-
         <AppUpdate />
         <SetDefaultAccountModal
           isVisible={setDefaultAccountModalVisible}
