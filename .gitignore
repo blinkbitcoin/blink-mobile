@@ -103,3 +103,8 @@ android-recordings
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# MCP development
+.mcp-pids/
+.mcp-logs/
+.mcp-ready

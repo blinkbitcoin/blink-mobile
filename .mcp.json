@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "blink-appium": {
+      "command": "npx",
+      "args": ["tsx", "dev/mcp-server/src/index.ts"],
+      "env": {
+        "APPIUM_HOME": "~/.appium"
+      }
+    }
+  }
+}

@@ -14,6 +14,6 @@ export function getConfig(): AppiumConfig {
     appPath:
       process.env.TEST_APK_PATH ||
       "./android/app/build/outputs/apk/debug/app-universal-debug.apk",
-    appPackage: "io.galoy.bitcoinbeach",
+    appPackage: "com.galoyapp",
   };
 }
