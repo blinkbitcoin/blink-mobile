@@ -451,7 +451,6 @@ export type Card = {
   readonly status: CardStatus;
 };
 
-/** Input for creating a consumer application using Sumsub share token */
 export type CardConsumerApplicationCreateInput = {
   /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
@@ -459,16 +458,14 @@ export type CardConsumerApplicationCreateInput = {
   readonly annualSalary: Scalars['String']['input'];
   /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Whether the user has completed L2 KYC verification */
+  readonly isL2Verified: Scalars['Boolean']['input'];
   /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
+  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for creating a consumer application using manual KYC */
@@ -503,8 +500,6 @@ export type CardConsumerApplicationManualCreateInput = {
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating an existing consumer application */
@@ -537,8 +532,6 @@ export type CardConsumerApplicationUpdateInput = {
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
@@ -1295,6 +1288,7 @@ export type Mutation = {
    * failed, pending, already_paid).
    */
   readonly intraLedgerUsdPaymentSend: PaymentSendPayload;
+  readonly kycFlowStart: OnboardingFlowStartResult;
   /** Sends a payment to a lightning address. */
   readonly lnAddressPaymentSend: PaymentSendPayload;
   /** Cancel an unpaid lightning invoice for an associated wallet. */
@@ -9670,6 +9664,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
   intraLedgerUsdPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerUsdPaymentSendArgs, 'input'>>;
+  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType>;
   lnAddressPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnAddressPaymentSendArgs, 'input'>>;
   lnInvoiceCancel?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCancelArgs, 'input'>>;
   lnInvoiceCreate?: Resolver<ResolversTypes['LnInvoicePayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCreateArgs, 'input'>>;
