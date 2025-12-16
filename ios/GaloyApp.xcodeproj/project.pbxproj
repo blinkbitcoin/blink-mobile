@@ -485,7 +485,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 772;
+				CURRENT_PROJECT_VERSION = 789;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UL7ND37VAD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UL7ND37VAD;
@@ -495,7 +495,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Blink;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.328;
+				MARKETING_VERSION = 2.4.15;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -522,7 +522,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 772;
+				CURRENT_PROJECT_VERSION = 789;
 				DEVELOPMENT_TEAM = UL7ND37VAD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UL7ND37VAD;
 				ENABLE_BITCODE = NO;
@@ -531,7 +531,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Blink;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.328;
+				MARKETING_VERSION = 2.4.15;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
