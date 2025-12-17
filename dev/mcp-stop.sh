@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stop all MCP services started by mcp-start.sh
+# Stop all MCP services started by orchestrator.sh
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
