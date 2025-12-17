@@ -136,6 +136,20 @@ function convertNode(
   return node;
 }
 
+// Collect all testIDs (content-desc values) from tree
+export function collectTestIds(node: ElementNode | null): string[] {
+  if (!node) return [];
+  const ids: string[] = [];
+
+  function walk(n: ElementNode) {
+    if (n.id) ids.push(n.id);
+    n.children?.forEach(walk);
+  }
+
+  walk(node);
+  return [...new Set(ids)].sort();
+}
+
 // Main export: parse Appium XML to efficient JSON
 export function parsePageSource(
   xml: string,

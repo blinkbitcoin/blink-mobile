@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
-import { parsePageSource, type FilterType } from "../utils/xml-parser.js";
+import { parsePageSource, collectTestIds, type FilterType } from "../utils/xml-parser.js";
 
 export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
   server.tool(
@@ -20,11 +20,17 @@ export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
           filter: filter as FilterType,
         });
 
+        const testIds = collectTestIds(tree);
+        const result = {
+          testIds,
+          tree,
+        };
+
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(tree, null, 2),
+              text: JSON.stringify(result, null, 2),
             },
           ],
         };

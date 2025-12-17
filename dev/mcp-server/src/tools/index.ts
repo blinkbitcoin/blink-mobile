@@ -15,6 +15,7 @@ import { registerScreenshotTool } from "./screenshot.js";
 import { registerLaunchAppTool } from "./launch-app.js";
 import { registerReloadAppTool } from "./reload-app.js";
 import { registerCheckInfrastructureTool } from "./check-infrastructure.js";
+import { registerStartServicesTool } from "./start-services.js";
 
 export function registerTools(server: McpServer, client: AppiumClient) {
   // Core viewing tools
@@ -34,4 +35,5 @@ export function registerTools(server: McpServer, client: AppiumClient) {
 
   // Infrastructure tools
   registerCheckInfrastructureTool(server);
+  registerStartServicesTool(server);
 }

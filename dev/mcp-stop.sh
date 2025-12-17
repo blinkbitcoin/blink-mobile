@@ -4,8 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-PID_DIR="$PROJECT_DIR/.mcp-pids"
-LOG_DIR="$PROJECT_DIR/.mcp-logs"
+MCP_STATE_DIR="$PROJECT_DIR/.mcp"
+PID_DIR="$MCP_STATE_DIR/pids"
+LOG_DIR="$MCP_STATE_DIR/logs"
 
 echo "Stopping MCP services..."
 

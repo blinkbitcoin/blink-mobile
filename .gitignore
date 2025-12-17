@@ -104,7 +104,8 @@ android-recordings
 !.yarn/sdks
 !.yarn/versions
 
-# MCP development
-.mcp-pids/
-.mcp-logs/
-.mcp-ready
+# MCP state (logs, pids, ready marker)
+.mcp/
+
+# Beads issue tracker (local only)
+.beads/

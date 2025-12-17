@@ -8,9 +8,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
 MCP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$(cd "$MCP_DIR/../.." && pwd)"
-PID_DIR="$PROJECT_DIR/.mcp-pids"
-LOG_DIR="$PROJECT_DIR/.mcp-logs"
-READY_MARKER="$PROJECT_DIR/.mcp-ready"
+MCP_STATE_DIR="$PROJECT_DIR/.mcp"
+PID_DIR="$MCP_STATE_DIR/pids"
+LOG_DIR="$MCP_STATE_DIR/logs"
+READY_MARKER="$MCP_STATE_DIR/ready"
 
 # Config
 export APPIUM_HOME="${APPIUM_HOME:-$HOME/.appium}"
@@ -34,7 +35,7 @@ die() {
 
 # Directory setup
 ensure_dirs() {
-  mkdir -p "$PID_DIR" "$LOG_DIR" "$APPIUM_HOME"
+  mkdir -p "$MCP_STATE_DIR" "$PID_DIR" "$LOG_DIR" "$APPIUM_HOME"
 }
 
 # PID management
