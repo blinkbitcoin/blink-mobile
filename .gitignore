@@ -107,5 +107,9 @@ android-recordings
 # MCP state (logs, pids, ready marker)
 .mcp/
 
-# Beads issue tracker (local only)
-.beads/
+# Convenience of using different agent tooling
+.claude
+.augment
+.bmad
+bmad-custom-src
+.beads
