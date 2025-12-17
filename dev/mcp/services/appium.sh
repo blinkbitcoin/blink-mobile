@@ -36,7 +36,9 @@ fi
 
 # Start Appium
 cd "$PROJECT_DIR"
-start_daemon "appium" "yarn appium --relaxed-security" || {
+# --address 127.0.0.1: bind to localhost only (security)
+# --relaxed-security: required for shell commands (hot reload) and app management
+start_daemon "appium" "yarn appium --address 127.0.0.1 --relaxed-security" || {
   print_failure "appium"
   exit 1
 }

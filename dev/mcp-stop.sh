@@ -32,7 +32,7 @@ echo "  Cleaning up orphaned processes..."
 pkill -f "emulator.*Pixel_API_35" 2>/dev/null || true
 pkill -f "qemu-system" 2>/dev/null || true
 pkill -f "@react-native/community-cli-plugin" 2>/dev/null || true
-pkill -f "appium --relaxed-security" 2>/dev/null || true
+pkill -f "appium.*--relaxed-security" 2>/dev/null || true
 
 # Force kill anything holding ports
 for port in 8081 4723; do

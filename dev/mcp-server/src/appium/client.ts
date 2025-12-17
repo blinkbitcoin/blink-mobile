@@ -1,13 +1,14 @@
-// @ts-nocheck - WebDriverIO types are complex, runtime behavior is correct
 import { remote } from "webdriverio";
 import { getConfig } from "./config.js";
 
-export class AppiumClient {
-  private browser = null;
-  private connecting = null;
+type WdioBrowser = Awaited<ReturnType<typeof remote>>;
 
-  // Get or create session
-  async getSession() {
+export class AppiumClient {
+  private browser: WdioBrowser | null = null;
+  private connecting: Promise<WdioBrowser> | null = null;
+
+  // Get or create session - always returns a valid browser
+  async getSession(): Promise<WdioBrowser> {
     if (this.browser?.sessionId) return this.browser;
     if (this.connecting) return this.connecting;
 
@@ -18,21 +19,18 @@ export class AppiumClient {
   }
 
   // Create new Appium session
-  private async connect() {
+  private async connect(): Promise<WdioBrowser> {
     const config = getConfig();
-    return remote({
-      hostname: config.host,
-      port: config.port,
-      path: "/",
-      capabilities: {
-        platformName: "Android",
-        "appium:deviceName": config.deviceName,
-        "appium:app": config.appPath,
-        "appium:automationName": "UiAutomator2",
-        "appium:snapshotMaxDepth": 500,
-        "appium:noReset": true,
-      } as const,
-    });
+    // Appium capabilities use vendor-prefixed keys not in WebDriverIO base types
+    const capabilities = {
+      platformName: "Android",
+      "appium:deviceName": config.deviceName,
+      "appium:app": config.appPath,
+      "appium:automationName": "UiAutomator2",
+      "appium:snapshotMaxDepth": 500,
+      "appium:noReset": true,
+    } as WebdriverIO.Capabilities;
+    return remote({ hostname: config.host, port: config.port, path: "/", capabilities });
   }
 
   // Trigger hot reload via Metro dev menu
@@ -41,7 +39,7 @@ export class AppiumClient {
     const config = getConfig();
 
     if (fullReload) {
-      await browser.terminateApp(config.appPackage);
+      await browser.terminateApp(config.appPackage, {});
       await browser.activateApp(config.appPackage);
     } else {
       // Open dev menu (keycode 82 opens the dev menu on Android)

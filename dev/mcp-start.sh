@@ -113,7 +113,7 @@ done
 
 # 3. Appium
 echo "Starting Appium..."
-nohup yarn appium --relaxed-security > "$LOG_DIR/appium.log" 2>&1 &
+nohup yarn appium --address 127.0.0.1 --relaxed-security > "$LOG_DIR/appium.log" 2>&1 &
 APPIUM_PID=$!
 echo $APPIUM_PID > "$PID_DIR/appium.pid"
 disown $APPIUM_PID

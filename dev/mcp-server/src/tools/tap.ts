@@ -1,4 +1,3 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
@@ -11,7 +10,8 @@ export function registerTapTool(server: McpServer, client: AppiumClient) {
     {
       id: z.string().describe("Element testID to tap"),
       waitMs: z.number().optional().describe("Pause after tap (default: 500ms)"),
-    } as never,
+    },
+    // @ts-expect-error - MCP SDK has complex recursive types for Zod schema inference
     async ({ id, waitMs = 500 }: { id: string; waitMs?: number }) => {
       try {
         const browser = await client.getSession();
@@ -23,13 +23,13 @@ export function registerTapTool(server: McpServer, client: AppiumClient) {
         await browser.pause(waitMs);
 
         return {
-          content: [{ type: "text", text: `Tapped: ${id}` }],
+          content: [{ type: "text" as const, text: `Tapped: ${id}` }],
         };
       } catch (error) {
         return {
           content: [
             {
-              type: "text",
+              type: "text" as const,
               text: `Error tapping ${id}: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],

@@ -50,9 +50,9 @@ mcp-build:
 mcp-server:
 	cd dev/mcp-server && npx tsx src/index.ts
 
-# Start Appium server standalone
+# Start Appium server standalone (localhost only)
 mcp-appium:
-	yarn appium --relaxed-security
+	yarn appium --address 127.0.0.1 --relaxed-security
 
 # Start all MCP services (emulator, metro, appium, app)
 # MCP server is spawned by Claude Code via .mcp.json
