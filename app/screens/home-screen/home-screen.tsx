@@ -23,9 +23,9 @@ import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
 import {
-  IncomingAmountBadge,
-  useIncomingAmountBadge,
-} from "@app/components/incoming-amount-badge"
+  UnseenTxAmountBadge,
+  useUnseenTxAmountBadge,
+} from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -255,8 +255,8 @@ export const HomeScreen: React.FC = () => {
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { latestIncomingTx, incomingAmountText, handleIncomingBadgePress, isOutgoing } =
-    useIncomingAmountBadge({
+  const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
+    useUnseenTxAmountBadge({
       transactions,
       hasUnseenBtcTx,
       hasUnseenUsdTx,
@@ -471,12 +471,12 @@ export const HomeScreen: React.FC = () => {
         </View>
       </View>
       <View style={styles.badgeSlot}>
-        <IncomingAmountBadge
-          key={latestIncomingTx?.id}
-          text={incomingAmountText ?? ""}
-          visible={Boolean(incomingAmountText)}
-          onPress={handleIncomingBadgePress}
-          outgoing={isOutgoing}
+        <UnseenTxAmountBadge
+          key={latestUnseenTx?.id}
+          amountText={unseenAmountText ?? ""}
+          visible={Boolean(unseenAmountText)}
+          onPress={handleUnseenBadgePress}
+          isOutgoing={isOutgoing}
         />
       </View>
       <ScrollView

@@ -4,7 +4,7 @@ import { Text, makeStyles } from "@rn-vui/themed"
 
 import { useDropInAnimation } from "@app/components/animations"
 
-const INCOMING_BADGE_ANIMATION = {
+const UNSEEN_BADGE_ANIMATION = {
   delay: 300,
   distance: 15,
   durationIn: 180,
@@ -14,37 +14,37 @@ const HIDDEN_STYLE = {
   transform: [{ translateY: 0 }],
 }
 
-type IncomingBadgeProps = {
-  text: string
+type UnseenTxAmountBadgeProps = {
+  amountText: string
   visible?: boolean
   onPress?: () => void
-  outgoing?: boolean
+  isOutgoing?: boolean
 }
 
-export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
-  text,
+export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
+  amountText,
   visible = true,
   onPress,
-  outgoing,
+  isOutgoing,
 }) => {
-  const styles = useStyles({ outgoing })
+  const styles = useStyles({ isOutgoing })
   const { opacity, translateY } = useDropInAnimation({
     visible,
-    delay: INCOMING_BADGE_ANIMATION.delay,
-    distance: INCOMING_BADGE_ANIMATION.distance,
-    durationIn: INCOMING_BADGE_ANIMATION.durationIn,
+    delay: UNSEEN_BADGE_ANIMATION.delay,
+    distance: UNSEEN_BADGE_ANIMATION.distance,
+    durationIn: UNSEEN_BADGE_ANIMATION.durationIn,
   })
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={text}
+      accessibilityLabel={amountText}
       disabled={!visible}
       onPress={onPress}
       style={styles.touch}
     >
       <Animated.View
-        key={text}
+        key={amountText}
         style={[
           styles.badge,
           visible ? { opacity, transform: [{ translateY }] } : HIDDEN_STYLE,
@@ -52,13 +52,13 @@ export const IncomingAmountBadge: React.FC<IncomingBadgeProps> = ({
         accessibilityElementsHidden={!visible}
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
-        {visible ? <Text style={styles.text}>{text}</Text> : null}
+        {visible ? <Text style={styles.text}>{amountText}</Text> : null}
       </Animated.View>
     </Pressable>
   )
 }
 
-const useStyles = makeStyles(({ colors }, { outgoing }: { outgoing?: boolean }) => ({
+const useStyles = makeStyles(({ colors }, { isOutgoing }: { isOutgoing?: boolean }) => ({
   touch: {
     alignSelf: "center",
   },
@@ -69,6 +69,6 @@ const useStyles = makeStyles(({ colors }, { outgoing }: { outgoing?: boolean }) 
   },
   text: {
     fontSize: 20,
-    color: outgoing ? colors.grey2 : colors._green,
+    color: isOutgoing ? colors.grey2 : colors._green,
   },
 }))

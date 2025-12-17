@@ -7,35 +7,41 @@ import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useDisplayCurrency } from "@app/hooks"
 import { toWalletAmount } from "@app/types/amounts"
 
-type IncomingBadgeParams = {
+type UnseenTxAmountBadgeParams = {
   transactions?: TransactionFragment[] | null
   hasUnseenUsdTx: boolean
   hasUnseenBtcTx: boolean
 }
 
-export const useIncomingAmountBadge = ({
+export const useUnseenTxAmountBadge = ({
   transactions,
   hasUnseenUsdTx,
   hasUnseenBtcTx,
-}: IncomingBadgeParams) => {
+}: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
 
-  const latestIncomingTx = useMemo(() => {
-    if (!transactions) return
+  const latestUnseenTx = useMemo(() => {
+    if (!transactions || transactions.length === 0) return
+    if (!hasUnseenBtcTx && !hasUnseenUsdTx) return
 
-    const wantedCurrency = hasUnseenUsdTx
-      ? WalletCurrency.Usd
-      : hasUnseenBtcTx
-        ? WalletCurrency.Btc
-        : null
-    if (!wantedCurrency) return
+    const unseenCurrencies: WalletCurrency[] = []
+    if (hasUnseenBtcTx) unseenCurrencies.push(WalletCurrency.Btc)
+    if (hasUnseenUsdTx) unseenCurrencies.push(WalletCurrency.Usd)
 
-    return transactions.find((t) => t.settlementCurrency === wantedCurrency)
-  }, [transactions, hasUnseenUsdTx, hasUnseenBtcTx])
+    const unseenTransactions = transactions.filter((tx) =>
+      unseenCurrencies.includes(tx.settlementCurrency),
+    )
 
-  const incomingAmountText = useMemo(() => {
-    if (!latestIncomingTx) return null
+    if (unseenTransactions.length === 0) return
+
+    return unseenTransactions.reduce((latest, tx) =>
+      tx.createdAt > latest.createdAt ? tx : latest,
+    )
+  }, [transactions, hasUnseenBtcTx, hasUnseenUsdTx])
+
+  const unseenAmountText = useMemo(() => {
+    if (!latestUnseenTx) return null
 
     const {
       settlementDisplayAmount: displayAmount,
@@ -43,7 +49,7 @@ export const useIncomingAmountBadge = ({
       settlementAmount: rawAmount,
       settlementCurrency: rawCurrency,
       direction,
-    } = latestIncomingTx
+    } = latestUnseenTx
 
     const hasDisplayAmount =
       displayAmount !== null && displayAmount !== undefined && Boolean(displayCurrency)
@@ -59,7 +65,7 @@ export const useIncomingAmountBadge = ({
         ? formatMoneyAmount({
             moneyAmount: toWalletAmount({
               amount: rawAmount,
-              currency: rawCurrency as WalletCurrency,
+              currency: rawCurrency,
             }),
           })
         : null
@@ -68,18 +74,18 @@ export const useIncomingAmountBadge = ({
     if (!formatted) return null
 
     return direction === TxDirection.Receive ? `+${formatted}` : formatted
-  }, [latestIncomingTx, formatCurrency, formatMoneyAmount])
+  }, [latestUnseenTx, formatCurrency, formatMoneyAmount])
 
-  const handleIncomingBadgePress = useCallback(() => {
-    if (!latestIncomingTx?.id) return
+  const handleUnseenBadgePress = useCallback(() => {
+    if (!latestUnseenTx?.id) return
 
-    navigation.navigate("transactionDetail", { txid: latestIncomingTx.id })
-  }, [navigation, latestIncomingTx?.id])
+    navigation.navigate("transactionDetail", { txid: latestUnseenTx.id })
+  }, [navigation, latestUnseenTx?.id])
 
   return {
-    latestIncomingTx,
-    incomingAmountText,
-    handleIncomingBadgePress,
-    isOutgoing: latestIncomingTx?.direction === TxDirection.Send,
+    latestUnseenTx,
+    unseenAmountText,
+    handleUnseenBadgePress,
+    isOutgoing: latestUnseenTx?.direction === TxDirection.Send,
   }
 }

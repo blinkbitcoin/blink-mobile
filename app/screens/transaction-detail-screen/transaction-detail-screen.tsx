@@ -191,7 +191,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       tx.settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
     if (latestId && latestId === txid) {
-      markTxSeen(tx.settlementCurrency as WalletCurrency)
+      markTxSeen(tx.settlementCurrency)
     }
   }, [txid, tx.settlementCurrency, latestBtcTxId, latestUsdTxId, markTxSeen])
 
