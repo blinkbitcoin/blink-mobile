@@ -2,7 +2,7 @@ import React from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
-import { GaloyCurrencyBubbleText } from "./galoy-currency-bubble-text"
+import { CurrencyPill } from "./currency-pill"
 import { Story, UseCase } from "../../../../.storybook/views"
 
 const UseCaseWrapper = ({ children, text, style }) => (
@@ -16,19 +16,19 @@ const styles = {
 }
 
 export default {
-  title: "Galoy Currency Bubble",
-  component: GaloyCurrencyBubbleText,
+  title: "Currency Pill",
+  component: CurrencyPill,
 }
 
 export const Default = () => (
   <Story>
     <UseCaseWrapper style={styles.wrapper} text="Text Size: p2 (medium)">
-      <GaloyCurrencyBubbleText textSize="p2" currency={WalletCurrency.Btc} />
-      <GaloyCurrencyBubbleText textSize="p2" currency={WalletCurrency.Usd} />
+      <CurrencyPill textSize="p2" currency={WalletCurrency.Btc} />
+      <CurrencyPill textSize="p2" currency={WalletCurrency.Usd} />
     </UseCaseWrapper>
     <UseCaseWrapper style={styles.wrapper} text="Text Size: p1 (large)">
-      <GaloyCurrencyBubbleText textSize="p1" currency={WalletCurrency.Btc} />
-      <GaloyCurrencyBubbleText textSize="p1" currency={WalletCurrency.Usd} />
+      <CurrencyPill textSize="p1" currency={WalletCurrency.Btc} />
+      <CurrencyPill textSize="p1" currency={WalletCurrency.Usd} />
     </UseCaseWrapper>
   </Story>
 )

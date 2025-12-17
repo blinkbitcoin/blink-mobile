@@ -4,13 +4,15 @@ import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
-export const GaloyCurrencyBubbleText = ({
+export const CurrencyPill = ({
   currency,
+  label,
   textSize,
   highlighted = true,
   containerSize = "small",
 }: {
   currency?: WalletCurrency | "ALL"
+  label?: string
   textSize?: TextProps["type"]
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
@@ -23,19 +25,19 @@ export const GaloyCurrencyBubbleText = ({
     switch (currency) {
       case WalletCurrency.Btc:
         return {
-          text: "BTC",
+          defaultText: "BTC",
           color: highlighted ? colors.white : colors._white,
           backgroundColor: highlighted ? colors.primary : colors.grey3,
         }
       case WalletCurrency.Usd:
         return {
-          text: "USD",
+          defaultText: "USD",
           color: highlighted ? colors._white : colors._white,
           backgroundColor: highlighted ? colors._green : colors.grey3,
         }
       default:
         return {
-          text: "ALL",
+          defaultText: "ALL",
           color: colors.primary,
           backgroundColor: colors.transparent,
           borderColor: colors.primary,
@@ -44,10 +46,11 @@ export const GaloyCurrencyBubbleText = ({
   }
 
   const currencyProps = getCurrencyProps()
+  const text = label ?? currencyProps.defaultText
 
   return (
     <ContainerBubble
-      text={currencyProps.text}
+      text={text}
       textSize={textSize}
       highlighted={highlighted}
       color={currencyProps.color}

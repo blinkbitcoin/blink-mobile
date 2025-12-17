@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { GaloyCurrencyBubbleText } from "../atomic/galoy-currency-bubble-text"
+import { CurrencyPill } from "../atomic/currency-pill"
 
 const Loader = () => {
   const styles = useStyles()
@@ -143,7 +143,7 @@ const WalletOverview: React.FC<Props> = ({
           <View style={styles.currency}>
             <View style={styles.bubbleWrapper} pointerEvents="box-none">
               <View style={pressedBtc && styles.pressedOpacity}>
-                <GaloyCurrencyBubbleText
+                <CurrencyPill
                   currency={WalletCurrency.Btc}
                   textSize="p2"
                   containerSize="medium"
@@ -180,7 +180,7 @@ const WalletOverview: React.FC<Props> = ({
           <View style={styles.currency}>
             <View style={styles.bubbleWrapper} pointerEvents="box-none">
               <View style={pressedUsd && styles.pressedOpacity}>
-                <GaloyCurrencyBubbleText
+                <CurrencyPill
                   currency={WalletCurrency.Usd}
                   textSize="p2"
                   containerSize="medium"

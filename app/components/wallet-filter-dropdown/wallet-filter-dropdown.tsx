@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
-import { GaloyCurrencyBubbleText } from "../atomic/galoy-currency-bubble-text"
+import { CurrencyPill } from "../atomic/currency-pill"
 
 export type WalletValues = WalletCurrency | "ALL"
 
@@ -40,20 +40,24 @@ export const WalletFilterDropdown: React.FC<{
   const walletOptions = [
     {
       value: "ALL",
-      label: LL.common.all() as WalletValues,
+      label: LL.common.all(),
       description: LL.common.allAccounts(),
     },
     {
-      value: "BTC",
-      label: WalletCurrency.Btc as WalletValues,
+      value: WalletCurrency.Btc,
+      label: WalletCurrency.Btc,
       description: LL.common.bitcoin(),
     },
     {
-      value: "USD",
-      label: WalletCurrency.Usd as WalletValues,
+      value: WalletCurrency.Usd,
+      label: WalletCurrency.Usd,
       description: LL.common.dollar(),
     },
-  ] as const
+  ] as const satisfies ReadonlyArray<{
+    value: WalletValues
+    label: string
+    description: string
+  }>
 
   const current = walletOptions.find(
     (opt) => opt.value === (pendingSelection || selected),
@@ -68,8 +72,9 @@ export const WalletFilterDropdown: React.FC<{
       >
         <View style={[styles.fieldBackground, loading && styles.disabled]}>
           <View style={styles.walletSelectorTypeContainer}>
-            <GaloyCurrencyBubbleText
-              currency={current.label}
+            <CurrencyPill
+              currency={current.value}
+              label={current.label}
               textSize="p2"
               containerSize="medium"
             />
@@ -106,8 +111,9 @@ export const WalletFilterDropdown: React.FC<{
             >
               <View style={styles.walletContainer}>
                 <View style={styles.walletSelectorTypeContainer}>
-                  <GaloyCurrencyBubbleText
-                    currency={opt.label}
+                  <CurrencyPill
+                    currency={opt.value}
+                    label={opt.label}
                     textSize="p2"
                     containerSize="medium"
                   />
