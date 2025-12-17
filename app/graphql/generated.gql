@@ -300,6 +300,14 @@ mutation intraLedgerUsdPaymentSend($input: IntraLedgerUsdPaymentSendInput!) {
   }
 }
 
+mutation kycFlowStart {
+  kycFlowStart {
+    workflowRunId
+    tokenWeb
+    __typename
+  }
+}
+
 mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
   lnInvoiceCreate(input: $input) {
     errors {
@@ -508,14 +516,6 @@ mutation onChainUsdPaymentSendAsBtcDenominated($input: OnChainUsdPaymentSendAsBt
       __typename
     }
     status
-    __typename
-  }
-}
-
-mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-  onboardingFlowStart(input: $input) {
-    workflowRunId
-    tokenWeb
     __typename
   }
 }

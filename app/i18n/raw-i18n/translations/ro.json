@@ -2773,7 +2773,7 @@
         "firstName": "Prenumele",
         "lastName": "Numele de familie",
         "confirmNameContent": "Este corectă ortografia numelui tău?\n\n{firstName: string} {lastName: string}\n\nTrebuie să corespundă numelui din actul dvs. de identitate.",
-        "requirements": "Upgrade-ul contului dvs. vă va crește limitele și vă va oferi funcționalități suplimentare, cum ar fi transferul în conturi bancare din țările selectate.\n\nVa trebui să furnizați numele dvs., un act de identitate emis de guvern și un selfie. Vom începe cu numele.",
+        "requirements": "Upgrade-ul contului dvs. vă va crește limitele și vă va oferi funcționalități suplimentare, cum ar fi transferul în conturi bancare din țările selectate.",
         "success": "Documentele au fost primite cu succes și vor fi procesate în scurt timp. Puteți reveni la această pagină pentru a avea o actualizare a stării procesului dvs.",
         "error": "A apărut o eroare la depunerea documentelor. Puteți contacta asistența dacă problema persistă.",
         "status": "Starea dvs de înregistrare este:",

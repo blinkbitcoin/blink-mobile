@@ -3007,12 +3007,10 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
-export type OnboardingFlowStartMutationVariables = Exact<{
-  input: OnboardingFlowStartInput;
-}>;
+export type KycFlowStartMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type OnboardingFlowStartMutation = { readonly __typename: 'Mutation', readonly onboardingFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
+export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
 
 export type FullOnboardingScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4985,40 +4983,39 @@ export function useUserEmailRegistrationValidateMutation(baseOptions?: Apollo.Mu
 export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof useUserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
-export const OnboardingFlowStartDocument = gql`
-    mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-  onboardingFlowStart(input: $input) {
+export const KycFlowStartDocument = gql`
+    mutation kycFlowStart {
+  kycFlowStart {
     workflowRunId
     tokenWeb
   }
 }
     `;
-export type OnboardingFlowStartMutationFn = Apollo.MutationFunction<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
 
 /**
- * __useOnboardingFlowStartMutation__
+ * __useKycFlowStartMutation__
  *
- * To run a mutation, you first call `useOnboardingFlowStartMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOnboardingFlowStartMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [onboardingFlowStartMutation, { data, loading, error }] = useOnboardingFlowStartMutation({
+ * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
  *   variables: {
- *      input: // value for 'input'
  *   },
  * });
  */
-export function useOnboardingFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>) {
+export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>(OnboardingFlowStartDocument, options);
+        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
       }
-export type OnboardingFlowStartMutationHookResult = ReturnType<typeof useOnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationResult = Apollo.MutationResult<OnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationOptions = Apollo.BaseMutationOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
+export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
+export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const FullOnboardingScreenDocument = gql`
     query fullOnboardingScreen {
   me {
