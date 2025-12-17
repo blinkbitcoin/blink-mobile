@@ -6,8 +6,9 @@ Guide for AI agents interacting with the Blink mobile app via MCP tools.
 
 ```
 1. Start infrastructure:  ./dev/mcp/orchestrator.sh
-2. Wait for ready:        .mcp-ready file appears (~35s)
+2. Wait for ready:        .mcp/ready file appears (~40s)
 3. Use MCP tools:         checkInfrastructure, getScreen, tap, etc.
+   Or CLI:                ./dev/app tap "Login"
 4. Stop when done:        ./dev/mcp-stop.sh
 ```
 
@@ -161,29 +162,29 @@ reloadApp()   # Hot reload (keeps JS state, reloads bundle)
 
 ## CLI Tool
 
-For shell-based interaction (useful for scripting):
+For shell-based interaction (useful when MCP tools unavailable):
 
 ```bash
 # Take screenshot
-npx tsx dev/mcp-server/src/cli.ts screen /tmp/shot.png
+./dev/app screen /tmp/shot.png
 
 # List all testIDs on screen
-npx tsx dev/mcp-server/src/cli.ts ui
+./dev/app ui
 
 # Tap by testID
-npx tsx dev/mcp-server/src/cli.ts tap "Accept"
+./dev/app tap "Accept"
 
 # Tap by coordinates
-npx tsx dev/mcp-server/src/cli.ts tap 540,1200
+./dev/app tap 540,1200
 
 # Type text
-npx tsx dev/mcp-server/src/cli.ts type "hello world"
+./dev/app type "hello world"
 
 # Navigate back
-npx tsx dev/mcp-server/src/cli.ts back
+./dev/app back
 
 # Swipe
-npx tsx dev/mcp-server/src/cli.ts swipe up
+./dev/app swipe up
 ```
 
 ## Common Workflows
@@ -367,6 +368,7 @@ dev/mcp/
     appium.sh             # Appium server
     app.sh                # App install/launch
 
+dev/app                   # CLI wrapper (./dev/app tap "Login")
 dev/mcp-stop.sh           # Stop all services
 .mcp.json                 # MCP server config for Claude Code
 .mcp/                     # Runtime state directory
