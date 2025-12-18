@@ -77,7 +77,6 @@ const WalletOverview: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { formatMoneyAmount, displayCurrency, moneyAmountToDisplayCurrencyString } =
@@ -88,9 +87,13 @@ const WalletOverview: React.FC<Props> = ({
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
 
+  const hasWallets = wallets && wallets.length > 0
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
+  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+
   if (isAuthed) {
-    const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-    const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+    const btcWallet = getBtcWallet(resolvedWallets)
+    const usdWallet = getUsdWallet(resolvedWallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -113,8 +116,13 @@ const WalletOverview: React.FC<Props> = ({
     }
   }
 
-  const openTransactionHistory = (currencyFilter: WalletCurrency) =>
-    wallets && navigation.navigate("transactionHistory", { wallets, currencyFilter })
+  const openTransactionHistory = (currencyFilter: WalletCurrency) => {
+    if (!resolvedWallets || resolvedWallets.length === 0) return
+    navigation.navigate("transactionHistory", {
+      wallets: resolvedWallets,
+      currencyFilter,
+    })
+  }
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
