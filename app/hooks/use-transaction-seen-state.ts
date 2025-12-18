@@ -12,14 +12,6 @@ import {
   TxDirection,
 } from "@app/graphql/generated"
 
-type TransactionDigest = {
-  transactions?: ReadonlyArray<TransactionFragment>
-  latestBtcTxId?: string | null
-  latestUsdTxId?: string | null
-}
-
-type TransactionSource = ReadonlyArray<TransactionFragment> | TransactionDigest
-
 const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
   currency: WalletCurrency,
@@ -35,12 +27,9 @@ const getLatestTransactionId = (
   return latestTransaction.id
 }
 
-const isTransactionDigest = (value: TransactionSource): value is TransactionDigest =>
-  !Array.isArray(value)
-
 export const useTransactionSeenState = (
-  transactionSource: TransactionSource,
   accountId: string,
+  transactions?: ReadonlyArray<TransactionFragment>,
 ) => {
   const client = useApolloClient()
 
@@ -63,29 +52,14 @@ export const useTransactionSeenState = (
   }, [client])
 
   const latestTransactionIds = useMemo(() => {
-    const baseTransactions = isTransactionDigest(transactionSource)
-      ? transactionSource.transactions && transactionSource.transactions.length > 0
-        ? transactionSource.transactions
-        : readCachedTransactions()
-      : transactionSource.length > 0
-        ? transactionSource
-        : readCachedTransactions()
+    const baseTransactions =
+      transactions && transactions.length > 0 ? transactions : readCachedTransactions()
 
-    if (isTransactionDigest(transactionSource)) {
-      return {
-        btcId:
-          transactionSource.latestBtcTxId ||
-          getLatestTransactionId(baseTransactions, WalletCurrency.Btc),
-        usdId:
-          transactionSource.latestUsdTxId ||
-          getLatestTransactionId(baseTransactions, WalletCurrency.Usd),
-      }
-    }
     return {
       btcId: getLatestTransactionId(baseTransactions, WalletCurrency.Btc),
       usdId: getLatestTransactionId(baseTransactions, WalletCurrency.Usd),
     }
-  }, [readCachedTransactions, transactionSource])
+  }, [readCachedTransactions, transactions])
 
   const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",

@@ -159,9 +159,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       : ""
 
   const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState(
-    {
-      transactions: [] as TransactionFragment[],
-    },
     homeData?.me?.defaultAccount?.id || "",
   )
 

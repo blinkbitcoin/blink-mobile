@@ -149,7 +149,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   }, [pendingTxs, settledTxs])
 
   const { hasUnseenBtcTx, hasUnseenUsdTx, lastSeenBtcId, lastSeenUsdId, markTxSeen } =
-    useTransactionSeenState({ transactions: allTransactions }, accountId || "")
+    useTransactionSeenState(accountId || "", allTransactions)
 
   const [seenTxIds, setSeenTxIds] = React.useState<Set<string>>(new Set())
 

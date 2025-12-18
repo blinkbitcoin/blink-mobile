@@ -249,8 +249,8 @@ export const HomeScreen: React.FC = () => {
   }, [pendingIncomingTransactions, transactionsEdges])
 
   const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionSeenState(
-    transactions,
     accountId || "",
+    transactions,
   )
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
