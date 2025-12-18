@@ -1,11 +1,10 @@
-import React from "react"
-import { Dimensions, View, Pressable } from "react-native"
-import { PanGestureHandler } from "react-native-gesture-handler"
+import React, { useState, useEffect } from "react"
+import { View, Pressable, ActivityIndicator } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
-  Extrapolate,
+  Extrapolation,
   interpolate,
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -14,7 +13,6 @@ import Animated, {
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-const SCREEN_WIDTH = Dimensions.get("screen").width
 const TOUCH_AREA_HEIGHT = 82
 const MAX_SWIPE_DISTANCE = 80
 const SWIPE_COMPLETION_TOLERANCE = 5
@@ -37,14 +35,22 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
 
   const dragDistance = useSharedValue(0)
   const isActive = useSharedValue(0)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: () => {
-      if (disabled) return
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => setIsLoading(false), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading])
+
+  const gesture = Gesture.Pan()
+    .enabled(!disabled && !isLoading)
+    .onStart(() => {
+      runOnJS(setIsLoading)(false)
       isActive.value = withTiming(1, { duration: 100 })
-    },
-    onActive: (event) => {
-      if (disabled) return
+    })
+    .onUpdate((event) => {
       if (event.translationY >= 0) {
         dragDistance.value = 0
         return
@@ -52,57 +58,43 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
 
       const distance = Math.abs(event.translationY)
       dragDistance.value = Math.min(distance, MAX_SWIPE_DISTANCE)
-    },
-    onEnd: (event) => {
-      if (disabled) {
-        dragDistance.value = withSpring(0)
-        isActive.value = withTiming(0, { duration: 120 })
-        return
-      }
-
+    })
+    .onEnd((event) => {
       const isSwipingUp = event.translationY < 0
       const isFullSwipe =
         isSwipingUp &&
         dragDistance.value >= MAX_SWIPE_DISTANCE - SWIPE_COMPLETION_TOLERANCE
 
       if (isFullSwipe) {
+        runOnJS(setIsLoading)(true)
         runOnJS(onAction)()
       }
 
       dragDistance.value = withSpring(0)
       isActive.value = withTiming(0, { duration: 120 })
-    },
-    onCancel: () => {
-      dragDistance.value = withSpring(0)
-      isActive.value = withTiming(0, { duration: 120 })
-    },
-    onFail: () => {
-      dragDistance.value = withSpring(0)
-      isActive.value = withTiming(0, { duration: 120 })
-    },
-  })
+    })
 
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: isActive.value,
   }))
 
   const progressBarStyle = useAnimatedStyle(() => {
-    const progress = dragDistance.value / MAX_SWIPE_DISTANCE
+    const progress = isLoading ? 1 : dragDistance.value / MAX_SWIPE_DISTANCE
     return {
-      height: interpolate(progress, [0, 1], [0, 64], Extrapolate.CLAMP),
+      height: interpolate(progress, [0, 1], [0, 64], Extrapolation.CLAMP),
     }
   })
 
   const iconAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: -dragDistance.value * 0.35 },
-      { scale: interpolate(isActive.value, [0, 1], [1, 1.06], Extrapolate.CLAMP) },
+      { scale: interpolate(isActive.value, [0, 1], [1, 1.06], Extrapolation.CLAMP) },
     ],
   }))
 
   return (
     <View pointerEvents="box-none" style={styles.overlay}>
-      <PanGestureHandler enabled={!disabled} onGestureEvent={gestureHandler}>
+      <GestureDetector gesture={gesture}>
         <Animated.View style={styles.touchArea}>
           <Animated.View style={[styles.progressContainer, containerAnimatedStyle]}>
             <Animated.View
@@ -114,18 +106,24 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
             />
           </Animated.View>
           <Pressable
-            disabled={disabled}
+            disabled={disabled || isLoading}
             onPress={() => {
-              if (!disabled) onAction()
+              if (disabled || isLoading) return
+              setIsLoading(true)
+              onAction()
             }}
             style={styles.iconPressable}
           >
             <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
-              <Icon name="chevron-up-outline" size={18} color={colors.black} />
+              {isLoading ? (
+                <ActivityIndicator size="small" color={colors.black} />
+              ) : (
+                <Icon name="chevron-up-outline" size={18} color={colors.black} />
+              )}
             </Animated.View>
           </Pressable>
         </Animated.View>
-      </PanGestureHandler>
+      </GestureDetector>
     </View>
   )
 }
@@ -141,7 +139,7 @@ const useStyles = makeStyles(
       justifyContent: "center",
     },
     touchArea: {
-      width: SCREEN_WIDTH - 40,
+      width: "90%",
       height: TOUCH_AREA_HEIGHT,
       alignItems: "center",
       justifyContent: "flex-end",
