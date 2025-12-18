@@ -473,6 +473,7 @@ export const HomeScreen: React.FC = () => {
           />
         </View>
       </View>
+      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
@@ -611,7 +612,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 40,
+    marginHorizontal: 20,
+    marginTop: 6,
   },
   error: {
     alignSelf: "center",
@@ -628,7 +630,8 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
   },
   badgeSlot: {
-    height: 65,
+    height: 35,
+    marginVertical: 3,
     justifyContent: "center",
     alignItems: "center",
   },

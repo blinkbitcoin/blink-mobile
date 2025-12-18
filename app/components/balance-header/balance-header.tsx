@@ -66,14 +66,6 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
     textAlign: "center",
-<<<<<<< HEAD
-    justifyContent: "flex-start",
-    flex: 1,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    height: 60,
-    maxHeight: 60,
-=======
   },
   marginBottom: {
     marginBottom: 0,
@@ -82,7 +74,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     flexGrow: 1,
     justifyContent: "center",
->>>>>>> 412764d7d (feat(home-screen): incoming badge)
   },
   primaryBalanceText: {
     fontSize: 32,
