@@ -2086,6 +2086,11 @@ export type QueryRealtimePriceArgs = {
 };
 
 
+export type QueryTxLastSeenArgs = {
+  accountId: Scalars['ID']['input'];
+};
+
+
 export type QueryUserDefaultWalletIdArgs = {
   username: Scalars['Username']['input'];
 };
@@ -2375,6 +2380,7 @@ export const TxDirection = {
 export type TxDirection = typeof TxDirection[keyof typeof TxDirection];
 export type TxLastSeen = {
   readonly __typename: 'TxLastSeen';
+  readonly accountId: Scalars['ID']['output'];
   readonly btcId: Scalars['String']['output'];
   readonly usdId: Scalars['String']['output'];
 };
@@ -2937,10 +2943,12 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
 
-export type TxLastSeenQueryVariables = Exact<{ [key: string]: never; }>;
+export type TxLastSeenQueryVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
 
 
-export type TxLastSeenQuery = { readonly __typename: 'Query', readonly txLastSeen: { readonly __typename: 'TxLastSeen', readonly btcId: string, readonly usdId: string } };
+export type TxLastSeenQuery = { readonly __typename: 'Query', readonly txLastSeen: { readonly __typename: 'TxLastSeen', readonly accountId: string, readonly btcId: string, readonly usdId: string } };
 
 export type TransactionFragment = { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } };
 
@@ -4442,8 +4450,9 @@ export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceS
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
 export const TxLastSeenDocument = gql`
-    query txLastSeen {
-  txLastSeen @client {
+    query txLastSeen($accountId: ID!) {
+  txLastSeen(accountId: $accountId) @client {
+    accountId
     btcId
     usdId
   }
@@ -4462,10 +4471,11 @@ export const TxLastSeenDocument = gql`
  * @example
  * const { data, loading, error } = useTxLastSeenQuery({
  *   variables: {
+ *      accountId: // value for 'accountId'
  *   },
  * });
  */
-export function useTxLastSeenQuery(baseOptions?: Apollo.QueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+export function useTxLastSeenQuery(baseOptions: Apollo.QueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables> & ({ variables: TxLastSeenQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
       }
@@ -9969,7 +9979,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
-  txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType>;
+  txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType, RequireFields<QueryTxLastSeenArgs, 'accountId'>>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;
@@ -10180,6 +10190,7 @@ export interface TxExternalIdScalarConfig extends GraphQLScalarTypeConfig<Resolv
 }
 
 export type TxLastSeenResolvers<ContextType = any, ParentType extends ResolversParentTypes['TxLastSeen'] = ResolversParentTypes['TxLastSeen']> = {
+  accountId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   btcId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   usdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

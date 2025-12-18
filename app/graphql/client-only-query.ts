@@ -86,8 +86,9 @@ export default gql`
     deviceSessionCount @client
   }
 
-  query txLastSeen {
-    txLastSeen @client {
+  query txLastSeen($accountId: ID!) {
+    txLastSeen(accountId: $accountId) @client {
+      accountId
       btcId
       usdId
     }
@@ -298,22 +299,33 @@ export const updateDeviceSessionCount = (
   return setDeviceSessionCount(client, prev + 1)
 }
 
-export const markTxLastSeenId = (
-  client: ApolloClient<unknown>,
-  currency: WalletCurrency,
-  id: string,
-): string | null => {
+export const markTxLastSeenId = ({
+  client,
+  accountId,
+  currency,
+  id,
+}: {
+  client: ApolloClient<unknown>
+  accountId: string
+  currency: WalletCurrency
+  id: string
+}): string | null => {
   try {
     if (!id) return null
 
-    const prev = client.readQuery<TxLastSeenQuery>({ query: TxLastSeenDocument })
+    const prev = client.readQuery<TxLastSeenQuery>({
+      query: TxLastSeenDocument,
+      variables: { accountId },
+    })
 
     client.writeQuery<TxLastSeenQuery>({
       query: TxLastSeenDocument,
+      variables: { accountId },
       data: {
         __typename: "Query",
         txLastSeen: {
           __typename: "TxLastSeen",
+          accountId,
           btcId: currency === WalletCurrency.Btc ? id : prev?.txLastSeen?.btcId ?? "",
           usdId: currency === WalletCurrency.Usd ? id : prev?.txLastSeen?.usdId ?? "",
         },

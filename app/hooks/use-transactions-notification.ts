@@ -1,11 +1,10 @@
 import { useMemo, useCallback } from "react"
-import { useApolloClient, useQuery } from "@apollo/client"
+import { useApolloClient } from "@apollo/client"
 
 import { markTxLastSeenId } from "@app/graphql/client-only-query"
 import {
   TransactionFragment,
-  TxLastSeenDocument,
-  TxLastSeenQuery,
+  useTxLastSeenQuery,
   WalletCurrency,
   HomeAuthedDocument,
   HomeAuthedQuery,
@@ -39,7 +38,10 @@ const getLatestTransactionId = (
 const isTransactionDigest = (value: TransactionSource): value is TransactionDigest =>
   !Array.isArray(value)
 
-export const useTransactionsNotification = (transactionSource: TransactionSource) => {
+export const useTransactionsNotification = (
+  transactionSource: TransactionSource,
+  accountId: string,
+) => {
   const client = useApolloClient()
 
   const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
@@ -85,9 +87,10 @@ export const useTransactionsNotification = (transactionSource: TransactionSource
     }
   }, [readCachedTransactions, transactionSource])
 
-  const { data: lastSeenData } = useQuery<TxLastSeenQuery>(TxLastSeenDocument, {
+  const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",
     returnPartialData: true,
+    variables: { accountId },
   })
 
   const lastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
@@ -110,10 +113,10 @@ export const useTransactionsNotification = (transactionSource: TransactionSource
       const transactionIdToMark =
         currency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
       if (transactionIdToMark) {
-        markTxLastSeenId(client, currency, transactionIdToMark)
+        markTxLastSeenId({ client, accountId, currency, id: transactionIdToMark })
       }
     },
-    [client, latestBtcTxId, latestUsdTxId],
+    [client, latestBtcTxId, latestUsdTxId, accountId],
   )
 
   return {
@@ -121,6 +124,8 @@ export const useTransactionsNotification = (transactionSource: TransactionSource
     hasUnseenUsdTx,
     latestBtcTxId,
     latestUsdTxId,
+    lastSeenBtcId,
+    lastSeenUsdId,
     markTxSeen: markTransactionAsSeen,
   }
 }

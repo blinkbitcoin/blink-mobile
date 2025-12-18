@@ -16,6 +16,7 @@ import {
   TransactionFragment,
   TransactionFragmentDoc,
   useTransactionListForDefaultAccountLazyQuery,
+  useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useAppConfig, useTransactionsNotification } from "@app/hooks"
@@ -104,6 +105,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
   const { txid } = route.params
 
+  const { data: homeData } = useHomeAuthedQuery({ fetchPolicy: "cache-only" })
+
   const viewInExplorer = (hash: string): Promise<Linking> =>
     Linking.openURL(galoyInstance.blockExplorer + hash)
 
@@ -155,9 +158,12 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
-  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification({
-    transactions: [] as TransactionFragment[],
-  })
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification(
+    {
+      transactions: [] as TransactionFragment[],
+    },
+    homeData?.me?.defaultAccount?.id || "",
+  )
 
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout

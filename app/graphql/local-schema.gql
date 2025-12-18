@@ -16,10 +16,11 @@ extend type Query {
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
   deviceSessionCount: Int!
-  txLastSeen: TxLastSeen!
+  txLastSeen(accountId: ID!): TxLastSeen!
 }
 
 type TxLastSeen {
+  accountId: ID!
   btcId: String!
   usdId: String!
 }

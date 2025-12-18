@@ -248,7 +248,10 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionsNotification(transactions)
+  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionsNotification(
+    transactions,
+    accountId || "",
+  )
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,

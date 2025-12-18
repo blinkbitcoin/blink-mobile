@@ -65,7 +65,7 @@ export const createCache = () =>
         },
       },
       TxLastSeen: {
-        keyFields: [],
+        keyFields: ["accountId"],
       },
       Query: {
         fields: {
@@ -107,9 +107,15 @@ export const createCache = () =>
             read: (value) => value ?? 0,
           },
           txLastSeen: {
-            read(existing) {
+            keyArgs: ["accountId"],
+            read(existing, { args }) {
               if (existing) return existing
-              return { btcId: "", usdId: "" }
+              return {
+                __typename: "TxLastSeen",
+                accountId: args?.accountId || "",
+                btcId: "",
+                usdId: "",
+              }
             },
           },
         },

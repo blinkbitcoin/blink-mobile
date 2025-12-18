@@ -3,12 +3,13 @@ import { ActivityIndicator, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
-import { RouteProp, useFocusEffect } from "@react-navigation/native"
+import { RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 import {
   TransactionFragment,
   useTransactionListForDefaultAccountQuery,
+  useWalletOverviewScreenQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -21,7 +22,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useTransactionsNotification } from "@app/hooks"
 
-import { MemoizedTransactionItem } from "../../components/transaction-item"
+import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
 
 gql`
@@ -53,12 +54,9 @@ type TransactionHistoryScreenProps = {
   route: RouteProp<RootStackParamList, "transactionHistory">
 }
 
-const lastHighlightedByCurrency: Partial<Record<WalletCurrency, string>> = {}
-
 export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> = ({
   route,
 }) => {
-  const showLoading = route.params?.showLoading === true
   const {
     theme: { colors },
   } = useTheme()
@@ -68,27 +66,57 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     route.params?.currencyFilter ?? "ALL",
   )
 
-  const currencyFilter: WalletCurrency | undefined = route.params?.currencyFilter
-  const walletIdsByCurrency = React.useMemo(() => {
-    const wallets = route.params?.wallets ?? []
-    return wallets
-      .filter((w) => walletFilter === "ALL" || w.walletCurrency === walletFilter)
-      .map((w) => w.id)
-  }, [route.params?.wallets, walletFilter])
+  const isAuthed = useIsAuthed()
 
-  const { data, error, fetchMore, refetch, loading } =
+  const hasRouteWallets = (route.params?.wallets?.length ?? 0) > 0
+
+  const [availableWallets, setAvailableWallets] = React.useState<
+    ReadonlyArray<{ id: string; walletCurrency: WalletCurrency }>
+  >(route.params?.wallets ?? [])
+
+  const { data: walletOverviewData } = useWalletOverviewScreenQuery({
+    skip: !isAuthed || hasRouteWallets,
+    fetchPolicy: "cache-first",
+  })
+
+  const walletIdsByCurrency = React.useMemo(() => {
+    if (!availableWallets.length) return undefined
+
+    if (walletFilter === "ALL") {
+      return availableWallets.map((w) => w.id)
+    }
+
+    return availableWallets
+      .filter((w) => w.walletCurrency === walletFilter)
+      .map((w) => w.id)
+  }, [availableWallets, walletFilter])
+
+  const { data, previousData, error, fetchMore, refetch, loading } =
     useTransactionListForDefaultAccountQuery({
-      skip: !useIsAuthed(),
+      skip: !isAuthed,
       fetchPolicy: "cache-and-network",
+      returnPartialData: true,
       variables: {
         first: QUERY_BATCH_SIZE,
         walletIds: walletIdsByCurrency,
       },
     })
 
+  const dataToRender = data ?? previousData
+
+  React.useEffect(() => {
+    if (availableWallets.length) return
+
+    const queryWallets = walletOverviewData?.me?.defaultAccount?.wallets ?? []
+    if (queryWallets.length === 0) return
+
+    setAvailableWallets(queryWallets)
+  }, [availableWallets.length, walletOverviewData?.me?.defaultAccount?.wallets])
+
+  const accountId = dataToRender?.me?.defaultAccount?.id
   const pendingIncomingTransactions =
-    data?.me?.defaultAccount?.pendingIncomingTransactions
-  const transactions = data?.me?.defaultAccount?.transactions
+    dataToRender?.me?.defaultAccount?.pendingIncomingTransactions
+  const transactions = dataToRender?.me?.defaultAccount?.transactions
 
   const settledTxs = React.useMemo(
     () => transactions?.edges?.map((e) => e.node) ?? [],
@@ -118,65 +146,113 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return transactions
   }, [pendingTxs, settledTxs])
 
-  const { latestBtcTxId, latestUsdTxId, hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } =
-    useTransactionsNotification({
-      transactions: allTransactions,
-    })
+  const { hasUnseenBtcTx, hasUnseenUsdTx, lastSeenBtcId, lastSeenUsdId, markTxSeen } =
+    useTransactionsNotification({ transactions: allTransactions }, accountId || "")
 
-  const newTx = React.useMemo(() => {
-    if (walletFilter === "ALL") {
-      const currency =
-        (hasUnseenBtcTx && latestBtcTxId && WalletCurrency.Btc) ||
-        (hasUnseenUsdTx && latestUsdTxId && WalletCurrency.Usd)
-      if (!currency) return
+  const [highlightBaselineLastSeen, setHighlightBaselineLastSeen] = React.useState<{
+    btcId: string
+    usdId: string
+  } | null>(() => {
+    if (lastSeenBtcId || lastSeenUsdId) {
+      return { btcId: lastSeenBtcId, usdId: lastSeenUsdId }
+    }
+    return null
+  })
 
-      const id = currency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
-      return { id: id ?? "", currency }
+  React.useEffect(() => {
+    if (loading) return
+
+    if (highlightBaselineLastSeen === null) {
+      setHighlightBaselineLastSeen({ btcId: lastSeenBtcId, usdId: lastSeenUsdId })
+      return
     }
 
-    const selectedCurrency =
-      walletFilter === WalletCurrency.Btc || walletFilter === WalletCurrency.Usd
-        ? walletFilter
-        : currencyFilter
+    const missingBtc = !highlightBaselineLastSeen.btcId && lastSeenBtcId
+    const missingUsd = !highlightBaselineLastSeen.usdId && lastSeenUsdId
 
-    if (selectedCurrency === WalletCurrency.Btc) {
-      return { id: latestBtcTxId, currency: WalletCurrency.Btc }
+    if (missingBtc || missingUsd) {
+      setHighlightBaselineLastSeen({
+        btcId: missingBtc ? lastSeenBtcId : highlightBaselineLastSeen.btcId,
+        usdId: missingUsd ? lastSeenUsdId : highlightBaselineLastSeen.usdId,
+      })
     }
+  }, [loading, highlightBaselineLastSeen, lastSeenBtcId, lastSeenUsdId])
 
-    if (selectedCurrency === WalletCurrency.Usd) {
-      return { id: latestUsdTxId, currency: WalletCurrency.Usd }
-    }
-  }, [
-    walletFilter,
-    currencyFilter,
-    hasUnseenBtcTx,
-    hasUnseenUsdTx,
-    latestBtcTxId,
-    latestUsdTxId,
-  ])
+  const lastSeenIdForAll = React.useMemo(() => {
+    if (!highlightBaselineLastSeen?.btcId || !highlightBaselineLastSeen?.usdId) return ""
 
-  const [stickyHighlightId, setStickyHighlightId] = React.useState<string | null>(null)
+    return highlightBaselineLastSeen.btcId < highlightBaselineLastSeen.usdId
+      ? highlightBaselineLastSeen.btcId
+      : highlightBaselineLastSeen.usdId
+  }, [highlightBaselineLastSeen])
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setStickyHighlightId(null)
-    }, []),
+  const shouldHighlightTransactionId = React.useCallback(
+    ({
+      txId,
+      settlementCurrency,
+    }: {
+      txId: string
+      settlementCurrency?: WalletCurrency | null
+    }) => {
+      if (!highlightBaselineLastSeen) return false
+      if (!settlementCurrency) return false
+
+      if (walletFilter === "ALL") {
+        if (!lastSeenIdForAll) return false
+
+        const lastSeenIdForCurrency =
+          settlementCurrency === WalletCurrency.Btc
+            ? highlightBaselineLastSeen.btcId
+            : settlementCurrency === WalletCurrency.Usd
+              ? highlightBaselineLastSeen.usdId
+              : ""
+
+        if (!lastSeenIdForCurrency) return false
+
+        return txId > lastSeenIdForCurrency && txId > lastSeenIdForAll
+      }
+
+      if (settlementCurrency !== walletFilter) return false
+
+      const lastSeenId =
+        settlementCurrency === WalletCurrency.Btc
+          ? highlightBaselineLastSeen.btcId
+          : settlementCurrency === WalletCurrency.Usd
+            ? highlightBaselineLastSeen.usdId
+            : ""
+
+      if (!lastSeenId) return false
+
+      return txId > lastSeenId
+    },
+    [walletFilter, highlightBaselineLastSeen, lastSeenIdForAll],
   )
 
   React.useEffect(() => {
-    if (loading || !newTx || !newTx.id || !newTx.currency) return
+    if (loading) return
+    if (!highlightBaselineLastSeen) return
 
-    const isUnseen =
-      (newTx.currency === WalletCurrency.Btc && hasUnseenBtcTx) ||
-      (newTx.currency === WalletCurrency.Usd && hasUnseenUsdTx)
-    if (!isUnseen) return
-
-    if (lastHighlightedByCurrency[newTx.currency] !== newTx.id) {
-      setStickyHighlightId(newTx.id)
-      markTxSeen(newTx.currency)
-      lastHighlightedByCurrency[newTx.currency] = newTx.id
+    if (walletFilter === "ALL") {
+      if (hasUnseenBtcTx) markTxSeen(WalletCurrency.Btc)
+      if (hasUnseenUsdTx) markTxSeen(WalletCurrency.Usd)
+      return
     }
-  }, [loading, newTx, markTxSeen, hasUnseenBtcTx, hasUnseenUsdTx])
+
+    if (walletFilter === WalletCurrency.Btc && hasUnseenBtcTx) {
+      markTxSeen(WalletCurrency.Btc)
+    }
+
+    if (walletFilter === WalletCurrency.Usd && hasUnseenUsdTx) {
+      markTxSeen(WalletCurrency.Usd)
+    }
+  }, [
+    loading,
+    highlightBaselineLastSeen,
+    walletFilter,
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    markTxSeen,
+  ])
 
   if (error) {
     console.error(error)
@@ -188,7 +264,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return <></>
   }
 
-  if (!transactions || (showLoading && loading)) {
+  if (!transactions) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator color={colors.primary} size={"large"} />
@@ -198,15 +274,15 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const fetchNextTransactionsPage = () => {
     const pageInfo = transactions?.pageInfo
-    if (pageInfo.hasNextPage) {
-      fetchMore({
-        variables: {
-          first: QUERY_BATCH_SIZE,
-          walletIds: walletIdsByCurrency,
-          after: pageInfo.endCursor,
-        },
-      })
-    }
+    if (!pageInfo?.hasNextPage || !pageInfo.endCursor) return
+
+    fetchMore({
+      variables: {
+        first: QUERY_BATCH_SIZE,
+        walletIds: walletIdsByCurrency,
+        after: pageInfo.endCursor,
+      },
+    })
   }
 
   return (
@@ -228,7 +304,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
             txid={item.id}
             subtitle
             testId={`transaction-by-index-${index}`}
-            highlight={item.id === stickyHighlightId}
+            highlight={shouldHighlightTransactionId({
+              txId: item.id,
+              settlementCurrency: item.settlementCurrency,
+            })}
           />
         )}
         renderSectionHeader={({ section: { title } }) => (

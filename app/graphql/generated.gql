@@ -1692,8 +1692,9 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
   }
 }
 
-query txLastSeen {
-  txLastSeen @client {
+query txLastSeen($accountId: ID!) {
+  txLastSeen(accountId: $accountId) @client {
+    accountId
     btcId
     usdId
     __typename

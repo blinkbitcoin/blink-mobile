@@ -167,6 +167,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.primary3,
   },
   walletCurrencyText: {
+    flex: 1,
     fontWeight: "bold",
     fontSize: 18,
     color: colors.black,
