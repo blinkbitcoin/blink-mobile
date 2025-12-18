@@ -59,7 +59,6 @@ type Props = {
   wallets?: readonly WalletBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
-  onWalletPress?: (currency: WalletCurrency) => void
 }
 
 const WalletOverview: React.FC<Props> = ({

@@ -52,7 +52,6 @@ export const CurrencyPill = ({
     <ContainerBubble
       text={text}
       textSize={textSize}
-      highlighted={highlighted}
       color={currencyProps.color}
       backgroundColor={currencyProps.backgroundColor}
       borderColor={currencyProps.borderColor}
@@ -71,7 +70,6 @@ const ContainerBubble = ({
 }: {
   text: string
   textSize?: TextProps["type"]
-  highlighted?: boolean
   color?: string
   backgroundColor?: string
   containerSize?: "small" | "medium" | "large"
