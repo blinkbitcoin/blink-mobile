@@ -196,11 +196,9 @@ const WalletOverview: React.FC<Props> = ({
               </View>
               <NotificationBadge visible={showUsdNotification} />
             </View>
-            {!showUsdNotification && (
-              <Pressable onPress={() => setIsStablesatModalVisible(true)}>
-                <GaloyIcon color={colors.grey1} name="question" size={18} />
-              </Pressable>
-            )}
+            <Pressable onPress={() => setIsStablesatModalVisible(true)}>
+              <GaloyIcon color={colors.grey1} name="question" size={18} />
+            </Pressable>
           </View>
           {loading ? (
             <Loader />

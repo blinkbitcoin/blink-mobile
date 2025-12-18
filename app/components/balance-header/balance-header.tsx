@@ -67,14 +67,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     textAlign: "center",
   },
-  marginBottom: {
-    marginBottom: 0,
-  },
-  hiddenBalanceTouchableOpacity: {
-    alignItems: "center",
-    flexGrow: 1,
-    justifyContent: "center",
-  },
   primaryBalanceText: {
     fontSize: 32,
     color: colors.black,
