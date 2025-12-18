@@ -333,7 +333,8 @@ export const markTxLastSeenId = ({
     })
 
     return id
-  } catch {
+  } catch (err) {
+    console.error("Failed to mark transaction as seen:", err)
     return null
   }
 }
