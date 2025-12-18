@@ -20,7 +20,7 @@ import {
   WalletValues,
 } from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useTransactionsNotification } from "@app/hooks"
+import { useTransactionSeenState } from "@app/hooks"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
@@ -147,7 +147,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   }, [pendingTxs, settledTxs])
 
   const { hasUnseenBtcTx, hasUnseenUsdTx, lastSeenBtcId, lastSeenUsdId, markTxSeen } =
-    useTransactionsNotification({ transactions: allTransactions }, accountId || "")
+    useTransactionSeenState({ transactions: allTransactions }, accountId || "")
 
   const [highlightBaselineLastSeen, setHighlightBaselineLastSeen] = React.useState<{
     btcId: string

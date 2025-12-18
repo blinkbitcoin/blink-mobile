@@ -38,7 +38,7 @@ const getLatestTransactionId = (
 const isTransactionDigest = (value: TransactionSource): value is TransactionDigest =>
   !Array.isArray(value)
 
-export const useTransactionsNotification = (
+export const useTransactionSeenState = (
   transactionSource: TransactionSource,
   accountId: string,
 ) => {

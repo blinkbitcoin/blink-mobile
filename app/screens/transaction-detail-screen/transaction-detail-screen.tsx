@@ -19,7 +19,7 @@ import {
   useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { useAppConfig, useTransactionsNotification } from "@app/hooks"
+import { useAppConfig, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
@@ -158,7 +158,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
-  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionsNotification(
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState(
     {
       transactions: [] as TransactionFragment[],
     },

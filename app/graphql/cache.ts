@@ -108,8 +108,8 @@ export const createCache = () =>
           },
           txLastSeen: {
             keyArgs: ["accountId"],
-            read(existing, { args }) {
-              if (existing) return existing
+            read(value, { args }) {
+              if (value) return value
               return {
                 __typename: "TxLastSeen",
                 accountId: args?.accountId || "",

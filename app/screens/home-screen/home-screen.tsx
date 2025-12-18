@@ -37,7 +37,7 @@ import { isIos } from "@app/utils/helper"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
-  useTransactionsNotification,
+  useTransactionSeenState,
 } from "@app/hooks"
 import {
   AccountLevel,
@@ -248,7 +248,7 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionsNotification(
+  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionSeenState(
     transactions,
     accountId || "",
   )
