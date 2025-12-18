@@ -3,7 +3,8 @@ import { ActivityIndicator, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
-import { RouteProp } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { useNavigation, RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 import {
@@ -62,6 +63,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   } = useTheme()
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const [walletFilter, setWalletFilter] = React.useState<WalletValues>(
     route.params?.currencyFilter ?? "ALL",
   )
@@ -149,6 +151,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const { hasUnseenBtcTx, hasUnseenUsdTx, lastSeenBtcId, lastSeenUsdId, markTxSeen } =
     useTransactionSeenState({ transactions: allTransactions }, accountId || "")
 
+  const [seenTxIds, setSeenTxIds] = React.useState<Set<string>>(new Set())
+
   const [highlightBaselineLastSeen, setHighlightBaselineLastSeen] = React.useState<{
     btcId: string
     usdId: string
@@ -194,6 +198,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       txId: string
       settlementCurrency?: WalletCurrency | null
     }) => {
+      if (seenTxIds.has(txId)) return false
       if (!highlightBaselineLastSeen) return false
       if (!settlementCurrency) return false
 
@@ -225,7 +230,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
       return txId > lastSeenId
     },
-    [walletFilter, highlightBaselineLastSeen, lastSeenIdForAll],
+    [walletFilter, highlightBaselineLastSeen, lastSeenIdForAll, seenTxIds],
   )
 
   React.useEffect(() => {
@@ -308,6 +313,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
               txId: item.id,
               settlementCurrency: item.settlementCurrency,
             })}
+            onPress={() => {
+              setSeenTxIds((prev) => new Set(prev).add(item.id))
+              navigation.navigate("transactionDetail", { txid: item.id })
+            }}
           />
         )}
         renderSectionHeader={({ section: { title } }) => (

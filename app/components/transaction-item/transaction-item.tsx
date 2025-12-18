@@ -1,8 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { useNavigation, useIsFocused } from "@react-navigation/native"
+import { useIsFocused } from "@react-navigation/native"
 import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 import { useFragment } from "@apollo/client"
 
@@ -15,7 +14,6 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useBounceInAnimation } from "@app/components/animations"
 import { toWalletAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -67,6 +65,7 @@ type Props = {
   isOnHomeScreen?: boolean
   testId?: string
   highlight?: boolean
+  onPress?: () => void
 }
 
 const TransactionItem: React.FC<Props> = ({
@@ -77,6 +76,7 @@ const TransactionItem: React.FC<Props> = ({
   isOnHomeScreen = false,
   testId = "transaction-item",
   highlight = false,
+  onPress,
 }) => {
   const styles = useStyles({
     isFirst,
@@ -84,8 +84,6 @@ const TransactionItem: React.FC<Props> = ({
     isOnHomeScreen,
     highlight,
   })
-
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -170,11 +168,7 @@ const TransactionItem: React.FC<Props> = ({
       <ListItem
         {...testProps(testId)}
         containerStyle={styles.container}
-        onPress={() => {
-          navigation.navigate("transactionDetail", {
-            txid,
-          })
-        }}
+        onPress={onPress}
       >
         <IconTransaction
           onChain={tx.settlementVia?.__typename === "SettlementViaOnChain"}
