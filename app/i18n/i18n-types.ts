@@ -7675,6 +7675,19 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​p​r​o​f​i​l​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
 		 */
 		error: string
+		/**
+		 * f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		fromThisDevice: string
+		/**
+		 * Y​o​u​ ​s​w​i​t​c​h​e​d​ ​t​o​ ​a​n​o​t​h​e​r​ ​a​c​c​o​u​n​t
+		 */
+		switchAccount: string
+		/**
+		 * Y​o​u​ ​r​e​m​o​v​e​d​ ​a​c​c​o​u​n​t​ ​{​i​d​e​n​t​i​f​i​e​r​}​.
+		 * @param {string} identifier
+		 */
+		removedAccount: RequiredParams<'identifier'>
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -8442,6 +8455,14 @@ type RootTranslation = {
 		 */
 		account: string
 		/**
+		 * A​c​c​o​u​n​t​s
+		 */
+		accounts: string
+		/**
+		 * A​c​c​o​u​n​t​ ​I​n​f​o​r​m​a​t​i​o​n
+		 */
+		accountInformation: string
+		/**
 		 * T​r​i​a​l​ ​A​c​c​o​u​n​t
 		 */
 		trialAccount: string
@@ -8853,6 +8874,10 @@ type RootTranslation = {
 		 * A​l​l​ ​a​c​c​o​u​n​t​s
 		 */
 		allAccounts: string
+		/**
+		 * P​r​o​f​i​l​e​s
+		 */
+		profiles: string
 	}
 	errors: {
 		/**
@@ -9037,6 +9062,12 @@ type RootTranslation = {
 		 * B​y​e​!
 		 */
 		bye: string
+		/**
+		 * A​t​t​e​n​t​i​o​n​:​ ​A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
+	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​d​e​l​e​t​i​n​g​.​
+	​D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.
+		 */
+		deleteAccountWarning: string
 	}
 	lnurl: {
 		/**
@@ -9347,9 +9378,7 @@ type RootTranslation = {
 		 */
 		confirmNameContent: RequiredParams<'firstName' | 'lastName'>
 		/**
-		 * U​p​g​r​a​d​i​n​g​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t​s​ ​a​n​d​ ​g​i​v​e​ ​y​o​u​ ​a​d​d​i​t​i​o​n​a​l​ ​f​u​n​c​t​i​o​n​a​l​i​t​y​ ​s​u​c​h​ ​a​s​ ​t​r​a​n​s​f​e​r​ ​t​o​ ​b​a​n​k​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​s​e​l​e​c​t​e​d​ ​c​o​u​n​t​r​i​e​s​.​
-	​
-	​Y​o​u​ ​w​i​l​l​ ​h​a​v​e​ ​t​o​ ​p​r​o​v​i​d​e​ ​y​o​u​r​ ​n​a​m​e​,​ ​a​ ​g​o​v​e​r​n​e​m​e​n​t​ ​i​s​s​u​e​d​ ​I​D​ ​a​n​d​ ​a​ ​s​e​l​f​i​e​.​ ​W​e​'​l​l​ ​s​t​a​r​t​ ​w​i​t​h​ ​y​o​u​r​ ​n​a​m​e​.
+		 * U​p​g​r​a​d​i​n​g​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t​s​ ​a​n​d​ ​g​i​v​e​ ​y​o​u​ ​a​d​d​i​t​i​o​n​a​l​ ​f​u​n​c​t​i​o​n​a​l​i​t​y​ ​s​u​c​h​ ​a​s​ ​t​r​a​n​s​f​e​r​ ​t​o​ ​b​a​n​k​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​s​e​l​e​c​t​e​d​ ​c​o​u​n​t​r​i​e​s​.
 		 */
 		requirements: string
 		/**
@@ -17001,6 +17030,18 @@ export type TranslationFunctions = {
 		 * Unable to fetch profiles at this time
 		 */
 		error: () => LocalizedString
+		/**
+		 * from this device?
+		 */
+		fromThisDevice: () => LocalizedString
+		/**
+		 * You switched to another account
+		 */
+		switchAccount: () => LocalizedString
+		/**
+		 * You removed account {identifier}.
+		 */
+		removedAccount: (arg: { identifier: string }) => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -17752,6 +17793,14 @@ export type TranslationFunctions = {
 		 */
 		account: () => LocalizedString
 		/**
+		 * Accounts
+		 */
+		accounts: () => LocalizedString
+		/**
+		 * Account Information
+		 */
+		accountInformation: () => LocalizedString
+		/**
 		 * Trial Account
 		 */
 		trialAccount: () => LocalizedString
@@ -18161,6 +18210,10 @@ export type TranslationFunctions = {
 		 * All accounts
 		 */
 		allAccounts: () => LocalizedString
+		/**
+		 * Profiles
+		 */
+		profiles: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -18336,6 +18389,12 @@ export type TranslationFunctions = {
 		 * Bye!
 		 */
 		bye: () => LocalizedString
+		/**
+		 * Attention: Account deletion is permanent!
+	Make sure wallets have no funds before deleting.
+	Deleted account cannot be reinstated.
+		 */
+		deleteAccountWarning: () => LocalizedString
 	}
 	lnurl: {
 		/**
@@ -18636,8 +18695,6 @@ export type TranslationFunctions = {
 		confirmNameContent: (arg: { firstName: string, lastName: string }) => LocalizedString
 		/**
 		 * Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.
-
-	You will have to provide your name, a governement issued ID and a selfie. We'll start with your name.
 		 */
 		requirements: () => LocalizedString
 		/**

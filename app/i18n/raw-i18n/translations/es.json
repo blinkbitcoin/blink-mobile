@@ -2366,7 +2366,10 @@
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
-        "error": "No se pudo obtener la información de los perfiles en este momento"
+        "error": "No se pudo obtener la información de los perfiles en este momento",
+        "fromThisDevice": "desde este dispositivo?",
+        "switchAccount": "Cambiaste a otra cuenta",
+        "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
@@ -2601,6 +2604,8 @@
         "advanced": "Avanzado",
         "community": "Comunidad",
         "account": "Cuenta",
+        "accounts": "Cuentas",
+        "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
         "transactionLimits": "Límites de la transacción",
@@ -2704,7 +2709,8 @@
         },
         "dollar": "Dólar",
         "all": "TODAS",
-        "allAccounts": "Todas las cuentas"
+        "allAccounts": "Todas las cuentas",
+        "profiles": "Perfiles"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2754,7 +2760,8 @@
         "deleteAccountConfirmation": "Tu cuenta ha sido designada para su eliminación.\n\nCuando finalice el período de prueba relacionado con los requisitos reglamentarios, los datos restantes relacionados con tu cuenta se eliminarán de forma permanente.",
         "deleteAccountFromPhone": "¡Hola! Por favor, elimina mi cuenta. Mi número de teléfono es {phoneNumber: string}.",
         "deleteAccountError": "Algo salió mal. Ponte en contacto con {email: string} para obtener más ayuda.",
-        "bye": "¡Adiós!"
+        "bye": "¡Adiós!",
+        "deleteAccountWarning": "Atención: ¡La eliminación de la cuenta es permanente!\nAsegúrate de que las billeteras no tengan fondos antes de eliminarla.\nUna cuenta eliminada no se puede restaurar."
     },
     "lnurl": {
         "overLimit": "No se puede enviar más de la cantidad máxima",
@@ -2840,7 +2847,7 @@
         "firstName": "Primer Nombre",
         "lastName": "Primer Apellido",
         "confirmNameContent": "¿Está correcta la ortografía de tu nombre?\n\n{firstName: string} {lastName: string}\n\nDebe coincidir con el nombre que figura en tu DNI.",
-        "requirements": "Actualizar el Nivel de su cuenta aumentará sus límites y le brindará funciones adicionales, como transferencias a cuentas bancarias en países seleccionados.\n\nTendrás que proporcionar tu nombre, una identificación emitida por el gobierno y una selfie. Empezaremos con tu nombre.",
+        "requirements": "Actualizar el Nivel de su cuenta aumentará sus límites y le brindará funciones adicionales, como transferencias a cuentas bancarias en países seleccionados.",
         "success": "Los documentos se recibieron exitosamente y se procesarán en breve. Puede volver a esta página para obtener una actualización sobre el estado de su Solicitud de Incorporación.",
         "error": "Ha habido un error con el envío de sus documentos. Puede ponerse en contacto con el soporte si el problema persiste.",
         "status": "El Estado de su Solicitud de Incorporación es:",

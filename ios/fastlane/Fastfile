@@ -129,6 +129,8 @@ platform :ios do
       release_notes: {
         "default": ENV["CHANGELOG"],
         "en-US": ENV["CHANGELOG"],
+        "es-ES": ENV["CHANGELOG"],
+        "es-MX": ENV["CHANGELOG"],
       },
     )
   end

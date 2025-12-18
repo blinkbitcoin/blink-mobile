@@ -22397,6 +22397,11 @@ react-native-bundle-visualizer@^3.1.3:
     open "^8.4.0"
     source-map-explorer "^2.5.3"
 
+react-native-camera-kit@^16.1.3:
+  version "16.1.3"
+  resolved "https://registry.yarnpkg.com/react-native-camera-kit/-/react-native-camera-kit-16.1.3.tgz#71a3005688f37cfad16b89bc85addf56921498df"
+  integrity sha512-mqOgFY8wON6YGaZVSP1eaH+fbcxIbUSgAaFlt5yLTz3H8Lc1Hl0IvQ4FlcC1lG5AbyqCyNqvK60kkgq5dWFnag==
+
 react-native-config@^1.5.1:
   version "1.5.1"
   resolved "https://registry.npmjs.org/react-native-config/-/react-native-config-1.5.1.tgz#73c94f511493e9b7ff9350cdf351d203a1b05acc"
@@ -22582,10 +22587,10 @@ react-native-randombytes@^3.5.1:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
-react-native-reanimated-carousel@3.5.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated-carousel/-/react-native-reanimated-carousel-3.5.1.tgz#3605b9959ffc0aa1c6b8b8736d98f91f46e36b17"
-  integrity sha512-9BBQV6JAYSQm2lV7MFtT4mzapXmW4IZO6s38gfiJL84Jg23ivGB1UykcNQauKgtHyhtW2NuZJzItb1s42lM+hA==
+react-native-reanimated-carousel@4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated-carousel/-/react-native-reanimated-carousel-4.0.3.tgz#975f4ff3f5da5bb3790fe60850a46ad8119612bc"
+  integrity sha512-YZXlvZNghR5shFcI9hTA7h7bEhh97pfUSLZvLBAshpbkuYwJDKmQXejO/199T6hqGq0wCRwR0CWf2P4Vs6A4Fw==
 
 react-native-reanimated@3.16.7:
   version "3.16.7"
@@ -22694,11 +22699,6 @@ react-native-view-shot@^4.0.3:
   integrity sha512-USNjYmED7C0me02c1DxKA0074Hw+y/nxo+xJKlffMvfUWWzL5ELh/TJA/pTnVqFurIrzthZDPtDM7aBFJuhrHQ==
   dependencies:
     html2canvas "^1.4.1"
-
-react-native-vision-camera@^4.7.2:
-  version "4.7.2"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.7.2.tgz#e4bd8f3d893a3f5fa9d8224ce28b8ef00d171bc1"
-  integrity sha512-C+5PvlSunN6I4aYplSask+v3jfhgduZumIVw6H6lG+Afpf8boIcG3uFSsSfVgj+hxI7fx6qM6bsciEhzgxEUYg==
 
 react-native-webln@^0.1.11:
   version "0.1.11"
@@ -23762,10 +23762,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rn-qr-generator@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/rn-qr-generator/-/rn-qr-generator-1.4.0.tgz#57ea7109df809d70103ee5ee0569f7bd4fb07a79"
-  integrity sha512-L3HS1eahpAA3k2s/CGZOBuv3bELshodNHO/aw9tWVrbZagSXJ9BrDat/CUnDVNWjCl8/qt9Dv+8CYY2K1q4iMQ==
+rn-qr-generator@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/rn-qr-generator/-/rn-qr-generator-1.4.5.tgz#b10034615f250a80e9e2af2a372af5d989889a3d"
+  integrity sha512-zdcYD0LYGY7vQoJ/N7OvSaC97vHD+cZ3rY7nFZ81YJs0tqbhRxZsEQddQnkBkP41WVb40M9J129xNe2zfnwtSw==
 
 robots-parser@^2.0.1:
   version "2.4.0"

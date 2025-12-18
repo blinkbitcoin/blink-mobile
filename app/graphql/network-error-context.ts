@@ -4,11 +4,13 @@ import { NetworkError } from "@apollo/client/errors"
 
 type NetworkErrorState = {
   networkError: NetworkError | undefined
+  token: string | undefined
   clearNetworkError: () => void
 }
 
 const NetworkErrorContext = createContext<NetworkErrorState>({
   networkError: undefined,
+  token: undefined,
   clearNetworkError: () => {},
 })
 
