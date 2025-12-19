@@ -340,6 +340,17 @@ export const useDisplayCurrency = () => {
     [convertMoneyAmount, formatMoneyAmount],
   )
 
+  const getCurrencySymbol = useCallback(
+    ({ currency }: { currency: string }) => {
+      const currencyInfo = displayCurrencyDictionary[currency] || {
+        symbol: currency,
+        fractionDigits: 2,
+      }
+      return currencyInfo.symbol
+    },
+    [displayCurrencyDictionary],
+  )
+
   return {
     fractionDigits: displayCurrencyInfo.fractionDigits,
     fiatSymbol: displayCurrencyInfo.symbol,
@@ -358,5 +369,6 @@ export const useDisplayCurrency = () => {
     zeroDisplayAmount: toDisplayMoneyAmount(0),
 
     formatCurrency,
+    getCurrencySymbol,
   }
 }

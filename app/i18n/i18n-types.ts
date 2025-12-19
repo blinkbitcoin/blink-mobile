@@ -243,17 +243,25 @@ type RootTranslation = {
 	}
 	ConversionDetailsScreen: {
 		/**
-		 * C​o​n​v​e​r​t
+		 * T​r​a​n​s​f​e​r​ ​f​u​n​d​s
 		 */
 		title: string
+		/**
+		 * T​r​a​n​s​f​e​r
+		 */
+		transfer: string
 		/**
 		 * %​ ​t​o​ ​c​o​n​v​e​r​t
 		 */
 		percentageToConvert: string
+		/**
+		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
+		 */
+		reviewTransfer: string
 	}
 	ConversionConfirmationScreen: {
 		/**
-		 * R​e​v​i​e​w​ ​c​o​n​v​e​r​s​i​o​n
+		 * C​o​n​f​i​r​m​ ​t​r​a​n​s​f​e​r
 		 */
 		title: string
 		/**
@@ -264,14 +272,24 @@ type RootTranslation = {
 		 * R​e​c​e​i​v​i​n​g​ ​a​c​c​o​u​n​t
 		 */
 		receivingAccount: string
+		/**
+		 * B​i​t​c​o​i​n​ ​a​m​o​u​n​t​ ​i​s​ ​o​n​l​y​ ​a​p​p​r​o​x​i​m​a​t​e​.​ ​I​t​ ​c​a​n​ ​v​a​r​y​ ​b​y​ ​a​ ​s​m​a​l​l​ ​a​m​o​u​n​t​.
+		 */
+		infoBitcoin: string
+		/**
+		 * D​o​l​l​a​r​ ​a​m​o​u​n​t​ ​i​s​ ​o​n​l​y​ ​a​p​p​r​o​x​i​m​a​t​e​.​ ​I​t​ ​c​a​n​ ​v​a​r​y​ ​b​y​ ​a​ ​s​m​a​l​l​ ​a​m​o​u​n​t​.
+		 */
+		infoDollar: string
+		/**
+		 * T​r​a​n​s​f​e​r​ ​{​f​r​o​m​W​a​l​l​e​t​}​ ​t​o​ ​{​t​o​W​a​l​l​e​t​}
+		 * @param {unknown} fromWallet
+		 * @param {unknown} toWallet
+		 */
+		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
 	}
 	ConversionSuccessScreen: {
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​S​u​c​c​e​s​s
-		 */
-		title: string
-		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​s​u​c​c​e​s​s​f​u​l
+		 * T​r​a​n​s​f​e​r​ ​s​u​c​c​e​s​s​f​u​l
 		 */
 		message: string
 	}
@@ -9627,17 +9645,25 @@ export type TranslationFunctions = {
 	}
 	ConversionDetailsScreen: {
 		/**
-		 * Convert
+		 * Transfer funds
 		 */
 		title: () => LocalizedString
+		/**
+		 * Transfer
+		 */
+		transfer: () => LocalizedString
 		/**
 		 * % to convert
 		 */
 		percentageToConvert: () => LocalizedString
+		/**
+		 * Review transfer
+		 */
+		reviewTransfer: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
-		 * Review conversion
+		 * Confirm transfer
 		 */
 		title: () => LocalizedString
 		/**
@@ -9648,14 +9674,22 @@ export type TranslationFunctions = {
 		 * Receiving account
 		 */
 		receivingAccount: () => LocalizedString
+		/**
+		 * Bitcoin amount is only approximate. It can vary by a small amount.
+		 */
+		infoBitcoin: () => LocalizedString
+		/**
+		 * Dollar amount is only approximate. It can vary by a small amount.
+		 */
+		infoDollar: () => LocalizedString
+		/**
+		 * Transfer {fromWallet} to {toWallet}
+		 */
+		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
-		 * Conversion Success
-		 */
-		title: () => LocalizedString
-		/**
-		 * Conversion successful
+		 * Transfer successful
 		 */
 		message: () => LocalizedString
 	}
