@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
 import { Pressable, View } from "react-native"
 
@@ -6,15 +6,19 @@ import { gql } from "@apollo/client"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyCurrencyBubble } from "../atomic/galoy-currency-bubble"
 import { GaloyIcon } from "../atomic/galoy-icon"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { NotificationBadge } from "@app/components/notification-badge"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { CurrencyPill } from "../atomic/currency-pill"
 
 const Loader = () => {
   const styles = useStyles()
@@ -52,9 +56,18 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
+  wallets?: readonly WalletBalance[]
+  showBtcNotification?: boolean
+  showUsdNotification?: boolean
 }
 
-const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }) => {
+const WalletOverview: React.FC<Props> = ({
+  loading,
+  setIsStablesatModalVisible,
+  wallets,
+  showBtcNotification = false,
+  showUsdNotification = false,
+}) => {
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
@@ -63,7 +76,7 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { formatMoneyAmount, displayCurrency, moneyAmountToDisplayCurrencyString } =
     useDisplayCurrency()
@@ -73,9 +86,13 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
 
+  const hasWallets = wallets && wallets.length > 0
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
+  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+
   if (isAuthed) {
-    const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-    const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+    const btcWallet = getBtcWallet(resolvedWallets)
+    const usdWallet = getUsdWallet(resolvedWallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -98,6 +115,17 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
     }
   }
 
+  const openTransactionHistory = (currencyFilter: WalletCurrency) => {
+    if (!resolvedWallets || resolvedWallets.length === 0) return
+    navigation.navigate("transactionHistory", {
+      wallets: resolvedWallets,
+      currencyFilter,
+    })
+  }
+
+  const [pressedBtc, setPressedBtc] = useState(false)
+  const [pressedUsd, setPressedUsd] = useState(false)
+
   return (
     <View style={styles.container}>
       <View style={styles.myAccounts}>
@@ -108,58 +136,94 @@ const WalletOverview: React.FC<Props> = ({ loading, setIsStablesatModalVisible }
           <GaloyIcon name={hideAmount ? "eye-slash" : "eye"} size={24} />
         </Pressable>
       </View>
-      <View style={[styles.separator, styles.titleSeparator]}></View>
-      <View style={styles.displayTextView}>
-        <View style={styles.currency}>
-          <GaloyCurrencyBubble currency="BTC" />
-          <Text type="p1">Bitcoin</Text>
-        </View>
-        {loading ? (
-          <Loader />
-        ) : hideAmount ? (
-          <Text>****</Text>
-        ) : (
-          <View style={styles.hideableArea}>
-            <Text type="p1" bold {...testProps("bitcoin-balance")}>
-              {btcInUnderlyingCurrency}
-            </Text>
-            <Text type="p3">{btcInDisplayCurrencyFormatted}</Text>
+
+      <View style={[styles.separator, styles.titleSeparator]} />
+
+      <Pressable
+        onPressIn={() => setPressedBtc(true)}
+        onPressOut={() => setPressedBtc(false)}
+        onPress={() => {
+          openTransactionHistory(WalletCurrency.Btc)
+        }}
+      >
+        <View style={styles.displayTextView}>
+          <View style={styles.currency}>
+            <View style={styles.bubbleWrapper} pointerEvents="box-none">
+              <View style={pressedBtc && styles.pressedOpacity}>
+                <CurrencyPill
+                  currency={WalletCurrency.Btc}
+                  textSize="p2"
+                  containerSize="medium"
+                />
+              </View>
+              <NotificationBadge visible={showBtcNotification} />
+            </View>
           </View>
-        )}
-      </View>
-      <View style={styles.separator}></View>
-      <View style={styles.displayTextView}>
-        <View style={styles.currency}>
-          <GaloyCurrencyBubble currency="USD" />
-          <Text type="p1">Dollar</Text>
-          <Pressable onPress={() => setIsStablesatModalVisible(true)}>
-            <GaloyIcon color={colors.grey1} name="question" size={18} />
-          </Pressable>
+          {loading ? (
+            <Loader />
+          ) : hideAmount ? (
+            <Text>****</Text>
+          ) : (
+            <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
+              <Text type="p1" bold {...testProps("bitcoin-balance")}>
+                {btcInUnderlyingCurrency}
+              </Text>
+              <Text type="p3">{btcInDisplayCurrencyFormatted}</Text>
+            </View>
+          )}
         </View>
-        {loading ? (
-          <Loader />
-        ) : (
-          <View style={styles.hideableArea}>
-            {!hideAmount && (
-              <>
-                {usdInUnderlyingCurrency ? (
-                  <Text type="p1" bold>
-                    {usdInUnderlyingCurrency}
+      </Pressable>
+
+      <View style={styles.separator} />
+
+      <Pressable
+        onPressIn={() => setPressedUsd(true)}
+        onPressOut={() => setPressedUsd(false)}
+        onPress={() => {
+          openTransactionHistory(WalletCurrency.Usd)
+        }}
+      >
+        <View style={styles.displayTextView}>
+          <View style={styles.currency}>
+            <View style={styles.bubbleWrapper} pointerEvents="box-none">
+              <View style={pressedUsd && styles.pressedOpacity}>
+                <CurrencyPill
+                  currency={WalletCurrency.Usd}
+                  textSize="p2"
+                  containerSize="medium"
+                />
+              </View>
+              <NotificationBadge visible={showUsdNotification} />
+            </View>
+            <Pressable onPress={() => setIsStablesatModalVisible(true)}>
+              <GaloyIcon color={colors.grey1} name="question" size={18} />
+            </Pressable>
+          </View>
+          {loading ? (
+            <Loader />
+          ) : (
+            <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
+              {!hideAmount && (
+                <>
+                  {usdInUnderlyingCurrency ? (
+                    <Text type="p1" bold>
+                      {usdInUnderlyingCurrency}
+                    </Text>
+                  ) : null}
+                  <Text
+                    {...testProps("stablesats-balance")}
+                    type={usdInUnderlyingCurrency ? "p3" : "p1"}
+                    bold={!usdInUnderlyingCurrency}
+                  >
+                    {usdInDisplayCurrencyFormatted}
                   </Text>
-                ) : null}
-                <Text
-                  {...testProps("stablesats-balance")}
-                  type={usdInUnderlyingCurrency ? "p3" : "p1"}
-                  bold={!usdInUnderlyingCurrency}
-                >
-                  {usdInDisplayCurrencyFormatted}
-                </Text>
-              </>
-            )}
-            {hideAmount && <Text>****</Text>}
-          </View>
-        )}
-      </View>
+                </>
+              )}
+              {hideAmount && <Text>****</Text>}
+            </View>
+          )}
+        </View>
+      </Pressable>
     </View>
   )
 }
@@ -209,6 +273,9 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 10,
   },
+  bubbleWrapper: {
+    position: "relative",
+  },
   hideableArea: {
     alignItems: "flex-end",
   },
@@ -219,4 +286,5 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 45,
     marginTop: 5,
   },
+  pressedOpacity: { opacity: 0.7 },
 }))
