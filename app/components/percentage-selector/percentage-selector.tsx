@@ -49,6 +49,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
             style={[styles.chip, isLocked && styles.chipDisabled]}
             disabled={isLocked}
             onPress={() => onSelect(p)}
+            accessibilityLabel={testIdPrefix}
           >
             {loading ? (
               <ActivityIndicator color={colors.primary} />

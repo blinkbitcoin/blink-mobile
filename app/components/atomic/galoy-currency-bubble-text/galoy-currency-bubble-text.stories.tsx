@@ -1,17 +1,26 @@
 import React from "react"
+import { ViewStyle } from "react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { GaloyCurrencyBubbleText } from "./galoy-currency-bubble-text"
 import { Story, UseCase } from "../../../../.storybook/views"
 
-const UseCaseWrapper = ({ children, text, style }) => (
+const UseCaseWrapper = ({
+  children,
+  text,
+  style,
+}: {
+  children: React.ReactNode
+  text: string
+  style: ViewStyle
+}) => (
   <UseCase style={style} text={text}>
     {children}
   </UseCase>
 )
 
-const styles = {
+const styles: { wrapper: ViewStyle } = {
   wrapper: { flexDirection: "row", gap: 12 },
 }
 

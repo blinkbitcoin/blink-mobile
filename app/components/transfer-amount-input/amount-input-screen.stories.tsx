@@ -12,7 +12,11 @@ import {
   MoneyAmount,
   WalletOrDisplayCurrency,
 } from "../../types/amounts"
-import { AmountInputScreen, AmountInputScreenProps } from "./amount-input-screen"
+import {
+  AmountInputScreen,
+  AmountInputScreenProps,
+  ConvertInputType,
+} from "./amount-input-screen"
 
 export default {
   title: "Amount Input Screen",
@@ -32,15 +36,44 @@ const amountInputDefaultProps: AmountInputScreenProps = {
     currency: DisplayCurrency,
   },
   walletCurrency: WalletCurrency.Btc,
-  setAmount: (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) =>
-    console.log("set amount: ", moneyAmount),
-  goBack: () => console.log("go back"),
-  convertMoneyAmount: (moneyAmount, toCurrency) => {
+  onAmountChange: (amount: number) => {
+    console.log("onAmountChange: ", amount)
+  },
+  convertMoneyAmount: (
+    moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
+    toCurrency: WalletOrDisplayCurrency,
+  ) => {
     return {
       amount: moneyAmount.amount,
       currency: toCurrency,
     }
   },
+  inputValues: {
+    fromInput: {
+      id: ConvertInputType.FROM,
+      currency: WalletCurrency.Btc,
+      amount: { amount: 0, currency: WalletCurrency.Btc },
+      isFocused: false,
+      formattedAmount: "",
+    },
+    toInput: {
+      id: ConvertInputType.TO,
+      currency: WalletCurrency.Usd,
+      amount: { amount: 0, currency: WalletCurrency.Usd },
+      isFocused: false,
+      formattedAmount: "",
+    },
+    currencyInput: {
+      id: ConvertInputType.CURRENCY,
+      currency: DisplayCurrency,
+      amount: { amount: 0, currency: DisplayCurrency },
+      isFocused: false,
+      formattedAmount: "",
+    },
+    formattedAmount: "",
+  },
+  onSetFormattedAmount: (values) => console.log("set formatted: ", values),
+  focusedInput: null,
 }
 
 export const NoAmount = () => (
