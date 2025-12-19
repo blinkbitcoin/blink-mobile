@@ -1047,10 +1047,6 @@ query analytics {
   }
 }
 
-query beta {
-  beta @client
-}
-
 query btcPriceList($range: PriceGraphRange!) {
   btcPriceList(range: $range) {
     timestamp
@@ -1078,10 +1074,6 @@ query businessMapMarkers {
     }
     __typename
   }
-}
-
-query colorScheme {
-  colorScheme @client
 }
 
 query contacts {
@@ -1116,10 +1108,6 @@ query conversionScreen {
   }
 }
 
-query countryCode {
-  countryCode @client
-}
-
 query currencyList {
   currencyList {
     __typename
@@ -1142,10 +1130,6 @@ query debugScreen {
   }
 }
 
-query deviceSessionCount {
-  deviceSessionCount @client
-}
-
 query displayCurrency {
   me {
     id
@@ -1156,10 +1140,6 @@ query displayCurrency {
     }
     __typename
   }
-}
-
-query feedbackModalShown {
-  feedbackModalShown @client
 }
 
 query fullOnboardingScreen {
@@ -1192,18 +1172,6 @@ query getUsernames {
     }
     __typename
   }
-}
-
-query hasPromptedSetDefaultAccount {
-  hasPromptedSetDefaultAccount @client
-}
-
-query hiddenBalanceToolTip {
-  hiddenBalanceToolTip @client
-}
-
-query hideBalance {
-  hideBalance @client
 }
 
 query homeAuthed {
@@ -1254,14 +1222,6 @@ query homeUnauthed {
     fractionDigits
     __typename
   }
-}
-
-query innerCircleValue {
-  innerCircleValue @client
-}
-
-query introducingCirclesModalShown {
-  introducingCirclesModalShown @client
 }
 
 query invite {
@@ -1445,16 +1405,6 @@ query realtimePrice {
       }
       __typename
     }
-    __typename
-  }
-}
-
-query region {
-  region @client {
-    latitude
-    longitude
-    latitudeDelta
-    longitudeDelta
     __typename
   }
 }
@@ -1690,10 +1640,6 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
     }
     __typename
   }
-}
-
-query upgradeModalLastShownAt {
-  upgradeModalLastShownAt @client
 }
 
 query walletOverviewScreen {
