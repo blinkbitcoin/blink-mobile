@@ -14,6 +14,7 @@ import {
   useOnChainPaymentSendAllMutation,
   useOnChainUsdPaymentSendAsBtcDenominatedMutation,
   useOnChainUsdPaymentSendMutation,
+  Transaction,
 } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
 
@@ -26,6 +27,7 @@ type UseSendPaymentResult = {
   sendPayment:
     | (() => Promise<{
         status: PaymentSendResult | null | undefined
+        transaction?: Partial<Transaction> | null
         errorsMessage?: string
         extraInfo?: PaymentSendExtraInfo
       }>)
@@ -41,6 +43,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
@@ -50,6 +55,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
@@ -59,6 +67,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
@@ -69,6 +80,7 @@ gql`
       }
       status
       transaction {
+        createdAt
         settlementVia {
           ... on SettlementViaLn {
             preImage
@@ -87,12 +99,16 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
   mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
     onChainPaymentSend(input: $input) {
       transaction {
+        createdAt
         settlementVia {
           ... on SettlementViaOnChain {
             arrivalInMempoolEstimatedAt
@@ -112,6 +128,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
@@ -121,6 +140,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 
@@ -132,6 +154,9 @@ gql`
         message
       }
       status
+      transaction {
+        createdAt
+      }
     }
   }
 `
@@ -202,7 +227,7 @@ export const useSendPayment = (
     return sendPaymentMutation && !hasAttemptedSend
       ? async () => {
           setHasAttemptedSend(true)
-          const { status, errors, extraInfo } = await sendPaymentMutation({
+          const { status, errors, extraInfo, transaction } = await sendPaymentMutation({
             intraLedgerPaymentSend,
             intraLedgerUsdPaymentSend,
             lnInvoicePaymentSend,
@@ -220,7 +245,7 @@ export const useSendPayment = (
           if (status === PaymentSendResult.Failure) {
             setHasAttemptedSend(false)
           }
-          return { status, errorsMessage, extraInfo }
+          return { status, errorsMessage, extraInfo, transaction }
         }
       : undefined
   }, [
