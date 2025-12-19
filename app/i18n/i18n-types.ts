@@ -6329,7 +6329,7 @@ type RootTranslation = {
 		 */
 		logBackInWith: string
 		/**
-		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​G​a​l​o​y
+		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​B​l​i​n​k
 		 */
 		headline: string
 		/**
@@ -6842,6 +6842,10 @@ type RootTranslation = {
 	}
 	SecurityScreen: {
 		/**
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​P​r​i​v​a​c​y
+		 */
+		title: string
+		/**
 		 * U​n​l​o​c​k​ ​w​i​t​h​ ​f​i​n​g​e​r​p​r​i​n​t​ ​o​r​ ​f​a​c​i​a​l​ ​r​e​c​o​g​n​i​t​i​o​n​.
 		 */
 		biometricDescription: string
@@ -6864,15 +6868,15 @@ type RootTranslation = {
 		 */
 		hideBalanceDescription: string
 		/**
-		 * H​i​d​e​ ​B​a​l​a​n​c​e
+		 * A​l​w​a​y​s​ ​h​i​d​e​ ​b​a​l​a​n​c​e
 		 */
 		hideBalanceTitle: string
 		/**
-		 * P​I​N​ ​i​s​ ​u​s​e​d​ ​a​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​m​e​t​h​o​d​ ​f​o​r​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
+		 * S​e​t​ ​a​ ​4​-​d​i​g​i​t​ ​n​u​m​e​r​i​c​a​l​ ​P​I​N​ ​t​o​ ​u​n​l​o​c​k
 		 */
 		pinDescription: string
 		/**
-		 * P​I​N​ ​C​o​d​e
+		 * P​I​N​ ​c​o​d​e
 		 */
 		pinTitle: string
 		/**
@@ -7241,7 +7245,7 @@ type RootTranslation = {
 	}
 	SettingsScreen: {
 		/**
-		 * P​r​i​n​t​a​b​l​e​ ​S​t​a​t​i​c​ ​Q​R​ ​C​o​d​e
+		 * P​r​i​n​t​a​b​l​e​ ​s​t​a​t​i​c​ ​Q​R
 		 */
 		staticQr: string
 		/**
@@ -7253,9 +7257,17 @@ type RootTranslation = {
 		 */
 		setByOs: string
 		/**
-		 * A​P​I​ ​A​c​c​e​s​s
+		 * A​P​I​ ​i​n​t​e​g​r​a​t​i​o​n
 		 */
 		apiAcess: string
+		/**
+		 * A​P​I​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
+		 */
+		apiDocumentation: string
+		/**
+		 * A​P​I​ ​a​c​c​e​s​s​ ​a​n​d​ ​d​a​s​h​b​o​a​r​d
+		 */
+		apiDashboard: string
 		/**
 		 * P​o​i​n​t​ ​o​f​ ​S​a​l​e
 		 */
@@ -7265,7 +7277,7 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * S​e​t​ ​Y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s
+		 * S​e​t​ ​y​o​u​r​ ​l​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
 		 */
 		setYourLightningAddress: string
 		/**
@@ -7379,14 +7391,22 @@ type RootTranslation = {
 		 * I​ ​u​n​d​e​r​s​t​a​n​d​.​ ​P​l​e​a​s​e​ ​l​o​g​ ​o​u​t​.
 		 */
 		logoutOneAccountConfirm: string
+		/**
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
+		 */
+		receiveCurrency: string
+		/**
+		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
+		 */
+		displayCurrency: string
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​S​e​t​t​i​n​g​s
+		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
 		 */
 		title: string
 		/**
-		 * P​u​s​h​ ​N​o​t​i​f​i​c​a​t​i​o​n​s
+		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
 		notificationCategories: {
@@ -7402,7 +7422,7 @@ type RootTranslation = {
 			}
 			Payments: {
 				/**
-				 * P​a​y​m​e​n​t​s
+				 * T​r​a​n​s​a​c​t​i​o​n​ ​a​l​e​r​t​s
 				 */
 				title: string
 				/**
@@ -7446,7 +7466,7 @@ type RootTranslation = {
 		 */
 		accountBeingDeleted: string
 		/**
-		 * D​a​n​g​e​r​ ​Z​o​n​e
+		 * D​a​n​g​e​r​ ​z​o​n​e
 		 */
 		dangerZone: string
 		/**
@@ -7462,7 +7482,7 @@ type RootTranslation = {
 		 */
 		tapToAddPhoneNumber: string
 		/**
-		 * L​o​g​i​n​ ​M​e​t​h​o​d​s
+		 * L​o​g​i​n​ ​m​e​t​h​o​d​s
 		 */
 		loginMethods: string
 		/**
@@ -7471,7 +7491,7 @@ type RootTranslation = {
 		 */
 		level: RequiredParams<'level'>
 		/**
-		 * S​w​i​t​c​h​ ​A​c​c​o​u​n​t
+		 * S​w​i​t​c​h​ ​a​c​c​o​u​n​t
 		 */
 		switchAccount: string
 		/**
@@ -7647,10 +7667,14 @@ type RootTranslation = {
 		 * C​o​p​y
 		 */
 		copy: string
+		/**
+		 * I​d​e​n​t​i​t​y​ ​V​e​r​i​f​i​c​a​t​i​o​n
+		 */
+		identityVerification: string
 	}
 	ProfileScreen: {
 		/**
-		 * A​d​d​ ​A​c​c​o​u​n​t
+		 * A​d​d​ ​a​c​c​o​u​n​t
 		 */
 		addAccount: string
 		/**
@@ -7677,7 +7701,11 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 * S​e​c​r​e​t​/​b​a​c​k​u​p
+		 */
+		secret: string
+		/**
+		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​.
 		 */
 		content: string
 	}
@@ -7725,11 +7753,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * P​i​c​k​ ​w​h​i​c​h​ ​a​c​c​o​u​n​t​ ​t​o​ ​s​e​t​ ​a​s​ ​d​e​f​a​u​l​t​ ​f​o​r​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​a​d​j​u​s​t​ ​t​h​e​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​i​n​d​i​v​i​d​u​a​l​ ​p​a​y​m​e​n​t​s​ ​i​n​ ​t​h​e​ ​m​o​b​i​l​e​ ​a​p​p​.​ ​P​a​y​m​e​n​t​s​ ​r​e​c​e​i​v​e​d​ ​t​h​r​o​u​g​h​ ​t​h​e​ ​c​a​s​h​ ​r​e​g​i​s​t​e​r​ ​o​r​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​w​i​l​l​ ​a​l​w​a​y​s​ ​g​o​ ​t​o​ ​t​h​e​ ​d​e​f​a​u​l​t​ ​a​c​c​o​u​n​t​.​
-	​
-	​T​o​ ​a​v​o​i​d​ ​B​i​t​c​o​i​n​'​s​ ​v​o​l​a​t​i​l​i​t​y​,​ ​c​h​o​o​s​e​ ​S​t​a​b​l​e​s​a​t​s​.​ ​T​h​i​s​ ​a​l​l​o​w​s​ ​y​o​u​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​a​b​l​e​ ​a​m​o​u​n​t​ ​o​f​ ​m​o​n​e​y​ ​w​h​i​l​e​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​a​b​l​e​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​s​.​
-	​
-	​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​i​s​ ​s​e​t​t​i​n​g​ ​a​t​ ​a​n​y​ ​t​i​m​e​,​ ​a​n​d​ ​i​t​ ​w​o​n​'​t​ ​a​f​f​e​c​t​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​b​a​l​a​n​c​e​.
+		 * U​s​e​ ​y​o​u​r​ ​S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​i​n​ ​B​l​i​n​k​ ​t​o​ ​k​e​e​p​ ​t​h​e​ ​m​o​n​e​y​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​s​t​a​b​l​e​ ​i​n​ ​f​i​a​t​ ​(​d​o​l​l​a​r​)​ ​t​e​r​m​s​.​ ​U​s​e​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​f​ ​y​o​u​'​r​e​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​ ​a​n​d​ ​a​r​e​ ​o​k​a​y​ ​w​i​t​h​ ​y​o​u​r​ ​f​i​a​t​ ​b​a​l​a​n​c​e​ ​c​h​a​n​g​i​n​g​ ​a​l​l​ ​t​h​e​ ​t​i​m​e​.
 		 */
 		info: string
 	}
@@ -7743,23 +7767,23 @@ type RootTranslation = {
 		 */
 		info: string
 		/**
-		 * U​s​e​ ​S​y​s​t​e​m​ ​s​e​t​t​i​n​g
+		 * S​y​s​t​e​m​ ​s​e​t​t​i​n​g
 		 */
 		system: string
 		/**
-		 * U​s​e​ ​L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		light: string
 		/**
-		 * U​s​e​ ​D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		dark: string
 		/**
-		 * D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		setToDark: string
 		/**
-		 * L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		setToLight: string
 	}
@@ -7861,11 +7885,11 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​ ​T​r​a​n​s​f​e​r​s
+		 * S​t​a​b​l​e​s​a​t​s​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
-		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​U​s​e​r
+		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​u​s​e​r
 		 * @param {string} bankName
 		 */
 		internalSend: RequiredParams<'bankName'>
@@ -8417,7 +8441,7 @@ type RootTranslation = {
 		 */
 		preferences: string
 		/**
-		 * O​n​-​D​e​v​i​c​e​ ​S​e​c​u​r​i​t​y
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​p​r​i​v​a​c​y
 		 */
 		onDeviceSecurity: string
 		/**
@@ -8437,6 +8461,10 @@ type RootTranslation = {
 		 */
 		account: string
 		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t
+		 */
+		yourAccount: string
+		/**
 		 * A​c​c​o​u​n​t​s
 		 */
 		accounts: string
@@ -8453,7 +8481,7 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
-		 * T​r​a​n​s​a​c​t​i​o​n​ ​L​i​m​i​t​s
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
 		transactionLimits: string
 		/**
@@ -8535,7 +8563,7 @@ type RootTranslation = {
 		 */
 		currencySyncIssue: string
 		/**
-		 * E​x​p​o​r​t​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​s​ ​C​S​V
+		 * E​x​p​o​r​t​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s
 		 */
 		csvExport: string
 		/**
@@ -8857,6 +8885,14 @@ type RootTranslation = {
 		 */
 		allAccounts: string
 		/**
+		 * S​o​m​e
+		 */
+		some: string
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		support: string
+		/**
 		 * P​r​o​f​i​l​e​s
 		 */
 		profiles: string
@@ -8963,7 +8999,7 @@ type RootTranslation = {
 		 */
 		enjoyingApp: string
 		/**
-		 * S​t​a​t​u​s​ ​P​a​g​e
+		 * S​t​a​t​u​s​ ​p​a​g​e
 		 */
 		statusPage: string
 		/**
@@ -15710,7 +15746,7 @@ export type TranslationFunctions = {
 		 */
 		logBackInWith: () => LocalizedString
 		/**
-		 * Wallet powered by Galoy
+		 * Wallet powered by Blink
 		 */
 		headline: () => LocalizedString
 		/**
@@ -16209,6 +16245,10 @@ export type TranslationFunctions = {
 	}
 	SecurityScreen: {
 		/**
+		 * Security and Privacy
+		 */
+		title: () => LocalizedString
+		/**
 		 * Unlock with fingerprint or facial recognition.
 		 */
 		biometricDescription: () => LocalizedString
@@ -16231,15 +16271,15 @@ export type TranslationFunctions = {
 		 */
 		hideBalanceDescription: () => LocalizedString
 		/**
-		 * Hide Balance
+		 * Always hide balance
 		 */
 		hideBalanceTitle: () => LocalizedString
 		/**
-		 * PIN is used as the backup authentication method for biometric authentication.
+		 * Set a 4-digit numerical PIN to unlock
 		 */
 		pinDescription: () => LocalizedString
 		/**
-		 * PIN Code
+		 * PIN code
 		 */
 		pinTitle: () => LocalizedString
 		/**
@@ -16589,7 +16629,7 @@ export type TranslationFunctions = {
 	}
 	SettingsScreen: {
 		/**
-		 * Printable Static QR Code
+		 * Printable static QR
 		 */
 		staticQr: () => LocalizedString
 		/**
@@ -16601,9 +16641,17 @@ export type TranslationFunctions = {
 		 */
 		setByOs: () => LocalizedString
 		/**
-		 * API Access
+		 * API integration
 		 */
 		apiAcess: () => LocalizedString
+		/**
+		 * API documentation
+		 */
+		apiDocumentation: () => LocalizedString
+		/**
+		 * API access and dashboard
+		 */
+		apiDashboard: () => LocalizedString
 		/**
 		 * Point of Sale
 		 */
@@ -16613,7 +16661,7 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Set Your Lightning Address
+		 * Set your lightning address
 		 */
 		setYourLightningAddress: () => LocalizedString
 		/**
@@ -16725,14 +16773,22 @@ export type TranslationFunctions = {
 		 * I understand. Please log out.
 		 */
 		logoutOneAccountConfirm: () => LocalizedString
+		/**
+		 * Receive currency
+		 */
+		receiveCurrency: () => LocalizedString
+		/**
+		 * Display currency
+		 */
+		displayCurrency: () => LocalizedString
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * Notification Settings
+		 * Notification settings
 		 */
 		title: () => LocalizedString
 		/**
-		 * Push Notifications
+		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
 		notificationCategories: {
@@ -16748,7 +16804,7 @@ export type TranslationFunctions = {
 			}
 			Payments: {
 				/**
-				 * Payments
+				 * Transaction alerts
 				 */
 				title: () => LocalizedString
 				/**
@@ -16792,7 +16848,7 @@ export type TranslationFunctions = {
 		 */
 		accountBeingDeleted: () => LocalizedString
 		/**
-		 * Danger Zone
+		 * Danger zone
 		 */
 		dangerZone: () => LocalizedString
 		/**
@@ -16808,7 +16864,7 @@ export type TranslationFunctions = {
 		 */
 		tapToAddPhoneNumber: () => LocalizedString
 		/**
-		 * Login Methods
+		 * Login methods
 		 */
 		loginMethods: () => LocalizedString
 		/**
@@ -16816,7 +16872,7 @@ export type TranslationFunctions = {
 		 */
 		level: (arg: { level: string }) => LocalizedString
 		/**
-		 * Switch Account
+		 * Switch account
 		 */
 		switchAccount: () => LocalizedString
 		/**
@@ -16986,10 +17042,14 @@ export type TranslationFunctions = {
 		 * Copy
 		 */
 		copy: () => LocalizedString
+		/**
+		 * Identity Verification
+		 */
+		identityVerification: () => LocalizedString
 	}
 	ProfileScreen: {
 		/**
-		 * Add Account
+		 * Add account
 		 */
 		addAccount: () => LocalizedString
 		/**
@@ -17015,7 +17075,11 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app.
+		 * Secret/backup
+		 */
+		secret: () => LocalizedString
+		/**
+		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.
 		 */
 		content: () => LocalizedString
 	}
@@ -17063,11 +17127,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.
-
-	To avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.
-
-	You can change this setting at any time, and it won't affect your current balance.
+		 * Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.
 		 */
 		info: () => LocalizedString
 	}
@@ -17081,23 +17141,23 @@ export type TranslationFunctions = {
 		 */
 		info: () => LocalizedString
 		/**
-		 * Use System setting
+		 * System setting
 		 */
 		system: () => LocalizedString
 		/**
-		 * Use Light Mode
+		 * Light mode
 		 */
 		light: () => LocalizedString
 		/**
-		 * Use Dark Mode
+		 * Dark mode
 		 */
 		dark: () => LocalizedString
 		/**
-		 * Dark Mode
+		 * Dark mode
 		 */
 		setToDark: () => LocalizedString
 		/**
-		 * Light Mode
+		 * Light mode
 		 */
 		setToLight: () => LocalizedString
 	}
@@ -17197,11 +17257,11 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesat Transfers
+		 * Stablesats transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
-		 * Send to {bankName} User
+		 * Send to {bankName} user
 		 */
 		internalSend: (arg: { bankName: string }) => LocalizedString
 		/**
@@ -17739,7 +17799,7 @@ export type TranslationFunctions = {
 		 */
 		preferences: () => LocalizedString
 		/**
-		 * On-Device Security
+		 * Security and privacy
 		 */
 		onDeviceSecurity: () => LocalizedString
 		/**
@@ -17759,6 +17819,10 @@ export type TranslationFunctions = {
 		 */
 		account: () => LocalizedString
 		/**
+		 * Your account
+		 */
+		yourAccount: () => LocalizedString
+		/**
 		 * Accounts
 		 */
 		accounts: () => LocalizedString
@@ -17775,7 +17839,7 @@ export type TranslationFunctions = {
 		 */
 		blinkUser: () => LocalizedString
 		/**
-		 * Transaction Limits
+		 * Transaction limits
 		 */
 		transactionLimits: () => LocalizedString
 		/**
@@ -17855,7 +17919,7 @@ export type TranslationFunctions = {
 		 */
 		currencySyncIssue: () => LocalizedString
 		/**
-		 * Export transactions as CSV
+		 * Export all transactions
 		 */
 		csvExport: () => LocalizedString
 		/**
@@ -18177,6 +18241,14 @@ export type TranslationFunctions = {
 		 */
 		allAccounts: () => LocalizedString
 		/**
+		 * Some
+		 */
+		some: () => LocalizedString
+		/**
+		 * Support
+		 */
+		support: () => LocalizedString
+		/**
 		 * Profiles
 		 */
 		profiles: () => LocalizedString
@@ -18282,7 +18354,7 @@ export type TranslationFunctions = {
 		 */
 		enjoyingApp: () => LocalizedString
 		/**
-		 * Status Page
+		 * Status page
 		 */
 		statusPage: () => LocalizedString
 		/**

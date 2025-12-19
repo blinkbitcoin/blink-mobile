@@ -7,9 +7,13 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { SettingsRow } from "../row"
+import { useTheme } from "@rn-vui/themed"
 
 export const AccountStaticQR: React.FC = () => {
   const { appConfig } = useAppConfig()
+  const {
+    theme: { colors },
+  } = useTheme()
   const posUrl = appConfig.galoyInstance.posUrl
 
   const { LL } = useI18nContext()
@@ -23,10 +27,9 @@ export const AccountStaticQR: React.FC = () => {
     <SettingsRow
       loading={loading}
       title={LL.SettingsScreen.staticQr()}
-      subtitle={qrUrl}
       subtitleShorter={true}
       leftIcon="qr-code-outline"
-      rightIcon={<GaloyIcon name="link" size={24} />}
+      rightIcon={<GaloyIcon name="link" size={24} color={colors.primary} />}
       action={() => {
         Linking.openURL(qrUrl)
       }}
