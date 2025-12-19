@@ -31,15 +31,23 @@ const REFETCH_UPDATE_TYPES = ["IntraLedgerUpdate", "LnUpdate", "OnChainUpdate"]
 export const MyAccountUpdatesSub = ({ children }: PropsWithChildren) => {
   const client = useApolloClient()
 
-  const { data: dataSub } = useAccountUpdatesSubscription()
+  const { data: dataSub, error } = useAccountUpdatesSubscription()
 
   React.useEffect(() => {
+    if (error) {
+      console.error("Account updates subscription error:", error)
+      return
+    }
+
+    if (dataSub?.myUpdates?.errors?.length) {
+      console.error("Account updates errors:", dataSub.myUpdates.errors)
+    }
+
     const typename = dataSub?.myUpdates?.update?.__typename
     if (typename && REFETCH_UPDATE_TYPES.includes(typename)) {
-      console.error(dataSub?.myUpdates)
       client.refetchQueries({ include: [HomeAuthedDocument] })
     }
-  }, [dataSub, client])
+  }, [dataSub, client, error])
 
   return <>{children}</>
 }
