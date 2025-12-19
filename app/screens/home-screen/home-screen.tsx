@@ -53,6 +53,8 @@ import {
 } from "@app/graphql/generated"
 import { useLevel } from "@app/graphql/level-context"
 
+import { withMyAccountUpdatesSub } from "./my-account-updates-sub"
+
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
 
@@ -139,7 +141,7 @@ gql`
   }
 `
 
-export const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -636,3 +638,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
 }))
+
+const HomeScreenWithSubscription = withMyAccountUpdatesSub(HomeScreen)
+export { HomeScreenWithSubscription as HomeScreen }
