@@ -16,6 +16,21 @@ interface UiElement {
   children?: UiElement[];
 }
 
+// Strip emojis from string for cleaner display/matching
+function stripEmoji(str: string): string {
+  return str
+    // Unicode emojis
+    .replace(/[\u{1F1E0}-\u{1F1FF}]|[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, "")
+    // HTML entities for flag emojis (&#127462; etc)
+    .replace(/&#\d{5,6};/g, "")
+    // Clean up leading comma/space from removed flags
+    .replace(/^[,\s]+/, "")
+    .trim();
+}
+
+// Map of normalized testID -> original testID (for emoji handling)
+const testIdMap = new Map<string, string>();
+
 function adb(cmd: string): string {
   try {
     return execSync(`adb ${cmd}`, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
@@ -94,7 +109,10 @@ function getUiHierarchy(): UiElement | null {
 }
 
 function findElement(root: UiElement, testId: string): UiElement | null {
+  // Try exact match first
   if (root.id === testId) return root;
+  // Try normalized match (for emoji handling)
+  if (root.id && stripEmoji(root.id) === testId) return root;
   for (const child of root.children || []) {
     const found = findElement(child, testId);
     if (found) return found;
@@ -156,10 +174,15 @@ function ui() {
     process.exit(1);
   }
 
-  // Collect all testIDs
+  // Collect all testIDs and build normalized map
   const testIds: string[] = [];
+  testIdMap.clear();
   function collectIds(node: UiElement) {
-    if (node.id) testIds.push(node.id);
+    if (node.id) {
+      const normalized = stripEmoji(node.id);
+      testIdMap.set(normalized, node.id);
+      testIds.push(normalized);
+    }
     node.children?.forEach(collectIds);
   }
   collectIds(root);
@@ -196,6 +219,27 @@ function swipe(direction: string) {
   console.log(`Swiped ${direction}`);
 }
 
+function reload() {
+  const APP_PACKAGE = "com.galoyapp";
+  const APP_ACTIVITY = `${APP_PACKAGE}/.MainActivity`;
+
+  // Bring app to foreground first
+  adb(`shell am start -n ${APP_ACTIVITY}`);
+
+  // Trigger Metro reload
+  try {
+    execSync("curl -s http://localhost:8081/reload", { encoding: "utf-8", timeout: 5000 });
+  } catch {
+    console.error("Failed to reload - is Metro running on port 8081?");
+    process.exit(1);
+  }
+
+  // Wait for reload, then ensure app is still in foreground
+  execSync("sleep 2");
+  adb(`shell am start -n ${APP_ACTIVITY}`);
+  console.log("Reload complete");
+}
+
 // Main
 const [cmd, ...args] = process.argv.slice(2);
 
@@ -222,6 +266,10 @@ switch (cmd) {
   case "swipe":
     swipe(args[0] || "up");
     break;
+  case "reload":
+  case "r":
+    reload();
+    break;
   default:
     console.log(`
 App CLI - interact with running app
@@ -235,5 +283,6 @@ Commands:
   type <text>        Type text
   back               Press back button
   swipe <dir>        Swipe (up|down|left|right)
+  reload             Hot reload app via Metro
 `);
 }

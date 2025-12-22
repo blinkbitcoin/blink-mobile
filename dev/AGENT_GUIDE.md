@@ -185,6 +185,9 @@ For shell-based interaction (useful when MCP tools unavailable):
 
 # Swipe
 ./dev/app swipe up
+
+# Hot reload (after code changes)
+./dev/app reload
 ```
 
 ## Common Workflows
