@@ -170,9 +170,24 @@ export function waitForElement(testId: string, timeoutMs = 10000): boolean {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     if (hasElement(testId)) return true;
-    sleep(500);
+    sleep(200);
   }
   return false;
+}
+
+// Wait for any of the given testIds, returns which one was found (or null)
+export function waitForAny(testIds: string[], timeoutMs = 10000): string | null {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const root = getUiHierarchy();
+    if (root) {
+      for (const id of testIds) {
+        if (findElement(root, id)) return id;
+      }
+    }
+    sleep(200);
+  }
+  return null;
 }
 
 export function tapAndWait(tapTarget: string, waitTarget: string, timeoutMs = 5000): boolean {
@@ -184,6 +199,14 @@ export function typeText(text: string, silent = false) {
   const escaped = text.replace(/ /g, "%s").replace(/'/g, "\\'");
   adb(`shell input text '${escaped}'`);
   if (!silent) console.log(`Typed: ${text}`);
+}
+
+export function clearInput() {
+  // Select all (Ctrl+A) then delete
+  adb("shell input keyevent 123"); // KEYCODE_MOVE_END
+  for (let i = 0; i < 20; i++) {
+    adb("shell input keyevent 67"); // KEYCODE_DEL
+  }
 }
 
 export function goHome(): boolean {

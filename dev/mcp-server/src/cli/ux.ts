@@ -6,12 +6,18 @@ import {
   tapElement,
   tapAndWait,
   typeText,
+  clearInput,
   hasElement,
   waitForElement,
+  waitForAny,
   verifyScreen,
   getElementText,
+  getUiHierarchy,
+  collectTestIds,
+  collectUiInfo,
 } from "./helpers.js";
 import { loadConfig } from "./config.js";
+import { SWIPES, TIMEOUTS, fail } from "./constants.js";
 
 function uxHome() {
   if (goHome()) {
@@ -22,45 +28,27 @@ function uxHome() {
 }
 
 function uxSettings() {
-  if (!goHome()) {
-    console.error("Could not navigate to home first");
-    process.exit(1);
-  }
-  if (!tapElement("menu", true)) {
-    console.error("Could not find menu button");
-    process.exit(1);
-  }
+  if (!goHome()) fail("Could not navigate to home first");
+  if (!tapElement("menu", true)) fail("Could not find menu button");
   console.log("Opened Settings");
 }
 
 function uxSend(destination: string, amount: string, opts: { wallet?: string; note?: string }) {
   console.log(`Sending ${amount} to ${destination}...`);
 
-  // Step 1: Go home and tap Send
-  if (!goHome()) {
-    console.error("Could not navigate to home first");
-    process.exit(1);
-  }
-  if (!tapAndWait("Send", "Username, invoice, or address")) {
-    console.error("Could not open Send screen");
-    process.exit(1);
-  }
+  if (!goHome()) fail("Could not navigate to home first");
+  if (!tapAndWait("Send", "Username, invoice, or address")) fail("Could not open Send screen");
   console.log("  [1/4] Opened send screen");
 
-  // Step 2: Enter destination
   sleep(300);
   tapElement("Username, invoice, or address", true);
   sleep(200);
   typeText(destination, true);
   sleep(500);
 
-  if (!tapAndWait("Next", "Amount Input Button")) {
-    console.error("Could not proceed to amount screen - check destination");
-    process.exit(1);
-  }
+  if (!tapAndWait("Next", "Amount Input Button")) fail("Could not proceed to amount screen");
   console.log("  [2/4] Destination set");
 
-  // Step 3: Enter amount
   sleep(300);
   tapElement("Amount Input Button", true);
   sleep(300);
@@ -80,12 +68,8 @@ function uxSend(destination: string, amount: string, opts: { wallet?: string; no
   }
 
   if (!tapAndWait("Set Amount", "Slide to Confirm")) {
-    if (hasElement("icon-warning")) {
-      console.error("Amount exceeds balance or invalid");
-      process.exit(1);
-    }
-    console.error("Could not proceed to confirmation");
-    process.exit(1);
+    if (hasElement("icon-warning")) fail("Amount exceeds balance or invalid");
+    fail("Could not proceed to confirmation");
   }
   console.log("  [3/4] Amount set");
 
@@ -101,46 +85,46 @@ function uxSend(destination: string, amount: string, opts: { wallet?: string; no
 }
 
 function uxBackend(backend: string) {
-  // Y coordinates for backend buttons after scroll (approximate)
-  const backendCoords: Record<string, number> = {
-    local: 1180,
-    main: 1290,
-    staging: 1400,
-    custom: 1510,
+  const buttonIds: Record<string, string> = {
+    local: "Local Button",
+    main: "Main Button",
+    staging: "Staging Button",
+    custom: "Custom Button",
   };
 
-  const y = backendCoords[backend.toLowerCase()];
-  if (!y) {
-    console.error(`Unknown backend: ${backend}. Use: staging, main, local, custom`);
-    process.exit(1);
-  }
+  const buttonId = buttonIds[backend.toLowerCase()];
+  if (!buttonId) fail(`Unknown backend: ${backend}. Use: staging, main, local, custom`);
 
   console.log(`Switching to ${backend} backend...`);
 
-  // Step 1: Verify on entry screen (one UI check)
-  if (!hasElement("logo-button")) {
-    console.error("Not on entry screen - navigate there first or logout");
-    process.exit(1);
+  // Step 1: Get to developer screen
+  if (hasElement("developer-screen-scroll-view")) {
+    // Already on dev screen
+  } else if (hasElement("logo-button")) {
+    tapElement("logo-button", true); sleep(80);
+    tapElement("logo-button", true); sleep(80);
+    tapElement("logo-button", true);
+    if (!waitForElement("developer-screen-scroll-view", TIMEOUTS.short)) {
+      fail("Could not open developer screen");
+    }
+  } else {
+    fail("Not on entry screen - navigate there first");
   }
+  console.log("  [1/3] On developer screen");
 
-  // Step 2: Tap logo 3x fast (use cached coordinates)
-  adb("shell input tap 540 1235"); sleep(80);
-  adb("shell input tap 540 1235"); sleep(80);
-  adb("shell input tap 540 1235");
-  sleep(400);
-  console.log("  [1/3] Opened developer screen");
-
-  // Step 3: Scroll and tap backend by coordinates
-  adb("shell input swipe 540 1800 540 600 150");
-  sleep(150);
-  adb(`shell input tap 541 ${y}`);
+  // Step 2: Select backend (scroll if needed)
+  if (!hasElement(buttonId)) {
+    adb(SWIPES.up);
+    sleep(300);
+  }
+  if (!tapElement(buttonId, true)) fail(`Could not find ${buttonId}`);
   console.log(`  [2/3] Selected ${backend}`);
 
-  // Step 4: Save (y~1056) and Go back (y~206)
-  sleep(100);
-  adb("shell input tap 541 1056"); // Save Changes
-  sleep(150);
-  adb("shell input tap 69 206");   // Go back
+  // Step 3: Save and go back
+  sleep(200);
+  if (!tapElement("Save Changes", true)) fail("Could not find Save Changes button");
+  sleep(300);
+  tapElement("Go back", true);
   console.log("  [3/3] Saved and exited");
 }
 
@@ -150,162 +134,134 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
   const code = opts.code || cfg.code;
   const country = opts.country || cfg.country;
 
-  if (!phone || !code) {
-    console.error("Phone and code required - set in config.yaml or pass via flags");
-    process.exit(1);
-  }
+  if (!phone || !code) fail("Phone and code required - set in config.yaml or pass via flags");
 
   console.log(`Logging in with +${country} ${phone}...`);
 
-  // === STEP 1: Verify on entry screen ===
-  if (!verifyScreen(["logo-button", "Login"], "Not on entry screen")) {
-    if (hasElement("home-screen")) {
-      console.error("Already logged in");
+  // Step 1: Navigate to SMS login screen
+  if (hasElement("home-screen")) fail("Already logged in");
+
+  if (hasElement("Login")) {
+    tapElement("Login", true);
+    waitForElement("SMS", TIMEOUTS.short);
+  }
+  if (hasElement("SMS")) {
+    tapElement("SMS", true);
+    waitForElement("Use SMS", TIMEOUTS.short);
+  }
+  if (hasElement("Use SMS")) {
+    tapElement("Use SMS", true);
+  }
+
+  if (!waitForElement("telephoneNumber", TIMEOUTS.short)) fail("Could not reach SMS login screen");
+  console.log("  [1/4] On SMS login screen");
+
+  // Step 2: Select country if specified
+  if (country) {
+    tapElement("Country Picker", true);
+    if (waitForElement("text-input-country-filter", TIMEOUTS.short)) {
+      tapElement("text-input-country-filter", true);
+      clearInput();
+      typeText(country, true);
+      sleep(500);
+
+      // Find country testID (format: "Country Name (+code)")
+      const root = getUiHierarchy();
+      if (root) {
+        const testIds = collectTestIds(root);
+        // Match exact country name before the "(+" part
+        const countryId = testIds.find((id) => {
+          const match = id.match(/^(.+?)\s*\(\+/);
+          return match && match[1].toLowerCase() === country.toLowerCase();
+        });
+        if (countryId) {
+          tapElement(countryId, true);
+        } else {
+          console.log(`  [!] Country '${country}' not found, using default`);
+          adb("shell input keyevent KEYCODE_BACK");
+        }
+      }
+      waitForElement("telephoneNumber", TIMEOUTS.short);
     }
-    process.exit(1);
-  }
-  console.log("  [1/6] Verified: on entry screen");
-
-  // === STEP 2: Navigate to SMS login ===
-  tapElement("Login", true);
-  if (!waitForElement("SMS", 5000)) {
-    console.error("VERIFY FAILED: Login methods not shown");
-    process.exit(1);
   }
 
-  tapElement("SMS", true);
-  if (!waitForElement("Use SMS", 3000)) {
-    console.error("VERIFY FAILED: SMS option not shown");
-    process.exit(1);
-  }
-
-  tapElement("Use SMS", true);
-  if (!waitForElement("telephoneNumber", 5000)) {
-    console.error("VERIFY FAILED: SMS login screen not shown");
-    process.exit(1);
-  }
-  console.log("  [2/6] Verified: on SMS login screen");
-
-  // === STEP 3: Select country ===
-  tapElement("Country Picker", true);
-  if (!waitForElement("text-input-country-filter", 3000)) {
-    console.error("VERIFY FAILED: Country picker not open");
-    process.exit(1);
-  }
-
-  tapElement("text-input-country-filter", true);
-  sleep(200);
-  typeText(country, true);
-  sleep(500);
-
-  // Verify country filter has our text
-  const filterText = getElementText("text-input-country-filter");
-  if (!filterText?.includes(country)) {
-    console.error(`VERIFY FAILED: Country filter should contain '${country}', got '${filterText}'`);
-    process.exit(1);
-  }
-
-  // Tap first result (the filtered country)
-  adb("shell input tap 540 340");
-  sleep(400);
-
-  // Verify back on phone input screen (country picker closed)
-  if (!waitForElement("Send via SMS", 3000)) {
-    console.error("VERIFY FAILED: Not back on phone input after country select");
-    process.exit(1);
-  }
-  console.log(`  [3/6] Verified: ${country} selected`);
-
-  // === STEP 4: Enter phone number ===
+  // Step 3: Enter phone
   tapElement("telephoneNumber", true);
-  sleep(200);
+  clearInput();
   typeText(phone, true);
-  sleep(300);
+  console.log("  [2/4] Phone entered");
 
-  // Verify phone was entered
-  const phoneText = getElementText("telephoneNumber");
-  if (!phoneText?.includes(phone.slice(-4))) { // Check last 4 digits
-    console.error(`VERIFY FAILED: Phone field should contain '${phone}', got '${phoneText}'`);
-    process.exit(1);
-  }
-  console.log(`  [4/6] Verified: phone entered`);
-
-  // === STEP 5: Send SMS and enter code ===
+  // Step 4: Send SMS and handle captcha
   tapElement("Send via SMS", true);
 
-  // Wait for either code screen or captcha (up to 2 min for captcha solve)
-  const timeout = 120000;
   const start = Date.now();
   let captchaShown = false;
 
-  while (Date.now() - start < timeout) {
-    sleep(500);
+  while (Date.now() - start < TIMEOUTS.captcha) {
+    const found = waitForAny(
+      ["oneTimeCode", "home-screen", "Geetest", "icon-warning", "permission_allow_button"],
+      2000
+    );
 
-    if (hasElement("Geetest")) {
+    if (found === "oneTimeCode") break;
+    if (found === "home-screen") {
+      console.log("  [3/4] Logged in directly (local backend)");
+      console.log("  [4/4] SUCCESS: Logged in!");
+      return;
+    }
+    if (found === "permission_allow_button") {
+      tapElement("permission_allow_button", true);
+      continue;
+    }
+    if (found === "Geetest") {
       if (!captchaShown) {
-        console.log("  [!] Captcha detected - please solve it...");
+        console.log("  [!] Captcha - please solve...");
         captchaShown = true;
       }
       continue;
     }
-
-    if (captchaShown) {
+    if (found === "icon-warning") {
+      // Try to get actual error text
+      const root = getUiHierarchy();
+      const items = root ? collectUiInfo(root) : [];
+      const errText = items.find((i) => i.text && i.text.length > 20 && !i.id)?.text;
+      fail(errText ? errText.slice(0, 60) : "Error after sending SMS");
+    }
+    if (captchaShown && !hasElement("Geetest")) {
       console.log("  [✓] Captcha solved!");
-      captchaShown = false; // Reset so we don't print again
-      sleep(500);
-    }
-
-    if (hasElement("oneTimeCode")) {
-      break;
-    }
-
-    if (hasElement("icon-warning")) {
-      console.error("VERIFY FAILED: Error shown - possibly rate limited");
-      process.exit(1);
+      captchaShown = false;
     }
   }
 
-  if (!hasElement("oneTimeCode")) {
-    console.error("VERIFY FAILED: Code entry screen not shown");
-    process.exit(1);
+  if (!hasElement("oneTimeCode") && !hasElement("home-screen")) fail("Code screen not shown");
+  if (hasElement("home-screen")) {
+    console.log("  [4/4] SUCCESS: Logged in!");
+    return;
   }
-  console.log(`  [5/6] Verified: on code entry screen`);
+  console.log("  [3/4] Code screen ready");
 
-  // Enter code
+  // Step 5: Enter code
   tapElement("oneTimeCode", true);
-  sleep(200);
   typeText(code, true);
-  sleep(1500);
 
-  // === STEP 6: Verify login success ===
-  // Handle captcha after code entry
-  if (hasElement("Geetest")) {
-    console.log("  [!] Post-code captcha - please solve it...");
-    const captchaTimeout = 120000;
-    const start = Date.now();
-    while (Date.now() - start < captchaTimeout) {
-      sleep(1000);
-      if (!hasElement("Geetest")) {
-        console.log("  [✓] Captcha solved!");
-        sleep(1000);
-        break;
-      }
-    }
+  const result = waitForAny(["home-screen", "Geetest", "icon-warning", "permission_allow_button"], TIMEOUTS.medium);
+
+  if (result === "Geetest") {
+    console.log("  [!] Post-code captcha - please solve...");
+    while (hasElement("Geetest")) sleep(500);
+    console.log("  [✓] Solved!");
   }
 
-  // Handle permission dialog
   if (hasElement("permission_allow_button")) {
     tapElement("permission_allow_button", true);
-    sleep(800);
   }
 
-  if (hasElement("home-screen")) {
-    console.log("  [6/6] SUCCESS: Logged in!");
+  if (waitForElement("home-screen", TIMEOUTS.short)) {
+    console.log("  [4/4] SUCCESS: Logged in!");
   } else if (hasElement("icon-warning")) {
-    console.error("  [6/6] FAILED: Error shown - wrong code?");
-    process.exit(1);
+    fail("Wrong code?");
   } else {
-    console.log("  [6/6] Code entered - check screen for next steps");
+    console.log("  [4/4] Code entered - check screen");
   }
 }
 

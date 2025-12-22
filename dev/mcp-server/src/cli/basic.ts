@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import { Command } from "commander";
 import { adb, adbSafe, tapElement, typeText, getUiHierarchy, collectTestIds, collectUiInfo } from "./helpers.js";
+import { APP_PACKAGE, APP_ACTIVITY, SWIPES, fail } from "./constants.js";
 
 export function registerBasicCommands(program: Command) {
   program
@@ -9,8 +10,7 @@ export function registerBasicCommands(program: Command) {
     .description("Tap element by testID or coordinates (x,y)")
     .action((target: string) => {
       if (!tapElement(target)) {
-        console.error(`Element '${target}' not found`);
-        process.exit(1);
+        fail(`Element '${target}' not found`);
       }
     });
 
@@ -32,8 +32,7 @@ export function registerBasicCommands(program: Command) {
     .action((opts: { json?: boolean; verbose?: boolean }) => {
       const root = getUiHierarchy();
       if (!root) {
-        console.error("Failed to get UI hierarchy");
-        process.exit(1);
+        fail("Failed to get UI hierarchy");
       }
       const items = collectUiInfo(root);
 
@@ -83,16 +82,9 @@ export function registerBasicCommands(program: Command) {
     .command("swipe <direction>")
     .description("Swipe in direction (up|down|left|right)")
     .action((direction: string) => {
-      const swipes: Record<string, string> = {
-        up: "shell input swipe 540 1800 540 600 300",
-        down: "shell input swipe 540 600 540 1800 300",
-        left: "shell input swipe 900 1200 180 1200 300",
-        right: "shell input swipe 180 1200 900 1200 300",
-      };
-      const cmd = swipes[direction];
+      const cmd = SWIPES[direction as keyof typeof SWIPES];
       if (!cmd) {
-        console.error(`Unknown direction: ${direction}. Use: up, down, left, right`);
-        process.exit(1);
+        fail(`Unknown direction: ${direction}. Use: up, down, left, right`);
       }
       adb(cmd);
       console.log(`Swiped ${direction}`);
@@ -103,14 +95,11 @@ export function registerBasicCommands(program: Command) {
     .alias("r")
     .description("Hot reload app via Metro")
     .action(() => {
-      const APP_PACKAGE = "com.galoyapp";
-      const APP_ACTIVITY = `${APP_PACKAGE}/.MainActivity`;
       adb(`shell am start -n ${APP_ACTIVITY}`);
       try {
         execSync("curl -s http://localhost:8081/reload", { encoding: "utf-8", timeout: 5000 });
       } catch {
-        console.error("Failed to reload - is Metro running on port 8081?");
-        process.exit(1);
+        fail("Failed to reload - is Metro running on port 8081?");
       }
       execSync("sleep 2");
       adb(`shell am start -n ${APP_ACTIVITY}`);
@@ -118,8 +107,6 @@ export function registerBasicCommands(program: Command) {
     });
 
   // App lifecycle commands
-  const APP_PACKAGE = "com.galoyapp";
-  const APP_ACTIVITY = `${APP_PACKAGE}/.MainActivity`;
 
   const appCmd = program.command("app").description("App lifecycle commands");
 
@@ -167,8 +154,7 @@ export function registerBasicCommands(program: Command) {
       if (info.trim()) {
         console.log(info.trim());
       } else {
-        console.error("App not installed");
-        process.exit(1);
+        fail("App not installed");
       }
     });
 }
