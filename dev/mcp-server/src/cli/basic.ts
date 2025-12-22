@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import { Command } from "commander";
-import { adb, tapElement, typeText, getUiHierarchy, collectTestIds, collectUiInfo } from "./helpers.js";
+import { adb, adbSafe, tapElement, typeText, getUiHierarchy, collectTestIds, collectUiInfo } from "./helpers.js";
 
 export function registerBasicCommands(program: Command) {
   program
@@ -115,5 +115,60 @@ export function registerBasicCommands(program: Command) {
       execSync("sleep 2");
       adb(`shell am start -n ${APP_ACTIVITY}`);
       console.log("Reload complete");
+    });
+
+  // App lifecycle commands
+  const APP_PACKAGE = "com.galoyapp";
+  const APP_ACTIVITY = `${APP_PACKAGE}/.MainActivity`;
+
+  const appCmd = program.command("app").description("App lifecycle commands");
+
+  appCmd
+    .command("launch")
+    .alias("l")
+    .description("Launch the app")
+    .action(() => {
+      adb(`shell am start -n ${APP_ACTIVITY}`);
+      console.log("App launched");
+    });
+
+  appCmd
+    .command("kill")
+    .alias("k")
+    .description("Force stop the app")
+    .action(() => {
+      adb(`shell am force-stop ${APP_PACKAGE}`);
+      console.log("App killed");
+    });
+
+  appCmd
+    .command("restart")
+    .description("Kill and relaunch the app")
+    .action(() => {
+      adb(`shell am force-stop ${APP_PACKAGE}`);
+      execSync("sleep 0.5");
+      adb(`shell am start -n ${APP_ACTIVITY}`);
+      console.log("App restarted");
+    });
+
+  appCmd
+    .command("clear")
+    .description("Clear app data (full reset)")
+    .action(() => {
+      adb(`shell pm clear ${APP_PACKAGE}`);
+      console.log("App data cleared");
+    });
+
+  appCmd
+    .command("info")
+    .description("Show app package info")
+    .action(() => {
+      const info = adbSafe(`shell dumpsys package ${APP_PACKAGE} | grep -E "versionName|versionCode|firstInstallTime|lastUpdateTime"`);
+      if (info.trim()) {
+        console.log(info.trim());
+      } else {
+        console.error("App not installed");
+        process.exit(1);
+      }
     });
 }

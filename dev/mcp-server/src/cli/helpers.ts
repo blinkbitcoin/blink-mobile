@@ -15,8 +15,12 @@ export function sleep(ms: number) {
 }
 
 export function adb(cmd: string): string {
+  return execSync(`adb ${cmd}`, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+}
+
+export function adbSafe(cmd: string): string {
   try {
-    return execSync(`adb ${cmd}`, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+    return adb(cmd);
   } catch {
     return "";
   }
@@ -88,8 +92,8 @@ function parseUiDump(xml: string): UiElement | null {
 }
 
 export function getUiHierarchy(): UiElement | null {
-  adb("shell uiautomator dump /sdcard/ui.xml");
-  const xml = adb("shell cat /sdcard/ui.xml");
+  adbSafe("shell uiautomator dump /sdcard/ui.xml");
+  const xml = adbSafe("shell cat /sdcard/ui.xml");
   if (!xml) return null;
   return parseUiDump(xml);
 }

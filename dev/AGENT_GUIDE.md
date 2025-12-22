@@ -202,6 +202,16 @@ Shell-based interaction via `./dev/app`:
 ./dev/app ux backend <name>     # Switch backend (staging|main|local|custom)
 ```
 
+### App Lifecycle
+
+```bash
+./dev/app app launch            # Start the app
+./dev/app app kill              # Force stop
+./dev/app app restart           # Kill + launch
+./dev/app app clear             # Clear app data (full reset)
+./dev/app app info              # Show version info
+```
+
 ### Configuration
 
 Create `dev/mcp-server/config.yaml` (see `config.example.yaml`):
@@ -328,7 +338,7 @@ Switch to local backend or wait before retrying.
 ### App Exited to Launcher
 
 ```bash
-adb shell am start -n com.galoyapp/.MainActivity
+./dev/app app launch
 ```
 
 ### "Infrastructure not ready"
