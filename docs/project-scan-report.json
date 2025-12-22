@@ -7,8 +7,8 @@
   },
   "mode": "initial_scan",
   "scan_level": "exhaustive",
-  "project_root": "/Users/kim/src/blink-mobile",
-  "output_folder": "/Users/kim/src/blink-mobile/docs",
+  "project_root": ".",
+  "output_folder": "./docs",
   "completed_steps": [
     "step_1_detect_structure",
     "step_2_discover_documentation",

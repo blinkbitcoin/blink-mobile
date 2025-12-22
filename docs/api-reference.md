@@ -334,3 +334,5 @@ Key features configured in `app/graphql/client.tsx`:
 | Production | https://api.blink.sv/graphql | wss://ws.blink.sv/graphql |
 | Staging | https://api.staging.blink.sv/graphql | wss://ws.staging.blink.sv/graphql |
 | Local | http://localhost:4455/graphql | ws://localhost:4455/graphqlws |
+
+> **Note:** Local dev uses `/graphqlws` path while prod/staging use `/graphql`. See `galoy-instances.ts`.

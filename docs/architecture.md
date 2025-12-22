@@ -193,6 +193,8 @@ RootStack (Stack Navigator)
 | Staging | api.staging.blink.sv/graphql | wss://ws.staging.blink.sv/graphql | api.staging.blink.sv |
 | Local | localhost:4455/graphql | localhost:4455/graphqlws | localhost:4455 |
 
+> **Note:** Local dev uses `/graphqlws` path while prod/staging use `/graphql`. See `galoy-instances.ts`.
+
 ### External Services
 
 | Service | Purpose |
