@@ -56,7 +56,7 @@ If `ready: false`, run `startServices()` or `./dev/mcp/orchestrator.sh`.
 ./dev/mcp-stop.sh
 ```
 
-## Core Tools
+## Core MCP Tools
 
 ### getScreen
 
@@ -162,129 +162,188 @@ reloadApp()   # Hot reload (keeps JS state, reloads bundle)
 
 ## CLI Tool
 
-For shell-based interaction (useful when MCP tools unavailable):
+Shell-based interaction via `./dev/app`:
+
+### Basic Commands
 
 ```bash
-# Take screenshot
-./dev/app screen /tmp/shot.png
+./dev/app ui                    # List testIDs and text (flat format)
+./dev/app ui -v                 # Include element tags
+./dev/app ui -j                 # JSON output (machine-readable)
 
-# List all testIDs on screen
-./dev/app ui
+./dev/app tap "Login"           # Tap by testID
+./dev/app tap 540,1200          # Tap by coordinates
+./dev/app t "Login"             # Alias
 
-# Tap by testID
-./dev/app tap "Accept"
+./dev/app screen /tmp/shot.png  # Screenshot
+./dev/app s                     # Alias (saves to /tmp/screen.png)
 
-# Tap by coordinates
-./dev/app tap 540,1200
+./dev/app type "hello world"    # Type into focused input
+./dev/app back                  # Press back button
+./dev/app swipe up              # Swipe direction (up/down/left/right)
+./dev/app reload                # Hot reload via Metro
+```
 
-# Type text
-./dev/app type "hello world"
+### UX Flows (High-Level Automation)
 
-# Navigate back
-./dev/app back
+```bash
+./dev/app ux home               # Navigate to home screen
+./dev/app ux settings           # Open settings menu
 
-# Swipe
-./dev/app swipe up
+./dev/app ux send <dest> <amt>  # Send money flow
+  -w, --wallet <btc|usd>        # Wallet to send from
+  -n, --note <text>             # Add memo
 
-# Hot reload (after code changes)
-./dev/app reload
+./dev/app ux login              # Full SMS login
+  -p, --phone <number>          # Override phone
+  -c, --code <code>             # Override verification code
+  --country <name>              # Override country
+
+./dev/app ux backend <name>     # Switch backend (staging|main|local|custom)
+```
+
+### Configuration
+
+Create `dev/mcp-server/config.yaml` (see `config.example.yaml`):
+
+```yaml
+login:
+  country: Germany
+  phone: "1234567890"
+  code: "000000"
+
+backend: staging
+```
+
+**Local backend**: Use code `000000` - bypasses SMS verification.
+
+## Key TestIDs
+
+| Screen | TestID | Purpose |
+|--------|--------|---------|
+| Entry | `logo-button` | Logo (tap 3x for dev menu) |
+| Entry | `Login` | Login button |
+| Entry | `Create new account` | Registration button |
+| Login | `SMS` | SMS login option |
+| Login | `Use SMS` | Confirm SMS method |
+| Phone | `telephoneNumber` | Phone input field |
+| Phone | `Country Picker` | Country selector |
+| Phone | `Send via SMS` | Submit phone |
+| Code | `oneTimeCode` | Verification code input |
+| Captcha | `Geetest` | GeeTest captcha (if shown) |
+| Home | `home-screen` | Home screen identifier |
+| Home | `menu` | Settings/menu button |
+| Home | `Send` | Send money button |
+| Warning | `icon-warning` | Error indicator |
+
+## Backend Switching
+
+Switch between environments from the entry screen:
+
+```bash
+# Must be on entry screen (not logged in)
+./dev/app ux backend staging    # Production-like
+./dev/app ux backend main       # Production
+./dev/app ux backend local      # Local galoy-quickstart
+./dev/app ux backend custom     # Custom endpoint
+```
+
+**Local backend benefits**:
+- Code `000000` always works (no real SMS)
+- No real GeeTest captcha
+- Fast iteration for testing
+
+## Captcha Handling
+
+GeeTest captcha may appear during login (staging/main backends).
+
+**Automated flow** (`ux login`):
+1. Detects captcha via `Geetest` testID
+2. Prints "Captcha detected - please solve it..."
+3. Polls every 500ms waiting for captcha to disappear
+4. Auto-continues once solved (up to 2 min timeout)
+
+**Manual handling**:
+```bash
+./dev/app ui              # Check for "Geetest" in output
+# Solve captcha manually on device
+./dev/app ui              # Verify captcha gone
 ```
 
 ## Common Workflows
 
-### Navigate to Screen
+### Login Flow (Staging)
 
-```
-1. getScreen()                    # See current state and testIds
-2. tap({ id: "target-button" })   # Navigate
-3. getScreen()                    # Confirm arrival
-```
-
-### Fill Form
-
-```
-1. getScreen()                           # Find input testIds
-2. tap({ id: "email-input" })            # Focus field
-3. type({ text: "user@example.com" })    # Enter text
-4. tap({ id: "password-input" })         # Next field
-5. type({ text: "secret123" })
-6. tap({ id: "submit-button" })          # Submit
+```bash
+./dev/app ux backend staging    # If needed
+./dev/app ux login -p "1234567890" -c "actual-sms-code"
+# Solve captcha if prompted
 ```
 
-### Scroll to Find Element
+### Login Flow (Local - No Captcha)
 
-```
-1. getScreen()                    # Check if element visible
-2. If not found in testIds:
-   swipe({ direction: "up" })     # Scroll down
-   getScreen()                    # Check again
-3. Repeat until found or max attempts
+```bash
+./dev/app ux backend local
+./dev/app ux login -p "1234567890" -c "000000"
 ```
 
-### Handle Modals/Alerts
+### Navigate and Send
 
+```bash
+./dev/app ux home
+./dev/app ux send "username" "100" -w btc -n "Test payment"
+# Stops before final confirmation
 ```
-1. getScreen()                    # Modal testIds appear at top level
-2. tap({ id: "modal-confirm" })   # Or "modal-dismiss"
+
+### Debug Current State
+
+```bash
+./dev/app ui -j | jq '.[] | select(.id)'   # All elements with testIDs
+./dev/app screen /tmp/debug.png             # Visual check
 ```
-
-## TestID Patterns
-
-Common patterns in this codebase:
-
-| Pattern | Example | Purpose |
-|---------|---------|---------|
-| `Back` | Navigation back button |
-| `Accept`, `Confirm`, `Cancel` | Action buttons |
-| `{Screen}Screen` | `HomeScreen` | Screen identifiers |
-| `{field}-input` | `email-input` | Input fields |
-| `RNE_BUTTON_WRAPPER` | React Native Elements wrapper (tap child instead) |
 
 ## Troubleshooting
 
 ### "Element not found"
 
-1. `getScreen()` to see available testIds
+1. `./dev/app ui` to see available testIds
 2. Check spelling (case-sensitive)
-3. Element may need scroll: `swipe({ direction: "up" })`
-4. Element may be loading: `waitFor({ id: "target" })`
+3. Element may need scroll: `./dev/app swipe up`
+4. Screen may be loading: add `sleep 1`
+
+### Rate Limited
+
+```
+Too many requests. Please wait before retrying.
+```
+
+Switch to local backend or wait before retrying.
+
+### Captcha Won't Solve
+
+- Ensure you're interacting with the emulator directly
+- Check if it's a slider puzzle (slide to complete)
+- May need to wait for animation to finish
+
+### App Exited to Launcher
+
+```bash
+adb shell am start -n com.galoyapp/.MainActivity
+```
 
 ### "Infrastructure not ready"
 
-```
-checkInfrastructure()  # See which service failed
-startServices()        # Restart all
-```
-
-Or manually:
 ```bash
 ./dev/mcp-stop.sh
 ./dev/mcp/orchestrator.sh
 ```
 
-### App Crashed
-
-```
-launchApp()  # Restart app
-```
-
-### Stale UI State
-
-After navigation, always `getScreen()` to refresh understanding.
-
-### Tap Not Working
-
-1. Verify element is `clickable: true` in getScreen output
-2. Check if element is obscured (modal, overlay)
-3. Try `waitFor` before tap
-4. Increase `waitMs` parameter
-
 ## Performance Tips
 
-1. **Prefer getScreen over screenshot** - JSON is faster to process than images
-2. **Use filter parameter** - `getScreen({ filter: "interactive" })` reduces noise
-3. **Batch understanding** - One getScreen call, then multiple taps
-4. **Check testIds first** - Don't parse full tree if testIds has what you need
+1. **Prefer `ui` over screenshot** - Text is faster than images
+2. **Use `-j` for parsing** - JSON output is machine-friendly
+3. **Use UX commands** - `ux login` handles timing/waiting
+4. **Local backend** - Faster, no captcha, deterministic codes
 
 ## Architecture
 
@@ -310,22 +369,33 @@ After navigation, always `getScreen()` to refresh understanding.
 └─────────────────┘
 ```
 
-## State Directory
-
-All MCP runtime state lives in `.mcp/`:
+## Files Reference
 
 ```
-.mcp/
-  ready           # Marker file - exists when infrastructure ready
-  logs/           # Service logs (emulator.log, metro.log, appium.log, install.log)
-  pids/           # PID files for running services
-```
+dev/mcp-server/
+  src/
+    index.ts              # MCP server entry
+    cli.ts                # CLI entry point
+    cli/
+      basic.ts            # Basic commands (tap, ui, type, etc.)
+      ux.ts               # UX flows (login, send, etc.)
+      helpers.ts          # Shared utilities (adb, element finding)
+      config.ts           # Config file loading
+    tools/                # MCP tool implementations
+    appium/               # Appium WebDriver client
+  config.yaml             # User config (gitignored)
+  config.example.yaml     # Example config
 
-| Path | Purpose |
-|------|---------|
-| `.mcp/ready` | Created when all services healthy. Check existence to verify infrastructure. |
-| `.mcp/logs/` | Per-service logs. Check on failures. |
-| `.mcp/pids/` | PID files. Used by stop script. |
+dev/mcp/
+  orchestrator.sh         # Start all services
+  health-check.sh         # Verify services
+  services/               # Per-service scripts
+
+dev/app                   # CLI wrapper
+dev/mcp-stop.sh           # Stop all services
+.mcp.json                 # MCP server config
+.mcp/                     # Runtime state (ready, logs/, pids/)
+```
 
 ## Service Ports
 
@@ -334,48 +404,3 @@ All MCP runtime state lives in `.mcp/`:
 | Metro | 8081 | `curl http://localhost:8081/status` |
 | Appium | 4723 | `curl http://localhost:4723/status` |
 | Emulator | 5554 | `adb devices` |
-
-## Files Reference
-
-```
-dev/mcp-server/
-  src/
-    index.ts              # MCP server entry
-    cli.ts                # Shell CLI tool
-    tools/
-      get-screen.ts       # getScreen tool
-      tap.ts              # tap tool
-      type.ts             # type tool
-      swipe.ts            # swipe tool
-      wait-for.ts         # waitFor tool
-      screenshot.ts       # screenshot tool
-      get-element.ts      # getElement tool
-      launch-app.ts       # launchApp tool
-      reload-app.ts       # reloadApp tool
-      check-infrastructure.ts  # checkInfrastructure tool
-      start-services.ts   # startServices tool
-    appium/
-      client.ts           # Appium WebDriver client
-      config.ts           # Connection config
-    utils/
-      xml-parser.ts       # UI hierarchy parser
-      selectors.ts        # Element selector builders
-
-dev/mcp/
-  orchestrator.sh         # Start all services
-  health-check.sh         # Verify services
-  lib/common.sh           # Shared utilities
-  services/
-    emulator.sh           # Emulator management
-    metro.sh              # Metro bundler
-    appium.sh             # Appium server
-    app.sh                # App install/launch
-
-dev/app                   # CLI wrapper (./dev/app tap "Login")
-dev/mcp-stop.sh           # Stop all services
-.mcp.json                 # MCP server config for Claude Code
-.mcp/                     # Runtime state directory
-  ready                   # Marker file (exists when ready)
-  logs/                   # Service logs
-  pids/                   # Process ID files
-```

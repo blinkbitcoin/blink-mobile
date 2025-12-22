@@ -168,28 +168,28 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
 
   // === STEP 2: Navigate to SMS login ===
   tapElement("Login", true);
-  sleep(500);
-  if (!verifyScreen(["SMS"], "Login methods not shown")) {
+  if (!waitForElement("SMS", 5000)) {
+    console.error("VERIFY FAILED: Login methods not shown");
     process.exit(1);
   }
 
   tapElement("SMS", true);
-  sleep(400);
-  if (!verifyScreen(["Use SMS"], "SMS option not shown")) {
+  if (!waitForElement("Use SMS", 3000)) {
+    console.error("VERIFY FAILED: SMS option not shown");
     process.exit(1);
   }
 
   tapElement("Use SMS", true);
-  sleep(500);
-  if (!verifyScreen(["telephoneNumber", "Country Picker", "Send via SMS"], "SMS login screen not shown")) {
+  if (!waitForElement("telephoneNumber", 5000)) {
+    console.error("VERIFY FAILED: SMS login screen not shown");
     process.exit(1);
   }
   console.log("  [2/6] Verified: on SMS login screen");
 
   // === STEP 3: Select country ===
   tapElement("Country Picker", true);
-  sleep(400);
-  if (!verifyScreen(["text-input-country-filter", "list-countries"], "Country picker not open")) {
+  if (!waitForElement("text-input-country-filter", 3000)) {
+    console.error("VERIFY FAILED: Country picker not open");
     process.exit(1);
   }
 
@@ -210,7 +210,8 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
   sleep(400);
 
   // Verify back on phone input screen (country picker closed)
-  if (!verifyScreen(["telephoneNumber", "Send via SMS"], "Not back on phone input after country select")) {
+  if (!waitForElement("Send via SMS", 3000)) {
+    console.error("VERIFY FAILED: Not back on phone input after country select");
     process.exit(1);
   }
   console.log(`  [3/6] Verified: ${country} selected`);
@@ -231,20 +232,41 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
 
   // === STEP 5: Send SMS and enter code ===
   tapElement("Send via SMS", true);
-  sleep(1000);
 
-  // Check for geetest captcha
-  if (hasElement("Geetest")) {
-    console.log("  [!] Captcha detected - please solve manually, then run again");
-    process.exit(1);
-  }
+  // Wait for either code screen or captcha (up to 2 min for captcha solve)
+  const timeout = 120000;
+  const start = Date.now();
+  let captchaShown = false;
 
-  // Verify on code entry screen
-  if (!verifyScreen(["oneTimeCode"], "Code entry screen not shown")) {
-    // Check for rate limit error
+  while (Date.now() - start < timeout) {
+    sleep(500);
+
+    if (hasElement("Geetest")) {
+      if (!captchaShown) {
+        console.log("  [!] Captcha detected - please solve it...");
+        captchaShown = true;
+      }
+      continue;
+    }
+
+    if (captchaShown) {
+      console.log("  [✓] Captcha solved!");
+      captchaShown = false; // Reset so we don't print again
+      sleep(500);
+    }
+
+    if (hasElement("oneTimeCode")) {
+      break;
+    }
+
     if (hasElement("icon-warning")) {
       console.error("VERIFY FAILED: Error shown - possibly rate limited");
+      process.exit(1);
     }
+  }
+
+  if (!hasElement("oneTimeCode")) {
+    console.error("VERIFY FAILED: Code entry screen not shown");
     process.exit(1);
   }
   console.log(`  [5/6] Verified: on code entry screen`);
@@ -256,7 +278,22 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
   sleep(1500);
 
   // === STEP 6: Verify login success ===
-  // Handle permission dialog if it appears
+  // Handle captcha after code entry
+  if (hasElement("Geetest")) {
+    console.log("  [!] Post-code captcha - please solve it...");
+    const captchaTimeout = 120000;
+    const start = Date.now();
+    while (Date.now() - start < captchaTimeout) {
+      sleep(1000);
+      if (!hasElement("Geetest")) {
+        console.log("  [✓] Captcha solved!");
+        sleep(1000);
+        break;
+      }
+    }
+  }
+
+  // Handle permission dialog
   if (hasElement("permission_allow_button")) {
     tapElement("permission_allow_button", true);
     sleep(800);
@@ -264,8 +301,6 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
 
   if (hasElement("home-screen")) {
     console.log("  [6/6] SUCCESS: Logged in!");
-  } else if (hasElement("Geetest")) {
-    console.log("  [6/6] Captcha appeared after code - solve manually");
   } else if (hasElement("icon-warning")) {
     console.error("  [6/6] FAILED: Error shown - wrong code?");
     process.exit(1);
