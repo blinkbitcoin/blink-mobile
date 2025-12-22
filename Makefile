@@ -28,6 +28,9 @@ tilt-down:
 emulator:
 	emulator -avd Pixel_API_35 -gpu swiftshader -wipe-data -no-boot-anim
 
+mcp:
+	./dev/mcp/orchestrator.sh
+
 reset-e2e:
 	tilt trigger dev-setup
 	tilt wait --timeout 5m --for=condition=Ready uiresources dev-setup
