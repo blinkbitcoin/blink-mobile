@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Simple CLI wrapper for app interactions
+# Usage: ./dev/app <command> [args]
+exec npx tsx "$(dirname "$0")/mcp-server/src/cli.ts" "$@"

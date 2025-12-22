@@ -103,3 +103,13 @@ android-recordings
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# MCP state (logs, pids, ready marker)
+.mcp/
+
+# Convenience of using different agent tooling
+.claude
+.augment
+.bmad
+bmad-custom-src
+.beads
