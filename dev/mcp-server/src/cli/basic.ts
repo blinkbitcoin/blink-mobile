@@ -1,25 +1,42 @@
-import { execSync } from "child_process";
+import { writeFileSync } from "fs";
 import { Command } from "commander";
-import { adb, adbSafe, tapElement, typeText, getUiHierarchy, collectTestIds, collectUiInfo } from "./helpers.js";
-import { APP_PACKAGE, APP_ACTIVITY, SWIPES, fail } from "./constants.js";
+import {
+  tapElement,
+  typeText,
+  getUiHierarchy,
+  pressBack,
+  swipe,
+  reloadApp,
+  launchApp,
+  killApp,
+  restartApp,
+  clearApp,
+  getAppInfo,
+  takeScreenshot,
+  checkAppium,
+  fail,
+} from "./appium.js";
+import { collectUiInfo } from "../utils/xml-parser.js";
 
 export function registerBasicCommands(program: Command) {
   program
     .command("tap <target>")
     .alias("t")
     .description("Tap element by testID or coordinates (x,y)")
-    .action((target: string) => {
-      if (!tapElement(target)) {
+    .action(async (target: string) => {
+      if (!(await tapElement(target))) {
         fail(`Element '${target}' not found`);
       }
+      console.log(`Tapped '${target}'`);
     });
 
   program
     .command("screen [path]")
     .alias("s")
     .description("Take screenshot")
-    .action((path = "/tmp/screen.png") => {
-      execSync(`adb exec-out screencap -p > ${path}`);
+    .action(async (path = "/tmp/screen.png") => {
+      const base64 = await takeScreenshot();
+      writeFileSync(path, Buffer.from(base64, "base64"));
       console.log(path);
     });
 
@@ -29,8 +46,8 @@ export function registerBasicCommands(program: Command) {
     .description("Show UI elements (testIDs and text content)")
     .option("-j, --json", "Output as JSON")
     .option("-v, --verbose", "Show element tags")
-    .action((opts: { json?: boolean; verbose?: boolean }) => {
-      const root = getUiHierarchy();
+    .action(async (opts: { json?: boolean; verbose?: boolean }) => {
+      const root = await getUiHierarchy();
       if (!root) {
         fail("Failed to get UI hierarchy");
       }
@@ -38,7 +55,7 @@ export function registerBasicCommands(program: Command) {
 
       // Dedupe by id, keep text-only items
       const seen = new Set<string>();
-      const deduped = items.filter(i => {
+      const deduped = items.filter((i) => {
         if (i.id) {
           if (seen.has(i.id)) return false;
           seen.add(i.id);
@@ -67,26 +84,28 @@ export function registerBasicCommands(program: Command) {
   program
     .command("type <text...>")
     .description("Type text into focused input")
-    .action((words: string[]) => typeText(words.join(" ")));
+    .action(async (words: string[]) => {
+      await typeText(words.join(" "));
+      console.log(`Typed: ${words.join(" ")}`);
+    });
 
   program
     .command("back")
     .alias("b")
     .description("Press back button")
-    .action(() => {
-      adb("shell input keyevent KEYCODE_BACK");
+    .action(async () => {
+      await pressBack();
       console.log("Back pressed");
     });
 
   program
     .command("swipe <direction>")
     .description("Swipe in direction (up|down|left|right)")
-    .action((direction: string) => {
-      const cmd = SWIPES[direction as keyof typeof SWIPES];
-      if (!cmd) {
+    .action(async (direction: string) => {
+      if (!["up", "down", "left", "right"].includes(direction)) {
         fail(`Unknown direction: ${direction}. Use: up, down, left, right`);
       }
-      adb(cmd);
+      await swipe(direction as "up" | "down" | "left" | "right");
       console.log(`Swiped ${direction}`);
     });
 
@@ -94,28 +113,20 @@ export function registerBasicCommands(program: Command) {
     .command("reload")
     .alias("r")
     .description("Hot reload app via Metro")
-    .action(() => {
-      adb(`shell am start -n ${APP_ACTIVITY}`);
-      try {
-        execSync("curl -s http://localhost:8081/reload", { encoding: "utf-8", timeout: 5000 });
-      } catch {
-        fail("Failed to reload - is Metro running on port 8081?");
-      }
-      execSync("sleep 2");
-      adb(`shell am start -n ${APP_ACTIVITY}`);
+    .action(async () => {
+      await reloadApp(false);
       console.log("Reload complete");
     });
 
   // App lifecycle commands
-
   const appCmd = program.command("app").description("App lifecycle commands");
 
   appCmd
     .command("launch")
     .alias("l")
     .description("Launch the app")
-    .action(() => {
-      adb(`shell am start -n ${APP_ACTIVITY}`);
+    .action(async () => {
+      await launchApp();
       console.log("App launched");
     });
 
@@ -123,38 +134,51 @@ export function registerBasicCommands(program: Command) {
     .command("kill")
     .alias("k")
     .description("Force stop the app")
-    .action(() => {
-      adb(`shell am force-stop ${APP_PACKAGE}`);
+    .action(async () => {
+      await killApp();
       console.log("App killed");
     });
 
   appCmd
     .command("restart")
     .description("Kill and relaunch the app")
-    .action(() => {
-      adb(`shell am force-stop ${APP_PACKAGE}`);
-      execSync("sleep 0.5");
-      adb(`shell am start -n ${APP_ACTIVITY}`);
+    .action(async () => {
+      await restartApp();
       console.log("App restarted");
     });
 
   appCmd
     .command("clear")
     .description("Clear app data (full reset)")
-    .action(() => {
-      adb(`shell pm clear ${APP_PACKAGE}`);
+    .action(async () => {
+      await clearApp();
       console.log("App data cleared");
     });
 
   appCmd
     .command("info")
     .description("Show app package info")
-    .action(() => {
-      const info = adbSafe(`shell dumpsys package ${APP_PACKAGE} | grep -E "versionName|versionCode|firstInstallTime|lastUpdateTime"`);
-      if (info.trim()) {
-        console.log(info.trim());
+    .action(async () => {
+      const info = await getAppInfo();
+      const lines = info.split("\n").filter((l) =>
+        /versionName|versionCode|firstInstallTime|lastUpdateTime/.test(l)
+      );
+      if (lines.length) {
+        console.log(lines.map((l) => l.trim()).join("\n"));
       } else {
         fail("App not installed");
+      }
+    });
+
+  // Check command to verify Appium is running
+  program
+    .command("check")
+    .description("Check if Appium is available")
+    .action(async () => {
+      if (await checkAppium()) {
+        console.log("Appium is available");
+      } else {
+        fail("Appium not available at localhost:4723\nRun: ./dev/mcp/orchestrator.sh");
       }
     });
 }

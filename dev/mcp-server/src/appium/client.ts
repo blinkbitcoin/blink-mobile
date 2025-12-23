@@ -30,7 +30,13 @@ export class AppiumClient {
       "appium:snapshotMaxDepth": 500,
       "appium:noReset": true,
     } as WebdriverIO.Capabilities;
-    return remote({ hostname: config.host, port: config.port, path: "/", capabilities });
+    return remote({
+      hostname: config.host,
+      port: config.port,
+      path: "/",
+      capabilities,
+      logLevel: "silent",
+    });
   }
 
   // Trigger hot reload via Metro dev menu

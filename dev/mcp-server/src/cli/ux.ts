@@ -1,90 +1,90 @@
 import { Command } from "commander";
 import {
-  adb,
-  sleep,
   goHome,
   tapElement,
   tapAndWait,
   typeText,
+  typeInto,
   clearInput,
   hasElement,
   waitForElement,
   waitForAny,
-  verifyScreen,
-  getElementText,
   getUiHierarchy,
-  collectTestIds,
-  collectUiInfo,
-} from "./helpers.js";
+  getTestIds,
+  pressBack,
+  swipe,
+  pause,
+  fail,
+} from "./appium.js";
+import { collectTestIds, collectUiInfo } from "../utils/xml-parser.js";
 import { loadConfig } from "./config.js";
-import { SWIPES, TIMEOUTS, fail } from "./constants.js";
+import { TIMEOUTS } from "./constants.js";
 
-function uxHome() {
-  if (goHome()) {
+async function uxHome() {
+  if (await goHome()) {
     console.log("Navigated to Home");
   } else {
     console.error("Could not navigate to home - may not be logged in");
   }
 }
 
-function uxSettings() {
-  if (!goHome()) fail("Could not navigate to home first");
-  if (!tapElement("menu", true)) fail("Could not find menu button");
+async function uxSettings() {
+  if (!(await goHome())) fail("Could not navigate to home first");
+  if (!(await tapElement("menu"))) fail("Could not find menu button");
   console.log("Opened Settings");
 }
 
-function uxSend(destination: string, amount: string, opts: { wallet?: string; note?: string }) {
+async function uxSend(destination: string, amount: string, opts: { wallet?: string; note?: string }) {
   console.log(`Sending ${amount} to ${destination}...`);
 
-  if (!goHome()) fail("Could not navigate to home first");
-  if (!tapAndWait("Send", "Username, invoice, or address")) fail("Could not open Send screen");
+  if (!(await goHome())) fail("Could not navigate to home first");
+  if (!(await tapAndWait("Send", "Username, invoice, or address"))) fail("Could not open Send screen");
   console.log("  [1/4] Opened send screen");
 
-  sleep(300);
-  tapElement("Username, invoice, or address", true);
-  sleep(200);
-  typeText(destination, true);
-  sleep(500);
+  await pause(300);
+  await tapElement("Username, invoice, or address");
+  await pause(200);
+  await typeText(destination);
+  await pause(500);
 
-  if (!tapAndWait("Next", "Amount Input Button")) fail("Could not proceed to amount screen");
+  if (!(await tapAndWait("Next", "Amount Input Button"))) fail("Could not proceed to amount screen");
   console.log("  [2/4] Destination set");
 
-  sleep(300);
-  tapElement("Amount Input Button", true);
-  sleep(300);
+  await pause(300);
+  await tapElement("Amount Input Button");
+  await pause(300);
 
   for (const char of amount) {
     const key = char === "." ? "Key ." : `Key ${char}`;
-    tapElement(key, true);
-    sleep(100);
+    await tapElement(key, 100);
   }
 
   if (opts.wallet) {
-    tapElement("choose-wallet-to-send-from", true);
-    sleep(300);
+    await tapElement("choose-wallet-to-send-from");
+    await pause(300);
     const walletId = opts.wallet.toLowerCase() === "usd" ? "stablesats-balance" : "bitcoin-balance";
-    tapElement(walletId, true);
-    sleep(300);
+    await tapElement(walletId);
+    await pause(300);
   }
 
-  if (!tapAndWait("Set Amount", "Slide to Confirm")) {
-    if (hasElement("icon-warning")) fail("Amount exceeds balance or invalid");
+  if (!(await tapAndWait("Set Amount", "Slide to Confirm"))) {
+    if (await hasElement("icon-warning")) fail("Amount exceeds balance or invalid");
     fail("Could not proceed to confirmation");
   }
   console.log("  [3/4] Amount set");
 
   if (opts.note) {
-    tapElement("add-note", true);
-    sleep(200);
-    typeText(opts.note, true);
-    adb("shell input keyevent KEYCODE_BACK");
-    sleep(300);
+    await tapElement("add-note");
+    await pause(200);
+    await typeText(opts.note);
+    await pressBack();
+    await pause(300);
   }
 
   console.log("  [4/4] Ready to send - use 'Slide to Confirm' to complete");
 }
 
-function uxBackend(backend: string) {
+async function uxBackend(backend: string) {
   const buttonIds: Record<string, string> = {
     local: "Local Button",
     main: "Main Button",
@@ -98,13 +98,13 @@ function uxBackend(backend: string) {
   console.log(`Switching to ${backend} backend...`);
 
   // Step 1: Get to developer screen
-  if (hasElement("developer-screen-scroll-view")) {
+  if (await hasElement("developer-screen-scroll-view")) {
     // Already on dev screen
-  } else if (hasElement("logo-button")) {
-    tapElement("logo-button", true); sleep(80);
-    tapElement("logo-button", true); sleep(80);
-    tapElement("logo-button", true);
-    if (!waitForElement("developer-screen-scroll-view", TIMEOUTS.short)) {
+  } else if (await hasElement("logo-button")) {
+    await tapElement("logo-button", 80);
+    await tapElement("logo-button", 80);
+    await tapElement("logo-button", 80);
+    if (!(await waitForElement("developer-screen-scroll-view", TIMEOUTS.short))) {
       fail("Could not open developer screen");
     }
   } else {
@@ -113,22 +113,22 @@ function uxBackend(backend: string) {
   console.log("  [1/3] On developer screen");
 
   // Step 2: Select backend (scroll if needed)
-  if (!hasElement(buttonId)) {
-    adb(SWIPES.up);
-    sleep(300);
+  if (!(await hasElement(buttonId))) {
+    await swipe("up");
+    await pause(300);
   }
-  if (!tapElement(buttonId, true)) fail(`Could not find ${buttonId}`);
+  if (!(await tapElement(buttonId))) fail(`Could not find ${buttonId}`);
   console.log(`  [2/3] Selected ${backend}`);
 
   // Step 3: Save and go back
-  sleep(200);
-  if (!tapElement("Save Changes", true)) fail("Could not find Save Changes button");
-  sleep(300);
-  tapElement("Go back", true);
+  await pause(200);
+  if (!(await tapElement("Save Changes"))) fail("Could not find Save Changes button");
+  await pause(300);
+  await tapElement("Go back");
   console.log("  [3/3] Saved and exited");
 }
 
-function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
+async function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
   const cfg = loadConfig().login;
   const phone = opts.phone || cfg.phone;
   const code = opts.code || cfg.code;
@@ -139,66 +139,62 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
   console.log(`Logging in with +${country} ${phone}...`);
 
   // Step 1: Navigate to SMS login screen
-  if (hasElement("home-screen")) fail("Already logged in");
+  if (await hasElement("home-screen")) fail("Already logged in");
 
-  if (hasElement("Login")) {
-    tapElement("Login", true);
-    waitForElement("SMS", TIMEOUTS.short);
+  if (await hasElement("Login")) {
+    await tapElement("Login");
+    await waitForElement("SMS", TIMEOUTS.short);
   }
-  if (hasElement("SMS")) {
-    tapElement("SMS", true);
-    waitForElement("Use SMS", TIMEOUTS.short);
+  if (await hasElement("SMS")) {
+    await tapElement("SMS");
+    await waitForElement("Use SMS", TIMEOUTS.short);
   }
-  if (hasElement("Use SMS")) {
-    tapElement("Use SMS", true);
+  if (await hasElement("Use SMS")) {
+    await tapElement("Use SMS");
   }
 
-  if (!waitForElement("telephoneNumber", TIMEOUTS.short)) fail("Could not reach SMS login screen");
+  if (!(await waitForElement("telephoneNumber", TIMEOUTS.short))) fail("Could not reach SMS login screen");
   console.log("  [1/4] On SMS login screen");
 
   // Step 2: Select country if specified
   if (country) {
-    tapElement("Country Picker", true);
-    if (waitForElement("text-input-country-filter", TIMEOUTS.short)) {
-      tapElement("text-input-country-filter", true);
-      clearInput();
-      typeText(country, true);
-      sleep(500);
+    await tapElement("Country Picker");
+    if (await waitForElement("text-input-country-filter", TIMEOUTS.short)) {
+      await tapElement("text-input-country-filter");
+      await clearInput();
+      await typeText(country);
+      await pause(500);
 
       // Find country testID (format: "Country Name (+code)")
-      const root = getUiHierarchy();
-      if (root) {
-        const testIds = collectTestIds(root);
-        // Match exact country name before the "(+" part
-        const countryId = testIds.find((id) => {
-          const match = id.match(/^(.+?)\s*\(\+/);
-          return match && match[1].toLowerCase() === country.toLowerCase();
-        });
-        if (countryId) {
-          tapElement(countryId, true);
-        } else {
-          console.log(`  [!] Country '${country}' not found, using default`);
-          adb("shell input keyevent KEYCODE_BACK");
-        }
+      const testIds = await getTestIds();
+      const countryId = testIds.find((id) => {
+        const match = id.match(/^(.+?)\s*\(\+/);
+        return match && match[1].toLowerCase() === country.toLowerCase();
+      });
+      if (countryId) {
+        await tapElement(countryId);
+      } else {
+        console.log(`  [!] Country '${country}' not found, using default`);
+        await pressBack();
       }
-      waitForElement("telephoneNumber", TIMEOUTS.short);
+      await waitForElement("telephoneNumber", TIMEOUTS.short);
     }
   }
 
   // Step 3: Enter phone
-  tapElement("telephoneNumber", true);
-  clearInput();
-  typeText(phone, true);
+  await tapElement("telephoneNumber");
+  await clearInput();
+  await typeText(phone);
   console.log("  [2/4] Phone entered");
 
   // Step 4: Send SMS and handle captcha
-  tapElement("Send via SMS", true);
+  await tapElement("Send via SMS");
 
   const start = Date.now();
   let captchaShown = false;
 
   while (Date.now() - start < TIMEOUTS.captcha) {
-    const found = waitForAny(
+    const found = await waitForAny(
       ["oneTimeCode", "home-screen", "Geetest", "icon-warning", "permission_allow_button"],
       2000
     );
@@ -210,7 +206,7 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
       return;
     }
     if (found === "permission_allow_button") {
-      tapElement("permission_allow_button", true);
+      await tapElement("permission_allow_button");
       continue;
     }
     if (found === "Geetest") {
@@ -222,43 +218,43 @@ function uxLogin(opts: { phone?: string; code?: string; country?: string }) {
     }
     if (found === "icon-warning") {
       // Try to get actual error text
-      const root = getUiHierarchy();
+      const root = await getUiHierarchy();
       const items = root ? collectUiInfo(root) : [];
       const errText = items.find((i) => i.text && i.text.length > 20 && !i.id)?.text;
       fail(errText ? errText.slice(0, 60) : "Error after sending SMS");
     }
-    if (captchaShown && !hasElement("Geetest")) {
-      console.log("  [✓] Captcha solved!");
+    if (captchaShown && !(await hasElement("Geetest"))) {
+      console.log("  [OK] Captcha solved!");
       captchaShown = false;
     }
   }
 
-  if (!hasElement("oneTimeCode") && !hasElement("home-screen")) fail("Code screen not shown");
-  if (hasElement("home-screen")) {
+  if (!(await hasElement("oneTimeCode")) && !(await hasElement("home-screen"))) fail("Code screen not shown");
+  if (await hasElement("home-screen")) {
     console.log("  [4/4] SUCCESS: Logged in!");
     return;
   }
   console.log("  [3/4] Code screen ready");
 
   // Step 5: Enter code
-  tapElement("oneTimeCode", true);
-  typeText(code, true);
+  await tapElement("oneTimeCode");
+  await typeText(code);
 
-  const result = waitForAny(["home-screen", "Geetest", "icon-warning", "permission_allow_button"], TIMEOUTS.medium);
+  const result = await waitForAny(["home-screen", "Geetest", "icon-warning", "permission_allow_button"], TIMEOUTS.medium);
 
   if (result === "Geetest") {
     console.log("  [!] Post-code captcha - please solve...");
-    while (hasElement("Geetest")) sleep(500);
-    console.log("  [✓] Solved!");
+    while (await hasElement("Geetest")) await pause(500);
+    console.log("  [OK] Solved!");
   }
 
-  if (hasElement("permission_allow_button")) {
-    tapElement("permission_allow_button", true);
+  if (await hasElement("permission_allow_button")) {
+    await tapElement("permission_allow_button");
   }
 
-  if (waitForElement("home-screen", TIMEOUTS.short)) {
+  if (await waitForElement("home-screen", TIMEOUTS.short)) {
     console.log("  [4/4] SUCCESS: Logged in!");
-  } else if (hasElement("icon-warning")) {
+  } else if (await hasElement("icon-warning")) {
     fail("Wrong code?");
   } else {
     console.log("  [4/4] Code entered - check screen");
