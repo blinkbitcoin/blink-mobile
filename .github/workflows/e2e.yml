@@ -11,17 +11,49 @@ concurrency:
 jobs:
   e2e-android:
     name: Android
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GRADLE_USER_HOME: /nix/gradle
+      GRADLE_OPTS: >-
+        -Dorg.gradle.internal.http.socketTimeout=120000
+        -Dorg.gradle.internal.http.connectionTimeout=120000
+        -Dorg.gradle.workers.max=2
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          build-mount-path: /nix
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
 
-      # In case this is run on a runner without nix
-      # - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Prepare /nix for Nix installer
+        shell: bash
+        run: |
+          sudo mkdir -p /nix
+          sudo chown root:root /nix
+          sudo chmod 0755 /nix
+          echo "Ownership after fix:"
+          ls -ld /nix
+
+      - uses: actions/checkout@v4
+
+      # Install Nix + enable cache
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          use-flakehub: false
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -29,6 +61,28 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock', '**/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-deps-
+
+      - name: Move Docker data-root to /nix/docker
+        run: |
+          sudo systemctl stop docker
+          sudo mkdir -p /nix/docker
+          echo '{"data-root":"/nix/docker"}' | sudo tee /etc/docker/daemon.json
+          sudo rsync -aH --delete /var/lib/docker/ /nix/docker/ || true
+          sudo systemctl start docker
+          docker info
+
+      - name: Relocate caches to /nix
+        run: |
+          sudo mkdir -p /nix/{tmp,yarn-cache,npm-cache,gradle,avd}
+          sudo chown -R $USER:$USER /nix/{tmp,yarn-cache,npm-cache,gradle,avd}
+          {
+            echo "TMPDIR=/nix/tmp"
+            echo "YARN_CACHE_FOLDER=/nix/yarn-cache"
+            echo "NPM_CONFIG_CACHE=/nix/npm-cache"
+            echo "GRADLE_USER_HOME=/nix/gradle"
+            echo "ANDROID_AVD_HOME=/nix/avd"
+            echo "ANDROID_PREFS_ROOT=/nix/avd"
+          } >> $GITHUB_ENV
 
       # Installations
       - name: Install Node Modules and Pods
@@ -57,7 +111,36 @@ jobs:
           echo "TILT_SERVER_PID=$!" >> $GITHUB_ENV
 
       # Builds
-      - run: nix develop -c yarn e2e:build android.emu.debug
+      - name: Android build
+        timeout-minutes: 30
+        run: |
+          cat >> android/gradle.properties <<'EOF'
+          org.gradle.console=plain
+          org.gradle.logging.level=warn
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          org.gradle.caching=true
+          org.gradle.parallel=true
+          org.gradle.daemon=false
+          EOF
+
+          # Keep the step alive
+          ( while sleep 60; do echo "[build] running..."; done ) & HB=$!
+
+          set +e
+          timeout 30m nix develop -c yarn e2e:build android.emu.debug
+          CODE=$?
+
+          # If it failed or hung out, cleanup locks and retry with safer settings
+          if [ $CODE -ne 0 ]; then
+            pkill -f GradleDaemon || true
+            rm -rf "$GRADLE_USER_HOME"/caches/*/file-locks || true
+            sed -i 's/^org\.gradle\.parallel=true/org.gradle.parallel=false/' android/gradle.properties || true
+            timeout 20m nix develop -c yarn e2e:build android.emu.debug
+            CODE=$?
+          fi
+
+          kill $HB || true
+          exit $CODE
 
       # Tests on Android Emulator
       - name: Start Android Emulator
@@ -127,6 +210,22 @@ jobs:
             echo "- $TEST_NAME" >> $GITHUB_STEP_SUMMARY
           done
 
+      - name: Disk usage (report)
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          echo "== root =="
+          df -h /
+          echo "== /mnt =="
+          df -h /mnt
+          echo "== workspace =="
+          df -h "$GITHUB_WORKSPACE"
+          if [ -d /nix ]; then
+            echo "== /nix =="
+            df -h /nix
+          fi
+
       # Cleanup
       - name: Terminate Metro
         if: always()
@@ -148,14 +247,14 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # In case this is run on a runner without nix
       # - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
