@@ -7,6 +7,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { gql } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
@@ -311,19 +312,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             >
               <View style={styles.walletContainer}>
                 <View style={styles.walletSelectorTypeContainer}>
-                  <View
-                    style={
-                      wallet.walletCurrency === WalletCurrency.Btc
-                        ? styles.walletSelectorTypeLabelBitcoin
-                        : styles.walletSelectorTypeLabelUsd
+                  <CurrencyPill
+                    currency={wallet.walletCurrency}
+                    textSize="p3"
+                    containerSize="medium"
+                    label={
+                      wallet.walletCurrency === WalletCurrency.Usd
+                        ? LL.common.dollar()
+                        : LL.common.bitcoin()
                     }
-                  >
-                    {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text style={styles.walletSelectorTypeLabelBtcText}>BTC</Text>
-                    ) : (
-                      <Text style={styles.walletSelectorTypeLabelUsdText}>USD</Text>
-                    )}
-                  </View>
+                  />
                 </View>
                 <View style={styles.walletSelectorInfoContainer}>
                   <View style={styles.walletSelectorTypeTextContainer}>
@@ -500,19 +498,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           >
             <View style={styles.fieldBackground}>
               <View style={styles.walletSelectorTypeContainer}>
-                <View
-                  style={
-                    sendingWalletDescriptor.currency === WalletCurrency.Btc
-                      ? styles.walletSelectorTypeLabelBitcoin
-                      : styles.walletSelectorTypeLabelUsd
+                <CurrencyPill
+                  currency={sendingWalletDescriptor.currency}
+                  textSize="p3"
+                  containerSize="medium"
+                  label={
+                    sendingWalletDescriptor.currency === WalletCurrency.Usd
+                      ? LL.common.dollar()
+                      : LL.common.bitcoin()
                   }
-                >
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text style={styles.walletSelectorTypeLabelBtcText}>BTC</Text>
-                  ) : (
-                    <Text style={styles.walletSelectorTypeLabelUsdText}>USD</Text>
-                  )}
-                </View>
+                />
               </View>
               <View style={styles.walletSelectorInfoContainer}>
                 <View style={styles.walletSelectorTypeTextContainer}>
@@ -652,30 +647,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
     width: 50,
     marginRight: 20,
-  },
-  walletSelectorTypeLabelBitcoin: {
-    height: 30,
-    width: 50,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsd: {
-    height: 30,
-    width: 50,
-    backgroundColor: colors._green,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsdText: {
-    fontWeight: "bold",
-    color: colors.black,
-  },
-  walletSelectorTypeLabelBtcText: {
-    fontWeight: "bold",
-    color: colors.white,
   },
   walletSelectorInfoContainer: {
     flex: 1,
