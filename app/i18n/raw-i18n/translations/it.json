@@ -2366,8 +2366,8 @@
         "toastMessage": "Segreto copiato negli appunti!"
     },
     "DefaultWalletScreen": {
-        "title": "Account predefinito",
-        "info": "Seleziona quale account impostare come predefinito per la ricezione e l'invio. Puoi modificare l'account di invio e ricezione per i singoli pagamenti nell'app mobile. I pagamenti ricevuti tramite il registratore di cassa o il tuo indirizzo Lightning andranno sempre all'account predefinito.\n\nPer evitare la volatilità di Bitcoin, scegli Stablesats. Ciò ti consente di mantenere una quantità di denaro stabile pur continuando a inviare e ricevere pagamenti.\n\nPuoi modificare questa impostazione in qualsiasi momento e non influirà sul tuo saldo attuale."
+        "title": "Ricevere valuta",
+        "info": "Usa il tuo account Stablesats in Blink per mantenere il denaro nel tuo wallet stabile in termini di valuta fiat (dollaro). Usa il tuo account Bitcoin se stai accumulando sats e non ti dispiace che il saldo in fiat cambi continuamente."
     },
     "ThemeScreen": {
         "title": "Tema",

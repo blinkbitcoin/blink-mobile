@@ -2366,8 +2366,8 @@
         "toastMessage": "Texto copiado para a área de transferência!"
     },
     "DefaultWalletScreen": {
-        "title": "Conta Padrão",
-        "info": "Escolha qual conta definir como padrão para recebimento e envio. Você pode ajustar a conta de envio e recebimento para pagamentos individuais no aplicativo. Os pagamentos recebidos por meio da caixa registradora ou de seu endereço Lightning sempre irão para a conta padrão.\n\nPara evitar a volatilidade do Bitcoin, escolha Stablesats. Isso permite que você mantenha uma quantia estável de dinheiro enquanto ainda pode enviar e receber pagamentos.\n\nVocê pode alterar essa configuração a qualquer momento e isso não afetará seu saldo atual.\n "
+        "title": "Receber moeda",
+        "info": "Use sua conta Stablesats no Blink para manter o dinheiro da sua carteira estável em termos de moeda fiduciária (dólar). Use sua conta Bitcoin se você estiver acumulando sats e não se importar que seu saldo em fiat mude o tempo todo."
     },
     "ThemeScreen": {
         "title": "Tema",
