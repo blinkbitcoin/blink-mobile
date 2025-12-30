@@ -491,7 +491,6 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorTypeContainer: {
     justifyContent: "center",
     alignItems: "flex-start",
-    width: 50,
     marginRight: 28,
   },
   walletSelectorInfoContainer: {
