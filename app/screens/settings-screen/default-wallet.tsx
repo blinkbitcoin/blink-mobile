@@ -88,12 +88,11 @@ export const DefaultWalletScreen: React.FC = () => {
 
   const Wallets = [
     {
-      // TODO: translation
-      name: "Bitcoin",
+      name: LL.common.bitcoin(),
       id: btcWalletId,
     },
     {
-      name: "Stablesats (USD)",
+      name: LL.common.dollarStablesats(),
       id: usdWalletId,
     },
   ] as const
