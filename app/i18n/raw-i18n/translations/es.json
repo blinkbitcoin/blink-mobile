@@ -2385,8 +2385,8 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Cuenta predeterminada",
-        "info": "Elige qué cuenta establecer como predeterminada para recibir y enviar. Puedes ajustar la cuenta de envío y recepción para pagos individuales en la app móvil. Los pagos recibidos a través de la caja o de su dirección Lightning siempre irán a la cuenta predeterminada.\n\nPara evitar la volatilidad de Bitcoin, elige Stablesats. Esto te permite mantener una cantidad estable de dinero sin dejar de poder enviar y recibir pagos.\n\nPuedes cambiar esta configuración en cualquier momento, y no afectará a tu saldo actual."
+        "title": "Recibir moneda",
+        "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2677,6 +2677,7 @@
         "submit": "Entregar",
         "success": "Éxito",
         "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dólar (Stablesats)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transacciones",

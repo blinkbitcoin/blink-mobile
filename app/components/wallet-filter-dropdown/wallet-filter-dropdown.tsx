@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
+import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -74,14 +74,10 @@ export const WalletFilterDropdown: React.FC<{
           <View style={styles.walletSelectorTypeContainer}>
             <CurrencyPill
               currency={current.value}
-              label={current.label}
-              textSize="p2"
+              textSize="p3"
               containerSize="medium"
+              label={current.description}
             />
-          </View>
-
-          <View style={styles.walletSelectorTypeTextContainer}>
-            <Text style={styles.walletCurrencyText}>{current.description}</Text>
           </View>
 
           <View style={styles.pickWalletIcon}>
@@ -113,12 +109,11 @@ export const WalletFilterDropdown: React.FC<{
                 <View style={styles.walletSelectorTypeContainer}>
                   <CurrencyPill
                     currency={opt.value}
-                    label={opt.label}
-                    textSize="p2"
+                    textSize="p3"
                     containerSize="medium"
+                    label={opt.description}
                   />
                 </View>
-                <Text style={styles.walletCurrencyText}>{opt.description}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -132,6 +127,7 @@ const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
     backgroundColor: colors.grey5,
+    justifyContent: "space-between",
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -165,13 +161,6 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorTypeLabelAllText: {
     fontWeight: "bold",
     color: colors.primary3,
-  },
-  walletCurrencyText: {
-    flex: 1,
-    fontWeight: "bold",
-    fontSize: 18,
-    color: colors.black,
-    marginBottom: 1,
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

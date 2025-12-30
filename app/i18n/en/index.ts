@@ -2470,8 +2470,8 @@ const en: BaseTranslation = {
     toastMessage: "Secret copied to clipboard!",
   },
   DefaultWalletScreen: {
-    title: "Default Account",
-    info: "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance.",
+    title: "Receive currency",
+    info: "Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.",
   },
   ThemeScreen: {
     title: "Theme",
@@ -2778,6 +2778,7 @@ const en: BaseTranslation = {
     submit: "Submit",
     success: "Success!",
     stablesatsUsd: "Stablesats USD",
+    dollarStablesats: "Dollar (Stablesats)",
     to: "To",
     total: "Total",
     transactions: "Transactions",

@@ -2366,8 +2366,8 @@
         "toastMessage": "Ekyama kyiwanduukuluddwa ku lutimbe"
     },
     "DefaultWalletScreen": {
-        "title": "Akawunti Esokerwako",
-        "info": "Londa akawunti ki gy'oteekawo ng'eyabulijjo okufuna n'okusindika. Osobola okukyusa akawunti y'okusindika n'okufuna akawunti ku ssente buli omu z'asasula mu pulogulaamu y'oku ssimu. Ebintu by'ofuna okuyitira mu ssente oba ku ndagiriro yo eya Laddu buli kiseera bijja kugenda ku akawunti eyabulijjo.\n\nOkwewala okukyukakyuka kwa Bitcoin, londa Stablesats. Kino kikuyamba okukuuma omuwendo gwa ssente nga tegukyali mukkakkamu kyokka ng'osobola okusindika n'okufuna ssente.\n\nOsobola okukyusa enteekateeka eno ekiseera kyonna, era tekigenda kukosa ssente eziriko kati."
+        "title": "Funa ssente",
+        "info": "Kozesa akawunti yo eya Stablesats mu Blink okukuuma ssente mu wallet yo nga zinywevu mu ssente za fiat (doola). Kozesa akawunti yo eya Bitcoin bw’oba okuŋŋaanya sats era nga tofaayo ku nkyukakyuka mu bbalansi ya fiat."
     },
     "ThemeScreen": {
         "title": "Endabika",
