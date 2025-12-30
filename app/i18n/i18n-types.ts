@@ -8775,6 +8775,10 @@ type RootTranslation = {
 		 */
 		stablesatsUsd: string
 		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
+		 */
+		dollarStablesats: string
+		/**
 		 * T​o
 		 */
 		to: string
@@ -18130,6 +18134,10 @@ export type TranslationFunctions = {
 		 * Stablesats USD
 		 */
 		stablesatsUsd: () => LocalizedString
+		/**
+		 * Dollar (Stablesats)
+		 */
+		dollarStablesats: () => LocalizedString
 		/**
 		 * To
 		 */
