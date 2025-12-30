@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 import { HeaderBackButton } from "@react-navigation/elements"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const InvisibleBackButton: React.FC = () => {
   const styles = useStyles()
@@ -22,7 +22,14 @@ type HeaderBackControlParams = {
 }
 
 export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) =>
-  canGoBack ? undefined : () => <InvisibleBackButton />
+  canGoBack
+    ? (props: React.ComponentProps<typeof HeaderBackButton>) => {
+        const {
+          theme: { colors },
+        } = useTheme()
+        return <HeaderBackButton {...props} pressColor={colors.grey5} pressOpacity={1} />
+      }
+    : () => <InvisibleBackButton />
 
 const useStyles = makeStyles(() => ({
   container: {
