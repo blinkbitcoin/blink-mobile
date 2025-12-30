@@ -2366,8 +2366,8 @@
         "toastMessage": "Tajný kód bol skopírovaný do schránky!"
     },
     "DefaultWalletScreen": {
-        "title": "Predvolený účet",
-        "info": "Vyberte účet, ktorý chcete nastaviť ako predvolený na prijímanie a odosielanie. Účet na odosielanie a prijímanie jednotlivých platieb môžete nastaviť v mobilnej aplikácii. Platby prijaté prostredníctvom pokladne alebo vašej Lightning adresy budú vždy zaslané na predvolený účet.\n\nAk sa chcete vyhnúť volatilite Bitcoinu, vyberte si Stablesats. To vám umožní udržiavať stabilnú hodnotu peňazí a zároveň mať možnosť odosielať a prijímať platby.\n\nToto nastavenie môžete kedykoľvek zmeniť a nebude mať vplyv na váš aktuálny zostatok."
+        "title": "Prijať menu",
+        "info": "Použite svoj účet Stablesats v Blink na udržanie peňazí vo vašej peňaženke stabilných v hodnote fiat meny (dolár). Použite svoj Bitcoin účet, ak zbierate sats a nevadí vám, že sa váš fiat zostatok neustále mení."
     },
     "ThemeScreen": {
         "title": "Motív",

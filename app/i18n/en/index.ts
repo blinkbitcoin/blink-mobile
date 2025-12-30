@@ -2477,7 +2477,7 @@ const en: BaseTranslation = {
     toastMessage: "Secret copied to clipboard!",
   },
   DefaultWalletScreen: {
-    title: "Default Account",
+    title: "Receive currency",
     info: "Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.",
   },
   ThemeScreen: {

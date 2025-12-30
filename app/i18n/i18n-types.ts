@@ -7749,7 +7749,7 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * D​e​f​a​u​l​t​ ​A​c​c​o​u​n​t
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
 		 */
 		title: string
 		/**
@@ -17127,7 +17127,7 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Default Account
+		 * Receive currency
 		 */
 		title: () => LocalizedString
 		/**
