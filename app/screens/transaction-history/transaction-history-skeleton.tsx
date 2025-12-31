@@ -14,7 +14,6 @@ const TransactionHistorySkeleton = () => {
         speed={1.2}
         backgroundColor={styles.background.color}
         foregroundColor={styles.foreground.color}
-        viewBox="0 0 100% 640"
       >
         <Rect x="0" y="40" rx="10" ry="10" width="100%" height="60" />
         <Rect x="0" y="102" rx="10" ry="10" width="100%" height="60" />
