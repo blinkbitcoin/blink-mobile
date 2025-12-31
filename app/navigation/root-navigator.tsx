@@ -351,7 +351,10 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="transactionHistory"
         component={TransactionHistoryScreen}
-        options={{ title: LL.TransactionScreen.transactionHistoryTitle() }}
+        options={{
+          title: LL.TransactionScreen.transactionHistoryTitle(),
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+        }}
       />
       <RootNavigator.Screen
         name="priceHistory"
