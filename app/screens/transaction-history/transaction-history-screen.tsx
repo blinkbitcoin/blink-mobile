@@ -1,7 +1,7 @@
 import * as React from "react"
-import { ActivityIndicator, SectionList, Text, View } from "react-native"
+import { InteractionManager, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useNavigation, RouteProp } from "@react-navigation/native"
@@ -25,6 +25,8 @@ import { useTransactionSeenState } from "@app/hooks"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
+
+import TransactionHistorySkeleton from "./transaction-history-skeleton"
 
 gql`
   query transactionListForDefaultAccount(
@@ -58,9 +60,6 @@ type TransactionHistoryScreenProps = {
 export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> = ({
   route,
 }) => {
-  const {
-    theme: { colors },
-  } = useTheme()
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -70,6 +69,15 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const isAuthed = useIsAuthed()
 
+  const [deferQueries, setDeferQueries] = React.useState(true)
+
+  React.useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setDeferQueries(false)
+    })
+    return () => task.cancel()
+  }, [])
+
   const hasRouteWallets = (route.params?.wallets?.length ?? 0) > 0
 
   const [availableWallets, setAvailableWallets] = React.useState<
@@ -77,7 +85,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   >(route.params?.wallets ?? [])
 
   const { data: walletOverviewData } = useWalletOverviewScreenQuery({
-    skip: !isAuthed || hasRouteWallets,
+    skip: !isAuthed || hasRouteWallets || deferQueries,
     fetchPolicy: "cache-first",
   })
 
@@ -95,7 +103,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const { data, previousData, error, fetchMore, refetch, loading } =
     useTransactionListForDefaultAccountQuery({
-      skip: !isAuthed,
+      skip: !isAuthed || deferQueries,
       fetchPolicy: "cache-and-network",
       returnPartialData: true,
       variables: {
@@ -108,12 +116,17 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   React.useEffect(() => {
     if (availableWallets.length) return
+    if (deferQueries) return
 
     const queryWallets = walletOverviewData?.me?.defaultAccount?.wallets ?? []
     if (queryWallets.length === 0) return
 
     setAvailableWallets(queryWallets)
-  }, [availableWallets.length, walletOverviewData?.me?.defaultAccount?.wallets])
+  }, [
+    availableWallets.length,
+    walletOverviewData?.me?.defaultAccount?.wallets,
+    deferQueries,
+  ])
 
   const accountId = dataToRender?.me?.defaultAccount?.id
   const pendingIncomingTransactions =
@@ -269,11 +282,18 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return <></>
   }
 
-  if (!transactions) {
+  if (deferQueries || !transactions) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator color={colors.primary} size={"large"} />
-      </View>
+      <Screen>
+        <WalletFilterDropdown
+          selected={walletFilter}
+          onSelectionChange={setWalletFilter}
+          loading={true}
+        />
+        <View style={styles.skeletonWrapper}>
+          <TransactionHistorySkeleton />
+        </View>
+      </Screen>
     )
   }
 
@@ -344,6 +364,14 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
 const useStyles = makeStyles(({ colors }) => ({
   loadingContainer: { justifyContent: "center", alignItems: "center", flex: 1 },
+  skeletonWrapper: { flex: 1, alignSelf: "stretch" },
+  skeletonContainer: { alignSelf: "stretch" },
+  loaderBackground: {
+    color: colors.loaderBackground,
+  },
+  loaderForefound: {
+    color: colors.loaderForeground,
+  },
   noTransactionText: {
     fontSize: 24,
   },
