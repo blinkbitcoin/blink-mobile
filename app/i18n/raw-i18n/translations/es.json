@@ -2403,7 +2403,7 @@
     "StablesatsModal": {
         "header": "¡Ya tienes una cuenta en USD agregada a tu billetera con StableSats!",
         "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta BTC y USD. El valor en la cuenta en USD no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
-        "termsAndConditions": "Lee los términos y condiciones.",
+        "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats"
     },
     "SplashScreen": {

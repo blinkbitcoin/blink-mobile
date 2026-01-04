@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Avec Stablesats, vous avez à présent un compte en dollar US ajouté à votre portefeuille !",
         "body": "Vous pouvez l’utiliser pour envoyer et recevoir des bitcoins, et instantanément transférer la valeur entre votre compte BTC et Dollar US. La valeur du dollar US ne fluctuera pas avec le prix du bitcoin. Cette fonction n’est pas compatible avec le système bancaire traditionnel.",
-        "termsAndConditions": "Lire les Termes & Conditions.",
+        "termsAndConditions": "Lire les Termes & Conditions",
         "learnMore": "En savoir plus sur Stablesats"
     },
     "SplashScreen": {

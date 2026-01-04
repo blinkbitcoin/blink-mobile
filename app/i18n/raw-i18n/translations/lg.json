@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Ne Stablesats, kati olina akawunti ya USD eyongeddwa mu waleti yo!",
         "body": "Osobola okugikozesa okusindika n'okufuna Bitcoin, era amangu ago n'owaanyisa omuwendo wakati w'akawunti yo eya BTC ne USD. Omuwendo oguli ku akawunti ya USD tegujja kukyukakyuka ku bbeeyi ya Bitcoin. Enkola eno tekwatagana na nkola ya bbanka ey'edda.",
-        "termsAndConditions": "Soma amateeka n'ebiragiro.",
+        "termsAndConditions": "Soma amateeka n'ebiragiro",
         "learnMore": "Yiga ebisingawo ku Stablesats"
     },
     "SplashScreen": {
