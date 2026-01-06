@@ -19,13 +19,18 @@ export const useOutgoingBadgeVisibility = ({
       return
     }
 
-    setVisible(true)
+    const showTimeout = setTimeout(() => {
+      setVisible(true)
+    }, 50)
 
-    const id = setTimeout(() => {
+    const hideTimeout = setTimeout(() => {
       setVisible(false)
-    }, ttlMs)
+    }, ttlMs + 50)
 
-    return () => clearTimeout(id)
+    return () => {
+      clearTimeout(showTimeout)
+      clearTimeout(hideTimeout)
+    }
   }, [txId, isOutgoing, amountText, ttlMs])
 
   return visible
