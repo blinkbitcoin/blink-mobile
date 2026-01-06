@@ -1,4 +1,5 @@
 import React from "react"
+import { InteractionManager } from "react-native"
 import { MockedResponse } from "@apollo/client/testing"
 import { RouteProp } from "@react-navigation/native"
 import { act, fireEvent, render, waitFor, cleanup } from "@testing-library/react-native"
@@ -15,6 +16,16 @@ import { ContextForScreen } from "./helper"
 let currentMocks: MockedResponse[] = []
 const DEFAULT_ACCOUNT_ID = "account-id"
 let currentTxLastSeen = { btcId: "", usdId: "" }
+
+jest.spyOn(InteractionManager, "runAfterInteractions").mockImplementation((callback) => {
+  if (typeof callback === "function") {
+    callback()
+  }
+
+  return {
+    cancel: () => {},
+  } as ReturnType<typeof InteractionManager.runAfterInteractions>
+})
 
 jest.mock("../../app/graphql/cache", () => {
   const actual = jest.requireActual("../../app/graphql/cache")
