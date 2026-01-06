@@ -12,6 +12,7 @@ import {
   useTransactionListForDefaultAccountQuery,
   useWalletOverviewScreenQuery,
   WalletCurrency,
+  TxDirection,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
@@ -210,15 +211,18 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       txId,
       settlementCurrency,
       memo,
+      direction,
     }: {
       txId: string
       settlementCurrency?: WalletCurrency | null
       memo?: string | null
+      direction?: TxDirection | null
     }) => {
       if (seenTxIds.has(txId)) return false
       if (!highlightBaselineLastSeen) return false
       if (!settlementCurrency) return false
       if (memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
+      if (direction !== TxDirection.Receive) return false
 
       if (walletFilter === "ALL") {
         if (!lastSeenIdForAll) return false
@@ -344,6 +348,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
               txId: item.id,
               settlementCurrency: item.settlementCurrency,
               memo: item.memo,
+              direction: item.direction,
             })}
             onPress={() => {
               setSeenTxIds((prev) => new Set(prev).add(item.id))

@@ -249,7 +249,7 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionSeenState(
+  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
     accountId || "",
     transactions,
   )
@@ -270,6 +270,11 @@ export const HomeScreen: React.FC = () => {
     txId: latestUnseenTx?.id,
     amountText: unseenAmountText,
     isOutgoing,
+    onHide: () => {
+      if (latestUnseenTx?.settlementCurrency) {
+        markTxSeen(latestUnseenTx.settlementCurrency)
+      }
+    },
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
