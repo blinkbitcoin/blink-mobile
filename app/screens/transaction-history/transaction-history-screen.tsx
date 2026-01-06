@@ -22,6 +22,7 @@ import {
 } from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useTransactionSeenState } from "@app/hooks"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
@@ -68,6 +69,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   )
 
   const isAuthed = useIsAuthed()
+  const { feeReimbursementMemo } = useRemoteConfig()
 
   const [deferQueries, setDeferQueries] = React.useState(true)
 
@@ -207,13 +209,16 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     ({
       txId,
       settlementCurrency,
+      memo,
     }: {
       txId: string
       settlementCurrency?: WalletCurrency | null
+      memo?: string | null
     }) => {
       if (seenTxIds.has(txId)) return false
       if (!highlightBaselineLastSeen) return false
       if (!settlementCurrency) return false
+      if (memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
 
       if (walletFilter === "ALL") {
         if (!lastSeenIdForAll) return false
@@ -243,7 +248,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
       return txId > lastSeenId
     },
-    [walletFilter, highlightBaselineLastSeen, lastSeenIdForAll, seenTxIds],
+    [
+      walletFilter,
+      highlightBaselineLastSeen,
+      lastSeenIdForAll,
+      seenTxIds,
+      feeReimbursementMemo,
+    ],
   )
 
   React.useEffect(() => {
@@ -332,6 +343,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
             highlight={shouldHighlightTransactionId({
               txId: item.id,
               settlementCurrency: item.settlementCurrency,
+              memo: item.memo,
             })}
             onPress={() => {
               setSeenTxIds((prev) => new Set(prev).add(item.id))
