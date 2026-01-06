@@ -353,6 +353,7 @@ export const RootStack = () => {
         component={TransactionHistoryScreen}
         options={{
           title: LL.TransactionScreen.transactionHistoryTitle(),
+          presentation: "modal",
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
         }}
       />
