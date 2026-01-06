@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 
 import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useDisplayCurrency } from "@app/hooks"
 import { toWalletAmount } from "@app/types/amounts"
 
@@ -20,6 +21,7 @@ export const useUnseenTxAmountBadge = ({
 }: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
+  const { feeReimbursementMemo } = useRemoteConfig()
 
   const latestUnseenTx = useMemo(() => {
     if (!transactions || transactions.length === 0) return
@@ -29,16 +31,19 @@ export const useUnseenTxAmountBadge = ({
     if (hasUnseenBtcTx) unseenCurrencies.push(WalletCurrency.Btc)
     if (hasUnseenUsdTx) unseenCurrencies.push(WalletCurrency.Usd)
 
-    const unseenTransactions = transactions.filter((tx) =>
-      unseenCurrencies.includes(tx.settlementCurrency),
-    )
+    const unseenTransactions = transactions.filter((tx) => {
+      if (!unseenCurrencies.includes(tx.settlementCurrency)) return false
+      if (tx.memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
+
+      return true
+    })
 
     if (unseenTransactions.length === 0) return
 
     return unseenTransactions.reduce((latest, tx) =>
       tx.createdAt > latest.createdAt ? tx : latest,
     )
-  }, [transactions, hasUnseenBtcTx, hasUnseenUsdTx])
+  }, [transactions, hasUnseenBtcTx, hasUnseenUsdTx, feeReimbursementMemo])
 
   const unseenAmountText = useMemo(() => {
     if (!latestUnseenTx) return null
