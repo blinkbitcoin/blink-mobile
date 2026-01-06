@@ -334,10 +334,6 @@ describe("HomeScreen", () => {
 
     fireEvent.press(getByTestId("slide-up-handle"))
 
-    await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith("transactionHistory", {
-        showLoading: true,
-      }),
-    )
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
   })
 })
