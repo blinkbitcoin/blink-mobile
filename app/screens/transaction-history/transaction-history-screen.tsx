@@ -164,8 +164,15 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return transactions
   }, [pendingTxs, settledTxs])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx, lastSeenBtcId, lastSeenUsdId, markTxSeen } =
-    useTransactionSeenState(accountId || "", allTransactions)
+  const {
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    lastSeenBtcId,
+    lastSeenUsdId,
+    latestBtcTxId,
+    latestUsdTxId,
+    markTxSeen,
+  } = useTransactionSeenState(accountId || "", allTransactions)
 
   const [seenTxIds, setSeenTxIds] = React.useState<Set<string>>(new Set())
 
@@ -224,33 +231,30 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       if (memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
       if (direction !== TxDirection.Receive) return false
 
-      if (walletFilter === "ALL") {
-        if (!lastSeenIdForAll) return false
-
-        const lastSeenIdForCurrency =
-          settlementCurrency === WalletCurrency.Btc
-            ? highlightBaselineLastSeen.btcId
-            : settlementCurrency === WalletCurrency.Usd
-              ? highlightBaselineLastSeen.usdId
-              : ""
-
-        if (!lastSeenIdForCurrency) return false
-
-        return txId > lastSeenIdForCurrency && txId > lastSeenIdForAll
-      }
-
-      if (settlementCurrency !== walletFilter) return false
-
-      const lastSeenId =
+      const lastSeenIdForCurrency =
         settlementCurrency === WalletCurrency.Btc
           ? highlightBaselineLastSeen.btcId
           : settlementCurrency === WalletCurrency.Usd
             ? highlightBaselineLastSeen.usdId
             : ""
 
-      if (!lastSeenId) return false
+      const latestTxIdForCurrency =
+        settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
-      return txId > lastSeenId
+      if (walletFilter === "ALL") {
+        if (lastSeenIdForAll) {
+          return txId > lastSeenIdForCurrency && txId > lastSeenIdForAll
+        }
+        return lastSeenIdForCurrency
+          ? txId > lastSeenIdForCurrency
+          : txId === latestTxIdForCurrency
+      }
+
+      if (settlementCurrency !== walletFilter) return false
+
+      return lastSeenIdForCurrency
+        ? txId > lastSeenIdForCurrency
+        : txId === latestTxIdForCurrency
     },
     [
       walletFilter,
@@ -258,6 +262,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       lastSeenIdForAll,
       seenTxIds,
       feeReimbursementMemo,
+      latestBtcTxId,
+      latestUsdTxId,
     ],
   )
 

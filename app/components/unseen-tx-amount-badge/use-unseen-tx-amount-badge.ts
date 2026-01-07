@@ -1,12 +1,20 @@
 import { useCallback, useMemo } from "react"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { useNavigation } from "@react-navigation/native"
+import { useApolloClient } from "@apollo/client"
 
-import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useDisplayCurrency } from "@app/hooks"
 import { toWalletAmount } from "@app/types/amounts"
+import {
+  TransactionFragment,
+  TxDirection,
+  WalletCurrency,
+  HomeAuthedDocument,
+  HomeAuthedQuery,
+  TxStatus,
+} from "@app/graphql/generated"
 
 type UnseenTxAmountBadgeParams = {
   transactions?: TransactionFragment[] | null
@@ -22,17 +30,41 @@ export const useUnseenTxAmountBadge = ({
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
+  const client = useApolloClient()
+
+  const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
+    const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
+    const pendingTransactions =
+      data?.me?.defaultAccount?.pendingIncomingTransactions || []
+    const transactionEdges = data?.me?.defaultAccount?.transactions?.edges
+    if (!transactionEdges?.length) return pendingTransactions
+
+    const settledTransactions = transactionEdges
+      .map((edge) => edge.node)
+      .filter(
+        (transaction) =>
+          transaction.status !== TxStatus.Pending ||
+          transaction.direction === TxDirection.Send,
+      )
+    if (pendingTransactions.length === 0) return settledTransactions
+
+    return [...pendingTransactions, ...settledTransactions]
+  }, [client])
 
   const latestUnseenTx = useMemo(() => {
-    if (!transactions || transactions.length === 0) return
+    const baseTransactions =
+      transactions && transactions.length > 0 ? transactions : readCachedTransactions()
+
+    if (!baseTransactions || baseTransactions.length === 0) return
     if (!hasUnseenBtcTx && !hasUnseenUsdTx) return
 
     const unseenCurrencies: WalletCurrency[] = []
     if (hasUnseenBtcTx) unseenCurrencies.push(WalletCurrency.Btc)
     if (hasUnseenUsdTx) unseenCurrencies.push(WalletCurrency.Usd)
 
-    const unseenTransactions = transactions.filter((tx) => {
+    const unseenTransactions = baseTransactions.filter((tx) => {
       if (!unseenCurrencies.includes(tx.settlementCurrency)) return false
+      if (tx.settlementAmount === 0) return false
       if (tx.memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
 
       return true
@@ -43,7 +75,13 @@ export const useUnseenTxAmountBadge = ({
     return unseenTransactions.reduce((latest, tx) =>
       tx.createdAt > latest.createdAt ? tx : latest,
     )
-  }, [transactions, hasUnseenBtcTx, hasUnseenUsdTx, feeReimbursementMemo])
+  }, [
+    transactions,
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    feeReimbursementMemo,
+    readCachedTransactions,
+  ])
 
   const unseenAmountText = useMemo(() => {
     if (!latestUnseenTx) return null
