@@ -4,7 +4,7 @@
         "buttonTitle": "Estableix la teva adreça",
         "yourLightningAddress": "La teva adreça Lightning",
         "notAbleToChange": "No podràs canviar la teva {bankName: string} adreça un cop l'hagis configurat.",
-        "addressNotAvailable": "Aquesta {bankName} adreça ja està presa.",
+        "addressNotAvailable": "Aquesta {bankName: string} adreça ja està presa.",
         "somethingWentWrong": "Alguna cosa ha anat malament. Si us plau, intenta-ho més tard. ",
         "merchantTitle": "Per als comerciants",
         "yourCashRegister": "La teva caixa registradora Lightning",
@@ -18,7 +18,7 @@
         "howToUseYourCashRegister": "Com utilitzar la teva Caixa Registradora",
         "howToUseYourAddressExplainer": "Comparteix amb algú que tingui un moneder compatible, com ara:",
         "howToUseYourPaycodeExplainer": "Pots imprimir el teu codi de pagament  (és una factura sense import) i mostrar-lo al teu comerç per rebre pagaments. Les persones poden pagar-te escanejant-lo amb un moneder que tingui activat el  Lightning.\n\nNo obstant, tinguis en compte que alguns moneders no poden escanejar factures sense import:",
-        "howToUseYourCashRegisterExplainer": "Permet que les persones recaptin pagaments mitjançant l'enllaç de la caixa registradora, sense accedir al teu moneder.\nPoden crear factures i els pagaments s'enviaran directament al teu moneder {bankName}."
+        "howToUseYourCashRegisterExplainer": "Permet que les persones recaptin pagaments mitjançant l'enllaç de la caixa registradora, sense accedir al teu moneder.\nPoden crear factures i els pagaments s'enviaran directament al teu moneder {bankName: string}."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Termes i Condicions",
@@ -56,7 +56,7 @@
         "frequentContacts": "Contactes freqüents"
     },
     "ContactDetailsScreen": {
-        "title": "Transaccions amb {username}"
+        "title": "Transaccions amb {username: string}"
     },
     "ConversionDetailsScreen": {
         "title": "Converteix",
@@ -1256,7 +1256,7 @@
                             "Wow, aquest és un objectiu ambiciós! Tot i que és cert que la mineria requereix una quantitat significativa de potència computacional, estic bastant segur que el propòsit principal no és crear un exèrcit de senyors de l'IA. Més sort la propera vegada!"
                         ],
                         "question": "Quin és l'objectiu principal de la mineria a la xarxa bitcoin?",
-                        "text": "Quan un usuari vol enviar una transacció a la xarxa bitcoin, ha de signar la transacció amb la seva clau privada per demostrar que és el propietari dels fons que es transfereixen. Un cop signada la transacció, es transmet a la xarxa usuari-a-usuari.\n\nLa mineria és el procés d'afegir transaccions a la cadena de blocs de bitcoin. Quan una transacció es transmet a la xarxa, els miners la capten i verifiquen que la transacció és vàlida (és a dir, que l'usuari té els fons necessaris i que la clau privada utilitzada per signar la transacció correspon a la clau pública associada als fons).\n\nUn cop verificada una transacció, s'afegeix a un bloc de transaccions, juntament amb un trencaclosques matemàtic. Els miners competeixen per resoldre el trencaclosques, i el primer que el resolgui afegeix el bloc a la cadena de blocs i reclama una recompensa en bitcoins. La recompensa actualment és de 3,125 bitcoins, més les comissions de transacció que s'havien inclòs al bloc.\n\nA més d'afegir transaccions a la cadena de blocs, la mineria també serveix per assegurar la xarxa de bitcoin. Això és degut a que resoldre el trencaclosques requereix una quantitat significativa de potència computacional, i afegir un bloc a la cadena de blocs requereix que altres miners verifiquin la solució. Això fa que sigui molt difícil que qualsevol persona o grup manipuli la cadena de blocs.\n",
+                        "text": "Quan un usuari vol enviar una transacció a la xarxa bitcoin, necessita signar la transacció amb la seva clau privada per demostrar que és el propietari dels fons que s'estan transferint. Un cop la transacció està signada, es difon a la xarxa d'iguals.\n\nLa mineria és el procés d'afegir transaccions a la cadena de blocs de bitcoin. Quan una transacció es difon a la xarxa, és recollida pels miners, que verifiquen que la transacció és vàlida (és a dir, l'usuari té els fons necessaris i la clau privada utilitzada per signar la transacció correspon a la clau pública associada als fons).\n\nUn cop una transacció ha estat verificada, s'afegeix a un bloc de transaccions, juntament amb un trencaclosques matemàtic. Els miners competeixen per resoldre el trencaclosques, i el primer que el resol afegeix el bloc a la cadena de blocs i reclama una recompensa en bitcoins. La recompensa actual és de 6,25 bitcoins, més les comissions de transacció que s'hagin inclòs al bloc.\n\nA més d'afegir transaccions a la cadena de blocs, la mineria també serveix per assegurar la xarxa bitcoin. Això és perquè resoldre el trencaclosques requereix una quantitat significativa de potència computacional, i afegir un bloc a la cadena de blocs requereix que altres miners verifiquin la solució. Això fa molt difícil que una sola persona o grup manipuli la cadena de blocs.\n",
                         "title": "La mineria."
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "S'ajusta cada 2 setmanes per mantenir estable el temps dels blocs en 10 minuts",
-                            "S'ajusta un cop l'any en funció del preu del mercat",
-                            "Els miners ho canvien aleatòriament per consens."
+                            "Es redueix a la meitat.",
+                            "Es dobla.",
+                            "Es multiplica per un nombre aleatori escollit pel programari bitcoin."
                         ],
                         "feedback": [
-                            "Així és! El programari de Bitcoin ajusta automàticament la dificultat de la mineria cada 2016 blocs -aproximadament cada dues setmanes- per aconseguir un ritme constant d'un bloc cada 10 minuts. Aquesta és una de les característiques més elegants del protocol.",
-                            "No exactament. Tot i que el preu influeix en quants miners estan actius, l'ajust de dificultat no té res a veure amb el preu. Es basa únicament en el temps, concretament, en quant de temps va trigar a minar els darrers 2016 blocs. Torna-ho a intentar!",
-                            "Bon intent, però no. Els miners no poden canviar la dificultat aleatòriament. Està integrat al protocol i passa automàticament. Això evita la manipulació i garanteix un calendari d'emissió coherent. Torna-ho a intentar!"
+                            "Correcte! Satoshi va determinar la reducció del nou subministrament de bitcoins a la meitat en el primer llançament del programari Bitcoin el 2009 i és pràcticament impossible canviar-ho.",
+                            "Ho sento, però la recompensa del bloc no es duplica cada quatre anys. Deus estar confonent Bitcoin amb el subministrament de monedes fiduciaries que s'estan expandint a un ritme més ràpid. Torna-ho a provar.",
+                            "Molt creatiu, però equivocat. El calendari de subministrament de Bitcoin és qualsevol cosa menys aleatori. La seva predictibilitat proporciona certesa als actors econòmics com res en la història de la humanitat. Torna-ho a provar!"
                         ],
-                        "question": "Com garanteix la xarxa Bitcoin que s'afegeixin nous blocs aproximadament cada 10 minuts?",
-                        "text": "Un altre component crític de la xarxa Bitcoin és l'\"Ajust de Dificultat\", un mecanisme de recalibratge automàtic que garanteix que els blocs es trobin a intervals regulars d'uns 10 minuts, independentment de quants miners hi participin.\n\nCada 2016 blocs -aproximadament cada dues setmanes-, el programari Bitcoin comprova quant de temps ha trigat a minar el lot anterior. Si els blocs s'estaven minant massa ràpid, el trencaclosques criptogràfic es fa més difícil. Si eren massa lents, el trencaclosques es fa més fàcil. Això manté l'emissió de nous bitcoins en un calendari predictible.\n\nAquest mecanisme no s'assembla a res del món físic. Per exemple, quan més miners d'or s'uneixen a la recerca d'or, l'oferta augmenta. En Bitcoin, més miners simplement augmenten la seguretat de la xarxa, no la taxa d'emissió. L'ajust de dificultat és el que manté la màquina Bitcoin funcionant a temps.",
+                        "question": "Què passa amb la recompensa de bloc a la xarxa bitcoin cada quatre anys?",
+                        "text": "Un element crucial del protocol de Bitcoin és l'Ajust de Dificultat. Aquest algorisme assegura que es trobin nous blocs cada 10 minuts de mitjana.\n\nQuan més miners s'uneixen a la xarxa, el temps mitjà necessari per trobar un nou bloc disminueix. En el cas contrari, quan els miners abandonen la xarxa, triga més temps a afegir un nou bloc. L'algorisme d'Ajust de Dificultat ajusta la dificultat del trencaclosques matemàtic per adaptar-se als canvis en la potència de càlcul combinada de tots els miners. Això evita la creació de més (o menys) unitats de bitcoin que l'establert en el calendari de subministrament predeterminat.\n\nAixò contrasta radicalment amb la mineria física de metalls preciosos com l'or, on l'afegiment de més miners d'or porta a un major subministrament d'or i, per tant, a una disminució del seu preu. No obstant això, en Bitcoin, l'addició de nous miners només afegeix més seguretat a la xarxa.\n",
                         "title": "Ajust de dificultat."
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Molt creatiu, però equivocat. El calendari de subministrament de Bitcoin és qualsevol cosa menys aleatori. La seva predictibilitat proporciona certesa als actors econòmics com res en la història de la humanitat. Torna-ho a provar!"
                         ],
                         "question": "Què passa amb la recompensa de bloc a la xarxa bitcoin cada quatre anys?",
-                        "text": "Un últim element que és important entendre és que la recompensa per bloc a la xarxa bitcoin es redueix a la meitat cada quatre anys, o cada 210.000 blocs.\n\nAquest esdeveniment, conegut com a \"halving\", està programat al programari de bitcoin que executen tots els usuaris. Quan es va llançar bitcoin per primera vegada, els miners rebien 50 bitcoins nous per cada bloc que afegien a la cadena de blocs. Actualment, la recompensa del bloc és de 3,125 bitcoins, però es reduirà a 1,5625 bitcoins el 2028 quan es produeixi el proper halving.\n\nAquests \"halvings\" continuaran tenint lloc fins a l'any 2140, moment en què el nombre total de bitcoins que s'hauran minat es limitarà a 21 milions. A partir del 2023, al voltant del 92% de tots els bitcoins (~19,3 milions) ja s'havien minat.\n\nA diferència de les monedes fiduciàries, que poden ser inflacionistes, el bitcoin és de naturalesa desinflacionista. Això el fa més escàs que les monedes fiduciàries i els metalls preciosos com l'or i la plata, o qualsevol altra cosa coneguda a l'univers.\n",
+                        "text": "Un element final que és important entendre, és que la recompensa del bloc a la xarxa de bitcoin es redueix a la meitat cada quatre anys, o cada 210.000 blocs.\n\nAquest esdeveniment, conegut com a \"halving\", està programat en el software de bitcoin que tots els usuaris executen. Quan bitcoin es va llançar per primera vegada, els miners van rebre 50 bitcoins nous per cada bloc que afegien a la cadena. Actualment, la recompensa del bloc és de 6,25 bitcoins, però es reduirà a 3,125 bitcoins el 2024 quan es produeixi el proper halving.\n\nAquests halvings continuaran tenint lloc fins a l'any 2140, moment en què el nombre total de bitcoins que s'hauran minat sereà 21 milions. Al 2023, al voltant del 92% de tots els bitcoins (\\~19,3 milions) ja s'han minat.\n\nA diferència de les monedes fiduciàries, que poden ser inflacionàries, el bitcoin és desinflacionari per naturalesa. Això el fa més escàs que les monedes fiduciàries i els metalls preciosos com l'or i la plata, o qualsevol altra cosa coneguda a l'univers.\n",
                         "title": "El \"halving\" - La reducció a la mitat."
                     }
                 }
@@ -2009,7 +2009,6 @@
         "logInCreateAccount": "Iniciar sessió / crear un compte",
         "createAccount": "Crea un nou compte",
         "exploreWallet": "Explora el moneder",
-        "login": "Iniciar sessió",
         "logBackInWith": "Torna a iniciar sessió amb",
         "headline": "Moneder desenvolupat per Galoy",
         "startTrialAccount": "Comença amb un compte de prova",
@@ -2019,13 +2018,9 @@
         "trialAccountCreationFailedMessage": "Malauradament, no hem pogut crear el teu compte de prova. Torna-ho a provar més tard o crea un compte amb un número de telèfon.",
         "trialAccountHasLimits": "El compte de prova té limits",
         "trialAccountLimits": {
-            "modalTitle": "Actualitza per a més avantatges",
             "noBackup": "No hi ha opció de còpia de seguretat",
             "sendingLimit": "Límit diari d'enviament reduït",
-            "noOnchain": "No rebre bitcoin \"onchain\"",
-            "recoveryOption": "Recuperar fons per SMS o correu electrònic",
-            "dailyLimit": "Límit de transacció diari de 1000 $",
-            "onchainReceive": "Rep bitcoin onchain"
+            "noOnchain": "No rebre bitcoin \"onchain\""
         }
     },
     "MapScreen": {
@@ -2047,7 +2042,7 @@
         "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
     },
     "PinScreen": {
-        "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining} intents.",
+        "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
         "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
         "setPin": "Configura el teu codi PIN",
         "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
@@ -2109,7 +2104,7 @@
         "invoiceExpired": "Factura caducada",
         "invoiceValidity": {
             "validFor1Day": "Vàlid per 1 dia",
-            "validForNext": "Vàlid per al proper {duration:string}",
+            "validForNext": "Vàlid per al proper {duration: string}",
             "validBefore": "Vàlid abans de {time: string}",
             "expiresIn": "Caduca en {duration: string}",
             "expiresNow": "Caduca ara"
@@ -2128,14 +2123,14 @@
         "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
         "redeemingError": "No s'ha pogut bescanviar Bitcoin. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
         "submissionError": "No s'ha pogut enviar la petició de retirada. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
-        "minMaxRange": "Min: {minimumAmount}, Max: {maximumAmount}",
+        "minMaxRange": "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
         "redeemBitcoin": "Bescanviar Bitcoin",
-        "amountToRedeemFrom": "Import a bescanviar de {domain}",
-        "redeemAmountFrom": "Bescanviar {amountToRedeem} de {domain}"
+        "amountToRedeemFrom": "Import a bescanviar de {domain: string}",
+        "redeemAmountFrom": "Bescanviar {amountToRedeem: string} de {domain: string}"
     },
     "ScanningQRCodeScreen": {
-        "invalidContent": "Hem trobat:\n\n{found}\n\nAquesta no és una adreça Bitcoin vàlida o una factura Lightning",
-        "expiredContent": "Hem trobat:\n\n{found}\n\nAquesta factura ha caducat",
+        "invalidContent": "Hem trobat:\n\n{found: string}\n\nAquesta no és una adreça Bitcoin vàlida o una factura Lightning",
+        "expiredContent": "Hem trobat:\n\n{found: string}\n\nAquesta factura ha caducat",
         "invalidTitle": "Codi QR no vàlid",
         "openLinkTitle": "Obrir l'enllaç",
         "confirmOpenLink": "Estàs segur que vols obrir aquest enllaç?",
@@ -2145,7 +2140,7 @@
         "noCamera": "No s'ha trobat cap càmera",
         "openSettings": "Obra la configuració",
         "unableToOpenSettings": "No és possible obrir la configuració",
-        "invalidContentLnurl": "Hem trobat:\n\n{found}\n\nactualment no és compatible",
+        "invalidContentLnurl": "Hem trobat:\n\n{found: string}\n\nactualment no és compatible",
         "imageLibraryPermissionsNotGranted": "No tenim permí per accedir a la biblioteca d'imatges. Comprova la configuració de l'aplicació."
     },
     "SecurityScreen": {
@@ -2167,10 +2162,10 @@
         "feeLabel": "Comissió",
         "memoLabel": "Nota:",
         "paymentFinal": "Els pagaments són definitius.",
-        "stalePrice": "El preu de bitcoin és antic i es va actualitzar per última vegada fa {timePeriod}. Si us plau, reinicia l'aplicació abans de fer un pagament.",
+        "stalePrice": "El preu de bitcoin és antic i es va actualitzar per última vegada fa {timePeriod: string}. Si us plau, reinicia l'aplicació abans de fer un pagament.",
         "title": "Confirma el pagament",
         "totalLabel": "Total:",
-        "totalExceed": "El total supera el teu saldo de {balance:}",
+        "totalExceed": "El total supera el teu saldo de {balance: string}",
         "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
         "feeError": "No s'ha pogut calcular la comissió",
         "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
@@ -2182,29 +2177,29 @@
         "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning."
     },
     "SendBitcoinDestinationScreen": {
-        "usernameNowAddress": "{bankName} nom d'usuari és ara la adreça {bankName}.",
-        "usernameNowAddressInfo": "Quan introdueixes un nom d'usuari {bankName} , afegirem \"@{lnDomain}\" al nom  (e.g maria@{lnDomain}) per convertir-lo en adreça. El teu nom d'usuari {bankName} és tambe una adreça.\n\nVes a la teva pàgina {bankName} des de configuració per apendre a utilitzar-la o per compartir-la per rebre pagaments.",
+        "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",
+        "usernameNowAddressInfo": "Quan introdueixes un nom d'usuari {bankName: string} , afegirem \"@{lnDomain: string}\" al nom  (e.g maria@{lnDomain: string}) per convertir-lo en adreça. El teu nom d'usuari {bankName: string} és tambe una adreça.\n\nVes a la teva pàgina {bankName: string} des de configuració per apendre a utilitzar-la o per compartir-la per rebre pagaments.",
         "enterValidDestination": "Si us plau introdueix una destinació vàlida",
-        "destinationOptions": "Pots enviar a {bankName} adreça, adreça LN, factura LN, o a adreça BTC.",
+        "destinationOptions": "Pots enviar a {bankName: string} adreça, adreça LN, factura LN, o a adreça BTC.",
         "expiredInvoice": "Aquesta factura ha caducat. Si us plau genera una nova factura.",
         "wrongNetwork": "Aquesta factura és per a una altra xarxa. Si us plau genera una nova factura.",
         "invalidAmount": "Això conté un import invàlid. Si us plau torna-ho a generar amb un import vàlid.",
-        "usernameDoesNotExist": "{lnAddress} no sembla ser una {bankName} adreça existent.",
+        "usernameDoesNotExist": "{lnAddress: string} no sembla ser una {bankName: string} adreça existent.",
         "usernameDoesNotExistAdvice": "Assegurat que l'ortografia sigui correcta o demana al destinatari una factura LN o una adreça BTC.",
-        "selfPaymentError": "{lnAddress} és la teva adreça {bankName} .",
+        "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
         "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
         "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
         "lnAddressAdvice": "Revisa que l'ortografia sigui correcta o demana al destinatari una factura o una adreça BTC.",
         "unknownLightning": "No podem analitzar aquesta adreça Lightning. Si us plau torna-ho.a provar",
         "unknownOnchain": "No podem analitzar aquesta adreça Bitcoin. Si us plau torna-ho a provar.",
-        "newBankAddressUsername": "{lnAddress: string} existeix com a adreça {bankName}, però mai hi has enviat diners.",
+        "newBankAddressUsername": "{lnAddress: string} existeix com a adreça {bankName: string}, però mai hi has enviat diners.",
         "confirmUsernameModal": {
             "title": "Mai has enviat diners a aquesta adreça",
-            "body1": "Si us plau, assegura't que el destinatari t'ha donat una adreça {bankName},",
+            "body1": "Si us plau, assegura't que el destinatari t'ha donat una adreça {bankName: string},",
             "bold2bold": "no un nom d'usuari d'un altre moneder.",
-            "body3": "En cas contrari, els diners aniran al compte  {bankName} que té l'adreça “{lnAddress}”.\n\nRevisa l'ortografia de la primera part de l'adreça. per exemple. jackie i jack1e són 2 adreces diferents",
-            "warning": "Si l'adreça {bankName} s'introdueix incorrectament, {bankName} no es podrà anular la transacció.",
-            "checkBox": "{lnAddress} és l'adreça correcta.",
+            "body3": "En cas contrari, els diners aniran al compte  {bankName: string} que té l'adreça “{lnAddress: string}”.\n\nRevisa l'ortografia de la primera part de l'adreça. per exemple. jackie i jack1e són 2 adreces diferents",
+            "warning": "Si l'adreça {bankName: string} s'introdueix incorrectament, {bankName: string} no es podrà anular la transacció.",
+            "checkBox": "{lnAddress: string} és l'adreça correcta.",
             "confirmButton": "Estic 100% segur"
         },
         "clipboardError": "S'ha produït un error en obtenir un valor del porta-retalls",
@@ -2213,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
         "amount": "Import",
-        "amountExceed": "L'import excedeix el teu saldo {balance}",
+        "amountExceed": "L'import excedeix el teu saldo {balance: string}",
         "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
         "amountIsRequired": "L'import és necessari",
@@ -2270,7 +2265,7 @@
         "lnurlNoUsername": "Per generar una adreça lnurl primer has d'establir un nom d'usuari. Vols configurar un nom d'usuari ara?",
         "copyClipboardLnurl": "L'adreça Lnurl s'ha copiat al porta-retalls",
         "defaultWallet": "Compte predeterminat",
-        "rateUs": "Valora'ns a {storeName}",
+        "rateUs": "Valora'ns a {storeName: string}",
         "theme": "Tema",
         "nfc": "Rep per NFC",
         "nfcError": "Error llegint la etiqueta NFC. Si us plau torna-ho a provar.",
@@ -2278,11 +2273,7 @@
         "nfcOnlyReceive": "De moment, només està disponible rebre per NFC",
         "nfcScanNow": "Escaneja NFC ara",
         "nfcNotSupported": "NFC no és compatible amb aquest dispositiu",
-        "logInOrCreateAccount": "Iniciar sessió o crear un compte",
-        "logOutFromOneAccount": "Tanca la sessió d'aquest compte",
-        "logoutOneAccountAlertTitle": "Estas segur que vols tancar la sessió d'aquest compte?",
-        "logoutOneAccountAlertContent": "Es tancarà la sessió enllaçada a {identifier: string}.\nAssegura't que tens accés per tornar a iniciar la sessió en el futur.",
-        "logoutOneAccountConfirm": "Ho entenc. Si us plau, tanca la sessió."
+        "logInOrCreateAccount": "Iniciar sessió o crear un compte"
     },
     "NotificationSettingsScreen": {
         "title": "Configuració de notificacions",
@@ -2316,8 +2307,6 @@
         "tapToAddPhoneNumber": "Prem per afegir el número de telèfon",
         "loginMethods": "Mètodes d'inici de sessió",
         "level": "Nivell {level: string}",
-        "switchAccount": "Canvia de compte",
-        "pleaseWait": "Si us plau, espereu.",
         "accountLevel": "Nivell de compte",
         "upgrade": "Millora el teu compte",
         "logOutAndDeleteLocalData": "Tancar la sessió i borrar totes les dades locals",
@@ -2358,13 +2347,6 @@
         "yourAccountId": "La ID del teu compte",
         "accountId": "ID del compte",
         "copy": "Copiar"
-    },
-    "ProfileScreen": {
-        "addAccount": "Afegir un compte",
-        "error": "No es poden obtenir els perfils en aquest moment",
-        "fromThisDevice": "des d'aquest dispositiu?",
-        "switchAccount": "Has canviat a un altre compte",
-        "removedAccount": "Has eliminat el compte {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autentificació de dos factors",
@@ -2427,7 +2409,7 @@
         "unlimited": "Il·limitat",
         "remaining": "Restant",
         "stablesatTransfers": "Transferències de Stablesats",
-        "internalSend": "Enviar a usuari {bankName} ",
+        "internalSend": "Enviar a usuari {bankName: string} ",
         "error": "No es poden obtenir els límits en aquest moment",
         "increaseLimits": "Incrementa els teus límits"
     },
@@ -2448,14 +2430,10 @@
         "receiveOnchain": "Rep bitcoin onchain",
         "onlyAPhoneNumber": "Verificació ràpida i senzilla del número de telèfon",
         "letsGo": "Anem!",
-        "stayInTrialMode": "Mantenir-se en mode de prova",
-        "upgradeToLevel": "Millora de nivell {level: number}",
-        "notNow": "Ara no",
-        "setUpLevelAccount": "Configura un compte de nivell {level: number}"
+        "stayInTrialMode": "Mantenir-se en mode de prova"
     },
     "SetAddressModal": {
         "title": "Estableix la teva adreça {bankName: string} ",
-        "mainTitle": "Tria l'adreça Lightning",
         "setLightningAddress": "Configura la adreça Lightning",
         "Errors": {
             "tooShort": "L'adreça ha de tenir almenys 3 caràcters",
@@ -2465,7 +2443,7 @@
             "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard"
         },
         "receiveMoney": "Rep diners d'altres moneders lightning i usuaris de {bankName: string} amb aquesta adreça.",
-        "itCannotBeChanged": "Tria bé, no es pot canviar més tard!"
+        "itCannotBeChanged": "No es pot canviar més endavant."
     },
     "WelcomeFirstScreen": {
         "bank": "Bitcoin està dissenyat per permetre guardar, enviar i rebre diners, sense dependre d'un banc o targeta de crèdit.",
@@ -2486,50 +2464,7 @@
         "placeholder": "Número de telèfon",
         "verify": "Clica per verificar",
         "sms": "Envia per SMS",
-        "whatsapp": "Envia per WhatsApp",
-        "telegram": "Enviar per Telegram"
-    },
-    "LoginMethodScreen": {
-        "title": "Selecciona el mètode d'inici de sessió preferit.",
-        "useTelegram": "Utilitza Telegram",
-        "useSms": "Utilitza SMS",
-        "useWhatsapp": "Utilitza WhatsApp",
-        "useEmail": "Utilitza el correu electrònic",
-        "setupTelegram": "Configura l'inici de sessió amb Telegram",
-        "setupSms": "Configura l'inici de sessió per SMS",
-        "setupWhatsapp": "Configura l'inici de sessió amb WhatsApp",
-        "setupEmail": "Configura l'inici de sessió per correu electrònic"
-    },
-    "OnboardingScreen": {
-        "welcomeLevel1": {
-            "mainTitle": "Benvingut al Nivell 1",
-            "title": "Noves funcions desbloquejades per al teu compte:",
-            "receiveBitcoinDescription": "Rep Bitcoin amb el teu número de telèfon",
-            "dailyLimitDescription": "Envia fins a 1.000 dòlars al dia",
-            "onchainDescription": "Rebre pagaments en cadena"
-        },
-        "emailBenefits": {
-            "mainTitle": "Afegeix un inici de sessió per correu electrònic",
-            "title": "L'inici de sessió per correu electrònic et permet:",
-            "backupDescription": "Tinguis una còpia de seguretat per accedir al teu compte",
-            "supportDescription": "Facilita'ns que et puguem donar suport",
-            "securityDescription": "Augmenta la seguretat del compte",
-            "primaryButton": "Configura l'inici de sessió amb correu electrònic"
-        },
-        "lightningBenefits": {
-            "mainTitle": "Configura una adreça Lightning personalitzada",
-            "title": "Beneficis de l'adreça Lightning:",
-            "staticAddressDescription": "Una adreça fixa per rebre pagaments",
-            "easyToShareDescription": "Fàcil de memoritzar i compartir públicament o en privat",
-            "blinkToolsDescription": "Desbloqueja diverses eines de Blink útils per al comerç",
-            "primaryButton": "Configura una adreça personalitzada"
-        },
-        "supportScreen": {
-            "mainTitle": "Ens encanten els comentaris",
-            "title": "Tot a punt!",
-            "description": "Qualsevol comentari és benvingut, no dubtis a enviar-nos un correu electrònic a {email}",
-            "primaryButton": "Fet"
-        }
+        "whatsapp": "Envia per WhatsApp"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Error en iniciar la sessió. Has utilitzat el codi correcte?",
@@ -2542,16 +2477,6 @@
         "sendAgain": "Reenvia",
         "tryAgain": "Torna-ho a intentar",
         "sendViaOtherChannel": "Has seleccionat rebre el codi mitjançant {canal: cadena}. Pots provar de rebre mitjançant {other: string}"
-    },
-    "TelegramValidationScreen": {
-        "text": "Passaport de Telegram",
-        "description": "Després d'autoritzar-ho a Telegram, iniciaràs la sessió automàticament.",
-        "loginWithTelegram": "Inicia la sessió amb Telegram",
-        "waitingForAuthorization": "Esperant l' autorització de Telegram...",
-        "errorFetchParams": "No s'han pogut obtenir els paràmetres d'identificació de Telegram.",
-        "errorFetchLogin": "No s'ha pogut obtenir l'inici de sessió de Telegram",
-        "errorAuthTimeout": "S'ha esgotat el temps d'autorització. Torna-ho a intentar.",
-        "errorOpenAppError": "No s'ha pogut obrir Telegram. Assegura't que l'aplicació estigui instal·lada."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Configuració del telèfon",
@@ -2599,8 +2524,6 @@
         "advanced": "Avançat",
         "community": "Comunitat",
         "account": "Compte",
-        "accounts": "Comptes",
-        "accountInformation": "Informació del compte",
         "trialAccount": "Compte de prova",
         "blinkUser": "Usuari Blink",
         "transactionLimits": "Límits de transacció",
@@ -2610,8 +2533,8 @@
         "backHome": "Retorn a l'inici",
         "bank": "Banc",
         "bankAccount": "Compte fiat",
-        "bankAdvice": "{bankName} Consell",
-        "bankInfo": "{bankName} Informació",
+        "bankAdvice": "{bankName: string} Consell",
+        "bankInfo": "{bankName: string} Informació",
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Preu de Bitcoin",
@@ -2694,18 +2617,7 @@
         "thisMonth": "Aquest mes",
         "prevMonths": "Mesos anteriors",
         "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
-        "warning": "Advertència",
-        "recommended": "Recomanat",
-        "expirationTime": "Temps de caducitat",
-        "minute": "Minut",
-        "day": {
-            "one": "Dia",
-            "other": "Dies"
-        },
-        "dollar": "Dòlar",
-        "all": "Tot",
-        "allAccounts": "Tots els comptes",
-        "profiles": "Perfils"
+        "warning": "Advertència"
     },
     "errors": {
         "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",
@@ -2726,7 +2638,7 @@
     },
     "notifications": {
         "payment": {
-            "body": "Acabes de rebre {value} sats",
+            "body": "Acabes de rebre {value: string} sats",
             "title": "Pagament rebut"
         }
     },
@@ -2735,7 +2647,6 @@
         "joinTheCommunity": "Uneix-te a la comunitat",
         "whatsapp": "WhatsApp",
         "email": "Correu electrònic",
-        "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Gaudint de l'aplicació?",
         "statusPage": "Pàgina d'estat",
@@ -2744,8 +2655,8 @@
         "mattermost": "Mattermost",
         "thankYouText": "Gràcies pels comentaris, vols suggerir una millora?",
         "defaultEmailSubject": "{bankName: string} - Suport",
-        "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName}, utilitzo la versió {version} de {os}.",
-        "emailCopied": "l'adreça electrònica {email} s'ha copiat al porta-retalls",
+        "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
+        "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
         "deleteAccount": "Elimina el compte",
         "delete": "esborrar",
         "typeDelete": "Escriu \"{delete: string}\" per confirmar la supressió del compte",
@@ -2755,8 +2666,7 @@
         "deleteAccountConfirmation": "El seu compte ha estat marcat per a la supressió.\n\nQuan finalitzi el període de prova relacionat amb els requisits normatius, les dades restants relacionades amb el seu compte seran eliminades de manera permanent.",
         "deleteAccountFromPhone": "Hola!, si us plau, esborra el meu compte. El meu número de telèfon és {phoneNumber: string}.",
         "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
-        "bye": "Adéu!",
-        "deleteAccountWarning": "Atenció: L'eliminació del compte és permanent!\nAssegura't que els moneders no tinguin fons abans d'eliminar-los.\nEl compte eliminat no es pot restablir."
+        "bye": "Adéu!"
     },
     "lnurl": {
         "overLimit": "No pots enviar més que l'import màxim",
@@ -2770,14 +2680,14 @@
     "AmountInputScreen": {
         "enterAmount": "Introdüeix l'import",
         "setAmount": "Estableix l'import",
-        "maxAmountExceeded": "l'import no ha de superar {maxAmount}.",
-        "minAmountNotMet": "l'import ha de ser com a mínimt {minAmount}."
+        "maxAmountExceeded": "l'import no ha de superar {maxAmount: string}.",
+        "minAmountNotMet": "l'import ha de ser com a mínimt {minAmount: string}."
     },
     "AmountInputButton": {
         "tapToSetAmount": "Estableix l'import"
     },
     "AppUpdate": {
-        "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os} versió {version}.",
+        "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",
         "versionNotSupported": "Aquesta versió per a mòbils ja no s'admet",
         "updateMandatory": "L'actualització és obligatòria",
         "tapHereUpdate": "Prem aquí per actualitzar ara",
@@ -2842,7 +2752,7 @@
         "firstName": "Nom",
         "lastName": "Cognom",
         "confirmNameContent": "L'ortografia del teu nom és correcta?\n\n{firstName: string} {lastName: string}\n\nHa de coincidir amb el nom del teu document d'identitat.",
-        "requirements": "Actualitzar el compte augmentarà els límits i et proporcionarà funcionalitats addicionals, com ara transferències a comptes bancaris en determinats països.",
+        "requirements": "L'actualització del teu compte augmentarà els teus límits i t'oferirà funcionalitats addicionals, com ara la transferència a comptes bancaris dels països seleccionats.",
         "success": "Els documents s'han rebut correctament i es processaran en breu. pots tornar a aquesta pàgina per tenir una actualització de l'estat de la teva incorporació",
         "error": "S'ha produït un error amb l'enviament dels teus documents. Pots contactar amb el servei d'assistència si el problema persisteix.",
         "status": "El teu estat és:",
