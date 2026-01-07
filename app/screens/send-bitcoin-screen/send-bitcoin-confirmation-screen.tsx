@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
+import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
   useSendBitcoinConfirmationScreenQuery,
   WalletCurrency,
@@ -241,7 +242,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? "****" : btcPrimaryText,
+        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText,
       })
     }
   }
@@ -257,7 +258,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? "****" : usdPrimaryText,
+        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText,
       })
     }
   }
@@ -357,19 +358,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               <View style={styles.walletSelectorTypeTextContainer}>
                 {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                   <Text style={styles.walletCurrencyText}>
-                    {hideAmount ? "****" : btcPrimaryText}
+                    {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
                   </Text>
                 ) : (
                   <Text style={styles.walletCurrencyText}>
-                    {hideAmount ? "****" : usdPrimaryText}
+                    {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
                   </Text>
                 )}
               </View>
               <View style={styles.walletSelectorBalanceContainer}>
                 {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text>{hideAmount ? "****" : btcSecondaryText}</Text>
+                  <Text>{hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcSecondaryText}</Text>
                 ) : (
-                  <Text>{hideAmount ? "****" : usdSecondaryText}</Text>
+                  <Text>{hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdSecondaryText}</Text>
                 )}
               </View>
               <View />
