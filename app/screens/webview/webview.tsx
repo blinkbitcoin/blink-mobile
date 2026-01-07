@@ -133,6 +133,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
           // },
         })}
         style={styles.full}
+        allowsInlineMediaPlayback
       />
     </Screen>
   )
