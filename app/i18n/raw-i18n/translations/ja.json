@@ -2296,8 +2296,8 @@
         "toastMessage": "シークレットコードがクリップボードにコピーするされました！"
     },
     "DefaultWalletScreen": {
-        "title": "メインウォレット",
-        "info": "受金および送金用のメインウォレットとして設定するウォレットを選択します。 モバイル アプリでそれぞれのウォレットを設定できます。 レジまたは ライトニング・アドレスを通じて受け取った支払いは、常にメインウォレットに送られます。\n\nビットコインのボラティリティを回避するには、ステーブル satsを選択してください。 これにより、安定した価値を維持しながら、送受金が可能になります。\n\nこの設定はいつでも変更でき、現在の残高には影響しません。"
+        "title": "通貨を受け取る",
+        "info": "Blink の Stablesats アカウントを使用すると、ウォレット内の資金を法定通貨（ドル）ベースで安定させることができます。サッツを積み上げており、法定通貨残高が常に変動しても問題ない場合は、Bitcoin アカウントを使用してください。"
     },
     "ThemeScreen": {
         "title": "テーマ",
@@ -2666,7 +2666,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",

@@ -107,13 +107,13 @@ export const TotpRegistrationInitiateScreen = () => {
         <>
           <View style={styles.centeredContent}>
             <QrCodeComponent otpauth={otpauth} />
-            <Text style={styles.textStyle} type="h2">
-              {LL.TotpRegistrationInitiateScreen.content()}
-            </Text>
           </View>
+          <CopySecretComponent secret={secret} />
+          <Text style={styles.textStyle} type="p2">
+            {LL.TotpRegistrationInitiateScreen.content()}
+          </Text>
 
-          <View style={styles.bottomContent}>
-            <CopySecretComponent secret={secret} />
+          <View style={styles.buttonsContainer}>
             <GaloyPrimaryButton
               containerStyle={styles.buttonContainer}
               title={LL.common.next()}
@@ -136,20 +136,23 @@ const useStyles = makeStyles(() => ({
   },
   centeredContent: {
     padding: 20,
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   textStyle: {
     textAlign: "center",
     marginTop: 20,
+    marginHorizontal: 20,
   },
   buttonContainer: {
     marginTop: 20,
   },
-  bottomContent: {
+  buttonsContainer: {
+    flex: 1,
     justifyContent: "flex-end",
-    padding: 20,
-    marginBottom: 20,
+    marginBottom: 14,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    zIndex: 2,
   },
 }))

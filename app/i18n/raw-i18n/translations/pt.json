@@ -2366,8 +2366,8 @@
         "toastMessage": "Texto copiado para a área de transferência!"
     },
     "DefaultWalletScreen": {
-        "title": "Conta Padrão",
-        "info": "Escolha qual conta definir como padrão para recebimento e envio. Você pode ajustar a conta de envio e recebimento para pagamentos individuais no aplicativo. Os pagamentos recebidos por meio da caixa registradora ou de seu endereço Lightning sempre irão para a conta padrão.\n\nPara evitar a volatilidade do Bitcoin, escolha Stablesats. Isso permite que você mantenha uma quantia estável de dinheiro enquanto ainda pode enviar e receber pagamentos.\n\nVocê pode alterar essa configuração a qualquer momento e isso não afetará seu saldo atual.\n "
+        "title": "Receber moeda",
+        "info": "Use sua conta Stablesats no Blink para manter o dinheiro da sua carteira estável em termos de moeda fiduciária (dólar). Use sua conta Bitcoin se você estiver acumulando sats e não se importar que seu saldo em fiat mude o tempo todo."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2752,7 +2752,7 @@
         "firstName": "Primeiro Nome",
         "lastName": "Último nome",
         "confirmNameContent": "O nome está escrito corretamente?\n\n{firstName: string} {lastName: string}\n\nDeve corresponder ao nome no seu documento de identificação.",
-        "requirements": "Atualizar sua conta aumentará seus limites e fornecerá funcionalidades adicionais, como transferência para contas bancárias em países selecionados.\n\nVocê precisará fornecer seu nome, um documento de identidade emitido pelo governo e uma selfie. Começaremos com seu nome.",
+        "requirements": "Atualizar sua conta aumentará seus limites e fornecerá funcionalidades adicionais, como transferência para contas bancárias em países selecionados.",
         "success": "Os documentos foram recebidos com sucesso e serão processados em breve. Você pode voltar a esta página para obter uma atualização sobre o status do seu processo de integração.",
         "error": "Houve um erro com o envio dos seus documentos. Você pode entrar em contato com o suporte se o problema persistir.",
         "status": "Seu status de integração é:",

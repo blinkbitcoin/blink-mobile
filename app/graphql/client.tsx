@@ -327,6 +327,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
               value={{
                 networkError,
                 clearNetworkError,
+                token: appConfig.token,
               }}
             >
               <MessagingContainer />

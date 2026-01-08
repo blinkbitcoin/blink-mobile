@@ -13,6 +13,7 @@ const filepath = "app/graphql/generated.ts"
 
 const result = gqlPluckFromCodeStringSync(filepath, fs.readFileSync(filepath, "utf8"))
 const asStr = result
+  .filter((item) => !item.body.includes("@client"))
   .map((item) => item.body + "\n\n")
   .sort()
   .join("")

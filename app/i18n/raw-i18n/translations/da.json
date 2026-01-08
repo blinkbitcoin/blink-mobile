@@ -2319,8 +2319,8 @@
         "toastMessage": "Hemmelig nøgle kopieret til udklipsholderen!"
     },
     "DefaultWalletScreen": {
-        "title": "Standardkonto",
-        "info": "Vælg hvilken konto der skal indstilles som standard til modtagelse og afsendelse. Du kan justere sende- og modtagekontoen for individuelle betalinger i mobilappen. Betalinger, der modtages gennem kasseapparatet eller din Lightning-adresse, vil altid gå til standardkontoen.\n\nFor at undgå Bitcoins volatilitet, vælg Stablesats. Dette giver dig mulighed for at opretholde en stabil mængde penge, samtidig med at du stadig kan sende og modtage betalinger.\n\nDu kan ændre denne indstilling når som helst, og det vil ikke påvirke din nuværende saldo."
+        "title": "Modtag valuta",
+        "info": "Brug din Stablesats-konto i Blink til at holde pengene i din wallet stabile i fiat-termer (dollar). Brug din Bitcoin-konto, hvis du samler sats og er okay med, at din fiat-saldo ændrer sig hele tiden."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2696,7 +2696,7 @@
         "firstName": "Fornavn",
         "lastName": "Efternavn",
         "confirmNameContent": "Er dit navn stavet korrekt?\n\n{firstName: string} {lastName: string}\n\nDet skal matche navnet på dit ID.",
-        "requirements": "Opgradering af din konto vil øge dine grænser og give dig yderligere funktionalitet såsom overførsel til bankkonti i udvalgte lande.\n\nDu skal angive dit navn, et ID udstedt af regeringen og et selfie. Vi starter med dit navn.",
+        "requirements": "Opgradering af din konto vil øge dine grænser og give dig yderligere funktionalitet såsom overførsel til bankkonti i udvalgte lande.",
         "success": "Dokumenter er modtaget og vil blive behandlet snarest. Du kan vende tilbage til denne side for at få en opdatering om status for din onboarding",
         "error": "Der har været en fejl med indsendelsen af dine dokumenter. Du kan kontakte supporten, hvis problemet fortsætter.",
         "status": "Din onboarding-status er: ",

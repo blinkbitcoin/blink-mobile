@@ -7,11 +7,13 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { gql } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
+import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
   Network,
   useOnChainTxFeeLazyQuery,
@@ -127,7 +129,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     skip: !useIsAuthed(),
   })
 
-  const { formatDisplayAndWalletAmount } = useDisplayCurrency()
+  const { formatMoneyAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
@@ -233,14 +235,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const usdBalanceMoneyAmount = toUsdMoneyAmount(usdWallet?.balance)
 
-  const btcWalletText = formatDisplayAndWalletAmount({
-    displayAmount: convertMoneyAmount(btcBalanceMoneyAmount, DisplayCurrency),
-    walletAmount: btcBalanceMoneyAmount,
+  const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
+  const btcSecondaryText = formatMoneyAmount({
+    moneyAmount: convertMoneyAmount(btcBalanceMoneyAmount, DisplayCurrency),
+    isApproximate: true,
   })
 
-  const usdWalletText = formatDisplayAndWalletAmount({
-    displayAmount: convertMoneyAmount(usdBalanceMoneyAmount, DisplayCurrency),
-    walletAmount: usdBalanceMoneyAmount,
+  const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
+  const usdSecondaryText = formatMoneyAmount({
+    moneyAmount: convertMoneyAmount(usdBalanceMoneyAmount, WalletCurrency.Btc),
+    isApproximate: true,
   })
 
   const amountStatus = isValidAmount({
@@ -311,37 +315,38 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             >
               <View style={styles.walletContainer}>
                 <View style={styles.walletSelectorTypeContainer}>
-                  <View
-                    style={
-                      wallet.walletCurrency === WalletCurrency.Btc
-                        ? styles.walletSelectorTypeLabelBitcoin
-                        : styles.walletSelectorTypeLabelUsd
+                  <CurrencyPill
+                    currency={wallet.walletCurrency}
+                    textSize="p3"
+                    containerSize="medium"
+                    label={
+                      wallet.walletCurrency === WalletCurrency.Usd
+                        ? LL.common.dollar()
+                        : LL.common.bitcoin()
                     }
-                  >
-                    {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text style={styles.walletSelectorTypeLabelBtcText}>BTC</Text>
-                    ) : (
-                      <Text style={styles.walletSelectorTypeLabelUsdText}>USD</Text>
-                    )}
-                  </View>
+                  />
                 </View>
                 <View style={styles.walletSelectorInfoContainer}>
                   <View style={styles.walletSelectorTypeTextContainer}>
                     {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text
-                        style={styles.walletCurrencyText}
-                      >{`${LL.common.btcAccount()}`}</Text>
+                      <Text style={styles.walletCurrencyText}>
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
+                      </Text>
                     ) : (
-                      <Text
-                        style={styles.walletCurrencyText}
-                      >{`${LL.common.usdAccount()}`}</Text>
+                      <Text style={styles.walletCurrencyText}>
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
+                      </Text>
                     )}
                   </View>
                   <View style={styles.walletSelectorBalanceContainer}>
                     {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text>{btcWalletText}</Text>
+                      <Text>
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcSecondaryText}
+                      </Text>
                     ) : (
-                      <Text>{usdWalletText}</Text>
+                      <Text>
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdSecondaryText}
+                      </Text>
                     )}
                   </View>
                   <View />
@@ -500,32 +505,29 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           >
             <View style={styles.fieldBackground}>
               <View style={styles.walletSelectorTypeContainer}>
-                <View
-                  style={
-                    sendingWalletDescriptor.currency === WalletCurrency.Btc
-                      ? styles.walletSelectorTypeLabelBitcoin
-                      : styles.walletSelectorTypeLabelUsd
+                <CurrencyPill
+                  currency={sendingWalletDescriptor.currency}
+                  textSize="p3"
+                  containerSize="medium"
+                  label={
+                    sendingWalletDescriptor.currency === WalletCurrency.Usd
+                      ? LL.common.dollar()
+                      : LL.common.bitcoin()
                   }
-                >
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text style={styles.walletSelectorTypeLabelBtcText}>BTC</Text>
-                  ) : (
-                    <Text style={styles.walletSelectorTypeLabelUsdText}>USD</Text>
-                  )}
-                </View>
+                />
               </View>
               <View style={styles.walletSelectorInfoContainer}>
                 <View style={styles.walletSelectorTypeTextContainer}>
                   {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                     <>
                       <Text style={styles.walletCurrencyText}>
-                        {LL.common.btcAccount()}
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
                       </Text>
                     </>
                   ) : (
                     <>
                       <Text style={styles.walletCurrencyText}>
-                        {LL.common.usdAccount()}
+                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
                       </Text>
                     </>
                   )}
@@ -535,16 +537,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                     {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
                   >
                     {hideAmount
-                      ? "****"
+                      ? HIDDEN_AMOUNT_PLACEHOLDER
                       : sendingWalletDescriptor.currency === WalletCurrency.Btc
-                        ? btcWalletText
-                        : usdWalletText}
+                        ? btcSecondaryText
+                        : usdSecondaryText}
                   </Text>
                 </View>
               </View>
 
               <View style={styles.pickWalletIcon}>
-                <Icon name={"chevron-down"} size={24} color={colors.black} />
+                <Icon name={"chevron-down"} size={24} color={colors.primary} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -650,32 +652,7 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorTypeContainer: {
     justifyContent: "center",
     alignItems: "flex-start",
-    width: 50,
-    marginRight: 20,
-  },
-  walletSelectorTypeLabelBitcoin: {
-    height: 30,
-    width: 50,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsd: {
-    height: 30,
-    width: 50,
-    backgroundColor: colors._green,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsdText: {
-    fontWeight: "bold",
-    color: colors.black,
-  },
-  walletSelectorTypeLabelBtcText: {
-    fontWeight: "bold",
-    color: colors.white,
+    marginRight: 28,
   },
   walletSelectorInfoContainer: {
     flex: 1,
@@ -716,7 +693,8 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: "90%",
   },
   pickWalletIcon: {
-    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
   screenStyle: {
     padding: 20,

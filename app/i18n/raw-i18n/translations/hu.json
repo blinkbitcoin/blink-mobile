@@ -2366,8 +2366,8 @@
         "toastMessage": "Titok másolva a vágólapra!"
     },
     "DefaultWalletScreen": {
-        "title": "Alapértelmezett számla",
-        "info": "Válaszd ki, hogy fogadás és küldés esetén melyik számla legyen az alapértelmezett. Az egyes fizetéseknél a mobilalkalmazásban módosíthatod a küldő és fogadó számlát. A Pénztáron vagy a Lightning címen keresztül érkező fizetések mindig az alapértelmezett számlára kerülnek.\n\nA Bitcoin volatilitásának elkerülése érdekében válaszd a Stablesats-ot. Ez lehetővé teszi számodra, hogy stabil USD értéket tarts fenn, miközben továbbra is tudsz fizetéseket fogadni és küldeni.\n\nBármikor megváltoztathatod ezt a beállítást, és ez nem befolyásolja jelenlegi egyenleged."
+        "title": "Deviza fogadása",
+        "info": "Használd a Stablesats fiókodat a Blinkben, hogy a pénzed fiat (dollár) értékben stabil maradjon a tárcádban. Használd a Bitcoin fiókodat, ha satsokat gyűjtesz, és nem gond, hogy a fiat egyenleged folyamatosan változik."
     },
     "ThemeScreen": {
         "title": "Téma",
@@ -2752,7 +2752,7 @@
         "firstName": "Keresztnév",
         "lastName": "Vezetéknév",
         "confirmNameContent": "Helyesen van leírva a neved?\n\n{firstName: string} {lastName: string}\n\nEgyeznie kell az igazolványodon szereplő névvel.",
-        "requirements": "A magasabb szintű számlára váltás növelni fogja a limiteket és további funkcionalitást biztosít, például banki átutalást egyes országokban.\n\nMeg kell adnod a neved, egy kormány által kibocsátott igazolványt és egy szelfit. A neveddel kezdünk.",
+        "requirements": "A magasabb szintű számlára váltás növelni fogja a limiteket és további funkcionalitást biztosít, például banki átutalást egyes országokban.",
         "success": "Az irataid sikeresen beérkeztek és hamarosan feldolgozzuk. Visszatérhetsz erre az oldalra, hogy frissítést kapj a folyamat állapotáról.",
         "error": "Hiba történt a irataid benyújtásakor. Ha a probléma továbbra is fennáll, lépj kapcsolatba az ügyfélszolgálattal.",
         "status": "Az integrációs állapotod:",

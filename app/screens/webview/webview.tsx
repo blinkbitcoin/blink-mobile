@@ -23,7 +23,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
-  const { url, initialTitle } = route.params
+  const { url, initialTitle, headerTitle } = route.params
   const { LL } = useI18nContext()
 
   const webview = React.useRef<WebView | null>(null)
@@ -46,9 +46,14 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
   }, [canGoBack, navigation])
 
   React.useEffect(() => {
+    if (headerTitle) {
+      navigation.setOptions({ title: headerTitle })
+      return
+    }
+
     if (!initialTitle) return
     navigation.setOptions({ title: initialTitle })
-  }, [navigation, initialTitle])
+  }, [navigation, initialTitle, headerTitle])
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -62,7 +67,9 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
 
   const handleWebViewNavigationStateChange = (newNavState: WebViewNavigation) => {
     setCanGoBack(newNavState.canGoBack)
-    newNavState.title && navigation.setOptions({ title: newNavState.title })
+    if (!headerTitle && newNavState.title) {
+      navigation.setOptions({ title: newNavState.title })
+    }
   }
 
   const injectThemeJs = () => {
@@ -126,6 +133,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
           // },
         })}
         style={styles.full}
+        allowsInlineMediaPlayback
       />
     </Screen>
   )

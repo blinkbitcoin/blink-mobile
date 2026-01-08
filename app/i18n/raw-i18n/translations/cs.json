@@ -2296,8 +2296,8 @@
         "toastMessage": "Tajemství zkopírováno do schránky!"
     },
     "DefaultWalletScreen": {
-        "title": "Výchozí účet",
-        "info": "Vyberte účet, který chcete nastavit jako výchozí pro příjem a odesílání. Účet pro odesílání a přijímání jednotlivých plateb můžete nastavit v mobilní aplikaci. Platby přijaté prostřednictvím pokladny nebo vaší Lightning adresy budou vždy zaslány na výchozí účet.\n\nChcete-li se vyhnout volatilitě Bitcoinu, zvolte Stablesats. To vám umožní udržovat stabilní množství peněz a zároveň mít možnost odesílat a přijímat platby.\n\nToto nastavení můžete kdykoli změnit a nebude mít vliv na váš aktuální zůstatek."
+        "title": "Přijmout měnu",
+        "info": "Použijte svůj účet Stablesats v Blink, abyste udrželi peníze ve své peněžence stabilní v hodnotě fiat měny (dolar). Použijte svůj Bitcoin účet, pokud hromadíte sats a nevadí vám, že se vaše fiat zůstatky neustále mění."
     },
     "ThemeScreen": {
         "title": "Motiv",
@@ -2666,7 +2666,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",
