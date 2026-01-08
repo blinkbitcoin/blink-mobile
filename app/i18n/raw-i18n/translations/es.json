@@ -2154,13 +2154,14 @@
         "imageLibraryPermissionsNotGranted": "No tenemos permisos para acceder a la biblioteca de imágenes. Verifica en la configuración de la aplicación para tu plataforma."
     },
     "SecurityScreen": {
+        "title": "Seguridad y Privacidad",
         "biometricDescription": "Desbloqueo con huella dactilar o reconocimiento facial.",
         "biometricTitle": "Biométrica",
         "biometryNotAvailable": "El sensor biométrico no está disponible.",
         "biometryNotEnrolled": "Registre al menos un sensor biométrico para utilizar la autenticación basada en datos biométricos.",
         "hideBalanceDescription": "Ocultar el saldo de forma predeterminada para no mostrarlo si alguien está\nviendo tu pantalla.\n\nAún puedes ver tu saldo tocando el monto principal en el encabezado de tu pantalla de inicio.",
-        "hideBalanceTitle": "Ocultar Balance",
-        "pinDescription": "El PIN se utiliza como método de autenticación de respaldo para la autenticación biométrica.",
+        "hideBalanceTitle": "Siempre ocultar el balance",
+        "pinDescription": "Establece un PIN numérico de 4 dígitos para desbloquear",
         "pinTitle": "Código PIN",
         "setPin": "Establecer PIN"
     },
@@ -2254,13 +2255,15 @@
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
     },
     "SettingsScreen": {
-        "staticQr": "Código QR estático imprimible",
+        "staticQr": "QR estático imprimible",
         "staticQrCopied": "Tu enlace de código QR estático se ha copiado",
         "setByOs": "Establecido por OS",
-        "apiAcess": "Acceso API",
+        "apiAcess": "Integración de API",
+        "apiDocumentation": "Documentación de la API",
+        "apiDashboard": "Acceso a la API y panel de control",
         "pos": "Punto de venta",
         "posCopied": "Su enlace de punto de venta ha sido copiado",
-        "setYourLightningAddress": "Establezca su dirección Lightning",
+        "setYourLightningAddress": "Establezca su dirección lightning",
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
         "tapUserName": "Ingrese aquí para configurarlo",
@@ -2287,18 +2290,20 @@
         "logOutFromOneAccount": "Cerrar sesión de esta cuenta",
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
-        "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión."
+        "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
+        "receiveCurrency": "Recibir moneda",
+        "displayCurrency": "Mostrar moneda"
     },
     "NotificationSettingsScreen": {
-        "title": "Configuración de Notificaciones ",
-        "pushNotifications": "Notificaciones push",
+        "title": "Configuración de notificaciones",
+        "pushNotifications": "Habilitar todas",
         "notificationCategories": {
             "Circles": {
                 "title": "Círculos",
                 "description": "Notificaciones sobre tus círculos."
             },
             "Payments": {
-                "title": "Pagos",
+                "title": "Alerta de transacciones",
                 "description": "Notificaciones relacionadas con el envío y recepción de pagos."
             },
             "Marketing": {
@@ -2362,7 +2367,8 @@
         "copiedAccountId": "Copiaste la ID de tu cuenta al portapapeles",
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "identityVerification": "Verificación de identidad"
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
@@ -2373,7 +2379,8 @@
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
-        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto en su aplicación de autenticación."
+        "secret": "código secreto/respaldo",
+        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto."
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticación de dos factores",
@@ -2389,17 +2396,17 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Cuenta predeterminada",
-        "info": "Elige qué cuenta establecer como predeterminada para recibir y enviar. Puedes ajustar la cuenta de envío y recepción para pagos individuales en la app móvil. Los pagos recibidos a través de la caja o de su dirección Lightning siempre irán a la cuenta predeterminada.\n\nPara evitar la volatilidad de Bitcoin, elige Stablesats. Esto te permite mantener una cantidad estable de dinero sin dejar de poder enviar y recibir pagos.\n\nPuedes cambiar esta configuración en cualquier momento, y no afectará a tu saldo actual."
+        "title": "Recibir moneda",
+        "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
     },
     "ThemeScreen": {
         "title": "Tema",
         "info": "Elige el tema que más te guste para usar Blink o manténlo sincronizado con la configuración de tu sistema.",
-        "system": "Utilizar la configuración del sistema",
-        "light": "Utilizar el modo Claro",
-        "dark": "Utilizar el modo Oscuro",
+        "system": "Configuración del sistema",
+        "light": "Modo claro",
+        "dark": "Modo oscuro",
         "setToDark": "Modo oscuro.",
-        "setToLight": "Modo Luz"
+        "setToLight": "Modo luz"
     },
     "Languages": {
         "DEFAULT": "Predeterminado (OS)"
@@ -2431,8 +2438,8 @@
         "perWeek": "por semana",
         "unlimited": "ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferencias de Stablesats",
-        "internalSend": "Enviar a Usuario {bankName: string}",
+        "stablesatTransfers": "Transferencias de stablesats",
+        "internalSend": "Enviar a usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
     },
@@ -2599,11 +2606,12 @@
         "enabled": "Activado",
         "notifications": "Notificaciones ",
         "preferences": "Preferencias",
-        "onDeviceSecurity": "Seguridad en los dispositivos",
+        "onDeviceSecurity": "Seguridad y privacidad",
         "securityAndPrivacy": "Seguridad y privacidad",
         "advanced": "Avanzado",
         "community": "Comunidad",
         "account": "Cuenta",
+        "yourAccount": "Tu cuenta",
         "accounts": "Cuentas",
         "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
@@ -2628,7 +2636,7 @@
         "codeConfirmation": "Confirmación de código",
         "currency": "Moneda",
         "currencySyncIssue": "Problema con la moneda predeterminada. Es necesario actualizar la pantalla",
-        "csvExport": "Exportar transacciones como archivo CSV",
+        "csvExport": "Exportar todas las transacciones",
         "date": "Fecha ",
         "description": "Descripción",
         "domain": "Dominio",
@@ -2681,6 +2689,7 @@
         "submit": "Entregar",
         "success": "Éxito",
         "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dólar (Stablesats)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transacciones",
@@ -2710,6 +2719,8 @@
         "dollar": "Dólar",
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
+        "some": "Algunos",
+        "support": "Soporte",
         "profiles": "Perfiles"
     },
     "errors": {
@@ -2743,7 +2754,7 @@
         "sms": "SMS",
         "faq": "Preguntas Frecuentes - FAQ",
         "enjoyingApp": "¿Disfrutas de la aplicación?",
-        "statusPage": "Página de Estado",
+        "statusPage": "Página de estado",
         "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",

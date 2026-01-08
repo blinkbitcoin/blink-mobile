@@ -2366,8 +2366,8 @@
         "toastMessage": "Geheimnis in Zwischenablage kopiert!"
     },
     "DefaultWalletScreen": {
-        "title": "Standard-Konto",
-        "info": "Wähle, welches Konto du standardmäßig zum Senden und Empfangen nutzen möchtest. Du kannst das verwendete Konto für individuelle Zahlungen jederzeit in der App ändern. Zahlungen, die über die Kasse oder deine Lightning Adresse empfangen werden, gehen immer auf dein Standard-Konto.\n\nUm die Volatilität von Bitcoin zu umgehen, nutze Stablesats. Stablesats ermöglicht es dir, Kursschwankungen auszugleichen und dennoch Geld senden und empfangen zu können.\n\nDu kannst diese Einstellungen jederzeit ändern, ohne, dass dein Kontostand davon betroffen ist."
+        "title": "Währung empfangen",
+        "info": "Verwenden Sie Ihr Stablesats-Konto in Blink, um das Geld in Ihrer Wallet in Fiat-Werten (Dollar) stabil zu halten. Verwenden Sie Ihr Bitcoin-Konto, wenn Sie Sats sammeln und es für Sie in Ordnung ist, dass sich Ihr Fiat-Guthaben ständig ändert."
     },
     "ThemeScreen": {
         "title": "Design",

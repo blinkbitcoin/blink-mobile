@@ -8,17 +8,16 @@ import React from "react"
 import { View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
+import { Text, makeStyles, Skeleton, Avatar } from "@rn-vui/themed"
 import { useAppConfig } from "@app/hooks"
 
-export const AccountBanner: React.FC = () => {
+export const AccountBannerVertical: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const {
@@ -52,32 +51,35 @@ export const AccountBanner: React.FC = () => {
       }
     >
       <View style={styles.outer}>
-        <View style={styles.iconContainer}>
-          <AccountIcon size={25} />
+        <Avatar
+          size={80}
+          rounded
+          title={
+            isUserLoggedIn
+              ? usernameTitle.charAt(0)
+              : LL.SettingsScreen.logInOrCreateAccount().charAt(0)
+          }
+          containerStyle={styles.containerStyle}
+          titleStyle={styles.titleStyle}
+        />
+        <View style={styles.textContainer}>
+          <Text type="p2">
+            {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
+          </Text>
+          <Text type="p2">{LL.AccountScreen.level({ level: currentLevel })}</Text>
         </View>
-        <Text type="p2">
-          {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
-        </Text>
       </View>
     </TouchableWithoutFeedback>
   )
 }
 
-export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
-  const {
-    theme: { colors },
-  } = useTheme()
-  return <GaloyIcon name="user" size={size} backgroundColor={colors.grey4} />
-}
-
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ colors }) => ({
   outer: {
-    height: 70,
     padding: 4,
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
-    columnGap: 12,
+    rowGap: 15,
   },
   switch: {
     display: "flex",
@@ -85,9 +87,19 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  iconContainer: {
-    backgroundColor: theme.colors.grey4,
-    borderRadius: 100,
-    padding: 3,
+  textContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    rowGap: 1,
+  },
+  containerStyle: {
+    backgroundColor: colors.grey5,
+  },
+  titleStyle: {
+    color: colors.primary,
+    fontWeight: "bold",
+    fontSize: 50,
+    includeFontPadding: false,
   },
 }))

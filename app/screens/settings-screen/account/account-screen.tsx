@@ -6,16 +6,18 @@ import { testProps } from "@app/utils/testProps"
 import { makeStyles } from "@rn-vui/themed"
 
 import { AccountDeleteContextProvider } from "./account-delete-context"
-import { AccountBanner } from "./banner"
 import { AccountId } from "./id"
 import { DangerZoneSettings } from "./settings/danger-zone"
 import { UpgradeAccountLevelOne } from "./settings/upgrade"
 import { UpgradeTrialAccount } from "./settings/upgrade-trial-account"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { AccountBannerVertical } from "./banner-vertical"
 import { SettingsGroup } from "../group"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 export const AccountScreen: React.FC = () => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const { updateCurrentProfile } = useSaveSessionProfile()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -35,10 +37,13 @@ export const AccountScreen: React.FC = () => {
           }
           {...testProps("account-screen-scroll-view")}
         >
-          <AccountBanner />
-          <AccountId />
+          <AccountBannerVertical />
           <UpgradeTrialAccount />
-          <SettingsGroup items={[UpgradeAccountLevelOne]} />
+          <SettingsGroup
+            items={[UpgradeAccountLevelOne]}
+            name={LL.AccountScreen.upgrade()}
+          />
+          <AccountId />
           <DangerZoneSettings />
         </ScrollView>
       </Screen>
@@ -53,6 +58,6 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     display: "flex",
     flexDirection: "column",
-    rowGap: 12,
+    rowGap: 15,
   },
 }))

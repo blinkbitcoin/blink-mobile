@@ -81,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 10,
     marginBottom: 10,
-    height: 48,
+    height: 55,
   },
   accIdWrapper: {
     display: "flex",

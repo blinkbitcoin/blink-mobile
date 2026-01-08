@@ -11,7 +11,7 @@ import { SettingsRow } from "../row"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useTheme } from "@rn-vui/themed"
 
-export const AccountLNAddress: React.FC = () => {
+export const PhoneNAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
   const {
     theme: { colors },
@@ -25,8 +25,8 @@ export const AccountLNAddress: React.FC = () => {
 
   const { LL } = useI18nContext()
 
-  const hasUsername = Boolean(data?.me?.username)
-  const lnAddress = `${data?.me?.username}@${hostName}`
+  const hasUsername = Boolean(data?.me?.phone)
+  const lnAddress = `${data?.me?.phone}@${hostName}`
 
   return (
     <>
@@ -34,7 +34,7 @@ export const AccountLNAddress: React.FC = () => {
         loading={loading}
         title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(data?.me?.username || "").length > 22}
-        leftGaloyIcon="lightning-address"
+        leftIcon="call-outline"
         rightIcon={
           hasUsername ? (
             <GaloyIcon name="copy-paste" size={24} color={colors.primary} />

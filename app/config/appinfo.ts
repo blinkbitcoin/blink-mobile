@@ -22,4 +22,5 @@ export const getInviteLink = (_username: string | null | undefined) => {
 
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
+export const HIDDEN_AMOUNT_PLACEHOLDER = "****"
 export const APPROXIMATE_PREFIX = "~"

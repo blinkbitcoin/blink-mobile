@@ -2294,9 +2294,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Подразумевани налог",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
-    },
+        "title": "Примање валуте",
+        "info": "Користите свој Stablesats налог у Blink-у да бисте новац у свом новчанику одржали стабилним у фиат вредности (долар). Користите свој Bitcoin налог ако сакупљате sats и не смета вам што се фиат стање стално мења."    },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
