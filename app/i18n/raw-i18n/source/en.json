@@ -2131,7 +2131,8 @@
         "minMaxRange": "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
         "redeemBitcoin": "Redeem Bitcoin",
         "amountToRedeemFrom": "Amount to redeem from {domain: string}",
-        "redeemAmountFrom": "Redeem {amountToRedeem: string} from {domain: string}"
+        "redeemAmountFrom": "Redeem {amountToRedeem: string} from {domain: string}",
+        "withdrawalSuccessful": "Withdrawal successful"
     },
     "ScanningQRCodeScreen": {
         "invalidContent": "We found:\n\n{found: string}\n\nThis is not a valid Bitcoin address or Lightning invoice",

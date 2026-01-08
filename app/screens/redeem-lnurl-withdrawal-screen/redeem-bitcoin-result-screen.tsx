@@ -66,12 +66,15 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   const [err, setErr] = useState("")
   const [lnServiceErrorReason, setLnServiceErrorReason] = useState("")
   const [withdrawalInvoice, setInvoice] = useState<LnInvoiceNoSecret | null>(null)
+  const [lnurlCallbackSuccess, setLnurlCallbackSuccess] = useState(false)
 
   const [memo] = useState(defaultDescription)
 
   // FIXME: this would be false again if multiple invoice happen to be paid
   // when the user stays on this screen
   const invoicePaid = withdrawalInvoice?.paymentHash === lastHash
+  // Show success when either WebSocket confirms payment OR LNURL callback succeeds
+  const showSuccess = invoicePaid || lnurlCallbackSuccess
   const [lnInvoiceCreate] = useLnInvoiceCreateMutation()
 
   const createWithdrawRequestInvoice = useCallback(
@@ -126,7 +129,10 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
 
       if (result.ok) {
         const lnurlResponse = await result.json()
-        if (lnurlResponse?.status?.toLowerCase() !== "ok") {
+        if (lnurlResponse?.status?.toLowerCase() === "ok") {
+          // LNURL service confirmed withdrawal request was accepted
+          setLnurlCallbackSuccess(true)
+        } else {
           console.error(lnurlResponse, "error with redeeming")
           setErr(LL.RedeemBitcoinScreen.redeemingError())
           if (lnurlResponse?.reason) {
@@ -156,7 +162,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   ])
 
   const renderSuccessView = useMemo(() => {
-    if (invoicePaid) {
+    if (showSuccess) {
       client.refetchQueries({ include: [HomeAuthedDocument] })
 
       return (
@@ -164,11 +170,14 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
           <View {...testProps("Success Icon")} style={styles.container}>
             <GaloyIcon name={"payment-success"} size={128} />
           </View>
+          <Text type={"p1"} style={styles.successText}>
+            {LL.RedeemBitcoinScreen.withdrawalSuccessful()}
+          </Text>
         </View>
       )
     }
     return null
-  }, [invoicePaid, styles, client])
+  }, [showSuccess, styles, client, LL])
 
   const renderErrorView = useMemo(() => {
     if (err !== "") {
@@ -190,7 +199,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   }, [err, lnServiceErrorReason, styles])
 
   const renderActivityStatusView = useMemo(() => {
-    if (err === "" && !invoicePaid) {
+    if (err === "" && !showSuccess) {
       return (
         <View style={styles.container}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -198,7 +207,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
       )
     }
     return null
-  }, [err, invoicePaid, styles, colors.primary])
+  }, [err, showSuccess, styles, colors.primary])
 
   return (
     <Screen preset="scroll" style={styles.contentContainer}>
@@ -258,6 +267,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   errorText: {
     color: colors.error,
+    textAlign: "center",
+  },
+  successText: {
+    marginTop: 16,
     textAlign: "center",
   },
   contentContainer: {

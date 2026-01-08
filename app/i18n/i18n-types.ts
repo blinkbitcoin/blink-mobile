@@ -6750,6 +6750,10 @@ type RootTranslation = {
 		 */
 		submissionError: string
 		/**
+		 * W​i​t​h​d​r​a​w​a​l​ ​s​u​c​c​e​s​s​f​u​l
+		 */
+		withdrawalSuccessful: string
+		/**
 		 * M​i​n​:​ ​{​m​i​n​i​m​u​m​A​m​o​u​n​t​}​,​ ​M​a​x​:​ ​{​m​a​x​i​m​u​m​A​m​o​u​n​t​}
 		 * @param {string} maximumAmount
 		 * @param {string} minimumAmount
@@ -16164,6 +16168,10 @@ export type TranslationFunctions = {
 		 * Failed to submit withdrawal request. Please contact support if this problem persists.
 		 */
 		submissionError: () => LocalizedString
+		/**
+		 * Withdrawal successful
+		 */
+		withdrawalSuccessful: () => LocalizedString
 		/**
 		 * Min: {minimumAmount}, Max: {maximumAmount}
 		 */
