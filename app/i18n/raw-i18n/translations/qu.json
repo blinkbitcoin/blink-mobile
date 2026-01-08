@@ -2294,9 +2294,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Chaynamanta kaniy",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
-    },
+        "title": "Qullqi chaskiy",
+        "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."    },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",

@@ -104,8 +104,10 @@ const useStyles = makeStyles(
     container: {
       backgroundColor,
       paddingHorizontal:
-        containerSize === "small" ? 7 : containerSize === "medium" ? 11 : 15,
-      paddingVertical: containerSize === "small" ? 3 : containerSize === "medium" ? 3 : 5,
+        containerSize === "small" ? 5 : containerSize === "medium" ? 5 : 15,
+      paddingVertical: containerSize === "small" ? 3 : containerSize === "medium" ? 5 : 5,
+      minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
+      minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
       borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",

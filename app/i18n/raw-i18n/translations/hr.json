@@ -2296,8 +2296,8 @@
         "toastMessage": "Tajna kopirana u međuspremnik!"
     },
     "DefaultWalletScreen": {
-        "title": "Zadani račun",
-        "info": "Odaberite koji ćete račun postaviti kao zadani za primanje i slanje. Možete prilagoditi račun za slanje i primanje za pojedinačna plaćanja u mobilnoj aplikaciji. Uplate primljene putem blagajne ili vaše Lightning adrese uvijek će ići na zadani račun.\n\nKako biste izbjegli volatilnost Bitcoina, odaberite Stablesats. To vam omogućuje da zadržite stabilan iznos novca dok još uvijek možete slati i primati plaćanja.\n\nOvu postavku možete promijeniti u bilo kojem trenutku i ona neće utjecati na vaš trenutni saldo."
+        "title": "Primanje valute",
+        "info": "Koristite svoj Stablesats račun u Blinku kako biste zadržali novac u svom novčaniku stabilnim u fiat vrijednosti (dolar). Koristite svoj Bitcoin račun ako skupljate sats i ne smeta vam stalna promjena fiat stanja."
     },
     "ThemeScreen": {
         "title": "Tema",

@@ -22,7 +22,8 @@ export const DefaultWallet: React.FC = () => {
   return (
     <SettingsRow
       loading={loading}
-      title={`${LL.SettingsScreen.receiveCurrency()}: ${defaultWalletCurrency}`}
+      title={LL.DefaultWalletScreen.title()}
+      subtitle={defaultWalletCurrency}
       leftIcon="wallet-outline"
       action={() => {
         navigate("defaultWallet")

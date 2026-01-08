@@ -2366,8 +2366,8 @@
         "toastMessage": "Titok másolva a vágólapra!"
     },
     "DefaultWalletScreen": {
-        "title": "Alapértelmezett számla",
-        "info": "Válaszd ki, hogy fogadás és küldés esetén melyik számla legyen az alapértelmezett. Az egyes fizetéseknél a mobilalkalmazásban módosíthatod a küldő és fogadó számlát. A Pénztáron vagy a Lightning címen keresztül érkező fizetések mindig az alapértelmezett számlára kerülnek.\n\nA Bitcoin volatilitásának elkerülése érdekében válaszd a Stablesats-ot. Ez lehetővé teszi számodra, hogy stabil USD értéket tarts fenn, miközben továbbra is tudsz fizetéseket fogadni és küldeni.\n\nBármikor megváltoztathatod ezt a beállítást, és ez nem befolyásolja jelenlegi egyenleged."
+        "title": "Deviza fogadása",
+        "info": "Használd a Stablesats fiókodat a Blinkben, hogy a pénzed fiat (dollár) értékben stabil maradjon a tárcádban. Használd a Bitcoin fiókodat, ha satsokat gyűjtesz, és nem gond, hogy a fiat egyenleged folyamatosan változik."
     },
     "ThemeScreen": {
         "title": "Téma",

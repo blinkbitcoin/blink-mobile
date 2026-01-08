@@ -7749,7 +7749,7 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * D​e​f​a​u​l​t​ ​A​c​c​o​u​n​t
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
 		 */
 		title: string
 		/**
@@ -8774,6 +8774,10 @@ type RootTranslation = {
 		 * S​t​a​b​l​e​s​a​t​s​ ​U​S​D
 		 */
 		stablesatsUsd: string
+		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
+		 */
+		dollarStablesats: string
 		/**
 		 * T​o
 		 */
@@ -17123,7 +17127,7 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Default Account
+		 * Receive currency
 		 */
 		title: () => LocalizedString
 		/**
@@ -18130,6 +18134,10 @@ export type TranslationFunctions = {
 		 * Stablesats USD
 		 */
 		stablesatsUsd: () => LocalizedString
+		/**
+		 * Dollar (Stablesats)
+		 */
+		dollarStablesats: () => LocalizedString
 		/**
 		 * To
 		 */

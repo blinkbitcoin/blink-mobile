@@ -2296,8 +2296,8 @@
         "toastMessage": "Kata rahsia telah disalin pada papan klip!"
     },
     "DefaultWalletScreen": {
-        "title": "Akaun tetap",
-        "info": "Pilih akaun yang ditetapkan sebagai akaun utama ketika menerima dan menghantar bayaran  Anda boleh mengubah akaun bayaran dan penerimaan kepada bayaran individu dalam aplikasi telefon pintar anda. Pembayaran yang diterima melalui daftar tunai, atau alamat Lightning akan ke akaun utama.\n\nBagi mengelak ketidak tentuan harga Bitcoin, pilih Stablesats. Ini akan membolehkan anda mengekalkan amaun wang anda ketika menghantar atau menerima bayaran.\n\nAnda boleh menukar tetapan ini jika perlu, dan ia tidak akan mengakibatkan kehilangan jumlah baki wang anda."
+        "title": "Terima mata wang",
+        "info": "Gunakan akaun Stablesats anda di Blink untuk mengekalkan wang dalam dompet anda stabil dari segi mata wang fiat (dolar). Gunakan akaun Bitcoin anda jika anda mengumpul sats dan tidak kisah baki fiat anda berubah sepanjang masa."
     },
     "ThemeScreen": {
         "title": "Tema",
