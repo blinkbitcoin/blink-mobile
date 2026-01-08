@@ -489,7 +489,7 @@ export const ConversionDetailsScreen = () => {
             />
             <WalletToggleButton
               loading={toggleInitiated.current || isTyping || Boolean(loadingPercent)}
-              disabled={!canToggleWallet || uiLocked}
+              disabled={!canToggleWallet || uiLocked || !isValidAmount}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
             />
