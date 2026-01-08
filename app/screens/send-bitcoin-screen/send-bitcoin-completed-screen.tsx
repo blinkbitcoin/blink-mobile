@@ -381,7 +381,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
 
   if (showSuccessIcon) {
     return (
-      <Screen>
+      <Screen headerShown={false}>
         <SuccessIconComponent
           status={status}
           arrivalAtMempoolEstimate={arrivalAtMempoolEstimate}
@@ -391,7 +391,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   }
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
       <HeaderSection
         isTakingScreenshot={isTakingScreenshot}
         onClose={handleNavigateHome}
