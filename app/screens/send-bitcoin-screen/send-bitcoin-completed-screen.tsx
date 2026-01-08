@@ -425,6 +425,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
               style={styles.shareButton}
               onPress={captureAndShare}
               title={LL.common.share()}
+              underlayColor="transparent"
             />
           )}
         </View>
