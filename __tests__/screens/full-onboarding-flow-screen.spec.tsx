@@ -77,7 +77,15 @@ const generateFullOnboardingMock = ({
       },
     },
     {
-      request: { query: KycFlowStartDocument },
+      request: {
+        query: KycFlowStartDocument,
+        variables: {
+          input: {
+            firstName: "",
+            lastName: "",
+          },
+        },
+      },
       result: {
         data: {
           kycFlowStart: {
