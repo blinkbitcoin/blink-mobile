@@ -300,8 +300,8 @@ mutation intraLedgerUsdPaymentSend($input: IntraLedgerUsdPaymentSendInput!) {
   }
 }
 
-mutation kycFlowStart {
-  kycFlowStart {
+mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
     workflowRunId
     tokenWeb
     __typename
