@@ -1,8 +1,9 @@
 import * as React from "react"
 
+import { APPROXIMATE_PREFIX } from "@app/config"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
   DisplayCurrency,
@@ -101,7 +102,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   }
 
   if (isSendingMax && formattedPrimaryAmount)
-    formattedPrimaryAmount = `~ ${formattedPrimaryAmount} (${LL.SendBitcoinScreen.max()})`
+    formattedPrimaryAmount = `${APPROXIMATE_PREFIX} ${formattedPrimaryAmount} (${LL.SendBitcoinScreen.max()})`
 
   const onPressInputButton = () => {
     setIsSettingAmount(true)

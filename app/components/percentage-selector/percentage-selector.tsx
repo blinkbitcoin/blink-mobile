@@ -1,14 +1,17 @@
 import React, { useMemo } from "react"
 import {
-  View,
-  TouchableOpacity,
   ActivityIndicator,
   StyleProp,
+  TouchableOpacity,
+  View,
   ViewStyle,
 } from "react-native"
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
+
+const DEFAULT_OPTIONS = [25, 50, 75, 100] as const
+const DEFAULT_TEST_ID_PREFIX = "convert"
 
 export type PercentageSelectorProps = {
   isLocked: boolean
@@ -19,14 +22,12 @@ export type PercentageSelectorProps = {
   containerStyle?: StyleProp<ViewStyle>
 }
 
-const DEFAULT_OPTIONS = [25, 50, 75, 100] as const
-
 export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   isLocked,
   loadingPercent,
   onSelect,
   options,
-  testIdPrefix = "convert",
+  testIdPrefix = DEFAULT_TEST_ID_PREFIX,
   containerStyle,
 }) => {
   const {

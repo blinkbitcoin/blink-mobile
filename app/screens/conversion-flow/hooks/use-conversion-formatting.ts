@@ -1,11 +1,16 @@
 import { useCallback } from "react"
 
-import { DisplayCurrency } from "@app/types/amounts"
-import { WalletCurrency } from "@app/graphql/generated"
-
 import { ConvertInputType } from "@app/components/transfer-amount-input"
-import { InputValues, InputField } from "../use-convert-money-details"
-import { formatBtcWithSuffix, findBtcSuffixIndex } from "../btc-format"
+import { WalletCurrency } from "@app/graphql/generated"
+import { DisplayCurrency } from "@app/types/amounts"
+import {
+  findBtcSuffixIndex,
+  formatBtcWithSuffix,
+} from "@app/screens/conversion-flow/btc-format"
+import {
+  InputField,
+  InputValues,
+} from "@app/screens/conversion-flow/use-convert-money-details"
 
 type GetCurrencySymbol = (p: { currency: WalletCurrency | DisplayCurrency }) => string
 
@@ -28,34 +33,39 @@ export const useConversionFormatting = ({
   displayCurrency,
   getCurrencySymbol,
 }: Params) => {
-  const fieldFormatted = useCallback(
+  const getInputField = useCallback(
     (id: InputField["id"]) => {
-      if (id === ConvertInputType.FROM) {
-        return inputFormattedValues?.fromInput.formattedAmount || ""
-      }
-      if (id === ConvertInputType.TO) {
-        return inputFormattedValues?.toInput.formattedAmount || ""
-      }
-      return inputFormattedValues?.currencyInput.formattedAmount || ""
+      if (id === ConvertInputType.FROM) return inputFormattedValues?.fromInput
+      if (id === ConvertInputType.TO) return inputFormattedValues?.toInput
+      return inputFormattedValues?.currencyInput
     },
     [inputFormattedValues],
+  )
+
+  const fieldFormatted = useCallback(
+    (id: InputField["id"]) => getInputField(id)?.formattedAmount || "",
+    [getInputField],
+  )
+
+  const getCurrency = useCallback(
+    (id: InputField["id"]) => {
+      if (id === ConvertInputType.FROM) return inputValues.fromInput.currency
+      if (id === ConvertInputType.TO) return inputValues.toInput.currency
+      return displayCurrency
+    },
+    [inputValues, displayCurrency],
   )
 
   const typedValue = useCallback(
     (id: InputField["id"]) => {
       const digits = inputFormattedValues?.formattedAmount ?? ""
       if (!digits) return ""
-      const currency =
-        id === ConvertInputType.FROM
-          ? inputValues.fromInput.currency
-          : id === ConvertInputType.TO
-            ? inputValues.toInput.currency
-            : displayCurrency
-      if (currency === WalletCurrency.Btc) return formatBtcWithSuffix(digits)
 
+      const currency = getCurrency(id)
+      if (currency === WalletCurrency.Btc) return formatBtcWithSuffix(digits)
       return `${getCurrencySymbol({ currency })}${digits}`
     },
-    [inputFormattedValues, inputValues, displayCurrency, getCurrencySymbol],
+    [inputFormattedValues, getCurrency, getCurrencySymbol],
   )
 
   const renderValue = useCallback(

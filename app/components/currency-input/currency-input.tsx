@@ -1,16 +1,16 @@
-import React, { forwardRef, useImperativeHandle, useCallback, useEffect } from "react"
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle } from "react"
 import {
-  View,
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
-  TargetedEvent,
-  TouchableOpacity,
   Animated,
+  NativeSyntheticEvent,
   StyleProp,
+  TargetedEvent,
+  TextInput,
+  TextInputFocusEventData,
+  TouchableOpacity,
+  View,
   ViewStyle,
 } from "react-native"
-import { Input, Text, useTheme, makeStyles } from "@rn-vui/themed"
+import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 
@@ -105,7 +105,9 @@ export const CurrencyInput = forwardRef<TextInput, CurrencyInputProps>(
   },
 )
 
-CurrencyInput.displayName = "CurrencyInput"
+const COMPONENT_DISPLAY_NAME = "CurrencyInput"
+
+CurrencyInput.displayName = COMPONENT_DISPLAY_NAME
 
 const useStyles = makeStyles(({ colors }) => ({
   containerBase: {

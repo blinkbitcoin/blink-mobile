@@ -2,15 +2,13 @@ import * as React from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
+import { Key } from "@app/components/amount-input-screen/number-pad-reducer"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"
-import { Key } from "@app/components/amount-input-screen/number-pad-reducer"
 
 export type AmountInputScreenUIProps = {
   errorMessage?: string
   onKeyPress: (key: Key) => void
-  onClearAmount: () => void
-  onPaste: (keys: number) => void
   compact?: boolean
 }
 

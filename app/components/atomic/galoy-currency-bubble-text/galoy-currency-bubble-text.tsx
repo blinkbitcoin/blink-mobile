@@ -1,8 +1,20 @@
 import React from "react"
 import { View } from "react-native"
-import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
+import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+
+const BTC_TEXT = "BTC"
+const USD_TEXT = "USD"
+const DEFAULT_TEXT_SIZE = "p3"
+
+type ContainerSize = "small" | "medium" | "large"
+
+const CONTAINER_SIZES: Record<ContainerSize, { horizontal: number; vertical: number }> = {
+  small: { horizontal: 8, vertical: 4 },
+  medium: { horizontal: 12, vertical: 5 },
+  large: { horizontal: 16, vertical: 6 },
+}
 
 export const GaloyCurrencyBubbleText = ({
   currency,
@@ -12,29 +24,24 @@ export const GaloyCurrencyBubbleText = ({
 }: {
   currency: WalletCurrency
   textSize?: TextProps["type"]
-  containerSize?: "small" | "medium" | "large"
+  containerSize?: ContainerSize
   highlighted?: boolean
 }) => {
   const {
     theme: { colors },
   } = useTheme()
 
-  return currency === WalletCurrency.Btc ? (
+  const isBtc = currency === WalletCurrency.Btc
+
+  return (
     <ContainerBubble
-      text="BTC"
+      text={isBtc ? BTC_TEXT : USD_TEXT}
       textSize={textSize}
       highlighted={highlighted}
-      color={highlighted ? colors.white : colors._white}
-      backgroundColor={highlighted ? colors.primary : colors.grey3}
-      containerSize={containerSize}
-    />
-  ) : (
-    <ContainerBubble
-      text="USD"
-      textSize={textSize}
-      highlighted={highlighted}
-      color={highlighted ? colors._white : colors._white}
-      backgroundColor={highlighted ? colors._green : colors.grey3}
+      color={highlighted ? (isBtc ? colors.white : colors._white) : colors._white}
+      backgroundColor={
+        highlighted ? (isBtc ? colors.primary : colors._green) : colors.grey3
+      }
       containerSize={containerSize}
     />
   )
@@ -52,13 +59,13 @@ const ContainerBubble = ({
   highlighted?: boolean
   color?: string
   backgroundColor?: string
-  containerSize?: "small" | "medium" | "large"
+  containerSize?: ContainerSize
 }) => {
   const styles = useStyles({ backgroundColor, containerSize, color })
 
   return (
     <View style={styles.container}>
-      <Text type={textSize || "p3"} style={styles.text}>
+      <Text type={textSize || DEFAULT_TEXT_SIZE} style={styles.text}>
         {text}
       </Text>
     </View>
@@ -74,22 +81,24 @@ const useStyles = makeStyles(
       color,
     }: {
       backgroundColor?: string
-      containerSize: "small" | "medium" | "large"
+      containerSize: ContainerSize
       color?: string
     },
-  ) => ({
-    container: {
-      backgroundColor,
-      paddingHorizontal:
-        containerSize === "small" ? 8 : containerSize === "medium" ? 12 : 16,
-      paddingVertical: containerSize === "small" ? 4 : containerSize === "medium" ? 5 : 6,
-      borderRadius: 10,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    text: {
-      color,
-      fontWeight: "bold",
-    },
-  }),
+  ) => {
+    const sizes = CONTAINER_SIZES[containerSize]
+    return {
+      container: {
+        backgroundColor,
+        paddingHorizontal: sizes.horizontal,
+        paddingVertical: sizes.vertical,
+        borderRadius: 10,
+        alignItems: "center",
+        justifyContent: "center",
+      },
+      text: {
+        color,
+        fontWeight: "bold",
+      },
+    }
+  },
 )

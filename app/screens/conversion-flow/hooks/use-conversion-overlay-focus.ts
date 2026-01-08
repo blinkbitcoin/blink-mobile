@@ -2,9 +2,11 @@ import { useCallback } from "react"
 import { TextInput } from "react-native"
 
 import { ConvertInputType } from "@app/components/transfer-amount-input"
-
-import { InputValues, InputField } from "../use-convert-money-details"
-import { findBtcSuffixIndex } from "../btc-format"
+import { findBtcSuffixIndex } from "@app/screens/conversion-flow/btc-format"
+import {
+  InputField,
+  InputValues,
+} from "@app/screens/conversion-flow/use-convert-money-details"
 
 type Params = {
   uiLocked: boolean

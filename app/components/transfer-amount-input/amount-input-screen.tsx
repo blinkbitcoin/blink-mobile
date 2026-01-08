@@ -1,11 +1,23 @@
 import * as React from "react"
 import { useCallback, useEffect, useReducer, useRef, useState } from "react"
 
+import { APPROXIMATE_PREFIX } from "@app/config"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDebouncedEffect } from "@app/hooks/use-debounce"
 import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
+import {
+  InputField,
+  InputValues,
+} from "@app/screens/conversion-flow/use-convert-money-details"
+import {
+  Key,
+  NumberPadNumber,
+  numberPadReducer,
+  NumberPadReducerActionType,
+  NumberPadReducerState,
+} from "@app/components/amount-input-screen/number-pad-reducer"
 import {
   greaterThan,
   lessThan,
@@ -14,17 +26,6 @@ import {
 } from "@app/types/amounts"
 
 import { AmountInputScreenUI } from "./amount-input-screen-ui"
-import {
-  Key,
-  NumberPadNumber,
-  numberPadReducer,
-  NumberPadReducerActionType,
-  NumberPadReducerState,
-} from "../amount-input-screen/number-pad-reducer"
-import {
-  InputValues,
-  InputField,
-} from "@app/screens/conversion-flow/use-convert-money-details"
 
 export type AmountInputScreenProps = {
   inputValues: InputValues
@@ -117,19 +118,22 @@ const moneyAmountToNumberPadReducerState = ({
   }
 }
 
-const snapshotKey = (v: InputValues) =>
-  [
-    v.formattedAmount,
-    v.fromInput.formattedAmount,
-    v.toInput.formattedAmount,
-    v.currencyInput.formattedAmount,
-    v.fromInput.currency,
-    v.toInput.currency,
-    v.currencyInput.currency,
-    v.fromInput.isFocused ? 1 : 0,
-    v.toInput.isFocused ? 1 : 0,
-    v.currencyInput.isFocused ? 1 : 0,
+const snapshotKey = (values: InputValues) => {
+  const focusedValue = (isFocused: boolean) => (isFocused ? 1 : 0)
+
+  return [
+    values.formattedAmount,
+    values.fromInput.formattedAmount,
+    values.toInput.formattedAmount,
+    values.currencyInput.formattedAmount,
+    values.fromInput.currency,
+    values.toInput.currency,
+    values.currencyInput.currency,
+    focusedValue(values.fromInput.isFocused),
+    focusedValue(values.toInput.isFocused),
+    focusedValue(values.currencyInput.isFocused),
   ].join("|")
+}
 
 export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   inputValues,
@@ -277,8 +281,16 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     const focusStates = createFocusStates(focusedIdRef.current)
     const baseValues = lastValuesRef.current || inputValues
 
-    const strip = (s?: string) => (s ? s.replace(/^\s*~\s*/, "") : s)
-    const ensure = (s?: string) => (s ? (s.trim().startsWith("~") ? s : `~ ${s}`) : s)
+    const stripApproximatePrefix = (value?: string) => {
+      if (!value) return value
+      return value.replace(new RegExp(`^\\s*${APPROXIMATE_PREFIX}\\s*`), "")
+    }
+
+    const ensureApproximatePrefix = (value?: string) => {
+      if (!value) return value
+      if (value.trim().startsWith(APPROXIMATE_PREFIX)) return value
+      return `${APPROXIMATE_PREFIX} ${value}`
+    }
 
     const updatedValues: InputValues = {
       ...baseValues,
@@ -288,24 +300,24 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
         ...focusStates.fromInput,
         formattedAmount:
           focusedIdRef.current === ConvertInputType.FROM
-            ? strip(baseValues.fromInput.formattedAmount) ?? ""
-            : ensure(baseValues.fromInput.formattedAmount) ?? "",
+            ? stripApproximatePrefix(baseValues.fromInput.formattedAmount) ?? ""
+            : ensureApproximatePrefix(baseValues.fromInput.formattedAmount) ?? "",
       },
       toInput: {
         ...baseValues.toInput,
         ...focusStates.toInput,
         formattedAmount:
           focusedIdRef.current === ConvertInputType.TO
-            ? strip(baseValues.toInput.formattedAmount) ?? ""
-            : ensure(baseValues.toInput.formattedAmount) ?? "",
+            ? stripApproximatePrefix(baseValues.toInput.formattedAmount) ?? ""
+            : ensureApproximatePrefix(baseValues.toInput.formattedAmount) ?? "",
       },
       currencyInput: {
         ...baseValues.currencyInput,
         ...focusStates.currencyInput,
         formattedAmount:
           focusedIdRef.current === ConvertInputType.CURRENCY
-            ? strip(baseValues.currencyInput.formattedAmount) ?? ""
-            : ensure(baseValues.currencyInput.formattedAmount) ?? "",
+            ? stripApproximatePrefix(baseValues.currencyInput.formattedAmount) ?? ""
+            : ensureApproximatePrefix(baseValues.currencyInput.formattedAmount) ?? "",
       },
     }
 
@@ -518,19 +530,6 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
   return (
     <AmountInputScreenUI
-      onPaste={(keys) => {
-        startTyping()
-        ;(function paste() {
-          dispatchNumberPadAction({
-            action: NumberPadReducerActionType.HandlePaste,
-            payload: { keys },
-          })
-        })()
-      }}
-      onClearAmount={() => {
-        startTyping()
-        dispatchNumberPadAction({ action: NumberPadReducerActionType.ClearAmount })
-      }}
       errorMessage={errorMessage || ""}
       onKeyPress={handleKeyPress}
       compact={compact}

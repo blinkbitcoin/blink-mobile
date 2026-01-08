@@ -457,7 +457,9 @@ export const ConversionDetailsScreen = () => {
               inputRef={fromInputRef}
               value={renderValue(ConvertInputType.FROM)}
               placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd ? "$0" : `0${BTC_SUFFIX}`
+                fromWallet.walletCurrency === WalletCurrency.Usd
+                  ? "$0"
+                  : `0 ${BTC_SUFFIX}`
               }
               selection={caretSelectionFor(ConvertInputType.FROM)}
               isLocked={uiLocked}
@@ -500,7 +502,9 @@ export const ConversionDetailsScreen = () => {
               inputRef={toInputRef}
               value={renderValue(ConvertInputType.TO)}
               placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd ? `0${BTC_SUFFIX}` : "$0"
+                fromWallet.walletCurrency === WalletCurrency.Usd
+                  ? `0 ${BTC_SUFFIX}`
+                  : "$0"
               }
               selection={caretSelectionFor(ConvertInputType.TO)}
               isLocked={uiLocked}

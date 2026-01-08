@@ -1,7 +1,7 @@
 import React from "react"
-import { ActivityIndicator, TouchableHighlight, ViewStyle, StyleProp } from "react-native"
-import { useTheme, makeStyles } from "@rn-vui/themed"
+import { ActivityIndicator, StyleProp, TouchableHighlight, ViewStyle } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export type WalletToggleButtonProps = {
   loading: boolean

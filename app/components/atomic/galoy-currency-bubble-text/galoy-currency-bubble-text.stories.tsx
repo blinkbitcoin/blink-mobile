@@ -1,10 +1,13 @@
 import React from "react"
 import { ViewStyle } from "react-native"
 
-import { WalletCurrency } from "@app/graphql/generated"
-
-import { GaloyCurrencyBubbleText } from "./galoy-currency-bubble-text"
+import { WalletCurrency } from "../../../graphql/generated"
 import { Story, UseCase } from "../../../../.storybook/views"
+import { GaloyCurrencyBubbleText } from "./galoy-currency-bubble-text"
+
+const STORY_TITLE = "Galoy Currency Bubble"
+const TEXT_SIZE_P2_LABEL = "Text Size: p2 (medium)"
+const TEXT_SIZE_P1_LABEL = "Text Size: p1 (large)"
 
 const UseCaseWrapper = ({
   children,
@@ -25,17 +28,17 @@ const styles: { wrapper: ViewStyle } = {
 }
 
 export default {
-  title: "Galoy Currency Bubble",
+  title: STORY_TITLE,
   component: GaloyCurrencyBubbleText,
 }
 
 export const Default = () => (
   <Story>
-    <UseCaseWrapper style={styles.wrapper} text="Text Size: p2 (medium)">
+    <UseCaseWrapper style={styles.wrapper} text={TEXT_SIZE_P2_LABEL}>
       <GaloyCurrencyBubbleText textSize="p2" currency={WalletCurrency.Btc} />
       <GaloyCurrencyBubbleText textSize="p2" currency={WalletCurrency.Usd} />
     </UseCaseWrapper>
-    <UseCaseWrapper style={styles.wrapper} text="Text Size: p1 (large)">
+    <UseCaseWrapper style={styles.wrapper} text={TEXT_SIZE_P1_LABEL}>
       <GaloyCurrencyBubbleText textSize="p1" currency={WalletCurrency.Btc} />
       <GaloyCurrencyBubbleText textSize="p1" currency={WalletCurrency.Usd} />
     </UseCaseWrapper>

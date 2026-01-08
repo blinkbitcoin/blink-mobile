@@ -1,4 +1,3 @@
-// @app/hooks/use-debounce.ts
 import { useEffect, useRef, useCallback, DependencyList } from "react"
 
 export type DebouncedControl = {

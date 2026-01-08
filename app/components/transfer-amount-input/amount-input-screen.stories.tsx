@@ -18,8 +18,10 @@ import {
   ConvertInputType,
 } from "./amount-input-screen"
 
+const STORY_TITLE = "Amount Input Screen"
+
 export default {
-  title: "Amount Input Screen",
+  title: STORY_TITLE,
   component: AmountInputScreen,
   decorators: [
     (Story) => (

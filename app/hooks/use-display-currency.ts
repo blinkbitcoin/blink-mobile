@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react"
 
 import { gql } from "@apollo/client"
+import { APPROXIMATE_PREFIX } from "@app/config"
 import { useCurrencyListQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -79,7 +80,7 @@ const formatCurrencyHelper = ({
     // FIXME this workaround of using .format and not .formatNumber is
     // because hermes haven't fully implemented Intl.NumberFormat yet
   }).format(Math.abs(Number(amountInMajorUnits)))
-  return `${isApproximate ? "~ " : ""}${
+  return `${isApproximate ? `${APPROXIMATE_PREFIX} ` : ""}${
     isNegative && withSign ? "-" : ""
   }${symbol}${amountStr}${currencyCode ? ` ${currencyCode}` : ""}`
 }

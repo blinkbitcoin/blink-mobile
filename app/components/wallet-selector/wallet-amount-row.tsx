@@ -1,10 +1,11 @@
 import React from "react"
-import { View, TouchableOpacity, TextInput, StyleProp, ViewStyle } from "react-native"
-import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { IconNode } from "@rn-vui/base"
+import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { StyleProp, TextInput, TouchableOpacity, View, ViewStyle } from "react-native"
 
-import { WalletCurrency } from "@app/graphql/generated"
 import { GaloyCurrencyBubbleText } from "@app/components/atomic/galoy-currency-bubble-text"
+import { WalletCurrency } from "@app/graphql/generated"
+import { APPROXIMATE_PREFIX } from "@app/config"
 
 export type WalletAmountRowProps = {
   inputRef: React.RefObject<TextInput>
@@ -73,9 +74,11 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         </View>
         <View style={styles.walletSelectorBalanceContainer}>
           <Text style={styles.convertText}>{balancePrimary}</Text>
-          <Text style={styles.convertText}>
-            {balanceSecondary ? `~ ${balanceSecondary}` : ""}
-          </Text>
+          {balanceSecondary && (
+            <Text style={styles.convertText}>
+              {APPROXIMATE_PREFIX} {balanceSecondary}
+            </Text>
+          )}
         </View>
       </View>
     </View>
