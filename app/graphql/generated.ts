@@ -963,6 +963,11 @@ export const InvoicePaymentStatus = {
 } as const;
 
 export type InvoicePaymentStatus = typeof InvoicePaymentStatus[keyof typeof InvoicePaymentStatus];
+export type KycFlowStartInput = {
+  readonly firstName?: InputMaybe<Scalars['String']['input']>;
+  readonly lastName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Leader = {
   readonly __typename: 'Leader';
   readonly name?: Maybe<Scalars['LeaderboardName']['output']>;
@@ -1497,6 +1502,11 @@ export type MutationIntraLedgerPaymentSendArgs = {
 
 export type MutationIntraLedgerUsdPaymentSendArgs = {
   input: IntraLedgerUsdPaymentSendInput;
+};
+
+
+export type MutationKycFlowStartArgs = {
+  input?: InputMaybe<KycFlowStartInput>;
 };
 
 
@@ -8726,6 +8736,7 @@ export type ResolversTypes = {
   InvoiceConnection: ResolverTypeWrapper<InvoiceConnection>;
   InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
   InvoicePaymentStatus: InvoicePaymentStatus;
+  KycFlowStartInput: KycFlowStartInput;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
@@ -8983,6 +8994,7 @@ export type ResolversParentTypes = {
   Invoice: ResolversInterfaceTypes<ResolversParentTypes>['Invoice'];
   InvoiceConnection: InvoiceConnection;
   InvoiceEdge: InvoiceEdge;
+  KycFlowStartInput: KycFlowStartInput;
   Language: Scalars['Language']['output'];
   Leader: Leader;
   Leaderboard: Leaderboard;
@@ -9725,7 +9737,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
   intraLedgerUsdPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerUsdPaymentSendArgs, 'input'>>;
-  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType>;
+  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType, Partial<MutationKycFlowStartArgs>>;
   lnAddressPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnAddressPaymentSendArgs, 'input'>>;
   lnInvoiceCancel?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCancelArgs, 'input'>>;
   lnInvoiceCreate?: Resolver<ResolversTypes['LnInvoicePayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCreateArgs, 'input'>>;
