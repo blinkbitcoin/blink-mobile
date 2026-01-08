@@ -2666,7 +2666,7 @@
         "firstName": "Prénom",
         "lastName": "Nom ",
         "confirmNameContent": "L'orthographe de votre nom est-elle correcte ?\n{firstName: string} {lastName: string}\nIl doit correspondre au nom sur votre pièce d'identité.",
-        "requirements": "La mise à niveau de votre compte augmentera vos limites et vous donnera des fonctionnalités supplémentaires, telles que le transfert vers des comptes bancaires dans certains pays.",
+        "requirements": "La mise à niveau de votre compte augmentera vos limites et vous donnera des fonctionnalités supplémentaires, telles que le transfert vers des comptes bancaires dans certains pays.Vous devrez fournir votre nom, une pièce d'identité émise par le gouvernement et un selfie. Nous allons commencer par votre nom.\n\n\n ",
         "success": "Vos documents ont été reçus avec succès et seront traités prochainement. Vous pouvez revenir sur cette page pour avoir une mise à jour sur l'état de votre intégration.",
         "error": "Une erreur s'est produite lors de la soumission de vos documents. Vous pouvez contacter le support si le problème persiste.\n\n\n ",
         "status": "L'état de votre intégration est :\n\n\n ",

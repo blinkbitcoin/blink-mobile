@@ -2752,7 +2752,7 @@
         "firstName": "Krstné meno",
         "lastName": "Priezvisko",
         "confirmNameContent": "Je vaše meno napísané správne?\n\n{firstName: string} {lastName: string}\n\nMusí sa zhodovať s menom na vašom doklade totožnosti.",
-        "requirements": "Vylepšenie vášho účtu zvýši vaše limity a poskytne vám ďalšie funkcie, ako napríklad prevody na bankové účty vo vybraných krajinách.",
+        "requirements": "Vylepšenie vášho účtu zvýši vaše limity a poskytne vám ďalšie funkcie, ako napríklad prevody na bankové účty vo vybraných krajinách.\n\nBudete musieť uviesť svoje meno, vládou vydaný doklad totožnosti a selfie. Začneme vaším menom.",
         "success": "Dokumenty boli úspešne prijaté a budú čoskoro spracované. Na tejto stránke môžete sledovať stav svojho nastavenia.",
         "error": "Pri odosielaní vašich dokumentov došlo k chybe. Ak problém pretrváva, kontaktujte podporu.",
         "status": "Stav vášho nastavenia je: ",

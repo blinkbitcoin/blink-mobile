@@ -2752,7 +2752,7 @@
         "firstName": "İsim",
         "lastName": "Soyadı",
         "confirmNameContent": "İsminizin yazılışı doğru mu?\n\n{firstName: string} {lastName: string}\n\nKimliğinizdeki isimle eşleşmelidir.",
-        "requirements": "Hesabınızı yükseltmek, limitlerinizi artıracak ve size belirli ülkelerdeki banka hesaplarına transfer gibi ek işlevler sağlayacaktır.",
+        "requirements": "Hesabınızı yükseltmek, limitlerinizi artıracak ve size belirli ülkelerdeki banka hesaplarına transfer gibi ek işlevler sağlayacaktır.\n\nAdınızı, devlet tarafından verilmiş kimliğinizi ve bir özçekiminizi göndermeniz gerekecektir. İsminizle başlayacağız.",
         "success": "Belgeler başarıyla alınmıştır ve kısa süre içinde işleme alınacaktır. işe alımınızın durumu hakkında bilgi almak için bu sayfaya geri dönebilirsiniz",
         "error": "Belgelerinizin gönderilmesiyle ilgili bir hata oluştu. Sorun devam ederse destek ekibiyle iletişime geçebilirsiniz.",
         "status": "Kabul olma durumunuz:",
