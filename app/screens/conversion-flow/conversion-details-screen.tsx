@@ -492,6 +492,7 @@ export const ConversionDetailsScreen = () => {
               disabled={!canToggleWallet || uiLocked || !isValidAmount}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
+              testID="wallet-toggle-button"
             />
           </View>
 
@@ -600,6 +601,7 @@ export const ConversionDetailsScreen = () => {
           containerStyle={styles.buttonContainer}
           disabled={!isValidAmount || uiLocked}
           onPress={moveToNextScreen}
+          testID="next-button"
         />
       </View>
     </Screen>

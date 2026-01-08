@@ -8,6 +8,7 @@ export type WalletToggleButtonProps = {
   disabled: boolean
   onPress: () => void
   containerStyle?: StyleProp<ViewStyle>
+  testID?: string
 }
 
 export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
@@ -15,6 +16,7 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
   disabled,
   onPress,
   containerStyle,
+  testID,
 }) => {
   const {
     theme: { colors },
@@ -27,6 +29,7 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
       disabled={disabled}
       onPress={onPress}
       underlayColor={colors.grey6}
+      testID={testID}
     >
       {loading ? (
         <ActivityIndicator color={colors.primary} />
