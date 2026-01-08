@@ -1,5 +1,5 @@
 import fetch from "cross-fetch"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
@@ -67,6 +67,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   const [lnServiceErrorReason, setLnServiceErrorReason] = useState("")
   const [withdrawalInvoice, setInvoice] = useState<LnInvoiceNoSecret | null>(null)
   const [lnurlCallbackSuccess, setLnurlCallbackSuccess] = useState(false)
+  const hasRefetchedRef = useRef(false)
 
   const [memo] = useState(defaultDescription)
 
@@ -129,6 +130,9 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
 
       if (result.ok) {
         const lnurlResponse = await result.json()
+        // Check if LNURL service accepted the withdrawal request
+        // Note: Condition logic was changed from `!== "ok"` to `=== "ok"`
+        // to avoid ESLint no-negated-condition error
         if (lnurlResponse?.status?.toLowerCase() === "ok") {
           // LNURL service confirmed withdrawal request was accepted
           setLnurlCallbackSuccess(true)
@@ -163,7 +167,11 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
 
   const renderSuccessView = useMemo(() => {
     if (showSuccess) {
-      client.refetchQueries({ include: [HomeAuthedDocument] })
+      // Refetch queries only once to avoid duplicate requests when both signals arrive
+      if (!hasRefetchedRef.current) {
+        client.refetchQueries({ include: [HomeAuthedDocument] })
+        hasRefetchedRef.current = true
+      }
 
       return (
         <View style={styles.container}>
