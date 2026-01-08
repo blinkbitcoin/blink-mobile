@@ -550,7 +550,9 @@ export const ConversionDetailsScreen = () => {
 
       <View style={styles.bottomStack}>
         <PercentageSelector
-          isLocked={uiLocked}
+          isLocked={
+            uiLocked || toggleInitiated.current || isTyping || Boolean(loadingPercent)
+          }
           loadingPercent={loadingPercent}
           onSelect={setAmountToBalancePercentage}
           testIdPrefix="convert"
