@@ -80,9 +80,10 @@ const useSuccessMessage = (
         ? utils.decipherAES({ successAction, preimage })
         : null
 
-    const messageParts = [message, url, description, decryptedMessage].filter(Boolean)
+    const textContent = [message, description, decryptedMessage].filter(Boolean).join(" ")
+    const includeUrl = url && !textContent.includes(url)
 
-    return messageParts.join(" ")
+    return includeUrl ? `${textContent} ${url}`.trim() : textContent
   }, [successAction, preimage])()
 }
 
