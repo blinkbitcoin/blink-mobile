@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-hooks"
+
 import { useDebouncedEffect } from "@app/hooks/use-debounce"
 
 describe("useDebouncedEffect", () => {
