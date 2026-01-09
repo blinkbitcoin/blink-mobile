@@ -49,6 +49,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
           maxAmount={maxAmount}
           minAmount={minAmount}
           goBack={close}
+          compact
         />
       </SafeAreaView>
     </ReactNativeModal>

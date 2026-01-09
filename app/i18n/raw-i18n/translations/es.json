@@ -59,17 +59,21 @@
         "title": "Transacciones con {username: string}"
     },
     "ConversionDetailsScreen": {
-        "title": "Convertir",
-        "percentageToConvert": "% para convertir"
+        "title": "Transferir fondos",
+        "transfer": "Transferir",
+        "percentageToConvert": "% para convertir",
+        "reviewTransfer": "Revisar transferencia"
     },
     "ConversionConfirmationScreen": {
-        "title": "Confirmar conversión",
+        "title": "Confirmar transferencia",
         "youreConverting": "Estás convirtiendo",
-        "receivingAccount": "Cuenta destino"
+        "receivingAccount": "Cuenta destino",
+        "infoBitcoin": "La cantidad de Bitcoin es solo aproximada. Puede variar en una pequeña cantidad.",
+        "infoDollar": "La cantidad de Dólares es solo aproximada. Puede variar en una pequeña cantidad.",
+        "transferButtonText": "Transferir {fromWallet} a {toWallet}"
     },
     "ConversionSuccessScreen": {
-        "title": "Conversión exitosa",
-        "message": "Conversión exitosa"
+        "message": "Transferencia exitosa"
     },
     "EarnScreen": {
         "satoshi": "sat",

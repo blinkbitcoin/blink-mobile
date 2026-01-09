@@ -29,6 +29,7 @@ const light = {
   grey3: "#AEAEB8", // grey5
   grey4: "#E2E2E4", // grey8-ish
   grey5: "#F2F2F4", // grey9-ish
+  grey6: "#E7E7E7", // grey6-ish
 
   loaderForeground: "#ecebeb",
   loaderBackground: "#f3f3f3",
@@ -77,6 +78,7 @@ const dark = {
   grey3: "#949494", // grey5
   grey4: "#393939", // grey8
   grey5: "#1d1d1d", // after grey9
+  grey6: "#2B2B2B", // grey6
 
   loaderBackground: "#131313",
   loaderForeground: "#3c3b3b",
