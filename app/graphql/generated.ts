@@ -3037,7 +3037,9 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
-export type KycFlowStartMutationVariables = Exact<{ [key: string]: never; }>;
+export type KycFlowStartMutationVariables = Exact<{
+  input: KycFlowStartInput;
+}>;
 
 
 export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
@@ -5056,8 +5058,8 @@ export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof 
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
 export const KycFlowStartDocument = gql`
-    mutation kycFlowStart {
-  kycFlowStart {
+    mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
     workflowRunId
     tokenWeb
   }
@@ -5078,6 +5080,7 @@ export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutatio
  * @example
  * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
  *   variables: {
+ *      input: // value for 'input'
  *   },
  * });
  */

@@ -2752,7 +2752,7 @@
         "firstName": "Primeiro Nome",
         "lastName": "Último nome",
         "confirmNameContent": "O nome está escrito corretamente?\n\n{firstName: string} {lastName: string}\n\nDeve corresponder ao nome no seu documento de identificação.",
-        "requirements": "Atualizar sua conta aumentará seus limites e fornecerá funcionalidades adicionais, como transferência para contas bancárias em países selecionados.",
+        "requirements": "Atualizar sua conta aumentará seus limites e fornecerá funcionalidades adicionais, como transferência para contas bancárias em países selecionados.\n\nVocê precisará fornecer seu nome, um documento de identidade emitido pelo governo e uma selfie. Começaremos com seu nome.",
         "success": "Os documentos foram recebidos com sucesso e serão processados em breve. Você pode voltar a esta página para obter uma atualização sobre o status do seu processo de integração.",
         "error": "Houve um erro com o envio dos seus documentos. Você pode entrar em contato com o suporte se o problema persistir.",
         "status": "Seu status de integração é:",

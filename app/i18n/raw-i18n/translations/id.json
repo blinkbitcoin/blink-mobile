@@ -2752,7 +2752,7 @@
         "firstName": "Nama Depan",
         "lastName": "Nama Belakang",
         "confirmNameContent": "Apakah ejaan nama Anda benar?\n\n{firstName: string} {lastName: string}\n\nHarus sesuai dengan nama di ID Anda.",
-        "requirements": "Meningkatkan akun Anda akan meningkatkan batas Anda dan memberikan fungsionalitas tambahan seperti transfer ke rekening bank di negara terpilih.",
+        "requirements": "Meningkatkan akun Anda akan meningkatkan batas Anda dan memberikan fungsionalitas tambahan seperti transfer ke rekening bank di negara terpilih.\n\nAnda harus memberikan nama, ID yang dikeluarkan pemerintah, dan selfie. Kami akan memulai dengan nama Anda.",
         "success": "Dokumen berhasil diterima dan akan diproses segera. Anda dapat kembali ke halaman ini untuk pembaruan status onboarding Anda.",
         "error": "Terjadi kesalahan dalam pengiriman dokumen Anda. Silakan hubungi dukungan jika masalah berlanjut.",
         "status": "Status onboarding Anda adalah: ",

@@ -2752,7 +2752,7 @@
         "firstName": "Nom",
         "lastName": "Cognom",
         "confirmNameContent": "L'ortografia del teu nom és correcta?\n\n{firstName: string} {lastName: string}\n\nHa de coincidir amb el nom del teu document d'identitat.",
-        "requirements": "L'actualització del teu compte augmentarà els teus límits i t'oferirà funcionalitats addicionals, com ara la transferència a comptes bancaris dels països seleccionats.",
+        "requirements": "L'actualització del teu compte augmentarà els teus límits i t'oferirà funcionalitats addicionals, com ara la transferència a comptes bancaris dels països seleccionats.\n\nHauràs de proporcionar el teu nom, un document d'identitat emès pel govern i una selfie. Començarem pel teu nom.",
         "success": "Els documents s'han rebut correctament i es processaran en breu. pots tornar a aquesta pàgina per tenir una actualització de l'estat de la teva incorporació",
         "error": "S'ha produït un error amb l'enviament dels teus documents. Pots contactar amb el servei d'assistència si el problema persisteix.",
         "status": "El teu estat és:",
