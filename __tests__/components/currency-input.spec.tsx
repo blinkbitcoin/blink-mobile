@@ -1,29 +1,41 @@
 import React from "react"
 import { Text as ReactNativeText, TextInput } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render } from "@testing-library/react-native"
 
 import { CurrencyInput } from "@app/components/currency-input/currency-input"
 
 jest.mock("@rn-vui/themed", () => ({
-  Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
-    <ReactNativeText {...props} />
-  ),
-  Input: React.forwardRef(
-    (
-      {
-        value,
-        placeholder,
-        onFocus,
-        testID,
-      }: {
-        value: string
-        placeholder: string
-        onFocus: () => void
-        testID?: string
-      },
-      _ref: React.Ref<TextInput>,
-    ) => <ReactNativeText testID={testID}>{value || placeholder}</ReactNativeText>,
-  ),
+  Text: (() => {
+    const MockText = (props: React.ComponentProps<typeof ReactNativeText>) => (
+      <ReactNativeText {...props} />
+    )
+
+    MockText.displayName = "MockText"
+
+    return MockText
+  })(),
+  Input: (() => {
+    const MockInput = React.forwardRef(
+      (
+        {
+          value,
+          placeholder,
+          onFocus: _onFocus,
+          testID,
+        }: {
+          value: string
+          placeholder: string
+          onFocus?: () => void
+          testID?: string
+        },
+        _ref: React.Ref<TextInput>,
+      ) => <ReactNativeText testID={testID}>{value || placeholder}</ReactNativeText>,
+    )
+
+    MockInput.displayName = "MockInput"
+
+    return MockInput
+  })(),
   useTheme: () => ({
     theme: {
       colors: {
@@ -49,7 +61,6 @@ jest.mock("@rn-vui/themed", () => ({
 
 describe("CurrencyInput", () => {
   const mockOnChangeText = jest.fn()
-  const mockOnFocus = jest.fn()
   const inputRef = React.createRef<TextInput>()
 
   beforeEach(() => {

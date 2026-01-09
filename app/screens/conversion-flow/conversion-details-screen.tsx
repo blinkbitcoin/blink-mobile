@@ -311,7 +311,7 @@ export const ConversionDetailsScreen = () => {
         fromInputRef.current?.setNativeProps({ selection: { start: pos, end: pos } })
       }, 100)
     }
-  }, [displayCurrency])
+  }, [displayCurrency, renderValue])
 
   if (!data?.me?.defaultAccount || !fromWallet) return <></>
 
