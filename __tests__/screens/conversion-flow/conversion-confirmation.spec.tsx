@@ -1,8 +1,10 @@
 import React from "react"
-import { render, screen } from "@testing-library/react-native"
+import { Text, TouchableOpacity } from "react-native"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { useNavigation } from "@react-navigation/native"
 
 import { ConversionConfirmationScreen } from "@app/screens/conversion-flow"
-import { WalletCurrency } from "@app/graphql/generated"
+import { HomeAuthedDocument, WalletCurrency } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -111,8 +113,43 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => displayCurrencyMock(),
 }))
 
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: jest.fn(),
+}))
+
+jest.mock("react-native-haptic-feedback", () => ({
+  trigger: jest.fn(),
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: jest.fn(),
+}))
+
+jest.mock("@app/utils/analytics", () => ({
+  logConversionAttempt: jest.fn(),
+  logConversionResult: jest.fn(),
+}))
+
+jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
+  type Props = { onSwipe: () => void; initialText: string }
+
+  const MockGaloySliderButton = ({ onSwipe, initialText }: Props) => (
+    <TouchableOpacity onPress={onSwipe}>
+      <Text>{initialText}</Text>
+    </TouchableOpacity>
+  )
+
+  return { __esModule: true, default: MockGaloySliderButton }
+})
+
 describe("conversion-confirmation-screen", () => {
   let LL: ReturnType<typeof i18nObject>
+  const dispatchMock = jest.fn()
 
   beforeAll(() => {
     loadLocale("en")
@@ -121,6 +158,7 @@ describe("conversion-confirmation-screen", () => {
   beforeEach(() => {
     LL = i18nObject("en")
     jest.clearAllMocks()
+    ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
   })
 
   it("renders BTC to USD texts", async () => {
@@ -231,5 +269,95 @@ describe("conversion-confirmation-screen", () => {
     )
 
     expect(screen.getAllByText("$10000").length).toBeGreaterThanOrEqual(2)
+  })
+
+  it("sends BTC conversion on swipe", async () => {
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: {
+          amount: 10000,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: WalletCurrency.Btc,
+          toWallet: WalletCurrency.Usd,
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(intraLedgerMutationMock).toHaveBeenCalledWith({
+        variables: {
+          input: {
+            walletId: "btc-wallet-id",
+            recipientWalletId: "usd-wallet-id",
+            amount: 10000,
+          },
+        },
+        refetchQueries: [HomeAuthedDocument],
+      })
+    })
+
+    expect(dispatchMock).toHaveBeenCalled()
+  })
+
+  it("sends USD conversion on swipe", async () => {
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Usd,
+        moneyAmount: {
+          amount: 5000,
+          currency: WalletCurrency.Usd,
+          currencyCode: WalletCurrency.Usd,
+        },
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: WalletCurrency.Usd,
+          toWallet: WalletCurrency.Btc,
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(intraLedgerUsdMutationMock).toHaveBeenCalledWith({
+        variables: {
+          input: {
+            walletId: "usd-wallet-id",
+            recipientWalletId: "btc-wallet-id",
+            amount: 5000,
+          },
+        },
+        refetchQueries: [HomeAuthedDocument],
+      })
+    })
+
+    expect(dispatchMock).toHaveBeenCalled()
   })
 })
