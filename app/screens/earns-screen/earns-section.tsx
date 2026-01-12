@@ -295,6 +295,7 @@ export const EarnSection = ({ route }: Props) => {
           data={cards}
           renderItem={CardItem}
           width={screenWidth}
+          style={{ width: screenWidth }}
           mode="parallax"
           defaultIndex={firstItem}
           loop={false}
@@ -302,9 +303,7 @@ export const EarnSection = ({ route }: Props) => {
             parallaxScrollingScale: 0.82,
             parallaxScrollingOffset: 80,
           }}
-          onProgressChange={(_, absoluteProgress) =>
-            (progressValue.value = absoluteProgress)
-          }
+          onProgressChange={progressValue}
         />
         {Boolean(progressValue) && (
           <View style={styles.paginationContainer}>

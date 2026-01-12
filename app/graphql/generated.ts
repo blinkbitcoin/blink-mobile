@@ -963,6 +963,11 @@ export const InvoicePaymentStatus = {
 } as const;
 
 export type InvoicePaymentStatus = typeof InvoicePaymentStatus[keyof typeof InvoicePaymentStatus];
+export type KycFlowStartInput = {
+  readonly firstName?: InputMaybe<Scalars['String']['input']>;
+  readonly lastName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Leader = {
   readonly __typename: 'Leader';
   readonly name?: Maybe<Scalars['LeaderboardName']['output']>;
@@ -1500,6 +1505,11 @@ export type MutationIntraLedgerUsdPaymentSendArgs = {
 };
 
 
+export type MutationKycFlowStartArgs = {
+  input?: InputMaybe<KycFlowStartInput>;
+};
+
+
 export type MutationLnAddressPaymentSendArgs = {
   input: LnAddressPaymentSendInput;
 };
@@ -2016,6 +2026,7 @@ export type Query = {
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
   readonly region?: Maybe<Region>;
+  readonly txLastSeen: TxLastSeen;
   readonly upgradeModalLastShownAt?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be migrated to AccountDefaultWalletId */
   readonly userDefaultWalletId: Scalars['WalletId']['output'];
@@ -2082,6 +2093,11 @@ export type QueryOnChainUsdTxFeeAsBtcDenominatedArgs = {
 
 export type QueryRealtimePriceArgs = {
   currency?: InputMaybe<Scalars['DisplayCurrency']['input']>;
+};
+
+
+export type QueryTxLastSeenArgs = {
+  accountId: Scalars['ID']['input'];
 };
 
 
@@ -2372,6 +2388,13 @@ export const TxDirection = {
 } as const;
 
 export type TxDirection = typeof TxDirection[keyof typeof TxDirection];
+export type TxLastSeen = {
+  readonly __typename: 'TxLastSeen';
+  readonly accountId: Scalars['ID']['output'];
+  readonly btcId: Scalars['String']['output'];
+  readonly usdId: Scalars['String']['output'];
+};
+
 export const TxNotificationType = {
   IntraLedgerPayment: 'IntraLedgerPayment',
   IntraLedgerReceipt: 'IntraLedgerReceipt',
@@ -2930,6 +2953,13 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
 
+export type TxLastSeenQueryVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type TxLastSeenQuery = { readonly __typename: 'Query', readonly txLastSeen: { readonly __typename: 'TxLastSeen', readonly accountId: string, readonly btcId: string, readonly usdId: string } };
+
 export type TransactionFragment = { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } };
 
 export type TransactionListFragment = { readonly __typename: 'TransactionConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null, readonly endCursor?: string | null }, readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } }> | null };
@@ -3007,12 +3037,12 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
-export type OnboardingFlowStartMutationVariables = Exact<{
-  input: OnboardingFlowStartInput;
+export type KycFlowStartMutationVariables = Exact<{
+  input: KycFlowStartInput;
 }>;
 
 
-export type OnboardingFlowStartMutation = { readonly __typename: 'Mutation', readonly onboardingFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
+export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
 
 export type FullOnboardingScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4431,6 +4461,48 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const TxLastSeenDocument = gql`
+    query txLastSeen($accountId: ID!) {
+  txLastSeen(accountId: $accountId) @client {
+    accountId
+    btcId
+    usdId
+  }
+}
+    `;
+
+/**
+ * __useTxLastSeenQuery__
+ *
+ * To run a query within a React component, call `useTxLastSeenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTxLastSeenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTxLastSeenQuery({
+ *   variables: {
+ *      accountId: // value for 'accountId'
+ *   },
+ * });
+ */
+export function useTxLastSeenQuery(baseOptions: Apollo.QueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables> & ({ variables: TxLastSeenQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+      }
+export function useTxLastSeenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export function useTxLastSeenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export type TxLastSeenQueryHookResult = ReturnType<typeof useTxLastSeenQuery>;
+export type TxLastSeenLazyQueryHookResult = ReturnType<typeof useTxLastSeenLazyQuery>;
+export type TxLastSeenSuspenseQueryHookResult = ReturnType<typeof useTxLastSeenSuspenseQuery>;
+export type TxLastSeenQueryResult = Apollo.QueryResult<TxLastSeenQuery, TxLastSeenQueryVariables>;
 export const NetworkDocument = gql`
     query network {
   globals {
@@ -4986,40 +5058,40 @@ export function useUserEmailRegistrationValidateMutation(baseOptions?: Apollo.Mu
 export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof useUserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
-export const OnboardingFlowStartDocument = gql`
-    mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-  onboardingFlowStart(input: $input) {
+export const KycFlowStartDocument = gql`
+    mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
     workflowRunId
     tokenWeb
   }
 }
     `;
-export type OnboardingFlowStartMutationFn = Apollo.MutationFunction<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
 
 /**
- * __useOnboardingFlowStartMutation__
+ * __useKycFlowStartMutation__
  *
- * To run a mutation, you first call `useOnboardingFlowStartMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOnboardingFlowStartMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [onboardingFlowStartMutation, { data, loading, error }] = useOnboardingFlowStartMutation({
+ * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useOnboardingFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>) {
+export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>(OnboardingFlowStartDocument, options);
+        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
       }
-export type OnboardingFlowStartMutationHookResult = ReturnType<typeof useOnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationResult = Apollo.MutationResult<OnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationOptions = Apollo.BaseMutationOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
+export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
+export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const FullOnboardingScreenDocument = gql`
     query fullOnboardingScreen {
   me {
@@ -8668,6 +8740,7 @@ export type ResolversTypes = {
   InvoiceConnection: ResolverTypeWrapper<InvoiceConnection>;
   InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
   InvoicePaymentStatus: InvoicePaymentStatus;
+  KycFlowStartInput: KycFlowStartInput;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
@@ -8797,6 +8870,7 @@ export type ResolversTypes = {
   TransactionStatus: TransactionStatus;
   TxDirection: TxDirection;
   TxExternalId: ResolverTypeWrapper<Scalars['TxExternalId']['output']>;
+  TxLastSeen: ResolverTypeWrapper<TxLastSeen>;
   TxNotificationType: TxNotificationType;
   TxStatus: TxStatus;
   UpgradePayload: ResolverTypeWrapper<UpgradePayload>;
@@ -8924,6 +8998,7 @@ export type ResolversParentTypes = {
   Invoice: ResolversInterfaceTypes<ResolversParentTypes>['Invoice'];
   InvoiceConnection: InvoiceConnection;
   InvoiceEdge: InvoiceEdge;
+  KycFlowStartInput: KycFlowStartInput;
   Language: Scalars['Language']['output'];
   Leader: Leader;
   Leaderboard: Leaderboard;
@@ -9042,6 +9117,7 @@ export type ResolversParentTypes = {
   TransactionConnection: TransactionConnection;
   TransactionEdge: TransactionEdge;
   TxExternalId: Scalars['TxExternalId']['output'];
+  TxLastSeen: TxLastSeen;
   UpgradePayload: UpgradePayload;
   UsdWallet: UsdWallet;
   User: User;
@@ -9665,7 +9741,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
   intraLedgerUsdPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerUsdPaymentSendArgs, 'input'>>;
-  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType>;
+  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType, Partial<MutationKycFlowStartArgs>>;
   lnAddressPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnAddressPaymentSendArgs, 'input'>>;
   lnInvoiceCancel?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCancelArgs, 'input'>>;
   lnInvoiceCreate?: Resolver<ResolversTypes['LnInvoicePayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCreateArgs, 'input'>>;
@@ -9919,6 +9995,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
+  txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType, RequireFields<QueryTxLastSeenArgs, 'accountId'>>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;
@@ -10127,6 +10204,13 @@ export type TransactionEdgeResolvers<ContextType = any, ParentType extends Resol
 export interface TxExternalIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['TxExternalId'], any> {
   name: 'TxExternalId';
 }
+
+export type TxLastSeenResolvers<ContextType = any, ParentType extends ResolversParentTypes['TxLastSeen'] = ResolversParentTypes['TxLastSeen']> = {
+  accountId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  btcId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  usdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type UpgradePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpgradePayload'] = ResolversParentTypes['UpgradePayload']> = {
   authToken?: Resolver<Maybe<ResolversTypes['AuthToken']>, ParentType, ContextType>;
@@ -10438,6 +10522,7 @@ export type Resolvers<ContextType = any> = {
   TransactionConnection?: TransactionConnectionResolvers<ContextType>;
   TransactionEdge?: TransactionEdgeResolvers<ContextType>;
   TxExternalId?: GraphQLScalarType;
+  TxLastSeen?: TxLastSeenResolvers<ContextType>;
   UpgradePayload?: UpgradePayloadResolvers<ContextType>;
   UsdWallet?: UsdWalletResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

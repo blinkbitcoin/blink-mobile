@@ -25,6 +25,7 @@ export type AmountInputScreenUIProps = {
   onClearAmount: () => void
   onSetAmountPress?: () => void
   goBack: () => void
+  compact?: boolean
 }
 
 export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
@@ -41,9 +42,10 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   onSetAmountPress,
   setAmountDisabled,
   goBack,
+  compact = false,
 }) => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
+  const styles = useStyles(compact)
   const { theme } = useTheme()
 
   return (
@@ -108,7 +110,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
           {errorMessage && <GaloyErrorBox errorMessage={errorMessage} />}
         </View>
         <View style={styles.keyboardContainer}>
-          <CurrencyKeyboard onPress={onKeyPress} />
+          <CurrencyKeyboard onPress={onKeyPress} compact={compact} />
         </View>
         <GaloyPrimaryButton
           disabled={!onSetAmountPress || setAmountDisabled}
@@ -120,7 +122,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, compact: boolean) => ({
   amountInputScreenContainer: {
     flex: 1,
   },
@@ -196,7 +198,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   buttonContainer: {},
   keyboardContainer: {
-    paddingHorizontal: 16,
     marginBottom: 30,
+    ...(compact
+      ? { alignSelf: "stretch", paddingHorizontal: 20 }
+      : { paddingHorizontal: 16 }),
   },
 }))

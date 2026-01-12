@@ -1,11 +1,12 @@
 import React, { useState } from "react"
-import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
+import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
+import { CurrencyPill } from "../atomic/currency-pill"
 
 export type WalletValues = WalletCurrency | "ALL"
 
@@ -41,24 +42,22 @@ export const WalletFilterDropdown: React.FC<{
       value: "ALL",
       label: LL.common.all(),
       description: LL.common.allAccounts(),
-      containerStyle: styles.walletSelectorTypeLabelAll,
-      textStyle: styles.walletSelectorTypeLabelAllText,
     },
     {
-      value: "BTC",
+      value: WalletCurrency.Btc,
       label: WalletCurrency.Btc,
       description: LL.common.bitcoin(),
-      containerStyle: styles.walletSelectorTypeLabelBitcoin,
-      textStyle: styles.walletSelectorTypeLabelBtcText,
     },
     {
-      value: "USD",
+      value: WalletCurrency.Usd,
       label: WalletCurrency.Usd,
       description: LL.common.dollar(),
-      containerStyle: styles.walletSelectorTypeLabelUsd,
-      textStyle: styles.walletSelectorTypeLabelUsdText,
     },
-  ] as const
+  ] as const satisfies ReadonlyArray<{
+    value: WalletValues
+    label: string
+    description: string
+  }>
 
   const current = walletOptions.find(
     (opt) => opt.value === (pendingSelection || selected),
@@ -73,15 +72,12 @@ export const WalletFilterDropdown: React.FC<{
       >
         <View style={[styles.fieldBackground, loading && styles.disabled]}>
           <View style={styles.walletSelectorTypeContainer}>
-            <View style={current.containerStyle}>
-              <Text style={current.textStyle}>{current.label}</Text>
-            </View>
-          </View>
-
-          <View style={styles.walletSelectorInfoContainer}>
-            <View style={styles.walletSelectorTypeTextContainer}>
-              <Text style={styles.walletCurrencyText}>{current.description}</Text>
-            </View>
+            <CurrencyPill
+              currency={current.value}
+              textSize="p3"
+              containerSize="medium"
+              label={current.description}
+            />
           </View>
 
           <View style={styles.pickWalletIcon}>
@@ -111,14 +107,12 @@ export const WalletFilterDropdown: React.FC<{
             >
               <View style={styles.walletContainer}>
                 <View style={styles.walletSelectorTypeContainer}>
-                  <View style={opt.containerStyle}>
-                    <Text style={opt.textStyle}>{opt.label}</Text>
-                  </View>
-                </View>
-                <View style={styles.walletSelectorInfoContainer}>
-                  <View style={styles.walletSelectorTypeTextContainer}>
-                    <Text style={styles.walletCurrencyText}>{opt.description}</Text>
-                  </View>
+                  <CurrencyPill
+                    currency={opt.value}
+                    textSize="p3"
+                    containerSize="medium"
+                    label={opt.description}
+                  />
                 </View>
               </View>
             </TouchableOpacity>
@@ -133,6 +127,7 @@ const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
     backgroundColor: colors.grey5,
+    justifyContent: "space-between",
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -147,26 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 60,
   },
   walletSelectorTypeContainer: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: 50,
     marginRight: 20,
-  },
-  walletSelectorTypeLabelBitcoin: {
-    height: 30,
-    width: 50,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  walletSelectorTypeLabelUsd: {
-    height: 30,
-    width: 50,
-    backgroundColor: colors._green,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
   },
   walletSelectorTypeLabelAll: {
     height: 30,
@@ -178,10 +154,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  walletSelectorTypeLabelUsdText: {
-    fontWeight: "bold",
-    color: colors.black,
-  },
   walletSelectorTypeLabelBtcText: {
     fontWeight: "bold",
     color: colors.white,
@@ -189,15 +161,6 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorTypeLabelAllText: {
     fontWeight: "bold",
     color: colors.primary3,
-  },
-  walletSelectorInfoContainer: {
-    flex: 1,
-    flexDirection: "column",
-  },
-  walletCurrencyText: {
-    fontWeight: "bold",
-    fontSize: 18,
-    color: colors.black,
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

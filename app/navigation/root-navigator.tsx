@@ -96,6 +96,7 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
@@ -237,7 +238,7 @@ export const RootStack = () => {
         component={ConversionSuccessScreen}
         options={{
           headerShown: false,
-          title: LL.ConversionSuccessScreen.title(),
+          title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
@@ -280,7 +281,7 @@ export const RootStack = () => {
         name="defaultWallet"
         component={DefaultWalletScreen}
         options={() => ({
-          title: LL.DefaultWalletScreen.title(),
+          title: LL.SettingsScreen.receiveCurrency(),
         })}
       />
       <RootNavigator.Screen
@@ -298,12 +299,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="currency"
         component={DisplayCurrencyScreen}
-        options={{ title: LL.common.currency() }}
+        options={{ title: LL.SettingsScreen.displayCurrency() }}
       />
       <RootNavigator.Screen
         name="security"
         component={SecurityScreen}
-        options={{ title: LL.common.security() }}
+        options={{ title: LL.SecurityScreen.title() }}
       />
       <RootNavigator.Screen
         name="developerScreen"
@@ -381,6 +382,13 @@ export const RootStack = () => {
         component={NotificationSettingsScreen}
         options={{
           title: LL.NotificationSettingsScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="apiScreen"
+        component={ApiScreen}
+        options={{
+          title: LL.SettingsScreen.apiAcess(),
         }}
       />
       <RootNavigator.Screen

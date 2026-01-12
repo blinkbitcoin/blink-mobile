@@ -96,11 +96,14 @@ export type RootStackParamList = {
       readonly id: string
       readonly walletCurrency: WalletCurrency
     }>
+    currencyFilter?: WalletCurrency
+    showLoading?: boolean
   }
   Earn: undefined
   accountScreen: undefined
   profileScreen: undefined
   notificationSettingsScreen: undefined
+  apiScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
   emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
@@ -115,7 +118,7 @@ export type RootStackParamList = {
   totpRegistrationInitiate: undefined
   totpRegistrationValidate: { totpRegistrationId: string }
   totpLoginValidate: { authToken: string }
-  webView: { url: string; initialTitle?: string }
+  webView: { url: string; initialTitle?: string; headerTitle?: string }
   fullOnboardingFlow: undefined
   supportChat: undefined
   notificationHistory: undefined
