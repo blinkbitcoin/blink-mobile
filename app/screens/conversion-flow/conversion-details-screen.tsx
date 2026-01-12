@@ -30,7 +30,7 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
-import { ErrorBanner } from "@app/components/error-banner"
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
@@ -557,7 +557,13 @@ export const ConversionDetailsScreen = () => {
           )}
         </View>
 
-        <ErrorBanner message={amountFieldError} />
+        <View style={styles.errorBoxWrapper}>
+          {amountFieldError ? (
+            <GaloyErrorBox errorMessage={amountFieldError} />
+          ) : (
+            <View style={styles.errorBoxSpacer} />
+          )}
+        </View>
       </View>
 
       <View style={styles.bottomStack}>
@@ -691,4 +697,6 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
+  errorBoxWrapper: { marginTop: 8 },
+  errorBoxSpacer: { height: 44 },
 }))
