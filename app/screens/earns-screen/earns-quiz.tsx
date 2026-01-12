@@ -276,7 +276,14 @@ export const EarnQuiz = ({ route }: Props) => {
   }
 
   const claimQuizWrapper = React.useCallback(
-    async (skipRewards?: boolean): Promise<FetchResult<QuizClaimMutation>> => {
+    async (params?: {
+      skipRewards?: boolean
+      errorCodeToMark?: ValidateQuizCodeErrorsType
+    }): Promise<FetchResult<QuizClaimMutation>> => {
+      const { skipRewards, errorCodeToMark } = params || {}
+      if (skipRewards) {
+        markErrorCodeAlertAsShown(errorCodeToMark)
+      }
       const result = await quizClaim({
         variables: { input: { id, skipRewards } },
       })
@@ -339,8 +346,10 @@ export const EarnQuiz = ({ route }: Props) => {
   )
 
   const handleClaimWithoutRewards = React.useCallback(async () => {
-    markErrorCodeAlertAsShown(quizErrorCode)
-    await claimQuizWrapper(true)
+    await claimQuizWrapper({
+      skipRewards: true,
+      errorCodeToMark: quizErrorCode as ValidateQuizCodeErrorsType,
+    })
     setShowModal(false)
   }, [claimQuizWrapper, quizErrorCode])
 
@@ -351,7 +360,7 @@ export const EarnQuiz = ({ route }: Props) => {
       if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
         setHasTriedClaim(true)
-        const { data } = await claimQuizWrapper(false)
+        const { data } = await claimQuizWrapper()
 
         if (data?.quizClaim?.errors?.length) {
           const errorCode = data.quizClaim.errors[0]?.code as ValidateQuizCodeErrorsType
@@ -361,7 +370,10 @@ export const EarnQuiz = ({ route }: Props) => {
 
           if (skipRewardErrorCodes(errorCode)) {
             if (errorCodeAlertAlreadyShown(errorCode)) {
-              await handleClaimWithoutRewards()
+              await claimQuizWrapper({
+                skipRewards: true,
+                errorCodeToMark: errorCode,
+              })
               return
             }
             setQuizErrorMessage(defaultErrorMessage)
@@ -371,15 +383,7 @@ export const EarnQuiz = ({ route }: Props) => {
         }
       }
     })()
-  }, [
-    recordedAnswer,
-    claimQuizWrapper,
-    LL,
-    completed,
-    quizClaimLoading,
-    hasTriedClaim,
-    handleClaimWithoutRewards,
-  ])
+  }, [recordedAnswer, claimQuizWrapper, LL, completed, quizClaimLoading, hasTriedClaim])
 
   const closeModal = () => {
     setShowModal(false)
