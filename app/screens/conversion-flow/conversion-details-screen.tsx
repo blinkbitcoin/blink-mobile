@@ -318,10 +318,8 @@ export const ConversionDetailsScreen = () => {
   const toggleInputs = () => {
     if (uiLocked) return
 
-    toggleInitiated.current = true
     setLockFormattingInputId(null)
     setIsTyping(false)
-    setUiLocked(true)
 
     const currentActiveAmount =
       moneyAmount ||
@@ -332,6 +330,13 @@ export const ConversionDetailsScreen = () => {
       currentFocusedId === ConvertInputType.FROM
         ? ConvertInputType.TO
         : ConvertInputType.FROM
+
+    const hasValidAmountToRecalc = moneyAmount && moneyAmount.amount > 0
+
+    if (hasValidAmountToRecalc) {
+      toggleInitiated.current = true
+      setUiLocked(true)
+    }
 
     pendingFocusId.current = newFocusedId
     const baseTarget =
@@ -389,6 +394,12 @@ export const ConversionDetailsScreen = () => {
         formattedAmount: prev.formattedAmount,
       }
     })
+
+    if (!hasValidAmountToRecalc) {
+      if (toggleWallet) toggleWallet()
+      focusPhysically(newFocusedId)
+      pendingFocusId.current = null
+    }
   }
 
   const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
@@ -489,7 +500,7 @@ export const ConversionDetailsScreen = () => {
             />
             <WalletToggleButton
               loading={toggleInitiated.current || isTyping || Boolean(loadingPercent)}
-              disabled={!canToggleWallet || uiLocked || !isValidAmount}
+              disabled={!canToggleWallet || uiLocked}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
               testID="wallet-toggle-button"
