@@ -1,6 +1,7 @@
 import {
   StatefulNotification,
   StatefulNotificationsDocument,
+  UnacknowledgedNotificationCountDocument,
   useStatefulNotificationAcknowledgeMutation,
 } from "@app/graphql/generated"
 import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -41,7 +42,7 @@ export const Notification: React.FC<StatefulNotification> = ({
 
   const [ack, _] = useStatefulNotificationAcknowledgeMutation({
     variables: { input: { notificationId: id } },
-    refetchQueries: [StatefulNotificationsDocument],
+    refetchQueries: [StatefulNotificationsDocument, UnacknowledgedNotificationCountDocument],
   })
 
   return (
