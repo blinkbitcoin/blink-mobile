@@ -88,6 +88,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
       })
 
       const token = res.data?.kycFlowStart?.tokenWeb ?? ""
+      const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
 
       const theme = mode === "dark" || mode === "light" ? mode : ""
 
@@ -97,7 +98,8 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         ...(theme && { theme }),
       }).toString()
 
-      const url = `${kycUrl}/webflow?${query}`
+      const workflowRunIdParam = workflowRunId ? `&workflow_run_id=${workflowRunId}` : ""
+      const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
 
       navigate("webView", {
         url,
