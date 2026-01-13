@@ -1,7 +1,14 @@
 import React from "react"
 import { IconNode } from "@rn-vui/base"
 import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { StyleProp, TextInput, TouchableOpacity, View, ViewStyle } from "react-native"
+import {
+  LayoutChangeEvent,
+  StyleProp,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native"
 
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -20,6 +27,8 @@ export type WalletAmountRowProps = {
   currency: WalletCurrency
   balancePrimary: string
   balanceSecondary?: string | null
+  pillContainerStyle?: StyleProp<ViewStyle>
+  pillOnLayout?: (event: LayoutChangeEvent) => void
   containerStyle?: StyleProp<ViewStyle>
 }
 
@@ -35,6 +44,8 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   currency,
   balancePrimary,
   balanceSecondary,
+  pillContainerStyle,
+  pillOnLayout,
   containerStyle,
 }) => {
   const {
@@ -70,6 +81,8 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
             label={
               currency === WalletCurrency.Usd ? LL.common.dollar() : LL.common.bitcoin()
             }
+            containerStyle={pillContainerStyle}
+            onLayout={pillOnLayout}
           />
         </View>
         <View style={styles.walletSelectorBalanceContainer}>

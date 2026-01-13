@@ -35,6 +35,7 @@ import { toastShow } from "@app/utils/toast"
 
 import { Screen } from "@app/components/screen"
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {
@@ -63,6 +64,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useIntraLedgerUsdPaymentSendMutation()
   const isLoading = intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading
   const { LL } = useI18nContext()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-first",
@@ -259,6 +261,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
                   ? LL.common.dollar()
                   : LL.common.bitcoin()
               }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(fromWallet.currency)}
             />
 
             <View style={styles.walletSelectorBalanceContainer}>
@@ -286,6 +290,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
                   ? LL.common.dollar()
                   : LL.common.bitcoin()
               }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(toWallet.currency)}
             />
             <View style={styles.walletSelectorBalanceContainer}>
               <Text style={styles.conversionInfoFieldValue}>

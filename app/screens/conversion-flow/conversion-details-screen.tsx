@@ -35,6 +35,7 @@ import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
 import {
   AmountInputScreen,
   ConvertInputType,
@@ -150,6 +151,7 @@ export const ConversionDetailsScreen = () => {
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const fromInputRef = useRef<TextInput | null>(null)
   const toInputRef = useRef<TextInput | null>(null)
@@ -501,6 +503,8 @@ export const ConversionDetailsScreen = () => {
               currency={fromWallet.walletCurrency}
               balancePrimary={fromWalletBalanceFormatted}
               balanceSecondary={fromSatsFormatted}
+              pillContainerStyle={pillWidthStyle}
+              pillOnLayout={onPillLayout(fromWallet.walletCurrency)}
             />
           </Animated.View>
 
@@ -552,6 +556,8 @@ export const ConversionDetailsScreen = () => {
               currency={toWallet.walletCurrency}
               balancePrimary={toWalletBalanceFormatted}
               balanceSecondary={toSatsFormatted}
+              pillContainerStyle={pillWidthStyle}
+              pillOnLayout={onPillLayout(toWallet.walletCurrency)}
             />
           </Animated.View>
         </View>
