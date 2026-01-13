@@ -143,6 +143,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     padding: 0,
     margin: 0,
+    color: colors.grey1,
+    fontWeight: "bold",
   },
   inputContainer: {
     borderBottomWidth: 0,

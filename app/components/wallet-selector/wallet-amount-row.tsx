@@ -153,6 +153,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 0,
     margin: 0,
     color: colors.grey1,
+    fontWeight: "bold",
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },
   disabledOpacity: { opacity: 0.5 },
