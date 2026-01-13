@@ -34,7 +34,7 @@ import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { Screen } from "@app/components/screen"
-import { GaloyCurrencyBubbleText } from "@app/components/atomic/galoy-currency-bubble-text"
+import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {
@@ -250,10 +250,15 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         </View>
         <View style={styles.conversionInfoCard}>
           <View style={styles.fromFieldContainer}>
-            <GaloyCurrencyBubbleText
+            <CurrencyPill
               currency={fromWallet.currency}
-              textSize="p2"
+              textSize="p3"
               containerSize="medium"
+              label={
+                fromWallet.currency === WalletCurrency.Usd
+                  ? LL.common.dollar()
+                  : LL.common.bitcoin()
+              }
             />
 
             <View style={styles.walletSelectorBalanceContainer}>
@@ -272,10 +277,15 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.toFieldContainer}>
-            <GaloyCurrencyBubbleText
+            <CurrencyPill
               currency={toWallet.currency}
-              textSize="p2"
+              textSize="p3"
               containerSize="medium"
+              label={
+                toWallet.currency === WalletCurrency.Usd
+                  ? LL.common.dollar()
+                  : LL.common.bitcoin()
+              }
             />
             <View style={styles.walletSelectorBalanceContainer}>
               <Text style={styles.conversionInfoFieldValue}>

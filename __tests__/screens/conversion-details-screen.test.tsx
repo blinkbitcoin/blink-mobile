@@ -174,7 +174,7 @@ describe("ConversionDetailsScreen", () => {
     expect(getByTestId("wallet-toggle-button")).toBeTruthy()
   })
 
-  it("disables toggle button when no valid amount", () => {
+  it("enables toggle button when canToggleWallet is true even without valid amount", () => {
     mockUseConvertMoneyDetails.mockReturnValue(
       createMockConvertMoneyDetails({
         canToggleWallet: true,
@@ -188,7 +188,7 @@ describe("ConversionDetailsScreen", () => {
       </ContextForScreen>,
     )
     const toggleButton = getByTestId("wallet-toggle-button")
-    expect(toggleButton.props.accessibilityState.disabled).toBe(true)
+    expect(toggleButton.props.accessibilityState.disabled).toBe(false)
   })
 
   it("enables toggle button when valid amount exists", () => {

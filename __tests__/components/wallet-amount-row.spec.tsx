@@ -47,18 +47,21 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-jest.mock("@app/components/atomic/galoy-currency-bubble-text", () => ({
-  GaloyCurrencyBubbleText: ({
-    currency,
-  }: {
-    currency: typeof WalletCurrency.Btc | typeof WalletCurrency.Usd
-  }) => {
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: {
+      common: {
+        bitcoin: () => "Bitcoin",
+        dollar: () => "Dollar",
+      },
+    },
+  }),
+}))
+
+jest.mock("@app/components/atomic/currency-pill", () => ({
+  CurrencyPill: ({ label }: { label: string }) => {
     const ReactNative = jest.requireActual("react-native")
-    return (
-      <ReactNative.Text testID="currency-bubble">
-        {currency === "BTC" ? "BTC" : "USD"}
-      </ReactNative.Text>
-    )
+    return <ReactNative.Text testID="currency-pill">{label}</ReactNative.Text>
   },
 }))
 
@@ -87,7 +90,7 @@ describe("WalletAmountRow", () => {
       />,
     )
 
-    expect(getByText("BTC")).toBeTruthy()
+    expect(getByText("Bitcoin")).toBeTruthy()
     expect(getByText("1,000 sats")).toBeTruthy()
   })
 
@@ -107,7 +110,7 @@ describe("WalletAmountRow", () => {
       />,
     )
 
-    expect(getByText("USD")).toBeTruthy()
+    expect(getByText("Dollar")).toBeTruthy()
     expect(getByText("$100.00")).toBeTruthy()
   })
 

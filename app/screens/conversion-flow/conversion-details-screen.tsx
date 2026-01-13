@@ -30,7 +30,7 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
-import { ErrorBanner } from "@app/components/error-banner"
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
@@ -318,10 +318,8 @@ export const ConversionDetailsScreen = () => {
   const toggleInputs = () => {
     if (uiLocked) return
 
-    toggleInitiated.current = true
     setLockFormattingInputId(null)
     setIsTyping(false)
-    setUiLocked(true)
 
     const currentActiveAmount =
       moneyAmount ||
@@ -332,6 +330,13 @@ export const ConversionDetailsScreen = () => {
       currentFocusedId === ConvertInputType.FROM
         ? ConvertInputType.TO
         : ConvertInputType.FROM
+
+    const hasValidAmountToRecalc = moneyAmount && moneyAmount.amount > 0
+
+    if (hasValidAmountToRecalc) {
+      toggleInitiated.current = true
+      setUiLocked(true)
+    }
 
     pendingFocusId.current = newFocusedId
     const baseTarget =
@@ -389,6 +394,12 @@ export const ConversionDetailsScreen = () => {
         formattedAmount: prev.formattedAmount,
       }
     })
+
+    if (!hasValidAmountToRecalc) {
+      if (toggleWallet) toggleWallet()
+      focusPhysically(newFocusedId)
+      pendingFocusId.current = null
+    }
   }
 
   const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
@@ -489,7 +500,7 @@ export const ConversionDetailsScreen = () => {
             />
             <WalletToggleButton
               loading={toggleInitiated.current || isTyping || Boolean(loadingPercent)}
-              disabled={!canToggleWallet || uiLocked || !isValidAmount}
+              disabled={!canToggleWallet || uiLocked}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
               testID="wallet-toggle-button"
@@ -546,7 +557,13 @@ export const ConversionDetailsScreen = () => {
           )}
         </View>
 
-        <ErrorBanner message={amountFieldError} />
+        <View style={styles.errorBoxWrapper}>
+          {amountFieldError ? (
+            <GaloyErrorBox errorMessage={amountFieldError} />
+          ) : (
+            <View style={styles.errorBoxSpacer} />
+          )}
+        </View>
       </View>
 
       <View style={styles.bottomStack}>
@@ -680,4 +697,6 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
+  errorBoxWrapper: { marginTop: 8 },
+  errorBoxSpacer: { height: 44 },
 }))
