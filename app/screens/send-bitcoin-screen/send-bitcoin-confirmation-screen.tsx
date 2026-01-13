@@ -5,6 +5,7 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
@@ -72,6 +73,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">>()
 
   const { hideAmount } = useHideAmount()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { paymentDetail } = route.params
 
@@ -352,6 +354,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     ? LL.common.dollar()
                     : LL.common.bitcoin()
                 }
+                containerStyle={pillWidthStyle}
+                onLayout={onPillLayout(sendingWalletDescriptor.currency)}
               />
             </View>
             <View style={styles.walletSelectorInfoContainer}>
