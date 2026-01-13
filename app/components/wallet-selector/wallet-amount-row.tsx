@@ -61,11 +61,6 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         selection={selection}
         pointerEvents="none"
       />
-      <TouchableOpacity
-        style={styles.inputOverlay}
-        activeOpacity={1}
-        onPress={onOverlayPress}
-      />
       <View style={styles.rightColumn}>
         <View style={styles.currencyBubbleText}>
           <CurrencyPill
@@ -77,7 +72,12 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
             }
           />
         </View>
-        <View style={styles.walletSelectorBalanceContainer}>
+        <View
+          style={[
+            styles.walletSelectorBalanceContainer,
+            styles.walletSelectorBalanceContainerReserved,
+          ]}
+        >
           <Text style={styles.convertText}>{balancePrimary}</Text>
           {balanceSecondary && (
             <Text style={styles.convertText}>
@@ -86,6 +86,11 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
           )}
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.inputOverlay}
+        activeOpacity={1}
+        onPress={onOverlayPress}
+      />
     </View>
   )
 }
@@ -126,7 +131,10 @@ const useStyles = makeStyles(() => ({
     marginTop: 5,
     flexDirection: "column",
     alignItems: "flex-end",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
+  },
+  walletSelectorBalanceContainerReserved: {
+    minHeight: 40,
   },
   convertText: { textAlign: "right" },
   primaryNumberContainer: { flex: 1 },
