@@ -362,7 +362,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
   conversionInfoFieldValue: {
-    color: colors.grey0,
+    color: colors.grey1,
     fontWeight: "bold",
     fontSize: 20,
   },

@@ -103,7 +103,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -152,6 +152,7 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     padding: 0,
     margin: 0,
+    color: colors.grey1,
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },
   disabledOpacity: { opacity: 0.5 },
