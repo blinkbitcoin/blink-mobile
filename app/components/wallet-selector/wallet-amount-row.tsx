@@ -72,12 +72,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
             }
           />
         </View>
-        <View
-          style={[
-            styles.walletSelectorBalanceContainer,
-            styles.walletSelectorBalanceContainerReserved,
-          ]}
-        >
+        <View style={styles.walletSelectorBalanceContainer}>
           <Text style={styles.convertText}>{balancePrimary}</Text>
           {balanceSecondary && (
             <Text style={styles.convertText}>
@@ -98,15 +93,17 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
 const useStyles = makeStyles(() => ({
   row: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingTop: 6,
     paddingBottom: 6,
     position: "relative",
+    flexGrow: 1,
   },
   inputWithOverlay: {
     position: "relative",
     flex: 1,
     paddingHorizontal: 0,
+    alignSelf: "center",
   },
   inputOverlay: {
     position: "absolute",
@@ -120,6 +117,7 @@ const useStyles = makeStyles(() => ({
     minWidth: 96,
     alignItems: "flex-end",
     justifyContent: "flex-start",
+    alignSelf: "flex-start",
   },
   currencyBubbleText: {
     display: "flex",
@@ -132,9 +130,6 @@ const useStyles = makeStyles(() => ({
     flexDirection: "column",
     alignItems: "flex-end",
     justifyContent: "flex-start",
-  },
-  walletSelectorBalanceContainerReserved: {
-    minHeight: 40,
   },
   convertText: { textAlign: "right" },
   primaryNumberContainer: { flex: 1 },

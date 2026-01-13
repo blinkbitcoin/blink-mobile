@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { View, TextInput, Animated, Easing } from "react-native"
+import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
@@ -145,6 +145,7 @@ export const ConversionDetailsScreen = () => {
   const [lockFormattingInputId, setLockFormattingInputId] = useState<
     InputField["id"] | null
   >(null)
+  const [rowHeights, setRowHeights] = useState({ from: 0, to: 0 })
 
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
@@ -215,6 +216,16 @@ export const ConversionDetailsScreen = () => {
     setFocusedInputValues,
   })
   const isCurrencyVisible = displayCurrency !== WalletCurrency.Usd
+  const maxRowHeight = Math.max(rowHeights.from, rowHeights.to)
+  const rowMinHeightStyle = maxRowHeight ? { minHeight: maxRowHeight } : undefined
+
+  const setRowHeight = useCallback(
+    (key: "from" | "to") => (event: LayoutChangeEvent) => {
+      const { height } = event.nativeEvent.layout
+      setRowHeights((prev) => (prev[key] === height ? prev : { ...prev, [key]: height }))
+    },
+    [],
+  )
 
   useEffect(() => {
     if (hadInitialFocus.current || !overlaysReady) return
@@ -462,7 +473,12 @@ export const ConversionDetailsScreen = () => {
       <View style={styles.styleWalletContainer}>
         <View style={styles.walletSelectorContainer}>
           <Animated.View
-            style={[styles.rowWrapTop, getAnimatedBackground(ConvertInputType.FROM)]}
+            style={[
+              styles.rowWrapTop,
+              rowMinHeightStyle,
+              getAnimatedBackground(ConvertInputType.FROM),
+            ]}
+            onLayout={setRowHeight("from")}
           >
             <WalletAmountRow
               inputRef={fromInputRef}
@@ -508,7 +524,12 @@ export const ConversionDetailsScreen = () => {
           </View>
 
           <Animated.View
-            style={[styles.rowWrapBottom, getAnimatedBackground(ConvertInputType.TO)]}
+            style={[
+              styles.rowWrapBottom,
+              rowMinHeightStyle,
+              getAnimatedBackground(ConvertInputType.TO),
+            ]}
+            onLayout={setRowHeight("to")}
           >
             <WalletAmountRow
               inputRef={toInputRef}
