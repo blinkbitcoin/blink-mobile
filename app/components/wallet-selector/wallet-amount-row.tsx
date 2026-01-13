@@ -29,6 +29,8 @@ export type WalletAmountRowProps = {
   balanceSecondary?: string | null
   pillContainerStyle?: StyleProp<ViewStyle>
   pillOnLayout?: (event: LayoutChangeEvent) => void
+  pillWrapperStyle?: StyleProp<ViewStyle>
+  inputContainerStyle?: StyleProp<ViewStyle>
   containerStyle?: StyleProp<ViewStyle>
 }
 
@@ -46,6 +48,8 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   balanceSecondary,
   pillContainerStyle,
   pillOnLayout,
+  pillWrapperStyle,
+  inputContainerStyle,
   containerStyle,
 }) => {
   const {
@@ -62,7 +66,11 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         onFocus={onFocus}
         onChangeText={() => {}}
         showSoftInputOnFocus={false}
-        containerStyle={[styles.primaryNumberContainer, styles.inputWithOverlay]}
+        containerStyle={[
+          styles.primaryNumberContainer,
+          styles.inputWithOverlay,
+          inputContainerStyle,
+        ]}
         inputStyle={styles.primaryNumberText}
         placeholder={placeholder}
         placeholderTextColor={colors.grey2}
@@ -73,7 +81,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         pointerEvents="none"
       />
       <View style={styles.rightColumn}>
-        <View style={styles.currencyBubbleText}>
+        <View style={[styles.currencyBubbleText, pillWrapperStyle]}>
           <CurrencyPill
             currency={currency}
             textSize="p3"
