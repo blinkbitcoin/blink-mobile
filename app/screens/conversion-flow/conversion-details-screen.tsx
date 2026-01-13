@@ -645,7 +645,13 @@ export const ConversionDetailsScreen = () => {
         <GaloyPrimaryButton
           title={LL.ConversionDetailsScreen.reviewTransfer()}
           containerStyle={styles.buttonContainer}
-          disabled={!isValidAmount || uiLocked}
+          disabled={
+            !isValidAmount ||
+            uiLocked ||
+            toggleInitiated.current ||
+            isTyping ||
+            Boolean(loadingPercent)
+          }
           onPress={moveToNextScreen}
           testID="next-button"
         />
