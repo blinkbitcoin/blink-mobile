@@ -1,4 +1,10 @@
 import React from "react"
+import {
+  Text,
+  type LayoutChangeEvent,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
@@ -7,6 +13,25 @@ import { DisplayCurrency } from "@app/types/amounts"
 import { ContextForScreen } from "./helper"
 
 const mockNavigate = jest.fn()
+const mockUseEqualPillWidth = jest.fn()
+type CurrencyPillProps = {
+  currency?: WalletCurrency | "ALL"
+  label?: string
+  textSize?: string
+  containerSize?: "small" | "medium" | "large"
+  highlighted?: boolean
+  containerStyle?: StyleProp<ViewStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
+}
+const currencyPillMock = jest.fn<void, [CurrencyPillProps]>()
+
+jest.mock("@app/components/atomic/currency-pill", () => ({
+  CurrencyPill: (props: CurrencyPillProps) => {
+    currencyPillMock(props)
+    return <Text>{props.label ?? ""}</Text>
+  },
+  useEqualPillWidth: () => mockUseEqualPillWidth(),
+}))
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -148,6 +173,10 @@ describe("ConversionDetailsScreen", () => {
     }))
 
     mockUseConvertMoneyDetails.mockReturnValue(createMockConvertMoneyDetails())
+    mockUseEqualPillWidth.mockReturnValue({
+      widthStyle: { width: 140 },
+      onPillLayout: jest.fn(() => jest.fn()),
+    })
   })
 
   it("renders loading state when data is not available", () => {
@@ -227,6 +256,25 @@ describe("ConversionDetailsScreen", () => {
     )
     const toggleButton = getByTestId("wallet-toggle-button")
     expect(toggleButton.props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("passes equal pill width props to both wallet rows", () => {
+    render(
+      <ContextForScreen>
+        <ConversionDetailsScreen />
+      </ContextForScreen>,
+    )
+
+    const calls = currencyPillMock.mock.calls
+    expect(calls.length).toBeGreaterThanOrEqual(2)
+
+    const firstCall = calls[calls.length - 2][0]
+    const secondCall = calls[calls.length - 1][0]
+
+    expect(firstCall.containerStyle).toEqual({ width: 140 })
+    expect(secondCall.containerStyle).toEqual({ width: 140 })
+    expect(typeof firstCall.onLayout).toBe("function")
+    expect(typeof secondCall.onLayout).toBe("function")
   })
 
   it("disables next button when amount is invalid", () => {
