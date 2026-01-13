@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
 import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -10,12 +10,16 @@ export const CurrencyPill = ({
   textSize,
   highlighted = true,
   containerSize = "small",
+  containerStyle,
+  onLayout,
 }: {
   currency?: WalletCurrency | "ALL"
   label?: string
   textSize?: TextProps["type"]
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
+  containerStyle?: StyleProp<ViewStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
 }) => {
   const {
     theme: { colors },
@@ -56,6 +60,8 @@ export const CurrencyPill = ({
       backgroundColor={currencyProps.backgroundColor}
       borderColor={currencyProps.borderColor}
       containerSize={containerSize}
+      containerStyle={containerStyle}
+      onLayout={onLayout}
     />
   )
 }
@@ -67,6 +73,8 @@ const ContainerBubble = ({
   backgroundColor,
   containerSize = "small",
   borderColor,
+  containerStyle,
+  onLayout,
 }: {
   text: string
   textSize?: TextProps["type"]
@@ -74,11 +82,13 @@ const ContainerBubble = ({
   backgroundColor?: string
   containerSize?: "small" | "medium" | "large"
   borderColor?: string
+  containerStyle?: StyleProp<ViewStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
 }) => {
   const styles = useStyles({ backgroundColor, containerSize, color, borderColor })
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]} onLayout={onLayout}>
       <Text type={textSize || "p3"} style={styles.text}>
         {text}
       </Text>
