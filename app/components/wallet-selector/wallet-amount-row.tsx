@@ -73,7 +73,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         ]}
         inputStyle={styles.primaryNumberText}
         placeholder={placeholder}
-        placeholderTextColor={colors.grey2}
+        placeholderTextColor={colors.grey3}
         inputContainerStyle={styles.primaryNumberInputContainer}
         renderErrorMessage={false}
         rightIcon={rightIcon}
@@ -94,9 +94,9 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
           />
         </View>
         <View style={styles.walletSelectorBalanceContainer}>
-          <Text style={styles.convertText}>{balancePrimary}</Text>
+          <Text style={styles.primaryBalanceText}>{balancePrimary}</Text>
           {balanceSecondary && (
-            <Text style={styles.convertText}>
+            <Text style={styles.secondaryBalanceText}>
               {APPROXIMATE_PREFIX} {balanceSecondary}
             </Text>
           )}
@@ -152,7 +152,18 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-end",
     justifyContent: "flex-start",
   },
-  convertText: { textAlign: "right" },
+  primaryBalanceText: {
+    textAlign: "right",
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.black,
+  },
+  secondaryBalanceText: {
+    textAlign: "right",
+    fontSize: 10,
+    lineHeight: 14,
+    color: colors.grey1,
+  },
   primaryNumberContainer: { flex: 1 },
   primaryNumberText: {
     fontSize: 20,
@@ -160,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     padding: 0,
     margin: 0,
-    color: colors.grey1,
+    color: colors.black,
     fontWeight: "bold",
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },

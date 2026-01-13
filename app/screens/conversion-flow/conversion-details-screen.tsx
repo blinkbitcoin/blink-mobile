@@ -684,7 +684,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   topRowInputAlign: {
     alignSelf: "flex-start",
-    paddingTop: 23,
+    paddingTop: 18,
   },
   topRowPillAlign: {
     marginTop: 11,

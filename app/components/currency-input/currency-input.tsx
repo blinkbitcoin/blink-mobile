@@ -75,7 +75,7 @@ export const CurrencyInput = forwardRef<TextInput, CurrencyInputProps>(
               showSoftInputOnFocus={false}
               inputStyle={styles.inputText}
               placeholder={placeholder}
-              placeholderTextColor={colors.grey2}
+              placeholderTextColor={colors.grey3}
               inputContainerStyle={styles.inputContainer}
               renderErrorMessage={false}
               selection={getEndSelection()}
@@ -143,7 +143,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     padding: 0,
     margin: 0,
-    color: colors.grey1,
+    color: colors.black,
     fontWeight: "bold",
   },
   inputContainer: {

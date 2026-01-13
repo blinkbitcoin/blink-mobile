@@ -34,7 +34,7 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={colors.primary} />
       ) : (
-        <GaloyIcon name="transfer" color={colors.primary} size={32} />
+        <GaloyIcon name="transfer" color={colors.primary} size={25} />
       )}
     </TouchableHighlight>
   )
