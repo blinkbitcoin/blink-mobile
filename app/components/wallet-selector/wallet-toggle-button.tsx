@@ -1,8 +1,8 @@
 import React from "react"
 import { ActivityIndicator, StyleProp, TouchableHighlight, ViewStyle } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 export type WalletToggleButtonProps = {
   loading: boolean
   disabled: boolean
@@ -34,7 +34,7 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={colors.primary} />
       ) : (
-        <Icon name="arrow-down-outline" color={colors.primary} size={25} />
+        <GaloyIcon name="transfer" color={colors.primary} size={32} />
       )}
     </TouchableHighlight>
   )
