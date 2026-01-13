@@ -100,6 +100,11 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
       ? { id: usdWallet.id, currency: WalletCurrency.Usd }
       : { id: btcWallet.id, currency: WalletCurrency.Btc }
 
+  const fromWalletLabel =
+    fromWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const toWalletLabel =
+    toWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+
   const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
   const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
 
@@ -320,8 +325,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <GaloySliderButton
             isLoading={isLoading}
             initialText={LL.ConversionConfirmationScreen.transferButtonText({
-              fromWallet: fromWallet.currency,
-              toWallet: toWallet.currency,
+              fromWallet: fromWalletLabel,
+              toWallet: toWalletLabel,
             })}
             loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
             onSwipe={payWallet}
