@@ -35,7 +35,7 @@ import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import {
   AmountInputScreen,
   ConvertInputType,

@@ -6,8 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
-import { CurrencyPill } from "../atomic/currency-pill"
-import { useEqualPillWidth } from "../atomic/currency-pill/use-equal-pill-width"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 export type WalletValues = WalletCurrency | "ALL"
 

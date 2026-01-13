@@ -34,8 +34,7 @@ import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { Screen } from "@app/components/screen"
-import { CurrencyPill } from "@app/components/atomic/currency-pill"
-import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
+import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {

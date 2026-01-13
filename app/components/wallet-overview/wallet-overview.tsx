@@ -18,8 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { CurrencyPill } from "../atomic/currency-pill"
-import { useEqualPillWidth } from "../atomic/currency-pill/use-equal-pill-width"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 const Loader = () => {
   const styles = useStyles()
