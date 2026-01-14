@@ -23,7 +23,6 @@ import {
   lessThan,
   MoneyAmount,
   toBtcMoneyAmount,
-  toDisplayAmount,
   toUsdMoneyAmount,
   toWalletAmount,
   WalletOrDisplayCurrency,
@@ -40,7 +39,11 @@ import {
   ConvertInputType,
 } from "@app/components/transfer-amount-input"
 
-import { useConversionFormatting, useConversionOverlayFocus } from "./hooks"
+import {
+  useConversionFormatting,
+  useConversionOverlayFocus,
+  useSyncedInputValues,
+} from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
 
 gql`
@@ -115,29 +118,10 @@ export const ConversionDetailsScreen = () => {
   const [inputFormattedValues, setInputFormattedValues] = useState<InputValues | null>(
     null,
   )
-  const [inputValues, setInputValues] = useState<InputValues>({
-    fromInput: {
-      id: ConvertInputType.FROM,
-      currency: WalletCurrency.Btc,
-      amount: toBtcMoneyAmount(0),
-      isFocused: false,
-      formattedAmount: "",
-    },
-    toInput: {
-      id: ConvertInputType.TO,
-      currency: WalletCurrency.Usd,
-      amount: toUsdMoneyAmount(0),
-      isFocused: false,
-      formattedAmount: "",
-    },
-    currencyInput: {
-      id: ConvertInputType.CURRENCY,
-      currency: displayCurrency as DisplayCurrency,
-      amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
-      isFocused: false,
-      formattedAmount: "",
-    },
-    formattedAmount: "",
+  const { inputValues, setInputValues } = useSyncedInputValues({
+    fromWallet,
+    toWallet,
+    displayCurrency,
   })
 
   const [isTyping, setIsTyping] = useState(false)
@@ -264,28 +248,6 @@ export const ConversionDetailsScreen = () => {
     (amount: MoneyAmount<WalletOrDisplayCurrency>) => setMoneyAmount(amount),
     [setMoneyAmount],
   )
-
-  useEffect(() => {
-    if (fromWallet && toWallet) {
-      setInputValues((prev) => ({
-        ...prev,
-        fromInput: {
-          ...prev.fromInput,
-          currency:
-            fromWallet.walletCurrency === WalletCurrency.Btc
-              ? WalletCurrency.Btc
-              : WalletCurrency.Usd,
-        },
-        toInput: {
-          ...prev.toInput,
-          currency:
-            toWallet.walletCurrency === WalletCurrency.Btc
-              ? WalletCurrency.Btc
-              : WalletCurrency.Usd,
-        },
-      }))
-    }
-  }, [fromWallet, fromWallet?.walletCurrency, toWallet, toWallet?.walletCurrency])
 
   const onSetFormattedValues = useCallback((values: InputValues | null) => {
     if (!values) return
