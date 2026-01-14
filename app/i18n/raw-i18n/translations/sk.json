@@ -59,8 +59,8 @@
         "title": "Transakcie s {username: string}"
     },
     "ConversionDetailsScreen": {
-        "title": "Konverzia",
-        "percentageToConvert": "% na konverziu"
+        "title": "Konvertovať",
+        "percentageToConvert": "% na prevod"
     },
     "ConversionConfirmationScreen": {
         "title": "Preskúmať konverziu",
@@ -151,7 +151,7 @@
                             "Nesprávne. Neexistuje spôsob, ako by niekto mohol bitcoin kopírovať alebo vytvoriť jeho duplikát."
                         ],
                         "question": "Ak je Bitcoin digitálnymi peniazmi, nemôže ho niekto jednoducho kopírovať - a vytvoriť tak peniaze zadarmo?",
-                        "text": "Hodnotu bitcoinu nikdy nemožno kopírovať. To je práve dôvod, prečo je bitcoin tak mocným novým vynálezom!!\n\nVäčšinu digitálnych súborov - napríklad fotografiu z iPhonu, skladbu vo formáte MP3 alebo dokument Microsoft Word - možno ľahko duplikovať a zdieľať. \n\nSoftvér Bitcoinu jedinečne zabraňuje duplikácii - čiže \\\"dvojnásobnému utrácaniu\\\" - digitálnych peňazí. O tom, ako presne to funguje, sa podelíme neskôr!",
+                        "text": "Hodnotu bitcoinu nikdy nemožno kopírovať. To je práve dôvod, prečo je bitcoin tak mocným novým vynálezom!! \n\nVäčšinu digitálnych súborov - napríklad fotografiu z iPhonu, skladbu vo formáte MP3 alebo dokument Microsoft Word - možno ľahko duplikovať a zdieľať. \n\nSoftvér Bitcoinu jedinečne zabraňuje duplikácii - čiže \\\"dvojnásobnému utrácaniu\\\" - digitálnych peňazí. O tom, ako presne to funguje, sa podelíme neskôr!",
                         "title": "Ak je Bitcoin digitálnymi peniazmi, nemôže ho niekto jednoducho kopírovať - a vytvoriť tak peniaze zadarmo?"
                     }
                 }
@@ -597,7 +597,7 @@
                         ],
                         "question": "Ktorá z nasledujúcich možností NIE JE dobrým uchovávateľom hodnoty, pretože je ťažké ju ľahko rozdeliť na každodenné obchodovanie",
                         "text": "Schopnosť rozdeliť tovar je dôležitou vlastnosťou, aby bol dobrým uchovávateľom hodnoty.\n\nPredstavte si, že máte 100 dolárovú bankovku a chcete si kúpiť balíček žuvačiek, ktorý stojí 10 centov. Úspech obchodu závisí od toho, či má predajca v danom momente k dispozícii 99,90 USD.\n\nV spoločnostiach, kde prevláda obchod, možnosť rozdeliť tovar na menšie množstvá umožňuje presnejšiu výmenu a môže uľahčiť používanie pri každodenných transakciách.\n\nBitcoin je v tomto ohľade obzvlášť užitočný, pretože ho možno rozdeliť až na stomilióntinu jednotky a prenášať v malých a presných množstvách.\n\nFiat meny sú zvyčajne deliteľné na drobné, ktoré majú malú kúpnu silu, vďaka čomu je fiat v praxi dostatočne deliteľný.\n\nZlato, hoci je fyzicky deliteľné, môže byť ťažké použiť v malom množstve na každodenný obchod.\n",
-                        "title": "Dobro sa musí dať ľahko rozdeliť"
+                        "title": "Statok sa musí dať ľahko rozdeliť"
                     },
                     "scarce": {
                         "answers": [
@@ -616,7 +616,7 @@
                     },
                     "establishedHistory": {
                         "answers": [
-                            "Nový príchod má oproti zavedenému dobru značnú výhodu",
+                            "Nový produkt má oproti zavedenému statku značnú výhodu",
                             "Zavedené dobro má dlhšiu históriu oceňovania spoločnosťou",
                             "Výroba nového produktu je lacnejšia"
                         ],
@@ -1256,7 +1256,7 @@
                             "Páni, to je ambiciózny cieľ! Aj keď je pravda, že ťažba vyžaduje značné množstvo výpočtového výkonu, som si celkom istý, že hlavným účelom nie je vytvoriť armádu vládcov AI. Viac šťastia nabudúce!"
                         ],
                         "question": "Aký je hlavný účel ťažby v bitcoinovej sieti",
-                        "text": "Keď chce používateľ odoslať transakciu v bitcoinovej sieti, musí transakciu podpísať svojim súkromným kľúčom, aby dokázal, že je vlastníkom prevádzaných prostriedkov. Akonáhle je transakcia podpísaná, je vysielaná do siete peer-to-peer.\n\nŤažba je proces pridávania transakcií do bitcoinového blockchainu. Keď je transakcia vysielaná do siete, vyzdvihnú ju ťažiari, ktorí overia, že transakcia je platná (t. j. používateľ má potrebné finančné prostriedky a súkromný kľúč použitý na podpísanie transakcie zodpovedá verejnému kľúču spojenému s finančnými prostriedkami ).\n\nPo overení transakcie sa pridá do bloku transakcií spolu s matematickou hádankou. Ťažiari súťažia o vyriešenie hádanky a prvý, kto ju vyrieši, pridá blok do blockchainu a získa odmenu v bitcoine. Odmena je momentálne 6,25 bitcoinov plus prípadné transakčné poplatky, ktoré boli zahrnuté v bloku.\n\nOkrem pridávania transakcií do blockchainu slúži ťažba aj na zabezpečenie bitcoinovej siete. Je to preto, že vyriešenie hádanky si vyžaduje značné množstvo výpočtového výkonu a pridanie bloku do blockchainu vyžaduje, aby overenie riešenia overili ďalší ťažiari. To veľmi sťažuje manipuláciu s blockchainom pre jednu osobu alebo skupinu.\n",
+                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
                         "title": "Ťažba"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "Znižuje sa na polovicu",
-                            "Je zdvojená",
-                            "Vynásobí sa náhodným číslom vybraným bitcoinovým softvérom"
+                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+                            "It adjusts once a year based on market price",
+                            "It is randomly changed by miners through consensus"
                         ],
                         "feedback": [
-                            "Presne tak! Satoshi určil zníženie ponuky nových bitcoinov na polovicu v úplne prvom vydaní softvéru bitcoinov v roku 2009 a je prakticky nemožné to zmeniť",
-                            "Prepáčte, ale bloková odmena sa nezdvojnásobuje každé štyri roky. Musíte si mýliť bitcoín s dodávkami fiat mien, ktoré sa stále rozširujú rýchlejšie. Skúste to znova",
-                            "Veľmi kreatívne, ale nesprávne. Harmonogram ponuky bitcoinov nie je náhodný. Jeho predvídateľnosť poskytuje ekonomickým aktérom istotu, ktorá sa nepodobá ničomu v histórii ľudstva. Skúste to znova!"
+                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
+                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
                         ],
-                        "question": "Čo sa stane s blokovou odmenou v bitcoinovej sieti každé štyri roky",
-                        "text": "Rozhodujúcim prvkom bitcoinového protokolu je úprava obtiažnosti. Tento algoritmus zabezpečuje, že nové bloky sa nachádzajú v priemere každých 10 minút.\n\nKeď sa k sieti pripojí viac ťažiarov, priemerný čas potrebný na nájdenie nového bloku sa zníži. V opačnom prípade, keď ťažiari opustia sieť, pridanie nového bloku trvá dlhšie. Algoritmus úpravy obtiažnosti upravuje obtiažnosť matematickej hádanky tak, aby zodpovedala zmenám v kombinovanom výpočtovom výkone všetkých ťažiarov. To zabraňuje vytvoreniu väčšieho množstva (alebo menej) bitcoinových jednotiek, ako je vopred stanovený harmonogram dodávok.\n\nTo je v ostrom kontraste s fyzickou ťažbou drahých kovov, ako je zlato, kde pridanie ďalších zlatokopov vedie k vyššej ponuke zlata, a teda k poklesu jeho ceny. V bitcoinoch však pridanie nových ťažiarov iba zvyšuje bezpečnosť siete.\n",
+                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
                         "title": "Úprava obtiažnosti"
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Veľmi kreatívne, ale nesprávne. Harmonogram ponuky bitcoinov nie je náhodný. Jeho predvídateľnosť poskytuje ekonomickým aktérom istotu, ktorá sa nepodobá ničomu v histórii ľudstva. Skúste to znova!"
                         ],
                         "question": "Čo sa stane s blokovou odmenou v bitcoinovej sieti každé štyri roky",
-                        "text": "Jeden posledný prvok, ktorý je dôležité pochopiť, je, že odmena za blok v bitcoinovej sieti sa znižuje o polovicu každé štyri roky alebo každých 210 000 blokov.\n\nTáto udalosť, známa ako „halving“, je naprogramovaná v bitcoinovom softvéri, ktorý spúšťajú všetci používatelia. Keď bol bitcoin prvýkrát spustený, ťažiari dostali 50 nových bitcoinov za každý blok, ktorý pridali do blockchainu. V súčasnosti je bloková odmena 6,25 bitcoinov, ale v roku 2024, keď dôjde k ďalšiemu zníženiu na polovicu, sa zníži na 3,125 bitcoinov.\n\nTieto polovičné sumy budú pokračovať až do roku 2140, kedy bude celkový počet bitcoinov, ktoré budú vyťažené, obmedzený na 21 miliónov. Od roku 2023 už bolo vyťažených približne 92 % všetkých bitcoinov (\\~19,3 milióna).\n\nNa rozdiel od fiat mien, ktoré môžu byť inflačné, bitcoin má dezinflačný charakter. Vďaka tomu je vzácnejší ako fiat a drahé kovy ako zlato a striebro alebo čokoľvek iné, čo je vo vesmíre známe.\n",
+                        "text": "One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.\n\nThis event, known as the \"halving\", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 3.125 bitcoins, but it will be reduced to 1.5625 bitcoins in 2028 when the next halving occurs.\n\nThese halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\\~19.3 million) have already been mined.\n\nUnlike fiat currencies, which can be inflationary, bitcoin is disinflationary in nature. This makes it more scarce than fiat and precious metals such as gold and silver, or anything else known in the universe.\n",
                         "title": "Polenie (Halving)"
                     }
                 }
@@ -2162,7 +2162,7 @@
         "feeLabel": "Poplatok",
         "memoLabel": "Poznámka:",
         "paymentFinal": "Platby sú konečné.",
-        "stalePrice": "Vaša cena bitcoinu je zastaraná a bola naposledy aktualizovaná pred {timePeriod: string}. Pred vykonaním platby prosím reštartujte aplikáciu.",
+        "stalePrice": "Vaša cena bitcoinu je zastaraná a bola naposledy aktualizovaná pred {timePeriod}. Pred vykonaním platby prosím reštartujte aplikáciu.",
         "title": "Potvrdiť platbu",
         "totalLabel": "Celkom:",
         "totalExceed": "Celková suma prekračuje váš zostatok {balance: string}",
@@ -2273,7 +2273,11 @@
         "nfcOnlyReceive": "Momentálne je k dispozícii iba prijatie platby cez NFC",
         "nfcScanNow": "Skenovanie NFC",
         "nfcNotSupported": "Toto zariadenie nepodporuje technológiu NFC",
-        "logInOrCreateAccount": "Prihlásiť sa alebo vytvoriť účet"
+        "logInOrCreateAccount": "Prihlásiť sa alebo vytvoriť účet",
+        "logOutFromOneAccount": "Log out from this account",
+        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
+        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
+        "logoutOneAccountConfirm": "I understand. Please log out."
     },
     "NotificationSettingsScreen": {
         "title": "Nastavenia upozornení",
@@ -2307,6 +2311,8 @@
         "tapToAddPhoneNumber": "Klepnutím pridáte telefónne číslo",
         "loginMethods": "Metódy prihlásenia",
         "level": "Úroveň {level: string}",
+        "switchAccount": "Switch Account",
+        "pleaseWait": "Please Wait.",
         "accountLevel": "Úroveň účtu",
         "upgrade": "Upgradovať účet",
         "logOutAndDeleteLocalData": "Odhlásiť sa a vymazať všetky lokálne údaje",
@@ -2347,6 +2353,10 @@
         "yourAccountId": "Vaše ID účtu",
         "accountId": "ID účtu",
         "copy": "Kopírovať"
+    },
+    "ProfileScreen": {
+        "addAccount": "Add Account",
+        "error": "Unable to fetch profiles at this time"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Dvojfaktorové overenie",
@@ -2464,7 +2474,8 @@
         "placeholder": "Telefónne číslo",
         "verify": "Kliknite na overenie",
         "sms": "Odoslať cez SMS",
-        "whatsapp": "Odoslať cez WhatsApp"
+        "whatsapp": "Odoslať cez WhatsApp",
+        "telegram": "Send via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Pri prihlásení sa vyskytla chyba. Použili ste správny kód?",
@@ -2477,6 +2488,16 @@
         "sendAgain": "Odoslať znova",
         "tryAgain": "Skúsiť znova",
         "sendViaOtherChannel": "Zvolili ste prijatie kódu cez {channel: string}. Môžete skúsiť prijať cez {other: string}."
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "After authorizing in Telegram, you will be automatically logged in",
+        "loginWithTelegram": "Log in with Telegram",
+        "waitingForAuthorization": "Waiting for authorization in Telegram...",
+        "errorFetchParams": "Failed to fetch Telegram auth params",
+        "errorFetchLogin": "Failed to fetch Telegram login",
+        "errorAuthTimeout": "Authorization timed out. Please try again.",
+        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Telefón je nastavený",
