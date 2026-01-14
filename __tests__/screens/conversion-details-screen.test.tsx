@@ -33,6 +33,13 @@ jest.mock("@app/components/atomic/currency-pill", () => ({
   useEqualPillWidth: () => mockUseEqualPillWidth(),
 }))
 
+jest.mock("@app/components/atomic/currency-pill/use-equal-pill-width", () => ({
+  useEqualPillWidth: () => ({
+    widthStyle: { minWidth: 140 },
+    onPillLayout: () => jest.fn(),
+  }),
+}))
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
