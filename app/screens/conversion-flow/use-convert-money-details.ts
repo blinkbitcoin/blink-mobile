@@ -104,21 +104,16 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     )
   }
 
-  const toggleWallet =
-    toWallet.balance > 0
-      ? ({
-          canToggleWallet: true,
-          toggleWallet: () => {
-            setWallets({
-              fromWallet: wallets.toWallet,
-              toWallet: wallets.fromWallet,
-            })
-            setMoneyAmount(convertMoneyAmount(moneyAmount, DisplayCurrency))
-          },
-        } as const)
-      : ({
-          canToggleWallet: false,
-        } as const)
+  const toggleWallet = {
+    canToggleWallet: true,
+    toggleWallet: () => {
+      setWallets({
+        fromWallet: wallets.toWallet,
+        toWallet: wallets.fromWallet,
+      })
+      setMoneyAmount(convertMoneyAmount(moneyAmount, DisplayCurrency))
+    },
+  } as const
 
   const settlementSendAmount = convertMoneyAmount(moneyAmount, fromWallet.walletCurrency)
   const settlementReceiveAmount = convertMoneyAmount(moneyAmount, toWallet.walletCurrency)
