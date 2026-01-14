@@ -115,10 +115,10 @@ const useStyles = makeStyles(
       backgroundColor,
       paddingHorizontal:
         containerSize === "small" ? 9 : containerSize === "medium" ? 11 : 13,
-      paddingVertical: containerSize === "small" ? 3 : containerSize === "medium" ? 5 : 5,
+      paddingVertical: 8,
       minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
       minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
-      borderRadius: 10,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
       borderColor: borderColor ?? "transparent",
