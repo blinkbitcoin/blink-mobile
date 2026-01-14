@@ -154,7 +154,6 @@ const WalletOverview: React.FC<Props> = ({
                 <CurrencyPill
                   label={LL.common.bitcoin()}
                   currency={WalletCurrency.Btc}
-                  textSize="p3"
                   containerSize="medium"
                   containerStyle={pillWidthStyle}
                   onLayout={onPillLayout(WalletCurrency.Btc)}
@@ -194,7 +193,6 @@ const WalletOverview: React.FC<Props> = ({
                 <CurrencyPill
                   label={LL.common.dollar()}
                   currency={WalletCurrency.Usd}
-                  textSize="p3"
                   containerSize="medium"
                   containerStyle={pillWidthStyle}
                   onLayout={onPillLayout(WalletCurrency.Usd)}

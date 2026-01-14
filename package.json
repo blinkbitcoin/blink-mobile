@@ -139,6 +139,7 @@
     "react-native-securerandom": "^1.0.1",
     "react-native-share": "^11.1.0",
     "react-native-svg": "^15.8.0",
+    "react-native-text-size-latest": "^1.9.0",
     "react-native-toast-message": "^2.2.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.0.3",

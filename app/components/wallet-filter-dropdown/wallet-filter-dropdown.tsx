@@ -78,7 +78,6 @@ export const WalletFilterDropdown: React.FC<{
           <View style={styles.walletSelectorTypeContainer}>
             <CurrencyPill
               currency={current.value}
-              textSize="p3"
               containerSize="medium"
               label={current.description}
               containerStyle={
@@ -119,7 +118,6 @@ export const WalletFilterDropdown: React.FC<{
                 <View style={styles.walletSelectorTypeContainer}>
                   <CurrencyPill
                     currency={opt.value}
-                    textSize="p3"
                     containerSize="medium"
                     label={opt.description}
                     containerStyle={

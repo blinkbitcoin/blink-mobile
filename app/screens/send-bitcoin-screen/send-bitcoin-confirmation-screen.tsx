@@ -346,7 +346,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <View style={styles.walletSelectorTypeContainer}>
               <CurrencyPill
                 currency={sendingWalletDescriptor.currency}
-                textSize="p3"
                 containerSize="medium"
                 label={
                   sendingWalletDescriptor.currency === WalletCurrency.Usd

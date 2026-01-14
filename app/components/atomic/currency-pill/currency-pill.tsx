@@ -1,13 +1,20 @@
 import React from "react"
 import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
-import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
+import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+
+export const CURRENCY_PILL_PADDING_HORIZONTAL = 11
+export const CURRENCY_PILL_BORDER_WIDTH = 1
+
+export const CURRENCY_PILL_TEXT_STYLE = {
+  fontSize: 14,
+  fontWeight: "bold",
+} as const
 
 export const CurrencyPill = ({
   currency,
   label,
-  textSize,
   highlighted = true,
   containerSize = "small",
   containerStyle,
@@ -15,7 +22,6 @@ export const CurrencyPill = ({
 }: {
   currency?: WalletCurrency | "ALL"
   label?: string
-  textSize?: TextProps["type"]
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
   containerStyle?: StyleProp<ViewStyle>
@@ -55,7 +61,6 @@ export const CurrencyPill = ({
   return (
     <ContainerBubble
       text={text}
-      textSize={textSize}
       color={currencyProps.color}
       backgroundColor={currencyProps.backgroundColor}
       borderColor={currencyProps.borderColor}
@@ -68,7 +73,6 @@ export const CurrencyPill = ({
 
 const ContainerBubble = ({
   text,
-  textSize,
   color,
   backgroundColor,
   containerSize = "small",
@@ -77,7 +81,6 @@ const ContainerBubble = ({
   onLayout,
 }: {
   text: string
-  textSize?: TextProps["type"]
   color?: string
   backgroundColor?: string
   containerSize?: "small" | "medium" | "large"
@@ -89,7 +92,7 @@ const ContainerBubble = ({
 
   return (
     <View style={[styles.container, containerStyle]} onLayout={onLayout}>
-      <Text type={textSize || "p3"} style={styles.text}>
+      <Text type="p3" style={styles.text}>
         {text}
       </Text>
     </View>
@@ -113,8 +116,7 @@ const useStyles = makeStyles(
   ) => ({
     container: {
       backgroundColor,
-      paddingHorizontal:
-        containerSize === "small" ? 9 : containerSize === "medium" ? 11 : 13,
+      paddingHorizontal: CURRENCY_PILL_PADDING_HORIZONTAL,
       paddingVertical: 8,
       minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
       minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
@@ -122,12 +124,12 @@ const useStyles = makeStyles(
       alignItems: "center",
       justifyContent: "center",
       borderColor: borderColor ?? "transparent",
-      borderWidth: 1,
+      borderWidth: CURRENCY_PILL_BORDER_WIDTH,
       flexShrink: 0,
     },
     text: {
       color,
-      fontWeight: "bold",
+      ...CURRENCY_PILL_TEXT_STYLE,
     },
   }),
 )

@@ -84,7 +84,6 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         <View style={[styles.currencyBubbleText, pillWrapperStyle]}>
           <CurrencyPill
             currency={currency}
-            textSize="p3"
             containerSize="medium"
             label={
               currency === WalletCurrency.Usd ? LL.common.dollar() : LL.common.bitcoin()

@@ -258,7 +258,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.fromFieldContainer}>
             <CurrencyPill
               currency={fromWallet.currency}
-              textSize="p3"
               containerSize="medium"
               label={
                 fromWallet.currency === WalletCurrency.Usd
@@ -287,7 +286,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.toFieldContainer}>
             <CurrencyPill
               currency={toWallet.currency}
-              textSize="p3"
               containerSize="medium"
               label={
                 toWallet.currency === WalletCurrency.Usd

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -151,8 +151,12 @@ export const ConversionDetailsScreen = () => {
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
+  const pillLabels = useMemo(
+    () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar() }),
+    [LL.common],
+  )
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
-    useCache: true,
+    labels: pillLabels,
   })
 
   const fromInputRef = useRef<TextInput | null>(null)

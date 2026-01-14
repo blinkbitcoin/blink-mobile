@@ -318,7 +318,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                 <View style={styles.walletSelectorTypeContainer}>
                   <CurrencyPill
                     currency={wallet.walletCurrency}
-                    textSize="p3"
                     containerSize="medium"
                     label={
                       wallet.walletCurrency === WalletCurrency.Usd
@@ -510,7 +509,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               <View style={styles.walletSelectorTypeContainer}>
                 <CurrencyPill
                   currency={sendingWalletDescriptor.currency}
-                  textSize="p3"
                   containerSize="medium"
                   label={
                     sendingWalletDescriptor.currency === WalletCurrency.Usd
