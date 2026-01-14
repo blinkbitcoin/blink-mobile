@@ -27,7 +27,7 @@ describe("useEqualPillWidth", () => {
       result.current.onPillLayout("USD")(layoutEvent(120))
     })
 
-    expect(result.current.widthStyle).toEqual({ width: 120 })
+    expect(result.current.widthStyle).toEqual({ minWidth: 120 })
   })
 
   it("updates when a wider pill is measured later", () => {
@@ -42,6 +42,6 @@ describe("useEqualPillWidth", () => {
       result.current.onPillLayout("BTC")(layoutEvent(140))
     })
 
-    expect(result.current.widthStyle).toEqual({ width: 140 })
+    expect(result.current.widthStyle).toEqual({ minWidth: 140 })
   })
 })

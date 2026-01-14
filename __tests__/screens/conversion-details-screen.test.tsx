@@ -271,8 +271,8 @@ describe("ConversionDetailsScreen", () => {
     const firstCall = calls[calls.length - 2][0]
     const secondCall = calls[calls.length - 1][0]
 
-    expect(firstCall.containerStyle).toEqual({ width: 140 })
-    expect(secondCall.containerStyle).toEqual({ width: 140 })
+    expect(firstCall.containerStyle).toEqual({ minWidth: 140 })
+    expect(secondCall.containerStyle).toEqual({ minWidth: 140 })
     expect(typeof firstCall.onLayout).toBe("function")
     expect(typeof secondCall.onLayout).toBe("function")
   })

@@ -151,7 +151,9 @@ export const ConversionDetailsScreen = () => {
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
-  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
+    useCache: true,
+  })
 
   const fromInputRef = useRef<TextInput | null>(null)
   const toInputRef = useRef<TextInput | null>(null)
@@ -220,6 +222,7 @@ export const ConversionDetailsScreen = () => {
   const isCurrencyVisible = displayCurrency !== WalletCurrency.Usd
   const maxRowHeight = Math.max(rowHeights.from, rowHeights.to)
   const rowMinHeightStyle = maxRowHeight ? { minHeight: maxRowHeight } : undefined
+  const pillContainerStyle = pillWidthStyle
 
   const setRowHeight = useCallback(
     (key: "from" | "to") => (event: LayoutChangeEvent) => {
@@ -503,7 +506,7 @@ export const ConversionDetailsScreen = () => {
               currency={fromWallet.walletCurrency}
               balancePrimary={fromWalletBalanceFormatted}
               balanceSecondary={fromSatsFormatted}
-              pillContainerStyle={pillWidthStyle}
+              pillContainerStyle={pillContainerStyle}
               pillOnLayout={onPillLayout(fromWallet.walletCurrency)}
               pillWrapperStyle={styles.topRowPillAlign}
               inputContainerStyle={styles.topRowInputAlign}
@@ -558,7 +561,7 @@ export const ConversionDetailsScreen = () => {
               currency={toWallet.walletCurrency}
               balancePrimary={toWalletBalanceFormatted}
               balanceSecondary={toSatsFormatted}
-              pillContainerStyle={pillWidthStyle}
+              pillContainerStyle={pillContainerStyle}
               pillOnLayout={onPillLayout(toWallet.walletCurrency)}
             />
           </Animated.View>

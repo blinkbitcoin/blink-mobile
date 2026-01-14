@@ -114,7 +114,7 @@ const useStyles = makeStyles(
     container: {
       backgroundColor,
       paddingHorizontal:
-        containerSize === "small" ? 5 : containerSize === "medium" ? 5 : 15,
+        containerSize === "small" ? 9 : containerSize === "medium" ? 11 : 13,
       paddingVertical: containerSize === "small" ? 3 : containerSize === "medium" ? 5 : 5,
       minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
       minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
@@ -123,6 +123,7 @@ const useStyles = makeStyles(
       justifyContent: "center",
       borderColor: borderColor ?? "transparent",
       borderWidth: 1,
+      flexShrink: 0,
     },
     text: {
       color,
