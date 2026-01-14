@@ -12,23 +12,26 @@ import { Notification } from "./notification"
 gql`
   query StatefulNotifications($after: String) {
     me {
-      statefulNotificationsWithoutBulletinEnabled(first: 20, after: $after) {
-        nodes {
-          id
-          title
-          body
-          createdAt
-          acknowledgedAt
-          bulletinEnabled
-          icon
-          action {
-            ... on OpenDeepLinkAction {
-              deepLink
-            }
-            ... on OpenExternalLinkAction {
-              url
+      statefulNotificationsWithoutBulletinEnabled(first: 10, after: $after) {
+        edges {
+          node {
+            id
+            title
+            body
+            createdAt
+            acknowledgedAt
+            bulletinEnabled
+            icon
+            action {
+              ... on OpenDeepLinkAction {
+                deepLink
+              }
+              ... on OpenExternalLinkAction {
+                url
+              }
             }
           }
+          cursor
         }
         pageInfo {
           endCursor
@@ -58,13 +61,12 @@ export const NotificationHistoryScreen = () => {
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo
 
-    if (pageInfo?.hasNextPage) {
+    if (pageInfo?.hasNextPage)
       fetchMore({
         variables: {
-          after: pageInfo.endCursor,
+          after: pageInfo?.endCursor,
         },
       })
-    }
   }
 
   return (
@@ -80,7 +82,7 @@ export const NotificationHistoryScreen = () => {
             tintColor={colors.primary} // iOS refresh indicator color
           />
         }
-        data={notifications?.nodes.filter((n) => !n.bulletinEnabled)}
+        data={notifications?.edges.map(({ node }) => node)}
         renderItem={({ item }) => <Notification {...item} />}
         onEndReached={fetchNextNotificationsPage}
         onEndReachedThreshold={0.5}

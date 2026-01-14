@@ -945,26 +945,30 @@ query SettingsScreen {
 
 query StatefulNotifications($after: String) {
   me {
-    statefulNotificationsWithoutBulletinEnabled(first: 20, after: $after) {
-      nodes {
-        id
-        title
-        body
-        createdAt
-        acknowledgedAt
-        bulletinEnabled
-        icon
-        action {
-          ... on OpenDeepLinkAction {
-            deepLink
-            __typename
-          }
-          ... on OpenExternalLinkAction {
-            url
+    statefulNotificationsWithoutBulletinEnabled(first: 10, after: $after) {
+      edges {
+        node {
+          id
+          title
+          body
+          createdAt
+          acknowledgedAt
+          bulletinEnabled
+          icon
+          action {
+            ... on OpenDeepLinkAction {
+              deepLink
+              __typename
+            }
+            ... on OpenExternalLinkAction {
+              url
+              __typename
+            }
             __typename
           }
           __typename
         }
+        cursor
         __typename
       }
       pageInfo {
