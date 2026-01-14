@@ -62,14 +62,6 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     fromWallet: WalletFragment
     toWallet: WalletFragment
   }) => {
-    // if the from wallet is empty, swap the wallets
-    if (wallets.fromWallet.balance === 0) {
-      return _setWallets({
-        fromWallet: wallets.toWallet,
-        toWallet: wallets.fromWallet,
-      })
-    }
-
     _setWallets(wallets)
   }
 
