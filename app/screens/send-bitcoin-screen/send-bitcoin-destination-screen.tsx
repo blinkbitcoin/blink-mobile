@@ -100,6 +100,8 @@ const wordMatchesContact = (searchWord: string, contact: UserContact): boolean =
   return contactNameMatchesSearchWord || contactPrettyNameMatchesSearchWord
 }
 
+const normalizeHandle = (handle?: string) => (handle ?? "").trim().toLowerCase()
+
 const matchCheck = (newSearchText: string, allContacts: UserContact[]): UserContact[] => {
   if (newSearchText.length > 0) {
     const searchWordArray = newSearchText
@@ -148,6 +150,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   )
   const bitcoinNetwork = useMemo(() => data?.globals?.network, [data?.globals?.network])
   const contacts = useMemo(() => data?.me?.contacts ?? [], [data?.me?.contacts])
+  const contactHandleSet = useMemo(
+    () => new Set(contacts.map((contact) => normalizeHandle(contact.handle))),
+    [contacts],
+  )
 
   const { LL } = useI18nContext()
   const [accountDefaultWalletQuery] = useAccountDefaultWalletLazyQuery({
@@ -298,11 +304,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         destination.destinationDirection === DestinationDirection.Send &&
         destination.validDestination.paymentType === PaymentType.Intraledger
       ) {
-        if (
-          !contacts
-            .map((contact) => contact.handle.toLowerCase())
-            .includes(destination.validDestination.handle.toLowerCase())
-        ) {
+        const normalizedHandle = normalizeHandle(destination.validDestination.handle)
+        const hasConfirmedUsername =
+          normalizeHandle(destinationState.confirmationUsernameType?.username) ===
+            normalizedHandle && destinationState.unparsedDestination === rawInput
+
+        if (!contactHandleSet.has(normalizedHandle) && !hasConfirmedUsername) {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetRequiresUsernameConfirmation,
             payload: {
@@ -329,6 +336,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       navigation,
       accountDefaultWalletQuery,
       dispatchDestinationStateAction,
+      destinationState,
+      contactHandleSet,
       bitcoinNetwork,
       wallets,
       contacts,
