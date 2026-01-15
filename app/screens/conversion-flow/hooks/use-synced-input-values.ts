@@ -2,12 +2,7 @@ import { useEffect, useState } from "react"
 
 import { WalletCurrency, Wallet } from "@app/graphql/generated"
 import { ConvertInputType } from "@app/components/transfer-amount-input"
-import {
-  DisplayCurrency,
-  toBtcMoneyAmount,
-  toDisplayAmount,
-  toUsdMoneyAmount,
-} from "@app/types/amounts"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { InputValues } from "@app/screens/conversion-flow/use-convert-money-details"
 
 type WalletFragment = Pick<Wallet, "id" | "balance" | "walletCurrency">
@@ -15,13 +10,13 @@ type WalletFragment = Pick<Wallet, "id" | "balance" | "walletCurrency">
 type UseSyncedInputValuesParams = {
   fromWallet?: WalletFragment
   toWallet?: WalletFragment
-  displayCurrency: string
+  initialCurrencyInput: Pick<InputValues, "currencyInput" | "formattedAmount">
 }
 
 export const useSyncedInputValues = ({
   fromWallet,
   toWallet,
-  displayCurrency,
+  initialCurrencyInput,
 }: UseSyncedInputValuesParams) => {
   const [inputValues, setInputValues] = useState<InputValues>({
     fromInput: {
@@ -38,14 +33,7 @@ export const useSyncedInputValues = ({
       isFocused: false,
       formattedAmount: "",
     },
-    currencyInput: {
-      id: ConvertInputType.CURRENCY,
-      currency: displayCurrency as DisplayCurrency,
-      amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
-      isFocused: false,
-      formattedAmount: "",
-    },
-    formattedAmount: "",
+    ...initialCurrencyInput,
   })
 
   useEffect(() => {

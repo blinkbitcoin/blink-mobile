@@ -23,6 +23,7 @@ import {
   lessThan,
   MoneyAmount,
   toBtcMoneyAmount,
+  toDisplayAmount,
   toUsdMoneyAmount,
   toWalletAmount,
   WalletOrDisplayCurrency,
@@ -121,7 +122,16 @@ export const ConversionDetailsScreen = () => {
   const { inputValues, setInputValues } = useSyncedInputValues({
     fromWallet,
     toWallet,
-    displayCurrency,
+    initialCurrencyInput: {
+      currencyInput: {
+        id: ConvertInputType.CURRENCY,
+        currency: displayCurrency as DisplayCurrency,
+        amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
+        isFocused: false,
+        formattedAmount: "",
+      },
+      formattedAmount: "",
+    },
   })
 
   const [isTyping, setIsTyping] = useState(false)
