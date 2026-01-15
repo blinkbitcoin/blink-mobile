@@ -114,13 +114,21 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
             }}
             style={styles.iconPressable}
           >
-            <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
-              {isLoading ? (
-                <ActivityIndicator size="small" color={colors.black} />
-              ) : (
-                <Icon name="chevron-up-outline" size={18} color={colors.black} />
-              )}
-            </Animated.View>
+            {({ pressed }) => (
+              <Animated.View
+                style={[
+                  styles.iconContainer,
+                  iconAnimatedStyle,
+                  pressed && styles.iconPressed,
+                ]}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color={colors.grey2} />
+                ) : (
+                  <Icon name="chevron-up-outline" size={18} color={colors.grey2} />
+                )}
+              </Animated.View>
+            )}
           </Pressable>
         </Animated.View>
       </GestureDetector>
@@ -167,6 +175,10 @@ const useStyles = makeStyles(
       height: 40,
       alignItems: "center",
       justifyContent: "center",
+    },
+    iconPressed: {
+      backgroundColor: colors.grey5,
+      borderRadius: 20,
     },
   }),
 )

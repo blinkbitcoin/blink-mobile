@@ -2,16 +2,13 @@ import * as React from "react"
 import { Animated, Pressable } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 
-import { useDropInAnimation } from "@app/components/animations"
+import { useDropInOutAnimation } from "@app/components/animations"
 
 const UNSEEN_BADGE_ANIMATION = {
   delay: 300,
   distance: 15,
   durationIn: 180,
-}
-const HIDDEN_STYLE = {
-  opacity: 0,
-  transform: [{ translateY: 0 }],
+  durationOut: 180,
 }
 
 type UnseenTxAmountBadgeProps = {
@@ -28,12 +25,28 @@ export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
   isOutgoing,
 }) => {
   const styles = useStyles({ isOutgoing })
-  const { opacity, translateY } = useDropInAnimation({
+  const { opacity, translateY } = useDropInOutAnimation({
     visible,
     delay: UNSEEN_BADGE_ANIMATION.delay,
     distance: UNSEEN_BADGE_ANIMATION.distance,
     durationIn: UNSEEN_BADGE_ANIMATION.durationIn,
+    durationOut: UNSEEN_BADGE_ANIMATION.durationOut,
   })
+
+  const [shouldRender, setShouldRender] = React.useState(visible)
+
+  React.useEffect(() => {
+    if (visible) {
+      setShouldRender(true)
+      return
+    }
+
+    const timeout = setTimeout(() => {
+      setShouldRender(false)
+    }, UNSEEN_BADGE_ANIMATION.durationOut)
+
+    return () => clearTimeout(timeout)
+  }, [visible])
 
   return (
     <Pressable
@@ -45,14 +58,11 @@ export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
     >
       <Animated.View
         key={amountText}
-        style={[
-          styles.badge,
-          visible ? { opacity, transform: [{ translateY }] } : HIDDEN_STYLE,
-        ]}
+        style={[styles.badge, { opacity, transform: [{ translateY }] }]}
         accessibilityElementsHidden={!visible}
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
-        {visible ? <Text style={styles.text}>{amountText}</Text> : null}
+        {shouldRender ? <Text style={styles.text}>{amountText}</Text> : null}
       </Animated.View>
     </Pressable>
   )

@@ -42,6 +42,19 @@ jest.mock("@app/types/amounts", () => {
   }
 })
 
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    feeReimbursementMemo: "fee reimbursement",
+  }),
+}))
+
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => ({
+    readQuery: jest.fn(() => null),
+  }),
+}))
+
 const tx = (overrides: Partial<TransactionFragment>): TransactionFragment =>
   ({
     __typename: "Transaction",

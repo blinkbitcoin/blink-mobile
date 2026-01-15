@@ -119,6 +119,7 @@ export const RootStack = () => {
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerMode: "screen",
+        headerLeft: headerBackControl(),
       }}
       initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
     >
@@ -351,7 +352,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="transactionHistory"
         component={TransactionHistoryScreen}
-        options={{ title: LL.TransactionScreen.transactionHistoryTitle() }}
+        options={{
+          title: LL.TransactionScreen.transactionHistoryTitle(),
+          presentation: "modal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+        }}
       />
       <RootNavigator.Screen
         name="priceHistory"
@@ -566,6 +571,7 @@ export const ContactNavigator = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerLeft: headerBackControl(),
       }}
       initialRouteName="peopleHome"
     >
@@ -624,6 +630,7 @@ export const PhoneLoginNavigator = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerLeft: headerBackControl(),
       }}
     >
       <StackPhoneValidation.Screen
