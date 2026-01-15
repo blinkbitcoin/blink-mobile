@@ -2233,7 +2233,7 @@
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
         "note": "Nota",
-        "success": "El pago se ha enviado correctamente.",
+        "success": "Pago exitoso",
         "suggestionInput": "Introduce tu sugerencia",
         "max": "Max",
         "maxAmount": "Monto máximo",
@@ -2247,12 +2247,18 @@
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "copySuccessMessage": "Copiar mensaje de éxito al portapapeles",
+        "openSuccessUrl": "Abrir URL de éxito en el navegador",
+        "copySecretMessage": "Copiar mensaje secreto al portapapeles",
+        "copiedSuccessMessage": "Mensaje copiado exitosamente",
+        "copiedSecretMessage": "Mensaje secreto copiado exitosamente",
+        "pendingDecryptionMessage": "Mensaje cifrado. Esperando confirmación de pago.",
+        "feeLabel": "Comisión",
+        "noteLabel": "Nota",
+        "sender": "Remitente",
+        "recipient": "Destinatario",
+        "time": "Hora",
+        "type": "Tipo"
     },
     "SettingsScreen": {
         "staticQr": "QR estático imprimible",
@@ -2721,7 +2727,8 @@
         "allAccounts": "Todas las cuentas",
         "some": "Algunos",
         "support": "Soporte",
-        "profiles": "Perfiles"
+        "profiles": "Perfiles",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

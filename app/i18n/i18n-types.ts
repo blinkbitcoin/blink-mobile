@@ -7183,7 +7183,7 @@ type RootTranslation = {
 		 */
 		note: string
 		/**
-		 * P​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​s​e​n​t​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 * P​a​y​m​e​n​t​ ​s​u​c​c​e​s​s​f​u​l
 		 */
 		success: string
 		/**
@@ -7260,6 +7260,30 @@ type RootTranslation = {
 		 * E​n​c​r​y​p​t​e​d​ ​m​e​s​s​a​g​e​.​ ​W​a​i​t​i​n​g​ ​f​o​r​ ​p​a​y​m​e​n​t​ ​c​o​n​f​i​r​m​a​t​i​o​n​.
 		 */
 		pendingDecryptionMessage: string
+		/**
+		 * F​e​e
+		 */
+		feeLabel: string
+		/**
+		 * N​o​t​e
+		 */
+		noteLabel: string
+		/**
+		 * S​e​n​d​e​r
+		 */
+		sender: string
+		/**
+		 * R​e​c​i​p​i​e​n​t
+		 */
+		recipient: string
+		/**
+		 * T​i​m​e
+		 */
+		time: string
+		/**
+		 * T​y​p​e
+		 */
+		type: string
 	}
 	SettingsScreen: {
 		/**
@@ -8498,6 +8522,10 @@ type RootTranslation = {
 		 * B​l​i​n​k​ ​U​s​e​r
 		 */
 		blinkUser: string
+		/**
+		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
+		 */
+		blinkToBlink: string
 		/**
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
@@ -16589,7 +16617,7 @@ export type TranslationFunctions = {
 		 */
 		note: () => LocalizedString
 		/**
-		 * Payment has been sent successfully
+		 * Payment successful
 		 */
 		success: () => LocalizedString
 		/**
@@ -16666,6 +16694,30 @@ export type TranslationFunctions = {
 		 * Encrypted message. Waiting for payment confirmation.
 		 */
 		pendingDecryptionMessage: () => LocalizedString
+		/**
+		 * Fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Note
+		 */
+		noteLabel: () => LocalizedString
+		/**
+		 * Sender
+		 */
+		sender: () => LocalizedString
+		/**
+		 * Recipient
+		 */
+		recipient: () => LocalizedString
+		/**
+		 * Time
+		 */
+		time: () => LocalizedString
+		/**
+		 * Type
+		 */
+		type: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
@@ -17878,6 +17930,10 @@ export type TranslationFunctions = {
 		 * Blink User
 		 */
 		blinkUser: () => LocalizedString
+		/**
+		 * Blink to Blink
+		 */
+		blinkToBlink: () => LocalizedString
 		/**
 		 * Transaction limits
 		 */

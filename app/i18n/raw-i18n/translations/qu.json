@@ -2295,7 +2295,8 @@
     },
     "DefaultWalletScreen": {
         "title": "Qullqi chaskiy",
-        "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."    },
+        "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."
+    },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
@@ -2521,7 +2522,8 @@
         "thisMonth": "Kay killapi",
         "prevMonths": "Qhipa killapi",
         "problemMaybeReauth": "Ñuqaq kaniyta munanichuqchu. Qhipa kaniyta qayna kani. Mana kaniyta munanichuqchu, ñuqaqa chaskisqa kaniyta kaniy. Chaskisqa kaniyta kaniy, Ajustisqa > Cuenta > Chaskisqa kaniyta kaniy.",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "Blinkmanta Blinkman"
     },
     "errors": {
         "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",
