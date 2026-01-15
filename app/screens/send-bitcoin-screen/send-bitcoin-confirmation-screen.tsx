@@ -132,7 +132,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation)
 
-  let feeDisplayText = ""
+  const feeErrorText = String(LL.SendBitcoinConfirmationScreen.feeError())
+  let feeDisplayText = feeErrorText
+  currencyFeeAmount = feeErrorText
+  satFeeAmount = feeErrorText
   if (fee.amount) {
     const feeDisplayAmount = paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency)
     feeDisplayText = formatDisplayAndWalletAmount({
@@ -152,10 +155,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     satFeeAmount = formatMoneyAmount({
       moneyAmount: secondaryFeeAmount ?? ZeroUsdMoneyAmount,
     })
-  } else {
-    feeDisplayText = LL.SendBitcoinConfirmationScreen.feeError()
-    currencyFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
-    satFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
   }
 
   const displayAmount = paymentDetail.convertMoneyAmount(
