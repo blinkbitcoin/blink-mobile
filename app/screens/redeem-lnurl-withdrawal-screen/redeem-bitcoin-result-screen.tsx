@@ -66,7 +66,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   const [err, setErr] = useState("")
   const [lnServiceErrorReason, setLnServiceErrorReason] = useState("")
   const [withdrawalInvoice, setInvoice] = useState<LnInvoiceNoSecret | null>(null)
-  const [lnurlCallbackSuccess, setLnurlCallbackSuccess] = useState(false)
+  const [lnurlCallbackAccepted, setLnurlCallbackAccepted] = useState(false)
   const hasRefetchedRef = useRef(false)
 
   const [memo] = useState(defaultDescription)
@@ -74,8 +74,8 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   // FIXME: this would be false again if multiple invoice happen to be paid
   // when the user stays on this screen
   const invoicePaid = withdrawalInvoice?.paymentHash === lastHash
-  // Show success when either WebSocket confirms payment OR LNURL callback succeeds
-  const showSuccess = invoicePaid || lnurlCallbackSuccess
+  // Show pending state when LNURL callback is accepted but payment not yet confirmed
+  const showPending = lnurlCallbackAccepted && !invoicePaid
   const [lnInvoiceCreate] = useLnInvoiceCreateMutation()
 
   const createWithdrawRequestInvoice = useCallback(
@@ -131,11 +131,10 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
       if (result.ok) {
         const lnurlResponse = await result.json()
         // Check if LNURL service accepted the withdrawal request
-        // Note: Condition logic was changed from `!== "ok"` to `=== "ok"`
-        // to avoid ESLint no-negated-condition error
+        // Note: This only means the request was accepted, not that payment completed
         if (lnurlResponse?.status?.toLowerCase() === "ok") {
-          // LNURL service confirmed withdrawal request was accepted
-          setLnurlCallbackSuccess(true)
+          // LNURL service accepted the withdrawal request
+          setLnurlCallbackAccepted(true)
         } else {
           console.error(lnurlResponse, "error with redeeming")
           setErr(LL.RedeemBitcoinScreen.redeemingError())
@@ -165,14 +164,16 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     submitLNURLWithdrawRequest,
   ])
 
-  const renderSuccessView = useMemo(() => {
-    if (showSuccess) {
-      // Refetch queries only once to avoid duplicate requests when both signals arrive
-      if (!hasRefetchedRef.current) {
-        client.refetchQueries({ include: [HomeAuthedDocument] })
-        hasRefetchedRef.current = true
-      }
+  // Refetch queries when payment is confirmed, but only once
+  useEffect(() => {
+    if (invoicePaid && !hasRefetchedRef.current) {
+      client.refetchQueries({ include: [HomeAuthedDocument] })
+      hasRefetchedRef.current = true
+    }
+  }, [invoicePaid, client])
 
+  const renderSuccessView = useMemo(() => {
+    if (invoicePaid) {
       return (
         <View style={styles.container}>
           <View {...testProps("Success Icon")} style={styles.container}>
@@ -185,7 +186,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
       )
     }
     return null
-  }, [showSuccess, styles, client, LL])
+  }, [invoicePaid, styles, LL])
 
   const renderErrorView = useMemo(() => {
     if (err !== "") {
@@ -206,8 +207,22 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     return null
   }, [err, lnServiceErrorReason, styles])
 
+  const renderPendingView = useMemo(() => {
+    if (showPending) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text type={"p1"} style={styles.pendingText}>
+            {LL.RedeemBitcoinScreen.withdrawalPending()}
+          </Text>
+        </View>
+      )
+    }
+    return null
+  }, [showPending, styles, colors.primary, LL])
+
   const renderActivityStatusView = useMemo(() => {
-    if (err === "" && !showSuccess) {
+    if (err === "" && !invoicePaid && !showPending) {
       return (
         <View style={styles.container}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -215,7 +230,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
       )
     }
     return null
-  }, [err, showSuccess, styles, colors.primary])
+  }, [err, invoicePaid, showPending, styles, colors.primary])
 
   return (
     <Screen preset="scroll" style={styles.contentContainer}>
@@ -241,6 +256,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
         <View style={styles.qr}>
           {renderSuccessView}
           {renderErrorView}
+          {renderPendingView}
           {renderActivityStatusView}
         </View>
       </View>
@@ -280,6 +296,11 @@ const useStyles = makeStyles(({ colors }) => ({
   successText: {
     marginTop: 16,
     textAlign: "center",
+  },
+  pendingText: {
+    marginTop: 16,
+    textAlign: "center",
+    color: colors.grey1,
   },
   contentContainer: {
     padding: 20,

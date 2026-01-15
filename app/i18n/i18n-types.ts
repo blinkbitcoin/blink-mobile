@@ -6754,6 +6754,10 @@ type RootTranslation = {
 		 */
 		withdrawalSuccessful: string
 		/**
+		 * W​i​t​h​d​r​a​w​a​l​ ​r​e​q​u​e​s​t​ ​a​c​c​e​p​t​e​d​,​ ​w​a​i​t​i​n​g​ ​f​o​r​ ​p​a​y​m​e​n​t​.​.​.
+		 */
+		withdrawalPending: string
+		/**
 		 * M​i​n​:​ ​{​m​i​n​i​m​u​m​A​m​o​u​n​t​}​,​ ​M​a​x​:​ ​{​m​a​x​i​m​u​m​A​m​o​u​n​t​}
 		 * @param {string} maximumAmount
 		 * @param {string} minimumAmount
@@ -16172,6 +16176,10 @@ export type TranslationFunctions = {
 		 * Withdrawal successful
 		 */
 		withdrawalSuccessful: () => LocalizedString
+		/**
+		 * Withdrawal request accepted, waiting for payment...
+		 */
+		withdrawalPending: () => LocalizedString
 		/**
 		 * Min: {minimumAmount}, Max: {maximumAmount}
 		 */

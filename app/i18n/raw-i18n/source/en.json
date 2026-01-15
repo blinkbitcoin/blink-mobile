@@ -2132,7 +2132,8 @@
         "redeemBitcoin": "Redeem Bitcoin",
         "amountToRedeemFrom": "Amount to redeem from {domain: string}",
         "redeemAmountFrom": "Redeem {amountToRedeem: string} from {domain: string}",
-        "withdrawalSuccessful": "Withdrawal successful"
+        "withdrawalSuccessful": "Withdrawal successful",
+        "withdrawalPending": "Withdrawal request accepted, waiting for payment..."
     },
     "ScanningQRCodeScreen": {
         "invalidContent": "We found:\n\n{found: string}\n\nThis is not a valid Bitcoin address or Lightning invoice",
