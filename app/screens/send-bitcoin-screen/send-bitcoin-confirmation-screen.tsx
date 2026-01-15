@@ -123,8 +123,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const fee = useFee(getFee)
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
-  let currencyAmount = defaultAmount
-  let satAmount = defaultAmount
   let currencyFeeAmount = defaultAmount
   let satFeeAmount = defaultAmount
 
@@ -159,6 +157,25 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     currencyFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
     satFeeAmount = LL.SendBitcoinConfirmationScreen.feeError()
   }
+
+  const displayAmount = paymentDetail.convertMoneyAmount(
+    settlementAmount,
+    DisplayCurrency,
+  )
+
+  const currencyAmount = formatMoneyAmount({
+    moneyAmount: displayAmount,
+  })
+
+  const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
+    primaryAmount: displayAmount,
+    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
+  })
+
+  const satAmount = formatMoneyAmount({
+    moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
+  })
 
   const handleSendPayment = React.useCallback(async () => {
     if (!sendPayment || !sendingWalletDescriptor?.currency) {
@@ -318,25 +335,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }
 
   const errorMessage = paymentError || invalidAmountErrorMessage
-
-  const displayAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
-    DisplayCurrency,
-  )
-
-  currencyAmount = formatMoneyAmount({
-    moneyAmount: displayAmount,
-  })
-
-  const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
-    primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
-  })
-
-  satAmount = formatMoneyAmount({
-    moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
-  })
 
   const transactionType = () => {
     if (paymentType === "intraledger") return LL.common.intraledger()
