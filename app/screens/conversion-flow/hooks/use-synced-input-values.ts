@@ -13,8 +13,8 @@ import { InputValues } from "@app/screens/conversion-flow/use-convert-money-deta
 type WalletFragment = Pick<Wallet, "id" | "balance" | "walletCurrency">
 
 type UseSyncedInputValuesParams = {
-  fromWallet: WalletFragment | undefined
-  toWallet: WalletFragment | undefined
+  fromWallet?: WalletFragment
+  toWallet?: WalletFragment
   displayCurrency: string
 }
 
