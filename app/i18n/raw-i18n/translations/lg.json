@@ -2617,7 +2617,8 @@
         "thisMonth": "Omwezi guno",
         "prevMonths": "Emyezi egiyise",
         "problemMaybeReauth": "Waabaddewo obuzibu mu kusaba kwo. Nsaba oddemu okugezaako mu ddakiika emu. Singa ekizibu kisigalawo, tukukubiriza okufuluma n’oddamu okuyingira Osobola okufuluma ng’ogenda mu Ensengeka > Akawunti > Fuluma",
-        "warning": "Okulabula"
+        "warning": "Okulabula",
+        "blinkToBlink": "Blink okutuuka ku Blink"
     },
     "errors": {
         "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",

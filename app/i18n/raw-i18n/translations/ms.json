@@ -2524,7 +2524,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan lepas",
         "problemMaybeReauth": "Ada masalah dengan permohonan anda. Silancuba lagi dalam seminit dua. Jika masalah masih terjadi, kami cadangkan anda untuk log keluar dan log masuk semula. Anda boleh log keluar dengan pergi ke bahagian Tetapan > Akaun > Log Keluar",
-        "warning": "Amaran"
+        "warning": "Amaran",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Ada masalah timbul\nSila cuba lagi",

@@ -2719,6 +2719,7 @@ const en: BaseTranslation = {
     accountInformation: "Account Information",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
+    blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
     amountRequired: "Amount is required",

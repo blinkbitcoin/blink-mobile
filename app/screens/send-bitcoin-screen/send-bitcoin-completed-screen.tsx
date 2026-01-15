@@ -42,6 +42,7 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyInstance } from "@app/config/galoy-instances"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 
 type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
 
@@ -63,8 +64,14 @@ const processStatus = ({
   return arrivalAtMempoolEstimate ? "QUEUED" : "PENDING"
 }
 
-const formatPaymentType = (paymentType?: string): string => {
-  return paymentType === "intraledger" ? "Blink to Blink" : paymentType ?? ""
+const formatPaymentType = ({
+  blinkToBlinkLabel,
+  paymentType,
+}: {
+  blinkToBlinkLabel: string
+  paymentType?: PaymentType | string
+}): string => {
+  return paymentType === PaymentType.Intraledger ? blinkToBlinkLabel : paymentType ?? ""
 }
 
 const useSuccessMessage = (
@@ -226,7 +233,7 @@ const PaymentDetailsSection: React.FC<{
   usernameTitle: string
   destination?: string
   createdAt?: number
-  paymentType?: string
+  paymentType?: PaymentType | string
   LL: TranslationFunctions
 }> = ({
   currencyAmount,
@@ -281,7 +288,10 @@ const PaymentDetailsSection: React.FC<{
         />
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.type()}
-          text={formatPaymentType(paymentType)}
+          text={formatPaymentType({
+            blinkToBlinkLabel: LL.common.blinkToBlink(),
+            paymentType,
+          })}
           key="type"
           visible={Boolean(paymentType)}
         />

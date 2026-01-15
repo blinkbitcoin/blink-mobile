@@ -2638,7 +2638,8 @@
         "thisMonth": "Luna aceasta",
         "prevMonths": "Lunile trecute",
         "problemMaybeReauth": "A apărut o problemă cu solicitarea dvs. Vă rugăm să încercați din nou într-un minut. Dacă problema persistă, vă recomandăm să vă deconectați și să vă conectați din nou. Vă puteți deconecta accesând Setări > Cont > Deconectare",
-        "warning": "Avertizare"
+        "warning": "Avertizare",
+        "blinkToBlink": "Blink la Blink"
     },
     "errors": {
         "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",

@@ -2723,7 +2723,8 @@
         "allAccounts": "Todas las cuentas",
         "some": "Algunos",
         "support": "Soporte",
-        "profiles": "Perfiles"
+        "profiles": "Perfiles",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

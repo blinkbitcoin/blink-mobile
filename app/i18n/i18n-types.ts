@@ -8505,6 +8505,10 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
+		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
+		 */
+		blinkToBlink: string
+		/**
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
 		transactionLimits: string
@@ -17890,6 +17894,10 @@ export type TranslationFunctions = {
 		 * Blink User
 		 */
 		blinkUser: () => LocalizedString
+		/**
+		 * Blink to Blink
+		 */
+		blinkToBlink: () => LocalizedString
 		/**
 		 * Transaction limits
 		 */
