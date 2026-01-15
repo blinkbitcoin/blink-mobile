@@ -278,6 +278,7 @@ export const EarnMapScreen: React.FC = () => {
 
   const continueNotRewards = () => {
     setNotRewards(true)
+    setShowModal(false)
     navigation.navigate("earnsSection", {
       section: selectedSection,
       isAvailable: false,
