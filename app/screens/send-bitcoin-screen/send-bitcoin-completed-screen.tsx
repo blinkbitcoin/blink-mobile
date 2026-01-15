@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { View, Alert, ScrollView } from "react-native"
 import InAppReview from "react-native-in-app-review"
-import Share from "react-native-share"
-import ViewShot, { captureRef } from "react-native-view-shot"
+import ViewShot from "react-native-view-shot"
 
 import { useApolloClient } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -17,7 +16,7 @@ import {
   useFeedbackModalShownQuery,
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useScreenshot } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logAppFeedback } from "@app/utils/analytics"
@@ -51,7 +50,6 @@ interface Props {
 }
 
 const FEEDBACK_DELAY = 3000
-const SCREENSHOT_DELAY = 100
 
 const processStatus = ({
   status,
@@ -122,34 +120,6 @@ const useFeedbackHandler = () => {
   return { requestFeedback, showSuggestionModal, setShowSuggestionModal }
 }
 
-const useScreenshot = (viewRef: React.RefObject<View>) => {
-  const [isTakingScreenshot, setIsTakingScreenshot] = useState(false)
-
-  const captureAndShare = useCallback(async () => {
-    try {
-      setIsTakingScreenshot(true)
-
-      await delay(SCREENSHOT_DELAY)
-
-      const uri = await captureRef(viewRef, {
-        format: "jpg",
-        quality: 0.9,
-      })
-
-      await Share.open({
-        url: uri,
-        failOnCancel: false,
-      })
-    } catch {
-      // Do nothing
-    } finally {
-      setIsTakingScreenshot(false)
-    }
-  }, [viewRef])
-
-  return { isTakingScreenshot, captureAndShare }
-}
-
 const shouldShowFeedback = (appConfig: {
   token: string
   galoyInstance: GaloyInstance
@@ -172,11 +142,6 @@ const showFeedbackAlert = (
     { cancelable: true },
   )
 }
-
-const delay = (ms: number): Promise<void> =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms)
-  })
 
 const SuccessIconComponent: React.FC<{
   status: StatusProcessed
