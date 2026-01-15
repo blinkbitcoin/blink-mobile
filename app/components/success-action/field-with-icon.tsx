@@ -1,13 +1,18 @@
 import React from "react"
 import { View, Linking } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
-import { FieldWithEventProps } from "./field-with-icon.props"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
 type TTextWithUrl = {
   text: string
   url?: string
+}
+
+type FieldWithEventProps = {
+  title: string
+  value: string
+  subValue?: string
 }
 
 export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) => {

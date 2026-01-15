@@ -31,7 +31,7 @@ import { PaymentSendCompletedStatus } from "./use-send-payment"
 import LogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import LogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { SuccessActionTag } from "@app/components/success-action/success-action.props"
+import { SuccessActionTag } from "@app/components/success-action/success-action"
 import { LNURLPaySuccessAction, utils } from "lnurl-pay"
 import { formatUnixTimestampYMDHM } from "@app/utils/date"
 import {

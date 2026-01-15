@@ -2,8 +2,20 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
-import { SuccessActionComponentProps } from "./success-action.props"
 import { FieldWithEvent } from "./field-with-icon"
+
+type SuccessActionComponentProps = {
+  visible?: boolean
+  title: string
+  text?: string | null
+  subValue?: string
+}
+
+export enum SuccessActionTag {
+  AES = "aes",
+  MESSAGE = "message",
+  URL = "url",
+}
 
 export const SuccessActionComponent: React.FC<SuccessActionComponentProps> = ({
   visible,
