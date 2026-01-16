@@ -6317,13 +6317,98 @@ type RootTranslation = {
 		 */
 		oneSectionADay: string
 		/**
-		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n​!
+		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​w​h​i​l​e​ ​l​e​a​r​n​i​n​g​.​
+	​
+	​O​r​,​ ​c​l​i​c​k​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
 		 */
 		availableTomorrow: string
 		/**
 		 * D​i​g​ ​y​o​u​r​ ​w​a​y​ ​t​h​r​o​u​g​h​ ​t​h​e​s​e​ ​l​e​s​s​o​n​s​ ​a​n​d​ ​e​a​r​n​ ​a​s​ ​y​o​u​ ​l​e​a​r​n
 		 */
 		motivatingBadger: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​(​N​o​ ​R​e​w​a​r​d​s​)
+		 */
+		continueNoRewards: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​'​s​ ​N​o​t​ ​R​i​g​h​t​.​.​.
+		 */
+		somethingNotRight: string
+		/**
+		 * {​e​r​r​o​r​M​e​s​s​a​g​e​}​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.​
+	​O​r​,​ ​c​l​i​c​k​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
+		 * @param {string} errorMessage
+		 */
+		defaultErrorMessage: RequiredParams<'errorMessage'>
+		/**
+		 * I​t​ ​l​o​o​k​s​ ​l​i​k​e​ ​w​e​'​v​e​ ​d​e​t​e​c​t​e​d​ ​s​o​m​e​ ​u​n​u​s​u​a​l​ ​a​c​t​i​v​i​t​y​ ​o​n​ ​y​o​u​r​ ​a​c​c​o​u​n​t​.​ ​T​o​ ​e​n​s​u​r​e​ ​f​a​i​r​ ​p​l​a​y​ ​f​o​r​ ​e​v​e​r​y​o​n​e​,​ ​w​e​'​r​e​ ​u​n​a​b​l​e​ ​t​o​ ​o​f​f​e​r​ ​r​e​w​a​r​d​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e​.​
+	​Y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​,​ ​o​r​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​f​r​o​m​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​c​o​n​n​e​c​t​i​o​n​.
+		 */
+		customErrorMessage: string
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * T​e​l​c​o​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​t​e​l​c​o​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​e​l​c​o​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			invalidIpMetadata: {
+				/**
+				 * I​P​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​I​P​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​I​P​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			claimedTooEarly: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			oneSectionADay: {
+				/**
+				 * C​o​n​t​i​n​u​e​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​?
+				 */
+				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​o​n​l​y​ ​d​o​ ​o​n​e​ ​s​e​c​t​i​o​n​ ​p​e​r​ ​d​a​y​ ​w​h​i​l​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​r​e​w​a​r​d​s​.
+				 */
+				message: string
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -8900,6 +8985,14 @@ type RootTranslation = {
 		 * W​a​r​n​i​n​g
 		 */
 		warning: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		'continue': string
+		/**
+		 * C​o​r​r​e​c​t
+		 */
+		correct: string
 		/**
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
@@ -15784,13 +15877,97 @@ export type TranslationFunctions = {
 		 */
 		oneSectionADay: () => LocalizedString
 		/**
-		 * Come back tomorrow to continue learning about Bitcoin!
+		 * Come back tomorrow to continue earning sats while learning.
+
+	Or, click continue to keep learning without rewards.
 		 */
 		availableTomorrow: () => LocalizedString
 		/**
 		 * Dig your way through these lessons and earn as you learn
 		 */
 		motivatingBadger: () => LocalizedString
+		/**
+		 * Continue (No Rewards)
+		 */
+		continueNoRewards: () => LocalizedString
+		/**
+		 * Something's Not Right...
+		 */
+		somethingNotRight: () => LocalizedString
+		/**
+		 * {errorMessage} Please try again later.
+	Or, click to continue to keep learning without rewards.
+		 */
+		defaultErrorMessage: (arg: { errorMessage: string }) => LocalizedString
+		/**
+		 * It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.
+	You can still continue learning without rewards, or please try again later from a different connection.
+		 */
+		customErrorMessage: () => LocalizedString
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * Telco restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this telco.
+			We've disabled rewards for this telco until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			invalidIpMetadata: {
+				/**
+				 * IP restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this IP.
+			We've disabled rewards for this IP until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			claimedTooEarly: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			oneSectionADay: {
+				/**
+				 * Continue without rewards?
+				 */
+				title: () => LocalizedString
+				/**
+				 * You can only do one section per day while earning sats rewards.
+				 */
+				message: () => LocalizedString
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -18306,6 +18483,14 @@ export type TranslationFunctions = {
 		 * Warning
 		 */
 		warning: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		'continue': () => LocalizedString
+		/**
+		 * Correct
+		 */
+		correct: () => LocalizedString
 		/**
 		 * Recommended
 		 */

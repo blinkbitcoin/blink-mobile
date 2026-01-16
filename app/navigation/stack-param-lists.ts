@@ -32,8 +32,8 @@ export type RootStackParamList = {
   }
   pin: { screenPurpose: PinScreenPurpose }
   Primary: undefined
-  earnsSection: { section: EarnSectionType }
-  earnsQuiz: { id: string }
+  earnsSection: { section: EarnSectionType; isAvailable: boolean }
+  earnsQuiz: { id: string; isAvailable: boolean }
   scanningQRCode: undefined
   settings: undefined
   addressScreen: undefined
@@ -76,7 +76,7 @@ export type RootStackParamList = {
     mIsPinEnabled: boolean
   }
   lnurl: { username: string }
-  sectionCompleted: { amount: number; sectionTitle: string }
+  sectionCompleted: { amount: number; sectionTitle: string; isAvailable: boolean }
   priceHistory: undefined
   receiveBitcoin: undefined
   redeemBitcoinDetail: {

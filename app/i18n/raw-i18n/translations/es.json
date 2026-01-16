@@ -2006,8 +2006,38 @@
         "registerTitle": "Necesitas actualizar tu cuenta",
         "registerContent": "Regístrate con tu número de teléfono para recibir sats",
         "oneSectionADay": "¡Una sección al día!",
-        "availableTomorrow": "¡Vuelve mañana para seguir aprendiendo sobre Bitcoin!",
-        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes"
+        "availableTomorrow": "Regresa mañana para seguir ganando sats mientras aprendes.\n\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
+        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "continueNoRewards": "Continuar (Sin Recompensas)",
+        "somethingNotRight": "Algo no está bien...",
+        "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
+        "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
+        "customMessages": {
+            "invalidPhoneForQuiz":{
+                "title": "Operadora restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
+            },
+            "invalidIpMetadata":{
+                "title": "IP restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
+            },
+            "claimedTooEarly":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "notEnoughBalanceForQuiz":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "invalidQuizQuestionId":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "oneSectionADay":{
+                "title": "¿Continuar sin recompensas?",
+                "message": "Solo puedes hacer una sección por día mientras ganas recompensas sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / Crear Cuenta",
@@ -2715,6 +2745,8 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
         "warning": "Advertencia",
+        "continue": "Continuar",
+        "correct": "Correcto",
         "recommended": "Recomendado",
         "expirationTime": "Tiempo de expiración",
         "minute": "Minuto",

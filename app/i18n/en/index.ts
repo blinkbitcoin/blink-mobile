@@ -2042,8 +2042,38 @@ const en: BaseTranslation = {
     registerTitle: "Need to upgrade your account",
     registerContent: "Register with your phone number to receive sats",
     oneSectionADay: "One section a day!",
-    availableTomorrow: "Come back tomorrow to continue learning about Bitcoin!",
+    availableTomorrow: "Come back tomorrow to continue earning sats while learning.\n\nOr, click continue to keep learning without rewards.",
     motivatingBadger: "Dig your way through these lessons and earn as you learn",
+    continueNoRewards: "Continue (No Rewards)",
+    somethingNotRight: "Something's Not Right...",
+    defaultErrorMessage: "{errorMessage: string} Please try again later.\nOr, click to continue to keep learning without rewards.",
+    customErrorMessage: "It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.",
+    customMessages: {
+      invalidPhoneForQuiz:{
+        title: "Telco restricted",
+        message: "We're experiencing an attack from users with this telco.\nWe've disabled rewards for this telco until further notice. Apologies!",
+      },
+      invalidIpMetadata:{
+        title: "IP restricted",
+        message: "We're experiencing an attack from users with this IP.\nWe've disabled rewards for this IP until further notice. Apologies!",
+      },
+      claimedTooEarly:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      notEnoughBalanceForQuiz:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      invalidQuizQuestionId:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      oneSectionADay:{
+        title: "Continue without rewards?",
+        message: "You can only do one section per day while earning sats rewards.",
+      },
+    },
   },
   GetStartedScreen: {
     logInCreateAccount: "Log in / create account",
@@ -2818,6 +2848,8 @@ const en: BaseTranslation = {
     problemMaybeReauth:
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
+    continue: "Continue",
+    correct: "Correct",
     recommended: "Recommended",
     expirationTime: "Expiration Time",
     minute: "Minute",

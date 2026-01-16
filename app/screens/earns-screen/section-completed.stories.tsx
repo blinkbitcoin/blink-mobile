@@ -12,6 +12,7 @@ const route = {
   params: {
     amount: 12,
     sectionTitle: "Bitcoin: What is it?",
+    isAvailable: true,
   },
 } as const
 
