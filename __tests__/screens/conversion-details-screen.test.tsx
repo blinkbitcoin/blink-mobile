@@ -74,6 +74,8 @@ jest.mock("@app/screens/conversion-flow/use-convert-money-details", () => ({
 const mockRenderValue = jest.fn()
 const mockCaretSelectionFor = jest.fn()
 
+const mockSetInputValues = jest.fn()
+
 jest.mock("@app/screens/conversion-flow/hooks", () => ({
   useConversionFormatting: () => ({
     renderValue: mockRenderValue,
@@ -83,6 +85,33 @@ jest.mock("@app/screens/conversion-flow/hooks", () => ({
   useConversionOverlayFocus: () => ({
     handleInputPress: jest.fn(),
     focusPhysically: jest.fn(),
+  }),
+  useSyncedInputValues: () => ({
+    inputValues: {
+      fromInput: {
+        id: "fromInput",
+        currency: "BTC",
+        amount: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+        isFocused: false,
+        formattedAmount: "",
+      },
+      toInput: {
+        id: "toInput",
+        currency: "USD",
+        amount: { amount: 0, currency: "USD", currencyCode: "USD" },
+        isFocused: false,
+        formattedAmount: "",
+      },
+      currencyInput: {
+        id: "currencyInput",
+        currency: "DisplayCurrency",
+        amount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+        isFocused: false,
+        formattedAmount: "",
+      },
+      formattedAmount: "",
+    },
+    setInputValues: mockSetInputValues,
   }),
 }))
 
@@ -651,5 +680,49 @@ describe("ConversionDetailsScreen", () => {
       </ContextForScreen>,
     )
     expect(getByPlaceholderText("£0")).toBeTruthy()
+  })
+
+  it("updates input amount currencies when wallets are swapped from USD to BTC", () => {
+    mockUseConvertMoneyDetails.mockReturnValue(
+      createMockConvertMoneyDetails({
+        fromWallet: mockUsdWallet,
+        toWallet: mockBtcWallet,
+        isValidAmount: true,
+        moneyAmount: {
+          amount: 30000,
+          currency: WalletCurrency.Usd,
+          currencyCode: "USD",
+        },
+        settlementSendAmount: {
+          amount: 30000,
+          currency: WalletCurrency.Usd,
+          currencyCode: "USD",
+        },
+        settlementReceiveAmount: {
+          amount: 29000,
+          currency: WalletCurrency.Btc,
+          currencyCode: "BTC",
+        },
+        displayAmount: {
+          amount: 30000,
+          currency: DisplayCurrency,
+          currencyCode: DisplayCurrency,
+        },
+      }),
+    )
+
+    mockRenderValue
+      .mockReturnValueOnce("$300")
+      .mockReturnValueOnce("29,000 SAT")
+      .mockReturnValue("")
+
+    const { getByPlaceholderText } = render(
+      <ContextForScreen>
+        <ConversionDetailsScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByPlaceholderText("$0")).toBeTruthy()
+    expect(getByPlaceholderText("0 SAT")).toBeTruthy()
   })
 })
