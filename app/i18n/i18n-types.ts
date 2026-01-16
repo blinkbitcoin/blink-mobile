@@ -9146,10 +9146,6 @@ type RootTranslation = {
 		 */
 		statusPage: string
 		/**
-		 * C​h​a​t​b​o​t
-		 */
-		chatbot: string
-		/**
 		 * T​e​l​e​g​r​a​m
 		 */
 		telegram: string
@@ -9590,20 +9586,6 @@ type RootTranslation = {
 		 * Y​o​u​ ​d​o​n​'​t​ ​h​a​v​e​ ​a​n​y​ ​n​o​t​i​f​i​c​a​t​i​o​n​s​ ​r​i​g​h​t​ ​n​o​w
 		 */
 		noNotifications: string
-	}
-	SupportChat: {
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​s​e​n​d​i​n​g​ ​t​h​e​ ​m​e​s​s​a​g​e
-		 */
-		errorSendingMessage: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​r​e​s​e​t​ ​t​h​e​ ​c​h​a​t​?
-		 */
-		confirmChatReset: string
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​r​e​s​e​t​t​i​n​g​ ​t​h​e​ ​c​h​a​t
-		 */
-		errorResettingChat: string
 	}
 }
 
@@ -18643,10 +18625,6 @@ export type TranslationFunctions = {
 		 */
 		statusPage: () => LocalizedString
 		/**
-		 * Chatbot
-		 */
-		chatbot: () => LocalizedString
-		/**
 		 * Telegram
 		 */
 		telegram: () => LocalizedString
@@ -19068,20 +19046,6 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
-	}
-	SupportChat: {
-		/**
-		 * An error occurred while sending the message
-		 */
-		errorSendingMessage: () => LocalizedString
-		/**
-		 * Are you sure you want to reset the chat?
-		 */
-		confirmChatReset: () => LocalizedString
-		/**
-		 * An error occurred while resetting the chat
-		 */
-		errorResettingChat: () => LocalizedString
 	}
 }
 

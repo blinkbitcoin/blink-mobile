@@ -2651,7 +2651,6 @@
         "faq": "SSS",
         "enjoyingApp": "Uygulamayı beğendiniz mi?",
         "statusPage": "Durum Sayfası",
-        "chatbot": "Sohbet Botu",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Geri bildiriminiz için teşekkür ederiz, bir iyileştirme önermek ister misiniz?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Bildirimler",
         "noNotifications": "Şu anda herhangi bir bildiriminiz yok"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
     }
 }

@@ -2651,7 +2651,6 @@
         "faq": "Maswali yanayoulizwa mara kwa mara",
         "enjoyingApp": "Unafurahia programu?",
         "statusPage": "Ukurasa wa Hali",
-        "chatbot": "Gumzo",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Asante kwa maoni, ungependa kupendekeza uboreshaji?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Arifa",
         "noNotifications": "Huna arifa zozote kwa sasa"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Hitilafu ilitokea wakati wa kutuma ujumbe",
-        "confirmChatReset": "Je, una uhakika unataka kuweka upya gumzo?",
-        "errorResettingChat": "Hitilafu ilitokea wakati wa kuweka upya gumzo"
     }
 }

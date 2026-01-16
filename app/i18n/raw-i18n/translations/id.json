@@ -2651,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Enjoying the app?",
         "statusPage": "Status Page",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Terima kasih atas masukan Anda, apakah Anda ingin menyarankan perbaikan?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifikasi",
         "noNotifications": "Anda tidak memiliki notifikasi saat ini"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Terjadi kesalahan saat mengirim pesan.",
-        "confirmChatReset": "Apakah Anda yakin ingin mengatur ulang obrolan?",
-        "errorResettingChat": "Terjadi kesalahan saat mengatur ulang obrolan."
     }
 }

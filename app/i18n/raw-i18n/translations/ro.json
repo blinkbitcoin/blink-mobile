@@ -2672,7 +2672,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Vă place aplicația?",
         "statusPage": "Pagina de stare",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Vă mulțumim pentru feedback, doriți să sugerați o îmbunătățire?",
@@ -2788,10 +2787,5 @@
     "NotificationHistory": {
         "title": "Notificări",
         "noNotifications": "Nu aveți nicio notificare momentan"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "A apărut o eroare la trimiterea mesajului",
-        "confirmChatReset": "Sigur doriți să resetați chat-ul?",
-        "errorResettingChat": "A apărut o eroare la resetarea chatului"
     }
 }

@@ -2651,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Onyumirwa omukutu?",
         "statusPage": "Omuko gw'embeera",
-        "chatbot": "Nnyumya naffe",
         "telegram": "Telegram",
         "mattermost": "Ekisinga obukulu",
         "thankYouText": "Webale nnyo endowooza yo, wandyagadde okuteesa ku nnongoosereza?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Okumanyisibwa",
         "noNotifications": "You don't have any notifications right now"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
     }
 }

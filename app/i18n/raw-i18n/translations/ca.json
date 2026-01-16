@@ -2651,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Gaudint de l'aplicació?",
         "statusPage": "Pàgina d'estat",
-        "chatbot": "Bot de xat",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Gràcies pels comentaris, vols suggerir una millora?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notificacions",
         "noNotifications": "Ara no tens cap notificació"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "S'ha produït un error en enviar el missatge",
-        "confirmChatReset": "Confirmes que vols restablir el xat?",
-        "errorResettingChat": "S'ha produït un error en restablir el xat"
     }
 }
