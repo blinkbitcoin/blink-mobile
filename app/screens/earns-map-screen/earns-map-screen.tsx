@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native"
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler"
 import { SvgProps } from "react-native-svg"
 
@@ -34,6 +34,8 @@ import RightOngoing from "./right-section-ongoing-01.svg"
 import RightTodo from "./right-section-to-do-01.svg"
 import TextBlock from "./text-block-medium.svg"
 import { useQuizServer } from "./use-quiz-server"
+import CustomModal from "@app/components/custom-modal/custom-modal"
+import { useState } from "react"
 
 type SideType = "left" | "right"
 interface IInBetweenTile {
@@ -102,6 +104,10 @@ export const EarnMapScreen: React.FC = () => {
   let currSection = 0
   let progress = NaN
 
+  const [showModal, setShowModal] = useState(false)
+  const [notRewards, setNotRewards] = useState(false)
+  const [selectedSection, setSelectedSection] = useState<EarnSectionType>(sections[0])
+
   const { loading, quizServerData, earnedSats } = useQuizServer({
     fetchPolicy: "network-only",
   })
@@ -123,7 +129,7 @@ export const EarnMapScreen: React.FC = () => {
       currSection += 1
     } else if (isNaN(progress)) {
       // get progress of the current section
-      progress = cards?.filter((item) => item?.completed).length / cards.length ?? 0
+      progress = cards?.filter((item) => item?.completed).length / cards.length || 0
 
       const notBefore = cards[cards.length - 1]?.notBefore
       canDoNextSection = !notBefore || new Date() > notBefore
@@ -187,9 +193,22 @@ export const EarnMapScreen: React.FC = () => {
     const progressSection = disabled ? 0 : currSection > position ? 1 : progress
 
     const onPress = () => {
-      nextSectionNotYetAvailable
-        ? Alert.alert(LL.EarnScreen.oneSectionADay(), LL.EarnScreen.availableTomorrow())
-        : navigation.navigate("earnsSection", { section })
+      if (nextSectionNotYetAvailable) {
+        setSelectedSection(section)
+        if (notRewards) {
+          navigation.navigate("earnsSection", {
+            section,
+            isAvailable: false,
+          })
+          return
+        }
+        setShowModal(true)
+        return
+      }
+      navigation.navigate("earnsSection", {
+        section,
+        isAvailable: true,
+      })
     }
 
     // rework this to pass props into the style object
@@ -257,6 +276,15 @@ export const EarnMapScreen: React.FC = () => {
 
   const backgroundColor = currSection < sectionsData.length ? colors._sky : colors._orange
 
+  const continueNotRewards = () => {
+    setNotRewards(true)
+    setShowModal(false)
+    navigation.navigate("earnsSection", {
+      section: selectedSection,
+      isAvailable: false,
+    })
+  }
+
   return (
     <Screen unsafe statusBar="light-content">
       <ScrollView
@@ -270,7 +298,11 @@ export const EarnMapScreen: React.FC = () => {
           }
         }}
       >
-        <MountainHeader amount={earnedSats.toString()} color={backgroundColor} />
+        <MountainHeader
+          amount={earnedSats.toString()}
+          color={backgroundColor}
+          isAvailable
+        />
         <View style={styles.mainView}>
           <Finish currSection={currSection} length={sectionsData.length} />
           {SectionsComp}
@@ -290,6 +322,24 @@ export const EarnMapScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      <CustomModal
+        isVisible={showModal}
+        toggleModal={() => setShowModal(false)}
+        title={LL.EarnScreen.customMessages.oneSectionADay.title()}
+        backgroundModalColor={colors.white}
+        body={
+          <View style={styles.modalBody}>
+            <Text style={styles.modalBodyText}>
+              {LL.EarnScreen.customMessages.oneSectionADay.message()}
+            </Text>
+          </View>
+        }
+        primaryButtonOnPress={continueNotRewards}
+        primaryButtonTitle={LL.EarnScreen.continueNoRewards()}
+        secondaryButtonTitle={LL.common.close()}
+        secondaryButtonOnPress={() => setShowModal(false)}
+      />
     </Screen>
   )
 }
@@ -329,28 +379,29 @@ const useStyles = makeStyles(({ colors }) => ({
     top: 30,
     width: 160,
   },
-
   icon: {
     marginBottom: 6,
     marginHorizontal: 10,
   },
-
   mainView: {
     alignSelf: "center",
   },
-
   textStyleBox: {
     color: colors._white,
     fontSize: 16,
     fontWeight: "bold",
     marginHorizontal: 10,
   },
-
   progressContainer: { backgroundColor: colors._darkGrey, margin: 10 },
-
   position: { height: 40 },
-
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   fullView: { position: "absolute", width: "100%" },
+  modalBodyText: {
+    fontSize: 17,
+    color: colors.black,
+    textAlign: "left",
+  },
+  modalBody: {
+    marginTop: 20,
+  },
 }))

@@ -2617,7 +2617,8 @@
         "thisMonth": "Aquest mes",
         "prevMonths": "Mesos anteriors",
         "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
-        "warning": "Advertència"
+        "warning": "Advertència",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",

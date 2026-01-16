@@ -2617,7 +2617,8 @@
         "thisMonth": "Tento mesiac",
         "prevMonths": "Predchádzajúce mesiace",
         "problemMaybeReauth": "Vyskytol sa problém s vašou požiadavkou. Skúste to prosím znova o minútu. Ak problém pretrváva, odporúčame odhlásiť sa a prihlásiť sa znova. Odhlásiť sa môžete v Nastavenia > Účet > Odhlásiť.",
-        "warning": "Upozornenie"
+        "warning": "Upozornenie",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",

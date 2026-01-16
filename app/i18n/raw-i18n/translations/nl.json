@@ -2524,7 +2524,8 @@
         "thisMonth": "Deze maand",
         "prevMonths": "Vorige maanden",
         "problemMaybeReauth": "Er was een probleem met je verzoek. Probeer het over een minuut opnieuw. Als het probleem zich blijft voordoen, raden we u aan uit te loggen en weer in te loggen. U kunt uitloggen door naar Instellingen > Account > Uitloggen te gaan.",
-        "warning": "Waarschuwing"
+        "warning": "Waarschuwing",
+        "blinkToBlink": "Blink naar Blink"
     },
     "errors": {
         "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",

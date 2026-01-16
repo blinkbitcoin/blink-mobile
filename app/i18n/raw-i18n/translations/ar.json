@@ -2522,7 +2522,8 @@
         "thisMonth": "هذا الشهر",
         "prevMonths": "الأشهر السابقة",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "من Blink إلى Blink"
     },
     "errors": {
         "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",

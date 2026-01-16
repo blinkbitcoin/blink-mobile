@@ -2524,7 +2524,8 @@
         "thisMonth": "Ovaj mjesec",
         "prevMonths": "Prethodni mjeseci",
         "problemMaybeReauth": "Došlo je do problema s vašim zahtjevom. Pokušajte ponovno za jednu minutu. Ako se problem nastavi, preporučujemo da se odjavite i ponovno prijavite. Možete se odjaviti tako da odete u Postavke > Račun > Odjava",
-        "warning": "Upozorenje"
+        "warning": "Upozorenje",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",

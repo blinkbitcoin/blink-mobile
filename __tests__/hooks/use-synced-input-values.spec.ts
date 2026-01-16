@@ -3,6 +3,7 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSyncedInputValues } from "@app/screens/conversion-flow/hooks/use-synced-input-values"
 import { ConvertInputType } from "@app/components/transfer-amount-input"
+import { DisplayCurrency, toDisplayAmount } from "@app/types/amounts"
 
 type WalletFragment = {
   id: string
@@ -22,13 +23,24 @@ const mockUsdWallet: WalletFragment = {
   walletCurrency: WalletCurrency.Usd,
 }
 
+const createInitialCurrencyInput = (displayCurrency: string) => ({
+  currencyInput: {
+    id: ConvertInputType.CURRENCY,
+    currency: displayCurrency as DisplayCurrency,
+    amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
+    isFocused: false,
+    formattedAmount: "",
+  },
+  formattedAmount: "",
+})
+
 describe("useSyncedInputValues", () => {
   it("returns default input values when wallets are undefined", () => {
     const { result } = renderHook(() =>
       useSyncedInputValues({
         fromWallet: undefined,
         toWallet: undefined,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -43,7 +55,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -60,7 +72,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockUsdWallet,
         toWallet: mockBtcWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -84,7 +96,7 @@ describe("useSyncedInputValues", () => {
         useSyncedInputValues({
           fromWallet,
           toWallet,
-          displayCurrency: "USD",
+          initialCurrencyInput: createInitialCurrencyInput("USD"),
         }),
       {
         initialProps: {
@@ -120,7 +132,7 @@ describe("useSyncedInputValues", () => {
         useSyncedInputValues({
           fromWallet,
           toWallet,
-          displayCurrency: "USD",
+          initialCurrencyInput: createInitialCurrencyInput("USD"),
         }),
       {
         initialProps: {
@@ -163,7 +175,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "EUR",
+        initialCurrencyInput: createInitialCurrencyInput("EUR"),
       }),
     )
 
@@ -176,7 +188,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -195,7 +207,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -209,7 +221,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -223,7 +235,7 @@ describe("useSyncedInputValues", () => {
       useSyncedInputValues({
         fromWallet: mockBtcWallet,
         toWallet: mockUsdWallet,
-        displayCurrency: "USD",
+        initialCurrencyInput: createInitialCurrencyInput("USD"),
       }),
     )
 
@@ -239,7 +251,7 @@ describe("useSyncedInputValues", () => {
         useSyncedInputValues({
           fromWallet,
           toWallet,
-          displayCurrency: "USD",
+          initialCurrencyInput: createInitialCurrencyInput("USD"),
         }),
       {
         initialProps: {

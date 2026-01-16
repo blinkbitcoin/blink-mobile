@@ -2617,7 +2617,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan sebelumnya",
         "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
-        "warning": "Peringatan"
+        "warning": "Peringatan",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",

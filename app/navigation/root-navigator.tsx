@@ -189,7 +189,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"

@@ -2006,8 +2006,38 @@
         "registerTitle": "Necesitas actualizar tu cuenta",
         "registerContent": "Regístrate con tu número de teléfono para recibir sats",
         "oneSectionADay": "¡Una sección al día!",
-        "availableTomorrow": "¡Vuelve mañana para seguir aprendiendo sobre Bitcoin!",
-        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes"
+        "availableTomorrow": "Regresa mañana para seguir ganando sats mientras aprendes.\n\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
+        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "continueNoRewards": "Continuar (Sin Recompensas)",
+        "somethingNotRight": "Algo no está bien...",
+        "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
+        "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
+        "customMessages": {
+            "invalidPhoneForQuiz":{
+                "title": "Operadora restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
+            },
+            "invalidIpMetadata":{
+                "title": "IP restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
+            },
+            "claimedTooEarly":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "notEnoughBalanceForQuiz":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "invalidQuizQuestionId":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "oneSectionADay":{
+                "title": "¿Continuar sin recompensas?",
+                "message": "Solo puedes hacer una sección por día mientras ganas recompensas sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / Crear Cuenta",
@@ -2233,7 +2263,7 @@
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
         "note": "Nota",
-        "success": "El pago se ha enviado correctamente.",
+        "success": "Pago exitoso",
         "suggestionInput": "Introduce tu sugerencia",
         "max": "Max",
         "maxAmount": "Monto máximo",
@@ -2247,12 +2277,18 @@
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "copySuccessMessage": "Copiar mensaje de éxito al portapapeles",
+        "openSuccessUrl": "Abrir URL de éxito en el navegador",
+        "copySecretMessage": "Copiar mensaje secreto al portapapeles",
+        "copiedSuccessMessage": "Mensaje copiado exitosamente",
+        "copiedSecretMessage": "Mensaje secreto copiado exitosamente",
+        "pendingDecryptionMessage": "Mensaje cifrado. Esperando confirmación de pago.",
+        "feeLabel": "Comisión",
+        "noteLabel": "Nota",
+        "sender": "Remitente",
+        "recipient": "Destinatario",
+        "time": "Hora",
+        "type": "Tipo"
     },
     "SettingsScreen": {
         "staticQr": "QR estático imprimible",
@@ -2709,6 +2745,8 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
         "warning": "Advertencia",
+        "continue": "Continuar",
+        "correct": "Correcto",
         "recommended": "Recomendado",
         "expirationTime": "Tiempo de expiración",
         "minute": "Minuto",
@@ -2721,7 +2759,8 @@
         "allAccounts": "Todas las cuentas",
         "some": "Algunos",
         "support": "Soporte",
-        "profiles": "Perfiles"
+        "profiles": "Perfiles",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
