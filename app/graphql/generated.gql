@@ -568,30 +568,6 @@ mutation quizClaim($input: QuizClaimInput!) {
   }
 }
 
-mutation supportChatMessageAdd($input: SupportChatMessageAddInput!) {
-  supportChatMessageAdd(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    supportMessage {
-      id
-      message
-      role
-      timestamp
-      __typename
-    }
-    __typename
-  }
-}
-
-mutation supportChatReset {
-  supportChatReset {
-    success
-    __typename
-  }
-}
-
 mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
   userContactUpdateAlias(input: $input) {
     errors {
@@ -1601,20 +1577,6 @@ query setDefaultWalletScreen {
         walletCurrency
         __typename
       }
-      __typename
-    }
-    __typename
-  }
-}
-
-query supportChat {
-  me {
-    id
-    supportChat {
-      id
-      message
-      role
-      timestamp
       __typename
     }
     __typename
