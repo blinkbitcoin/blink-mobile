@@ -5,6 +5,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native"
+import { it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
@@ -1636,63 +1637,76 @@ describe("Comprehensive conversion scenarios", () => {
     jest.useRealTimers()
   })
 
-  scenarios.forEach((scenario) => {
-    it(scenario.name, async () => {
-      const displayCurrency = scenario.options.displayCurrency ?? "USD"
-      const Wrapper = createTestWrapper(createGraphQLMocks(scenario.options))
+  it.each(scenarios)("$name", async (scenario) => {
+    const displayCurrency = scenario.options.displayCurrency ?? "USD"
+    const Wrapper = createTestWrapper(createGraphQLMocks(scenario.options))
 
-      const { getByTestId, getByPlaceholderText, queryByText } = render(
-        <Wrapper>
-          <ConversionDetailsScreen />
-        </Wrapper>,
-      )
+    const { getByTestId, getByPlaceholderText, queryByText } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
 
-      await waitFor(() => {
-        expect(getByTestId("wallet-toggle-button")).toBeTruthy()
+    await waitFor(() => {
+      expect(getByTestId("wallet-toggle-button")).toBeTruthy()
+    })
+
+    let fromCurrency = getInitialFromCurrency(
+      scenario.options.btcBalance,
+      scenario.options.usdBalance,
+    )
+    let toCurrency =
+      fromCurrency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
+    let primary: PrimaryAmount | null = null
+    const expectedFocusedField = computeFocusedField(scenario.actions)
+
+    const advanceTimers = (ms: number) => {
+      act(() => {
+        jest.advanceTimersByTime(ms)
+        jest.runAllTimers()
       })
+    }
 
-      let fromCurrency = getInitialFromCurrency(
-        scenario.options.btcBalance,
-        scenario.options.usdBalance,
-      )
-      let toCurrency =
-        fromCurrency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
-      let primary: PrimaryAmount | null = null
-      const expectedFocusedField = computeFocusedField(scenario.actions)
+    const clearInput = async (field?: Field) => {
+      if (field) await focusField(field)
+      await act(async () => {
+        pressKeys(
+          getByTestId,
+          Array.from({ length: 10 }, () => "⌫"),
+        )
+      })
+      advanceTimers(1500)
+    }
 
-      const advanceTimers = (ms: number) => {
-        act(() => {
-          jest.advanceTimersByTime(ms)
-          jest.runAllTimers()
-        })
-      }
+    const focusField = async (field: Field) => {
+      const input =
+        field === "from"
+          ? getFromInput(getByPlaceholderText, fromCurrency)
+          : field === "to"
+            ? getToInput(getByPlaceholderText, toCurrency)
+            : await waitFor(() => getCurrencyInput(getByPlaceholderText, displayCurrency))
+      fireEvent(input, "focus")
+      await act(async () => {})
+    }
 
-      const clearInput = async (field?: Field) => {
-        if (field) await focusField(field)
+    for (const action of scenario.actions) {
+      if (action.type === "toggle") {
+        const shouldWaitRecalc = Boolean(primary && primary.amount > 0)
         await act(async () => {
-          pressKeys(
-            getByTestId,
-            Array.from({ length: 10 }, () => "⌫"),
-          )
+          fireEvent.press(getByTestId("wallet-toggle-button"))
         })
-        advanceTimers(1500)
+        advanceTimers(shouldWaitRecalc ? 1500 : 200)
+        ;[fromCurrency, toCurrency] = [toCurrency, fromCurrency]
+        if (primary) {
+          primary = {
+            currency: DisplayCurrencyType,
+            amount: convertAmount(primary.amount, primary.currency, DisplayCurrencyType),
+          }
+        }
       }
 
-      const focusField = async (field: Field) => {
-        const input =
-          field === "from"
-            ? getFromInput(getByPlaceholderText, fromCurrency)
-            : field === "to"
-              ? getToInput(getByPlaceholderText, toCurrency)
-              : await waitFor(() =>
-                  getCurrencyInput(getByPlaceholderText, displayCurrency),
-                )
-        fireEvent(input, "focus")
-        await act(async () => {})
-      }
-
-      for (const action of scenario.actions) {
-        if (action.type === "toggle") {
+      if (action.type === "multiToggle") {
+        for (let i = 0; i < action.count; i += 1) {
           const shouldWaitRecalc = Boolean(primary && primary.amount > 0)
           await act(async () => {
             fireEvent.press(getByTestId("wallet-toggle-button"))
@@ -1710,120 +1724,99 @@ describe("Comprehensive conversion scenarios", () => {
             }
           }
         }
+      }
 
-        if (action.type === "multiToggle") {
-          for (let i = 0; i < action.count; i += 1) {
-            const shouldWaitRecalc = Boolean(primary && primary.amount > 0)
-            await act(async () => {
-              fireEvent.press(getByTestId("wallet-toggle-button"))
-            })
-            advanceTimers(shouldWaitRecalc ? 1500 : 200)
-            ;[fromCurrency, toCurrency] = [toCurrency, fromCurrency]
-            if (primary) {
-              primary = {
-                currency: DisplayCurrencyType,
-                amount: convertAmount(
-                  primary.amount,
-                  primary.currency,
-                  DisplayCurrencyType,
-                ),
-              }
-            }
-          }
-        }
+      if (action.type === "focus") {
+        await focusField(action.field)
+      }
 
-        if (action.type === "focus") {
-          await focusField(action.field)
-        }
-
-        if (action.type === "type") {
-          const fieldCurrency =
-            action.field === "from"
-              ? fromCurrency
-              : action.field === "to"
-                ? toCurrency
-                : DisplayCurrencyType
-          await focusField(action.field)
-          await clearInput()
-          const digits = digitsForCurrency(fieldCurrency, displayCurrency)
-          await act(async () => {
-            pressKeys(getByTestId, digits)
-          })
-          advanceTimers(1500)
-          primary = {
-            currency: fieldCurrency,
-            amount: amountFromDigits(fieldCurrency, digits, displayCurrency),
-          }
-        }
-
-        if (action.type === "clear") {
-          await clearInput(action.field)
-          primary = null
-        }
-
-        if (action.type === "percent") {
-          await act(async () => {
-            fireEvent.press(getByTestId(`convert-${action.value}%`))
-          })
-          advanceTimers(1500)
-          const balance =
-            fromCurrency === WalletCurrency.Btc
-              ? scenario.options.btcBalance
-              : scenario.options.usdBalance
-          primary = {
-            currency: fromCurrency,
-            amount: Math.round((balance * action.value) / 100),
-          }
-        }
-
-        if (action.type === "next") {
-          await waitFor(() => {
-            const nextButton = getByTestId("next-button")
-            expect(nextButton.props.accessibilityState?.disabled).toBe(false)
-          })
-          await act(async () => {
-            fireEvent.press(getByTestId("next-button"))
-          })
+      if (action.type === "type") {
+        const fieldCurrency =
+          action.field === "from"
+            ? fromCurrency
+            : action.field === "to"
+              ? toCurrency
+              : DisplayCurrencyType
+        await focusField(action.field)
+        await clearInput()
+        const digits = digitsForCurrency(fieldCurrency, displayCurrency)
+        await act(async () => {
+          pressKeys(getByTestId, digits)
+        })
+        advanceTimers(1500)
+        primary = {
+          currency: fieldCurrency,
+          amount: amountFromDigits(fieldCurrency, digits, displayCurrency),
         }
       }
 
-      if (!primary) {
-        throw new Error("Scenario must set a primary amount to validate conversion.")
+      if (action.type === "clear") {
+        await clearInput(action.field)
+        primary = null
       }
 
-      await assertConversionValues({
-        getByPlaceholderText,
-        primary,
-        fromCurrency,
-        toCurrency,
-        displayCurrency,
-        focusedField: expectedFocusedField,
-      })
-
-      if (scenario.expectError) {
-        const errorNode = queryByText(/Amount exceeds your balance of/i)
-        if (errorNode) {
-          expect(errorNode).toBeTruthy()
+      if (action.type === "percent") {
+        await act(async () => {
+          fireEvent.press(getByTestId(`convert-${action.value}%`))
+        })
+        advanceTimers(1500)
+        const balance =
+          fromCurrency === WalletCurrency.Btc
+            ? scenario.options.btcBalance
+            : scenario.options.usdBalance
+        primary = {
+          currency: fromCurrency,
+          amount: Math.round((balance * action.value) / 100),
         }
-        if (!errorNode) {
+      }
+
+      if (action.type === "next") {
+        await waitFor(() => {
           const nextButton = getByTestId("next-button")
-          expect(nextButton.props.accessibilityState?.disabled).toBe(true)
-        }
+          expect(nextButton.props.accessibilityState?.disabled).toBe(false)
+        })
+        await act(async () => {
+          fireEvent.press(getByTestId("next-button"))
+        })
       }
+    }
 
-      if (scenario.expectNavigate) {
-        expect(mockNavigate).toHaveBeenCalledWith(
-          "conversionConfirmation",
-          expect.objectContaining({
-            fromWalletCurrency: fromCurrency,
-            moneyAmount: expect.objectContaining({
-              currency: expect.any(String),
-              amount: expect.any(Number),
-            }),
-          }),
-        )
-      }
+    if (!primary) {
+      throw new Error("Scenario must set a primary amount to validate conversion.")
+    }
+
+    await assertConversionValues({
+      getByPlaceholderText,
+      primary,
+      fromCurrency,
+      toCurrency,
+      displayCurrency,
+      focusedField: expectedFocusedField,
     })
+
+    if (scenario.expectError) {
+      const errorNode = queryByText(/Amount exceeds your balance of/i)
+      if (errorNode) {
+        expect(errorNode).toBeTruthy()
+      }
+      if (!errorNode) {
+        const nextButton = getByTestId("next-button")
+        expect(nextButton.props.accessibilityState?.disabled).toBe(true)
+      }
+    }
+
+    if (scenario.expectNavigate) {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "conversionConfirmation",
+        expect.objectContaining({
+          fromWalletCurrency: fromCurrency,
+          moneyAmount: expect.objectContaining({
+            currency: expect.any(String),
+            amount: expect.any(Number),
+          }),
+        }),
+      )
+    }
   })
 })
 
