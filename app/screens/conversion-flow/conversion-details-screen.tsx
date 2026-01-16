@@ -126,7 +126,7 @@ export const ConversionDetailsScreen = () => {
     initialCurrencyInput: {
       currencyInput: {
         id: ConvertInputType.CURRENCY,
-        currency: displayCurrency as DisplayCurrency,
+        currency: DisplayCurrency,
         amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
         isFocused: false,
         formattedAmount: "",
@@ -313,10 +313,6 @@ export const ConversionDetailsScreen = () => {
     setLockFormattingInputId(null)
     setIsTyping(false)
 
-    const currentActiveAmount =
-      moneyAmount ||
-      inputFormattedValues?.fromInput?.amount ||
-      inputValues.fromInput.amount
     const currentFocusedId = focusedInputValues?.id ?? null
     const newFocusedId =
       currentFocusedId === ConvertInputType.FROM
@@ -331,16 +327,32 @@ export const ConversionDetailsScreen = () => {
     }
 
     pendingFocusId.current = newFocusedId
+
+    const newFromCurrency = toWallet.walletCurrency
+    const newToCurrency = fromWallet.walletCurrency
+
     const baseTarget =
       newFocusedId === ConvertInputType.FROM
         ? (inputValues.toInput as InputField)
         : (inputValues.fromInput as InputField)
 
+    const newFocusedCurrency =
+      newFocusedId === ConvertInputType.FROM ? newFromCurrency : newToCurrency
+
+    const targetAmount = hasValidAmountToRecalc
+      ? moneyAmount
+      : {
+          ...baseTarget.amount,
+          currency: newFocusedCurrency,
+          currencyCode: newFocusedCurrency,
+        }
+
     setFocusedInputValues({
       ...baseTarget,
       id: newFocusedId,
       isFocused: true,
-      amount: currentActiveAmount,
+      currency: newFocusedCurrency,
+      amount: targetAmount,
     })
 
     setInputValues((prev) => ({
@@ -364,21 +376,18 @@ export const ConversionDetailsScreen = () => {
     setInputFormattedValues((prev: InputValues | null): InputValues | null => {
       if (!prev) return prev
 
-      const swappedFrom: InputField = {
-        ...prev.toInput,
-        id: ConvertInputType.FROM,
-        isFocused: newFocusedId === ConvertInputType.FROM,
-      }
-      const swappedTo: InputField = {
-        ...prev.fromInput,
-        id: ConvertInputType.TO,
-        isFocused: newFocusedId === ConvertInputType.TO,
-      }
-
       return {
         ...prev,
-        fromInput: swappedFrom,
-        toInput: swappedTo,
+        fromInput: {
+          ...prev.toInput,
+          id: ConvertInputType.FROM,
+          isFocused: newFocusedId === ConvertInputType.FROM,
+        },
+        toInput: {
+          ...prev.fromInput,
+          id: ConvertInputType.TO,
+          isFocused: newFocusedId === ConvertInputType.TO,
+        },
         currencyInput: {
           ...prev.currencyInput,
           isFocused: currentFocusedId === ConvertInputType.CURRENCY,
@@ -474,11 +483,18 @@ export const ConversionDetailsScreen = () => {
               onOverlayPress={() =>
                 overlaysReady && !uiLocked && handleInputPress(ConvertInputType.FROM)
               }
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.fromInput ?? { ...inputValues.fromInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput = inputFormattedValues?.fromInput ?? inputValues.fromInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: fromWallet.walletCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: fromWallet.walletCurrency,
+                    currencyCode: fromWallet.walletCurrency,
+                  },
+                })
+              }}
               currency={fromWallet.walletCurrency}
               balancePrimary={fromWalletBalanceFormatted}
               balanceSecondary={fromSatsFormatted}
@@ -529,11 +545,18 @@ export const ConversionDetailsScreen = () => {
               onOverlayPress={() =>
                 overlaysReady && !uiLocked && handleInputPress(ConvertInputType.TO)
               }
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.toInput ?? { ...inputValues.toInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput = inputFormattedValues?.toInput ?? inputValues.toInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: toWallet.walletCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: toWallet.walletCurrency,
+                    currencyCode: toWallet.walletCurrency,
+                  },
+                })
+              }}
               currency={toWallet.walletCurrency}
               balancePrimary={toWalletBalanceFormatted}
               balanceSecondary={toSatsFormatted}
@@ -552,11 +575,19 @@ export const ConversionDetailsScreen = () => {
               value={renderValue(ConvertInputType.CURRENCY)}
               inputRef={currencyInputRef}
               isFocused={focusedInputValues?.id === ConvertInputType.CURRENCY}
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.currencyInput ?? { ...inputValues.currencyInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput =
+                  inputFormattedValues?.currencyInput ?? inputValues.currencyInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: DisplayCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: DisplayCurrency,
+                    currencyCode: displayCurrency,
+                  },
+                })
+              }}
               onChangeText={() => {}}
               currency={displayCurrency}
               placeholder={`${getCurrencySymbol({ currency: displayCurrency })}0`}
