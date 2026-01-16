@@ -4,7 +4,12 @@ import { Quiz } from "@app/graphql/generated"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 
 import { QuizQuestion, QuizQuestionContent, QuizSectionContent } from "./earns-section"
-import { EarnSectionType, ValidateQuizCodeErrorsType, earnSections } from "./sections"
+import {
+  EarnSectionType,
+  ValidateQuizCodeErrorsType,
+  earnSections,
+  validateQuizCodeErrors,
+} from "./sections"
 
 export const getCardsFromSection = ({
   section,
@@ -92,16 +97,8 @@ export const getQuizQuestionsContent = ({
 
 const shownErrorCodes = new Set<ValidateQuizCodeErrorsType>()
 
-const skipRewardErrorCodesList: ValidateQuizCodeErrorsType[] = [
-  "INVALID_IP_METADATA",
-  "INVALID_PHONE_FOR_QUIZ",
-  "INVALID_QUIZ_QUESTION_ID",
-  "NOT_ENOUGH_BALANCE_FOR_QUIZ",
-  "QUIZ_CLAIMED_TOO_EARLY",
-]
-
 export const skipRewardErrorCodes = (code?: string | null): boolean =>
-  Boolean(code) && skipRewardErrorCodesList.includes(code as ValidateQuizCodeErrorsType)
+  Boolean(code) && validateQuizCodeErrors.includes(code as ValidateQuizCodeErrorsType)
 
 export const errorCodeAlertAlreadyShown = (code?: string | null): boolean =>
   Boolean(code) &&
