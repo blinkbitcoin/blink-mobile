@@ -2310,7 +2310,7 @@
     "StablesatsModal": {
         "header": "Với Stablesats, bây giờ bạn có một tài khoản USD được thêm vào ví của bạn!",
         "body": "Bạn có thể sử dụng nó để gửi và nhận bitcoin và chuyển giá trị ngay lập tức giữa tài khoản BTC và USD của bạn. Giá trị trong tài khoản USD sẽ không dao động với giá Bitcoin. Tính năng này không tương thích với hệ thống ngân hàng truyền thống.",
-        "termsAndConditions": "Đọc các Điều khoản & Điều kiện.",
+        "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
         "learnMore": "Tìm hiểu thêm về Stablesats"
     },
     "SplashScreen": {

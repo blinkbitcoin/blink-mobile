@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Met Stablesats heb je nu een USD-account toegevoegd aan je wallet!",
         "body": "U kunt het gebruiken om Bitcoin te verzenden en te ontvangen, en direct waarde over te dragen tussen uw BTC- en USD-account. De waarde op de USD-rekening fluctueert niet met de prijs van Bitcoin. Deze functie is niet compatibel met het traditionele banksysteem.",
-        "termsAndConditions": "Lees de Algemene voorwaarden.",
+        "termsAndConditions": "Lees de Algemene voorwaarden",
         "learnMore": "Meer informatie over Stablesats"
     },
     "SplashScreen": {

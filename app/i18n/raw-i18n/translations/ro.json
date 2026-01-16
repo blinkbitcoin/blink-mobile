@@ -2394,7 +2394,7 @@
     "StablesatsModal": {
         "header": "Cu Stablesats, aveți acum un cont USD adăugat la portofel!",
         "body": "Îl puteți folosi pentru a trimite și primi Bitcoin și pentru a transfera instantaneu valoare între contul BTC și USD. Valoarea din contul USD nu va fluctua cu prețul Bitcoin. Această caracteristică nu este compatibilă cu sistemul bancar tradițional.",
-        "termsAndConditions": "Citiți Termenii și condițiile.",
+        "termsAndConditions": "Citiți Termenii și condițiile",
         "learnMore": "Aflați mai multe despre Stablesats"
     },
     "SplashScreen": {

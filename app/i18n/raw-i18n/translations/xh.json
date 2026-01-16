@@ -656,7 +656,7 @@
     "StablesatsModal": {
         "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
         "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
-        "termsAndConditions": "Funda iMigaqo neMiqathango.",
+        "termsAndConditions": "Funda iMigaqo neMiqathango",
         "learnMore": "Funda ngakumbi malunga neStablesats"
     },
     "SplashScreen": {

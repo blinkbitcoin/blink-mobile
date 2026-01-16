@@ -2335,7 +2335,7 @@
     "StablesatsModal": {
         "header": "Med Stablesats har du nu en USD-konto tilføjet til din tegnebog!",
         "body": "Du kan bruge den til at sende og modtage Bitcoin og øjeblikkeligt overføre værdi mellem din BTC og USD-konto. Værdien i USD-kontoen vil ikke svinge med prisen på Bitcoin. Denne funktion er ikke kompatibel med det traditionelle banksystem.",
-        "termsAndConditions": "Læs vilkårene.",
+        "termsAndConditions": "Læs vilkårene",
         "learnMore": "Læs mere om Stablesats"
     },
     "SplashScreen": {

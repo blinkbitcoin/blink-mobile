@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Mit Stablesats kannst Du ein USD Konto mit deiner Wallet nutzen!",
         "body": "Du kannst es nutzen, um Bitcoin zu senden und empfangen, und Gelder direkt zwischen deinen BTC und USD Konten zu transferieren. Der Wert in deinem USD Konto wird nicht mit dem Bitcoin-Preis schwanken. Diese Funktion ist nicht kompatibel mit traditionellen Banksystemen.",
-        "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen.",
+        "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über Stablesats erfahren"
     },
     "SplashScreen": {

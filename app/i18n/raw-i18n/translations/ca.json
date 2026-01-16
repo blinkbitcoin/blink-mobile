@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Amb Stablesats, ara tens un compte en USD afegit al teu moneder!",
         "body": "Pots utilitzar-lo per enviar i rebre Bitcoin o per transferir  instantàniament entre els teus comptes de BTC i USD. El valor del compte USD no fluctuarà amb el preu de Bitcoin. Aquesta característica no és compatible amb el sistema bancari tradicional.",
-        "termsAndConditions": "Llegeix els Termes i Condicions.",
+        "termsAndConditions": "Llegeix els Termes i Condicions",
         "learnMore": "Apren més sobre els Stablesats"
     },
     "SplashScreen": {
