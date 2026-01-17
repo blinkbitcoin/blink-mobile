@@ -2898,7 +2898,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     enjoyingApp: "Enjoying the app?",
     statusPage: "Status page",
-    chatbot: "Chatbot",
     telegram: "Telegram",
     mattermost: "Mattermost",
     thankYouText: "Thank you for the feedback, would you like to suggest an improvement?",
@@ -3036,11 +3035,6 @@ const en: BaseTranslation = {
   NotificationHistory: {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
-  },
-  SupportChat: {
-    errorSendingMessage: "An error occurred while sending the message",
-    confirmChatReset: "Are you sure you want to reset the chat?",
-    errorResettingChat: "An error occurred while resetting the chat",
   },
 }
 

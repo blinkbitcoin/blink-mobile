@@ -2651,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Páči sa vám aplikácia?",
         "statusPage": "Stav",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Ďakujeme za spätnú väzbu, chcete nám nechať návrh na zlepšenie?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifikácie",
         "noNotifications": "Momentálne nemáte žiadne upozornenia"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Pri odosielaní správy sa vyskytla chyba",
-        "confirmChatReset": "Naozaj chcete zresetovať čet?",
-        "errorResettingChat": "Pri resetovaní četu sa vyskytla chyba"
     }
 }

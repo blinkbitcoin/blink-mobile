@@ -2651,7 +2651,6 @@
         "faq": "GYIK",
         "enjoyingApp": "Tetszik az alkalmazás?",
         "statusPage": "Állapotoldal",
-        "chatbot": "Csevegőrobot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Köszönjük a visszajelzést! Szeretnél javaslatot tenni a fejlesztésre?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Értesítések",
         "noNotifications": "Jelenleg nincsenek értesítéseid"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Hiba történt az üzenet küldése közben",
-        "confirmChatReset": "Biztos, hogy törölni akarod a chat előzményeit?",
-        "errorResettingChat": "Hiba történt a chat előzmények törlése közben"
     }
 }

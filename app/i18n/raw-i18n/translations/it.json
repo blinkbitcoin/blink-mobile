@@ -2651,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Ti piace l'app?",
         "statusPage": "Pagina di stato",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Grazie per il feedback, vuoi suggerire un miglioramento?",
@@ -2767,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifiche",
         "noNotifications": "Al momento non hai notifiche"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Si è verificato un errore durante l'invio del messaggio",
-        "confirmChatReset": "Vuoi davvero reimpostare la chat?",
-        "errorResettingChat": "Si è verificato un errore durante il ripristino della chat"
     }
 }
