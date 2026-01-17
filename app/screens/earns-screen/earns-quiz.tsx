@@ -360,13 +360,15 @@ export const EarnQuiz = ({ route }: Props) => {
       if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
         setHasTriedClaim(true)
-        const { data } = await claimQuizWrapper()
+        const { data } = await claimQuizWrapper({ skipRewards: !isAvailable })
 
         if (data?.quizClaim?.errors?.length) {
           const errorCode = data.quizClaim.errors[0]?.code as ValidateQuizCodeErrorsType
           const defaultErrorMessage = LL.EarnScreen.defaultErrorMessage({
             errorMessage: getErrorMessages(data.quizClaim.errors),
           })
+
+          if (!isAvailable) return
 
           if (skipRewardErrorCodes(errorCode)) {
             if (errorCodeAlertAlreadyShown(errorCode)) {
