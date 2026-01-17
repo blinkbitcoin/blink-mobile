@@ -103,3 +103,7 @@ android-recordings
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Compiled TypeScript files
+*.js
+*.js.map
