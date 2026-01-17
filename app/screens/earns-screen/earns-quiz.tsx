@@ -360,9 +360,7 @@ export const EarnQuiz = ({ route }: Props) => {
       if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
         setHasTriedClaim(true)
-        const { data } = await claimQuizWrapper(
-          isAvailable ? undefined : { skipRewards: true },
-        )
+        const { data } = await claimQuizWrapper({ skipRewards: !isAvailable })
 
         if (data?.quizClaim?.errors?.length) {
           const errorCode = data.quizClaim.errors[0]?.code as ValidateQuizCodeErrorsType
