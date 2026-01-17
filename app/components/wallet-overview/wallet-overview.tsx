@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { CurrencyPill } from "../atomic/currency-pill"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 const Loader = () => {
   const styles = useStyles()
@@ -125,6 +125,7 @@ const WalletOverview: React.FC<Props> = ({
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   return (
     <View style={styles.container}>
@@ -153,8 +154,9 @@ const WalletOverview: React.FC<Props> = ({
                 <CurrencyPill
                   label={LL.common.bitcoin()}
                   currency={WalletCurrency.Btc}
-                  textSize="p3"
                   containerSize="medium"
+                  containerStyle={pillWidthStyle}
+                  onLayout={onPillLayout(WalletCurrency.Btc)}
                 />
               </View>
               <NotificationBadge visible={showBtcNotification} />
@@ -191,8 +193,9 @@ const WalletOverview: React.FC<Props> = ({
                 <CurrencyPill
                   label={LL.common.dollar()}
                   currency={WalletCurrency.Usd}
-                  textSize="p3"
                   containerSize="medium"
+                  containerStyle={pillWidthStyle}
+                  onLayout={onPillLayout(WalletCurrency.Usd)}
                 />
               </View>
               <NotificationBadge visible={showUsdNotification} />

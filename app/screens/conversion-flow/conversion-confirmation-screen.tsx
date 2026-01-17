@@ -34,7 +34,7 @@ import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { Screen } from "@app/components/screen"
-import { CurrencyPill } from "@app/components/atomic/currency-pill"
+import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {
@@ -63,6 +63,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useIntraLedgerUsdPaymentSendMutation()
   const isLoading = intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading
   const { LL } = useI18nContext()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-first",
@@ -98,6 +99,11 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     fromWalletCurrency === WalletCurrency.Btc
       ? { id: usdWallet.id, currency: WalletCurrency.Usd }
       : { id: btcWallet.id, currency: WalletCurrency.Btc }
+
+  const fromWalletLabel =
+    fromWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const toWalletLabel =
+    toWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
 
   const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
   const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
@@ -252,13 +258,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.fromFieldContainer}>
             <CurrencyPill
               currency={fromWallet.currency}
-              textSize="p3"
               containerSize="medium"
               label={
                 fromWallet.currency === WalletCurrency.Usd
                   ? LL.common.dollar()
                   : LL.common.bitcoin()
               }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(fromWallet.currency)}
             />
 
             <View style={styles.walletSelectorBalanceContainer}>
@@ -279,13 +286,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.toFieldContainer}>
             <CurrencyPill
               currency={toWallet.currency}
-              textSize="p3"
               containerSize="medium"
               label={
                 toWallet.currency === WalletCurrency.Usd
                   ? LL.common.dollar()
                   : LL.common.bitcoin()
               }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(toWallet.currency)}
             />
             <View style={styles.walletSelectorBalanceContainer}>
               <Text style={styles.conversionInfoFieldValue}>
@@ -315,8 +323,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <GaloySliderButton
             isLoading={isLoading}
             initialText={LL.ConversionConfirmationScreen.transferButtonText({
-              fromWallet: fromWallet.currency,
-              toWallet: toWallet.currency,
+              fromWallet: fromWalletLabel,
+              toWallet: toWalletLabel,
             })}
             loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
             onSwipe={payWallet}
@@ -352,7 +360,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
   conversionInfoFieldValue: {
-    color: colors.grey0,
+    color: colors.grey1,
     fontWeight: "bold",
     fontSize: 20,
   },

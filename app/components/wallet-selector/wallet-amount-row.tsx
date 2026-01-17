@@ -1,7 +1,14 @@
 import React from "react"
 import { IconNode } from "@rn-vui/base"
 import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { StyleProp, TextInput, TouchableOpacity, View, ViewStyle } from "react-native"
+import {
+  LayoutChangeEvent,
+  StyleProp,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native"
 
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -20,6 +27,10 @@ export type WalletAmountRowProps = {
   currency: WalletCurrency
   balancePrimary: string
   balanceSecondary?: string | null
+  pillContainerStyle?: StyleProp<ViewStyle>
+  pillOnLayout?: (event: LayoutChangeEvent) => void
+  pillWrapperStyle?: StyleProp<ViewStyle>
+  inputContainerStyle?: StyleProp<ViewStyle>
   containerStyle?: StyleProp<ViewStyle>
 }
 
@@ -35,6 +46,10 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   currency,
   balancePrimary,
   balanceSecondary,
+  pillContainerStyle,
+  pillOnLayout,
+  pillWrapperStyle,
+  inputContainerStyle,
   containerStyle,
 }) => {
   const {
@@ -51,57 +66,64 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         onFocus={onFocus}
         onChangeText={() => {}}
         showSoftInputOnFocus={false}
-        containerStyle={[styles.primaryNumberContainer, styles.inputWithOverlay]}
+        containerStyle={[
+          styles.primaryNumberContainer,
+          styles.inputWithOverlay,
+          inputContainerStyle,
+        ]}
         inputStyle={styles.primaryNumberText}
         placeholder={placeholder}
-        placeholderTextColor={colors.grey2}
+        placeholderTextColor={colors.grey3}
         inputContainerStyle={styles.primaryNumberInputContainer}
         renderErrorMessage={false}
         rightIcon={rightIcon}
         selection={selection}
         pointerEvents="none"
       />
-      <TouchableOpacity
-        style={styles.inputOverlay}
-        activeOpacity={1}
-        onPress={onOverlayPress}
-      />
       <View style={styles.rightColumn}>
-        <View style={styles.currencyBubbleText}>
+        <View style={[styles.currencyBubbleText, pillWrapperStyle]}>
           <CurrencyPill
             currency={currency}
-            textSize="p3"
             containerSize="medium"
             label={
               currency === WalletCurrency.Usd ? LL.common.dollar() : LL.common.bitcoin()
             }
+            containerStyle={pillContainerStyle}
+            onLayout={pillOnLayout}
           />
         </View>
         <View style={styles.walletSelectorBalanceContainer}>
-          <Text style={styles.convertText}>{balancePrimary}</Text>
+          <Text style={styles.primaryBalanceText}>{balancePrimary}</Text>
           {balanceSecondary && (
-            <Text style={styles.convertText}>
+            <Text style={styles.secondaryBalanceText}>
               {APPROXIMATE_PREFIX} {balanceSecondary}
             </Text>
           )}
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.inputOverlay}
+        activeOpacity={1}
+        onPress={onOverlayPress}
+      />
     </View>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingTop: 6,
     paddingBottom: 6,
     position: "relative",
+    flexGrow: 1,
   },
   inputWithOverlay: {
     position: "relative",
     flex: 1,
     paddingHorizontal: 0,
+    alignSelf: "center",
   },
   inputOverlay: {
     position: "absolute",
@@ -115,6 +137,7 @@ const useStyles = makeStyles(() => ({
     minWidth: 96,
     alignItems: "flex-end",
     justifyContent: "flex-start",
+    alignSelf: "flex-start",
   },
   currencyBubbleText: {
     display: "flex",
@@ -126,9 +149,20 @@ const useStyles = makeStyles(() => ({
     marginTop: 5,
     flexDirection: "column",
     alignItems: "flex-end",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
   },
-  convertText: { textAlign: "right" },
+  primaryBalanceText: {
+    textAlign: "right",
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.black,
+  },
+  secondaryBalanceText: {
+    textAlign: "right",
+    fontSize: 10,
+    lineHeight: 14,
+    color: colors.grey1,
+  },
   primaryNumberContainer: { flex: 1 },
   primaryNumberText: {
     fontSize: 20,
@@ -136,6 +170,8 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     padding: 0,
     margin: 0,
+    color: colors.black,
+    fontWeight: "bold",
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },
   disabledOpacity: { opacity: 0.5 },

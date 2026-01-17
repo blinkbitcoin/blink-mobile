@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
-import { CurrencyPill } from "../atomic/currency-pill"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 export type WalletValues = WalletCurrency | "ALL"
 
@@ -23,6 +23,7 @@ export const WalletFilterDropdown: React.FC<{
 
   const [isModalVisible, setModalVisible] = useState(false)
   const [pendingSelection, setPendingSelection] = useState<WalletValues | null>(null)
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
   const toggleModal = () => setModalVisible((visible) => !visible)
 
   const handleSelect = (selectedValue: WalletValues) => {
@@ -64,6 +65,9 @@ export const WalletFilterDropdown: React.FC<{
   )
   if (!current) return null
 
+  const isCurrencyOption = (value: WalletValues): value is WalletCurrency =>
+    value !== "ALL"
+
   return (
     <>
       <TouchableWithoutFeedback
@@ -74,9 +78,14 @@ export const WalletFilterDropdown: React.FC<{
           <View style={styles.walletSelectorTypeContainer}>
             <CurrencyPill
               currency={current.value}
-              textSize="p3"
               containerSize="medium"
               label={current.description}
+              containerStyle={
+                isCurrencyOption(current.value) ? pillWidthStyle : undefined
+              }
+              onLayout={
+                isCurrencyOption(current.value) ? onPillLayout(current.value) : undefined
+              }
             />
           </View>
 
@@ -109,9 +118,14 @@ export const WalletFilterDropdown: React.FC<{
                 <View style={styles.walletSelectorTypeContainer}>
                   <CurrencyPill
                     currency={opt.value}
-                    textSize="p3"
                     containerSize="medium"
                     label={opt.description}
+                    containerStyle={
+                      isCurrencyOption(opt.value) ? pillWidthStyle : undefined
+                    }
+                    onLayout={
+                      isCurrencyOption(opt.value) ? onPillLayout(opt.value) : undefined
+                    }
                   />
                 </View>
               </View>

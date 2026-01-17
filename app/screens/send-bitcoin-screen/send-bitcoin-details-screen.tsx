@@ -7,7 +7,7 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { gql } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { CurrencyPill } from "@app/components/atomic/currency-pill"
+import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
@@ -171,6 +171,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   // we are caching the _convertMoneyAmount when the screen loads.
   // this is because the _convertMoneyAmount can change while the user is on this screen
@@ -317,13 +318,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                 <View style={styles.walletSelectorTypeContainer}>
                   <CurrencyPill
                     currency={wallet.walletCurrency}
-                    textSize="p3"
                     containerSize="medium"
                     label={
                       wallet.walletCurrency === WalletCurrency.Usd
                         ? LL.common.dollar()
                         : LL.common.bitcoin()
                     }
+                    containerStyle={pillWidthStyle}
+                    onLayout={onPillLayout(wallet.walletCurrency)}
                   />
                 </View>
                 <View style={styles.walletSelectorInfoContainer}>
@@ -507,13 +509,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               <View style={styles.walletSelectorTypeContainer}>
                 <CurrencyPill
                   currency={sendingWalletDescriptor.currency}
-                  textSize="p3"
                   containerSize="medium"
                   label={
                     sendingWalletDescriptor.currency === WalletCurrency.Usd
                       ? LL.common.dollar()
                       : LL.common.bitcoin()
                   }
+                  containerStyle={pillWidthStyle}
+                  onLayout={onPillLayout(sendingWalletDescriptor.currency)}
                 />
               </View>
               <View style={styles.walletSelectorInfoContainer}>

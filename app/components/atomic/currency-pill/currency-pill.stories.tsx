@@ -22,13 +22,9 @@ export default {
 
 export const Default = () => (
   <Story>
-    <UseCaseWrapper style={styles.wrapper} text="Text Size: p2 (medium)">
-      <CurrencyPill textSize="p2" currency={WalletCurrency.Btc} />
-      <CurrencyPill textSize="p2" currency={WalletCurrency.Usd} />
-    </UseCaseWrapper>
-    <UseCaseWrapper style={styles.wrapper} text="Text Size: p1 (large)">
-      <CurrencyPill textSize="p1" currency={WalletCurrency.Btc} />
-      <CurrencyPill textSize="p1" currency={WalletCurrency.Usd} />
+    <UseCaseWrapper style={styles.wrapper} text="Default (p3)">
+      <CurrencyPill currency={WalletCurrency.Btc} />
+      <CurrencyPill currency={WalletCurrency.Usd} />
     </UseCaseWrapper>
   </Story>
 )

@@ -182,8 +182,8 @@ describe("conversion-confirmation-screen", () => {
     )
 
     const transferText = LL.ConversionConfirmationScreen.transferButtonText({
-      fromWallet: WalletCurrency.Btc,
-      toWallet: WalletCurrency.Usd,
+      fromWallet: LL.common.bitcoin(),
+      toWallet: LL.common.dollar(),
     })
     const infoText = LL.ConversionConfirmationScreen.infoDollar()
 
@@ -216,8 +216,8 @@ describe("conversion-confirmation-screen", () => {
     )
 
     const transferText = LL.ConversionConfirmationScreen.transferButtonText({
-      fromWallet: WalletCurrency.Usd,
-      toWallet: WalletCurrency.Btc,
+      fromWallet: LL.common.dollar(),
+      toWallet: LL.common.bitcoin(),
     })
     const infoText = LL.ConversionConfirmationScreen.infoBitcoin()
 
@@ -294,8 +294,8 @@ describe("conversion-confirmation-screen", () => {
     fireEvent.press(
       screen.getByText(
         LL.ConversionConfirmationScreen.transferButtonText({
-          fromWallet: WalletCurrency.Btc,
-          toWallet: WalletCurrency.Usd,
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.dollar(),
         }),
       ),
     )
@@ -339,8 +339,8 @@ describe("conversion-confirmation-screen", () => {
     fireEvent.press(
       screen.getByText(
         LL.ConversionConfirmationScreen.transferButtonText({
-          fromWallet: WalletCurrency.Usd,
-          toWallet: WalletCurrency.Btc,
+          fromWallet: LL.common.dollar(),
+          toWallet: LL.common.bitcoin(),
         }),
       ),
     )

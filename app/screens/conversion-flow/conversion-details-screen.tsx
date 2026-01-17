@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { View, TextInput, Animated, Easing } from "react-native"
+import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
@@ -35,6 +35,7 @@ import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
 import {
   AmountInputScreen,
   ConvertInputType,
@@ -125,7 +126,7 @@ export const ConversionDetailsScreen = () => {
     initialCurrencyInput: {
       currencyInput: {
         id: ConvertInputType.CURRENCY,
-        currency: displayCurrency as DisplayCurrency,
+        currency: DisplayCurrency,
         amount: toDisplayAmount({ amount: 0, currencyCode: displayCurrency }),
         isFocused: false,
         formattedAmount: "",
@@ -139,10 +140,18 @@ export const ConversionDetailsScreen = () => {
   const [lockFormattingInputId, setLockFormattingInputId] = useState<
     InputField["id"] | null
   >(null)
+  const [rowHeights, setRowHeights] = useState({ from: 0, to: 0 })
 
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
+  const pillLabels = useMemo(
+    () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar() }),
+    [LL.common],
+  )
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
+    labels: pillLabels,
+  })
 
   const fromInputRef = useRef<TextInput | null>(null)
   const toInputRef = useRef<TextInput | null>(null)
@@ -209,6 +218,17 @@ export const ConversionDetailsScreen = () => {
     setFocusedInputValues,
   })
   const isCurrencyVisible = displayCurrency !== WalletCurrency.Usd
+  const maxRowHeight = Math.max(rowHeights.from, rowHeights.to)
+  const rowMinHeightStyle = maxRowHeight ? { minHeight: maxRowHeight } : undefined
+  const pillContainerStyle = pillWidthStyle
+
+  const setRowHeight = useCallback(
+    (key: "from" | "to") => (event: LayoutChangeEvent) => {
+      const { height } = event.nativeEvent.layout
+      setRowHeights((prev) => (prev[key] === height ? prev : { ...prev, [key]: height }))
+    },
+    [],
+  )
 
   useEffect(() => {
     if (hadInitialFocus.current || !overlaysReady) return
@@ -293,10 +313,6 @@ export const ConversionDetailsScreen = () => {
     setLockFormattingInputId(null)
     setIsTyping(false)
 
-    const currentActiveAmount =
-      moneyAmount ||
-      inputFormattedValues?.fromInput?.amount ||
-      inputValues.fromInput.amount
     const currentFocusedId = focusedInputValues?.id ?? null
     const newFocusedId =
       currentFocusedId === ConvertInputType.FROM
@@ -311,16 +327,32 @@ export const ConversionDetailsScreen = () => {
     }
 
     pendingFocusId.current = newFocusedId
+
+    const newFromCurrency = toWallet.walletCurrency
+    const newToCurrency = fromWallet.walletCurrency
+
     const baseTarget =
       newFocusedId === ConvertInputType.FROM
         ? (inputValues.toInput as InputField)
         : (inputValues.fromInput as InputField)
 
+    const newFocusedCurrency =
+      newFocusedId === ConvertInputType.FROM ? newFromCurrency : newToCurrency
+
+    const targetAmount = hasValidAmountToRecalc
+      ? moneyAmount
+      : {
+          ...baseTarget.amount,
+          currency: newFocusedCurrency,
+          currencyCode: newFocusedCurrency,
+        }
+
     setFocusedInputValues({
       ...baseTarget,
       id: newFocusedId,
       isFocused: true,
-      amount: currentActiveAmount,
+      currency: newFocusedCurrency,
+      amount: targetAmount,
     })
 
     setInputValues((prev) => ({
@@ -344,21 +376,18 @@ export const ConversionDetailsScreen = () => {
     setInputFormattedValues((prev: InputValues | null): InputValues | null => {
       if (!prev) return prev
 
-      const swappedFrom: InputField = {
-        ...prev.toInput,
-        id: ConvertInputType.FROM,
-        isFocused: newFocusedId === ConvertInputType.FROM,
-      }
-      const swappedTo: InputField = {
-        ...prev.fromInput,
-        id: ConvertInputType.TO,
-        isFocused: newFocusedId === ConvertInputType.TO,
-      }
-
       return {
         ...prev,
-        fromInput: swappedFrom,
-        toInput: swappedTo,
+        fromInput: {
+          ...prev.toInput,
+          id: ConvertInputType.FROM,
+          isFocused: newFocusedId === ConvertInputType.FROM,
+        },
+        toInput: {
+          ...prev.fromInput,
+          id: ConvertInputType.TO,
+          isFocused: newFocusedId === ConvertInputType.TO,
+        },
         currencyInput: {
           ...prev.currencyInput,
           isFocused: currentFocusedId === ConvertInputType.CURRENCY,
@@ -434,7 +463,12 @@ export const ConversionDetailsScreen = () => {
       <View style={styles.styleWalletContainer}>
         <View style={styles.walletSelectorContainer}>
           <Animated.View
-            style={[styles.rowWrapTop, getAnimatedBackground(ConvertInputType.FROM)]}
+            style={[
+              styles.rowWrapTop,
+              rowMinHeightStyle,
+              getAnimatedBackground(ConvertInputType.FROM),
+            ]}
+            onLayout={setRowHeight("from")}
           >
             <WalletAmountRow
               inputRef={fromInputRef}
@@ -449,14 +483,25 @@ export const ConversionDetailsScreen = () => {
               onOverlayPress={() =>
                 overlaysReady && !uiLocked && handleInputPress(ConvertInputType.FROM)
               }
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.fromInput ?? { ...inputValues.fromInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput = inputFormattedValues?.fromInput ?? inputValues.fromInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: fromWallet.walletCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: fromWallet.walletCurrency,
+                    currencyCode: fromWallet.walletCurrency,
+                  },
+                })
+              }}
               currency={fromWallet.walletCurrency}
               balancePrimary={fromWalletBalanceFormatted}
               balanceSecondary={fromSatsFormatted}
+              pillContainerStyle={pillContainerStyle}
+              pillOnLayout={onPillLayout(fromWallet.walletCurrency)}
+              pillWrapperStyle={styles.topRowPillAlign}
+              inputContainerStyle={styles.topRowInputAlign}
             />
           </Animated.View>
 
@@ -480,7 +525,12 @@ export const ConversionDetailsScreen = () => {
           </View>
 
           <Animated.View
-            style={[styles.rowWrapBottom, getAnimatedBackground(ConvertInputType.TO)]}
+            style={[
+              styles.rowWrapBottom,
+              rowMinHeightStyle,
+              getAnimatedBackground(ConvertInputType.TO),
+            ]}
+            onLayout={setRowHeight("to")}
           >
             <WalletAmountRow
               inputRef={toInputRef}
@@ -495,14 +545,23 @@ export const ConversionDetailsScreen = () => {
               onOverlayPress={() =>
                 overlaysReady && !uiLocked && handleInputPress(ConvertInputType.TO)
               }
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.toInput ?? { ...inputValues.toInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput = inputFormattedValues?.toInput ?? inputValues.toInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: toWallet.walletCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: toWallet.walletCurrency,
+                    currencyCode: toWallet.walletCurrency,
+                  },
+                })
+              }}
               currency={toWallet.walletCurrency}
               balancePrimary={toWalletBalanceFormatted}
               balanceSecondary={toSatsFormatted}
+              pillContainerStyle={pillContainerStyle}
+              pillOnLayout={onPillLayout(toWallet.walletCurrency)}
             />
           </Animated.View>
         </View>
@@ -516,11 +575,19 @@ export const ConversionDetailsScreen = () => {
               value={renderValue(ConvertInputType.CURRENCY)}
               inputRef={currencyInputRef}
               isFocused={focusedInputValues?.id === ConvertInputType.CURRENCY}
-              onFocus={() =>
-                setFocusedInputValues(
-                  inputFormattedValues?.currencyInput ?? { ...inputValues.currencyInput },
-                )
-              }
+              onFocus={() => {
+                const baseInput =
+                  inputFormattedValues?.currencyInput ?? inputValues.currencyInput
+                setFocusedInputValues({
+                  ...baseInput,
+                  currency: DisplayCurrency,
+                  amount: {
+                    ...baseInput.amount,
+                    currency: DisplayCurrency,
+                    currencyCode: displayCurrency,
+                  },
+                })
+              }}
               onChangeText={() => {}}
               currency={displayCurrency}
               placeholder={`${getCurrencySymbol({ currency: displayCurrency })}0`}
@@ -588,7 +655,13 @@ export const ConversionDetailsScreen = () => {
         <GaloyPrimaryButton
           title={LL.ConversionDetailsScreen.reviewTransfer()}
           containerStyle={styles.buttonContainer}
-          disabled={!isValidAmount || uiLocked}
+          disabled={
+            !isValidAmount ||
+            uiLocked ||
+            toggleInitiated.current ||
+            isTyping ||
+            Boolean(loadingPercent)
+          }
           onPress={moveToNextScreen}
           testID="next-button"
         />
@@ -623,8 +696,14 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   rowWrapTop: {
     marginHorizontal: -15,
     paddingHorizontal: 15,
-    paddingTop: 10,
     paddingBottom: 6,
+  },
+  topRowInputAlign: {
+    alignSelf: "flex-start",
+    paddingTop: 18,
+  },
+  topRowPillAlign: {
+    marginTop: 11,
   },
   rowWrapBottom: {
     marginHorizontal: -15,
