@@ -7,7 +7,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletAmount } from "@app/types/amounts"
 import { Text, makeStyles } from "@rn-vui/themed"
 
-import { CurrencyTag } from "../currency-tag"
+import { CurrencyPill } from "../atomic/currency-pill"
 
 type WalletSummaryProps = {
   settlementAmount: WalletAmount<WalletCurrency>
@@ -57,7 +57,15 @@ export const WalletSummary: FunctionComponent<WalletSummaryProps> = ({
   return (
     <View style={styles.walletSummaryContainer}>
       <View style={styles.currencyTagContainer}>
-        <CurrencyTag walletCurrency={settlementAmount.currency} />
+        <CurrencyPill
+          currency={settlementAmount.currency}
+          containerSize="medium"
+          label={
+            settlementAmount.currency === WalletCurrency.Btc
+              ? LL.common.bitcoin()
+              : LL.common.dollar()
+          }
+        />
       </View>
       <View style={styles.amountsContainer}>
         <Text type={"p2"}>{walletName}</Text>
