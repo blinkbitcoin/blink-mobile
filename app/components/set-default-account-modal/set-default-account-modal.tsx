@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform, View, TouchableOpacity, ActivityIndicator } from "react-native"
+import { View, TouchableOpacity, ActivityIndicator } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
@@ -15,7 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyCurrencyBubble } from "../atomic/galoy-currency-bubble"
+import { CurrencyPill } from "../atomic/currency-pill"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 
 gql`
@@ -174,31 +174,41 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
           </View>
         </ScrollView>
         <View style={styles.modalActionsContainer}>
-          <TouchableOpacity onPress={onPressUsdAccount}>
-            <View style={styles.currencyButtonContainer}>
-              {loadingUsdAccount ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <>
-                  <GaloyCurrencyBubble iconSize={32} currency={WalletCurrency.Usd} />
-                  <View style={styles.currencyButtonTextContainer}>
-                    <Text type={"h1"}>{LL.common.stablesatsUsd()}</Text>
-                    <Text type={"p3"}>{LL.SetAccountModal.stablesatsTag()}</Text>
-                  </View>
-                </>
-              )}
-            </View>
-          </TouchableOpacity>
           <TouchableOpacity onPress={onPressBtcAccount}>
             <View style={styles.currencyButtonContainer}>
               {loadingBtcAccount ? (
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
-                  <GaloyCurrencyBubble iconSize={32} currency={WalletCurrency.Btc} />
+                  <CurrencyPill
+                    label={LL.common.bitcoin()}
+                    currency={WalletCurrency.Btc}
+                    containerSize="medium"
+                  />
                   <View style={styles.currencyButtonTextContainer}>
-                    <Text type={"h1"}>{LL.common.bitcoin()}</Text>
-                    <Text type={"p3"}>{LL.SetAccountModal.bitcoinTag()}</Text>
+                    <Text type="p2" style={styles.currencyButtonText}>
+                      {LL.SetAccountModal.bitcoinTag()}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onPressUsdAccount}>
+            <View style={styles.currencyButtonContainer}>
+              {loadingUsdAccount ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <>
+                  <CurrencyPill
+                    label={LL.common.dollar()}
+                    currency={WalletCurrency.Usd}
+                    containerSize="medium"
+                  />
+                  <View style={styles.currencyButtonTextContainer}>
+                    <Text type="p2" style={styles.currencyButtonText}>
+                      {LL.SetAccountModal.stablesatsTag()}
+                    </Text>
                   </View>
                 </>
               )}
@@ -225,6 +235,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     flexDirection: "column",
   },
+  currencyButtonText: {
+    color: colors.black,
+    fontWeight: "400",
+    lineHeight: 22,
+  },
   container: {
     backgroundColor: colors.grey5,
     maxHeight: "80%",
@@ -242,7 +257,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modalTitleText: {
     fontSize: 24,
-    fontWeight: Platform.OS === "ios" ? "600" : "700",
+    fontWeight: "700",
     lineHeight: 32,
     maxWidth: "80%",
     textAlign: "center",
@@ -256,6 +271,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollViewContainer: { flexGrow: 1 },
   modalBodyText: {
     textAlign: "center",
+    color: colors.black,
   },
   modalActionsContainer: {
     width: "100%",
