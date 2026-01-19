@@ -43,6 +43,12 @@ export default gql`
       }
       ... on SettlementViaLn {
         preImage
+        successAction {
+          tag
+          message
+          url
+          description
+        }
       }
       ... on SettlementViaOnChain {
         transactionHash

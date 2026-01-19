@@ -2553,6 +2553,7 @@ const en: BaseTranslation = {
       "Your transaction is queued. It should appear in the mempool {countdown: string}.",
     momentarily: "momentarily",
     hasBeenCopiedToClipboard: "{type: string} has been copied to clipboard",
+    successAction: "Payment Message",
   },
   TransactionLimitsScreen: {
     receive: "Receive",

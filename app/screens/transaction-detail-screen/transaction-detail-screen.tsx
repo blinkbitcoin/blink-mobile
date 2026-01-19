@@ -31,6 +31,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"
+import { SuccessActionComponent } from "../../components/success-action"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 
@@ -68,6 +69,22 @@ const Row = ({
       )}
     </View>
   )
+}
+
+// Type for successAction field when backend support is deployed
+// TODO: Remove this when backend deploys successAction and types are regenerated
+type SuccessAction = {
+  tag?: string | null
+  message?: string | null
+  url?: string | null
+  description?: string | null
+}
+
+// Extended type for SettlementViaLn with optional successAction
+type SettlementViaLnWithSuccessAction = {
+  __typename: "SettlementViaLn"
+  preImage?: string | null
+  successAction?: SuccessAction | null
 }
 
 const typeDisplay = (instance?: SettlementVia | DeepPartialObject<SettlementVia>) => {
@@ -476,6 +493,29 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ]}
               />
             )}
+          {settlementVia?.__typename === "SettlementViaLn" &&
+            "successAction" in settlementVia &&
+            (settlementVia as SettlementViaLnWithSuccessAction)?.successAction && (
+              <View style={styles.successActionContainer}>
+                <SuccessActionComponent
+                  visible={true}
+                  title={LL.TransactionDetailScreen.successAction()}
+                  text={
+                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
+                      ?.message ||
+                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
+                      ?.description ||
+                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
+                      ?.url ||
+                    null
+                  }
+                  subValue={
+                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
+                      ?.url || undefined
+                  }
+                />
+              </View>
+            )}
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentRequest && (
               <Row
@@ -613,5 +653,9 @@ const useStyles = makeStyles(({ colors }) => ({
 
   outerContainer: {
     flex: 1,
+  },
+
+  successActionContainer: {
+    marginBottom: 6,
   },
 }))
