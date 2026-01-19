@@ -5,7 +5,7 @@ import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-export const CURRENCY_PILL_PADDING_HORIZONTAL = 11
+export const CURRENCY_PILL_PADDING_HORIZONTAL = 8
 export const CURRENCY_PILL_BORDER_WIDTH = 1
 
 export const CURRENCY_PILL_TEXT_STYLE = {
@@ -119,10 +119,10 @@ const useStyles = makeStyles(
     container: {
       backgroundColor,
       paddingHorizontal: CURRENCY_PILL_PADDING_HORIZONTAL,
-      paddingVertical: 8,
+      paddingVertical: 7,
       minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
       minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
-      borderRadius: 12,
+      borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
       borderColor: borderColor ?? "transparent",
