@@ -12,7 +12,6 @@ import {
 
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { APPROXIMATE_PREFIX } from "@app/config"
 
 export type WalletAmountRowProps = {
@@ -56,8 +55,6 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const { LL } = useI18nContext()
-
   return (
     <View style={[styles.row, isLocked && styles.disabledOpacity, containerStyle]}>
       <Input
