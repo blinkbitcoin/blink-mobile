@@ -15,7 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { CurrencyPill } from "../atomic/currency-pill"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 
 gql`
@@ -138,6 +138,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
     theme: { mode, colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   return (
     <Modal
@@ -180,7 +181,12 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
-                  <CurrencyPill currency={WalletCurrency.Btc} containerSize="medium" />
+                  <CurrencyPill
+                    currency={WalletCurrency.Btc}
+                    containerSize="medium"
+                    containerStyle={pillWidthStyle}
+                    onLayout={onPillLayout(WalletCurrency.Btc)}
+                  />
                   <View style={styles.currencyButtonTextContainer}>
                     <Text type="p2" style={styles.currencyButtonText}>
                       {LL.SetAccountModal.bitcoinTag()}
@@ -196,7 +202,12 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
-                  <CurrencyPill currency={WalletCurrency.Usd} containerSize="medium" />
+                  <CurrencyPill
+                    currency={WalletCurrency.Usd}
+                    containerSize="medium"
+                    containerStyle={pillWidthStyle}
+                    onLayout={onPillLayout(WalletCurrency.Usd)}
+                  />
                   <View style={styles.currencyButtonTextContainer}>
                     <Text type="p2" style={styles.currencyButtonText}>
                       {LL.SetAccountModal.stablesatsTag()}
