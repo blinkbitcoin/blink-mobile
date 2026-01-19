@@ -285,6 +285,10 @@ mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -296,12 +300,16 @@ mutation intraLedgerUsdPaymentSend($input: IntraLedgerUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
 
-mutation kycFlowStart {
-  kycFlowStart {
+mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
     workflowRunId
     tokenWeb
     __typename
@@ -346,6 +354,7 @@ mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
     }
     status
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaLn {
           preImage
@@ -399,6 +408,10 @@ mutation lnNoAmountInvoicePaymentSend($input: LnNoAmountInvoicePaymentInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -421,6 +434,10 @@ mutation lnNoAmountUsdInvoicePaymentSend($input: LnNoAmountUsdInvoicePaymentInpu
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -469,6 +486,7 @@ mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
 mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
   onChainPaymentSend(input: $input) {
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaOnChain {
           arrivalInMempoolEstimatedAt
@@ -494,6 +512,10 @@ mutation onChainPaymentSendAll($input: OnChainPaymentSendAllInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -505,6 +527,10 @@ mutation onChainUsdPaymentSend($input: OnChainUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -516,6 +542,10 @@ mutation onChainUsdPaymentSendAsBtcDenominated($input: OnChainUsdPaymentSendAsBt
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -524,6 +554,7 @@ mutation quizClaim($input: QuizClaimInput!) {
   quizClaim(input: $input) {
     errors {
       message
+      code
       __typename
     }
     quizzes {
@@ -533,30 +564,6 @@ mutation quizClaim($input: QuizClaimInput!) {
       notBefore
       __typename
     }
-    __typename
-  }
-}
-
-mutation supportChatMessageAdd($input: SupportChatMessageAddInput!) {
-  supportChatMessageAdd(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    supportMessage {
-      id
-      message
-      role
-      timestamp
-      __typename
-    }
-    __typename
-  }
-}
-
-mutation supportChatReset {
-  supportChatReset {
-    success
     __typename
   }
 }
@@ -1570,20 +1577,6 @@ query setDefaultWalletScreen {
         walletCurrency
         __typename
       }
-      __typename
-    }
-    __typename
-  }
-}
-
-query supportChat {
-  me {
-    id
-    supportChat {
-      id
-      message
-      role
-      timestamp
       __typename
     }
     __typename

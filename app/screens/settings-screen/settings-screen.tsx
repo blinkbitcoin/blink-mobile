@@ -21,8 +21,8 @@ import { SettingsGroup } from "./group"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
+import { PhoneNAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
-import { AccountStaticQR } from "./settings/account-static-qr"
 import { TxLimits } from "./settings/account-tx-limits"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
@@ -34,6 +34,7 @@ import { ThemeSetting } from "./settings/preferences-theme"
 import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
+import { AccountStaticQR } from "./settings/account-static-qr"
 import { SwitchAccountSetting } from "./settings/multi-account"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -81,17 +82,15 @@ export const SettingsScreen: React.FC = () => {
     fetchPolicy: "cache-and-network",
   })
 
-  const accountItems = [AccountLevelSetting, TxLimits, SwitchAccountSetting]
-
   const items = {
-    account: [...accountItems],
+    account: [AccountLevelSetting, TxLimits, SwitchAccountSetting],
+    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
-    waysToGetPaid: [AccountLNAddress, AccountPOS, AccountStaticQR],
     preferences: [
       NotificationSetting,
       DefaultWallet,
-      LanguageSetting,
       CurrencySetting,
+      LanguageSetting,
       ThemeSetting,
     ],
     securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],
@@ -108,12 +107,8 @@ export const SettingsScreen: React.FC = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
-          <Icon style={styles.headerRight} name="notifications" type="ionicon" />
-          {count !== 0 && (
-            <Text type="p4" style={styles.notificationCount}>
-              {count}
-            </Text>
-          )}
+          <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
+          {count !== 0 && <Text type="p4" style={styles.notificationCount}></Text>}
         </TouchableOpacity>
       ),
     })
@@ -123,24 +118,24 @@ export const SettingsScreen: React.FC = () => {
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
         <AccountBanner />
-        <SettingsGroup name={LL.common.accountInformation()} items={items.account} />
+        <SettingsGroup name={LL.common.account()} items={items.account} />
+        <SettingsGroup
+          name={LL.SettingsScreen.addressScreen()}
+          items={items.waysToGetPaid}
+        />
         {isAtLeastLevelOne && (
           <SettingsGroup
             name={LL.AccountScreen.loginMethods()}
             items={items.loginMethods}
           />
         )}
-        <SettingsGroup
-          name={LL.SettingsScreen.addressScreen()}
-          items={items.waysToGetPaid}
-        />
         <SettingsGroup name={LL.common.preferences()} items={items.preferences} />
         <SettingsGroup
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        <SettingsGroup name={LL.common.community()} items={items.community} />
+        <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
     </Screen>
@@ -164,11 +159,11 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 9,
     top: -3,
     color: colors._darkGrey,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.black,
     textAlign: "center",
     verticalAlign: "middle",
-    height: 18,
-    width: 18,
+    height: 14,
+    width: 14,
     borderRadius: 9,
     overflow: "hidden",
   },

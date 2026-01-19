@@ -25,9 +25,8 @@ export const ThemeSetting: React.FC = () => {
 
   return (
     <SettingsRow
-      title={LL.SettingsScreen.theme()}
-      subtitle={colorScheme}
-      leftIcon="contrast-outline"
+      title={`${LL.SettingsScreen.theme()}: ${colorScheme}`}
+      leftIcon="brush-outline"
       action={() => navigate("theme")}
     />
   )

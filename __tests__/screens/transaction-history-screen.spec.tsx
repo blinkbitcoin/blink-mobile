@@ -10,6 +10,7 @@ import {
   TransactionListForDefaultAccountDocument,
   TxLastSeenDocument,
 } from "@app/graphql/generated"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "./helper"
 
@@ -247,6 +248,10 @@ const buildTransactionMocks = ({
 }
 
 describe("TransactionHistoryScreen", () => {
+  beforeEach(() => {
+    loadLocale("en")
+  })
+
   afterEach(() => {
     cleanup()
     currentMocks = []
@@ -297,7 +302,7 @@ describe("TransactionHistoryScreen", () => {
     const dropdown = screen.getByTestId("wallet-filter-dropdown")
     await act(() => fireEvent.press(dropdown))
 
-    const btcOption = await screen.findByText("BTC")
+    const btcOption = await screen.findByText("Bitcoin")
 
     await act(() => fireEvent.press(btcOption))
 
@@ -360,7 +365,7 @@ describe("TransactionHistoryScreen", () => {
     const dropdown = screen.getByTestId("wallet-filter-dropdown")
     await act(() => fireEvent.press(dropdown))
 
-    const usdOption = await screen.findByText("USD")
+    const usdOption = await screen.findByText("Dollar")
     await act(() => fireEvent.press(usdOption))
 
     await waitFor(() => {

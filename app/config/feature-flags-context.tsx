@@ -10,6 +10,7 @@ const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
+const SuccessIconDurationKey = "successIconDuration"
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -22,6 +23,7 @@ type RemoteConfig = {
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
   [FeeReimbursementMemoKey]: string
+  [SuccessIconDurationKey]: number
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -31,6 +33,7 @@ const defaultRemoteConfig: RemoteConfig = {
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
   feeReimbursementMemo: "fee reimbursement",
+  successIconDuration: 2300,
 }
 
 const defaultFeatureFlags = {
@@ -86,6 +89,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
         const feeReimbursementMemo = remoteConfigInstance()
           .getValue(FeeReimbursementMemoKey)
           .asString()
+        const successIconDuration = remoteConfigInstance()
+          .getValue(SuccessIconDurationKey)
+          .asNumber()
 
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
@@ -94,6 +100,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
           feeReimbursementMemo,
+          successIconDuration,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)

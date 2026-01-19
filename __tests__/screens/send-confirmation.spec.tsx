@@ -214,7 +214,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(screen.getByText(lnurl)).toBeTruthy()
-    expect(screen.getByText("₦100 ($100.00)")).toBeTruthy()
+    expect(screen.getByText("$0.05 (₦100)")).toBeTruthy()
     expect(screen.getByTestId("slider")).toBeTruthy()
     expect(LL.SendBitcoinConfirmationScreen.slideToConfirm()).toBeTruthy()
   })

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { ActivityIndicator, Alert, View } from "react-native"
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
 import { Screen } from "@app/components/screen"
@@ -19,8 +19,8 @@ import {
 } from "@app/graphql/generated"
 
 gql`
-  mutation kycFlowStart {
-    kycFlowStart {
+  mutation kycFlowStart($input: KycFlowStartInput!) {
+    kycFlowStart(input: $input) {
       workflowRunId
       tokenWeb
     }
@@ -53,7 +53,9 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
   const onboardingStatus = data?.me?.defaultAccount?.onboardingStatus
 
-  const [loadingSumsub, setLoadingSumsub] = useState(false)
+  const [loadingKyc, setLoadingKyc] = useState(false)
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
 
   const [kycFlowStart] = useKycFlowStartMutation()
 
@@ -63,13 +65,30 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     },
   } = useAppConfig()
 
-  const sumsubStart = React.useCallback(async () => {
-    setLoadingSumsub(true)
+  const confirmNames = async () => {
+    Alert.alert(
+      LL.FullOnboarding.confirmNameTitle(),
+      LL.FullOnboarding.confirmNameContent({ firstName, lastName }),
+      [
+        { text: LL.common.cancel(), onPress: () => {} },
+        {
+          text: LL.common.yes(),
+          onPress: startKyc,
+        },
+      ],
+    )
+  }
+
+  const startKyc = React.useCallback(async () => {
+    setLoadingKyc(true)
 
     try {
-      const res = await kycFlowStart()
+      const res = await kycFlowStart({
+        variables: { input: { firstName, lastName } },
+      })
 
       const token = res.data?.kycFlowStart?.tokenWeb ?? ""
+      const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
 
       const theme = mode === "dark" || mode === "light" ? mode : ""
 
@@ -79,7 +98,8 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         ...(theme && { theme }),
       }).toString()
 
-      const url = `${kycUrl}/webflow?${query}`
+      const workflowRunIdParam = workflowRunId ? `&workflow_run_id=${workflowRunId}` : ""
+      const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
 
       navigate("webView", {
         url,
@@ -94,7 +114,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
       if (message.match(/canceled/i)) {
         goBack()
-        setLoadingSumsub(false)
+        setLoadingKyc(false)
         return
       }
 
@@ -111,15 +131,15 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         ],
       )
     } finally {
-      setLoadingSumsub(false)
+      setLoadingKyc(false)
     }
-  }, [LL, locale, mode, navigate, goBack, kycFlowStart, kycUrl])
+  }, [LL, firstName, lastName, locale, mode, navigate, goBack, kycFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
-      sumsubStart()
+      startKyc()
     }
-  }, [onboardingStatus, sumsubStart])
+  }, [onboardingStatus, startKyc])
 
   if (loading) {
     return (
@@ -171,12 +191,24 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         <Text type="h2" style={styles.textStyle}>
           {LL.FullOnboarding.requirements()}
         </Text>
+        <>
+          <Input
+            placeholder={LL.FullOnboarding.firstName()}
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
+          />
+          <Input
+            placeholder={LL.FullOnboarding.lastName()}
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
+          />
+        </>
         <View style={styles.buttonContainer}>
           <GaloyPrimaryButton
-            onPress={sumsubStart}
+            onPress={confirmNames}
             title={LL.common.next()}
-            disabled={false}
-            loading={loadingSumsub}
+            disabled={!firstName || !lastName}
+            loading={loadingKyc}
           />
         </View>
       </View>

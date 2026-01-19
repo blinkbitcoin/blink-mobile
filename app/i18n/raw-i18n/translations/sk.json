@@ -2366,8 +2366,8 @@
         "toastMessage": "Tajný kód bol skopírovaný do schránky!"
     },
     "DefaultWalletScreen": {
-        "title": "Predvolený účet",
-        "info": "Vyberte účet, ktorý chcete nastaviť ako predvolený na prijímanie a odosielanie. Účet na odosielanie a prijímanie jednotlivých platieb môžete nastaviť v mobilnej aplikácii. Platby prijaté prostredníctvom pokladne alebo vašej Lightning adresy budú vždy zaslané na predvolený účet.\n\nAk sa chcete vyhnúť volatilite Bitcoinu, vyberte si Stablesats. To vám umožní udržiavať stabilnú hodnotu peňazí a zároveň mať možnosť odosielať a prijímať platby.\n\nToto nastavenie môžete kedykoľvek zmeniť a nebude mať vplyv na váš aktuálny zostatok."
+        "title": "Prijať menu",
+        "info": "Použite svoj účet Stablesats v Blink na udržanie peňazí vo vašej peňaženke stabilných v hodnote fiat meny (dolár). Použite svoj Bitcoin účet, ak zbierate sats a nevadí vám, že sa váš fiat zostatok neustále mení."
     },
     "ThemeScreen": {
         "title": "Motív",
@@ -2617,7 +2617,8 @@
         "thisMonth": "Tento mesiac",
         "prevMonths": "Predchádzajúce mesiace",
         "problemMaybeReauth": "Vyskytol sa problém s vašou požiadavkou. Skúste to prosím znova o minútu. Ak problém pretrváva, odporúčame odhlásiť sa a prihlásiť sa znova. Odhlásiť sa môžete v Nastavenia > Účet > Odhlásiť.",
-        "warning": "Upozornenie"
+        "warning": "Upozornenie",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",
@@ -2650,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Páči sa vám aplikácia?",
         "statusPage": "Stav",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Ďakujeme za spätnú väzbu, chcete nám nechať návrh na zlepšenie?",
@@ -2752,7 +2752,7 @@
         "firstName": "Krstné meno",
         "lastName": "Priezvisko",
         "confirmNameContent": "Je vaše meno napísané správne?\n\n{firstName: string} {lastName: string}\n\nMusí sa zhodovať s menom na vašom doklade totožnosti.",
-        "requirements": "Vylepšenie vášho účtu zvýši vaše limity a poskytne vám ďalšie funkcie, ako napríklad prevody na bankové účty vo vybraných krajinách.",
+        "requirements": "Vylepšenie vášho účtu zvýši vaše limity a poskytne vám ďalšie funkcie, ako napríklad prevody na bankové účty vo vybraných krajinách.\n\nBudete musieť uviesť svoje meno, vládou vydaný doklad totožnosti a selfie. Začneme vaším menom.",
         "success": "Dokumenty boli úspešne prijaté a budú čoskoro spracované. Na tejto stránke môžete sledovať stav svojho nastavenia.",
         "error": "Pri odosielaní vašich dokumentov došlo k chybe. Ak problém pretrváva, kontaktujte podporu.",
         "status": "Stav vášho nastavenia je: ",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifikácie",
         "noNotifications": "Momentálne nemáte žiadne upozornenia"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Pri odosielaní správy sa vyskytla chyba",
-        "confirmChatReset": "Naozaj chcete zresetovať čet?",
-        "errorResettingChat": "Pri resetovaní četu sa vyskytla chyba"
     }
 }

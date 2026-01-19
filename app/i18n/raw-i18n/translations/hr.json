@@ -2296,8 +2296,8 @@
         "toastMessage": "Tajna kopirana u međuspremnik!"
     },
     "DefaultWalletScreen": {
-        "title": "Zadani račun",
-        "info": "Odaberite koji ćete račun postaviti kao zadani za primanje i slanje. Možete prilagoditi račun za slanje i primanje za pojedinačna plaćanja u mobilnoj aplikaciji. Uplate primljene putem blagajne ili vaše Lightning adrese uvijek će ići na zadani račun.\n\nKako biste izbjegli volatilnost Bitcoina, odaberite Stablesats. To vam omogućuje da zadržite stabilan iznos novca dok još uvijek možete slati i primati plaćanja.\n\nOvu postavku možete promijeniti u bilo kojem trenutku i ona neće utjecati na vaš trenutni saldo."
+        "title": "Primanje valute",
+        "info": "Koristite svoj Stablesats račun u Blinku kako biste zadržali novac u svom novčaniku stabilnim u fiat vrijednosti (dolar). Koristite svoj Bitcoin račun ako skupljate sats i ne smeta vam stalna promjena fiat stanja."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2524,7 +2524,8 @@
         "thisMonth": "Ovaj mjesec",
         "prevMonths": "Prethodni mjeseci",
         "problemMaybeReauth": "Došlo je do problema s vašim zahtjevom. Pokušajte ponovno za jednu minutu. Ako se problem nastavi, preporučujemo da se odjavite i ponovno prijavite. Možete se odjaviti tako da odete u Postavke > Račun > Odjava",
-        "warning": "Upozorenje"
+        "warning": "Upozorenje",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",
@@ -2666,7 +2667,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",

@@ -407,7 +407,7 @@ export const HomeScreen: React.FC = () => {
     isIosWithBalance
   ) {
     buttons.unshift({
-      title: LL.ConversionDetailsScreen.title(),
+      title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails" as Target,
       icon: "transfer" as IconNamesType,
     })

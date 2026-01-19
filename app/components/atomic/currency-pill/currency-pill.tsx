@@ -1,21 +1,31 @@
 import React from "react"
-import { View } from "react-native"
-import { useTheme, TextProps, Text, makeStyles } from "@rn-vui/themed"
+import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
+import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+
+export const CURRENCY_PILL_PADDING_HORIZONTAL = 11
+export const CURRENCY_PILL_BORDER_WIDTH = 1
+
+export const CURRENCY_PILL_TEXT_STYLE = {
+  fontSize: 14,
+  fontWeight: "bold",
+} as const
 
 export const CurrencyPill = ({
   currency,
   label,
-  textSize,
   highlighted = true,
   containerSize = "small",
+  containerStyle,
+  onLayout,
 }: {
   currency?: WalletCurrency | "ALL"
   label?: string
-  textSize?: TextProps["type"]
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
+  containerStyle?: StyleProp<ViewStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
 }) => {
   const {
     theme: { colors },
@@ -51,35 +61,38 @@ export const CurrencyPill = ({
   return (
     <ContainerBubble
       text={text}
-      textSize={textSize}
       color={currencyProps.color}
       backgroundColor={currencyProps.backgroundColor}
       borderColor={currencyProps.borderColor}
       containerSize={containerSize}
+      containerStyle={containerStyle}
+      onLayout={onLayout}
     />
   )
 }
 
 const ContainerBubble = ({
   text,
-  textSize,
   color,
   backgroundColor,
   containerSize = "small",
   borderColor,
+  containerStyle,
+  onLayout,
 }: {
   text: string
-  textSize?: TextProps["type"]
   color?: string
   backgroundColor?: string
   containerSize?: "small" | "medium" | "large"
   borderColor?: string
+  containerStyle?: StyleProp<ViewStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
 }) => {
   const styles = useStyles({ backgroundColor, containerSize, color, borderColor })
 
   return (
-    <View style={styles.container}>
-      <Text type={textSize || "p3"} style={styles.text}>
+    <View style={[styles.container, containerStyle]} onLayout={onLayout}>
+      <Text type="p3" style={styles.text}>
         {text}
       </Text>
     </View>
@@ -103,18 +116,20 @@ const useStyles = makeStyles(
   ) => ({
     container: {
       backgroundColor,
-      paddingHorizontal:
-        containerSize === "small" ? 7 : containerSize === "medium" ? 11 : 15,
-      paddingVertical: containerSize === "small" ? 3 : containerSize === "medium" ? 3 : 5,
-      borderRadius: 10,
+      paddingHorizontal: CURRENCY_PILL_PADDING_HORIZONTAL,
+      paddingVertical: 8,
+      minWidth: containerSize === "small" ? 40 : containerSize === "medium" ? 60 : 80,
+      minHeight: containerSize === "small" ? 20 : containerSize === "medium" ? 30 : 40,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
       borderColor: borderColor ?? "transparent",
-      borderWidth: 1,
+      borderWidth: CURRENCY_PILL_BORDER_WIDTH,
+      flexShrink: 0,
     },
     text: {
       color,
-      fontWeight: "bold",
+      ...CURRENCY_PILL_TEXT_STYLE,
     },
   }),
 )

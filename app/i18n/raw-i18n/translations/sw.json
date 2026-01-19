@@ -2617,7 +2617,8 @@
         "thisMonth": "Mwezi huu",
         "prevMonths": "Miezi iliyopita",
         "problemMaybeReauth": "Kulikuwa na tatizo na ombi lako. Tafadhali jaribu baada ya dakika moja. Ikiwa tatizo litasistea, tunapendekeza ujitoke nje na uingie tena. Unaweza kujitokeza kwa kwenda kwenye Mipangilio > Akaunti > Toka",
-        "warning": "Onyo"
+        "warning": "Onyo",
+        "blinkToBlink": "Blink hadi Blink"
     },
     "errors": {
         "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -2650,7 +2651,6 @@
         "faq": "Maswali yanayoulizwa mara kwa mara",
         "enjoyingApp": "Unafurahia programu?",
         "statusPage": "Ukurasa wa Hali",
-        "chatbot": "Gumzo",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Asante kwa maoni, ungependa kupendekeza uboreshaji?",
@@ -2752,7 +2752,7 @@
         "firstName": "Jina la kwanza",
         "lastName": "Jina la mwisho",
         "confirmNameContent": "Je, uandishi wa jina lako ni sahihi?\n\n{firstName: string} {lastName: string}\n\nLazima linganishe na jina kwenye kitambulisho chako.",
-        "requirements": "Kuboresha akaunti yako kutapanua mipaka yako na kukupa utendaji zaidi kama vile uhamisho wa akaunti za benki katika nchi zilizochaguliwa.",
+        "requirements": "Kuboresha akaunti yako kutapanua mipaka yako na kukupa utendaji zaidi kama vile uhamisho wa akaunti za benki katika nchi zilizochaguliwa.\n\nUnapaswa kutoa jina lako, kitambulisho cha serikali na picha yako. Tutanza na jina lako.",
         "success": "Hati zimepokelewa kwa mafanikio na zitashughulikiwa karibuni. Unaweza kurudi kwenye ukurasa huu kupata sasisho kuhusu hali ya usajili wako",
         "error": "Kuna hitilafu katika kuwasilisha hati zako. Unaweza kuwasiliana na msaada endapo tatizo litaendelea.",
         "status": "Hali yako ya usajili ni: ",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Arifa",
         "noNotifications": "Huna arifa zozote kwa sasa"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Hitilafu ilitokea wakati wa kutuma ujumbe",
-        "confirmChatReset": "Je, una uhakika unataka kuweka upya gumzo?",
-        "errorResettingChat": "Hitilafu ilitokea wakati wa kuweka upya gumzo"
     }
 }

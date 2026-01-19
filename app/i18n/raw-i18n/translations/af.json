@@ -2296,8 +2296,8 @@
         "toastMessage": "Geheim na knipbord!"
     },
     "DefaultWalletScreen": {
-        "title": "Verstek-rekening",
-        "info": "Kies jou verstekrekening vir Stuur en Ontvang. Jy kan die stuur- en ontvangrekening vir aparte transaksies in die mobiele toepassing verander. Betalings wat deur die kasregister of Lightning-adres ontvang word gaan altyd na jou verstekrekening.\n\nOm wisselvalligheid te vermy kan jy Stablesats kies. Dit help om 'n stabiele bedrag te behou en steeds te stuur en ontvang. \n\nJy kan die verstelling enige tyd verander en dit sal nie jou huidige saldo veander nie."
+        "title": "Ontvang geldeenheid",
+        "info": "Gebruik jou Stablesats-rekening in Blink om die geld in jou beursie stabiel te hou in fiat-terme (dollar). Gebruik jou Bitcoin-rekening as jy sats opstapel en dit vir jou reg is dat jou fiat-balans heeltyd verander."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2524,7 +2524,8 @@
         "thisMonth": "Hierdie maand",
         "prevMonths": "Vorige maande",
         "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
-        "warning": "Waarskuwing"
+        "warning": "Waarskuwing",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -2666,7 +2667,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",

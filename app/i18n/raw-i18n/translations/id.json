@@ -2617,7 +2617,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan sebelumnya",
         "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
-        "warning": "Peringatan"
+        "warning": "Peringatan",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -2650,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Enjoying the app?",
         "statusPage": "Status Page",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Terima kasih atas masukan Anda, apakah Anda ingin menyarankan perbaikan?",
@@ -2752,7 +2752,7 @@
         "firstName": "Nama Depan",
         "lastName": "Nama Belakang",
         "confirmNameContent": "Apakah ejaan nama Anda benar?\n\n{firstName: string} {lastName: string}\n\nHarus sesuai dengan nama di ID Anda.",
-        "requirements": "Meningkatkan akun Anda akan meningkatkan batas Anda dan memberikan fungsionalitas tambahan seperti transfer ke rekening bank di negara terpilih.",
+        "requirements": "Meningkatkan akun Anda akan meningkatkan batas Anda dan memberikan fungsionalitas tambahan seperti transfer ke rekening bank di negara terpilih.\n\nAnda harus memberikan nama, ID yang dikeluarkan pemerintah, dan selfie. Kami akan memulai dengan nama Anda.",
         "success": "Dokumen berhasil diterima dan akan diproses segera. Anda dapat kembali ke halaman ini untuk pembaruan status onboarding Anda.",
         "error": "Terjadi kesalahan dalam pengiriman dokumen Anda. Silakan hubungi dukungan jika masalah berlanjut.",
         "status": "Status onboarding Anda adalah: ",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifikasi",
         "noNotifications": "Anda tidak memiliki notifikasi saat ini"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Terjadi kesalahan saat mengirim pesan.",
-        "confirmChatReset": "Apakah Anda yakin ingin mengatur ulang obrolan?",
-        "errorResettingChat": "Terjadi kesalahan saat mengatur ulang obrolan."
     }
 }

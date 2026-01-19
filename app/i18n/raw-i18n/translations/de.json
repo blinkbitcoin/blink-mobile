@@ -2366,8 +2366,8 @@
         "toastMessage": "Geheimnis in Zwischenablage kopiert!"
     },
     "DefaultWalletScreen": {
-        "title": "Standard-Konto",
-        "info": "Wähle, welches Konto du standardmäßig zum Senden und Empfangen nutzen möchtest. Du kannst das verwendete Konto für individuelle Zahlungen jederzeit in der App ändern. Zahlungen, die über die Kasse oder deine Lightning Adresse empfangen werden, gehen immer auf dein Standard-Konto.\n\nUm die Volatilität von Bitcoin zu umgehen, nutze Stablesats. Stablesats ermöglicht es dir, Kursschwankungen auszugleichen und dennoch Geld senden und empfangen zu können.\n\nDu kannst diese Einstellungen jederzeit ändern, ohne, dass dein Kontostand davon betroffen ist."
+        "title": "Währung empfangen",
+        "info": "Verwenden Sie Ihr Stablesats-Konto in Blink, um das Geld in Ihrer Wallet in Fiat-Werten (Dollar) stabil zu halten. Verwenden Sie Ihr Bitcoin-Konto, wenn Sie Sats sammeln und es für Sie in Ordnung ist, dass sich Ihr Fiat-Guthaben ständig ändert."
     },
     "ThemeScreen": {
         "title": "Design",
@@ -2617,7 +2617,8 @@
         "thisMonth": "Dieser Monat",
         "prevMonths": "Vorherige Monate",
         "problemMaybeReauth": "Es gab ein Problem mit deiner Anfrage. Bitte versuche es in einer Minute erneut. Wenn das Problem weiterhin besteht, versuche dich aus- und wieder einzuloggen. Du kannst dich ausloggen unter Einstellungen > Account > Log out",
-        "warning": "Warnung"
+        "warning": "Warnung",
+        "blinkToBlink": "Blink zu Blink"
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",
@@ -2650,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Gefällt Dir die App?",
         "statusPage": "Status-Seite",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Danke für Deine Rückmeldung. Möchtest du einen Verbesserungsvorschlag einreichen?",
@@ -2752,7 +2752,7 @@
         "firstName": "Vorname",
         "lastName": "Nachname",
         "confirmNameContent": "Ist die Schreibweise Ihres Namens korrekt?\n\n{firstName: string} {lastName: string}\n\nEr muss mit dem Namen in Ihrem Ausweis übereinstimmen.",
-        "requirements": "Mit der Hochstufung Ihres Kontos erhöhen sich Ihre Limits und Sie erhalten zusätzliche Funktionen wie Überweisungen auf Bankkonten in ausgewählten Ländern.",
+        "requirements": "Mit der Hochstufung Ihres Kontos erhöhen sich Ihre Limits und Sie erhalten zusätzliche Funktionen wie Überweisungen auf Bankkonten in ausgewählten Ländern.\n\nSie müssen Ihren Namen, einen von der Regierung ausgestellten Ausweis und ein Selfie angeben. Wir werden mit ihrem Namen anfangen.",
         "success": "Die Dokumente wurden erfolgreich empfangen und werden in Kürze bearbeitet. Sie können auf diese Seite zurückkehren, um sich über den Status Ihrer Registrierung zu informieren.",
         "error": "Bei der Einreichung Ihrer Dokumente ist ein Fehler aufgetreten. Sie können sich an den Support wenden, wenn das Problem weiterhin besteht.",
         "status": "Dein Onboarding-Status ist: ",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Benachrichtigungen",
         "noNotifications": "Sie haben im Moment keine Benachrichtigungen"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Beim Senden der Nachricht ist ein Fehler aufgetreten",
-        "confirmChatReset": "Sind Sie sicher, dass Sie den Chat zurücksetzen wollen?",
-        "errorResettingChat": "Beim Zurücksetzen des Chats ist ein Fehler aufgetreten"
     }
 }

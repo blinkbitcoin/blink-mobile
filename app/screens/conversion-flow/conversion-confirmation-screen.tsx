@@ -1,11 +1,18 @@
 import { GraphQLError } from "graphql"
-import React, { useState } from "react"
-import { Text, View } from "react-native"
-import { ScrollView } from "react-native-gesture-handler"
+import React, { useMemo, useState } from "react"
+import { TouchableOpacity, View } from "react-native"
+import { makeStyles, useTheme, Text } from "@rn-vui/themed"
+import Icon from "react-native-vector-icons/Ionicons"
+import { PanGestureHandler, ScrollView } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+import crashlytics from "@react-native-firebase/crashlytics"
+import {
+  CommonActions,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from "@react-navigation/native"
 
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { Screen } from "@app/components/screen"
 import {
   HomeAuthedDocument,
   PaymentSendResult,
@@ -21,29 +28,29 @@ import { SATS_PER_BTC, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { DisplayCurrency, toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
-import crashlytics from "@react-native-firebase/crashlytics"
-import {
-  CommonActions,
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-} from "@react-navigation/native"
-import { makeStyles } from "@rn-vui/themed"
+
+import { Screen } from "@app/components/screen"
+import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
+import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
 }
 
 export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
+  const {
+    theme: { colors },
+  } = useTheme()
   const styles = useStyles()
   const navigation =
     useNavigation<NavigationProp<RootStackParamList, "conversionConfirmation">>()
 
-  const { formatMoneyAmount, displayCurrency } = useDisplayCurrency()
+  const { formatMoneyAmount, displayCurrency, moneyAmountToDisplayCurrencyString } =
+    useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
   const { fromWalletCurrency, moneyAmount } = route.params
@@ -56,9 +63,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useIntraLedgerUsdPaymentSendMutation()
   const isLoading = intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading
   const { LL } = useI18nContext()
-
-  let fromWallet: WalletDescriptor<WalletCurrency>
-  let toWallet: WalletDescriptor<WalletCurrency>
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-first",
@@ -68,21 +73,61 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
   const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
 
+  const btcToUsdRate = useMemo(() => {
+    if (!convertMoneyAmount) return null
+
+    const oneBtc = toBtcMoneyAmount(SATS_PER_BTC)
+    const usdEquivalent = convertMoneyAmount(oneBtc, WalletCurrency.Usd)
+
+    return formatMoneyAmount({
+      moneyAmount: usdEquivalent,
+      isApproximate: false,
+    })
+  }, [convertMoneyAmount, formatMoneyAmount])
+
   if (!data?.me || !usdWallet || !btcWallet || !convertMoneyAmount) {
     // TODO: handle errors and or provide some loading state
     return null
   }
 
-  if (fromWalletCurrency === WalletCurrency.Btc) {
-    fromWallet = { id: btcWallet.id, currency: WalletCurrency.Btc }
-    toWallet = { id: usdWallet.id, currency: WalletCurrency.Usd }
-  } else {
-    fromWallet = { id: usdWallet.id, currency: WalletCurrency.Usd }
-    toWallet = { id: btcWallet.id, currency: WalletCurrency.Btc }
-  }
+  const fromWallet: WalletDescriptor<WalletCurrency> =
+    fromWalletCurrency === WalletCurrency.Btc
+      ? { id: btcWallet.id, currency: WalletCurrency.Btc }
+      : { id: usdWallet.id, currency: WalletCurrency.Usd }
+
+  const toWallet: WalletDescriptor<WalletCurrency> =
+    fromWalletCurrency === WalletCurrency.Btc
+      ? { id: usdWallet.id, currency: WalletCurrency.Usd }
+      : { id: btcWallet.id, currency: WalletCurrency.Btc }
+
+  const fromWalletLabel =
+    fromWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const toWalletLabel =
+    toWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
 
   const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
   const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
+
+  const fromWalletBalanceFormatted = formatMoneyAmount({ moneyAmount: fromAmount })
+  const fromSatsFormatted =
+    fromWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
+      ? null
+      : moneyAmountToDisplayCurrencyString({
+          moneyAmount: fromAmount,
+          isApproximate: true,
+        })
+
+  const toWalletBalanceFormatted = formatMoneyAmount({
+    moneyAmount: toAmount,
+    isApproximate: true,
+  })
+  const toSatsFormatted =
+    toWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
+      ? null
+      : moneyAmountToDisplayCurrencyString({
+          moneyAmount: toAmount,
+          isApproximate: true,
+        })
 
   const handlePaymentReturn = (
     status: PaymentSendResult,
@@ -130,8 +175,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         const { data, errors } = await intraLedgerPaymentSend({
           variables: {
             input: {
-              walletId: fromWallet?.id,
-              recipientWalletId: toWallet?.id,
+              walletId: fromWallet.id,
+              recipientWalletId: toWallet.id,
               amount: fromAmount.amount,
             },
           },
@@ -169,8 +214,8 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         const { data, errors } = await intraLedgerUsdPaymentSend({
           variables: {
             input: {
-              walletId: fromWallet?.id,
-              recipientWalletId: toWallet?.id,
+              walletId: fromWallet.id,
+              recipientWalletId: toWallet.id,
               amount: fromAmount.amount,
             },
           },
@@ -204,50 +249,68 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   return (
     <Screen>
       <ScrollView style={styles.scrollViewContainer}>
+        <View style={styles.conversionRate}>
+          <Text type="p2" style={styles.conversionRateText}>
+            1 BTC = {btcToUsdRate}
+          </Text>
+        </View>
         <View style={styles.conversionInfoCard}>
-          <View style={styles.conversionInfoField}>
-            <Text style={styles.conversionInfoFieldTitle}>
-              {LL.ConversionConfirmationScreen.youreConverting()}
-            </Text>
-            <Text style={styles.conversionInfoFieldValue}>
-              {formatMoneyAmount({ moneyAmount: fromAmount })}
-              {displayCurrency !== fromWallet.currency &&
-              displayCurrency !== toWallet.currency
-                ? ` - ${formatMoneyAmount({
-                    moneyAmount: convertMoneyAmount(moneyAmount, DisplayCurrency),
-                  })}`
-                : ""}
-            </Text>
+          <View style={styles.fromFieldContainer}>
+            <CurrencyPill
+              currency={fromWallet.currency}
+              containerSize="medium"
+              label={
+                fromWallet.currency === WalletCurrency.Usd
+                  ? LL.common.dollar()
+                  : LL.common.bitcoin()
+              }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(fromWallet.currency)}
+            />
+
+            <View style={styles.walletSelectorBalanceContainer}>
+              <Text style={styles.conversionInfoFieldValue}>
+                {fromWalletBalanceFormatted}
+              </Text>
+              <Text style={styles.conversionInfoFieldConvertValue}>
+                {fromSatsFormatted}
+              </Text>
+            </View>
           </View>
-          <View style={styles.conversionInfoField}>
-            <Text style={styles.conversionInfoFieldTitle}>{LL.common.to()}</Text>
-            <Text style={styles.conversionInfoFieldValue}>
-              {formatMoneyAmount({ moneyAmount: toAmount, isApproximate: true })}
-            </Text>
+          <View style={styles.walletSeparator}>
+            <View style={styles.line}></View>
+            <TouchableOpacity style={styles.switchButton} disabled>
+              <Icon name="arrow-down-outline" color={colors.grey3} size={25} />
+            </TouchableOpacity>
           </View>
-          <View style={styles.conversionInfoField}>
-            <Text style={styles.conversionInfoFieldTitle}>
-              {LL.ConversionConfirmationScreen.receivingAccount()}
-            </Text>
-            <Text style={styles.conversionInfoFieldValue}>
-              {toWallet.currency === WalletCurrency.Btc
-                ? LL.common.btcAccount()
-                : LL.common.usdAccount()}
-            </Text>
+          <View style={styles.toFieldContainer}>
+            <CurrencyPill
+              currency={toWallet.currency}
+              containerSize="medium"
+              label={
+                toWallet.currency === WalletCurrency.Usd
+                  ? LL.common.dollar()
+                  : LL.common.bitcoin()
+              }
+              containerStyle={pillWidthStyle}
+              onLayout={onPillLayout(toWallet.currency)}
+            />
+            <View style={styles.walletSelectorBalanceContainer}>
+              <Text style={styles.conversionInfoFieldValue}>
+                {toWalletBalanceFormatted}
+              </Text>
+              <Text style={styles.conversionInfoFieldConvertValue}>
+                {toSatsFormatted}
+              </Text>
+            </View>
           </View>
-          <View style={styles.conversionInfoField}>
-            <Text style={styles.conversionInfoFieldTitle}>{LL.common.rate()}</Text>
-            <Text style={styles.conversionInfoFieldValue}>
-              {formatMoneyAmount({
-                moneyAmount: convertMoneyAmount(
-                  toBtcMoneyAmount(Number(SATS_PER_BTC)),
-                  DisplayCurrency,
-                ),
-                isApproximate: true,
-              })}{" "}
-              / 1 BTC
-            </Text>
-          </View>
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.conversionInfoFieldTitle}>
+            {toWallet.currency === WalletCurrency.Btc
+              ? LL.ConversionConfirmationScreen.infoBitcoin()
+              : LL.ConversionConfirmationScreen.infoDollar()}
+          </Text>
         </View>
         {errorMessage && (
           <View style={styles.errorContainer}>
@@ -255,13 +318,20 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           </View>
         )}
       </ScrollView>
-      <GaloyPrimaryButton
-        title={LL.common.convert()}
-        containerStyle={styles.buttonContainer}
-        disabled={isLoading}
-        onPress={payWallet}
-        loading={isLoading}
-      />
+      <PanGestureHandler>
+        <View style={styles.sliderContainer}>
+          <GaloySliderButton
+            isLoading={isLoading}
+            initialText={LL.ConversionConfirmationScreen.transferButtonText({
+              fromWallet: fromWalletLabel,
+              toWallet: toWalletLabel,
+            })}
+            loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
+            onSwipe={payWallet}
+            disabled={isLoading}
+          />
+        </View>
+      </PanGestureHandler>
     </Screen>
   )
 }
@@ -273,17 +343,31 @@ const useStyles = makeStyles(({ colors }) => ({
   conversionInfoCard: {
     margin: 20,
     backgroundColor: colors.grey5,
-    borderRadius: 10,
+    borderRadius: 13,
     padding: 20,
+  },
+  conversionRate: {
+    marginHorizontal: 20,
+    padding: 20,
+    paddingBottom: 0,
+    marginBottom: 0,
+  },
+  conversionRateText: {
+    color: colors.grey0,
   },
   conversionInfoField: {
     marginBottom: 20,
   },
-  conversionInfoFieldTitle: { color: colors.grey1 },
+  conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
   conversionInfoFieldValue: {
-    color: colors.grey0,
+    color: colors.grey1,
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
+  },
+  conversionInfoFieldConvertValue: {
+    color: colors.grey2,
+    fontSize: 14,
+    fontWeight: "normal",
   },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
   errorContainer: {
@@ -292,5 +376,63 @@ const useStyles = makeStyles(({ colors }) => ({
   errorText: {
     color: colors.error,
     textAlign: "center",
+  },
+  walletSelectorContainer: {
+    flexDirection: "column",
+    backgroundColor: colors.grey5,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+  },
+  fromFieldContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  walletSelectorBalanceContainer: {
+    marginTop: 5,
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+  },
+  walletSeparator: {
+    flexDirection: "row",
+    height: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  line: {
+    backgroundColor: colors.grey4,
+    height: 1,
+    flex: 1,
+  },
+  switchButton: {
+    position: "absolute",
+    left: 100,
+    height: 43,
+    width: 43,
+    borderRadius: 50,
+    backgroundColor: colors.grey4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  toFieldContainer: {
+    flexDirection: "row",
+    marginTop: 15,
+    alignItems: "center",
+  },
+  infoContainer: {
+    marginHorizontal: 20,
+    backgroundColor: colors.grey5,
+    borderRadius: 6,
+    padding: 20,
+    paddingVertical: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: colors.black,
+  },
+  sliderContainer: {
+    padding: 20,
   },
 }))

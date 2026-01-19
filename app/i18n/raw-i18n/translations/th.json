@@ -2294,8 +2294,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Default Account",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+        "title": "รับสกุลเงิน",
+        "info": "ใช้บัญชี Stablesats ของคุณใน Blink เพื่อรักษาเงินในกระเป๋าให้นิ่งในแง่ของสกุลเงินทั่วไป (ดอลลาร์) ใช้บัญชี Bitcoin หากคุณกำลังสะสม sats และไม่กังวลว่ามูลค่าเงิน fiat จะเปลี่ยนแปลงตลอดเวลา"
     },
     "ThemeScreen": {
         "title": "Theme",
@@ -2522,7 +2522,8 @@
         "thisMonth": "เดือนนี้",
         "prevMonths": "เดือนที่ผ่านมา",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "Blink ไปยัง Blink"
     },
     "errors": {
         "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -2664,7 +2665,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",

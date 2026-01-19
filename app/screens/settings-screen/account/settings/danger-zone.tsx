@@ -1,20 +1,21 @@
-import { TouchableOpacity, View } from "react-native"
+import { View, TouchableOpacity } from "react-native"
 
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Icon, Text, makeStyles } from "@rn-vui/themed"
 
 import { Delete } from "./delete"
+import { LogOut } from "./logout"
 import { useState } from "react"
 
 export const DangerZoneSettings: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
 
-  const { currentLevel, isAtLeastLevelZero } = useLevel()
   const [expanded, setExpanded] = useState(false)
-
   const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
+
+  const { currentLevel, isAtLeastLevelOne, isAtLeastLevelZero } = useLevel()
   if (!isAtLeastLevelZero) return <></>
 
   return (
@@ -25,6 +26,7 @@ export const DangerZoneSettings: React.FC = () => {
           {LL.AccountScreen.dangerZone()}
         </Text>
       </TouchableOpacity>
+      {isAtLeastLevelOne && expanded && <LogOut />}
       {currentLevel !== AccountLevel.NonAuth && expanded && <Delete />}
     </View>
   )
@@ -32,10 +34,10 @@ export const DangerZoneSettings: React.FC = () => {
 
 const useStyles = makeStyles(() => ({
   verticalSpacing: {
-    marginTop: 10,
+    marginTop: 5,
     display: "flex",
     flexDirection: "column",
-    rowGap: 20,
+    rowGap: 10,
   },
   titleStyle: {
     display: "flex",

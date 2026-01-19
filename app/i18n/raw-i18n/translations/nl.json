@@ -2296,8 +2296,8 @@
         "toastMessage": "Geheim gekopieerd naar klembord!"
     },
     "DefaultWalletScreen": {
-        "title": "Standaard Account",
-        "info": "Kies welk account u als standaard wilt instellen voor ontvangen en verzenden. In de mobiele app kunt u het verzend- en ontvangstaccount voor individuele betalingen aanpassen. Betalingen ontvangen via de kassa of uw Lightning-adres gaan altijd naar de standaardrekening.\n\nKies Stablesats om de volatiliteit van Bitcoin te vermijden. Hierdoor kunt u een stabiel geldbedrag aanhouden terwijl u nog steeds betalingen kunt verzenden en ontvangen.\n\nU kunt deze instelling op elk gewenst moment wijzigen. Dit heeft geen invloed op uw huidige saldo."
+        "title": "Valuta ontvangen",
+        "info": "Gebruik je Stablesats-account in Blink om het geld in je wallet stabiel te houden in fiat-termen (dollar). Gebruik je Bitcoin-account als je sats spaart en het prima vindt dat je fiat-saldo voortdurend verandert."
     },
     "ThemeScreen": {
         "title": "Thema",
@@ -2524,7 +2524,8 @@
         "thisMonth": "Deze maand",
         "prevMonths": "Vorige maanden",
         "problemMaybeReauth": "Er was een probleem met je verzoek. Probeer het over een minuut opnieuw. Als het probleem zich blijft voordoen, raden we u aan uit te loggen en weer in te loggen. U kunt uitloggen door naar Instellingen > Account > Uitloggen te gaan.",
-        "warning": "Waarschuwing"
+        "warning": "Waarschuwing",
+        "blinkToBlink": "Blink naar Blink"
     },
     "errors": {
         "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",
@@ -2666,7 +2667,7 @@
         "firstName": "First name",
         "lastName": "Last name",
         "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.",
+        "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
         "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
         "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
         "status": "Your onboarding status is: ",
