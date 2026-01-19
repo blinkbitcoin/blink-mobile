@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。"
     },
     "SetAccountModal": {
-        "title": "メインウォレットを設定する",
-        "description": "メインの送受金ウォレットとして設定されます。この設定はいつでも変更することができます。",
-        "stablesatsTag": "米ドルで保管する場合はこれを選択してください。",
-        "bitcoinTag": "ビットコインで保管する場合はこれを選択してください。"
+        "title": "受取アカウントを設定",
+        "description": "後で「設定」でいつでも変更できます。",
+        "stablesatsTag": "価格安定のためのStablesatsアカウント",
+        "bitcoinTag": "マキシマリスト向けBitcoinアカウント"
     },
     "NoteInput": {
         "addNote": "メモを追加"

@@ -28,10 +28,10 @@
         "text": "Dengan mengklik 'Setuju', Anda menyetujui Syarat dan Ketentuan kami. Anda juga setuju bahwa Anda bukan penduduk atau warga negara dari salah satu negara yang dilarang."
     },
     "SetAccountModal": {
-        "title": "Atur akun default",
-        "description": "Akun ini akan dipilih untuk mengirim dan menerima pembayaran. Ini dapat diubah kapanpun.",
-        "stablesatsTag": "Pilih ini untuk mempertahankan nilai USD yang stabil.",
-        "bitcoinTag": "Pilih ini untuk dijadikan standar dalam Bitcoin."
+        "title": "Atur akun penerimaan Anda",
+        "description": "Anda selalu bisa mengubahnya nanti di Pengaturan",
+        "stablesatsTag": "Akun Stablesats untuk stabilitas harga",
+        "bitcoinTag": "Akun Bitcoin untuk maksimalis"
     },
     "NoteInput": {
         "addNote": "Tambahkan catatan"

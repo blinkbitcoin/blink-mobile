@@ -28,10 +28,10 @@
         "text": "Ao clicar em \"Aceitar\", você concorda com nossos temos e condições. Você também concorda que não é residente ou cidadão de nenhum dos países proibidos."
     },
     "SetAccountModal": {
-        "title": "Defina sua conta padrão",
-        "description": "Essa conta será selecionada inicialmente para envio e recebimento de pagamentos. Você pode alterá-la a qualquer momento.",
-        "stablesatsTag": "Escolha essa opção para manter um valor estável em USD",
-        "bitcoinTag": "Escolha essa opção para estar no padrão Bitcoin"
+        "title": "Configure sua conta de recebimento",
+        "description": "Você sempre pode mudar isso mais tarde nas Configurações",
+        "stablesatsTag": "Conta Stablesats para estabilidade de preço",
+        "bitcoinTag": "Conta Bitcoin para maximalistas"
     },
     "NoteInput": {
         "addNote": "Adicione uma nota"

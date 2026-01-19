@@ -28,10 +28,10 @@
         "text": "Făcând clic pe „Accept”, sunteți de acord cu Termenii și condițiile noastre. De asemenea, sunteți de acord că nu sunteți rezident sau cetățean al uneia dintre țările interzise."
     },
     "SetAccountModal": {
-        "title": "Setați contul implicit",
-        "description": "Acest cont va fi selectat inițial pentru trimiterea și primirea plăților. Acesta poate fi modificat în orice moment.",
-        "stablesatsTag": "Alegeți acesta pentru a menține o valoare stabillită în USD.",
-        "bitcoinTag": "Alegeți aceasta pentru a fi pe standardul Bitcoin."
+        "title": "Configurează contul de primire",
+        "description": "Poți schimba oricând mai târziu din Setări",
+        "stablesatsTag": "Cont Stablesats pentru stabilitatea prețului",
+        "bitcoinTag": "Cont Bitcoin pentru maximiști"
     },
     "NoteInput": {
         "addNote": "Adaugă notă"

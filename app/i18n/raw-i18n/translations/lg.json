@@ -28,10 +28,10 @@
         "text": "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries."
     },
     "SetAccountModal": {
-        "title": "Kola akawunti esookerwako",
-        "description": "Akawunti eno ejja kusooka kulondebwa okusindika n’okufuna ssente. Kisobola okukyusibwa essaawa yonna.",
-        "stablesatsTag": "Londa kino okukuuma omuwendo gwa doola ogutebenkedde.",
-        "bitcoinTag": "Londa kino okubeera ku bendera ya Bitcoin."
+        "title": "Teekateeka akawunti yo ey'okufuna",
+        "description": "Oyinza okukyusa kino oluvannyuma mu Setingi",
+        "stablesatsTag": "Akawunti ya Stablesats ey'obutebenkevu bw'omuwendo",
+        "bitcoinTag": "Akawunti ya Bitcoin ya maximalist"
     },
     "NoteInput": {
         "addNote": "Yongerako ekiwandiiko"
