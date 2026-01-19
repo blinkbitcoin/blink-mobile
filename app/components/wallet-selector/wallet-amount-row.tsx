@@ -85,9 +85,6 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
           <CurrencyPill
             currency={currency}
             containerSize="medium"
-            label={
-              currency === WalletCurrency.Usd ? LL.common.dollar() : LL.common.bitcoin()
-            }
             containerStyle={pillContainerStyle}
             onLayout={pillOnLayout}
           />

@@ -57,15 +57,7 @@ export const WalletSummary: FunctionComponent<WalletSummaryProps> = ({
   return (
     <View style={styles.walletSummaryContainer}>
       <View style={styles.currencyTagContainer}>
-        <CurrencyPill
-          currency={settlementAmount.currency}
-          containerSize="medium"
-          label={
-            settlementAmount.currency === WalletCurrency.Btc
-              ? LL.common.bitcoin()
-              : LL.common.dollar()
-          }
-        />
+        <CurrencyPill currency={settlementAmount.currency} containerSize="medium" />
       </View>
       <View style={styles.amountsContainer}>
         <Text type={"p2"}>{walletName}</Text>

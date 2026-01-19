@@ -180,11 +180,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
-                  <CurrencyPill
-                    label={LL.common.bitcoin()}
-                    currency={WalletCurrency.Btc}
-                    containerSize="medium"
-                  />
+                  <CurrencyPill currency={WalletCurrency.Btc} containerSize="medium" />
                   <View style={styles.currencyButtonTextContainer}>
                     <Text type="p2" style={styles.currencyButtonText}>
                       {LL.SetAccountModal.bitcoinTag()}
@@ -200,11 +196,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
-                  <CurrencyPill
-                    label={LL.common.dollar()}
-                    currency={WalletCurrency.Usd}
-                    containerSize="medium"
-                  />
+                  <CurrencyPill currency={WalletCurrency.Usd} containerSize="medium" />
                   <View style={styles.currencyButtonTextContainer}>
                     <Text type="p2" style={styles.currencyButtonText}>
                       {LL.SetAccountModal.stablesatsTag()}

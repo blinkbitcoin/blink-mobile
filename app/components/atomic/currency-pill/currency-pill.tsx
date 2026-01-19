@@ -3,6 +3,7 @@ import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { useI18nContext } from "@app/i18n/i18n-react"
 
 export const CURRENCY_PILL_PADDING_HORIZONTAL = 11
 export const CURRENCY_PILL_BORDER_WIDTH = 1
@@ -30,24 +31,25 @@ export const CurrencyPill = ({
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
 
   const getCurrencyProps = () => {
     switch (currency) {
       case WalletCurrency.Btc:
         return {
-          defaultText: "BTC",
+          defaultText: LL.common.bitcoin(),
           color: highlighted ? colors.white : colors._white,
           backgroundColor: highlighted ? colors.primary : colors.grey3,
         }
       case WalletCurrency.Usd:
         return {
-          defaultText: "USD",
+          defaultText: LL.common.dollar(),
           color: highlighted ? colors._white : colors._white,
           backgroundColor: highlighted ? colors._green : colors.grey3,
         }
       default:
         return {
-          defaultText: "ALL",
+          defaultText: currency === "ALL" ? LL.common.all() : "ALL",
           color: colors.primary,
           backgroundColor: colors.transparent,
           borderColor: colors.primary,

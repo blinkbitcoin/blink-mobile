@@ -259,11 +259,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             <CurrencyPill
               currency={fromWallet.currency}
               containerSize="medium"
-              label={
-                fromWallet.currency === WalletCurrency.Usd
-                  ? LL.common.dollar()
-                  : LL.common.bitcoin()
-              }
               containerStyle={pillWidthStyle}
               onLayout={onPillLayout(fromWallet.currency)}
             />
@@ -287,11 +282,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             <CurrencyPill
               currency={toWallet.currency}
               containerSize="medium"
-              label={
-                toWallet.currency === WalletCurrency.Usd
-                  ? LL.common.dollar()
-                  : LL.common.bitcoin()
-              }
               containerStyle={pillWidthStyle}
               onLayout={onPillLayout(toWallet.currency)}
             />
