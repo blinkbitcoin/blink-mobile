@@ -355,6 +355,7 @@ export const RootStack = () => {
           title: LL.TransactionScreen.transactionHistoryTitle(),
           presentation: "modal",
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
         }}
       />
       <RootNavigator.Screen
