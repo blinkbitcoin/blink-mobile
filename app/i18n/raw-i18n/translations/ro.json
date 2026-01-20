@@ -31,7 +31,7 @@
         "title": "Configurează contul de primire",
         "description": "Poți schimba oricând mai târziu din Setări",
         "stablesatsTag": "Cont Stablesats pentru stabilitatea prețului",
-        "bitcoinTag": "Cont Bitcoin pentru maximiști"
+        "bitcoinTag": "Cont Bitcoin pentru maximaliști"
     },
     "NoteInput": {
         "addNote": "Adaugă notă"
