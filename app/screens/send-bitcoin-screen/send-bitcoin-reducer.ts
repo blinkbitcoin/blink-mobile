@@ -111,7 +111,7 @@ export const sendBitcoinDestinationReducer = (
         destinationState: DestinationState.Validating,
       }
     case SendBitcoinActions.SetValid:
-      return state.unparsedDestination === action.payload?.unparsedDestination //
+      return state.unparsedDestination === action.payload?.unparsedDestination
         ? {
             unparsedDestination: state.unparsedDestination,
             destinationState: DestinationState.Valid,
