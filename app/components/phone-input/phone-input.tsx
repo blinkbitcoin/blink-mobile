@@ -149,7 +149,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                 style={[
                   styles.countryPickerButtonStyle,
                   isDisabled && styles.disabledInput,
-                  countryPickerButtonStyle && countryPickerButtonStyle,
+                  countryPickerButtonStyle,
                 ]}
                 onPress={onOpen}
               >
