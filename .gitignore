@@ -104,18 +104,10 @@ android-recordings
 !.yarn/sdks
 !.yarn/versions
 
-# As long asd we haven't agreed on an AI agent strategy, let's ignore any AI agent data
-.claude
-.augment
-.bmad
-bmad-custom-src
-.history # a defined place to dump all that intermediate stuff from AI agents
-
 # MCP state (logs, pids, ready marker)
 .mcp/
 
-# Convenience of using different agent tooling
-.claude
+# AI agent tooling (keeping .claude/skills tracked)
 .augment
 .bmad
 bmad-custom-src
