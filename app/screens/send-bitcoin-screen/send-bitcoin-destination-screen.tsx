@@ -398,6 +398,33 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
+      if (
+        destination.destinationDirection === DestinationDirection.Send &&
+        destination.validDestination.paymentType === PaymentType.Lnurl &&
+        activeInputRef.current === "phone"
+      ) {
+        const identifier = destination.validDestination.lnurlParams.identifier
+        const normalizedHandle = normalizeHandle(identifier)
+        const hasConfirmedUsername =
+          normalizeHandle(destinationState.confirmationUsernameType?.username) ===
+            normalizedHandle && destinationState.unparsedDestination === rawInput
+
+        if (!contactHandleSet.has(normalizedHandle) && !hasConfirmedUsername) {
+          dispatchDestinationStateAction({
+            type: SendBitcoinActions.SetRequiresUsernameConfirmation,
+            payload: {
+              validDestination: destination,
+              unparsedDestination: rawInput,
+              confirmationUsernameType: {
+                type: "new-username",
+                username: identifier,
+              },
+            },
+          })
+          return
+        }
+      }
+
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetValid,
         payload: {
