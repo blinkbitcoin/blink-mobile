@@ -176,7 +176,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         inputContainerStyle={[
           styles.inputContainerStyle,
           isDisabled && styles.disabledInput,
-          inputContainerStyle && inputContainerStyle,
+          inputContainerStyle,
         ]}
         renderErrorMessage={false}
         textContentType="telephoneNumber"
