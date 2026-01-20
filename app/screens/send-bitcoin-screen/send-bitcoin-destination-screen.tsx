@@ -841,6 +841,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             disabled={
               destinationState.destinationState === DestinationState.Invalid ||
               destinationState.destinationState === DestinationState.PhoneInvalid ||
+              destinationState.destinationState === DestinationState.PhoneNotAllowed ||
               !destinationState.unparsedDestination ||
               (activeInputRef.current === InputType.Phone && rawPhoneNumber === "")
             }
