@@ -64,12 +64,14 @@ export const resolveLnurlDestination = async ({
         const isFixedAmount = lnurlPayParams.min === lnurlPayParams.max
 
         if (!isFixedAmount) {
-          const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
-            lnurlDomains,
-            lnurlPayParams,
-            myWalletIds,
-            accountDefaultWalletQuery,
-          })
+          const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl(
+            {
+              lnurlDomains,
+              lnurlPayParams,
+              myWalletIds,
+              accountDefaultWalletQuery,
+            },
+          )
           if (maybeIntraledgerDestination && maybeIntraledgerDestination.valid) {
             return maybeIntraledgerDestination
           }
