@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react"
-import { ActivityIndicator, Alert, Linking, View } from "react-native"
-import InAppBrowser from "react-native-inappbrowser-reborn"
-
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { ActivityIndicator, Alert, View } from "react-native"
+import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
+
+import { Screen } from "@app/components/screen"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { ContactSupportButton } from "@app/components/contact-support-button/contact-support-button"
-import { Screen } from "@app/components/screen"
+
+import { useAppConfig } from "@app/hooks"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   OnboardingStatus,
   useFullOnboardingScreenQuery,
-  useOnboardingFlowStartMutation,
+  useKycFlowStartMutation,
 } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { useNavigation } from "@react-navigation/native"
-import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 gql`
-  mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-    onboardingFlowStart(input: $input) {
+  mutation kycFlowStart($input: KycFlowStartInput!) {
+    kycFlowStart(input: $input) {
       workflowRunId
       tokenWeb
     }
@@ -38,30 +40,24 @@ gql`
 `
 
 export const FullOnboardingFlowScreen: React.FC = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
+  const { navigate, goBack } = navigation
 
-  const { LL } = useI18nContext()
-
-  const {
-    theme: { colors },
-  } = useTheme()
-
+  const { LL, locale } = useI18nContext()
   const styles = useStyles()
+  const {
+    theme: { colors, mode },
+  } = useTheme()
 
   const { data, loading } = useFullOnboardingScreenQuery({ fetchPolicy: "network-only" })
 
   const onboardingStatus = data?.me?.defaultAccount?.onboardingStatus
 
-  const [loadingOnfido, setLoadingOnfido] = useState(false)
-
-  const [onboardingFlowStart] = useOnboardingFlowStartMutation()
-
+  const [loadingKyc, setLoadingKyc] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
 
-  useEffect(() => {
-    InAppBrowser.warmup()
-  }, [])
+  const [kycFlowStart] = useKycFlowStartMutation()
 
   const {
     appConfig: {
@@ -77,43 +73,38 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         { text: LL.common.cancel(), onPress: () => {} },
         {
           text: LL.common.yes(),
-          onPress: onfidoStart,
+          onPress: startKyc,
         },
       ],
     )
   }
 
-  const onfidoStart = React.useCallback(async () => {
-    setLoadingOnfido(true)
+  const startKyc = React.useCallback(async () => {
+    setLoadingKyc(true)
 
     try {
-      console.log("onfidoStart", firstName, lastName)
-      const res = await onboardingFlowStart({
+      const res = await kycFlowStart({
         variables: { input: { firstName, lastName } },
       })
 
-      const workflowRunId = res.data?.onboardingFlowStart?.workflowRunId
-      if (!workflowRunId) {
-        Alert.alert("no workflowRunId")
-        setLoadingOnfido(false)
-        return
-      }
+      const token = res.data?.kycFlowStart?.tokenWeb ?? ""
+      const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
 
-      const tokenWeb = res.data?.onboardingFlowStart?.tokenWeb
+      const theme = mode === "dark" || mode === "light" ? mode : ""
 
-      const page = `${kycUrl}/webflow?token=${tokenWeb}&workflow_run_id=${workflowRunId}`
+      const query = new URLSearchParams({
+        token,
+        ...(locale && { lang: locale }),
+        ...(theme && { theme }),
+      }).toString()
 
-      if (await InAppBrowser.isAvailable()) {
-        await InAppBrowser.open(page, {
-          dismissButtonStyle: "done",
-          enableDefaultShare: false,
-          hasBackButton: false,
-          showInRecents: false,
-        })
-        navigation.goBack()
-      } else {
-        Linking.openURL(page)
-      }
+      const workflowRunIdParam = workflowRunId ? `&workflow_run_id=${workflowRunId}` : ""
+      const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
+
+      navigate("webView", {
+        url,
+        headerTitle: LL.UpgradeAccountModal.title(),
+      })
     } catch (err) {
       console.error(err, "error")
       let message = ""
@@ -122,8 +113,8 @@ export const FullOnboardingFlowScreen: React.FC = () => {
       }
 
       if (message.match(/canceled/i)) {
-        navigation.goBack()
-        setLoadingOnfido(false)
+        goBack()
+        setLoadingKyc(false)
         return
       }
 
@@ -134,21 +125,21 @@ export const FullOnboardingFlowScreen: React.FC = () => {
           {
             text: LL.common.ok(),
             onPress: () => {
-              navigation.goBack()
+              goBack()
             },
           },
         ],
       )
     } finally {
-      setLoadingOnfido(false)
+      setLoadingKyc(false)
     }
-  }, [LL, firstName, lastName, navigation, onboardingFlowStart, kycUrl])
+  }, [LL, firstName, lastName, locale, mode, navigate, goBack, kycFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {
-      onfidoStart()
+      startKyc()
     }
-  }, [onboardingStatus, onfidoStart])
+  }, [onboardingStatus, startKyc])
 
   if (loading) {
     return (
@@ -217,7 +208,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
             onPress={confirmNames}
             title={LL.common.next()}
             disabled={!firstName || !lastName}
-            loading={loadingOnfido}
+            loading={loadingKyc}
           />
         </View>
       </View>
@@ -227,10 +218,11 @@ export const FullOnboardingFlowScreen: React.FC = () => {
 
 const useStyles = makeStyles(() => ({
   screenStyle: {
-    flexGrow: 1,
+    flex: 1,
   },
 
   innerView: {
+    flex: 1,
     padding: 20,
   },
 
@@ -241,6 +233,7 @@ const useStyles = makeStyles(() => ({
   buttonContainer: {
     flex: 1,
     justifyContent: "flex-end",
+    paddingBottom: 15,
   },
 
   verticalAlignment: { flex: 1, justifyContent: "center", alignItems: "center" },

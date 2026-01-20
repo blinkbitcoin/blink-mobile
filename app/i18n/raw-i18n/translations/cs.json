@@ -2296,8 +2296,8 @@
         "toastMessage": "Tajemství zkopírováno do schránky!"
     },
     "DefaultWalletScreen": {
-        "title": "Výchozí účet",
-        "info": "Vyberte účet, který chcete nastavit jako výchozí pro příjem a odesílání. Účet pro odesílání a přijímání jednotlivých plateb můžete nastavit v mobilní aplikaci. Platby přijaté prostřednictvím pokladny nebo vaší Lightning adresy budou vždy zaslány na výchozí účet.\n\nChcete-li se vyhnout volatilitě Bitcoinu, zvolte Stablesats. To vám umožní udržovat stabilní množství peněz a zároveň mít možnost odesílat a přijímat platby.\n\nToto nastavení můžete kdykoli změnit a nebude mít vliv na váš aktuální zůstatek."
+        "title": "Přijmout měnu",
+        "info": "Použijte svůj účet Stablesats v Blink, abyste udrželi peníze ve své peněžence stabilní v hodnotě fiat měny (dolar). Použijte svůj Bitcoin účet, pokud hromadíte sats a nevadí vám, že se vaše fiat zůstatky neustále mění."
     },
     "ThemeScreen": {
         "title": "Motiv",
@@ -2524,7 +2524,8 @@
         "thisMonth": "Tento měsíc",
         "prevMonths": "Předchozí měsíce",
         "problemMaybeReauth": "Ve vašem požadavku se vyskytl problém. Zkuste to prosím znovu za minutu. Pokud problém přetrvává, doporučujeme se odhlásit a znovu přihlásit. Odhlásit se můžete v Nastavení > Účet > Odhlásit se.",
-        "warning": "Upozornění"
+        "warning": "Upozornění",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Došlo k chybě.\nZkuste to prosím později.",

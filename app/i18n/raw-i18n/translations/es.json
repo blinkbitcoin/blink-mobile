@@ -59,17 +59,21 @@
         "title": "Transacciones con {username: string}"
     },
     "ConversionDetailsScreen": {
-        "title": "Convertir",
-        "percentageToConvert": "% para convertir"
+        "title": "Transferir fondos",
+        "transfer": "Transferir",
+        "percentageToConvert": "% para convertir",
+        "reviewTransfer": "Revisar transferencia"
     },
     "ConversionConfirmationScreen": {
-        "title": "Confirmar conversión",
+        "title": "Confirmar transferencia",
         "youreConverting": "Estás convirtiendo",
-        "receivingAccount": "Cuenta destino"
+        "receivingAccount": "Cuenta destino",
+        "infoBitcoin": "La cantidad de Bitcoin es solo aproximada. Puede variar en una pequeña cantidad.",
+        "infoDollar": "La cantidad de Dólares es solo aproximada. Puede variar en una pequeña cantidad.",
+        "transferButtonText": "Transferir {fromWallet} a {toWallet}"
     },
     "ConversionSuccessScreen": {
-        "title": "Conversión exitosa",
-        "message": "Conversión exitosa"
+        "message": "Transferencia exitosa"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2002,8 +2006,38 @@
         "registerTitle": "Necesitas actualizar tu cuenta",
         "registerContent": "Regístrate con tu número de teléfono para recibir sats",
         "oneSectionADay": "¡Una sección al día!",
-        "availableTomorrow": "¡Vuelve mañana para seguir aprendiendo sobre Bitcoin!",
-        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes"
+        "availableTomorrow": "Regresa mañana para seguir ganando sats mientras aprendes.\n\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
+        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "continueNoRewards": "Continuar (Sin Recompensas)",
+        "somethingNotRight": "Algo no está bien...",
+        "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
+        "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
+        "customMessages": {
+            "invalidPhoneForQuiz":{
+                "title": "Operadora restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
+            },
+            "invalidIpMetadata":{
+                "title": "IP restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
+            },
+            "claimedTooEarly":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "notEnoughBalanceForQuiz":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "invalidQuizQuestionId":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "oneSectionADay":{
+                "title": "¿Continuar sin recompensas?",
+                "message": "Solo puedes hacer una sección por día mientras ganas recompensas sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / Crear Cuenta",
@@ -2150,13 +2184,14 @@
         "imageLibraryPermissionsNotGranted": "No tenemos permisos para acceder a la biblioteca de imágenes. Verifica en la configuración de la aplicación para tu plataforma."
     },
     "SecurityScreen": {
+        "title": "Seguridad y Privacidad",
         "biometricDescription": "Desbloqueo con huella dactilar o reconocimiento facial.",
         "biometricTitle": "Biométrica",
         "biometryNotAvailable": "El sensor biométrico no está disponible.",
         "biometryNotEnrolled": "Registre al menos un sensor biométrico para utilizar la autenticación basada en datos biométricos.",
         "hideBalanceDescription": "Ocultar el saldo de forma predeterminada para no mostrarlo si alguien está\nviendo tu pantalla.\n\nAún puedes ver tu saldo tocando el monto principal en el encabezado de tu pantalla de inicio.",
-        "hideBalanceTitle": "Ocultar Balance",
-        "pinDescription": "El PIN se utiliza como método de autenticación de respaldo para la autenticación biométrica.",
+        "hideBalanceTitle": "Siempre ocultar el balance",
+        "pinDescription": "Establece un PIN numérico de 4 dígitos para desbloquear",
         "pinTitle": "Código PIN",
         "setPin": "Establecer PIN"
     },
@@ -2230,7 +2265,7 @@
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
         "note": "Nota",
-        "success": "El pago se ha enviado correctamente.",
+        "success": "Pago exitoso",
         "suggestionInput": "Introduce tu sugerencia",
         "max": "Max",
         "maxAmount": "Monto máximo",
@@ -2244,24 +2279,32 @@
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
+        "copySuccessMessage": "Copiar mensaje de éxito al portapapeles",
+        "openSuccessUrl": "Abrir URL de éxito en el navegador",
+        "copySecretMessage": "Copiar mensaje secreto al portapapeles",
+        "copiedSuccessMessage": "Mensaje copiado exitosamente",
+        "copiedSecretMessage": "Mensaje secreto copiado exitosamente",
+        "pendingDecryptionMessage": "Mensaje cifrado. Esperando confirmación de pago.",
         "destinationScreenTitle": "Enviar a",
         "orBySMS": "O Número De Teléfono",
-        "orSaved": "O Guardado"
+        "orSaved": "O Guardado",
+        "feeLabel": "Comisión",
+        "noteLabel": "Nota",
+        "sender": "Remitente",
+        "recipient": "Destinatario",
+        "time": "Hora",
+        "type": "Tipo"
     },
     "SettingsScreen": {
-        "staticQr": "Código QR estático imprimible",
+        "staticQr": "QR estático imprimible",
         "staticQrCopied": "Tu enlace de código QR estático se ha copiado",
         "setByOs": "Establecido por OS",
-        "apiAcess": "Acceso API",
+        "apiAcess": "Integración de API",
+        "apiDocumentation": "Documentación de la API",
+        "apiDashboard": "Acceso a la API y panel de control",
         "pos": "Punto de venta",
         "posCopied": "Su enlace de punto de venta ha sido copiado",
-        "setYourLightningAddress": "Establezca su dirección Lightning",
+        "setYourLightningAddress": "Establezca su dirección lightning",
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
         "tapUserName": "Ingrese aquí para configurarlo",
@@ -2288,18 +2331,20 @@
         "logOutFromOneAccount": "Cerrar sesión de esta cuenta",
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
-        "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión."
+        "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
+        "receiveCurrency": "Recibir moneda",
+        "displayCurrency": "Mostrar moneda"
     },
     "NotificationSettingsScreen": {
-        "title": "Configuración de Notificaciones ",
-        "pushNotifications": "Notificaciones push",
+        "title": "Configuración de notificaciones",
+        "pushNotifications": "Habilitar todas",
         "notificationCategories": {
             "Circles": {
                 "title": "Círculos",
                 "description": "Notificaciones sobre tus círculos."
             },
             "Payments": {
-                "title": "Pagos",
+                "title": "Alerta de transacciones",
                 "description": "Notificaciones relacionadas con el envío y recepción de pagos."
             },
             "Marketing": {
@@ -2363,7 +2408,8 @@
         "copiedAccountId": "Copiaste la ID de tu cuenta al portapapeles",
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "identityVerification": "Verificación de identidad"
     },
     "ProfileScreen": {
         "addAccount": "Agregar una cuenta",
@@ -2374,7 +2420,8 @@
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
-        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto en su aplicación de autenticación."
+        "secret": "código secreto/respaldo",
+        "content": "Escanee este código QR con su aplicación de autenticación. Alternativamente, puede copiar/pegar manualmente el código secreto."
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticación de dos factores",
@@ -2390,17 +2437,17 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Cuenta predeterminada",
-        "info": "Elige qué cuenta establecer como predeterminada para recibir y enviar. Puedes ajustar la cuenta de envío y recepción para pagos individuales en la app móvil. Los pagos recibidos a través de la caja o de su dirección Lightning siempre irán a la cuenta predeterminada.\n\nPara evitar la volatilidad de Bitcoin, elige Stablesats. Esto te permite mantener una cantidad estable de dinero sin dejar de poder enviar y recibir pagos.\n\nPuedes cambiar esta configuración en cualquier momento, y no afectará a tu saldo actual."
+        "title": "Recibir moneda",
+        "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
     },
     "ThemeScreen": {
         "title": "Tema",
         "info": "Elige el tema que más te guste para usar Blink o manténlo sincronizado con la configuración de tu sistema.",
-        "system": "Utilizar la configuración del sistema",
-        "light": "Utilizar el modo Claro",
-        "dark": "Utilizar el modo Oscuro",
+        "system": "Configuración del sistema",
+        "light": "Modo claro",
+        "dark": "Modo oscuro",
         "setToDark": "Modo oscuro.",
-        "setToLight": "Modo Luz"
+        "setToLight": "Modo luz"
     },
     "Languages": {
         "DEFAULT": "Predeterminado (OS)"
@@ -2432,8 +2479,8 @@
         "perWeek": "por semana",
         "unlimited": "ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferencias de Stablesats",
-        "internalSend": "Enviar a Usuario {bankName: string}",
+        "stablesatTransfers": "Transferencias de stablesats",
+        "internalSend": "Enviar a usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
     },
@@ -2600,11 +2647,12 @@
         "enabled": "Activado",
         "notifications": "Notificaciones ",
         "preferences": "Preferencias",
-        "onDeviceSecurity": "Seguridad en los dispositivos",
+        "onDeviceSecurity": "Seguridad y privacidad",
         "securityAndPrivacy": "Seguridad y privacidad",
         "advanced": "Avanzado",
         "community": "Comunidad",
         "account": "Cuenta",
+        "yourAccount": "Tu cuenta",
         "accounts": "Cuentas",
         "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
@@ -2629,7 +2677,7 @@
         "codeConfirmation": "Confirmación de código",
         "currency": "Moneda",
         "currencySyncIssue": "Problema con la moneda predeterminada. Es necesario actualizar la pantalla",
-        "csvExport": "Exportar transacciones como archivo CSV",
+        "csvExport": "Exportar todas las transacciones",
         "date": "Fecha ",
         "description": "Descripción",
         "domain": "Dominio",
@@ -2682,6 +2730,7 @@
         "submit": "Entregar",
         "success": "Éxito",
         "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dólar (Stablesats)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transacciones",
@@ -2701,6 +2750,8 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
         "warning": "Advertencia",
+        "continue": "Continuar",
+        "correct": "Correcto",
         "recommended": "Recomendado",
         "expirationTime": "Tiempo de expiración",
         "minute": "Minuto",
@@ -2712,7 +2763,10 @@
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
         "profiles": "Perfiles",
-        "paste": "Pegar"
+        "paste": "Pegar",
+        "some": "Algunos",
+        "support": "Soporte",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2745,8 +2799,7 @@
         "sms": "SMS",
         "faq": "Preguntas Frecuentes - FAQ",
         "enjoyingApp": "¿Disfrutas de la aplicación?",
-        "statusPage": "Página de Estado",
-        "chatbot": "Chatbot",
+        "statusPage": "Página de estado",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Gracias por tus comentarios, ¿te gustaría sugerir una mejora?",
@@ -2863,10 +2916,5 @@
     "NotificationHistory": {
         "title": "Notificaciones ",
         "noNotifications": "No tienes notificaciones en este momento"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Se ha producido un error al enviar el mensaje",
-        "confirmChatReset": "¿Seguro que quieres reiniciar el chat?",
-        "errorResettingChat": "Se ha producido un error al restablecer el chat"
     }
 }

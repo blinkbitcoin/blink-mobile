@@ -15,16 +15,15 @@ export const LanguageSetting: React.FC = () => {
 
   const { data, loading } = useSettingsScreenQuery()
   const language = getLanguageFromString(data?.me?.language)
+  const languageValue =
+    !language || language === "DEFAULT"
+      ? LL.SettingsScreen.setByOs()
+      : LocaleToTranslateLanguageSelector[language] ?? language
 
   return (
     <SettingsRow
       loading={loading}
-      title={LL.common.language()}
-      subtitle={
-        language === "DEFAULT"
-          ? LL.SettingsScreen.setByOs()
-          : LocaleToTranslateLanguageSelector[language]
-      }
+      title={`${LL.common.language()}: ${languageValue}`}
       leftIcon="language"
       action={() => navigate("language")}
     />

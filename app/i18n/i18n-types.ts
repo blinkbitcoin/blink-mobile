@@ -243,17 +243,25 @@ type RootTranslation = {
 	}
 	ConversionDetailsScreen: {
 		/**
-		 * C​o​n​v​e​r​t
+		 * T​r​a​n​s​f​e​r​ ​f​u​n​d​s
 		 */
 		title: string
+		/**
+		 * T​r​a​n​s​f​e​r
+		 */
+		transfer: string
 		/**
 		 * %​ ​t​o​ ​c​o​n​v​e​r​t
 		 */
 		percentageToConvert: string
+		/**
+		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
+		 */
+		reviewTransfer: string
 	}
 	ConversionConfirmationScreen: {
 		/**
-		 * R​e​v​i​e​w​ ​c​o​n​v​e​r​s​i​o​n
+		 * C​o​n​f​i​r​m​ ​t​r​a​n​s​f​e​r
 		 */
 		title: string
 		/**
@@ -264,14 +272,24 @@ type RootTranslation = {
 		 * R​e​c​e​i​v​i​n​g​ ​a​c​c​o​u​n​t
 		 */
 		receivingAccount: string
+		/**
+		 * B​i​t​c​o​i​n​ ​a​m​o​u​n​t​ ​i​s​ ​o​n​l​y​ ​a​p​p​r​o​x​i​m​a​t​e​.​ ​I​t​ ​c​a​n​ ​v​a​r​y​ ​b​y​ ​a​ ​s​m​a​l​l​ ​a​m​o​u​n​t​.
+		 */
+		infoBitcoin: string
+		/**
+		 * D​o​l​l​a​r​ ​a​m​o​u​n​t​ ​i​s​ ​o​n​l​y​ ​a​p​p​r​o​x​i​m​a​t​e​.​ ​I​t​ ​c​a​n​ ​v​a​r​y​ ​b​y​ ​a​ ​s​m​a​l​l​ ​a​m​o​u​n​t​.
+		 */
+		infoDollar: string
+		/**
+		 * T​r​a​n​s​f​e​r​ ​{​f​r​o​m​W​a​l​l​e​t​}​ ​t​o​ ​{​t​o​W​a​l​l​e​t​}
+		 * @param {unknown} fromWallet
+		 * @param {unknown} toWallet
+		 */
+		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
 	}
 	ConversionSuccessScreen: {
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​S​u​c​c​e​s​s
-		 */
-		title: string
-		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​s​u​c​c​e​s​s​f​u​l
+		 * T​r​a​n​s​f​e​r​ ​s​u​c​c​e​s​s​f​u​l
 		 */
 		message: string
 	}
@@ -6299,13 +6317,98 @@ type RootTranslation = {
 		 */
 		oneSectionADay: string
 		/**
-		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n​!
+		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​w​h​i​l​e​ ​l​e​a​r​n​i​n​g​.​
+	​
+	​O​r​,​ ​c​l​i​c​k​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
 		 */
 		availableTomorrow: string
 		/**
 		 * D​i​g​ ​y​o​u​r​ ​w​a​y​ ​t​h​r​o​u​g​h​ ​t​h​e​s​e​ ​l​e​s​s​o​n​s​ ​a​n​d​ ​e​a​r​n​ ​a​s​ ​y​o​u​ ​l​e​a​r​n
 		 */
 		motivatingBadger: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​(​N​o​ ​R​e​w​a​r​d​s​)
+		 */
+		continueNoRewards: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​'​s​ ​N​o​t​ ​R​i​g​h​t​.​.​.
+		 */
+		somethingNotRight: string
+		/**
+		 * {​e​r​r​o​r​M​e​s​s​a​g​e​}​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.​
+	​O​r​,​ ​c​l​i​c​k​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
+		 * @param {string} errorMessage
+		 */
+		defaultErrorMessage: RequiredParams<'errorMessage'>
+		/**
+		 * I​t​ ​l​o​o​k​s​ ​l​i​k​e​ ​w​e​'​v​e​ ​d​e​t​e​c​t​e​d​ ​s​o​m​e​ ​u​n​u​s​u​a​l​ ​a​c​t​i​v​i​t​y​ ​o​n​ ​y​o​u​r​ ​a​c​c​o​u​n​t​.​ ​T​o​ ​e​n​s​u​r​e​ ​f​a​i​r​ ​p​l​a​y​ ​f​o​r​ ​e​v​e​r​y​o​n​e​,​ ​w​e​'​r​e​ ​u​n​a​b​l​e​ ​t​o​ ​o​f​f​e​r​ ​r​e​w​a​r​d​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e​.​
+	​Y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​,​ ​o​r​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​f​r​o​m​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​c​o​n​n​e​c​t​i​o​n​.
+		 */
+		customErrorMessage: string
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * T​e​l​c​o​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​t​e​l​c​o​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​e​l​c​o​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			invalidIpMetadata: {
+				/**
+				 * I​P​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​I​P​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​I​P​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			claimedTooEarly: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			oneSectionADay: {
+				/**
+				 * C​o​n​t​i​n​u​e​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​?
+				 */
+				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​o​n​l​y​ ​d​o​ ​o​n​e​ ​s​e​c​t​i​o​n​ ​p​e​r​ ​d​a​y​ ​w​h​i​l​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​r​e​w​a​r​d​s​.
+				 */
+				message: string
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -6329,7 +6432,7 @@ type RootTranslation = {
 		 */
 		logBackInWith: string
 		/**
-		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​G​a​l​o​y
+		 * W​a​l​l​e​t​ ​p​o​w​e​r​e​d​ ​b​y​ ​B​l​i​n​k
 		 */
 		headline: string
 		/**
@@ -6842,6 +6945,10 @@ type RootTranslation = {
 	}
 	SecurityScreen: {
 		/**
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​P​r​i​v​a​c​y
+		 */
+		title: string
+		/**
 		 * U​n​l​o​c​k​ ​w​i​t​h​ ​f​i​n​g​e​r​p​r​i​n​t​ ​o​r​ ​f​a​c​i​a​l​ ​r​e​c​o​g​n​i​t​i​o​n​.
 		 */
 		biometricDescription: string
@@ -6864,15 +6971,15 @@ type RootTranslation = {
 		 */
 		hideBalanceDescription: string
 		/**
-		 * H​i​d​e​ ​B​a​l​a​n​c​e
+		 * A​l​w​a​y​s​ ​h​i​d​e​ ​b​a​l​a​n​c​e
 		 */
 		hideBalanceTitle: string
 		/**
-		 * P​I​N​ ​i​s​ ​u​s​e​d​ ​a​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​m​e​t​h​o​d​ ​f​o​r​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
+		 * S​e​t​ ​a​ ​4​-​d​i​g​i​t​ ​n​u​m​e​r​i​c​a​l​ ​P​I​N​ ​t​o​ ​u​n​l​o​c​k
 		 */
 		pinDescription: string
 		/**
-		 * P​I​N​ ​C​o​d​e
+		 * P​I​N​ ​c​o​d​e
 		 */
 		pinTitle: string
 		/**
@@ -7169,7 +7276,7 @@ type RootTranslation = {
 		 */
 		note: string
 		/**
-		 * P​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​s​e​n​t​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 * P​a​y​m​e​n​t​ ​s​u​c​c​e​s​s​f​u​l
 		 */
 		success: string
 		/**
@@ -7258,10 +7365,34 @@ type RootTranslation = {
 		 * O​r​ ​S​a​v​e​d
 		 */
 		orSaved: string
+		/**
+		 * F​e​e
+		 */
+		feeLabel: string
+		/**
+		 * N​o​t​e
+		 */
+		noteLabel: string
+		/**
+		 * S​e​n​d​e​r
+		 */
+		sender: string
+		/**
+		 * R​e​c​i​p​i​e​n​t
+		 */
+		recipient: string
+		/**
+		 * T​i​m​e
+		 */
+		time: string
+		/**
+		 * T​y​p​e
+		 */
+		type: string
 	}
 	SettingsScreen: {
 		/**
-		 * P​r​i​n​t​a​b​l​e​ ​S​t​a​t​i​c​ ​Q​R​ ​C​o​d​e
+		 * P​r​i​n​t​a​b​l​e​ ​s​t​a​t​i​c​ ​Q​R
 		 */
 		staticQr: string
 		/**
@@ -7273,9 +7404,17 @@ type RootTranslation = {
 		 */
 		setByOs: string
 		/**
-		 * A​P​I​ ​A​c​c​e​s​s
+		 * A​P​I​ ​i​n​t​e​g​r​a​t​i​o​n
 		 */
 		apiAcess: string
+		/**
+		 * A​P​I​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
+		 */
+		apiDocumentation: string
+		/**
+		 * A​P​I​ ​a​c​c​e​s​s​ ​a​n​d​ ​d​a​s​h​b​o​a​r​d
+		 */
+		apiDashboard: string
 		/**
 		 * P​o​i​n​t​ ​o​f​ ​S​a​l​e
 		 */
@@ -7285,7 +7424,7 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * S​e​t​ ​Y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​A​d​d​r​e​s​s
+		 * S​e​t​ ​y​o​u​r​ ​l​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
 		 */
 		setYourLightningAddress: string
 		/**
@@ -7399,14 +7538,22 @@ type RootTranslation = {
 		 * I​ ​u​n​d​e​r​s​t​a​n​d​.​ ​P​l​e​a​s​e​ ​l​o​g​ ​o​u​t​.
 		 */
 		logoutOneAccountConfirm: string
+		/**
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
+		 */
+		receiveCurrency: string
+		/**
+		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
+		 */
+		displayCurrency: string
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​S​e​t​t​i​n​g​s
+		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
 		 */
 		title: string
 		/**
-		 * P​u​s​h​ ​N​o​t​i​f​i​c​a​t​i​o​n​s
+		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
 		notificationCategories: {
@@ -7422,7 +7569,7 @@ type RootTranslation = {
 			}
 			Payments: {
 				/**
-				 * P​a​y​m​e​n​t​s
+				 * T​r​a​n​s​a​c​t​i​o​n​ ​a​l​e​r​t​s
 				 */
 				title: string
 				/**
@@ -7466,7 +7613,7 @@ type RootTranslation = {
 		 */
 		accountBeingDeleted: string
 		/**
-		 * D​a​n​g​e​r​ ​Z​o​n​e
+		 * D​a​n​g​e​r​ ​z​o​n​e
 		 */
 		dangerZone: string
 		/**
@@ -7482,7 +7629,7 @@ type RootTranslation = {
 		 */
 		tapToAddPhoneNumber: string
 		/**
-		 * L​o​g​i​n​ ​M​e​t​h​o​d​s
+		 * L​o​g​i​n​ ​m​e​t​h​o​d​s
 		 */
 		loginMethods: string
 		/**
@@ -7491,7 +7638,7 @@ type RootTranslation = {
 		 */
 		level: RequiredParams<'level'>
 		/**
-		 * S​w​i​t​c​h​ ​A​c​c​o​u​n​t
+		 * S​w​i​t​c​h​ ​a​c​c​o​u​n​t
 		 */
 		switchAccount: string
 		/**
@@ -7667,10 +7814,14 @@ type RootTranslation = {
 		 * C​o​p​y
 		 */
 		copy: string
+		/**
+		 * I​d​e​n​t​i​t​y​ ​V​e​r​i​f​i​c​a​t​i​o​n
+		 */
+		identityVerification: string
 	}
 	ProfileScreen: {
 		/**
-		 * A​d​d​ ​A​c​c​o​u​n​t
+		 * A​d​d​ ​a​c​c​o​u​n​t
 		 */
 		addAccount: string
 		/**
@@ -7697,7 +7848,11 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 * S​e​c​r​e​t​/​b​a​c​k​u​p
+		 */
+		secret: string
+		/**
+		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​.
 		 */
 		content: string
 	}
@@ -7741,15 +7896,11 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * D​e​f​a​u​l​t​ ​A​c​c​o​u​n​t
+		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
 		 */
 		title: string
 		/**
-		 * P​i​c​k​ ​w​h​i​c​h​ ​a​c​c​o​u​n​t​ ​t​o​ ​s​e​t​ ​a​s​ ​d​e​f​a​u​l​t​ ​f​o​r​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​a​d​j​u​s​t​ ​t​h​e​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​i​n​d​i​v​i​d​u​a​l​ ​p​a​y​m​e​n​t​s​ ​i​n​ ​t​h​e​ ​m​o​b​i​l​e​ ​a​p​p​.​ ​P​a​y​m​e​n​t​s​ ​r​e​c​e​i​v​e​d​ ​t​h​r​o​u​g​h​ ​t​h​e​ ​c​a​s​h​ ​r​e​g​i​s​t​e​r​ ​o​r​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​w​i​l​l​ ​a​l​w​a​y​s​ ​g​o​ ​t​o​ ​t​h​e​ ​d​e​f​a​u​l​t​ ​a​c​c​o​u​n​t​.​
-	​
-	​T​o​ ​a​v​o​i​d​ ​B​i​t​c​o​i​n​'​s​ ​v​o​l​a​t​i​l​i​t​y​,​ ​c​h​o​o​s​e​ ​S​t​a​b​l​e​s​a​t​s​.​ ​T​h​i​s​ ​a​l​l​o​w​s​ ​y​o​u​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​a​b​l​e​ ​a​m​o​u​n​t​ ​o​f​ ​m​o​n​e​y​ ​w​h​i​l​e​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​a​b​l​e​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​s​.​
-	​
-	​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​i​s​ ​s​e​t​t​i​n​g​ ​a​t​ ​a​n​y​ ​t​i​m​e​,​ ​a​n​d​ ​i​t​ ​w​o​n​'​t​ ​a​f​f​e​c​t​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​b​a​l​a​n​c​e​.
+		 * U​s​e​ ​y​o​u​r​ ​S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​i​n​ ​B​l​i​n​k​ ​t​o​ ​k​e​e​p​ ​t​h​e​ ​m​o​n​e​y​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​s​t​a​b​l​e​ ​i​n​ ​f​i​a​t​ ​(​d​o​l​l​a​r​)​ ​t​e​r​m​s​.​ ​U​s​e​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​f​ ​y​o​u​'​r​e​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​ ​a​n​d​ ​a​r​e​ ​o​k​a​y​ ​w​i​t​h​ ​y​o​u​r​ ​f​i​a​t​ ​b​a​l​a​n​c​e​ ​c​h​a​n​g​i​n​g​ ​a​l​l​ ​t​h​e​ ​t​i​m​e​.
 		 */
 		info: string
 	}
@@ -7763,23 +7914,23 @@ type RootTranslation = {
 		 */
 		info: string
 		/**
-		 * U​s​e​ ​S​y​s​t​e​m​ ​s​e​t​t​i​n​g
+		 * S​y​s​t​e​m​ ​s​e​t​t​i​n​g
 		 */
 		system: string
 		/**
-		 * U​s​e​ ​L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		light: string
 		/**
-		 * U​s​e​ ​D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		dark: string
 		/**
-		 * D​a​r​k​ ​M​o​d​e
+		 * D​a​r​k​ ​m​o​d​e
 		 */
 		setToDark: string
 		/**
-		 * L​i​g​h​t​ ​M​o​d​e
+		 * L​i​g​h​t​ ​m​o​d​e
 		 */
 		setToLight: string
 	}
@@ -7881,11 +8032,11 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​ ​T​r​a​n​s​f​e​r​s
+		 * S​t​a​b​l​e​s​a​t​s​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
-		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​U​s​e​r
+		 * S​e​n​d​ ​t​o​ ​{​b​a​n​k​N​a​m​e​}​ ​u​s​e​r
 		 * @param {string} bankName
 		 */
 		internalSend: RequiredParams<'bankName'>
@@ -8437,7 +8588,7 @@ type RootTranslation = {
 		 */
 		preferences: string
 		/**
-		 * O​n​-​D​e​v​i​c​e​ ​S​e​c​u​r​i​t​y
+		 * S​e​c​u​r​i​t​y​ ​a​n​d​ ​p​r​i​v​a​c​y
 		 */
 		onDeviceSecurity: string
 		/**
@@ -8457,6 +8608,10 @@ type RootTranslation = {
 		 */
 		account: string
 		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t
+		 */
+		yourAccount: string
+		/**
 		 * A​c​c​o​u​n​t​s
 		 */
 		accounts: string
@@ -8473,7 +8628,11 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
-		 * T​r​a​n​s​a​c​t​i​o​n​ ​L​i​m​i​t​s
+		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
+		 */
+		blinkToBlink: string
+		/**
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
 		transactionLimits: string
 		/**
@@ -8555,7 +8714,7 @@ type RootTranslation = {
 		 */
 		currencySyncIssue: string
 		/**
-		 * E​x​p​o​r​t​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​s​ ​C​S​V
+		 * E​x​p​o​r​t​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s
 		 */
 		csvExport: string
 		/**
@@ -8767,6 +8926,10 @@ type RootTranslation = {
 		 */
 		stablesatsUsd: string
 		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
+		 */
+		dollarStablesats: string
+		/**
 		 * T​o
 		 */
 		to: string
@@ -8843,6 +9006,14 @@ type RootTranslation = {
 		 */
 		warning: string
 		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		'continue': string
+		/**
+		 * C​o​r​r​e​c​t
+		 */
+		correct: string
+		/**
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
@@ -8876,6 +9047,14 @@ type RootTranslation = {
 		 * A​l​l​ ​a​c​c​o​u​n​t​s
 		 */
 		allAccounts: string
+		/**
+		 * S​o​m​e
+		 */
+		some: string
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		support: string
 		/**
 		 * P​r​o​f​i​l​e​s
 		 */
@@ -8987,13 +9166,9 @@ type RootTranslation = {
 		 */
 		enjoyingApp: string
 		/**
-		 * S​t​a​t​u​s​ ​P​a​g​e
+		 * S​t​a​t​u​s​ ​p​a​g​e
 		 */
 		statusPage: string
-		/**
-		 * C​h​a​t​b​o​t
-		 */
-		chatbot: string
 		/**
 		 * T​e​l​e​g​r​a​m
 		 */
@@ -9436,20 +9611,6 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
-	SupportChat: {
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​s​e​n​d​i​n​g​ ​t​h​e​ ​m​e​s​s​a​g​e
-		 */
-		errorSendingMessage: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​r​e​s​e​t​ ​t​h​e​ ​c​h​a​t​?
-		 */
-		confirmChatReset: string
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​r​e​s​e​t​t​i​n​g​ ​t​h​e​ ​c​h​a​t
-		 */
-		errorResettingChat: string
-	}
 }
 
 export type TranslationFunctions = {
@@ -9653,17 +9814,25 @@ export type TranslationFunctions = {
 	}
 	ConversionDetailsScreen: {
 		/**
-		 * Convert
+		 * Transfer funds
 		 */
 		title: () => LocalizedString
+		/**
+		 * Transfer
+		 */
+		transfer: () => LocalizedString
 		/**
 		 * % to convert
 		 */
 		percentageToConvert: () => LocalizedString
+		/**
+		 * Review transfer
+		 */
+		reviewTransfer: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
-		 * Review conversion
+		 * Confirm transfer
 		 */
 		title: () => LocalizedString
 		/**
@@ -9674,14 +9843,22 @@ export type TranslationFunctions = {
 		 * Receiving account
 		 */
 		receivingAccount: () => LocalizedString
+		/**
+		 * Bitcoin amount is only approximate. It can vary by a small amount.
+		 */
+		infoBitcoin: () => LocalizedString
+		/**
+		 * Dollar amount is only approximate. It can vary by a small amount.
+		 */
+		infoDollar: () => LocalizedString
+		/**
+		 * Transfer {fromWallet} to {toWallet}
+		 */
+		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
-		 * Conversion Success
-		 */
-		title: () => LocalizedString
-		/**
-		 * Conversion successful
+		 * Transfer successful
 		 */
 		message: () => LocalizedString
 	}
@@ -15706,13 +15883,97 @@ export type TranslationFunctions = {
 		 */
 		oneSectionADay: () => LocalizedString
 		/**
-		 * Come back tomorrow to continue learning about Bitcoin!
+		 * Come back tomorrow to continue earning sats while learning.
+
+	Or, click continue to keep learning without rewards.
 		 */
 		availableTomorrow: () => LocalizedString
 		/**
 		 * Dig your way through these lessons and earn as you learn
 		 */
 		motivatingBadger: () => LocalizedString
+		/**
+		 * Continue (No Rewards)
+		 */
+		continueNoRewards: () => LocalizedString
+		/**
+		 * Something's Not Right...
+		 */
+		somethingNotRight: () => LocalizedString
+		/**
+		 * {errorMessage} Please try again later.
+	Or, click to continue to keep learning without rewards.
+		 */
+		defaultErrorMessage: (arg: { errorMessage: string }) => LocalizedString
+		/**
+		 * It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.
+	You can still continue learning without rewards, or please try again later from a different connection.
+		 */
+		customErrorMessage: () => LocalizedString
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * Telco restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this telco.
+			We've disabled rewards for this telco until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			invalidIpMetadata: {
+				/**
+				 * IP restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this IP.
+			We've disabled rewards for this IP until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			claimedTooEarly: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			oneSectionADay: {
+				/**
+				 * Continue without rewards?
+				 */
+				title: () => LocalizedString
+				/**
+				 * You can only do one section per day while earning sats rewards.
+				 */
+				message: () => LocalizedString
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -15736,7 +15997,7 @@ export type TranslationFunctions = {
 		 */
 		logBackInWith: () => LocalizedString
 		/**
-		 * Wallet powered by Galoy
+		 * Wallet powered by Blink
 		 */
 		headline: () => LocalizedString
 		/**
@@ -16235,6 +16496,10 @@ export type TranslationFunctions = {
 	}
 	SecurityScreen: {
 		/**
+		 * Security and Privacy
+		 */
+		title: () => LocalizedString
+		/**
 		 * Unlock with fingerprint or facial recognition.
 		 */
 		biometricDescription: () => LocalizedString
@@ -16257,15 +16522,15 @@ export type TranslationFunctions = {
 		 */
 		hideBalanceDescription: () => LocalizedString
 		/**
-		 * Hide Balance
+		 * Always hide balance
 		 */
 		hideBalanceTitle: () => LocalizedString
 		/**
-		 * PIN is used as the backup authentication method for biometric authentication.
+		 * Set a 4-digit numerical PIN to unlock
 		 */
 		pinDescription: () => LocalizedString
 		/**
-		 * PIN Code
+		 * PIN code
 		 */
 		pinTitle: () => LocalizedString
 		/**
@@ -16543,7 +16808,7 @@ export type TranslationFunctions = {
 		 */
 		note: () => LocalizedString
 		/**
-		 * Payment has been sent successfully
+		 * Payment successful
 		 */
 		success: () => LocalizedString
 		/**
@@ -16632,10 +16897,34 @@ export type TranslationFunctions = {
 		 * Or Saved
 		 */
 		orSaved: () => LocalizedString
+		/**
+		 * Fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Note
+		 */
+		noteLabel: () => LocalizedString
+		/**
+		 * Sender
+		 */
+		sender: () => LocalizedString
+		/**
+		 * Recipient
+		 */
+		recipient: () => LocalizedString
+		/**
+		 * Time
+		 */
+		time: () => LocalizedString
+		/**
+		 * Type
+		 */
+		type: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
-		 * Printable Static QR Code
+		 * Printable static QR
 		 */
 		staticQr: () => LocalizedString
 		/**
@@ -16647,9 +16936,17 @@ export type TranslationFunctions = {
 		 */
 		setByOs: () => LocalizedString
 		/**
-		 * API Access
+		 * API integration
 		 */
 		apiAcess: () => LocalizedString
+		/**
+		 * API documentation
+		 */
+		apiDocumentation: () => LocalizedString
+		/**
+		 * API access and dashboard
+		 */
+		apiDashboard: () => LocalizedString
 		/**
 		 * Point of Sale
 		 */
@@ -16659,7 +16956,7 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Set Your Lightning Address
+		 * Set your lightning address
 		 */
 		setYourLightningAddress: () => LocalizedString
 		/**
@@ -16771,14 +17068,22 @@ export type TranslationFunctions = {
 		 * I understand. Please log out.
 		 */
 		logoutOneAccountConfirm: () => LocalizedString
+		/**
+		 * Receive currency
+		 */
+		receiveCurrency: () => LocalizedString
+		/**
+		 * Display currency
+		 */
+		displayCurrency: () => LocalizedString
 	}
 	NotificationSettingsScreen: {
 		/**
-		 * Notification Settings
+		 * Notification settings
 		 */
 		title: () => LocalizedString
 		/**
-		 * Push Notifications
+		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
 		notificationCategories: {
@@ -16794,7 +17099,7 @@ export type TranslationFunctions = {
 			}
 			Payments: {
 				/**
-				 * Payments
+				 * Transaction alerts
 				 */
 				title: () => LocalizedString
 				/**
@@ -16838,7 +17143,7 @@ export type TranslationFunctions = {
 		 */
 		accountBeingDeleted: () => LocalizedString
 		/**
-		 * Danger Zone
+		 * Danger zone
 		 */
 		dangerZone: () => LocalizedString
 		/**
@@ -16854,7 +17159,7 @@ export type TranslationFunctions = {
 		 */
 		tapToAddPhoneNumber: () => LocalizedString
 		/**
-		 * Login Methods
+		 * Login methods
 		 */
 		loginMethods: () => LocalizedString
 		/**
@@ -16862,7 +17167,7 @@ export type TranslationFunctions = {
 		 */
 		level: (arg: { level: string }) => LocalizedString
 		/**
-		 * Switch Account
+		 * Switch account
 		 */
 		switchAccount: () => LocalizedString
 		/**
@@ -17032,10 +17337,14 @@ export type TranslationFunctions = {
 		 * Copy
 		 */
 		copy: () => LocalizedString
+		/**
+		 * Identity Verification
+		 */
+		identityVerification: () => LocalizedString
 	}
 	ProfileScreen: {
 		/**
-		 * Add Account
+		 * Add account
 		 */
 		addAccount: () => LocalizedString
 		/**
@@ -17061,7 +17370,11 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app.
+		 * Secret/backup
+		 */
+		secret: () => LocalizedString
+		/**
+		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.
 		 */
 		content: () => LocalizedString
 	}
@@ -17105,15 +17418,11 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Default Account
+		 * Receive currency
 		 */
 		title: () => LocalizedString
 		/**
-		 * Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.
-
-	To avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.
-
-	You can change this setting at any time, and it won't affect your current balance.
+		 * Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.
 		 */
 		info: () => LocalizedString
 	}
@@ -17127,23 +17436,23 @@ export type TranslationFunctions = {
 		 */
 		info: () => LocalizedString
 		/**
-		 * Use System setting
+		 * System setting
 		 */
 		system: () => LocalizedString
 		/**
-		 * Use Light Mode
+		 * Light mode
 		 */
 		light: () => LocalizedString
 		/**
-		 * Use Dark Mode
+		 * Dark mode
 		 */
 		dark: () => LocalizedString
 		/**
-		 * Dark Mode
+		 * Dark mode
 		 */
 		setToDark: () => LocalizedString
 		/**
-		 * Light Mode
+		 * Light mode
 		 */
 		setToLight: () => LocalizedString
 	}
@@ -17243,11 +17552,11 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesat Transfers
+		 * Stablesats transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
-		 * Send to {bankName} User
+		 * Send to {bankName} user
 		 */
 		internalSend: (arg: { bankName: string }) => LocalizedString
 		/**
@@ -17785,7 +18094,7 @@ export type TranslationFunctions = {
 		 */
 		preferences: () => LocalizedString
 		/**
-		 * On-Device Security
+		 * Security and privacy
 		 */
 		onDeviceSecurity: () => LocalizedString
 		/**
@@ -17805,6 +18114,10 @@ export type TranslationFunctions = {
 		 */
 		account: () => LocalizedString
 		/**
+		 * Your account
+		 */
+		yourAccount: () => LocalizedString
+		/**
 		 * Accounts
 		 */
 		accounts: () => LocalizedString
@@ -17821,7 +18134,11 @@ export type TranslationFunctions = {
 		 */
 		blinkUser: () => LocalizedString
 		/**
-		 * Transaction Limits
+		 * Blink to Blink
+		 */
+		blinkToBlink: () => LocalizedString
+		/**
+		 * Transaction limits
 		 */
 		transactionLimits: () => LocalizedString
 		/**
@@ -17901,7 +18218,7 @@ export type TranslationFunctions = {
 		 */
 		currencySyncIssue: () => LocalizedString
 		/**
-		 * Export transactions as CSV
+		 * Export all transactions
 		 */
 		csvExport: () => LocalizedString
 		/**
@@ -18113,6 +18430,10 @@ export type TranslationFunctions = {
 		 */
 		stablesatsUsd: () => LocalizedString
 		/**
+		 * Dollar (Stablesats)
+		 */
+		dollarStablesats: () => LocalizedString
+		/**
 		 * To
 		 */
 		to: () => LocalizedString
@@ -18189,6 +18510,14 @@ export type TranslationFunctions = {
 		 */
 		warning: () => LocalizedString
 		/**
+		 * Continue
+		 */
+		'continue': () => LocalizedString
+		/**
+		 * Correct
+		 */
+		correct: () => LocalizedString
+		/**
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
@@ -18222,6 +18551,14 @@ export type TranslationFunctions = {
 		 * All accounts
 		 */
 		allAccounts: () => LocalizedString
+		/**
+		 * Some
+		 */
+		some: () => LocalizedString
+		/**
+		 * Support
+		 */
+		support: () => LocalizedString
 		/**
 		 * Profiles
 		 */
@@ -18332,13 +18669,9 @@ export type TranslationFunctions = {
 		 */
 		enjoyingApp: () => LocalizedString
 		/**
-		 * Status Page
+		 * Status page
 		 */
 		statusPage: () => LocalizedString
-		/**
-		 * Chatbot
-		 */
-		chatbot: () => LocalizedString
 		/**
 		 * Telegram
 		 */
@@ -18761,20 +19094,6 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
-	}
-	SupportChat: {
-		/**
-		 * An error occurred while sending the message
-		 */
-		errorSendingMessage: () => LocalizedString
-		/**
-		 * Are you sure you want to reset the chat?
-		 */
-		confirmChatReset: () => LocalizedString
-		/**
-		 * An error occurred while resetting the chat
-		 */
-		errorResettingChat: () => LocalizedString
 	}
 }
 

@@ -3,16 +3,11 @@ import { useMemo } from "react"
 import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
-import { LocalizedString } from "typesafe-i18n"
 import Icon from "react-native-vector-icons/Ionicons"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
-import {
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from "react-native-gesture-handler"
+import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -25,8 +20,12 @@ import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
+import {
+  UnseenTxAmountBadge,
+  useUnseenTxAmountBadge,
+} from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -35,7 +34,11 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useTransactionSeenState,
+} from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -233,24 +236,34 @@ export const HomeScreen: React.FC = () => {
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
   const transactions = useMemo(() => {
-    const transactions: TransactionFragment[] = []
-    if (pendingIncomingTransactions) {
-      transactions.push(...pendingIncomingTransactions)
-    }
-    const settledTransactions =
+    const txs: TransactionFragment[] = []
+    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
+    const settled =
       transactionsEdges
-        ?.map((edge) => edge.node)
+        ?.map((e) => e.node)
         .filter(
           (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
         ) ?? []
-    transactions.push(...settledTransactions)
-    return transactions
+    txs.push(...settled)
+    return txs
   }, [pendingIncomingTransactions, transactionsEdges])
+
+  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionSeenState(
+    accountId || "",
+    transactions,
+  )
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
+
+  const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
+    useUnseenTxAmountBadge({
+      transactions,
+      hasUnseenBtcTx,
+      hasUnseenUsdTx,
+    })
 
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
@@ -312,11 +325,6 @@ export const HomeScreen: React.FC = () => {
         return
       }
 
-      if (target === "transactionHistory" && wallets) {
-        navigation.navigate("transactionHistory", { wallets })
-        return
-      }
-
       // we are using any because Typescript complain on the fact we are not passing any params
       // but there is no need for a params and the types should not necessitate it
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -356,45 +364,7 @@ export const HomeScreen: React.FC = () => {
     }, [openUpgradeModal, triggerUpgradeModal]),
   )
 
-  let recentTransactionsData:
-    | {
-        title: LocalizedString
-        details: React.ReactNode
-      }
-    | undefined = undefined
-
-  const TRANSACTIONS_TO_SHOW = 1
-
-  if (isAuthed && transactions.length > 0) {
-    recentTransactionsData = {
-      title: LL.TransactionScreen.title(),
-      details: (
-        <>
-          {transactions
-            .slice(0, TRANSACTIONS_TO_SHOW)
-            .map(
-              (tx, index, array) =>
-                tx && (
-                  <MemoizedTransactionItem
-                    key={`transaction-${tx.id}`}
-                    txid={tx.id}
-                    subtitle
-                    isOnHomeScreen={true}
-                    isLast={index === array.length - 1}
-                    testId={`transaction-by-index-${index}`}
-                  />
-                ),
-            )}
-        </>
-      ),
-    }
-  }
-
-  type Target =
-    | "scanningQRCode"
-    | "sendBitcoinDestination"
-    | "receiveBitcoin"
-    | "transactionHistory"
+  type Target = "scanningQRCode" | "sendBitcoinDestination" | "receiveBitcoin"
   type IconNamesType = keyof typeof icons
 
   const buttons = [
@@ -425,7 +395,7 @@ export const HomeScreen: React.FC = () => {
     isIosWithBalance
   ) {
     buttons.unshift({
-      title: LL.ConversionDetailsScreen.title(),
+      title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails" as Target,
       icon: "transfer" as IconNamesType,
     })
@@ -504,6 +474,15 @@ export const HomeScreen: React.FC = () => {
         </View>
       </View>
       <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
+      <View style={styles.badgeSlot}>
+        <UnseenTxAmountBadge
+          key={latestUnseenTx?.id}
+          amountText={unseenAmountText ?? ""}
+          visible={Boolean(unseenAmountText)}
+          onPress={handleUnseenBadgePress}
+          isOutgoing={isOutgoing}
+        />
+      </View>
       <ScrollView
         {...testProps("home-screen")}
         contentContainerStyle={styles.scrollViewContainer}
@@ -511,51 +490,35 @@ export const HomeScreen: React.FC = () => {
           <RefreshControl
             refreshing={loading && isFocused}
             onRefresh={refetch}
-            colors={[colors.primary]} // Android refresh indicator colors
-            tintColor={colors.primary} // iOS refresh indicator color
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
       >
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
+          wallets={wallets}
+          showBtcNotification={hasUnseenBtcTx}
+          showUsdNotification={hasUnseenUsdTx}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
-            <View key={item.icon} style={styles.button}>
-              <GaloyIconButton
-                name={item.icon}
-                size="large"
-                text={item.title}
-                onPress={() => onMenuClick(item.target)}
-              />
-            </View>
+            <React.Fragment key={item.icon}>
+              {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
+              <View style={styles.button}>
+                <GaloyIconButton
+                  name={item.icon}
+                  size="large"
+                  text={item.title}
+                  onPress={() => onMenuClick(item.target)}
+                />
+              </View>
+            </React.Fragment>
           ))}
         </View>
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
-        <View>
-          {recentTransactionsData && (
-            <>
-              <TouchableOpacity
-                style={styles.recentTransaction}
-                onPress={() => onMenuClick("transactionHistory")}
-                activeOpacity={0.6}
-              >
-                <Text
-                  type="p1"
-                  style={{ color: colors.primary }}
-                  bold
-                  {...testProps(recentTransactionsData.title)}
-                >
-                  {recentTransactionsData?.title}
-                </Text>
-              </TouchableOpacity>
-              {recentTransactionsData?.details}
-            </>
-          )}
-        </View>
-
         <AppUpdate />
         <SetDefaultAccountModal
           isVisible={setDefaultAccountModalVisible}
@@ -565,6 +528,10 @@ export const HomeScreen: React.FC = () => {
           }}
         />
       </ScrollView>
+      <SlideUpHandle
+        bottomOffset={15}
+        onAction={() => navigation.navigate("transactionHistory", { showLoading: true })}
+      />
     </Screen>
   )
 }
@@ -582,8 +549,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
+    columnGap: 12,
   },
   noTransaction: {
     alignItems: "center",
@@ -630,6 +598,7 @@ const useStyles = makeStyles(({ colors }) => ({
   button: {
     maxWidth: "25%",
     flexGrow: 1,
+    alignItems: "center",
   },
   balanceContainer: {
     marginTop: 7,
@@ -654,5 +623,16 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+  actionsSeparator: {
+    width: 1,
+    alignSelf: "stretch",
+    backgroundColor: colors.grey4,
+  },
+  badgeSlot: {
+    height: 35,
+    marginVertical: 3,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }))

@@ -59,17 +59,21 @@
         "title": "Transactions with {username: string}"
     },
     "ConversionDetailsScreen": {
-        "title": "Convert",
-        "percentageToConvert": "% to convert"
+        "title": "Transfer funds",
+        "transfer": "Transfer",
+        "percentageToConvert": "% to convert",
+        "reviewTransfer": "Review transfer"
     },
     "ConversionConfirmationScreen": {
-        "title": "Review conversion",
+        "title": "Confirm transfer",
         "youreConverting": "You're converting",
-        "receivingAccount": "Receiving account"
+        "receivingAccount": "Receiving account",
+        "infoBitcoin": "Bitcoin amount is only approximate. It can vary by a small amount.",
+        "infoDollar": "Dollar amount is only approximate. It can vary by a small amount.",
+        "transferButtonText": "Transfer {fromWallet} to {toWallet}"
     },
     "ConversionSuccessScreen": {
-        "title": "Conversion Success",
-        "message": "Conversion successful"
+        "message": "Transfer successful"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2002,8 +2006,38 @@
         "registerTitle": "Need to upgrade your account",
         "registerContent": "Register with your phone number to receive sats",
         "oneSectionADay": "One section a day!",
-        "availableTomorrow": "Come back tomorrow to continue learning about Bitcoin!",
-        "motivatingBadger": "Dig your way through these lessons and earn as you learn"
+        "availableTomorrow": "Come back tomorrow to continue earning sats while learning.\n\nOr, click continue to keep learning without rewards.",
+        "motivatingBadger": "Dig your way through these lessons and earn as you learn",
+        "continueNoRewards": "Continue (No Rewards)",
+        "somethingNotRight": "Something's Not Right...",
+        "defaultErrorMessage": "{errorMessage: string} Please try again later.\nOr, click to continue to keep learning without rewards.",
+        "customErrorMessage": "It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.",
+        "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "Telco restricted",
+                "message": "We're experiencing an attack from users with this telco.\nWe've disabled rewards for this telco until further notice. Apologies!"
+            },
+            "invalidIpMetadata": {
+                "title": "IP restricted",
+                "message": "We're experiencing an attack from users with this IP.\nWe've disabled rewards for this IP until further notice. Apologies!"
+            },
+            "claimedTooEarly": {
+                "title": "Reward wallet empty",
+                "message": "We'll add funds soon. Sorry!"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "Reward wallet empty",
+                "message": "We'll add funds soon. Sorry!"
+            },
+            "invalidQuizQuestionId": {
+                "title": "Reward wallet empty",
+                "message": "We'll add funds soon. Sorry!"
+            },
+            "oneSectionADay": {
+                "title": "Continue without rewards?",
+                "message": "You can only do one section per day while earning sats rewards."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / create account",
@@ -2011,7 +2045,7 @@
         "exploreWallet": "Explore wallet",
         "login": "Login",
         "logBackInWith": "Log back in with",
-        "headline": "Wallet powered by Galoy",
+        "headline": "Wallet powered by Blink",
         "startTrialAccount": "Start with a trial account",
         "startWithTrialAccount": "Start with trial account",
         "registerPhoneAccount": "Register phone account",
@@ -2149,14 +2183,15 @@
         "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
     },
     "SecurityScreen": {
+        "title": "Security and Privacy",
         "biometricDescription": "Unlock with fingerprint or facial recognition.",
         "biometricTitle": "Biometric",
         "biometryNotAvailable": "Biometric sensor is not available.",
         "biometryNotEnrolled": "Please register at least one biometric sensor in order to use biometric based authentication.",
         "hideBalanceDescription": "Hides your balance on the home screen when the app starts, so you don't reveal it to anyone looking at your screen.\n\nYou can still see your balance by tapping on the main amount in the header of your home screen.",
-        "hideBalanceTitle": "Hide Balance",
-        "pinDescription": "PIN is used as the backup authentication method for biometric authentication.",
-        "pinTitle": "PIN Code",
+        "hideBalanceTitle": "Always hide balance",
+        "pinDescription": "Set a 4-digit numerical PIN to unlock",
+        "pinTitle": "PIN code",
         "setPin": "Set PIN"
     },
     "SendBitcoinConfirmationScreen": {
@@ -2229,7 +2264,7 @@
         "noAmount": "This invoice doesn't have an amount, so you need to manually specify how much money you want to send",
         "notConfirmed": "Payment has been sent\nbut is not confirmed yet\n\nYou can check the status\nof the payment in Transactions",
         "note": "Note or label",
-        "success": "Payment has been sent successfully",
+        "success": "Payment successful",
         "suggestionInput": "Enter your suggestion",
         "max": "Max",
         "maxAmount": "Max Amount",
@@ -2251,16 +2286,24 @@
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
         "destinationScreenTitle": "Send to",
         "orBySMS": "Or Mobile Number",
-        "orSaved": "Or Saved"
+        "orSaved": "Or Saved",
+        "feeLabel": "Fee",
+        "noteLabel": "Note",
+        "sender": "Sender",
+        "recipient": "Recipient",
+        "time": "Time",
+        "type": "Type"
     },
     "SettingsScreen": {
-        "staticQr": "Printable Static QR Code",
+        "staticQr": "Printable static QR",
         "staticQrCopied": "Your static QR code link has been copied",
         "setByOs": "Set by OS",
-        "apiAcess": "API Access",
+        "apiAcess": "API integration",
+        "apiDocumentation": "API documentation",
+        "apiDashboard": "API access and dashboard",
         "pos": "Point of Sale",
         "posCopied": "Your point of sale link has been copied",
-        "setYourLightningAddress": "Set Your Lightning Address",
+        "setYourLightningAddress": "Set your lightning address",
         "activated": "Activated",
         "addressScreen": "Ways to get paid",
         "tapUserName": "Tap to set username",
@@ -2287,18 +2330,20 @@
         "logOutFromOneAccount": "Log out from this account",
         "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
         "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
-        "logoutOneAccountConfirm": "I understand. Please log out."
+        "logoutOneAccountConfirm": "I understand. Please log out.",
+        "receiveCurrency": "Receive currency",
+        "displayCurrency": "Display currency"
     },
     "NotificationSettingsScreen": {
-        "title": "Notification Settings",
-        "pushNotifications": "Push Notifications",
+        "title": "Notification settings",
+        "pushNotifications": "Enable all",
         "notificationCategories": {
             "Circles": {
                 "title": "Circles",
                 "description": "Notifications about your circles."
             },
             "Payments": {
-                "title": "Payments",
+                "title": "Transaction alerts",
                 "description": "Notifications related to sending and receiving payments."
             },
             "Marketing": {
@@ -2315,13 +2360,13 @@
         "fundsMoreThan5Dollars": "Your account has more than $5",
         "itsATrialAccount": "Trial accounts have reduced transaction limits and no recovery method. If you lose your phone or uninstall the app, your funds will be unrecoverable.",
         "accountBeingDeleted": "Your account is being deleted, please wait...",
-        "dangerZone": "Danger Zone",
+        "dangerZone": "Danger zone",
         "phoneDeletedSuccessfully": "Phone deleted successfully",
         "phoneNumber": "Phone Number",
         "tapToAddPhoneNumber": "Tap to add phone number",
-        "loginMethods": "Login Methods",
+        "loginMethods": "Login methods",
         "level": "Level {level: string}",
-        "switchAccount": "Switch Account",
+        "switchAccount": "Switch account",
         "pleaseWait": "Please Wait.",
         "accountLevel": "Account Level",
         "upgrade": "Upgrade your account",
@@ -2362,10 +2407,11 @@
         "copiedAccountId": "Copied your account ID to clipboard",
         "yourAccountId": "Your Account ID",
         "accountId": "Account ID",
-        "copy": "Copy"
+        "copy": "Copy",
+        "identityVerification": "Identity Verification"
     },
     "ProfileScreen": {
-        "addAccount": "Add Account",
+        "addAccount": "Add account",
         "error": "Unable to fetch profiles at this time",
         "fromThisDevice": "from this device?",
         "switchAccount": "You switched to another account",
@@ -2373,7 +2419,8 @@
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Two-factor authentication",
-        "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+        "secret": "Secret/backup",
+        "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret."
     },
     "TotpRegistrationValidateScreen": {
         "title": "Two-factor authentication",
@@ -2389,17 +2436,17 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Default Account",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+        "title": "Receive currency",
+        "info": "Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time."
     },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
-        "system": "Use System setting",
-        "light": "Use Light Mode",
-        "dark": "Use Dark Mode",
-        "setToDark": "Dark Mode",
-        "setToLight": "Light Mode"
+        "system": "System setting",
+        "light": "Light mode",
+        "dark": "Dark mode",
+        "setToDark": "Dark mode",
+        "setToLight": "Light mode"
     },
     "Languages": {
         "DEFAULT": "Default (OS)"
@@ -2431,8 +2478,8 @@
         "perWeek": "per week",
         "unlimited": "Unlimited",
         "remaining": "Remaining",
-        "stablesatTransfers": "Stablesat Transfers",
-        "internalSend": "Send to {bankName: string} User",
+        "stablesatTransfers": "Stablesats transfers",
+        "internalSend": "Send to {bankName: string} user",
         "error": "Unable to fetch limits at this time",
         "increaseLimits": "Increase your limits"
     },
@@ -2599,16 +2646,18 @@
         "enabled": "Enabled",
         "notifications": "Notifications",
         "preferences": "Preferences",
-        "onDeviceSecurity": "On-Device Security",
+        "onDeviceSecurity": "Security and privacy",
         "securityAndPrivacy": "Security and Privacy",
         "advanced": "Advanced",
         "community": "Community",
         "account": "Account",
+        "yourAccount": "Your account",
         "accounts": "Accounts",
         "accountInformation": "Account Information",
         "trialAccount": "Trial Account",
         "blinkUser": "Blink User",
-        "transactionLimits": "Transaction Limits",
+        "blinkToBlink": "Blink to Blink",
+        "transactionLimits": "Transaction limits",
         "activateWallet": "Activate Wallet",
         "amountRequired": "Amount is required",
         "back": "Back",
@@ -2628,7 +2677,7 @@
         "codeConfirmation": "Code Confirmation",
         "currency": "Currency",
         "currencySyncIssue": "Currency issue. Refresh needed",
-        "csvExport": "Export transactions as CSV",
+        "csvExport": "Export all transactions",
         "date": "Date",
         "description": "Description",
         "domain": "Domain",
@@ -2681,6 +2730,7 @@
         "submit": "Submit",
         "success": "Success!",
         "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dollar (Stablesats)",
         "to": "To",
         "total": "Total",
         "transactions": "Transactions",
@@ -2700,6 +2750,8 @@
         "prevMonths": "Previous months",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
         "warning": "Warning",
+        "continue": "Continue",
+        "correct": "Correct",
         "recommended": "Recommended",
         "expirationTime": "Expiration Time",
         "minute": "Minute",
@@ -2710,6 +2762,8 @@
         "dollar": "Dollar",
         "all": "ALL",
         "allAccounts": "All accounts",
+        "some": "Some",
+        "support": "Support",
         "profiles": "Profiles",
         "paste": "Paste"
     },
@@ -2744,8 +2798,7 @@
         "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Enjoying the app?",
-        "statusPage": "Status Page",
-        "chatbot": "Chatbot",
+        "statusPage": "Status page",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Thank you for the feedback, would you like to suggest an improvement?",
@@ -2862,10 +2915,5 @@
     "NotificationHistory": {
         "title": "Notifications",
         "noNotifications": "You don't have any notifications right now"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
     }
 }

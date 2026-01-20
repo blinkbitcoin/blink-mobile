@@ -32,8 +32,8 @@ export type RootStackParamList = {
   }
   pin: { screenPurpose: PinScreenPurpose }
   Primary: undefined
-  earnsSection: { section: EarnSectionType }
-  earnsQuiz: { id: string }
+  earnsSection: { section: EarnSectionType; isAvailable: boolean }
+  earnsQuiz: { id: string; isAvailable: boolean }
   scanningQRCode: undefined
   settings: undefined
   addressScreen: undefined
@@ -61,6 +61,13 @@ export type RootStackParamList = {
     status: PaymentSendCompletedStatus
     successAction?: LNURLPaySuccessAction
     preimage?: string
+    currencyAmount?: string
+    satAmount?: string
+    currencyFeeAmount?: string
+    satFeeAmount?: string
+    destination?: string
+    paymentType?: string
+    createdAt?: number
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined
@@ -70,7 +77,7 @@ export type RootStackParamList = {
     mIsPinEnabled: boolean
   }
   lnurl: { username: string }
-  sectionCompleted: { amount: number; sectionTitle: string }
+  sectionCompleted: { amount: number; sectionTitle: string; isAvailable: boolean }
   priceHistory: undefined
   receiveBitcoin: undefined
   redeemBitcoinDetail: {
@@ -97,11 +104,14 @@ export type RootStackParamList = {
       readonly id: string
       readonly walletCurrency: WalletCurrency
     }>
+    currencyFilter?: WalletCurrency
+    showLoading?: boolean
   }
   Earn: undefined
   accountScreen: undefined
   profileScreen: undefined
   notificationSettingsScreen: undefined
+  apiScreen: undefined
   transactionLimitsScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
   emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
@@ -116,9 +126,8 @@ export type RootStackParamList = {
   totpRegistrationInitiate: undefined
   totpRegistrationValidate: { totpRegistrationId: string }
   totpLoginValidate: { authToken: string }
-  webView: { url: string; initialTitle?: string }
+  webView: { url: string; initialTitle?: string; headerTitle?: string }
   fullOnboardingFlow: undefined
-  supportChat: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
 }

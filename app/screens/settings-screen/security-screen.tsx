@@ -3,12 +3,11 @@ import { useState } from "react"
 import { View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
-import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { useHideBalanceQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, Switch } from "@rn-vui/themed"
+import { makeStyles, Switch, ListItem } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import {
@@ -115,69 +114,59 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <Screen style={styles.container} preset="scroll">
       <View style={styles.settingContainer}>
-        <View style={styles.textContainer}>
-          <Text type="h1">{LL.SecurityScreen.biometricTitle()}</Text>
-          <Text type="p2">{LL.SecurityScreen.biometricDescription()}</Text>
-        </View>
-        <Switch
-          style={styles.switch}
-          value={isBiometricsEnabled}
-          onValueChange={onBiometricsValueChanged}
-        />
+        <ListItem containerStyle={styles.listItemContainer}>
+          <ListItem.Content>
+            <ListItem.Title>{LL.SecurityScreen.biometricTitle()}</ListItem.Title>
+            <ListItem.Subtitle style={styles.textContainer}>
+              {LL.SecurityScreen.biometricDescription()}
+            </ListItem.Subtitle>
+          </ListItem.Content>
+          <Switch value={isBiometricsEnabled} onValueChange={onBiometricsValueChanged} />
+        </ListItem>
       </View>
+
       <View style={styles.settingContainer}>
-        <View style={styles.textContainer}>
-          <Text type="h1">{LL.SecurityScreen.pinTitle()}</Text>
-          <Text type="p2">{LL.SecurityScreen.pinDescription()}</Text>
-          <GaloyTertiaryButton
-            title={LL.SecurityScreen.setPin()}
-            onPress={() =>
-              navigation.navigate("pin", { screenPurpose: PinScreenPurpose.SetPin })
-            }
+        <ListItem containerStyle={styles.listItemContainer}>
+          <ListItem.Content>
+            <ListItem.Title>{LL.SecurityScreen.pinTitle()}</ListItem.Title>
+            <ListItem.Subtitle style={styles.textContainer}>
+              {LL.SecurityScreen.pinDescription()}
+            </ListItem.Subtitle>
+          </ListItem.Content>
+          <Switch value={isPinEnabled} onValueChange={onPinValueChanged} />
+        </ListItem>
+      </View>
+
+      <View style={styles.settingContainer}>
+        <ListItem containerStyle={styles.listItemContainer}>
+          <ListItem.Content>
+            <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
+          </ListItem.Content>
+          <Switch
+            value={isHideBalanceEnabled}
+            onValueChange={onHideBalanceValueChanged}
           />
-        </View>
-        <Switch
-          style={styles.switch}
-          value={isPinEnabled}
-          onValueChange={onPinValueChanged}
-        />
-      </View>
-      <View style={styles.settingContainer}>
-        <View style={styles.textContainer}>
-          <Text type="h1">{LL.SecurityScreen.hideBalanceTitle()}</Text>
-          <Text type="p2">{LL.SecurityScreen.hideBalanceDescription()}</Text>
-        </View>
-        <Switch
-          style={styles.switch}
-          value={isHideBalanceEnabled}
-          onValueChange={onHideBalanceValueChanged}
-        />
+        </ListItem>
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     margin: 24,
     display: "flex",
     flexDirection: "column",
     rowGap: 20,
   },
-
   settingContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
   },
-
-  switch: {
-    position: "absolute",
-    right: 0,
-  },
-
   textContainer: {
-    display: "flex",
-    flexDirection: "column",
-    rowGap: 8,
+    color: colors.grey3,
+  },
+  listItemContainer: {
+    backgroundColor: colors.transparent,
   },
 }))

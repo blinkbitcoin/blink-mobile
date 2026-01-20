@@ -2319,8 +2319,8 @@
         "toastMessage": "Hemmelig nøgle kopieret til udklipsholderen!"
     },
     "DefaultWalletScreen": {
-        "title": "Standardkonto",
-        "info": "Vælg hvilken konto der skal indstilles som standard til modtagelse og afsendelse. Du kan justere sende- og modtagekontoen for individuelle betalinger i mobilappen. Betalinger, der modtages gennem kasseapparatet eller din Lightning-adresse, vil altid gå til standardkontoen.\n\nFor at undgå Bitcoins volatilitet, vælg Stablesats. Dette giver dig mulighed for at opretholde en stabil mængde penge, samtidig med at du stadig kan sende og modtage betalinger.\n\nDu kan ændre denne indstilling når som helst, og det vil ikke påvirke din nuværende saldo."
+        "title": "Modtag valuta",
+        "info": "Brug din Stablesats-konto i Blink til at holde pengene i din wallet stabile i fiat-termer (dollar). Brug din Bitcoin-konto, hvis du samler sats og er okay med, at din fiat-saldo ændrer sig hele tiden."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2558,7 +2558,8 @@
         "thisMonth": "Denne måned",
         "prevMonths": "Forrige måneder",
         "problemMaybeReauth": "Der opstod et problem med din anmodning. Prøv igen om et minut. Hvis problemet fortsætter, anbefaler vi, at du logger ud og logger ind igen. Du kan logge ud ved at gå til Indstillinger > Konto > Log ud",
-        "warning": "Advarsel"
+        "warning": "Advarsel",
+        "blinkToBlink": "Blink til Blink"
     },
     "errors": {
         "generic": "Der opstod en fejl.\nPrøv igen senere.",

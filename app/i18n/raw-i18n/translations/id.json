@@ -2617,7 +2617,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan sebelumnya",
         "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
-        "warning": "Peringatan"
+        "warning": "Peringatan",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -2650,7 +2651,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Enjoying the app?",
         "statusPage": "Status Page",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Terima kasih atas masukan Anda, apakah Anda ingin menyarankan perbaikan?",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Notifikasi",
         "noNotifications": "Anda tidak memiliki notifikasi saat ini"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Terjadi kesalahan saat mengirim pesan.",
-        "confirmChatReset": "Apakah Anda yakin ingin mengatur ulang obrolan?",
-        "errorResettingChat": "Terjadi kesalahan saat mengatur ulang obrolan."
     }
 }

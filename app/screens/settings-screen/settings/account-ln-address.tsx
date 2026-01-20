@@ -8,9 +8,14 @@ import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 
 import { SettingsRow } from "../row"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useTheme } from "@rn-vui/themed"
 
 export const AccountLNAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
+  const {
+    theme: { colors },
+  } = useTheme()
   const hostName = appConfig.galoyInstance.lnAddressHostname
 
   const [isModalShown, setModalShown] = useState(false)
@@ -27,15 +32,14 @@ export const AccountLNAddress: React.FC = () => {
     <>
       <SettingsRow
         loading={loading}
-        title={
-          hasUsername
-            ? LL.GaloyAddressScreen.yourLightningAddress()
-            : LL.SettingsScreen.setYourLightningAddress()
-        }
-        subtitle={hasUsername ? lnAddress : undefined}
+        title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(data?.me?.username || "").length > 22}
-        leftIcon="at-outline"
-        rightIcon={hasUsername ? "copy-outline" : undefined}
+        leftGaloyIcon="lightning-address"
+        rightIcon={
+          hasUsername ? (
+            <GaloyIcon name="copy-paste" size={24} color={colors.primary} />
+          ) : undefined
+        }
         action={() => {
           if (hasUsername) {
             Clipboard.setString(lnAddress)

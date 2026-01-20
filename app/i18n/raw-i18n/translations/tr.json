@@ -2366,8 +2366,8 @@
         "toastMessage": "Sır panoya kopyalandı"
     },
     "DefaultWalletScreen": {
-        "title": "Varsayılan Hesap",
-        "info": "Ödeme almak ve göndermek için hangi hesabın varsayılan olarak ayarlanacağını seçin. Mobil uygulamada bireysel ödemeler için gönderme ve alma hesabını ayarlayabilirsiniz. Kasa veya Lightning adresiniz aracılığıyla alınan ödemeler her zaman varsayılan hesaba gider.\n\nBitcoin'in dalgalanmasını önlemek için Stablesats'ı seçin. Bu, ödeme gönderip alabilmeye devam ederken sabit miktarda para tutmanıza olanak tanır.\n\nBu ayarı istediğiniz zaman değiştirebilirsiniz ve mevcut bakiyenizi etkilemez."
+        "title": "Para birimi al",
+        "info": "Blink’teki Stablesats hesabınızı kullanarak cüzdanınızdaki parayı itibari para (dolar) cinsinden sabit tutun. Sats biriktiriyorsanız ve itibari bakiyenizin sürekli değişmesinde sorun yoksa Bitcoin hesabınızı kullanın."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2617,7 +2617,8 @@
         "thisMonth": "Bu ay",
         "prevMonths": "Geçmiş aylar",
         "problemMaybeReauth": "İsteğinizle ilgili bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin. Sorun devam ederse, oturumu kapatıp tekrar giriş yapmanızı öneririz. Ayarlar > Hesap > Oturumu kapat seçeneğine giderek oturumu kapatabilirsiniz",
-        "warning": "Uyarı"
+        "warning": "Uyarı",
+        "blinkToBlink": "Blink'ten Blink'e"
     },
     "errors": {
         "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",
@@ -2650,7 +2651,6 @@
         "faq": "SSS",
         "enjoyingApp": "Uygulamayı beğendiniz mi?",
         "statusPage": "Durum Sayfası",
-        "chatbot": "Sohbet Botu",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Geri bildiriminiz için teşekkür ederiz, bir iyileştirme önermek ister misiniz?",
@@ -2766,10 +2766,5 @@
     "NotificationHistory": {
         "title": "Bildirimler",
         "noNotifications": "Şu anda herhangi bir bildiriminiz yok"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
     }
 }

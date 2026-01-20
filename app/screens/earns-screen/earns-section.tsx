@@ -22,7 +22,7 @@ import {
   augmentCardWithGqlData,
   getCardsFromSection,
   getQuizQuestionsContent,
-} from "./earns-utils"
+} from "./helpers"
 
 const { width: screenWidth } = Dimensions.get("window")
 
@@ -176,7 +176,8 @@ export const EarnSection = ({ route }: Props) => {
 
   const { quizServerData } = useQuizServer()
 
-  const section = route.params.section
+  const { section, isAvailable } = route.params
+
   const cardsOnSection = getCardsFromSection({
     section,
     quizQuestionsContent,
@@ -201,6 +202,7 @@ export const EarnSection = ({ route }: Props) => {
     navigation.navigate("sectionCompleted", {
       amount: cards.reduce((acc, item) => item.amount + acc, 0),
       sectionTitle,
+      isAvailable,
     })
   }
 
@@ -225,7 +227,7 @@ export const EarnSection = ({ route }: Props) => {
       return
     }
 
-    navigation.navigate("earnsQuiz", { id })
+    navigation.navigate("earnsQuiz", { id, isAvailable })
   }
 
   const CardItem = ({ item }: { item: QuizQuestionForSectionScreen }) => {
@@ -256,8 +258,12 @@ export const EarnSection = ({ route }: Props) => {
               titleStyle={item.completed ? styles.titleStyleFulfilled : styles.titleStyle}
               title={
                 item.completed
-                  ? LL.EarnScreen.satsEarned({ formattedNumber: item.amount })
-                  : LL.EarnScreen.earnSats({ formattedNumber: item.amount })
+                  ? isAvailable
+                    ? LL.EarnScreen.satsEarned({ formattedNumber: item.amount })
+                    : LL.common.correct()
+                  : isAvailable
+                    ? LL.EarnScreen.earnSats({ formattedNumber: item.amount })
+                    : LL.common.continue()
               }
               icon={
                 item.completed ? (
@@ -289,6 +295,7 @@ export const EarnSection = ({ route }: Props) => {
           data={cards}
           renderItem={CardItem}
           width={screenWidth}
+          style={{ width: screenWidth }}
           mode="parallax"
           defaultIndex={firstItem}
           loop={false}
@@ -296,9 +303,7 @@ export const EarnSection = ({ route }: Props) => {
             parallaxScrollingScale: 0.82,
             parallaxScrollingOffset: 80,
           }}
-          onProgressChange={(_, absoluteProgress) =>
-            (progressValue.value = absoluteProgress)
-          }
+          onProgressChange={progressValue}
         />
         {Boolean(progressValue) && (
           <View style={styles.paginationContainer}>

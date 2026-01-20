@@ -1,7 +1,10 @@
 import React from "react"
 import { View } from "react-native"
-
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
+import { useIsFocused } from "@react-navigation/native"
+import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 import { useFragment } from "@apollo/client"
+
 import {
   TransactionFragment,
   TransactionFragmentDoc,
@@ -11,12 +14,9 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useBounceInAnimation } from "@app/components/animations"
 import { toWalletAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 
 import { IconTransaction } from "../icon-transactions"
 import { TransactionDate } from "../transaction-date"
@@ -64,6 +64,8 @@ type Props = {
   isLast?: boolean
   isOnHomeScreen?: boolean
   testId?: string
+  highlight?: boolean
+  onPress?: () => void
 }
 
 const TransactionItem: React.FC<Props> = ({
@@ -73,14 +75,15 @@ const TransactionItem: React.FC<Props> = ({
   isLast = false,
   isOnHomeScreen = false,
   testId = "transaction-item",
+  highlight = false,
+  onPress,
 }) => {
   const styles = useStyles({
     isFirst,
     isLast,
     isOnHomeScreen,
+    highlight,
   })
-
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -102,6 +105,20 @@ const TransactionItem: React.FC<Props> = ({
     tx,
     bankName: galoyInstance.name,
   })
+
+  const isFocused = useIsFocused()
+  const scale = useSharedValue(1)
+  useBounceInAnimation({
+    isFocused,
+    visible: highlight,
+    scale,
+    delay: 300,
+    duration: 120,
+  })
+  const animatedStyle = useAnimatedStyle(
+    () => ({ transform: [{ scale: scale.value }] }),
+    [scale],
+  )
 
   if (!tx || Object.keys(tx).length === 0) {
     return null
@@ -147,51 +164,49 @@ const TransactionItem: React.FC<Props> = ({
       : formattedSettlementAmount
 
   return (
-    <ListItem
-      {...testProps(testId)}
-      containerStyle={styles.container}
-      onPress={() =>
-        navigation.navigate("transactionDetail", {
-          txid,
-        })
-      }
-    >
-      <IconTransaction
-        onChain={tx.settlementVia?.__typename === "SettlementViaOnChain"}
-        isReceive={isReceive}
-        pending={isPending}
-        walletCurrency={walletCurrency}
-      />
-      <ListItem.Content {...testProps("list-item-content")}>
-        <ListItem.Title
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          {...testProps("tx-description")}
-        >
-          {description}
-        </ListItem.Title>
-        <ListItem.Subtitle>
-          {subtitle ? (
-            <TransactionDate
-              createdAt={tx.createdAt}
-              status={tx.status}
-              includeTime={false}
-            />
-          ) : undefined}
-        </ListItem.Subtitle>
-      </ListItem.Content>
+    <Animated.View style={animatedStyle}>
+      <ListItem
+        {...testProps(testId)}
+        containerStyle={styles.container}
+        onPress={onPress}
+      >
+        <IconTransaction
+          onChain={tx.settlementVia?.__typename === "SettlementViaOnChain"}
+          isReceive={isReceive}
+          pending={isPending}
+          walletCurrency={walletCurrency}
+        />
+        <ListItem.Content {...testProps("list-item-content")}>
+          <ListItem.Title
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            {...testProps("tx-description")}
+          >
+            {description}
+          </ListItem.Title>
+          <ListItem.Subtitle>
+            {subtitle ? (
+              <TransactionDate
+                createdAt={tx.createdAt}
+                status={tx.status}
+                includeTime={false}
+              />
+            ) : undefined}
+          </ListItem.Subtitle>
+        </ListItem.Content>
 
-      {hideAmount ? (
-        <Text>****</Text>
-      ) : (
-        <View>
-          <Text style={amountStyle}>{formattedDisplayAmount}</Text>
-          {formattedSecondaryAmount && (
-            <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
-          )}
-        </View>
-      )}
-    </ListItem>
+        {hideAmount ? (
+          <Text>****</Text>
+        ) : (
+          <View>
+            <Text style={amountStyle}>{formattedDisplayAmount}</Text>
+            {formattedSecondaryAmount && (
+              <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+            )}
+          </View>
+        )}
+      </ListItem>
+    </Animated.View>
   )
 }
 
@@ -201,6 +216,7 @@ type UseStyleProps = {
   isFirst?: boolean
   isLast?: boolean
   isOnHomeScreen?: boolean
+  highlight?: boolean
 }
 
 const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
@@ -209,7 +225,7 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     paddingVertical: 9,
     borderColor: colors.grey4,
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: props.highlight ? colors.grey4 : colors.grey5,
     borderTopWidth: (props.isFirst && props.isOnHomeScreen) || !props.isFirst ? 1 : 0,
     borderBottomLeftRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
     borderBottomRightRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,

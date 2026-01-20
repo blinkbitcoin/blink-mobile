@@ -1,9 +1,7 @@
 import * as React from "react"
-import { View } from "react-native"
+import { View, TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
-import { GaloyInfo } from "@app/components/atomic/galoy-info"
-import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
 import {
   useAccountUpdateDefaultWalletIdMutation,
   useSetDefaultWalletScreenQuery,
@@ -11,10 +9,11 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Text, makeStyles } from "@rn-vui/themed"
+import { Divider, Text, makeStyles, useTheme, ListItem, Icon } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { testProps } from "../../utils/testProps"
+import { GaloyInfo } from "@app/components/atomic/galoy-info"
 
 gql`
   mutation accountUpdateDefaultWalletId($input: AccountUpdateDefaultWalletIdInput!) {
@@ -48,6 +47,9 @@ gql`
 export const DefaultWalletScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const isAuthed = useIsAuthed()
 
   const [newDefaultWalletId, setNewDefaultWalletId] = React.useState("")
@@ -88,28 +90,56 @@ export const DefaultWalletScreen: React.FC = () => {
 
   const Wallets = [
     {
-      // TODO: translation
-      name: "Bitcoin",
+      name: LL.common.bitcoin(),
       id: btcWalletId,
     },
     {
-      name: "Stablesats (USD)",
+      name: LL.common.dollarStablesats(),
       id: usdWalletId,
     },
   ] as const
 
+  const selectedWalletId = newDefaultWalletId || defaultWalletId || ""
+
   return (
     <Screen preset="scroll">
-      <MenuSelect
-        value={newDefaultWalletId || defaultWalletId || ""}
-        onChange={handleSetDefaultWallet}
-      >
-        {Wallets.map(({ name, id }) => (
-          <MenuSelectItem key={id} value={id} {...testProps(name)}>
-            {name}
-          </MenuSelectItem>
-        ))}
-      </MenuSelect>
+      <View style={styles.walletsContainer}>
+        {Wallets.map(({ name, id }, index) => {
+          const isLast = index === Wallets.length - 1
+          const isSelected = selectedWalletId === id
+          return (
+            <React.Fragment key={id}>
+              <Divider color={colors.grey4} />
+              <TouchableOpacity
+                onPress={() => handleSetDefaultWallet(id)}
+                activeOpacity={0.7}
+                {...testProps(name)}
+              >
+                <ListItem containerStyle={styles.listItemContainer}>
+                  <View>
+                    {isSelected ? (
+                      <Icon
+                        name="checkmark-circle"
+                        size={20}
+                        color={colors._green}
+                        type="ionicon"
+                      />
+                    ) : (
+                      <View style={styles.listSeparator}></View>
+                    )}
+                  </View>
+                  <ListItem.Content>
+                    <ListItem.Title style={styles.itemTitle}>
+                      <Text type="p2">{name}</Text>
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              </TouchableOpacity>
+              {isLast && <Divider color={colors.grey4} />}
+            </React.Fragment>
+          )
+        })}
+      </View>
       <View style={styles.containerInfo}>
         <GaloyInfo>{LL.DefaultWalletScreen.info()}</GaloyInfo>
       </View>
@@ -117,8 +147,26 @@ export const DefaultWalletScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
+  walletsContainer: {
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  listItemContainer: {
+    backgroundColor: colors.transparent,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  itemTitle: {
+    fontSize: 16,
+  },
   containerInfo: {
-    margin: 20,
+    marginHorizontal: 20,
+    marginTop: 34,
+    marginBottom: 32,
+  },
+  listSeparator: {
+    width: 20,
+    height: 20,
   },
 }))

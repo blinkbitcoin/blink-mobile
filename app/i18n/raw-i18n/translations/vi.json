@@ -2294,8 +2294,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Default Account",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+        "title": "Nhận tiền tệ",
+        "info": "Sử dụng tài khoản Stablesats của bạn trong Blink để giữ tiền trong ví ổn định theo giá trị tiền pháp định (đô la). Sử dụng tài khoản Bitcoin nếu bạn đang tích lũy sats và không ngại việc số dư fiat thay đổi liên tục."
     },
     "ThemeScreen": {
         "title": "Theme",
@@ -2522,7 +2522,8 @@
         "thisMonth": "Tháng này",
         "prevMonths": "Những tháng trước",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "Blink tới Blink"
     },
     "errors": {
         "generic": "Đã có lỗi.\nVui lòng thử lại sau.",

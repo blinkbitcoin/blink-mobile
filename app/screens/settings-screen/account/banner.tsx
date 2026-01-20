@@ -10,13 +10,13 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
 import { useAppConfig } from "@app/hooks"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
 
 export const AccountBanner: React.FC = () => {
   const styles = useStyles()
@@ -29,14 +29,10 @@ export const AccountBanner: React.FC = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const isUserLoggedIn = useIsAuthed()
+  const { currentLevel } = useLevel()
+  const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
 
-  const { data, loading } = useSettingsScreenQuery({
-    skip: !isUserLoggedIn,
-    fetchPolicy: "cache-first",
-    // this enables offline mode use-case
-    nextFetchPolicy: "cache-and-network",
-  })
+  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
 
   const hasUsername = Boolean(data?.me?.username)
   const lnAddress = `${data?.me?.username}@${lnAddressHostname}`
@@ -57,7 +53,7 @@ export const AccountBanner: React.FC = () => {
     >
       <View style={styles.outer}>
         <View style={styles.iconContainer}>
-          <AccountIcon size={22} />
+          <AccountIcon size={25} />
         </View>
         <Text type="p2">
           {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}

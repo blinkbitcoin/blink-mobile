@@ -74,7 +74,7 @@ export const SuccessAction = ({
 }) => (
   <MockedProvider mocks={[]} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
-      <SendBitcoinCompletedScreen route={route} />0
+      <SendBitcoinCompletedScreen route={route} />
     </IsAuthedContextProvider>
   </MockedProvider>
 )

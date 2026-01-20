@@ -4,22 +4,19 @@ import { View } from "react-native"
 import { gql } from "@apollo/client"
 import {
   AccountDisableNotificationCategoryMutation,
-  AccountDisableNotificationChannelMutation,
   AccountEnableNotificationCategoryMutation,
-  AccountEnableNotificationChannelMutation,
   NotificationChannel,
   NotificationSettings,
   useAccountDisableNotificationCategoryMutation,
-  useAccountDisableNotificationChannelMutation,
   useAccountEnableNotificationCategoryMutation,
-  useAccountEnableNotificationChannelMutation,
   useNotificationSettingsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Switch, Text } from "@rn-vui/themed"
+import { Divider, ListItem, makeStyles, Switch, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 gql`
   query notificationSettings {
@@ -115,11 +112,18 @@ gql`
 `
 
 const NotificationCategories = {
-  Circles: "Circles",
   Payments: "Payments",
+  Circles: "Circles",
   Price: "Price",
   Marketing: "Marketing",
 } as const
+
+const CategoryIcons: Record<NotificationCategoryType, IconNamesType> = {
+  Payments: "receive",
+  Circles: "people",
+  Price: "graph",
+  Marketing: "upgrade",
+}
 
 type NotificationCategoryType =
   (typeof NotificationCategories)[keyof typeof NotificationCategories]
@@ -127,6 +131,10 @@ type NotificationCategoryType =
 export const NotificationSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
   const isAuthed = useIsAuthed()
   const { data } = useNotificationSettingsQuery({
     fetchPolicy: "cache-first",
@@ -135,28 +143,6 @@ export const NotificationSettingsScreen: React.FC = () => {
 
   const accountId = data?.me?.defaultAccount?.id
   const notificationSettings = data?.me?.defaultAccount?.notificationSettings
-
-  const [enableNotificationChannel] = useAccountEnableNotificationChannelMutation({
-    optimisticResponse:
-      accountId && notificationSettings
-        ? () =>
-            optimisticEnableChannelResponse({
-              notificationSettings,
-              accountId,
-            })
-        : undefined,
-  })
-
-  const [disableNotificationChannel] = useAccountDisableNotificationChannelMutation({
-    optimisticResponse:
-      accountId && notificationSettings
-        ? () =>
-            optimisticDisableChannelResponse({
-              notificationSettings,
-              accountId,
-            })
-        : undefined,
-  })
 
   const [enableNotificationCategory] = useAccountEnableNotificationCategoryMutation({
     optimisticResponse:
@@ -181,8 +167,6 @@ export const NotificationSettingsScreen: React.FC = () => {
             })
         : undefined,
   })
-
-  const pushNotificationsEnabled = notificationSettings?.push.enabled
 
   const pushNotificationCategoryEnabled = (category: NotificationCategoryType) => {
     return !notificationSettings?.push.disabledCategories.includes(category)
@@ -214,136 +198,54 @@ export const NotificationSettingsScreen: React.FC = () => {
     }
   }
 
-  const pushNotificationSettings = Object.values(NotificationCategories).map(
-    (category) => {
-      return (
-        <View style={styles.settingsRow} key={category}>
+  const categoriesArray = Object.values(NotificationCategories)
+
+  const pushNotificationSettings = categoriesArray.map((category, index) => {
+    const isLast = index === categoriesArray.length - 1
+
+    return (
+      <React.Fragment key={category}>
+        <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name={CategoryIcons[category]} size={24} />
+          <ListItem.Content>
+            <ListItem.Title>
+              <Text type="p2">
+                {LL.NotificationSettingsScreen.notificationCategories[category].title()}
+              </Text>
+            </ListItem.Title>
+          </ListItem.Content>
           <Switch
             value={pushNotificationCategoryEnabled(category)}
             onValueChange={(value) =>
               toggleCategory(category, value, NotificationChannel.Push)
             }
           />
-          <Text type="h2">
-            {LL.NotificationSettingsScreen.notificationCategories[category].title()}
-          </Text>
-        </View>
-      )
-    },
-  )
+        </ListItem>
+        {!isLast && <Divider color={colors.grey4} />}
+      </React.Fragment>
+    )
+  })
 
   return (
     <Screen style={styles.container} preset="scroll">
-      <View style={styles.settingsHeader}>
-        <Switch
-          value={pushNotificationsEnabled}
-          onValueChange={async (enabled) => {
-            if (enabled) {
-              await enableNotificationChannel({
-                variables: {
-                  input: {
-                    channel: NotificationChannel.Push,
-                  },
-                },
-              })
-            } else {
-              await disableNotificationChannel({
-                variables: {
-                  input: {
-                    channel: NotificationChannel.Push,
-                  },
-                },
-              })
-            }
-          }}
-        />
-        <Text type="h1">{LL.NotificationSettingsScreen.pushNotifications()}</Text>
-      </View>
-      {pushNotificationsEnabled && (
-        <View style={styles.settingsBody}>{pushNotificationSettings}</View>
-      )}
+      <View style={styles.settingsBody}>{pushNotificationSettings}</View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     padding: 20,
-    rowGap: 20,
-  },
-  settingsHeader: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    columnGap: 10,
   },
   settingsBody: {
-    marginLeft: 40,
-    columnGap: 10,
-    rowGap: 20,
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
+    paddingHorizontal: 5,
   },
-  settingsRow: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    columnGap: 10,
+  listItemContainer: {
+    backgroundColor: colors.transparent,
   },
 }))
-
-const optimisticEnableChannelResponse = ({
-  notificationSettings,
-  accountId,
-}: {
-  notificationSettings: NotificationSettings
-  accountId: string
-}) => {
-  return {
-    accountEnableNotificationChannel: {
-      account: {
-        id: accountId,
-        notificationSettings: {
-          push: {
-            enabled: true,
-            disabledCategories: notificationSettings.push.disabledCategories,
-            __typename: "NotificationChannelSettings",
-          },
-          __typename: "NotificationSettings",
-        },
-        __typename: "ConsumerAccount",
-      },
-      errors: [],
-      __typename: "AccountUpdateNotificationSettingsPayload",
-    },
-    __typename: "Mutation",
-  } as AccountEnableNotificationChannelMutation
-}
-
-const optimisticDisableChannelResponse = ({
-  notificationSettings,
-  accountId,
-}: {
-  notificationSettings: NotificationSettings
-  accountId: string
-}) => {
-  return {
-    accountDisableNotificationChannel: {
-      account: {
-        id: accountId,
-        notificationSettings: {
-          push: {
-            enabled: false,
-            disabledCategories: notificationSettings.push.disabledCategories,
-            __typename: "NotificationChannelSettings",
-          },
-          __typename: "NotificationSettings",
-        },
-        __typename: "ConsumerAccount",
-      },
-      errors: [],
-      __typename: "AccountUpdateNotificationSettingsPayload",
-    },
-    __typename: "Mutation",
-  } as AccountDisableNotificationChannelMutation
-}
 
 const optimisticEnableCategoryResponse = ({
   notificationSettings,

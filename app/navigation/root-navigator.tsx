@@ -6,7 +6,6 @@ import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { SupportChatScreen } from "@app/screens/support-chat-screen/support-chat"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -104,6 +103,7 @@ import {
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
@@ -207,7 +207,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
@@ -256,7 +256,7 @@ export const RootStack = () => {
         component={ConversionSuccessScreen}
         options={{
           headerShown: false,
-          title: LL.ConversionSuccessScreen.title(),
+          title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
@@ -299,7 +299,7 @@ export const RootStack = () => {
         name="defaultWallet"
         component={DefaultWalletScreen}
         options={() => ({
-          title: LL.DefaultWalletScreen.title(),
+          title: LL.SettingsScreen.receiveCurrency(),
         })}
       />
       <RootNavigator.Screen
@@ -317,12 +317,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="currency"
         component={DisplayCurrencyScreen}
-        options={{ title: LL.common.currency() }}
+        options={{ title: LL.SettingsScreen.displayCurrency() }}
       />
       <RootNavigator.Screen
         name="security"
         component={SecurityScreen}
-        options={{ title: LL.common.security() }}
+        options={{ title: LL.SecurityScreen.title() }}
       />
       <RootNavigator.Screen
         name="developerScreen"
@@ -403,6 +403,13 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="apiScreen"
+        component={ApiScreen}
+        options={{
+          title: LL.SettingsScreen.apiAcess(),
+        }}
+      />
+      <RootNavigator.Screen
         name="transactionLimitsScreen"
         component={TransactionLimitsScreen}
         options={{
@@ -479,13 +486,6 @@ export const RootStack = () => {
         component={FullOnboardingFlowScreen}
         options={{
           title: LL.FullOnboarding.title(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="supportChat"
-        component={SupportChatScreen}
-        options={{
-          title: LL.support.chatbot(),
         }}
       />
       <RootNavigator.Screen
