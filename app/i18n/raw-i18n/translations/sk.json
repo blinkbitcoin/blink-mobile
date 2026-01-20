@@ -28,10 +28,10 @@
         "text": "Kliknutím na \"Prijať\" súhlasíte s našimi zmluvnými podmienkami. Súhlasíte tiež s tým, že nie ste rezidentom ani občanom jednej zo zakázaných krajín."
     },
     "SetAccountModal": {
-        "title": "Nastaviť predvolený účet",
-        "description": "Tento účet bude zvolený na odosielanie a prijímanie platieb. Možno ho kedykoľvek zmeniť.",
-        "stablesatsTag": "Túto možnosť zvoľte, aby ste udržali stabilnú hodnotu USD.",
-        "bitcoinTag": "Zvoľte túto možnosť, aby ste boli na Bitcoin štandarde."
+        "title": "Nastavte si účet na prijímanie",
+        "description": "Toto môžete kedykoľvek neskôr zmeniť v Nastaveniach",
+        "stablesatsTag": "Stablesats účet pre cenovú stabilitu",
+        "bitcoinTag": "Bitcoin účet pre maximalistov"
     },
     "NoteInput": {
         "addNote": "Pridať poznámku"

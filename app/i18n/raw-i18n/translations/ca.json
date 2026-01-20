@@ -28,10 +28,10 @@
         "text": "En fer clic a \"Acceptar\", acceptes els nostres Termes i Condicions. També acceptes que no ets resident o ciutadà d'un dels països prohibits."
     },
     "SetAccountModal": {
-        "title": "Estableix el teu compte predeterminat",
-        "description": "Aquest compte serà seleccionat inicialment per enviar i rebre pagaments. Es pot canviar en qualsevol moment.",
-        "stablesatsTag": "Tria-ho per mantenir un valor estable en USD.",
-        "bitcoinTag": "Escull-ho per estar en un estàndard de Bitcoin"
+        "title": "Configura el teu compte de recepció",
+        "description": "Sempre ho pots canviar més endavant a Configuració",
+        "stablesatsTag": "Compte Stablesats per a l'estabilitat del preu",
+        "bitcoinTag": "Compte Bitcoin per a maximalistes"
     },
     "NoteInput": {
         "addNote": "Afegir nota"

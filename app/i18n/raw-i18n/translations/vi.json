@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Thiết lập tài khoản nhận",
+        "description": "Bạn luôn có thể thay đổi điều này sau trong Cài đặt",
+        "stablesatsTag": "Tài khoản Stablesats để ổn định giá",
+        "bitcoinTag": "Tài khoản Bitcoin cho các maximalist"
     },
     "NoteInput": {
         "addNote": "Add note"

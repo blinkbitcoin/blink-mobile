@@ -28,10 +28,10 @@
         "text": "Kwa kubofya 'Kubali', unakubali Sheria na Masharti yetu. Pia unakubali kuwa wewe si mkazi au raia kutoka mojawapo ya nchi zilizopigwa marufuku."
     },
     "SetAccountModal": {
-        "title": "Wekeza akaunti ya chaguo",
-        "description": "Akaunti hii itachaguliwa kwa awali kwa kutuma na kupokea malipo. Inaweza kubadilishwa wakati wowote.",
-        "stablesatsTag": "Chagua hii kudumisha thamani imara ya USD.",
-        "bitcoinTag": "Chagua hii kuwa kwenye kiwango cha Bitcoin."
+        "title": "Sanidi akaunti yako ya kupokea",
+        "description": "Unaweza kubadilisha hili baadaye katika Mipangilio",
+        "stablesatsTag": "Akaunti ya Stablesats kwa uthabiti wa bei",
+        "bitcoinTag": "Akaunti ya Bitcoin kwa maximalisti"
     },
     "NoteInput": {
         "addNote": "Ongeza taarifa"

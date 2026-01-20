@@ -406,11 +406,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               <CurrencyPill
                 currency={sendingWalletDescriptor.currency}
                 containerSize="medium"
-                label={
-                  sendingWalletDescriptor.currency === WalletCurrency.Usd
-                    ? LL.common.dollar()
-                    : LL.common.bitcoin()
-                }
                 containerStyle={pillWidthStyle}
                 onLayout={onPillLayout(sendingWalletDescriptor.currency)}
               />

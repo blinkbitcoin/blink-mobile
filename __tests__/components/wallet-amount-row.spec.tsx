@@ -59,9 +59,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/components/atomic/currency-pill", () => ({
-  CurrencyPill: ({ label }: { label: string }) => {
+  CurrencyPill: ({ currency, label }: { currency: WalletCurrency; label?: string }) => {
     const ReactNative = jest.requireActual("react-native")
-    return <ReactNative.Text testID="currency-pill">{label}</ReactNative.Text>
+    const fallbackLabel = currency === WalletCurrency.Usd ? "Dollar" : "Bitcoin"
+    return (
+      <ReactNative.Text testID="currency-pill">{label ?? fallbackLabel}</ReactNative.Text>
+    )
   },
 }))
 

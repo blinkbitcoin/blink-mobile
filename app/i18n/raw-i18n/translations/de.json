@@ -28,10 +28,10 @@
         "text": "Indem Sie auf \"Akzeptieren\" klicken, erklären Sie sich mit unseren Allgemeinen Geschäftsbedingungen einverstanden. Sie stimmen auch zu, dass Sie kein Einwohner oder Staatsbürger eines der verbotenen Länder sind."
     },
     "SetAccountModal": {
-        "title": "Standard Account festlegen",
-        "description": "Dieser Account wird zunächst für das Senden und Empfangen von Zahlungen ausgewählt. Diese Einstellung kann jederzeit geändert werden.",
-        "stablesatsTag": "Auswählen, um den USD Betrag stabil zu halten.",
-        "bitcoinTag": "Auswählen, um auf den Bitcoin Standard zu wechseln."
+        "title": "Richte dein Empfangskonto ein",
+        "description": "Du kannst das später jederzeit in den Einstellungen ändern",
+        "stablesatsTag": "Stablesats-Konto für Preisstabilität",
+        "bitcoinTag": "Bitcoin-Konto für Maximalisten"
     },
     "NoteInput": {
         "addNote": "Notiz hinzufügen"

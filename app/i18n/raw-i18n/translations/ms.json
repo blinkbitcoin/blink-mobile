@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Benarkan individu lain untuk terima bayaran melalui pautan Cash Register, tanpa akses ke dompet anda\n\nMereka boleh membuat invois baru dan bayaran akan dihantar terus ke dompet {bankName: string} anda."
     },
     "SetAccountModal": {
-        "title": "Tetapkan akaun utama",
-        "description": "Untuk permulaan, akaun ini ditetapkan sebagai tempat menerima dan membuat pembayaran. Ia boleh ditukar pada bila bila masa jika perlu",
-        "stablesatsTag": "Pilih ini untuk mengekalkan nilai USD",
-        "bitcoinTag": "Pilih ini untuk penetapan nilai standard Bitcoin"
+        "title": "Sediakan akaun penerimaan anda",
+        "description": "Anda sentiasa boleh mengubahnya kemudian di Tetapan",
+        "stablesatsTag": "Akaun Stablesats untuk kestabilan harga",
+        "bitcoinTag": "Akaun Bitcoin untuk maksimalis"
     },
     "NoteInput": {
         "addNote": "tambah nota catatan"
