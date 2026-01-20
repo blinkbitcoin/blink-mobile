@@ -176,11 +176,11 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
       return
     }
 
-    const captchaPath = async () => {
-      const isTestEnvironment =
-        appConfig.galoyInstance.name === "Local" ||
-        appConfig.galoyInstance.name === "Staging"
+    const isTestEnvironment =
+      appConfig.galoyInstance.name === "Local" ||
+      appConfig.galoyInstance.name === "Staging"
 
+    const captchaPath = async () => {
       if (geetestError && !isTestEnvironment) {
         setStatus(RequestPhoneCodeStatus.Error)
         setError(ErrorType.FailedCaptchaError)
@@ -272,10 +272,6 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
         }
       }
     }
-
-    const isTestEnvironment =
-      appConfig.galoyInstance.name === "Local" ||
-      appConfig.galoyInstance.name === "Staging"
 
     // On test environments, always use captchaPath (with dummy values, server-side bypass)
     // On production, prefer appCheck if available
