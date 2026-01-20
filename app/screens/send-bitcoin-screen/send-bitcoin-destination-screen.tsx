@@ -705,9 +705,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             activeInputRef.current === InputType.Search && inputContainerStyle,
             activeInputRef.current === InputType.Phone && styles.disabledInput,
           ]}
-          onStartShouldSetResponder={() =>
-            activeInputRef.current !== InputType.Search
-          }
+          onStartShouldSetResponder={() => activeInputRef.current !== InputType.Search}
           onResponderRelease={() => onFocusedInput(InputType.Search)}
         >
           <SearchBar
@@ -1007,9 +1005,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         </View>
       </View>
       <View
-        onStartShouldSetResponder={() =>
-          activeInputRef.current !== InputType.Phone
-        }
+        onStartShouldSetResponder={() => activeInputRef.current !== InputType.Phone}
         onResponderRelease={() => onFocusedInput(InputType.Phone)}
       >
         <PhoneInput

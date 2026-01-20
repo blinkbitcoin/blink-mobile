@@ -167,9 +167,7 @@ describe("SendBitcoinDestinationScreen", () => {
     return match
   }
 
-  const createUsernameDoesNotExistResult = (
-    handle: string,
-  ): ParseDestinationResult => {
+  const createUsernameDoesNotExistResult = (handle: string): ParseDestinationResult => {
     const invalidPaymentDestination: ParsedPaymentDestination = {
       valid: false,
       paymentType: PaymentType.Intraledger,
@@ -345,10 +343,7 @@ describe("SendBitcoinDestinationScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.changeText(
-      screen.getByLabelText(LL.SendBitcoinScreen.placeholder()),
-      input,
-    )
+    fireEvent.changeText(screen.getByLabelText(LL.SendBitcoinScreen.placeholder()), input)
     fireEvent.press(screen.getByLabelText(LL.common.next()))
 
     await flushAsync()
@@ -391,10 +386,7 @@ describe("SendBitcoinDestinationScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.changeText(
-      screen.getByLabelText(LL.SendBitcoinScreen.placeholder()),
-      input,
-    )
+    fireEvent.changeText(screen.getByLabelText(LL.SendBitcoinScreen.placeholder()), input)
     fireEvent.press(screen.getByLabelText(LL.common.next()))
 
     await flushAsync()
@@ -469,9 +461,7 @@ describe("SendBitcoinDestinationScreen", () => {
       await flushAsync()
 
       const responderLabel =
-        triggerLabel === "search"
-          ? LL.SendBitcoinScreen.placeholder()
-          : "telephoneNumber"
+        triggerLabel === "search" ? LL.SendBitcoinScreen.placeholder() : "telephoneNumber"
       const responder = getResponderByLabel(responderLabel)
 
       fireEvent(responder, "onResponderRelease")
