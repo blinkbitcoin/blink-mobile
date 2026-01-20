@@ -705,6 +705,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             activeInputRef.current === InputType.Search && inputContainerStyle,
             activeInputRef.current === InputType.Phone && styles.disabledInput,
           ]}
+          onStartShouldSetResponder={() =>
+            activeInputRef.current !== InputType.Search
+          }
+          onResponderRelease={() => onFocusedInput(InputType.Search)}
         >
           <SearchBar
             {...testProps(LL.SendBitcoinScreen.placeholder())}
@@ -1001,40 +1005,49 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orBySMS()}</Text>
         </View>
       </View>
-      <PhoneInput
-        key={1}
-        rightIcon={
-          rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
-            <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
-          ) : (
-            <TouchableOpacity
-              onPress={handlePastePhone}
-              disabled={activeInputRef.current === InputType.Search}
-            >
-              <Text color={colors.primary} type="p2">
-                {LL.common.paste()}
-              </Text>
-            </TouchableOpacity>
-          )
+      <View
+        onStartShouldSetResponder={() =>
+          activeInputRef.current !== InputType.Phone
         }
-        onChangeText={(text) => {
-          onFocusedInput(InputType.Phone)
-          setRawPhoneNumber(text)
-        }}
-        onChangeInfo={(e) => {
-          setDefaultPhoneInputInfo(e)
-        }}
-        value={activeInputRef.current === InputType.Phone ? rawPhoneNumber : ""}
-        isDisabled={activeInputRef.current === InputType.Search}
-        onFocus={() => onFocusedInput(InputType.Phone)}
-        onSubmitEditing={() =>
-          willInitiateValidation() &&
-          waitAndValidateDestination(destinationState.unparsedDestination)
-        }
-        inputContainerStyle={activeInputRef.current === InputType.Phone && inputContainerStyle}
-        bgColor={colors.grey6}
-        keepCountryCode={keepCountryCode}
-      />
+        onResponderRelease={() => onFocusedInput(InputType.Phone)}
+      >
+        <PhoneInput
+          key={1}
+          rightIcon={
+            rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
+              <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
+            ) : (
+              <TouchableOpacity
+                onPress={handlePastePhone}
+                disabled={activeInputRef.current === InputType.Search}
+              >
+                <Text color={colors.primary} type="p2">
+                  {LL.common.paste()}
+                </Text>
+              </TouchableOpacity>
+            )
+          }
+          onChangeText={(text) => {
+            onFocusedInput(InputType.Phone)
+            setRawPhoneNumber(text)
+          }}
+          onChangeInfo={(e) => {
+            setDefaultPhoneInputInfo(e)
+          }}
+          value={activeInputRef.current === InputType.Phone ? rawPhoneNumber : ""}
+          isDisabled={activeInputRef.current === InputType.Search}
+          onFocus={() => onFocusedInput(InputType.Phone)}
+          onSubmitEditing={() =>
+            willInitiateValidation() &&
+            waitAndValidateDestination(destinationState.unparsedDestination)
+          }
+          inputContainerStyle={
+            activeInputRef.current === InputType.Phone && inputContainerStyle
+          }
+          bgColor={colors.grey6}
+          keepCountryCode={keepCountryCode}
+        />
+      </View>
       {activeInputRef.current === InputType.Phone ? (
         <DestinationInformation destinationState={destinationState} />
       ) : (
