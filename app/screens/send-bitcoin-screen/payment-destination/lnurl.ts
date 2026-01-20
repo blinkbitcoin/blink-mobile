@@ -59,14 +59,20 @@ export const resolveLnurlDestination = async ({
       })
 
       if (lnurlPayParams) {
-        const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
-          lnurlDomains,
-          lnurlPayParams,
-          myWalletIds,
-          accountDefaultWalletQuery,
-        })
-        if (maybeIntraledgerDestination && maybeIntraledgerDestination.valid) {
-          return maybeIntraledgerDestination
+        // Skip intraledger optimization for fixed-amount LNURLs to preserve the
+        // min === max constraint (fixes #3583)
+        const isFixedAmount = lnurlPayParams.min === lnurlPayParams.max
+
+        if (!isFixedAmount) {
+          const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
+            lnurlDomains,
+            lnurlPayParams,
+            myWalletIds,
+            accountDefaultWalletQuery,
+          })
+          if (maybeIntraledgerDestination && maybeIntraledgerDestination.valid) {
+            return maybeIntraledgerDestination
+          }
         }
 
         return createLnurlPaymentDestination({
