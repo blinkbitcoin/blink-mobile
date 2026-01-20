@@ -109,5 +109,15 @@ android-recordings
 .augment
 .bmad
 bmad-custom-src
-.beads
 .history # a defined place to dump all that intermediate stuff from AI agents
+
+# MCP state (logs, pids, ready marker)
+.mcp/
+
+# Convenience of using different agent tooling
+.claude
+.augment
+.bmad
+bmad-custom-src
+.beads
+.history
