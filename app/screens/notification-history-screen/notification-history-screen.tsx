@@ -125,7 +125,7 @@ export const NotificationHistoryScreen = () => {
         })
       })
       .catch(console.error)
-  }, [acknowledgeNotification, client, isFocused, notifications?.nodes, unackIdsKey])
+  }, [acknowledgeNotification, client, isFocused, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo
