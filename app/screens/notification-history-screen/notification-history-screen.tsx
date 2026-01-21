@@ -115,11 +115,16 @@ export const NotificationHistoryScreen = () => {
             inFlightIdsRef.current.delete(notification.id)
           }),
       ),
-    ).then(() => {
-      client.refetchQueries({
-        include: [UnacknowledgedNotificationCountDocument, StatefulNotificationsDocument],
+    )
+      .then(() => {
+        client.refetchQueries({
+          include: [
+            UnacknowledgedNotificationCountDocument,
+            StatefulNotificationsDocument,
+          ],
+        })
       })
-    })
+      .catch(console.error)
   }, [acknowledgeNotification, client, isFocused, notifications?.nodes, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {
