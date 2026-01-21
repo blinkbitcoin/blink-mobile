@@ -518,6 +518,13 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 } else {
                   successActionText = successAction.url ?? null
                 }
+              } else if (successAction) {
+                // Log unexpected successAction tags to aid debugging (e.g., "aes").
+                console.warn(
+                  "[TransactionDetailScreen] Unhandled successAction tag encountered:",
+                  successAction.tag,
+                  successAction,
+                )
               }
 
               return (
