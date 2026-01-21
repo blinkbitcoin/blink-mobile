@@ -1,3 +1,4 @@
+import React from "react"
 import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"
 import { useStatefulNotificationsQuery } from "@app/graphql/generated"
