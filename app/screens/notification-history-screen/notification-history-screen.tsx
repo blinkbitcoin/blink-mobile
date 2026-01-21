@@ -1,7 +1,12 @@
-import React from "react"
-import { gql } from "@apollo/client"
+import React, { useEffect, useRef } from "react"
+import { gql, useApolloClient } from "@apollo/client"
 import { Screen } from "@app/components/screen"
-import { useStatefulNotificationsQuery } from "@app/graphql/generated"
+import {
+  StatefulNotificationsDocument,
+  UnacknowledgedNotificationCountDocument,
+  useStatefulNotificationAcknowledgeMutation,
+  useStatefulNotificationsQuery,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -48,13 +53,55 @@ export const NotificationHistoryScreen = () => {
     theme: { colors },
   } = useTheme()
   const isFocused = useIsFocused()
+  const client = useApolloClient()
+  const acknowledgedIdsRef = useRef(new Set<string>())
+  const inFlightIdsRef = useRef(new Set<string>())
 
   const { LL } = useI18nContext()
 
   const { data, fetchMore, refetch, loading } = useStatefulNotificationsQuery({
     skip: !useIsAuthed(),
   })
+  const [acknowledgeNotification] = useStatefulNotificationAcknowledgeMutation()
   const notifications = data?.me?.statefulNotificationsWithoutBulletinEnabled
+
+  useEffect(() => {
+    if (!isFocused || !notifications?.nodes?.length) return
+
+    const unacknowledged = notifications.nodes.filter(
+      (notification) =>
+        !notification.acknowledgedAt &&
+        !acknowledgedIdsRef.current.has(notification.id) &&
+        !inFlightIdsRef.current.has(notification.id),
+    )
+
+    if (unacknowledged.length === 0) return
+
+    unacknowledged.forEach((notification) => {
+      inFlightIdsRef.current.add(notification.id)
+    })
+
+    Promise.all(
+      unacknowledged.map((notification) =>
+        acknowledgeNotification({
+          variables: { input: { notificationId: notification.id } },
+        })
+          .then(() => {
+            acknowledgedIdsRef.current.add(notification.id)
+          })
+          .catch(() => {
+            // Keep it eligible for retry on the next render.
+          })
+          .finally(() => {
+            inFlightIdsRef.current.delete(notification.id)
+          }),
+      ),
+    ).then(() => {
+      client.refetchQueries({
+        include: [UnacknowledgedNotificationCountDocument, StatefulNotificationsDocument],
+      })
+    })
+  }, [acknowledgeNotification, client, isFocused, notifications?.nodes])
 
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo
