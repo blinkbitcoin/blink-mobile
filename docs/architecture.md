@@ -158,6 +158,15 @@ RootStack (Stack Navigator)
 3. TOTP (authenticator app)
 4. Telegram Passport
 
+### Phone Authentication CAPTCHA Behavior
+
+| Environment | CAPTCHA Handling |
+|-------------|------------------|
+| Production | Geetest challenge shown, server validates |
+| Local/Staging | Dummy values sent ("bypass"), server-side `test_accounts_captcha` handles bypass |
+
+In test environments (Local/Staging), the app calls the API with dummy CAPTCHA values instead of showing the Geetest challenge. The server-side `test_accounts_captcha` config determines which phone numbers can bypass CAPTCHA validation.
+
 ## Bitcoin/Lightning Architecture
 
 ### Wallet Types
