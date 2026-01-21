@@ -49,16 +49,28 @@ const notificationNodes = [
   },
 ]
 
-let notificationCount = 3
-let setActiveScreen: ((screen: string) => void) | null = null
-let triggerRender: React.Dispatch<React.SetStateAction<number>> | null = null
-let headerRight: (() => React.ReactNode) | null = null
-let headerCount = -1
+type TestState = {
+  notificationCount: number
+  setActiveScreen: ((screen: string) => void) | null
+  triggerRender: React.Dispatch<React.SetStateAction<number>> | null
+  headerRight: (() => React.ReactNode) | null
+  headerCount: number
+}
+
+const createTestState = (): TestState => ({
+  notificationCount: 3,
+  setActiveScreen: null,
+  triggerRender: null,
+  headerRight: null,
+  headerCount: -1,
+})
+
+let testState = createTestState()
 
 const updateNotificationCount = (next: number) => {
-  notificationCount = next
-  if (triggerRender) {
-    triggerRender((value) => value + 1)
+  testState.notificationCount = next
+  if (testState.triggerRender) {
+    testState.triggerRender((value) => value + 1)
   }
 }
 
@@ -69,16 +81,16 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: (screen: string) => {
       mockNavigate(screen)
-      if (setActiveScreen) {
-        setActiveScreen(screen)
+      if (testState.setActiveScreen) {
+        testState.setActiveScreen(screen)
       }
     },
     setOptions: (options: { headerRight?: () => React.ReactNode }) => {
-      if (options.headerRight && notificationCount !== headerCount) {
-        headerCount = notificationCount
-        headerRight = options.headerRight
-        if (triggerRender) {
-          triggerRender((value) => value + 1)
+      if (options.headerRight && testState.notificationCount !== testState.headerCount) {
+        testState.headerCount = testState.notificationCount
+        testState.headerRight = options.headerRight
+        if (testState.triggerRender) {
+          testState.triggerRender((value) => value + 1)
         }
       }
     },
@@ -92,7 +104,7 @@ jest.mock("@apollo/client", () => {
     ...actual,
     useApolloClient: () => ({
       refetchQueries: jest.fn(() => {
-        updateNotificationCount(notificationCount)
+        updateNotificationCount(testState.notificationCount)
         return Promise.resolve()
       }),
     }),
@@ -145,7 +157,7 @@ jest.mock("@app/graphql/generated", () => {
         me: {
           id: "user-id",
           unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount:
-            notificationCount,
+            testState.notificationCount,
         },
       },
     })),
@@ -169,7 +181,7 @@ jest.mock("@app/graphql/generated", () => {
     })),
     useStatefulNotificationAcknowledgeMutation: jest.fn((_options) => {
       const ack = jest.fn(() => {
-        updateNotificationCount(Math.max(notificationCount - 1, 0))
+        updateNotificationCount(Math.max(testState.notificationCount - 1, 0))
         return Promise.resolve()
       })
       return [ack, { loading: false }]
@@ -206,23 +218,21 @@ const mocksWithUsername = [
 describe("Settings Screen", () => {
   beforeEach(() => {
     loadLocale("en")
-    notificationCount = 3
-    headerCount = -1
-    setActiveScreen = null
-    triggerRender = null
-    headerRight = null
+    testState = createTestState()
   })
 
   const TestNavigator = () => {
     const [screenName, setScreenName] = React.useState("settings")
     const [, setTick] = React.useState(0)
 
-    setActiveScreen = setScreenName
-    triggerRender = setTick
+    testState.setActiveScreen = setScreenName
+    testState.triggerRender = setTick
 
     return (
       <View>
-        <View testID="notification-header">{headerRight ? headerRight() : null}</View>
+        <View testID="notification-header">
+          {testState.headerRight ? testState.headerRight() : null}
+        </View>
         <SettingsScreen />
         {screenName === "notificationHistory" ? (
           <View>
@@ -290,9 +300,9 @@ describe("Settings Screen", () => {
   })
 
   it("hides the badge when the last unread notification is acknowledged", async () => {
-    notificationCount = 1
-    headerCount = -1
-    headerRight = null
+    testState.notificationCount = 1
+    testState.headerCount = -1
+    testState.headerRight = null
 
     render(
       <ContextForScreen>
@@ -343,9 +353,9 @@ describe("Settings Screen", () => {
   })
 
   it("does not render a badge when there are no unread notifications", async () => {
-    notificationCount = 0
-    headerCount = -1
-    headerRight = null
+    testState.notificationCount = 0
+    testState.headerCount = -1
+    testState.headerRight = null
 
     render(
       <ContextForScreen>
