@@ -509,10 +509,13 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                       ?.url ||
                     null
                   }
-                  subValue={
-                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
-                      ?.url || undefined
-                  }
+                  subValue={(() => {
+                    const successAction = (settlementVia as SettlementViaLnWithSuccessAction)
+                      .successAction
+                    const hasText =
+                      !!successAction?.message || !!successAction?.description
+                    return hasText ? successAction?.url : undefined
+                  })()}
                 />
               </View>
             )}
