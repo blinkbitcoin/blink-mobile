@@ -8,6 +8,7 @@ scalar AccountId
 
 enum AccountLevel {
   ONE
+  THREE
   TWO
   ZERO
 }
@@ -133,12 +134,34 @@ type Coordinates {
 """A CCA2 country code (ex US, FR, etc)"""
 scalar CountryCode
 
-enum DeepLink {
+enum DeepLinkAction {
+  SET_DEFAULT_ACCOUNT_MODAL
+  SET_LN_ADDRESS_MODAL
+  UPGRADE_ACCOUNT_MODAL
+}
+
+enum DeepLinkScreen {
+  CHAT
   CIRCLES
+  CONVERT
   EARN
+  HOME
   MAP
   PEOPLE
   PRICE
+  RECEIVE
+  SCAN_QR
+  SETTINGS
+  SETTINGS_2FA
+  SETTINGS_ACCOUNT
+  SETTINGS_DEFAULT_ACCOUNT
+  SETTINGS_DISPLAY_CURRENCY
+  SETTINGS_EMAIL
+  SETTINGS_LANGUAGE
+  SETTINGS_NOTIFICATIONS
+  SETTINGS_SECURITY
+  SETTINGS_THEME
+  SETTINGS_TX_LIMITS
 }
 
 """Display currency of an account"""
@@ -157,6 +180,9 @@ interface Error {
   message: String!
   path: [String]
 }
+
+"""Url that will be fetched on events for the account"""
+scalar ExternalUrl
 
 type GraphQLApplicationError implements Error {
   code: String
@@ -267,16 +293,21 @@ enum LnPaymentStatus {
 
 scalar LnPubkey
 
-input LocalizedPushContentInput {
+input LocalizedNotificationContentInput {
   body: String!
   language: Language!
   title: String!
 }
 
 input MarketingNotificationTriggerInput {
-  deepLink: DeepLink
-  localizedPushContents: [LocalizedPushContentInput!]!
+  icon: NotificationIcon
+  localizedNotificationContents: [LocalizedNotificationContentInput!]!
+  openDeepLink: OpenDeepLinkInput
+  openExternalUrl: OpenExternalUrlInput
   phoneCountryCodesFilter: [CountryCode!]
+  shouldAddToBulletin: Boolean!
+  shouldAddToHistory: Boolean!
+  shouldSendPush: Boolean!
   userIdsFilter: [ID!]
 }
 
@@ -321,10 +352,73 @@ type Mutation {
   userUpdatePhone(input: UserUpdatePhoneInput!): AccountDetailPayload!
 }
 
+enum NotificationIcon {
+  ARROW_LEFT
+  ARROW_RIGHT
+  BACKSPACE
+  BANK
+  BELL
+  BITCOIN
+  BOOK
+  BTC_BOOK
+  CARET_DOWN
+  CARET_LEFT
+  CARET_RIGHT
+  CARET_UP
+  CHECK
+  CHECK_CIRCLE
+  CLOSE
+  CLOSE_CROSS_WITH_BACKGROUND
+  COINS
+  COPY_PASTE
+  DOLLAR
+  EYE
+  EYE_SLASH
+  FILTER
+  GLOBE
+  GRAPH
+  IMAGE
+  INFO
+  LIGHTNING
+  LINK
+  LOADING
+  MAGNIFYING_GLASS
+  MAP
+  MENU
+  NOTE
+  PAYMENT_ERROR
+  PAYMENT_PENDING
+  PAYMENT_SUCCESS
+  PENCIL
+  PEOPLE
+  QR_CODE
+  QUESTION
+  RANK
+  RECEIVE
+  REFRESH
+  SEND
+  SETTINGS
+  SHARE
+  TRANSFER
+  USER
+  VIDEO
+  WARNING
+  WARNING_WITH_BACKGROUND
+}
+
 """An address for an on-chain bitcoin destination"""
 scalar OnChainAddress
 
 scalar OnChainTxHash
+
+input OpenDeepLinkInput {
+  action: DeepLinkAction
+  screen: DeepLinkScreen
+}
+
+input OpenExternalUrlInput {
+  url: ExternalUrl!
+}
 
 """Information about pagination in a connection."""
 type PageInfo {
