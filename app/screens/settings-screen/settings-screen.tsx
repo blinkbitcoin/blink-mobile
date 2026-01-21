@@ -108,11 +108,7 @@ export const SettingsScreen: React.FC = () => {
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
           <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
-          {count !== 0 && (
-            <Text type="p4" style={styles.notificationCount}>
-              {count}
-            </Text>
-          )}
+          {count !== 0 && <Text type="p4" style={styles.notificationCount}></Text>}
         </TouchableOpacity>
       ),
     })
@@ -160,16 +156,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   notificationCount: {
     position: "absolute",
-    right: 7,
-    top: -4,
-    color: colors.white,
+    right: 9,
+    top: -3,
+    color: colors._darkGrey,
     backgroundColor: colors.black,
     textAlign: "center",
-    lineHeight: 17,
-    height: 17,
-    minWidth: 17,
-    paddingHorizontal: 5,
-    borderRadius: 11,
+    verticalAlign: "middle",
+    height: 14,
+    width: 14,
+    borderRadius: 9,
     overflow: "hidden",
   },
 }))
