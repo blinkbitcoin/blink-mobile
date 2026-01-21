@@ -30,7 +30,7 @@ export interface InputValues {
 }
 
 export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) => {
-  const { convertMoneyAmount } = usePriceConversion()
+  const { convertMoneyAmount, convertMoneyAmountWithRounding } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
 
   const [wallets, _setWallets] = React.useState<
@@ -65,7 +65,7 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     _setWallets(wallets)
   }
 
-  if (!wallets || !convertMoneyAmount) {
+  if (!wallets || !convertMoneyAmount || !convertMoneyAmountWithRounding) {
     return {
       moneyAmount,
       setMoneyAmount,
@@ -109,6 +109,11 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
 
   const settlementSendAmount = convertMoneyAmount(moneyAmount, fromWallet.walletCurrency)
   const settlementReceiveAmount = convertMoneyAmount(moneyAmount, toWallet.walletCurrency)
+  const settlementReceiveAmountRoundedDown = convertMoneyAmountWithRounding(
+    moneyAmount,
+    toWallet.walletCurrency,
+    Math.floor,
+  )
 
   return {
     moneyAmount,
@@ -123,7 +128,8 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     toWallet,
     isValidAmount:
       settlementSendAmount.amount <= fromWallet.balance &&
-      settlementSendAmount.amount > 0,
+      settlementSendAmount.amount > 0 &&
+      settlementReceiveAmountRoundedDown.amount > 0,
     ...toggleWallet,
   }
 }
