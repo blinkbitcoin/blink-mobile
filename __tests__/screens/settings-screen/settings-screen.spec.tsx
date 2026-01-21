@@ -182,7 +182,7 @@ jest.mock("@app/graphql/generated", () => {
     })),
     useStatefulNotificationsQuery: jest.fn(() => ({
       data: {
-                me: {
+        me: {
           statefulNotificationsWithoutBulletinEnabled: {
             nodes: testState.notificationNodes,
             pageInfo: {
