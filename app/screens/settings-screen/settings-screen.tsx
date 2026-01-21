@@ -109,7 +109,11 @@ export const SettingsScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
           <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
           {count !== 0 && (
-            <Text type="p4" style={styles.notificationCount} testID="notification-badge" />
+            <Text
+              type="p4"
+              style={styles.notificationCount}
+              testID="notification-badge"
+            />
           )}
         </TouchableOpacity>
       ),

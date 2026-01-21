@@ -167,7 +167,7 @@ jest.mock("@app/graphql/generated", () => {
       fetchMore: jest.fn(),
       refetch: jest.fn(),
     })),
-    useStatefulNotificationAcknowledgeMutation: jest.fn((options) => {
+    useStatefulNotificationAcknowledgeMutation: jest.fn((_options) => {
       const ack = jest.fn(() => {
         updateNotificationCount(Math.max(notificationCount - 1, 0))
         return Promise.resolve()
