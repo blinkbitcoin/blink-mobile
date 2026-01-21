@@ -13,7 +13,17 @@ import { ContextForScreen } from "../helper"
 const notificationTitle = "Test notification"
 const notificationBody = "Test body"
 const notificationCreatedAt = 1_720_000_000
-const notificationNodes = [
+const baseNotificationNodes: Array<{
+  id: string
+  title: string
+  body: string
+  createdAt: number
+  acknowledgedAt: number | null
+  bulletinEnabled: boolean
+  icon: null
+  action: null
+  __typename: "StatefulNotification"
+}> = [
   {
     id: "notif-1",
     title: notificationTitle,
@@ -51,14 +61,22 @@ const notificationNodes = [
 
 type TestState = {
   notificationCount: number
+  notificationNodes: typeof baseNotificationNodes
   setActiveScreen: ((screen: string) => void) | null
   triggerRender: React.Dispatch<React.SetStateAction<number>> | null
   headerRight: (() => React.ReactNode) | null
   headerCount: number
 }
 
+const buildNotificationNodes = (unreadCount: number) =>
+  baseNotificationNodes.map((notification, index) => ({
+    ...notification,
+    acknowledgedAt: index < unreadCount ? null : 1,
+  }))
+
 const createTestState = (): TestState => ({
   notificationCount: 3,
+  notificationNodes: buildNotificationNodes(3),
   setActiveScreen: null,
   triggerRender: null,
   headerRight: null,
@@ -69,6 +87,7 @@ let testState = createTestState()
 
 const updateNotificationCount = (next: number) => {
   testState.notificationCount = next
+  testState.notificationNodes = buildNotificationNodes(next)
   if (testState.triggerRender) {
     testState.triggerRender((value) => value + 1)
   }
@@ -163,9 +182,9 @@ jest.mock("@app/graphql/generated", () => {
     })),
     useStatefulNotificationsQuery: jest.fn(() => ({
       data: {
-        me: {
+                me: {
           statefulNotificationsWithoutBulletinEnabled: {
-            nodes: notificationNodes,
+            nodes: testState.notificationNodes,
             pageInfo: {
               endCursor: null,
               hasNextPage: false,
@@ -300,7 +319,7 @@ describe("Settings Screen", () => {
   })
 
   it("hides the badge when the last unread notification is acknowledged", async () => {
-    testState.notificationCount = 1
+    updateNotificationCount(1)
     testState.headerCount = -1
     testState.headerRight = null
 
@@ -353,7 +372,7 @@ describe("Settings Screen", () => {
   })
 
   it("does not render a badge when there are no unread notifications", async () => {
-    testState.notificationCount = 0
+    updateNotificationCount(0)
     testState.headerCount = -1
     testState.headerRight = null
 
