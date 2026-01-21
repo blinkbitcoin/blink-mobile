@@ -30,7 +30,6 @@ export const Notification: React.FC<StatefulNotification> = ({
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        setIsAcknowledged(true)
         if (action?.__typename === "OpenDeepLinkAction")
           Linking.openURL(BLINK_DEEP_LINK_PREFIX + action.deepLink)
         else if (action?.__typename === "OpenExternalLinkAction")
