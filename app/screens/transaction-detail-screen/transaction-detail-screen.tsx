@@ -78,6 +78,8 @@ type SuccessAction = {
   message?: string | null
   url?: string | null
   description?: string | null
+  ciphertext?: string | null
+  iv?: string | null
 }
 
 // Extended type for SettlementViaLn with optional successAction

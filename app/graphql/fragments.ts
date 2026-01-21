@@ -48,6 +48,8 @@ export default gql`
           message
           url
           description
+          ciphertext
+          iv
         }
       }
       ... on SettlementViaOnChain {
