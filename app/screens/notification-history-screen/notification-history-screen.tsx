@@ -89,9 +89,6 @@ export const NotificationHistoryScreen = () => {
           .then(() => {
             acknowledgedIdsRef.current.add(notification.id)
           })
-          .catch(() => {
-            // Keep it eligible for retry on the next render.
-          })
           .finally(() => {
             inFlightIdsRef.current.delete(notification.id)
           }),
