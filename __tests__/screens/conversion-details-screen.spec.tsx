@@ -327,6 +327,7 @@ type ScenarioAction =
   | { type: "multiToggle"; count: number }
   | { type: "focus"; field: Field }
   | { type: "type"; field: Field }
+  | { type: "typeDigits"; field: Field; digits: string[] }
   | { type: "clear"; field?: Field }
   | { type: "percent"; value: 25 | 50 | 75 | 100 }
   | { type: "next" }
@@ -336,6 +337,8 @@ type Scenario = {
   options: MockOptions
   actions: ScenarioAction[]
   expectError?: boolean
+  expectNextDisabled?: boolean
+  expectNextEnabled?: boolean
   expectNavigate?: boolean
 }
 
@@ -353,6 +356,7 @@ const computeFocusedField = (actions: ScenarioAction[]): Field | null => {
   for (const action of actions) {
     if (action.type === "focus") focused = action.field
     if (action.type === "type") focused = action.field
+    if (action.type === "typeDigits") focused = action.field
     if (action.type === "clear" && action.field) focused = action.field
     if (action.type === "percent") focused = "from"
     if (action.type === "toggle") focused = swapFocusedField(focused)
@@ -845,7 +849,7 @@ describe("Keyboard input and conversion verification", () => {
     })
 
     await act(async () => {
-      pressKeys(getByTestId, ["1", "0", "0", "0"])
+      pressKeys(getByTestId, ["1", "0", "0", "0", "0", "0"])
     })
 
     act(() => {
@@ -1627,6 +1631,18 @@ describe("Comprehensive conversion scenarios", () => {
         { type: "type", field: "currency" },
       ],
     },
+    {
+      name: "63. Too small conversion from -> disable next when receive is zero",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [{ type: "typeDigits", field: "from", digits: ["4", "5", "4", "5", "4"] }],
+      expectNextDisabled: true,
+    },
+    {
+      name: "64. Minimum conversion from -> enable next when receive is non-zero",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [{ type: "typeDigits", field: "from", digits: ["4", "5", "4", "5", "5"] }],
+      expectNextEnabled: true,
+    },
   ]
 
   beforeEach(() => {
@@ -1750,6 +1766,25 @@ describe("Comprehensive conversion scenarios", () => {
         }
       }
 
+      if (action.type === "typeDigits") {
+        const fieldCurrency =
+          action.field === "from"
+            ? fromCurrency
+            : action.field === "to"
+              ? toCurrency
+              : DisplayCurrencyType
+        await focusField(action.field)
+        await clearInput()
+        await act(async () => {
+          pressKeys(getByTestId, action.digits)
+        })
+        advanceTimers(1500)
+        primary = {
+          currency: fieldCurrency,
+          amount: amountFromDigits(fieldCurrency, action.digits, displayCurrency),
+        }
+      }
+
       if (action.type === "clear") {
         await clearInput(action.field)
         primary = null
@@ -1803,6 +1838,16 @@ describe("Comprehensive conversion scenarios", () => {
         const nextButton = getByTestId("next-button")
         expect(nextButton.props.accessibilityState?.disabled).toBe(true)
       }
+    }
+
+    if (scenario.expectNextDisabled) {
+      const nextButton = getByTestId("next-button")
+      expect(nextButton.props.accessibilityState?.disabled).toBe(true)
+    }
+
+    if (scenario.expectNextEnabled) {
+      const nextButton = getByTestId("next-button")
+      expect(nextButton.props.accessibilityState?.disabled).toBe(false)
     }
 
     if (scenario.expectNavigate) {
