@@ -63,14 +63,14 @@ export const Notification: React.FC<StatefulNotification> = ({
         {icon ? (
           <GaloyIcon
             name={icon?.toLowerCase().replace("_", "-") as IconNamesType}
-            color={isAcknowledged ? colors.grey3 : colors.black}
+            color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
         ) : (
           <Icon
             type="ionicon"
             name="notifications-outline"
-            color={isAcknowledged ? colors.grey3 : colors.black}
+            color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
         )}
@@ -102,7 +102,7 @@ const useStyles = makeStyles(
       alignItems: "center",
     },
     text: {
-      color: isAcknowledged ? colors.grey3 : colors.black,
+      color: isAcknowledged ? colors.grey2 : colors.black,
     },
   }),
 )
