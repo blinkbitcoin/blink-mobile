@@ -25,6 +25,28 @@ const notificationNodes = [
     action: null,
     __typename: "StatefulNotification",
   },
+  {
+    id: "notif-2",
+    title: notificationTitle,
+    body: notificationBody,
+    createdAt: notificationCreatedAt,
+    acknowledgedAt: null,
+    bulletinEnabled: false,
+    icon: null,
+    action: null,
+    __typename: "StatefulNotification",
+  },
+  {
+    id: "notif-3",
+    title: notificationTitle,
+    body: notificationBody,
+    createdAt: notificationCreatedAt,
+    acknowledgedAt: null,
+    bulletinEnabled: false,
+    icon: null,
+    action: null,
+    __typename: "StatefulNotification",
+  },
 ]
 
 let notificationCount = 3
@@ -63,6 +85,19 @@ jest.mock("@react-navigation/native", () => ({
   }),
   useIsFocused: () => true,
 }))
+
+jest.mock("@apollo/client", () => {
+  const actual = jest.requireActual("@apollo/client")
+  return {
+    ...actual,
+    useApolloClient: () => ({
+      refetchQueries: jest.fn(() => {
+        updateNotificationCount(notificationCount)
+        return Promise.resolve()
+      }),
+    }),
+  }
+})
 
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
@@ -134,13 +169,7 @@ jest.mock("@app/graphql/generated", () => {
     })),
     useStatefulNotificationAcknowledgeMutation: jest.fn((options) => {
       const ack = jest.fn(() => {
-        const refetchQueries = options?.refetchQueries ?? []
-        const hasCountRefetch = refetchQueries.includes(
-          actual.UnacknowledgedNotificationCountDocument,
-        )
-        if (hasCountRefetch) {
-          updateNotificationCount(Math.max(notificationCount - 1, 0))
-        }
+        updateNotificationCount(Math.max(notificationCount - 1, 0))
         return Promise.resolve()
       })
       return [ack, { loading: false }]
@@ -208,7 +237,7 @@ describe("Settings Screen", () => {
     )
   }
 
-  it("updates the badge count after acknowledging a notification", async () => {
+  it("clears the badge after entering the notification history", async () => {
     render(
       <ContextForScreen>
         <LevelContextProvider
@@ -233,17 +262,21 @@ describe("Settings Screen", () => {
     )
 
     const header = screen.getByTestId("notification-header")
-    expect(within(header).getByText("3")).toBeTruthy()
+    expect(within(header).getByTestId("notification-badge")).toBeTruthy()
 
     const headerButton = within(header).UNSAFE_getByType(TouchableOpacity)
     fireEvent.press(headerButton)
     expect(mockNavigate).toHaveBeenCalledWith("notificationHistory")
 
     expect(screen.getByTestId("notification-screen")).toBeTruthy()
+    expect(screen.getAllByText(notificationTitle)).toHaveLength(3)
 
-    fireEvent.press(screen.getByText(notificationTitle))
-    expect(screen.getByText(notificationTitle)).toBeTruthy()
-
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
     fireEvent.press(screen.getByTestId("back-to-settings"))
 
     await act(
@@ -253,7 +286,7 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(within(header).getByText("2")).toBeTruthy()
+    expect(within(header).queryByTestId("notification-badge")).toBeNull()
   })
 
   it("hides the badge when the last unread notification is acknowledged", async () => {
@@ -285,13 +318,18 @@ describe("Settings Screen", () => {
     )
 
     const header = screen.getByTestId("notification-header")
-    expect(within(header).getByText("1")).toBeTruthy()
+    expect(within(header).getByTestId("notification-badge")).toBeTruthy()
 
     const headerButton = within(header).UNSAFE_getByType(TouchableOpacity)
     fireEvent.press(headerButton)
     expect(mockNavigate).toHaveBeenCalledWith("notificationHistory")
 
-    fireEvent.press(screen.getByText(notificationTitle))
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
     fireEvent.press(screen.getByTestId("back-to-settings"))
 
     await act(
@@ -301,8 +339,7 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(within(header).queryByText("1")).toBeNull()
-    expect(within(header).queryByText("0")).toBeNull()
+    expect(within(header).queryByTestId("notification-badge")).toBeNull()
   })
 
   it("does not render a badge when there are no unread notifications", async () => {
@@ -334,8 +371,7 @@ describe("Settings Screen", () => {
     )
 
     const header = screen.getByTestId("notification-header")
-    expect(within(header).queryByText("0")).toBeNull()
-    expect(within(header).queryByText("1")).toBeNull()
+    expect(within(header).queryByTestId("notification-badge")).toBeNull()
   })
 
   it("Renders user info", async () => {
