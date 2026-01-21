@@ -193,9 +193,7 @@ describe("Settings Screen", () => {
 
     return (
       <View>
-        <View testID="notification-header">
-          {headerRight ? headerRight() : null}
-        </View>
+        <View testID="notification-header">{headerRight ? headerRight() : null}</View>
         <SettingsScreen />
         {screenName === "notificationHistory" ? (
           <View>

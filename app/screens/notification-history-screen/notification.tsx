@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   StatefulNotification,
   StatefulNotificationsDocument,
@@ -10,7 +10,6 @@ import { View, Linking } from "react-native"
 import { timeAgo } from "./utils"
 import { gql } from "@apollo/client"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
-import { useState } from "react"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
