@@ -497,30 +497,40 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             )}
           {settlementVia?.__typename === "SettlementViaLn" &&
             "successAction" in settlementVia &&
-            (settlementVia as SettlementViaLnWithSuccessAction)?.successAction && (
-              <View style={styles.successActionContainer}>
-                <SuccessActionComponent
-                  visible={true}
-                  title={LL.TransactionDetailScreen.successAction()}
-                  text={
-                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
-                      ?.message ||
-                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
-                      ?.description ||
-                    (settlementVia as SettlementViaLnWithSuccessAction).successAction
-                      ?.url ||
-                    null
-                  }
-                  subValue={(() => {
-                    const successAction = (settlementVia as SettlementViaLnWithSuccessAction)
-                      .successAction
-                    const hasText =
-                      !!successAction?.message || !!successAction?.description
-                    return hasText ? successAction?.url : undefined
-                  })()}
-                />
-              </View>
-            )}
+            (settlementVia as SettlementViaLnWithSuccessAction)?.successAction &&
+            (() => {
+              const successAction = (settlementVia as SettlementViaLnWithSuccessAction)
+                .successAction
+
+              let successActionText: string | null = null
+              let successActionSubValue: string | undefined
+
+              if (successAction?.tag === "message") {
+                // For "message" tag, only display the message as primary text.
+                successActionText = successAction.message ?? null
+              } else if (successAction?.tag === "url") {
+                // For "url" tag, description (if present) is the primary text and
+                // the URL is shown as a secondary value. If there is no description,
+                // fall back to showing only the URL as the primary text.
+                if (successAction.description) {
+                  successActionText = successAction.description
+                  successActionSubValue = successAction.url ?? undefined
+                } else {
+                  successActionText = successAction.url ?? null
+                }
+              }
+
+              return (
+                <View style={styles.successActionContainer}>
+                  <SuccessActionComponent
+                    visible={true}
+                    title={LL.TransactionDetailScreen.successAction()}
+                    text={successActionText}
+                    subValue={successActionSubValue}
+                  />
+                </View>
+              )
+            })()}
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentRequest && (
               <Row
