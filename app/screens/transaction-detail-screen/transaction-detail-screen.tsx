@@ -13,6 +13,7 @@ import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { WalletSummary } from "@app/components/wallet-summary"
 import {
   SettlementVia,
+  SettlementViaLn,
   TransactionFragment,
   TransactionFragmentDoc,
   useTransactionListForDefaultAccountLazyQuery,
@@ -83,9 +84,8 @@ type SuccessAction = {
 }
 
 // Extended type for SettlementViaLn with optional successAction
-type SettlementViaLnWithSuccessAction = {
-  __typename: "SettlementViaLn"
-  preImage?: string | null
+// Extends the generated type to include all fields plus successAction
+type SettlementViaLnWithSuccessAction = SettlementViaLn & {
   successAction?: SuccessAction | null
 }
 
