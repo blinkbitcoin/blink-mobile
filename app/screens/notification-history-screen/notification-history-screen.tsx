@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 import { gql, useApolloClient } from "@apollo/client"
 import { Screen } from "@app/components/screen"
 import {
@@ -16,6 +16,16 @@ import { FlatList, RefreshControl } from "react-native-gesture-handler"
 import { Notification } from "./notification"
 
 gql`
+  mutation StatefulNotificationAcknowledge(
+    $input: StatefulNotificationAcknowledgeInput!
+  ) {
+    statefulNotificationAcknowledge(input: $input) {
+      notification {
+        acknowledgedAt
+      }
+    }
+  }
+
   query StatefulNotifications($after: String) {
     me {
       statefulNotificationsWithoutBulletinEnabled(first: 20, after: $after) {
@@ -56,6 +66,7 @@ export const NotificationHistoryScreen = () => {
   const client = useApolloClient()
   const acknowledgedIdsRef = useRef(new Set<string>())
   const inFlightIdsRef = useRef(new Set<string>())
+  const lastUnackIdsKeyRef = useRef("")
 
   const { LL } = useI18nContext()
 
@@ -65,8 +76,19 @@ export const NotificationHistoryScreen = () => {
   const [acknowledgeNotification] = useStatefulNotificationAcknowledgeMutation()
   const notifications = data?.me?.statefulNotificationsWithoutBulletinEnabled
 
+  const unackIdsKey = useMemo(() => {
+    const nodes = notifications?.nodes
+    if (!nodes?.length) return ""
+    return nodes
+      .filter((notification) => !notification.acknowledgedAt)
+      .map((notification) => notification.id)
+      .join("|")
+  }, [notifications?.nodes])
+
   useEffect(() => {
     if (!isFocused || !notifications?.nodes?.length) return
+    if (!unackIdsKey || unackIdsKey === lastUnackIdsKeyRef.current) return
+    lastUnackIdsKeyRef.current = unackIdsKey
 
     const unacknowledged = notifications.nodes.filter(
       (notification) =>
@@ -98,7 +120,7 @@ export const NotificationHistoryScreen = () => {
         include: [UnacknowledgedNotificationCountDocument, StatefulNotificationsDocument],
       })
     })
-  }, [acknowledgeNotification, client, isFocused, notifications?.nodes])
+  }, [acknowledgeNotification, client, isFocused, notifications?.nodes, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo

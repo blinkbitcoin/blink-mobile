@@ -1,32 +1,13 @@
-import React, { useState } from "react"
-import {
-  StatefulNotification,
-  StatefulNotificationsDocument,
-  UnacknowledgedNotificationCountDocument,
-  useStatefulNotificationAcknowledgeMutation,
-} from "@app/graphql/generated"
+import React, { useEffect, useState } from "react"
+import { StatefulNotification } from "@app/graphql/generated"
 import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { View, Linking } from "react-native"
 import { timeAgo } from "./utils"
-import { gql } from "@apollo/client"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
-gql`
-  mutation StatefulNotificationAcknowledge(
-    $input: StatefulNotificationAcknowledgeInput!
-  ) {
-    statefulNotificationAcknowledge(input: $input) {
-      notification {
-        acknowledgedAt
-      }
-    }
-  }
-`
-
 export const Notification: React.FC<StatefulNotification> = ({
-  id,
   title,
   body,
   createdAt,
@@ -40,19 +21,16 @@ export const Notification: React.FC<StatefulNotification> = ({
     theme: { colors },
   } = useTheme()
 
-  const [ack, _] = useStatefulNotificationAcknowledgeMutation({
-    variables: { input: { notificationId: id } },
-    refetchQueries: [
-      StatefulNotificationsDocument,
-      UnacknowledgedNotificationCountDocument,
-    ],
-  })
+  useEffect(() => {
+    if (acknowledgedAt && !isAcknowledged) {
+      setIsAcknowledged(true)
+    }
+  }, [acknowledgedAt, isAcknowledged])
 
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         setIsAcknowledged(true)
-        !isAcknowledged && ack()
         if (action?.__typename === "OpenDeepLinkAction")
           Linking.openURL(BLINK_DEEP_LINK_PREFIX + action.deepLink)
         else if (action?.__typename === "OpenExternalLinkAction")
