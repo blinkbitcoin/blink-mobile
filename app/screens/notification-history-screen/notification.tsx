@@ -1,31 +1,13 @@
-import {
-  StatefulNotification,
-  StatefulNotificationsDocument,
-  useStatefulNotificationAcknowledgeMutation,
-} from "@app/graphql/generated"
+import React, { useEffect, useState } from "react"
+import { StatefulNotification } from "@app/graphql/generated"
 import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { View, Linking } from "react-native"
 import { timeAgo } from "./utils"
-import { gql } from "@apollo/client"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
-import { useState } from "react"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
-gql`
-  mutation StatefulNotificationAcknowledge(
-    $input: StatefulNotificationAcknowledgeInput!
-  ) {
-    statefulNotificationAcknowledge(input: $input) {
-      notification {
-        acknowledgedAt
-      }
-    }
-  }
-`
-
 export const Notification: React.FC<StatefulNotification> = ({
-  id,
   title,
   body,
   createdAt,
@@ -39,16 +21,15 @@ export const Notification: React.FC<StatefulNotification> = ({
     theme: { colors },
   } = useTheme()
 
-  const [ack, _] = useStatefulNotificationAcknowledgeMutation({
-    variables: { input: { notificationId: id } },
-    refetchQueries: [StatefulNotificationsDocument],
-  })
+  useEffect(() => {
+    if (acknowledgedAt && !isAcknowledged) {
+      setIsAcknowledged(true)
+    }
+  }, [acknowledgedAt, isAcknowledged])
 
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        setIsAcknowledged(true)
-        !isAcknowledged && ack()
         if (action?.__typename === "OpenDeepLinkAction")
           Linking.openURL(BLINK_DEEP_LINK_PREFIX + action.deepLink)
         else if (action?.__typename === "OpenExternalLinkAction")
@@ -59,14 +40,14 @@ export const Notification: React.FC<StatefulNotification> = ({
         {icon ? (
           <GaloyIcon
             name={icon?.toLowerCase().replace("_", "-") as IconNamesType}
-            color={isAcknowledged ? colors.grey3 : colors.black}
+            color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
         ) : (
           <Icon
             type="ionicon"
             name="notifications-outline"
-            color={isAcknowledged ? colors.grey3 : colors.black}
+            color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
         )}
@@ -98,7 +79,7 @@ const useStyles = makeStyles(
       alignItems: "center",
     },
     text: {
-      color: isAcknowledged ? colors.grey3 : colors.black,
+      color: isAcknowledged ? colors.grey2 : colors.black,
     },
   }),
 )
