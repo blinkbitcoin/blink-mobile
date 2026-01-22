@@ -180,11 +180,12 @@ const TransactionItem: React.FC<Props> = ({
           <ListItem.Title
             numberOfLines={1}
             ellipsizeMode="tail"
+            style={styles.title}
             {...testProps("tx-description")}
           >
             {description}
           </ListItem.Title>
-          <ListItem.Subtitle>
+          <ListItem.Subtitle style={styles.subtitle}>
             {subtitle ? (
               <TransactionDate
                 createdAt={tx.createdAt}
@@ -221,7 +222,6 @@ type UseStyleProps = {
 
 const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
   container: {
-    height: 60,
     paddingVertical: 9,
     borderColor: colors.grey4,
     overflow: "hidden",
@@ -248,5 +248,15 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     color: colors.grey0,
     textAlign: "right",
     flexWrap: "wrap",
+  },
+  title: {
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: "400",
+  },
+  subtitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "400",
   },
 }))
