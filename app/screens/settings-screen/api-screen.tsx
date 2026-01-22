@@ -1,9 +1,12 @@
 import * as React from "react"
-import { View, Linking } from "react-native"
-import { makeStyles, Text, useTheme, Divider, ListItem } from "@rn-vui/themed"
-import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
-import { Screen } from "../../components/screen"
+import { Linking, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { ListItem, makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { Screen } from "@app/components/screen"
+
+import { SettingsGroup } from "./group"
 
 type ApiItem = {
   id: string
@@ -45,65 +48,42 @@ export const ApiScreen: React.FC = () => {
     Linking.openURL(item.link)
   }
 
-  return (
-    <Screen>
-      <View style={styles.container}>
-        <View style={styles.settingsBody}>
-          {apiItems.map((item, index) => {
-            const isLast = index === apiItems.length - 1
-            return (
-              <React.Fragment key={item.id}>
-                <ListItem
-                  containerStyle={styles.listItemContainer}
-                  onPress={() => handleItemPress(item)}
-                >
-                  <View style={styles.iconContainer}>
-                    <GaloyIcon name={item.leftIcon} size={24} color={colors.grey0} />
-                  </View>
-                  <ListItem.Content>
-                    <ListItem.Title style={styles.itemTitle}>
-                      <View style={styles.listContent}>
-                        <Text type="p2">{item.title}</Text>
-                        {item.infoIcon && (
-                          <GaloyIcon
-                            name={item.infoIcon}
-                            size={18}
-                            color={colors.black}
-                          />
-                        )}
-                      </View>
-                    </ListItem.Title>
-                  </ListItem.Content>
-                  <GaloyIcon name={item.rightIcon} size={24} color={colors.warning} />
-                </ListItem>
-                {!isLast && <Divider color={colors.grey4} />}
-              </React.Fragment>
-            )
-          })}
-        </View>
+  const apiSettings = apiItems.map((item) => () => (
+    <ListItem
+      containerStyle={styles.listItemContainer}
+      onPress={() => handleItemPress(item)}
+    >
+      <View style={styles.iconContainer}>
+        <GaloyIcon name={item.leftIcon} size={24} color={colors.grey0} />
       </View>
+      <ListItem.Content>
+        <ListItem.Title style={styles.itemTitle}>
+          <View style={styles.listContent}>
+            <Text type="p2">{item.title}</Text>
+            {item.infoIcon && (
+              <GaloyIcon name={item.infoIcon} size={18} color={colors.black} />
+            )}
+          </View>
+        </ListItem.Title>
+      </ListItem.Content>
+      <GaloyIcon name={item.rightIcon} size={24} color={colors.warning} />
+    </ListItem>
+  ))
+
+  return (
+    <Screen style={styles.container} preset="scroll">
+      <SettingsGroup items={apiSettings} />
     </Screen>
   )
 }
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  preferencesText: {
-    marginBottom: 12,
-  },
-  settingsBody: {
-    backgroundColor: theme.colors.grey5,
-    borderRadius: 12,
-    overflow: "hidden",
+    paddingHorizontal: 12,
+    paddingVertical: 20,
   },
   listItemContainer: {
-    backgroundColor: theme.colors.grey5,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    backgroundColor: theme.colors.transparent,
   },
   iconContainer: {
     marginRight: 12,
