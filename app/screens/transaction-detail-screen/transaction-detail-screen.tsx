@@ -29,14 +29,13 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { utils } from "lnurl-pay"
 
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"
-import { SuccessActionComponent } from "../../components/success-action"
-import { SuccessActionTag } from "../../components/success-action/success-action"
+import { SuccessActionComponent, SuccessActionTag } from "../../components/success-action"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
-import { utils } from "lnurl-pay"
 
 const Row = ({
   entry,
@@ -523,21 +522,27 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               } else if (successAction?.tag === SuccessActionTag.AES && settlementVia?.preImage) {
                 // For "aes" tag, decrypt the ciphertext using preImage per LUD-09 spec.
                 // Uses the same approach as send-bitcoin-completed-screen.tsx
-                try {
-                  const decryptedMessage = utils.decipherAES({
-                    successAction: successAction as Parameters<typeof utils.decipherAES>[0]["successAction"],
-                    preimage: settlementVia.preImage,
-                  })
-                  successActionText = decryptedMessage
-                  // Include description as subValue if present
-                  if (successAction.description) {
-                    successActionSubValue = successAction.description
-                  }
-                } catch (error) {
+                if (!successAction.ciphertext || !successAction.iv) {
                   console.warn(
-                    "[TransactionDetailScreen] Failed to decrypt AES successAction:",
-                    error,
+                    "[TransactionDetailScreen] AES successAction missing required ciphertext or iv fields",
                   )
+                } else {
+                  try {
+                    const decryptedMessage = utils.decipherAES({
+                      successAction: successAction as Parameters<typeof utils.decipherAES>[0]["successAction"],
+                      preimage: settlementVia.preImage,
+                    })
+                    successActionText = decryptedMessage
+                    // Include description as subValue if present
+                    if (successAction.description) {
+                      successActionSubValue = successAction.description
+                    }
+                  } catch (error) {
+                    console.warn(
+                      "[TransactionDetailScreen] Failed to decrypt AES successAction:",
+                      error,
+                    )
+                  }
                 }
               } else if (successAction) {
                 // Log unexpected successAction tags to aid debugging.
