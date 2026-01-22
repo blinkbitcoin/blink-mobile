@@ -2,10 +2,15 @@ process.env.TZ = "UTC"
 
 import React from "react"
 import { InteractionManager } from "react-native"
-import { MockedResponse } from "@apollo/client/testing"
-import { RouteProp } from "@react-navigation/native"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
+import { NavigationContainer, RouteProp } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { ThemeProvider } from "@rn-vui/themed"
 import { cleanup, render, waitFor } from "@testing-library/react-native"
 
+import mocks from "@app/graphql/mocks"
+import TypesafeI18n from "@app/i18n/i18n-react"
+import theme from "@app/rne-theme/theme"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
 import {
@@ -13,11 +18,15 @@ import {
   TxLastSeenDocument,
 } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { detectDefaultLocale } from "@app/utils/locale-detector"
+import { createCache } from "@app/graphql/cache"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 
-import { ContextForScreen } from "./helper"
+import { StoryScreen } from "../../.storybook/views"
 
 let currentMocks: MockedResponse[] = []
 const DEFAULT_ACCOUNT_ID = "account-id"
+const Stack = createStackNavigator()
 
 jest.spyOn(InteractionManager, "runAfterInteractions").mockImplementation((callback) => {
   if (typeof callback === "function") {
@@ -27,45 +36,6 @@ jest.spyOn(InteractionManager, "runAfterInteractions").mockImplementation((callb
   return {
     cancel: () => {},
   } as ReturnType<typeof InteractionManager.runAfterInteractions>
-})
-
-jest.mock("../../app/graphql/cache", () => {
-  const actual = jest.requireActual("../../app/graphql/cache")
-
-  return {
-    __esModule: true,
-    ...actual,
-    createCache: () => {
-      const cache = actual.createCache()
-
-      cache.writeQuery({
-        query: TxLastSeenDocument,
-        variables: { accountId: DEFAULT_ACCOUNT_ID },
-        data: {
-          __typename: "Query",
-          txLastSeen: {
-            __typename: "TxLastSeen",
-            accountId: DEFAULT_ACCOUNT_ID,
-            btcId: "",
-            usdId: "",
-          },
-        },
-      })
-
-      return cache
-    },
-  }
-})
-
-jest.mock("@app/graphql/mocks", () => {
-  const actual = jest.requireActual("@app/graphql/mocks")
-
-  return {
-    __esModule: true,
-    get default() {
-      return [...currentMocks, ...actual.default]
-    },
-  }
 })
 
 const BTC_WALLET_ID = "e821e124-1c70-4aab-9416-074ee5be21f6"
@@ -221,6 +191,48 @@ const makeEdge = (id: string, createdAt: number) => ({
   },
 })
 
+const createTestCache = () => {
+  const cache = createCache()
+
+  cache.writeQuery({
+    query: TxLastSeenDocument,
+    variables: { accountId: DEFAULT_ACCOUNT_ID },
+    data: {
+      __typename: "Query",
+      txLastSeen: {
+        __typename: "TxLastSeen",
+        accountId: DEFAULT_ACCOUNT_ID,
+        btcId: "",
+        usdId: "",
+      },
+    },
+  })
+
+  return cache
+}
+
+const ContextForHistory: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <ThemeProvider theme={theme}>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home">
+          {() => (
+            <MockedProvider mocks={currentMocks} cache={createTestCache()}>
+              <StoryScreen>
+                <TypesafeI18n locale={detectDefaultLocale()}>
+                  <IsAuthedContextProvider value={true}>
+                    {children}
+                  </IsAuthedContextProvider>
+                </TypesafeI18n>
+              </StoryScreen>
+            </MockedProvider>
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
+  </ThemeProvider>
+)
+
 describe("TransactionHistoryScreen date formatting", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -251,12 +263,12 @@ describe("TransactionHistoryScreen date formatting", () => {
       makeEdge("tx-older-5", Math.floor(Date.parse("2025-11-15T12:00:00Z") / 1000)),
     ]
 
-    currentMocks = buildTransactionMocks(edges)
+    currentMocks = [...buildTransactionMocks(edges), ...mocks]
 
     const screen = render(
-      <ContextForScreen>
+      <ContextForHistory>
         <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
-      </ContextForScreen>,
+      </ContextForHistory>,
     )
 
     await waitFor(() => {
