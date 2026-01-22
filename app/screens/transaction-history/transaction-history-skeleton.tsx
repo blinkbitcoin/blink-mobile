@@ -1,15 +1,16 @@
 import * as React from "react"
-import { View } from "react-native"
+import { View, useWindowDimensions } from "react-native"
 import ContentLoader, { Rect } from "react-content-loader/native"
 import { makeStyles } from "@rn-vui/themed"
 
 const TransactionHistorySkeleton = () => {
   const styles = useStyles()
+  const { height } = useWindowDimensions()
 
   return (
     <View style={styles.container}>
       <ContentLoader
-        height={640}
+        height={height}
         width="100%"
         speed={1.2}
         backgroundColor={styles.background.color}
