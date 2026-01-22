@@ -388,13 +388,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 const useStyles = makeStyles(({ colors }) => ({
   loadingContainer: { justifyContent: "center", alignItems: "center", flex: 1 },
   skeletonWrapper: { flex: 1, alignSelf: "stretch" },
-  skeletonContainer: { alignSelf: "stretch" },
-  loaderBackground: {
-    color: colors.loaderBackground,
-  },
-  loaderForefound: {
-    color: colors.loaderForeground,
-  },
   noTransactionText: {
     fontSize: 24,
   },

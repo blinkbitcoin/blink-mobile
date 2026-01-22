@@ -266,15 +266,17 @@ export const HomeScreen: React.FC = () => {
       hasUnseenUsdTx,
     })
 
+  const handleOutgoingBadgeHide = React.useCallback(() => {
+    if (latestUnseenTx?.settlementCurrency) {
+      markTxSeen(latestUnseenTx.settlementCurrency)
+    }
+  }, [latestUnseenTx?.settlementCurrency, markTxSeen])
+
   const showOutgoingBadge = useOutgoingBadgeVisibility({
     txId: latestUnseenTx?.id,
     amountText: unseenAmountText,
     isOutgoing,
-    onHide: () => {
-      if (latestUnseenTx?.settlementCurrency) {
-        markTxSeen(latestUnseenTx.settlementCurrency)
-      }
-    },
+    onHide: handleOutgoingBadgeHide,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)

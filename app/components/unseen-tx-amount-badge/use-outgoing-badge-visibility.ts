@@ -21,18 +21,21 @@ export const useOutgoingBadgeVisibility = ({
       return
     }
 
+    let hideTimeout: ReturnType<typeof setTimeout> | undefined
+
     const showTimeout = setTimeout(() => {
       setVisible(true)
+      hideTimeout = setTimeout(() => {
+        setVisible(false)
+        onHide?.()
+      }, ttlMs)
     }, 50)
-
-    const hideTimeout = setTimeout(() => {
-      setVisible(false)
-      onHide?.()
-    }, ttlMs + 50)
 
     return () => {
       clearTimeout(showTimeout)
-      clearTimeout(hideTimeout)
+      if (hideTimeout !== undefined) {
+        clearTimeout(hideTimeout)
+      }
     }
   }, [txId, isOutgoing, amountText, ttlMs, onHide])
 
