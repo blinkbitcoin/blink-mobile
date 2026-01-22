@@ -116,14 +116,15 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
   },
   spacing: {
     paddingHorizontal: 8,
-    paddingRight: 12,
+    paddingRight: 0,
   },
   center: {
     justifyContent: "space-around",
   },
   rightActionTouchArea: {
-    padding: 12,
-    marginRight: -12,
+    paddingVertical: 17,
+    paddingLeft: 14,
+    paddingRight: 10,
     position: "relative",
   },
   sidetoside: {
