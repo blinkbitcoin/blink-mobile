@@ -152,7 +152,6 @@ const WalletOverview: React.FC<Props> = ({
             <View style={styles.bubbleWrapper} pointerEvents="box-none">
               <View style={pressedBtc && styles.pressedOpacity}>
                 <CurrencyPill
-                  label={LL.common.bitcoin()}
                   currency={WalletCurrency.Btc}
                   containerSize="medium"
                   containerStyle={pillWidthStyle}
@@ -191,7 +190,6 @@ const WalletOverview: React.FC<Props> = ({
             <View style={styles.bubbleWrapper} pointerEvents="box-none">
               <View style={pressedUsd && styles.pressedOpacity}>
                 <CurrencyPill
-                  label={LL.common.dollar()}
                   currency={WalletCurrency.Usd}
                   containerSize="medium"
                   containerStyle={pillWidthStyle}

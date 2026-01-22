@@ -1,6 +1,12 @@
-import { gql } from "@apollo/client"
+import React, { useEffect, useMemo, useRef } from "react"
+import { gql, useApolloClient } from "@apollo/client"
 import { Screen } from "@app/components/screen"
-import { useStatefulNotificationsQuery } from "@app/graphql/generated"
+import {
+  StatefulNotificationsDocument,
+  UnacknowledgedNotificationCountDocument,
+  useStatefulNotificationAcknowledgeMutation,
+  useStatefulNotificationsQuery,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -10,6 +16,16 @@ import { FlatList, RefreshControl } from "react-native-gesture-handler"
 import { Notification } from "./notification"
 
 gql`
+  mutation StatefulNotificationAcknowledge(
+    $input: StatefulNotificationAcknowledgeInput!
+  ) {
+    statefulNotificationAcknowledge(input: $input) {
+      notification {
+        acknowledgedAt
+      }
+    }
+  }
+
   query StatefulNotifications($after: String) {
     me {
       statefulNotificationsWithoutBulletinEnabled(first: 20, after: $after) {
@@ -47,13 +63,69 @@ export const NotificationHistoryScreen = () => {
     theme: { colors },
   } = useTheme()
   const isFocused = useIsFocused()
+  const client = useApolloClient()
+  const acknowledgedIdsRef = useRef(new Set<string>())
+  const inFlightIdsRef = useRef(new Set<string>())
+  const lastUnackIdsKeyRef = useRef("")
 
   const { LL } = useI18nContext()
 
   const { data, fetchMore, refetch, loading } = useStatefulNotificationsQuery({
     skip: !useIsAuthed(),
   })
+  const [acknowledgeNotification] = useStatefulNotificationAcknowledgeMutation()
   const notifications = data?.me?.statefulNotificationsWithoutBulletinEnabled
+
+  const unackIdsKey = useMemo(() => {
+    const nodes = notifications?.nodes
+    if (!nodes?.length) return ""
+    return nodes
+      .filter((notification) => !notification.acknowledgedAt)
+      .map((notification) => notification.id)
+      .join("|")
+  }, [notifications?.nodes])
+
+  useEffect(() => {
+    if (!isFocused || !notifications?.nodes?.length) return
+    if (!unackIdsKey || unackIdsKey === lastUnackIdsKeyRef.current) return
+    lastUnackIdsKeyRef.current = unackIdsKey
+
+    const unacknowledged = notifications.nodes.filter(
+      (notification) =>
+        !notification.acknowledgedAt &&
+        !acknowledgedIdsRef.current.has(notification.id) &&
+        !inFlightIdsRef.current.has(notification.id),
+    )
+
+    if (unacknowledged.length === 0) return
+
+    unacknowledged.forEach((notification) => {
+      inFlightIdsRef.current.add(notification.id)
+    })
+
+    Promise.all(
+      unacknowledged.map((notification) =>
+        acknowledgeNotification({
+          variables: { input: { notificationId: notification.id } },
+        })
+          .then(() => {
+            acknowledgedIdsRef.current.add(notification.id)
+          })
+          .finally(() => {
+            inFlightIdsRef.current.delete(notification.id)
+          }),
+      ),
+    )
+      .then(() => {
+        client.refetchQueries({
+          include: [
+            UnacknowledgedNotificationCountDocument,
+            StatefulNotificationsDocument,
+          ],
+        })
+      })
+      .catch(console.error)
+  }, [acknowledgeNotification, client, isFocused, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo

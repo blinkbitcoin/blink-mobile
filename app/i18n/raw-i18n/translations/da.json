@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Tillad folk at modtage betalinger via kasseapparat-linket uden at få adgang til din wallet.\n\nDe kan oprette fakturaer, og betalinger vil blive sendt direkte til din {bankName: string} wallet."
     },
     "SetAccountModal": {
-        "title": "Vælg primær konto",
-        "description": "Din primær konto vil som udgangspunkt blive valgt til at sende og modtage betalinger. Denne kan ændres når som helst.",
-        "stablesatsTag": "Vælg denne for at sikre en stabil USD værdi.",
-        "bitcoinTag": "Vælg denne for at være på en Bitcoin standard."
+        "title": "Sæt din modtagekonto op",
+        "description": "Du kan altid ændre det senere i Indstillinger",
+        "stablesatsTag": "Stablesats-konto for prisstabilitet",
+        "bitcoinTag": "Bitcoin-konto for maksimalister"
     },
     "NoteInput": {
         "addNote": "Tilføj note"

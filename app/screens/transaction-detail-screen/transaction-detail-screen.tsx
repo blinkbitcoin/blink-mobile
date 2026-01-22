@@ -53,9 +53,6 @@ const Row = ({
         <Text style={styles.entry} selectable={false}>
           {entry}
         </Text>
-        {icons.map((icon, index) => (
-          <React.Fragment key={index}>{icon}</React.Fragment>
-        ))}
       </View>
       {content ? (
         content
@@ -64,6 +61,13 @@ const Row = ({
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
+          {icons.length > 0 && (
+            <View style={styles.valueIcons}>
+              {icons.map((icon, index) => (
+                <React.Fragment key={index}>{icon}</React.Fragment>
+              ))}
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -590,10 +594,14 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 8,
   },
   value: {
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
     fontSize: 14,
     fontWeight: "bold",
+  },
+  valueIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 12,
   },
   txNotBroadcast: {
     marginBottom: 16,
@@ -601,7 +609,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   icon: {
     marginBottom: 2,
-    marginHorizontal: 12,
+    marginHorizontal: 6,
   },
 
   container: {

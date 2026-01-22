@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Laat mensen betalingen incasseren via de Kassa-link, zonder toegang tot uw portemonnee.\n\nZe kunnen facturen maken en betalingen worden rechtstreeks naar uw {bankName: string} Wallet gestuurd."
     },
     "SetAccountModal": {
-        "title": "Standaardaccount instellen",
-        "description": "Dit account wordt in eerste instantie geselecteerd voor het verzenden en ontvangen van betalingen. Het kan op elk moment worden gewijzigd.",
-        "stablesatsTag": "Kies dit om een ​​stabiele USD-waarde te behouden.",
-        "bitcoinTag": "Kies dit voor een Bitcoin-standaard."
+        "title": "Stel je ontvangstrekening in",
+        "description": "Je kunt dit later altijd wijzigen in Instellingen",
+        "stablesatsTag": "Stablesats-rekening voor prijsstabiliteit",
+        "bitcoinTag": "Bitcoin-rekening voor maximalisten"
     },
     "NoteInput": {
         "addNote": "Notitie toevoegen"

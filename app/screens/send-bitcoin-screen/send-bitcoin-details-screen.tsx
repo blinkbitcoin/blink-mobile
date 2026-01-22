@@ -319,11 +319,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                   <CurrencyPill
                     currency={wallet.walletCurrency}
                     containerSize="medium"
-                    label={
-                      wallet.walletCurrency === WalletCurrency.Usd
-                        ? LL.common.dollar()
-                        : LL.common.bitcoin()
-                    }
                     containerStyle={pillWidthStyle}
                     onLayout={onPillLayout(wallet.walletCurrency)}
                   />
@@ -510,11 +505,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                 <CurrencyPill
                   currency={sendingWalletDescriptor.currency}
                   containerSize="medium"
-                  label={
-                    sendingWalletDescriptor.currency === WalletCurrency.Usd
-                      ? LL.common.dollar()
-                      : LL.common.bitcoin()
-                  }
                   containerStyle={pillWidthStyle}
                   onLayout={onPillLayout(sendingWalletDescriptor.currency)}
                 />

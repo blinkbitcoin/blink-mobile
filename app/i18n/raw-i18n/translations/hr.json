@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Omogućite ljudima da prikupljaju uplate putem poveznice na blagajnu, bez pristupa vašem novčaniku.\n\nOni mogu izraditi fakture i uplate će se slati izravno u vaš novčanik {bankName: string}."
     },
     "SetAccountModal": {
-        "title": "Postavi zadani račun",
-        "description": "Ovaj će račun biti inicijalno odabran za slanje i primanje plaćanja. Može se promijeniti u bilo kojem trenutku.",
-        "stablesatsTag": "Odaberi ovo za održavanje stabilne vrijednosti USD.",
-        "bitcoinTag": "Odaberi ovo da budeš na Bitcoin standardu."
+        "title": "Postavite svoj račun za primanje",
+        "description": "Uvijek to možete kasnije promijeniti u Postavkama",
+        "stablesatsTag": "Stablesats račun za stabilnost cijene",
+        "bitcoinTag": "Bitcoin račun za maksimaliste"
     },
     "NoteInput": {
         "addNote": "Dodaj bilješku"
