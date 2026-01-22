@@ -1,5 +1,4 @@
 import * as React from "react"
-import { View } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -13,11 +12,12 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Divider, ListItem, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
+import { SettingsGroup } from "./group"
 
 gql`
   query notificationSettings {
@@ -132,9 +132,6 @@ type NotificationCategoryType =
 export const NotificationSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
 
   const isAuthed = useIsAuthed()
   const { data } = useNotificationSettingsQuery({
@@ -201,47 +198,36 @@ export const NotificationSettingsScreen: React.FC = () => {
 
   const categoriesArray = Object.values(NotificationCategories)
 
-  const pushNotificationSettings = categoriesArray.map((category, index) => {
-    const isLast = index === categoriesArray.length - 1
-
-    return (
-      <React.Fragment key={category}>
-        <ListItem containerStyle={styles.listItemContainer}>
-          <GaloyIcon name={CategoryIcons[category]} size={24} />
-          <ListItem.Content>
-            <ListItem.Title>
-              <Text type="p2">
-                {LL.NotificationSettingsScreen.notificationCategories[category].title()}
-              </Text>
-            </ListItem.Title>
-          </ListItem.Content>
-          <Switch
-            value={pushNotificationCategoryEnabled(category)}
-            onValueChange={(value) =>
-              toggleCategory(category, value, NotificationChannel.Push)
-            }
-          />
-        </ListItem>
-        {!isLast && <Divider color={colors.grey4} />}
-      </React.Fragment>
-    )
-  })
+  const pushNotificationSettings = categoriesArray.map((category) => () => (
+    <ListItem containerStyle={styles.listItemContainer}>
+      <GaloyIcon name={CategoryIcons[category]} size={24} />
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text type="p2">
+            {LL.NotificationSettingsScreen.notificationCategories[category].title()}
+          </Text>
+        </ListItem.Title>
+      </ListItem.Content>
+      <Switch
+        value={pushNotificationCategoryEnabled(category)}
+        onValueChange={(value) =>
+          toggleCategory(category, value, NotificationChannel.Push)
+        }
+      />
+    </ListItem>
+  ))
 
   return (
     <Screen style={styles.container} preset="scroll">
-      <View style={styles.settingsBody}>{pushNotificationSettings}</View>
+      <SettingsGroup items={pushNotificationSettings} />
     </Screen>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    padding: 20,
-  },
-  settingsBody: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    paddingHorizontal: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 20,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,

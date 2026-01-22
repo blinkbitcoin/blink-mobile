@@ -44,6 +44,6 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
   },
   divider: {
-    marginHorizontal: 10,
+    marginHorizontal: 14,
   },
 }))
