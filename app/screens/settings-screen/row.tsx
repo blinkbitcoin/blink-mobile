@@ -138,7 +138,7 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
   internalContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    paddingRight: 16,
+    paddingRight: 18,
     minWidth: 0,
   },
   title: {
