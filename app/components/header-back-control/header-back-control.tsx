@@ -21,15 +21,17 @@ type HeaderBackControlParams = {
   canGoBack?: boolean
 }
 
+const HeaderBackButtonWithTheme: React.FC<
+  React.ComponentProps<typeof HeaderBackButton>
+> = (props) => {
+  const {
+    theme: { colors },
+  } = useTheme()
+  return <HeaderBackButton {...props} pressColor={colors.grey5} pressOpacity={1} />
+}
+
 export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) =>
-  canGoBack
-    ? (props: React.ComponentProps<typeof HeaderBackButton>) => {
-        const {
-          theme: { colors },
-        } = useTheme()
-        return <HeaderBackButton {...props} pressColor={colors.grey5} pressOpacity={1} />
-      }
-    : () => <InvisibleBackButton />
+  canGoBack ? HeaderBackButtonWithTheme : InvisibleBackButton
 
 const useStyles = makeStyles(() => ({
   container: {
