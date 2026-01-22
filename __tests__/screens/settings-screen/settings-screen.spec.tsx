@@ -62,6 +62,7 @@ const baseNotificationNodes: Array<{
 type TestState = {
   notificationCount: number
   notificationNodes: typeof baseNotificationNodes
+  phone: string | null
   setActiveScreen: ((screen: string) => void) | null
   triggerRender: React.Dispatch<React.SetStateAction<number>> | null
   headerRight: (() => React.ReactNode) | null
@@ -77,6 +78,7 @@ const buildNotificationNodes = (unreadCount: number) =>
 const createTestState = (): TestState => ({
   notificationCount: 3,
   notificationNodes: buildNotificationNodes(3),
+  phone: "+50365055539",
   setActiveScreen: null,
   triggerRender: null,
   headerRight: null,
@@ -141,7 +143,7 @@ jest.mock("@app/graphql/generated", () => {
           username: "test1",
           language: "en",
           totpEnabled: false,
-          phone: "+50365055539",
+          phone: testState.phone,
           email: {
             address: "test@example.com",
             verified: true,
@@ -419,5 +421,46 @@ describe("Settings Screen", () => {
 
     const elements = screen.getAllByText("test1@blink.sv")
     expect(elements.length).toBeGreaterThan(0)
+  })
+
+  it("shows phone ln address when phone is verified", async () => {
+    const phone = "+50365055539"
+    const lnAddress = `${phone}@blink.sv`
+    testState.phone = phone
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText(lnAddress)).toBeTruthy()
+  })
+
+  it("hides phone ln address when phone is missing", async () => {
+    testState.phone = null
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText("Set your lightning address")).toBeNull()
+    expect(screen.queryByText("+50365055539@blink.sv")).toBeNull()
   })
 })

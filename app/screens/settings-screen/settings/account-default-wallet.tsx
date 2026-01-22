@@ -18,9 +18,7 @@ export const DefaultWallet: React.FC = () => {
   const btcWalletId = btcWallet?.id
   const defaultWalletId = data?.me?.defaultAccount?.defaultWalletId
   const defaultWalletCurrency =
-    defaultWalletId === btcWalletId
-      ? LL.common.bitcoin()
-      : LL.common.dollar()
+    defaultWalletId === btcWalletId ? LL.common.bitcoin() : LL.common.dollar()
 
   return (
     <SettingsRow

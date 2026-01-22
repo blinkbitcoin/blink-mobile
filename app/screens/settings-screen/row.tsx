@@ -79,12 +79,7 @@ export const SettingsRow: React.FC<Props> = ({
             ))}
           <View>
             <View style={styles.sidetoside}>
-              <Text
-                type="p2"
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={styles.title}
-              >
+              <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
                 {title}
               </Text>
               <Text>{extraComponentBesideTitle}</Text>
