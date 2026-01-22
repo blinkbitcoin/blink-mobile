@@ -11,7 +11,7 @@ import { toastShow } from "@app/utils/toast"
 
 import { SettingsRow } from "../row"
 
-export const PhoneNAddress: React.FC = () => {
+export const PhoneLnAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
   const {
     theme: { colors },
@@ -32,7 +32,6 @@ export const PhoneNAddress: React.FC = () => {
     <SettingsRow
       loading={loading}
       title={lnAddress}
-      subtitleShorter={(data?.me?.username || "").length > 22}
       leftIcon="call-outline"
       rightIcon={<GaloyIcon name="copy-paste" size={24} color={colors.primary} />}
       action={() => {
