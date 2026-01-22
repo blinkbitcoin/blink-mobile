@@ -386,7 +386,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  loadingContainer: { justifyContent: "center", alignItems: "center", flex: 1 },
   skeletonWrapper: { flex: 1, alignSelf: "stretch" },
   noTransactionText: {
     fontSize: 24,
