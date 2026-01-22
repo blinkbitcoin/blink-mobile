@@ -49,6 +49,7 @@ export const SettingsRow: React.FC<Props> = ({
     )
 
   const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
+  const hasLeftIcon = Boolean(leftGaloyIcon || leftIcon)
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
@@ -70,11 +71,12 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          {leftGaloyIcon ? (
-            <GaloyIcon name={leftGaloyIcon} size={24} />
-          ) : (
-            <Icon name={leftIcon ?? ""} type="ionicon" />
-          )}
+          {hasLeftIcon &&
+            (leftGaloyIcon ? (
+              <GaloyIcon name={leftGaloyIcon} size={24} />
+            ) : (
+              <Icon name={leftIcon ?? ""} type="ionicon" />
+            ))}
           <View>
             <View style={styles.sidetoside}>
               <Text type="p2">{title}</Text>
