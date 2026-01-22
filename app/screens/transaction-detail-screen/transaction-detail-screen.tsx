@@ -107,6 +107,87 @@ const typeDisplay = (instance?: SettlementVia | DeepPartialObject<SettlementVia>
   }
 }
 
+// Helper component for rendering successAction from LN payments
+// Extracted from IIFE for better readability and testability
+const SuccessActionSection = ({
+  successAction,
+  preImage,
+  title,
+}: {
+  successAction: SuccessAction | null | undefined
+  preImage: string | null | undefined
+  title: string
+}) => {
+  const styles = useStyles()
+
+  if (!successAction) {
+    return null
+  }
+
+  let successActionText: string | null = null
+  let successActionSubValue: string | undefined
+
+  if (successAction.tag === SuccessActionTag.MESSAGE) {
+    // For "message" tag, only display the message as primary text.
+    successActionText = successAction.message ?? null
+  } else if (successAction.tag === SuccessActionTag.URL) {
+    // For "url" tag, description (if present) is the primary text and
+    // the URL is shown as a secondary value. If there is no description,
+    // fall back to showing only the URL as the primary text.
+    if (successAction.description) {
+      successActionText = successAction.description
+      successActionSubValue = successAction.url ?? undefined
+    } else {
+      successActionText = successAction.url ?? null
+    }
+  } else if (successAction.tag === SuccessActionTag.AES && preImage) {
+    // For "aes" tag, decrypt the ciphertext using preImage per LUD-09 spec.
+    // Uses the same approach as send-bitcoin-completed-screen.tsx
+    if (!successAction.ciphertext || !successAction.iv) {
+      console.warn(
+        "[TransactionDetailScreen] AES successAction missing required ciphertext or iv fields",
+      )
+    } else {
+      try {
+        const decryptedMessage = utils.decipherAES({
+          successAction: successAction as Parameters<
+            typeof utils.decipherAES
+          >[0]["successAction"],
+          preimage: preImage,
+        })
+        successActionText = decryptedMessage
+        // Include description as subValue if present
+        if (successAction.description) {
+          successActionSubValue = successAction.description
+        }
+      } catch (error) {
+        console.warn(
+          "[TransactionDetailScreen] Failed to decrypt AES successAction:",
+          error,
+        )
+      }
+    }
+  } else {
+    // Log unexpected successAction tags to aid debugging.
+    console.warn(
+      "[TransactionDetailScreen] Unhandled successAction tag encountered:",
+      successAction.tag,
+      successAction,
+    )
+  }
+
+  return (
+    <View style={styles.successActionContainer}>
+      <SuccessActionComponent
+        visible={true}
+        title={title}
+        text={successActionText}
+        subValue={successActionSubValue}
+      />
+    </View>
+  )
+}
+
 type Props = {
   route: RouteProp<RootStackParamList, "transactionDetail">
 }
@@ -497,73 +578,15 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               />
             )}
           {settlementVia?.__typename === "SettlementViaLn" &&
-            "successAction" in settlementVia &&
-            (settlementVia as SettlementViaLnWithSuccessAction)?.successAction &&
-            (() => {
-              const successAction = (settlementVia as SettlementViaLnWithSuccessAction)
-                .successAction
-
-              let successActionText: string | null = null
-              let successActionSubValue: string | undefined
-
-              if (successAction?.tag === SuccessActionTag.MESSAGE) {
-                // For "message" tag, only display the message as primary text.
-                successActionText = successAction.message ?? null
-              } else if (successAction?.tag === SuccessActionTag.URL) {
-                // For "url" tag, description (if present) is the primary text and
-                // the URL is shown as a secondary value. If there is no description,
-                // fall back to showing only the URL as the primary text.
-                if (successAction.description) {
-                  successActionText = successAction.description
-                  successActionSubValue = successAction.url ?? undefined
-                } else {
-                  successActionText = successAction.url ?? null
+            "successAction" in settlementVia && (
+              <SuccessActionSection
+                successAction={
+                  (settlementVia as SettlementViaLnWithSuccessAction).successAction
                 }
-              } else if (successAction?.tag === SuccessActionTag.AES && settlementVia?.preImage) {
-                // For "aes" tag, decrypt the ciphertext using preImage per LUD-09 spec.
-                // Uses the same approach as send-bitcoin-completed-screen.tsx
-                if (!successAction.ciphertext || !successAction.iv) {
-                  console.warn(
-                    "[TransactionDetailScreen] AES successAction missing required ciphertext or iv fields",
-                  )
-                } else {
-                  try {
-                    const decryptedMessage = utils.decipherAES({
-                      successAction: successAction as Parameters<typeof utils.decipherAES>[0]["successAction"],
-                      preimage: settlementVia.preImage,
-                    })
-                    successActionText = decryptedMessage
-                    // Include description as subValue if present
-                    if (successAction.description) {
-                      successActionSubValue = successAction.description
-                    }
-                  } catch (error) {
-                    console.warn(
-                      "[TransactionDetailScreen] Failed to decrypt AES successAction:",
-                      error,
-                    )
-                  }
-                }
-              } else if (successAction) {
-                // Log unexpected successAction tags to aid debugging.
-                console.warn(
-                  "[TransactionDetailScreen] Unhandled successAction tag encountered:",
-                  successAction.tag,
-                  successAction,
-                )
-              }
-
-              return (
-                <View style={styles.successActionContainer}>
-                  <SuccessActionComponent
-                    visible={true}
-                    title={LL.TransactionDetailScreen.successAction()}
-                    text={successActionText}
-                    subValue={successActionSubValue}
-                  />
-                </View>
-              )
-            })()}
+                preImage={settlementVia.preImage}
+                title={LL.TransactionDetailScreen.successAction()}
+              />
+            )}
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentRequest && (
               <Row
