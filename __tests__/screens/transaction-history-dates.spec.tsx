@@ -15,7 +15,6 @@ import {
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "./helper"
-import { clear } from "@app/utils/storage"
 
 let currentMocks: MockedResponse[] = []
 const DEFAULT_ACCOUNT_ID = "account-id"
@@ -261,9 +260,7 @@ describe("TransactionHistoryScreen date formatting", () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("transaction-by-index-0").length).toBeGreaterThan(
-        0,
-      )
+      expect(screen.getAllByTestId("transaction-by-index-0").length).toBeGreaterThan(0)
     })
 
     expect(await screen.findByText("5 seconds ago")).toBeTruthy()
