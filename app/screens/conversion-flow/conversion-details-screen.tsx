@@ -46,6 +46,7 @@ import {
   useConversionOverlayFocus,
   useSyncedInputValues,
 } from "./hooks"
+import { BODY_PADDING } from "@app/config"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
 
 gql`
@@ -679,7 +680,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   styleWalletContainer: {
     flexDirection: "column",
-    marginHorizontal: 20,
+    marginHorizontal: BODY_PADDING,
     marginTop: 16,
     ...(currencyInput ? { minHeight: 70 } : {}),
   },
@@ -736,7 +737,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: BODY_PADDING,
     marginVertical: 10,
     gap: 12,
   },
@@ -747,7 +748,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     paddingBottom: 32,
   },
   disabledOpacity: { opacity: 0.5 },
-  buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
+  buttonContainer: { marginHorizontal: BODY_PADDING, marginBottom: BODY_PADDING },
   errorBoxWrapper: { marginTop: 8 },
   errorBoxSpacer: { height: 44 },
 }))
