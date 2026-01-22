@@ -58,3 +58,31 @@ export const getTimeLeft = ({ after, until }: { after: number; until: number }) 
 export function formatUnixTimestampYMDHM(timestampInSeconds: number) {
   return new Date(timestampInSeconds * 1000).toISOString().slice(0, 16).replace("T", " ")
 }
+
+export const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate()
+
+export const isToday = (createdAt: number) =>
+  isSameDay(new Date(createdAt * 1000), new Date())
+
+export const isYesterday = (createdAt: number) =>
+  isSameDay(new Date(createdAt * 1000), new Date(Date.now() - 86400000))
+
+export const formatShortDate = ({
+  createdAt,
+  timezone,
+}: {
+  createdAt: number
+  timezone?: string
+}) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: timezone,
+  }
+
+  return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
+}
