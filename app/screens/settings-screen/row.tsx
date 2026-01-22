@@ -79,7 +79,14 @@ export const SettingsRow: React.FC<Props> = ({
             ))}
           <View>
             <View style={styles.sidetoside}>
-              <Text type="p2">{title}</Text>
+              <Text
+                type="p2"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={styles.title}
+              >
+                {title}
+              </Text>
               <Text>{extraComponentBesideTitle}</Text>
             </View>
             {subtitle && (
@@ -134,8 +141,12 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
     columnGap: 5,
   },
   internalContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: "flex-start",
     paddingRight: 16,
+    minWidth: 0,
+  },
+  title: {
+    flexShrink: 1,
   },
 }))
