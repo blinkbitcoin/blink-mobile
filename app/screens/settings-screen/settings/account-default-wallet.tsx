@@ -17,13 +17,15 @@ export const DefaultWallet: React.FC = () => {
 
   const btcWalletId = btcWallet?.id
   const defaultWalletId = data?.me?.defaultAccount?.defaultWalletId
-  const defaultWalletCurrency = defaultWalletId === btcWalletId ? "BTC" : "Stablesats USD"
+  const defaultWalletCurrency =
+    defaultWalletId === btcWalletId
+      ? LL.common.bitcoin()
+      : LL.common.dollar()
 
   return (
     <SettingsRow
       loading={loading}
-      title={LL.DefaultWalletScreen.title()}
-      subtitle={defaultWalletCurrency}
+      title={`${LL.DefaultWalletScreen.title()}: ${defaultWalletCurrency}`}
       leftIcon="wallet-outline"
       action={() => {
         navigate("defaultWallet")
