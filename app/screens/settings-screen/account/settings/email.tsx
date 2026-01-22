@@ -1,8 +1,8 @@
 import React from "react"
-import { Alert, View } from "react-native"
+import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import {
   useUserEmailDeleteMutation,
   useUserEmailRegistrationInitiateMutation,
@@ -13,7 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
@@ -67,7 +67,6 @@ const title = (
 }
 
 export const EmailSetting: React.FC = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -159,21 +158,26 @@ export const EmailSetting: React.FC = () => {
     )
   }
 
+  const rightIconAction = email
+    ? () => {
+        if (emailVerified) {
+          if (bothEmailAndPhoneVerified) {
+            deleteEmailPrompt()
+          }
+          return
+        }
+        reVerifyEmailPrompt()
+      }
+    : undefined
+
   const RightIcon = email ? (
-    <View style={styles.sidetoside}>
-      {!emailVerified && (
-        <GaloyIconButton name="refresh" size="medium" onPress={reVerifyEmailPrompt} />
-      )}
-      {(bothEmailAndPhoneVerified || (email && !emailVerified)) && (
-        <GaloyIconButton
-          name="close"
-          size="medium"
-          iconOnly
-          onPress={deleteEmailPrompt}
-          color={colors.red}
-        />
-      )}
-    </View>
+    emailVerified ? (
+      bothEmailAndPhoneVerified ? (
+        <GaloyIcon name="close" size={24} color={colors.red} />
+      ) : null
+    ) : (
+      <GaloyIcon name="refresh" size={24} color={colors.primary} />
+    )
   ) : undefined
 
   return (
@@ -184,15 +188,7 @@ export const EmailSetting: React.FC = () => {
       leftIcon="mail-outline"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
+      rightIconAction={rightIconAction}
     />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  sidetoside: {
-    display: "flex",
-    flexDirection: "row",
-    columnGap: 10,
-    marginRight: -5,
-  },
-}))

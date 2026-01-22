@@ -2,7 +2,7 @@ import React from "react"
 import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useUserPhoneDeleteMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -12,7 +12,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
@@ -36,7 +36,6 @@ gql`
 
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -87,25 +86,13 @@ export const PhoneSetting: React.FC = () => {
       rightIcon={
         phoneVerified ? (
           emailVerified ? (
-            <GaloyIconButton
-              name="close"
-              size="medium"
-              color={colors.red}
-              iconOnly
-              onPress={deletePhonePrompt}
-              style={styles.buttonStyle}
-            />
+            <GaloyIcon name="close" size={24} color={colors.red} />
           ) : null
         ) : (
           "chevron-forward"
         )
       }
+      rightIconAction={phoneVerified && emailVerified ? deletePhonePrompt : undefined}
     />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  buttonStyle: {
-    marginRight: -5,
-  },
-}))
