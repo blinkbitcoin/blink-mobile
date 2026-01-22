@@ -1,4 +1,3 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { AppiumClient } from "../appium/client.js";
 

@@ -1,10 +1,9 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 
 export function registerSwipeTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "swipe",
     "Perform swipe gestures to scroll or navigate. Note: 'up' scrolls content down (finger moves up).",
     {
@@ -25,32 +24,27 @@ export function registerSwipeTool(server: McpServer, client: AppiumClient) {
         const offsetX = (width * distance) / 2;
         const offsetY = (height * distance) / 2;
 
-        let startX: number, startY: number, endX: number, endY: number;
+        let startX = centerX;
+        let startY = centerY;
+        let endX = centerX;
+        let endY = centerY;
 
         switch (direction) {
           case "up": // Scroll content down (finger moves up)
-            startX = centerX;
             startY = centerY + offsetY;
-            endX = centerX;
             endY = centerY - offsetY;
             break;
           case "down": // Scroll content up (finger moves down)
-            startX = centerX;
             startY = centerY - offsetY;
-            endX = centerX;
             endY = centerY + offsetY;
             break;
           case "left": // Swipe left
             startX = centerX + offsetX;
-            startY = centerY;
             endX = centerX - offsetX;
-            endY = centerY;
             break;
           case "right": // Swipe right
             startX = centerX - offsetX;
-            startY = centerY;
             endX = centerX + offsetX;
-            endY = centerY;
             break;
         }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -26,7 +25,7 @@ async function checkService(
 }
 
 export function registerCheckInfrastructureTool(server: McpServer) {
-  server.tool(
+  (server as any).tool(
     "checkInfrastructure",
     "Verify all MCP infrastructure services (emulator, Metro, Appium, app) are running. Call this before using other tools to ensure the environment is ready.",
     {} as never,

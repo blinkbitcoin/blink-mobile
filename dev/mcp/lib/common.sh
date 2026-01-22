@@ -16,7 +16,7 @@ READY_MARKER="$MCP_STATE_DIR/ready"
 # Config
 export APPIUM_HOME="${APPIUM_HOME:-$HOME/.appium}"
 export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}"  # Headless by default
-AVD_NAME="Pixel_API_35"
+AVD_NAME="${AVD_NAME:-Pixel_API_35}"
 APP_PACKAGE="com.galoyapp"
 APK_PATH="$PROJECT_DIR/android/app/build/outputs/apk/debug/app-universal-debug.apk"
 

@@ -4,7 +4,6 @@ import {
   tapElement,
   tapAndWait,
   typeText,
-  typeInto,
   clearInput,
   hasElement,
   waitForElement,
@@ -16,7 +15,7 @@ import {
   pause,
   fail,
 } from "./appium.js";
-import { collectTestIds, collectUiInfo } from "../utils/xml-parser.js";
+import { collectUiInfo } from "../utils/xml-parser.js";
 import { loadConfig } from "./config.js";
 import { TIMEOUTS } from "./constants.js";
 

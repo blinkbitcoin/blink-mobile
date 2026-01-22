@@ -1,9 +1,8 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { AppiumClient } from "../appium/client.js";
 
 export function registerScreenshotTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "screenshot",
     "Capture actual screen as base64 PNG image. Use sparingly - prefer getScreen for token efficiency.",
     {} as never,

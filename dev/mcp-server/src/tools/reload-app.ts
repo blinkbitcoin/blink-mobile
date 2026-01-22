@@ -1,11 +1,10 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 import { parsePageSource } from "../utils/xml-parser.js";
 
 export function registerReloadAppTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "reloadApp",
     "Trigger Metro hot reload after code changes. Returns current screen state after reload.",
     {

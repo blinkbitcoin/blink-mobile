@@ -1,11 +1,10 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 import { buildSelector } from "../utils/selectors.js";
 
 export function registerWaitForTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "waitFor",
     "Wait until element appears or reaches desired state",
     {

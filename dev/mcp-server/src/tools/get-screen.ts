@@ -1,11 +1,10 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 import { parsePageSource, collectTestIds, type FilterType } from "../utils/xml-parser.js";
 
 export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "getScreen",
     "Get structured representation of all visible elements as JSON. Primary tool for understanding app state.",
     {

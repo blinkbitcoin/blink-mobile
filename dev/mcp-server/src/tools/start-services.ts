@@ -1,16 +1,18 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { spawn } from "child_process";
 import { existsSync, unlinkSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
-const PROJECT_ROOT = join(import.meta.dirname, "../../../..");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = join(__dirname, "../../../..");
 const MCP_STATE_DIR = join(PROJECT_ROOT, ".mcp");
 const READY_MARKER = join(MCP_STATE_DIR, "ready");
 const ORCHESTRATOR = join(PROJECT_ROOT, "dev/mcp/orchestrator.sh");
 
 export function registerStartServicesTool(server: McpServer) {
-  server.tool(
+  (server as any).tool(
     "startServices",
     "Start all MCP infrastructure services (emulator, Metro, Appium, app). Waits for completion. Use checkInfrastructure first to see if services are already running.",
     {} as never,

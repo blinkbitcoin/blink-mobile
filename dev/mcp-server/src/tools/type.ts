@@ -1,11 +1,10 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 import { buildSelector } from "../utils/selectors.js";
 
 export function registerTypeTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "type",
     "Enter text into an input field",
     {

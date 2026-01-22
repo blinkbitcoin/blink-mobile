@@ -96,7 +96,7 @@ export async function typeText(text: string): Promise<void> {
     await el.setValue(text);
   } else {
     // Fallback: use shell input
-    const escaped = text.replace(/ /g, "%s").replace(/'/g, "\\'");
+    const escaped = text.replace(/\\/g, "\\\\").replace(/ /g, "%s").replace(/'/g, "\\'");
     await browser.execute("mobile: shell", {
       command: "input",
       args: ["text", escaped],

@@ -1,11 +1,10 @@
-// @ts-nocheck - MCP SDK type inference is complex
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { AppiumClient } from "../appium/client.js";
 import { getConfig } from "../appium/config.js";
 
 export function registerLaunchAppTool(server: McpServer, client: AppiumClient) {
-  server.tool(
+  (server as any).tool(
     "launchApp",
     "Launch or restart the app from scratch",
     {
@@ -24,7 +23,7 @@ export function registerLaunchAppTool(server: McpServer, client: AppiumClient) {
         }
 
         // Terminate and relaunch
-        await browser.terminateApp(config.appPackage);
+        await browser.terminateApp(config.appPackage, {});
         await browser.activateApp(config.appPackage);
 
         // Wait for app to stabilize
