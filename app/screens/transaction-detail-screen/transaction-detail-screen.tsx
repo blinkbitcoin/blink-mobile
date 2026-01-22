@@ -33,8 +33,10 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { IconTransaction } from "../../components/icon-transactions"
 import { Screen } from "../../components/screen"
 import { SuccessActionComponent } from "../../components/success-action"
+import { SuccessActionTag } from "../../components/success-action/success-action"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
+import { utils } from "lnurl-pay"
 
 const Row = ({
   entry,
@@ -505,10 +507,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               let successActionText: string | null = null
               let successActionSubValue: string | undefined
 
-              if (successAction?.tag === "message") {
+              if (successAction?.tag === SuccessActionTag.MESSAGE) {
                 // For "message" tag, only display the message as primary text.
                 successActionText = successAction.message ?? null
-              } else if (successAction?.tag === "url") {
+              } else if (successAction?.tag === SuccessActionTag.URL) {
                 // For "url" tag, description (if present) is the primary text and
                 // the URL is shown as a secondary value. If there is no description,
                 // fall back to showing only the URL as the primary text.
@@ -518,8 +520,27 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 } else {
                   successActionText = successAction.url ?? null
                 }
+              } else if (successAction?.tag === SuccessActionTag.AES && settlementVia?.preImage) {
+                // For "aes" tag, decrypt the ciphertext using preImage per LUD-09 spec.
+                // Uses the same approach as send-bitcoin-completed-screen.tsx
+                try {
+                  const decryptedMessage = utils.decipherAES({
+                    successAction: successAction as Parameters<typeof utils.decipherAES>[0]["successAction"],
+                    preimage: settlementVia.preImage,
+                  })
+                  successActionText = decryptedMessage
+                  // Include description as subValue if present
+                  if (successAction.description) {
+                    successActionSubValue = successAction.description
+                  }
+                } catch (error) {
+                  console.warn(
+                    "[TransactionDetailScreen] Failed to decrypt AES successAction:",
+                    error,
+                  )
+                }
               } else if (successAction) {
-                // Log unexpected successAction tags to aid debugging (e.g., "aes").
+                // Log unexpected successAction tags to aid debugging.
                 console.warn(
                   "[TransactionDetailScreen] Unhandled successAction tag encountered:",
                   successAction.tag,
