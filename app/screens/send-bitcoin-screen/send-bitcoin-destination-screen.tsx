@@ -284,7 +284,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const parseValidPhone = useCallback(
     (input: string) => {
       if (!defaultPhoneInputInfo) return null
-      return parseValidPhoneNumber(input, defaultPhoneInputInfo.countryCode as CountryCode)
+      return parseValidPhoneNumber(
+        input,
+        defaultPhoneInputInfo.countryCode as CountryCode,
+      )
     },
     [defaultPhoneInputInfo],
   )
