@@ -74,7 +74,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
       expect(mockOnValueChange).toHaveBeenCalledTimes(1)
@@ -86,7 +86,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
       expect(mockOnValueChange).toHaveBeenCalledTimes(1)
@@ -103,7 +103,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).not.toHaveBeenCalled()
     })
@@ -115,7 +115,7 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
 
       rerender(
@@ -126,7 +126,7 @@ describe("Switch", () => {
         </ThemeProvider>,
       )
 
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
 
       expect(mockOnValueChange).toHaveBeenCalledTimes(2)
@@ -145,7 +145,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).not.toHaveBeenCalled()
     })
@@ -161,7 +161,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
     })
@@ -172,7 +172,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
 
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
     })
@@ -186,7 +186,7 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(mockOnValueChange).toHaveBeenLastCalledWith(true)
 
       rerender(
@@ -196,7 +196,7 @@ describe("Switch", () => {
           </TypesafeI18n>
         </ThemeProvider>,
       )
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(mockOnValueChange).toHaveBeenLastCalledWith(false)
 
       rerender(
@@ -206,7 +206,7 @@ describe("Switch", () => {
           </TypesafeI18n>
         </ThemeProvider>,
       )
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(mockOnValueChange).toHaveBeenLastCalledWith(true)
     })
 
@@ -220,7 +220,7 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(firstCallback).toHaveBeenCalledWith(true)
       expect(secondCallback).not.toHaveBeenCalled()
 
@@ -232,7 +232,7 @@ describe("Switch", () => {
         </ThemeProvider>,
       )
 
-      fireEvent.press(pressable)
+      fireEvent(pressable, "pressIn")
       expect(secondCallback).toHaveBeenCalledWith(true)
       expect(firstCallback).toHaveBeenCalledTimes(1)
     })

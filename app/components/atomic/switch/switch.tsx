@@ -41,13 +41,19 @@ export const Switch: React.FC<SwitchProps> = ({
   const styles = useStyles()
 
   const progress = useSharedValue(value ? 1 : 0)
+  const skipNextAnimationRef = React.useRef(false)
 
   React.useEffect(() => {
+    if (skipNextAnimationRef.current) {
+      skipNextAnimationRef.current = false
+      return
+    }
     progress.value = withTiming(value ? 1 : 0, { duration: ANIMATION_DURATION })
   }, [value, progress])
 
   const handlePress = () => {
     if (!disabled) {
+      skipNextAnimationRef.current = true
       progress.value = withTiming(value ? 0 : 1, { duration: ANIMATION_DURATION })
       onValueChange(!value)
     }
@@ -76,7 +82,7 @@ export const Switch: React.FC<SwitchProps> = ({
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel ?? LL.common.switch()}
       accessibilityState={{ checked: value, disabled }}
-      onPress={handlePress}
+      onPressIn={handlePress}
       hitSlop={HIT_SLOP}
       disabled={disabled}
       style={style}
