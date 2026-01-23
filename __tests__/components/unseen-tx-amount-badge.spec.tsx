@@ -6,7 +6,7 @@ import { UnseenTxAmountBadge } from "@app/components/unseen-tx-amount-badge"
 
 jest.mock("@app/components/animations", () => {
   return {
-    useDropInAnimation: () => ({ opacity: 1, translateY: 0 }),
+    useDropInOutAnimation: () => ({ opacity: 1, translateY: 0 }),
   }
 })
 
