@@ -124,29 +124,22 @@ const matchCheck = (
   allContacts: UserContact[],
   activeInput: TInputType,
 ): UserContact[] => {
-  if (newSearchText.length > 0) {
-    const searchWordArray = newSearchText
-      .split(" ")
-      .filter((text) => text.trim().length > 0)
+  const baseContacts =
+    activeInput === InputType.Phone
+      ? allContacts.filter((contact) => isPhoneNumber(contact.handle))
+      : allContacts
 
-    let filteredContacts = allContacts
-
-    if (activeInput === InputType.Phone) {
-      filteredContacts = allContacts.filter((contact) => isPhoneNumber(contact.handle))
-    }
-
-    const matchingContacts = filteredContacts.filter((contact) =>
-      searchWordArray.some((word) => wordMatchesContact(word, contact)),
-    )
-
-    return matchingContacts
+  if (newSearchText.length === 0) {
+    return baseContacts
   }
 
-  if (activeInput === InputType.Phone) {
-    return allContacts.filter((contact) => isPhoneNumber(contact.handle))
-  }
+  const searchWordArray = newSearchText
+    .split(" ")
+    .filter((text) => text.trim().length > 0)
 
-  return allContacts
+  return baseContacts.filter((contact) =>
+    searchWordArray.some((word) => wordMatchesContact(word, contact)),
+  )
 }
 
 const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
