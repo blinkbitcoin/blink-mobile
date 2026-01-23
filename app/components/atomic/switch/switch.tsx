@@ -8,6 +8,8 @@ import Animated, {
 } from "react-native-reanimated"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
+
 const TRACK_WIDTH = 51
 const TRACK_HEIGHT = 31
 const THUMB_SIZE = 27
@@ -20,6 +22,7 @@ type SwitchProps = {
   disabled?: boolean
   style?: ViewStyle
   testID?: string
+  accessibilityLabel?: string
 }
 
 export const Switch: React.FC<SwitchProps> = ({
@@ -28,10 +31,12 @@ export const Switch: React.FC<SwitchProps> = ({
   disabled = false,
   style,
   testID,
+  accessibilityLabel,
 }) => {
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
   const styles = useStyles()
 
   const progress = useSharedValue(value ? 1 : 0)
@@ -65,7 +70,15 @@ export const Switch: React.FC<SwitchProps> = ({
   })
 
   return (
-    <Pressable onPress={handlePress} disabled={disabled} style={style} testID={testID}>
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityLabel={accessibilityLabel ?? LL.common.switch()}
+      accessibilityState={{ checked: value, disabled }}
+      onPress={handlePress}
+      disabled={disabled}
+      style={style}
+      testID={testID}
+    >
       <Animated.View
         style={[styles.track, animatedTrackStyle, disabled && styles.trackDisabled]}
       >
