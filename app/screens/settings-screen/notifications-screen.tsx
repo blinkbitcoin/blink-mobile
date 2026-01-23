@@ -198,7 +198,9 @@ export const NotificationSettingsScreen: React.FC = () => {
 
   const categoriesArray = Object.values(NotificationCategories)
 
-  const pushNotificationSettings = categoriesArray.map((category) => () => (
+  const NotificationRow: React.FC<{ category: NotificationCategoryType }> = ({
+    category,
+  }) => (
     <ListItem containerStyle={styles.listItemContainer}>
       <GaloyIcon name={CategoryIcons[category]} size={24} />
       <ListItem.Content>
@@ -215,7 +217,16 @@ export const NotificationSettingsScreen: React.FC = () => {
         }
       />
     </ListItem>
-  ))
+  )
+  NotificationRow.displayName = "NotificationRow"
+
+  const pushNotificationSettings = categoriesArray.map((category) => {
+    const NotificationRowWithCategory: React.FC = () => (
+      <NotificationRow category={category} />
+    )
+    NotificationRowWithCategory.displayName = `NotificationRow-${category}`
+    return NotificationRowWithCategory
+  })
 
   return (
     <Screen style={styles.container} preset="scroll">

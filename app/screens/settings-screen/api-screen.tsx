@@ -17,7 +17,36 @@ type ApiItem = {
   infoIcon?: IconNamesType
 }
 
+type ThemeColors = ReturnType<typeof useTheme>["theme"]["colors"]
+
+type ApiItemRowProps = {
+  colors: ThemeColors
+  item: ApiItem
+  onPress: (item: ApiItem) => void
+  styles: ReturnType<typeof useStyles>
+}
+
 const DASHBOARD_LINK = "https://dashboard.blink.sv"
+
+const ApiItemRow: React.FC<ApiItemRowProps> = ({ colors, item, onPress, styles }) => (
+  <ListItem containerStyle={styles.listItemContainer} onPress={() => onPress(item)}>
+    <View style={styles.iconContainer}>
+      <GaloyIcon name={item.leftIcon} size={24} color={colors.grey0} />
+    </View>
+    <ListItem.Content>
+      <ListItem.Title style={styles.itemTitle}>
+        <View style={styles.listContent}>
+          <Text type="p2">{item.title}</Text>
+          {item.infoIcon && (
+            <GaloyIcon name={item.infoIcon} size={18} color={colors.black} />
+          )}
+        </View>
+      </ListItem.Title>
+    </ListItem.Content>
+    <GaloyIcon name={item.rightIcon} size={24} color={colors.warning} />
+  </ListItem>
+)
+ApiItemRow.displayName = "ApiItemRow"
 
 export const ApiScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -48,27 +77,13 @@ export const ApiScreen: React.FC = () => {
     Linking.openURL(item.link)
   }
 
-  const apiSettings = apiItems.map((item) => () => (
-    <ListItem
-      containerStyle={styles.listItemContainer}
-      onPress={() => handleItemPress(item)}
-    >
-      <View style={styles.iconContainer}>
-        <GaloyIcon name={item.leftIcon} size={24} color={colors.grey0} />
-      </View>
-      <ListItem.Content>
-        <ListItem.Title style={styles.itemTitle}>
-          <View style={styles.listContent}>
-            <Text type="p2">{item.title}</Text>
-            {item.infoIcon && (
-              <GaloyIcon name={item.infoIcon} size={18} color={colors.black} />
-            )}
-          </View>
-        </ListItem.Title>
-      </ListItem.Content>
-      <GaloyIcon name={item.rightIcon} size={24} color={colors.warning} />
-    </ListItem>
-  ))
+  const apiSettings = apiItems.map((item) => {
+    const ApiItemRowWithItem: React.FC = () => (
+      <ApiItemRow colors={colors} item={item} onPress={handleItemPress} styles={styles} />
+    )
+    ApiItemRowWithItem.displayName = `ApiItemRow-${item.id}`
+    return ApiItemRowWithItem
+  })
 
   return (
     <Screen style={styles.container} preset="scroll">
