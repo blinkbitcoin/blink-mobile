@@ -15,6 +15,7 @@ const TRACK_HEIGHT = 31
 const THUMB_SIZE = 27
 const THUMB_OFFSET = 2
 const ANIMATION_DURATION = 150
+const HIT_SLOP = 0
 
 type SwitchProps = {
   value: boolean
@@ -47,6 +48,7 @@ export const Switch: React.FC<SwitchProps> = ({
 
   const handlePress = () => {
     if (!disabled) {
+      progress.value = withTiming(value ? 0 : 1, { duration: ANIMATION_DURATION })
       onValueChange(!value)
     }
   }
@@ -75,6 +77,7 @@ export const Switch: React.FC<SwitchProps> = ({
       accessibilityLabel={accessibilityLabel ?? LL.common.switch()}
       accessibilityState={{ checked: value, disabled }}
       onPress={handlePress}
+      hitSlop={HIT_SLOP}
       disabled={disabled}
       style={style}
       testID={testID}
