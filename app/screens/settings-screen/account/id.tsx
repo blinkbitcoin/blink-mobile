@@ -44,6 +44,7 @@ export const AccountId: React.FC = () => {
       rightIconAction={copyToClipboard}
     />
   )
+  AccountIdRow.displayName = "AccountIdRow"
 
   return <SettingsGroup name={LL.AccountScreen.accountId()} items={[AccountIdRow]} />
 }
