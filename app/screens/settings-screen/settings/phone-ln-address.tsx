@@ -3,7 +3,6 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
 import { useAppConfig } from "@app/hooks"
@@ -18,15 +17,12 @@ export const PhoneLnAddress: React.FC = () => {
   } = useTheme()
   const hostName = appConfig.galoyInstance.lnAddressHostname
 
-  const { data, loading } = useSettingsScreenQuery()
-  const { phoneVerified } = useLoginMethods()
+  const { loading, phone, phoneVerified } = useLoginMethods()
   const { LL } = useI18nContext()
 
-  const phoneNumber = data?.me?.phone
-  const isPhoneVerified = phoneVerified && Boolean(phoneNumber)
-  const lnAddress = `${phoneNumber}@${hostName}`
+  if (!phoneVerified || !phone) return null
 
-  if (!isPhoneVerified) return null
+  const lnAddress = `${phone}@${hostName}`
 
   return (
     <SettingsRow
