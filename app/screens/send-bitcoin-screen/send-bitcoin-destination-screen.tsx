@@ -168,7 +168,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const activeInputRef = useRef<TInputType>(InputType.Search)
 
   const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("")
-  // To don't update the country code as we type
   const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
   const [defaultPhoneInputInfo, setDefaultPhoneInputInfo] =
     useState<PhoneInputInfo | null>(null)
@@ -960,7 +959,6 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts])
 
-  // Clear countryCallingCode from input value after pasting or selecting one
   useEffect(() => {
     if (!rawPhoneNumber) return
     if (activeInputRef.current === InputType.Search) return
