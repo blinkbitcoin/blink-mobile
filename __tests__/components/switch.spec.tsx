@@ -4,6 +4,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { Switch } from "@app/components/atomic/switch"
+import TypesafeI18n from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 
 jest.mock("react-native-reanimated", () => ({
@@ -18,7 +19,11 @@ jest.mock("react-native-reanimated", () => ({
 }))
 
 const renderWithTheme = (component: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{component}</ThemeProvider>)
+  return render(
+    <ThemeProvider theme={theme}>
+      <TypesafeI18n locale="en">{component}</TypesafeI18n>
+    </ThemeProvider>,
+  )
 }
 
 describe("Switch", () => {
@@ -115,7 +120,9 @@ describe("Switch", () => {
 
       rerender(
         <ThemeProvider theme={theme}>
-          <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
+          <TypesafeI18n locale="en">
+            <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
+          </TypesafeI18n>
         </ThemeProvider>,
       )
 
@@ -184,7 +191,9 @@ describe("Switch", () => {
 
       rerender(
         <ThemeProvider theme={theme}>
-          <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
+          <TypesafeI18n locale="en">
+            <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
+          </TypesafeI18n>
         </ThemeProvider>,
       )
       fireEvent.press(pressable)
@@ -192,7 +201,9 @@ describe("Switch", () => {
 
       rerender(
         <ThemeProvider theme={theme}>
-          <Switch value={false} onValueChange={mockOnValueChange} testID="switch" />
+          <TypesafeI18n locale="en">
+            <Switch value={false} onValueChange={mockOnValueChange} testID="switch" />
+          </TypesafeI18n>
         </ThemeProvider>,
       )
       fireEvent.press(pressable)
@@ -215,7 +226,9 @@ describe("Switch", () => {
 
       rerender(
         <ThemeProvider theme={theme}>
-          <Switch value={false} onValueChange={secondCallback} testID="switch" />
+          <TypesafeI18n locale="en">
+            <Switch value={false} onValueChange={secondCallback} testID="switch" />
+          </TypesafeI18n>
         </ThemeProvider>,
       )
 
