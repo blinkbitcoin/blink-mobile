@@ -56,6 +56,7 @@ export const SettingsRow: React.FC<Props> = ({
       <Icon
         name={rightIcon ? rightIcon : defaultIcon}
         type="ionicon"
+        size={20}
         color={colors.primary}
       />
     ) : (
@@ -73,9 +74,9 @@ export const SettingsRow: React.FC<Props> = ({
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
           {hasLeftIcon &&
             (leftGaloyIcon ? (
-              <GaloyIcon name={leftGaloyIcon} size={24} />
+              <GaloyIcon name={leftGaloyIcon} size={20} />
             ) : (
-              <Icon name={leftIcon ?? ""} type="ionicon" />
+              <Icon name={leftIcon ?? ""} type="ionicon" size={20} />
             ))}
           <View>
             <View style={styles.sidetoside}>

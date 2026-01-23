@@ -29,7 +29,7 @@ export const AccountPOS: React.FC = () => {
       title={LL.SettingsScreen.pos()}
       subtitleShorter={data.me.username.length > 22}
       leftGaloyIcon="calculator"
-      rightIcon={<GaloyIcon name="link" size={24} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="link" size={20} color={colors.primary} />}
       action={() => {
         Linking.openURL(pos)
       }}

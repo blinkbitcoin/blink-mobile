@@ -29,7 +29,7 @@ export const PhoneLnAddress: React.FC = () => {
       loading={loading}
       title={lnAddress}
       leftIcon="call-outline"
-      rightIcon={<GaloyIcon name="copy-paste" size={24} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
       action={() => {
         Clipboard.setString(lnAddress)
         toastShow({

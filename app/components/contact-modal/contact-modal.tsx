@@ -48,7 +48,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.StatusPage,
       name: LL.support.statusPage(),
-      icon: <Icon name={"alert-circle-outline"} type="ionicon" size={24} />,
+      icon: <Icon name={"alert-circle-outline"} type="ionicon" size={20} />,
       action: () => {
         // TODO: extract in Instance
         Linking.openURL(`https://blink.statuspage.io/`)
@@ -57,7 +57,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Faq,
       name: LL.support.faq(),
-      icon: <Icon name={"book-outline"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"book-outline"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         Linking.openURL(`https://faq.blink.sv`)
         toggleModal()
@@ -66,7 +66,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Telegram,
       name: LL.support.telegram(),
-      icon: <TelegramOutline width={24} height={24} fill={colors.black} />,
+      icon: <TelegramOutline width={20} height={20} fill={colors.black} />,
       action: () => {
         Linking.openURL(`https://t.me/blinkbtc`)
         toggleModal()
@@ -80,7 +80,7 @@ const ContactModal: React.FC<Props> = ({
           name={"chatbubbles-outline"}
           type="ionicon"
           color={colors.black}
-          size={24}
+          size={20}
         />
       ),
       action: () => {
@@ -91,7 +91,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.WhatsApp,
       name: LL.support.whatsapp(),
-      icon: <Icon name={"logo-whatsapp"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"logo-whatsapp"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         openWhatsAppAction(messageBody)
         toggleModal()
@@ -100,7 +100,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Email,
       name: LL.support.email(),
-      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         Linking.openURL(
           `mailto:${CONTACT_EMAIL_ADDRESS}?subject=${encodeURIComponent(
@@ -140,7 +140,7 @@ const ContactModal: React.FC<Props> = ({
                 name={"chevron-forward"}
                 type="ionicon"
                 color={colors.primary}
-                size={24}
+                size={20}
               />
             </ListItem>
           )
