@@ -28,7 +28,7 @@ import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
-import { CountryCode, parsePhoneNumber, isValidPhoneNumber } from "libphonenumber-js"
+import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -52,6 +52,7 @@ import {
 } from "./send-bitcoin-reducer"
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { isPhoneNumber } from "@app/utils/phone"
 import { isInt } from "validator"
 
 gql`
@@ -115,16 +116,6 @@ const wordMatchesContact = (searchWord: string, contact: UserContact): boolean =
   }
 
   return contactNameMatchesSearchWord || contactPrettyNameMatchesSearchWord
-}
-
-const isPhoneNumber = (handle: string): boolean => {
-  try {
-    if (isValidPhoneNumber(handle)) return true
-    const parsed = parsePhoneNumber(handle)
-    return parsed?.isValid() ?? false
-  } catch {
-    return false
-  }
 }
 
 const normalizeHandle = (handle?: string) => (handle ?? "").trim().toLowerCase()

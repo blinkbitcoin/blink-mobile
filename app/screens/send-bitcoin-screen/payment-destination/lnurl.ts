@@ -1,6 +1,7 @@
 import { getParams } from "js-lnurl"
 import { requestPayServiceParams, LnUrlPayServiceResponse } from "lnurl-pay"
-import parsePhoneNumber from "libphonenumber-js/mobile"
+
+import { isPhoneNumber } from "@app/utils/phone"
 
 import {
   AccountDefaultWalletLazyQueryHookResult,
@@ -125,15 +126,6 @@ const tryGetIntraLedgerDestinationFromLnurl = ({
   }
 
   return undefined
-}
-
-const isPhoneNumber = (phoneNumber: string): boolean => {
-  try {
-    const parsed = parsePhoneNumber(phoneNumber)
-    return parsed?.isValid() ?? false
-  } catch {
-    return false
-  }
 }
 
 const getIntraLedgerHandleIfLnurlIsOurOwn = ({
