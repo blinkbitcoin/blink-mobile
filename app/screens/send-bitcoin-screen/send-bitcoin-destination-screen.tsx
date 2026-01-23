@@ -674,6 +674,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         return styles.warningInputContainer
       case DestinationState.PhoneInvalid:
         return styles.errorInputContainer
+      case DestinationState.PhoneNotAllowed:
+        return styles.errorInputContainer
       default:
         return {}
     }
