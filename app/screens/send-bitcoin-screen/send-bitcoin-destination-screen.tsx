@@ -52,6 +52,7 @@ import {
 } from "./send-bitcoin-reducer"
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { normalizeString } from "@app/utils/helper"
 import { isPhoneNumber } from "@app/utils/phone"
 import { isInt } from "validator"
 
@@ -117,8 +118,6 @@ const wordMatchesContact = (searchWord: string, contact: UserContact): boolean =
 
   return contactNameMatchesSearchWord || contactPrettyNameMatchesSearchWord
 }
-
-const normalizeHandle = (handle?: string) => (handle ?? "").trim().toLowerCase()
 
 const matchCheck = (
   newSearchText: string,
@@ -193,7 +192,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const bitcoinNetwork = useMemo(() => data?.globals?.network, [data?.globals?.network])
   const contacts = useMemo(() => data?.me?.contacts ?? [], [data?.me?.contacts])
   const contactHandleSet = useMemo(
-    () => new Set(contacts.map((contact) => normalizeHandle(contact.handle))),
+    () => new Set(contacts.map((contact) => normalizeString(contact.handle))),
     [contacts],
   )
 
@@ -372,9 +371,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         destination.destinationDirection === DestinationDirection.Send &&
         destination.validDestination.paymentType === PaymentType.Intraledger
       ) {
-        const normalizedHandle = normalizeHandle(destination.validDestination.handle)
+        const normalizedHandle = normalizeString(destination.validDestination.handle)
         const hasConfirmedUsername =
-          normalizeHandle(destinationState.confirmationUsernameType?.username) ===
+          normalizeString(destinationState.confirmationUsernameType?.username) ===
             normalizedHandle && destinationState.unparsedDestination === rawInput
 
         if (!contactHandleSet.has(normalizedHandle) && !hasConfirmedUsername) {
@@ -399,9 +398,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         activeInputRef.current === InputType.Phone
       ) {
         const identifier = destination.validDestination.lnurlParams.identifier
-        const normalizedHandle = normalizeHandle(identifier)
+        const normalizedHandle = normalizeString(identifier)
         const hasConfirmedUsername =
-          normalizeHandle(destinationState.confirmationUsernameType?.username) ===
+          normalizeString(destinationState.confirmationUsernameType?.username) ===
             normalizedHandle && destinationState.unparsedDestination === rawInput
 
         if (!contactHandleSet.has(normalizedHandle) && !hasConfirmedUsername) {
