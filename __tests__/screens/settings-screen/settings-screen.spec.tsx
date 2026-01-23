@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react-n
 import { SettingsScreenDocument } from "@app/graphql/generated"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import { SettingsScreen } from "@app/screens/settings-screen/settings-screen"
+import { SettingsRow } from "@app/screens/settings-screen/row"
 import { LevelContextProvider, AccountLevel } from "@app/graphql/level-context"
 import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-screen.stories"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -462,5 +463,52 @@ describe("Settings Screen", () => {
 
     expect(screen.queryByText("Set your lightning address")).toBeNull()
     expect(screen.queryByText("+50365055539@blink.sv")).toBeNull()
+  })
+
+  it("truncates long settings row titles", () => {
+    const longTitle = "This is a very long settings row title that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} />
+      </ContextForScreen>,
+    )
+
+    const titleNode = screen.getByText(longTitle)
+    expect(titleNode.props.numberOfLines).toBe(1)
+    expect(titleNode.props.ellipsizeMode).toBe("tail")
+  })
+
+  it("truncates long settings row subtitles", () => {
+    const longTitle = "Short title"
+    const longSubtitle = "This is a very long subtitle that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
+      </ContextForScreen>,
+    )
+
+    const subtitleNode = screen.getByText(longSubtitle)
+    expect(subtitleNode.props.numberOfLines).toBe(1)
+    expect(subtitleNode.props.ellipsizeMode).toBe("tail")
+  })
+
+  it("truncates long title and subtitle together", () => {
+    const longTitle = "Another very long settings row title that should truncate"
+    const longSubtitle = "Another very long subtitle that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
+      </ContextForScreen>,
+    )
+
+    const titleNode = screen.getByText(longTitle)
+    const subtitleNode = screen.getByText(longSubtitle)
+    expect(titleNode.props.numberOfLines).toBe(1)
+    expect(titleNode.props.ellipsizeMode).toBe("tail")
+    expect(subtitleNode.props.numberOfLines).toBe(1)
+    expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 })
