@@ -157,9 +157,6 @@ export const DestinationInformation = ({
           text={information.infoTooltip.text}
         />
       )}
-      {/* {information.adviceTooltip && (
-        <ModalTooltip type="advice" size={20} text={information.adviceTooltip.text} />
-      )} */}
       <View style={styles.textContainer}>
         {information.information && (
           <Text style={styles.informationText}>{information.information}</Text>
