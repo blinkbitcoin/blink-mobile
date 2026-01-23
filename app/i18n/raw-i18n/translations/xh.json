@@ -747,6 +747,7 @@
         "sendViaOtherChannel": "You selected to receive the code via {channel: string}. You can try receiving via {other: string} instead"
     },
     "common": {
+        "switch": "Iswitshi",
         "account": "Account",
         "transactionLimits": "Transaction Limits",
         "activateWallet": "Activate Wallet",

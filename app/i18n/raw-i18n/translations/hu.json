@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Engedélyezve",
+        "switch": "Kapcsoló",
         "notifications": "Értesítések",
         "preferences": "Preferenciák",
         "onDeviceSecurity": "Eszközön lévő biztonság",

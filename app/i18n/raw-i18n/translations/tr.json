@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Etkin",
+        "switch": "Anahtar",
         "notifications": "Bildirimler",
         "preferences": "Tercihleriniz",
         "onDeviceSecurity": "Cihaz İçi Güvenlik",

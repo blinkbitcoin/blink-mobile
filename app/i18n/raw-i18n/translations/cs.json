@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} úspěšně potvrzen"
     },
     "common": {
+        "switch": "Přepínač",
         "account": "Účet",
         "transactionLimits": "Transakční limity",
         "activateWallet": "Aktivovat peněženku",

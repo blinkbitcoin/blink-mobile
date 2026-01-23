@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Aktiviert",
+        "switch": "Schalter",
         "notifications": "Benachrichtigungen",
         "preferences": "Einstellungen",
         "onDeviceSecurity": "Gerätesicherheit",

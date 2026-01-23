@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Povolený",
+        "switch": "Prepínač",
         "notifications": "Notifikácie",
         "preferences": "Preferencie",
         "onDeviceSecurity": "Zabezpečenie na zariadení",

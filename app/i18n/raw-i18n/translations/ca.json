@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Habilitat",
+        "switch": "Interruptor",
         "notifications": "Notificacions",
         "preferences": "Preferències",
         "onDeviceSecurity": "Seguretat al dispositiu",

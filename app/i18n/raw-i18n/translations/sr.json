@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Прекидач",
         "account": "Налог",
         "transactionLimits": "Ограничења трансакција",
         "activateWallet": "Активирајте новчаник",

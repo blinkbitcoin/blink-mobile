@@ -2640,6 +2640,7 @@
     },
     "common": {
         "enabled": "Activado",
+        "switch": "Interruptor",
         "notifications": "Notificaciones",
         "preferences": "Preferencias",
         "onDeviceSecurity": "Seguridad y privacidad",

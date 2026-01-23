@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Abilitato",
+        "switch": "Interruttore",
         "notifications": "Notifiche",
         "preferences": "Preferenze",
         "onDeviceSecurity": "Sicurezza sul dispositivo",

@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "مفتاح",
         "account": "حساب",
         "transactionLimits": "قيود المعاملات",
         "activateWallet": "تفعيل المحفظة",

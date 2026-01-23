@@ -2437,6 +2437,7 @@
         "success": "Էլ․ հասցեն {email: string} հաջողությամբ հաստատվել է"
     },
     "common": {
+        "switch": "Անջատիչ",
         "account": "Հաշիվ",
         "transactionLimits": "Գործառնության սահմաններ",
         "activateWallet": "Ակտիվացնել դրամապանակը",

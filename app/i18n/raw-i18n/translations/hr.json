@@ -2437,6 +2437,7 @@
         "success": "E-pošta {email: string} uspješno je potvrđena"
     },
     "common": {
+        "switch": "Prekidač",
         "account": "Račun",
         "transactionLimits": "Transakcijska ograničenja",
         "activateWallet": "Aktiviraj novčanik",
