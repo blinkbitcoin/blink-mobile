@@ -1,4 +1,30 @@
-import { isPhoneNumber } from "../../app/utils/phone"
+import { isPhoneNumber, parseValidPhoneNumber } from "../../app/utils/phone"
+
+describe("parseValidPhoneNumber", () => {
+  it("returns parsed phone for valid international number", () => {
+    const result = parseValidPhoneNumber("+14155552671")
+    expect(result).not.toBeNull()
+    expect(result?.isValid()).toBe(true)
+    expect(result?.country).toBe("US")
+  })
+
+  it("returns parsed phone for valid number with country code", () => {
+    const result = parseValidPhoneNumber("7400123456", "GB")
+    expect(result).not.toBeNull()
+    expect(result?.isValid()).toBe(true)
+    expect(result?.country).toBe("GB")
+  })
+
+  it("returns null for invalid phone number", () => {
+    expect(parseValidPhoneNumber("invalid")).toBeNull()
+    expect(parseValidPhoneNumber("123")).toBeNull()
+    expect(parseValidPhoneNumber("")).toBeNull()
+  })
+
+  it("returns null for invalid country code combination", () => {
+    expect(parseValidPhoneNumber("123", "US")).toBeNull()
+  })
+})
 
 describe("isPhoneNumber", () => {
   it("returns true for valid international phone numbers", () => {

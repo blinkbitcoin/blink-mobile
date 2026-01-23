@@ -28,7 +28,7 @@ import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
-import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
+import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -53,7 +53,7 @@ import {
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { normalizeString } from "@app/utils/helper"
-import { isPhoneNumber } from "@app/utils/phone"
+import { isPhoneNumber, parseValidPhoneNumber } from "@app/utils/phone"
 import { isInt } from "validator"
 
 gql`
@@ -284,18 +284,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const parseValidPhone = useCallback(
     (input: string) => {
       if (!defaultPhoneInputInfo) return null
-      try {
-        const parsed = parsePhoneNumber(
-          input,
-          defaultPhoneInputInfo.countryCode as CountryCode,
-        )
-        if (parsed && parsed.isValid()) {
-          return parsed
-        }
-      } catch {
-        return null
-      }
-      return null
+      return parseValidPhoneNumber(input, defaultPhoneInputInfo.countryCode as CountryCode)
     },
     [defaultPhoneInputInfo],
   )
@@ -843,7 +832,7 @@ interface PhoneInputSectionProps {
   activeInputRef: React.MutableRefObject<TInputType>
   destinationState: SendBitcoinDestinationState
   onFocusedInput: (inputType: TInputType) => void
-  parseValidPhone: (input: string) => ReturnType<typeof parsePhoneNumber> | null
+  parseValidPhone: (input: string) => PhoneNumber | null
   updateMatchingContacts: (newSearchText: string) => void
   willInitiateValidation: () => boolean
   waitAndValidateDestination: (input: string) => void
