@@ -77,7 +77,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     }
   }, [data?.globals])
 
-  // setting default country code from IP
   useEffect(() => {
     if (detectedCountryCode) {
       setCountryCode(detectedCountryCode)
@@ -200,7 +199,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     minHeight: 60,
   },
   countryPickerButtonStyle: {
-    backgroundColor: props.bgColor ? props.bgColor : colors.grey5,
+    backgroundColor: props.bgColor || colors.grey5,
     borderRadius: 8,
     paddingHorizontal: 15,
     flexDirection: "row",
@@ -218,7 +217,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     borderWidth: 1,
     borderColor: colors.transparent,
     paddingHorizontal: 10,
-    backgroundColor: props.bgColor ? props.bgColor : colors.grey5,
+    backgroundColor: props.bgColor || colors.grey5,
     borderRadius: 8,
   },
   disabledInput: { opacity: 0.6 },
