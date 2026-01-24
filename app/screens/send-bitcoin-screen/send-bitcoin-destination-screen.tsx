@@ -924,6 +924,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     willInitiateValidation,
     waitAndValidateDestination,
     LL,
+    setRawPhoneNumber,
   ])
 
   useEffect(() => {
@@ -986,7 +987,6 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         onResponderRelease={() => onFocusedInput(InputType.Phone)}
       >
         <PhoneInput
-          key={1}
           rightIcon={
             rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
               <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
