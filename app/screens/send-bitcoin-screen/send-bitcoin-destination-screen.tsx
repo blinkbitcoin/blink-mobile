@@ -737,7 +737,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         {activeInputRef.current === InputType.Search ? (
           <DestinationInformation destinationState={destinationState} />
         ) : (
-          <View style={styles.spacerStyle}></View>
+          <View style={styles.spacerStyle} />
         )}
         <PhoneInputSection
           rawPhoneNumber={rawPhoneNumber}
@@ -974,7 +974,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
   return (
     <>
       <View style={styles.textSeparator}>
-        <View style={styles.line}></View>
+        <View style={styles.line} />
         <View style={styles.textInformationWrapper}>
           <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orBySMS()}</Text>
         </View>
@@ -1023,11 +1023,11 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
       {activeInputRef.current === InputType.Phone ? (
         <DestinationInformation destinationState={destinationState} />
       ) : (
-        <View style={styles.spacerStyle}></View>
+        <View style={styles.spacerStyle} />
       )}
       {matchingContacts.length > 0 && (
         <View style={[styles.textSeparator, styles.lastInfoTextStyle]}>
-          <View style={styles.line}></View>
+          <View style={styles.line} />
           <View style={styles.textInformationWrapper}>
             <Text style={styles.textInformation}>{LL.SendBitcoinScreen.orSaved()}</Text>
           </View>
