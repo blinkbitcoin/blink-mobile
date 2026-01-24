@@ -44,7 +44,7 @@ describe("isPhoneNumber", () => {
     expect(isPhoneNumber("test@blink.sv")).toBe(false)
   })
 
-  it("returns true for valid phone numbers without plus sign when format is recognized", () => {
+  it("returns false for valid phone numbers without plus sign even when format is recognized", () => {
     expect(isPhoneNumber("14155552671")).toBe(false)
   })
 })
