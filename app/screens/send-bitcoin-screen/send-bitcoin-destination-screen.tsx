@@ -639,6 +639,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       updateMatchingContacts,
       handleSelection,
       initiateGoToNextScreen,
+      setKeepCountryCode,
+      setRawPhoneNumber,
     ],
   )
 
