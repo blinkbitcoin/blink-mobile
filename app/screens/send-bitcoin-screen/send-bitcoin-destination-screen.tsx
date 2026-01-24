@@ -972,6 +972,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     defaultPhoneInputInfo,
     destinationState.destinationState,
     parseValidPhone,
+    setRawPhoneNumber,
   ])
 
   return (
