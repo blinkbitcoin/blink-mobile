@@ -67,4 +67,43 @@ describe("formatDateForTransaction", () => {
       formatDateForTransaction({ createdAt, locale, includeTime: false, now }),
     ).toEqual("5 seconds ago")
   })
+
+  it("if tx is from yesterday, use hours instead of day", () => {
+    mockedIsToday.mockReturnValue(false)
+    mockedIsYesterday.mockReturnValue(true)
+
+    const createdAt = 1620849600
+    const now = (1620849600 + 60 * 60 * 26) * 1000
+    const locale = "en"
+
+    expect(
+      formatDateForTransaction({ createdAt, locale, includeTime: false, now }),
+    ).toEqual("26 hours ago")
+  })
+
+  it("if tx is from yesterday and under a minute, use seconds", () => {
+    mockedIsToday.mockReturnValue(false)
+    mockedIsYesterday.mockReturnValue(true)
+
+    const createdAt = 1620849600
+    const now = (1620849600 + 30) * 1000
+    const locale = "en"
+
+    expect(
+      formatDateForTransaction({ createdAt, locale, includeTime: false, now }),
+    ).toEqual("30 seconds ago")
+  })
+
+  it("if tx is from yesterday and under an hour, use minutes", () => {
+    mockedIsToday.mockReturnValue(false)
+    mockedIsYesterday.mockReturnValue(true)
+
+    const createdAt = 1620849600
+    const now = (1620849600 + 60 * 25) * 1000
+    const locale = "en"
+
+    expect(
+      formatDateForTransaction({ createdAt, locale, includeTime: false, now }),
+    ).toEqual("25 minutes ago")
+  })
 })

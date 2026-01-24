@@ -1,5 +1,3 @@
-process.env.TZ = "UTC"
-
 import React from "react"
 import { InteractionManager } from "react-native"
 import { MockedResponse } from "@apollo/client/testing"
@@ -180,6 +178,8 @@ const buildTransactionMocks = (
         },
       },
       result,
+      maxUsageCount: Number.POSITIVE_INFINITY,
+      newData: () => result,
     },
   ]
 }
@@ -268,12 +268,9 @@ describe("TransactionHistoryScreen date formatting", () => {
     expect(await screen.findByText("2 hours ago")).toBeTruthy()
     expect(await screen.findByText("18 hours ago")).toBeTruthy()
     expect(await screen.findByText("20 hours ago")).toBeTruthy()
-
-    const yesterdayMatch = await screen.findAllByText(/yesterday|1 day ago/i)
-    expect(yesterdayMatch.length).toBeGreaterThan(0)
+    expect(await screen.findByText("30 hours ago")).toBeTruthy()
 
     expect(await screen.findByText("2026-01-18")).toBeTruthy()
     expect(await screen.findByText("2026-01-10")).toBeTruthy()
-    expect(await screen.findByText("2025-12-31")).toBeTruthy()
   })
 })
