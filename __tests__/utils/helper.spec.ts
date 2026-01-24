@@ -1,4 +1,4 @@
-import { ellipsizeMiddle } from "@app/utils/helper"
+import { ellipsizeMiddle, normalizeString } from "@app/utils/helper"
 
 describe("ellipsizeMiddle", () => {
   it("returns original text when it fits", () => {
@@ -34,5 +34,27 @@ describe("ellipsizeMiddle", () => {
     })
     expect(result.startsWith(text.slice(0, 13))).toBe(true)
     expect(result.endsWith(text.slice(text.length - 8))).toBe(true)
+  })
+})
+
+describe("normalizeString", () => {
+  it("trims whitespace and converts to lowercase", () => {
+    expect(normalizeString("  Hello World  ")).toBe("hello world")
+  })
+
+  it("handles uppercase strings", () => {
+    expect(normalizeString("UPPERCASE")).toBe("uppercase")
+  })
+
+  it("returns empty string for undefined", () => {
+    expect(normalizeString(undefined)).toBe("")
+  })
+
+  it("returns empty string for empty input", () => {
+    expect(normalizeString("")).toBe("")
+  })
+
+  it("handles strings with only whitespace", () => {
+    expect(normalizeString("   ")).toBe("")
   })
 })

@@ -42,6 +42,7 @@ export type RootStackParamList = {
   sendBitcoinDestination?: {
     payment?: string
     username?: string
+    scanPressed?: number
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination

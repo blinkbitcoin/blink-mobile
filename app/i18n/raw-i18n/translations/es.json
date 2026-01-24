@@ -2220,7 +2220,7 @@
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Los nombres de usuario de {bankName: string} ahora son direcciones de {bankName: string}.",
         "usernameNowAddressInfo": "Cuando ingrese un nombre de usuario de {bankName: string}, le agregaremos \"@{lnDomain: string}\" ( por ejemplo, maria@{lnDomain: string} ) para convertirlo en una dirección. Tu nombre de usuario ahora también es una dirección de {bankName: string}.\n\nLos nombres de usuario de {bankName: string} solo permitían transacciones dentro de {bankName: string}, mientras que las direcciones de {bankName: string} permiten realizar pagos con personas que usan diferentes billeteras.",
-        "enterValidDestination": "Introduce un destino válido.",
+        "enterValidDestination": "Introduzca un destino válido",
         "destinationOptions": "Puede enviar a una dirección {bankName: string}, una dirección LN, una factura LN o una dirección BTC.",
         "expiredInvoice": "Esta factura ha caducado. Por favor, genere una nueva factura.",
         "wrongNetwork": "Esta factura es para una red diferente. Por favor, genere una nueva factura.",
@@ -2244,7 +2244,9 @@
             "confirmButton": "Estoy 100% seguro"
         },
         "clipboardError": "Error al obtener el valor del portapapeles",
-        "pastedClipboardSuccess": "Pegado desde el portapapeles"
+        "pastedClipboardSuccess": "Pegado desde el portapapeles",
+        "invalidPhoneNumber": "Introduzca un número de teléfono válido",
+        "phoneNotAllowed": "Este campo no acepta números de teléfono"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
@@ -2255,10 +2257,10 @@
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
         "destination": "Destino",
-        "destinationIsRequired": "El destino es obligatorio",
+        "destinationRequired": "Destino requerido",
         "fee": "tarifa de red",
         "feeCalculationUnsuccessful": "Error al calcular, inténtelo de nuevo ⚠️",
-        "placeholder": "Nombre de usuario o factura",
+        "placeholder": "Factura o Dirección",
         "invalidUsername": "Nombre de usuario no válido",
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
@@ -2283,6 +2285,9 @@
         "copiedSuccessMessage": "Mensaje copiado exitosamente",
         "copiedSecretMessage": "Mensaje secreto copiado exitosamente",
         "pendingDecryptionMessage": "Mensaje cifrado. Esperando confirmación de pago.",
+        "destinationScreenTitle": "Enviar a",
+        "orBySMS": "O Número De Teléfono",
+        "orSaved": "O Guardado",
         "feeLabel": "Comisión",
         "noteLabel": "Nota",
         "sender": "Remitente",
@@ -2758,9 +2763,10 @@
         "dollar": "Dólar",
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
+        "profiles": "Perfiles",
+        "paste": "Pegar",
         "some": "Algunos",
         "support": "Soporte",
-        "profiles": "Perfiles",
         "blinkToBlink": "Blink a Blink"
     },
     "errors": {

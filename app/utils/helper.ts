@@ -41,3 +41,5 @@ export const ellipsizeMiddle = (
 }
 
 export const isIos = Platform.OS === "ios"
+
+export const normalizeString = (value?: string) => (value ?? "").trim().toLowerCase()
