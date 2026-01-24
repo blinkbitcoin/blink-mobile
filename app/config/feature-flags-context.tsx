@@ -9,6 +9,7 @@ const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
 const FeedbackEmailKey = "feedbackEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
+const FeeReimbursementMemoKey = "feeReimbursementMemo"
 const SuccessIconDurationKey = "successIconDuration"
 
 type FeatureFlags = {
@@ -21,6 +22,7 @@ type RemoteConfig = {
   [FeedbackEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
+  [FeeReimbursementMemoKey]: string
   [SuccessIconDurationKey]: number
 }
 
@@ -30,6 +32,7 @@ const defaultRemoteConfig: RemoteConfig = {
   feedbackEmailAddress: "feedback@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
+  feeReimbursementMemo: "fee reimbursement",
   successIconDuration: 2300,
 }
 
@@ -83,6 +86,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(UpgradeModalShowAtSessionNumberKey)
           .asNumber()
 
+        const feeReimbursementMemo = remoteConfigInstance()
+          .getValue(FeeReimbursementMemoKey)
+          .asString()
         const successIconDuration = remoteConfigInstance()
           .getValue(SuccessIconDurationKey)
           .asNumber()
@@ -93,6 +99,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           feedbackEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
+          feeReimbursementMemo,
           successIconDuration,
         })
       } catch (err) {

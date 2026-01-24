@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from "react"
 import { useApolloClient } from "@apollo/client"
 
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { markTxLastSeenId } from "@app/graphql/client-only-query"
 import {
   TransactionFragment,
@@ -15,9 +16,13 @@ import {
 const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
   currency: WalletCurrency,
+  feeReimbursementMemo: string,
 ): string => {
   const filteredTransactions = transactions.filter(
-    (transaction) => transaction.settlementCurrency === currency,
+    (transaction) =>
+      transaction.settlementCurrency === currency &&
+      transaction.settlementAmount !== 0 &&
+      transaction.memo?.toLowerCase() !== feeReimbursementMemo.toLowerCase(),
   )
   if (filteredTransactions.length === 0) return ""
 
@@ -32,6 +37,7 @@ export const useTransactionSeenState = (
   transactions?: ReadonlyArray<TransactionFragment>,
 ) => {
   const client = useApolloClient()
+  const { feeReimbursementMemo } = useRemoteConfig()
 
   const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
     const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
@@ -56,10 +62,18 @@ export const useTransactionSeenState = (
       transactions && transactions.length > 0 ? transactions : readCachedTransactions()
 
     return {
-      btcId: getLatestTransactionId(baseTransactions, WalletCurrency.Btc),
-      usdId: getLatestTransactionId(baseTransactions, WalletCurrency.Usd),
+      btcId: getLatestTransactionId(
+        baseTransactions,
+        WalletCurrency.Btc,
+        feeReimbursementMemo,
+      ),
+      usdId: getLatestTransactionId(
+        baseTransactions,
+        WalletCurrency.Usd,
+        feeReimbursementMemo,
+      ),
     }
-  }, [readCachedTransactions, transactions])
+  }, [readCachedTransactions, transactions, feeReimbursementMemo])
 
   const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",

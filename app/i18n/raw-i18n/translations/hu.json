@@ -28,10 +28,10 @@
         "text": "Az 'Elfogadom' gombra kattintva elfogadod a Felhasználási Feltételeinket. Azzal is egyetértesz, hogy nem egy tiltott ország lakosa vagy állampolgára vagy."
     },
     "SetAccountModal": {
-        "title": "Alapértelmezett számla beállítása",
-        "description": "A kezdetben ez a számla lesz kiválasztva a fizetések küldéséhez és fogadásához. Bármikor megváltoztatható.",
-        "stablesatsTag": "Válaszd ezt stabil USD érték fenntartásához.",
-        "bitcoinTag": "Válaszd ezt a Bitcoin alapon való elszámoláshoz."
+        "title": "Állítsd be a fogadó számládat",
+        "description": "Ezt később bármikor módosíthatod a Beállításokban",
+        "stablesatsTag": "Stablesats számla az árstabilitásért",
+        "bitcoinTag": "Bitcoin számla maximalistáknak"
     },
     "NoteInput": {
         "addNote": "Jegyzet hozzáadása"

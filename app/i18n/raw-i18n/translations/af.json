@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. "
     },
     "SetAccountModal": {
-        "title": "Stel jou verstekrekening",
-        "description": "Die rekening sal voorlopig gekies word om betalings te stuur en ontvang. Dit kan enige tyd verander word.",
-        "stablesatsTag": "Kies die om 'n konstante USD-waarde te behou.",
-        "bitcoinTag": "Kies die om op 'n Bitcoin-standaard te wees."
+        "title": "Stel jou ontvangrekening op",
+        "description": "Jy kan dit later altyd in die Instellings verander",
+        "stablesatsTag": "Stablesats-rekening vir prysstabiliteit",
+        "bitcoinTag": "Bitcoin-rekening vir maksimaliste"
     },
     "NoteInput": {
         "addNote": "Voeg nota by"

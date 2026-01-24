@@ -28,10 +28,10 @@
         "text": "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Set up your receive account",
+        "description": "You can always change this later in the Settings",
+        "stablesatsTag": "Stablesats account for price stability",
+        "bitcoinTag": "Bitcoin account for maximalists"
     },
     "NoteInput": {
         "addNote": "Add note"

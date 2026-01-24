@@ -28,10 +28,10 @@
         "text": "'Kabul Et' seçeneğine tıklayarak Hüküm ve Koşullarımızı kabul etmiş olursunuz. Ayrıca, yasaklı ülkelerden birinde ikamet etmediğinizi veya vatandaşı olmadığınızı da kabul edersiniz."
     },
     "SetAccountModal": {
-        "title": "Varsayılan hesap olarak ayarla",
-        "description": "Bu hesap öncelikle ödeme göndermek ve almak için seçilecektir. İstenildiği zaman değiştirilebilir.",
-        "stablesatsTag": "Sabit dolar değerini korumak için bunu seçin.",
-        "bitcoinTag": "Bitcoin standardında kullanmak için bunu seçin."
+        "title": "Alım hesabını ayarla",
+        "description": "Bunu daha sonra Ayarlar'da her zaman değiştirebilirsin",
+        "stablesatsTag": "Fiyat istikrarı için Stablesats hesabı",
+        "bitcoinTag": "Maksimalistler için Bitcoin hesabı"
     },
     "NoteInput": {
         "addNote": "Not ekle"

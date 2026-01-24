@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Umožněte lidem vybírat platby prostřednictvím odkazu Pokladny, aniž by měli přístup k vaší peněžence. Vytvořené faktury a platby budou zasílány přímo na vaši {bankName: string} peněženku."
     },
     "SetAccountModal": {
-        "title": "Nastavit výchozí účet",
-        "description": "Tento účet bude zpočátku vybrán pro odesílání a přijímání plateb. Lze jej kdykoli změnit.",
-        "stablesatsTag": "Tuto možnost zvolte, abyste udrželi stabilní hodnotu USD.",
-        "bitcoinTag": "Zvolte tuto možnost, abyste byli na Bitcoin standardu."
+        "title": "Nastavte si účet pro příjem",
+        "description": "Vždy to můžete později změnit v Nastavení",
+        "stablesatsTag": "Účet Stablesats pro cenovou stabilitu",
+        "bitcoinTag": "Bitcoinový účet pro maximalisty"
     },
     "NoteInput": {
         "addNote": "Přidat poznámku"

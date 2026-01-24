@@ -148,19 +148,19 @@ type RootTranslation = {
 	}
 	SetAccountModal: {
 		/**
-		 * S​e​t​ ​d​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
 		 */
 		title: string
 		/**
-		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​i​t​i​a​l​l​y​ ​s​e​l​e​c​t​e​d​ ​f​o​r​ ​s​e​n​d​i​n​g​ ​a​n​d​ ​r​e​c​e​i​v​i​n​g​ ​p​a​y​m​e​n​t​s​.​ ​I​t​ ​c​a​n​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​t​ ​a​n​y​ ​t​i​m​e​.
+		 * Y​o​u​ ​c​a​n​ ​a​l​w​a​y​s​ ​c​h​a​n​g​e​ ​t​h​i​s​ ​l​a​t​e​r​ ​i​n​ ​t​h​e​ ​S​e​t​t​i​n​g​s
 		 */
 		description: string
 		/**
-		 * C​h​o​o​s​e​ ​t​h​i​s​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​a​b​l​e​ ​U​S​D​ ​v​a​l​u​e​.
+		 * S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​p​r​i​c​e​ ​s​t​a​b​i​l​i​t​y
 		 */
 		stablesatsTag: string
 		/**
-		 * C​h​o​o​s​e​ ​t​h​i​s​ ​t​o​ ​b​e​ ​o​n​ ​a​ ​B​i​t​c​o​i​n​ ​s​t​a​n​d​a​r​d​.
+		 * B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​m​a​x​i​m​a​l​i​s​t​s
 		 */
 		bitcoinTag: string
 	}
@@ -9720,19 +9720,19 @@ export type TranslationFunctions = {
 	}
 	SetAccountModal: {
 		/**
-		 * Set default account
+		 * Set up your receive account
 		 */
 		title: () => LocalizedString
 		/**
-		 * This account will be initially selected for sending and receiving payments. It can be changed at any time.
+		 * You can always change this later in the Settings
 		 */
 		description: () => LocalizedString
 		/**
-		 * Choose this to maintain a stable USD value.
+		 * Stablesats account for price stability
 		 */
 		stablesatsTag: () => LocalizedString
 		/**
-		 * Choose this to be on a Bitcoin standard.
+		 * Bitcoin account for maximalists
 		 */
 		bitcoinTag: () => LocalizedString
 	}

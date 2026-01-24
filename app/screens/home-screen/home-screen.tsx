@@ -25,6 +25,7 @@ import { Screen } from "@app/components/screen"
 import {
   UnseenTxAmountBadge,
   useUnseenTxAmountBadge,
+  useOutgoingBadgeVisibility,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -248,7 +249,7 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx } = useTransactionSeenState(
+  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
     accountId || "",
     transactions,
   )
@@ -264,6 +265,19 @@ export const HomeScreen: React.FC = () => {
       hasUnseenBtcTx,
       hasUnseenUsdTx,
     })
+
+  const handleOutgoingBadgeHide = React.useCallback(() => {
+    if (latestUnseenTx?.settlementCurrency) {
+      markTxSeen(latestUnseenTx.settlementCurrency)
+    }
+  }, [latestUnseenTx?.settlementCurrency, markTxSeen])
+
+  const showOutgoingBadge = useOutgoingBadgeVisibility({
+    txId: latestUnseenTx?.id,
+    amountText: unseenAmountText,
+    isOutgoing,
+    onHide: handleOutgoingBadgeHide,
+  })
 
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
@@ -478,7 +492,7 @@ export const HomeScreen: React.FC = () => {
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
           amountText={unseenAmountText ?? ""}
-          visible={Boolean(unseenAmountText)}
+          visible={isOutgoing ? showOutgoingBadge : Boolean(unseenAmountText)}
           onPress={handleUnseenBadgePress}
           isOutgoing={isOutgoing}
         />
@@ -499,8 +513,8 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           wallets={wallets}
-          showBtcNotification={hasUnseenBtcTx}
-          showUsdNotification={hasUnseenUsdTx}
+          showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
+          showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
@@ -530,7 +544,7 @@ export const HomeScreen: React.FC = () => {
       </ScrollView>
       <SlideUpHandle
         bottomOffset={15}
-        onAction={() => navigation.navigate("transactionHistory", { showLoading: true })}
+        onAction={() => navigation.navigate("transactionHistory")}
       />
     </Screen>
   )

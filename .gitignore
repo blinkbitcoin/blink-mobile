@@ -103,3 +103,11 @@ android-recordings
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# As long asd we haven't agreed on an AI agent strategy, let's ignore any AI agent data
+.claude
+.augment
+.bmad
+bmad-custom-src
+.beads
+.history # a defined place to dump all that intermediate stuff from AI agents

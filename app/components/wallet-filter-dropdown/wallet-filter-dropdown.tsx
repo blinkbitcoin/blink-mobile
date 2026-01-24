@@ -79,7 +79,7 @@ export const WalletFilterDropdown: React.FC<{
             <CurrencyPill
               currency={current.value}
               containerSize="medium"
-              label={current.description}
+              label={current.value === "ALL" ? current.description : undefined}
               containerStyle={
                 isCurrencyOption(current.value) ? pillWidthStyle : undefined
               }
@@ -119,7 +119,7 @@ export const WalletFilterDropdown: React.FC<{
                   <CurrencyPill
                     currency={opt.value}
                     containerSize="medium"
-                    label={opt.description}
+                    label={opt.value === "ALL" ? opt.description : undefined}
                     containerStyle={
                       isCurrencyOption(opt.value) ? pillWidthStyle : undefined
                     }

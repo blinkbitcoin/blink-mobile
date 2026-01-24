@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Accepter que des personnes collectent des paiements via le lien du terminal de paiement, sans avoir accès à votre portefeuille.\n\nIls peuvent créer des factures et les paiements seront envoyés directement à votre portefeuille\n{bankName: string}."
     },
     "SetAccountModal": {
-        "title": "Définir le compte par défaut",
-        "description": "Ce compte sera d’abord sélectionné pour envoyer et recevoir des paiements. Il peut être modifié à tout moment.",
-        "stablesatsTag": "Choisir cette option pour garder un montant stable du dollar US.",
-        "bitcoinTag": "Choisir cette option pour être dans le standard Bitcoin."
+        "title": "Configurez votre compte de réception",
+        "description": "Vous pouvez toujours changer cela plus tard dans les Réglages",
+        "stablesatsTag": "Compte Stablesats pour la stabilité des prix",
+        "bitcoinTag": "Compte Bitcoin pour les maximalistes"
     },
     "NoteInput": {
         "addNote": "Ajouter une note"

@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Дозволите особама да примају плаћања преко линка касе, без приступа вашем новчанику.\n\nМогу издати рачуне и плаћања ће бити послата директно на ваш {bankName: string} новчаник."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Podesi svoj nalog za prijem",
+        "description": "Ovo uvek možeš kasnije da promeniš u Podešavanjima",
+        "stablesatsTag": "Stablesats nalog za stabilnost cene",
+        "bitcoinTag": "Bitcoin nalog za maksimaliste"
     },
     "NoteInput": {
         "addNote": "Add note"

@@ -5,6 +5,18 @@ import { render } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: {
+      common: {
+        bitcoin: () => "Bitcoin",
+        dollar: () => "Dollar",
+        all: () => "All",
+      },
+    },
+  }),
+}))
+
 jest.mock("@rn-vui/themed", () => {
   return {
     Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
@@ -35,8 +47,8 @@ describe("CurrencyPill", () => {
       </>,
     )
 
-    expect(getByText("BTC")).toBeTruthy()
-    expect(getByText("USD")).toBeTruthy()
+    expect(getByText("Bitcoin")).toBeTruthy()
+    expect(getByText("Dollar")).toBeTruthy()
   })
 
   it("renders custom label for ALL", () => {

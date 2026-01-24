@@ -71,21 +71,22 @@ export const usePriceConversion = () => {
     }
   }, [displayCurrencyPerSat, displayCurrencyPerCent])
 
-  const convertMoneyAmount = useMemo(() => {
+  const converters = useMemo(() => {
     if (!priceOfCurrencyInCurrency) {
       return undefined
     }
 
-    return <T extends WalletOrDisplayCurrency>(
+    const convertWithRounding = <T extends WalletOrDisplayCurrency>(
       moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
       toCurrency: T,
+      roundingFn: (value: number) => number,
     ): MoneyAmount<T> => {
       // If the money amount is already the correct currency, return it
       if (moneyAmountIsCurrencyType(moneyAmount, toCurrency)) {
         return moneyAmount
       }
 
-      let amount = Math.round(
+      let amount = roundingFn(
         moneyAmount.amount * priceOfCurrencyInCurrency(moneyAmount.currency, toCurrency),
       )
 
@@ -108,10 +109,24 @@ export const usePriceConversion = () => {
         currencyCode: toCurrency === DisplayCurrency ? displayCurrency : toCurrency,
       }
     }
+
+    const convertMoneyAmount = <T extends WalletOrDisplayCurrency>(
+      moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
+      toCurrency: T,
+    ): MoneyAmount<T> => convertWithRounding(moneyAmount, toCurrency, Math.round)
+
+    const convertMoneyAmountWithRounding = <T extends WalletOrDisplayCurrency>(
+      moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
+      toCurrency: T,
+      roundingFn: (value: number) => number,
+    ): MoneyAmount<T> => convertWithRounding(moneyAmount, toCurrency, roundingFn)
+
+    return { convertMoneyAmount, convertMoneyAmountWithRounding }
   }, [priceOfCurrencyInCurrency, displayCurrency])
 
   return {
-    convertMoneyAmount,
+    convertMoneyAmount: converters?.convertMoneyAmount,
+    convertMoneyAmountWithRounding: converters?.convertMoneyAmountWithRounding,
     displayCurrency,
     toDisplayMoneyAmount: createToDisplayAmount(displayCurrency),
     usdPerSat: priceOfCurrencyInCurrency
