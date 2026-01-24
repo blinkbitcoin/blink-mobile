@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "สวิตช์",
         "account": "บัญชี",
         "transactionLimits": "จำกัดธุรกรรม",
         "activateWallet": "เปิดใช้งานกระเป๋า",

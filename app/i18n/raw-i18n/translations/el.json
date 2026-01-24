@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Ενεργοποιημένο",
+        "switch": "Διακόπτης",
         "notifications": "Ειδοποιήσεις",
         "preferences": "Προτιμήσεις",
         "onDeviceSecurity": " Ασφάλεια συσκευής",

@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} succesvol bevestigd"
     },
     "common": {
+        "switch": "Schakelaar",
         "account": "Rekening",
         "transactionLimits": "Transactie Limieten",
         "activateWallet": "Activeer Wallet",

@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Interruptor",
         "account": "Qillqa sutiyuq",
         "transactionLimits": "Kawsayniy tukuykuna chiqanakuykuna",
         "activateWallet": "Chaski qillqa kawsayniykita kaniy",

@@ -2740,6 +2740,7 @@ const en: BaseTranslation = {
   },
   common: {
     enabled: "Enabled",
+    switch: "Switch",
     notifications: "Notifications",
     preferences: "Preferences",
     onDeviceSecurity: "Security and privacy",

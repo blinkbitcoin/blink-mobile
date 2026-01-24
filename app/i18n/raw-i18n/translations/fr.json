@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} a été validé avec succès"
     },
     "common": {
+        "switch": "Interrupteur",
         "account": "Compte",
         "transactionLimits": "Limite de transaction",
         "activateWallet": "Activer le portefeuille",

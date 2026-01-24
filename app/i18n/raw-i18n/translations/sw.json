@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Imewashwa",
+        "switch": "Swichi",
         "notifications": "Arifa",
         "preferences": "Mapendeleo",
         "onDeviceSecurity": "Usalama Kwenye Kifaa",

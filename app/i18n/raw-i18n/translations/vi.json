@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Công tắc",
         "account": "Tài khoản",
         "transactionLimits": "Giới hạn giao dịch",
         "activateWallet": "Kích hoạt ví",

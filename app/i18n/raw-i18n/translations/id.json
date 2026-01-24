@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Diaktifkan",
+        "switch": "Sakelar",
         "notifications": "Notifikasi",
         "preferences": "Preferensi",
         "onDeviceSecurity": "Keamanan Perangkat",

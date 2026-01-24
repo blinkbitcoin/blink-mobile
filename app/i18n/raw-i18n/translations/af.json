@@ -2437,6 +2437,7 @@
         "success": "Epos {email: string} suksesvol bevestig"
     },
     "common": {
+        "switch": "Skakelaar",
         "account": "Rekening",
         "transactionLimits": "Transaksielimiete ",
         "activateWallet": "Aktiveer beursie",

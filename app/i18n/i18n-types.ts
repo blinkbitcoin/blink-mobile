@@ -8560,6 +8560,10 @@ type RootTranslation = {
 		 */
 		enabled: string
 		/**
+		 * S​w​i​t​c​h
+		 */
+		'switch': string
+		/**
 		 * N​o​t​i​f​i​c​a​t​i​o​n​s
 		 */
 		notifications: string
@@ -18041,6 +18045,10 @@ export type TranslationFunctions = {
 		 * Enabled
 		 */
 		enabled: () => LocalizedString
+		/**
+		 * Switch
+		 */
+		'switch': () => LocalizedString
 		/**
 		 * Notifications
 		 */

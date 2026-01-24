@@ -37,7 +37,7 @@ export const AccountLNAddress: React.FC = () => {
         leftGaloyIcon="lightning-address"
         rightIcon={
           hasUsername ? (
-            <GaloyIcon name="copy-paste" size={24} color={colors.primary} />
+            <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
           ) : undefined
         }
         action={() => {

@@ -2538,6 +2538,7 @@
     },
     "common": {
         "enabled": "Activat",
+        "switch": "Comutator",
         "notifications": "Notificări",
         "preferences": "Preferinţe",
         "onDeviceSecurity": "Securitate pe dispozitiv",

@@ -2466,6 +2466,7 @@
         "success": "E-mail {email: string} bekræftet med succes"
     },
     "common": {
+        "switch": "Afbryder",
         "account": "Konto",
         "transactionLimits": "Transaktionsgrænser",
         "activateWallet": "Aktiver Tegnebog",

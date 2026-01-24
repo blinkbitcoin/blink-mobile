@@ -2303,7 +2303,7 @@
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
         "tapUserName": "Ingrese aquí para configurarlo",
-        "notifications": "Notificaciones ",
+        "notifications": "Notificaciones",
         "title": "Configuración",
         "darkMode": "Modo oscuro.",
         "setToDark": "Modo: oscuro.",
@@ -2640,7 +2640,8 @@
     },
     "common": {
         "enabled": "Activado",
-        "notifications": "Notificaciones ",
+        "switch": "Interruptor",
+        "notifications": "Notificaciones",
         "preferences": "Preferencias",
         "onDeviceSecurity": "Seguridad y privacidad",
         "securityAndPrivacy": "Seguridad y privacidad",

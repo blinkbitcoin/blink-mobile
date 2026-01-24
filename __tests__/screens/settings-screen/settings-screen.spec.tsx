@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react-n
 import { SettingsScreenDocument } from "@app/graphql/generated"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import { SettingsScreen } from "@app/screens/settings-screen/settings-screen"
+import { SettingsRow } from "@app/screens/settings-screen/row"
 import { LevelContextProvider, AccountLevel } from "@app/graphql/level-context"
 import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-screen.stories"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -62,6 +63,7 @@ const baseNotificationNodes: Array<{
 type TestState = {
   notificationCount: number
   notificationNodes: typeof baseNotificationNodes
+  phone: string | null
   setActiveScreen: ((screen: string) => void) | null
   triggerRender: React.Dispatch<React.SetStateAction<number>> | null
   headerRight: (() => React.ReactNode) | null
@@ -77,6 +79,7 @@ const buildNotificationNodes = (unreadCount: number) =>
 const createTestState = (): TestState => ({
   notificationCount: 3,
   notificationNodes: buildNotificationNodes(3),
+  phone: "+50365055539",
   setActiveScreen: null,
   triggerRender: null,
   headerRight: null,
@@ -141,7 +144,7 @@ jest.mock("@app/graphql/generated", () => {
           username: "test1",
           language: "en",
           totpEnabled: false,
-          phone: "+50365055539",
+          phone: testState.phone,
           email: {
             address: "test@example.com",
             verified: true,
@@ -419,5 +422,93 @@ describe("Settings Screen", () => {
 
     const elements = screen.getAllByText("test1@blink.sv")
     expect(elements.length).toBeGreaterThan(0)
+  })
+
+  it("shows phone ln address when phone is verified", async () => {
+    const phone = "+50365055539"
+    const lnAddress = `${phone}@blink.sv`
+    testState.phone = phone
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText(lnAddress)).toBeTruthy()
+  })
+
+  it("hides phone ln address when phone is missing", async () => {
+    testState.phone = null
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText("Set your lightning address")).toBeNull()
+    expect(screen.queryByText("+50365055539@blink.sv")).toBeNull()
+  })
+
+  it("truncates long settings row titles", () => {
+    const longTitle = "This is a very long settings row title that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} />
+      </ContextForScreen>,
+    )
+
+    const titleNode = screen.getByText(longTitle)
+    expect(titleNode.props.numberOfLines).toBe(1)
+    expect(titleNode.props.ellipsizeMode).toBe("tail")
+  })
+
+  it("truncates long settings row subtitles", () => {
+    const longTitle = "Short title"
+    const longSubtitle = "This is a very long subtitle that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
+      </ContextForScreen>,
+    )
+
+    const subtitleNode = screen.getByText(longSubtitle)
+    expect(subtitleNode.props.numberOfLines).toBe(1)
+    expect(subtitleNode.props.ellipsizeMode).toBe("tail")
+  })
+
+  it("truncates long title and subtitle together", () => {
+    const longTitle = "Another very long settings row title that should truncate"
+    const longSubtitle = "Another very long subtitle that should truncate"
+
+    render(
+      <ContextForScreen>
+        <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
+      </ContextForScreen>,
+    )
+
+    const titleNode = screen.getByText(longTitle)
+    const subtitleNode = screen.getByText(longSubtitle)
+    expect(titleNode.props.numberOfLines).toBe(1)
+    expect(titleNode.props.ellipsizeMode).toBe("tail")
+    expect(subtitleNode.props.numberOfLines).toBe(1)
+    expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 })

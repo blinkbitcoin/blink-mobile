@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Esobozeseddwa",
+        "switch": "Swichi",
         "notifications": "Okumanyisibwa",
         "preferences": "By’oyagala",
         "onDeviceSecurity": "Obukuumi ku ssimu",

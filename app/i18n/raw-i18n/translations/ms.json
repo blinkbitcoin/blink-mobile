@@ -2437,6 +2437,7 @@
         "success": "Emel {email: string} telah berjaya disahkan"
     },
     "common": {
+        "switch": "Suis",
         "account": "Akaun",
         "transactionLimits": "Had transaksi",
         "activateWallet": "Aktifkan dompet",

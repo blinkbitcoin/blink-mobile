@@ -1,63 +1,44 @@
-import React, { useState } from "react"
-
-import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { toastShow } from "@app/utils/toast"
+import React from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
-
-import { SettingsRow } from "../row"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useTheme } from "@rn-vui/themed"
 
-export const PhoneNAddress: React.FC = () => {
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import { useAppConfig } from "@app/hooks"
+import { toastShow } from "@app/utils/toast"
+
+import { SettingsRow } from "../row"
+
+export const PhoneLnAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
   const {
     theme: { colors },
   } = useTheme()
   const hostName = appConfig.galoyInstance.lnAddressHostname
 
-  const [isModalShown, setModalShown] = useState(false)
-  const toggleModalVisibility = () => setModalShown((x) => !x)
-
-  const { data, loading } = useSettingsScreenQuery()
-
+  const { loading, phone, phoneVerified } = useLoginMethods()
   const { LL } = useI18nContext()
 
-  const hasUsername = Boolean(data?.me?.phone)
-  const lnAddress = `${data?.me?.phone}@${hostName}`
+  if (!phoneVerified || !phone) return null
+
+  const lnAddress = `${phone}@${hostName}`
 
   return (
-    <>
-      <SettingsRow
-        loading={loading}
-        title={hasUsername ? lnAddress : LL.SettingsScreen.setYourLightningAddress()}
-        subtitleShorter={(data?.me?.username || "").length > 22}
-        leftIcon="call-outline"
-        rightIcon={
-          hasUsername ? (
-            <GaloyIcon name="copy-paste" size={24} color={colors.primary} />
-          ) : undefined
-        }
-        action={() => {
-          if (hasUsername) {
-            Clipboard.setString(lnAddress)
-            toastShow({
-              type: "success",
-              message: (translations) =>
-                translations.GaloyAddressScreen.copiedLightningAddressToClipboard(),
-              LL,
-            })
-          } else {
-            toggleModalVisibility()
-          }
-        }}
-      />
-      <SetLightningAddressModal
-        isVisible={isModalShown}
-        toggleModal={toggleModalVisibility}
-      />
-    </>
+    <SettingsRow
+      loading={loading}
+      title={lnAddress}
+      leftIcon="call-outline"
+      rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
+      action={() => {
+        Clipboard.setString(lnAddress)
+        toastShow({
+          type: "success",
+          message: (translations) =>
+            translations.GaloyAddressScreen.copiedLightningAddressToClipboard(),
+          LL,
+        })
+      }}
+    />
   )
 }
