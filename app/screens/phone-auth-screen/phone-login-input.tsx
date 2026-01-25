@@ -281,6 +281,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
               return (
                 countryCode && (
                   <TouchableOpacity
+                    testID="Country Picker"
                     style={styles.countryPickerButtonStyle}
                     onPress={onOpen}
                   >
