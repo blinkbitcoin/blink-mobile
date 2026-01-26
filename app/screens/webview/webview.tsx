@@ -11,10 +11,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import {
-  WebViewProgressEvent,
-  ShouldStartLoadRequest,
-} from "react-native-webview/lib/WebViewTypes"
+import { WebViewProgressEvent } from "react-native-webview/lib/WebViewTypes"
 
 type WebViewDebugScreenRouteProp = RouteProp<RootStackParamList, "webView">
 
@@ -26,12 +23,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
-  const { url, initialTitle, hideHeader, onShouldStartLoad } = route.params as {
-    url: string
-    initialTitle?: string
-    hideHeader?: boolean
-    onShouldStartLoad?: (req: ShouldStartLoadRequest) => boolean
-  }
+  const { url, initialTitle, headerTitle } = route.params
   const { LL } = useI18nContext()
 
   const webview = React.useRef<WebView | null>(null)
@@ -53,19 +45,17 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
     navigation.goBack()
   }, [canGoBack, navigation])
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: !hideHeader })
-  }, [navigation, hideHeader])
-
   React.useEffect(() => {
-    if (hideHeader) return
+    if (headerTitle) {
+      navigation.setOptions({ title: headerTitle })
+      return
+    }
+
     if (!initialTitle) return
     navigation.setOptions({ title: initialTitle })
-  }, [navigation, initialTitle, hideHeader])
+  }, [navigation, initialTitle, headerTitle])
 
   React.useEffect(() => {
-    if (hideHeader) return
-
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity style={styles.iconContainer} onPress={handleBackPress}>
@@ -73,11 +63,11 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
         </TouchableOpacity>
       ),
     })
-  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.black, hideHeader])
+  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.black])
 
   const handleWebViewNavigationStateChange = (newNavState: WebViewNavigation) => {
     setCanGoBack(newNavState.canGoBack)
-    if (!hideHeader && newNavState.title) {
+    if (!headerTitle && newNavState.title) {
       navigation.setOptions({ title: newNavState.title })
     }
   }
@@ -104,7 +94,6 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
           }
         }}
         onNavigationStateChange={handleWebViewNavigationStateChange}
-        onShouldStartLoadWithRequest={onShouldStartLoad}
         onMessage={onMessageHandler(webview as React.MutableRefObject<WebView>, {
           enable: async () => {
             /* Your implementation goes here */
@@ -144,6 +133,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
           // },
         })}
         style={styles.full}
+        allowsInlineMediaPlayback
       />
     </Screen>
   )

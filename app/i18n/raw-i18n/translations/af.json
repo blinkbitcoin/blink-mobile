@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. "
     },
     "SetAccountModal": {
-        "title": "Stel jou verstekrekening",
-        "description": "Die rekening sal voorlopig gekies word om betalings te stuur en ontvang. Dit kan enige tyd verander word.",
-        "stablesatsTag": "Kies die om 'n konstante USD-waarde te behou.",
-        "bitcoinTag": "Kies die om op 'n Bitcoin-standaard te wees."
+        "title": "Stel jou ontvangrekening op",
+        "description": "Jy kan dit later altyd in die Instellings verander",
+        "stablesatsTag": "Stablesats-rekening vir prysstabiliteit",
+        "bitcoinTag": "Bitcoin-rekening vir maksimaliste"
     },
     "NoteInput": {
         "addNote": "Voeg nota by"
@@ -2296,8 +2296,8 @@
         "toastMessage": "Geheim na knipbord!"
     },
     "DefaultWalletScreen": {
-        "title": "Verstek-rekening",
-        "info": "Kies jou verstekrekening vir Stuur en Ontvang. Jy kan die stuur- en ontvangrekening vir aparte transaksies in die mobiele toepassing verander. Betalings wat deur die kasregister of Lightning-adres ontvang word gaan altyd na jou verstekrekening.\n\nOm wisselvalligheid te vermy kan jy Stablesats kies. Dit help om 'n stabiele bedrag te behou en steeds te stuur en ontvang. \n\nJy kan die verstelling enige tyd verander en dit sal nie jou huidige saldo veander nie."
+        "title": "Ontvang geldeenheid",
+        "info": "Gebruik jou Stablesats-rekening in Blink om die geld in jou beursie stabiel te hou in fiat-terme (dollar). Gebruik jou Bitcoin-rekening as jy sats opstapel en dit vir jou reg is dat jou fiat-balans heeltyd verander."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2437,6 +2437,7 @@
         "success": "Epos {email: string} suksesvol bevestig"
     },
     "common": {
+        "switch": "Skakelaar",
         "account": "Rekening",
         "transactionLimits": "Transaksielimiete ",
         "activateWallet": "Aktiveer beursie",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Hierdie maand",
         "prevMonths": "Vorige maande",
         "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
-        "warning": "Waarskuwing"
+        "warning": "Waarskuwing",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",

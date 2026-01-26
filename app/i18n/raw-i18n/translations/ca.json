@@ -28,10 +28,10 @@
         "text": "En fer clic a \"Acceptar\", acceptes els nostres Termes i Condicions. També acceptes que no ets resident o ciutadà d'un dels països prohibits."
     },
     "SetAccountModal": {
-        "title": "Estableix el teu compte predeterminat",
-        "description": "Aquest compte serà seleccionat inicialment per enviar i rebre pagaments. Es pot canviar en qualsevol moment.",
-        "stablesatsTag": "Tria-ho per mantenir un valor estable en USD.",
-        "bitcoinTag": "Escull-ho per estar en un estàndard de Bitcoin"
+        "title": "Configura el teu compte de recepció",
+        "description": "Sempre ho pots canviar més endavant a Configuració",
+        "stablesatsTag": "Compte Stablesats per a l'estabilitat del preu",
+        "bitcoinTag": "Compte Bitcoin per a maximalistes"
     },
     "NoteInput": {
         "addNote": "Afegir nota"
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Habilitat",
+        "switch": "Interruptor",
         "notifications": "Notificacions",
         "preferences": "Preferències",
         "onDeviceSecurity": "Seguretat al dispositiu",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Aquest mes",
         "prevMonths": "Mesos anteriors",
         "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
-        "warning": "Advertència"
+        "warning": "Advertència",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",
@@ -2650,7 +2652,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Gaudint de l'aplicació?",
         "statusPage": "Pàgina d'estat",
-        "chatbot": "Bot de xat",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Gràcies pels comentaris, vols suggerir una millora?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Notificacions",
         "noNotifications": "Ara no tens cap notificació"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "S'ha produït un error en enviar el missatge",
-        "confirmChatReset": "Confirmes que vols restablir el xat?",
-        "errorResettingChat": "S'ha produït un error en restablir el xat"
     }
 }

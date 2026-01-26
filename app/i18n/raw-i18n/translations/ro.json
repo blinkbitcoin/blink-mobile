@@ -28,10 +28,10 @@
         "text": "Făcând clic pe „Accept”, sunteți de acord cu Termenii și condițiile noastre. De asemenea, sunteți de acord că nu sunteți rezident sau cetățean al uneia dintre țările interzise."
     },
     "SetAccountModal": {
-        "title": "Setați contul implicit",
-        "description": "Acest cont va fi selectat inițial pentru trimiterea și primirea plăților. Acesta poate fi modificat în orice moment.",
-        "stablesatsTag": "Alegeți acesta pentru a menține o valoare stabillită în USD.",
-        "bitcoinTag": "Alegeți aceasta pentru a fi pe standardul Bitcoin."
+        "title": "Configurează contul de primire",
+        "description": "Poți schimba oricând mai târziu din Setări",
+        "stablesatsTag": "Cont Stablesats pentru stabilitatea prețului",
+        "bitcoinTag": "Cont Bitcoin pentru maximaliști"
     },
     "NoteInput": {
         "addNote": "Adaugă notă"
@@ -2376,8 +2376,8 @@
         "toastMessage": "Secret copiat în clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Cont implicit - Default",
-        "info": "Alegeți contul pe care doriți să îl setați ca implicit pentru primire și trimitere. Puteți ajusta contul de trimitere și primire pentru plăți individuale în aplicația mobilă. Plățile primite prin casa de marcat sau adresa Lightning vor merge întotdeauna în contul implicit.\n\nPentru a evita volatilitatea Bitcoin, alegeți Stablesats. Acest lucru vă permite să mențineți o sumă stabilă de bani, în timp ce puteți trimite și primi plăți.\n\nPuteți modifica oricând această setare și nu vă va afecta soldul curent."
+        "title": "Primește monedă",
+        "info": "Folosește contul tău Stablesats în Blink pentru a menține banii din portofel stabili în termeni de monedă fiat (dolar). Folosește contul tău Bitcoin dacă acumulezi sats și nu te deranjează ca soldul fiat să se schimbe constant."
     },
     "ThemeScreen": {
         "title": "Temă",
@@ -2538,6 +2538,7 @@
     },
     "common": {
         "enabled": "Activat",
+        "switch": "Comutator",
         "notifications": "Notificări",
         "preferences": "Preferinţe",
         "onDeviceSecurity": "Securitate pe dispozitiv",
@@ -2638,7 +2639,8 @@
         "thisMonth": "Luna aceasta",
         "prevMonths": "Lunile trecute",
         "problemMaybeReauth": "A apărut o problemă cu solicitarea dvs. Vă rugăm să încercați din nou într-un minut. Dacă problema persistă, vă recomandăm să vă deconectați și să vă conectați din nou. Vă puteți deconecta accesând Setări > Cont > Deconectare",
-        "warning": "Avertizare"
+        "warning": "Avertizare",
+        "blinkToBlink": "Blink la Blink"
     },
     "errors": {
         "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -2671,7 +2673,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Vă place aplicația?",
         "statusPage": "Pagina de stare",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Vă mulțumim pentru feedback, doriți să sugerați o îmbunătățire?",
@@ -2787,10 +2788,5 @@
     "NotificationHistory": {
         "title": "Notificări",
         "noNotifications": "Nu aveți nicio notificare momentan"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "A apărut o eroare la trimiterea mesajului",
-        "confirmChatReset": "Sigur doriți să resetați chat-ul?",
-        "errorResettingChat": "A apărut o eroare la resetarea chatului"
     }
 }

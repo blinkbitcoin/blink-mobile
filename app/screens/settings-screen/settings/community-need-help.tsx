@@ -33,8 +33,7 @@ export const NeedHelpSetting: React.FC = () => {
     <>
       <SettingsRow
         title={LL.support.contactUs()}
-        leftIcon="help-circle-outline"
-        rightIcon={null}
+        leftGaloyIcon="headset"
         action={toggleModal}
       />
       <ContactModal
@@ -45,7 +44,6 @@ export const NeedHelpSetting: React.FC = () => {
         supportChannels={[
           SupportChannels.Faq,
           SupportChannels.StatusPage,
-          SupportChannels.SupportChat,
           SupportChannels.Email,
         ]}
       />

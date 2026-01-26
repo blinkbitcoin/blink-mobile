@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Benarkan individu lain untuk terima bayaran melalui pautan Cash Register, tanpa akses ke dompet anda\n\nMereka boleh membuat invois baru dan bayaran akan dihantar terus ke dompet {bankName: string} anda."
     },
     "SetAccountModal": {
-        "title": "Tetapkan akaun utama",
-        "description": "Untuk permulaan, akaun ini ditetapkan sebagai tempat menerima dan membuat pembayaran. Ia boleh ditukar pada bila bila masa jika perlu",
-        "stablesatsTag": "Pilih ini untuk mengekalkan nilai USD",
-        "bitcoinTag": "Pilih ini untuk penetapan nilai standard Bitcoin"
+        "title": "Sediakan akaun penerimaan anda",
+        "description": "Anda sentiasa boleh mengubahnya kemudian di Tetapan",
+        "stablesatsTag": "Akaun Stablesats untuk kestabilan harga",
+        "bitcoinTag": "Akaun Bitcoin untuk maksimalis"
     },
     "NoteInput": {
         "addNote": "tambah nota catatan"
@@ -2296,8 +2296,8 @@
         "toastMessage": "Kata rahsia telah disalin pada papan klip!"
     },
     "DefaultWalletScreen": {
-        "title": "Akaun tetap",
-        "info": "Pilih akaun yang ditetapkan sebagai akaun utama ketika menerima dan menghantar bayaran  Anda boleh mengubah akaun bayaran dan penerimaan kepada bayaran individu dalam aplikasi telefon pintar anda. Pembayaran yang diterima melalui daftar tunai, atau alamat Lightning akan ke akaun utama.\n\nBagi mengelak ketidak tentuan harga Bitcoin, pilih Stablesats. Ini akan membolehkan anda mengekalkan amaun wang anda ketika menghantar atau menerima bayaran.\n\nAnda boleh menukar tetapan ini jika perlu, dan ia tidak akan mengakibatkan kehilangan jumlah baki wang anda."
+        "title": "Terima mata wang",
+        "info": "Gunakan akaun Stablesats anda di Blink untuk mengekalkan wang dalam dompet anda stabil dari segi mata wang fiat (dolar). Gunakan akaun Bitcoin anda jika anda mengumpul sats dan tidak kisah baki fiat anda berubah sepanjang masa."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2437,6 +2437,7 @@
         "success": "Emel {email: string} telah berjaya disahkan"
     },
     "common": {
+        "switch": "Suis",
         "account": "Akaun",
         "transactionLimits": "Had transaksi",
         "activateWallet": "Aktifkan dompet",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan lepas",
         "problemMaybeReauth": "Ada masalah dengan permohonan anda. Silancuba lagi dalam seminit dua. Jika masalah masih terjadi, kami cadangkan anda untuk log keluar dan log masuk semula. Anda boleh log keluar dengan pergi ke bahagian Tetapan > Akaun > Log Keluar",
-        "warning": "Amaran"
+        "warning": "Amaran",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Ada masalah timbul\nSila cuba lagi",

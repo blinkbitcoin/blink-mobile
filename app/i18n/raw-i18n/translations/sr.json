@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Дозволите особама да примају плаћања преко линка касе, без приступа вашем новчанику.\n\nМогу издати рачуне и плаћања ће бити послата директно на ваш {bankName: string} новчаник."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Podesi svoj nalog za prijem",
+        "description": "Ovo uvek možeš kasnije da promeniš u Podešavanjima",
+        "stablesatsTag": "Stablesats nalog za stabilnost cene",
+        "bitcoinTag": "Bitcoin nalog za maksimaliste"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2294,8 +2294,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Подразумевани налог",
-        "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+        "title": "Примање валуте",
+        "info": "Користите свој Stablesats налог у Blink-у да бисте новац у свом новчанику одржали стабилним у фиат вредности (долар). Користите свој Bitcoin налог ако сакупљате sats и не смета вам што се фиат стање стално мења."
     },
     "ThemeScreen": {
         "title": "Theme",
@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Прекидач",
         "account": "Налог",
         "transactionLimits": "Ограничења трансакција",
         "activateWallet": "Активирајте новчаник",
@@ -2522,7 +2523,8 @@
         "thisMonth": "Овог месеца",
         "prevMonths": "Прошли месеци",
         "problemMaybeReauth": "Дошло је до проблема са вашим захтевом. Молимо вас покушајте поново за један минут. Уколико проблем и даље постоји, препоручујемо да се одјавите и поново пријавите. Можете се одјавити преко Подешавања > Налог > Одјави се",
-        "warning": "Упозорење"
+        "warning": "Упозорење",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",

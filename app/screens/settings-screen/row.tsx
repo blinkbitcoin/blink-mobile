@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Icon, Text, Skeleton } from "@rn-vui/themed"
+import { makeStyles, Icon, Text, Skeleton, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 type Props = {
@@ -36,6 +36,9 @@ export const SettingsRow: React.FC<Props> = ({
 }) => {
   const [hovering, setHovering] = useState(false)
   const styles = useStyles({ hovering })
+  const {
+    theme: { colors },
+  } = useTheme()
 
   if (loading) return <Skeleton style={styles.container} animation="pulse" />
   if (spinner)
@@ -46,10 +49,16 @@ export const SettingsRow: React.FC<Props> = ({
     )
 
   const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
+  const hasLeftIcon = Boolean(leftGaloyIcon || leftIcon)
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
-      <Icon name={rightIcon ? rightIcon : defaultIcon} type="ionicon" />
+      <Icon
+        name={rightIcon ? rightIcon : defaultIcon}
+        type="ionicon"
+        size={20}
+        color={colors.primary}
+      />
     ) : (
       rightIcon
     ))
@@ -63,14 +72,17 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          {leftGaloyIcon ? (
-            <GaloyIcon name={leftGaloyIcon} size={24} />
-          ) : (
-            <Icon name={leftIcon ?? ""} type="ionicon" />
-          )}
+          {hasLeftIcon &&
+            (leftGaloyIcon ? (
+              <GaloyIcon name={leftGaloyIcon} size={20} />
+            ) : (
+              <Icon name={leftIcon ?? ""} type="ionicon" size={20} />
+            ))}
           <View>
             <View style={styles.sidetoside}>
-              <Text type="p2">{title}</Text>
+              <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
+                {title}
+              </Text>
               <Text>{extraComponentBesideTitle}</Text>
             </View>
             {subtitle && (
@@ -107,14 +119,15 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
   },
   spacing: {
     paddingHorizontal: 8,
-    paddingRight: 12,
+    paddingRight: 0,
   },
   center: {
     justifyContent: "space-around",
   },
   rightActionTouchArea: {
-    padding: 12,
-    marginRight: -12,
+    paddingVertical: 17,
+    paddingLeft: 14,
+    paddingRight: 10,
     position: "relative",
   },
   sidetoside: {
@@ -124,8 +137,12 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
     columnGap: 5,
   },
   internalContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: "flex-start",
-    paddingRight: 16,
+    paddingRight: 18,
+    minWidth: 0,
+  },
+  title: {
+    flexShrink: 1,
   },
 }))

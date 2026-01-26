@@ -61,13 +61,16 @@ import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
 import verifiedBadge from "@app/assets/icons-redesign/verified-badge.svg"
 import applePay from "@app/assets/icons-redesign/apple-pay.svg"
-import headset from "@app/assets/icons-redesign/headset.svg"
 import flashOutline from "@app/assets/icons-redesign/flash-outline.svg"
 import linkOutline from "@app/assets/icons-redesign/link-outline.svg"
 import btcHand from "@app/assets/icons-redesign/btc-hand.svg"
-import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import checkBadge from "@app/assets/icons-redesign/check-badge.svg"
 import familyOutline from "@app/assets/icons-redesign/family-outline.svg"
+import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import DocumentIcon from "@app/assets/icons-redesign/document.svg"
+import KeyIcon from "@app/assets/icons-redesign/key.svg"
+import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
+import Headset from "@app/assets/icons-redesign/headset.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -131,13 +134,16 @@ export const icons = {
   "welcome": Welcome,
   "verified-badge": verifiedBadge,
   "apple-pay": applePay,
-  "headset": headset,
   "flash-outline": flashOutline,
   "link-outline": linkOutline,
   "btc-hand": btcHand,
-  "document": DocumentIcon,
   "check-badge": checkBadge,
   "family-outline": familyOutline,
+  "calculator": Calculator,
+  "document-outline": DocumentIcon,
+  "key-outline": KeyIcon,
+  "house-outline": HouseIcon,
+  "headset": Headset,
 } as const
 
 export type IconNamesType = keyof typeof icons

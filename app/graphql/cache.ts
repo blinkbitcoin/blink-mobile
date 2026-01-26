@@ -64,6 +64,9 @@ export const createCache = () =>
           },
         },
       },
+      TxLastSeen: {
+        keyFields: ["accountId"],
+      },
       Query: {
         fields: {
           // local only fields
@@ -102,6 +105,18 @@ export const createCache = () =>
           },
           deviceSessionCount: {
             read: (value) => value ?? 0,
+          },
+          txLastSeen: {
+            keyArgs: ["accountId"],
+            read(value, { args }) {
+              if (value) return value
+              return {
+                __typename: "TxLastSeen",
+                accountId: args?.accountId || "",
+                btcId: "",
+                usdId: "",
+              }
+            },
           },
         },
       },

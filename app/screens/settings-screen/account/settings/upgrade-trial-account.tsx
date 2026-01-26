@@ -48,7 +48,7 @@ export const UpgradeTrialAccount: React.FC = () => {
           <Text type="h2" bold>
             {LL.common.trialAccount()}
           </Text>
-          <GaloyIcon name="warning" size={30} />
+          <GaloyIcon name="warning" size={20} />
         </View>
         <Text type="p3">{LL.AccountScreen.itsATrialAccount()}</Text>
         {hasBalance && (
@@ -58,6 +58,7 @@ export const UpgradeTrialAccount: React.FC = () => {
           title={LL.common.backupAccount()}
           iconName="caret-right"
           iconPosition="right"
+          size="sm"
           containerStyle={styles.selfCenter}
           onPress={openUpgradeAccountModal}
         />

@@ -37,6 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: colors.error9,
+    zIndex: 1,
   },
   textContainer: {
     overflow: "hidden",

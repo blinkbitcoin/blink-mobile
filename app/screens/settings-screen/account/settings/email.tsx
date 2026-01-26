@@ -1,8 +1,8 @@
 import React from "react"
-import { Alert, View } from "react-native"
+import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import {
   useUserEmailDeleteMutation,
   useUserEmailRegistrationInitiateMutation,
@@ -13,10 +13,11 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
   mutation userEmailDelete {
@@ -59,19 +60,22 @@ const title = (
   LL: TranslationFunctions,
 ): string => {
   if (email) {
-    if (emailVerified) return LL.AccountScreen.email()
+    if (emailVerified) return email?.toString()
     return LL.AccountScreen.unverifiedEmail()
   }
   return LL.AccountScreen.tapToAddEmail()
 }
 
 export const EmailSetting: React.FC = () => {
-  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { loading, email, emailVerified, bothEmailAndPhoneVerified } = useLoginMethods()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [emailDeleteMutation, { loading: emDelLoading }] = useUserEmailDeleteMutation()
   const [setEmailMutation, { loading: emRegLoading }] =
@@ -80,6 +84,7 @@ export const EmailSetting: React.FC = () => {
   const deleteEmail = async () => {
     try {
       await emailDeleteMutation()
+      await updateCurrentProfile()
       toastShow({
         type: "success",
         message: LL.AccountScreen.emailDeletedSuccessfully(),
@@ -153,15 +158,26 @@ export const EmailSetting: React.FC = () => {
     )
   }
 
+  const rightIconAction = email
+    ? () => {
+        if (emailVerified) {
+          if (bothEmailAndPhoneVerified) {
+            deleteEmailPrompt()
+          }
+          return
+        }
+        reVerifyEmailPrompt()
+      }
+    : undefined
+
   const RightIcon = email ? (
-    <View style={styles.sidetoside}>
-      {!emailVerified && (
-        <GaloyIconButton name="refresh" size="medium" onPress={reVerifyEmailPrompt} />
-      )}
-      {(bothEmailAndPhoneVerified || (email && !emailVerified)) && (
-        <GaloyIconButton name="close" size="medium" onPress={deleteEmailPrompt} />
-      )}
-    </View>
+    emailVerified ? (
+      bothEmailAndPhoneVerified ? (
+        <GaloyIcon name="close" size={20} color={colors.red} />
+      ) : null
+    ) : (
+      <GaloyIcon name="refresh" size={20} color={colors.primary} />
+    )
   ) : undefined
 
   return (
@@ -169,18 +185,10 @@ export const EmailSetting: React.FC = () => {
       loading={loading}
       spinner={emDelLoading || emRegLoading}
       title={title(email, emailVerified, LL)}
-      subtitle={emailVerified ? email?.toString() : email}
       leftIcon="mail-outline"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
+      rightIconAction={rightIconAction}
     />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  sidetoside: {
-    display: "flex",
-    flexDirection: "row",
-    columnGap: 10,
-  },
-}))

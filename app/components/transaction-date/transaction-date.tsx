@@ -3,6 +3,7 @@ import { Text } from "react-native"
 
 import { TxStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { formatShortDate, isToday, isYesterday } from "@app/utils/date"
 
 type TransactionDateProps = {
   createdAt: number
@@ -26,17 +27,18 @@ export const formatDateForTransaction = ({
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" })
 
   const diffInSeconds = Math.max(0, Math.floor((now - createdAt * 1000) / 1000))
-  let output = ""
 
-  // if date is less than 1 day, we calculate relative time
-  // otherwise, we return absolute date and time
-  if (diffInSeconds < 60) {
-    output = rtf.format(-diffInSeconds, "second")
-  } else if (diffInSeconds < 3600) {
-    output = rtf.format(-Math.floor(diffInSeconds / 60), "minute")
-  } else if (diffInSeconds < 86400) {
-    output = rtf.format(-Math.floor(diffInSeconds / 3600), "hour")
-  } else {
+  if (!includeTime && (isToday(createdAt) || isYesterday(createdAt))) {
+    if (diffInSeconds < 60) {
+      return rtf.format(-diffInSeconds, "second")
+    }
+    if (diffInSeconds < 3600) {
+      return rtf.format(-Math.floor(diffInSeconds / 60), "minute")
+    }
+    return rtf.format(-Math.floor(diffInSeconds / 3600), "hour")
+  }
+
+  if (includeTime) {
     const options: Intl.DateTimeFormatOptions = {
       dateStyle: "full",
     }
@@ -48,10 +50,10 @@ export const formatDateForTransaction = ({
       options.timeStyle = "medium"
     }
 
-    output = new Date(createdAt * 1000).toLocaleString(locale, options)
+    return new Date(createdAt * 1000).toLocaleString(locale, options)
   }
 
-  return output
+  return formatShortDate({ createdAt, timezone })
 }
 
 export const TransactionDate = ({

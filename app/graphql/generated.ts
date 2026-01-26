@@ -451,7 +451,6 @@ export type Card = {
   readonly status: CardStatus;
 };
 
-/** Input for creating a consumer application using Sumsub share token */
 export type CardConsumerApplicationCreateInput = {
   /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
@@ -459,16 +458,14 @@ export type CardConsumerApplicationCreateInput = {
   readonly annualSalary: Scalars['String']['input'];
   /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
+  /** Whether the user has completed L2 KYC verification */
+  readonly isL2Verified: Scalars['Boolean']['input'];
   /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation */
+  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** Sumsub share token */
-  readonly sumsubShareToken: Scalars['String']['input'];
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for creating a consumer application using manual KYC */
@@ -503,8 +500,6 @@ export type CardConsumerApplicationManualCreateInput = {
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating an existing consumer application */
@@ -537,8 +532,6 @@ export type CardConsumerApplicationUpdateInput = {
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
   /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
-  /** EVM wallet address (optional) */
-  readonly walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
@@ -970,6 +963,11 @@ export const InvoicePaymentStatus = {
 } as const;
 
 export type InvoicePaymentStatus = typeof InvoicePaymentStatus[keyof typeof InvoicePaymentStatus];
+export type KycFlowStartInput = {
+  readonly firstName?: InputMaybe<Scalars['String']['input']>;
+  readonly lastName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Leader = {
   readonly __typename: 'Leader';
   readonly name?: Maybe<Scalars['LeaderboardName']['output']>;
@@ -1295,6 +1293,7 @@ export type Mutation = {
    * failed, pending, already_paid).
    */
   readonly intraLedgerUsdPaymentSend: PaymentSendPayload;
+  readonly kycFlowStart: OnboardingFlowStartResult;
   /** Sends a payment to a lightning address. */
   readonly lnAddressPaymentSend: PaymentSendPayload;
   /** Cancel an unpaid lightning invoice for an associated wallet. */
@@ -1503,6 +1502,11 @@ export type MutationIntraLedgerPaymentSendArgs = {
 
 export type MutationIntraLedgerUsdPaymentSendArgs = {
   input: IntraLedgerUsdPaymentSendInput;
+};
+
+
+export type MutationKycFlowStartArgs = {
+  input?: InputMaybe<KycFlowStartInput>;
 };
 
 
@@ -2022,6 +2026,7 @@ export type Query = {
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
   readonly region?: Maybe<Region>;
+  readonly txLastSeen: TxLastSeen;
   readonly upgradeModalLastShownAt?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be migrated to AccountDefaultWalletId */
   readonly userDefaultWalletId: Scalars['WalletId']['output'];
@@ -2088,6 +2093,11 @@ export type QueryOnChainUsdTxFeeAsBtcDenominatedArgs = {
 
 export type QueryRealtimePriceArgs = {
   currency?: InputMaybe<Scalars['DisplayCurrency']['input']>;
+};
+
+
+export type QueryTxLastSeenArgs = {
+  accountId: Scalars['ID']['input'];
 };
 
 
@@ -2378,6 +2388,13 @@ export const TxDirection = {
 } as const;
 
 export type TxDirection = typeof TxDirection[keyof typeof TxDirection];
+export type TxLastSeen = {
+  readonly __typename: 'TxLastSeen';
+  readonly accountId: Scalars['ID']['output'];
+  readonly btcId: Scalars['String']['output'];
+  readonly usdId: Scalars['String']['output'];
+};
+
 export const TxNotificationType = {
   IntraLedgerPayment: 'IntraLedgerPayment',
   IntraLedgerReceipt: 'IntraLedgerReceipt',
@@ -2936,6 +2953,13 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
 
+export type TxLastSeenQueryVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type TxLastSeenQuery = { readonly __typename: 'Query', readonly txLastSeen: { readonly __typename: 'TxLastSeen', readonly accountId: string, readonly btcId: string, readonly usdId: string } };
+
 export type TransactionFragment = { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } };
 
 export type TransactionListFragment = { readonly __typename: 'TransactionConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null, readonly endCursor?: string | null }, readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } }> | null };
@@ -2997,7 +3021,7 @@ export type QuizClaimMutationVariables = Exact<{
 }>;
 
 
-export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
+export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
 
 export type UserEmailRegistrationInitiateMutationVariables = Exact<{
   input: UserEmailRegistrationInitiateInput;
@@ -3013,12 +3037,12 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
-export type OnboardingFlowStartMutationVariables = Exact<{
-  input: OnboardingFlowStartInput;
+export type KycFlowStartMutationVariables = Exact<{
+  input: KycFlowStartInput;
 }>;
 
 
-export type OnboardingFlowStartMutation = { readonly __typename: 'Mutation', readonly onboardingFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
+export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
 
 export type FullOnboardingScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3053,19 +3077,19 @@ export type BusinessMapMarkersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type BusinessMapMarkersQuery = { readonly __typename: 'Query', readonly businessMapMarkers: ReadonlyArray<{ readonly __typename: 'MapMarker', readonly username: string, readonly mapInfo: { readonly __typename: 'MapInfo', readonly title: string, readonly coordinates: { readonly __typename: 'Coordinates', readonly longitude: number, readonly latitude: number } } }> };
 
-export type StatefulNotificationsQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
-
 export type StatefulNotificationAcknowledgeMutationVariables = Exact<{
   input: StatefulNotificationAcknowledgeInput;
 }>;
 
 
 export type StatefulNotificationAcknowledgeMutation = { readonly __typename: 'Mutation', readonly statefulNotificationAcknowledge: { readonly __typename: 'StatefulNotificationAcknowledgePayload', readonly notification: { readonly __typename: 'StatefulNotification', readonly acknowledgedAt?: number | null } } };
+
+export type StatefulNotificationsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
 
 export type CirclesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3295,63 +3319,63 @@ export type IntraLedgerPaymentSendMutationVariables = Exact<{
 }>;
 
 
-export type IntraLedgerPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type IntraLedgerPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type IntraLedgerUsdPaymentSendMutationVariables = Exact<{
   input: IntraLedgerUsdPaymentSendInput;
 }>;
 
 
-export type IntraLedgerUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type IntraLedgerUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly intraLedgerUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type LnNoAmountInvoicePaymentSendMutationVariables = Exact<{
   input: LnNoAmountInvoicePaymentInput;
 }>;
 
 
-export type LnNoAmountInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type LnNoAmountInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type LnInvoicePaymentSendMutationVariables = Exact<{
   input: LnInvoicePaymentInput;
 }>;
 
 
-export type LnInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain' } } | null } };
+export type LnInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain' } } | null } };
 
 export type LnNoAmountUsdInvoicePaymentSendMutationVariables = Exact<{
   input: LnNoAmountUsdInvoicePaymentInput;
 }>;
 
 
-export type LnNoAmountUsdInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountUsdInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type LnNoAmountUsdInvoicePaymentSendMutation = { readonly __typename: 'Mutation', readonly lnNoAmountUsdInvoicePaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainPaymentSendMutationVariables = Exact<{
   input: OnChainPaymentSendInput;
 }>;
 
 
-export type OnChainPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly transaction?: { readonly __typename: 'Transaction', readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain', readonly arrivalInMempoolEstimatedAt?: number | null } } | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain', readonly arrivalInMempoolEstimatedAt?: number | null } } | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
 export type OnChainPaymentSendAllMutationVariables = Exact<{
   input: OnChainPaymentSendAllInput;
 }>;
 
 
-export type OnChainPaymentSendAllMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSendAll: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainPaymentSendAllMutation = { readonly __typename: 'Mutation', readonly onChainPaymentSendAll: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainUsdPaymentSendMutationVariables = Exact<{
   input: OnChainUsdPaymentSendInput;
 }>;
 
 
-export type OnChainUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainUsdPaymentSendMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSend: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type OnChainUsdPaymentSendAsBtcDenominatedMutationVariables = Exact<{
   input: OnChainUsdPaymentSendAsBtcDenominatedInput;
 }>;
 
 
-export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSendAsBtcDenominated: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typename: 'Mutation', readonly onChainUsdPaymentSendAsBtcDenominated: { readonly __typename: 'PaymentSendPayload', readonly status?: PaymentSendResult | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly transaction?: { readonly __typename: 'Transaction', readonly createdAt: number } | null } };
 
 export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -3463,23 +3487,6 @@ export type AccountLimitsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AccountLimitsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly limits: { readonly __typename: 'AccountLimits', readonly withdrawal: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }>, readonly internalSend: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }>, readonly convert: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }> } } } | null };
-
-export type SupportChatQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type SupportChatQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly supportChat: ReadonlyArray<{ readonly __typename: 'SupportMessage', readonly id: string, readonly message: string, readonly role: SupportRole, readonly timestamp: number }> } | null };
-
-export type SupportChatMessageAddMutationVariables = Exact<{
-  input: SupportChatMessageAddInput;
-}>;
-
-
-export type SupportChatMessageAddMutation = { readonly __typename: 'Mutation', readonly supportChatMessageAdd: { readonly __typename: 'SupportChatMessageAddPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly supportMessage?: ReadonlyArray<{ readonly __typename: 'SupportMessage', readonly id: string, readonly message: string, readonly role: SupportRole, readonly timestamp: number } | null> | null } };
-
-export type SupportChatResetMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type SupportChatResetMutation = { readonly __typename: 'Mutation', readonly supportChatReset: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
 
 export type UserLoginUpgradeTelegramMutationVariables = Exact<{
   input: UserLoginUpgradeTelegramInput;
@@ -4437,6 +4444,48 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const TxLastSeenDocument = gql`
+    query txLastSeen($accountId: ID!) {
+  txLastSeen(accountId: $accountId) @client {
+    accountId
+    btcId
+    usdId
+  }
+}
+    `;
+
+/**
+ * __useTxLastSeenQuery__
+ *
+ * To run a query within a React component, call `useTxLastSeenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTxLastSeenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTxLastSeenQuery({
+ *   variables: {
+ *      accountId: // value for 'accountId'
+ *   },
+ * });
+ */
+export function useTxLastSeenQuery(baseOptions: Apollo.QueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables> & ({ variables: TxLastSeenQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+      }
+export function useTxLastSeenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export function useTxLastSeenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TxLastSeenQuery, TxLastSeenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TxLastSeenQuery, TxLastSeenQueryVariables>(TxLastSeenDocument, options);
+        }
+export type TxLastSeenQueryHookResult = ReturnType<typeof useTxLastSeenQuery>;
+export type TxLastSeenLazyQueryHookResult = ReturnType<typeof useTxLastSeenLazyQuery>;
+export type TxLastSeenSuspenseQueryHookResult = ReturnType<typeof useTxLastSeenSuspenseQuery>;
+export type TxLastSeenQueryResult = Apollo.QueryResult<TxLastSeenQuery, TxLastSeenQueryVariables>;
 export const NetworkDocument = gql`
     query network {
   globals {
@@ -4870,6 +4919,7 @@ export const QuizClaimDocument = gql`
   quizClaim(input: $input) {
     errors {
       message
+      code
     }
     quizzes {
       id
@@ -4991,40 +5041,40 @@ export function useUserEmailRegistrationValidateMutation(baseOptions?: Apollo.Mu
 export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof useUserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
-export const OnboardingFlowStartDocument = gql`
-    mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-  onboardingFlowStart(input: $input) {
+export const KycFlowStartDocument = gql`
+    mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
     workflowRunId
     tokenWeb
   }
 }
     `;
-export type OnboardingFlowStartMutationFn = Apollo.MutationFunction<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
 
 /**
- * __useOnboardingFlowStartMutation__
+ * __useKycFlowStartMutation__
  *
- * To run a mutation, you first call `useOnboardingFlowStartMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOnboardingFlowStartMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [onboardingFlowStartMutation, { data, loading, error }] = useOnboardingFlowStartMutation({
+ * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useOnboardingFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>) {
+export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>(OnboardingFlowStartDocument, options);
+        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
       }
-export type OnboardingFlowStartMutationHookResult = ReturnType<typeof useOnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationResult = Apollo.MutationResult<OnboardingFlowStartMutation>;
-export type OnboardingFlowStartMutationOptions = Apollo.BaseMutationOptions<OnboardingFlowStartMutation, OnboardingFlowStartMutationVariables>;
+export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
+export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
+export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const FullOnboardingScreenDocument = gql`
     query fullOnboardingScreen {
   me {
@@ -5337,6 +5387,41 @@ export type BusinessMapMarkersQueryHookResult = ReturnType<typeof useBusinessMap
 export type BusinessMapMarkersLazyQueryHookResult = ReturnType<typeof useBusinessMapMarkersLazyQuery>;
 export type BusinessMapMarkersSuspenseQueryHookResult = ReturnType<typeof useBusinessMapMarkersSuspenseQuery>;
 export type BusinessMapMarkersQueryResult = Apollo.QueryResult<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>;
+export const StatefulNotificationAcknowledgeDocument = gql`
+    mutation StatefulNotificationAcknowledge($input: StatefulNotificationAcknowledgeInput!) {
+  statefulNotificationAcknowledge(input: $input) {
+    notification {
+      acknowledgedAt
+    }
+  }
+}
+    `;
+export type StatefulNotificationAcknowledgeMutationFn = Apollo.MutationFunction<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>;
+
+/**
+ * __useStatefulNotificationAcknowledgeMutation__
+ *
+ * To run a mutation, you first call `useStatefulNotificationAcknowledgeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatefulNotificationAcknowledgeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statefulNotificationAcknowledgeMutation, { data, loading, error }] = useStatefulNotificationAcknowledgeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useStatefulNotificationAcknowledgeMutation(baseOptions?: Apollo.MutationHookOptions<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>(StatefulNotificationAcknowledgeDocument, options);
+      }
+export type StatefulNotificationAcknowledgeMutationHookResult = ReturnType<typeof useStatefulNotificationAcknowledgeMutation>;
+export type StatefulNotificationAcknowledgeMutationResult = Apollo.MutationResult<StatefulNotificationAcknowledgeMutation>;
+export type StatefulNotificationAcknowledgeMutationOptions = Apollo.BaseMutationOptions<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>;
 export const StatefulNotificationsDocument = gql`
     query StatefulNotifications($after: String) {
   me {
@@ -5401,41 +5486,6 @@ export type StatefulNotificationsQueryHookResult = ReturnType<typeof useStateful
 export type StatefulNotificationsLazyQueryHookResult = ReturnType<typeof useStatefulNotificationsLazyQuery>;
 export type StatefulNotificationsSuspenseQueryHookResult = ReturnType<typeof useStatefulNotificationsSuspenseQuery>;
 export type StatefulNotificationsQueryResult = Apollo.QueryResult<StatefulNotificationsQuery, StatefulNotificationsQueryVariables>;
-export const StatefulNotificationAcknowledgeDocument = gql`
-    mutation StatefulNotificationAcknowledge($input: StatefulNotificationAcknowledgeInput!) {
-  statefulNotificationAcknowledge(input: $input) {
-    notification {
-      acknowledgedAt
-    }
-  }
-}
-    `;
-export type StatefulNotificationAcknowledgeMutationFn = Apollo.MutationFunction<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>;
-
-/**
- * __useStatefulNotificationAcknowledgeMutation__
- *
- * To run a mutation, you first call `useStatefulNotificationAcknowledgeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStatefulNotificationAcknowledgeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [statefulNotificationAcknowledgeMutation, { data, loading, error }] = useStatefulNotificationAcknowledgeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useStatefulNotificationAcknowledgeMutation(baseOptions?: Apollo.MutationHookOptions<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>(StatefulNotificationAcknowledgeDocument, options);
-      }
-export type StatefulNotificationAcknowledgeMutationHookResult = ReturnType<typeof useStatefulNotificationAcknowledgeMutation>;
-export type StatefulNotificationAcknowledgeMutationResult = Apollo.MutationResult<StatefulNotificationAcknowledgeMutation>;
-export type StatefulNotificationAcknowledgeMutationOptions = Apollo.BaseMutationOptions<StatefulNotificationAcknowledgeMutation, StatefulNotificationAcknowledgeMutationVariables>;
 export const CirclesDocument = gql`
     query Circles {
   me {
@@ -6909,6 +6959,9 @@ export const IntraLedgerPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -6945,6 +6998,9 @@ export const IntraLedgerUsdPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -6981,6 +7037,9 @@ export const LnNoAmountInvoicePaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7018,6 +7077,7 @@ export const LnInvoicePaymentSendDocument = gql`
     }
     status
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaLn {
           preImage
@@ -7063,6 +7123,9 @@ export const LnNoAmountUsdInvoicePaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7096,6 +7159,7 @@ export const OnChainPaymentSendDocument = gql`
     mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
   onChainPaymentSend(input: $input) {
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaOnChain {
           arrivalInMempoolEstimatedAt
@@ -7142,6 +7206,9 @@ export const OnChainPaymentSendAllDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7178,6 +7245,9 @@ export const OnChainUsdPaymentSendDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -7214,6 +7284,9 @@ export const OnChainUsdPaymentSendAsBtcDenominatedDocument = gql`
       message
     }
     status
+    transaction {
+      createdAt
+    }
   }
 }
     `;
@@ -8083,124 +8156,6 @@ export type AccountLimitsQueryHookResult = ReturnType<typeof useAccountLimitsQue
 export type AccountLimitsLazyQueryHookResult = ReturnType<typeof useAccountLimitsLazyQuery>;
 export type AccountLimitsSuspenseQueryHookResult = ReturnType<typeof useAccountLimitsSuspenseQuery>;
 export type AccountLimitsQueryResult = Apollo.QueryResult<AccountLimitsQuery, AccountLimitsQueryVariables>;
-export const SupportChatDocument = gql`
-    query supportChat {
-  me {
-    id
-    supportChat {
-      id
-      message
-      role
-      timestamp
-    }
-  }
-}
-    `;
-
-/**
- * __useSupportChatQuery__
- *
- * To run a query within a React component, call `useSupportChatQuery` and pass it any options that fit your needs.
- * When your component renders, `useSupportChatQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSupportChatQuery({
- *   variables: {
- *   },
- * });
- */
-export function useSupportChatQuery(baseOptions?: Apollo.QueryHookOptions<SupportChatQuery, SupportChatQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SupportChatQuery, SupportChatQueryVariables>(SupportChatDocument, options);
-      }
-export function useSupportChatLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SupportChatQuery, SupportChatQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SupportChatQuery, SupportChatQueryVariables>(SupportChatDocument, options);
-        }
-export function useSupportChatSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SupportChatQuery, SupportChatQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<SupportChatQuery, SupportChatQueryVariables>(SupportChatDocument, options);
-        }
-export type SupportChatQueryHookResult = ReturnType<typeof useSupportChatQuery>;
-export type SupportChatLazyQueryHookResult = ReturnType<typeof useSupportChatLazyQuery>;
-export type SupportChatSuspenseQueryHookResult = ReturnType<typeof useSupportChatSuspenseQuery>;
-export type SupportChatQueryResult = Apollo.QueryResult<SupportChatQuery, SupportChatQueryVariables>;
-export const SupportChatMessageAddDocument = gql`
-    mutation supportChatMessageAdd($input: SupportChatMessageAddInput!) {
-  supportChatMessageAdd(input: $input) {
-    errors {
-      message
-    }
-    supportMessage {
-      id
-      message
-      role
-      timestamp
-    }
-  }
-}
-    `;
-export type SupportChatMessageAddMutationFn = Apollo.MutationFunction<SupportChatMessageAddMutation, SupportChatMessageAddMutationVariables>;
-
-/**
- * __useSupportChatMessageAddMutation__
- *
- * To run a mutation, you first call `useSupportChatMessageAddMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSupportChatMessageAddMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [supportChatMessageAddMutation, { data, loading, error }] = useSupportChatMessageAddMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useSupportChatMessageAddMutation(baseOptions?: Apollo.MutationHookOptions<SupportChatMessageAddMutation, SupportChatMessageAddMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SupportChatMessageAddMutation, SupportChatMessageAddMutationVariables>(SupportChatMessageAddDocument, options);
-      }
-export type SupportChatMessageAddMutationHookResult = ReturnType<typeof useSupportChatMessageAddMutation>;
-export type SupportChatMessageAddMutationResult = Apollo.MutationResult<SupportChatMessageAddMutation>;
-export type SupportChatMessageAddMutationOptions = Apollo.BaseMutationOptions<SupportChatMessageAddMutation, SupportChatMessageAddMutationVariables>;
-export const SupportChatResetDocument = gql`
-    mutation supportChatReset {
-  supportChatReset {
-    success
-  }
-}
-    `;
-export type SupportChatResetMutationFn = Apollo.MutationFunction<SupportChatResetMutation, SupportChatResetMutationVariables>;
-
-/**
- * __useSupportChatResetMutation__
- *
- * To run a mutation, you first call `useSupportChatResetMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSupportChatResetMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [supportChatResetMutation, { data, loading, error }] = useSupportChatResetMutation({
- *   variables: {
- *   },
- * });
- */
-export function useSupportChatResetMutation(baseOptions?: Apollo.MutationHookOptions<SupportChatResetMutation, SupportChatResetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SupportChatResetMutation, SupportChatResetMutationVariables>(SupportChatResetDocument, options);
-      }
-export type SupportChatResetMutationHookResult = ReturnType<typeof useSupportChatResetMutation>;
-export type SupportChatResetMutationResult = Apollo.MutationResult<SupportChatResetMutation>;
-export type SupportChatResetMutationOptions = Apollo.BaseMutationOptions<SupportChatResetMutation, SupportChatResetMutationVariables>;
 export const UserLoginUpgradeTelegramDocument = gql`
     mutation userLoginUpgradeTelegram($input: UserLoginUpgradeTelegramInput!) {
   userLoginUpgradeTelegram(input: $input) {
@@ -8673,6 +8628,7 @@ export type ResolversTypes = {
   InvoiceConnection: ResolverTypeWrapper<InvoiceConnection>;
   InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
   InvoicePaymentStatus: InvoicePaymentStatus;
+  KycFlowStartInput: KycFlowStartInput;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
@@ -8802,6 +8758,7 @@ export type ResolversTypes = {
   TransactionStatus: TransactionStatus;
   TxDirection: TxDirection;
   TxExternalId: ResolverTypeWrapper<Scalars['TxExternalId']['output']>;
+  TxLastSeen: ResolverTypeWrapper<TxLastSeen>;
   TxNotificationType: TxNotificationType;
   TxStatus: TxStatus;
   UpgradePayload: ResolverTypeWrapper<UpgradePayload>;
@@ -8929,6 +8886,7 @@ export type ResolversParentTypes = {
   Invoice: ResolversInterfaceTypes<ResolversParentTypes>['Invoice'];
   InvoiceConnection: InvoiceConnection;
   InvoiceEdge: InvoiceEdge;
+  KycFlowStartInput: KycFlowStartInput;
   Language: Scalars['Language']['output'];
   Leader: Leader;
   Leaderboard: Leaderboard;
@@ -9047,6 +9005,7 @@ export type ResolversParentTypes = {
   TransactionConnection: TransactionConnection;
   TransactionEdge: TransactionEdge;
   TxExternalId: Scalars['TxExternalId']['output'];
+  TxLastSeen: TxLastSeen;
   UpgradePayload: UpgradePayload;
   UsdWallet: UsdWallet;
   User: User;
@@ -9670,6 +9629,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
   intraLedgerPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerPaymentSendArgs, 'input'>>;
   intraLedgerUsdPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationIntraLedgerUsdPaymentSendArgs, 'input'>>;
+  kycFlowStart?: Resolver<ResolversTypes['OnboardingFlowStartResult'], ParentType, ContextType, Partial<MutationKycFlowStartArgs>>;
   lnAddressPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnAddressPaymentSendArgs, 'input'>>;
   lnInvoiceCancel?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCancelArgs, 'input'>>;
   lnInvoiceCreate?: Resolver<ResolversTypes['LnInvoicePayload'], ParentType, ContextType, RequireFields<MutationLnInvoiceCreateArgs, 'input'>>;
@@ -9923,6 +9883,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
+  txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType, RequireFields<QueryTxLastSeenArgs, 'accountId'>>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;
@@ -10131,6 +10092,13 @@ export type TransactionEdgeResolvers<ContextType = any, ParentType extends Resol
 export interface TxExternalIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['TxExternalId'], any> {
   name: 'TxExternalId';
 }
+
+export type TxLastSeenResolvers<ContextType = any, ParentType extends ResolversParentTypes['TxLastSeen'] = ResolversParentTypes['TxLastSeen']> = {
+  accountId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  btcId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  usdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type UpgradePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpgradePayload'] = ResolversParentTypes['UpgradePayload']> = {
   authToken?: Resolver<Maybe<ResolversTypes['AuthToken']>, ParentType, ContextType>;
@@ -10442,6 +10410,7 @@ export type Resolvers<ContextType = any> = {
   TransactionConnection?: TransactionConnectionResolvers<ContextType>;
   TransactionEdge?: TransactionEdgeResolvers<ContextType>;
   TxExternalId?: GraphQLScalarType;
+  TxLastSeen?: TxLastSeenResolvers<ContextType>;
   UpgradePayload?: UpgradePayloadResolvers<ContextType>;
   UsdWallet?: UsdWalletResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

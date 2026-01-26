@@ -2,7 +2,7 @@ import React from "react"
 import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useUserPhoneDeleteMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -12,6 +12,8 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
+import { useTheme } from "@rn-vui/themed"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
   mutation userPhoneDelete {
@@ -34,9 +36,13 @@ gql`
 
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { loading, phone, emailVerified, phoneVerified } = useLoginMethods()
+  const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneDeleteMutation, { loading: phoneDeleteLoading }] =
     useUserPhoneDeleteMutation()
@@ -44,6 +50,7 @@ export const PhoneSetting: React.FC = () => {
   const deletePhone = async () => {
     try {
       await phoneDeleteMutation()
+      await updateCurrentProfile()
       toastShow({
         message: LL.AccountScreen.phoneDeletedSuccessfully(),
         LL,
@@ -72,24 +79,20 @@ export const PhoneSetting: React.FC = () => {
   return (
     <SettingsRow
       loading={loading}
-      title={
-        phoneVerified
-          ? LL.AccountScreen.phoneNumber()
-          : LL.AccountScreen.tapToAddPhoneNumber()
-      }
-      subtitle={phone || undefined}
+      title={phoneVerified ? phone || "" : LL.AccountScreen.tapToAddPhoneNumber()}
       leftIcon="call-outline"
       action={phoneVerified ? null : () => navigate("phoneRegistrationInitiate")}
       spinner={phoneDeleteLoading}
       rightIcon={
         phoneVerified ? (
           emailVerified ? (
-            <GaloyIconButton name="close" size="medium" onPress={deletePhonePrompt} />
+            <GaloyIcon name="close" size={20} color={colors.red} />
           ) : null
         ) : (
           "chevron-forward"
         )
       }
+      rightIconAction={phoneVerified && emailVerified ? deletePhonePrompt : undefined}
     />
   )
 }

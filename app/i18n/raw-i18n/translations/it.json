@@ -28,10 +28,10 @@
         "text": "Facendo clic su \"Accetta\", accetti i nostri Termini e condizioni. Accetti inoltre di non essere residente o cittadino di uno dei paesi vietati."
     },
     "SetAccountModal": {
-        "title": "Imposta l'account predefinito",
-        "description": "Questo account verrà inizialmente selezionato per l'invio e la ricezione dei pagamenti. Può essere modificato in qualsiasi momento.",
-        "stablesatsTag": "Sceglilo per mantenere un valore USD stabile.",
-        "bitcoinTag": "Scegli questo per essere sullo standard Bitcoin."
+        "title": "Configura il tuo conto di ricezione",
+        "description": "Puoi sempre cambiarlo più tardi nelle Impostazioni",
+        "stablesatsTag": "Conto Stablesats per la stabilità del prezzo",
+        "bitcoinTag": "Conto Bitcoin per i massimalisti"
     },
     "NoteInput": {
         "addNote": "Aggiungi nota"
@@ -2366,8 +2366,8 @@
         "toastMessage": "Segreto copiato negli appunti!"
     },
     "DefaultWalletScreen": {
-        "title": "Account predefinito",
-        "info": "Seleziona quale account impostare come predefinito per la ricezione e l'invio. Puoi modificare l'account di invio e ricezione per i singoli pagamenti nell'app mobile. I pagamenti ricevuti tramite il registratore di cassa o il tuo indirizzo Lightning andranno sempre all'account predefinito.\n\nPer evitare la volatilità di Bitcoin, scegli Stablesats. Ciò ti consente di mantenere una quantità di denaro stabile pur continuando a inviare e ricevere pagamenti.\n\nPuoi modificare questa impostazione in qualsiasi momento e non influirà sul tuo saldo attuale."
+        "title": "Ricevere valuta",
+        "info": "Usa il tuo account Stablesats in Blink per mantenere il denaro nel tuo wallet stabile in termini di valuta fiat (dollaro). Usa il tuo account Bitcoin se stai accumulando sats e non ti dispiace che il saldo in fiat cambi continuamente."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Abilitato",
+        "switch": "Interruttore",
         "notifications": "Notifiche",
         "preferences": "Preferenze",
         "onDeviceSecurity": "Sicurezza sul dispositivo",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Questo mese",
         "prevMonths": "Mesi precedenti",
         "problemMaybeReauth": "Si è verificato un problema con la tua richiesta. Riprova tra un minuto. Se il problema persiste, ti consigliamo di uscire e di accedere nuovamente. Puoi uscire andando in Impostazioni > Account > Esci",
-        "warning": "Avvertimento"
+        "warning": "Avvertimento",
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",
@@ -2650,7 +2652,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Ti piace l'app?",
         "statusPage": "Pagina di stato",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Grazie per il feedback, vuoi suggerire un miglioramento?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Notifiche",
         "noNotifications": "Al momento non hai notifiche"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Si è verificato un errore durante l'invio del messaggio",
-        "confirmChatReset": "Vuoi davvero reimpostare la chat?",
-        "errorResettingChat": "Si è verificato un errore durante il ripristino della chat"
     }
 }

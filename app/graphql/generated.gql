@@ -285,6 +285,10 @@ mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -296,6 +300,18 @@ mutation intraLedgerUsdPaymentSend($input: IntraLedgerUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
+    workflowRunId
+    tokenWeb
     __typename
   }
 }
@@ -338,6 +354,7 @@ mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
     }
     status
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaLn {
           preImage
@@ -391,6 +408,10 @@ mutation lnNoAmountInvoicePaymentSend($input: LnNoAmountInvoicePaymentInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -413,6 +434,10 @@ mutation lnNoAmountUsdInvoicePaymentSend($input: LnNoAmountUsdInvoicePaymentInpu
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -461,6 +486,7 @@ mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
 mutation onChainPaymentSend($input: OnChainPaymentSendInput!) {
   onChainPaymentSend(input: $input) {
     transaction {
+      createdAt
       settlementVia {
         ... on SettlementViaOnChain {
           arrivalInMempoolEstimatedAt
@@ -486,6 +512,10 @@ mutation onChainPaymentSendAll($input: OnChainPaymentSendAllInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -497,6 +527,10 @@ mutation onChainUsdPaymentSend($input: OnChainUsdPaymentSendInput!) {
       __typename
     }
     status
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -508,14 +542,10 @@ mutation onChainUsdPaymentSendAsBtcDenominated($input: OnChainUsdPaymentSendAsBt
       __typename
     }
     status
-    __typename
-  }
-}
-
-mutation onboardingFlowStart($input: OnboardingFlowStartInput!) {
-  onboardingFlowStart(input: $input) {
-    workflowRunId
-    tokenWeb
+    transaction {
+      createdAt
+      __typename
+    }
     __typename
   }
 }
@@ -524,6 +554,7 @@ mutation quizClaim($input: QuizClaimInput!) {
   quizClaim(input: $input) {
     errors {
       message
+      code
       __typename
     }
     quizzes {
@@ -533,30 +564,6 @@ mutation quizClaim($input: QuizClaimInput!) {
       notBefore
       __typename
     }
-    __typename
-  }
-}
-
-mutation supportChatMessageAdd($input: SupportChatMessageAddInput!) {
-  supportChatMessageAdd(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    supportMessage {
-      id
-      message
-      role
-      timestamp
-      __typename
-    }
-    __typename
-  }
-}
-
-mutation supportChatReset {
-  supportChatReset {
-    success
     __typename
   }
 }
@@ -1047,10 +1054,6 @@ query analytics {
   }
 }
 
-query beta {
-  beta @client
-}
-
 query btcPriceList($range: PriceGraphRange!) {
   btcPriceList(range: $range) {
     timestamp
@@ -1078,10 +1081,6 @@ query businessMapMarkers {
     }
     __typename
   }
-}
-
-query colorScheme {
-  colorScheme @client
 }
 
 query contacts {
@@ -1116,10 +1115,6 @@ query conversionScreen {
   }
 }
 
-query countryCode {
-  countryCode @client
-}
-
 query currencyList {
   currencyList {
     __typename
@@ -1142,10 +1137,6 @@ query debugScreen {
   }
 }
 
-query deviceSessionCount {
-  deviceSessionCount @client
-}
-
 query displayCurrency {
   me {
     id
@@ -1156,10 +1147,6 @@ query displayCurrency {
     }
     __typename
   }
-}
-
-query feedbackModalShown {
-  feedbackModalShown @client
 }
 
 query fullOnboardingScreen {
@@ -1192,18 +1179,6 @@ query getUsernames {
     }
     __typename
   }
-}
-
-query hasPromptedSetDefaultAccount {
-  hasPromptedSetDefaultAccount @client
-}
-
-query hiddenBalanceToolTip {
-  hiddenBalanceToolTip @client
-}
-
-query hideBalance {
-  hideBalance @client
 }
 
 query homeAuthed {
@@ -1254,14 +1229,6 @@ query homeUnauthed {
     fractionDigits
     __typename
   }
-}
-
-query innerCircleValue {
-  innerCircleValue @client
-}
-
-query introducingCirclesModalShown {
-  introducingCirclesModalShown @client
 }
 
 query invite {
@@ -1449,16 +1416,6 @@ query realtimePrice {
   }
 }
 
-query region {
-  region @client {
-    latitude
-    longitude
-    latitudeDelta
-    longitudeDelta
-    __typename
-  }
-}
-
 query scanningQRCodeScreen {
   globals {
     network
@@ -1626,20 +1583,6 @@ query setDefaultWalletScreen {
   }
 }
 
-query supportChat {
-  me {
-    id
-    supportChat {
-      id
-      message
-      role
-      timestamp
-      __typename
-    }
-    __typename
-  }
-}
-
 query supportedCountries {
   globals {
     supportedCountries {
@@ -1690,10 +1633,6 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
     }
     __typename
   }
-}
-
-query upgradeModalLastShownAt {
-  upgradeModalLastShownAt @client
 }
 
 query walletOverviewScreen {

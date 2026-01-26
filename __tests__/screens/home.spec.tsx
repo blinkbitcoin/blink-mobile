@@ -1,7 +1,7 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { act, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
@@ -40,6 +40,36 @@ jest.mock("@app/graphql/mocks", () => ({
     return currentMocks
   },
 }))
+
+jest.mock("@app/components/slide-up-handle", () => {
+  const React = jest.requireActual("react")
+  const { TouchableOpacity, Text } = jest.requireActual("react-native")
+
+  type Props = {
+    onAction: () => void
+    testID?: string
+  }
+
+  const MockSlideUpHandle = ({ onAction, testID = "slide-up-handle" }: Props) => (
+    <TouchableOpacity testID={testID} onPress={onAction}>
+      <Text>Slide up</Text>
+    </TouchableOpacity>
+  )
+
+  return { __esModule: true, default: MockSlideUpHandle }
+})
+
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual("@react-navigation/native")
+  return {
+    ...actual,
+    useNavigation: () => ({
+      ...actual.useNavigation?.(),
+      navigate: mockNavigate,
+    }),
+  }
+})
 
 jest.mock("@react-native-firebase/app-check", () => {
   return () => ({
@@ -292,4 +322,18 @@ describe("HomeScreen", () => {
       await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
     },
   )
+
+  it("Slide-up handle triggers navigation to transaction history", async () => {
+    mockNavigate.mockClear()
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(getByTestId("slide-up-handle"))
+
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
+  })
 })

@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Laat mensen betalingen incasseren via de Kassa-link, zonder toegang tot uw portemonnee.\n\nZe kunnen facturen maken en betalingen worden rechtstreeks naar uw {bankName: string} Wallet gestuurd."
     },
     "SetAccountModal": {
-        "title": "Standaardaccount instellen",
-        "description": "Dit account wordt in eerste instantie geselecteerd voor het verzenden en ontvangen van betalingen. Het kan op elk moment worden gewijzigd.",
-        "stablesatsTag": "Kies dit om een ​​stabiele USD-waarde te behouden.",
-        "bitcoinTag": "Kies dit voor een Bitcoin-standaard."
+        "title": "Stel je ontvangstrekening in",
+        "description": "Je kunt dit later altijd wijzigen in Instellingen",
+        "stablesatsTag": "Stablesats-rekening voor prijsstabiliteit",
+        "bitcoinTag": "Bitcoin-rekening voor maximalisten"
     },
     "NoteInput": {
         "addNote": "Notitie toevoegen"
@@ -2296,8 +2296,8 @@
         "toastMessage": "Geheim gekopieerd naar klembord!"
     },
     "DefaultWalletScreen": {
-        "title": "Standaard Account",
-        "info": "Kies welk account u als standaard wilt instellen voor ontvangen en verzenden. In de mobiele app kunt u het verzend- en ontvangstaccount voor individuele betalingen aanpassen. Betalingen ontvangen via de kassa of uw Lightning-adres gaan altijd naar de standaardrekening.\n\nKies Stablesats om de volatiliteit van Bitcoin te vermijden. Hierdoor kunt u een stabiel geldbedrag aanhouden terwijl u nog steeds betalingen kunt verzenden en ontvangen.\n\nU kunt deze instelling op elk gewenst moment wijzigen. Dit heeft geen invloed op uw huidige saldo."
+        "title": "Valuta ontvangen",
+        "info": "Gebruik je Stablesats-account in Blink om het geld in je wallet stabiel te houden in fiat-termen (dollar). Gebruik je Bitcoin-account als je sats spaart en het prima vindt dat je fiat-saldo voortdurend verandert."
     },
     "ThemeScreen": {
         "title": "Thema",
@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} succesvol bevestigd"
     },
     "common": {
+        "switch": "Schakelaar",
         "account": "Rekening",
         "transactionLimits": "Transactie Limieten",
         "activateWallet": "Activeer Wallet",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Deze maand",
         "prevMonths": "Vorige maanden",
         "problemMaybeReauth": "Er was een probleem met je verzoek. Probeer het over een minuut opnieuw. Als het probleem zich blijft voordoen, raden we u aan uit te loggen en weer in te loggen. U kunt uitloggen door naar Instellingen > Account > Uitloggen te gaan.",
-        "warning": "Waarschuwing"
+        "warning": "Waarschuwing",
+        "blinkToBlink": "Blink naar Blink"
     },
     "errors": {
         "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",

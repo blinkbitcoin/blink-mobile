@@ -16,9 +16,10 @@ import {
   TransactionFragment,
   TransactionFragmentDoc,
   useTransactionListForDefaultAccountLazyQuery,
+  useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
@@ -52,9 +53,6 @@ const Row = ({
         <Text style={styles.entry} selectable={false}>
           {entry}
         </Text>
-        {icons.map((icon, index) => (
-          <React.Fragment key={index}>{icon}</React.Fragment>
-        ))}
       </View>
       {content ? (
         content
@@ -63,6 +61,13 @@ const Row = ({
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
+          {icons.length > 0 && (
+            <View style={styles.valueIcons}>
+              {icons.map((icon, index) => (
+                <React.Fragment key={index}>{icon}</React.Fragment>
+              ))}
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -103,6 +108,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     appConfig: { galoyInstance },
   } = useAppConfig()
   const { txid } = route.params
+
+  const { data: homeData } = useHomeAuthedQuery({ fetchPolicy: "cache-only" })
 
   const viewInExplorer = (hash: string): Promise<Linking> =>
     Linking.openURL(galoyInstance.blockExplorer + hash)
@@ -155,6 +162,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState(
+    homeData?.me?.defaultAccount?.id || "",
+  )
+
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout
 
@@ -180,6 +191,16 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       }
     }
   }, [tx, refetch, timer, timeDiff])
+
+  React.useEffect(() => {
+    if (!txid || !tx.settlementCurrency) return
+    const latestId =
+      tx.settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
+
+    if (latestId && latestId === txid) {
+      markTxSeen(tx.settlementCurrency)
+    }
+  }, [txid, tx.settlementCurrency, latestBtcTxId, latestUsdTxId, markTxSeen])
 
   // FIXME doesn't work with storybook
   // TODO: translation
@@ -573,10 +594,14 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 8,
   },
   value: {
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
     fontSize: 14,
     fontWeight: "bold",
+  },
+  valueIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 12,
   },
   txNotBroadcast: {
     marginBottom: 16,
@@ -584,7 +609,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   icon: {
     marginBottom: 2,
-    marginHorizontal: 12,
+    marginHorizontal: 6,
   },
 
   container: {
