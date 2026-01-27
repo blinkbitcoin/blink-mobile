@@ -176,42 +176,24 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
       return
     }
 
-    const isTestEnvironment =
-      appConfig.galoyInstance.name === "Local" ||
-      appConfig.galoyInstance.name === "Staging"
-
     const captchaPath = async () => {
-      if (geetestError && !isTestEnvironment) {
+      if (geetestError) {
         setStatus(RequestPhoneCodeStatus.Error)
         setError(ErrorType.FailedCaptchaError)
         resetError()
         return
       }
 
-      // On test environments, use dummy CAPTCHA values (server-side bypass via test_accounts_captcha)
-      // On production, use actual Geetest validation data
-      const captchaData = isTestEnvironment
-        ? {
-            geetestChallenge: "bypass",
-            geetestValidate: "bypass",
-            geetestSecCode: "bypass",
-          }
-        : geetestValidationData
-
-      if (captchaData && validatedPhoneNumber) {
+      if (geetestValidationData && validatedPhoneNumber) {
         setStatus(RequestPhoneCodeStatus.RequestingCode)
         const input = {
           phone: validatedPhoneNumber,
-          challengeCode: captchaData.geetestChallenge,
-          validationCode: captchaData.geetestValidate,
-          secCode: captchaData.geetestSecCode,
+          challengeCode: geetestValidationData.geetestChallenge,
+          validationCode: geetestValidationData.geetestValidate,
+          secCode: geetestValidationData.geetestSecCode,
           channel: phoneCodeChannel,
         } as const
-
-        if (!isTestEnvironment) {
-          resetValidationData()
-        }
-
+        resetValidationData()
         logRequestAuthCode({
           instance: appConfig.galoyInstance.id,
           channel: phoneCodeChannel,
@@ -273,9 +255,13 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
       }
     }
 
-    // On test environments, always use captchaPath (with dummy values, server-side bypass)
-    // On production, prefer appCheck if available
-    if (!isTestEnvironment && appCheckToken) {
+    const skipRequestPhoneCode =
+      appConfig.galoyInstance.name === "Local" ||
+      appConfig.galoyInstance.name === "Staging"
+
+    if (skipRequestPhoneCode) {
+      setStatus(RequestPhoneCodeStatus.SuccessRequestingCode)
+    } else if (appCheckToken) {
       appCheckPath()
     } else {
       captchaPath()
