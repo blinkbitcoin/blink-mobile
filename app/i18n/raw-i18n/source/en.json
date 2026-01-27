@@ -2919,11 +2919,6 @@
         "title": "Notifications",
         "noNotifications": "You don't have any notifications right now"
     },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
-    },
     "BitcoinCardScreen": {
         "title": "Introducing",
         "cardInfo": {

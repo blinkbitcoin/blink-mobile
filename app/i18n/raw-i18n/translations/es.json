@@ -2920,11 +2920,6 @@
         "title": "Notificaciones ",
         "noNotifications": "No tienes notificaciones en este momento"
     },
-    "SupportChat": {
-        "errorSendingMessage": "Se ha producido un error al enviar el mensaje",
-        "confirmChatReset": "¿Seguro que quieres reiniciar el chat?",
-        "errorResettingChat": "Se ha producido un error al restablecer el chat"
-    },
     "BitcoinCardScreen": {
         "title": "Presentando",
         "cardInfo": {
