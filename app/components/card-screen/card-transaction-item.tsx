@@ -44,7 +44,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
         <Icon name="storefront-outline" size={20} color={colors.primary} />
       </View>
       <View style={styles.detailsColumn}>
-        <Text type="p3" bold style={styles.merchantName}>
+        <Text type="p3" bold numberOfLines={1} style={styles.merchantName}>
           {merchantName}
         </Text>
         <Text type="p4" style={styles.timeAgo}>
@@ -82,6 +82,7 @@ const useStyles = makeStyles(({ colors }) => ({
   detailsColumn: {
     flex: 1,
     justifyContent: "center",
+    marginRight: 12,
   },
   merchantName: {
     color: colors.black,
