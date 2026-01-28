@@ -104,7 +104,7 @@ const ShareImageComponent: React.FC<ShareImageProps & React.RefAttributes<View>>
         <View style={styles.usernameContainer}>
           <LinearGradient
             style={styles.usernameContainerGrad}
-            colors={["#FB5607", "#FFBE0B"]}
+            colors={[colors._primary2, colors._primary1]}
             useAngle={true}
             angle={190}
             angleCenter={{ x: 0.5, y: 0.5 }}
