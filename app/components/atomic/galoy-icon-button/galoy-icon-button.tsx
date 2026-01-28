@@ -13,6 +13,7 @@ import {
 export type GaloyIconButtonProps = {
   name: IconNamesType
   size: "small" | "medium" | "large"
+  iconSize?: number
   text?: string
   iconOnly?: boolean
   color?: string
@@ -28,6 +29,7 @@ const sizeMapping = {
 export const GaloyIconButton = ({
   size,
   name,
+  iconSize,
   text,
   iconOnly,
   disabled,
@@ -39,7 +41,8 @@ export const GaloyIconButton = ({
     theme: { colors },
   } = useTheme()
 
-  const iconContainerSize = circleDiameterThatContainsSquare(sizeMapping[size])
+  const resolvedIconSize = iconSize ?? sizeMapping[size]
+  const iconContainerSize = circleDiameterThatContainsSquare(resolvedIconSize)
 
   const pressableStyle = (): StyleProp<ViewStyle> => {
     if (text) {
@@ -119,7 +122,7 @@ export const GaloyIconButton = ({
           <>
             <GaloyIcon
               name={name}
-              size={sizeMapping[size]}
+              size={resolvedIconSize}
               {...iconProps(pressed, Boolean(iconOnly), Boolean(disabled))}
             />
             {text && <Text style={fontStyle(Boolean(disabled))}>{text}</Text>}
