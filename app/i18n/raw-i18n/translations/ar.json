@@ -2970,8 +2970,8 @@
             "Actions": {
                 "details": "التفاصيل",
                 "freeze": "تجميد",
-                "setLimits": "تعيين الحدود",
-                "statements": "كشوفات"
+                "setLimits": "الحدود",
+                "statements": "الحركات"
             },
             "emptyTransactions": "لا توجد معاملات بعد",
             "addFunds": "إضافة أموال",
