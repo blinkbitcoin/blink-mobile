@@ -4,8 +4,8 @@ import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
-const BTC_TEXT = "BTC"
-const USD_TEXT = "USD"
+const BTC_TEXT = "Bitcoin"
+const USD_TEXT = "Dollar"
 const DEFAULT_TEXT_SIZE = "p3"
 
 type ContainerSize = "small" | "medium" | "large"

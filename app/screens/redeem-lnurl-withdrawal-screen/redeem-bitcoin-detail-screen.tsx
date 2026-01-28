@@ -115,14 +115,14 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
             onPress={() => setReceiveCurrency(WalletCurrency.Btc)}
           >
             <View>
-              <Text>BTC</Text>
+              <Text>Bitcoin</Text>
             </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => setReceiveCurrency(WalletCurrency.Usd)}
           >
             <View>
-              <Text>USD</Text>
+              <Text>Dollar</Text>
             </View>
           </TouchableWithoutFeedback>
         </View>
