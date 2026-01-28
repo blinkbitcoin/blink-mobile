@@ -153,6 +153,7 @@ type GaloyIconProps = {
   style?: StyleProp<ViewStyle>
   backgroundColor?: string
   opacity?: number
+  containerSize?: number
 } & (
   | {
       size: number
@@ -180,12 +181,18 @@ export const GaloyIcon = ({
   style,
   backgroundColor,
   opacity,
+  containerSize,
 }: GaloyIconProps) => {
   const {
     theme: { colors },
   } = useTheme()
   const resolvedSize = size ?? Math.max(width ?? 0, height ?? 0)
-  const styles = useStyles({ backgroundColor, opacity, size: resolvedSize })
+  const styles = useStyles({
+    backgroundColor,
+    opacity,
+    size: resolvedSize,
+    containerSize,
+  })
   const Icon = icons[name]
 
   return backgroundColor ? (
@@ -216,19 +223,22 @@ type UseStylesProps = {
   backgroundColor?: string
   opacity?: number
   size: number
+  containerSize?: number
 }
 
-const useStyles = makeStyles((_, { backgroundColor, opacity, size }: UseStylesProps) => {
-  const containerSize = circleDiameterThatContainsSquare(size)
-  return {
-    iconContainerStyle: {
-      opacity: opacity || 1,
-      backgroundColor,
-      borderRadius: containerSize,
-      width: containerSize,
-      height: containerSize,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  }
-})
+const useStyles = makeStyles(
+  (_, { backgroundColor, opacity, size, containerSize }: UseStylesProps) => {
+    const resolvedContainerSize = containerSize ?? circleDiameterThatContainsSquare(size)
+    return {
+      iconContainerStyle: {
+        opacity: opacity || 1,
+        backgroundColor,
+        borderRadius: resolvedContainerSize,
+        width: resolvedContainerSize,
+        height: resolvedContainerSize,
+        alignItems: "center",
+        justifyContent: "center",
+      },
+    }
+  },
+)
