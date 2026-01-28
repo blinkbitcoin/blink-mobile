@@ -72,6 +72,7 @@
     "@gorhom/bottom-sheet": "^5.2.8",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-clipboard/clipboard": "^1.14.0",
+    "@react-native-community/blur": "^4.4.1",
     "@react-native-community/datetimepicker": "^8.0.0",
     "@react-native-community/geolocation": "^3.2.1",
     "@react-native-firebase/analytics": "^23.3.1",
