@@ -40,14 +40,14 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
       label: LL.CardFlow.CardDashboard.Actions.details(),
       icon: "eye",
       onPress: onDetails,
-      iconSize: 30,
+      iconSize: 31,
     },
     {
       label: LL.CardFlow.CardDashboard.Actions.freeze(),
       icon: "snowflake",
       onPress: onFreeze,
       isFreezeButton: true,
-      iconSize: 29,
+      iconSize: 26,
     },
     {
       label: LL.CardFlow.CardDashboard.Actions.setLimits(),
@@ -72,7 +72,7 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
           <View key={action.label} style={styles.actionButton}>
             <GaloyIconButton
               name={action.icon}
-              size="medium"
+              size={42}
               iconSize={action.iconSize}
               text={action.label}
               onPress={action.onPress}
@@ -99,6 +99,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 8,
   },
   actionButton: {
+    flex: 1,
     alignItems: "center",
     gap: 6,
   },
