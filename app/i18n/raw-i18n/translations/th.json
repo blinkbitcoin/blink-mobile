@@ -2970,8 +2970,8 @@
             "Actions": {
                 "details": "รายละเอียด",
                 "freeze": "ระงับ",
-                "setLimits": "ตั้งขีดจำกัด",
-                "statements": "รายการเดินบัญชี"
+                "setLimits": "วงเงิน",
+                "statements": "รายการ"
             },
             "emptyTransactions": "ยังไม่มีธุรกรรม",
             "addFunds": "เติมเงิน",

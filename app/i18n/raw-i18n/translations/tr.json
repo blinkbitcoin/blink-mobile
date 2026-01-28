@@ -2932,8 +2932,8 @@
       "Actions": {
         "details": "Detaylar",
         "freeze": "Dondur",
-        "setLimits": "Limitleri ayarla",
-        "statements": "Hesap özeti"
+        "setLimits": "Limitler",
+        "statements": "Hareketler"
       },
       "emptyTransactions": "Henüz işlem yok",
       "addFunds": "Para ekle",

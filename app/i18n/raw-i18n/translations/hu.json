@@ -2932,8 +2932,8 @@
       "Actions": {
         "details": "Részletek",
         "freeze": "Befagyasztás",
-        "setLimits": "Limit beállítása",
-        "statements": "Kimutatások"
+        "setLimits": "Limitek",
+        "statements": "Forgalom"
       },
       "emptyTransactions": "Még nincs tranzakció",
       "addFunds": "Pénz hozzáadása",

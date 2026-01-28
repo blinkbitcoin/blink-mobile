@@ -2932,8 +2932,8 @@
       "Actions": {
         "details": "Detalii",
         "freeze": "Blochează",
-        "setLimits": "Setează limite",
-        "statements": "Extrase"
+        "setLimits": "Limite",
+        "statements": "Mișcări"
       },
       "emptyTransactions": "Încă nu există tranzacții",
       "addFunds": "Adaugă fonduri",

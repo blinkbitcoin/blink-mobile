@@ -2970,8 +2970,8 @@
             "Actions": {
                 "details": "Chi tiết",
                 "freeze": "Đóng băng",
-                "setLimits": "Đặt giới hạn",
-                "statements": "Sao kê"
+                "setLimits": "Hạn mức",
+                "statements": "Giao dịch"
             },
             "emptyTransactions": "Chưa có giao dịch",
             "addFunds": "Nạp tiền",

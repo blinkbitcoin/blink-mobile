@@ -2973,8 +2973,8 @@
             "Actions": {
                 "details": "Details",
                 "freeze": "Bevriezen",
-                "setLimits": "Limieten instellen",
-                "statements": "Afschriften"
+                "setLimits": "Limieten",
+                "statements": "Transacties"
             },
             "emptyTransactions": "Nog geen transacties",
             "addFunds": "Tegoed toevoegen",

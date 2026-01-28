@@ -2932,8 +2932,8 @@
             "Actions": {
                 "details": "Detalhes",
                 "freeze": "Congelar",
-                "setLimits": "Definir limites",
-                "statements": "Extratos"
+                "setLimits": "Limites",
+                "statements": "Movimentos"
             },
             "emptyTransactions": "Nenhuma transação ainda",
             "addFunds": "Adicionar fundos",
