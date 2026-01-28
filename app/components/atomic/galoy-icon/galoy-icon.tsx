@@ -64,6 +64,12 @@ import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
 import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
 import Headset from "@app/assets/icons-redesign/headset.svg"
+import Snowflake from "@app/assets/icons-redesign/snowflake.svg"
+import Speedometer from "@app/assets/icons-redesign/speedometer.svg"
+import BookOpen from "@app/assets/icons-redesign/book-open.svg"
+import LockClosed from "@app/assets/icons-redesign/lock-closed.svg"
+import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
+import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -130,6 +136,12 @@ export const icons = {
   "key-outline": KeyIcon,
   "house-outline": HouseIcon,
   "headset": Headset,
+  "snowflake": Snowflake,
+  "speedometer": Speedometer,
+  "book-open": BookOpen,
+  "lock-closed": LockClosed,
+  "visa-platinum": VisaPlatinum,
+  "blink-icon": BlinkIcon,
 } as const
 
 export type IconNamesType = keyof typeof icons
@@ -137,12 +149,22 @@ export const IconNames = Object.keys(icons)
 
 type GaloyIconProps = {
   name: IconNamesType
-  size: number
   color?: string
   style?: StyleProp<ViewStyle>
   backgroundColor?: string
   opacity?: number
-}
+} & (
+  | {
+      size: number
+      width?: never
+      height?: never
+    }
+  | {
+      size?: never
+      width: number
+      height: number
+    }
+)
 
 export const circleDiameterThatContainsSquare = (squareSize: number) => {
   const SQRT2 = 1.414
@@ -152,6 +174,8 @@ export const circleDiameterThatContainsSquare = (squareSize: number) => {
 export const GaloyIcon = ({
   name,
   size,
+  width,
+  height,
   color,
   style,
   backgroundColor,
@@ -160,15 +184,16 @@ export const GaloyIcon = ({
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles({ backgroundColor, opacity, size })
+  const resolvedSize = size ?? Math.max(width ?? 0, height ?? 0)
+  const styles = useStyles({ backgroundColor, opacity, size: resolvedSize })
   const Icon = icons[name]
 
   return backgroundColor ? (
     <View style={[style, styles.iconContainerStyle]}>
       <Icon
-        width={size}
+        width={size ?? width}
         opacity={opacity || 1}
-        height={size}
+        height={size ?? height}
         color={color || colors.black}
         fontWeight={"600"}
         testID={`icon-${name}`}
@@ -177,8 +202,8 @@ export const GaloyIcon = ({
   ) : (
     <Icon
       opacity={opacity || 1}
-      width={size}
-      height={size}
+      width={size ?? width}
+      height={size ?? height}
       color={color || colors.black}
       style={style}
       fontWeight={"600"}
