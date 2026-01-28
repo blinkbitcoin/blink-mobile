@@ -97,6 +97,11 @@
 | react-native-maps | Map display |
 | react-native-permissions | Permission management |
 
+### UI Effects
+| Package | Version | Purpose |
+|---------|---------|---------|
+| @react-native-community/blur | 4.4.1 | Native blur effects for iOS and Android |
+
 ## Firebase Services
 
 | Package | Purpose |
