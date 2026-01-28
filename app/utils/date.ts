@@ -86,3 +86,39 @@ export const formatShortDate = ({
 
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
 }
+
+export const parseCardValidThru = (
+  value: string | Date,
+): { month: string; year: string } | null => {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const month = `${value.getMonth() + 1}`.padStart(2, "0")
+    const year = `${value.getFullYear()}`.slice(-2)
+    return { month, year }
+  }
+
+  const raw = `${value}`.trim()
+  const parsed = Date.parse(raw)
+  if (!Number.isNaN(parsed) && (raw.includes("-") || raw.includes("T"))) {
+    const date = new Date(parsed)
+    const month = `${date.getMonth() + 1}`.padStart(2, "0")
+    const year = `${date.getFullYear()}`.slice(-2)
+    return { month, year }
+  }
+
+  return null
+}
+
+import { MASK_CHAR } from "@app/config/appinfo"
+
+export const formatCardValidThruDisplay = (
+  value: string | Date,
+  showDetails: boolean,
+  maskChar = MASK_CHAR,
+) => {
+  const parts = parseCardValidThru(value)
+  if (!parts) return ""
+
+  if (showDetails) return `${parts.month}/ ${parts.year}`.trim()
+
+  return `${maskChar}${maskChar} / ${maskChar}${maskChar}`
+}
