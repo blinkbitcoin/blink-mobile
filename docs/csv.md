@@ -1,7 +1,5 @@
 # Blink CSV Export Field Explanations
 
-    `CSV_EXPORT_FIELDS`
-
 ## Transaction History CSV Export - Field Explanations
 
 This guide explains the fields you'll find when exporting your transaction history as a CSV file from Blink. The Full Export from Blink contains **24 fields** with complete transaction details.
@@ -100,8 +98,7 @@ The **type** field tells you what kind of transaction this was. Here's a complet
 
 | Type | What It Means |
 |------|---------------|
-| `on_us` | You sent money to another Blink user using their username or Lightning address.  The payment stayed within Blink's system (instant
-and free). |
+| `on_us` | You sent money to another Blink user using their username or Lightning address.  The payment stayed within Blink's system (instant and free). |
 | `ln_on_us` | Similar to `on_us` – a Lightning payment to another Blink user that stayed within the network. |
 | `onchain_on_us` | An on-chain style transfer to another Blink user. Rare, as Lightning is preferred within Blink. |
 
@@ -174,7 +171,7 @@ Both will have a `self_trade` or `ln_self_trade` type.
 
 **Q: What does an empty `fee` mean?**
 
-A: An empty fee typically means:
+**A:** An empty fee typically means:
 
 * The transaction was free (internal Blink transfer)
 * You were the receiver (fees are paid by sender)
@@ -189,7 +186,7 @@ A: An empty fee typically means:
    - Sum the `debit` column for total sent
    - Remember: BTC values are in satoshis (divide by 100,000,000 for BTC)
 4. **Filtering by type**: Use your spreadsheet's filter to see only specific transaction types (e.g., only invoice for all received Lightning payments).
-5. Matching wallet conversions: When you swap between BTC and USD wallets, look for matching timestamps with `self_trade` or `ln_self_trade` types - one will be credit, one will be debit.
+5. **Matching wallet conversions**: When you swap between BTC and USD wallets, look for matching timestamps with `self_trade` or `ln_self_trade` types - one will be credit, one will be debit.
 
 ## Quick Reference: Transaction Types
 
