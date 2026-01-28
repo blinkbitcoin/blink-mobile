@@ -1,6 +1,13 @@
 import { it } from "@jest/globals"
 
-import { formatShortDate, isSameDay, isToday, isYesterday } from "@app/utils/date"
+import {
+  formatCardValidThruDisplay,
+  formatShortDate,
+  isSameDay,
+  isToday,
+  isYesterday,
+  parseCardValidThru,
+} from "@app/utils/date"
 
 describe("date utils", () => {
   describe("isSameDay", () => {
@@ -184,6 +191,58 @@ describe("date utils", () => {
       expect(formatShortDate({ createdAt })).toMatch(/2024-06-10/)
 
       jest.useRealTimers()
+    })
+  })
+
+  describe("parseCardValidThru", () => {
+    it("parses a valid Date instance", () => {
+      expect(parseCardValidThru(new Date("2024-05-01T12:00:00Z"))).toEqual({
+        month: "05",
+        year: "24",
+      })
+    })
+
+    it("returns null for an invalid Date instance", () => {
+      expect(parseCardValidThru(new Date("invalid-date"))).toBeNull()
+    })
+
+    it("parses an ISO date string with dashes", () => {
+      expect(parseCardValidThru("2024-02-03")).toEqual({ month: "02", year: "24" })
+    })
+
+    it("parses an ISO datetime string with a time separator", () => {
+      expect(parseCardValidThru("2026-11-30T15:00:00Z")).toEqual({
+        month: "11",
+        year: "26",
+      })
+    })
+
+    it("trims whitespace before parsing", () => {
+      expect(parseCardValidThru(" 2024-12-09 ")).toEqual({ month: "12", year: "24" })
+    })
+
+    it("returns null when the string lacks '-' or 'T'", () => {
+      expect(parseCardValidThru("May 01 2024")).toBeNull()
+    })
+  })
+
+  describe("formatCardValidThruDisplay", () => {
+    it("returns empty string when parsing fails", () => {
+      expect(formatCardValidThruDisplay("not-a-date", true, "*")).toBe("")
+    })
+
+    it("formats with details when showDetails is true", () => {
+      expect(formatCardValidThruDisplay("2024-12-05", true, "*")).toBe("12/ 24")
+    })
+
+    it("masks when showDetails is false", () => {
+      expect(formatCardValidThruDisplay("2024-12-05", false, "#")).toBe("## / ##")
+    })
+
+    it("accepts a Date instance as input", () => {
+      expect(
+        formatCardValidThruDisplay(new Date("2031-01-15T12:00:00Z"), true, "*"),
+      ).toBe("01/ 31")
     })
   })
 })
