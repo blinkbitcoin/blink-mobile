@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Podrobnosti",
                 "freeze": "Zmraziť",
-                "setLimits": "Nastaviť limity",
-                "statements": "Výpisy"
+                "setLimits": "Limity",
+                "statements": "Pohyby"
             },
             "emptyTransactions": "Zatiaľ žiadne transakcie",
             "addFunds": "Pridať prostriedky",

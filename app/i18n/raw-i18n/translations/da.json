@@ -2718,8 +2718,8 @@
             "Actions": {
                 "details": "Detaljer",
                 "freeze": "Spær",
-                "setLimits": "Sæt grænser",
-                "statements": "Kontoudtog"
+                "setLimits": "Grænser",
+                "statements": "Bevægelser"
             },
             "emptyTransactions": "Ingen transaktioner endnu",
             "addFunds": "Tilføj midler",

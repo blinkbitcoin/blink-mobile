@@ -911,8 +911,8 @@
             "Actions": {
                 "details": "Iinkcukacha",
                 "freeze": "Bandisa",
-                "setLimits": "Cwangcisa imida",
-                "statements": "Iingxelo"
+                "setLimits": "Imida",
+                "statements": "Intshukumo"
             },
             "emptyTransactions": "Akukho ntengiselwano okwangoku",
             "addFunds": "Yongeza imali",

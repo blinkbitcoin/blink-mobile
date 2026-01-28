@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Detail",
                 "freeze": "Bekukan",
-                "setLimits": "Atur batas",
-                "statements": "Laporan"
+                "setLimits": "Batas",
+                "statements": "Mutasi"
             },
             "emptyTransactions": "Belum ada transaksi",
             "addFunds": "Tambah dana",

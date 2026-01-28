@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Detalls",
                 "freeze": "Congela",
-                "setLimits": "Estableix límits",
-                "statements": "Extractes"
+                "setLimits": "Límits",
+                "statements": "Moviments"
             },
             "emptyTransactions": "Encara no hi ha transaccions",
             "addFunds": "Afegir fons",

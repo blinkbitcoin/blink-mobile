@@ -2691,8 +2691,8 @@
             "Actions": {
                 "details": "Butiran",
                 "freeze": "Bekukan",
-                "setLimits": "Tetapkan had",
-                "statements": "Penyata"
+                "setLimits": "Had",
+                "statements": "Transaksi"
             },
             "emptyTransactions": "Belum ada transaksi",
             "addFunds": "Tambah dana",

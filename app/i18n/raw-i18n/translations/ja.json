@@ -2691,7 +2691,7 @@
             "Actions": {
                 "details": "詳細",
                 "freeze": "凍結",
-                "setLimits": "制限を設定",
+                "setLimits": "限度額",
                 "statements": "明細"
             },
             "emptyTransactions": "取引はまだありません",

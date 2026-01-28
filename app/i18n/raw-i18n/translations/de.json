@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Details",
                 "freeze": "Sperren",
-                "setLimits": "Limits festlegen",
-                "statements": "Kontoauszüge"
+                "setLimits": "Limits",
+                "statements": "Umsätze"
             },
             "emptyTransactions": "Noch keine Transaktionen",
             "addFunds": "Guthaben hinzufügen",

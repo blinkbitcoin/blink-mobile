@@ -2691,8 +2691,8 @@
             "Actions": {
                 "details": "Detalji",
                 "freeze": "Zamrzni",
-                "setLimits": "Postavi limite",
-                "statements": "Izvodi"
+                "setLimits": "Limiti",
+                "statements": "Promet"
             },
             "emptyTransactions": "Još nema transakcija",
             "addFunds": "Dodaj sredstva",

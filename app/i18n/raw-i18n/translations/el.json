@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Λεπτομέρειες",
                 "freeze": "Πάγωμα",
-                "setLimits": "Ορισμός ορίων",
-                "statements": "Καταστάσεις"
+                "setLimits": "Όρια",
+                "statements": "Κινήσεις"
             },
             "emptyTransactions": "Δεν υπάρχουν συναλλαγές ακόμη",
             "addFunds": "Προσθήκη χρημάτων",

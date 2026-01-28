@@ -2691,8 +2691,8 @@
             "Actions": {
                 "details": "Besonderhede",
                 "freeze": "Vries",
-                "setLimits": "Stel perke",
-                "statements": "State"
+                "setLimits": "Limiete",
+                "statements": "Bewegings"
             },
             "emptyTransactions": "Nog geen transaksies nie",
             "addFunds": "Voeg fondse by",

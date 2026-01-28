@@ -2777,8 +2777,8 @@
             "Actions": {
                 "details": "Dettagli",
                 "freeze": "Blocca",
-                "setLimits": "Imposta limiti",
-                "statements": "Estratti conto"
+                "setLimits": "Limiti",
+                "statements": "Movimenti"
             },
             "emptyTransactions": "Nessuna transazione al momento",
             "addFunds": "Aggiungi fondi",

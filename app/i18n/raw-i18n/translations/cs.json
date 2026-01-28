@@ -2691,8 +2691,8 @@
             "Actions": {
                 "details": "Detaily",
                 "freeze": "Zmrazit",
-                "setLimits": "Nastavit limity",
-                "statements": "Výpisy"
+                "setLimits": "Limity",
+                "statements": "Pohyby"
             },
             "emptyTransactions": "Zatím žádné transakce",
             "addFunds": "Přidat prostředky",

@@ -2691,8 +2691,8 @@
             "Actions": {
                 "details": "Մանրամասներ",
                 "freeze": "Սառեցնել",
-                "setLimits": "Սահմանել սահմանաչափեր",
-                "statements": "Հաշվետվություններ"
+                "setLimits": "Սdelays",
+                "statements": "Շdelays"
             },
             "emptyTransactions": "Դեռ գործարքներ չկան",
             "addFunds": "Ավելացնել միջոցներ",
