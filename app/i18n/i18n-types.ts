@@ -9625,6 +9625,66 @@ type RootTranslation = {
 		 */
 		REVIEW: string
 	}
+	CardFlow: {
+		/**
+		 * V​A​L​I​D​ ​T​H​R​U
+		 */
+		validThruLabel: string
+		/**
+		 * C​a​r​d​ ​f​r​o​z​e​n
+		 */
+		cardFrozenTitle: string
+		/**
+		 * C​a​r​d​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​d​i​s​a​b​l​e​d
+		 */
+		cardFrozenSubtitle: string
+		TransactionStatus: {
+			/**
+			 * P​e​n​d​i​n​g
+			 */
+			pending: string
+			/**
+			 * C​o​m​p​l​e​t​e​d
+			 */
+			completed: string
+		}
+		CardDashboard: {
+			Actions: {
+				/**
+				 * D​e​t​a​i​l​s
+				 */
+				details: string
+				/**
+				 * F​r​e​e​z​e
+				 */
+				freeze: string
+				/**
+				 * S​e​t​ ​l​i​m​i​t​s
+				 */
+				setLimits: string
+				/**
+				 * S​t​a​t​e​m​e​n​t​s
+				 */
+				statements: string
+			}
+			/**
+			 * B​l​i​n​k​ ​C​a​r​d
+			 */
+			title: string
+			/**
+			 * A​d​d​ ​f​u​n​d​s
+			 */
+			addFunds: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​s
+			 */
+			transactionsTitle: string
+			/**
+			 * N​o​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​y​e​t
+			 */
+			emptyTransactions: string
+		}
+	}
 	NotificationHistory: {
 		/**
 		 * N​o​t​i​f​i​c​a​t​i​o​n​s
@@ -19128,6 +19188,66 @@ export type TranslationFunctions = {
 		 * Review
 		 */
 		REVIEW: () => LocalizedString
+	}
+	CardFlow: {
+		/**
+		 * VALID THRU
+		 */
+		validThruLabel: () => LocalizedString
+		/**
+		 * Card frozen
+		 */
+		cardFrozenTitle: () => LocalizedString
+		/**
+		 * Card is temporarily disabled
+		 */
+		cardFrozenSubtitle: () => LocalizedString
+		TransactionStatus: {
+			/**
+			 * Pending
+			 */
+			pending: () => LocalizedString
+			/**
+			 * Completed
+			 */
+			completed: () => LocalizedString
+		}
+		CardDashboard: {
+			Actions: {
+				/**
+				 * Details
+				 */
+				details: () => LocalizedString
+				/**
+				 * Freeze
+				 */
+				freeze: () => LocalizedString
+				/**
+				 * Set limits
+				 */
+				setLimits: () => LocalizedString
+				/**
+				 * Statements
+				 */
+				statements: () => LocalizedString
+			}
+			/**
+			 * Blink Card
+			 */
+			title: () => LocalizedString
+			/**
+			 * Add funds
+			 */
+			addFunds: () => LocalizedString
+			/**
+			 * Transactions
+			 */
+			transactionsTitle: () => LocalizedString
+			/**
+			 * No transactions yet
+			 */
+			emptyTransactions: () => LocalizedString
+		}
 	}
 	NotificationHistory: {
 		/**

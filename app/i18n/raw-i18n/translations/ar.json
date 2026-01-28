@@ -2960,5 +2960,26 @@
   "NotificationHistory": {
     "title": "الإشعارات",
     "noNotifications": "ليس لديك أي إشعارات الآن"
-  }
+  },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "قيد الانتظار",
+            "completed": "مكتمل"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "التفاصيل",
+                "freeze": "تجميد",
+                "setLimits": "تعيين الحدود",
+                "statements": "كشوفات"
+            },
+            "emptyTransactions": "لا توجد معاملات بعد",
+            "addFunds": "إضافة أموال",
+            "transactionsTitle": "المعاملات",
+            "title": "بطاقة Blink"
+        },
+        "validThruLabel": "صالح حتى",
+        "cardFrozenTitle": "البطاقة مجمدة",
+        "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا"
+    }
 }

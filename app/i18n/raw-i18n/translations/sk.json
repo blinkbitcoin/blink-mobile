@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Notifikácie",
     "noNotifications": "Momentálne nemáte žiadne upozornenia"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Čaká",
+      "completed": "Dokončené"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Podrobnosti",
+        "freeze": "Zmraziť",
+        "setLimits": "Nastaviť limity",
+        "statements": "Výpisy"
+      },
+      "emptyTransactions": "Zatiaľ žiadne transakcie",
+      "addFunds": "Pridať prostriedky",
+      "transactionsTitle": "Transakcie",
+      "title": "Karta Blink"
+    },
+    "validThruLabel": "PLATNÉ DO",
+    "cardFrozenTitle": "Karta zmrazená",
+    "cardFrozenSubtitle": "Karta je dočasne deaktivovaná"
   }
 }

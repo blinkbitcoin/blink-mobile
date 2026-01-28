@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Bildirimler",
     "noNotifications": "Şu anda herhangi bir bildiriminiz yok"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Beklemede",
+      "completed": "Tamamlandı"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detaylar",
+        "freeze": "Dondur",
+        "setLimits": "Limitleri ayarla",
+        "statements": "Hesap özeti"
+      },
+      "emptyTransactions": "Henüz işlem yok",
+      "addFunds": "Para ekle",
+      "transactionsTitle": "İşlemler",
+      "title": "Blink Kartı"
+    },
+    "validThruLabel": "GEÇERLİLİK",
+    "cardFrozenTitle": "Kart donduruldu",
+    "cardFrozenSubtitle": "Kart geçici olarak devre dışı"
   }
 }
