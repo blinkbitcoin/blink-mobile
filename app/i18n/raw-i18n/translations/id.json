@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Dengan Stablesats, Anda sekarang memiliki akun USD yang ditambahkan ke dompet Anda!",
         "body": "Anda dapat menggunakannya untuk mengirim dan menerima Bitcoin, serta mentransfer nilai secara instan antara akun BTC dan USD Anda. Nilai di akun USD tidak akan berfluktuasi dengan harga Bitcoin. Fitur ini tidak kompatibel dengan sistem perbankan tradisional.",
-        "termsAndConditions": "Baca Syarat & Ketentuan.",
+        "termsAndConditions": "Baca Syarat & Ketentuan",
         "learnMore": "Pelajari lebih lanjut tentang Stablesats"
     },
     "SplashScreen": {

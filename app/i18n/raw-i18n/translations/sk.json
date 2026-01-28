@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "So Stablesats máte vo svojej peňaženke pridaný účet v USD!",
         "body": "Pomocou tohto účtu môžete odosielať a prijímať bitcoiny a okamžite prevádzať hodnotu medzi svojím BTC a USD účtom. Hodnota na USD účte nebude kolísať s cenou Bitcoinu. Táto funkcia nie je kompatibilná s tradičným bankovým systémom.",
-        "termsAndConditions": "Prečítajte si podmienky používania.",
+        "termsAndConditions": "Prečítajte si podmienky používania",
         "learnMore": "Zistite viac o Stablesats"
     },
     "SplashScreen": {
