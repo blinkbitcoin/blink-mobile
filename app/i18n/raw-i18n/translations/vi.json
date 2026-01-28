@@ -2676,5 +2676,26 @@
         "ERROR": "Lỗi",
         "PROCESSING": "Processing",
         "REVIEW": "Review"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Đang chờ",
+            "completed": "Đã hoàn tất"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Chi tiết",
+                "freeze": "Đóng băng",
+                "setLimits": "Đặt giới hạn",
+                "statements": "Sao kê"
+            },
+            "emptyTransactions": "Chưa có giao dịch",
+            "addFunds": "Nạp tiền",
+            "transactionsTitle": "Giao dịch",
+            "title": "Thẻ Blink"
+        },
+        "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
+        "cardFrozenTitle": "Thẻ bị khóa",
+        "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa"
     }
 }

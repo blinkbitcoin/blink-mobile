@@ -901,5 +901,26 @@
         "updateMandatory": "Update is mandatory",
         "tapHereUpdate": "Tap here to update now",
         "contactSupport": "Contact Support"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Kulindile",
+            "completed": "Kugqityiwe"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Iinkcukacha",
+                "freeze": "Bandisa",
+                "setLimits": "Cwangcisa imida",
+                "statements": "Iingxelo"
+            },
+            "emptyTransactions": "Akukho ntengiselwano okwangoku",
+            "addFunds": "Yongeza imali",
+            "transactionsTitle": "Iintengiselwano",
+            "title": "Ikhadi le-Blink"
+        },
+        "validThruLabel": "ISEBENZA DE KUPHELA",
+        "cardFrozenTitle": "Ikhadi libandisiwe",
+        "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana"
     }
 }

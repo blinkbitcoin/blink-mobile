@@ -2767,5 +2767,26 @@
     "NotificationHistory": {
         "title": "Notificacions",
         "noNotifications": "Ara no tens cap notificació"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Pendent",
+            "completed": "Completat"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalls",
+                "freeze": "Congela",
+                "setLimits": "Estableix límits",
+                "statements": "Extractes"
+            },
+            "emptyTransactions": "Encara no hi ha transaccions",
+            "addFunds": "Afegir fons",
+            "transactionsTitle": "Transaccions",
+            "title": "Targeta Blink"
+        },
+        "validThruLabel": "VÀLIDA FINS",
+        "cardFrozenTitle": "Targeta congelada",
+        "cardFrozenSubtitle": "La targeta està temporalment desactivada"
     }
 }

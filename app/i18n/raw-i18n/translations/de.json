@@ -2767,5 +2767,26 @@
     "NotificationHistory": {
         "title": "Benachrichtigungen",
         "noNotifications": "Sie haben im Moment keine Benachrichtigungen"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Ausstehend",
+            "completed": "Abgeschlossen"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Details",
+                "freeze": "Sperren",
+                "setLimits": "Limits festlegen",
+                "statements": "Kontoauszüge"
+            },
+            "emptyTransactions": "Noch keine Transaktionen",
+            "addFunds": "Guthaben hinzufügen",
+            "transactionsTitle": "Transaktionen",
+            "title": "Blink-Karte"
+        },
+        "validThruLabel": "GÜLTIG BIS",
+        "cardFrozenTitle": "Karte eingefroren",
+        "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert"
     }
 }

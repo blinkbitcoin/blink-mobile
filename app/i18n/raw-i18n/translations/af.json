@@ -2681,5 +2681,26 @@
     },
     "Fake": {
         "doNotTranslate": "NA"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Hangend",
+            "completed": "Voltooi"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Besonderhede",
+                "freeze": "Vries",
+                "setLimits": "Stel perke",
+                "statements": "State"
+            },
+            "emptyTransactions": "Nog geen transaksies nie",
+            "addFunds": "Voeg fondse by",
+            "transactionsTitle": "Transaksies",
+            "title": "Blink-kaart"
+        },
+        "validThruLabel": "GELDIG TOT",
+        "cardFrozenTitle": "Kaart gevries",
+        "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer"
     }
 }

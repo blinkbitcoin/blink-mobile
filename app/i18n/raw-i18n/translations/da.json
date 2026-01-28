@@ -2708,5 +2708,26 @@
         "ERROR": "Fejl",
         "PROCESSING": "Behandler",
         "REVIEW": "Gennemgang"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Afventer",
+            "completed": "Fuldført"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detaljer",
+                "freeze": "Spær",
+                "setLimits": "Sæt grænser",
+                "statements": "Kontoudtog"
+            },
+            "emptyTransactions": "Ingen transaktioner endnu",
+            "addFunds": "Tilføj midler",
+            "transactionsTitle": "Transaktioner",
+            "title": "Blink-kort"
+        },
+        "validThruLabel": "GYLDIG TIL",
+        "cardFrozenTitle": "Kort spærret",
+        "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret"
     }
 }

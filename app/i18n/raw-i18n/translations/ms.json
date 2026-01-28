@@ -2681,5 +2681,26 @@
     },
     "Fake": {
         "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Menunggu",
+            "completed": "Selesai"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Butiran",
+                "freeze": "Bekukan",
+                "setLimits": "Tetapkan had",
+                "statements": "Penyata"
+            },
+            "emptyTransactions": "Belum ada transaksi",
+            "addFunds": "Tambah dana",
+            "transactionsTitle": "Transaksi",
+            "title": "Kad Blink"
+        },
+        "validThruLabel": "SAH SEHINGGA",
+        "cardFrozenTitle": "Kad dibekukan",
+        "cardFrozenSubtitle": "Kad dinyahaktifkan sementara"
     }
 }

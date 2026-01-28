@@ -2676,5 +2676,26 @@
         "ERROR": "Llimphi",
         "PROCESSING": "Processing",
         "REVIEW": "Review"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Pendiente",
+            "completed": "Completado"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalles",
+                "freeze": "Congelar",
+                "setLimits": "Establecer límites",
+                "statements": "Estados de cuenta"
+            },
+            "emptyTransactions": "Aún no hay transacciones",
+            "addFunds": "Agregar fondos",
+            "transactionsTitle": "Transacciones",
+            "title": "Tarjeta Blink"
+        },
+        "validThruLabel": "VÁLIDO HASTA",
+        "cardFrozenTitle": "Tarjeta congelada",
+        "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
     }
 }
