@@ -316,7 +316,7 @@ export const DeveloperScreen: React.FC = () => {
               LN Address Hostname: {appConfig.galoyInstance.lnAddressHostname}
             </Text>
             <Text selectable>
-              USD per 1 sat: {usdPerSat ? `$${usdPerSat}` : "No price data"}
+              Dollar per 1 sat: {usdPerSat ? `$${usdPerSat}` : "No price data"}
             </Text>
             <Text>Hermes: {String(Boolean(usingHermes))}</Text>
             <Button
