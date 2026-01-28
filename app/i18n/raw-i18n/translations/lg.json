@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Okumanyisibwa",
     "noNotifications": "You don't have any notifications right now"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Kikyali mu kutegeerwa",
+      "completed": "Kiwedde"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Ebisingawo",
+        "freeze": "Kkuzza",
+        "setLimits": "Teekawo ekkomo",
+        "statements": "Ebisusunsiddwa"
+      },
+      "emptyTransactions": "Tewali byokukola ku nsimbi",
+      "addFunds": "Yongera sente",
+      "transactionsTitle": "Ebyokukola ku nsimbi",
+      "title": "Kaadi ya Blink"
+    },
+    "validThruLabel": "KIKWATA OKUTUUSA",
+    "cardFrozenTitle": "Kaadi ekkuziddwa",
+    "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera"
   }
 }

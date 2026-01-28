@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Értesítések",
     "noNotifications": "Jelenleg nincsenek értesítéseid"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Függőben",
+      "completed": "Teljesítve"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Részletek",
+        "freeze": "Befagyasztás",
+        "setLimits": "Limit beállítása",
+        "statements": "Kimutatások"
+      },
+      "emptyTransactions": "Még nincs tranzakció",
+      "addFunds": "Pénz hozzáadása",
+      "transactionsTitle": "Tranzakciók",
+      "title": "Blink kártya"
+    },
+    "validThruLabel": "ÉRVÉNYES",
+    "cardFrozenTitle": "Kártya befagyasztva",
+    "cardFrozenSubtitle": "A kártya ideiglenesen letiltva"
   }
 }

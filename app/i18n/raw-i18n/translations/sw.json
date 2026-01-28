@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Arifa",
     "noNotifications": "Huna arifa zozote kwa sasa"
-  }
+  },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Inasubiri",
+            "completed": "Imekamilika"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Maelezo",
+                "freeze": "Gandisha",
+                "setLimits": "Weka mipaka",
+                "statements": "Taarifa"
+            },
+            "emptyTransactions": "Hakuna miamala bado",
+            "addFunds": "Ongeza fedha",
+            "transactionsTitle": "Miamala",
+            "title": "Kadi ya Blink"
+        },
+        "validThruLabel": "INATUMIKA HADI",
+        "cardFrozenTitle": "Kadi imegandishwa",
+        "cardFrozenSubtitle": "Kadi imezimwa kwa muda"
+    }
 }

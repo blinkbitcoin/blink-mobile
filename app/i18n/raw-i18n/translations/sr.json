@@ -2960,5 +2960,26 @@
   "NotificationHistory": {
     "title": "Обавештења",
     "noNotifications": "Тренутно немате обавештења"
-  }
+  },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Na čekanju",
+            "completed": "Završeno"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalji",
+                "freeze": "Zamrzni",
+                "setLimits": "Postavi limite",
+                "statements": "Izvodi"
+            },
+            "emptyTransactions": "Još nema transakcija",
+            "addFunds": "Dodaj sredstva",
+            "transactionsTitle": "Transakcije",
+            "title": "Blink kartica"
+        },
+        "validThruLabel": "VAŽI DO",
+        "cardFrozenTitle": "Kartica zamrznuta",
+        "cardFrozenSubtitle": "Kartica je privremeno onemogućena"
+    }
 }
