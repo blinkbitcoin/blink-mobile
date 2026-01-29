@@ -131,6 +131,7 @@ export type RootStackParamList = {
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
   cardDashboard: undefined
+  cardLimitsScreen: undefined
 }
 
 export type OnboardingStackParamList = {
