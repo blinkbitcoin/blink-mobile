@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "PLATNÉ DO",
     "cardFrozenTitle": "Karta zmrazená",
-    "cardFrozenSubtitle": "Karta je dočasne deaktivovaná"
+    "cardFrozenSubtitle": "Karta je dočasne deaktivovaná",
+    "CardLimits": {
+      "currentLimitsTitle": "Aktuálne limity",
+      "dailySpending": "Denné výdavky",
+      "monthlySpending": "Mesačné výdavky",
+      "spendingLimitsTitle": "Limity výdavkov",
+      "dailyLimit": "Denný limit",
+      "dailyLimitHelper": "Maximálna suma, ktorú môžete minúť za deň",
+      "monthlyLimit": "Mesačné limity útraty",
+      "monthlyLimitHelper": "Maximálna suma, ktorú môžete minúť za mesiac",
+      "atmLimitsTitle": "Limity výberu z bankomatu",
+      "dailyAtmLimit": "Denné limity bankomatu",
+      "dailyAtmLimitHelper": "Maximálny výber z bankomatu za deň",
+      "monthlyAtmLimit": "Mesačný limit bankomatu",
+      "monthlyAtmLimitHelper": "Maximálny výber z bankomatu za mesiac",
+      "transactionTypesTitle": "Typy transakcií",
+      "TransactionTypes": {
+        "ecommerce": "Online nákupy",
+        "ecommerceDescription": "Povoliť online a e-commerce transakcie",
+        "atm": "Výbery z bankomatu",
+        "atmDescription": "Povoliť výbery hotovosti z bankomatov",
+        "contactless": "Bezkontaktné platby",
+        "contactlessDescription": "Povoliť bezkontaktné transakcie"
+      },
+      "title": "Limity karty"
+    }
   }
 }

@@ -2983,6 +2983,31 @@
         },
         "validThruLabel": "有効期限",
         "cardFrozenTitle": "カードが凍結されました",
-        "cardFrozenSubtitle": "カードは一時的に無効になっています"
+        "cardFrozenSubtitle": "カードは一時的に無効になっています",
+        "CardLimits": {
+            "currentLimitsTitle": "現在の限度額",
+            "dailySpending": "1日の支出",
+            "monthlySpending": "月間支出",
+            "spendingLimitsTitle": "支出限度額",
+            "dailyLimit": "1日の限度額",
+            "dailyLimitHelper": "1日に使える最大金額",
+            "monthlyLimit": "月間支出限度額",
+            "monthlyLimitHelper": "1ヶ月に使える最大金額",
+            "atmLimitsTitle": "ATM引き出し限度額",
+            "dailyAtmLimit": "日次ATM限度額",
+            "dailyAtmLimitHelper": "1日のATM引き出し最大額",
+            "monthlyAtmLimit": "月間ATM限度額",
+            "monthlyAtmLimitHelper": "1ヶ月のATM引き出し最大額",
+            "transactionTypesTitle": "取引タイプ",
+            "TransactionTypes": {
+                "ecommerce": "オンライン購入",
+                "ecommerceDescription": "オンラインとEコマース取引を許可",
+                "atm": "ATM引き出し",
+                "atmDescription": "ATMからの現金引き出しを許可",
+                "contactless": "非接触決済",
+                "contactlessDescription": "非接触取引を許可"
+            },
+            "title": "カード限度額"
+        }
     }
 }

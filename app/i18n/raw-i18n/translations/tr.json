@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "GEÇERLİLİK",
     "cardFrozenTitle": "Kart donduruldu",
-    "cardFrozenSubtitle": "Kart geçici olarak devre dışı"
+    "cardFrozenSubtitle": "Kart geçici olarak devre dışı",
+    "CardLimits": {
+      "currentLimitsTitle": "Mevcut limitler",
+      "dailySpending": "Günlük harcama",
+      "monthlySpending": "Aylık harcama",
+      "spendingLimitsTitle": "Harcama limitleri",
+      "dailyLimit": "Günlük limit",
+      "dailyLimitHelper": "Günde harcayabileceğiniz maksimum tutar",
+      "monthlyLimit": "Aylık harcama limitleri",
+      "monthlyLimitHelper": "Ayda harcayabileceğiniz maksimum tutar",
+      "atmLimitsTitle": "ATM çekim limitleri",
+      "dailyAtmLimit": "Günlük ATM limitleri",
+      "dailyAtmLimitHelper": "Günlük maksimum ATM çekimi",
+      "monthlyAtmLimit": "Aylık ATM limiti",
+      "monthlyAtmLimitHelper": "Aylık maksimum ATM çekimi",
+      "transactionTypesTitle": "İşlem türleri",
+      "TransactionTypes": {
+        "ecommerce": "Online alışveriş",
+        "ecommerceDescription": "E-ticaret işlemlerine izin ver",
+        "atm": "ATM çekimleri",
+        "atmDescription": "ATM'den nakit çekimlere izin ver",
+        "contactless": "Temassız ödemeler",
+        "contactlessDescription": "Temassız işlemlere izin ver"
+      },
+      "title": "Kart limitleri"
+    }
   }
 }

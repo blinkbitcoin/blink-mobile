@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "VALABIL PÂNĂ LA",
     "cardFrozenTitle": "Card blocat",
-    "cardFrozenSubtitle": "Cardul este dezactivat temporar"
+    "cardFrozenSubtitle": "Cardul este dezactivat temporar",
+    "CardLimits": {
+      "currentLimitsTitle": "Limite curente",
+      "dailySpending": "Cheltuieli zilnice",
+      "monthlySpending": "Cheltuieli lunare",
+      "spendingLimitsTitle": "Limite de cheltuieli",
+      "dailyLimit": "Limita zilnică",
+      "dailyLimitHelper": "Suma maximă pe care o poți cheltui pe zi",
+      "monthlyLimit": "Limite de cheltuieli lunare",
+      "monthlyLimitHelper": "Suma maximă pe care o poți cheltui pe lună",
+      "atmLimitsTitle": "Limite de retragere ATM",
+      "dailyAtmLimit": "Limite zilnice ATM",
+      "dailyAtmLimitHelper": "Retragere maximă la ATM pe zi",
+      "monthlyAtmLimit": "Limita lunară ATM",
+      "monthlyAtmLimitHelper": "Retragere maximă la ATM pe lună",
+      "transactionTypesTitle": "Tipuri de tranzacții",
+      "TransactionTypes": {
+        "ecommerce": "Cumpărături online",
+        "ecommerceDescription": "Permite tranzacții e-commerce",
+        "atm": "Retrageri ATM",
+        "atmDescription": "Permite retrageri de numerar de la ATM",
+        "contactless": "Plăți fără contact",
+        "contactlessDescription": "Permite tranzacții fără contact"
+      },
+      "title": "Limite card"
+    }
   }
 }

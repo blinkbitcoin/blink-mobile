@@ -2983,6 +2983,31 @@
     },
     "validThruLabel": "Վավեր է մինչև",
     "cardFrozenTitle": "Քարտը սառեցված է",
-    "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է"
+    "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է",
+    "CardLimits": {
+      "currentLimitsTitle": " Delays limitner",
+      "dailySpending": "Orakan tsakhsner",
+      "monthlySpending": "Amsakan tsakhsner",
+      "spendingLimitsTitle": "Tsakhsneri sahmanner",
+      "dailyLimit": "Orakan sahman",
+      "dailyLimitHelper": "Aravaguyn gumar, vor karogh ek tsakhsel or@ orakan",
+      "monthlyLimit": "Amsakan tsakhseri sahmanapakmanner",
+      "monthlyLimitHelper": "Aravaguyn gumar, vor karogh ek tsakhsel amis@",
+      "atmLimitsTitle": "Bankomat@ kankhik sahmanner",
+      "dailyAtmLimit": "Orakanbank kankhiknerisahmanapakmanner",
+      "dailyAtmLimitHelper": "Aravaguyn bankomat kankhik or@",
+      "monthlyAtmLimit": "Amsakan bankomat sahman",
+      "monthlyAtmLimitHelper": "Aravaguyn bankomat kankhik amis@",
+      "transactionTypesTitle": "Gortsnarkutyunneri tesak",
+      "TransactionTypes": {
+        "ecommerce": "Arnlayn gnumner",
+        "ecommerceDescription": "Tuylatvir arnlayn ev el-arewturi gortsakarutyunner",
+        "atm": "Bankomat kankhikner",
+        "atmDescription": "Tuylatvir kankhik bankomatneritc",
+        "contactless": "Anshoshap vcharumner",
+        "contactlessDescription": "Tuylatvir anshoshap gortsakarutyunner"
+      },
+      "title": "Qart limitner"
+    }
   }
 }

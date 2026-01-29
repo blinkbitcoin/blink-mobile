@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "ÉRVÉNYES",
     "cardFrozenTitle": "Kártya befagyasztva",
-    "cardFrozenSubtitle": "A kártya ideiglenesen letiltva"
+    "cardFrozenSubtitle": "A kártya ideiglenesen letiltva",
+    "CardLimits": {
+      "currentLimitsTitle": "Jelenlegi korlátok",
+      "dailySpending": "Napi költés",
+      "monthlySpending": "Havi költés",
+      "spendingLimitsTitle": "Költési korlátok",
+      "dailyLimit": "Napi korlát",
+      "dailyLimitHelper": "Maximális összeg, amit naponta költhet",
+      "monthlyLimit": "Havi költési limitek",
+      "monthlyLimitHelper": "Maximális összeg, amit havonta költhet",
+      "atmLimitsTitle": "ATM felvételi korlátok",
+      "dailyAtmLimit": "Napi ATM limitek",
+      "dailyAtmLimitHelper": "Maximális ATM felvétel naponta",
+      "monthlyAtmLimit": "Havi ATM korlát",
+      "monthlyAtmLimitHelper": "Maximális ATM felvétel havonta",
+      "transactionTypesTitle": "Tranzakciótípusok",
+      "TransactionTypes": {
+        "ecommerce": "Online vásárlások",
+        "ecommerceDescription": "Online és e-kereskedelmi tranzakciók engedélyezése",
+        "atm": "ATM felvételek",
+        "atmDescription": "Készpénzfelvétel engedélyezése ATM-ből",
+        "contactless": "Érintésmentes fizetések",
+        "contactlessDescription": "Érintésmentes tranzakciók engedélyezése"
+      },
+      "title": "Kártyakorlátok"
+    }
   }
 }
