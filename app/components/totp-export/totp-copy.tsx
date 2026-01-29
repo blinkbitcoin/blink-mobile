@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useClipboard } from "@app/hooks/use-clipboard"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 type Props = {

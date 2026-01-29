@@ -19,8 +19,7 @@ import {
   useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { useAppConfig, useTransactionSeenState } from "@app/hooks"
-import { useClipboard } from "@app/hooks/use-clipboard"
+import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
