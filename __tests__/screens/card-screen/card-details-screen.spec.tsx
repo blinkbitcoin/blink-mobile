@@ -15,6 +15,17 @@ jest.mock("react-native-linear-gradient", () => ({
 
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
+const mockSetOptions = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native")
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      setOptions: mockSetOptions,
+    }),
+  }
+})
+
 const mockCopyToClipboard = jest.fn()
 
 jest.mock("@app/hooks/use-clipboard", () => ({
@@ -46,6 +57,7 @@ describe("CardDetailsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockCopyToClipboard.mockClear()
+    mockSetOptions.mockClear()
   })
 
   describe("rendering", () => {
@@ -379,6 +391,24 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Network")).toBeTruthy()
+    })
+  })
+
+  describe("header settings button", () => {
+    it("sets headerRight option on mount", async () => {
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockSetOptions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headerRight: expect.any(Function),
+        }),
+      )
     })
   })
 })
