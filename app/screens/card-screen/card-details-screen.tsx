@@ -1,6 +1,8 @@
-import React from "react"
-import { View } from "react-native"
+import React, { useCallback, useEffect } from "react"
+import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
 
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -9,6 +11,7 @@ import { InfoRow } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useClipboard } from "@app/hooks/use-clipboard"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { CardStatus, MOCK_CARD } from "./card-mock-data"
 
@@ -19,6 +22,7 @@ export const CardDetailsScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const cardNumberWithoutSpaces = MOCK_CARD.cardNumber.replace(/\s/g, "")
 
@@ -28,6 +32,20 @@ export const CardDetailsScreen: React.FC = () => {
       message: LL.TransactionDetailScreen.hasBeenCopiedToClipboard({ type: label }),
     })
   }
+
+  const handleSettingsPress = useCallback(() => {
+    console.log("Settings pressed")
+  }, [])
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
+          <GaloyIcon name="settings" size={24} color={colors.black} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
   return (
     <Screen preset="scroll">
@@ -125,6 +143,9 @@ export const CardDetailsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  headerRight: {
+    marginRight: 24,
+  },
   content: {
     paddingTop: 20,
     paddingBottom: 40,
