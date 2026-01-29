@@ -2454,7 +2454,7 @@
     "StablesatsModal": {
         "header": "With Stablesats, you now have a USD account added to your wallet!",
         "body": "You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
-        "termsAndConditions": "Read the Terms & Conditions",
+        "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Stablesats"
     },
     "SplashScreen": {
@@ -2912,6 +2912,33 @@
         "ERROR": "Error",
         "PROCESSING": "Processing",
         "REVIEW": "Review"
+    },
+    "CardFlow": {
+        "CardLimits": {
+            "title": "Card limits",
+            "currentLimitsTitle": "Current limits",
+            "dailySpending": "Daily spending",
+            "monthlySpending": "Monthly spending",
+            "spendingLimitsTitle": "Spending limits",
+            "dailyLimit": "Daily limit",
+            "dailyLimitHelper": "Maximum amount you can spend per day",
+            "monthlyLimit": "Monthly spending limits",
+            "monthlyLimitHelper": "Maximum amount you can spend per month",
+            "atmLimitsTitle": "ATM withdrawal limits",
+            "dailyAtmLimit": "Daily ATM limits",
+            "dailyAtmLimitHelper": "Maximum ATM withdrawal per day",
+            "monthlyAtmLimit": "Monthly ATM limit",
+            "monthlyAtmLimitHelper": "Maximum ATM withdrawal per month",
+            "transactionTypesTitle": "Transaction types",
+            "TransactionTypes": {
+                "ecommerce": "Online purchases",
+                "ecommerceDescription": "Allow online and e-commerce transactions",
+                "atm": "ATM withdrawals",
+                "atmDescription": "Allow cash withdrawals from ATMs",
+                "contactless": "Contactless payments",
+                "contactlessDescription": "Allow tap-to-pay transactions"
+            }
+        }
     },
     "NotificationHistory": {
         "title": "Notifications",

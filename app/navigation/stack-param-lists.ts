@@ -130,6 +130,7 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
+  cardLimitsScreen: undefined
 }
 
 export type OnboardingStackParamList = {

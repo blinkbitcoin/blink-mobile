@@ -139,6 +139,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         notificationSettingsScreen: "settings/notifications",
         emailRegistrationInitiate: "settings/email",
         settings: "settings",
+        cardLimitsScreen: "card/limits",
         transactionDetail: {
           path: "transaction/:txid",
         },

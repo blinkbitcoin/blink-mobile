@@ -20,6 +20,7 @@ import {
   numberPadReducer,
   NumberPadReducerActionType,
   NumberPadReducerState,
+  formatNumberPadNumber,
 } from "./number-pad-reducer"
 
 export type AmountInputScreenProps = {
@@ -31,22 +32,6 @@ export type AmountInputScreenProps = {
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
   compact?: boolean
-}
-
-const formatNumberPadNumber = (numberPadNumber: NumberPadNumber) => {
-  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
-
-  if (!majorAmount && !minorAmount && !hasDecimal) {
-    return ""
-  }
-
-  const formattedMajorAmount = Number(majorAmount).toLocaleString()
-
-  if (hasDecimal) {
-    return `${formattedMajorAmount}.${minorAmount}`
-  }
-
-  return formattedMajorAmount
 }
 
 const numberPadNumberToMoneyAmount = ({
