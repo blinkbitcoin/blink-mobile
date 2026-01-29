@@ -24,6 +24,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-token"
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
+import { ensureLocaleLoaded } from "@app/i18n/lazy-locale-loader"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { isIos } from "../utils/helper"
@@ -370,9 +371,14 @@ const LanguageSync = () => {
   const { locale, setLocale } = useI18nContext()
 
   useEffect(() => {
-    if (userPreferredLocale !== locale) {
-      setLocale(userPreferredLocale)
+    // Lazy load locale before switching if needed
+    const switchLocale = async () => {
+      if (userPreferredLocale !== locale) {
+        await ensureLocaleLoaded(userPreferredLocale)
+        setLocale(userPreferredLocale)
+      }
     }
+    switchLocale()
     // setLocale is not set as a dependency because it changes every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPreferredLocale, locale])
