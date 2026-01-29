@@ -92,7 +92,6 @@ export const StableSatsModal: React.FC<Props> = ({ isVisible, setIsVisible }) =>
               >
                 {LL.StablesatsModal.termsAndConditions()}
               </Text>
-              .
             </Text>
           </View>
           <View style={styles.cardActionsContainer}>
