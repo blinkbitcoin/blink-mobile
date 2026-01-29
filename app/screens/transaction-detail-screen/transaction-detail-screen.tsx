@@ -20,11 +20,10 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useAppConfig, useTransactionSeenState } from "@app/hooks"
+import { useClipboard } from "@app/hooks/use-clipboard"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -132,6 +131,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
 
   const description = useDescriptionDisplay({
@@ -278,12 +278,16 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     />
   )
 
-  const copyToClipboard = ({ content, type }: { content: string; type: string }) => {
-    Clipboard.setString(content)
-    toastShow({
-      type: "success",
+  const handleCopyToClipboard = ({
+    content,
+    type,
+  }: {
+    content: string
+    type: string
+  }) => {
+    copyToClipboard({
+      content,
       message: LL.TransactionDetailScreen.hasBeenCopiedToClipboard({ type }),
-      LL,
     })
   }
 
@@ -359,7 +363,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content:
                             ("transactionHash" in settlementVia &&
                               settlementVia?.transactionHash) ||
@@ -403,7 +407,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               <View key="copy">
                 <TouchableWithoutFeedback
                   onPress={() =>
-                    copyToClipboard({
+                    handleCopyToClipboard({
                       content: description || "",
                       type: LL.common.description(),
                     })
@@ -435,7 +439,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: initiationVia?.paymentHash ?? "",
                           type: "Hash",
                         })
@@ -463,7 +467,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: settlementVia?.preImage || "",
                           type: LL.common.preimageProofOfPayment(),
                         })
@@ -503,7 +507,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: initiationVia?.paymentRequest ?? "",
                           type: LL.common.paymentRequest(),
                         })
@@ -528,7 +532,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <View key="copy">
                   <TouchableWithoutFeedback
                     onPress={() =>
-                      copyToClipboard({
+                      handleCopyToClipboard({
                         content: id,
                         type: "Blink Internal Id",
                       })

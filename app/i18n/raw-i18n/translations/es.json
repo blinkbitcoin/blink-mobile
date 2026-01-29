@@ -2770,7 +2770,8 @@
         "paste": "Pegar",
         "some": "Algunos",
         "support": "Soporte",
-        "blinkToBlink": "Blink a Blink"
+        "blinkToBlink": "Blink a Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
