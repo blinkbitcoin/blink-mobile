@@ -67,11 +67,15 @@ export type NumberPadReducerActionType =
   (typeof NumberPadReducerActionType)[keyof typeof NumberPadReducerActionType]
 
 export const parseStringToNumberPad = (value: string): NumberPadNumber => {
-  const parts = value.split(".")
+  const trimmed = value.trim()
+  const match = /^(\d*)(?:\.(\d*))?$/.exec(trimmed)
+
+  if (!match) return { majorAmount: "", minorAmount: "", hasDecimal: false }
+
   return {
-    majorAmount: parts[0] || "",
-    minorAmount: parts[1] || "",
-    hasDecimal: parts.length > 1,
+    majorAmount: match[1] || "",
+    minorAmount: match[2] || "",
+    hasDecimal: trimmed.includes("."),
   }
 }
 
