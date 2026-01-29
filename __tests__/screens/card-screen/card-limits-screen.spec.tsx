@@ -233,5 +233,21 @@ describe("CardLimitsScreen", () => {
       const switches = getAllByRole("switch")
       fireEvent(switches[2], "pressIn")
     })
+
+    it("verifies switch state changes after toggle", () => {
+      const { getAllByRole } = render(
+        <ContextForScreen>
+          <CardLimitsScreen />
+        </ContextForScreen>,
+      )
+
+      const switchesBefore = getAllByRole("switch")
+      expect(switchesBefore[0].props.accessibilityState.checked).toBe(true)
+
+      fireEvent(switchesBefore[0], "pressIn")
+
+      const switchesAfter = getAllByRole("switch")
+      expect(switchesAfter[0].props.accessibilityState.checked).toBe(false)
+    })
   })
 })
