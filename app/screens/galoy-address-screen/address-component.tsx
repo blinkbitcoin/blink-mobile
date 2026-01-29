@@ -1,7 +1,7 @@
 import { Linking, Pressable, Share, View } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useClipboard } from "@app/hooks/use-clipboard"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 

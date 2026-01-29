@@ -9,7 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
 import { InfoRow } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
-import { useClipboard } from "@app/hooks/use-clipboard"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
