@@ -2767,5 +2767,32 @@
     "NotificationHistory": {
         "title": "Benachrichtigungen",
         "noNotifications": "Sie haben im Moment keine Benachrichtigungen"
+    },
+    "CardFlow": {
+        "CardLimits": {
+            "currentLimitsTitle": "Aktuelle Limits",
+            "dailySpending": "Tägliche Ausgaben",
+            "monthlySpending": "Monatliche Ausgaben",
+            "spendingLimitsTitle": "Ausgabenlimits",
+            "dailyLimit": "Tageslimit",
+            "dailyLimitHelper": "Maximaler Betrag, den Sie pro Tag ausgeben können",
+            "monthlyLimit": "Monatliche Ausgabenlimits",
+            "monthlyLimitHelper": "Maximaler Betrag, den Sie pro Monat ausgeben können",
+            "atmLimitsTitle": "Geldautomaten-Limits",
+            "dailyAtmLimit": "Tägliche Geldautomaten-Limits",
+            "dailyAtmLimitHelper": "Maximale Abhebung pro Tag",
+            "monthlyAtmLimit": "Monatliches Geldautomaten-Limit",
+            "monthlyAtmLimitHelper": "Maximale Abhebung pro Monat",
+            "transactionTypesTitle": "Transaktionsarten",
+            "TransactionTypes": {
+                "ecommerce": "Online-Einkäufe",
+                "ecommerceDescription": "Online- und E-Commerce-Transaktionen erlauben",
+                "atm": "Geldautomaten-Abhebungen",
+                "atmDescription": "Bargeldabhebungen an Geldautomaten erlauben",
+                "contactless": "Kontaktlose Zahlungen",
+                "contactlessDescription": "Kontaktlose Transaktionen erlauben"
+            },
+            "title": "Kartenlimits"
+        }
     }
 }
