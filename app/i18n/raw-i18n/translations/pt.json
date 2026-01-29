@@ -2619,7 +2619,8 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Houve um problema com o seu pedido. Tente novamente em um minuto. Se o problema persistir, recomendamos que você saia e entre no app novamente. Você pode sair acessando Configurações > Conta > Sair",
         "warning": "Aviso",
-        "blinkToBlink": "Blink para Blink"
+        "blinkToBlink": "Blink para Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",

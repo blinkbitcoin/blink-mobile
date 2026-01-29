@@ -2619,7 +2619,8 @@
         "prevMonths": "Geçmiş aylar",
         "problemMaybeReauth": "İsteğinizle ilgili bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin. Sorun devam ederse, oturumu kapatıp tekrar giriş yapmanızı öneririz. Ayarlar > Hesap > Oturumu kapat seçeneğine giderek oturumu kapatabilirsiniz",
         "warning": "Uyarı",
-        "blinkToBlink": "Blink'ten Blink'e"
+        "blinkToBlink": "Blink'ten Blink'e",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",

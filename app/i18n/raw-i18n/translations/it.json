@@ -2619,7 +2619,8 @@
         "prevMonths": "Mesi precedenti",
         "problemMaybeReauth": "Si è verificato un problema con la tua richiesta. Riprova tra un minuto. Se il problema persiste, ti consigliamo di uscire e di accedere nuovamente. Puoi uscire andando in Impostazioni > Account > Esci",
         "warning": "Avvertimento",
-        "blinkToBlink": "Blink a Blink"
+        "blinkToBlink": "Blink a Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",

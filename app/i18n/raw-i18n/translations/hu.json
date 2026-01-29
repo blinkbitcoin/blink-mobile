@@ -2619,7 +2619,8 @@
         "prevMonths": "Előző hónapok",
         "problemMaybeReauth": "Probléma merült fel a kérés során. Kérjük, próbáld újra egy perc múlva. Ha a probléma továbbra is fennáll, javasoljuk, hogy jelentkezz ki, majd jelentkezz be újra. Kijelentkezni a Beállítások > Számla > Kijelentkezés menüpontban tudsz.",
         "warning": "Figyelmeztetés",
-        "blinkToBlink": "Blinkről Blinkre"
+        "blinkToBlink": "Blinkről Blinkre",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Hiba történt.\nKérjük, próbáld újra később.",

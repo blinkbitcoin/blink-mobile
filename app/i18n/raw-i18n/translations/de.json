@@ -2619,7 +2619,8 @@
         "prevMonths": "Vorherige Monate",
         "problemMaybeReauth": "Es gab ein Problem mit deiner Anfrage. Bitte versuche es in einer Minute erneut. Wenn das Problem weiterhin besteht, versuche dich aus- und wieder einzuloggen. Du kannst dich ausloggen unter Einstellungen > Account > Log out",
         "warning": "Warnung",
-        "blinkToBlink": "Blink zu Blink"
+        "blinkToBlink": "Blink zu Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",

@@ -2526,7 +2526,8 @@
         "prevMonths": "Předchozí měsíce",
         "problemMaybeReauth": "Ve vašem požadavku se vyskytl problém. Zkuste to prosím znovu za minutu. Pokud problém přetrvává, doporučujeme se odhlásit a znovu přihlásit. Odhlásit se můžete v Nastavení > Účet > Odhlásit se.",
         "warning": "Upozornění",
-        "blinkToBlink": "Blink na Blink"
+        "blinkToBlink": "Blink na Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Došlo k chybě.\nZkuste to prosím později.",

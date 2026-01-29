@@ -2524,7 +2524,8 @@
         "prevMonths": "Qhipa killapi",
         "problemMaybeReauth": "Ñuqaq kaniyta munanichuqchu. Qhipa kaniyta qayna kani. Mana kaniyta munanichuqchu, ñuqaqa chaskisqa kaniyta kaniy. Chaskisqa kaniyta kaniy, Ajustisqa > Cuenta > Chaskisqa kaniyta kaniy.",
         "warning": "Warning",
-        "blinkToBlink": "Blinkmanta Blinkman"
+        "blinkToBlink": "Blinkmanta Blinkman",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",

@@ -2619,7 +2619,8 @@
         "prevMonths": "Miezi iliyopita",
         "problemMaybeReauth": "Kulikuwa na tatizo na ombi lako. Tafadhali jaribu baada ya dakika moja. Ikiwa tatizo litasistea, tunapendekeza ujitoke nje na uingie tena. Unaweza kujitokeza kwa kwenda kwenye Mipangilio > Akaunti > Toka",
         "warning": "Onyo",
-        "blinkToBlink": "Blink hadi Blink"
+        "blinkToBlink": "Blink hadi Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",

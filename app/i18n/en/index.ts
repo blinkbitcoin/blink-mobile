@@ -2869,6 +2869,7 @@ const en: BaseTranslation = {
     support: "Support",
     profiles: "Profiles",
     paste: "Paste",
+    copied: "Copied to clipboard",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

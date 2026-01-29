@@ -9067,6 +9067,10 @@ type RootTranslation = {
 		 * P​a​s​t​e
 		 */
 		paste: string
+		/**
+		 * C​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copied: string
 	}
 	errors: {
 		/**
@@ -18723,6 +18727,10 @@ export type TranslationFunctions = {
 		 * Paste
 		 */
 		paste: () => LocalizedString
+		/**
+		 * Copied to clipboard
+		 */
+		copied: () => LocalizedString
 	}
 	errors: {
 		/**

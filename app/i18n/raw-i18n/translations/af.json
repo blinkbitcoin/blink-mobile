@@ -2526,7 +2526,8 @@
         "prevMonths": "Vorige maande",
         "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
         "warning": "Waarskuwing",
-        "blinkToBlink": "Blink na Blink"
+        "blinkToBlink": "Blink na Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
