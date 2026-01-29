@@ -96,7 +96,12 @@ export const LimitInput: React.FC<LimitInputProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <Pressable style={pressableStyle} onPress={handleOpen}>
+      <Pressable
+        style={pressableStyle}
+        onPress={handleOpen}
+        accessibilityLabel={`${label}: ${formattedValue}`}
+        accessibilityRole="button"
+      >
         <Text style={styles.value}>{formattedValue}</Text>
         <GaloyIcon name={icon} size={20} color={colors.primary} />
       </Pressable>
