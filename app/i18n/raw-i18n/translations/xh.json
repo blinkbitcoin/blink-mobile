@@ -903,6 +903,25 @@
         "contactSupport": "Contact Support"
     },
     "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Kulindile",
+            "completed": "Kugqityiwe"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Iinkcukacha",
+                "freeze": "Bandisa",
+                "setLimits": "Imida",
+                "statements": "Intshukumo"
+            },
+            "emptyTransactions": "Akukho ntengiselwano okwangoku",
+            "addFunds": "Yongeza imali",
+            "transactionsTitle": "Iintengiselwano",
+            "title": "Ikhadi le-Blink"
+        },
+        "validThruLabel": "ISEBENZA DE KUPHELA",
+        "cardFrozenTitle": "Ikhadi libandisiwe",
+        "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana",
         "CardLimits": {
             "currentLimitsTitle": "Imida yangoku",
             "dailySpending": "Ukuchitha ngosuku",

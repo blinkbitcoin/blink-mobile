@@ -2769,6 +2769,25 @@
         "noNotifications": "Você não possui notificações no momento"
     },
     "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Pendente",
+            "completed": "Concluído"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalhes",
+                "freeze": "Congelar",
+                "setLimits": "Limites",
+                "statements": "Movimentos"
+            },
+            "emptyTransactions": "Nenhuma transação ainda",
+            "addFunds": "Adicionar fundos",
+            "transactionsTitle": "Transações",
+            "title": "Cartão Blink"
+        },
+        "validThruLabel": "VÁLIDO ATÉ",
+        "cardFrozenTitle": "Cartão congelado",
+        "cardFrozenSubtitle": "O cartão está temporariamente desativado",
         "CardLimits": {
             "currentLimitsTitle": "Limites atuais",
             "dailySpending": "Gasto diário",

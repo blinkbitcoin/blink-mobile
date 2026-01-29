@@ -3039,6 +3039,25 @@ const en: BaseTranslation = {
     REVIEW: "Review",
   },
   CardFlow: {
+    validThruLabel: "VALID THRU",
+    cardFrozenTitle: "Card frozen",
+    cardFrozenSubtitle: "Card is temporarily disabled",
+    TransactionStatus: {
+      pending: "Pending",
+      completed: "Completed",
+    },
+    CardDashboard: {
+      Actions: {
+        details: "Details",
+        freeze: "Freeze",
+        setLimits: "Set limits",
+        statements: "Statements",
+      },
+      title: "Blink Card",
+      addFunds: "Add funds",
+      transactionsTitle: "Transactions",
+      emptyTransactions: "No transactions yet",
+    },
     CardLimits: {
       title: "Card limits",
       currentLimitsTitle: "Current limits",

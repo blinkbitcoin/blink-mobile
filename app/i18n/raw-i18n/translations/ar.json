@@ -2678,6 +2678,25 @@
         "REVIEW": "Review"
     },
     "CardFlow": {
+        "TransactionStatus": {
+            "pending": "قيد الانتظار",
+            "completed": "مكتمل"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "التفاصيل",
+                "freeze": "تجميد",
+                "setLimits": "الحدود",
+                "statements": "الحركات"
+            },
+            "emptyTransactions": "لا توجد معاملات بعد",
+            "addFunds": "إضافة أموال",
+            "transactionsTitle": "المعاملات",
+            "title": "بطاقة Blink"
+        },
+        "validThruLabel": "صالح حتى",
+        "cardFrozenTitle": "البطاقة مجمدة",
+        "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا",
         "CardLimits": {
             "currentLimitsTitle": "الحدود الحالية",
             "dailySpending": "الإنفاق اليومي",

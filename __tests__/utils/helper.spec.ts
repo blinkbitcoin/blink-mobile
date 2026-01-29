@@ -1,4 +1,9 @@
-import { ellipsizeMiddle, normalizeString } from "@app/utils/helper"
+import {
+  ellipsizeMiddle,
+  maskDigits,
+  maskString,
+  normalizeString,
+} from "@app/utils/helper"
 
 describe("ellipsizeMiddle", () => {
   it("returns original text when it fits", () => {
@@ -56,5 +61,49 @@ describe("normalizeString", () => {
 
   it("handles strings with only whitespace", () => {
     expect(normalizeString("   ")).toBe("")
+  })
+})
+
+describe("maskString", () => {
+  it("masks all but the visible right characters with default pattern", () => {
+    expect(maskString("abcdef", { visibleRight: 2, maskChar: "*" })).toBe("****ef")
+  })
+
+  it("returns original when visibleRight covers all matches", () => {
+    expect(maskString("abc", { visibleRight: 5, maskChar: "*" })).toBe("abc")
+  })
+
+  it("respects maskPattern and leaves non-matching characters intact", () => {
+    const result = maskString("AB-12-CD", {
+      visibleRight: 2,
+      maskChar: "X",
+      maskPattern: /[A-Z]/,
+    })
+    expect(result).toBe("XX-12-CD")
+  })
+
+  it("handles a non-global maskPattern by applying it globally", () => {
+    expect(
+      maskString("abcd", { visibleRight: 1, maskChar: "*", maskPattern: /[a-z]/ }),
+    ).toBe("***d")
+  })
+
+  it("masks everything when visibleRight is zero", () => {
+    expect(maskString("123", { visibleRight: 0, maskChar: "#" })).toBe("###")
+  })
+})
+
+describe("maskDigits", () => {
+  it("masks only digits and keeps separators", () => {
+    const result = maskDigits("1234-5678-90", { visibleRight: 4, maskChar: "*" })
+    expect(result).toBe("****-**78-90")
+  })
+
+  it("returns original when there are no digits", () => {
+    expect(maskDigits("abcd-ef", { visibleRight: 2, maskChar: "*" })).toBe("abcd-ef")
+  })
+
+  it("uses the provided maskChar", () => {
+    expect(maskDigits("9999", { visibleRight: 1, maskChar: "X" })).toBe("XXX9")
   })
 })

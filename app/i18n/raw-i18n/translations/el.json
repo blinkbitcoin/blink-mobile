@@ -2769,6 +2769,25 @@
         "noNotifications": "Δεν έχετε καμία ειδοποίηση αυτή τη στιγμή"
     },
     "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Σε αναμονή",
+            "completed": "Ολοκληρώθηκε"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Λεπτομέρειες",
+                "freeze": "Πάγωμα",
+                "setLimits": "Όρια",
+                "statements": "Κινήσεις"
+            },
+            "emptyTransactions": "Δεν υπάρχουν συναλλαγές ακόμη",
+            "addFunds": "Προσθήκη χρημάτων",
+            "transactionsTitle": "Συναλλαγές",
+            "title": "Κάρτα Blink"
+        },
+        "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
+        "cardFrozenTitle": "Κάρτα παγωμένη",
+        "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη",
         "CardLimits": {
             "currentLimitsTitle": "Τρέχοντα όρια",
             "dailySpending": "Ημερήσιες δαπάνες",

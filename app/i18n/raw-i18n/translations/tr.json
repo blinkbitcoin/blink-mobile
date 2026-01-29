@@ -2769,6 +2769,25 @@
         "noNotifications": "Şu anda herhangi bir bildiriminiz yok"
     },
     "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Beklemede",
+            "completed": "Tamamlandı"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detaylar",
+                "freeze": "Dondur",
+                "setLimits": "Limitler",
+                "statements": "Hareketler"
+            },
+            "emptyTransactions": "Henüz işlem yok",
+            "addFunds": "Para ekle",
+            "transactionsTitle": "İşlemler",
+            "title": "Blink Kartı"
+        },
+        "validThruLabel": "GEÇERLİLİK",
+        "cardFrozenTitle": "Kart donduruldu",
+        "cardFrozenSubtitle": "Kart geçici olarak devre dışı",
         "CardLimits": {
             "currentLimitsTitle": "Mevcut limitler",
             "dailySpending": "Günlük harcama",
