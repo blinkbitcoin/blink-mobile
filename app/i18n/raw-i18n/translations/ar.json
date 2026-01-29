@@ -2980,6 +2980,31 @@
     },
     "validThruLabel": "صالح حتى",
     "cardFrozenTitle": "البطاقة مجمدة",
-    "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا"
+    "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا",
+    "CardLimits": {
+      "currentLimitsTitle": "الحدود الحالية",
+      "dailySpending": "الإنفاق اليومي",
+      "monthlySpending": "الإنفاق الشهري",
+      "spendingLimitsTitle": "حدود الإنفاق",
+      "dailyLimit": "الحد اليومي",
+      "dailyLimitHelper": "الحد الأقصى للمبلغ الذي يمكنك إنفاقه يوميًا",
+      "monthlyLimit": "حدود الإنفاق الشهرية",
+      "monthlyLimitHelper": "الحد الأقصى للمبلغ الذي يمكنك إنفاقه شهريًا",
+      "atmLimitsTitle": "حدود السحب من الصراف الآلي",
+      "dailyAtmLimit": "حدود السحب اليومي من الصراف",
+      "dailyAtmLimitHelper": "الحد الأقصى للسحب من الصراف الآلي يوميًا",
+      "monthlyAtmLimit": "الحد الشهري للصراف الآلي",
+      "monthlyAtmLimitHelper": "الحد الأقصى للسحب من الصراف الآلي شهريًا",
+      "transactionTypesTitle": "أنواع المعاملات",
+      "TransactionTypes": {
+        "ecommerce": "المشتريات عبر الإنترنت",
+        "ecommerceDescription": "السماح بمعاملات التجارة الإلكترونية",
+        "atm": "سحب من الصراف الآلي",
+        "atmDescription": "السماح بالسحب النقدي من الصراف الآلي",
+        "contactless": "الدفع بدون تلامس",
+        "contactlessDescription": "السماح بمعاملات اللمس للدفع"
+      },
+      "title": "حدود البطاقة"
+    }
   }
 }

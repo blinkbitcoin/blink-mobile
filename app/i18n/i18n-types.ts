@@ -9684,6 +9684,94 @@ type RootTranslation = {
 			 */
 			emptyTransactions: string
 		}
+		CardLimits: {
+			/**
+			 * C​a​r​d​ ​l​i​m​i​t​s
+			 */
+			title: string
+			/**
+			 * C​u​r​r​e​n​t​ ​l​i​m​i​t​s
+			 */
+			currentLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​s​p​e​n​d​i​n​g
+			 */
+			dailySpending: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g
+			 */
+			monthlySpending: string
+			/**
+			 * S​p​e​n​d​i​n​g​ ​l​i​m​i​t​s
+			 */
+			spendingLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​l​i​m​i​t
+			 */
+			dailyLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​a​m​o​u​n​t​ ​y​o​u​ ​c​a​n​ ​s​p​e​n​d​ ​p​e​r​ ​d​a​y
+			 */
+			dailyLimitHelper: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g​ ​l​i​m​i​t​s
+			 */
+			monthlyLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​a​m​o​u​n​t​ ​y​o​u​ ​c​a​n​ ​s​p​e​n​d​ ​p​e​r​ ​m​o​n​t​h
+			 */
+			monthlyLimitHelper: string
+			/**
+			 * A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​l​i​m​i​t​s
+			 */
+			atmLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			dailyAtmLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​p​e​r​ ​d​a​y
+			 */
+			dailyAtmLimitHelper: string
+			/**
+			 * M​o​n​t​h​l​y​ ​A​T​M​ ​l​i​m​i​t
+			 */
+			monthlyAtmLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​p​e​r​ ​m​o​n​t​h
+			 */
+			monthlyAtmLimitHelper: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
+			 */
+			transactionTypesTitle: string
+			TransactionTypes: {
+				/**
+				 * O​n​l​i​n​e​ ​p​u​r​c​h​a​s​e​s
+				 */
+				ecommerce: string
+				/**
+				 * A​l​l​o​w​ ​o​n​l​i​n​e​ ​a​n​d​ ​e​-​c​o​m​m​e​r​c​e​ ​t​r​a​n​s​a​c​t​i​o​n​s
+				 */
+				ecommerceDescription: string
+				/**
+				 * A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+				 */
+				atm: string
+				/**
+				 * A​l​l​o​w​ ​c​a​s​h​ ​w​i​t​h​d​r​a​w​a​l​s​ ​f​r​o​m​ ​A​T​M​s
+				 */
+				atmDescription: string
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​s
+				 */
+				contactless: string
+				/**
+				 * A​l​l​o​w​ ​t​a​p​-​t​o​-​p​a​y​ ​t​r​a​n​s​a​c​t​i​o​n​s
+				 */
+				contactlessDescription: string
+			}
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -19247,6 +19335,94 @@ export type TranslationFunctions = {
 			 * No transactions yet
 			 */
 			emptyTransactions: () => LocalizedString
+		}
+		CardLimits: {
+			/**
+			 * Card limits
+			 */
+			title: () => LocalizedString
+			/**
+			 * Current limits
+			 */
+			currentLimitsTitle: () => LocalizedString
+			/**
+			 * Daily spending
+			 */
+			dailySpending: () => LocalizedString
+			/**
+			 * Monthly spending
+			 */
+			monthlySpending: () => LocalizedString
+			/**
+			 * Spending limits
+			 */
+			spendingLimitsTitle: () => LocalizedString
+			/**
+			 * Daily limit
+			 */
+			dailyLimit: () => LocalizedString
+			/**
+			 * Maximum amount you can spend per day
+			 */
+			dailyLimitHelper: () => LocalizedString
+			/**
+			 * Monthly spending limits
+			 */
+			monthlyLimit: () => LocalizedString
+			/**
+			 * Maximum amount you can spend per month
+			 */
+			monthlyLimitHelper: () => LocalizedString
+			/**
+			 * ATM withdrawal limits
+			 */
+			atmLimitsTitle: () => LocalizedString
+			/**
+			 * Daily ATM limits
+			 */
+			dailyAtmLimit: () => LocalizedString
+			/**
+			 * Maximum ATM withdrawal per day
+			 */
+			dailyAtmLimitHelper: () => LocalizedString
+			/**
+			 * Monthly ATM limit
+			 */
+			monthlyAtmLimit: () => LocalizedString
+			/**
+			 * Maximum ATM withdrawal per month
+			 */
+			monthlyAtmLimitHelper: () => LocalizedString
+			/**
+			 * Transaction types
+			 */
+			transactionTypesTitle: () => LocalizedString
+			TransactionTypes: {
+				/**
+				 * Online purchases
+				 */
+				ecommerce: () => LocalizedString
+				/**
+				 * Allow online and e-commerce transactions
+				 */
+				ecommerceDescription: () => LocalizedString
+				/**
+				 * ATM withdrawals
+				 */
+				atm: () => LocalizedString
+				/**
+				 * Allow cash withdrawals from ATMs
+				 */
+				atmDescription: () => LocalizedString
+				/**
+				 * Contactless payments
+				 */
+				contactless: () => LocalizedString
+				/**
+				 * Allow tap-to-pay transactions
+				 */
+				contactlessDescription: () => LocalizedString
+			}
 		}
 	}
 	NotificationHistory: {

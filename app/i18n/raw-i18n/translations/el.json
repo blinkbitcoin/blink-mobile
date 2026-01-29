@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
     "cardFrozenTitle": "Κάρτα παγωμένη",
-    "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη"
+    "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη",
+    "CardLimits": {
+      "currentLimitsTitle": "Τρέχοντα όρια",
+      "dailySpending": "Ημερήσιες δαπάνες",
+      "monthlySpending": "Μηνιαίες δαπάνες",
+      "spendingLimitsTitle": "Όρια δαπανών",
+      "dailyLimit": "Ημερήσιο όριο",
+      "dailyLimitHelper": "Μέγιστο ποσό που μπορείτε να ξοδέψετε ανά ημέρα",
+      "monthlyLimit": "Μηνιαία όρια δαπανών",
+      "monthlyLimitHelper": "Μέγιστο ποσό που μπορείτε να ξοδέψετε ανά μήνα",
+      "atmLimitsTitle": "Όρια ανάληψης ATM",
+      "dailyAtmLimit": "Ημερήσια όρια ATM",
+      "dailyAtmLimitHelper": "Μέγιστη ανάληψη ATM ανά ημέρα",
+      "monthlyAtmLimit": "Μηνιαίο όριο ATM",
+      "monthlyAtmLimitHelper": "Μέγιστη ανάληψη ATM ανά μήνα",
+      "transactionTypesTitle": "Τύποι συναλλαγών",
+      "TransactionTypes": {
+        "ecommerce": "Διαδικτυακές αγορές",
+        "ecommerceDescription": "Επιτρέψτε συναλλαγές ηλεκτρονικού εμπορίου",
+        "atm": "Αναλήψεις ATM",
+        "atmDescription": "Επιτρέψτε αναλήψεις μετρητών από ATM",
+        "contactless": "Ανέπαφες πληρωμές",
+        "contactlessDescription": "Επιτρέψτε ανέπαφες συναλλαγές"
+      },
+      "title": "Όρια κάρτας"
+    }
   }
 }

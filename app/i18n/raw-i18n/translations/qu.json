@@ -2980,6 +2980,31 @@
     },
     "validThruLabel": "VÁLIDO HASTA",
     "cardFrozenTitle": "Tarjeta congelada",
-    "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
+    "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
+    "CardLimits": {
+      "currentLimitsTitle": "Kunan limitkuna",
+      "dailySpending": "Sapa p'unchaw gastuy",
+      "monthlySpending": "Sapa killa gastuy",
+      "spendingLimitsTitle": "Gastuy limitkuna",
+      "dailyLimit": "Sapa p'unchaw limit",
+      "dailyLimitHelper": "Aswan hatun qullqi gastanayki sapa p'unchaw",
+      "monthlyLimit": "Killa gastukuna límites",
+      "monthlyLimitHelper": "Aswan hatun qullqi gastanayki sapa killa",
+      "atmLimitsTitle": "ATM hurquy limitkuna",
+      "dailyAtmLimit": "Punchaw ATM límites",
+      "dailyAtmLimitHelper": "Aswan hatun ATM hurquy sapa p'unchaw",
+      "monthlyAtmLimit": "Sapa killa ATM limit",
+      "monthlyAtmLimitHelper": "Aswan hatun ATM hurquy sapa killa",
+      "transactionTypesTitle": "Transacción laya",
+      "TransactionTypes": {
+        "ecommerce": "Arnlayn rantikuna",
+        "ecommerceDescription": "E-commerce transaccionkunata saqiy",
+        "atm": "ATM hurquykuna",
+        "atmDescription": "ATM nisqamanta qullqi hurquyta saqiy",
+        "contactless": "Mana llamk'ay pagokuna",
+        "contactlessDescription": "Mana llamk'ay transaccionkunata saqiy"
+      },
+      "title": "Tarjeta limitkuna"
+    }
   }
 }

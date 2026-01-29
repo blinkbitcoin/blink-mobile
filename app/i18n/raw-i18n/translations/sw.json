@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "INATUMIKA HADI",
     "cardFrozenTitle": "Kadi imegandishwa",
-    "cardFrozenSubtitle": "Kadi imezimwa kwa muda"
+    "cardFrozenSubtitle": "Kadi imezimwa kwa muda",
+    "CardLimits": {
+      "currentLimitsTitle": "Vipimo vya sasa",
+      "dailySpending": "Matumizi ya kila siku",
+      "monthlySpending": "Matumizi ya kila mwezi",
+      "spendingLimitsTitle": "Vipimo vya matumizi",
+      "dailyLimit": "Kipimo cha kila siku",
+      "dailyLimitHelper": "Kiasi cha juu unachoweza kutumia kwa siku",
+      "monthlyLimit": "Vikomo vya matumizi ya mwezi",
+      "monthlyLimitHelper": "Kiasi cha juu unachoweza kutumia kwa mwezi",
+      "atmLimitsTitle": "Vipimo vya kutoa ATM",
+      "dailyAtmLimit": "Vikomo vya ATM vya kila siku",
+      "dailyAtmLimitHelper": "Kutoa kwa juu ATM kwa siku",
+      "monthlyAtmLimit": "Kipimo cha ATM kwa mwezi",
+      "monthlyAtmLimitHelper": "Kutoa kwa juu ATM kwa mwezi",
+      "transactionTypesTitle": "Aina za miamala",
+      "TransactionTypes": {
+        "ecommerce": "Ununuzi wa mtandaoni",
+        "ecommerceDescription": "Ruhusu miamala ya e-commerce",
+        "atm": "Kutoa ATM",
+        "atmDescription": "Ruhusu kutoa pesa taslimu kwenye ATM",
+        "contactless": "Malipo bila kugusa",
+        "contactlessDescription": "Ruhusu miamala bila kugusa"
+      },
+      "title": "Vipimo vya kadi"
+    }
   }
 }

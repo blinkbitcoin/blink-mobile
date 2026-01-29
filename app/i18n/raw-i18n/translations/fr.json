@@ -2983,6 +2983,31 @@
         },
         "validThruLabel": "VALIDE JUSQU’À",
         "cardFrozenTitle": "Carte gelée",
-        "cardFrozenSubtitle": "La carte est temporairement désactivée"
+        "cardFrozenSubtitle": "La carte est temporairement désactivée",
+        "CardLimits": {
+            "currentLimitsTitle": "Limites actuelles",
+            "dailySpending": "Dépenses quotidiennes",
+            "monthlySpending": "Dépenses mensuelles",
+            "spendingLimitsTitle": "Limites de dépenses",
+            "dailyLimit": "Limite quotidienne",
+            "dailyLimitHelper": "Montant maximum que vous pouvez dépenser par jour",
+            "monthlyLimit": "Limites de dépenses mensuelles",
+            "monthlyLimitHelper": "Montant maximum que vous pouvez dépenser par mois",
+            "atmLimitsTitle": "Limites de retrait DAB",
+            "dailyAtmLimit": "Limites quotidiennes DAB",
+            "dailyAtmLimitHelper": "Retrait maximum au DAB par jour",
+            "monthlyAtmLimit": "Limite mensuelle DAB",
+            "monthlyAtmLimitHelper": "Retrait maximum au DAB par mois",
+            "transactionTypesTitle": "Types de transactions",
+            "TransactionTypes": {
+                "ecommerce": "Achats en ligne",
+                "ecommerceDescription": "Autoriser les transactions e-commerce",
+                "atm": "Retraits DAB",
+                "atmDescription": "Autoriser les retraits d'espèces aux DAB",
+                "contactless": "Paiements sans contact",
+                "contactlessDescription": "Autoriser les transactions sans contact"
+            },
+            "title": "Limites de carte"
+        }
     }
 }

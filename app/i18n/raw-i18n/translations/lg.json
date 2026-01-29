@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "KIKWATA OKUTUUSA",
     "cardFrozenTitle": "Kaadi ekkuziddwa",
-    "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera"
+    "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",
+    "CardLimits": {
+      "currentLimitsTitle": "Ensalo z'amazzi",
+      "dailySpending": "Okusaasaanya kw'olunaku",
+      "monthlySpending": "Okusaasaanya kw'omwezi",
+      "spendingLimitsTitle": "Ensalo z'okusaasaanya",
+      "dailyLimit": "Ensalo y'olunaku",
+      "dailyLimitHelper": "Omuwendo gw'ensonga ogusinga gy'osobola okusaasaanyiza ku lunaku",
+      "monthlyLimit": "Obukwakkulizo bw'omwezi",
+      "monthlyLimitHelper": "Omuwendo gw'ensonga ogusinga gy'osobola okusaasaanyiza mu mwezi",
+      "atmLimitsTitle": "Ensalo z'okuggya ku ATM",
+      "dailyAtmLimit": "Obukwakkulizo bwa ATM bwa buli lunaku",
+      "dailyAtmLimitHelper": "Okuggya ku ATM okusinga ku lunaku",
+      "monthlyAtmLimit": "Ensalo y'ATM ey'omwezi",
+      "monthlyAtmLimitHelper": "Okuggya ku ATM okusinga mu mwezi",
+      "transactionTypesTitle": "Ebika by'okutunda",
+      "TransactionTypes": {
+        "ecommerce": "Okugula ku mukutu",
+        "ecommerceDescription": "Okukkiriza okutunda ku mukutu",
+        "atm": "Okuggya ku ATM",
+        "atmDescription": "Okukkiriza okuggya ssente ku ATM",
+        "contactless": "Okusasula awatali kukwatagana",
+        "contactlessDescription": "Okukkiriza okutunda awatali kukwatagana"
+      },
+      "title": "Ensalo z'ekkaadi"
+    }
   }
 }
