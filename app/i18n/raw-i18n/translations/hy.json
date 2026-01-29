@@ -2703,6 +2703,23 @@
         "validThruLabel": "Վավեր է մինչև",
         "cardFrozenTitle": "Քարտը սառեցված է",
         "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": " Delays limitner",
             "dailySpending": "Orakan tsakhsner",
