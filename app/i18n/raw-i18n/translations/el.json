@@ -2619,7 +2619,8 @@
         "prevMonths": "Προηγούμενοι μήνες",
         "problemMaybeReauth": "Υπήρξε πρόβλημα με το αίτημά σας. Επαναλάβετε την προσπάθεια σε ένα λεπτό. Εάν το πρόβλημα επιμένει, σας συνιστούμε να αποσυνδεθείτε και να συνδεθείτε ξανά. Μπορείτε να αποσυνδεθείτε πηγαίνοντας στις Ρυθμίσεις > Λογαριασμός > Αποσύνδεση",
         "warning": "Προσοχή",
-        "blinkToBlink": "Blink σε Blink"
+        "blinkToBlink": "Blink σε Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Υπήρξε ένα σφάλμα. \nΠαρακαλούμε δοκιμάστε πάλι αργότερα. ",
@@ -2788,6 +2789,23 @@
         "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
         "cardFrozenTitle": "Κάρτα παγωμένη",
         "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Τρέχοντα όρια",
             "dailySpending": "Ημερήσιες δαπάνες",

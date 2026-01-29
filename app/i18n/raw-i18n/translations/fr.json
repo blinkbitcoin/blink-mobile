@@ -2526,7 +2526,8 @@
         "prevMonths": "Mois derniers",
         "problemMaybeReauth": "Il y a eu un problème avec votre demande. Merci de réessayer dans une minute. Si le problème persiste, nous vous conseillons de vous déconnecter et de vous connecter à nouveau. Vous pouvez vous déconnecter en allant dans Réglages > Compte > Déconnexion",
         "warning": "Alerte",
-        "blinkToBlink": "Blink à Blink"
+        "blinkToBlink": "Blink à Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
@@ -2702,6 +2703,23 @@
         "validThruLabel": "VALIDE JUSQU’À",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Limites actuelles",
             "dailySpending": "Dépenses quotidiennes",

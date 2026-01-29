@@ -2524,7 +2524,8 @@
         "prevMonths": "Прошли месеци",
         "problemMaybeReauth": "Дошло је до проблема са вашим захтевом. Молимо вас покушајте поново за један минут. Уколико проблем и даље постоји, препоручујемо да се одјавите и поново пријавите. Можете се одјавити преко Подешавања > Налог > Одјави се",
         "warning": "Упозорење",
-        "blinkToBlink": "Blink na Blink"
+        "blinkToBlink": "Blink na Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -2697,6 +2698,23 @@
         "validThruLabel": "VAŽI DO",
         "cardFrozenTitle": "Kartica zamrznuta",
         "cardFrozenSubtitle": "Kartica je privremeno onemogućena",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Тренутна ограничења",
             "dailySpending": "Дневна потрошња",

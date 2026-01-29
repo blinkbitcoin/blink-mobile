@@ -2619,7 +2619,8 @@
         "prevMonths": "Emyezi egiyise",
         "problemMaybeReauth": "Waabaddewo obuzibu mu kusaba kwo. Nsaba oddemu okugezaako mu ddakiika emu. Singa ekizibu kisigalawo, tukukubiriza okufuluma n’oddamu okuyingira Osobola okufuluma ng’ogenda mu Ensengeka > Akawunti > Fuluma",
         "warning": "Okulabula",
-        "blinkToBlink": "Blink okutuuka ku Blink"
+        "blinkToBlink": "Blink okutuuka ku Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -2788,6 +2789,23 @@
         "validThruLabel": "KIKWATA OKUTUUSA",
         "cardFrozenTitle": "Kaadi ekkuziddwa",
         "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Ensalo z'amazzi",
             "dailySpending": "Okusaasaanya kw'olunaku",

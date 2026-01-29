@@ -2524,7 +2524,8 @@
         "prevMonths": "เดือนที่ผ่านมา",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
         "warning": "Warning",
-        "blinkToBlink": "Blink ไปยัง Blink"
+        "blinkToBlink": "Blink ไปยัง Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -2697,6 +2698,23 @@
         "validThruLabel": "ใช้ได้ถึง",
         "cardFrozenTitle": "บัตรถูกระงับ",
         "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "วงเงินปัจจุบัน",
             "dailySpending": "การใช้จ่ายรายวัน",

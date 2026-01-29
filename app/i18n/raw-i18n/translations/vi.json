@@ -2524,7 +2524,8 @@
         "prevMonths": "Những tháng trước",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
         "warning": "Warning",
-        "blinkToBlink": "Blink tới Blink"
+        "blinkToBlink": "Blink tới Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Đã có lỗi.\nVui lòng thử lại sau.",
@@ -2697,6 +2698,23 @@
         "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
         "cardFrozenTitle": "Thẻ bị khóa",
         "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Hạn mức hiện tại",
             "dailySpending": "Chi tiêu hàng ngày",

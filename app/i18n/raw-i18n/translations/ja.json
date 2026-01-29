@@ -2526,7 +2526,8 @@
         "prevMonths": "先月",
         "problemMaybeReauth": "リクエストに失敗しました。1分後に再トライしてください。問題が解決しない場合は、一旦ログアウトし、再ログインすることをお勧めします。設定 ＞ウォレット ＞ログアウトで、ログアウトできます。",
         "warning": "警告",
-        "blinkToBlink": "Blink から Blink へ"
+        "blinkToBlink": "Blink から Blink へ",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",
@@ -2702,6 +2703,23 @@
         "validThruLabel": "有効期限",
         "cardFrozenTitle": "カードが凍結されました",
         "cardFrozenSubtitle": "カードは一時的に無効になっています",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "現在の限度額",
             "dailySpending": "1日の支出",

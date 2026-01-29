@@ -2640,7 +2640,8 @@
         "prevMonths": "Lunile trecute",
         "problemMaybeReauth": "A apărut o problemă cu solicitarea dvs. Vă rugăm să încercați din nou într-un minut. Dacă problema persistă, vă recomandăm să vă deconectați și să vă conectați din nou. Vă puteți deconecta accesând Setări > Cont > Deconectare",
         "warning": "Avertizare",
-        "blinkToBlink": "Blink la Blink"
+        "blinkToBlink": "Blink la Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -2809,6 +2810,23 @@
         "validThruLabel": "VALABIL PÂNĂ LA",
         "cardFrozenTitle": "Card blocat",
         "cardFrozenSubtitle": "Cardul este dezactivat temporar",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Limite curente",
             "dailySpending": "Cheltuieli zilnice",

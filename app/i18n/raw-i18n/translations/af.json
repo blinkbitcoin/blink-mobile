@@ -2526,7 +2526,8 @@
         "prevMonths": "Vorige maande",
         "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
         "warning": "Waarskuwing",
-        "blinkToBlink": "Blink na Blink"
+        "blinkToBlink": "Blink na Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -2702,6 +2703,23 @@
         "validThruLabel": "GELDIG TOT",
         "cardFrozenTitle": "Kaart gevries",
         "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Huidige limiete",
             "dailySpending": "Daaglikse besteding",

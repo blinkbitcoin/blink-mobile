@@ -2619,7 +2619,8 @@
         "prevMonths": "Előző hónapok",
         "problemMaybeReauth": "Probléma merült fel a kérés során. Kérjük, próbáld újra egy perc múlva. Ha a probléma továbbra is fennáll, javasoljuk, hogy jelentkezz ki, majd jelentkezz be újra. Kijelentkezni a Beállítások > Számla > Kijelentkezés menüpontban tudsz.",
         "warning": "Figyelmeztetés",
-        "blinkToBlink": "Blinkről Blinkre"
+        "blinkToBlink": "Blinkről Blinkre",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -2788,6 +2789,23 @@
         "validThruLabel": "ÉRVÉNYES",
         "cardFrozenTitle": "Kártya befagyasztva",
         "cardFrozenSubtitle": "A kártya ideiglenesen letiltva",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Jelenlegi korlátok",
             "dailySpending": "Napi költés",

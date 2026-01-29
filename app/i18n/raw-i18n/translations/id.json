@@ -2619,7 +2619,8 @@
         "prevMonths": "Bulan sebelumnya",
         "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
         "warning": "Peringatan",
-        "blinkToBlink": "Blink ke Blink"
+        "blinkToBlink": "Blink ke Blink",
+        "copied": "Copied to clipboard"
     },
     "errors": {
         "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -2788,6 +2789,23 @@
         "validThruLabel": "BERLAKU HINGGA",
         "cardFrozenTitle": "Kartu dibekukan",
         "cardFrozenSubtitle": "Kartu dinonaktifkan sementara",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Batas saat ini",
             "dailySpending": "Pengeluaran harian",
