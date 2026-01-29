@@ -2,18 +2,22 @@ import React, { useState } from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
-import { Screen } from "@app/components/screen"
 import { BlinkCard } from "@app/components/blink-card"
-
 import {
   CardActionButtons,
   CardBalanceSection,
   CardTransactionsSection,
 } from "@app/components/card-screen"
+import { Screen } from "@app/components/screen"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+
 import { MOCK_CARD, MOCK_TRANSACTIONS, EMPTY_TRANSACTIONS } from "./card-mock-data"
 
 export const CardDashboardScreen: React.FC = () => {
   const styles = useStyles()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const [isFrozen, setIsFrozen] = useState(false)
   const [hasTransactions] = useState(true)
 
@@ -38,9 +42,9 @@ export const CardDashboardScreen: React.FC = () => {
 
         <CardActionButtons
           isFrozen={isFrozen}
-          onDetails={() => console.log("Details pressed")}
+          onDetails={() => navigation.navigate("cardDetailsScreen")}
           onFreeze={() => setIsFrozen((prev) => !prev)}
-          onSetLimits={() => console.log("Set limits pressed")}
+          onSetLimits={() => navigation.navigate("cardLimitsScreen")}
           onStatements={() => console.log("Statements pressed")}
         />
 
