@@ -15,7 +15,7 @@ const TransactionTypes = {
   Ecommerce: "ecommerce",
   Atm: "atm",
   Contactless: "contactless",
-} as const satisfies Record<string, TransactionType>
+} as const
 
 export const CardLimitsScreen: React.FC = () => {
   const styles = useStyles()
