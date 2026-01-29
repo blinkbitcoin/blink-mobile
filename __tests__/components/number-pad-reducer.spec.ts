@@ -2,6 +2,8 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo } from "@app/hooks/use-display-currency"
 import { WalletOrDisplayCurrency } from "@app/types/amounts"
 import {
+  parseStringToNumberPad,
+  numberPadToString,
   formatNumberPadNumber,
   NumberPadNumber,
 } from "@app/components/amount-input-screen/number-pad-reducer"
@@ -32,6 +34,109 @@ const emptyNumber: NumberPadNumber = {
   minorAmount: "",
   hasDecimal: false,
 }
+
+describe("parseStringToNumberPad", () => {
+  it("parses integer string", () => {
+    const result = parseStringToNumberPad("1000")
+    expect(result).toEqual({
+      majorAmount: "1000",
+      minorAmount: "",
+      hasDecimal: false,
+    })
+  })
+
+  it("parses decimal string", () => {
+    const result = parseStringToNumberPad("1000.50")
+    expect(result).toEqual({
+      majorAmount: "1000",
+      minorAmount: "50",
+      hasDecimal: true,
+    })
+  })
+
+  it("parses string with trailing decimal", () => {
+    const result = parseStringToNumberPad("1000.")
+    expect(result).toEqual({
+      majorAmount: "1000",
+      minorAmount: "",
+      hasDecimal: true,
+    })
+  })
+
+  it("parses empty string", () => {
+    const result = parseStringToNumberPad("")
+    expect(result).toEqual({
+      majorAmount: "",
+      minorAmount: "",
+      hasDecimal: false,
+    })
+  })
+
+  it("parses zero", () => {
+    const result = parseStringToNumberPad("0")
+    expect(result).toEqual({
+      majorAmount: "0",
+      minorAmount: "",
+      hasDecimal: false,
+    })
+  })
+
+  it("parses decimal less than 1", () => {
+    const result = parseStringToNumberPad("0.99")
+    expect(result).toEqual({
+      majorAmount: "0",
+      minorAmount: "99",
+      hasDecimal: true,
+    })
+  })
+})
+
+describe("numberPadToString", () => {
+  it("converts integer numberPad to string", () => {
+    const numberPad: NumberPadNumber = {
+      majorAmount: "1000",
+      minorAmount: "",
+      hasDecimal: false,
+    }
+    expect(numberPadToString(numberPad)).toBe("1000")
+  })
+
+  it("converts decimal numberPad to string", () => {
+    const numberPad: NumberPadNumber = {
+      majorAmount: "1000",
+      minorAmount: "50",
+      hasDecimal: true,
+    }
+    expect(numberPadToString(numberPad)).toBe("1000.50")
+  })
+
+  it("converts numberPad with trailing decimal to string", () => {
+    const numberPad: NumberPadNumber = {
+      majorAmount: "1000",
+      minorAmount: "",
+      hasDecimal: true,
+    }
+    expect(numberPadToString(numberPad)).toBe("1000.")
+  })
+
+  it("converts empty numberPad to zero", () => {
+    const numberPad: NumberPadNumber = {
+      majorAmount: "",
+      minorAmount: "",
+      hasDecimal: false,
+    }
+    expect(numberPadToString(numberPad)).toBe("0")
+  })
+
+  it("converts decimal with empty major to string with zero", () => {
+    const numberPad: NumberPadNumber = {
+      majorAmount: "",
+      minorAmount: "50",
+      hasDecimal: true,
+    }
+    expect(numberPadToString(numberPad)).toBe("0.50")
+  })
+})
 
 describe("formatNumberPadNumber", () => {
   it("returns empty string for empty amounts with non-BTC currency", () => {
