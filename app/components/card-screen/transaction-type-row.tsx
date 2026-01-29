@@ -25,7 +25,7 @@ export const TransactionTypeRow: React.FC<TransactionTypeRowProps> = ({
           {description}
         </ListItem.Subtitle>
       </ListItem.Content>
-      <Switch value={value} onValueChange={onValueChange} />
+      <Switch value={value} onValueChange={onValueChange} accessibilityLabel={title} />
     </ListItem>
   )
 }
