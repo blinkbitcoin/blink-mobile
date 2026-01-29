@@ -17,6 +17,7 @@ import {
   numberPadReducer,
   NumberPadReducerActionType,
   NumberPadReducerState,
+  formatNumberPadNumber,
 } from "@app/components/amount-input-screen/number-pad-reducer"
 import {
   greaterThan,
@@ -48,13 +49,6 @@ export enum ConvertInputType {
   FROM = "fromInput",
   TO = "toInput",
   CURRENCY = "currencyInput",
-}
-
-const formatNumberPadNumber = (n: NumberPadNumber) => {
-  const { majorAmount, minorAmount, hasDecimal } = n
-  if (!majorAmount && !minorAmount && !hasDecimal) return ""
-  const formattedMajor = Number(majorAmount).toLocaleString()
-  return hasDecimal ? `${formattedMajor}.${minorAmount}` : formattedMajor
 }
 
 const numberPadNumberToMoneyAmount = ({

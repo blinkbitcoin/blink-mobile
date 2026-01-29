@@ -64,6 +64,35 @@ export type Key = (typeof Key)[keyof typeof Key]
 export type NumberPadReducerActionType =
   (typeof NumberPadReducerActionType)[keyof typeof NumberPadReducerActionType]
 
+export const parseStringToNumberPad = (value: string): NumberPadNumber => {
+  const parts = value.split(".")
+  return {
+    majorAmount: parts[0] || "",
+    minorAmount: parts[1] || "",
+    hasDecimal: parts.length > 1,
+  }
+}
+
+export const numberPadToString = (numberPadNumber: NumberPadNumber): string => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  if (hasDecimal) {
+    return `${majorAmount || "0"}.${minorAmount}`
+  }
+  return majorAmount || "0"
+}
+
+export const formatNumberPadNumber = (numberPadNumber: NumberPadNumber): string => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  if (!majorAmount && !minorAmount && !hasDecimal) {
+    return ""
+  }
+  const formattedMajorAmount = Number(majorAmount).toLocaleString()
+  if (hasDecimal) {
+    return `${formattedMajorAmount}.${minorAmount}`
+  }
+  return formattedMajorAmount
+}
+
 export const numberPadReducer = (
   state: NumberPadReducerState,
   action: NumberPadReducerAction,
