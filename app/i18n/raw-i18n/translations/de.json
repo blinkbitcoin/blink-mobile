@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Mit Stablesats kannst Du ein USD Konto mit deiner Wallet nutzen!",
         "body": "Du kannst es nutzen, um Bitcoin zu senden und empfangen, und Gelder direkt zwischen deinen BTC und USD Konten zu transferieren. Der Wert in deinem USD Konto wird nicht mit dem Bitcoin-Preis schwanken. Diese Funktion ist nicht kompatibel mit traditionellen Banksystemen.",
-        "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen.",
+        "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über Stablesats erfahren"
     },
     "SplashScreen": {
@@ -2787,6 +2787,31 @@
         },
         "validThruLabel": "GÜLTIG BIS",
         "cardFrozenTitle": "Karte eingefroren",
-        "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert"
+        "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",
+        "CardLimits": {
+            "currentLimitsTitle": "Aktuelle Limits",
+            "dailySpending": "Tägliche Ausgaben",
+            "monthlySpending": "Monatliche Ausgaben",
+            "spendingLimitsTitle": "Ausgabenlimits",
+            "dailyLimit": "Tageslimit",
+            "dailyLimitHelper": "Maximaler Betrag, den Sie pro Tag ausgeben können",
+            "monthlyLimit": "Monatliche Ausgabenlimits",
+            "monthlyLimitHelper": "Maximaler Betrag, den Sie pro Monat ausgeben können",
+            "atmLimitsTitle": "Geldautomaten-Limits",
+            "dailyAtmLimit": "Tägliche Geldautomaten-Limits",
+            "dailyAtmLimitHelper": "Maximale Abhebung pro Tag",
+            "monthlyAtmLimit": "Monatliches Geldautomaten-Limit",
+            "monthlyAtmLimitHelper": "Maximale Abhebung pro Monat",
+            "transactionTypesTitle": "Transaktionsarten",
+            "TransactionTypes": {
+                "ecommerce": "Online-Einkäufe",
+                "ecommerceDescription": "Online- und E-Commerce-Transaktionen erlauben",
+                "atm": "Geldautomaten-Abhebungen",
+                "atmDescription": "Bargeldabhebungen an Geldautomaten erlauben",
+                "contactless": "Kontaktlose Zahlungen",
+                "contactlessDescription": "Kontaktlose Transaktionen erlauben"
+            },
+            "title": "Kartenlimits"
+        }
     }
 }

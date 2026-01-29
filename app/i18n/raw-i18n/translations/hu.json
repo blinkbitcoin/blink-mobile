@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "A Stablesats-al most már van egy USD alapú számla a tárcádban!",
         "body": "Ezt használhatod Bitcoin küldésére és fogadására, valamint azonnal átvezethesz összegeket a BTC és az USD számláid között. Az USD számlán lévő érték nem ingadozik a Bitcoin ármozgásával. Ez a funkció nem kompatibilis a hagyományos bankrendszerrel.",
-        "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket.",
+        "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
         "learnMore": "Tudj meg többet a Stablesatsról"
     },
     "SplashScreen": {
@@ -2787,6 +2787,31 @@
         },
         "validThruLabel": "ÉRVÉNYES",
         "cardFrozenTitle": "Kártya befagyasztva",
-        "cardFrozenSubtitle": "A kártya ideiglenesen letiltva"
+        "cardFrozenSubtitle": "A kártya ideiglenesen letiltva",
+        "CardLimits": {
+            "currentLimitsTitle": "Jelenlegi korlátok",
+            "dailySpending": "Napi költés",
+            "monthlySpending": "Havi költés",
+            "spendingLimitsTitle": "Költési korlátok",
+            "dailyLimit": "Napi korlát",
+            "dailyLimitHelper": "Maximális összeg, amit naponta költhet",
+            "monthlyLimit": "Havi költési limitek",
+            "monthlyLimitHelper": "Maximális összeg, amit havonta költhet",
+            "atmLimitsTitle": "ATM felvételi korlátok",
+            "dailyAtmLimit": "Napi ATM limitek",
+            "dailyAtmLimitHelper": "Maximális ATM felvétel naponta",
+            "monthlyAtmLimit": "Havi ATM korlát",
+            "monthlyAtmLimitHelper": "Maximális ATM felvétel havonta",
+            "transactionTypesTitle": "Tranzakciótípusok",
+            "TransactionTypes": {
+                "ecommerce": "Online vásárlások",
+                "ecommerceDescription": "Online és e-kereskedelmi tranzakciók engedélyezése",
+                "atm": "ATM felvételek",
+                "atmDescription": "Készpénzfelvétel engedélyezése ATM-ből",
+                "contactless": "Érintésmentes fizetések",
+                "contactlessDescription": "Érintésmentes tranzakciók engedélyezése"
+            },
+            "title": "Kártyakorlátok"
+        }
     }
 }

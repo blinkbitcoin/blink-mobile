@@ -51,7 +51,7 @@ export const ExportCsvSetting: React.FC = () => {
     try {
       await Share.open({
         title: "blink-transactions",
-        filename: "blink-transactions",
+        filename: "blink-transactions.csv",
         url: `data:text/comma-separated-values;base64,${csvEncoded}`,
         type: "text/comma-separated-values",
       })

@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Ne Stablesats, kati olina akawunti ya USD eyongeddwa mu waleti yo!",
         "body": "Osobola okugikozesa okusindika n'okufuna Bitcoin, era amangu ago n'owaanyisa omuwendo wakati w'akawunti yo eya BTC ne USD. Omuwendo oguli ku akawunti ya USD tegujja kukyukakyuka ku bbeeyi ya Bitcoin. Enkola eno tekwatagana na nkola ya bbanka ey'edda.",
-        "termsAndConditions": "Soma amateeka n'ebiragiro.",
+        "termsAndConditions": "Soma amateeka n'ebiragiro",
         "learnMore": "Yiga ebisingawo ku Stablesats"
     },
     "SplashScreen": {
@@ -2787,6 +2787,31 @@
         },
         "validThruLabel": "KIKWATA OKUTUUSA",
         "cardFrozenTitle": "Kaadi ekkuziddwa",
-        "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera"
+        "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",
+        "CardLimits": {
+            "currentLimitsTitle": "Ensalo z'amazzi",
+            "dailySpending": "Okusaasaanya kw'olunaku",
+            "monthlySpending": "Okusaasaanya kw'omwezi",
+            "spendingLimitsTitle": "Ensalo z'okusaasaanya",
+            "dailyLimit": "Ensalo y'olunaku",
+            "dailyLimitHelper": "Omuwendo gw'ensonga ogusinga gy'osobola okusaasaanyiza ku lunaku",
+            "monthlyLimit": "Obukwakkulizo bw'omwezi",
+            "monthlyLimitHelper": "Omuwendo gw'ensonga ogusinga gy'osobola okusaasaanyiza mu mwezi",
+            "atmLimitsTitle": "Ensalo z'okuggya ku ATM",
+            "dailyAtmLimit": "Obukwakkulizo bwa ATM bwa buli lunaku",
+            "dailyAtmLimitHelper": "Okuggya ku ATM okusinga ku lunaku",
+            "monthlyAtmLimit": "Ensalo y'ATM ey'omwezi",
+            "monthlyAtmLimitHelper": "Okuggya ku ATM okusinga mu mwezi",
+            "transactionTypesTitle": "Ebika by'okutunda",
+            "TransactionTypes": {
+                "ecommerce": "Okugula ku mukutu",
+                "ecommerceDescription": "Okukkiriza okutunda ku mukutu",
+                "atm": "Okuggya ku ATM",
+                "atmDescription": "Okukkiriza okuggya ssente ku ATM",
+                "contactless": "Okusasula awatali kukwatagana",
+                "contactlessDescription": "Okukkiriza okutunda awatali kukwatagana"
+            },
+            "title": "Ensalo z'ekkaadi"
+        }
     }
 }

@@ -2455,7 +2455,7 @@
     "StablesatsModal": {
         "header": "¡Ya tienes una cuenta en USD agregada a tu billetera con StableSats!",
         "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta BTC y USD. El valor en la cuenta en USD no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
-        "termsAndConditions": "Lee los términos y condiciones.",
+        "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats"
     },
     "SplashScreen": {
@@ -2937,6 +2937,31 @@
         },
         "validThruLabel": "VÁLIDO HASTA",
         "cardFrozenTitle": "Tarjeta congelada",
-        "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
+        "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
+        "CardLimits": {
+            "currentLimitsTitle": "Límites actuales",
+            "dailySpending": "Gasto diario",
+            "monthlySpending": "Gasto mensual",
+            "spendingLimitsTitle": "Límites de gasto",
+            "dailyLimit": "Límite diario",
+            "dailyLimitHelper": "Monto máximo que puedes gastar por día",
+            "monthlyLimit": "Límites de gasto mensual",
+            "monthlyLimitHelper": "Monto máximo que puedes gastar por mes",
+            "atmLimitsTitle": "Límites de retiro en cajero",
+            "dailyAtmLimit": "Límites diarios de cajero",
+            "dailyAtmLimitHelper": "Retiro máximo en cajero por día",
+            "monthlyAtmLimit": "Límite mensual en cajero",
+            "monthlyAtmLimitHelper": "Retiro máximo en cajero por mes",
+            "transactionTypesTitle": "Tipos de transacción",
+            "TransactionTypes": {
+                "ecommerce": "Compras en línea",
+                "ecommerceDescription": "Permitir transacciones de comercio electrónico",
+                "atm": "Retiros en cajero",
+                "atmDescription": "Permitir retiros de efectivo en cajeros",
+                "contactless": "Pagos sin contacto",
+                "contactlessDescription": "Permitir transacciones sin contacto"
+            },
+            "title": "Límites de tarjeta"
+        }
     }
 }

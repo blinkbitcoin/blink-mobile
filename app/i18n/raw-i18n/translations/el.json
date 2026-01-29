@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "Με το Stablesats, έχετε τώρα έναν λογαριασμό USD που προστίθεται στο πορτοφόλι σας!",
         "body": "Μπορείτε να το χρησιμοποιήσετε για να στέλνετε και να λαμβάνετε Bitcoin και να μεταφέρετε άμεσα αξία μεταξύ του λογαριασμού σας σε BTC και USD. Η αξία στο λογαριασμό USD δεν θα αυξομειώνεται με την τιμή του Bitcoin. Αυτή η λειτουργία δεν είναι συμβατή με το παραδοσιακό τραπεζικό σύστημα.",
-        "termsAndConditions": "Διαβάστε τους Όρους & Προϋποθέσεις.",
+        "termsAndConditions": "Διαβάστε τους Όρους & Προϋποθέσεις",
         "learnMore": "Μάθετε περισσότερα σχετικά με τα Stablesats"
     },
     "SplashScreen": {
@@ -2787,6 +2787,31 @@
         },
         "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
         "cardFrozenTitle": "Κάρτα παγωμένη",
-        "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη"
+        "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη",
+        "CardLimits": {
+            "currentLimitsTitle": "Τρέχοντα όρια",
+            "dailySpending": "Ημερήσιες δαπάνες",
+            "monthlySpending": "Μηνιαίες δαπάνες",
+            "spendingLimitsTitle": "Όρια δαπανών",
+            "dailyLimit": "Ημερήσιο όριο",
+            "dailyLimitHelper": "Μέγιστο ποσό που μπορείτε να ξοδέψετε ανά ημέρα",
+            "monthlyLimit": "Μηνιαία όρια δαπανών",
+            "monthlyLimitHelper": "Μέγιστο ποσό που μπορείτε να ξοδέψετε ανά μήνα",
+            "atmLimitsTitle": "Όρια ανάληψης ATM",
+            "dailyAtmLimit": "Ημερήσια όρια ATM",
+            "dailyAtmLimitHelper": "Μέγιστη ανάληψη ATM ανά ημέρα",
+            "monthlyAtmLimit": "Μηνιαίο όριο ATM",
+            "monthlyAtmLimitHelper": "Μέγιστη ανάληψη ATM ανά μήνα",
+            "transactionTypesTitle": "Τύποι συναλλαγών",
+            "TransactionTypes": {
+                "ecommerce": "Διαδικτυακές αγορές",
+                "ecommerceDescription": "Επιτρέψτε συναλλαγές ηλεκτρονικού εμπορίου",
+                "atm": "Αναλήψεις ATM",
+                "atmDescription": "Επιτρέψτε αναλήψεις μετρητών από ATM",
+                "contactless": "Ανέπαφες πληρωμές",
+                "contactlessDescription": "Επιτρέψτε ανέπαφες συναλλαγές"
+            },
+            "title": "Όρια κάρτας"
+        }
     }
 }

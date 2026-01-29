@@ -656,7 +656,7 @@
     "StablesatsModal": {
         "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
         "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
-        "termsAndConditions": "Funda iMigaqo neMiqathango.",
+        "termsAndConditions": "Funda iMigaqo neMiqathango",
         "learnMore": "Funda ngakumbi malunga neStablesats"
     },
     "SplashScreen": {
@@ -921,6 +921,31 @@
         },
         "validThruLabel": "ISEBENZA DE KUPHELA",
         "cardFrozenTitle": "Ikhadi libandisiwe",
-        "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana"
+        "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana",
+        "CardLimits": {
+            "currentLimitsTitle": "Imida yangoku",
+            "dailySpending": "Ukuchitha ngosuku",
+            "monthlySpending": "Ukuchitha ngenyanga",
+            "spendingLimitsTitle": "Imida yokuchitha",
+            "dailyLimit": "Umda wosuku",
+            "dailyLimitHelper": "Eyona mali oyichithayo ngosuku",
+            "monthlyLimit": "Imida yokuchitha yenyanga",
+            "monthlyLimitHelper": "Eyona mali oyichithayo ngenyanga",
+            "atmLimitsTitle": "Imida yokukhupha kwi-ATM",
+            "dailyAtmLimit": "Imida ye-ATM yemihla ngemihla",
+            "dailyAtmLimitHelper": "Eyona mali oyikhuphayo kwi-ATM ngosuku",
+            "monthlyAtmLimit": "Umda we-ATM ngenyanga",
+            "monthlyAtmLimitHelper": "Eyona mali oyikhuphayo kwi-ATM ngenyanga",
+            "transactionTypesTitle": "Iintlobo zotshintshiselwano",
+            "TransactionTypes": {
+                "ecommerce": "Ukuthenga ku-intanethi",
+                "ecommerceDescription": "Vumela imisebenzi ye-e-commerce",
+                "atm": "Ukukhupha kwi-ATM",
+                "atmDescription": "Vumela ukukhupha imali kwi-ATM",
+                "contactless": "Ukuhlawula ngaphandle kochukumiso",
+                "contactlessDescription": "Vumela imisebenzi ngaphandle kochukumiso"
+            },
+            "title": "Imida yekhadi"
+        }
     }
 }
