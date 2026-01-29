@@ -15,6 +15,17 @@ jest.mock("react-native-linear-gradient", () => ({
 
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native")
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  }
+})
+
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_CARD: {
     cardNumber: "4111 1111 1111 1111",
@@ -60,6 +71,7 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
 describe("CardDashboardScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockNavigate.mockClear()
   })
 
   describe("rendering", () => {
@@ -291,8 +303,6 @@ describe("CardDashboardScreen", () => {
 
   describe("action buttons interaction", () => {
     it("allows pressing details button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -306,13 +316,10 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(detailsButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Details pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardDetailsScreen")
     })
 
     it("allows pressing set limits button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -326,8 +333,7 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(setLimitsButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Set limits pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardLimitsScreen")
     })
 
     it("allows pressing statements button", async () => {
