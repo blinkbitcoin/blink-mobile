@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Permet transaccions sense contacte"
             },
             "title": "Límits de la targeta"
+        },
+        "CardStatements": {
+            "title": "Moviments",
+            "selectYear": "Seleccionar any",
+            "currentStatement": "Moviment actual",
+            "statementPeriod": "Període del moviment",
+            "totalSpent": "Total gastat",
+            "monthlyStatements": "Moviments mensuals",
+            "downloadAll": "Descarregar tots",
+            "spent": "{amount} gastat",
+            "transactions": "{count} transaccions, {amount} gastat",
+            "noStatements": "Encara no hi ha moviments",
+            "statementsCount": "{count} moviments",
+            "aboutStatements": "Sobre els moviments",
+            "aboutBullet1": "Els moviments mensuals es generen l'últim dia de cada mes",
+            "aboutBullet2": "Els moviments inclouen totes les transaccions i comissions del període",
+            "aboutBullet3": "Descarrega els moviments en format PDF",
+            "notifyNewStatements": "Notifica'm quan hi hagi nous moviments disponibles"
         }
     }
 }

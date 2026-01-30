@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Temassız işlemlere izin ver"
             },
             "title": "Kart limitleri"
+        },
+        "CardStatements": {
+            "title": "Hareketler",
+            "selectYear": "Yıl seçin",
+            "currentStatement": "Güncel hareket",
+            "statementPeriod": "Hareket dönemi",
+            "totalSpent": "Toplam harcama",
+            "monthlyStatements": "Aylık hareketler",
+            "downloadAll": "Tümünü indir",
+            "spent": "{amount} harcandı",
+            "transactions": "{count} işlem, {amount} harcandı",
+            "noStatements": "Henüz hareket yok",
+            "statementsCount": "{count} hareket",
+            "aboutStatements": "Hareketler hakkında",
+            "aboutBullet1": "Aylık hareketler her ayın son gününde oluşturulur",
+            "aboutBullet2": "Hareketler dönem için tüm işlemleri ve ücretleri içerir",
+            "aboutBullet3": "Hareketleri PDF olarak indirin",
+            "notifyNewStatements": "Yeni hareketler mevcut olduğunda beni bilgilendir"
         }
     }
 }

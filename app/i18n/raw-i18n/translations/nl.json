@@ -2744,6 +2744,24 @@
                 "contactlessDescription": "Contactloze transacties toestaan"
             },
             "title": "Kaartlimieten"
+        },
+        "CardStatements": {
+            "title": "Transacties",
+            "selectYear": "Jaar selecteren",
+            "currentStatement": "Huidige transactie",
+            "statementPeriod": "Transactieperiode",
+            "totalSpent": "Totaal uitgegeven",
+            "monthlyStatements": "Maandelijkse transacties",
+            "downloadAll": "Alles downloaden",
+            "spent": "{amount} uitgegeven",
+            "transactions": "{count} transacties, {amount} uitgegeven",
+            "noStatements": "Nog geen transacties",
+            "statementsCount": "{count} transacties",
+            "aboutStatements": "Over de transacties",
+            "aboutBullet1": "Maandelijkse transacties worden op de laatste dag van elke maand gegenereerd",
+            "aboutBullet2": "Transacties bevatten alle transacties en kosten van de periode",
+            "aboutBullet3": "Download transacties als PDF",
+            "notifyNewStatements": "Meld mij wanneer nieuwe transacties beschikbaar zijn"
         }
     }
 }

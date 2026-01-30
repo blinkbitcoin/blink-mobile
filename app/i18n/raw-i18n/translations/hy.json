@@ -2744,6 +2744,24 @@
                 "contactlessDescription": "Tuylatvir anshoshap gortsakarutyunner"
             },
             "title": "Qart limitner"
+        },
+        "CardStatements": {
+            "title": "Շdelays",
+            "selectYear": " Delays delays",
+            "currentStatement": "Ընdelays շdelays",
+            "statementPeriod": "Շdelays delays",
+            "totalSpent": " Delays delays",
+            "monthlyStatements": "Ամសdelays շdelays",
+            "downloadAll": "Ներdelays բdelays",
+            "spent": "{amount} delays delays",
+            "transactions": "{count} delays, {amount} delays",
+            "noStatements": "Դեdelays delays շdelays չdelays",
+            "statementsCount": "{count} շdelays",
+            "aboutStatements": "Շdelays delays",
+            "aboutBullet1": " Delays շdelays delays delay delay delay delay delays",
+            "aboutBullet2": "Շdelays delay delay delay delay delay delays",
+            "aboutBullet3": "Ներdelay շdelays PDF delaysdelays",
+            "notifyNewStatements": "Ծdelays ինdelay delays շdelays delaysdelays"
         }
     }
 }

@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Érintésmentes tranzakciók engedélyezése"
             },
             "title": "Kártyakorlátok"
+        },
+        "CardStatements": {
+            "title": "Forgalom",
+            "selectYear": "Év kiválasztása",
+            "currentStatement": "Aktuális forgalom",
+            "statementPeriod": "Forgalmi időszak",
+            "totalSpent": "Összes költés",
+            "monthlyStatements": "Havi forgalom",
+            "downloadAll": "Összes letöltése",
+            "spent": "{amount} elköltve",
+            "transactions": "{count} tranzakció, {amount} elköltve",
+            "noStatements": "Még nincs forgalom",
+            "statementsCount": "{count} forgalom",
+            "aboutStatements": "A forgalomról",
+            "aboutBullet1": "A havi forgalom minden hónap utolsó napján készül",
+            "aboutBullet2": "A forgalom tartalmazza az időszak összes tranzakcióját és díját",
+            "aboutBullet3": "Forgalom letöltése PDF formátumban",
+            "notifyNewStatements": "Értesítsen, ha új forgalom érhető el"
         }
     }
 }

@@ -2744,6 +2744,24 @@
                 "contactlessDescription": "Dopusti beskontaktne transakcije"
             },
             "title": "Ograničenja kartice"
+        },
+        "CardStatements": {
+            "title": "Promet",
+            "selectYear": "Odaberi godinu",
+            "currentStatement": "Trenutni promet",
+            "statementPeriod": "Razdoblje prometa",
+            "totalSpent": "Ukupno potrošeno",
+            "monthlyStatements": "Mjesečni promet",
+            "downloadAll": "Preuzmi sve",
+            "spent": "{amount} potrošeno",
+            "transactions": "{count} transakcija, {amount} potrošeno",
+            "noStatements": "Još nema prometa",
+            "statementsCount": "{count} prometa",
+            "aboutStatements": "O prometu",
+            "aboutBullet1": "Mjesečni promet se generira zadnjeg dana svakog mjeseca",
+            "aboutBullet2": "Promet uključuje sve transakcije i naknade za razdoblje",
+            "aboutBullet3": "Preuzmite promet u PDF formatu",
+            "notifyNewStatements": "Obavijesti me kada bude dostupan novi promet"
         }
     }
 }

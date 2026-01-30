@@ -2771,6 +2771,24 @@
                 "contactlessDescription": "Tillad kontaktløse transaktioner"
             },
             "title": "Kortgrænser"
+        },
+        "CardStatements": {
+            "title": "Bevægelser",
+            "selectYear": "Vælg år",
+            "currentStatement": "Aktuel bevægelse",
+            "statementPeriod": "Bevægelsesperiode",
+            "totalSpent": "Samlet forbrug",
+            "monthlyStatements": "Månedlige bevægelser",
+            "downloadAll": "Download alle",
+            "spent": "{amount} brugt",
+            "transactions": "{count} transaktioner, {amount} brugt",
+            "noStatements": "Ingen bevægelser endnu",
+            "statementsCount": "{count} bevægelser",
+            "aboutStatements": "Om bevægelser",
+            "aboutBullet1": "Månedlige bevægelser genereres den sidste dag i hver måned",
+            "aboutBullet2": "Bevægelser inkluderer alle transaktioner og gebyrer for perioden",
+            "aboutBullet3": "Download bevægelser som PDF",
+            "notifyNewStatements": "Giv mig besked, når nye bevægelser er tilgængelige"
         }
     }
 }

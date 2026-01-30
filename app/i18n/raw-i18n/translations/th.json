@@ -2739,6 +2739,24 @@
                 "contactlessDescription": "อนุญาตธุรกรรมแบบไร้สัมผัส"
             },
             "title": "วงเงินบัตร"
+        },
+        "CardStatements": {
+            "title": "รายการ",
+            "selectYear": "เลือกปี",
+            "currentStatement": "รายการปัจจุบัน",
+            "statementPeriod": "ช่วงเวลารายการ",
+            "totalSpent": "ยอดใช้จ่ายรวม",
+            "monthlyStatements": "รายการรายเดือน",
+            "downloadAll": "ดาวน์โหลดทั้งหมด",
+            "spent": "ใช้จ่าย {amount}",
+            "transactions": "{count} รายการ, ใช้จ่าย {amount}",
+            "noStatements": "ยังไม่มีรายการ",
+            "statementsCount": "{count} รายการ",
+            "aboutStatements": "เกี่ยวกับรายการ",
+            "aboutBullet1": "รายการรายเดือนจะถูกสร้างในวันสุดท้ายของแต่ละเดือน",
+            "aboutBullet2": "รายการรวมธุรกรรมและค่าธรรมเนียมทั้งหมดในช่วงเวลานั้น",
+            "aboutBullet3": "ดาวน์โหลดรายการเป็น PDF",
+            "notifyNewStatements": "แจ้งเตือนเมื่อมีรายการใหม่"
         }
     }
 }

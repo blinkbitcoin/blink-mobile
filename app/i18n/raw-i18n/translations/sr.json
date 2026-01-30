@@ -2739,6 +2739,24 @@
                 "contactlessDescription": "Дозволи бесконтактне трансакције"
             },
             "title": "Ограничења картице"
+        },
+        "CardStatements": {
+            "title": "Промет",
+            "selectYear": "Изаберите годину",
+            "currentStatement": "Тренутни промет",
+            "statementPeriod": "Период промета",
+            "totalSpent": "Укупно потрошено",
+            "monthlyStatements": "Месечни промет",
+            "downloadAll": "Преузми све",
+            "spent": "{amount} потрошено",
+            "transactions": "{count} трансакција, {amount} потрошено",
+            "noStatements": "Још нема промета",
+            "statementsCount": "{count} промета",
+            "aboutStatements": "О промету",
+            "aboutBullet1": "Месечни промет се генерише последњег дана сваког месеца",
+            "aboutBullet2": "Промет укључује све трансакције и накнаде за период",
+            "aboutBullet3": "Преузмите промет у PDF формату",
+            "notifyNewStatements": "Обавести ме када буде доступан нови промет"
         }
     }
 }

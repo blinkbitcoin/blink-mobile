@@ -2739,6 +2739,24 @@
                 "contactlessDescription": "Mana llamk'ay transaccionkunata saqiy"
             },
             "title": "Tarjeta limitkuna"
+        },
+        "CardStatements": {
+            "title": "Kuyuykuna",
+            "selectYear": "Watata akllay",
+            "currentStatement": "Kunan kuyuy",
+            "statementPeriod": "Kuyuy pacha",
+            "totalSpent": "Tukuy gastasqa",
+            "monthlyStatements": "Killamanta kuyuykuna",
+            "downloadAll": "Tukuyta uraykachiy",
+            "spent": "{amount} gastasqa",
+            "transactions": "{count} kuyuykuna, {amount} gastasqa",
+            "noStatements": "Manaraq kuyuykuna kanchu",
+            "statementsCount": "{count} kuyuykuna",
+            "aboutStatements": "Kuyuykunamanta",
+            "aboutBullet1": "Killamanta kuyuykuna sapa killap qhipa punchawnin ruwakun",
+            "aboutBullet2": "Kuyuykuna tukuy kuyuykunata, qullqi mañasqakunata ima chay pacha ukhupi",
+            "aboutBullet3": "Kuyuykunata PDF nisqapi uraykachiy",
+            "notifyNewStatements": "Willaway musuq kuyuykuna kaptinqa"
         }
     }
 }

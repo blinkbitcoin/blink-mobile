@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Povoliť bezkontaktné transakcie"
             },
             "title": "Limity karty"
+        },
+        "CardStatements": {
+            "title": "Pohyby",
+            "selectYear": "Vybrať rok",
+            "currentStatement": "Aktuálny pohyb",
+            "statementPeriod": "Obdobie pohybu",
+            "totalSpent": "Celkom minuté",
+            "monthlyStatements": "Mesačné pohyby",
+            "downloadAll": "Stiahnuť všetko",
+            "spent": "{amount} minuté",
+            "transactions": "{count} transakcií, {amount} minuté",
+            "noStatements": "Zatiaľ žiadne pohyby",
+            "statementsCount": "{count} pohybov",
+            "aboutStatements": "O pohyboch",
+            "aboutBullet1": "Mesačné pohyby sa generujú posledný deň každého mesiaca",
+            "aboutBullet2": "Pohyby zahŕňajú všetky transakcie a poplatky za obdobie",
+            "aboutBullet3": "Stiahnite pohyby vo formáte PDF",
+            "notifyNewStatements": "Upozornite ma, keď budú dostupné nové pohyby"
         }
     }
 }

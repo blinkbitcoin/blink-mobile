@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Ruhusu miamala bila kugusa"
             },
             "title": "Vipimo vya kadi"
+        },
+        "CardStatements": {
+            "title": "Miamala",
+            "selectYear": "Chagua mwaka",
+            "currentStatement": "Miamala ya sasa",
+            "statementPeriod": "Kipindi cha miamala",
+            "totalSpent": "Jumla iliyotumika",
+            "monthlyStatements": "Miamala ya kila mwezi",
+            "downloadAll": "Pakua zote",
+            "spent": "{amount} imetumika",
+            "transactions": "{count} miamala, {amount} imetumika",
+            "noStatements": "Hakuna miamala bado",
+            "statementsCount": "{count} miamala",
+            "aboutStatements": "Kuhusu miamala",
+            "aboutBullet1": "Miamala ya kila mwezi hutengenezwa siku ya mwisho ya kila mwezi",
+            "aboutBullet2": "Miamala inajumuisha miamala yote na ada za kipindi",
+            "aboutBullet3": "Pakua miamala kama PDF",
+            "notifyNewStatements": "Nijulishe miamala mipya inapopatikana"
         }
     }
 }

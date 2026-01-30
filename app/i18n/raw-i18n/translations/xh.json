@@ -964,6 +964,24 @@
                 "contactlessDescription": "Vumela imisebenzi ngaphandle kochukumiso"
             },
             "title": "Imida yekhadi"
+        },
+        "CardStatements": {
+            "title": "Intshukumo",
+            "selectYear": "Khetha unyaka",
+            "currentStatement": "Intshukumo yangoku",
+            "statementPeriod": "Ixesha lentshukumo",
+            "totalSpent": "Iyonke echithiweyo",
+            "monthlyStatements": "Intshukumo yenyanga",
+            "downloadAll": "Khuphela zonke",
+            "spent": "{amount} ichithiwe",
+            "transactions": "{count} intshukumo, {amount} ichithiwe",
+            "noStatements": "Akukho ntshukumo okwangoku",
+            "statementsCount": "{count} intshukumo",
+            "aboutStatements": "Malunga nentshukumo",
+            "aboutBullet1": "Intshukumo yenyanga iyenziwa ngosuku lokugqibela lwenyanga nganye",
+            "aboutBullet2": "Intshukumo iquka zonke intshukumo neentlawulo zexesha",
+            "aboutBullet3": "Khuphela intshukumo njenge-PDF",
+            "notifyNewStatements": "Ndazise xa intshukumo entsha ifumaneka"
         }
     }
 }

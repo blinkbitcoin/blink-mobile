@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Επιτρέψτε ανέπαφες συναλλαγές"
             },
             "title": "Όρια κάρτας"
+        },
+        "CardStatements": {
+            "title": "Κινήσεις",
+            "selectYear": "Επιλέξτε έτος",
+            "currentStatement": "Τρέχουσα κίνηση",
+            "statementPeriod": "Περίοδος κίνησης",
+            "totalSpent": "Συνολική δαπάνη",
+            "monthlyStatements": "Μηνιαίες κινήσεις",
+            "downloadAll": "Λήψη όλων",
+            "spent": "{amount} δαπανήθηκε",
+            "transactions": "{count} συναλλαγές, {amount} δαπανήθηκε",
+            "noStatements": "Δεν υπάρχουν ακόμα κινήσεις",
+            "statementsCount": "{count} κινήσεις",
+            "aboutStatements": "Σχετικά με τις κινήσεις",
+            "aboutBullet1": "Οι μηνιαίες κινήσεις δημιουργούνται την τελευταία ημέρα κάθε μήνα",
+            "aboutBullet2": "Οι κινήσεις περιλαμβάνουν όλες τις συναλλαγές και χρεώσεις της περιόδου",
+            "aboutBullet3": "Κατεβάστε τις κινήσεις σε PDF",
+            "notifyNewStatements": "Ειδοποιήστε με όταν υπάρχουν νέες κινήσεις"
         }
     }
 }

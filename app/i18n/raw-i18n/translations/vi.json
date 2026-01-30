@@ -2739,6 +2739,24 @@
                 "contactlessDescription": "Cho phép giao dịch không tiếp xúc"
             },
             "title": "Hạn mức thẻ"
+        },
+        "CardStatements": {
+            "title": "Giao dịch",
+            "selectYear": "Chọn năm",
+            "currentStatement": "Giao dịch hiện tại",
+            "statementPeriod": "Kỳ giao dịch",
+            "totalSpent": "Tổng chi tiêu",
+            "monthlyStatements": "Giao dịch hàng tháng",
+            "downloadAll": "Tải tất cả",
+            "spent": "{amount} đã chi",
+            "transactions": "{count} giao dịch, {amount} đã chi",
+            "noStatements": "Chưa có giao dịch",
+            "statementsCount": "{count} giao dịch",
+            "aboutStatements": "Về giao dịch",
+            "aboutBullet1": "Giao dịch hàng tháng được tạo vào ngày cuối cùng của mỗi tháng",
+            "aboutBullet2": "Giao dịch bao gồm tất cả các giao dịch và phí trong kỳ",
+            "aboutBullet3": "Tải giao dịch dưới dạng PDF",
+            "notifyNewStatements": "Thông báo cho tôi khi có giao dịch mới"
         }
     }
 }

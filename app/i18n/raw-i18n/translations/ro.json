@@ -2851,6 +2851,24 @@
                 "contactlessDescription": "Permite tranzacții fără contact"
             },
             "title": "Limite card"
+        },
+        "CardStatements": {
+            "title": "Mișcări",
+            "selectYear": "Selectează anul",
+            "currentStatement": "Mișcare curentă",
+            "statementPeriod": "Perioada mișcării",
+            "totalSpent": "Total cheltuit",
+            "monthlyStatements": "Mișcări lunare",
+            "downloadAll": "Descarcă toate",
+            "spent": "{amount} cheltuit",
+            "transactions": "{count} tranzacții, {amount} cheltuit",
+            "noStatements": "Nu există încă mișcări",
+            "statementsCount": "{count} mișcări",
+            "aboutStatements": "Despre mișcări",
+            "aboutBullet1": "Mișcările lunare sunt generate în ultima zi a fiecărei luni",
+            "aboutBullet2": "Mișcările includ toate tranzacțiile și taxele perioadei",
+            "aboutBullet3": "Descarcă mișcările în format PDF",
+            "notifyNewStatements": "Notifică-mă când sunt disponibile mișcări noi"
         }
     }
 }

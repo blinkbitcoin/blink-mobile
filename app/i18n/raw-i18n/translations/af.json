@@ -2744,6 +2744,24 @@
                 "contactlessDescription": "Laat tik-om-te-betaal transaksies toe"
             },
             "title": "Kaartlimiete"
+        },
+        "CardStatements": {
+            "title": "Bewegings",
+            "selectYear": "Kies jaar",
+            "currentStatement": "Huidige beweging",
+            "statementPeriod": "Bewegingstydperk",
+            "totalSpent": "Totaal bestee",
+            "monthlyStatements": "Maandelikse bewegings",
+            "downloadAll": "Laai alles af",
+            "spent": "{amount} bestee",
+            "transactions": "{count} transaksies, {amount} bestee",
+            "noStatements": "Nog geen bewegings nie",
+            "statementsCount": "{count} bewegings",
+            "aboutStatements": "Oor bewegings",
+            "aboutBullet1": "Maandelikse bewegings word op die laaste dag van elke maand gegenereer",
+            "aboutBullet2": "Bewegings sluit alle transaksies en fooie vir die tydperk in",
+            "aboutBullet3": "Laai bewegings af as PDF",
+            "notifyNewStatements": "Stel my in kennis wanneer nuwe bewegings beskikbaar is"
         }
     }
 }

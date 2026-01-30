@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Okukkiriza okutunda awatali kukwatagana"
             },
             "title": "Ensalo z'ekkaadi"
+        },
+        "CardStatements": {
+            "title": "Entambula",
+            "selectYear": "Londa omwaka",
+            "currentStatement": "Entambula y'ekiseera kino",
+            "statementPeriod": "Ekiseera ky'entambula",
+            "totalSpent": "Byonna ebyakozesebwa",
+            "monthlyStatements": "Entambula y'omwezi",
+            "downloadAll": "Dawuniloda byonna",
+            "spent": "{amount} yakozesebwa",
+            "transactions": "{count} entambula, {amount} yakozesebwa",
+            "noStatements": "Tewali ntambula okutuusa kati",
+            "statementsCount": "{count} entambula",
+            "aboutStatements": "Ebikwata ku ntambula",
+            "aboutBullet1": "Entambula y'omwezi ekolebwa ku lunaku olw'enkomerero y'omwezi gwonna",
+            "aboutBullet2": "Entambula erimo entambula zonna n'emisolo egy'ekiseera ekyo",
+            "aboutBullet3": "Dawuniloda entambula nga PDF",
+            "notifyNewStatements": "Mbuulire entambula empya bwe ziba"
         }
     }
 }

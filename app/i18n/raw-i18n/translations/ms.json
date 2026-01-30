@@ -2744,6 +2744,24 @@
                 "contactlessDescription": "Benarkan transaksi tanpa sentuh"
             },
             "title": "Had kad"
+        },
+        "CardStatements": {
+            "title": "Transaksi",
+            "selectYear": "Pilih tahun",
+            "currentStatement": "Transaksi semasa",
+            "statementPeriod": "Tempoh transaksi",
+            "totalSpent": "Jumlah dibelanjakan",
+            "monthlyStatements": "Transaksi bulanan",
+            "downloadAll": "Muat turun semua",
+            "spent": "{amount} dibelanjakan",
+            "transactions": "{count} transaksi, {amount} dibelanjakan",
+            "noStatements": "Tiada transaksi lagi",
+            "statementsCount": "{count} transaksi",
+            "aboutStatements": "Mengenai transaksi",
+            "aboutBullet1": "Transaksi bulanan dijana pada hari terakhir setiap bulan",
+            "aboutBullet2": "Transaksi termasuk semua transaksi dan yuran untuk tempoh tersebut",
+            "aboutBullet3": "Muat turun transaksi dalam format PDF",
+            "notifyNewStatements": "Maklumkan saya apabila transaksi baharu tersedia"
         }
     }
 }

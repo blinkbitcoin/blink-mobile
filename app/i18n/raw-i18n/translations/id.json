@@ -2830,6 +2830,24 @@
                 "contactlessDescription": "Izinkan transaksi tanpa kontak"
             },
             "title": "Batas kartu"
+        },
+        "CardStatements": {
+            "title": "Mutasi",
+            "selectYear": "Pilih tahun",
+            "currentStatement": "Mutasi saat ini",
+            "statementPeriod": "Periode mutasi",
+            "totalSpent": "Total pengeluaran",
+            "monthlyStatements": "Mutasi bulanan",
+            "downloadAll": "Unduh semua",
+            "spent": "{amount} dibelanjakan",
+            "transactions": "{count} transaksi, {amount} dibelanjakan",
+            "noStatements": "Belum ada mutasi",
+            "statementsCount": "{count} mutasi",
+            "aboutStatements": "Tentang mutasi",
+            "aboutBullet1": "Mutasi bulanan dibuat pada hari terakhir setiap bulan",
+            "aboutBullet2": "Mutasi mencakup semua transaksi dan biaya untuk periode tersebut",
+            "aboutBullet3": "Unduh mutasi dalam format PDF",
+            "notifyNewStatements": "Beritahu saya ketika mutasi baru tersedia"
         }
     }
 }
