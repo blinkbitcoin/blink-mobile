@@ -2984,6 +2984,22 @@
       "network": "Network",
       "keepDetailsSafe": "Keep your details safe",
       "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+    },
+    "CardStatements": {
+      "title": "Statements",
+      "selectYear": "Select year",
+      "currentStatement": "Current statement",
+      "statementPeriod": "Statement period",
+      "totalSpent": "Total spent",
+      "monthlyStatements": "Monthly statements",
+      "downloadAll": "Download all",
+      "spent": "{amount} spent",
+      "transactions": "{count} transactions, {amount} spent",
+      "aboutStatements": "About statements",
+      "aboutBullet1": "Monthly statements are generated on the last day of each month",
+      "aboutBullet2": "Statements include all transactions and fees for the period",
+      "aboutBullet3": "Download statements as PDF",
+      "notifyNewStatements": "Notify me when new statements are made available"
     }
   }
 }

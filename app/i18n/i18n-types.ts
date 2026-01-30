@@ -9838,6 +9838,76 @@ type RootTranslation = {
 				contactlessDescription: string
 			}
 		}
+		CardStatements: {
+			/**
+			 * S​t​a​t​e​m​e​n​t​s
+			 */
+			title: string
+			/**
+			 * S​e​l​e​c​t​ ​y​e​a​r
+			 */
+			selectYear: string
+			/**
+			 * C​u​r​r​e​n​t​ ​s​t​a​t​e​m​e​n​t
+			 */
+			currentStatement: string
+			/**
+			 * S​t​a​t​e​m​e​n​t​ ​p​e​r​i​o​d
+			 */
+			statementPeriod: string
+			/**
+			 * T​o​t​a​l​ ​s​p​e​n​t
+			 */
+			totalSpent: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			monthlyStatements: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​a​l​l
+			 */
+			downloadAll: string
+			/**
+			 * {​a​m​o​u​n​t​}​ ​s​p​e​n​t
+			 * @param {unknown} amount
+			 */
+			spent: RequiredParams<'amount'>
+			/**
+			 * {​c​o​u​n​t​}​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​{​a​m​o​u​n​t​}​ ​s​p​e​n​t
+			 * @param {unknown} amount
+			 * @param {unknown} count
+			 */
+			transactions: RequiredParams<'amount' | 'count'>
+			/**
+			 * {​c​o​u​n​t​}​ ​s​t​a​t​e​m​e​n​t​s
+			 * @param {unknown} count
+			 */
+			statementsCount: RequiredParams<'count'>
+			/**
+			 * N​o​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			noStatements: string
+			/**
+			 * A​b​o​u​t​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			aboutStatements: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​t​a​t​e​m​e​n​t​s​ ​a​r​e​ ​g​e​n​e​r​a​t​e​d​ ​o​n​ ​t​h​e​ ​l​a​s​t​ ​d​a​y​ ​o​f​ ​e​a​c​h​ ​m​o​n​t​h
+			 */
+			aboutBullet1: string
+			/**
+			 * S​t​a​t​e​m​e​n​t​s​ ​i​n​c​l​u​d​e​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​n​d​ ​f​e​e​s​ ​f​o​r​ ​t​h​e​ ​p​e​r​i​o​d
+			 */
+			aboutBullet2: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​s​t​a​t​e​m​e​n​t​s​ ​a​s​ ​P​D​F
+			 */
+			aboutBullet3: string
+			/**
+			 * N​o​t​i​f​y​ ​m​e​ ​w​h​e​n​ ​n​e​w​ ​s​t​a​t​e​m​e​n​t​s​ ​a​r​e​ ​m​a​d​e​ ​a​v​a​i​l​a​b​l​e
+			 */
+			notifyNewStatements: string
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -19555,6 +19625,72 @@ export type TranslationFunctions = {
 				 */
 				contactlessDescription: () => LocalizedString
 			}
+		}
+		CardStatements: {
+			/**
+			 * Statements
+			 */
+			title: () => LocalizedString
+			/**
+			 * Select year
+			 */
+			selectYear: () => LocalizedString
+			/**
+			 * Current statement
+			 */
+			currentStatement: () => LocalizedString
+			/**
+			 * Statement period
+			 */
+			statementPeriod: () => LocalizedString
+			/**
+			 * Total spent
+			 */
+			totalSpent: () => LocalizedString
+			/**
+			 * Monthly statements
+			 */
+			monthlyStatements: () => LocalizedString
+			/**
+			 * Download all
+			 */
+			downloadAll: () => LocalizedString
+			/**
+			 * {amount} spent
+			 */
+			spent: (arg: { amount: unknown }) => LocalizedString
+			/**
+			 * {count} transactions, {amount} spent
+			 */
+			transactions: (arg: { amount: unknown, count: unknown }) => LocalizedString
+			/**
+			 * {count} statements
+			 */
+			statementsCount: (arg: { count: unknown }) => LocalizedString
+			/**
+			 * No statements
+			 */
+			noStatements: () => LocalizedString
+			/**
+			 * About statements
+			 */
+			aboutStatements: () => LocalizedString
+			/**
+			 * Monthly statements are generated on the last day of each month
+			 */
+			aboutBullet1: () => LocalizedString
+			/**
+			 * Statements include all transactions and fees for the period
+			 */
+			aboutBullet2: () => LocalizedString
+			/**
+			 * Download statements as PDF
+			 */
+			aboutBullet3: () => LocalizedString
+			/**
+			 * Notify me when new statements are made available
+			 */
+			notifyNewStatements: () => LocalizedString
 		}
 	}
 	NotificationHistory: {
