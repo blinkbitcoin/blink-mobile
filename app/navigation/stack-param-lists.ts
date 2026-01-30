@@ -133,6 +133,7 @@ export type RootStackParamList = {
   cardDashboardScreen: undefined
   cardDetailsScreen: undefined
   cardLimitsScreen: undefined
+  cardStatementsScreen: undefined
 }
 
 export type OnboardingStackParamList = {
