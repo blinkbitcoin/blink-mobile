@@ -45,7 +45,7 @@ export const CardDashboardScreen: React.FC = () => {
           onDetails={() => navigation.navigate("cardDetailsScreen")}
           onFreeze={() => setIsFrozen((prev) => !prev)}
           onSetLimits={() => navigation.navigate("cardLimitsScreen")}
-          onStatements={() => console.log("Statements pressed")}
+          onStatements={() => navigation.navigate("cardStatementsScreen")}
         />
 
         <CardTransactionsSection groups={transactions} />
