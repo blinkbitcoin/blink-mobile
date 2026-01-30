@@ -2229,7 +2229,7 @@
         "logInOrCreateAccount": "Přihlášení nebo vytvoření účtu"
     },
     "NotificationSettingsScreen": {
-        "title": "Notification Settings",
+        "title": "Notification settings",
         "pushNotifications": "Push Notifications",
         "notificationCategories": {
             "Circles": {
