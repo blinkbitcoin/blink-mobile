@@ -73,6 +73,9 @@ import BookOpen from "@app/assets/icons-redesign/book-open.svg"
 import LockClosed from "@app/assets/icons-redesign/lock-closed.svg"
 import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
 import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
+import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
+import PrivacyPolicy from "@app/assets/icons-redesign/privacy-policy.svg"
+import Trash from "@app/assets/icons-redesign/trash.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -148,6 +151,9 @@ export const icons = {
   "lock-closed": LockClosed,
   "visa-platinum": VisaPlatinum,
   "blink-icon": BlinkIcon,
+  "physical-card": PhysicalCard,
+  "privacy-policy": PrivacyPolicy,
+  "trash": Trash,
 } as const
 
 export type IconNamesType = keyof typeof icons
