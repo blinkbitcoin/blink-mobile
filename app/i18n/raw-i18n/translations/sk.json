@@ -2848,6 +2848,26 @@
             "aboutBullet2": "Pohyby zahŕňajú všetky transakcie a poplatky za obdobie",
             "aboutBullet3": "Stiahnite pohyby vo formáte PDF",
             "notifyNewStatements": "Upozornite ma, keď budú dostupné nové pohyby"
+        },
+        "CardSettings": {
+            "title": "Nastavenia karty",
+            "personalDetails": "Osobné údaje",
+            "changePin": "Zmeniť PIN",
+            "transactionAlerts": "Upozornenia na transakcie",
+            "transactionAlertsDescription": "Dostávajte oznámenia o všetkých transakciách",
+            "securityAlerts": "Bezpečnostné upozornenia",
+            "securityAlertsDescription": "Dostávajte oznámenia o bezpečnostných aktivitách",
+            "marketingUpdates": "Marketingové aktualizácie",
+            "marketingUpdatesDescription": "Aktualizácie produktov a ponuky",
+            "cardManagement": "Správa karty",
+            "orderPhysicalCard": "Objednať fyzickú kartu",
+            "addToGooglePay": "Pridať do Google Pay",
+            "replaceCard": "Vymeniť kartu",
+            "contactSupport": "Kontaktovať podporu",
+            "termsAndConditions": "Podmienky karty",
+            "privacyPolicy": "Zásady ochrany osobných údajov karty",
+            "closeCardAccount": "Zrušiť účet karty",
+            "closeCardAccountDescription": "Trvalo zrušte svoju kartu Visa"
         }
     }
 }

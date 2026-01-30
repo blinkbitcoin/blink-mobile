@@ -34,8 +34,8 @@ export const CardDetailsScreen: React.FC = () => {
   }
 
   const handleSettingsPress = useCallback(() => {
-    console.log("Settings pressed")
-  }, [])
+    navigation.navigate("cardSettingsScreen")
+  }, [navigation])
 
   useEffect(() => {
     navigation.setOptions({

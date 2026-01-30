@@ -2848,6 +2848,26 @@
             "aboutBullet2": "Hareketler dönem için tüm işlemleri ve ücretleri içerir",
             "aboutBullet3": "Hareketleri PDF olarak indirin",
             "notifyNewStatements": "Yeni hareketler mevcut olduğunda beni bilgilendir"
+        },
+        "CardSettings": {
+            "title": "Kart ayarları",
+            "personalDetails": "Kişisel bilgiler",
+            "changePin": "PIN değiştir",
+            "transactionAlerts": "İşlem uyarıları",
+            "transactionAlertsDescription": "Tüm işlemler için bildirim al",
+            "securityAlerts": "Güvenlik uyarıları",
+            "securityAlertsDescription": "Güvenlik aktiviteleri için bildirim al",
+            "marketingUpdates": "Pazarlama güncellemeleri",
+            "marketingUpdatesDescription": "Ürün güncellemeleri ve teklifler",
+            "cardManagement": "Kart yönetimi",
+            "orderPhysicalCard": "Fiziksel kart sipariş et",
+            "addToGooglePay": "Google Pay e ekle",
+            "replaceCard": "Kartı değiştir",
+            "contactSupport": "Destek ile iletişime geç",
+            "termsAndConditions": "Kart şartları ve koşulları",
+            "privacyPolicy": "Kart gizlilik politikası",
+            "closeCardAccount": "Kart hesabını kapat",
+            "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın"
         }
     }
 }

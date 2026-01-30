@@ -2757,6 +2757,26 @@
             "aboutBullet2": "تتضمن الحركات جميع المعاملات والرسوم للفترة",
             "aboutBullet3": "قم بتحميل الحركات بصيغة PDF",
             "notifyNewStatements": "أعلمني عند توفر حركات جديدة"
+        },
+        "CardSettings": {
+            "title": "إعدادات البطاقة",
+            "personalDetails": "البيانات الشخصية",
+            "changePin": "تغيير رمز PIN",
+            "transactionAlerts": "تنبيهات المعاملات",
+            "transactionAlertsDescription": "احصل على إشعارات لجميع المعاملات",
+            "securityAlerts": "تنبيهات الأمان",
+            "securityAlertsDescription": "احصل على إشعارات للأنشطة المتعلقة بالأمان",
+            "marketingUpdates": "تحديثات التسويق",
+            "marketingUpdatesDescription": "تحديثات المنتجات والعروض",
+            "cardManagement": "إدارة البطاقة",
+            "orderPhysicalCard": "طلب بطاقة فعلية",
+            "addToGooglePay": "إضافة إلى Google Pay",
+            "replaceCard": "استبدال البطاقة",
+            "contactSupport": "الاتصال بالدعم",
+            "termsAndConditions": "شروط وأحكام البطاقة",
+            "privacyPolicy": "سياسة خصوصية البطاقة",
+            "closeCardAccount": "إغلاق حساب البطاقة",
+            "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً"
         }
     }
 }

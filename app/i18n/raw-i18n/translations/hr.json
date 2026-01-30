@@ -2762,6 +2762,26 @@
             "aboutBullet2": "Promet uključuje sve transakcije i naknade za razdoblje",
             "aboutBullet3": "Preuzmite promet u PDF formatu",
             "notifyNewStatements": "Obavijesti me kada bude dostupan novi promet"
+        },
+        "CardSettings": {
+            "title": "Postavke kartice",
+            "personalDetails": "Osobni podaci",
+            "changePin": "Promijeni PIN",
+            "transactionAlerts": "Upozorenja o transakcijama",
+            "transactionAlertsDescription": "Primajte obavijesti za sve transakcije",
+            "securityAlerts": "Sigurnosna upozorenja",
+            "securityAlertsDescription": "Primajte obavijesti za sigurnosne aktivnosti",
+            "marketingUpdates": "Marketinška ažuriranja",
+            "marketingUpdatesDescription": "Ažuriranja proizvoda i ponude",
+            "cardManagement": "Upravljanje karticom",
+            "orderPhysicalCard": "Naruči fizičku karticu",
+            "addToGooglePay": "Dodaj u Google Pay",
+            "replaceCard": "Zamijeni karticu",
+            "contactSupport": "Kontaktiraj podršku",
+            "termsAndConditions": "Uvjeti i odredbe kartice",
+            "privacyPolicy": "Politika privatnosti kartice",
+            "closeCardAccount": "Zatvori račun kartice",
+            "closeCardAccountDescription": "Trajno zatvorite svoju Visa karticu"
         }
     }
 }
