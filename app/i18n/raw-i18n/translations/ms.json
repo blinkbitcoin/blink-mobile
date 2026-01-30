@@ -2746,20 +2746,22 @@
             "title": "Had kad"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Transaksi",
+            "selectYear": "Pilih tahun",
+            "currentStatement": "Transaksi semasa",
+            "statementPeriod": "Tempoh transaksi",
+            "totalSpent": "Jumlah dibelanjakan",
+            "monthlyStatements": "Transaksi bulanan",
+            "downloadAll": "Muat turun semua",
+            "spent": "{amount} dibelanjakan",
+            "transactions": "{count} transaksi, {amount} dibelanjakan",
+            "noStatements": "Tiada transaksi lagi",
+            "statementsCount": "{count} transaksi",
+            "aboutStatements": "Mengenai transaksi",
+            "aboutBullet1": "Transaksi bulanan dijana pada hari terakhir setiap bulan",
+            "aboutBullet2": "Transaksi termasuk semua transaksi dan yuran untuk tempoh tersebut",
+            "aboutBullet3": "Muat turun transaksi dalam format PDF",
+            "notifyNewStatements": "Maklumkan saya apabila transaksi baharu tersedia"
         }
     }
 }

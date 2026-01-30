@@ -2832,20 +2832,22 @@
             "title": "Όρια κάρτας"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Κινήσεις",
+            "selectYear": "Επιλέξτε έτος",
+            "currentStatement": "Τρέχουσα κίνηση",
+            "statementPeriod": "Περίοδος κίνησης",
+            "totalSpent": "Συνολική δαπάνη",
+            "monthlyStatements": "Μηνιαίες κινήσεις",
+            "downloadAll": "Λήψη όλων",
+            "spent": "{amount} δαπανήθηκε",
+            "transactions": "{count} συναλλαγές, {amount} δαπανήθηκε",
+            "noStatements": "Δεν υπάρχουν ακόμα κινήσεις",
+            "statementsCount": "{count} κινήσεις",
+            "aboutStatements": "Σχετικά με τις κινήσεις",
+            "aboutBullet1": "Οι μηνιαίες κινήσεις δημιουργούνται την τελευταία ημέρα κάθε μήνα",
+            "aboutBullet2": "Οι κινήσεις περιλαμβάνουν όλες τις συναλλαγές και χρεώσεις της περιόδου",
+            "aboutBullet3": "Κατεβάστε τις κινήσεις σε PDF",
+            "notifyNewStatements": "Ειδοποιήστε με όταν υπάρχουν νέες κινήσεις"
         }
     }
 }

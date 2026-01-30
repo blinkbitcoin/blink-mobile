@@ -2746,20 +2746,22 @@
             "title": "Qart limitner"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Շdelays",
+            "selectYear": " Delays delays",
+            "currentStatement": "Ընdelays շdelays",
+            "statementPeriod": "Շdelays delays",
+            "totalSpent": " Delays delays",
+            "monthlyStatements": "Ամសdelays շdelays",
+            "downloadAll": "Ներdelays բdelays",
+            "spent": "{amount} delays delays",
+            "transactions": "{count} delays, {amount} delays",
+            "noStatements": "Դեdelays delays շdelays չdelays",
+            "statementsCount": "{count} շdelays",
+            "aboutStatements": "Շdelays delays",
+            "aboutBullet1": " Delays շdelays delays delay delay delay delay delays",
+            "aboutBullet2": "Շdelays delay delay delay delay delay delays",
+            "aboutBullet3": "Ներdelay շdelays PDF delaysdelays",
+            "notifyNewStatements": "Ծdelays ինdelay delays շdelays delaysdelays"
         }
     }
 }

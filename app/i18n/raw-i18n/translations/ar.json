@@ -2741,20 +2741,22 @@
             "title": "حدود البطاقة"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "الحركات",
+            "selectYear": "اختر السنة",
+            "currentStatement": "الحركة الحالية",
+            "statementPeriod": "فترة الحركة",
+            "totalSpent": "إجمالي الإنفاق",
+            "monthlyStatements": "الحركات الشهرية",
+            "downloadAll": "تحميل الكل",
+            "spent": "{amount} تم إنفاقه",
+            "transactions": "{count} معاملات، {amount} تم إنفاقه",
+            "noStatements": "لا توجد حركات بعد",
+            "statementsCount": "{count} حركات",
+            "aboutStatements": "حول الحركات",
+            "aboutBullet1": "يتم إنشاء الحركات الشهرية في اليوم الأخير من كل شهر",
+            "aboutBullet2": "تتضمن الحركات جميع المعاملات والرسوم للفترة",
+            "aboutBullet3": "قم بتحميل الحركات بصيغة PDF",
+            "notifyNewStatements": "أعلمني عند توفر حركات جديدة"
         }
     }
 }

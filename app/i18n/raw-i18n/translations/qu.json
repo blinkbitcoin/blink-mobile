@@ -2741,20 +2741,22 @@
             "title": "Tarjeta limitkuna"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Kuyuykuna",
+            "selectYear": "Watata akllay",
+            "currentStatement": "Kunan kuyuy",
+            "statementPeriod": "Kuyuy pacha",
+            "totalSpent": "Tukuy gastasqa",
+            "monthlyStatements": "Killamanta kuyuykuna",
+            "downloadAll": "Tukuyta uraykachiy",
+            "spent": "{amount} gastasqa",
+            "transactions": "{count} kuyuykuna, {amount} gastasqa",
+            "noStatements": "Manaraq kuyuykuna kanchu",
+            "statementsCount": "{count} kuyuykuna",
+            "aboutStatements": "Kuyuykunamanta",
+            "aboutBullet1": "Killamanta kuyuykuna sapa killap qhipa punchawnin ruwakun",
+            "aboutBullet2": "Kuyuykuna tukuy kuyuykunata, qullqi mañasqakunata ima chay pacha ukhupi",
+            "aboutBullet3": "Kuyuykunata PDF nisqapi uraykachiy",
+            "notifyNewStatements": "Willaway musuq kuyuykuna kaptinqa"
         }
     }
 }

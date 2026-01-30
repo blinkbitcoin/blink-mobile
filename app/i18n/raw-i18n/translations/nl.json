@@ -2746,20 +2746,22 @@
             "title": "Kaartlimieten"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Transacties",
+            "selectYear": "Jaar selecteren",
+            "currentStatement": "Huidige transactie",
+            "statementPeriod": "Transactieperiode",
+            "totalSpent": "Totaal uitgegeven",
+            "monthlyStatements": "Maandelijkse transacties",
+            "downloadAll": "Alles downloaden",
+            "spent": "{amount} uitgegeven",
+            "transactions": "{count} transacties, {amount} uitgegeven",
+            "noStatements": "Nog geen transacties",
+            "statementsCount": "{count} transacties",
+            "aboutStatements": "Over de transacties",
+            "aboutBullet1": "Maandelijkse transacties worden op de laatste dag van elke maand gegenereerd",
+            "aboutBullet2": "Transacties bevatten alle transacties en kosten van de periode",
+            "aboutBullet3": "Download transacties als PDF",
+            "notifyNewStatements": "Meld mij wanneer nieuwe transacties beschikbaar zijn"
         }
     }
 }

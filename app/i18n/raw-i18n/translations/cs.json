@@ -2746,20 +2746,22 @@
             "title": "Limity karty"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Pohyby",
+            "selectYear": "Vybrat rok",
+            "currentStatement": "Aktuální pohyb",
+            "statementPeriod": "Období pohybu",
+            "totalSpent": "Celkem utraceno",
+            "monthlyStatements": "Měsíční pohyby",
+            "downloadAll": "Stáhnout vše",
+            "spent": "{amount} utraceno",
+            "transactions": "{count} transakcí, {amount} utraceno",
+            "noStatements": "Zatím žádné pohyby",
+            "statementsCount": "{count} pohybů",
+            "aboutStatements": "O pohybech",
+            "aboutBullet1": "Měsíční pohyby se generují poslední den každého měsíce",
+            "aboutBullet2": "Pohyby zahrnují všechny transakce a poplatky za období",
+            "aboutBullet3": "Stáhněte pohyby ve formátu PDF",
+            "notifyNewStatements": "Upozornit mě, když budou k dispozici nové pohyby"
         }
     }
 }

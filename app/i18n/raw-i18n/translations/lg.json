@@ -2832,20 +2832,22 @@
             "title": "Ensalo z'ekkaadi"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Entambula",
+            "selectYear": "Londa omwaka",
+            "currentStatement": "Entambula y'ekiseera kino",
+            "statementPeriod": "Ekiseera ky'entambula",
+            "totalSpent": "Byonna ebyakozesebwa",
+            "monthlyStatements": "Entambula y'omwezi",
+            "downloadAll": "Dawuniloda byonna",
+            "spent": "{amount} yakozesebwa",
+            "transactions": "{count} entambula, {amount} yakozesebwa",
+            "noStatements": "Tewali ntambula okutuusa kati",
+            "statementsCount": "{count} entambula",
+            "aboutStatements": "Ebikwata ku ntambula",
+            "aboutBullet1": "Entambula y'omwezi ekolebwa ku lunaku olw'enkomerero y'omwezi gwonna",
+            "aboutBullet2": "Entambula erimo entambula zonna n'emisolo egy'ekiseera ekyo",
+            "aboutBullet3": "Dawuniloda entambula nga PDF",
+            "notifyNewStatements": "Mbuulire entambula empya bwe ziba"
         }
     }
 }

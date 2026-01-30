@@ -2832,20 +2832,22 @@
             "title": "Vipimo vya kadi"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Miamala",
+            "selectYear": "Chagua mwaka",
+            "currentStatement": "Miamala ya sasa",
+            "statementPeriod": "Kipindi cha miamala",
+            "totalSpent": "Jumla iliyotumika",
+            "monthlyStatements": "Miamala ya kila mwezi",
+            "downloadAll": "Pakua zote",
+            "spent": "{amount} imetumika",
+            "transactions": "{count} miamala, {amount} imetumika",
+            "noStatements": "Hakuna miamala bado",
+            "statementsCount": "{count} miamala",
+            "aboutStatements": "Kuhusu miamala",
+            "aboutBullet1": "Miamala ya kila mwezi hutengenezwa siku ya mwisho ya kila mwezi",
+            "aboutBullet2": "Miamala inajumuisha miamala yote na ada za kipindi",
+            "aboutBullet3": "Pakua miamala kama PDF",
+            "notifyNewStatements": "Nijulishe miamala mipya inapopatikana"
         }
     }
 }

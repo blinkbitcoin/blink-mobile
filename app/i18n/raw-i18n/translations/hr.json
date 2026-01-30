@@ -2746,20 +2746,22 @@
             "title": "Ograničenja kartice"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Promet",
+            "selectYear": "Odaberi godinu",
+            "currentStatement": "Trenutni promet",
+            "statementPeriod": "Razdoblje prometa",
+            "totalSpent": "Ukupno potrošeno",
+            "monthlyStatements": "Mjesečni promet",
+            "downloadAll": "Preuzmi sve",
+            "spent": "{amount} potrošeno",
+            "transactions": "{count} transakcija, {amount} potrošeno",
+            "noStatements": "Još nema prometa",
+            "statementsCount": "{count} prometa",
+            "aboutStatements": "O prometu",
+            "aboutBullet1": "Mjesečni promet se generira zadnjeg dana svakog mjeseca",
+            "aboutBullet2": "Promet uključuje sve transakcije i naknade za razdoblje",
+            "aboutBullet3": "Preuzmite promet u PDF formatu",
+            "notifyNewStatements": "Obavijesti me kada bude dostupan novi promet"
         }
     }
 }

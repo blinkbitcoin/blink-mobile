@@ -2853,20 +2853,22 @@
             "title": "Limite card"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Mișcări",
+            "selectYear": "Selectează anul",
+            "currentStatement": "Mișcare curentă",
+            "statementPeriod": "Perioada mișcării",
+            "totalSpent": "Total cheltuit",
+            "monthlyStatements": "Mișcări lunare",
+            "downloadAll": "Descarcă toate",
+            "spent": "{amount} cheltuit",
+            "transactions": "{count} tranzacții, {amount} cheltuit",
+            "noStatements": "Nu există încă mișcări",
+            "statementsCount": "{count} mișcări",
+            "aboutStatements": "Despre mișcări",
+            "aboutBullet1": "Mișcările lunare sunt generate în ultima zi a fiecărei luni",
+            "aboutBullet2": "Mișcările includ toate tranzacțiile și taxele perioadei",
+            "aboutBullet3": "Descarcă mișcările în format PDF",
+            "notifyNewStatements": "Notifică-mă când sunt disponibile mișcări noi"
         }
     }
 }

@@ -966,20 +966,22 @@
             "title": "Imida yekhadi"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Intshukumo",
+            "selectYear": "Khetha unyaka",
+            "currentStatement": "Intshukumo yangoku",
+            "statementPeriod": "Ixesha lentshukumo",
+            "totalSpent": "Iyonke echithiweyo",
+            "monthlyStatements": "Intshukumo yenyanga",
+            "downloadAll": "Khuphela zonke",
+            "spent": "{amount} ichithiwe",
+            "transactions": "{count} intshukumo, {amount} ichithiwe",
+            "noStatements": "Akukho ntshukumo okwangoku",
+            "statementsCount": "{count} intshukumo",
+            "aboutStatements": "Malunga nentshukumo",
+            "aboutBullet1": "Intshukumo yenyanga iyenziwa ngosuku lokugqibela lwenyanga nganye",
+            "aboutBullet2": "Intshukumo iquka zonke intshukumo neentlawulo zexesha",
+            "aboutBullet3": "Khuphela intshukumo njenge-PDF",
+            "notifyNewStatements": "Ndazise xa intshukumo entsha ifumaneka"
         }
     }
 }
