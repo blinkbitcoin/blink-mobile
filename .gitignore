@@ -111,3 +111,12 @@ android-recordings
 bmad-custom-src
 .beads
 .history # a defined place to dump all that intermediate stuff from AI agents
+
+# Test build artifacts
+__tests__/**/*.js
+__tests__/**/*.js.map
+e2e/**/*.js
+e2e/**/*.js.map
+app/**/*.js
+app/**/*.js.map
+!app/config.js
