@@ -3002,6 +3002,26 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Zatiaľ žiadne pohyby",
       "statementsCount": "{count} pohybov"
+    },
+    "CardSettings": {
+      "title": "Nastavenia karty",
+      "personalDetails": "Osobné údaje",
+      "changePin": "Zmeniť PIN",
+      "transactionAlerts": "Upozornenia na transakcie",
+      "transactionAlertsDescription": "Dostávajte oznámenia o všetkých transakciách",
+      "securityAlerts": "Bezpečnostné upozornenia",
+      "securityAlertsDescription": "Dostávajte oznámenia o bezpečnostných aktivitách",
+      "marketingUpdates": "Marketingové aktualizácie",
+      "marketingUpdatesDescription": "Aktualizácie produktov a ponuky",
+      "cardManagement": "Správa karty",
+      "orderPhysicalCard": "Objednať fyzickú kartu",
+      "addToGooglePay": "Pridať do Google Pay",
+      "replaceCard": "Vymeniť kartu",
+      "contactSupport": "Kontaktovať podporu",
+      "termsAndConditions": "Podmienky karty",
+      "privacyPolicy": "Zásady ochrany osobných údajov karty",
+      "closeCardAccount": "Zrušiť účet karty",
+      "closeCardAccountDescription": "Trvalo zrušte svoju kartu Visa"
     }
   }
 }

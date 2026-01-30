@@ -3002,6 +3002,26 @@
             "aboutBullet2": "Os movimentos incluem todas as transações e taxas do período",
             "aboutBullet3": "Baixe os movimentos em formato PDF",
             "notifyNewStatements": "Notificar-me quando novos movimentos estiverem disponíveis"
+        },
+        "CardSettings": {
+            "title": "Configurações do cartão",
+            "personalDetails": "Dados pessoais",
+            "changePin": "Alterar PIN",
+            "transactionAlerts": "Alertas de transações",
+            "transactionAlertsDescription": "Receba notificações de todas as transações",
+            "securityAlerts": "Alertas de segurança",
+            "securityAlertsDescription": "Receba notificações de atividades de segurança",
+            "marketingUpdates": "Atualizações de marketing",
+            "marketingUpdatesDescription": "Atualizações de produtos e ofertas",
+            "cardManagement": "Gestão do cartão",
+            "orderPhysicalCard": "Solicitar cartão físico",
+            "addToGooglePay": "Adicionar ao Google Pay",
+            "replaceCard": "Substituir cartão",
+            "contactSupport": "Contactar suporte",
+            "termsAndConditions": "Termos e condições do cartão",
+            "privacyPolicy": "Política de privacidade do cartão",
+            "closeCardAccount": "Encerrar conta do cartão",
+            "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa"
         }
     }
 }

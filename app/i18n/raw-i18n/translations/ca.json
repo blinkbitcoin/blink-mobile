@@ -3002,6 +3002,26 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Encara no hi ha moviments",
       "statementsCount": "{count} moviments"
+    },
+    "CardSettings": {
+      "title": "Configuració de la targeta",
+      "personalDetails": "Dades personals",
+      "changePin": "Canviar PIN",
+      "transactionAlerts": "Alertes de transaccions",
+      "transactionAlertsDescription": "Rep notificacions de totes les transaccions",
+      "securityAlerts": "Alertes de seguretat",
+      "securityAlertsDescription": "Rep notificacions d activitats de seguretat",
+      "marketingUpdates": "Actualitzacions de màrqueting",
+      "marketingUpdatesDescription": "Actualitzacions de productes i ofertes",
+      "cardManagement": "Gestió de la targeta",
+      "orderPhysicalCard": "Demanar targeta física",
+      "addToGooglePay": "Afegir a Google Pay",
+      "replaceCard": "Substituir targeta",
+      "contactSupport": "Contactar suport",
+      "termsAndConditions": "Termes i condicions de la targeta",
+      "privacyPolicy": "Política de privacitat de la targeta",
+      "closeCardAccount": "Tancar compte de targeta",
+      "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa"
     }
   }
 }

@@ -3002,6 +3002,26 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Belum ada mutasi",
       "statementsCount": "{count} mutasi"
+    },
+    "CardSettings": {
+      "title": "Pengaturan kartu",
+      "personalDetails": "Detail pribadi",
+      "changePin": "Ubah PIN",
+      "transactionAlerts": "Peringatan transaksi",
+      "transactionAlertsDescription": "Dapatkan notifikasi untuk semua transaksi",
+      "securityAlerts": "Peringatan keamanan",
+      "securityAlertsDescription": "Dapatkan notifikasi untuk aktivitas keamanan",
+      "marketingUpdates": "Pembaruan pemasaran",
+      "marketingUpdatesDescription": "Pembaruan produk dan penawaran",
+      "cardManagement": "Manajemen kartu",
+      "orderPhysicalCard": "Pesan kartu fisik",
+      "addToGooglePay": "Tambahkan ke Google Pay",
+      "replaceCard": "Ganti kartu",
+      "contactSupport": "Hubungi dukungan",
+      "termsAndConditions": "Syarat dan ketentuan kartu",
+      "privacyPolicy": "Kebijakan privasi kartu",
+      "closeCardAccount": "Tutup akun kartu",
+      "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen"
     }
   }
 }
