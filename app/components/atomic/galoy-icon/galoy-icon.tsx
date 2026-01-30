@@ -18,7 +18,6 @@ import Check from "@app/assets/icons-redesign/check.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
 import Close from "@app/assets/icons-redesign/close.svg"
 import Coins from "@app/assets/icons-redesign/coins.svg"
-import ContactSupport from "@app/assets/icons-redesign/contact-support.svg"
 import CopyPaste from "@app/assets/icons-redesign/copy-paste.svg"
 import Dollar from "@app/assets/icons-redesign/dollar.svg"
 import Download from "@app/assets/icons-redesign/download.svg"
@@ -95,7 +94,6 @@ export const icons = {
   "close": Close,
   "close-cross-with-background": CloseCrossWithBackground,
   "coins": Coins,
-  "contact-support": ContactSupport,
   "people": People,
   "copy-paste": CopyPaste,
   "dollar": Dollar,
