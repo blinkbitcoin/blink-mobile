@@ -3,7 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
-import { LimitInput, TransactionTypeRow } from "@app/components/card-screen"
+import { LimitInput, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -112,7 +112,7 @@ export const CardLimitsScreen: React.FC = () => {
             dividerStyle={styles.dividerStyle}
             items={[
               () => (
-                <TransactionTypeRow
+                <SwitchRow
                   title={LL.CardFlow.CardLimits.TransactionTypes.ecommerce()}
                   description={LL.CardFlow.CardLimits.TransactionTypes.ecommerceDescription()}
                   value={transactionTypes[TransactionTypes.Ecommerce]}
@@ -120,7 +120,7 @@ export const CardLimitsScreen: React.FC = () => {
                 />
               ),
               () => (
-                <TransactionTypeRow
+                <SwitchRow
                   title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
                   description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
                   value={transactionTypes[TransactionTypes.Atm]}
@@ -128,7 +128,7 @@ export const CardLimitsScreen: React.FC = () => {
                 />
               ),
               () => (
-                <TransactionTypeRow
+                <SwitchRow
                   title={LL.CardFlow.CardLimits.TransactionTypes.contactless()}
                   description={LL.CardFlow.CardLimits.TransactionTypes.contactlessDescription()}
                   value={transactionTypes[TransactionTypes.Contactless]}
