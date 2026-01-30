@@ -45,6 +45,8 @@ export const StatementItem: React.FC<StatementItemProps> = ({
         testID="statement-download-button"
         style={styles.downloadButton}
         onPress={handleDownload}
+        accessibilityRole="button"
+        accessibilityLabel="Download statement"
       >
         <GaloyIcon
           name="download"
