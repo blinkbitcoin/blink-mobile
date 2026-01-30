@@ -3002,6 +3002,26 @@
             "aboutBullet2": "Umsätze enthalten alle Transaktionen und Gebühren des Zeitraums",
             "aboutBullet3": "Umsätze als PDF herunterladen",
             "notifyNewStatements": "Benachrichtigen, wenn neue Umsätze verfügbar sind"
+        },
+        "CardSettings": {
+            "title": "Karteneinstellungen",
+            "personalDetails": "Persönliche Daten",
+            "changePin": "PIN ändern",
+            "transactionAlerts": "Transaktionsbenachrichtigungen",
+            "transactionAlertsDescription": "Benachrichtigungen für alle Transaktionen erhalten",
+            "securityAlerts": "Sicherheitsbenachrichtigungen",
+            "securityAlertsDescription": "Benachrichtigungen für sicherheitsrelevante Aktivitäten erhalten",
+            "marketingUpdates": "Marketing-Updates",
+            "marketingUpdatesDescription": "Produktupdates und Angebote",
+            "cardManagement": "Kartenverwaltung",
+            "orderPhysicalCard": "Physische Karte bestellen",
+            "addToGooglePay": "Zu Google Pay hinzufügen",
+            "replaceCard": "Karte ersetzen",
+            "contactSupport": "Support kontaktieren",
+            "termsAndConditions": "Karten-AGB",
+            "privacyPolicy": "Karten-Datenschutzrichtlinie",
+            "closeCardAccount": "Kartenkonto schließen",
+            "closeCardAccountDescription": "Schließen Sie Ihre Visa-Karte dauerhaft"
         }
     }
 }

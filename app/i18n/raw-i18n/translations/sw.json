@@ -3002,6 +3002,26 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Hakuna miamala bado",
       "statementsCount": "{count} miamala"
+    },
+    "CardSettings": {
+      "title": "Mipangilio ya kadi",
+      "personalDetails": "Maelezo binafsi",
+      "changePin": "Badilisha PIN",
+      "transactionAlerts": "Arifa za miamala",
+      "transactionAlertsDescription": "Pata arifa kwa miamala yote",
+      "securityAlerts": "Arifa za usalama",
+      "securityAlertsDescription": "Pata arifa kwa shughuli za usalama",
+      "marketingUpdates": "Sasisho za masoko",
+      "marketingUpdatesDescription": "Sasisho za bidhaa na ofa",
+      "cardManagement": "Usimamizi wa kadi",
+      "orderPhysicalCard": "Agiza kadi halisi",
+      "addToGooglePay": "Ongeza kwenye Google Pay",
+      "replaceCard": "Badilisha kadi",
+      "contactSupport": "Wasiliana na msaada",
+      "termsAndConditions": "Masharti na vigezo vya kadi",
+      "privacyPolicy": "Sera ya faragha ya kadi",
+      "closeCardAccount": "Funga akaunti ya kadi",
+      "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa"
     }
   }
 }

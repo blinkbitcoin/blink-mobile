@@ -3002,6 +3002,26 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Tewali ntambula okutuusa kati",
       "statementsCount": "{count} entambula"
+    },
+    "CardSettings": {
+      "title": "Entegeka z ekkaadi",
+      "personalDetails": "Ebikwata ku ggwe",
+      "changePin": "Kyusa PIN",
+      "transactionAlerts": "Okulabula kw entambula",
+      "transactionAlertsDescription": "Funa obubaka ku ntambula zonna",
+      "securityAlerts": "Okulabula kw obukuumi",
+      "securityAlertsDescription": "Funa obubaka ku bikwata ku bukuumi",
+      "marketingUpdates": "Amawulire g okutunda",
+      "marketingUpdatesDescription": "Ebipya ku bintu n ebiweebwayo",
+      "cardManagement": "Okulabirira ekkaadi",
+      "orderPhysicalCard": "Gula ekkaadi ey engalo",
+      "addToGooglePay": "Ggatika ku Google Pay",
+      "replaceCard": "Kyusa ekkaadi",
+      "contactSupport": "Tuukirira obuyambi",
+      "termsAndConditions": "Amateeka g ekkaadi",
+      "privacyPolicy": "Enkola y ekyama ey ekkaadi",
+      "closeCardAccount": "Ggala akawunti y ekkaadi",
+      "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna"
     }
   }
 }
