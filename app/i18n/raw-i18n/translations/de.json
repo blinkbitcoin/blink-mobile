@@ -2986,20 +2986,22 @@
             "title": "Kartenlimits"
         },
         "CardStatements": {
-            "title": "Statements",
-            "selectYear": "Select year",
-            "currentStatement": "Current statement",
-            "statementPeriod": "Statement period",
-            "totalSpent": "Total spent",
-            "monthlyStatements": "Monthly statements",
-            "downloadAll": "Download all",
-            "spent": "{amount} spent",
-            "transactions": "{count} transactions, {amount} spent",
-            "aboutStatements": "About statements",
-            "aboutBullet1": "Monthly statements are generated on the last day of each month",
-            "aboutBullet2": "Statements include all transactions and fees for the period",
-            "aboutBullet3": "Download statements as PDF",
-            "notifyNewStatements": "Notify me when new statements are made available"
+            "title": "Umsätze",
+            "selectYear": "Jahr auswählen",
+            "currentStatement": "Aktueller Umsatz",
+            "statementPeriod": "Umsatzzeitraum",
+            "totalSpent": "Gesamtausgaben",
+            "monthlyStatements": "Monatliche Umsätze",
+            "downloadAll": "Alle herunterladen",
+            "spent": "{amount} ausgegeben",
+            "transactions": "{count} Transaktionen, {amount} ausgegeben",
+            "noStatements": "Noch keine Umsätze",
+            "statementsCount": "{count} Umsätze",
+            "aboutStatements": "Über die Umsätze",
+            "aboutBullet1": "Monatliche Umsätze werden am letzten Tag jedes Monats erstellt",
+            "aboutBullet2": "Umsätze enthalten alle Transaktionen und Gebühren des Zeitraums",
+            "aboutBullet3": "Umsätze als PDF herunterladen",
+            "notifyNewStatements": "Benachrichtigen, wenn neue Umsätze verfügbar sind"
         }
     }
 }
