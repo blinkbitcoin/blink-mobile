@@ -2762,6 +2762,26 @@
             "aboutBullet2": "Շdelays delay delay delay delay delay delays",
             "aboutBullet3": "Ներdelay շdelays PDF delaysdelays",
             "notifyNewStatements": "Ծdelays ինdelay delays շdelays delaysdelays"
+        },
+        "CardSettings": {
+            "title": "Card settings",
+            "personalDetails": "Personal Details",
+            "changePin": "Change PIN",
+            "transactionAlerts": "Transaction alerts",
+            "transactionAlertsDescription": "Get notified for all transactions",
+            "securityAlerts": "Security alerts",
+            "securityAlertsDescription": "Get notified for security-related activities",
+            "marketingUpdates": "Marketing updates",
+            "marketingUpdatesDescription": "Product updates and offers",
+            "cardManagement": "Card management",
+            "orderPhysicalCard": "Order physical card",
+            "addToGooglePay": "Add to Google Pay",
+            "replaceCard": "Replace card",
+            "contactSupport": "Contact support",
+            "termsAndConditions": "Card Terms & Conditions",
+            "privacyPolicy": "Card Privacy Policy",
+            "closeCardAccount": "Close card account",
+            "closeCardAccountDescription": "Permanently close your Visa card"
         }
     }
 }

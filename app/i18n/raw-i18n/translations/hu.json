@@ -2848,6 +2848,26 @@
             "aboutBullet2": "A forgalom tartalmazza az időszak összes tranzakcióját és díját",
             "aboutBullet3": "Forgalom letöltése PDF formátumban",
             "notifyNewStatements": "Értesítsen, ha új forgalom érhető el"
+        },
+        "CardSettings": {
+            "title": "Kártyabeállítások",
+            "personalDetails": "Személyes adatok",
+            "changePin": "PIN módosítása",
+            "transactionAlerts": "Tranzakciós értesítések",
+            "transactionAlertsDescription": "Értesítések minden tranzakcióról",
+            "securityAlerts": "Biztonsági értesítések",
+            "securityAlertsDescription": "Értesítések biztonsági tevékenységekről",
+            "marketingUpdates": "Marketing frissítések",
+            "marketingUpdatesDescription": "Termékfrissítések és ajánlatok",
+            "cardManagement": "Kártyakezelés",
+            "orderPhysicalCard": "Fizikai kártya rendelése",
+            "addToGooglePay": "Hozzáadás a Google Pay-hez",
+            "replaceCard": "Kártya cseréje",
+            "contactSupport": "Kapcsolatfelvétel az ügyfélszolgálattal",
+            "termsAndConditions": "Kártya feltételek",
+            "privacyPolicy": "Kártya adatvédelmi szabályzat",
+            "closeCardAccount": "Kártyaszámla bezárása",
+            "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját"
         }
     }
 }

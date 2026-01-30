@@ -9888,6 +9888,80 @@ type RootTranslation = {
 			 */
 			notifyNewStatements: string
 		}
+		CardSettings: {
+			/**
+			 * C​a​r​d​ ​s​e​t​t​i​n​g​s
+			 */
+			title: string
+			/**
+			 * P​e​r​s​o​n​a​l​ ​D​e​t​a​i​l​s
+			 */
+			personalDetails: string
+			/**
+			 * C​h​a​n​g​e​ ​P​I​N
+			 */
+			changePin: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​a​l​e​r​t​s
+			 */
+			transactionAlerts: string
+			/**
+			 * G​e​t​ ​n​o​t​i​f​i​e​d​ ​f​o​r​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s
+			 */
+			transactionAlertsDescription: string
+			/**
+			 * S​e​c​u​r​i​t​y​ ​a​l​e​r​t​s
+			 */
+			securityAlerts: string
+			/**
+			 * G​e​t​ ​n​o​t​i​f​i​e​d​ ​f​o​r​ ​s​e​c​u​r​i​t​y​-​r​e​l​a​t​e​d​ ​a​c​t​i​v​i​t​i​e​s
+			 */
+			securityAlertsDescription: string
+			/**
+			 * M​a​r​k​e​t​i​n​g​ ​u​p​d​a​t​e​s
+			 */
+			marketingUpdates: string
+			/**
+			 * P​r​o​d​u​c​t​ ​u​p​d​a​t​e​s​ ​a​n​d​ ​o​f​f​e​r​s
+			 */
+			marketingUpdatesDescription: string
+			/**
+			 * C​a​r​d​ ​m​a​n​a​g​e​m​e​n​t
+			 */
+			cardManagement: string
+			/**
+			 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+			 */
+			orderPhysicalCard: string
+			/**
+			 * A​d​d​ ​t​o​ ​G​o​o​g​l​e​ ​P​a​y
+			 */
+			addToGooglePay: string
+			/**
+			 * R​e​p​l​a​c​e​ ​c​a​r​d
+			 */
+			replaceCard: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupport: string
+			/**
+			 * C​a​r​d​ ​T​e​r​m​s​ ​&​ ​C​o​n​d​i​t​i​o​n​s
+			 */
+			termsAndConditions: string
+			/**
+			 * C​a​r​d​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+			 */
+			privacyPolicy: string
+			/**
+			 * C​l​o​s​e​ ​c​a​r​d​ ​a​c​c​o​u​n​t
+			 */
+			closeCardAccount: string
+			/**
+			 * P​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​ ​y​o​u​r​ ​V​i​s​a​ ​c​a​r​d
+			 */
+			closeCardAccountDescription: string
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -19655,6 +19729,80 @@ export type TranslationFunctions = {
 			 * Notify me when new statements are made available
 			 */
 			notifyNewStatements: () => LocalizedString
+		}
+		CardSettings: {
+			/**
+			 * Card settings
+			 */
+			title: () => LocalizedString
+			/**
+			 * Personal Details
+			 */
+			personalDetails: () => LocalizedString
+			/**
+			 * Change PIN
+			 */
+			changePin: () => LocalizedString
+			/**
+			 * Transaction alerts
+			 */
+			transactionAlerts: () => LocalizedString
+			/**
+			 * Get notified for all transactions
+			 */
+			transactionAlertsDescription: () => LocalizedString
+			/**
+			 * Security alerts
+			 */
+			securityAlerts: () => LocalizedString
+			/**
+			 * Get notified for security-related activities
+			 */
+			securityAlertsDescription: () => LocalizedString
+			/**
+			 * Marketing updates
+			 */
+			marketingUpdates: () => LocalizedString
+			/**
+			 * Product updates and offers
+			 */
+			marketingUpdatesDescription: () => LocalizedString
+			/**
+			 * Card management
+			 */
+			cardManagement: () => LocalizedString
+			/**
+			 * Order physical card
+			 */
+			orderPhysicalCard: () => LocalizedString
+			/**
+			 * Add to Google Pay
+			 */
+			addToGooglePay: () => LocalizedString
+			/**
+			 * Replace card
+			 */
+			replaceCard: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupport: () => LocalizedString
+			/**
+			 * Card Terms & Conditions
+			 */
+			termsAndConditions: () => LocalizedString
+			/**
+			 * Card Privacy Policy
+			 */
+			privacyPolicy: () => LocalizedString
+			/**
+			 * Close card account
+			 */
+			closeCardAccount: () => LocalizedString
+			/**
+			 * Permanently close your Visa card
+			 */
+			closeCardAccountDescription: () => LocalizedString
 		}
 	}
 	NotificationHistory: {

@@ -2848,6 +2848,26 @@
             "aboutBullet2": "Mutasi mencakup semua transaksi dan biaya untuk periode tersebut",
             "aboutBullet3": "Unduh mutasi dalam format PDF",
             "notifyNewStatements": "Beritahu saya ketika mutasi baru tersedia"
+        },
+        "CardSettings": {
+            "title": "Pengaturan kartu",
+            "personalDetails": "Detail pribadi",
+            "changePin": "Ubah PIN",
+            "transactionAlerts": "Peringatan transaksi",
+            "transactionAlertsDescription": "Dapatkan notifikasi untuk semua transaksi",
+            "securityAlerts": "Peringatan keamanan",
+            "securityAlertsDescription": "Dapatkan notifikasi untuk aktivitas keamanan",
+            "marketingUpdates": "Pembaruan pemasaran",
+            "marketingUpdatesDescription": "Pembaruan produk dan penawaran",
+            "cardManagement": "Manajemen kartu",
+            "orderPhysicalCard": "Pesan kartu fisik",
+            "addToGooglePay": "Tambahkan ke Google Pay",
+            "replaceCard": "Ganti kartu",
+            "contactSupport": "Hubungi dukungan",
+            "termsAndConditions": "Syarat dan ketentuan kartu",
+            "privacyPolicy": "Kebijakan privasi kartu",
+            "closeCardAccount": "Tutup akun kartu",
+            "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen"
         }
     }
 }
