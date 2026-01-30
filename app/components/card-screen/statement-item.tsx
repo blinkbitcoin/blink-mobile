@@ -35,7 +35,7 @@ export const StatementItem: React.FC<StatementItemProps> = ({
 
   return (
     <View style={styles.container}>
-      <GaloyIcon name="document-outline" size={20} color={colors.black} />
+      <GaloyIcon name="document-outline" size={18} color={colors.black} />
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         {subtitle1 && <Text style={styles.subtitle1}>{subtitle1}</Text>}
