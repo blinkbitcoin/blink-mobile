@@ -2227,7 +2227,7 @@
         "logInOrCreateAccount": "Log in or create account"
     },
     "NotificationSettingsScreen": {
-        "title": "Notification Settings",
+        "title": "Notification settings",
         "pushNotifications": "Push Notifications",
         "notificationCategories": {
             "Circles": {
