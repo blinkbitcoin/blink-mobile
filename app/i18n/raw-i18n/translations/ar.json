@@ -3037,7 +3037,9 @@
       "aboutBullet1": "Monthly statements are generated on the last day of each month",
       "aboutBullet2": "Statements include all transactions and fees for the period",
       "aboutBullet3": "Download statements as PDF",
-      "notifyNewStatements": "Notify me when new statements are made available"
+      "notifyNewStatements": "Notify me when new statements are made available",
+      "noStatements": "لا توجد حركات بعد",
+      "statementsCount": "{count} حركات"
     }
   }
 }
