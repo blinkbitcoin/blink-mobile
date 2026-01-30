@@ -74,7 +74,7 @@
     "EarnScreen": {
         "satoshi": "sat",
         "satoshis": "sats",
-        "earnSats": "Earn {formattedNumber | sats}",
+        "earnSats": "Ganhe {formattedNumber | sats}",
         "earnSections": {
             "bitcoinWhatIsIt": {
                 "title": "Bitcoin: O que é isso?",
@@ -640,7 +640,7 @@
                             "Não. Na verdade, bens físicos frequentemente requerem permissão para atravessar fronteiras e podem ser facilmente confiscados. Boa sorte da próxima vez.",
                             "Desculpe, mas o oposto é, na verdade, verdadeiro. O sistema bancário fiduciário, que é regulado pelos estados, requer intervenção humana para relatar e prevenir certos usos de bens monetários, tornando-o propenso à censura. Tente novamente!"
                         ],
-                        "question": "Which of the following is the reason that Bitcoin is considered a censorship-resistant good",
+                        "question": "Qual das alternativas a seguir é a razão pela qual o Bitcoin é considerado resistente à censura?",
                         "text": "A censura-resistência é um atributo que se tornou cada vez mais importante na era digital, pois se refere à dificuldade que partes externas, como corporações ou governos, têm em impedir que um indivíduo use um determinado bem.\n\nEsse atributo é particularmente valioso para indivíduos que vivem sob regimes que impõem controles de capital ou proíbem certas formas de comércio. O Bitcoin é frequentemente citado como um bem resistente à censura devido à sua rede descentralizada, ponto a ponto, que permite que as transações sejam feitas sem intervenção ou permissão humana.\n\nEm contraste, o sistema bancário fiduciário é regulado pelos estados e requer intervenção humana para relatar e impedir certos usos de bens monetários, como controles de capital.\n\nO ouro, embora não seja emitido pelos estados, pode ser difícil de transmitir a distância e, portanto, está mais sujeito à regulamentação estatal.\n",
                         "title": "Nenhuma permissão necessária"
                     }
@@ -1256,7 +1256,7 @@
                             "Uau, esse é um objetivo ambicioso! Embora seja verdade que a mineração requer uma quantidade significativa de poder computacional, tenho certeza de que o objetivo principal não é criar um exército de superinteligências artificiais. Boa sorte da próxima vez!"
                         ],
                         "question": "Qual é o objetivo principal da mineração na rede bitcoin?",
-                        "text": "Quando um usuário deseja enviar uma transação na rede bitcoin, eles precisam assinar a transação com sua chave privada para provar que são os proprietários dos fundos sendo transferidos. Uma vez que a transação é assinada, ela é transmitida para a rede peer-to-peer.\n\nMineração é o processo de adicionar transações ao blockchain do bitcoin. Quando uma transação é transmitida para a rede, ela é capturada pelos mineradores, que verificam se a transação é válida (ou seja, se o usuário possui os fundos necessários e se a chave privada usada para assinar a transação corresponde à chave pública associada aos fundos).\n\nUma vez que uma transação tenha sido verificada, ela é adicionada a um bloco de transações, juntamente com um quebra-cabeça matemático. Os mineradores competem para resolver o quebra-cabeça, e o primeiro a resolvê-lo pode adicionar o bloco ao blockchain e reivindicar uma recompensa em bitcoin. A recompensa atualmente é de 6,25 bitcoins, mais quaisquer taxas de transação que tenham sido incluídas no bloco.\n\nAlém de adicionar transações ao blockchain, a mineração também serve para proteger a rede bitcoin. Isso ocorre porque resolver o quebra-cabeça requer uma quantidade significativa de poder computacional, e adicionar um bloco ao blockchain requer que outros mineradores verifiquem a solução. Isso torna muito difícil para qualquer pessoa ou grupo manipular o blockchain.\n",
+                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 3.125 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
                         "title": "Mineração"
                     },
                     "proofOfWork": {
@@ -1276,17 +1276,17 @@
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "É reduzido pela metade",
-                            "É duplicado",
-                            "É multiplicado por um número aleatório escolhido pelo software do bitcoin."
+                            "It adjusts every 2 weeks to maintain a steady block time of 10 minutes",
+                            "It adjusts once a year based on market price",
+                            "It is randomly changed by miners through consensus"
                         ],
                         "feedback": [
-                            "Isso mesmo! Satoshi determinou a redução do novo fornecimento de bitcoin pela metade no primeiro lançamento do software Bitcoin em 2009 e é praticamente impossível de ser alterado.",
-                            "Desculpe, mas a recompensa do bloco não é dobrada a cada quatro anos. Você deve estar confundindo o Bitcoin com o suprimento das moedas fiduciárias, que estão sempre se expandindo em uma taxa mais rápida. Tente novamente.",
-                            "Muito criativo, mas errado. O cronograma de fornecimento do Bitcoin é tudo, menos aleatório. Sua previsibilidade fornece certeza para os atores econômicos como nada na história da humanidade. Tente novamente!"
+                            "That's right! The Bitcoin software automatically adjusts the mining difficulty every 2016 blocks—roughly every two weeks—to target a steady pace of one block every 10 minutes. This is one of the most elegant features of the protocol.",
+                            "Not quite. While price does influence how many miners are active, the difficulty adjustment has nothing to do with price. It is based solely on time—specifically, how long it took to mine the last 2016 blocks. Try again!",
+                            "Nice try, but no. Miners can't randomly change difficulty. It's baked into the protocol and happens automatically. This prevents manipulation and ensures a consistent issuance schedule. Try again!"
                         ],
-                        "question": "O que acontece com a recompensa do bloco na rede bitcoin a cada quatro anos?",
-                        "text": "Um elemento crucial do protocolo Bitcoin é o Ajuste de Dificuldade. Esse algoritmo garante que novos blocos sejam encontrados a cada 10 minutos, em média.\n\nQuando mais mineradores se juntam à rede, o tempo médio necessário para encontrar um novo bloco diminui. No caso oposto, quando os mineradores deixam a rede, leva mais tempo para adicionar um novo bloco. O algoritmo de Ajuste de Dificuldade ajusta a dificuldade do quebra-cabeça matemático para corresponder às mudanças na potência de computação combinada de todos os mineradores. Isso impede a criação de mais (ou menos) unidades de bitcoin do que o cronograma de fornecimento predeterminado.\n\nIsso contrasta fortemente com a mineração física de metais preciosos como o ouro, onde a adição de mais mineradores de ouro leva a um maior fornecimento de ouro e, portanto, a uma diminuição em seu preço. No Bitcoin, no entanto, a adição de novos mineradores apenas adiciona mais segurança à rede.\n",
+                        "question": "How does the Bitcoin network ensure that new blocks are added roughly every 10 minutes?",
+                        "text": "Another critical component of the Bitcoin network is the \"Difficulty Adjustment\"—an automatic recalibration mechanism that ensures blocks are found at a regular interval of about 10 minutes, regardless of how many miners are participating.\n\nEvery 2016 blocks—roughly every two weeks—the Bitcoin software checks how long it took to mine the previous batch. If blocks were being mined too quickly, it makes the cryptographic puzzle more difficult. If they were too slow, it makes the puzzle easier. This keeps the issuance of new bitcoin on a predictable schedule.\n\nThis mechanism is unlike anything in the physical world. For example, when more gold miners join the hunt for gold, the supply increases. In Bitcoin, more miners simply increase network security, not the issuance rate. The Difficulty Adjustment is what keeps the Bitcoin machine ticking on time.",
                         "title": "Ajuste de Dificuldade"
                     },
                     "halving": {
@@ -1301,7 +1301,7 @@
                             "Muito criativo, mas errado. O cronograma de fornecimento do Bitcoin é tudo, menos aleatório. Sua previsibilidade fornece certeza para os atores econômicos como nada na história da humanidade. Tente novamente!"
                         ],
                         "question": "O que acontece com a recompensa do bloco na rede bitcoin a cada quatro anos?",
-                        "text": "Um elemento final que é importante entender é que a recompensa por bloco na rede bitcoin é reduzida pela metade a cada quatro anos, ou a cada 210.000 blocos.\n\nEsse evento, conhecido como \"halving\", está programado no software bitcoin que todos os usuários executam. Quando o bitcoin foi lançado pela primeira vez, os mineradores recebiam 50 novos bitcoins para cada bloco adicionado ao blockchain. Atualmente, a recompensa por bloco é de 6,25 bitcoins, mas será reduzida para 3,125 bitcoins em 2024, quando ocorrer o próximo halving.\n\nEsses halvings continuarão a ocorrer até o ano de 2140, momento em que o número total de bitcoins minerados será limitado a 21 milhões. Em 2023, cerca de 92% de todos os bitcoins (\\~19,3 milhões) já foram minerados.\n\nAo contrário das moedas fiduciárias, que podem ser inflacionárias, o bitcoin é desinflacionário por natureza. Isso o torna mais escasso do que moedas fiduciárias e metais preciosos como ouro e prata, ou qualquer outra coisa conhecida no universo.\n",
+                        "text": "Um elemento final que é importante entender é que a recompensa por bloco na rede bitcoin é reduzida pela metade a cada quatro anos, ou a cada 210.000 blocos.\n\nEsse evento, conhecido como \"halving\", está programado no software bitcoin que todos os usuários executam. Quando o bitcoin foi lançado pela primeira vez, os mineradores recebiam 50 novos bitcoins para cada bloco adicionado ao blockchain. Atualmente, a recompensa por bloco é de 3,125 bitcoins, mas será reduzida para 1,5625 bitcoins em 2028, quando ocorrer o próximo halving.\n\nEsses halvings continuarão a ocorrer até o ano de 2140, momento em que o número total de bitcoins minerados será limitado a 21 milhões. Em 2023, cerca de 92% de todos os bitcoins (\\~19,3 milhões) já foram minerados.\n\nAo contrário das moedas fiduciárias, que podem ser inflacionárias, o bitcoin é desinflacionário por natureza. Isso o torna mais escasso do que moedas fiduciárias e metais preciosos como ouro e prata, ou qualquer outra coisa conhecida no universo.\n",
                         "title": "O Halving"
                     }
                 }
@@ -1991,10 +1991,10 @@
         "getRewardNow": "Responder quiz",
         "keepDigging": "Continue cavando!",
         "phoneNumberNeeded": "Número de telefone obrigatório",
-        "quizComplete": "Quiz completed and {formattedNumber | sats} earned",
+        "quizComplete": "Quiz completo e {formattedNumber | sats} foram ganhos!",
         "reviewQuiz": "Revisar quiz",
         "satAccumulated": "Sats acumulados",
-        "satsEarned": "{formattedNumber | sats} earned",
+        "satsEarned": "{formattedNumber | sats} ganhos",
         "sectionsCompleted": "Você concluiu",
         "title": "Ganhar",
         "unlockQuestion": "Para desbloquear, responda a pergunta:",
@@ -2162,10 +2162,10 @@
         "feeLabel": "Taxa:",
         "memoLabel": "Observação:",
         "paymentFinal": "Os pagamentos são finais.",
-        "stalePrice": "O preço do seu bitcoin é antigo e foi atualizado pela última vez {timePeriod: string} atrás. Reinicie o aplicativo antes de fazer um pagamento.",
+        "stalePrice": "O preço do seu bitcoin é antigo e foi atualizado pela última vez {timePeriod} atrás. Reinicie o aplicativo antes de fazer um pagamento.",
         "title": "Confirmar Pagamento",
         "totalLabel": "Total:",
-        "totalExceed": "O total excede seu saldo de {balance: string}",
+        "totalExceed": "O total excede seu saldo de {balance}",
         "maxFeeSelected": "Esta é a taxa máxima que será cobrada por esta transação. Pode acabar sendo menor uma vez que o pagamento foi feito.",
         "feeError": "Não foi possível calcular a taxa.",
         "invoiceAlreadyPaid": "Esta fatura já foi paga",
@@ -2208,7 +2208,7 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "A transação deve ser enviada para o mempool.",
         "amount": "quantidade",
-        "amountExceed": "O valor excede seu saldo de {balance: string}",
+        "amountExceed": "O valor excede seu saldo de {balance}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
         "amountIsRequired": "O valor é obrigatório",
@@ -2236,11 +2236,11 @@
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "pendingPayment": "O pagamento foi enviado, mas ainda não foi confirmado.\n\nÉ possível que o pagamento não seja confirmado, caso em que os fundos serão devolvidos à sua conta.",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
+        "copySuccessMessage": "Mensagem copiada com sucesso",
+        "openSuccessUrl": "Abra a URL no navegador",
+        "copySecretMessage": "Copiar mensagem secreta",
+        "copiedSuccessMessage": "Mensagem copiada com sucesso",
+        "copiedSecretMessage": "Mensagem secreta copiada com sucesso",
         "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
     },
     "SettingsScreen": {
@@ -2273,7 +2273,11 @@
         "nfcOnlyReceive": "Receber apenas por NFC está disponível por agora.",
         "nfcScanNow": "Scaneie o NFC Agora",
         "nfcNotSupported": "NFC não é suportado neste dispositivo",
-        "logInOrCreateAccount": "Login ou criar conta"
+        "logInOrCreateAccount": "Login ou criar conta",
+        "logOutFromOneAccount": "Log out from this account",
+        "logoutOneAccountAlertTitle": "Are you sure you want to log out from this account?",
+        "logoutOneAccountAlertContent": "You will be signed out from the session linked to {identifier: string}.\nMake sure you have access to sign in again in the future.",
+        "logoutOneAccountConfirm": "I understand. Please log out."
     },
     "NotificationSettingsScreen": {
         "title": "Configurações de Notificação",
@@ -2307,6 +2311,8 @@
         "tapToAddPhoneNumber": "Clique para adicionar um número de telefone",
         "loginMethods": "Métodos de login",
         "level": "Nível {level: string}",
+        "switchAccount": "Switch Account",
+        "pleaseWait": "Please Wait.",
         "accountLevel": "Nível da Conta",
         "upgrade": "Atualize a sua conta",
         "logOutAndDeleteLocalData": "Sair da conta e apagar toda a informação local",
@@ -2347,6 +2353,10 @@
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
         "copy": "Copiar"
+    },
+    "ProfileScreen": {
+        "addAccount": "Add Account",
+        "error": "Unable to fetch profiles at this time"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticação de dois fatores",
@@ -2464,7 +2474,8 @@
         "placeholder": "Número de Telefone",
         "verify": "Clique para verificar",
         "sms": "Enviar via SMS",
-        "whatsapp": "Enviar via WhatsApp"
+        "whatsapp": "Enviar via WhatsApp",
+        "telegram": "Send via Telegram"
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Erro ao entrar. Você usou o código correto?",
@@ -2477,6 +2488,16 @@
         "sendAgain": "Enviar novamente",
         "tryAgain": "Tente novamente",
         "sendViaOtherChannel": "Você escolheu receber o código via {channel: string}. Em vez disso, você pode tentar receber via {other: string}."
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "After authorizing in Telegram, you will be automatically logged in",
+        "loginWithTelegram": "Log in with Telegram",
+        "waitingForAuthorization": "Waiting for authorization in Telegram...",
+        "errorFetchParams": "Failed to fetch Telegram auth params",
+        "errorFetchLogin": "Failed to fetch Telegram login",
+        "errorAuthTimeout": "Authorization timed out. Please try again.",
+        "errorOpenAppError": "Failed to open Telegram. Please make sure the app is installed."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Configuração do telefone",
@@ -2725,8 +2746,8 @@
         "peopleWelcomedByMyCircle": "pessoas recebidas pelo meu círculo",
         "yourSphere": "Sua Esfera",
         "mySphere": "Minha Esfera",
-        "yourRankMessage": "Você está #{thisMonthRank: number} este mês e #{allTimeRank: number} de todos os tempos!",
-        "rankMessage": "#{thisMonthRank: number} este mês e #{allTimeRank: number} de todos os tempos!",
+        "yourRankMessage": "Você está #{thisMonthRank: número} este mês e #{allTimeRank: número} de todos os tempos!",
+        "rankMessage": "#{thisMonthRank: número} este mês e #{allTimeRank: número} de todos os tempos!",
         "inviteFriends": "Convidar um amigo",
         "buildYourCircle": "Construa seus círculos",
         "myBlinkCircles": "Meu círculo Blink",
