@@ -153,7 +153,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                 onPress={onOpen}
               >
                 <Flag countryCode={countryCode} flagSize={24} />
-                <Text type="p1">
+                <Text type="p1" style={{ includeFontPadding: false }}>
                   +{getCountryCallingCode(countryCode as PhoneNumberCountryCode)}
                 </Text>
               </TouchableOpacity>
@@ -195,7 +195,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
   inputContainer: {
     flexDirection: "row",
-    alignItems: "stretch",
+    alignItems: "center",
     minHeight: 60,
   },
   countryPickerButtonStyle: {
@@ -205,6 +205,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: 8,
   },
   inputComponentContainerStyle: {
     flex: 1,
