@@ -359,8 +359,6 @@ describe("CardDashboardScreen", () => {
     })
 
     it("allows pressing statements button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -374,8 +372,7 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(statementsButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Statements pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardStatementsScreen")
     })
 
     it("allows pressing add funds button when not frozen", async () => {
