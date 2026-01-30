@@ -120,3 +120,7 @@ e2e/**/*.js.map
 app/**/*.js
 app/**/*.js.map
 !app/config.js
+
+# Source maps (both common and uncommon patterns)
+*.js.map
+*.map.js
