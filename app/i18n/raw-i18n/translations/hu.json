@@ -3021,6 +3021,30 @@
       "privacyPolicy": "Kártya adatvédelmi szabályzat",
       "closeCardAccount": "Kártyaszámla bezárása",
       "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját"
+    },
+    "TransactionDetails": {
+      "title": "Tranzakció részletei",
+      "cardInformation": "Kártya információ",
+      "amount": "Összeg",
+      "time": "Idő",
+      "transactionId": "ID",
+      "cardUsed": "Használt kártya",
+      "paymentMethod": "Fizetési mód",
+      "merchantInformation": "Kereskedő információ",
+      "merchant": "Kereskedő",
+      "category": "Kategória",
+      "location": "Helyszín",
+      "mccCode": "MCC kód",
+      "currencyConversion": "Valutaátváltás",
+      "bitcoinRate": "Bitcoin árfolyam",
+      "bitcoinSpent": "Elköltött Bitcoin",
+      "conversionFee": "Átváltási díj",
+      "viewOnMap": "Térkép megtekintése",
+      "downloadReceipt": "Nyugta letöltése",
+      "reportIssue": "Probléma jelentése",
+      "transactionHelp": "Tranzakció súgó",
+      "transactionHelpDescription": "Ha nem ismeri fel ezt a tranzakciót vagy segítségre van szüksége, azonnal lépjen kapcsolatba ügyfélszolgálatunkkal.",
+      "transactionNotFound": "A tranzakció nem található"
     }
   }
 }

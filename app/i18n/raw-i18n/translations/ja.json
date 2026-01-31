@@ -3062,6 +3062,30 @@
             "privacyPolicy": "カードプライバシーポリシー",
             "closeCardAccount": "カードアカウントを閉じる",
             "closeCardAccountDescription": "Visaカードを永久に閉じる"
+        },
+        "TransactionDetails": {
+            "title": "取引詳細",
+            "cardInformation": "カード情報",
+            "amount": "金額",
+            "time": "時間",
+            "transactionId": "ID",
+            "cardUsed": "使用カード",
+            "paymentMethod": "支払い方法",
+            "merchantInformation": "加盟店情報",
+            "merchant": "加盟店",
+            "category": "カテゴリ",
+            "location": "場所",
+            "mccCode": "MCCコード",
+            "currencyConversion": "通貨換算",
+            "bitcoinRate": "ビットコインレート",
+            "bitcoinSpent": "使用ビットコイン",
+            "conversionFee": "換算手数料",
+            "viewOnMap": "地図で見る",
+            "downloadReceipt": "領収書をダウンロード",
+            "reportIssue": "問題を報告",
+            "transactionHelp": "取引ヘルプ",
+            "transactionHelpDescription": "この取引に覚えがない場合やサポートが必要な場合は、すぐにサポートチームにご連絡ください。",
+            "transactionNotFound": "取引が見つかりません"
         }
     }
 }

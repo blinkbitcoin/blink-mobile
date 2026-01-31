@@ -3059,6 +3059,30 @@
       "privacyPolicy": "Политика приватности картице",
       "closeCardAccount": "Затвори налог картице",
       "closeCardAccountDescription": "Трајно затворите своју Visa картицу"
+    },
+    "TransactionDetails": {
+      "title": "Детаљи трансакције",
+      "cardInformation": "Информације о картици",
+      "amount": "Износ",
+      "time": "Време",
+      "transactionId": "ID",
+      "cardUsed": "Коришћена картица",
+      "paymentMethod": "Начин плаћања",
+      "merchantInformation": "Информације о трговцу",
+      "merchant": "Трговац",
+      "category": "Категорија",
+      "location": "Локација",
+      "mccCode": "MCC код",
+      "currencyConversion": "Конверзија валуте",
+      "bitcoinRate": "Курс Биткоина",
+      "bitcoinSpent": "Потрошени Биткоин",
+      "conversionFee": "Накнада за конверзију",
+      "viewOnMap": "Погледај на мапи",
+      "downloadReceipt": "Преузми рачун",
+      "reportIssue": "Пријави проблем",
+      "transactionHelp": "Помоћ за трансакцију",
+      "transactionHelpDescription": "Ако не препознајете ову трансакцију или вам је потребна помоћ, одмах контактирајте наш тим за подршку.",
+      "transactionNotFound": "Трансакција није пронађена"
     }
   }
 }
