@@ -3039,6 +3039,30 @@
       "privacyPolicy": "Kortets privatlivspolitik",
       "closeCardAccount": "Luk kortkonto",
       "closeCardAccountDescription": "Luk dit Visa-kort permanent"
+    },
+    "TransactionDetails": {
+      "title": "Transaktionsdetaljer",
+      "cardInformation": "Kortoplysninger",
+      "amount": "Beløb",
+      "time": "Tid",
+      "transactionId": "ID",
+      "cardUsed": "Anvendt kort",
+      "paymentMethod": "Betalingsmetode",
+      "merchantInformation": "Forhandleroplysninger",
+      "merchant": "Forhandler",
+      "category": "Kategori",
+      "location": "Placering",
+      "mccCode": "MCC-kode",
+      "currencyConversion": "Valutaomregning",
+      "bitcoinRate": "Bitcoin-kurs",
+      "bitcoinSpent": "Brugt Bitcoin",
+      "conversionFee": "Omregningsgebyr",
+      "viewOnMap": "Se på kort",
+      "downloadReceipt": "Download kvittering",
+      "reportIssue": "Rapporter problem",
+      "transactionHelp": "Transaktionshjælp",
+      "transactionHelpDescription": "Hvis du ikke genkender denne transaktion eller har brug for hjælp, kontakt venligst vores supportteam med det samme.",
+      "transactionNotFound": "Transaktion ikke fundet"
     }
   }
 }

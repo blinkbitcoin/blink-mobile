@@ -3059,6 +3059,30 @@
       "privacyPolicy": "سياسة خصوصية البطاقة",
       "closeCardAccount": "إغلاق حساب البطاقة",
       "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً"
+    },
+    "TransactionDetails": {
+      "title": "تفاصيل المعاملة",
+      "cardInformation": "معلومات البطاقة",
+      "amount": "المبلغ",
+      "time": "الوقت",
+      "transactionId": "المعرف",
+      "cardUsed": "البطاقة المستخدمة",
+      "paymentMethod": "طريقة الدفع",
+      "merchantInformation": "معلومات التاجر",
+      "merchant": "التاجر",
+      "category": "الفئة",
+      "location": "الموقع",
+      "mccCode": "رمز MCC",
+      "currencyConversion": "تحويل العملة",
+      "bitcoinRate": "سعر البيتكوين",
+      "bitcoinSpent": "البيتكوين المنفق",
+      "conversionFee": "رسوم التحويل",
+      "viewOnMap": "عرض على الخريطة",
+      "downloadReceipt": "تحميل الإيصال",
+      "reportIssue": "الإبلاغ عن مشكلة",
+      "transactionHelp": "مساعدة المعاملة",
+      "transactionHelpDescription": "إذا لم تتعرف على هذه المعاملة أو تحتاج إلى مساعدة، اتصل بفريق الدعم لدينا فوراً.",
+      "transactionNotFound": "لم يتم العثور على المعاملة"
     }
   }
 }

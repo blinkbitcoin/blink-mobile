@@ -3062,6 +3062,30 @@
       "privacyPolicy": "Card Privacy Policy",
       "closeCardAccount": "Close card account",
       "closeCardAccountDescription": "Permanently close your Visa card"
+    },
+    "TransactionDetails": {
+      "title": "Գdelays մdelays",
+      "cardInformation": "Qarти tеghеkаtvутyun",
+      "amount": "Gumar",
+      "time": "Zhamanak",
+      "transactionId": "ID",
+      "cardUsed": "Ogtagortsats qart",
+      "paymentMethod": "Vacharqi yeghanak",
+      "merchantInformation": "Vacharogi teghekutyun",
+      "merchant": "Vacharog",
+      "category": "Kategoriya",
+      "location": "Teghavayrum",
+      "mccCode": "MCC kod",
+      "currencyConversion": "Artarzhuyti pokharkem",
+      "bitcoinRate": "Bitcoin-i poxarzhek",
+      "bitcoinSpent": "Tstaktsvats Bitcoin",
+      "conversionFee": "Pokharki varich",
+      "viewOnMap": "Ditеl qartezum",
+      "downloadReceipt": "Nerbernеl stacakani",
+      "reportIssue": "Zinеl khndiri masin",
+      "transactionHelp": "Gortsarqi ognutyun",
+      "transactionHelpDescription": "Yеtе chеq chanaचnum ays gortsarqy kam оgnutyun еq patrastum, anmijапеs kapvеq mеr ajakcman timi het.",
+      "transactionNotFound": "Gortarqy chgtsnvets"
     }
   }
 }

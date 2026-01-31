@@ -3021,6 +3021,30 @@
             "privacyPolicy": "Política de privacidade do cartão",
             "closeCardAccount": "Encerrar conta do cartão",
             "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa"
+        },
+        "TransactionDetails": {
+            "title": "Detalhes da transação",
+            "cardInformation": "Informações do cartão",
+            "amount": "Valor",
+            "time": "Hora",
+            "transactionId": "ID",
+            "cardUsed": "Cartão usado",
+            "paymentMethod": "Método de pagamento",
+            "merchantInformation": "Informações do comerciante",
+            "merchant": "Comerciante",
+            "category": "Categoria",
+            "location": "Localização",
+            "mccCode": "Código MCC",
+            "currencyConversion": "Conversão de moeda",
+            "bitcoinRate": "Taxa do Bitcoin",
+            "bitcoinSpent": "Bitcoin gasto",
+            "conversionFee": "Taxa de conversão",
+            "viewOnMap": "Ver no mapa",
+            "downloadReceipt": "Baixar recibo",
+            "reportIssue": "Reportar problema",
+            "transactionHelp": "Ajuda com transação",
+            "transactionHelpDescription": "Se você não reconhece esta transação ou precisa de ajuda, entre em contato com nossa equipe de suporte imediatamente.",
+            "transactionNotFound": "Transação não encontrada"
         }
     }
 }

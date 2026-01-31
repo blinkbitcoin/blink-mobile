@@ -3062,6 +3062,30 @@
       "privacyPolicy": "Zásady ochrany osobních údajů karty",
       "closeCardAccount": "Zrušit účet karty",
       "closeCardAccountDescription": "Trvale zrušte svou kartu Visa"
+    },
+    "TransactionDetails": {
+      "title": "Detaily transakce",
+      "cardInformation": "Informace o kartě",
+      "amount": "Částka",
+      "time": "Čas",
+      "transactionId": "ID",
+      "cardUsed": "Použitá karta",
+      "paymentMethod": "Platební metoda",
+      "merchantInformation": "Informace o obchodníkovi",
+      "merchant": "Obchodník",
+      "category": "Kategorie",
+      "location": "Poloha",
+      "mccCode": "MCC kód",
+      "currencyConversion": "Převod měny",
+      "bitcoinRate": "Kurz Bitcoinu",
+      "bitcoinSpent": "Utracený Bitcoin",
+      "conversionFee": "Poplatek za převod",
+      "viewOnMap": "Zobrazit na mapě",
+      "downloadReceipt": "Stáhnout účtenku",
+      "reportIssue": "Nahlásit problém",
+      "transactionHelp": "Nápověda k transakci",
+      "transactionHelpDescription": "Pokud tuto transakci nepoznáváte nebo potřebujete pomoc, okamžitě kontaktujte náš tým podpory.",
+      "transactionNotFound": "Transakce nenalezena"
     }
   }
 }

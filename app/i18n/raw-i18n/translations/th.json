@@ -3059,6 +3059,30 @@
       "privacyPolicy": "นโยบายความเป็นส่วนตัวของบัตร",
       "closeCardAccount": "ปิดบัญชีบัตร",
       "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร"
+    },
+    "TransactionDetails": {
+      "title": "รายละเอียดธุรกรรม",
+      "cardInformation": "ข้อมูลบัตร",
+      "amount": "จำนวนเงิน",
+      "time": "เวลา",
+      "transactionId": "ID",
+      "cardUsed": "บัตรที่ใช้",
+      "paymentMethod": "วิธีการชำระเงิน",
+      "merchantInformation": "ข้อมูลร้านค้า",
+      "merchant": "ร้านค้า",
+      "category": "หมวดหมู่",
+      "location": "ที่ตั้ง",
+      "mccCode": "รหัส MCC",
+      "currencyConversion": "การแปลงสกุลเงิน",
+      "bitcoinRate": "อัตรา Bitcoin",
+      "bitcoinSpent": "Bitcoin ที่ใช้",
+      "conversionFee": "ค่าธรรมเนียมการแปลง",
+      "viewOnMap": "ดูบนแผนที่",
+      "downloadReceipt": "ดาวน์โหลดใบเสร็จ",
+      "reportIssue": "รายงานปัญหา",
+      "transactionHelp": "ความช่วยเหลือธุรกรรม",
+      "transactionHelpDescription": "หากคุณไม่รู้จักธุรกรรมนี้หรือต้องการความช่วยเหลือ กรุณาติดต่อทีมสนับสนุนของเราทันที",
+      "transactionNotFound": "ไม่พบรายการธุรกรรม"
     }
   }
 }

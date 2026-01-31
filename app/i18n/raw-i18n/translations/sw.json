@@ -3021,6 +3021,30 @@
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
       "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa"
+    },
+    "TransactionDetails": {
+      "title": "Maelezo ya muamala",
+      "cardInformation": "Taarifa za kadi",
+      "amount": "Kiasi",
+      "time": "Wakati",
+      "transactionId": "ID",
+      "cardUsed": "Kadi iliyotumika",
+      "paymentMethod": "Njia ya malipo",
+      "merchantInformation": "Taarifa za mfanyabiashara",
+      "merchant": "Mfanyabiashara",
+      "category": "Kategoria",
+      "location": "Eneo",
+      "mccCode": "Msimbo wa MCC",
+      "currencyConversion": "Ubadilishaji wa sarafu",
+      "bitcoinRate": "Kiwango cha Bitcoin",
+      "bitcoinSpent": "Bitcoin iliyotumika",
+      "conversionFee": "Ada ya ubadilishaji",
+      "viewOnMap": "Tazama kwenye ramani",
+      "downloadReceipt": "Pakua risiti",
+      "reportIssue": "Ripoti tatizo",
+      "transactionHelp": "Msaada wa muamala",
+      "transactionHelpDescription": "Ikiwa hautambui muamala huu au unahitaji msaada, wasiliana na timu yetu ya msaada mara moja.",
+      "transactionNotFound": "Muamala haujapatikana"
     }
   }
 }

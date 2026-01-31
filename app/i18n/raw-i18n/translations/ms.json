@@ -3062,6 +3062,30 @@
       "privacyPolicy": "Dasar privasi kad",
       "closeCardAccount": "Tutup akaun kad",
       "closeCardAccountDescription": "Tutup kad Visa anda secara kekal"
+    },
+    "TransactionDetails": {
+      "title": "Butiran transaksi",
+      "cardInformation": "Maklumat kad",
+      "amount": "Jumlah",
+      "time": "Masa",
+      "transactionId": "ID",
+      "cardUsed": "Kad digunakan",
+      "paymentMethod": "Kaedah pembayaran",
+      "merchantInformation": "Maklumat peniaga",
+      "merchant": "Peniaga",
+      "category": "Kategori",
+      "location": "Lokasi",
+      "mccCode": "Kod MCC",
+      "currencyConversion": "Penukaran mata wang",
+      "bitcoinRate": "Kadar Bitcoin",
+      "bitcoinSpent": "Bitcoin dibelanjakan",
+      "conversionFee": "Yuran penukaran",
+      "viewOnMap": "Lihat di peta",
+      "downloadReceipt": "Muat turun resit",
+      "reportIssue": "Laporkan masalah",
+      "transactionHelp": "Bantuan transaksi",
+      "transactionHelpDescription": "Jika anda tidak mengenali transaksi ini atau memerlukan bantuan, hubungi pasukan sokongan kami dengan segera.",
+      "transactionNotFound": "Transaksi tidak dijumpai"
     }
   }
 }
