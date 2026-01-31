@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -10,6 +10,7 @@ type CardTransactionItemProps = {
   timeAgo: string
   amount: string
   status: CardTransactionStatus
+  onPress?: () => void
 }
 
 const CARD_TRANSACTION_STATUS = {
@@ -25,6 +26,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   timeAgo,
   amount,
   status,
+  onPress,
 }) => {
   const styles = useStyles()
   const {
@@ -38,8 +40,8 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
     ? LL.CardFlow.TransactionStatus.pending()
     : LL.CardFlow.TransactionStatus.completed()
 
-  return (
-    <View style={styles.container}>
+  const content = (
+    <>
       <View style={styles.iconContainer}>
         <Icon name="storefront-outline" size={20} color={colors.primary} />
       </View>
@@ -59,8 +61,24 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
           {statusText}
         </Text>
       </View>
-    </View>
+    </>
   )
+
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        style={styles.container}
+        onPress={onPress}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`${merchantName}, ${amount}, ${statusText}`}
+      >
+        {content}
+      </TouchableOpacity>
+    )
+  }
+
+  return <View style={styles.container}>{content}</View>
 }
 
 const useStyles = makeStyles(({ colors }) => ({
