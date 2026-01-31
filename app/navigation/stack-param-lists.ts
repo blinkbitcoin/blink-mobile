@@ -135,6 +135,7 @@ export type RootStackParamList = {
   cardLimitsScreen: undefined
   cardSettingsScreen: undefined
   cardStatementsScreen: undefined
+  cardTransactionDetailsScreen: { transactionId: string }
 }
 
 export type OnboardingStackParamList = {

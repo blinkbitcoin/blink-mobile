@@ -48,7 +48,12 @@ export const CardDashboardScreen: React.FC = () => {
           onStatements={() => navigation.navigate("cardStatementsScreen")}
         />
 
-        <CardTransactionsSection groups={transactions} />
+        <CardTransactionsSection
+          groups={transactions}
+          onTransactionPress={(transactionId) =>
+            navigation.navigate("cardTransactionDetailsScreen", { transactionId })
+          }
+        />
       </View>
     </Screen>
   )
