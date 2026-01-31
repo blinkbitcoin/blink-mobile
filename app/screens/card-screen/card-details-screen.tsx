@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect } from "react"
 import { TouchableOpacity, View } from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
-import { InfoRow } from "@app/components/card-screen"
+import { InfoSection, WarningCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -110,51 +110,41 @@ export const CardDetailsScreen: React.FC = () => {
             }
           />
 
-          <View style={styles.cardInfoSection}>
-            <Text style={styles.cardInfoTitle}>
-              {LL.CardFlow.CardDetails.cardInformation()}
-            </Text>
-            <View style={styles.cardInfoCard}>
-              <InfoRow
-                label={LL.CardFlow.CardDetails.cardType()}
-                value={MOCK_CARD.cardType}
-              />
-              <InfoRow
-                label={LL.CardFlow.CardDetails.status()}
-                value={getStatusLabel(MOCK_CARD.status)}
-                valueColor={
-                  MOCK_CARD.status === CardStatus.Active ? colors.success : colors.error
-                }
-              />
-              <InfoRow
-                label={LL.CardFlow.CardDetails.issued()}
-                value={MOCK_CARD.issuedDate}
-              />
-              <InfoRow
-                label={LL.CardFlow.CardDetails.network()}
-                value={MOCK_CARD.network}
-              />
-            </View>
-          </View>
+          <InfoSection
+            title={LL.CardFlow.CardDetails.cardInformation()}
+            items={[
+              {
+                label: LL.CardFlow.CardDetails.cardType(),
+                value: MOCK_CARD.cardType,
+              },
+              {
+                label: LL.CardFlow.CardDetails.status(),
+                value: getStatusLabel(MOCK_CARD.status),
+                valueColor:
+                  MOCK_CARD.status === CardStatus.Active ? colors.success : colors.error,
+              },
+              {
+                label: LL.CardFlow.CardDetails.issued(),
+                value: MOCK_CARD.issuedDate,
+              },
+              {
+                label: LL.CardFlow.CardDetails.network(),
+                value: MOCK_CARD.network,
+              },
+            ]}
+          />
 
-          <View style={styles.warningCard}>
-            <View style={styles.warningHeader}>
-              <GaloyIcon name="warning" size={16} color={colors.warning} />
-              <Text style={styles.warningTitle}>
-                {LL.CardFlow.CardDetails.keepDetailsSafe()}
-              </Text>
-            </View>
-            <Text style={styles.warningText}>
-              {LL.CardFlow.CardDetails.securityWarning()}
-            </Text>
-          </View>
+          <WarningCard
+            title={LL.CardFlow.CardDetails.keepDetailsSafe()}
+            description={LL.CardFlow.CardDetails.securityWarning()}
+          />
         </View>
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   headerRight: {
     marginRight: 24,
   },
@@ -173,48 +163,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   halfField: {
     flex: 1,
-  },
-  cardInfoSection: {
-    gap: 3,
-  },
-  cardInfoTitle: {
-    color: colors.black,
-    fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
-    lineHeight: 20,
-  },
-  cardInfoCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 14,
-    gap: 14,
-  },
-  warningCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    padding: 14,
-    gap: 10,
-  },
-  warningHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 3,
-  },
-  warningTitle: {
-    color: colors.warning,
-    fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
-    lineHeight: 22,
-  },
-  warningText: {
-    color: colors.grey2,
-    fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
-    lineHeight: 16,
   },
 }))
