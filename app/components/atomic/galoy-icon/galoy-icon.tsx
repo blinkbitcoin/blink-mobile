@@ -43,6 +43,7 @@ import Pencil from "@app/assets/icons-redesign/pencil.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import Question from "@app/assets/icons-redesign/question.svg"
 import Receive from "@app/assets/icons-redesign/receive.svg"
+import ReportFlag from "@app/assets/icons-redesign/report-flag.svg"
 import Send from "@app/assets/icons-redesign/send.svg"
 import Settings from "@app/assets/icons-redesign/settings.svg"
 import Support from "@app/assets/icons-redesign/support.svg"
@@ -119,6 +120,7 @@ export const icons = {
   "qr-code": QrCode,
   "question": Question,
   "receive": Receive,
+  "report-flag": ReportFlag,
   "send": Send,
   "settings": Settings,
   "share": Share,
