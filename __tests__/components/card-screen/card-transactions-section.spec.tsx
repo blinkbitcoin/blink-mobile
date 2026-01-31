@@ -57,18 +57,47 @@ jest.mock("@rn-vui/themed", () => ({
 
 type TransactionStatus = "pending" | "completed"
 
+type TransactionDetails = {
+  transactionId: string
+  cardUsed: string
+  paymentMethod: string
+  time: string
+  merchant: string
+  category: string
+  location: string
+  mccCode: string
+  bitcoinRate: string
+  bitcoinSpent: string
+  conversionFee: string
+}
+
 type Transaction = {
   id: string
   merchantName: string
   timeAgo: string
   amount: string
   status: TransactionStatus
+  details: TransactionDetails
 }
 
 type TransactionGroup = {
   date: string
   transactions: Transaction[]
 }
+
+const createMockDetails = (): TransactionDetails => ({
+  transactionId: "TXN-TEST-001",
+  cardUsed: "Visa •••• 4242",
+  paymentMethod: "Contactless",
+  time: "Jan 30, 10:00 AM",
+  merchant: "Test Merchant",
+  category: "Shopping",
+  location: "Test Location",
+  mccCode: "5411",
+  bitcoinRate: "$100,000.00",
+  bitcoinSpent: "10,000 SAT",
+  conversionFee: "$0.00",
+})
 
 const renderWithProviders = (component: React.ReactElement) => {
   return render(component)
@@ -85,6 +114,7 @@ describe("CardTransactionsSection", () => {
           timeAgo: "2 minutes ago",
           amount: "-$5.75",
           status: "pending",
+          details: createMockDetails(),
         },
         {
           id: "2",
@@ -92,6 +122,7 @@ describe("CardTransactionsSection", () => {
           timeAgo: "1 hour ago",
           amount: "-$24.99",
           status: "completed",
+          details: createMockDetails(),
         },
       ],
     },
@@ -104,6 +135,7 @@ describe("CardTransactionsSection", () => {
           timeAgo: "18 hours ago",
           amount: "-$15.99",
           status: "completed",
+          details: createMockDetails(),
         },
       ],
     },
@@ -213,6 +245,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "just now",
             amount: "-$4.50",
             status: "pending",
+            details: createMockDetails(),
           },
         ],
       },
@@ -240,6 +273,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "1 min ago",
             amount: "-$10.00",
             status: "pending",
+            details: createMockDetails(),
           },
           {
             id: "2",
@@ -247,6 +281,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "5 min ago",
             amount: "-$20.00",
             status: "pending",
+            details: createMockDetails(),
           },
           {
             id: "3",
@@ -254,6 +289,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "10 min ago",
             amount: "-$30.00",
             status: "completed",
+            details: createMockDetails(),
           },
           {
             id: "4",
@@ -261,6 +297,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "15 min ago",
             amount: "-$40.00",
             status: "completed",
+            details: createMockDetails(),
           },
         ],
       },
@@ -300,6 +337,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "2 weeks ago",
             amount: "-$100.00",
             status: "completed",
+            details: createMockDetails(),
           },
         ],
       },
@@ -312,6 +350,7 @@ describe("CardTransactionsSection", () => {
             timeAgo: "1 month ago",
             amount: "-$50.00",
             status: "completed",
+            details: createMockDetails(),
           },
         ],
       },
