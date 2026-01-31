@@ -8,10 +8,12 @@ import { CardTransactionItem } from "./card-transaction-item"
 
 type CardTransactionsSectionProps = {
   groups: TransactionGroup[]
+  onTransactionPress?: (transactionId: string) => void
 }
 
 export const CardTransactionsSection: React.FC<CardTransactionsSectionProps> = ({
   groups,
+  onTransactionPress,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -47,6 +49,7 @@ export const CardTransactionsSection: React.FC<CardTransactionsSectionProps> = (
                 timeAgo={tx.timeAgo}
                 amount={tx.amount}
                 status={tx.status}
+                onPress={onTransactionPress ? () => onTransactionPress(tx.id) : undefined}
               />
             ))}
           </View>
