@@ -2892,6 +2892,19 @@
             "transactionHelp": "Βοήθεια συναλλαγής",
             "transactionHelpDescription": "Αν δεν αναγνωρίζετε αυτή τη συναλλαγή ή χρειάζεστε βοήθεια, επικοινωνήστε αμέσως με την ομάδα υποστήριξής μας.",
             "transactionNotFound": "Η συναλλαγή δεν βρέθηκε"
+        },
+        "PersonalDetails": {
+            "title": "Προσωπικά στοιχεία",
+            "blinkVisaCardholder": "Κάτοχος κάρτας Blink Visa",
+            "kycVerifiedInformation": "Επαληθευμένες πληροφορίες KYC",
+            "kycVerifiedDescription": "Το όνομά σας, η ημερομηνία γέννησης και η διεύθυνσή σας έχουν επαληθευτεί μέσω της διαδικασίας KYC. Μπορείτε να αλλάξετε τις πληροφορίες επαναλαμβάνοντας τη διαδικασία KYC. Δεν εγγυόμαστε έγκριση.",
+            "changeKycInformation": "Αλλαγή πληροφοριών KYC",
+            "firstName": "Όνομα",
+            "lastName": "Επώνυμο",
+            "dateOfBirth": "Ημερομηνία γέννησης",
+            "contactInformation": "Στοιχεία επικοινωνίας",
+            "registeredAddress": "Καταχωρημένη διεύθυνση",
+            "shippingAddress": "Διεύθυνση αποστολής"
         }
     }
 }

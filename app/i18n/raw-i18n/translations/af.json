@@ -2806,6 +2806,19 @@
             "transactionHelp": "Transaksie-hulp",
             "transactionHelpDescription": "As jy hierdie transaksie nie herken nie of hulp nodig het, kontak ons ondersteuningspan onmiddellik.",
             "transactionNotFound": "Transaksie nie gevind nie"
+        },
+        "PersonalDetails": {
+            "title": "Persoonlike besonderhede",
+            "blinkVisaCardholder": "Blink Visa-kaarthouer",
+            "kycVerifiedInformation": "KYC-geverifieerde inligting",
+            "kycVerifiedDescription": "Jou naam, geboortedatum en adres is geverifieer deur ons KYC-proses. Jy kan die inligting verander deur die KYC-proses te herhaal. Ons waarborg nie goedkeuring nie.",
+            "changeKycInformation": "Verander KYC-inligting",
+            "firstName": "Voornaam",
+            "lastName": "Van",
+            "dateOfBirth": "Geboortedatum",
+            "contactInformation": "Kontakinligting",
+            "registeredAddress": "Geregistreerde adres",
+            "shippingAddress": "Afleweringsadres"
         }
     }
 }
