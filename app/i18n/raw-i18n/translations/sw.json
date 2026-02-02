@@ -2892,6 +2892,19 @@
             "transactionHelp": "Msaada wa muamala",
             "transactionHelpDescription": "Ikiwa hautambui muamala huu au unahitaji msaada, wasiliana na timu yetu ya msaada mara moja.",
             "transactionNotFound": "Muamala haujapatikana"
+        },
+        "PersonalDetails": {
+            "title": "Maelezo binafsi",
+            "blinkVisaCardholder": "Mmiliki wa Kadi ya Blink Visa",
+            "kycVerifiedInformation": "Maelezo ya KYC yaliyothibitishwa",
+            "kycVerifiedDescription": "Jina lako, tarehe ya kuzaliwa na anwani yako yamethibitishwa kupitia mchakato wetu wa KYC. Unaweza kubadilisha maelezo kwa kurudia mchakato wa KYC. Hatuhakikishi idhini.",
+            "changeKycInformation": "Badilisha maelezo ya KYC",
+            "firstName": "Jina la kwanza",
+            "lastName": "Jina la ukoo",
+            "dateOfBirth": "Tarehe ya kuzaliwa",
+            "contactInformation": "Maelezo ya mawasiliano",
+            "registeredAddress": "Anwani iliyosajiliwa",
+            "shippingAddress": "Anwani ya usafirishaji"
         }
     }
 }

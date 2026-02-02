@@ -8,7 +8,7 @@ import {
   IconTextButton,
   InfoSection,
   StatusBadge,
-  WarningCard,
+  InfoCard,
 } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -155,7 +155,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
           />
         </View>
 
-        <WarningCard
+        <InfoCard
           title={LL.CardFlow.TransactionDetails.transactionHelp()}
           description={LL.CardFlow.TransactionDetails.transactionHelpDescription()}
         />

@@ -2801,6 +2801,19 @@
             "transactionHelp": "Transacción yanapay",
             "transactionHelpDescription": "Mana kay transaccionta riqsinkichu utaq yanapata munanki chayqa, yanapaq huñuykuman usqhaylla rimanakuy.",
             "transactionNotFound": "Mana tarinkichu transaccionta"
+        },
+        "PersonalDetails": {
+            "title": "Kikinpa willakuyninkuna",
+            "blinkVisaCardholder": "Blink Visa tarjeta hap'iq",
+            "kycVerifiedInformation": "KYC taripasqa willakuykuna",
+            "kycVerifiedDescription": "Sutiyki, paqarisqa p'unchayniyki hinaspa tiyanayki KYC ruwayninchikwan taripasqa. Willakuykunata kutichiy atinki KYC ruwayta kutichispan. Mana ari ninata quwayku.",
+            "changeKycInformation": "KYC willakuykunata tikray",
+            "firstName": "Ñawpaq suti",
+            "lastName": "Ayllu suti",
+            "dateOfBirth": "Paqarisqa p'unchay",
+            "contactInformation": "Tinkuy willakuykuna",
+            "registeredAddress": "Qillqasqa tiyana",
+            "shippingAddress": "Apachina tiyana"
         }
     }
 }

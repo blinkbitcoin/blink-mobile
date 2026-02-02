@@ -2806,6 +2806,19 @@
             "transactionHelp": "Gortsarqi ognutyun",
             "transactionHelpDescription": "Yеtе chеq chanaचnum ays gortsarqy kam оgnutyun еq patrastum, anmijапеs kapvеq mеr ajakcman timi het.",
             "transactionNotFound": "Gortarqy chgtsnvets"
+        },
+        "PersonalDetails": {
+            "title": "Անձնական տվյալներ",
+            "blinkVisaCardholder": "Blink Visa քարտապան",
+            "kycVerifiedInformation": "KYC֊ով հաստատված տվյալներ",
+            "kycVerifiedDescription": "Ձեր անունը, ծննդյան ամսաթիվը և հասցեն հաստատված են մեր KYC ընթացակարգով։ Կարող եք փոխել այս տվյալները՝ կրկին անցնելով KYC ընթացակարգը։ Մենք չենք կարող երաշխավորել հայտի հաստատումը։",
+            "changeKycInformation": "Փոխել KYC տվյալները",
+            "firstName": "Անուն",
+            "lastName": "Ազգանուն",
+            "dateOfBirth": "Ծննդյան ամսաթիվ",
+            "contactInformation": "Կապի տվյալներ",
+            "registeredAddress": "Գրանցման հասցե",
+            "shippingAddress": "Առաքման հասցե"
         }
     }
 }
