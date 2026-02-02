@@ -1,40 +1,56 @@
 import React from "react"
 import { View } from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
-type BaseWarningCardProps = {
+type BaseInfoCardProps = {
   title: string
   icon?: IconNamesType
+  ionicon?: string
+  titleColor?: string
+  iconColor?: string
 }
 
-type WithDescription = BaseWarningCardProps & {
+type WithDescription = BaseInfoCardProps & {
   description: string
   customDescription?: never
 }
 
-type WithCustomDescription = BaseWarningCardProps & {
+type WithCustomDescription = BaseInfoCardProps & {
   description?: never
   customDescription: React.ReactNode
 }
 
-type WarningCardProps = WithDescription | WithCustomDescription
+type InfoCardProps = WithDescription | WithCustomDescription
 
-export const WarningCard: React.FC<WarningCardProps> = ({
+export const InfoCard: React.FC<InfoCardProps> = ({
   title,
   icon = "warning",
+  ionicon,
+  titleColor,
+  iconColor,
   ...rest
 }) => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
 
+  const resolvedTitleColor = titleColor ?? colors.warning
+  const resolvedIconColor = iconColor ?? colors.warning
+  const styles = useStyles({ titleColor: resolvedTitleColor })
+
+  const renderIcon = () => {
+    if (ionicon) {
+      return <Icon name={ionicon} type="ionicon" size={16} color={resolvedIconColor} />
+    }
+    return <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <GaloyIcon name={icon} size={16} color={colors.warning} />
+        {renderIcon()}
         <Text style={styles.title}>{title}</Text>
       </View>
       {rest.customDescription ? (
@@ -46,7 +62,11 @@ export const WarningCard: React.FC<WarningCardProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+type StyleProps = {
+  titleColor: string
+}
+
+const useStyles = makeStyles(({ colors }, { titleColor }: StyleProps) => ({
   container: {
     backgroundColor: colors.grey5,
     borderRadius: 8,
@@ -60,7 +80,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 3,
   },
   title: {
-    color: colors.warning,
+    color: titleColor,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
