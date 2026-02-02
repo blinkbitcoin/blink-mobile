@@ -3084,6 +3084,19 @@
       "transactionHelpDescription": "Ако не препознајете ову трансакцију или вам је потребна помоћ, одмах контактирајте наш {supportTeam}.",
       "supportTeam": "тим за подршку",
       "transactionNotFound": "Трансакција није пронађена"
+    },
+    "PersonalDetails": {
+      "title": "Лични подаци",
+      "blinkVisaCardholder": "Власник Blink Visa картице",
+      "kycVerifiedInformation": "KYC верификоване информације",
+      "kycVerifiedDescription": "Ваше име, датум рођења и адреса су верификовани кроз наш KYC процес. Можете променити информације поновним KYC процесом. Не гарантујемо одобрење.",
+      "changeKycInformation": "Промени KYC информације",
+      "firstName": "Име",
+      "lastName": "Презиме",
+      "dateOfBirth": "Датум рођења",
+      "contactInformation": "Контакт информације",
+      "registeredAddress": "Регистрована адреса",
+      "shippingAddress": "Адреса за доставу"
     }
   }
 }

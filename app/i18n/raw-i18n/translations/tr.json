@@ -3046,6 +3046,19 @@
       "transactionHelpDescription": "Bu işlemi tanımıyorsanız veya yardıma ihtiyacınız varsa, derhal {supportTeam} iletişime geçin.",
       "supportTeam": "destek ekibimizle",
       "transactionNotFound": "İşlem bulunamadı"
+    },
+    "PersonalDetails": {
+      "title": "Kişisel bilgiler",
+      "blinkVisaCardholder": "Blink Visa Kart Sahibi",
+      "kycVerifiedInformation": "KYC doğrulanmış bilgiler",
+      "kycVerifiedDescription": "Adınız, doğum tarihiniz ve adresiniz KYC sürecimiz aracılığıyla doğrulanmıştır. KYC sürecini tekrarlayarak bilgileri değiştirebilirsiniz. Onay garantisi vermiyoruz.",
+      "changeKycInformation": "KYC bilgilerini değiştir",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "dateOfBirth": "Doğum tarihi",
+      "contactInformation": "İletişim bilgileri",
+      "registeredAddress": "Kayıtlı adres",
+      "shippingAddress": "Teslimat adresi"
     }
   }
 }
