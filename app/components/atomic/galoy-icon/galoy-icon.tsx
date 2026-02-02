@@ -35,6 +35,7 @@ import Loading from "@app/assets/icons-redesign/loading.svg"
 import EmailAdd from "@app/assets/icons-redesign/email-add.svg"
 import MagnifyingGlass from "@app/assets/icons-redesign/magnifying-glass.svg"
 import Map from "@app/assets/icons-redesign/map.svg"
+import MapPin from "@app/assets/icons/map.svg"
 import Menu from "@app/assets/icons-redesign/menu.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
@@ -113,6 +114,7 @@ export const icons = {
   "email-add": EmailAdd,
   "magnifying-glass": MagnifyingGlass,
   "map": Map,
+  "map-pin": MapPin,
   "menu": Menu,
   "pencil": Pencil,
   "note": Note,
