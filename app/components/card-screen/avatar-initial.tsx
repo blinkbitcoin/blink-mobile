@@ -15,9 +15,12 @@ export const AvatarInitial: React.FC<AvatarInitialProps> = ({ name, size = 52 })
     theme: { colors },
   } = useTheme()
   const initial = name.trim().charAt(0).toUpperCase()
+  const accessibilityLabel = initial
+    ? `Initial ${initial} for ${name}`
+    : "User icon"
 
   return (
-    <View style={styles.container} accessible accessibilityLabel={name || "User"}>
+    <View style={styles.container} accessible accessibilityLabel={accessibilityLabel}>
       {initial ? (
         <Text style={styles.text} accessible={false}>
           {initial}
