@@ -2808,17 +2808,17 @@
             "transactionNotFound": "Gortarqy chgtsnvets"
         },
         "PersonalDetails": {
-            "title": "Personal details",
-            "blinkVisaCardholder": "Blink Visa Cardholder",
-            "kycVerifiedInformation": "KYC verified information",
-            "kycVerifiedDescription": "Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.",
-            "changeKycInformation": "Change KYC information",
-            "firstName": "First name",
-            "lastName": "Last name",
-            "dateOfBirth": "Date of birth",
-            "contactInformation": "Contact information",
-            "registeredAddress": "Registered address",
-            "shippingAddress": "Shipping address"
+            "title": "Անձնական տվյալներ",
+            "blinkVisaCardholder": "Blink Visa քարտապան",
+            "kycVerifiedInformation": "KYC֊ով հաստատված տվյալներ",
+            "kycVerifiedDescription": "Ձեր անունը, ծննդյան ամսաթիվը և հասցեն հաստատված են մեր KYC ընթացակարգով։ Կարող եք փոխել այս տվյալները՝ կրկին անցնելով KYC ընթացակարգը։ Մենք չենք կարող երաշխավորել հայտի հաստատումը։",
+            "changeKycInformation": "Փոխել KYC տվյալները",
+            "firstName": "Անուն",
+            "lastName": "Ազգանուն",
+            "dateOfBirth": "Ծննդյան ամսաթիվ",
+            "contactInformation": "Կապի տվյալներ",
+            "registeredAddress": "Գրանցման հասցե",
+            "shippingAddress": "Առաքման հասցե"
         }
     }
 }
