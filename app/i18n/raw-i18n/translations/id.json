@@ -3046,6 +3046,19 @@
       "transactionHelpDescription": "Jika Anda tidak mengenali transaksi ini atau membutuhkan bantuan, segera hubungi {supportTeam}.",
       "supportTeam": "tim dukungan kami",
       "transactionNotFound": "Transaksi tidak ditemukan"
+    },
+    "PersonalDetails": {
+      "title": "Detail pribadi",
+      "blinkVisaCardholder": "Pemegang Kartu Blink Visa",
+      "kycVerifiedInformation": "Informasi KYC terverifikasi",
+      "kycVerifiedDescription": "Nama, tanggal lahir, dan alamat Anda diverifikasi melalui proses KYC kami. Anda dapat mengubah informasi dengan mengulangi proses KYC. Kami tidak menjamin persetujuan.",
+      "changeKycInformation": "Ubah informasi KYC",
+      "firstName": "Nama depan",
+      "lastName": "Nama belakang",
+      "dateOfBirth": "Tanggal lahir",
+      "contactInformation": "Informasi kontak",
+      "registeredAddress": "Alamat terdaftar",
+      "shippingAddress": "Alamat pengiriman"
     }
   }
 }

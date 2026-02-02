@@ -9978,6 +9978,52 @@ type RootTranslation = {
 			 */
 			closeCardAccountDescription: string
 		}
+		PersonalDetails: {
+			/**
+			 * P​e​r​s​o​n​a​l​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​h​o​l​d​e​r
+			 */
+			blinkVisaCardholder: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​e​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			kycVerifiedInformation: string
+			/**
+			 * Y​o​u​r​ ​n​a​m​e​,​ ​d​a​t​e​ ​o​f​ ​b​i​r​t​h​ ​a​n​d​ ​a​d​d​r​e​s​s​ ​a​r​e​ ​v​e​r​i​f​i​e​d​ ​t​h​r​o​u​g​h​ ​o​u​r​ ​K​Y​C​ ​p​r​o​c​e​s​s​.​ ​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​b​y​ ​r​e​d​o​i​n​g​ ​t​h​e​ ​K​Y​C​ ​p​r​o​c​e​s​s​.​ ​W​e​ ​d​o​n​'​t​ ​g​u​a​r​a​n​t​e​e​ ​a​n​ ​a​p​p​r​o​v​a​l​.
+			 */
+			kycVerifiedDescription: string
+			/**
+			 * C​h​a​n​g​e​ ​K​Y​C​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			changeKycInformation: string
+			/**
+			 * F​i​r​s​t​ ​n​a​m​e
+			 */
+			firstName: string
+			/**
+			 * L​a​s​t​ ​n​a​m​e
+			 */
+			lastName: string
+			/**
+			 * D​a​t​e​ ​o​f​ ​b​i​r​t​h
+			 */
+			dateOfBirth: string
+			/**
+			 * C​o​n​t​a​c​t​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			contactInformation: string
+			/**
+			 * R​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s
+			 */
+			registeredAddress: string
+			/**
+			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			shippingAddress: string
+		}
 		TransactionDetails: {
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
@@ -19926,6 +19972,52 @@ export type TranslationFunctions = {
 			 * Permanently close your Visa card
 			 */
 			closeCardAccountDescription: () => LocalizedString
+		}
+		PersonalDetails: {
+			/**
+			 * Personal details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Blink Visa Cardholder
+			 */
+			blinkVisaCardholder: () => LocalizedString
+			/**
+			 * KYC verified information
+			 */
+			kycVerifiedInformation: () => LocalizedString
+			/**
+			 * Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.
+			 */
+			kycVerifiedDescription: () => LocalizedString
+			/**
+			 * Change KYC information
+			 */
+			changeKycInformation: () => LocalizedString
+			/**
+			 * First name
+			 */
+			firstName: () => LocalizedString
+			/**
+			 * Last name
+			 */
+			lastName: () => LocalizedString
+			/**
+			 * Date of birth
+			 */
+			dateOfBirth: () => LocalizedString
+			/**
+			 * Contact information
+			 */
+			contactInformation: () => LocalizedString
+			/**
+			 * Registered address
+			 */
+			registeredAddress: () => LocalizedString
+			/**
+			 * Shipping address
+			 */
+			shippingAddress: () => LocalizedString
 		}
 		TransactionDetails: {
 			/**

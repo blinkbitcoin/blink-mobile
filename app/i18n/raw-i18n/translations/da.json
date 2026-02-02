@@ -3064,6 +3064,19 @@
       "transactionHelpDescription": "Hvis du ikke genkender denne transaktion eller har brug for hjælp, kontakt venligst vores {supportTeam} med det samme.",
       "supportTeam": "supportteam",
       "transactionNotFound": "Transaktion ikke fundet"
+    },
+    "PersonalDetails": {
+      "title": "Personlige oplysninger",
+      "blinkVisaCardholder": "Blink Visa-kortholder",
+      "kycVerifiedInformation": "KYC-verificeret information",
+      "kycVerifiedDescription": "Dit navn, fødselsdato og adresse er verificeret gennem vores KYC-proces. Du kan ændre oplysningerne ved at gentage KYC-processen. Vi garanterer ikke godkendelse.",
+      "changeKycInformation": "Skift KYC-oplysninger",
+      "firstName": "Fornavn",
+      "lastName": "Efternavn",
+      "dateOfBirth": "Fødselsdato",
+      "contactInformation": "Kontaktoplysninger",
+      "registeredAddress": "Registreret adresse",
+      "shippingAddress": "Leveringsadresse"
     }
   }
 }

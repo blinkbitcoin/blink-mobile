@@ -3087,6 +3087,19 @@
             "transactionHelpDescription": "Si vous ne reconnaissez pas cette transaction ou avez besoin d'aide, contactez notre {supportTeam} immédiatement.",
             "supportTeam": "équipe de support",
             "transactionNotFound": "Transaction non trouvée"
+        },
+        "PersonalDetails": {
+            "title": "Informations personnelles",
+            "blinkVisaCardholder": "Titulaire de la carte Blink Visa",
+            "kycVerifiedInformation": "Informations KYC vérifiées",
+            "kycVerifiedDescription": "Votre nom, date de naissance et adresse sont vérifiés via notre processus KYC. Vous pouvez modifier les informations en refaisant le processus KYC. Nous ne garantissons pas l'approbation.",
+            "changeKycInformation": "Modifier les informations KYC",
+            "firstName": "Prénom",
+            "lastName": "Nom de famille",
+            "dateOfBirth": "Date de naissance",
+            "contactInformation": "Coordonnées",
+            "registeredAddress": "Adresse enregistrée",
+            "shippingAddress": "Adresse de livraison"
         }
     }
 }

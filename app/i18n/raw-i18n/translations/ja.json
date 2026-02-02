@@ -3087,6 +3087,19 @@
             "transactionHelpDescription": "この取引に覚えがない場合やサポートが必要な場合は、すぐに{supportTeam}にご連絡ください。",
             "supportTeam": "サポートチーム",
             "transactionNotFound": "取引が見つかりません"
+        },
+        "PersonalDetails": {
+            "title": "個人情報",
+            "blinkVisaCardholder": "Blink Visaカード保有者",
+            "kycVerifiedInformation": "KYC認証済み情報",
+            "kycVerifiedDescription": "お名前、生年月日、住所はKYCプロセスで認証されています。KYCプロセスを再度行うことで情報を変更できます。承認は保証されません。",
+            "changeKycInformation": "KYC情報を変更",
+            "firstName": "名",
+            "lastName": "姓",
+            "dateOfBirth": "生年月日",
+            "contactInformation": "連絡先情報",
+            "registeredAddress": "登録住所",
+            "shippingAddress": "配送先住所"
         }
     }
 }
