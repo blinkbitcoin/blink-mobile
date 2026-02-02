@@ -1,5 +1,6 @@
 export * from "./card-details-screen"
 export * from "./card-limits-screen"
+export * from "./card-personal-details-screen"
 export * from "./card-settings-screen"
 export * from "./card-statements-screen"
 export * from "./card-transaction-details-screen"
