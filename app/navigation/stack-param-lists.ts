@@ -133,6 +133,7 @@ export type RootStackParamList = {
   cardDashboardScreen: undefined
   cardDetailsScreen: undefined
   cardLimitsScreen: undefined
+  cardPersonalDetailsScreen: undefined
   cardSettingsScreen: undefined
   cardStatementsScreen: undefined
   cardTransactionDetailsScreen: { transactionId: string }
