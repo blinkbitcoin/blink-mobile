@@ -2,7 +2,7 @@ import React from "react"
 import { Text as RNText, View } from "react-native"
 import { render } from "@testing-library/react-native"
 
-import { WarningCard } from "@app/components/card-screen/warning-card"
+import { InfoCard } from "@app/components/card-screen/info-card"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
@@ -31,7 +31,7 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
   ),
 }))
 
-describe("WarningCard", () => {
+describe("InfoCard", () => {
   const defaultProps = {
     title: "Keep your details safe",
     description:
@@ -40,19 +40,19 @@ describe("WarningCard", () => {
 
   describe("rendering", () => {
     it("renders without crashing", () => {
-      const { toJSON } = render(<WarningCard {...defaultProps} />)
+      const { toJSON } = render(<InfoCard {...defaultProps} />)
 
       expect(toJSON()).toBeTruthy()
     })
 
     it("displays the title", () => {
-      const { getByText } = render(<WarningCard {...defaultProps} />)
+      const { getByText } = render(<InfoCard {...defaultProps} />)
 
       expect(getByText("Keep your details safe")).toBeTruthy()
     })
 
     it("displays the description", () => {
-      const { getByText } = render(<WarningCard {...defaultProps} />)
+      const { getByText } = render(<InfoCard {...defaultProps} />)
 
       expect(
         getByText(
@@ -62,7 +62,7 @@ describe("WarningCard", () => {
     })
 
     it("renders the default warning icon", () => {
-      const { getByTestId } = render(<WarningCard {...defaultProps} />)
+      const { getByTestId } = render(<InfoCard {...defaultProps} />)
 
       expect(getByTestId("galoy-icon-warning")).toBeTruthy()
     })
@@ -70,19 +70,19 @@ describe("WarningCard", () => {
 
   describe("custom icon", () => {
     it("renders with custom icon", () => {
-      const { getByTestId } = render(<WarningCard {...defaultProps} icon="info" />)
+      const { getByTestId } = render(<InfoCard {...defaultProps} icon="info" />)
 
       expect(getByTestId("galoy-icon-info")).toBeTruthy()
     })
 
     it("renders with question icon", () => {
-      const { getByTestId } = render(<WarningCard {...defaultProps} icon="question" />)
+      const { getByTestId } = render(<InfoCard {...defaultProps} icon="question" />)
 
       expect(getByTestId("galoy-icon-question")).toBeTruthy()
     })
 
     it("uses default warning icon when not specified", () => {
-      const { getByTestId, queryByTestId } = render(<WarningCard {...defaultProps} />)
+      const { getByTestId, queryByTestId } = render(<InfoCard {...defaultProps} />)
 
       expect(getByTestId("galoy-icon-warning")).toBeTruthy()
       expect(queryByTestId("galoy-icon-info")).toBeNull()
@@ -92,7 +92,7 @@ describe("WarningCard", () => {
   describe("different content", () => {
     it("renders with transaction help content", () => {
       const { getByText } = render(
-        <WarningCard
+        <InfoCard
           title="Need help with this transaction?"
           description="If something doesn't look right, please contact our support team for assistance."
         />,
@@ -107,9 +107,7 @@ describe("WarningCard", () => {
     })
 
     it("renders with short title", () => {
-      const { getByText } = render(
-        <WarningCard title="Warning" description="Be careful." />,
-      )
+      const { getByText } = render(<InfoCard title="Warning" description="Be careful." />)
 
       expect(getByText("Warning")).toBeTruthy()
     })
@@ -119,7 +117,7 @@ describe("WarningCard", () => {
         "This is a very long description that contains multiple sentences. It should still render correctly without any issues. The component should handle text of any reasonable length."
 
       const { getByText } = render(
-        <WarningCard title="Notice" description={longDescription} />,
+        <InfoCard title="Notice" description={longDescription} />,
       )
 
       expect(getByText(longDescription)).toBeTruthy()
@@ -128,7 +126,7 @@ describe("WarningCard", () => {
 
   describe("icon color", () => {
     it("renders icon with warning color", () => {
-      const { getByTestId } = render(<WarningCard {...defaultProps} />)
+      const { getByTestId } = render(<InfoCard {...defaultProps} />)
 
       const icon = getByTestId("galoy-icon-warning")
       expect(icon.props.accessibilityHint).toBe("#FFA726")
@@ -138,7 +136,7 @@ describe("WarningCard", () => {
   describe("content variations", () => {
     it("renders card details warning", () => {
       const { getByText } = render(
-        <WarningCard
+        <InfoCard
           title="Keep your details safe"
           description="Never share your card details with anyone."
         />,
@@ -150,7 +148,7 @@ describe("WarningCard", () => {
 
     it("renders transaction help warning", () => {
       const { getByText } = render(
-        <WarningCard
+        <InfoCard
           title="Need help with this transaction?"
           description="Contact support if something looks wrong."
         />,
@@ -162,11 +160,11 @@ describe("WarningCard", () => {
 
   describe("rerender", () => {
     it("updates content when props change", () => {
-      const { getByText, rerender } = render(<WarningCard {...defaultProps} />)
+      const { getByText, rerender } = render(<InfoCard {...defaultProps} />)
 
       expect(getByText("Keep your details safe")).toBeTruthy()
 
-      rerender(<WarningCard title="New title" description="New description" />)
+      rerender(<InfoCard title="New title" description="New description" />)
 
       expect(getByText("New title")).toBeTruthy()
       expect(getByText("New description")).toBeTruthy()
@@ -174,12 +172,12 @@ describe("WarningCard", () => {
 
     it("updates icon when prop changes", () => {
       const { getByTestId, queryByTestId, rerender } = render(
-        <WarningCard {...defaultProps} />,
+        <InfoCard {...defaultProps} />,
       )
 
       expect(getByTestId("galoy-icon-warning")).toBeTruthy()
 
-      rerender(<WarningCard {...defaultProps} icon="info" />)
+      rerender(<InfoCard {...defaultProps} icon="info" />)
 
       expect(getByTestId("galoy-icon-info")).toBeTruthy()
       expect(queryByTestId("galoy-icon-warning")).toBeNull()
