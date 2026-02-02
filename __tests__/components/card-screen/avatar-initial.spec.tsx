@@ -129,19 +129,19 @@ describe("AvatarInitial", () => {
     it("has accessibility label with full name", () => {
       const { getByLabelText } = render(<AvatarInitial {...defaultProps} />)
 
-      expect(getByLabelText("Satoshi Nakamoto")).toBeTruthy()
+      expect(getByLabelText("Initial S for Satoshi Nakamoto")).toBeTruthy()
     })
 
-    it("has User accessibility label when name is empty", () => {
+    it("has User icon accessibility label when name is empty", () => {
       const { getByLabelText } = render(<AvatarInitial name="" />)
 
-      expect(getByLabelText("User")).toBeTruthy()
+      expect(getByLabelText("User icon")).toBeTruthy()
     })
 
     it("is accessible", () => {
       const { getByLabelText } = render(<AvatarInitial name="Alice" />)
 
-      const container = getByLabelText("Alice")
+      const container = getByLabelText("Initial A for Alice")
       expect(container.props.accessible).toBe(true)
     })
   })
