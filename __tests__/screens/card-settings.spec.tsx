@@ -26,10 +26,22 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native")
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  }
+})
+
 describe("CardSettingsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockNavigate.mockClear()
   })
 
   describe("rendering", () => {
@@ -278,9 +290,7 @@ describe("CardSettingsScreen", () => {
   })
 
   describe("interactions", () => {
-    it("allows pressing personal details row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("allows pressing personal details row and navigates", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -294,8 +304,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Personal Details pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
     })
 
     it("allows pressing change pin row", async () => {
@@ -559,7 +568,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(getByText("Contact Support"))
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Personal Details pressed")
+      expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
       expect(consoleSpy).toHaveBeenCalledWith("Order physical card pressed")
       expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
 
