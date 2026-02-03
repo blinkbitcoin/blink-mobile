@@ -3062,14 +3062,14 @@
             "shippingAddress": "Lieferadresse"
         },
         "AddToMobileWallet": {
-            "title": "Zur mobilen Geldboerse hinzufuegen",
-            "addYourCard": "Fuege deine Karte hinzu",
-            "addYourCardDescription": "Fuege deine Blink Visa-Karte zu deiner mobilen Geldboerse fuer schnelle und sichere Zahlungen hinzu",
-            "addTo": "Hinzufuegen zu",
+            "title": "Zur mobilen Geldbörse hinzufügen",
+            "addYourCard": "Füge deine Karte hinzu",
+            "addYourCardDescription": "Füge deine Blink Visa-Karte zu deiner mobilen Geldbörse für schnelle und sichere Zahlungen hinzu",
+            "addTo": "Hinzufügen zu",
             "Benefits": {
-                "title": "Vorteile der mobilen Geldboerse",
+                "title": "Vorteile der mobilen Geldbörse",
                 "contactless": "Kontaktlose Zahlungen an Millionen von Standorten",
-                "security": "Erhoehte Sicherheit mit biometrischer Authentifizierung",
+                "security": "Erhöhte Sicherheit mit biometrischer Authentifizierung",
                 "noPhysicalCard": "Keine physische Karte erforderlich",
                 "worksLocked": "Funktioniert auch bei gesperrtem Telefon"
             }

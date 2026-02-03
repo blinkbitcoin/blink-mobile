@@ -3062,15 +3062,15 @@
             "shippingAddress": "Endereço de entrega"
         },
         "AddToMobileWallet": {
-            "title": "Adicionar a carteira movel",
-            "addYourCard": "Adicione seu cartao",
-            "addYourCardDescription": "Adicione seu cartao Blink Visa a sua carteira movel para pagamentos rapidos e seguros",
+            "title": "Adicionar à carteira móvel",
+            "addYourCard": "Adicione seu cartão",
+            "addYourCardDescription": "Adicione seu cartão Blink Visa à sua carteira móvel para pagamentos rápidos e seguros",
             "addTo": "Adicionar a",
             "Benefits": {
-                "title": "Beneficios da carteira movel",
-                "contactless": "Pagamentos sem contato em milhoes de locais",
-                "security": "Seguranca aprimorada com autenticacao biometrica",
-                "noPhysicalCard": "Nao precisa carregar seu cartao fisico",
+                "title": "Benefícios da carteira móvel",
+                "contactless": "Pagamentos sem contato em milhões de locais",
+                "security": "Segurança aprimorada com autenticação biométrica",
+                "noPhysicalCard": "Não precisa carregar seu cartão físico",
                 "worksLocked": "Funciona mesmo com o telefone bloqueado"
             }
         }

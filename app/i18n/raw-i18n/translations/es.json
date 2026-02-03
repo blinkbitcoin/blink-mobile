@@ -3062,16 +3062,16 @@
             "shippingAddress": "Dirección de envío"
         },
         "AddToMobileWallet": {
-            "title": "Agregar a billetera movil",
+            "title": "Agregar a billetera móvil",
             "addYourCard": "Agrega tu tarjeta",
-            "addYourCardDescription": "Agrega tu tarjeta Blink Visa a tu billetera movil para pagos rapidos y seguros",
+            "addYourCardDescription": "Agrega tu tarjeta Blink Visa a tu billetera móvil para pagos rápidos y seguros",
             "addTo": "Agregar a",
             "Benefits": {
-                "title": "Beneficios de la billetera movil",
+                "title": "Beneficios de la billetera móvil",
                 "contactless": "Pagos sin contacto en millones de ubicaciones",
-                "security": "Seguridad mejorada con autenticacion biometrica",
-                "noPhysicalCard": "No necesitas llevar tu tarjeta fisica",
-                "worksLocked": "Funciona incluso con el telefono bloqueado"
+                "security": "Seguridad mejorada con autenticación biométrica",
+                "noPhysicalCard": "No necesitas llevar tu tarjeta física",
+                "worksLocked": "Funciona incluso con el teléfono bloqueado"
             }
         }
     }
