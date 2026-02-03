@@ -49,6 +49,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
     gap: 8,
     height: 50,
     backgroundColor: colors._white,
