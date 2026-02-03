@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "Tidak perlu membawa kartu fisik",
         "worksLocked": "Berfungsi bahkan saat ponsel terkunci"
       }
+    },
+    "CardStatus": {
+      "title": "Kartu Visa",
+      "CardApproved": {
+        "title": "Selamat!",
+        "subtitle": "Kartu Blink Visa Anda telah diaktifkan.",
+        "buttonLabel": "Pesan kartu fisik"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Kartu fisik Anda sedang dalam perjalanan!",
+        "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
+        "buttonLabel": "Buat PIN"
+      }
     }
   }
 }

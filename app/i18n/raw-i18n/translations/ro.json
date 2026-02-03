@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "Nu e nevoie sa porti cardul fizic",
         "worksLocked": "Functioneaza chiar si cand telefonul e blocat"
       }
+    },
+    "CardStatus": {
+      "title": "Card Visa",
+      "CardApproved": {
+        "title": "Felicitări!",
+        "subtitle": "Cardul tău Blink Visa a fost activat.",
+        "buttonLabel": "Comandă card fizic"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Cardul tău fizic este pe drum!",
+        "subtitle": "Comanda pentru livrarea cardului Blink a fost trimisă.",
+        "buttonLabel": "Creează PIN"
+      }
     }
   }
 }

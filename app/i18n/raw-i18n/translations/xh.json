@@ -3120,6 +3120,19 @@
         "noPhysicalCard": "Akukho mfuneko yokuthwala ikhadi lakho lokwenyani",
         "worksLocked": "Iyasebenza nokuba ifowuni yakho itshixiwe"
       }
+    },
+    "CardStatus": {
+      "title": "Ikhadi le-Visa",
+      "CardApproved": {
+        "title": "Sivuyisana nawe!",
+        "subtitle": "Ikhadi lakho le-Blink Visa livuselelwe.",
+        "buttonLabel": "Odola ikhadi lokwenyani"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Ikhadi lakho lokwenyani lisendleleni!",
+        "subtitle": "I-odolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
+        "buttonLabel": "Yenza i-PIN"
+      }
     }
   }
 }

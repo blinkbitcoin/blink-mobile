@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "Fiziksel kartinizi tasimaniza gerek yok",
         "worksLocked": "Telefonunuz kilitliyken bile calisir"
       }
+    },
+    "CardStatus": {
+      "title": "Visa Kartı",
+      "CardApproved": {
+        "title": "Tebrikler!",
+        "subtitle": "Blink Visa kartınız etkinleştirildi.",
+        "buttonLabel": "Fiziksel kart sipariş et"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Fiziksel kartınız yolda!",
+        "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
+        "buttonLabel": "PIN oluştur"
+      }
     }
   }
 }

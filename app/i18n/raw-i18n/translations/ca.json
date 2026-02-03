@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "No cal portar la targeta fisica",
         "worksLocked": "Funciona fins i tot amb el telefon bloquejat"
       }
+    },
+    "CardStatus": {
+      "title": "Targeta Visa",
+      "CardApproved": {
+        "title": "Felicitats!",
+        "subtitle": "La teva targeta Blink Visa ha estat activada.",
+        "buttonLabel": "Demanar targeta física"
+      },
+      "PhysicalCardOrdered": {
+        "title": "La teva targeta física està en camí!",
+        "subtitle": "La comanda per al lliurament de la teva targeta Blink ha estat enviada.",
+        "buttonLabel": "Crear PIN"
+      }
     }
   }
 }

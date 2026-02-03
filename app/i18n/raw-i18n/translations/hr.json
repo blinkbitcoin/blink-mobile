@@ -3114,6 +3114,19 @@
         "noPhysicalCard": "Nije potrebno nositi fizicku karticu",
         "worksLocked": "Radi cak i kada je telefon zakljucan"
       }
+    },
+    "CardStatus": {
+      "title": "Visa kartica",
+      "CardApproved": {
+        "title": "Čestitamo!",
+        "subtitle": "Vaša Blink Visa kartica je aktivirana.",
+        "buttonLabel": "Naruči fizičku karticu"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Vaša fizička kartica je na putu!",
+        "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
+        "buttonLabel": "Kreiraj PIN"
+      }
     }
   }
 }

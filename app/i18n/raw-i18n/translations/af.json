@@ -3114,6 +3114,19 @@
         "noPhysicalCard": "Geen fisiese kaart nodig nie",
         "worksLocked": "Werk selfs wanneer jou foon gesluit is"
       }
+    },
+    "CardStatus": {
+      "title": "Visa-kaart",
+      "CardApproved": {
+        "title": "Geluk!",
+        "subtitle": "Jou Blink Visa-kaart is geaktiveer.",
+        "buttonLabel": "Bestel fisiese kaart"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Jou fisiese kaart is op pad!",
+        "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
+        "buttonLabel": "Skep PIN"
+      }
     }
   }
 }
