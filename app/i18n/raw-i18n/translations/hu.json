@@ -2771,7 +2771,8 @@
     "support": "Támogatás",
     "profiles": "Profilok",
     "paste": "Beillesztés",
-    "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva"
+    "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva",
+    "save": "Mentés"
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -3086,6 +3087,21 @@
         "subtitle": "A Blink kártyád kiszállítási rendelése beküldésre került.",
         "buttonLabel": "PIN létrehozása"
       }
+    },
+    "ShippingAddress": {
+      "title": "Szállítási cím",
+      "fullName": "Teljes név",
+      "addressLine1": "Cím 1. sor",
+      "addressLine2": "Cím 2. sor",
+      "city": "Város",
+      "state": "Állam",
+      "postalCode": "Irányítószám",
+      "country": "Ország",
+      "important": "Fontos",
+      "importantDescription": "Kérjük, győződjön meg róla, hogy címe pontos és teljes.",
+      "noPOBoxes": "A kártyák nem kézbesíthetők postafiókokba",
+      "signatureRequired": "Aláírás szükséges lehet a kézbesítéskor",
+      "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie"
     }
   }
 }

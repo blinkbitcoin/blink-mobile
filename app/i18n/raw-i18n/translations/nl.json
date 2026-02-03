@@ -2788,7 +2788,8 @@
     "support": "Ondersteuning",
     "profiles": "Profielen",
     "paste": "Plakken",
-    "hasBeenCopiedToClipboard": "{type: string} is naar het klembord gekopieerd"
+    "hasBeenCopiedToClipboard": "{type: string} is naar het klembord gekopieerd",
+    "save": "Opslaan"
   },
   "errors": {
     "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",
@@ -3127,6 +3128,21 @@
         "subtitle": "De bestelling voor levering van je Blink-kaart is ingediend.",
         "buttonLabel": "PIN aanmaken"
       }
+    },
+    "ShippingAddress": {
+      "title": "Verzendadres",
+      "fullName": "Volledige naam",
+      "addressLine1": "Adresregel 1",
+      "addressLine2": "Adresregel 2",
+      "city": "Stad",
+      "state": "Provincie",
+      "postalCode": "Postcode",
+      "country": "Land",
+      "important": "Belangrijk",
+      "importantDescription": "Zorg ervoor dat uw adres nauwkeurig en volledig is.",
+      "noPOBoxes": "Kaarten kunnen niet worden bezorgd bij postbussen",
+      "signatureRequired": "Bij bezorging kan een handtekening vereist zijn",
+      "supportedRegions": "Het adres moet binnen de ondersteunde verzendregio's liggen"
     }
   }
 }
