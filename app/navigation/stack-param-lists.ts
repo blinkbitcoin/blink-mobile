@@ -148,6 +148,13 @@ export type RootStackParamList = {
     iconName: IconNamesType
     iconColor?: string
   }
+  cardShippingAddressScreen: undefined
+  selectionScreen: {
+    title: string
+    options: Array<{ value: string; label: string }>
+    selectedValue: string
+    onSelect: (value: string) => void
+  }
 }
 
 export type OnboardingStackParamList = {
