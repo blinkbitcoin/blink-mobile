@@ -9,6 +9,7 @@ import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/ca
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { isIos } from "@app/utils/helper"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -34,8 +35,8 @@ export const CardSettingsScreen: React.FC = () => {
     console.log("Order physical card pressed")
   }
 
-  const handleAddToGooglePay = () => {
-    console.log("Add to Google Pay pressed")
+  const handleAddToMobileWallet = () => {
+    navigation.navigate("cardAddToMobileWalletScreen")
   }
 
   const handleReplaceCard = () => {
@@ -131,9 +132,13 @@ export const CardSettingsScreen: React.FC = () => {
             ),
             () => (
               <SettingItemRow
-                title={LL.CardFlow.CardSettings.addToGooglePay()}
+                title={
+                  isIos
+                    ? LL.CardFlow.CardSettings.addToAppleWallet()
+                    : LL.CardFlow.CardSettings.addToGooglePay()
+                }
                 leftIonicon="wallet-outline"
-                onPress={handleAddToGooglePay}
+                onPress={handleAddToMobileWallet}
               />
             ),
             () => (
