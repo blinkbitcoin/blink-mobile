@@ -2771,7 +2771,8 @@
     "support": "Obuyambi",
     "profiles": "Profayiro",
     "paste": "Teeka",
-    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
+    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe",
+    "save": "Save"
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -3086,6 +3087,21 @@
         "subtitle": "Order yo ey'okutwala kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Teekawo PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Shipping address",
+      "fullName": "Full name",
+      "addressLine1": "Address line 1",
+      "addressLine2": "Address line 2",
+      "city": "City",
+      "state": "State",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "important": "Important",
+      "importantDescription": "Please ensure your address is accurate and complete.",
+      "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
+      "signatureRequired": "Signature may be required upon delivery",
+      "supportedRegions": "Address must be within supported shipping regions"
     }
   }
 }

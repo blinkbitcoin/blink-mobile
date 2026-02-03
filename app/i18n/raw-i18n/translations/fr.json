@@ -2741,6 +2741,7 @@
         "rate": "Taux",
         "reauth": "Session expirée. SVP connectez-vous à nouveau.",
         "restart": "Recommencer",
+        "save": "Enregistrer",
         "sats": "sats",
         "search": "Recherche",
         "security": "Sécurité",
@@ -3127,6 +3128,21 @@
                 "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
                 "buttonLabel": "Créer un code PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Adresse de livraison",
+            "fullName": "Nom complet",
+            "addressLine1": "Adresse ligne 1",
+            "addressLine2": "Adresse ligne 2",
+            "city": "Ville",
+            "state": "État",
+            "postalCode": "Code postal",
+            "country": "Pays",
+            "important": "Important",
+            "importantDescription": "Veuillez vous assurer que votre adresse est exacte et complète.",
+            "noPOBoxes": "Les cartes ne peuvent pas être livrées aux boîtes postales",
+            "signatureRequired": "Une signature peut être requise à la livraison",
+            "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge"
         }
     }
 }

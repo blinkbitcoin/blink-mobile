@@ -2722,6 +2722,7 @@
         "rate": "Rate",
         "reauth": "Your session has expired. Please log in again.",
         "restart": "Restart",
+        "save": "Save",
         "sats": "sats",
         "search": "Search",
         "security": "Security",
@@ -3056,6 +3057,21 @@
                 "subtitle": "Order for delivery of your Blink Card has been submitted.",
                 "buttonLabel": "Create PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Shipping address",
+            "fullName": "Full name",
+            "addressLine1": "Address line 1",
+            "addressLine2": "Address line 2",
+            "city": "City",
+            "state": "State",
+            "postalCode": "Postal code",
+            "country": "Country",
+            "important": "Important",
+            "importantDescription": "Please ensure your address is accurate and complete.",
+            "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
+            "signatureRequired": "Signature may be required upon delivery",
+            "supportedRegions": "Address must be within supported shipping regions"
         },
         "TransactionDetails": {
             "title": "Transaction details",

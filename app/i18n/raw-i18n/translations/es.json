@@ -2722,6 +2722,7 @@
         "rate": "Tasa",
         "reauth": "Su sesión ha expirado. Inicie sesión de nuevo.",
         "restart": "Reiniciar",
+        "save": "Guardar",
         "sats": "Satoshis",
         "search": "Buscar",
         "security": "Seguridad",
@@ -3086,6 +3087,21 @@
                 "subtitle": "La solicitud de envío de tu tarjeta Blink ha sido enviada.",
                 "buttonLabel": "Crear PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Dirección de envío",
+            "fullName": "Nombre completo",
+            "addressLine1": "Dirección línea 1",
+            "addressLine2": "Dirección línea 2",
+            "city": "Ciudad",
+            "state": "Estado",
+            "postalCode": "Código postal",
+            "country": "País",
+            "important": "Importante",
+            "importantDescription": "Asegúrate de que tu dirección sea precisa y completa.",
+            "noPOBoxes": "No se puede entregar tarjetas a apartados postales",
+            "signatureRequired": "Puede requerirse firma al momento de la entrega",
+            "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas"
         }
     }
 }

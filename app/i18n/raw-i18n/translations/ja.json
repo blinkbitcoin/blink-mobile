@@ -2741,6 +2741,7 @@
         "rate": "レート",
         "reauth": "セッションの有効期限が切れました。再ログインしてください。",
         "restart": "再起動",
+        "save": "保存",
         "sats": "sats",
         "search": "検索する",
         "security": "セキュリティ",
@@ -3127,6 +3128,21 @@
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "PINを作成"
             }
+        },
+        "ShippingAddress": {
+            "title": "配送先住所",
+            "fullName": "氏名",
+            "addressLine1": "住所1",
+            "addressLine2": "住所2",
+            "city": "市区町村",
+            "state": "都道府県",
+            "postalCode": "郵便番号",
+            "country": "国",
+            "important": "重要",
+            "importantDescription": "住所が正確で完全であることを確認してください。",
+            "noPOBoxes": "私書箱には配達できません",
+            "signatureRequired": "配達時に署名が必要な場合があります",
+            "supportedRegions": "配送対応地域内の住所である必要があります"
         }
     }
 }

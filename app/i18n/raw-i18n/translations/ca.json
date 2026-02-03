@@ -2771,7 +2771,8 @@
     "support": "Suport",
     "profiles": "Perfils",
     "paste": "Enganxa",
-    "hasBeenCopiedToClipboard": "{type: string} s'ha copiat al porta-retalls"
+    "hasBeenCopiedToClipboard": "{type: string} s'ha copiat al porta-retalls",
+    "save": "Desa"
   },
   "errors": {
     "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",
@@ -3086,6 +3087,21 @@
         "subtitle": "La comanda per al lliurament de la teva targeta Blink ha estat enviada.",
         "buttonLabel": "Crear PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Adreça d'enviament",
+      "fullName": "Nom complet",
+      "addressLine1": "Adreça línia 1",
+      "addressLine2": "Adreça línia 2",
+      "city": "Ciutat",
+      "state": "Estat",
+      "postalCode": "Codi postal",
+      "country": "País",
+      "important": "Important",
+      "importantDescription": "Assegureu-vos que la vostra adreça sigui precisa i completa.",
+      "noPOBoxes": "Les targetes no es poden lliurar a apartats de correus",
+      "signatureRequired": "Es pot requerir signatura en el lliurament",
+      "supportedRegions": "L'adreça ha de ser dins de les regions d'enviament admeses"
     }
   }
 }
