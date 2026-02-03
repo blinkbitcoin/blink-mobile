@@ -2781,7 +2781,8 @@
             "termsAndConditions": "Card Terms & Conditions",
             "privacyPolicy": "Card Privacy Policy",
             "closeCardAccount": "Close card account",
-            "closeCardAccountDescription": "Permanently close your Visa card"
+            "closeCardAccountDescription": "Permanently close your Visa card",
+            "addToAppleWallet": "Ավելացնել Apple Wallet-ում"
         },
         "TransactionDetails": {
             "title": "Գdelays մdelays",
@@ -2819,6 +2820,19 @@
             "contactInformation": "Կապի տվյալներ",
             "registeredAddress": "Գրանցման հասցե",
             "shippingAddress": "Առաքման հասցե"
+        },
+        "AddToMobileWallet": {
+            "title": "Ավելացնել բջջային դրամապանակում",
+            "addYourCard": "Ավելացնել ձեր քարտը",
+            "addYourCardDescription": "Ավելացրեք ձեր Blink Visa քարտը բջջային դրամապանակում՝ արագ և անվտանգ վճարումների համար",
+            "addTo": "Ավելացնել",
+            "Benefits": {
+                "title": "Բջջային դրամապանակի առավելությունները",
+                "contactless": "Անհպում վճարումներ միլիոնավոր վայրերում",
+                "security": "Ավելացված անվտանգություն՝ կենսաչափական նույնականացմամբ",
+                "noPhysicalCard": "Կարիք չկա ձեզ հետ կրել ֆիզիկական քարտը",
+                "worksLocked": "Աշխատում է նույնիսկ երբ ձեր հեռախոսը կողպված է"
+            }
         }
     }
 }
