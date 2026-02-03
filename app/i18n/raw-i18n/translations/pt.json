@@ -3073,6 +3073,19 @@
                 "noPhysicalCard": "Não precisa carregar seu cartão físico",
                 "worksLocked": "Funciona mesmo com o telefone bloqueado"
             }
+        },
+        "CardStatus": {
+            "title": "Cartão Visa",
+            "CardApproved": {
+                "title": "Parabéns!",
+                "subtitle": "Seu cartão Blink Visa foi ativado.",
+                "buttonLabel": "Solicitar cartão físico"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Seu cartão físico está a caminho!",
+                "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
+                "buttonLabel": "Criar PIN"
+            }
         }
     }
 }

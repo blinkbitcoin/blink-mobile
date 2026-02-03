@@ -3111,6 +3111,19 @@
         "noPhysicalCard": "لا حاجة لحمل بطاقتك الفعلية",
         "worksLocked": "تعمل حتى عندما يكون هاتفك مقفلا"
       }
+    },
+    "CardStatus": {
+      "title": "بطاقة فيزا",
+      "CardApproved": {
+        "title": "تهانينا!",
+        "subtitle": "تم تفعيل بطاقة Blink Visa الخاصة بك.",
+        "buttonLabel": "اطلب البطاقة الفعلية"
+      },
+      "PhysicalCardOrdered": {
+        "title": "بطاقتك الفعلية في الطريق!",
+        "subtitle": "تم تقديم طلب توصيل بطاقة Blink الخاصة بك.",
+        "buttonLabel": "إنشاء رمز PIN"
+      }
     }
   }
 }

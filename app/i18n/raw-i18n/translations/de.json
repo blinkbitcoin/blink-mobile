@@ -3073,6 +3073,19 @@
                 "noPhysicalCard": "Keine physische Karte erforderlich",
                 "worksLocked": "Funktioniert auch bei gesperrtem Telefon"
             }
+        },
+        "CardStatus": {
+            "title": "Visa-Karte",
+            "CardApproved": {
+                "title": "Herzlichen Glückwunsch!",
+                "subtitle": "Deine Blink Visa-Karte wurde aktiviert.",
+                "buttonLabel": "Physische Karte bestellen"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Deine physische Karte ist unterwegs!",
+                "subtitle": "Die Bestellung zur Lieferung deiner Blink-Karte wurde eingereicht.",
+                "buttonLabel": "PIN erstellen"
+            }
         }
     }
 }

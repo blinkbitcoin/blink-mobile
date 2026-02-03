@@ -3111,6 +3111,19 @@
         "noPhysicalCard": "Mana tarjetaykita apanaykichu tiyan",
         "worksLocked": "Llamkan telefonoyki wisqasqa kaptinpas"
       }
+    },
+    "CardStatus": {
+      "title": "Visa tarjeta",
+      "CardApproved": {
+        "title": "¡Kusikuyki!",
+        "subtitle": "Blink Visa tarjetayki qallarisqa.",
+        "buttonLabel": "Tarjeta físicata mañakuy"
+      },
+      "PhysicalCardOrdered": {
+        "title": "¡Tarjeta físicayki ñanpi kachkan!",
+        "subtitle": "Blink tarjetayki apachiypa mañakuyninqa kachasqa.",
+        "buttonLabel": "PIN ruray"
+      }
     }
   }
 }

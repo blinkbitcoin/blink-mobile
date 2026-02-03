@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "Hakuna haja ya kubeba kadi yako halisi",
         "worksLocked": "Inafanya kazi hata simu yako imefungwa"
       }
+    },
+    "CardStatus": {
+      "title": "Kadi ya Visa",
+      "CardApproved": {
+        "title": "Hongera!",
+        "subtitle": "Kadi yako ya Blink Visa imeamilishwa.",
+        "buttonLabel": "Agiza kadi halisi"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Kadi yako halisi iko njiani!",
+        "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limetumwa.",
+        "buttonLabel": "Unda PIN"
+      }
     }
   }
 }
