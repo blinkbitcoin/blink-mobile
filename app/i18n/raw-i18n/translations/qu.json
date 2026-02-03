@@ -3058,7 +3058,8 @@
       "termsAndConditions": "Tarjeta kamachiykuna",
       "privacyPolicy": "Tarjeta pakasqa kamachiy",
       "closeCardAccount": "Tarjeta kuntata wisqay",
-      "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay"
+      "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay",
+      "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman"
     },
     "TransactionDetails": {
       "title": "Transacción willaykunakuna",
@@ -3097,6 +3098,19 @@
       "contactInformation": "Tinkuy willakuykuna",
       "registeredAddress": "Qillqasqa tiyana",
       "shippingAddress": "Apachina tiyana"
+    },
+    "AddToMobileWallet": {
+      "title": "Yapaykuy qullqi walitaman",
+      "addYourCard": "Tarjetaykita yapaykuy",
+      "addYourCardDescription": "Blink Visa tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
+      "addTo": "Yapaykuy",
+      "Benefits": {
+        "title": "Qullqi walitap allin kayninkunan",
+        "contactless": "Mana llamiyspa pagay waranqa waranqa cheqaspi",
+        "security": "Aswan allin waqaychay biometrico nisqawan",
+        "noPhysicalCard": "Mana tarjetaykita apanaykichu tiyan",
+        "worksLocked": "Llamkan telefonoyki wisqasqa kaptinpas"
+      }
     }
   }
 }

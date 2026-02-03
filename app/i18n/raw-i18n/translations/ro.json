@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Termeni și condiții card",
       "privacyPolicy": "Politica de confidențialitate card",
       "closeCardAccount": "Închide contul cardului",
-      "closeCardAccountDescription": "Închide permanent cardul tău Visa"
+      "closeCardAccountDescription": "Închide permanent cardul tău Visa",
+      "addToAppleWallet": "Adauga in Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Detalii tranzacție",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Informații de contact",
       "registeredAddress": "Adresă înregistrată",
       "shippingAddress": "Adresă de livrare"
+    },
+    "AddToMobileWallet": {
+      "title": "Adauga in portofelul mobil",
+      "addYourCard": "Adauga cardul tau",
+      "addYourCardDescription": "Adauga cardul Blink Visa in portofelul mobil pentru plati rapide si sigure",
+      "addTo": "Adauga in",
+      "Benefits": {
+        "title": "Beneficiile portofelului mobil",
+        "contactless": "Plati contactless in milioane de locatii",
+        "security": "Securitate imbunatatita cu autentificare biometrica",
+        "noPhysicalCard": "Nu e nevoie sa porti cardul fizic",
+        "worksLocked": "Functioneaza chiar si cand telefonul e blocat"
+      }
     }
   }
 }

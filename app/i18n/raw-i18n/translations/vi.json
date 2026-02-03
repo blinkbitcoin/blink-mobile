@@ -3058,7 +3058,8 @@
       "termsAndConditions": "Điều khoản và điều kiện thẻ",
       "privacyPolicy": "Chính sách bảo mật thẻ",
       "closeCardAccount": "Đóng tài khoản thẻ",
-      "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn"
+      "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn",
+      "addToAppleWallet": "Them vao Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Chi tiết giao dịch",
@@ -3097,6 +3098,19 @@
       "contactInformation": "Thông tin liên hệ",
       "registeredAddress": "Địa chỉ đăng ký",
       "shippingAddress": "Địa chỉ giao hàng"
+    },
+    "AddToMobileWallet": {
+      "title": "Them vao vi di dong",
+      "addYourCard": "Them the cua ban",
+      "addYourCardDescription": "Them the Blink Visa vao vi di dong de thanh toan nhanh chong va an toan",
+      "addTo": "Them vao",
+      "Benefits": {
+        "title": "Loi ich cua vi di dong",
+        "contactless": "Thanh toan khong tiep xuc tai hang trieu dia diem",
+        "security": "Bao mat nang cao voi xac thuc sinh trac hoc",
+        "noPhysicalCard": "Khong can mang theo the vat ly",
+        "worksLocked": "Hoat dong ngay ca khi dien thoai bi khoa"
+      }
     }
   }
 }

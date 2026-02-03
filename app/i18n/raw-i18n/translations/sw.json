@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Masharti na vigezo vya kadi",
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
-      "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa"
+      "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa",
+      "addToAppleWallet": "Ongeza kwenye Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Maelezo ya muamala",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Maelezo ya mawasiliano",
       "registeredAddress": "Anwani iliyosajiliwa",
       "shippingAddress": "Anwani ya usafirishaji"
+    },
+    "AddToMobileWallet": {
+      "title": "Ongeza kwenye pochi ya simu",
+      "addYourCard": "Ongeza kadi yako",
+      "addYourCardDescription": "Ongeza kadi yako ya Blink Visa kwenye pochi ya simu kwa malipo ya haraka na salama",
+      "addTo": "Ongeza kwenye",
+      "Benefits": {
+        "title": "Faida za pochi ya simu",
+        "contactless": "Malipo bila kugusa katika mamilioni ya maeneo",
+        "security": "Usalama ulioboreshwa na uthibitishaji wa kibayometriki",
+        "noPhysicalCard": "Hakuna haja ya kubeba kadi yako halisi",
+        "worksLocked": "Inafanya kazi hata simu yako imefungwa"
+      }
     }
   }
 }

@@ -3061,7 +3061,8 @@
       "termsAndConditions": "Terma dan syarat kad",
       "privacyPolicy": "Dasar privasi kad",
       "closeCardAccount": "Tutup akaun kad",
-      "closeCardAccountDescription": "Tutup kad Visa anda secara kekal"
+      "closeCardAccountDescription": "Tutup kad Visa anda secara kekal",
+      "addToAppleWallet": "Tambah ke Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Butiran transaksi",
@@ -3100,6 +3101,19 @@
       "contactInformation": "Maklumat hubungan",
       "registeredAddress": "Alamat berdaftar",
       "shippingAddress": "Alamat penghantaran"
+    },
+    "AddToMobileWallet": {
+      "title": "Tambah ke dompet mudah alih",
+      "addYourCard": "Tambah kad anda",
+      "addYourCardDescription": "Tambah kad Blink Visa ke dompet mudah alih untuk pembayaran pantas dan selamat",
+      "addTo": "Tambah ke",
+      "Benefits": {
+        "title": "Manfaat dompet mudah alih",
+        "contactless": "Pembayaran tanpa sentuh di jutaan lokasi",
+        "security": "Keselamatan dipertingkat dengan pengesahan biometrik",
+        "noPhysicalCard": "Tidak perlu membawa kad fizikal",
+        "worksLocked": "Berfungsi walaupun telefon dikunci"
+      }
     }
   }
 }

@@ -9958,6 +9958,10 @@ type RootTranslation = {
 			 */
 			addToGooglePay: string
 			/**
+			 * A​d​d​ ​t​o​ ​A​p​p​l​e​ ​W​a​l​l​e​t
+			 */
+			addToAppleWallet: string
+			/**
 			 * R​e​p​l​a​c​e​ ​c​a​r​d
 			 */
 			replaceCard: string
@@ -10023,6 +10027,46 @@ type RootTranslation = {
 			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
 			 */
 			shippingAddress: string
+		}
+		AddToMobileWallet: {
+			/**
+			 * A​d​d​ ​t​o​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * A​d​d​ ​y​o​u​r​ ​c​a​r​d
+			 */
+			addYourCard: string
+			/**
+			 * A​d​d​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​t​o​ ​y​o​u​r​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t​ ​f​o​r​ ​q​u​i​c​k​ ​a​n​d​ ​s​e​c​u​r​e​ ​p​a​y​m​e​n​t​s
+			 */
+			addYourCardDescription: string
+			/**
+			 * A​d​d​ ​t​o
+			 */
+			addTo: string
+			Benefits: {
+				/**
+				 * B​e​n​e​f​i​t​s​ ​o​f​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t
+				 */
+				title: string
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​s​ ​a​t​ ​m​i​l​l​i​o​n​s​ ​o​f​ ​l​o​c​a​t​i​o​n​s
+				 */
+				contactless: string
+				/**
+				 * E​n​h​a​n​c​e​d​ ​s​e​c​u​r​i​t​y​ ​w​i​t​h​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+				 */
+				security: string
+				/**
+				 * N​o​ ​n​e​e​d​ ​t​o​ ​c​a​r​r​y​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				noPhysicalCard: string
+				/**
+				 * W​o​r​k​s​ ​e​v​e​n​ ​w​h​e​n​ ​y​o​u​r​ ​p​h​o​n​e​ ​i​s​ ​l​o​c​k​e​d
+				 */
+				worksLocked: string
+			}
 		}
 		TransactionDetails: {
 			/**
@@ -19953,6 +19997,10 @@ export type TranslationFunctions = {
 			 */
 			addToGooglePay: () => LocalizedString
 			/**
+			 * Add to Apple Wallet
+			 */
+			addToAppleWallet: () => LocalizedString
+			/**
 			 * Replace card
 			 */
 			replaceCard: () => LocalizedString
@@ -20018,6 +20066,46 @@ export type TranslationFunctions = {
 			 * Shipping address
 			 */
 			shippingAddress: () => LocalizedString
+		}
+		AddToMobileWallet: {
+			/**
+			 * Add to mobile wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * Add your card
+			 */
+			addYourCard: () => LocalizedString
+			/**
+			 * Add your Blink Visa card to your mobile wallet for quick and secure payments
+			 */
+			addYourCardDescription: () => LocalizedString
+			/**
+			 * Add to
+			 */
+			addTo: () => LocalizedString
+			Benefits: {
+				/**
+				 * Benefits of mobile wallet
+				 */
+				title: () => LocalizedString
+				/**
+				 * Contactless payments at millions of locations
+				 */
+				contactless: () => LocalizedString
+				/**
+				 * Enhanced security with biometric authentication
+				 */
+				security: () => LocalizedString
+				/**
+				 * No need to carry your physical card
+				 */
+				noPhysicalCard: () => LocalizedString
+				/**
+				 * Works even when your phone is locked
+				 */
+				worksLocked: () => LocalizedString
+			}
 		}
 		TransactionDetails: {
 			/**
