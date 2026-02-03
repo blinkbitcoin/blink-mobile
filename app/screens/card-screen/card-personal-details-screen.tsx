@@ -1,6 +1,8 @@
 import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
 
 import {
   AvatarInitial,
@@ -8,12 +10,13 @@ import {
   IconTextButton,
   InfoCard,
   MultiLineField,
-  ReadOnlyField,
+  InputField,
   SettingItemRow,
 } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { MOCK_USER } from "./card-mock-data"
 
@@ -23,13 +26,14 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const handleChangeKycInformation = () => {
     console.log("Change KYC information pressed")
   }
 
   const handleEditShippingAddress = () => {
-    console.log("Edit shipping address pressed")
+    navigation.navigate("cardShippingAddressScreen")
   }
 
   const handleContactSupport = () => {
@@ -63,17 +67,17 @@ export const CardPersonalDetailsScreen: React.FC = () => {
           onPress={handleChangeKycInformation}
         />
 
-        <ReadOnlyField
+        <InputField
           label={LL.CardFlow.PersonalDetails.firstName()}
           value={MOCK_USER.firstName}
         />
 
-        <ReadOnlyField
+        <InputField
           label={LL.CardFlow.PersonalDetails.lastName()}
           value={MOCK_USER.lastName}
         />
 
-        <ReadOnlyField
+        <InputField
           label={LL.CardFlow.PersonalDetails.dateOfBirth()}
           value={MOCK_USER.dateOfBirth}
         />
