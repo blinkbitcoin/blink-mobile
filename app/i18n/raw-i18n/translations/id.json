@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Syarat dan ketentuan kartu",
       "privacyPolicy": "Kebijakan privasi kartu",
       "closeCardAccount": "Tutup akun kartu",
-      "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen"
+      "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen",
+      "addToAppleWallet": "Tambahkan ke Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Detail transaksi",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Informasi kontak",
       "registeredAddress": "Alamat terdaftar",
       "shippingAddress": "Alamat pengiriman"
+    },
+    "AddToMobileWallet": {
+      "title": "Tambahkan ke dompet seluler",
+      "addYourCard": "Tambahkan kartu Anda",
+      "addYourCardDescription": "Tambahkan kartu Blink Visa ke dompet seluler untuk pembayaran cepat dan aman",
+      "addTo": "Tambahkan ke",
+      "Benefits": {
+        "title": "Manfaat dompet seluler",
+        "contactless": "Pembayaran tanpa kontak di jutaan lokasi",
+        "security": "Keamanan yang ditingkatkan dengan autentikasi biometrik",
+        "noPhysicalCard": "Tidak perlu membawa kartu fisik",
+        "worksLocked": "Berfungsi bahkan saat ponsel terkunci"
+      }
     }
   }
 }

@@ -3138,6 +3138,7 @@ const en: BaseTranslation = {
       cardManagement: "Card management",
       orderPhysicalCard: "Order physical card",
       addToGooglePay: "Add to Google Pay",
+      addToAppleWallet: "Add to Apple Wallet",
       replaceCard: "Replace card",
       termsAndConditions: "Card Terms & Conditions",
       privacyPolicy: "Card Privacy Policy",
@@ -3157,6 +3158,20 @@ const en: BaseTranslation = {
       contactInformation: "Contact information",
       registeredAddress: "Registered address",
       shippingAddress: "Shipping address",
+    },
+    AddToMobileWallet: {
+      title: "Add to mobile wallet",
+      addYourCard: "Add your card",
+      addYourCardDescription:
+        "Add your Blink Visa card to your mobile wallet for quick and secure payments",
+      addTo: "Add to",
+      Benefits: {
+        title: "Benefits of mobile wallet",
+        contactless: "Contactless payments at millions of locations",
+        security: "Enhanced security with biometric authentication",
+        noPhysicalCard: "No need to carry your physical card",
+        worksLocked: "Works even when your phone is locked",
+      },
     },
     TransactionDetails: {
       title: "Transaction details",

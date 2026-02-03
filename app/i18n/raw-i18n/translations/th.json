@@ -3058,7 +3058,8 @@
       "termsAndConditions": "ข้อกำหนดและเงื่อนไขของบัตร",
       "privacyPolicy": "นโยบายความเป็นส่วนตัวของบัตร",
       "closeCardAccount": "ปิดบัญชีบัตร",
-      "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร"
+      "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร",
+      "addToAppleWallet": "เพิ่มไปยัง Apple Wallet"
     },
     "TransactionDetails": {
       "title": "รายละเอียดธุรกรรม",
@@ -3097,6 +3098,19 @@
       "contactInformation": "ข้อมูลติดต่อ",
       "registeredAddress": "ที่อยู่ที่ลงทะเบียน",
       "shippingAddress": "ที่อยู่จัดส่ง"
+    },
+    "AddToMobileWallet": {
+      "title": "เพิ่มไปยังกระเป๋าเงินมือถือ",
+      "addYourCard": "เพิ่มบัตรของคุณ",
+      "addYourCardDescription": "เพิ่มบัตร Blink Visa ไปยังกระเป๋าเงินมือถือเพื่อการชำระเงินที่รวดเร็วและปลอดภัย",
+      "addTo": "เพิ่มไปยัง",
+      "Benefits": {
+        "title": "ประโยชน์ของกระเป๋าเงินมือถือ",
+        "contactless": "ชำระเงินแบบไร้สัมผัสได้ที่หลายล้านสถานที่",
+        "security": "ความปลอดภัยที่เพิ่มขึ้นด้วยการยืนยันตัวตนทางชีวภาพ",
+        "noPhysicalCard": "ไม่จำเป็นต้องพกบัตรจริง",
+        "worksLocked": "ใช้งานได้แม้โทรศัพท์ถูกล็อค"
+      }
     }
   }
 }
