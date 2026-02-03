@@ -2817,16 +2817,16 @@
             "shippingAddress": "Адреса за доставу"
         },
         "AddToMobileWallet": {
-            "title": "Dodaj u mobilni novcanik",
-            "addYourCard": "Dodajte svoju karticu",
-            "addYourCardDescription": "Dodajte svoju Blink Visa karticu u mobilni novcanik za brza i sigurna placanja",
-            "addTo": "Dodaj u",
+            "title": "Додај у мобилни новчаник",
+            "addYourCard": "Додајте своју картицу",
+            "addYourCardDescription": "Додајте своју Blink Visa картицу у мобилни новчаник за брза и сигурна плаћања",
+            "addTo": "Додај у",
             "Benefits": {
-                "title": "Prednosti mobilnog novcanika",
-                "contactless": "Beskontaktna placanja na milionima lokacija",
-                "security": "Poboljsana sigurnost sa biometrijskom autentifikacijom",
-                "noPhysicalCard": "Nije potrebno nositi fizicku karticu",
-                "worksLocked": "Radi cak i kada je telefon zakljucan"
+                "title": "Предности мобилног новчаника",
+                "contactless": "Бесконтактна плаћања на милионима локација",
+                "security": "Побољшана сигурност са биометријском аутентификацијом",
+                "noPhysicalCard": "Није потребно носити физичку картицу",
+                "worksLocked": "Ради чак и када је телефон закључан"
             }
         }
     }

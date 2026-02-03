@@ -2929,16 +2929,16 @@
             "shippingAddress": "Adresă de livrare"
         },
         "AddToMobileWallet": {
-            "title": "Adauga in portofelul mobil",
-            "addYourCard": "Adauga cardul tau",
-            "addYourCardDescription": "Adauga cardul Blink Visa in portofelul mobil pentru plati rapide si sigure",
-            "addTo": "Adauga in",
+            "title": "Adaugă în portofelul mobil",
+            "addYourCard": "Adaugă cardul tău",
+            "addYourCardDescription": "Adaugă cardul Blink Visa în portofelul mobil pentru plăți rapide și sigure",
+            "addTo": "Adaugă în",
             "Benefits": {
                 "title": "Beneficiile portofelului mobil",
-                "contactless": "Plati contactless in milioane de locatii",
-                "security": "Securitate imbunatatita cu autentificare biometrica",
-                "noPhysicalCard": "Nu e nevoie sa porti cardul fizic",
-                "worksLocked": "Functioneaza chiar si cand telefonul e blocat"
+                "contactless": "Plăți contactless în milioane de locații",
+                "security": "Securitate îmbunătățită cu autentificare biometrică",
+                "noPhysicalCard": "Nu e nevoie să porți cardul fizic",
+                "worksLocked": "Funcționează chiar și când telefonul e blocat"
             }
         }
     }

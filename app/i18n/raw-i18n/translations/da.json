@@ -2849,16 +2849,16 @@
             "shippingAddress": "Leveringsadresse"
         },
         "AddToMobileWallet": {
-            "title": "Tilfoej til mobil tegnebog",
-            "addYourCard": "Tilfoej dit kort",
-            "addYourCardDescription": "Tilfoej dit Blink Visa-kort til din mobile tegnebog for hurtige og sikre betalinger",
-            "addTo": "Tilfoej til",
+            "title": "Tilføj til mobil tegnebog",
+            "addYourCard": "Tilføj dit kort",
+            "addYourCardDescription": "Tilføj dit Blink Visa-kort til din mobile tegnebog for hurtige og sikre betalinger",
+            "addTo": "Tilføj til",
             "Benefits": {
                 "title": "Fordele ved mobil tegnebog",
-                "contactless": "Kontaktlose betalinger pa millioner af steder",
+                "contactless": "Kontaktløse betalinger på millioner af steder",
                 "security": "Forbedret sikkerhed med biometrisk godkendelse",
-                "noPhysicalCard": "Intet behov for at baere dit fysiske kort",
-                "worksLocked": "Virker selv nar din telefon er last"
+                "noPhysicalCard": "Intet behov for at bære dit fysiske kort",
+                "worksLocked": "Virker selv når din telefon er låst"
             }
         }
     }

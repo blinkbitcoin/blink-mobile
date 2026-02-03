@@ -2822,16 +2822,16 @@
             "shippingAddress": "Dodací adresa"
         },
         "AddToMobileWallet": {
-            "title": "Pridat do mobilni penezenky",
-            "addYourCard": "Pridejte svou kartu",
-            "addYourCardDescription": "Pridejte svou kartu Blink Visa do mobilni penezenky pro rychle a bezpecne platby",
-            "addTo": "Pridat do",
+            "title": "Přidat do mobilní peněženky",
+            "addYourCard": "Přidejte svou kartu",
+            "addYourCardDescription": "Přidejte svou kartu Blink Visa do mobilní peněženky pro rychlé a bezpečné platby",
+            "addTo": "Přidat do",
             "Benefits": {
-                "title": "Vyhody mobilni penezenky",
-                "contactless": "Bezkontaktni platby na milionech mist",
-                "security": "Zvysena bezpecnost s biometrickou autentizaci",
-                "noPhysicalCard": "Neni treba nosit fyzickou kartu",
-                "worksLocked": "Funguje i pri zamknutem telefonu"
+                "title": "Výhody mobilní peněženky",
+                "contactless": "Bezkontaktní platby na milionech míst",
+                "security": "Zvýšená bezpečnost s biometrickou autentizací",
+                "noPhysicalCard": "Není třeba nosit fyzickou kartu",
+                "worksLocked": "Funguje i při zamknutém telefonu"
             }
         }
     }

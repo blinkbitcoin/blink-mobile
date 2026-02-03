@@ -2822,16 +2822,16 @@
             "shippingAddress": "Adresa za dostavu"
         },
         "AddToMobileWallet": {
-            "title": "Dodaj u mobilni novcanik",
+            "title": "Dodaj u mobilni novčanik",
             "addYourCard": "Dodajte svoju karticu",
-            "addYourCardDescription": "Dodajte svoju Blink Visa karticu u mobilni novcanik za brza i sigurna placanja",
+            "addYourCardDescription": "Dodajte svoju Blink Visa karticu u mobilni novčanik za brza i sigurna plaćanja",
             "addTo": "Dodaj u",
             "Benefits": {
-                "title": "Prednosti mobilnog novcanika",
-                "contactless": "Beskontaktna placanja na milijunima lokacija",
-                "security": "Poboljsana sigurnost s biometrijskom autentifikacijom",
-                "noPhysicalCard": "Nije potrebno nositi fizicku karticu",
-                "worksLocked": "Radi cak i kada je telefon zakljucan"
+                "title": "Prednosti mobilnog novčanika",
+                "contactless": "Beskontaktna plaćanja na milijunima lokacija",
+                "security": "Poboljšana sigurnost s biometrijskom autentifikacijom",
+                "noPhysicalCard": "Nije potrebno nositi fizičku karticu",
+                "worksLocked": "Radi čak i kada je telefon zaključan"
             }
         }
     }

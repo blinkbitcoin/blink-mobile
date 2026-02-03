@@ -2908,16 +2908,16 @@
             "shippingAddress": "Szállítási cím"
         },
         "AddToMobileWallet": {
-            "title": "Hozzaadas a mobil tarcahoz",
-            "addYourCard": "Add hozza a kartyad",
-            "addYourCardDescription": "Add hozza a Blink Visa kartyad a mobil tarcadhoz a gyors es biztonsagos fizetesekhez",
-            "addTo": "Hozzaadas",
+            "title": "Hozzáadás a mobil tárcához",
+            "addYourCard": "Add hozzá a kártyád",
+            "addYourCardDescription": "Add hozzá a Blink Visa kártyád a mobil tárcádhoz a gyors és biztonságos fizetésekhez",
+            "addTo": "Hozzáadás",
             "Benefits": {
-                "title": "A mobil tarca elonyei",
-                "contactless": "Erintesmentes fizetes millio helyen",
-                "security": "Fokozott biztonsag biometrikus hitelesitessel",
-                "noPhysicalCard": "Nem kell magadnal hordanod a fizikai kartyat",
-                "worksLocked": "Mukodik meg akkor is ha a telefonod zarolva van"
+                "title": "A mobil tárca előnyei",
+                "contactless": "Érintésmentes fizetés millió helyen",
+                "security": "Fokozott biztonság biometrikus hitelesítéssel",
+                "noPhysicalCard": "Nem kell magadnál hordanod a fizikai kártyát",
+                "worksLocked": "Működik még akkor is ha a telefonod zárolva van"
             }
         }
     }

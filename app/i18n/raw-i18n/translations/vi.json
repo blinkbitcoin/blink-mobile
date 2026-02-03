@@ -2817,16 +2817,16 @@
             "shippingAddress": "Địa chỉ giao hàng"
         },
         "AddToMobileWallet": {
-            "title": "Them vao vi di dong",
-            "addYourCard": "Them the cua ban",
-            "addYourCardDescription": "Them the Blink Visa vao vi di dong de thanh toan nhanh chong va an toan",
-            "addTo": "Them vao",
+            "title": "Thêm vào ví di động",
+            "addYourCard": "Thêm thẻ của bạn",
+            "addYourCardDescription": "Thêm thẻ Blink Visa vào ví di động để thanh toán nhanh chóng và an toàn",
+            "addTo": "Thêm vào",
             "Benefits": {
-                "title": "Loi ich cua vi di dong",
-                "contactless": "Thanh toan khong tiep xuc tai hang trieu dia diem",
-                "security": "Bao mat nang cao voi xac thuc sinh trac hoc",
-                "noPhysicalCard": "Khong can mang theo the vat ly",
-                "worksLocked": "Hoat dong ngay ca khi dien thoai bi khoa"
+                "title": "Lợi ích của ví di động",
+                "contactless": "Thanh toán không tiếp xúc tại hàng triệu địa điểm",
+                "security": "Bảo mật nâng cao với xác thực sinh trắc học",
+                "noPhysicalCard": "Không cần mang theo thẻ vật lý",
+                "worksLocked": "Hoạt động ngay cả khi điện thoại bị khóa"
             }
         }
     }

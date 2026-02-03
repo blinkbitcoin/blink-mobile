@@ -2908,16 +2908,16 @@
             "shippingAddress": "Dodacia adresa"
         },
         "AddToMobileWallet": {
-            "title": "Pridat do mobilnej penazenky",
+            "title": "Pridať do mobilnej peňaženky",
             "addYourCard": "Pridajte svoju kartu",
-            "addYourCardDescription": "Pridajte svoju kartu Blink Visa do mobilnej penazenky pre rychle a bezpecne platby",
-            "addTo": "Pridat do",
+            "addYourCardDescription": "Pridajte svoju kartu Blink Visa do mobilnej peňaženky pre rýchle a bezpečné platby",
+            "addTo": "Pridať do",
             "Benefits": {
-                "title": "Vyhody mobilnej penazenky",
-                "contactless": "Bezkontaktne platby na milionoch miest",
-                "security": "Zvysena bezpecnost s biometrickou autentifikaciou",
-                "noPhysicalCard": "Nie je potrebne nosit fyzicku kartu",
-                "worksLocked": "Funguje aj pri zamknutom telefone"
+                "title": "Výhody mobilnej peňaženky",
+                "contactless": "Bezkontaktné platby na miliónoch miest",
+                "security": "Zvýšená bezpečnosť s biometrickou autentifikáciou",
+                "noPhysicalCard": "Nie je potrebné nosiť fyzickú kartu",
+                "worksLocked": "Funguje aj pri zamknutom telefóne"
             }
         }
     }

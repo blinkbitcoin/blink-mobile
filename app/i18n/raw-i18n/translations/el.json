@@ -2908,16 +2908,16 @@
             "shippingAddress": "Διεύθυνση αποστολής"
         },
         "AddToMobileWallet": {
-            "title": "Prosthiki sto kinito portofoli",
-            "addYourCard": "Prostheste tin karta sas",
-            "addYourCardDescription": "Prostheste tin karta Blink Visa sto kinito portofoli gia grigores kai asfales pliromes",
-            "addTo": "Prosthiki se",
+            "title": "Προσθήκη στο κινητό πορτοφόλι",
+            "addYourCard": "Προσθέστε την κάρτα σας",
+            "addYourCardDescription": "Προσθέστε την κάρτα Blink Visa στο κινητό πορτοφόλι για γρήγορες και ασφαλείς πληρωμές",
+            "addTo": "Προσθήκη σε",
             "Benefits": {
-                "title": "Ofeloi tou kinitou portofoliou",
-                "contactless": "Anepafes pliromes se ekatommyria topothesies",
-                "security": "Enischymeni asfaleia me viometriki pistopoiisi",
-                "noPhysicalCard": "Den chreiazeste ti fysiki karta",
-                "worksLocked": "Leitoyrgei akoma kai otan to tilefono einai kleidomeno"
+                "title": "Οφέλη του κινητού πορτοφολιού",
+                "contactless": "Ανεπαφικές πληρωμές σε εκατομμύρια τοποθεσίες",
+                "security": "Ενισχυμένη ασφάλεια με βιομετρική πιστοποίηση",
+                "noPhysicalCard": "Δεν χρειάζεστε τη φυσική κάρτα",
+                "worksLocked": "Λειτουργεί ακόμα και όταν το τηλέφωνο είναι κλειδωμένο"
             }
         }
     }
