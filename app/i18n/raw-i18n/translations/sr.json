@@ -2828,6 +2828,19 @@
                 "noPhysicalCard": "Није потребно носити физичку картицу",
                 "worksLocked": "Ради чак и када је телефон закључан"
             }
+        },
+        "CardStatus": {
+            "title": "Visa картица",
+            "CardApproved": {
+                "title": "Честитамо!",
+                "subtitle": "Ваша Blink Visa картица је активирана.",
+                "buttonLabel": "Наручи физичку картицу"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Ваша физичка картица је на путу!",
+                "subtitle": "Поруџбина за испоруку ваше Blink картице је послата.",
+                "buttonLabel": "Креирај ПИН"
+            }
         }
     }
 }
