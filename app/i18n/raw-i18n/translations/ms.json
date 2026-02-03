@@ -2495,6 +2495,7 @@
         "rate": "Rating",
         "reauth": "Sesi anda dah tamat. Sila log masuk semula.",
         "restart": "Mula semula",
+        "save": "Simpan",
         "sats": "sats",
         "search": "Carian",
         "security": "Keselamatan",
@@ -2846,6 +2847,21 @@
                 "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
                 "buttonLabel": "Cipta PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Alamat penghantaran",
+            "fullName": "Nama penuh",
+            "addressLine1": "Alamat baris 1",
+            "addressLine2": "Alamat baris 2",
+            "city": "Bandar",
+            "state": "Negeri",
+            "postalCode": "Poskod",
+            "country": "Negara",
+            "important": "Penting",
+            "importantDescription": "Sila pastikan alamat anda tepat dan lengkap.",
+            "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",
+            "signatureRequired": "Tandatangan mungkin diperlukan semasa penghantaran",
+            "supportedRegions": "Alamat mesti berada dalam kawasan penghantaran yang disokong"
         }
     }
 }

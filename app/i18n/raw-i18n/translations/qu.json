@@ -2493,6 +2493,7 @@
         "rate": "Ratiy",
         "reauth": "Ñuqaqa kawsaymi ñawpaqmi kani. Ñuqaqa chaskisqa kaniyta kaniy.",
         "restart": "Musuq kani",
+        "save": "Save",
         "sats": "sats",
         "search": "Riqsichiy",
         "security": "Ayllu",
@@ -2841,6 +2842,21 @@
                 "subtitle": "Blink tarjetayki apachiypa mañakuyninqa kachasqa.",
                 "buttonLabel": "PIN ruray"
             }
+        },
+        "ShippingAddress": {
+            "title": "Shipping address",
+            "fullName": "Full name",
+            "addressLine1": "Address line 1",
+            "addressLine2": "Address line 2",
+            "city": "City",
+            "state": "State",
+            "postalCode": "Postal code",
+            "country": "Country",
+            "important": "Important",
+            "importantDescription": "Please ensure your address is accurate and complete.",
+            "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
+            "signatureRequired": "Signature may be required upon delivery",
+            "supportedRegions": "Address must be within supported shipping regions"
         }
     }
 }
