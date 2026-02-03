@@ -3173,6 +3173,19 @@ const en: BaseTranslation = {
         worksLocked: "Works even when your phone is locked",
       },
     },
+    CardStatus: {
+      title: "Visa card",
+      CardApproved: {
+        title: "Congratulations!",
+        subtitle: "Your Blink Visa Card has been activated.",
+        buttonLabel: "Order physical card",
+      },
+      PhysicalCardOrdered: {
+        title: "Your physical card is on the way!",
+        subtitle: "Order for delivery of your Blink Card has been submitted.",
+        buttonLabel: "Create PIN",
+      },
+    },
     TransactionDetails: {
       title: "Transaction details",
       cardInformation: "Card information",
