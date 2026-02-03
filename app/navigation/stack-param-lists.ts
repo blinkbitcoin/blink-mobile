@@ -1,4 +1,7 @@
+import { NavigatorScreenParams } from "@react-navigation/native"
 import { LNURLPaySuccessAction } from "lnurl-pay"
+
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
@@ -10,7 +13,6 @@ import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { NavigatorScreenParams } from "@react-navigation/native"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
@@ -138,6 +140,14 @@ export type RootStackParamList = {
   cardSettingsScreen: undefined
   cardStatementsScreen: undefined
   cardTransactionDetailsScreen: { transactionId: string }
+  cardStatusScreen: {
+    title: string
+    subtitle: string
+    buttonLabel: string
+    navigateTo: keyof RootStackParamList
+    iconName: IconNamesType
+    iconColor?: string
+  }
 }
 
 export type OnboardingStackParamList = {
