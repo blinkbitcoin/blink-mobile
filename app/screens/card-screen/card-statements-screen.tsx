@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import {
+  BulletListCard,
   ContactSupportRow,
   IconTextButton,
   StatementItem,
@@ -129,23 +130,14 @@ export const CardStatementsScreen: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.aboutCard}>
-          <Text style={styles.aboutTitle}>
-            {LL.CardFlow.CardStatements.aboutStatements()}
-          </Text>
-          <View style={styles.bulletList}>
-            {[
-              LL.CardFlow.CardStatements.aboutBullet1(),
-              LL.CardFlow.CardStatements.aboutBullet2(),
-              LL.CardFlow.CardStatements.aboutBullet3(),
-            ].map((text, index) => (
-              <View key={index} style={styles.bulletItem}>
-                <View style={styles.bullet} />
-                <Text style={styles.bulletText}>{text}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        <BulletListCard
+          title={LL.CardFlow.CardStatements.aboutStatements()}
+          items={[
+            LL.CardFlow.CardStatements.aboutBullet1(),
+            LL.CardFlow.CardStatements.aboutBullet2(),
+            LL.CardFlow.CardStatements.aboutBullet3(),
+          ]}
+        />
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.notifications()}</Text>
@@ -221,41 +213,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   statementsContainer: {
     gap: 14,
-  },
-  aboutCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    padding: 14,
-    gap: 10,
-  },
-  aboutTitle: {
-    color: colors.black,
-    fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
-    lineHeight: 22,
-  },
-  bulletList: {
-    gap: 4,
-  },
-  bulletItem: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  bullet: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.grey2,
-    marginTop: 9,
-  },
-  bulletText: {
-    flex: 1,
-    color: colors.grey2,
-    fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
-    lineHeight: 22,
   },
   settingsGroupContainer: {
     marginTop: 0,
