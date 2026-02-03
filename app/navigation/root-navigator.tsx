@@ -81,6 +81,7 @@ import { PriceHistoryScreen } from "../screens/price/price-history-screen"
 import { ScanningQRCodeScreen } from "../screens/send-bitcoin-screen"
 import { SettingsScreen } from "../screens/settings-screen"
 import { LanguageScreen } from "../screens/settings-screen/language-screen"
+import { SelectionScreen } from "../screens/settings-screen/selection-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
@@ -94,6 +95,7 @@ import {
   CardLimitsScreen,
   CardPersonalDetailsScreen,
   CardSettingsScreen,
+  CardShippingAddressScreen,
   CardStatementsScreen,
   CardStatusScreen,
   CardTransactionDetailsScreen,
@@ -556,6 +558,16 @@ export const RootStack = () => {
         name="cardStatusScreen"
         component={CardStatusScreen}
         options={{ title: LL.CardFlow.CardStatus.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardShippingAddressScreen"
+        component={CardShippingAddressScreen}
+        options={{ title: LL.CardFlow.ShippingAddress.title() }}
+      />
+      <RootNavigator.Screen
+        name="selectionScreen"
+        component={SelectionScreen}
+        options={({ route }) => ({ title: route.params.title })}
       />
       <RootNavigator.Screen
         name="onboarding"
