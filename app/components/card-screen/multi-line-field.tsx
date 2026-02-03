@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -38,13 +38,14 @@ export const MultiLineField: React.FC<MultiLineFieldProps> = ({
 
   if (onPress) {
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={onPress}
+        activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel={lines.join(", ")}
       >
         {content}
-      </Pressable>
+      </TouchableOpacity>
     )
   }
 
