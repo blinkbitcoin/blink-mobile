@@ -2808,7 +2808,8 @@
             "termsAndConditions": "Kortvilkår og betingelser",
             "privacyPolicy": "Kortets privatlivspolitik",
             "closeCardAccount": "Luk kortkonto",
-            "closeCardAccountDescription": "Luk dit Visa-kort permanent"
+            "closeCardAccountDescription": "Luk dit Visa-kort permanent",
+            "addToAppleWallet": "Tilfoej til Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Transaktionsdetaljer",
@@ -2846,6 +2847,19 @@
             "contactInformation": "Kontaktoplysninger",
             "registeredAddress": "Registreret adresse",
             "shippingAddress": "Leveringsadresse"
+        },
+        "AddToMobileWallet": {
+            "title": "Tilføj til mobil tegnebog",
+            "addYourCard": "Tilføj dit kort",
+            "addYourCardDescription": "Tilføj dit Blink Visa-kort til din mobile tegnebog for hurtige og sikre betalinger",
+            "addTo": "Tilføj til",
+            "Benefits": {
+                "title": "Fordele ved mobil tegnebog",
+                "contactless": "Kontaktløse betalinger på millioner af steder",
+                "security": "Forbedret sikkerhed med biometrisk godkendelse",
+                "noPhysicalCard": "Intet behov for at bære dit fysiske kort",
+                "worksLocked": "Virker selv når din telefon er låst"
+            }
         }
     }
 }

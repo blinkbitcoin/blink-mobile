@@ -2867,7 +2867,8 @@
             "termsAndConditions": "Όροι και προϋποθέσεις κάρτας",
             "privacyPolicy": "Πολιτική απορρήτου κάρτας",
             "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
-            "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας"
+            "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας",
+            "addToAppleWallet": "Prosthiki sto Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Λεπτομέρειες συναλλαγής",
@@ -2905,6 +2906,19 @@
             "contactInformation": "Στοιχεία επικοινωνίας",
             "registeredAddress": "Καταχωρημένη διεύθυνση",
             "shippingAddress": "Διεύθυνση αποστολής"
+        },
+        "AddToMobileWallet": {
+            "title": "Προσθήκη στο κινητό πορτοφόλι",
+            "addYourCard": "Προσθέστε την κάρτα σας",
+            "addYourCardDescription": "Προσθέστε την κάρτα Blink Visa στο κινητό πορτοφόλι για γρήγορες και ασφαλείς πληρωμές",
+            "addTo": "Προσθήκη σε",
+            "Benefits": {
+                "title": "Οφέλη του κινητού πορτοφολιού",
+                "contactless": "Ανεπαφικές πληρωμές σε εκατομμύρια τοποθεσίες",
+                "security": "Ενισχυμένη ασφάλεια με βιομετρική πιστοποίηση",
+                "noPhysicalCard": "Δεν χρειάζεστε τη φυσική κάρτα",
+                "worksLocked": "Λειτουργεί ακόμα και όταν το τηλέφωνο είναι κλειδωμένο"
+            }
         }
     }
 }

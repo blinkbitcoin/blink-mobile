@@ -2867,7 +2867,8 @@
             "termsAndConditions": "Kart şartları ve koşulları",
             "privacyPolicy": "Kart gizlilik politikası",
             "closeCardAccount": "Kart hesabını kapat",
-            "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın"
+            "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın",
+            "addToAppleWallet": "Apple Wallet'a ekle"
         },
         "TransactionDetails": {
             "title": "İşlem detayları",
@@ -2905,6 +2906,19 @@
             "contactInformation": "İletişim bilgileri",
             "registeredAddress": "Kayıtlı adres",
             "shippingAddress": "Teslimat adresi"
+        },
+        "AddToMobileWallet": {
+            "title": "Mobil cüzdana ekle",
+            "addYourCard": "Kartınızı ekleyin",
+            "addYourCardDescription": "Hızlı ve güvenli ödemeler için Blink Visa kartınızı mobil cüzdanınıza ekleyin",
+            "addTo": "Ekle",
+            "Benefits": {
+                "title": "Mobil cüzdanın avantajları",
+                "contactless": "Milyonlarca konumda temassız ödeme",
+                "security": "Biyometrik kimlik doğrulama ile geliştirilmiş güvenlik",
+                "noPhysicalCard": "Fiziksel kartınızı taşımanıza gerek yok",
+                "worksLocked": "Telefonunuz kilitliyken bile çalışır"
+            }
         }
     }
 }

@@ -2776,7 +2776,8 @@
             "termsAndConditions": "Điều khoản và điều kiện thẻ",
             "privacyPolicy": "Chính sách bảo mật thẻ",
             "closeCardAccount": "Đóng tài khoản thẻ",
-            "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn"
+            "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn",
+            "addToAppleWallet": "Them vao Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Chi tiết giao dịch",
@@ -2814,6 +2815,19 @@
             "contactInformation": "Thông tin liên hệ",
             "registeredAddress": "Địa chỉ đăng ký",
             "shippingAddress": "Địa chỉ giao hàng"
+        },
+        "AddToMobileWallet": {
+            "title": "Thêm vào ví di động",
+            "addYourCard": "Thêm thẻ của bạn",
+            "addYourCardDescription": "Thêm thẻ Blink Visa vào ví di động để thanh toán nhanh chóng và an toàn",
+            "addTo": "Thêm vào",
+            "Benefits": {
+                "title": "Lợi ích của ví di động",
+                "contactless": "Thanh toán không tiếp xúc tại hàng triệu địa điểm",
+                "security": "Bảo mật nâng cao với xác thực sinh trắc học",
+                "noPhysicalCard": "Không cần mang theo thẻ vật lý",
+                "worksLocked": "Hoạt động ngay cả khi điện thoại bị khóa"
+            }
         }
     }
 }

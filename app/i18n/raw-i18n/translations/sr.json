@@ -2776,7 +2776,8 @@
             "termsAndConditions": "Услови и одредбе картице",
             "privacyPolicy": "Политика приватности картице",
             "closeCardAccount": "Затвори налог картице",
-            "closeCardAccountDescription": "Трајно затворите своју Visa картицу"
+            "closeCardAccountDescription": "Трајно затворите своју Visa картицу",
+            "addToAppleWallet": "Dodaj u Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Детаљи трансакције",
@@ -2814,6 +2815,19 @@
             "contactInformation": "Контакт информације",
             "registeredAddress": "Регистрована адреса",
             "shippingAddress": "Адреса за доставу"
+        },
+        "AddToMobileWallet": {
+            "title": "Додај у мобилни новчаник",
+            "addYourCard": "Додајте своју картицу",
+            "addYourCardDescription": "Додајте своју Blink Visa картицу у мобилни новчаник за брза и сигурна плаћања",
+            "addTo": "Додај у",
+            "Benefits": {
+                "title": "Предности мобилног новчаника",
+                "contactless": "Бесконтактна плаћања на милионима локација",
+                "security": "Побољшана сигурност са биометријском аутентификацијом",
+                "noPhysicalCard": "Није потребно носити физичку картицу",
+                "worksLocked": "Ради чак и када је телефон закључан"
+            }
         }
     }
 }

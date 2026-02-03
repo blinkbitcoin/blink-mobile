@@ -2776,7 +2776,8 @@
             "termsAndConditions": "شروط وأحكام البطاقة",
             "privacyPolicy": "سياسة خصوصية البطاقة",
             "closeCardAccount": "إغلاق حساب البطاقة",
-            "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً"
+            "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً",
+            "addToAppleWallet": "اضافة الى Apple Wallet"
         },
         "TransactionDetails": {
             "title": "تفاصيل المعاملة",
@@ -2814,6 +2815,19 @@
             "contactInformation": "معلومات الاتصال",
             "registeredAddress": "العنوان المسجل",
             "shippingAddress": "عنوان الشحن"
+        },
+        "AddToMobileWallet": {
+            "title": "اضافة الى المحفظة",
+            "addYourCard": "اضف بطاقتك",
+            "addYourCardDescription": "اضف بطاقة Blink Visa الى محفظتك للدفع السريع والامن",
+            "addTo": "اضافة الى",
+            "Benefits": {
+                "title": "مزايا المحفظة",
+                "contactless": "مدفوعات بدون تلامس في ملايين المواقع",
+                "security": "امان محسن مع المصادقة البيومترية",
+                "noPhysicalCard": "لا حاجة لحمل بطاقتك الفعلية",
+                "worksLocked": "تعمل حتى عندما يكون هاتفك مقفلا"
+            }
         }
     }
 }

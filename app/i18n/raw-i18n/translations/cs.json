@@ -2781,7 +2781,8 @@
             "termsAndConditions": "Podmínky karty",
             "privacyPolicy": "Zásady ochrany osobních údajů karty",
             "closeCardAccount": "Zrušit účet karty",
-            "closeCardAccountDescription": "Trvale zrušte svou kartu Visa"
+            "closeCardAccountDescription": "Trvale zrušte svou kartu Visa",
+            "addToAppleWallet": "Pridat do Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Detaily transakce",
@@ -2819,6 +2820,19 @@
             "contactInformation": "Kontaktní informace",
             "registeredAddress": "Registrovaná adresa",
             "shippingAddress": "Dodací adresa"
+        },
+        "AddToMobileWallet": {
+            "title": "Přidat do mobilní peněženky",
+            "addYourCard": "Přidejte svou kartu",
+            "addYourCardDescription": "Přidejte svou kartu Blink Visa do mobilní peněženky pro rychlé a bezpečné platby",
+            "addTo": "Přidat do",
+            "Benefits": {
+                "title": "Výhody mobilní peněženky",
+                "contactless": "Bezkontaktní platby na milionech míst",
+                "security": "Zvýšená bezpečnost s biometrickou autentizací",
+                "noPhysicalCard": "Není třeba nosit fyzickou kartu",
+                "worksLocked": "Funguje i při zamknutém telefonu"
+            }
         }
     }
 }

@@ -2867,7 +2867,8 @@
             "termsAndConditions": "Kártya feltételek",
             "privacyPolicy": "Kártya adatvédelmi szabályzat",
             "closeCardAccount": "Kártyaszámla bezárása",
-            "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját"
+            "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját",
+            "addToAppleWallet": "Hozzaadas az Apple Wallethoz"
         },
         "TransactionDetails": {
             "title": "Tranzakció részletei",
@@ -2905,6 +2906,19 @@
             "contactInformation": "Kapcsolattartási adatok",
             "registeredAddress": "Regisztrált cím",
             "shippingAddress": "Szállítási cím"
+        },
+        "AddToMobileWallet": {
+            "title": "Hozzáadás a mobil tárcához",
+            "addYourCard": "Add hozzá a kártyád",
+            "addYourCardDescription": "Add hozzá a Blink Visa kártyád a mobil tárcádhoz a gyors és biztonságos fizetésekhez",
+            "addTo": "Hozzáadás",
+            "Benefits": {
+                "title": "A mobil tárca előnyei",
+                "contactless": "Érintésmentes fizetés millió helyen",
+                "security": "Fokozott biztonság biometrikus hitelesítéssel",
+                "noPhysicalCard": "Nem kell magadnál hordanod a fizikai kártyát",
+                "worksLocked": "Működik még akkor is ha a telefonod zárolva van"
+            }
         }
     }
 }
