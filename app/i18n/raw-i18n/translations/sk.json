@@ -2919,6 +2919,19 @@
                 "noPhysicalCard": "Nie je potrebné nosiť fyzickú kartu",
                 "worksLocked": "Funguje aj pri zamknutom telefóne"
             }
+        },
+        "CardStatus": {
+            "title": "Karta Visa",
+            "CardApproved": {
+                "title": "Gratulujeme!",
+                "subtitle": "Vaša karta Blink Visa bola aktivovaná.",
+                "buttonLabel": "Objednať fyzickú kartu"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Vaša fyzická karta je na ceste!",
+                "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
+                "buttonLabel": "Vytvoriť PIN"
+            }
         }
     }
 }

@@ -2919,6 +2919,19 @@
                 "noPhysicalCard": "Nem kell magadnál hordanod a fizikai kártyát",
                 "worksLocked": "Működik még akkor is ha a telefonod zárolva van"
             }
+        },
+        "CardStatus": {
+            "title": "Visa kártya",
+            "CardApproved": {
+                "title": "Gratulálunk!",
+                "subtitle": "A Blink Visa kártyád aktiválva lett.",
+                "buttonLabel": "Fizikai kártya rendelése"
+            },
+            "PhysicalCardOrdered": {
+                "title": "A fizikai kártyád úton van!",
+                "subtitle": "A Blink kártyád kiszállítási rendelése beküldésre került.",
+                "buttonLabel": "PIN létrehozása"
+            }
         }
     }
 }

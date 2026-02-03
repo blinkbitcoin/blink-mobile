@@ -2940,6 +2940,19 @@
                 "noPhysicalCard": "Nu e nevoie să porți cardul fizic",
                 "worksLocked": "Funcționează chiar și când telefonul e blocat"
             }
+        },
+        "CardStatus": {
+            "title": "Card Visa",
+            "CardApproved": {
+                "title": "Felicitări!",
+                "subtitle": "Cardul tău Blink Visa a fost activat.",
+                "buttonLabel": "Comandă card fizic"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Cardul tău fizic este pe drum!",
+                "subtitle": "Comanda pentru livrarea cardului Blink a fost trimisă.",
+                "buttonLabel": "Creează PIN"
+            }
         }
     }
 }
