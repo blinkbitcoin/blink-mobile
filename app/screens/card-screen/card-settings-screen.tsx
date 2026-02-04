@@ -11,6 +11,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isIos } from "@app/utils/helper"
 
+import { MOCK_CARD_PIN } from "./card-mock-data"
+
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -28,7 +30,11 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleChangePin = () => {
-    console.log("Change PIN pressed")
+    if (MOCK_CARD_PIN) {
+      navigation.navigate("cardChangePinScreen")
+      return
+    }
+    navigation.navigate("cardCreatePinScreen")
   }
 
   const handleOrderPhysicalCard = () => {
@@ -76,7 +82,11 @@ export const CardSettingsScreen: React.FC = () => {
             ),
             () => (
               <SettingItemRow
-                title={LL.CardFlow.CardSettings.changePin()}
+                title={
+                  MOCK_CARD_PIN
+                    ? LL.CardFlow.CardSettings.changePin()
+                    : LL.CardFlow.PinScreens.CreateFlow.title()
+                }
                 leftIcon="key-outline"
                 onPress={handleChangePin}
               />
