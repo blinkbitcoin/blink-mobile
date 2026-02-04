@@ -279,3 +279,5 @@ export const COUNTRIES: SelectionOption[] = [
   { value: "CAN", label: "Canada" },
   { value: "MEX", label: "Mexico" },
 ]
+
+export const MOCK_CARD_PIN = "1234"
