@@ -30,6 +30,10 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
+jest.mock("@app/screens/card-screen/card-mock-data", () => ({
+  MOCK_CARD_PIN: "1234",
+}))
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -311,9 +315,7 @@ describe("CardSettingsScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
     })
 
-    it("allows pressing change pin row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("allows pressing change pin row and navigates", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -327,8 +329,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Change PIN pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardChangePinScreen")
     })
 
     it("allows pressing order physical card row", async () => {
