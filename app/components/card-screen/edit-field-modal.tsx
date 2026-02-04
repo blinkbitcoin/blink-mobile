@@ -58,6 +58,9 @@ export const EditFieldModal: React.FC<EditFieldModalProps> = ({
             autoFocus
             placeholderTextColor={colors.grey2}
             selectionColor={colors.primary}
+            accessibilityLabel={fieldName}
+            returnKeyType="done"
+            onSubmitEditing={handleSave}
           />
         </View>
       }
