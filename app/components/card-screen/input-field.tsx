@@ -11,14 +11,16 @@ export const ValueStyle = {
 
 export type ValueStyleType = (typeof ValueStyle)[keyof typeof ValueStyle]
 
+type IconProps =
+  | { rightIcon?: IconNamesType; rightIonicon?: never }
+  | { rightIcon?: never; rightIonicon?: string }
+
 type InputFieldProps = {
   label: string
   value: string
-  rightIcon?: IconNamesType
-  rightIonicon?: string
   onPress?: () => void
   valueStyle?: ValueStyleType
-}
+} & IconProps
 
 type StyleProps = {
   valueStyle: ValueStyleType
