@@ -3143,6 +3143,39 @@
             "noPOBoxes": "Les cartes ne peuvent pas être livrées aux boîtes postales",
             "signatureRequired": "Une signature peut être requise à la livraison",
             "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Confirmer le nouveau PIN",
+                "confirmPinSubtitle": "Veuillez entrer à nouveau votre nouveau PIN à 4 chiffres pour continuer.",
+                "incorrectPin": "PIN incorrect. Veuillez réessayer.",
+                "pinMismatch": "Les PIN ne correspondent pas. Ressaisissez pour confirmer ou revenez en arrière pour changer votre PIN."
+            },
+            "CreateFlow": {
+                "title": "Créer un PIN",
+                "steps": {
+                    "setPin": "Définir le PIN",
+                    "confirm": "Confirmer"
+                },
+                "enterYourPin": "Entrez votre PIN",
+                "enterPinSubtitle": "Veuillez entrer un PIN à 4 chiffres pour continuer.",
+                "pinCreatedToast": "Le code PIN a été créé avec succès"
+            },
+            "ChangeFlow": {
+                "title": "Changer le PIN",
+                "steps": {
+                    "currentPin": "PIN actuel",
+                    "newPin": "Nouveau PIN",
+                    "confirm": "Confirmer"
+                },
+                "enterCurrentPin": "Entrez le PIN actuel",
+                "enterCurrentPinSubtitle": "Veuillez entrer votre PIN actuel à 4 chiffres pour continuer.",
+                "enterNewPin": "Entrez le nouveau PIN",
+                "enterNewPinSubtitle": "Veuillez entrer votre nouveau PIN à 4 chiffres.",
+                "pinChangedTitle": "PIN modifié",
+                "pinChangedSubtitle": "Votre PIN a été modifié avec succès.",
+                "pinChangedToast": "Le code PIN a été modifié avec succès"
+            }
         }
     }
 }

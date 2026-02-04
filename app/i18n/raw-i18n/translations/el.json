@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Οι κάρτες δεν μπορούν να παραδοθούν σε ταχυδρομικές θυρίδες",
       "signatureRequired": "Μπορεί να απαιτείται υπογραφή κατά την παράδοση",
       "supportedRegions": "Η διεύθυνση πρέπει να βρίσκεται εντός των υποστηριζόμενων περιοχών αποστολής"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Επιβεβαίωση νέου PIN",
+        "confirmPinSubtitle": "Παρακαλώ εισάγετε ξανά το νέο σας 4ψήφιο PIN για να συνεχίσετε.",
+        "incorrectPin": "Λανθασμένο PIN. Παρακαλώ δοκιμάστε ξανά.",
+        "pinMismatch": "Τα PIN δεν ταιριάζουν. Εισάγετε ξανά για επιβεβαίωση ή επιστρέψτε για να αλλάξετε το PIN σας."
+      },
+      "CreateFlow": {
+        "title": "Δημιουργία PIN",
+        "steps": {
+          "setPin": "Ορισμός PIN",
+          "confirm": "Επιβεβαίωση"
+        },
+        "enterYourPin": "Εισάγετε το PIN σας",
+        "enterPinSubtitle": "Παρακαλώ εισάγετε ένα 4ψήφιο PIN για να συνεχίσετε.",
+        "pinCreatedToast": "Ο κωδικός PIN δημιουργήθηκε επιτυχώς"
+      },
+      "ChangeFlow": {
+        "title": "Αλλαγή PIN",
+        "steps": {
+          "currentPin": "Τρέχον PIN",
+          "newPin": "Νέο PIN",
+          "confirm": "Επιβεβαίωση"
+        },
+        "enterCurrentPin": "Εισάγετε το τρέχον PIN",
+        "enterCurrentPinSubtitle": "Παρακαλώ εισάγετε το τρέχον 4ψήφιο PIN σας για να συνεχίσετε.",
+        "enterNewPin": "Εισάγετε νέο PIN",
+        "enterNewPinSubtitle": "Παρακαλώ εισάγετε το νέο σας 4ψήφιο PIN.",
+        "pinChangedTitle": "Το PIN άλλαξε",
+        "pinChangedSubtitle": "Το PIN σας άλλαξε επιτυχώς.",
+        "pinChangedToast": "Ο κωδικός PIN άλλαξε επιτυχώς"
+      }
     }
   }
 }

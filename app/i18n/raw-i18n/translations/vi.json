@@ -3140,6 +3140,39 @@
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
       "signatureRequired": "Có thể yêu cầu chữ ký khi nhận hàng",
       "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Xác nhận PIN mới",
+        "confirmPinSubtitle": "Vui lòng nhập lại PIN 4 chữ số mới của bạn để tiếp tục.",
+        "incorrectPin": "Mã PIN không chính xác. Vui lòng thử lại.",
+        "pinMismatch": "Mã PIN không khớp. Nhập lại để xác nhận hoặc quay lại để thay đổi mã PIN của bạn."
+      },
+      "CreateFlow": {
+        "title": "Tạo PIN",
+        "steps": {
+          "setPin": "Đặt PIN",
+          "confirm": "Xác nhận"
+        },
+        "enterYourPin": "Nhập PIN của bạn",
+        "enterPinSubtitle": "Vui lòng nhập PIN 4 chữ số để tiếp tục.",
+        "pinCreatedToast": "Đã tạo mã PIN thành công"
+      },
+      "ChangeFlow": {
+        "title": "Đổi PIN",
+        "steps": {
+          "currentPin": "PIN hiện tại",
+          "newPin": "PIN mới",
+          "confirm": "Xác nhận"
+        },
+        "enterCurrentPin": "Nhập PIN hiện tại",
+        "enterCurrentPinSubtitle": "Vui lòng nhập PIN 4 chữ số hiện tại của bạn để tiếp tục.",
+        "enterNewPin": "Nhập PIN mới",
+        "enterNewPinSubtitle": "Vui lòng nhập PIN 4 chữ số mới của bạn.",
+        "pinChangedTitle": "Đã đổi PIN",
+        "pinChangedSubtitle": "PIN của bạn đã được đổi thành công.",
+        "pinChangedToast": "Đã thay đổi mã PIN thành công"
+      }
     }
   }
 }

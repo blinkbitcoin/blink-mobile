@@ -3097,6 +3097,39 @@
             "transactionHelpDescription": "If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.",
             "supportTeam": "support team",
             "transactionNotFound": "Transaction not found"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Confirm new PIN",
+                "confirmPinSubtitle": "Please re-enter your new 4-digit PIN to continue.",
+                "incorrectPin": "Incorrect PIN. Please try again.",
+                "pinMismatch": "PINs do not match. Re-enter to confirm or go back to change your PIN."
+            },
+            "CreateFlow": {
+                "title": "Create PIN",
+                "steps": {
+                    "setPin": "Set PIN",
+                    "confirm": "Confirm"
+                },
+                "enterYourPin": "Enter your PIN",
+                "enterPinSubtitle": "Please enter a 4-digit PIN to continue.",
+                "pinCreatedToast": "PIN has been created successfully"
+            },
+            "ChangeFlow": {
+                "title": "Change PIN",
+                "steps": {
+                    "currentPin": "Current PIN",
+                    "newPin": "New PIN",
+                    "confirm": "Confirm"
+                },
+                "enterCurrentPin": "Enter current PIN",
+                "enterCurrentPinSubtitle": "Please enter your current 4-digit PIN to continue.",
+                "enterNewPin": "Enter new PIN",
+                "enterNewPinSubtitle": "Please enter your new 4-digit PIN.",
+                "pinChangedTitle": "PIN changed",
+                "pinChangedSubtitle": "Your PIN has been changed successfully.",
+                "pinChangedToast": "PIN has been changed successfully"
+            }
         }
     },
     "NotificationHistory": {

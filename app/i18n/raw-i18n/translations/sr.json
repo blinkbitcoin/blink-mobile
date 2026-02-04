@@ -3140,6 +3140,39 @@
       "noPOBoxes": "Картице се не могу доставити на поштанске сандучиће",
       "signatureRequired": "Потпис може бити потребан при достави",
       "supportedRegions": "Адреса мора бити унутар подржаних региона за испоруку"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Потврди нови ПИН",
+        "confirmPinSubtitle": "Молимо вас да поново унесете нови 4-цифрени ПИН да бисте наставили.",
+        "incorrectPin": "Netačan PIN. Molimo pokušajte ponovo.",
+        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promenite PIN."
+      },
+      "CreateFlow": {
+        "title": "Креирај ПИН",
+        "steps": {
+          "setPin": "Постави ПИН",
+          "confirm": "Потврди"
+        },
+        "enterYourPin": "Унесите свој ПИН",
+        "enterPinSubtitle": "Молимо вас да унесете 4-цифрени ПИН да бисте наставили.",
+        "pinCreatedToast": "ПИН је успешно креиран"
+      },
+      "ChangeFlow": {
+        "title": "Промени ПИН",
+        "steps": {
+          "currentPin": "Тренутни ПИН",
+          "newPin": "Нови ПИН",
+          "confirm": "Потврди"
+        },
+        "enterCurrentPin": "Унесите тренутни ПИН",
+        "enterCurrentPinSubtitle": "Молимо вас да унесете свој тренутни 4-цифрени ПИН да бисте наставили.",
+        "enterNewPin": "Унесите нови ПИН",
+        "enterNewPinSubtitle": "Молимо вас да унесете свој нови 4-цифрени ПИН.",
+        "pinChangedTitle": "ПИН промењен",
+        "pinChangedSubtitle": "Ваш ПИН је успешно промењен.",
+        "pinChangedToast": "ПИН је успешно промењен"
+      }
     }
   }
 }

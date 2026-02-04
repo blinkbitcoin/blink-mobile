@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Karty nemožno doručiť na poštové schránky",
       "signatureRequired": "Pri doručení môže byť vyžadovaný podpis",
       "supportedRegions": "Adresa musí byť v podporovaných oblastiach doručenia"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Potvrdiť nový PIN",
+        "confirmPinSubtitle": "Pre pokračovanie prosím znova zadajte svoj nový 4-miestny PIN.",
+        "incorrectPin": "Nesprávny PIN. Skúste to prosím znova.",
+        "pinMismatch": "PINy sa nezhodujú. Zadajte znova na potvrdenie alebo sa vráťte a zmeňte PIN."
+      },
+      "CreateFlow": {
+        "title": "Vytvoriť PIN",
+        "steps": {
+          "setPin": "Nastaviť PIN",
+          "confirm": "Potvrdiť"
+        },
+        "enterYourPin": "Zadajte svoj PIN",
+        "enterPinSubtitle": "Pre pokračovanie prosím zadajte 4-miestny PIN.",
+        "pinCreatedToast": "PIN bol úspešne vytvorený"
+      },
+      "ChangeFlow": {
+        "title": "Zmeniť PIN",
+        "steps": {
+          "currentPin": "Aktuálny PIN",
+          "newPin": "Nový PIN",
+          "confirm": "Potvrdiť"
+        },
+        "enterCurrentPin": "Zadajte aktuálny PIN",
+        "enterCurrentPinSubtitle": "Pre pokračovanie prosím zadajte svoj aktuálny 4-miestny PIN.",
+        "enterNewPin": "Zadajte nový PIN",
+        "enterNewPinSubtitle": "Prosím zadajte svoj nový 4-miestny PIN.",
+        "pinChangedTitle": "PIN zmenený",
+        "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
+        "pinChangedToast": "PIN bol úspešne zmenený"
+      }
     }
   }
 }

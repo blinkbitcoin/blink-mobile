@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Քարտերը չեն կարող առաքվել փոստային արկղերին",
       "signatureRequired": "Առաքման պահին կարող է պահանջվել ստորագրություն",
       "supportedRegions": "Հասցեն պետք է լինի առաքման աջակցվող տարածաշրջաններում"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Հաստատեք նոր PIN-ը",
+        "confirmPinSubtitle": "Շարունակելու համար կրկին մուտքագրեք ձեր նոր 4-նիշ PIN-ը։",
+        "incorrectPin": "Սխալ PIN կոդ։ Խնդրում ենք փորձել կրկին։",
+        "pinMismatch": "PIN կոդերը չեն համընկնում։ Հաստատելու համար կրկին մուտքագրեք կամ վերադարձեք՝ ձեր PIN-ը փոխելու համար։"
+      },
+      "CreateFlow": {
+        "title": "Ստեղծել PIN",
+        "steps": {
+          "setPin": "Սահմանել PIN",
+          "confirm": "Հաստատել"
+        },
+        "enterYourPin": "Մուտքագրեք ձեր PIN-ը",
+        "enterPinSubtitle": "Շարունակելու համար մուտքագրեք 4-նիշ PIN։",
+        "pinCreatedToast": "PIN կոդը հաջողությամբ ստեղծվել է։"
+      },
+      "ChangeFlow": {
+        "title": "Փոխել PIN",
+        "steps": {
+          "currentPin": "Ընթացիկ PIN",
+          "newPin": "Նոր PIN",
+          "confirm": "Հաստատել"
+        },
+        "enterCurrentPin": "Մուտքագրեք ընթացիկ PIN-ը",
+        "enterCurrentPinSubtitle": "Շարունակելու համար մուտքագրեք ձեր ընթացիկ 4-նիշ PIN-ը։",
+        "enterNewPin": "Մուտքագրեք նոր PIN-ը",
+        "enterNewPinSubtitle": "Մուտքագրեք ձեր նոր 4-նիշ PIN-ը։",
+        "pinChangedTitle": "PIN-ը փոխվեց",
+        "pinChangedSubtitle": "Ձեր PIN-ը հաջողությամբ փոխվել է։",
+        "pinChangedToast": "PIN կոդը հաջողությամբ փոխվել է։"
+      }
     }
   }
 }

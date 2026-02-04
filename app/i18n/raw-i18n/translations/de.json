@@ -3102,6 +3102,39 @@
             "noPOBoxes": "Karten können nicht an Postfächer geliefert werden",
             "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
             "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Neue PIN bestätigen",
+                "confirmPinSubtitle": "Bitte gib deine neue 4-stellige PIN erneut ein, um fortzufahren.",
+                "incorrectPin": "Falscher PIN. Bitte versuchen Sie es erneut.",
+                "pinMismatch": "PINs stimmen nicht überein. Erneut eingeben zum Bestätigen oder zurück, um Ihre PIN zu ändern."
+            },
+            "CreateFlow": {
+                "title": "PIN erstellen",
+                "steps": {
+                    "setPin": "PIN festlegen",
+                    "confirm": "Bestätigen"
+                },
+                "enterYourPin": "Gib deine PIN ein",
+                "enterPinSubtitle": "Bitte gib eine 4-stellige PIN ein, um fortzufahren.",
+                "pinCreatedToast": "PIN wurde erfolgreich erstellt"
+            },
+            "ChangeFlow": {
+                "title": "PIN ändern",
+                "steps": {
+                    "currentPin": "Aktuelle PIN",
+                    "newPin": "Neue PIN",
+                    "confirm": "Bestätigen"
+                },
+                "enterCurrentPin": "Aktuelle PIN eingeben",
+                "enterCurrentPinSubtitle": "Bitte gib deine aktuelle 4-stellige PIN ein, um fortzufahren.",
+                "enterNewPin": "Neue PIN eingeben",
+                "enterNewPinSubtitle": "Bitte gib deine neue 4-stellige PIN ein.",
+                "pinChangedTitle": "PIN geändert",
+                "pinChangedSubtitle": "Deine PIN wurde erfolgreich geändert.",
+                "pinChangedToast": "PIN wurde erfolgreich geändert"
+            }
         }
     }
 }
