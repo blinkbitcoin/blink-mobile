@@ -2493,6 +2493,7 @@
         "rate": "Tỉ giá",
         "reauth": "Phiên của bạn đã hết hạn. Xin vui lòng đăng nhập lại.",
         "restart": "Khởi động lại",
+        "save": "Lưu",
         "sats": "những sat",
         "search": "Tìm kiếm",
         "security": "An ninh",
@@ -2841,6 +2842,21 @@
                 "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
                 "buttonLabel": "Tạo PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Địa chỉ giao hàng",
+            "fullName": "Họ và tên",
+            "addressLine1": "Địa chỉ dòng 1",
+            "addressLine2": "Địa chỉ dòng 2",
+            "city": "Thành phố",
+            "state": "Tỉnh/Bang",
+            "postalCode": "Mã bưu điện",
+            "country": "Quốc gia",
+            "important": "Quan trọng",
+            "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
+            "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
+            "signatureRequired": "Có thể yêu cầu chữ ký khi nhận hàng",
+            "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ"
         }
     }
 }

@@ -2588,6 +2588,7 @@
         "rate": "Puanla",
         "reauth": "Oturumunuz kapandı. Lütfen tekrar giriş yapın.",
         "restart": "Resetle",
+        "save": "Kaydet",
         "sats": "sats",
         "search": "Ara",
         "security": "Güvenlik",
@@ -2932,6 +2933,21 @@
                 "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
                 "buttonLabel": "PIN oluştur"
             }
+        },
+        "ShippingAddress": {
+            "title": "Teslimat adresi",
+            "fullName": "Tam ad",
+            "addressLine1": "Adres satırı 1",
+            "addressLine2": "Adres satırı 2",
+            "city": "Şehir",
+            "state": "İl",
+            "postalCode": "Posta kodu",
+            "country": "Ülke",
+            "important": "Önemli",
+            "importantDescription": "Lütfen adresinizin doğru ve eksiksiz olduğundan emin olun.",
+            "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
+            "signatureRequired": "Teslimatta imza gerekebilir",
+            "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır"
         }
     }
 }

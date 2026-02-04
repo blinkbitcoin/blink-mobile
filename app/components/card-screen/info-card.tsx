@@ -11,6 +11,7 @@ type InfoCardProps = {
   ionicon?: string
   titleColor?: string
   iconColor?: string
+  bulletItems?: string[]
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -20,6 +21,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   ionicon,
   titleColor,
   iconColor,
+  bulletItems,
 }) => {
   const {
     theme: { colors },
@@ -36,6 +38,20 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     return <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
   }
 
+  const renderBulletItems = () => {
+    if (!bulletItems || bulletItems.length === 0) return null
+    return (
+      <View style={styles.bulletList}>
+        {bulletItems.map((item) => (
+          <View key={item} style={styles.bulletItem}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>{item}</Text>
+          </View>
+        ))}
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -43,6 +59,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         <Text style={styles.title}>{title}</Text>
       </View>
       <Text style={styles.description}>{description}</Text>
+      {renderBulletItems()}
     </View>
   )
 }
@@ -72,6 +89,30 @@ const useStyles = makeStyles(({ colors }, { titleColor }: StyleProps) => ({
     lineHeight: 22,
   },
   description: {
+    color: colors.grey2,
+    fontSize: 14,
+    fontFamily: "Source Sans Pro",
+    fontWeight: "400",
+    lineHeight: 16,
+  },
+  bulletList: {
+    marginTop: 4,
+    marginLeft: 11,
+  },
+  bulletItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  bullet: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.grey2,
+    marginTop: 6,
+  },
+  bulletText: {
+    flex: 1,
     color: colors.grey2,
     fontSize: 14,
     fontFamily: "Source Sans Pro",

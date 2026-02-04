@@ -2495,6 +2495,7 @@
         "rate": "Tečaj",
         "reauth": "Vaša sesija je istekla. Molimo prijavite se ponovo.",
         "restart": "Ponovno pokretanje",
+        "save": "Spremi",
         "sats": "sats",
         "search": "Traži",
         "security": "Sigurnost",
@@ -2846,6 +2847,21 @@
                 "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
                 "buttonLabel": "Kreiraj PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Adresa za dostavu",
+            "fullName": "Puno ime",
+            "addressLine1": "Adresa redak 1",
+            "addressLine2": "Adresa redak 2",
+            "city": "Grad",
+            "state": "Država",
+            "postalCode": "Poštanski broj",
+            "country": "Zemlja",
+            "important": "Važno",
+            "importantDescription": "Molimo provjerite da je vaša adresa točna i potpuna.",
+            "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",
+            "signatureRequired": "Potpis može biti potreban prilikom dostave",
+            "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu"
         }
     }
 }

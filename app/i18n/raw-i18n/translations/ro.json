@@ -2609,6 +2609,7 @@
         "rate": "Rata",
         "reauth": "Sesiunea a expirat. Vă rugăm să vă autentificați din nou.",
         "restart": "Restart",
+        "save": "Salvează",
         "sats": "sats",
         "search": "Caută",
         "security": "Securitate",
@@ -2953,6 +2954,21 @@
                 "subtitle": "Comanda pentru livrarea cardului Blink a fost trimisă.",
                 "buttonLabel": "Creează PIN"
             }
+        },
+        "ShippingAddress": {
+            "title": "Adresa de livrare",
+            "fullName": "Nume complet",
+            "addressLine1": "Adresa linia 1",
+            "addressLine2": "Adresa linia 2",
+            "city": "Oraș",
+            "state": "Stat",
+            "postalCode": "Cod poștal",
+            "country": "Țară",
+            "important": "Important",
+            "importantDescription": "Asigurați-vă că adresa dumneavoastră este corectă și completă.",
+            "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",
+            "signatureRequired": "Semnătura poate fi necesară la livrare",
+            "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate"
         }
     }
 }
