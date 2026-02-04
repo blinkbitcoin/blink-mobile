@@ -53,8 +53,8 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     if (!bulletItems || bulletItems.length === 0) return null
     return (
       <View style={styles.bulletList}>
-        {bulletItems.map((item, index) => (
-          <View key={index} style={styles.bulletItem}>
+        {bulletItems.map((item) => (
+          <View key={item} style={styles.bulletItem}>
             <View style={styles.bullet} />
             <Text style={styles.bulletText}>{item}</Text>
           </View>
