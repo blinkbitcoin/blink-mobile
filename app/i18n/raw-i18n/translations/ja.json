@@ -3143,6 +3143,39 @@
             "noPOBoxes": "私書箱には配達できません",
             "signatureRequired": "配達時に署名が必要な場合があります",
             "supportedRegions": "配送対応地域内の住所である必要があります"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "新しいPINを確認",
+                "confirmPinSubtitle": "続行するには、新しい4桁のPINを再入力してください。",
+                "incorrectPin": "PINが正しくありません。もう一度お試しください。",
+                "pinMismatch": "PINが一致しません。確認のため再入力するか、戻ってPINを変更してください。"
+            },
+            "CreateFlow": {
+                "title": "PINを作成",
+                "steps": {
+                    "setPin": "PINを設定",
+                    "confirm": "確認"
+                },
+                "enterYourPin": "PINを入力",
+                "enterPinSubtitle": "続行するには、4桁のPINを入力してください。",
+                "pinCreatedToast": "PINが正常に作成されました"
+            },
+            "ChangeFlow": {
+                "title": "PINを変更",
+                "steps": {
+                    "currentPin": "現在のPIN",
+                    "newPin": "新しいPIN",
+                    "confirm": "確認"
+                },
+                "enterCurrentPin": "現在のPINを入力",
+                "enterCurrentPinSubtitle": "続行するには、現在の4桁のPINを入力してください。",
+                "enterNewPin": "新しいPINを入力",
+                "enterNewPinSubtitle": "新しい4桁のPINを入力してください。",
+                "pinChangedTitle": "PINが変更されました",
+                "pinChangedSubtitle": "PINが正常に変更されました。",
+                "pinChangedToast": "PINが正常に変更されました"
+            }
         }
     }
 }

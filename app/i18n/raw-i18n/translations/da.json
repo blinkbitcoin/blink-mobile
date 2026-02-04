@@ -3120,6 +3120,39 @@
       "noPOBoxes": "Kort kan ikke leveres til postbokse",
       "signatureRequired": "Underskrift kan være påkrævet ved levering",
       "supportedRegions": "Adressen skal være inden for understøttede leveringsområder"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Bekræft ny PIN",
+        "confirmPinSubtitle": "Indtast venligst din nye 4-cifrede PIN igen for at fortsætte.",
+        "incorrectPin": "Forkert PIN. Prøv venligst igen.",
+        "pinMismatch": "PIN-koderne stemmer ikke overens. Indtast igen for at bekræfte eller gå tilbage for at ændre din PIN."
+      },
+      "CreateFlow": {
+        "title": "Opret PIN",
+        "steps": {
+          "setPin": "Indstil PIN",
+          "confirm": "Bekræft"
+        },
+        "enterYourPin": "Indtast din PIN",
+        "enterPinSubtitle": "Indtast venligst en 4-cifret PIN for at fortsætte.",
+        "pinCreatedToast": "PIN er oprettet"
+      },
+      "ChangeFlow": {
+        "title": "Skift PIN",
+        "steps": {
+          "currentPin": "Nuværende PIN",
+          "newPin": "Ny PIN",
+          "confirm": "Bekræft"
+        },
+        "enterCurrentPin": "Indtast nuværende PIN",
+        "enterCurrentPinSubtitle": "Indtast venligst din nuværende 4-cifrede PIN for at fortsætte.",
+        "enterNewPin": "Indtast ny PIN",
+        "enterNewPinSubtitle": "Indtast venligst din nye 4-cifrede PIN.",
+        "pinChangedTitle": "PIN ændret",
+        "pinChangedSubtitle": "Din PIN er blevet ændret.",
+        "pinChangedToast": "PIN er ændret"
+      }
     }
   }
 }

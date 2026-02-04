@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",
       "signatureRequired": "Semnătura poate fi necesară la livrare",
       "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Confirmă noul PIN",
+        "confirmPinSubtitle": "Vă rugăm să introduceți din nou noul dvs. PIN de 4 cifre pentru a continua.",
+        "incorrectPin": "PIN incorect. Vă rugăm să încercați din nou.",
+        "pinMismatch": "PIN-urile nu se potrivesc. Reintroduceți pentru a confirma sau reveniți pentru a vă schimba PIN-ul."
+      },
+      "CreateFlow": {
+        "title": "Creează PIN",
+        "steps": {
+          "setPin": "Setează PIN",
+          "confirm": "Confirmă"
+        },
+        "enterYourPin": "Introduceți PIN-ul dvs.",
+        "enterPinSubtitle": "Vă rugăm să introduceți un PIN de 4 cifre pentru a continua.",
+        "pinCreatedToast": "PIN-ul a fost creat cu succes"
+      },
+      "ChangeFlow": {
+        "title": "Schimbă PIN",
+        "steps": {
+          "currentPin": "PIN actual",
+          "newPin": "PIN nou",
+          "confirm": "Confirmă"
+        },
+        "enterCurrentPin": "Introduceți PIN-ul actual",
+        "enterCurrentPinSubtitle": "Vă rugăm să introduceți PIN-ul dvs. actual de 4 cifre pentru a continua.",
+        "enterNewPin": "Introduceți noul PIN",
+        "enterNewPinSubtitle": "Vă rugăm să introduceți noul dvs. PIN de 4 cifre.",
+        "pinChangedTitle": "PIN schimbat",
+        "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
+        "pinChangedToast": "PIN-ul a fost schimbat cu succes"
+      }
     }
   }
 }

@@ -3102,6 +3102,39 @@
             "noPOBoxes": "Cartões não podem ser entregues em caixas postais",
             "signatureRequired": "Pode ser necessária assinatura na entrega",
             "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Confirmar novo PIN",
+                "confirmPinSubtitle": "Por favor, digite novamente seu novo PIN de 4 dígitos para continuar.",
+                "incorrectPin": "PIN incorreto. Por favor, tente novamente.",
+                "pinMismatch": "Os PINs não coincidem. Digite novamente para confirmar ou volte para alterar seu PIN."
+            },
+            "CreateFlow": {
+                "title": "Criar PIN",
+                "steps": {
+                    "setPin": "Definir PIN",
+                    "confirm": "Confirmar"
+                },
+                "enterYourPin": "Digite seu PIN",
+                "enterPinSubtitle": "Por favor, digite um PIN de 4 dígitos para continuar.",
+                "pinCreatedToast": "O PIN foi criado com sucesso"
+            },
+            "ChangeFlow": {
+                "title": "Alterar PIN",
+                "steps": {
+                    "currentPin": "PIN atual",
+                    "newPin": "Novo PIN",
+                    "confirm": "Confirmar"
+                },
+                "enterCurrentPin": "Digite o PIN atual",
+                "enterCurrentPinSubtitle": "Por favor, digite seu PIN atual de 4 dígitos para continuar.",
+                "enterNewPin": "Digite o novo PIN",
+                "enterNewPinSubtitle": "Por favor, digite seu novo PIN de 4 dígitos.",
+                "pinChangedTitle": "PIN alterado",
+                "pinChangedSubtitle": "Seu PIN foi alterado com sucesso.",
+                "pinChangedToast": "O PIN foi alterado com sucesso"
+            }
         }
     }
 }

@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
       "signatureRequired": "Sahihi inaweza kuhitajika wakati wa utoaji",
       "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Thibitisha PIN mpya",
+        "confirmPinSubtitle": "Tafadhali ingiza tena PIN yako mpya ya tarakimu 4 ili kuendelea.",
+        "incorrectPin": "PIN si sahihi. Tafadhali jaribu tena.",
+        "pinMismatch": "PIN hazilingani. Ingiza tena ili kuthibitisha au rudi nyuma kubadilisha PIN yako."
+      },
+      "CreateFlow": {
+        "title": "Unda PIN",
+        "steps": {
+          "setPin": "Weka PIN",
+          "confirm": "Thibitisha"
+        },
+        "enterYourPin": "Ingiza PIN yako",
+        "enterPinSubtitle": "Tafadhali ingiza PIN ya tarakimu 4 ili kuendelea.",
+        "pinCreatedToast": "PIN imeundwa kwa mafanikio"
+      },
+      "ChangeFlow": {
+        "title": "Badilisha PIN",
+        "steps": {
+          "currentPin": "PIN ya sasa",
+          "newPin": "PIN mpya",
+          "confirm": "Thibitisha"
+        },
+        "enterCurrentPin": "Ingiza PIN ya sasa",
+        "enterCurrentPinSubtitle": "Tafadhali ingiza PIN yako ya sasa ya tarakimu 4 ili kuendelea.",
+        "enterNewPin": "Ingiza PIN mpya",
+        "enterNewPinSubtitle": "Tafadhali ingiza PIN yako mpya ya tarakimu 4.",
+        "pinChangedTitle": "PIN imebadilishwa",
+        "pinChangedSubtitle": "PIN yako imebadilishwa kwa mafanikio.",
+        "pinChangedToast": "PIN imebadilishwa kwa mafanikio"
+      }
     }
   }
 }

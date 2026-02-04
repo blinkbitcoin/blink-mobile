@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",
       "signatureRequired": "Potpis može biti potreban prilikom dostave",
       "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Potvrdi novi PIN",
+        "confirmPinSubtitle": "Molimo ponovno unesite svoj novi 4-znamenkasti PIN za nastavak.",
+        "incorrectPin": "Netočan PIN. Molimo pokušajte ponovo.",
+        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promijenite PIN."
+      },
+      "CreateFlow": {
+        "title": "Stvori PIN",
+        "steps": {
+          "setPin": "Postavi PIN",
+          "confirm": "Potvrdi"
+        },
+        "enterYourPin": "Unesite svoj PIN",
+        "enterPinSubtitle": "Molimo unesite 4-znamenkasti PIN za nastavak.",
+        "pinCreatedToast": "PIN je uspješno kreiran"
+      },
+      "ChangeFlow": {
+        "title": "Promijeni PIN",
+        "steps": {
+          "currentPin": "Trenutni PIN",
+          "newPin": "Novi PIN",
+          "confirm": "Potvrdi"
+        },
+        "enterCurrentPin": "Unesite trenutni PIN",
+        "enterCurrentPinSubtitle": "Molimo unesite svoj trenutni 4-znamenkasti PIN za nastavak.",
+        "enterNewPin": "Unesite novi PIN",
+        "enterNewPinSubtitle": "Molimo unesite svoj novi 4-znamenkasti PIN.",
+        "pinChangedTitle": "PIN promijenjen",
+        "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
+        "pinChangedToast": "PIN je uspješno promijenjen"
+      }
     }
   }
 }

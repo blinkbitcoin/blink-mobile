@@ -3140,6 +3140,39 @@
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Musuq PIN nisqa takyachiy",
+        "confirmPinSubtitle": "Ama hina kaspa, musuq 4 yupay PIN nisqaykita kutichiy ñawpaqman rinaykipaq.",
+        "incorrectPin": "PIN mana allinchu. Ama hina kaspa, hukmanta ruwapay.",
+        "pinMismatch": "PIN nisqakuna manam tupanchu. Hukmanta yaykuchiy takyachinapaq utaq kutiy PIN niykita tikranapaq."
+      },
+      "CreateFlow": {
+        "title": "PIN ruray",
+        "steps": {
+          "setPin": "PIN churay",
+          "confirm": "Takyachiy"
+        },
+        "enterYourPin": "PIN nisqaykita yaykuchiy",
+        "enterPinSubtitle": "Ama hina kaspa, 4 yupay PIN yaykuchiy ñawpaqman rinaykipaq.",
+        "pinCreatedToast": "PIN allinta ruwasqa"
+      },
+      "ChangeFlow": {
+        "title": "PIN tikray",
+        "steps": {
+          "currentPin": "Kunan PIN",
+          "newPin": "Musuq PIN",
+          "confirm": "Takyachiy"
+        },
+        "enterCurrentPin": "Kunan PIN yaykuchiy",
+        "enterCurrentPinSubtitle": "Ama hina kaspa, kunan 4 yupay PIN nisqaykita yaykuchiy ñawpaqman rinaykipaq.",
+        "enterNewPin": "Musuq PIN yaykuchiy",
+        "enterNewPinSubtitle": "Ama hina kaspa, musuq 4 yupay PIN nisqaykita yaykuchiy.",
+        "pinChangedTitle": "PIN tikrasqa",
+        "pinChangedSubtitle": "PIN nisqayki allinta tikrasqa.",
+        "pinChangedToast": "PIN allinta tikrasqa"
+      }
     }
   }
 }

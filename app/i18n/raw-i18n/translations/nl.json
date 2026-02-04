@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Kaarten kunnen niet worden bezorgd bij postbussen",
       "signatureRequired": "Bij bezorging kan een handtekening vereist zijn",
       "supportedRegions": "Het adres moet binnen de ondersteunde verzendregio's liggen"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Bevestig nieuwe PIN",
+        "confirmPinSubtitle": "Voer alstublieft uw nieuwe 4-cijferige PIN opnieuw in om door te gaan.",
+        "incorrectPin": "Onjuiste PIN. Probeer het opnieuw.",
+        "pinMismatch": "PINs komen niet overeen. Voer opnieuw in om te bevestigen of ga terug om uw PIN te wijzigen."
+      },
+      "CreateFlow": {
+        "title": "PIN aanmaken",
+        "steps": {
+          "setPin": "PIN instellen",
+          "confirm": "Bevestigen"
+        },
+        "enterYourPin": "Voer uw PIN in",
+        "enterPinSubtitle": "Voer alstublieft een 4-cijferige PIN in om door te gaan.",
+        "pinCreatedToast": "PIN is succesvol aangemaakt"
+      },
+      "ChangeFlow": {
+        "title": "PIN wijzigen",
+        "steps": {
+          "currentPin": "Huidige PIN",
+          "newPin": "Nieuwe PIN",
+          "confirm": "Bevestigen"
+        },
+        "enterCurrentPin": "Voer huidige PIN in",
+        "enterCurrentPinSubtitle": "Voer alstublieft uw huidige 4-cijferige PIN in om door te gaan.",
+        "enterNewPin": "Voer nieuwe PIN in",
+        "enterNewPinSubtitle": "Voer alstublieft uw nieuwe 4-cijferige PIN in.",
+        "pinChangedTitle": "PIN gewijzigd",
+        "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
+        "pinChangedToast": "PIN is succesvol gewijzigd"
+      }
     }
   }
 }
