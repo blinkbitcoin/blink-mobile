@@ -53,7 +53,12 @@ export const InputField: React.FC<InputFieldProps> = ({
   )
 
   const pressableContent = onPress ? (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
       {content}
     </TouchableOpacity>
   ) : (
