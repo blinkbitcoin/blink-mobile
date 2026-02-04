@@ -21,7 +21,8 @@ import {
   US_STATES,
 } from "./card-mock-data"
 
-type EditableField = keyof ShippingAddress | null
+type TextEditingField = "fullName" | "addressLine1" | "addressLine2"
+type EditingField = TextEditingField | null
 
 export const CardShippingAddressScreen: React.FC = () => {
   const styles = useStyles()
@@ -29,9 +30,9 @@ export const CardShippingAddressScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [address, setAddress] = useState<ShippingAddress>(MOCK_SHIPPING_ADDRESS)
-  const [editingField, setEditingField] = useState<EditableField>(null)
+  const [editingField, setEditingField] = useState<EditingField>(null)
 
-  const handleOpenEdit = (field: EditableField) => {
+  const handleOpenEdit = (field: EditingField) => {
     setEditingField(field)
   }
 
@@ -72,7 +73,7 @@ export const CardShippingAddressScreen: React.FC = () => {
     })
   }
 
-  const getFieldLabel = (field: EditableField): string => {
+  const getFieldLabel = (field: EditingField): string => {
     switch (field) {
       case "fullName":
         return LL.CardFlow.ShippingAddress.fullName()
@@ -85,7 +86,7 @@ export const CardShippingAddressScreen: React.FC = () => {
     }
   }
 
-  const getFieldValue = (field: EditableField): string => (field ? address[field] : "")
+  const getFieldValue = (field: EditingField): string => (field ? address[field] : "")
 
   const bulletItems = [
     LL.CardFlow.ShippingAddress.noPOBoxes(),
