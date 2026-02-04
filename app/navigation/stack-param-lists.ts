@@ -149,6 +149,8 @@ export type RootStackParamList = {
     iconColor?: string
   }
   cardShippingAddressScreen: undefined
+  cardCreatePinScreen: undefined
+  cardChangePinScreen: undefined
   selectionScreen: {
     title: string
     options: Array<{ value: string; label: string }>
