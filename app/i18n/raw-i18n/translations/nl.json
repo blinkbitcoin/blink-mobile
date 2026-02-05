@@ -3176,6 +3176,56 @@
         "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
         "pinChangedToast": "PIN is succesvol gewijzigd"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Melden",
+        "delivery": "Bezorging",
+        "confirm": "Bevestigen"
+      },
+      "ReportIssue": {
+        "title": "Wat is er met je kaart gebeurd?",
+        "subtitle": "Selecteer de reden voor het aanvragen van een vervangende kaart",
+        "lostCard": "Verloren kaart",
+        "lostCardDescription": "Ik kan mijn kaart niet vinden",
+        "stolenCard": "Gestolen kaart",
+        "stolenCardDescription": "Mijn kaart is zonder toestemming meegenomen",
+        "damagedCard": "Beschadigde kaart",
+        "damagedCardDescription": "Mijn kaart is fysiek beschadigd",
+        "whatHappensNext": "Wat gebeurt er nu?",
+        "currentCardDeactivated": "Je huidige kaart wordt onmiddellijk gedeactiveerd",
+        "newCardShipped": "Een nieuwe kaart wordt naar je adres verzonden",
+        "digitalCardAvailable": "Je digitale kaart blijft beschikbaar tijdens dit proces"
+      },
+      "Delivery": {
+        "title": "Kies je bezorgsnelheid",
+        "subtitle": "Selecteer hoe snel je je nieuwe kaart wilt ontvangen",
+        "standardDelivery": "Standaardbezorging",
+        "expressDelivery": "Expresbezorging",
+        "businessDays": "{day1}-{day2} werkdagen",
+        "free": "GRATIS",
+        "shippingAddress": "Verzendadres",
+        "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres"
+      },
+      "Confirm": {
+        "title": "Controleer je aanvraag",
+        "subtitle": "Bevestig de details van je kaartvervanging",
+        "requestSummary": "Aanvraagoverzicht",
+        "reason": "Reden",
+        "delivery": "Bezorging",
+        "shippingAddress": "Verzendadres",
+        "deliveryCost": "Bezorgkosten",
+        "submitRequest": "Aanvraag indienen",
+        "importantInformation": "Belangrijke informatie",
+        "processedImmediately": "Je aanvraag wordt onmiddellijk verwerkt",
+        "currentCardDeactivated": "De huidige kaart wordt gedeactiveerd bij bevestiging",
+        "trackStatus": "Je kunt de bezorgstatus van je nieuwe kaart volgen in de app"
+      },
+      "Status": {
+        "title": "Je nieuwe kaart is onderweg!",
+        "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
+        "buttonLabel": "Dashboard"
+      }
     }
   }
 }

@@ -3135,6 +3135,56 @@
         "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
         "pinChangedToast": "PIN başarıyla değiştirildi"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Bildir",
+        "delivery": "Teslimat",
+        "confirm": "Onayla"
+      },
+      "ReportIssue": {
+        "title": "Kartınıza ne oldu?",
+        "subtitle": "Yedek kart talebi için nedeni seçin",
+        "lostCard": "Kayıp kart",
+        "lostCardDescription": "Kartımı bulamıyorum",
+        "stolenCard": "Çalınan kart",
+        "stolenCardDescription": "Kartım izinsiz alındı",
+        "damagedCard": "Hasarlı kart",
+        "damagedCardDescription": "Kartım fiziksel olarak hasar gördü",
+        "whatHappensNext": "Bundan sonra ne olacak?",
+        "currentCardDeactivated": "Mevcut kartınız derhal devre dışı bırakılacak",
+        "newCardShipped": "Yeni bir kart adresinize gönderilecek",
+        "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır"
+      },
+      "Delivery": {
+        "title": "Teslimat hızınızı seçin",
+        "subtitle": "Yeni kartınızı ne kadar hızlı almak istediğinizi seçin",
+        "standardDelivery": "Standart teslimat",
+        "expressDelivery": "Ekspres teslimat",
+        "businessDays": "{day1}-{day2} iş günü",
+        "free": "ÜCRETSİZ",
+        "shippingAddress": "Teslimat adresi",
+        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan"
+      },
+      "Confirm": {
+        "title": "Talebinizi gözden geçirin",
+        "subtitle": "Lütfen kart değişimi detaylarını onaylayın",
+        "requestSummary": "Talep özeti",
+        "reason": "Neden",
+        "delivery": "Teslimat",
+        "shippingAddress": "Teslimat adresi",
+        "deliveryCost": "Teslimat ücreti",
+        "submitRequest": "Talebi gönder",
+        "importantInformation": "Önemli bilgiler",
+        "processedImmediately": "Talebiniz derhal işleme alınacak",
+        "currentCardDeactivated": "Mevcut kart onay sonrasında devre dışı bırakılacak",
+        "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz"
+      },
+      "Status": {
+        "title": "Yeni kartınız yolda!",
+        "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
+        "buttonLabel": "Gösterge Paneli"
+      }
     }
   }
 }

@@ -3176,6 +3176,56 @@
         "pinChangedSubtitle": "PIN anda telah berjaya ditukar.",
         "pinChangedToast": "PIN berjaya ditukar"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Laporkan",
+        "delivery": "Penghantaran",
+        "confirm": "Sahkan"
+      },
+      "ReportIssue": {
+        "title": "Apa yang berlaku pada kad anda?",
+        "subtitle": "Pilih sebab untuk meminta kad gantian",
+        "lostCard": "Kad hilang",
+        "lostCardDescription": "Saya tidak dapat menemui kad saya",
+        "stolenCard": "Kad dicuri",
+        "stolenCardDescription": "Kad saya diambil tanpa kebenaran",
+        "damagedCard": "Kad rosak",
+        "damagedCardDescription": "Kad saya rosak secara fizikal",
+        "whatHappensNext": "Apa yang berlaku seterusnya?",
+        "currentCardDeactivated": "Kad semasa anda akan dinyahaktifkan serta-merta",
+        "newCardShipped": "Kad baharu akan dihantar ke alamat anda",
+        "digitalCardAvailable": "Kad digital anda kekal tersedia semasa proses ini"
+      },
+      "Delivery": {
+        "title": "Pilih kelajuan penghantaran anda",
+        "subtitle": "Pilih berapa cepat anda ingin menerima kad baharu",
+        "standardDelivery": "Penghantaran standard",
+        "expressDelivery": "Penghantaran ekspres",
+        "businessDays": "{day1}-{day2} hari bekerja",
+        "free": "PERCUMA",
+        "shippingAddress": "Alamat penghantaran",
+        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran"
+      },
+      "Confirm": {
+        "title": "Semak permintaan anda",
+        "subtitle": "Sila sahkan butiran penggantian kad anda",
+        "requestSummary": "Ringkasan permintaan",
+        "reason": "Sebab",
+        "delivery": "Penghantaran",
+        "shippingAddress": "Alamat penghantaran",
+        "deliveryCost": "Kos penghantaran",
+        "submitRequest": "Hantar permintaan",
+        "importantInformation": "Maklumat penting",
+        "processedImmediately": "Permintaan anda akan diproses serta-merta",
+        "currentCardDeactivated": "Kad semasa akan dinyahaktifkan selepas pengesahan",
+        "trackStatus": "Anda boleh menjejaki status penghantaran kad baharu anda dalam aplikasi"
+      },
+      "Status": {
+        "title": "Kad baharu anda sedang dalam perjalanan!",
+        "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
+        "buttonLabel": "Papan Pemuka"
+      }
     }
   }
 }

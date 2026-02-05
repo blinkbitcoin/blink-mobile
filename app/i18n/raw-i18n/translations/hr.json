@@ -3176,6 +3176,56 @@
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
         "pinChangedToast": "PIN je uspješno promijenjen"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Prijavi",
+        "delivery": "Dostava",
+        "confirm": "Potvrdi"
+      },
+      "ReportIssue": {
+        "title": "Što se dogodilo s vašom karticom?",
+        "subtitle": "Odaberite razlog za zahtjev zamjenske kartice",
+        "lostCard": "Izgubljena kartica",
+        "lostCardDescription": "Ne mogu pronaći svoju karticu",
+        "stolenCard": "Ukradena kartica",
+        "stolenCardDescription": "Moja kartica je uzeta bez dopuštenja",
+        "damagedCard": "Oštećena kartica",
+        "damagedCardDescription": "Moja kartica je fizički oštećena",
+        "whatHappensNext": "Što slijedi?",
+        "currentCardDeactivated": "Vaša trenutna kartica bit će odmah deaktivirana",
+        "newCardShipped": "Nova kartica bit će poslana na vašu adresu",
+        "digitalCardAvailable": "Vaša digitalna kartica ostaje dostupna tijekom ovog procesa"
+      },
+      "Delivery": {
+        "title": "Odaberite brzinu dostave",
+        "subtitle": "Odaberite koliko brzo želite primiti novu karticu",
+        "standardDelivery": "Standardna dostava",
+        "expressDelivery": "Ekspresna dostava",
+        "businessDays": "{day1}-{day2} radnih dana",
+        "free": "BESPLATNO",
+        "shippingAddress": "Adresa za dostavu",
+        "useRegisteredAddress": "Koristi registriranu adresu kao adresu za dostavu"
+      },
+      "Confirm": {
+        "title": "Pregledajte svoj zahtjev",
+        "subtitle": "Potvrdite detalje zamjene kartice",
+        "requestSummary": "Sažetak zahtjeva",
+        "reason": "Razlog",
+        "delivery": "Dostava",
+        "shippingAddress": "Adresa za dostavu",
+        "deliveryCost": "Trošak dostave",
+        "submitRequest": "Pošalji zahtjev",
+        "importantInformation": "Važne informacije",
+        "processedImmediately": "Vaš zahtjev bit će odmah obrađen",
+        "currentCardDeactivated": "Trenutna kartica bit će deaktivirana nakon potvrde",
+        "trackStatus": "Možete pratiti status dostave nove kartice u aplikaciji"
+      },
+      "Status": {
+        "title": "Vaša nova kartica je na putu!",
+        "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
+        "buttonLabel": "Nadzorna ploča"
+      }
     }
   }
 }

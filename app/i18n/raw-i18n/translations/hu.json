@@ -3135,6 +3135,56 @@
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
         "pinChangedToast": "A PIN-kód sikeresen módosítva"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Bejelentés",
+        "delivery": "Szállítás",
+        "confirm": "Megerősítés"
+      },
+      "ReportIssue": {
+        "title": "Mi történt a kártyájával?",
+        "subtitle": "Válassza ki a pótlókártya igénylésének okát",
+        "lostCard": "Elveszett kártya",
+        "lostCardDescription": "Nem találom a kártyámat",
+        "stolenCard": "Ellopott kártya",
+        "stolenCardDescription": "A kártyámat engedély nélkül elvették",
+        "damagedCard": "Sérült kártya",
+        "damagedCardDescription": "A kártyám fizikailag sérült",
+        "whatHappensNext": "Mi történik ezután?",
+        "currentCardDeactivated": "A jelenlegi kártyája azonnal deaktiválásra kerül",
+        "newCardShipped": "Új kártyát küldünk a címére",
+        "digitalCardAvailable": "A digitális kártyája elérhető marad a folyamat során"
+      },
+      "Delivery": {
+        "title": "Válassza ki a szállítási sebességet",
+        "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát",
+        "standardDelivery": "Standard szállítás",
+        "expressDelivery": "Expressz szállítás",
+        "businessDays": "{day1}-{day2} munkanap",
+        "free": "INGYENES",
+        "shippingAddress": "Szállítási cím",
+        "useRegisteredAddress": "Regisztrált cím használata szállítási címként"
+      },
+      "Confirm": {
+        "title": "Ellenőrizze a kérelmét",
+        "subtitle": "Kérjük, erősítse meg a kártyacsere részleteit",
+        "requestSummary": "Kérelem összefoglalása",
+        "reason": "Ok",
+        "delivery": "Szállítás",
+        "shippingAddress": "Szállítási cím",
+        "deliveryCost": "Szállítási költség",
+        "submitRequest": "Kérelem beküldése",
+        "importantInformation": "Fontos információk",
+        "processedImmediately": "A kérelmét azonnal feldolgozzuk",
+        "currentCardDeactivated": "A jelenlegi kártya megerősítéskor deaktiválásra kerül",
+        "trackStatus": "Az új kártya szállítási állapotát az alkalmazásban követheti nyomon"
+      },
+      "Status": {
+        "title": "Az új kártyád úton van!",
+        "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
+        "buttonLabel": "Irányítópult"
+      }
     }
   }
 }

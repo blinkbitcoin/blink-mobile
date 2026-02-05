@@ -3176,6 +3176,56 @@
         "pinChangedSubtitle": "Váš PIN byl úspěšně změněn.",
         "pinChangedToast": "PIN byl úspěšně změněn"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Nahlásit",
+        "delivery": "Doručení",
+        "confirm": "Potvrdit"
+      },
+      "ReportIssue": {
+        "title": "Co se stalo s vaší kartou?",
+        "subtitle": "Vyberte důvod žádosti o náhradní kartu",
+        "lostCard": "Ztracená karta",
+        "lostCardDescription": "Nemohu najít svou kartu",
+        "stolenCard": "Ukradená karta",
+        "stolenCardDescription": "Moje karta byla odcizena bez povolení",
+        "damagedCard": "Poškozená karta",
+        "damagedCardDescription": "Moje karta je fyzicky poškozená",
+        "whatHappensNext": "Co bude následovat?",
+        "currentCardDeactivated": "Vaše aktuální karta bude okamžitě deaktivována",
+        "newCardShipped": "Nová karta bude odeslána na vaši adresu",
+        "digitalCardAvailable": "Vaše digitální karta zůstává během tohoto procesu dostupná"
+      },
+      "Delivery": {
+        "title": "Vyberte rychlost doručení",
+        "subtitle": "Vyberte, jak rychle chcete obdržet novou kartu",
+        "standardDelivery": "Standardní doručení",
+        "expressDelivery": "Expresní doručení",
+        "businessDays": "{day1}-{day2} pracovních dnů",
+        "free": "ZDARMA",
+        "shippingAddress": "Doručovací adresa",
+        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací"
+      },
+      "Confirm": {
+        "title": "Zkontrolujte svou žádost",
+        "subtitle": "Potvrďte prosím údaje o výměně karty",
+        "requestSummary": "Shrnutí žádosti",
+        "reason": "Důvod",
+        "delivery": "Doručení",
+        "shippingAddress": "Doručovací adresa",
+        "deliveryCost": "Cena doručení",
+        "submitRequest": "Odeslat žádost",
+        "importantInformation": "Důležité informace",
+        "processedImmediately": "Vaše žádost bude zpracována okamžitě",
+        "currentCardDeactivated": "Aktuální karta bude po potvrzení deaktivována",
+        "trackStatus": "Stav doručení nové karty můžete sledovat v aplikaci"
+      },
+      "Status": {
+        "title": "Vaše nová karta je na cestě!",
+        "subtitle": "Objednávka doručení vaší karty Blink byla odeslána.",
+        "buttonLabel": "Přehled"
+      }
     }
   }
 }

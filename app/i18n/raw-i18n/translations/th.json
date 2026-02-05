@@ -3173,6 +3173,56 @@
         "pinChangedSubtitle": "PIN ของคุณถูกเปลี่ยนเรียบร้อยแล้ว",
         "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "แจ้งปัญหา",
+        "delivery": "การจัดส่ง",
+        "confirm": "ยืนยัน"
+      },
+      "ReportIssue": {
+        "title": "เกิดอะไรขึ้นกับบัตรของคุณ?",
+        "subtitle": "เลือกเหตุผลในการขอบัตรทดแทน",
+        "lostCard": "บัตรหาย",
+        "lostCardDescription": "ฉันไม่สามารถหาบัตรของฉันเจอ",
+        "stolenCard": "บัตรถูกขโมย",
+        "stolenCardDescription": "บัตรของฉันถูกนำไปโดยไม่ได้รับอนุญาต",
+        "damagedCard": "บัตรเสียหาย",
+        "damagedCardDescription": "บัตรของฉันเสียหายทางกายภาพ",
+        "whatHappensNext": "จะเกิดอะไรขึ้นต่อไป?",
+        "currentCardDeactivated": "บัตรปัจจุบันของคุณจะถูกปิดใช้งานทันที",
+        "newCardShipped": "บัตรใหม่จะถูกจัดส่งไปยังที่อยู่ของคุณ",
+        "digitalCardAvailable": "บัตรดิจิทัลของคุณยังคงใช้งานได้ระหว่างกระบวนการนี้"
+      },
+      "Delivery": {
+        "title": "เลือกความเร็วในการจัดส่ง",
+        "subtitle": "เลือกว่าคุณต้องการรับบัตรใหม่เร็วแค่ไหน",
+        "standardDelivery": "จัดส่งมาตรฐาน",
+        "expressDelivery": "จัดส่งด่วน",
+        "businessDays": "{day1}-{day2} วันทำการ",
+        "free": "ฟรี",
+        "shippingAddress": "ที่อยู่จัดส่ง",
+        "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง"
+      },
+      "Confirm": {
+        "title": "ตรวจสอบคำขอของคุณ",
+        "subtitle": "กรุณายืนยันรายละเอียดการเปลี่ยนบัตรของคุณ",
+        "requestSummary": "สรุปคำขอ",
+        "reason": "เหตุผล",
+        "delivery": "การจัดส่ง",
+        "shippingAddress": "ที่อยู่จัดส่ง",
+        "deliveryCost": "ค่าจัดส่ง",
+        "submitRequest": "ส่งคำขอ",
+        "importantInformation": "ข้อมูลสำคัญ",
+        "processedImmediately": "คำขอของคุณจะถูกดำเนินการทันที",
+        "currentCardDeactivated": "บัตรปัจจุบันจะถูกปิดใช้งานเมื่อยืนยัน",
+        "trackStatus": "คุณสามารถติดตามสถานะการจัดส่งบัตรใหม่ของคุณในแอป"
+      },
+      "Status": {
+        "title": "บัตรใหม่ของคุณกำลังมา!",
+        "subtitle": "คำสั่งซื้อสำหรับการจัดส่งบัตร Blink ของคุณถูกส่งแล้ว",
+        "buttonLabel": "แดชบอร์ด"
+      }
     }
   }
 }

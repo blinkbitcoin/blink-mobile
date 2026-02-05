@@ -3135,6 +3135,56 @@
                 "pinChangedSubtitle": "Seu PIN foi alterado com sucesso.",
                 "pinChangedToast": "O PIN foi alterado com sucesso"
             }
+        },
+        "ReplaceCard": {
+            "steps": {
+                "reportIssue": "Reportar",
+                "delivery": "Entrega",
+                "confirm": "Confirmar"
+            },
+            "ReportIssue": {
+                "title": "O que aconteceu com o seu cartão?",
+                "subtitle": "Selecione o motivo para solicitar um cartão de substituição",
+                "lostCard": "Cartão perdido",
+                "lostCardDescription": "Não consigo encontrar o meu cartão",
+                "stolenCard": "Cartão roubado",
+                "stolenCardDescription": "O meu cartão foi levado sem permissão",
+                "damagedCard": "Cartão danificado",
+                "damagedCardDescription": "O meu cartão está fisicamente danificado",
+                "whatHappensNext": "O que acontece a seguir?",
+                "currentCardDeactivated": "O seu cartão atual será imediatamente desativado",
+                "newCardShipped": "Um novo cartão será enviado para o seu endereço",
+                "digitalCardAvailable": "O seu cartão digital permanece disponível durante este processo"
+            },
+            "Delivery": {
+                "title": "Escolha a velocidade de entrega",
+                "subtitle": "Selecione a rapidez com que deseja receber o seu novo cartão",
+                "standardDelivery": "Entrega padrão",
+                "expressDelivery": "Entrega expresso",
+                "businessDays": "{day1}-{day2} dias úteis",
+                "free": "GRÁTIS",
+                "shippingAddress": "Endereço de envio",
+                "useRegisteredAddress": "Usar endereço registado como endereço de envio"
+            },
+            "Confirm": {
+                "title": "Revise o seu pedido",
+                "subtitle": "Por favor, confirme os detalhes da substituição do seu cartão",
+                "requestSummary": "Resumo do pedido",
+                "reason": "Motivo",
+                "delivery": "Entrega",
+                "shippingAddress": "Endereço de envio",
+                "deliveryCost": "Custo de entrega",
+                "submitRequest": "Enviar pedido",
+                "importantInformation": "Informações importantes",
+                "processedImmediately": "O seu pedido será processado imediatamente",
+                "currentCardDeactivated": "O cartão atual será desativado após confirmação",
+                "trackStatus": "Pode acompanhar o estado da entrega do seu novo cartão na app"
+            },
+            "Status": {
+                "title": "O seu novo cartão está a caminho!",
+                "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
+                "buttonLabel": "Painel"
+            }
         }
     }
 }
