@@ -211,6 +211,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     marginLeft: 20,
     paddingLeft: 0,
     paddingRight: 0,
+    justifyContent: "center",
   },
   inputContainerStyle: {
     flex: 1,
@@ -219,6 +220,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     paddingHorizontal: 10,
     backgroundColor: props.bgColor || colors.grey5,
     borderRadius: 8,
+    justifyContent: "center",
   },
   disabledInput: { opacity: 0.6 },
 }))
