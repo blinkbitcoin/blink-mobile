@@ -3135,6 +3135,56 @@
         "pinChangedSubtitle": "PIN yako imebadilishwa kwa mafanikio.",
         "pinChangedToast": "PIN imebadilishwa kwa mafanikio"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Ripoti",
+        "delivery": "Utoaji",
+        "confirm": "Thibitisha"
+      },
+      "ReportIssue": {
+        "title": "Nini kilitokea kwa kadi yako?",
+        "subtitle": "Chagua sababu ya kuomba kadi mbadala",
+        "lostCard": "Kadi iliyopotea",
+        "lostCardDescription": "Siwezi kupata kadi yangu",
+        "stolenCard": "Kadi iliyoibwa",
+        "stolenCardDescription": "Kadi yangu ilichukuliwa bila ruhusa",
+        "damagedCard": "Kadi iliyoharibiwa",
+        "damagedCardDescription": "Kadi yangu imeharibiwa kimwili",
+        "whatHappensNext": "Nini kitatokea baadaye?",
+        "currentCardDeactivated": "Kadi yako ya sasa itazimwa mara moja",
+        "newCardShipped": "Kadi mpya itatumwa kwa anwani yako",
+        "digitalCardAvailable": "Kadi yako ya kidijitali inabaki kupatikana wakati wa mchakato huu"
+      },
+      "Delivery": {
+        "title": "Chagua kasi ya utoaji",
+        "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya",
+        "standardDelivery": "Utoaji wa kawaida",
+        "expressDelivery": "Utoaji wa haraka",
+        "businessDays": "Siku {day1}-{day2} za kazi",
+        "free": "BURE",
+        "shippingAddress": "Anwani ya usafirishaji",
+        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji"
+      },
+      "Confirm": {
+        "title": "Kagua ombi lako",
+        "subtitle": "Tafadhali thibitisha maelezo ya ubadilishaji wa kadi yako",
+        "requestSummary": "Muhtasari wa ombi",
+        "reason": "Sababu",
+        "delivery": "Utoaji",
+        "shippingAddress": "Anwani ya usafirishaji",
+        "deliveryCost": "Gharama ya utoaji",
+        "submitRequest": "Wasilisha ombi",
+        "importantInformation": "Taarifa muhimu",
+        "processedImmediately": "Ombi lako litashughulikiwa mara moja",
+        "currentCardDeactivated": "Kadi ya sasa itazimwa baada ya kuthibitisha",
+        "trackStatus": "Unaweza kufuatilia hali ya utoaji wa kadi yako mpya kwenye programu"
+      },
+      "Status": {
+        "title": "Kadi yako mpya iko njiani!",
+        "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limewasilishwa.",
+        "buttonLabel": "Dashibodi"
+      }
     }
   }
 }

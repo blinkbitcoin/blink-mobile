@@ -3135,6 +3135,56 @@
                 "pinChangedSubtitle": "Il tuo PIN è stato cambiato con successo.",
                 "pinChangedToast": "Il PIN è stato modificato con successo"
             }
+        },
+        "ReplaceCard": {
+            "steps": {
+                "reportIssue": "Segnala",
+                "delivery": "Consegna",
+                "confirm": "Conferma"
+            },
+            "ReportIssue": {
+                "title": "Cosa è successo alla tua carta?",
+                "subtitle": "Seleziona il motivo per richiedere una carta sostitutiva",
+                "lostCard": "Carta smarrita",
+                "lostCardDescription": "Non riesco a trovare la mia carta",
+                "stolenCard": "Carta rubata",
+                "stolenCardDescription": "La mia carta è stata presa senza permesso",
+                "damagedCard": "Carta danneggiata",
+                "damagedCardDescription": "La mia carta è fisicamente danneggiata",
+                "whatHappensNext": "Cosa succede dopo?",
+                "currentCardDeactivated": "La tua carta attuale sarà immediatamente disattivata",
+                "newCardShipped": "Una nuova carta sarà spedita al tuo indirizzo",
+                "digitalCardAvailable": "La tua carta digitale rimane disponibile durante questo processo"
+            },
+            "Delivery": {
+                "title": "Scegli la velocità di consegna",
+                "subtitle": "Seleziona quanto velocemente desideri ricevere la tua nuova carta",
+                "standardDelivery": "Consegna standard",
+                "expressDelivery": "Consegna express",
+                "businessDays": "{day1}-{day2} giorni lavorativi",
+                "free": "GRATIS",
+                "shippingAddress": "Indirizzo di spedizione",
+                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione"
+            },
+            "Confirm": {
+                "title": "Rivedi la tua richiesta",
+                "subtitle": "Conferma i dettagli della sostituzione della tua carta",
+                "requestSummary": "Riepilogo richiesta",
+                "reason": "Motivo",
+                "delivery": "Consegna",
+                "shippingAddress": "Indirizzo di spedizione",
+                "deliveryCost": "Costo di consegna",
+                "submitRequest": "Invia richiesta",
+                "importantInformation": "Informazioni importanti",
+                "processedImmediately": "La tua richiesta sarà elaborata immediatamente",
+                "currentCardDeactivated": "La carta attuale sarà disattivata alla conferma",
+                "trackStatus": "Puoi monitorare lo stato di consegna della tua nuova carta nell'app"
+            },
+            "Status": {
+                "title": "La tua nuova carta è in arrivo!",
+                "subtitle": "L'ordine per la consegna della tua carta Blink è stato inviato.",
+                "buttonLabel": "Dashboard"
+            }
         }
     }
 }

@@ -3176,6 +3176,56 @@
                 "pinChangedSubtitle": "PINが正常に変更されました。",
                 "pinChangedToast": "PINが正常に変更されました"
             }
+        },
+        "ReplaceCard": {
+            "steps": {
+                "reportIssue": "報告",
+                "delivery": "配送",
+                "confirm": "確認"
+            },
+            "ReportIssue": {
+                "title": "カードに何が起こりましたか？",
+                "subtitle": "交換カードを依頼する理由を選択してください",
+                "lostCard": "紛失したカード",
+                "lostCardDescription": "カードが見つかりません",
+                "stolenCard": "盗まれたカード",
+                "stolenCardDescription": "カードが許可なく持ち去られました",
+                "damagedCard": "破損したカード",
+                "damagedCardDescription": "カードが物理的に破損しています",
+                "whatHappensNext": "次に何が起こりますか？",
+                "currentCardDeactivated": "現在のカードは直ちに無効化されます",
+                "newCardShipped": "新しいカードがお届け先住所に発送されます",
+                "digitalCardAvailable": "このプロセス中、デジタルカードは引き続きご利用いただけます"
+            },
+            "Delivery": {
+                "title": "配送速度を選択",
+                "subtitle": "新しいカードをどのくらい早く受け取りたいかを選択してください",
+                "standardDelivery": "通常配送",
+                "expressDelivery": "速達配送",
+                "businessDays": "{day1}〜{day2}営業日",
+                "free": "無料",
+                "shippingAddress": "配送先住所",
+                "useRegisteredAddress": "登録住所を配送先住所として使用"
+            },
+            "Confirm": {
+                "title": "リクエストを確認",
+                "subtitle": "カード交換の詳細を確認してください",
+                "requestSummary": "リクエスト概要",
+                "reason": "理由",
+                "delivery": "配送",
+                "shippingAddress": "配送先住所",
+                "deliveryCost": "配送料",
+                "submitRequest": "リクエストを送信",
+                "importantInformation": "重要な情報",
+                "processedImmediately": "リクエストは直ちに処理されます",
+                "currentCardDeactivated": "確認後、現在のカードは無効化されます",
+                "trackStatus": "アプリで新しいカードの配送状況を追跡できます"
+            },
+            "Status": {
+                "title": "新しいカードが届きます！",
+                "subtitle": "Blinkカードの配送注文が送信されました。",
+                "buttonLabel": "ダッシュボード"
+            }
         }
     }
 }

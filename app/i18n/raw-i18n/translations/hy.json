@@ -3176,6 +3176,56 @@
         "pinChangedSubtitle": "Ձեր PIN-ը հաջողությամբ փոխվել է։",
         "pinChangedToast": "PIN կոդը հաջողությամբ փոխվել է։"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Հաղորդել խնդիրը",
+        "delivery": "Առաքում",
+        "confirm": "Հաստատում"
+      },
+      "ReportIssue": {
+        "title": "Ի՞նչ է պատահել ձեր քարտին",
+        "subtitle": "Ընտրեք փոխարինման քարտ պահանջելու պատճառը",
+        "lostCard": "Կորցրած քարտ",
+        "lostCardDescription": "Չեմ կարող գտնել իմ քարտը",
+        "stolenCard": "Գողացված քարտ",
+        "stolenCardDescription": "Իմ քարտը վերցվել է առանց թույլտվության",
+        "damagedCard": "Վնասված քարտ",
+        "damagedCardDescription": "Իմ քարտը ֆիզիկապես վնասված է",
+        "whatHappensNext": "Ի՞նչ է լինելու հաջորդը",
+        "currentCardDeactivated": "Ձեր ընթացիկ քարտը անմիջապես ապաակտիվացվի",
+        "newCardShipped": "Նոր քարտը կառաքվի ձեր հասցեով",
+        "digitalCardAvailable": "Այս ընթացքում ձեր թվային քարտը կմնա հասանելի"
+      },
+      "Delivery": {
+        "title": "Ընտրեք առաքման արագությունը",
+        "subtitle": "Ընտրեք՝ որքան արագ եք ցանկանում ստանալ ձեր նոր քարտը",
+        "standardDelivery": "Ստանդարտ առաքում",
+        "expressDelivery": "Արագ առաքում",
+        "businessDays": "{day1}-{day2} աշխատանքային օր",
+        "free": "ԱՆՎՃԱՐ",
+        "shippingAddress": "Առաքման հասցե",
+        "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե"
+      },
+      "Confirm": {
+        "title": "Վերանայեք ձեր հարցումը",
+        "subtitle": "Խնդրում ենք հաստատել ձեր քարտի փոխարինման տվյալները",
+        "requestSummary": "Հարցման ամփոփում",
+        "reason": "Պատճառ",
+        "delivery": "Առաքում",
+        "shippingAddress": "Առաքման հասցե",
+        "deliveryCost": "Առաքման արժեք",
+        "submitRequest": "Ուղարկել հարցումը",
+        "importantInformation": "Կարևոր տեղեկություն",
+        "processedImmediately": "Ձեր հարցումը կմշակվի անմիջապես",
+        "currentCardDeactivated": "Ընթացիկ քարտը հաստատումից հետո ապաակտիվացվի",
+        "trackStatus": "Դուք կարող եք հետևել ձեր նոր քարտի առաքման կարգավիճակին հավելվածում"
+      },
+      "Status": {
+        "title": "Ձեր նոր քարտը ճանապարհին է!",
+        "subtitle": "Ձեր Blink քարտի առաքման պատվերը ներկայացվել է։",
+        "buttonLabel": "Վահանակ"
+      }
     }
   }
 }

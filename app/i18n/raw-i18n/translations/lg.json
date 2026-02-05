@@ -3135,6 +3135,56 @@
         "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
         "pinChangedToast": "PIN ekyusiddwa obulungi"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Loopa",
+        "delivery": "Okutwala",
+        "confirm": "Kakasa"
+      },
+      "ReportIssue": {
+        "title": "Kiki ekyabadde ku kaadi yo?",
+        "subtitle": "Londa ensonga y'okusaba kaadi ey'okuddamu",
+        "lostCard": "Kaadi eyabulidde",
+        "lostCardDescription": "Sisobola kufuna kaadi yange",
+        "stolenCard": "Kaadi eyabbiddwa",
+        "stolenCardDescription": "Kaadi yange yatwaldwa awatali lukusa",
+        "damagedCard": "Kaadi eyonoonese",
+        "damagedCardDescription": "Kaadi yange yonoonese",
+        "whatHappensNext": "Kiki ekiddayo?",
+        "currentCardDeactivated": "Kaadi yo ey'omu kaakati ejja kusazibwamu amangu ago",
+        "newCardShipped": "Kaadi empya ejja kutumibwa ku ndagiriro yo",
+        "digitalCardAvailable": "Kaadi yo eya dijitaali esigala ng'esoboka mu nkola eno"
+      },
+      "Delivery": {
+        "title": "Londa embiro z'okutwala",
+        "subtitle": "Londa bw'omanyi oyagala okufuna kaadi yo empya",
+        "standardDelivery": "Okutwala okwa bulijjo",
+        "expressDelivery": "Okutwala okw'amangu",
+        "businessDays": "Ennaku {day1}-{day2} ez'omulimu",
+        "free": "BWEREERE",
+        "shippingAddress": "Endagiriro y'okutuma",
+        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma"
+      },
+      "Confirm": {
+        "title": "Kebera okusaba kwo",
+        "subtitle": "Kakasa ebikwata ku kukyusa kaadi yo",
+        "requestSummary": "Akafunze k'okusaba",
+        "reason": "Ensonga",
+        "delivery": "Okutwala",
+        "shippingAddress": "Endagiriro y'okutuma",
+        "deliveryCost": "Bbeeyi y'okutwala",
+        "submitRequest": "Weereza okusaba",
+        "importantInformation": "Amawulire ag'omugaso",
+        "processedImmediately": "Okusaba kwo kujja kukolesereza amangu ago",
+        "currentCardDeactivated": "Kaadi ey'omu kaakati ejja kusazibwamu ng'okakasizza",
+        "trackStatus": "Osobola okugoberera embeera y'okutwala kaadi yo empya mu app"
+      },
+      "Status": {
+        "title": "Kaadi yo empya eri mu kkubo!",
+        "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
+        "buttonLabel": "Dashiboodi"
+      }
     }
   }
 }

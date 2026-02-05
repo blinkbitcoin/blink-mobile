@@ -3135,6 +3135,56 @@
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
         "pinChangedToast": "PIN-ul a fost schimbat cu succes"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Raportează",
+        "delivery": "Livrare",
+        "confirm": "Confirmă"
+      },
+      "ReportIssue": {
+        "title": "Ce s-a întâmplat cu cardul tău?",
+        "subtitle": "Selectează motivul pentru solicitarea unui card de înlocuire",
+        "lostCard": "Card pierdut",
+        "lostCardDescription": "Nu îmi găsesc cardul",
+        "stolenCard": "Card furat",
+        "stolenCardDescription": "Cardul meu a fost luat fără permisiune",
+        "damagedCard": "Card deteriorat",
+        "damagedCardDescription": "Cardul meu este deteriorat fizic",
+        "whatHappensNext": "Ce urmează?",
+        "currentCardDeactivated": "Cardul tău actual va fi dezactivat imediat",
+        "newCardShipped": "Un card nou va fi expediat la adresa ta",
+        "digitalCardAvailable": "Cardul tău digital rămâne disponibil în timpul acestui proces"
+      },
+      "Delivery": {
+        "title": "Alege viteza de livrare",
+        "subtitle": "Selectează cât de repede dorești să primești noul card",
+        "standardDelivery": "Livrare standard",
+        "expressDelivery": "Livrare expresă",
+        "businessDays": "{day1}-{day2} zile lucrătoare",
+        "free": "GRATUIT",
+        "shippingAddress": "Adresa de expediere",
+        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere"
+      },
+      "Confirm": {
+        "title": "Verifică solicitarea ta",
+        "subtitle": "Te rugăm să confirmi detaliile înlocuirii cardului",
+        "requestSummary": "Rezumatul solicitării",
+        "reason": "Motiv",
+        "delivery": "Livrare",
+        "shippingAddress": "Adresa de expediere",
+        "deliveryCost": "Cost de livrare",
+        "submitRequest": "Trimite solicitarea",
+        "importantInformation": "Informații importante",
+        "processedImmediately": "Solicitarea ta va fi procesată imediat",
+        "currentCardDeactivated": "Cardul actual va fi dezactivat la confirmare",
+        "trackStatus": "Poți urmări starea livrării noului tău card în aplicație"
+      },
+      "Status": {
+        "title": "Noul tău card este pe drum!",
+        "subtitle": "Comanda pentru livrarea cardului tău Blink a fost trimisă.",
+        "buttonLabel": "Panou"
+      }
     }
   }
 }
