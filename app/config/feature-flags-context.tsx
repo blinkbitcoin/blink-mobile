@@ -1,8 +1,9 @@
-import React, { useState, createContext, useContext, useEffect } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
+import remoteConfigInstance from "@react-native-firebase/remote-config"
 
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
-import remoteConfigInstance from "@react-native-firebase/remote-config"
+import { ReplaceCardDeliveryConfig } from "@app/screens/card-screen/replace-card-screens/steps/types"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -11,6 +12,7 @@ const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
 const SuccessIconDurationKey = "successIconDuration"
+const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -24,6 +26,12 @@ type RemoteConfig = {
   [UpgradeModalShowAtSessionNumberKey]: number
   [FeeReimbursementMemoKey]: string
   [SuccessIconDurationKey]: number
+  [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
+}
+
+const defaultReplaceCardDeliveryConfig = {
+  standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
+  express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -34,13 +42,17 @@ const defaultRemoteConfig: RemoteConfig = {
   upgradeModalShowAtSessionNumber: 1,
   feeReimbursementMemo: "fee reimbursement",
   successIconDuration: 2300,
+  replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
 }
 
 const defaultFeatureFlags = {
   deviceAccountEnabled: false,
 }
 
-remoteConfigInstance().setDefaults(defaultRemoteConfig)
+remoteConfigInstance().setDefaults({
+  ...defaultRemoteConfig,
+  replaceCardDeliveryConfig: JSON.stringify(defaultReplaceCardDeliveryConfig),
+})
 
 remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
@@ -93,6 +105,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SuccessIconDurationKey)
           .asNumber()
 
+        const replaceCardDeliveryConfig = JSON.parse(
+          remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
+        )
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -101,6 +117,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           upgradeModalShowAtSessionNumber,
           feeReimbursementMemo,
           successIconDuration,
+          replaceCardDeliveryConfig,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
