@@ -46,7 +46,7 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleReplaceCard = () => {
-    console.log("Replace card pressed")
+    navigation.navigate("replaceCardScreen")
   }
 
   const handleContactSupport = () => {
