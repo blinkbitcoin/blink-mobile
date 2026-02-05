@@ -27,13 +27,7 @@ jest.mock("react-native-in-app-review", () => ({
 jest.mock("react-native-view-shot", () => {
   return {
     __esModule: true,
-    default: ({
-      children,
-      style,
-    }: {
-      children: React.ReactNode
-      style?: ViewStyle
-    }) => (
+    default: ({ children, style }: { children: React.ReactNode; style?: ViewStyle }) => (
       <View style={style} testID="view-shot">
         {children}
       </View>
