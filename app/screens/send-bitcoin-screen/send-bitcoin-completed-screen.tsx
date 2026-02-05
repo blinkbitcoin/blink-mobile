@@ -429,6 +429,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewShot: {
     flexGrow: 1,
+    backgroundColor: colors.white,
   },
   completedText: {
     textAlign: "center",

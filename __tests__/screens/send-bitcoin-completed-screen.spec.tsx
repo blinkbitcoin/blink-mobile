@@ -15,8 +15,9 @@ import {
   Pending,
   SuccessAction,
 } from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.stories"
-import { ContextForScreen } from "./helper"
-import { Linking, View } from "react-native"
+import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
+import { Linking, View, ViewStyle } from "react-native"
+import { light, dark } from "@app/rne-theme/colors"
 
 jest.mock("react-native-in-app-review", () => ({
   isAvailable: () => true,
@@ -26,7 +27,11 @@ jest.mock("react-native-in-app-review", () => ({
 jest.mock("react-native-view-shot", () => {
   return {
     __esModule: true,
-    default: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
+    default: ({ children, style }: { children: React.ReactNode; style?: ViewStyle }) => (
+      <View style={style} testID="view-shot">
+        {children}
+      </View>
+    ),
   }
 })
 
@@ -267,5 +272,56 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(screen.getByText(lud10AESRoute.params.paymentType)).toBeTruthy()
     expect(screen.getByText(lud10AESRoute.params.destination)).toBeTruthy()
     expect(screen.getByText(LL.common.share())).toBeTruthy()
+  })
+
+  describe("ViewShot background color for screenshot", () => {
+    const successRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "testuser",
+        paymentType: "lightning",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    it("has white background in light mode for screenshot capture", async () => {
+      render(
+        <ContextForScreenWithTheme mode="light">
+          <SuccessAction route={successRoute} />
+        </ContextForScreenWithTheme>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      const viewShot = await waitFor(() => screen.findByTestId("view-shot"))
+      expect(viewShot.props.style).toMatchObject({
+        backgroundColor: light.white,
+      })
+    })
+
+    it("has dark background in dark mode for screenshot capture", async () => {
+      render(
+        <ContextForScreenWithTheme mode="dark">
+          <SuccessAction route={successRoute} />
+        </ContextForScreenWithTheme>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      const viewShot = await waitFor(() => screen.findByTestId("view-shot"))
+      expect(viewShot.props.style).toMatchObject({
+        backgroundColor: dark.white,
+      })
+    })
   })
 })
