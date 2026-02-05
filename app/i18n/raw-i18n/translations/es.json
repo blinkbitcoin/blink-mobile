@@ -2332,8 +2332,8 @@
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
-        "receiveCurrency": "Recibir moneda",
-        "displayCurrency": "Mostrar moneda"
+        "receiveCurrency": "Cuenta a recibir",
+        "displayCurrency": "Moneda"
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de notificaciones",
@@ -2437,7 +2437,7 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Recibir moneda",
+        "title": "Cuenta a recibir",
         "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
     },
     "ThemeScreen": {
