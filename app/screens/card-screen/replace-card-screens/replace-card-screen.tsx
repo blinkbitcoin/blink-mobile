@@ -6,7 +6,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { ReplaceCardLayout } from "./replace-card-layout"
+import { SteppedCardLayout } from "../stepped-card-layout"
 import { ReportIssueStep, DeliveryStep, ConfirmStep } from "./steps"
 import { useReplaceCardFlow, Step } from "./use-replace-card-flow"
 
@@ -127,7 +127,7 @@ export const ReplaceCardScreen: React.FC = () => {
   const stepConfig = getStepConfig()
 
   return (
-    <ReplaceCardLayout
+    <SteppedCardLayout
       steps={steps}
       currentStep={step}
       icon={stepConfig.icon}
@@ -139,6 +139,6 @@ export const ReplaceCardScreen: React.FC = () => {
       isButtonDisabled={stepConfig.isButtonDisabled}
     >
       {renderStepContent()}
-    </ReplaceCardLayout>
+    </SteppedCardLayout>
   )
 }
