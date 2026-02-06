@@ -63,11 +63,13 @@ export const ReplaceCardLayout: React.FC<ReplaceCardLayoutProps> = ({
 
         <View style={styles.content}>{children}</View>
 
-        <GaloyPrimaryButton
-          title={buttonLabel}
-          onPress={onButtonPress}
-          disabled={isButtonDisabled}
-        />
+        <View style={styles.buttonContainer}>
+          <GaloyPrimaryButton
+            title={buttonLabel}
+            onPress={onButtonPress}
+            disabled={isButtonDisabled}
+          />
+        </View>
       </View>
     </Screen>
   )
@@ -111,5 +113,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     gap: 20,
+  },
+  buttonContainer: {
+    marginTop: 10,
   },
 }))
