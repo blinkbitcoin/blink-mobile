@@ -3215,6 +3215,53 @@
         "buttonLabel": "Oversigt"
       },
       "title": "Erstat kort"
+    },
+    "OrderPhysicalCard": {
+      "title": "Bestil fysisk kort",
+      "steps": {
+        "shipping": "Forsendelse",
+        "confirm": "Bekræft"
+      },
+      "Shipping": {
+        "title": "Bestil dit fysiske kort",
+        "subtitle": "Få dit Blink Visa-kort leveret til din adresse.",
+        "registeredAddress": "Registreret adresse",
+        "useRegisteredAddress": "Brug registreret adresse som leveringsadresse",
+        "delivery": "Levering",
+        "standardDelivery": "Standardlevering",
+        "expressDelivery": "Ekspreslevering",
+        "businessDays": "{day1}-{day2} hverdage",
+        "free": "GRATIS",
+        "deliveryInformation": "Leveringsoplysninger",
+        "bullet1": "Du modtager sporingsoplysninger via e-mail",
+        "bullet2": "Der kan kræves underskrift ved levering",
+        "bullet3": "Kortet sendes i diskret emballage",
+        "bullet4": "Aktivér dit kort, når det ankommer",
+        "cardFeatures": "Kortfunktioner",
+        "feature1": "Kontaktløs betalingsteknologi",
+        "feature2": "EMV-chip for øget sikkerhed",
+        "feature3": "Magnetstribe til universel accept",
+        "feature4": "Dit navn præget på kortet",
+        "important": "Vigtigt",
+        "importantBullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
+        "importantBullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
+        "importantBullet3": "Begge kort vil have samme kortnummer og oplysninger"
+      },
+      "Confirm": {
+        "title": "Bekræft din bestilling",
+        "subtitle": "Gennemgå din bestilling af det fysiske kort, før du sender den.",
+        "orderSummary": "Bestillingsoversigt",
+        "cardDesign": "Kortdesign",
+        "delivery": "Levering",
+        "deliveryTime": "Leveringstid",
+        "shippingCost": "Forsendelsesomkostninger",
+        "shippingAddress": "Leveringsadresse",
+        "placeOrder": "Afgiv bestilling",
+        "important": "Vigtigt",
+        "bullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
+        "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
+        "bullet3": "Begge kort vil have samme kortnummer og oplysninger"
+      }
     }
   }
 }

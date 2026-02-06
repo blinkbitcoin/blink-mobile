@@ -3188,6 +3188,53 @@
                 "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
                 "buttonLabel": "Painel"
             }
+        },
+        "OrderPhysicalCard": {
+            "title": "Pedir cartão físico",
+            "steps": {
+                "shipping": "Envio",
+                "confirm": "Confirmar"
+            },
+            "Shipping": {
+                "title": "Peça o seu cartão físico",
+                "subtitle": "Receba o seu cartão Blink Visa no seu endereço.",
+                "registeredAddress": "Endereço registado",
+                "useRegisteredAddress": "Usar o endereço registado como endereço de envio",
+                "delivery": "Entrega",
+                "standardDelivery": "Entrega padrão",
+                "expressDelivery": "Entrega expressa",
+                "businessDays": "{day1}-{day2} dias úteis",
+                "free": "GRÁTIS",
+                "deliveryInformation": "Informações de entrega",
+                "bullet1": "Você receberá as informações de rastreamento por e-mail",
+                "bullet2": "Pode ser necessária assinatura na entrega",
+                "bullet3": "O cartão será enviado em embalagem discreta",
+                "bullet4": "Ative o seu cartão quando ele chegar",
+                "cardFeatures": "Características do cartão",
+                "feature1": "Tecnologia de pagamento por aproximação",
+                "feature2": "Chip EMV para maior segurança",
+                "feature3": "Faixa magnética para aceitação universal",
+                "feature4": "Seu nome em relevo no cartão",
+                "important": "Importante",
+                "importantBullet1": "Seu cartão virtual permanecerá ativo enquanto você espera o cartão físico",
+                "importantBullet2": "Você precisará ativar o cartão físico quando ele chegar",
+                "importantBullet3": "Ambos os cartões terão o mesmo número e detalhes"
+            },
+            "Confirm": {
+                "title": "Confirme seu pedido",
+                "subtitle": "Revise o pedido do cartão físico antes de enviar.",
+                "orderSummary": "Resumo do pedido",
+                "cardDesign": "Design do cartão",
+                "delivery": "Entrega",
+                "deliveryTime": "Tempo de entrega",
+                "shippingCost": "Custo de envio",
+                "shippingAddress": "Endereço de envio",
+                "placeOrder": "Fazer pedido",
+                "important": "Importante",
+                "bullet1": "Seu cartão virtual permanecerá ativo enquanto você espera o cartão físico",
+                "bullet2": "Você precisará ativar o cartão físico quando ele chegar",
+                "bullet3": "Ambos os cartões terão o mesmo número e detalhes"
+            }
         }
     }
 }
