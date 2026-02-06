@@ -7,12 +7,12 @@ import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { StepsProgressBar } from "@app/components/steps-progress-bar"
 
-type ReplaceCardLayoutProps = {
+type SteppedCardLayoutProps = {
   steps: string[]
   currentStep: number
   icon: IconNamesType
   iconColor?: string
-  title: string
+  title?: string
   subtitle: string
   buttonLabel: string
   onButtonPress: () => void
@@ -20,7 +20,7 @@ type ReplaceCardLayoutProps = {
   children: React.ReactNode
 }
 
-export const ReplaceCardLayout: React.FC<ReplaceCardLayoutProps> = ({
+export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
   steps,
   currentStep,
   icon,
@@ -56,7 +56,7 @@ export const ReplaceCardLayout: React.FC<ReplaceCardLayoutProps> = ({
           />
 
           <View style={styles.textContainer}>
-            <Text style={styles.title}>{title}</Text>
+            {title ? <Text style={styles.title}>{title}</Text> : null}
             <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
         </View>
