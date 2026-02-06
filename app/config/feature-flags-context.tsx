@@ -3,7 +3,6 @@ import remoteConfigInstance from "@react-native-firebase/remote-config"
 
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
-import { ReplaceCardDeliveryConfig } from "@app/screens/card-screen/replace-card-screens/steps/types"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -13,6 +12,14 @@ const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
 const SuccessIconDurationKey = "successIconDuration"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
+
+type DeliveryOptionConfig = {
+  minDays: number
+  maxDays: number
+  priceUsd: number
+}
+
+type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -105,9 +112,13 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SuccessIconDurationKey)
           .asNumber()
 
-        const replaceCardDeliveryConfig = JSON.parse(
+        const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
+        const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
+          ...defaultReplaceCardDeliveryConfig,
+          ...parsedDeliveryConfig,
+        }
 
         setRemoteConfig({
           deviceAccountEnabledRestAuth,

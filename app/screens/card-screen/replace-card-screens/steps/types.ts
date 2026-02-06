@@ -12,11 +12,3 @@ export const Delivery = {
 } as const
 
 export type DeliveryType = (typeof Delivery)[keyof typeof Delivery]
-
-export type DeliveryOptionConfig = {
-  minDays: number
-  maxDays: number
-  priceUsd: number
-}
-
-export type ReplaceCardDeliveryConfig = Record<DeliveryType, DeliveryOptionConfig>
