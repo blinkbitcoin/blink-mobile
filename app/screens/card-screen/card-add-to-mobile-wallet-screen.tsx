@@ -5,7 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
-import { AddToWalletButton, BulletListCard } from "@app/components/card-screen"
+import { AddToWalletButton, InfoCard } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { CardStatus, MOCK_CARD } from "./card-mock-data"
@@ -50,14 +50,16 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
 
         <AddToWalletButton onPress={handleAddToWallet} disabled={isLoading} />
 
-        <BulletListCard
+        <InfoCard
           title={LL.CardFlow.AddToMobileWallet.Benefits.title()}
-          items={[
+          bulletItems={[
             LL.CardFlow.AddToMobileWallet.Benefits.contactless(),
             LL.CardFlow.AddToMobileWallet.Benefits.security(),
             LL.CardFlow.AddToMobileWallet.Benefits.noPhysicalCard(),
             LL.CardFlow.AddToMobileWallet.Benefits.worksLocked(),
           ]}
+          showIcon={false}
+          size="lg"
         />
       </View>
     </Screen>

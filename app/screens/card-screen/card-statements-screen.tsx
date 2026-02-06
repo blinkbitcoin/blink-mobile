@@ -5,9 +5,9 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import {
-  BulletListCard,
   ContactSupportRow,
   IconTextButton,
+  InfoCard,
   StatementItem,
   SwitchRow,
 } from "@app/components/card-screen"
@@ -130,13 +130,16 @@ export const CardStatementsScreen: React.FC = () => {
           </View>
         </View>
 
-        <BulletListCard
+        <InfoCard
           title={LL.CardFlow.CardStatements.aboutStatements()}
-          items={[
+          bulletItems={[
             LL.CardFlow.CardStatements.aboutBullet1(),
             LL.CardFlow.CardStatements.aboutBullet2(),
             LL.CardFlow.CardStatements.aboutBullet3(),
           ]}
+          showIcon={false}
+          size="lg"
+          bulletSpacing={1}
         />
 
         <View style={styles.section}>
