@@ -333,8 +333,6 @@ describe("CardSettingsScreen", () => {
     })
 
     it("allows pressing order physical card row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -348,8 +346,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Order physical card pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
     })
 
     it("allows pressing add to mobile wallet row and navigates", async () => {
@@ -568,7 +565,7 @@ describe("CardSettingsScreen", () => {
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
-      expect(consoleSpy).toHaveBeenCalledWith("Order physical card pressed")
+      expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
       expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
 
       consoleSpy.mockRestore()
