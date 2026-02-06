@@ -1,21 +1,29 @@
 import React, { useMemo } from "react"
+import { View } from "react-native"
+import { Text, useTheme } from "@rn-vui/themed"
 
-import { useTheme } from "@rn-vui/themed"
-
-import { InfoCard, InfoSection } from "@app/components/card-screen"
+import { InfoCard, InfoSection, MultiLineField } from "@app/components/card-screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import { Delivery, DeliveryType, Issue, IssueType } from "./types"
+import { ShippingAddress, shippingAddressToLines } from "../../card-mock-data"
+import { Delivery, DeliveryType } from "../../replace-card-screens/steps/types"
+import { useSharedStepStyles } from "./shared-styles"
+
+const MOCK_CARD_DESIGN = "Maxi orange"
 
 type ConfirmStepProps = {
-  issueType: IssueType
   deliveryType: DeliveryType
+  shippingAddress: ShippingAddress
 }
 
-export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryType }) => {
+export const ConfirmStep: React.FC<ConfirmStepProps> = ({
+  deliveryType,
+  shippingAddress,
+}) => {
+  const sharedStyles = useSharedStepStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -24,32 +32,19 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
   const { formatCurrency } = useDisplayCurrency()
 
   const deliveryConfig = replaceCardDeliveryConfig[deliveryType]
-  const {
-    ReportIssue: reportIssueLL,
-    Delivery: deliveryLL,
-    Confirm: confirmLL,
-  } = LL.CardFlow.ReplaceCard
-
-  const issueTypeLabels = useMemo<Record<IssueType, string>>(
-    () => ({
-      [Issue.Lost]: reportIssueLL.lostCard(),
-      [Issue.Stolen]: reportIssueLL.stolenCard(),
-      [Issue.Damaged]: reportIssueLL.damagedCard(),
-    }),
-    [reportIssueLL],
-  )
+  const { Shipping: shippingLL, Confirm: confirmLL } = LL.CardFlow.OrderPhysicalCard
 
   const deliveryLabels = useMemo<Record<DeliveryType, string>>(
     () => ({
-      [Delivery.Standard]: deliveryLL.standardDelivery(),
-      [Delivery.Express]: deliveryLL.expressDelivery(),
+      [Delivery.Standard]: shippingLL.standardDelivery(),
+      [Delivery.Express]: shippingLL.expressDelivery(),
     }),
-    [deliveryLL],
+    [shippingLL],
   )
 
   const deliveryPrice =
     deliveryConfig.priceUsd === 0
-      ? deliveryLL.free()
+      ? shippingLL.free()
       : formatCurrency({
           amountInMajorUnits: deliveryConfig.priceUsd,
           currency: WalletCurrency.Usd,
@@ -58,11 +53,11 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
   return (
     <>
       <InfoSection
-        title={confirmLL.requestSummary()}
+        title={confirmLL.orderSummary()}
         items={[
           {
-            label: confirmLL.issueType(),
-            value: issueTypeLabels[issueType],
+            label: confirmLL.cardDesign(),
+            value: MOCK_CARD_DESIGN,
           },
           {
             label: confirmLL.delivery(),
@@ -70,7 +65,7 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
           },
           {
             label: confirmLL.deliveryTime(),
-            value: deliveryLL.businessDays({
+            value: shippingLL.businessDays({
               day1: deliveryConfig.minDays.toString(),
               day2: deliveryConfig.maxDays.toString(),
             }),
@@ -83,10 +78,17 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
         ]}
       />
 
+      <View style={sharedStyles.section}>
+        <Text style={sharedStyles.sectionTitle}>{confirmLL.shippingAddress()}</Text>
+        <MultiLineField
+          lines={shippingAddressToLines(shippingAddress, true)}
+          leftIcon="map-pin"
+        />
+      </View>
+
       <InfoCard
-        title={confirmLL.importantInformation()}
+        title={confirmLL.important()}
         bulletItems={[confirmLL.bullet1(), confirmLL.bullet2(), confirmLL.bullet3()]}
-        showIcon={false}
         size="lg"
       />
     </>
