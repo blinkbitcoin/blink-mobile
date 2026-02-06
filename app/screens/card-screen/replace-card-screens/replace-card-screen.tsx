@@ -33,6 +33,7 @@ export const ReplaceCardScreen: React.FC = () => {
     setSelectedIssue,
     setSelectedDelivery,
     toggleUseRegisteredAddress,
+    setCustomAddress,
     goToNextStep,
     completeFlow,
   } = useReplaceCardFlow()
@@ -42,10 +43,6 @@ export const ReplaceCardScreen: React.FC = () => {
     LL.CardFlow.ReplaceCard.steps.delivery(),
     LL.CardFlow.ReplaceCard.steps.confirm(),
   ]
-
-  const handleEditAddress = () => {
-    navigation.navigate("cardShippingAddressScreen")
-  }
 
   const handleSubmit = () => {
     completeFlow()
@@ -110,7 +107,8 @@ export const ReplaceCardScreen: React.FC = () => {
             onSelectDelivery={setSelectedDelivery}
             useRegisteredAddress={state.useRegisteredAddress}
             onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
-            onEditAddress={handleEditAddress}
+            customAddress={state.customAddress}
+            onCustomAddressChange={setCustomAddress}
           />
         )
       case Step.Confirm:
