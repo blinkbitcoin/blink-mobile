@@ -3188,6 +3188,53 @@
                 "subtitle": "Bestellung zur Lieferung Ihrer Blink-Karte wurde eingereicht.",
                 "buttonLabel": "Dashboard"
             }
+        },
+        "OrderPhysicalCard": {
+            "title": "Physische Karte bestellen",
+            "steps": {
+                "shipping": "Versand",
+                "confirm": "Bestätigen"
+            },
+            "Shipping": {
+                "title": "Bestellen Sie Ihre physische Karte",
+                "subtitle": "Lassen Sie sich Ihre Blink Visa Karte an Ihre Adresse liefern.",
+                "registeredAddress": "Registrierte Adresse",
+                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
+                "delivery": "Lieferung",
+                "standardDelivery": "Standardlieferung",
+                "expressDelivery": "Expresslieferung",
+                "businessDays": "{day1}-{day2} Werktage",
+                "free": "KOSTENLOS",
+                "deliveryInformation": "Lieferinformationen",
+                "bullet1": "Sie erhalten Tracking-Informationen per E-Mail",
+                "bullet2": "Bei der Lieferung kann eine Unterschrift erforderlich sein",
+                "bullet3": "Die Karte wird in diskreter Verpackung versandt",
+                "bullet4": "Aktivieren Sie Ihre Karte, sobald sie ankommt",
+                "cardFeatures": "Kartenfunktionen",
+                "feature1": "Kontaktlose Zahlungstechnologie",
+                "feature2": "EMV-Chip für erhöhte Sicherheit",
+                "feature3": "Magnetstreifen für universelle Akzeptanz",
+                "feature4": "Ihr Name ist auf der Karte geprägt",
+                "important": "Wichtig",
+                "importantBullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
+                "importantBullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
+                "importantBullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
+            },
+            "Confirm": {
+                "title": "Bestellung bestätigen",
+                "subtitle": "Prüfen Sie Ihre Bestellung der physischen Karte, bevor Sie sie absenden.",
+                "orderSummary": "Bestellübersicht",
+                "cardDesign": "Kartendesign",
+                "delivery": "Lieferung",
+                "deliveryTime": "Lieferzeit",
+                "shippingCost": "Versandkosten",
+                "shippingAddress": "Lieferadresse",
+                "placeOrder": "Bestellung aufgeben",
+                "important": "Wichtig",
+                "bullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
+                "bullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
+                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
+            }
         }
     }
 }

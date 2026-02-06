@@ -3197,6 +3197,53 @@
         "buttonLabel": "Tauler"
       },
       "title": "Substituir targeta"
+    },
+    "OrderPhysicalCard": {
+      "title": "Demanar targeta física",
+      "steps": {
+        "shipping": "Enviament",
+        "confirm": "Confirmar"
+      },
+      "Shipping": {
+        "title": "Demana la teva targeta física",
+        "subtitle": "Rep la teva targeta Blink Visa al teu domicili.",
+        "registeredAddress": "Adreça registrada",
+        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
+        "delivery": "Lliurament",
+        "standardDelivery": "Lliurament estàndard",
+        "expressDelivery": "Lliurament exprés",
+        "businessDays": "{day1}-{day2} dies laborables",
+        "free": "GRATUÏT",
+        "deliveryInformation": "Informació de lliurament",
+        "bullet1": "Rebràs la informació de seguiment per correu electrònic",
+        "bullet2": "Es pot requerir signatura en el lliurament",
+        "bullet3": "La targeta s'enviarà en un embalatge discret",
+        "bullet4": "Activa la teva targeta quan arribi",
+        "cardFeatures": "Característiques de la targeta",
+        "feature1": "Tecnologia de pagament sense contacte",
+        "feature2": "Xip EMV per a més seguretat",
+        "feature3": "Banda magnètica per a acceptació universal",
+        "feature4": "El teu nom en relleu a la targeta",
+        "important": "Important",
+        "importantBullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
+        "importantBullet2": "Hauràs d'activar la targeta física quan arribi",
+        "importantBullet3": "Totes dues targetes tindran el mateix número i dades"
+      },
+      "Confirm": {
+        "title": "Confirma la teva comanda",
+        "subtitle": "Revisa la comanda de la targeta física abans d'enviar-la.",
+        "orderSummary": "Resum de la comanda",
+        "cardDesign": "Disseny de la targeta",
+        "delivery": "Lliurament",
+        "deliveryTime": "Termini de lliurament",
+        "shippingCost": "Cost d'enviament",
+        "shippingAddress": "Adreça d'enviament",
+        "placeOrder": "Fer la comanda",
+        "important": "Important",
+        "bullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
+        "bullet2": "Hauràs d'activar la targeta física quan arribi",
+        "bullet3": "Totes dues targetes tindran el mateix número i dades"
+      }
     }
   }
 }

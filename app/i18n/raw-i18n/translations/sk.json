@@ -3197,6 +3197,53 @@
         "buttonLabel": "Prehľad"
       },
       "title": "Vymeniť kartu"
+    },
+    "OrderPhysicalCard": {
+      "title": "Objednať fyzickú kartu",
+      "steps": {
+        "shipping": "Doručenie",
+        "confirm": "Potvrdiť"
+      },
+      "Shipping": {
+        "title": "Objednajte si fyzickú kartu",
+        "subtitle": "Nechajte si doručiť svoju kartu Blink Visa na adresu.",
+        "registeredAddress": "Registrovaná adresa",
+        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu adresu",
+        "delivery": "Doručenie",
+        "standardDelivery": "Štandardné doručenie",
+        "expressDelivery": "Expresné doručenie",
+        "businessDays": "{day1}-{day2} pracovných dní",
+        "free": "ZADARMO",
+        "deliveryInformation": "Informácie o doručení",
+        "bullet1": "Informácie o sledovaní dostanete e-mailom",
+        "bullet2": "Pri doručení môže byť potrebný podpis",
+        "bullet3": "Karta bude odoslaná v diskrétnom balení",
+        "bullet4": "Aktivujte kartu, keď dorazí",
+        "cardFeatures": "Vlastnosti karty",
+        "feature1": "Technológia bezkontaktných platieb",
+        "feature2": "EMV čip pre zvýšenú bezpečnosť",
+        "feature3": "Magnetický prúžok pre univerzálnu akceptáciu",
+        "feature4": "Vaše meno vyrazené na karte",
+        "important": "Dôležité",
+        "importantBullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
+        "importantBullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
+        "importantBullet3": "Obe karty budú mať rovnaké číslo a údaje"
+      },
+      "Confirm": {
+        "title": "Potvrďte objednávku",
+        "subtitle": "Skontrolujte objednávku fyzickej karty pred odoslaním.",
+        "orderSummary": "Súhrn objednávky",
+        "cardDesign": "Dizajn karty",
+        "delivery": "Doručenie",
+        "deliveryTime": "Čas doručenia",
+        "shippingCost": "Cena dopravy",
+        "shippingAddress": "Doručovacia adresa",
+        "placeOrder": "Odoslať objednávku",
+        "important": "Dôležité",
+        "bullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
+        "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
+        "bullet3": "Obe karty budú mať rovnaké číslo a údaje"
+      }
     }
   }
 }

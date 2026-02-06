@@ -3238,6 +3238,53 @@
         "buttonLabel": "Papan Pemuka"
       },
       "title": "Ganti kad"
+    },
+    "OrderPhysicalCard": {
+      "title": "Pesan kad fizikal",
+      "steps": {
+        "shipping": "Penghantaran",
+        "confirm": "Sahkan"
+      },
+      "Shipping": {
+        "title": "Pesan kad fizikal anda",
+        "subtitle": "Dapatkan kad Blink Visa anda dihantar ke alamat anda.",
+        "registeredAddress": "Alamat berdaftar",
+        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
+        "delivery": "Penghantaran",
+        "standardDelivery": "Penghantaran standard",
+        "expressDelivery": "Penghantaran ekspres",
+        "businessDays": "{day1}-{day2} hari bekerja",
+        "free": "PERCUMA",
+        "deliveryInformation": "Maklumat penghantaran",
+        "bullet1": "Anda akan menerima maklumat penjejakan melalui e-mel",
+        "bullet2": "Tandatangan mungkin diperlukan semasa penghantaran",
+        "bullet3": "Kad akan dihantar dalam pembungkusan yang tidak menonjol",
+        "bullet4": "Aktifkan kad anda apabila ia tiba",
+        "cardFeatures": "Ciri-ciri kad",
+        "feature1": "Teknologi pembayaran tanpa sentuh",
+        "feature2": "Cip EMV untuk keselamatan yang dipertingkatkan",
+        "feature3": "Jalur magnet untuk penerimaan sejagat",
+        "feature4": "Nama anda timbul pada kad",
+        "important": "Penting",
+        "importantBullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
+        "importantBullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
+        "importantBullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+      },
+      "Confirm": {
+        "title": "Sahkan pesanan anda",
+        "subtitle": "Semak pesanan kad fizikal anda sebelum menghantar.",
+        "orderSummary": "Ringkasan pesanan",
+        "cardDesign": "Reka bentuk kad",
+        "delivery": "Penghantaran",
+        "deliveryTime": "Masa penghantaran",
+        "shippingCost": "Kos penghantaran",
+        "shippingAddress": "Alamat penghantaran",
+        "placeOrder": "Buat pesanan",
+        "important": "Penting",
+        "bullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
+        "bullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
+        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+      }
     }
   }
 }

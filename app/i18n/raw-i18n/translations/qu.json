@@ -3235,6 +3235,53 @@
         "buttonLabel": "Ñawpaq panqa"
       },
       "title": "Tarjetata tikray"
+    },
+    "OrderPhysicalCard": {
+      "title": "Tarjeta física mañakuy",
+      "steps": {
+        "shipping": "Apachiy",
+        "confirm": "Takyachiy"
+      },
+      "Shipping": {
+        "title": "Tarjeta física mañakuy",
+        "subtitle": "Blink Visa tarjetaykiqa direcciónta apachisqa kanqa.",
+        "registeredAddress": "Qillqasqa dirección",
+        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
+        "delivery": "Apachiy",
+        "standardDelivery": "Estándar apachiy",
+        "expressDelivery": "Express apachiy",
+        "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
+        "free": "MANA QULLQI",
+        "deliveryInformation": "Apachiy willakuy",
+        "bullet1": "Email-manta qhawariy willakuyta chaskinki",
+        "bullet2": "Apachiykuchkanqa firmayta munachkanman",
+        "bullet3": "Tarjetaqa pakasqa envoltura-pi apachisqa kanqa",
+        "bullet4": "Chayamupataq tarjetaykita llamk'achiy",
+        "cardFeatures": "Tarjetap ruwasqankuna",
+        "feature1": "Mana llalliywan pagay teknuluxiya",
+        "feature2": "EMV chip aswan allin waqaychaypaq",
+        "feature3": "Magnetic stripe llapanwan chaskiypaq",
+        "feature4": "Sutiyki tarjeta patapi reliefe-wan",
+        "important": "Allin yuyaykuna",
+        "importantBullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
+        "importantBullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
+        "importantBullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
+      },
+      "Confirm": {
+        "title": "Mañakuyta takyachiy",
+        "subtitle": "Físico tarjeta mañakuyta apachinaykipaq ñawpaqta qhaway.",
+        "orderSummary": "Mañakuypa pisiyachisqan",
+        "cardDesign": "Tarjeta diseñu",
+        "delivery": "Apachiy",
+        "deliveryTime": "Apachiy pacha",
+        "shippingCost": "Apachiy chanin",
+        "shippingAddress": "Apachina dirección",
+        "placeOrder": "Mañakuyta apachiy",
+        "important": "Allin yuyaykuna",
+        "bullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
+        "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
+        "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
+      }
     }
   }
 }

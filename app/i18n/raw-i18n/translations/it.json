@@ -3188,6 +3188,53 @@
                 "subtitle": "L'ordine per la consegna della tua carta Blink è stato inviato.",
                 "buttonLabel": "Dashboard"
             }
+        },
+        "OrderPhysicalCard": {
+            "title": "Ordina carta fisica",
+            "steps": {
+                "shipping": "Spedizione",
+                "confirm": "Conferma"
+            },
+            "Shipping": {
+                "title": "Ordina la tua carta fisica",
+                "subtitle": "Ricevi la tua carta Blink Visa al tuo indirizzo.",
+                "registeredAddress": "Indirizzo registrato",
+                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione",
+                "delivery": "Consegna",
+                "standardDelivery": "Consegna standard",
+                "expressDelivery": "Consegna espressa",
+                "businessDays": "{day1}-{day2} giorni lavorativi",
+                "free": "GRATIS",
+                "deliveryInformation": "Informazioni sulla consegna",
+                "bullet1": "Riceverai le informazioni di tracciamento via email",
+                "bullet2": "Potrebbe essere richiesta una firma alla consegna",
+                "bullet3": "La carta verrà spedita in un imballaggio discreto",
+                "bullet4": "Attiva la tua carta quando arriva",
+                "cardFeatures": "Caratteristiche della carta",
+                "feature1": "Tecnologia di pagamento contactless",
+                "feature2": "Chip EMV per una sicurezza migliorata",
+                "feature3": "Banda magnetica per accettazione universale",
+                "feature4": "Il tuo nome in rilievo sulla carta",
+                "important": "Importante",
+                "importantBullet1": "La tua carta virtuale rimarrà attiva mentre aspetti la carta fisica",
+                "importantBullet2": "Dovrai attivare la tua carta fisica quando arriva",
+                "importantBullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli"
+            },
+            "Confirm": {
+                "title": "Conferma il tuo ordine",
+                "subtitle": "Rivedi l'ordine della carta fisica prima di inviarlo.",
+                "orderSummary": "Riepilogo ordine",
+                "cardDesign": "Design della carta",
+                "delivery": "Consegna",
+                "deliveryTime": "Tempi di consegna",
+                "shippingCost": "Costo di spedizione",
+                "shippingAddress": "Indirizzo di spedizione",
+                "placeOrder": "Effettua ordine",
+                "important": "Importante",
+                "bullet1": "La tua carta virtuale rimarrà attiva mentre aspetti la carta fisica",
+                "bullet2": "Dovrai attivare la tua carta fisica quando arriva",
+                "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli"
+            }
         }
     }
 }

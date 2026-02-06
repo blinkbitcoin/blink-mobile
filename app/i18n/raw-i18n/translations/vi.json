@@ -3235,6 +3235,53 @@
         "buttonLabel": "Bảng điều khiển"
       },
       "title": "Thay thẻ"
+    },
+    "OrderPhysicalCard": {
+      "title": "Đặt thẻ vật lý",
+      "steps": {
+        "shipping": "Vận chuyển",
+        "confirm": "Xác nhận"
+      },
+      "Shipping": {
+        "title": "Đặt thẻ vật lý của bạn",
+        "subtitle": "Nhận thẻ Blink Visa được giao đến địa chỉ của bạn.",
+        "registeredAddress": "Địa chỉ đã đăng ký",
+        "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
+        "delivery": "Giao hàng",
+        "standardDelivery": "Giao hàng tiêu chuẩn",
+        "expressDelivery": "Giao hàng nhanh",
+        "businessDays": "{day1}-{day2} ngày làm việc",
+        "free": "MIỄN PHÍ",
+        "deliveryInformation": "Thông tin giao hàng",
+        "bullet1": "Bạn sẽ nhận thông tin theo dõi qua email",
+        "bullet2": "Có thể cần chữ ký khi giao hàng",
+        "bullet3": "Thẻ sẽ được gửi trong bao bì kín đáo",
+        "bullet4": "Kích hoạt thẻ khi nhận được",
+        "cardFeatures": "Tính năng của thẻ",
+        "feature1": "Công nghệ thanh toán không tiếp xúc",
+        "feature2": "Chip EMV tăng cường bảo mật",
+        "feature3": "Dải từ để chấp nhận rộng rãi",
+        "feature4": "Tên của bạn được dập nổi trên thẻ",
+        "important": "Quan trọng",
+        "importantBullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
+        "importantBullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
+        "importantBullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+      },
+      "Confirm": {
+        "title": "Xác nhận đơn hàng",
+        "subtitle": "Xem lại đơn đặt thẻ vật lý trước khi gửi.",
+        "orderSummary": "Tóm tắt đơn hàng",
+        "cardDesign": "Thiết kế thẻ",
+        "delivery": "Giao hàng",
+        "deliveryTime": "Thời gian giao hàng",
+        "shippingCost": "Phí giao hàng",
+        "shippingAddress": "Địa chỉ giao hàng",
+        "placeOrder": "Đặt hàng",
+        "important": "Quan trọng",
+        "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
+        "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
+        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+      }
     }
   }
 }

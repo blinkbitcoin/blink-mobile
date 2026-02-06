@@ -3197,6 +3197,53 @@
         "buttonLabel": "Dashiboodi"
       },
       "title": "Kyusa kaadi"
+    },
+    "OrderPhysicalCard": {
+      "title": "Saba kaadi ey'omubiri",
+      "steps": {
+        "shipping": "Okusindika",
+        "confirm": "Okukakasa"
+      },
+      "Shipping": {
+        "title": "Saba kaadi yo ey'omubiri",
+        "subtitle": "Funa kaadi yo eya Blink Visa ekutuuke ku ndagiriro yo.",
+        "registeredAddress": "Endagiriro eyateekebwa",
+        "useRegisteredAddress": "Kozesa endagiriro eyateekebwa ng'ey'okutwalirako",
+        "delivery": "Okutuusa",
+        "standardDelivery": "Okutuusa kwa bulijjo",
+        "expressDelivery": "Okutuusa kw'amangu",
+        "businessDays": "{day1}-{day2} ennaku z'emirimu",
+        "free": "BWERERE",
+        "deliveryInformation": "Obubaka ku kutuusa",
+        "bullet1": "Ojja kufuna ebikwata ku kulondoola ku email",
+        "bullet2": "Obubonero buyinza okwetaagisa wakati w'okutuusa",
+        "bullet3": "Kaadi erisindikibwa mu pakka etaboneka",
+        "bullet4": "Aktiva kaadi yo ng'etuuse",
+        "cardFeatures": "Ebintu ebiri ku kaadi",
+        "feature1": "Tekinologiya y'okusasula nga togukwata",
+        "feature2": "EMV chip olw'obukuumi obulungi",
+        "feature3": "Magnetic stripe olw'okukkirizibwa buli wansi",
+        "feature4": "Erinnya lyo liryanga ku kaadi",
+        "important": "Kikulu",
+        "importantBullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
+        "importantBullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
+        "importantBullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
+      },
+      "Confirm": {
+        "title": "Kakasa oda yo",
+        "subtitle": "Kebera oda ya kaadi ey'omubiri nga tonasindika.",
+        "orderSummary": "Mu bufunze w'oda",
+        "cardDesign": "Dizayini ya kaadi",
+        "delivery": "Okutuusa",
+        "deliveryTime": "Obudde bw'okutuusa",
+        "shippingCost": "Ebyetaagisa okutuusa",
+        "shippingAddress": "Endagiriro y'okutuusa",
+        "placeOrder": "Teeka oda",
+        "important": "Kikulu",
+        "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
+        "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
+        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
+      }
     }
   }
 }

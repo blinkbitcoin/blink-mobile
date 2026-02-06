@@ -3197,6 +3197,53 @@
         "buttonLabel": "Irányítópult"
       },
       "title": "Kártya cseréje"
+    },
+    "OrderPhysicalCard": {
+      "title": "Fizikai kártya rendelése",
+      "steps": {
+        "shipping": "Szállítás",
+        "confirm": "Megerősítés"
+      },
+      "Shipping": {
+        "title": "Rendelje meg fizikai kártyáját",
+        "subtitle": "Kérje Blink Visa kártyájának kézbesítését a címére.",
+        "registeredAddress": "Regisztrált cím",
+        "useRegisteredAddress": "A regisztrált cím használata szállítási címként",
+        "delivery": "Kézbesítés",
+        "standardDelivery": "Normál kézbesítés",
+        "expressDelivery": "Expressz kézbesítés",
+        "businessDays": "{day1}-{day2} munkanap",
+        "free": "INGYENES",
+        "deliveryInformation": "Kézbesítési információk",
+        "bullet1": "A nyomkövetési információkat e-mailben kapja meg",
+        "bullet2": "A kézbesítéskor aláírásra lehet szükség",
+        "bullet3": "A kártyát diszkrét csomagolásban küldjük",
+        "bullet4": "Érkezéskor aktiválja a kártyáját",
+        "cardFeatures": "Kártya funkciók",
+        "feature1": "Érintés nélküli fizetési technológia",
+        "feature2": "EMV chip a fokozott biztonságért",
+        "feature3": "Mágnescsík az univerzális elfogadásért",
+        "feature4": "A neve dombornyomva a kártyán",
+        "important": "Fontos",
+        "importantBullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
+        "importantBullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
+        "importantBullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
+      },
+      "Confirm": {
+        "title": "Rendelés megerősítése",
+        "subtitle": "Kérjük, ellenőrizze fizikai kártya rendelését a beküldés előtt.",
+        "orderSummary": "Rendelés összefoglaló",
+        "cardDesign": "Kártyadizájn",
+        "delivery": "Kézbesítés",
+        "deliveryTime": "Szállítási idő",
+        "shippingCost": "Szállítási költség",
+        "shippingAddress": "Szállítási cím",
+        "placeOrder": "Rendelés leadása",
+        "important": "Fontos",
+        "bullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
+        "bullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
+        "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
+      }
     }
   }
 }

@@ -3197,6 +3197,53 @@
         "buttonLabel": "Gösterge Paneli"
       },
       "title": "Kartı değiştir"
+    },
+    "OrderPhysicalCard": {
+      "title": "Fiziksel kart sipariş et",
+      "steps": {
+        "shipping": "Kargo",
+        "confirm": "Onayla"
+      },
+      "Shipping": {
+        "title": "Fiziksel kartını sipariş et",
+        "subtitle": "Blink Visa kartını adresine teslim al.",
+        "registeredAddress": "Kayıtlı adres",
+        "useRegisteredAddress": "Kayıtlı adresi kargo adresi olarak kullan",
+        "delivery": "Teslimat",
+        "standardDelivery": "Standart teslimat",
+        "expressDelivery": "Ekspres teslimat",
+        "businessDays": "{day1}-{day2} iş günü",
+        "free": "ÜCRETSİZ",
+        "deliveryInformation": "Teslimat bilgileri",
+        "bullet1": "Takip bilgilerini e-posta ile alacaksın",
+        "bullet2": "Teslimatta imza gerekebilir",
+        "bullet3": "Kart gizli bir ambalajda gönderilecektir",
+        "bullet4": "Kartın geldiğinde etkinleştir",
+        "cardFeatures": "Kart özellikleri",
+        "feature1": "Temassız ödeme teknolojisi",
+        "feature2": "Gelişmiş güvenlik için EMV çipi",
+        "feature3": "Evrensel kabul için manyetik şerit",
+        "feature4": "İsmin kartın üzerinde kabartmalı",
+        "important": "Önemli",
+        "importantBullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
+        "importantBullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
+        "importantBullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+      },
+      "Confirm": {
+        "title": "Siparişini onayla",
+        "subtitle": "Göndermeden önce fiziksel kart siparişini gözden geçir.",
+        "orderSummary": "Sipariş özeti",
+        "cardDesign": "Kart tasarımı",
+        "delivery": "Teslimat",
+        "deliveryTime": "Teslimat süresi",
+        "shippingCost": "Kargo ücreti",
+        "shippingAddress": "Kargo adresi",
+        "placeOrder": "Sipariş ver",
+        "important": "Önemli",
+        "bullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
+        "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
+        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+      }
     }
   }
 }

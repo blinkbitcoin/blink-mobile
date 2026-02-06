@@ -3197,6 +3197,53 @@
         "buttonLabel": "Dasbor"
       },
       "title": "Ganti kartu"
+    },
+    "OrderPhysicalCard": {
+      "title": "Pesan kartu fisik",
+      "steps": {
+        "shipping": "Pengiriman",
+        "confirm": "Konfirmasi"
+      },
+      "Shipping": {
+        "title": "Pesan kartu fisik Anda",
+        "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
+        "registeredAddress": "Alamat terdaftar",
+        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
+        "delivery": "Pengiriman",
+        "standardDelivery": "Pengiriman standar",
+        "expressDelivery": "Pengiriman ekspres",
+        "businessDays": "{day1}-{day2} hari kerja",
+        "free": "GRATIS",
+        "deliveryInformation": "Informasi pengiriman",
+        "bullet1": "Anda akan menerima informasi pelacakan melalui email",
+        "bullet2": "Tanda tangan mungkin diperlukan saat pengiriman",
+        "bullet3": "Kartu akan dikirim dalam kemasan yang tidak mencolok",
+        "bullet4": "Aktifkan kartu Anda saat tiba",
+        "cardFeatures": "Fitur kartu",
+        "feature1": "Teknologi pembayaran nirsentuh",
+        "feature2": "Chip EMV untuk keamanan yang ditingkatkan",
+        "feature3": "Pita magnetik untuk penerimaan universal",
+        "feature4": "Nama Anda terembos pada kartu",
+        "important": "Penting",
+        "importantBullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
+        "importantBullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
+        "importantBullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+      },
+      "Confirm": {
+        "title": "Konfirmasi pesanan Anda",
+        "subtitle": "Tinjau pesanan kartu fisik Anda sebelum mengirimkan.",
+        "orderSummary": "Ringkasan pesanan",
+        "cardDesign": "Desain kartu",
+        "delivery": "Pengiriman",
+        "deliveryTime": "Waktu pengiriman",
+        "shippingCost": "Biaya pengiriman",
+        "shippingAddress": "Alamat pengiriman",
+        "placeOrder": "Buat pesanan",
+        "important": "Penting",
+        "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
+        "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
+        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+      }
     }
   }
 }
