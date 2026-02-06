@@ -3195,7 +3195,11 @@
         "whatHappensNext": "Apa yang berlaku seterusnya?",
         "currentCardDeactivated": "Kad semasa anda akan dinyahaktifkan serta-merta",
         "newCardShipped": "Kad baharu akan dihantar ke alamat anda",
-        "digitalCardAvailable": "Kad digital anda kekal tersedia semasa proses ini"
+        "digitalCardAvailable": "Kad digital anda kekal tersedia semasa proses ini",
+        "cardManagement": "Pengurusan kad",
+        "bullet1": "Kad semasa anda akan dibekukan untuk keselamatan",
+        "bullet2": "Kad baharu dengan nombor berbeza akan dikeluarkan",
+        "bullet3": "Anda boleh menyahbekukan jika menemui kad anda kemudian"
       },
       "Delivery": {
         "title": "Pilih kelajuan penghantaran anda",
@@ -3219,13 +3223,20 @@
         "importantInformation": "Maklumat penting",
         "processedImmediately": "Permintaan anda akan diproses serta-merta",
         "currentCardDeactivated": "Kad semasa akan dinyahaktifkan selepas pengesahan",
-        "trackStatus": "Anda boleh menjejaki status penghantaran kad baharu anda dalam aplikasi"
+        "trackStatus": "Anda boleh menjejaki status penghantaran kad baharu anda dalam aplikasi",
+        "issueType": "Sebab",
+        "deliveryTime": "Masa penghantaran",
+        "shippingCost": "Kos penghantaran",
+        "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baharu tiba",
+        "bullet2": "Kad baharu anda akan mempunyai nombor yang sama dengan kad semasa",
+        "bullet3": "Musnahkan kad rosak anda apabila kad baharu tiba"
       },
       "Status": {
         "title": "Kad baharu anda sedang dalam perjalanan!",
         "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
         "buttonLabel": "Papan Pemuka"
-      }
+      },
+      "title": "Ganti kad"
     }
   }
 }

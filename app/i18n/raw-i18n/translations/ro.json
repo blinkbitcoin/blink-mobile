@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Ce urmează?",
         "currentCardDeactivated": "Cardul tău actual va fi dezactivat imediat",
         "newCardShipped": "Un card nou va fi expediat la adresa ta",
-        "digitalCardAvailable": "Cardul tău digital rămâne disponibil în timpul acestui proces"
+        "digitalCardAvailable": "Cardul tău digital rămâne disponibil în timpul acestui proces",
+        "cardManagement": "Gestionare card",
+        "bullet1": "Cardul tău actual va fi înghețat pentru securitate",
+        "bullet2": "Va fi emis un card nou cu numere diferite",
+        "bullet3": "Poți dezgheța dacă îți găsești cardul mai târziu"
       },
       "Delivery": {
         "title": "Alege viteza de livrare",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Informații importante",
         "processedImmediately": "Solicitarea ta va fi procesată imediat",
         "currentCardDeactivated": "Cardul actual va fi dezactivat la confirmare",
-        "trackStatus": "Poți urmări starea livrării noului tău card în aplicație"
+        "trackStatus": "Poți urmări starea livrării noului tău card în aplicație",
+        "issueType": "Motiv",
+        "deliveryTime": "Timp de livrare",
+        "shippingCost": "Cost de livrare",
+        "bullet1": "Cardul tău actual va rămâne activ până când sosește cel nou",
+        "bullet2": "Cardul tău nou va avea aceleași numere ca cel actual",
+        "bullet3": "Distruge cardul deteriorat când sosește cel nou"
       },
       "Status": {
         "title": "Noul tău card este pe drum!",
         "subtitle": "Comanda pentru livrarea cardului tău Blink a fost trimisă.",
         "buttonLabel": "Panou"
-      }
+      },
+      "title": "Înlocuire card"
     }
   }
 }

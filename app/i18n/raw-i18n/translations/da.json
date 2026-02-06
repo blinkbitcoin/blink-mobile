@@ -3172,7 +3172,11 @@
         "whatHappensNext": "Hvad sker der nu?",
         "currentCardDeactivated": "Dit nuværende kort vil straks blive deaktiveret",
         "newCardShipped": "Et nyt kort vil blive sendt til din adresse",
-        "digitalCardAvailable": "Dit digitale kort forbliver tilgængeligt under denne proces"
+        "digitalCardAvailable": "Dit digitale kort forbliver tilgængeligt under denne proces",
+        "cardManagement": "Kortadministration",
+        "bullet1": "Dit nuværende kort vil blive frosset af sikkerhedshensyn",
+        "bullet2": "Et nyt kort med andre numre vil blive udstedt",
+        "bullet3": "Du kan optø det, hvis du finder dit kort senere"
       },
       "Delivery": {
         "title": "Vælg din leveringshastighed",
@@ -3196,13 +3200,20 @@
         "importantInformation": "Vigtig information",
         "processedImmediately": "Din anmodning vil blive behandlet med det samme",
         "currentCardDeactivated": "Nuværende kort vil blive deaktiveret ved bekræftelse",
-        "trackStatus": "Du kan følge dit nye korts leveringsstatus i appen"
+        "trackStatus": "Du kan følge dit nye korts leveringsstatus i appen",
+        "issueType": "Årsag",
+        "deliveryTime": "Leveringstid",
+        "shippingCost": "Leveringsomkostninger",
+        "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
+        "bullet2": "Dit nye kort vil have de samme numre som dit nuværende kort",
+        "bullet3": "Destruer dit beskadigede kort, når det nye ankommer"
       },
       "Status": {
         "title": "Dit nye kort er på vej!",
         "subtitle": "Ordre til levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Oversigt"
-      }
+      },
+      "title": "Erstat kort"
     }
   }
 }

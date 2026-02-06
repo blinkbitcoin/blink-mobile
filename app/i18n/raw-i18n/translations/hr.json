@@ -3195,7 +3195,11 @@
         "whatHappensNext": "Što slijedi?",
         "currentCardDeactivated": "Vaša trenutna kartica bit će odmah deaktivirana",
         "newCardShipped": "Nova kartica bit će poslana na vašu adresu",
-        "digitalCardAvailable": "Vaša digitalna kartica ostaje dostupna tijekom ovog procesa"
+        "digitalCardAvailable": "Vaša digitalna kartica ostaje dostupna tijekom ovog procesa",
+        "cardManagement": "Upravljanje karticom",
+        "bullet1": "Vaša trenutna kartica bit će zamrznuta radi sigurnosti",
+        "bullet2": "Izdat će se nova kartica s drugim brojevima",
+        "bullet3": "Možete je odmrznuti ako kasnije pronađete svoju karticu"
       },
       "Delivery": {
         "title": "Odaberite brzinu dostave",
@@ -3219,13 +3223,20 @@
         "importantInformation": "Važne informacije",
         "processedImmediately": "Vaš zahtjev bit će odmah obrađen",
         "currentCardDeactivated": "Trenutna kartica bit će deaktivirana nakon potvrde",
-        "trackStatus": "Možete pratiti status dostave nove kartice u aplikaciji"
+        "trackStatus": "Možete pratiti status dostave nove kartice u aplikaciji",
+        "issueType": "Razlog",
+        "deliveryTime": "Vrijeme isporuke",
+        "shippingCost": "Trošak dostave",
+        "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
+        "bullet2": "Vaša nova kartica imat će iste brojeve kao trenutna",
+        "bullet3": "Uništite oštećenu karticu kada stigne nova"
       },
       "Status": {
         "title": "Vaša nova kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
         "buttonLabel": "Nadzorna ploča"
-      }
+      },
+      "title": "Zamijeni karticu"
     }
   }
 }

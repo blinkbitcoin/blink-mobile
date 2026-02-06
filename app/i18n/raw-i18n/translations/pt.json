@@ -3137,6 +3137,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Substituir cartão",
             "steps": {
                 "reportIssue": "Reportar",
                 "delivery": "Entrega",
@@ -3145,6 +3146,7 @@
             "ReportIssue": {
                 "title": "O que aconteceu com o seu cartão?",
                 "subtitle": "Selecione o motivo para solicitar um cartão de substituição",
+                "cardManagement": "Gestão de cartão",
                 "lostCard": "Cartão perdido",
                 "lostCardDescription": "Não consigo encontrar o meu cartão",
                 "stolenCard": "Cartão roubado",
@@ -3152,9 +3154,9 @@
                 "damagedCard": "Cartão danificado",
                 "damagedCardDescription": "O meu cartão está fisicamente danificado",
                 "whatHappensNext": "O que acontece a seguir?",
-                "currentCardDeactivated": "O seu cartão atual será imediatamente desativado",
-                "newCardShipped": "Um novo cartão será enviado para o seu endereço",
-                "digitalCardAvailable": "O seu cartão digital permanece disponível durante este processo"
+                "bullet1": "O seu cartão atual será congelado por segurança",
+                "bullet2": "Será emitido um novo cartão com números diferentes",
+                "bullet3": "Pode descongelar se encontrar o seu cartão mais tarde"
             },
             "Delivery": {
                 "title": "Escolha a velocidade de entrega",
@@ -3170,15 +3172,15 @@
                 "title": "Revise o seu pedido",
                 "subtitle": "Por favor, confirme os detalhes da substituição do seu cartão",
                 "requestSummary": "Resumo do pedido",
-                "reason": "Motivo",
+                "issueType": "Motivo",
                 "delivery": "Entrega",
-                "shippingAddress": "Endereço de envio",
-                "deliveryCost": "Custo de entrega",
-                "submitRequest": "Enviar pedido",
+                "deliveryTime": "Tempo de entrega",
+                "shippingCost": "Custo de entrega",
                 "importantInformation": "Informações importantes",
-                "processedImmediately": "O seu pedido será processado imediatamente",
-                "currentCardDeactivated": "O cartão atual será desativado após confirmação",
-                "trackStatus": "Pode acompanhar o estado da entrega do seu novo cartão na app"
+                "bullet1": "O seu cartão atual permanecerá ativo até o novo chegar",
+                "bullet2": "O seu novo cartão terá os mesmos números que o cartão atual",
+                "bullet3": "Destrua o seu cartão danificado quando o novo chegar",
+                "submitRequest": "Enviar pedido"
             },
             "Status": {
                 "title": "O seu novo cartão está a caminho!",

@@ -3201,7 +3201,11 @@
         "whatHappensNext": "Kuzokwenzeka ntoni ngokulandelayo?",
         "currentCardDeactivated": "Ikhadi lakho langoku liza kucimwa ngokukhawuleza",
         "newCardShipped": "Ikhadi elitsha liza kuthunyelwa kwidilesi yakho",
-        "digitalCardAvailable": "Ikhadi lakho ledijithali lisafumaneka ngeli xesha"
+        "digitalCardAvailable": "Ikhadi lakho ledijithali lisafumaneka ngeli xesha",
+        "cardManagement": "Ulawulo lwekhadi",
+        "bullet1": "Ikhadi lakho langoku liza kumiswa ngenxa yokhuseleko",
+        "bullet2": "Ikhadi elitsha elineminani eyahlukileyo liza kukhutshwa",
+        "bullet3": "Ungalicima ukumiswa ukuba ulifumana ikhadi lakho kamva"
       },
       "Delivery": {
         "title": "Khetha isantya sokuhanjiswa",
@@ -3225,13 +3229,20 @@
         "importantInformation": "Ulwazi olubalulekileyo",
         "processedImmediately": "Isicelo sakho siza kuqhutywa ngokukhawuleza",
         "currentCardDeactivated": "Ikhadi langoku liza kucimwa xa uqinisekisa",
-        "trackStatus": "Ungalandela imeko yokuhanjiswa kwekhadi lakho elitsha kwi-app"
+        "trackStatus": "Ungalandela imeko yokuhanjiswa kwekhadi lakho elitsha kwi-app",
+        "issueType": "Isizathu",
+        "deliveryTime": "Ixesha lokunikezela",
+        "shippingCost": "Iindleko zokuhanjiswa",
+        "bullet1": "Ikhadi lakho langoku liza kuhlala lisebenza de kufike elitsha",
+        "bullet2": "Ikhadi lakho elitsha liza kuba neminani efanayo nekhadi langoku",
+        "bullet3": "Tshabalalisa ikhadi lakho elonakeleyo xa elitsha lifika"
       },
       "Status": {
         "title": "Ikhadi lakho elitsha lisendleleni!",
         "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
         "buttonLabel": "Ideshibhodi"
-      }
+      },
+      "title": "Tshintsha ikhadi"
     }
   }
 }

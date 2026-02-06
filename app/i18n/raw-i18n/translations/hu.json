@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Mi történik ezután?",
         "currentCardDeactivated": "A jelenlegi kártyája azonnal deaktiválásra kerül",
         "newCardShipped": "Új kártyát küldünk a címére",
-        "digitalCardAvailable": "A digitális kártyája elérhető marad a folyamat során"
+        "digitalCardAvailable": "A digitális kártyája elérhető marad a folyamat során",
+        "cardManagement": "Kártyakezelés",
+        "bullet1": "Jelenlegi kártyáját biztonsági okokból befagyasztjuk",
+        "bullet2": "Új kártya kerül kiállításra eltérő számokkal",
+        "bullet3": "Feloldhatja a befagyasztást, ha később megtalálja kártyáját"
       },
       "Delivery": {
         "title": "Válassza ki a szállítási sebességet",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Fontos információk",
         "processedImmediately": "A kérelmét azonnal feldolgozzuk",
         "currentCardDeactivated": "A jelenlegi kártya megerősítéskor deaktiválásra kerül",
-        "trackStatus": "Az új kártya szállítási állapotát az alkalmazásban követheti nyomon"
+        "trackStatus": "Az új kártya szállítási állapotát az alkalmazásban követheti nyomon",
+        "issueType": "Ok",
+        "deliveryTime": "Szállítási idő",
+        "shippingCost": "Szállítási költség",
+        "bullet1": "Jelenlegi kártyája aktív marad, amíg az új meg nem érkezik",
+        "bullet2": "Az új kártyának ugyanazok lesznek a számai, mint a jelenleginek",
+        "bullet3": "Semmisítse meg a sérült kártyáját, amikor az új megérkezik"
       },
       "Status": {
         "title": "Az új kártyád úton van!",
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
         "buttonLabel": "Irányítópult"
-      }
+      },
+      "title": "Kártya cseréje"
     }
   }
 }

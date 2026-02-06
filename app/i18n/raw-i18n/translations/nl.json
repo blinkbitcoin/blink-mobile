@@ -3195,7 +3195,11 @@
         "whatHappensNext": "Wat gebeurt er nu?",
         "currentCardDeactivated": "Je huidige kaart wordt onmiddellijk gedeactiveerd",
         "newCardShipped": "Een nieuwe kaart wordt naar je adres verzonden",
-        "digitalCardAvailable": "Je digitale kaart blijft beschikbaar tijdens dit proces"
+        "digitalCardAvailable": "Je digitale kaart blijft beschikbaar tijdens dit proces",
+        "cardManagement": "Kaartbeheer",
+        "bullet1": "Je huidige kaart wordt bevroren voor de veiligheid",
+        "bullet2": "Een nieuwe kaart met andere nummers wordt uitgegeven",
+        "bullet3": "Je kunt de kaart ontdooien als je hem later vindt"
       },
       "Delivery": {
         "title": "Kies je bezorgsnelheid",
@@ -3219,13 +3223,20 @@
         "importantInformation": "Belangrijke informatie",
         "processedImmediately": "Je aanvraag wordt onmiddellijk verwerkt",
         "currentCardDeactivated": "De huidige kaart wordt gedeactiveerd bij bevestiging",
-        "trackStatus": "Je kunt de bezorgstatus van je nieuwe kaart volgen in de app"
+        "trackStatus": "Je kunt de bezorgstatus van je nieuwe kaart volgen in de app",
+        "issueType": "Reden",
+        "deliveryTime": "Levertijd",
+        "shippingCost": "Bezorgkosten",
+        "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
+        "bullet2": "Je nieuwe kaart heeft dezelfde nummers als je huidige kaart",
+        "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
       },
       "Status": {
         "title": "Je nieuwe kaart is onderweg!",
         "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
         "buttonLabel": "Dashboard"
-      }
+      },
+      "title": "Kaart vervangen"
     }
   }
 }

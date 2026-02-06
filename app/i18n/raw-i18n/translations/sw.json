@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Nini kitatokea baadaye?",
         "currentCardDeactivated": "Kadi yako ya sasa itazimwa mara moja",
         "newCardShipped": "Kadi mpya itatumwa kwa anwani yako",
-        "digitalCardAvailable": "Kadi yako ya kidijitali inabaki kupatikana wakati wa mchakato huu"
+        "digitalCardAvailable": "Kadi yako ya kidijitali inabaki kupatikana wakati wa mchakato huu",
+        "cardManagement": "Usimamizi wa kadi",
+        "bullet1": "Kadi yako ya sasa itagandishwa kwa usalama",
+        "bullet2": "Kadi mpya yenye nambari tofauti itatolewa",
+        "bullet3": "Unaweza kuigandua ikiwa utaipata kadi yako baadaye"
       },
       "Delivery": {
         "title": "Chagua kasi ya utoaji",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Taarifa muhimu",
         "processedImmediately": "Ombi lako litashughulikiwa mara moja",
         "currentCardDeactivated": "Kadi ya sasa itazimwa baada ya kuthibitisha",
-        "trackStatus": "Unaweza kufuatilia hali ya utoaji wa kadi yako mpya kwenye programu"
+        "trackStatus": "Unaweza kufuatilia hali ya utoaji wa kadi yako mpya kwenye programu",
+        "issueType": "Sababu",
+        "deliveryTime": "Muda wa uwasilishaji",
+        "shippingCost": "Gharama ya utoaji",
+        "bullet1": "Kadi yako ya sasa itabaki hai hadi mpya itakapofika",
+        "bullet2": "Kadi yako mpya itakuwa na nambari sawa na kadi ya sasa",
+        "bullet3": "Haribu kadi yako iliyoharibiwa kadi mpya itakapofika"
       },
       "Status": {
         "title": "Kadi yako mpya iko njiani!",
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limewasilishwa.",
         "buttonLabel": "Dashibodi"
-      }
+      },
+      "title": "Badilisha kadi"
     }
   }
 }

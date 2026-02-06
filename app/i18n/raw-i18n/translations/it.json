@@ -3137,6 +3137,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Sostituisci carta",
             "steps": {
                 "reportIssue": "Segnala",
                 "delivery": "Consegna",
@@ -3145,6 +3146,7 @@
             "ReportIssue": {
                 "title": "Cosa è successo alla tua carta?",
                 "subtitle": "Seleziona il motivo per richiedere una carta sostitutiva",
+                "cardManagement": "Gestione carta",
                 "lostCard": "Carta smarrita",
                 "lostCardDescription": "Non riesco a trovare la mia carta",
                 "stolenCard": "Carta rubata",
@@ -3152,9 +3154,9 @@
                 "damagedCard": "Carta danneggiata",
                 "damagedCardDescription": "La mia carta è fisicamente danneggiata",
                 "whatHappensNext": "Cosa succede dopo?",
-                "currentCardDeactivated": "La tua carta attuale sarà immediatamente disattivata",
-                "newCardShipped": "Una nuova carta sarà spedita al tuo indirizzo",
-                "digitalCardAvailable": "La tua carta digitale rimane disponibile durante questo processo"
+                "bullet1": "La tua carta attuale sarà congelata per sicurezza",
+                "bullet2": "Verrà emessa una nuova carta con numeri diversi",
+                "bullet3": "Puoi scongelarla se trovi la tua carta in seguito"
             },
             "Delivery": {
                 "title": "Scegli la velocità di consegna",
@@ -3170,15 +3172,15 @@
                 "title": "Rivedi la tua richiesta",
                 "subtitle": "Conferma i dettagli della sostituzione della tua carta",
                 "requestSummary": "Riepilogo richiesta",
-                "reason": "Motivo",
+                "issueType": "Motivo",
                 "delivery": "Consegna",
-                "shippingAddress": "Indirizzo di spedizione",
-                "deliveryCost": "Costo di consegna",
-                "submitRequest": "Invia richiesta",
+                "deliveryTime": "Tempo di consegna",
+                "shippingCost": "Costo di consegna",
                 "importantInformation": "Informazioni importanti",
-                "processedImmediately": "La tua richiesta sarà elaborata immediatamente",
-                "currentCardDeactivated": "La carta attuale sarà disattivata alla conferma",
-                "trackStatus": "Puoi monitorare lo stato di consegna della tua nuova carta nell'app"
+                "bullet1": "La tua carta attuale rimarrà attiva fino all'arrivo della nuova",
+                "bullet2": "La tua nuova carta avrà gli stessi numeri della carta attuale",
+                "bullet3": "Distruggi la tua carta danneggiata quando arriva la nuova",
+                "submitRequest": "Invia richiesta"
             },
             "Status": {
                 "title": "La tua nuova carta è in arrivo!",

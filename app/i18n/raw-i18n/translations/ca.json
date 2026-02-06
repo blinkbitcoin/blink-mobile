@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Què passa després?",
         "currentCardDeactivated": "La teva targeta actual serà desactivada immediatament",
         "newCardShipped": "Una nova targeta serà enviada a la teva adreça",
-        "digitalCardAvailable": "La teva targeta digital roman disponible durant aquest procés"
+        "digitalCardAvailable": "La teva targeta digital roman disponible durant aquest procés",
+        "cardManagement": "Gestió de targetes",
+        "bullet1": "La teva targeta actual serà congelada per seguretat",
+        "bullet2": "S'emetrà una nova targeta amb números diferents",
+        "bullet3": "Pots descongelar-la si trobes la teva targeta més tard"
       },
       "Delivery": {
         "title": "Tria la velocitat de lliurament",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Informació important",
         "processedImmediately": "La teva sol·licitud serà processada immediatament",
         "currentCardDeactivated": "La targeta actual serà desactivada en confirmar",
-        "trackStatus": "Pots seguir l'estat del lliurament de la teva nova targeta a l'aplicació"
+        "trackStatus": "Pots seguir l'estat del lliurament de la teva nova targeta a l'aplicació",
+        "issueType": "Motiu",
+        "deliveryTime": "Temps de lliurament",
+        "shippingCost": "Cost de lliurament",
+        "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
+        "bullet2": "La teva nova targeta tindrà els mateixos números que l'actual",
+        "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
       },
       "Status": {
         "title": "La teva nova targeta està en camí!",
         "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
         "buttonLabel": "Tauler"
-      }
+      },
+      "title": "Substituir targeta"
     }
   }
 }
