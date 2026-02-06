@@ -93,6 +93,7 @@ import {
   CardAddToMobileWalletScreen,
   CardChangePinScreen,
   CardCreatePinScreen,
+  OrderCardScreen,
   ReplaceCardScreen,
   CardDetailsScreen,
   CardLimitsScreen,
@@ -576,6 +577,11 @@ export const RootStack = () => {
         name="cardChangePinScreen"
         component={CardChangePinScreen}
         options={{ title: LL.CardFlow.PinScreens.ChangeFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="orderCardScreen"
+        component={OrderCardScreen}
+        options={{ title: LL.CardFlow.OrderPhysicalCard.title() }}
       />
       <RootNavigator.Screen
         name="replaceCardScreen"
