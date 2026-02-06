@@ -2983,6 +2983,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Kártya cseréje",
             "steps": {
                 "reportIssue": "Bejelentés",
                 "delivery": "Szállítás",
@@ -2991,6 +2992,7 @@
             "ReportIssue": {
                 "title": "Mi történt a kártyájával?",
                 "subtitle": "Válassza ki a pótlókártya igénylésének okát",
+                "cardManagement": "Kártyakezelés",
                 "lostCard": "Elveszett kártya",
                 "lostCardDescription": "Nem találom a kártyámat",
                 "stolenCard": "Ellopott kártya",
@@ -2998,9 +3000,9 @@
                 "damagedCard": "Sérült kártya",
                 "damagedCardDescription": "A kártyám fizikailag sérült",
                 "whatHappensNext": "Mi történik ezután?",
-                "currentCardDeactivated": "A jelenlegi kártyája azonnal deaktiválásra kerül",
-                "newCardShipped": "Új kártyát küldünk a címére",
-                "digitalCardAvailable": "A digitális kártyája elérhető marad a folyamat során"
+                "bullet1": "Jelenlegi kártyáját biztonsági okokból befagyasztjuk",
+                "bullet2": "Új kártya kerül kiállításra eltérő számokkal",
+                "bullet3": "Feloldhatja a befagyasztást, ha később megtalálja kártyáját"
             },
             "Delivery": {
                 "title": "Válassza ki a szállítási sebességet",
@@ -3016,15 +3018,15 @@
                 "title": "Ellenőrizze a kérelmét",
                 "subtitle": "Kérjük, erősítse meg a kártyacsere részleteit",
                 "requestSummary": "Kérelem összefoglalása",
-                "reason": "Ok",
+                "issueType": "Ok",
                 "delivery": "Szállítás",
-                "shippingAddress": "Szállítási cím",
-                "deliveryCost": "Szállítási költség",
-                "submitRequest": "Kérelem beküldése",
+                "deliveryTime": "Szállítási idő",
+                "shippingCost": "Szállítási költség",
                 "importantInformation": "Fontos információk",
-                "processedImmediately": "A kérelmét azonnal feldolgozzuk",
-                "currentCardDeactivated": "A jelenlegi kártya megerősítéskor deaktiválásra kerül",
-                "trackStatus": "Az új kártya szállítási állapotát az alkalmazásban követheti nyomon"
+                "bullet1": "Jelenlegi kártyája aktív marad, amíg az új meg nem érkezik",
+                "bullet2": "Az új kártyának ugyanazok lesznek a számai, mint a jelenleginek",
+                "bullet3": "Semmisítse meg a sérült kártyáját, amikor az új megérkezik",
+                "submitRequest": "Kérelem beküldése"
             },
             "Status": {
                 "title": "Az új kártyád úton van!",

@@ -2924,6 +2924,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Erstat kort",
             "steps": {
                 "reportIssue": "Rapportér",
                 "delivery": "Levering",
@@ -2932,6 +2933,7 @@
             "ReportIssue": {
                 "title": "Hvad skete der med dit kort?",
                 "subtitle": "Vælg årsagen til at anmode om et erstatningskort",
+                "cardManagement": "Kortadministration",
                 "lostCard": "Mistet kort",
                 "lostCardDescription": "Jeg kan ikke finde mit kort",
                 "stolenCard": "Stjålet kort",
@@ -2939,9 +2941,9 @@
                 "damagedCard": "Beskadiget kort",
                 "damagedCardDescription": "Mit kort er fysisk beskadiget",
                 "whatHappensNext": "Hvad sker der nu?",
-                "currentCardDeactivated": "Dit nuværende kort vil straks blive deaktiveret",
-                "newCardShipped": "Et nyt kort vil blive sendt til din adresse",
-                "digitalCardAvailable": "Dit digitale kort forbliver tilgængeligt under denne proces"
+                "bullet1": "Dit nuværende kort vil blive frosset af sikkerhedshensyn",
+                "bullet2": "Et nyt kort med andre numre vil blive udstedt",
+                "bullet3": "Du kan optø det, hvis du finder dit kort senere"
             },
             "Delivery": {
                 "title": "Vælg din leveringshastighed",
@@ -2957,15 +2959,15 @@
                 "title": "Gennemgå din anmodning",
                 "subtitle": "Bekræft venligst detaljerne for din kortudskiftning",
                 "requestSummary": "Anmodningsoversigt",
-                "reason": "Årsag",
+                "issueType": "Årsag",
                 "delivery": "Levering",
-                "shippingAddress": "Leveringsadresse",
-                "deliveryCost": "Leveringsomkostninger",
-                "submitRequest": "Indsend anmodning",
+                "deliveryTime": "Leveringstid",
+                "shippingCost": "Leveringsomkostninger",
                 "importantInformation": "Vigtig information",
-                "processedImmediately": "Din anmodning vil blive behandlet med det samme",
-                "currentCardDeactivated": "Nuværende kort vil blive deaktiveret ved bekræftelse",
-                "trackStatus": "Du kan følge dit nye korts leveringsstatus i appen"
+                "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
+                "bullet2": "Dit nye kort vil have de samme numre som dit nuværende kort",
+                "bullet3": "Destruer dit beskadigede kort, når det nye ankommer",
+                "submitRequest": "Indsend anmodning"
             },
             "Status": {
                 "title": "Dit nye kort er på vej!",

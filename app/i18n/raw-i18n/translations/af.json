@@ -2897,6 +2897,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Vervang kaart",
             "steps": {
                 "reportIssue": "Rapporteer",
                 "delivery": "Aflewering",
@@ -2905,6 +2906,7 @@
             "ReportIssue": {
                 "title": "Wat het met jou kaart gebeur?",
                 "subtitle": "Kies die rede vir die aanvra van 'n vervangingskaart",
+                "cardManagement": "Kaartbestuur",
                 "lostCard": "Verlore kaart",
                 "lostCardDescription": "Ek kan nie my kaart vind nie",
                 "stolenCard": "Gesteelde kaart",
@@ -2912,9 +2914,9 @@
                 "damagedCard": "Beskadigde kaart",
                 "damagedCardDescription": "My kaart is fisies beskadig",
                 "whatHappensNext": "Wat gebeur volgende?",
-                "currentCardDeactivated": "Jou huidige kaart sal onmiddellik gedeaktiveer word",
-                "newCardShipped": "'n Nuwe kaart sal na jou adres gestuur word",
-                "digitalCardAvailable": "Jou digitale kaart bly beskikbaar tydens hierdie proses"
+                "bullet1": "Jou huidige kaart sal gevries word vir sekuriteit",
+                "bullet2": "'n Nuwe kaart met verskillende nommers sal uitgereik word",
+                "bullet3": "Jy kan ontdooi as jy jou kaart later vind"
             },
             "Delivery": {
                 "title": "Kies jou afleweringspoed",
@@ -2930,15 +2932,15 @@
                 "title": "Hersien jou versoek",
                 "subtitle": "Bevestig asseblief die besonderhede van jou kaartvervanging",
                 "requestSummary": "Versoekoopsomming",
-                "reason": "Rede",
+                "issueType": "Rede",
                 "delivery": "Aflewering",
-                "shippingAddress": "Versendingsadres",
-                "deliveryCost": "Afleweringskoste",
-                "submitRequest": "Dien versoek in",
+                "deliveryTime": "Afleweringstyd",
+                "shippingCost": "Afleweringskoste",
                 "importantInformation": "Belangrike inligting",
-                "processedImmediately": "Jou versoek sal onmiddellik verwerk word",
-                "currentCardDeactivated": "Huidige kaart sal met bevestiging gedeaktiveer word",
-                "trackStatus": "Jy kan jou nuwe kaart se afleweringstatus in die app volg"
+                "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
+                "bullet2": "Jou nuwe kaart sal dieselfde nommers as jou huidige kaart hê",
+                "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom",
+                "submitRequest": "Dien versoek in"
             },
             "Status": {
                 "title": "Jou nuwe kaart is op pad!",

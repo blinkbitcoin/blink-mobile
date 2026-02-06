@@ -2983,6 +2983,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Kyusa kaadi",
             "steps": {
                 "reportIssue": "Loopa",
                 "delivery": "Okutwala",
@@ -2991,6 +2992,7 @@
             "ReportIssue": {
                 "title": "Kiki ekyabadde ku kaadi yo?",
                 "subtitle": "Londa ensonga y'okusaba kaadi ey'okuddamu",
+                "cardManagement": "Okuddukanya kaadi",
                 "lostCard": "Kaadi eyabulidde",
                 "lostCardDescription": "Sisobola kufuna kaadi yange",
                 "stolenCard": "Kaadi eyabbiddwa",
@@ -2998,9 +3000,9 @@
                 "damagedCard": "Kaadi eyonoonese",
                 "damagedCardDescription": "Kaadi yange yonoonese",
                 "whatHappensNext": "Kiki ekiddayo?",
-                "currentCardDeactivated": "Kaadi yo ey'omu kaakati ejja kusazibwamu amangu ago",
-                "newCardShipped": "Kaadi empya ejja kutumibwa ku ndagiriro yo",
-                "digitalCardAvailable": "Kaadi yo eya dijitaali esigala ng'esoboka mu nkola eno"
+                "bullet1": "Kaadi yo ey'omu kaakati ejja kuzibwa olw'obukuumi",
+                "bullet2": "Kaadi empya n'ennamba ez'enjawulo ejja kufulumizibwa",
+                "bullet3": "Osobola okuggikoola bw'osanga kaadi yo oluvannyuma"
             },
             "Delivery": {
                 "title": "Londa embiro z'okutwala",
@@ -3016,15 +3018,15 @@
                 "title": "Kebera okusaba kwo",
                 "subtitle": "Kakasa ebikwata ku kukyusa kaadi yo",
                 "requestSummary": "Akafunze k'okusaba",
-                "reason": "Ensonga",
+                "issueType": "Ensonga",
                 "delivery": "Okutwala",
-                "shippingAddress": "Endagiriro y'okutuma",
-                "deliveryCost": "Bbeeyi y'okutwala",
-                "submitRequest": "Weereza okusaba",
+                "deliveryTime": "Obudde bw'okutuusa",
+                "shippingCost": "Bbeeyi y'okutwala",
                 "importantInformation": "Amawulire ag'omugaso",
-                "processedImmediately": "Okusaba kwo kujja kukolesereza amangu ago",
-                "currentCardDeactivated": "Kaadi ey'omu kaakati ejja kusazibwamu ng'okakasizza",
-                "trackStatus": "Osobola okugoberera embeera y'okutwala kaadi yo empya mu app"
+                "bullet1": "Kaadi yo ey'omu kaakati ejja kusigala nga ekola okutuusa empya lw'ejja",
+                "bullet2": "Kaadi yo empya ejja kuba n'ennamba ze zimu ng'eza kaadi ey'omu kaakati",
+                "bullet3": "Zikiriza kaadi yo eyonoonese kaadi empya bw'etuuka",
+                "submitRequest": "Weereza okusaba"
             },
             "Status": {
                 "title": "Kaadi yo empya eri mu kkubo!",

@@ -1117,6 +1117,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Tshintsha ikhadi",
             "steps": {
                 "reportIssue": "Xela",
                 "delivery": "Ukuhanjiswa",
@@ -1125,6 +1126,7 @@
             "ReportIssue": {
                 "title": "Kwenzeke ntoni ngekhadi lakho?",
                 "subtitle": "Khetha isizathu sokucela ikhadi lokutshintshwa",
+                "cardManagement": "Ulawulo lwekhadi",
                 "lostCard": "Ikhadi elilahlekileyo",
                 "lostCardDescription": "Andikwazi ukufumana ikhadi lam",
                 "stolenCard": "Ikhadi elibiweyo",
@@ -1132,9 +1134,9 @@
                 "damagedCard": "Ikhadi elonakeleyo",
                 "damagedCardDescription": "Ikhadi lam lonakele ngokwasemzimbeni",
                 "whatHappensNext": "Kuzokwenzeka ntoni ngokulandelayo?",
-                "currentCardDeactivated": "Ikhadi lakho langoku liza kucimwa ngokukhawuleza",
-                "newCardShipped": "Ikhadi elitsha liza kuthunyelwa kwidilesi yakho",
-                "digitalCardAvailable": "Ikhadi lakho ledijithali lisafumaneka ngeli xesha"
+                "bullet1": "Ikhadi lakho langoku liza kumiswa ngenxa yokhuseleko",
+                "bullet2": "Ikhadi elitsha elineminani eyahlukileyo liza kukhutshwa",
+                "bullet3": "Ungalicima ukumiswa ukuba ulifumana ikhadi lakho kamva"
             },
             "Delivery": {
                 "title": "Khetha isantya sokuhanjiswa",
@@ -1150,15 +1152,15 @@
                 "title": "Phonononga isicelo sakho",
                 "subtitle": "Nceda uqinisekise iinkcukacha zokutshintsha ikhadi lakho",
                 "requestSummary": "Isishwankathelo sesicelo",
-                "reason": "Isizathu",
+                "issueType": "Isizathu",
                 "delivery": "Ukuhanjiswa",
-                "shippingAddress": "Idilesi yokuthumela",
-                "deliveryCost": "Iindleko zokuhanjiswa",
-                "submitRequest": "Ngenisa isicelo",
+                "deliveryTime": "Ixesha lokunikezela",
+                "shippingCost": "Iindleko zokuhanjiswa",
                 "importantInformation": "Ulwazi olubalulekileyo",
-                "processedImmediately": "Isicelo sakho siza kuqhutywa ngokukhawuleza",
-                "currentCardDeactivated": "Ikhadi langoku liza kucimwa xa uqinisekisa",
-                "trackStatus": "Ungalandela imeko yokuhanjiswa kwekhadi lakho elitsha kwi-app"
+                "bullet1": "Ikhadi lakho langoku liza kuhlala lisebenza de kufike elitsha",
+                "bullet2": "Ikhadi lakho elitsha liza kuba neminani efanayo nekhadi langoku",
+                "bullet3": "Tshabalalisa ikhadi lakho elonakeleyo xa elitsha lifika",
+                "submitRequest": "Ngenisa isicelo"
             },
             "Status": {
                 "title": "Ikhadi lakho elitsha lisendleleni!",

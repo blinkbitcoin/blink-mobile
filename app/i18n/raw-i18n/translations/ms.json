@@ -2897,6 +2897,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Ganti kad",
             "steps": {
                 "reportIssue": "Laporkan",
                 "delivery": "Penghantaran",
@@ -2905,6 +2906,7 @@
             "ReportIssue": {
                 "title": "Apa yang berlaku pada kad anda?",
                 "subtitle": "Pilih sebab untuk meminta kad gantian",
+                "cardManagement": "Pengurusan kad",
                 "lostCard": "Kad hilang",
                 "lostCardDescription": "Saya tidak dapat menemui kad saya",
                 "stolenCard": "Kad dicuri",
@@ -2912,9 +2914,9 @@
                 "damagedCard": "Kad rosak",
                 "damagedCardDescription": "Kad saya rosak secara fizikal",
                 "whatHappensNext": "Apa yang berlaku seterusnya?",
-                "currentCardDeactivated": "Kad semasa anda akan dinyahaktifkan serta-merta",
-                "newCardShipped": "Kad baharu akan dihantar ke alamat anda",
-                "digitalCardAvailable": "Kad digital anda kekal tersedia semasa proses ini"
+                "bullet1": "Kad semasa anda akan dibekukan untuk keselamatan",
+                "bullet2": "Kad baharu dengan nombor berbeza akan dikeluarkan",
+                "bullet3": "Anda boleh menyahbekukan jika menemui kad anda kemudian"
             },
             "Delivery": {
                 "title": "Pilih kelajuan penghantaran anda",
@@ -2930,15 +2932,15 @@
                 "title": "Semak permintaan anda",
                 "subtitle": "Sila sahkan butiran penggantian kad anda",
                 "requestSummary": "Ringkasan permintaan",
-                "reason": "Sebab",
+                "issueType": "Sebab",
                 "delivery": "Penghantaran",
-                "shippingAddress": "Alamat penghantaran",
-                "deliveryCost": "Kos penghantaran",
-                "submitRequest": "Hantar permintaan",
+                "deliveryTime": "Masa penghantaran",
+                "shippingCost": "Kos penghantaran",
                 "importantInformation": "Maklumat penting",
-                "processedImmediately": "Permintaan anda akan diproses serta-merta",
-                "currentCardDeactivated": "Kad semasa akan dinyahaktifkan selepas pengesahan",
-                "trackStatus": "Anda boleh menjejaki status penghantaran kad baharu anda dalam aplikasi"
+                "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baharu tiba",
+                "bullet2": "Kad baharu anda akan mempunyai nombor yang sama dengan kad semasa",
+                "bullet3": "Musnahkan kad rosak anda apabila kad baharu tiba",
+                "submitRequest": "Hantar permintaan"
             },
             "Status": {
                 "title": "Kad baharu anda sedang dalam perjalanan!",

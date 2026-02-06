@@ -2892,6 +2892,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Thay thẻ",
             "steps": {
                 "reportIssue": "Báo cáo",
                 "delivery": "Giao hàng",
@@ -2900,6 +2901,7 @@
             "ReportIssue": {
                 "title": "Chuyện gì đã xảy ra với thẻ của bạn?",
                 "subtitle": "Chọn lý do yêu cầu thẻ thay thế",
+                "cardManagement": "Quản lý thẻ",
                 "lostCard": "Thẻ bị mất",
                 "lostCardDescription": "Tôi không thể tìm thấy thẻ của mình",
                 "stolenCard": "Thẻ bị đánh cắp",
@@ -2907,9 +2909,9 @@
                 "damagedCard": "Thẻ bị hỏng",
                 "damagedCardDescription": "Thẻ của tôi bị hỏng vật lý",
                 "whatHappensNext": "Điều gì xảy ra tiếp theo?",
-                "currentCardDeactivated": "Thẻ hiện tại của bạn sẽ bị vô hiệu hóa ngay lập tức",
-                "newCardShipped": "Thẻ mới sẽ được gửi đến địa chỉ của bạn",
-                "digitalCardAvailable": "Thẻ kỹ thuật số của bạn vẫn có sẵn trong quá trình này"
+                "bullet1": "Thẻ hiện tại của bạn sẽ bị đóng băng vì lý do bảo mật",
+                "bullet2": "Thẻ mới với số khác sẽ được phát hành",
+                "bullet3": "Bạn có thể mở đóng băng nếu tìm thấy thẻ sau này"
             },
             "Delivery": {
                 "title": "Chọn tốc độ giao hàng",
@@ -2925,15 +2927,15 @@
                 "title": "Xem lại yêu cầu của bạn",
                 "subtitle": "Vui lòng xác nhận chi tiết thay thế thẻ của bạn",
                 "requestSummary": "Tóm tắt yêu cầu",
-                "reason": "Lý do",
+                "issueType": "Lý do",
                 "delivery": "Giao hàng",
-                "shippingAddress": "Địa chỉ giao hàng",
-                "deliveryCost": "Phí giao hàng",
-                "submitRequest": "Gửi yêu cầu",
+                "deliveryTime": "Thời gian giao hàng",
+                "shippingCost": "Phí giao hàng",
                 "importantInformation": "Thông tin quan trọng",
-                "processedImmediately": "Yêu cầu của bạn sẽ được xử lý ngay lập tức",
-                "currentCardDeactivated": "Thẻ hiện tại sẽ bị vô hiệu hóa khi xác nhận",
-                "trackStatus": "Bạn có thể theo dõi trạng thái giao hàng của thẻ mới trong ứng dụng"
+                "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
+                "bullet2": "Thẻ mới của bạn sẽ có cùng số với thẻ hiện tại",
+                "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến",
+                "submitRequest": "Gửi yêu cầu"
             },
             "Status": {
                 "title": "Thẻ mới của bạn đang trên đường đến!",

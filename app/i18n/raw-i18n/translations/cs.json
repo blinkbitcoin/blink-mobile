@@ -2897,6 +2897,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Vyměnit kartu",
             "steps": {
                 "reportIssue": "Nahlásit",
                 "delivery": "Doručení",
@@ -2905,6 +2906,7 @@
             "ReportIssue": {
                 "title": "Co se stalo s vaší kartou?",
                 "subtitle": "Vyberte důvod žádosti o náhradní kartu",
+                "cardManagement": "Správa karty",
                 "lostCard": "Ztracená karta",
                 "lostCardDescription": "Nemohu najít svou kartu",
                 "stolenCard": "Ukradená karta",
@@ -2912,9 +2914,9 @@
                 "damagedCard": "Poškozená karta",
                 "damagedCardDescription": "Moje karta je fyzicky poškozená",
                 "whatHappensNext": "Co bude následovat?",
-                "currentCardDeactivated": "Vaše aktuální karta bude okamžitě deaktivována",
-                "newCardShipped": "Nová karta bude odeslána na vaši adresu",
-                "digitalCardAvailable": "Vaše digitální karta zůstává během tohoto procesu dostupná"
+                "bullet1": "Vaše aktuální karta bude z bezpečnostních důvodů zmrazena",
+                "bullet2": "Bude vydána nová karta s jinými čísly",
+                "bullet3": "Pokud kartu později najdete, můžete ji odblokovat"
             },
             "Delivery": {
                 "title": "Vyberte rychlost doručení",
@@ -2930,15 +2932,15 @@
                 "title": "Zkontrolujte svou žádost",
                 "subtitle": "Potvrďte prosím údaje o výměně karty",
                 "requestSummary": "Shrnutí žádosti",
-                "reason": "Důvod",
+                "issueType": "Důvod",
                 "delivery": "Doručení",
-                "shippingAddress": "Doručovací adresa",
-                "deliveryCost": "Cena doručení",
-                "submitRequest": "Odeslat žádost",
+                "deliveryTime": "Doba doručení",
+                "shippingCost": "Cena doručení",
                 "importantInformation": "Důležité informace",
-                "processedImmediately": "Vaše žádost bude zpracována okamžitě",
-                "currentCardDeactivated": "Aktuální karta bude po potvrzení deaktivována",
-                "trackStatus": "Stav doručení nové karty můžete sledovat v aplikaci"
+                "bullet1": "Vaše aktuální karta zůstane aktivní, dokud nedorazí nová",
+                "bullet2": "Vaše nová karta bude mít stejná čísla jako současná",
+                "bullet3": "Po doručení nové karty zničte poškozenou kartu",
+                "submitRequest": "Odeslat žádost"
             },
             "Status": {
                 "title": "Vaše nová karta je na cestě!",

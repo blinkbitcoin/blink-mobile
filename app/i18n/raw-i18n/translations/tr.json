@@ -2983,6 +2983,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Kartı değiştir",
             "steps": {
                 "reportIssue": "Bildir",
                 "delivery": "Teslimat",
@@ -2991,6 +2992,7 @@
             "ReportIssue": {
                 "title": "Kartınıza ne oldu?",
                 "subtitle": "Yedek kart talebi için nedeni seçin",
+                "cardManagement": "Kart yönetimi",
                 "lostCard": "Kayıp kart",
                 "lostCardDescription": "Kartımı bulamıyorum",
                 "stolenCard": "Çalınan kart",
@@ -2998,9 +3000,9 @@
                 "damagedCard": "Hasarlı kart",
                 "damagedCardDescription": "Kartım fiziksel olarak hasar gördü",
                 "whatHappensNext": "Bundan sonra ne olacak?",
-                "currentCardDeactivated": "Mevcut kartınız derhal devre dışı bırakılacak",
-                "newCardShipped": "Yeni bir kart adresinize gönderilecek",
-                "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır"
+                "bullet1": "Mevcut kartınız güvenlik için dondurulacak",
+                "bullet2": "Farklı numaralarla yeni bir kart düzenlenecek",
+                "bullet3": "Kartınızı daha sonra bulursanız dondurma işlemini kaldırabilirsiniz"
             },
             "Delivery": {
                 "title": "Teslimat hızınızı seçin",
@@ -3016,15 +3018,15 @@
                 "title": "Talebinizi gözden geçirin",
                 "subtitle": "Lütfen kart değişimi detaylarını onaylayın",
                 "requestSummary": "Talep özeti",
-                "reason": "Neden",
+                "issueType": "Neden",
                 "delivery": "Teslimat",
-                "shippingAddress": "Teslimat adresi",
-                "deliveryCost": "Teslimat ücreti",
-                "submitRequest": "Talebi gönder",
+                "deliveryTime": "Teslimat süresi",
+                "shippingCost": "Teslimat ücreti",
                 "importantInformation": "Önemli bilgiler",
-                "processedImmediately": "Talebiniz derhal işleme alınacak",
-                "currentCardDeactivated": "Mevcut kart onay sonrasında devre dışı bırakılacak",
-                "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz"
+                "bullet1": "Mevcut kartınız yeni kart gelene kadar aktif kalacak",
+                "bullet2": "Yeni kartınız mevcut kartınızla aynı numaralara sahip olacak",
+                "bullet3": "Yeni kart geldiğinde hasarlı kartınızı imha edin",
+                "submitRequest": "Talebi gönder"
             },
             "Status": {
                 "title": "Yeni kartınız yolda!",

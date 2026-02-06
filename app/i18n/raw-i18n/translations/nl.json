@@ -2897,6 +2897,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Kaart vervangen",
             "steps": {
                 "reportIssue": "Melden",
                 "delivery": "Bezorging",
@@ -2905,6 +2906,7 @@
             "ReportIssue": {
                 "title": "Wat is er met je kaart gebeurd?",
                 "subtitle": "Selecteer de reden voor het aanvragen van een vervangende kaart",
+                "cardManagement": "Kaartbeheer",
                 "lostCard": "Verloren kaart",
                 "lostCardDescription": "Ik kan mijn kaart niet vinden",
                 "stolenCard": "Gestolen kaart",
@@ -2912,9 +2914,9 @@
                 "damagedCard": "Beschadigde kaart",
                 "damagedCardDescription": "Mijn kaart is fysiek beschadigd",
                 "whatHappensNext": "Wat gebeurt er nu?",
-                "currentCardDeactivated": "Je huidige kaart wordt onmiddellijk gedeactiveerd",
-                "newCardShipped": "Een nieuwe kaart wordt naar je adres verzonden",
-                "digitalCardAvailable": "Je digitale kaart blijft beschikbaar tijdens dit proces"
+                "bullet1": "Je huidige kaart wordt bevroren voor de veiligheid",
+                "bullet2": "Een nieuwe kaart met andere nummers wordt uitgegeven",
+                "bullet3": "Je kunt de kaart ontdooien als je hem later vindt"
             },
             "Delivery": {
                 "title": "Kies je bezorgsnelheid",
@@ -2930,15 +2932,15 @@
                 "title": "Controleer je aanvraag",
                 "subtitle": "Bevestig de details van je kaartvervanging",
                 "requestSummary": "Aanvraagoverzicht",
-                "reason": "Reden",
+                "issueType": "Reden",
                 "delivery": "Bezorging",
-                "shippingAddress": "Verzendadres",
-                "deliveryCost": "Bezorgkosten",
-                "submitRequest": "Aanvraag indienen",
+                "deliveryTime": "Levertijd",
+                "shippingCost": "Bezorgkosten",
                 "importantInformation": "Belangrijke informatie",
-                "processedImmediately": "Je aanvraag wordt onmiddellijk verwerkt",
-                "currentCardDeactivated": "De huidige kaart wordt gedeactiveerd bij bevestiging",
-                "trackStatus": "Je kunt de bezorgstatus van je nieuwe kaart volgen in de app"
+                "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
+                "bullet2": "Je nieuwe kaart heeft dezelfde nummers als je huidige kaart",
+                "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt",
+                "submitRequest": "Aanvraag indienen"
             },
             "Status": {
                 "title": "Je nieuwe kaart is onderweg!",

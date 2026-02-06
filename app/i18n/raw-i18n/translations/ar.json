@@ -2892,6 +2892,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "استبدال البطاقة",
             "steps": {
                 "reportIssue": "الإبلاغ",
                 "delivery": "التوصيل",
@@ -2900,6 +2901,7 @@
             "ReportIssue": {
                 "title": "ماذا حدث لبطاقتك؟",
                 "subtitle": "اختر سبب طلب بطاقة بديلة",
+                "cardManagement": "إدارة البطاقة",
                 "lostCard": "بطاقة مفقودة",
                 "lostCardDescription": "لا أستطيع العثور على بطاقتي",
                 "stolenCard": "بطاقة مسروقة",
@@ -2907,9 +2909,9 @@
                 "damagedCard": "بطاقة تالفة",
                 "damagedCardDescription": "بطاقتي متضررة فعلياً",
                 "whatHappensNext": "ماذا يحدث بعد ذلك؟",
-                "currentCardDeactivated": "سيتم إلغاء تنشيط بطاقتك الحالية فوراً",
-                "newCardShipped": "سيتم شحن بطاقة جديدة إلى عنوانك",
-                "digitalCardAvailable": "تبقى بطاقتك الرقمية متاحة خلال هذه العملية"
+                "bullet1": "سيتم تجميد بطاقتك الحالية لأغراض الأمان",
+                "bullet2": "سيتم إصدار بطاقة جديدة بأرقام مختلفة",
+                "bullet3": "يمكنك إلغاء التجميد إذا وجدت بطاقتك لاحقاً"
             },
             "Delivery": {
                 "title": "اختر سرعة التوصيل",
@@ -2925,15 +2927,15 @@
                 "title": "راجع طلبك",
                 "subtitle": "يرجى تأكيد تفاصيل استبدال بطاقتك",
                 "requestSummary": "ملخص الطلب",
-                "reason": "السبب",
+                "issueType": "السبب",
                 "delivery": "التوصيل",
-                "shippingAddress": "عنوان الشحن",
-                "deliveryCost": "تكلفة التوصيل",
-                "submitRequest": "إرسال الطلب",
+                "deliveryTime": "وقت التسليم",
+                "shippingCost": "تكلفة التوصيل",
                 "importantInformation": "معلومات مهمة",
-                "processedImmediately": "سيتم معالجة طلبك فوراً",
-                "currentCardDeactivated": "سيتم إلغاء تنشيط البطاقة الحالية عند التأكيد",
-                "trackStatus": "يمكنك تتبع حالة توصيل بطاقتك الجديدة في التطبيق"
+                "bullet1": "ستبقى بطاقتك الحالية نشطة حتى وصول البطاقة الجديدة",
+                "bullet2": "ستحمل بطاقتك الجديدة نفس أرقام بطاقتك الحالية",
+                "bullet3": "أتلف بطاقتك التالفة عند وصول البطاقة الجديدة",
+                "submitRequest": "إرسال الطلب"
             },
             "Status": {
                 "title": "بطاقتك الجديدة في الطريق!",

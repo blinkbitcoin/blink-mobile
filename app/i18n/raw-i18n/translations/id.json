@@ -2983,6 +2983,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Ganti kartu",
             "steps": {
                 "reportIssue": "Laporkan",
                 "delivery": "Pengiriman",
@@ -2991,6 +2992,7 @@
             "ReportIssue": {
                 "title": "Apa yang terjadi dengan kartu Anda?",
                 "subtitle": "Pilih alasan untuk meminta kartu pengganti",
+                "cardManagement": "Manajemen kartu",
                 "lostCard": "Kartu hilang",
                 "lostCardDescription": "Saya tidak dapat menemukan kartu saya",
                 "stolenCard": "Kartu dicuri",
@@ -2998,9 +3000,9 @@
                 "damagedCard": "Kartu rusak",
                 "damagedCardDescription": "Kartu saya rusak secara fisik",
                 "whatHappensNext": "Apa yang terjadi selanjutnya?",
-                "currentCardDeactivated": "Kartu Anda saat ini akan segera dinonaktifkan",
-                "newCardShipped": "Kartu baru akan dikirim ke alamat Anda",
-                "digitalCardAvailable": "Kartu digital Anda tetap tersedia selama proses ini"
+                "bullet1": "Kartu Anda saat ini akan dibekukan demi keamanan",
+                "bullet2": "Kartu baru dengan nomor berbeda akan diterbitkan",
+                "bullet3": "Anda dapat membuka pembekuan jika menemukan kartu Anda nanti"
             },
             "Delivery": {
                 "title": "Pilih kecepatan pengiriman",
@@ -3016,15 +3018,15 @@
                 "title": "Tinjau permintaan Anda",
                 "subtitle": "Konfirmasi detail penggantian kartu Anda",
                 "requestSummary": "Ringkasan permintaan",
-                "reason": "Alasan",
+                "issueType": "Alasan",
                 "delivery": "Pengiriman",
-                "shippingAddress": "Alamat pengiriman",
-                "deliveryCost": "Biaya pengiriman",
-                "submitRequest": "Kirim permintaan",
+                "deliveryTime": "Waktu pengiriman",
+                "shippingCost": "Biaya pengiriman",
                 "importantInformation": "Informasi penting",
-                "processedImmediately": "Permintaan Anda akan segera diproses",
-                "currentCardDeactivated": "Kartu saat ini akan dinonaktifkan setelah konfirmasi",
-                "trackStatus": "Anda dapat melacak status pengiriman kartu baru di aplikasi"
+                "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
+                "bullet2": "Kartu baru Anda akan memiliki nomor yang sama dengan kartu saat ini",
+                "bullet3": "Musnahkan kartu rusak Anda ketika kartu baru tiba",
+                "submitRequest": "Kirim permintaan"
             },
             "Status": {
                 "title": "Kartu baru Anda sedang dalam perjalanan!",
