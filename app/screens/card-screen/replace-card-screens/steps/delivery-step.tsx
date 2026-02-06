@@ -1,12 +1,13 @@
 import React from "react"
 import { View } from "react-native"
 
-import { Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
   CheckboxRow,
   MultiLineField,
   SelectableOptionRow,
+  ShippingAddressForm,
 } from "@app/components/card-screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -14,7 +15,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { MOCK_USER } from "../../card-mock-data"
+import { MOCK_USER, ShippingAddress, shippingAddressToLines } from "../../card-mock-data"
 import { useSharedStepStyles } from "./shared-styles"
 import { Delivery, DeliveryType } from "./types"
 
@@ -23,7 +24,8 @@ type DeliveryStepProps = {
   onSelectDelivery: (delivery: DeliveryType) => void
   useRegisteredAddress: boolean
   onToggleUseRegisteredAddress: () => void
-  onEditAddress: () => void
+  customAddress: ShippingAddress
+  onCustomAddressChange: (address: ShippingAddress) => void
 }
 
 export const DeliveryStep: React.FC<DeliveryStepProps> = ({
@@ -31,9 +33,11 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
   onSelectDelivery,
   useRegisteredAddress,
   onToggleUseRegisteredAddress,
-  onEditAddress,
+  customAddress,
+  onCustomAddressChange,
 }) => {
-  const styles = useSharedStepStyles()
+  const sharedStyles = useSharedStepStyles()
+  const localStyles = useLocalStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -45,7 +49,7 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
 
   const currentAddress = useRegisteredAddress
     ? MOCK_USER.registeredAddress
-    : MOCK_USER.shippingAddress
+    : customAddress
 
   const getDays = (type: DeliveryType) => {
     const config = replaceCardDeliveryConfig[type]
@@ -65,8 +69,8 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
   return (
     <>
       <SettingsGroup
-        containerStyle={styles.settingsGroupContainer}
-        dividerStyle={styles.dividerStyle}
+        containerStyle={sharedStyles.settingsGroupContainer}
+        dividerStyle={sharedStyles.dividerStyle}
         items={[
           () => (
             <SelectableOptionRow
@@ -95,21 +99,35 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
         ]}
       />
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
+      <View style={sharedStyles.section}>
+        <Text style={sharedStyles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
         <MultiLineField
-          lines={currentAddress}
+          lines={shippingAddressToLines(currentAddress, false)}
           leftIcon="map-pin"
-          rightIcon="pencil"
-          onPress={onEditAddress}
         />
       </View>
 
-      <CheckboxRow
-        label={deliveryLL.useRegisteredAddress()}
-        isChecked={useRegisteredAddress}
-        onPress={onToggleUseRegisteredAddress}
-      />
+      <View style={localStyles.checkboxFormGroup}>
+        <CheckboxRow
+          label={deliveryLL.useRegisteredAddress()}
+          isChecked={useRegisteredAddress}
+          onPress={onToggleUseRegisteredAddress}
+        />
+
+        {!useRegisteredAddress && (
+          <ShippingAddressForm
+            address={customAddress}
+            onAddressChange={onCustomAddressChange}
+            showFullName={false}
+          />
+        )}
+      </View>
     </>
   )
 }
+
+const useLocalStyles = makeStyles(() => ({
+  checkboxFormGroup: {
+    gap: 17,
+  },
+}))
