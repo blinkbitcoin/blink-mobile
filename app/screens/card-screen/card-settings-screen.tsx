@@ -38,7 +38,7 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleOrderPhysicalCard = () => {
-    console.log("Order physical card pressed")
+    navigation.navigate("orderCardScreen")
   }
 
   const handleAddToMobileWallet = () => {
