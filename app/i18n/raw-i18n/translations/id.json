@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Apa yang terjadi selanjutnya?",
         "currentCardDeactivated": "Kartu Anda saat ini akan segera dinonaktifkan",
         "newCardShipped": "Kartu baru akan dikirim ke alamat Anda",
-        "digitalCardAvailable": "Kartu digital Anda tetap tersedia selama proses ini"
+        "digitalCardAvailable": "Kartu digital Anda tetap tersedia selama proses ini",
+        "cardManagement": "Manajemen kartu",
+        "bullet1": "Kartu Anda saat ini akan dibekukan demi keamanan",
+        "bullet2": "Kartu baru dengan nomor berbeda akan diterbitkan",
+        "bullet3": "Anda dapat membuka pembekuan jika menemukan kartu Anda nanti"
       },
       "Delivery": {
         "title": "Pilih kecepatan pengiriman",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Informasi penting",
         "processedImmediately": "Permintaan Anda akan segera diproses",
         "currentCardDeactivated": "Kartu saat ini akan dinonaktifkan setelah konfirmasi",
-        "trackStatus": "Anda dapat melacak status pengiriman kartu baru di aplikasi"
+        "trackStatus": "Anda dapat melacak status pengiriman kartu baru di aplikasi",
+        "issueType": "Alasan",
+        "deliveryTime": "Waktu pengiriman",
+        "shippingCost": "Biaya pengiriman",
+        "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
+        "bullet2": "Kartu baru Anda akan memiliki nomor yang sama dengan kartu saat ini",
+        "bullet3": "Musnahkan kartu rusak Anda ketika kartu baru tiba"
       },
       "Status": {
         "title": "Kartu baru Anda sedang dalam perjalanan!",
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
         "buttonLabel": "Dasbor"
-      }
+      },
+      "title": "Ganti kartu"
     }
   }
 }

@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Bundan sonra ne olacak?",
         "currentCardDeactivated": "Mevcut kartınız derhal devre dışı bırakılacak",
         "newCardShipped": "Yeni bir kart adresinize gönderilecek",
-        "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır"
+        "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır",
+        "cardManagement": "Kart yönetimi",
+        "bullet1": "Mevcut kartınız güvenlik için dondurulacak",
+        "bullet2": "Farklı numaralarla yeni bir kart düzenlenecek",
+        "bullet3": "Kartınızı daha sonra bulursanız dondurma işlemini kaldırabilirsiniz"
       },
       "Delivery": {
         "title": "Teslimat hızınızı seçin",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Önemli bilgiler",
         "processedImmediately": "Talebiniz derhal işleme alınacak",
         "currentCardDeactivated": "Mevcut kart onay sonrasında devre dışı bırakılacak",
-        "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz"
+        "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz",
+        "issueType": "Neden",
+        "deliveryTime": "Teslimat süresi",
+        "shippingCost": "Teslimat ücreti",
+        "bullet1": "Mevcut kartınız yeni kart gelene kadar aktif kalacak",
+        "bullet2": "Yeni kartınız mevcut kartınızla aynı numaralara sahip olacak",
+        "bullet3": "Yeni kart geldiğinde hasarlı kartınızı imha edin"
       },
       "Status": {
         "title": "Yeni kartınız yolda!",
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
         "buttonLabel": "Gösterge Paneli"
-      }
+      },
+      "title": "Kartı değiştir"
     }
   }
 }

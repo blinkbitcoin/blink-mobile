@@ -3178,6 +3178,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Remplacer la carte",
             "steps": {
                 "reportIssue": "Signaler",
                 "delivery": "Livraison",
@@ -3186,6 +3187,7 @@
             "ReportIssue": {
                 "title": "Que s'est-il passé avec votre carte ?",
                 "subtitle": "Sélectionnez la raison de la demande de carte de remplacement",
+                "cardManagement": "Gestion de carte",
                 "lostCard": "Carte perdue",
                 "lostCardDescription": "Je ne trouve pas ma carte",
                 "stolenCard": "Carte volée",
@@ -3193,9 +3195,9 @@
                 "damagedCard": "Carte endommagée",
                 "damagedCardDescription": "Ma carte est physiquement endommagée",
                 "whatHappensNext": "Que se passe-t-il ensuite ?",
-                "currentCardDeactivated": "Votre carte actuelle sera immédiatement désactivée",
-                "newCardShipped": "Une nouvelle carte sera envoyée à votre adresse",
-                "digitalCardAvailable": "Votre carte numérique reste disponible pendant ce processus"
+                "bullet1": "Votre carte actuelle sera gelée pour des raisons de sécurité",
+                "bullet2": "Une nouvelle carte avec des numéros différents sera émise",
+                "bullet3": "Vous pouvez la dégeler si vous retrouvez votre carte plus tard"
             },
             "Delivery": {
                 "title": "Choisissez votre vitesse de livraison",
@@ -3211,15 +3213,15 @@
                 "title": "Vérifiez votre demande",
                 "subtitle": "Veuillez confirmer les détails du remplacement de votre carte",
                 "requestSummary": "Résumé de la demande",
-                "reason": "Raison",
+                "issueType": "Raison",
                 "delivery": "Livraison",
-                "shippingAddress": "Adresse de livraison",
-                "deliveryCost": "Frais de livraison",
-                "submitRequest": "Soumettre la demande",
+                "deliveryTime": "Délai de livraison",
+                "shippingCost": "Frais de livraison",
                 "importantInformation": "Informations importantes",
-                "processedImmediately": "Votre demande sera traitée immédiatement",
-                "currentCardDeactivated": "La carte actuelle sera désactivée lors de la confirmation",
-                "trackStatus": "Vous pouvez suivre le statut de livraison de votre nouvelle carte dans l'application"
+                "bullet1": "Votre carte actuelle restera active jusqu'à l'arrivée de la nouvelle",
+                "bullet2": "Votre nouvelle carte aura les mêmes numéros que votre carte actuelle",
+                "bullet3": "Détruisez votre carte endommagée lorsque la nouvelle arrive",
+                "submitRequest": "Soumettre la demande"
             },
             "Status": {
                 "title": "Votre nouvelle carte est en route !",

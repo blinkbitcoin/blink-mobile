@@ -3192,7 +3192,11 @@
         "whatHappensNext": "Điều gì xảy ra tiếp theo?",
         "currentCardDeactivated": "Thẻ hiện tại của bạn sẽ bị vô hiệu hóa ngay lập tức",
         "newCardShipped": "Thẻ mới sẽ được gửi đến địa chỉ của bạn",
-        "digitalCardAvailable": "Thẻ kỹ thuật số của bạn vẫn có sẵn trong quá trình này"
+        "digitalCardAvailable": "Thẻ kỹ thuật số của bạn vẫn có sẵn trong quá trình này",
+        "cardManagement": "Quản lý thẻ",
+        "bullet1": "Thẻ hiện tại của bạn sẽ bị đóng băng vì lý do bảo mật",
+        "bullet2": "Thẻ mới với số khác sẽ được phát hành",
+        "bullet3": "Bạn có thể mở đóng băng nếu tìm thấy thẻ sau này"
       },
       "Delivery": {
         "title": "Chọn tốc độ giao hàng",
@@ -3216,13 +3220,20 @@
         "importantInformation": "Thông tin quan trọng",
         "processedImmediately": "Yêu cầu của bạn sẽ được xử lý ngay lập tức",
         "currentCardDeactivated": "Thẻ hiện tại sẽ bị vô hiệu hóa khi xác nhận",
-        "trackStatus": "Bạn có thể theo dõi trạng thái giao hàng của thẻ mới trong ứng dụng"
+        "trackStatus": "Bạn có thể theo dõi trạng thái giao hàng của thẻ mới trong ứng dụng",
+        "issueType": "Lý do",
+        "deliveryTime": "Thời gian giao hàng",
+        "shippingCost": "Phí giao hàng",
+        "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
+        "bullet2": "Thẻ mới của bạn sẽ có cùng số với thẻ hiện tại",
+        "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
       },
       "Status": {
         "title": "Thẻ mới của bạn đang trên đường đến!",
         "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
         "buttonLabel": "Bảng điều khiển"
-      }
+      },
+      "title": "Thay thẻ"
     }
   }
 }

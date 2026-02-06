@@ -3195,7 +3195,11 @@
         "whatHappensNext": "Co bude následovat?",
         "currentCardDeactivated": "Vaše aktuální karta bude okamžitě deaktivována",
         "newCardShipped": "Nová karta bude odeslána na vaši adresu",
-        "digitalCardAvailable": "Vaše digitální karta zůstává během tohoto procesu dostupná"
+        "digitalCardAvailable": "Vaše digitální karta zůstává během tohoto procesu dostupná",
+        "cardManagement": "Správa karty",
+        "bullet1": "Vaše aktuální karta bude z bezpečnostních důvodů zmrazena",
+        "bullet2": "Bude vydána nová karta s jinými čísly",
+        "bullet3": "Pokud kartu později najdete, můžete ji odblokovat"
       },
       "Delivery": {
         "title": "Vyberte rychlost doručení",
@@ -3219,13 +3223,20 @@
         "importantInformation": "Důležité informace",
         "processedImmediately": "Vaše žádost bude zpracována okamžitě",
         "currentCardDeactivated": "Aktuální karta bude po potvrzení deaktivována",
-        "trackStatus": "Stav doručení nové karty můžete sledovat v aplikaci"
+        "trackStatus": "Stav doručení nové karty můžete sledovat v aplikaci",
+        "issueType": "Důvod",
+        "deliveryTime": "Doba doručení",
+        "shippingCost": "Cena doručení",
+        "bullet1": "Vaše aktuální karta zůstane aktivní, dokud nedorazí nová",
+        "bullet2": "Vaše nová karta bude mít stejná čísla jako současná",
+        "bullet3": "Po doručení nové karty zničte poškozenou kartu"
       },
       "Status": {
         "title": "Vaše nová karta je na cestě!",
         "subtitle": "Objednávka doručení vaší karty Blink byla odeslána.",
         "buttonLabel": "Přehled"
-      }
+      },
+      "title": "Vyměnit kartu"
     }
   }
 }

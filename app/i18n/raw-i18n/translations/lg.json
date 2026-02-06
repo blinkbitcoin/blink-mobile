@@ -3154,7 +3154,11 @@
         "whatHappensNext": "Kiki ekiddayo?",
         "currentCardDeactivated": "Kaadi yo ey'omu kaakati ejja kusazibwamu amangu ago",
         "newCardShipped": "Kaadi empya ejja kutumibwa ku ndagiriro yo",
-        "digitalCardAvailable": "Kaadi yo eya dijitaali esigala ng'esoboka mu nkola eno"
+        "digitalCardAvailable": "Kaadi yo eya dijitaali esigala ng'esoboka mu nkola eno",
+        "cardManagement": "Okuddukanya kaadi",
+        "bullet1": "Kaadi yo ey'omu kaakati ejja kuzibwa olw'obukuumi",
+        "bullet2": "Kaadi empya n'ennamba ez'enjawulo ejja kufulumizibwa",
+        "bullet3": "Osobola okuggikoola bw'osanga kaadi yo oluvannyuma"
       },
       "Delivery": {
         "title": "Londa embiro z'okutwala",
@@ -3178,13 +3182,20 @@
         "importantInformation": "Amawulire ag'omugaso",
         "processedImmediately": "Okusaba kwo kujja kukolesereza amangu ago",
         "currentCardDeactivated": "Kaadi ey'omu kaakati ejja kusazibwamu ng'okakasizza",
-        "trackStatus": "Osobola okugoberera embeera y'okutwala kaadi yo empya mu app"
+        "trackStatus": "Osobola okugoberera embeera y'okutwala kaadi yo empya mu app",
+        "issueType": "Ensonga",
+        "deliveryTime": "Obudde bw'okutuusa",
+        "shippingCost": "Bbeeyi y'okutwala",
+        "bullet1": "Kaadi yo ey'omu kaakati ejja kusigala nga ekola okutuusa empya lw'ejja",
+        "bullet2": "Kaadi yo empya ejja kuba n'ennamba ze zimu ng'eza kaadi ey'omu kaakati",
+        "bullet3": "Zikiriza kaadi yo eyonoonese kaadi empya bw'etuuka"
       },
       "Status": {
         "title": "Kaadi yo empya eri mu kkubo!",
         "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Dashiboodi"
-      }
+      },
+      "title": "Kyusa kaadi"
     }
   }
 }

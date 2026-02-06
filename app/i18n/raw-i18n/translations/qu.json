@@ -3192,7 +3192,11 @@
         "whatHappensNext": "¿Imatataq qhipa kanqa?",
         "currentCardDeactivated": "Kunan tarjetayki usqhaylla pisiyachisqa kanqa",
         "newCardShipped": "Musuq tarjetam direcciónniykiman apachisqa kanqa",
-        "digitalCardAvailable": "Digital tarjetayki kay ruraykuna ukhupi kaqllapi"
+        "digitalCardAvailable": "Digital tarjetayki kay ruraykuna ukhupi kaqllapi",
+        "cardManagement": "Tarjeta kamachiy",
+        "bullet1": "Kunan tarjetayki chirirachisqa kanqa waqaychanapaq",
+        "bullet2": "Musuq tarjeta huknin yupaywanmi hurqusqa kanqa",
+        "bullet3": "Qhipaman tarjetaykita tarispaqa q'uñichiyta atinki"
       },
       "Delivery": {
         "title": "Akllay imaynapin apachimunki",
@@ -3216,13 +3220,20 @@
         "importantInformation": "Allin yuyaykuna",
         "processedImmediately": "Mañakusqayki usqhaylla ruwasqa kanqa",
         "currentCardDeactivated": "Kunan tarjeta takyachisqa kaptin pisiyachisqa kanqa",
-        "trackStatus": "Musuq tarjetaykipa apachiy kayninmanta qatipanki app ukhupi"
+        "trackStatus": "Musuq tarjetaykipa apachiy kayninmanta qatipanki app ukhupi",
+        "issueType": "Imarayku",
+        "deliveryTime": "Apachiy pacha",
+        "shippingCost": "Apachiy chanin",
+        "bullet1": "Kunan tarjetayki kawsaqllam kanqa musuq chayamunankama",
+        "bullet2": "Musuq tarjetayki kunan tarjetaykipa kikin yupayniyuqmi kanqa",
+        "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
       },
       "Status": {
         "title": "Musuq tarjetayki ñanpim kachkan!",
         "subtitle": "Blink tarjetaykipa apachiy kamachikuyqa kachisqañam.",
         "buttonLabel": "Ñawpaq panqa"
-      }
+      },
+      "title": "Tarjetata tikray"
     }
   }
 }

@@ -3137,6 +3137,7 @@
             }
         },
         "ReplaceCard": {
+            "title": "Reemplazar tarjeta",
             "steps": {
                 "reportIssue": "Reportar",
                 "delivery": "Entrega",
@@ -3145,6 +3146,7 @@
             "ReportIssue": {
                 "title": "¿Qué pasó con tu tarjeta?",
                 "subtitle": "Selecciona el motivo para solicitar una tarjeta de reemplazo",
+                "cardManagement": "Gestión de tarjeta",
                 "lostCard": "Tarjeta perdida",
                 "lostCardDescription": "No puedo encontrar mi tarjeta",
                 "stolenCard": "Tarjeta robada",
@@ -3152,9 +3154,9 @@
                 "damagedCard": "Tarjeta dañada",
                 "damagedCardDescription": "Mi tarjeta está físicamente dañada",
                 "whatHappensNext": "¿Qué sucede después?",
-                "currentCardDeactivated": "Tu tarjeta actual será desactivada inmediatamente",
-                "newCardShipped": "Una nueva tarjeta será enviada a tu dirección",
-                "digitalCardAvailable": "Tu tarjeta digital permanece disponible durante este proceso"
+                "bullet1": "Tu tarjeta actual será congelada por seguridad",
+                "bullet2": "Se emitirá una nueva tarjeta con números diferentes",
+                "bullet3": "Puedes descongelarla si encuentras tu tarjeta después"
             },
             "Delivery": {
                 "title": "Elige tu velocidad de entrega",
@@ -3170,15 +3172,15 @@
                 "title": "Revisa tu solicitud",
                 "subtitle": "Por favor confirma los detalles del reemplazo de tu tarjeta",
                 "requestSummary": "Resumen de solicitud",
-                "reason": "Motivo",
+                "issueType": "Motivo",
                 "delivery": "Entrega",
-                "shippingAddress": "Dirección de envío",
-                "deliveryCost": "Costo de entrega",
-                "submitRequest": "Enviar solicitud",
+                "deliveryTime": "Tiempo de entrega",
+                "shippingCost": "Costo de entrega",
                 "importantInformation": "Información importante",
-                "processedImmediately": "Tu solicitud será procesada inmediatamente",
-                "currentCardDeactivated": "La tarjeta actual será desactivada al confirmar",
-                "trackStatus": "Puedes rastrear el estado de entrega de tu nueva tarjeta en la app"
+                "bullet1": "Tu tarjeta actual permanecerá activa hasta que llegue la nueva",
+                "bullet2": "Tu nueva tarjeta tendrá los mismos números que tu tarjeta actual",
+                "bullet3": "Destruye tu tarjeta dañada cuando llegue la nueva",
+                "submitRequest": "Enviar solicitud"
             },
             "Status": {
                 "title": "¡Tu nueva tarjeta está en camino!",
