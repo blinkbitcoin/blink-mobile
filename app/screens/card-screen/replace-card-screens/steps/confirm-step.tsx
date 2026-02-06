@@ -2,7 +2,7 @@ import React, { useMemo } from "react"
 
 import { useTheme } from "@rn-vui/themed"
 
-import { BulletListCard, InfoSection } from "@app/components/card-screen"
+import { InfoCard, InfoSection } from "@app/components/card-screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -83,9 +83,11 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
         ]}
       />
 
-      <BulletListCard
+      <InfoCard
         title={confirmLL.importantInformation()}
-        items={[confirmLL.bullet1(), confirmLL.bullet2(), confirmLL.bullet3()]}
+        bulletItems={[confirmLL.bullet1(), confirmLL.bullet2(), confirmLL.bullet3()]}
+        showIcon={false}
+        size="lg"
       />
     </>
   )
