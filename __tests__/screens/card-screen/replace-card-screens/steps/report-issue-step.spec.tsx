@@ -75,12 +75,10 @@ jest.mock("@app/components/card-screen", () => ({
       <RNText>{subtitle}</RNText>
     </View>
   ),
-  BulletListCard: ({ title, items }: { title: string; items: string[] }) => (
-    <View testID="bullet-list-card">
+  InfoCard: ({ title, bulletItems }: { title: string; bulletItems?: string[] }) => (
+    <View testID="info-card">
       <RNText>{title}</RNText>
-      {items.map((item: string) => (
-        <RNText key={item}>{item}</RNText>
-      ))}
+      {bulletItems?.map((item: string) => <RNText key={item}>{item}</RNText>)}
     </View>
   ),
 }))
