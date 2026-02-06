@@ -2981,6 +2981,58 @@
                 "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
                 "pinChangedToast": "PIN ekyusiddwa obulungi"
             }
+        },
+        "ReplaceCard": {
+            "title": "Kyusa kaadi",
+            "steps": {
+                "reportIssue": "Loopa",
+                "delivery": "Okutwala",
+                "confirm": "Kakasa"
+            },
+            "ReportIssue": {
+                "title": "Kiki ekyabadde ku kaadi yo?",
+                "subtitle": "Londa ensonga y'okusaba kaadi ey'okuddamu",
+                "cardManagement": "Okuddukanya kaadi",
+                "lostCard": "Kaadi eyabulidde",
+                "lostCardDescription": "Sisobola kufuna kaadi yange",
+                "stolenCard": "Kaadi eyabbiddwa",
+                "stolenCardDescription": "Kaadi yange yatwaldwa awatali lukusa",
+                "damagedCard": "Kaadi eyonoonese",
+                "damagedCardDescription": "Kaadi yange yonoonese",
+                "whatHappensNext": "Kiki ekiddayo?",
+                "bullet1": "Kaadi yo ey'omu kaakati ejja kuzibwa olw'obukuumi",
+                "bullet2": "Kaadi empya n'ennamba ez'enjawulo ejja kufulumizibwa",
+                "bullet3": "Osobola okuggikoola bw'osanga kaadi yo oluvannyuma"
+            },
+            "Delivery": {
+                "title": "Londa embiro z'okutwala",
+                "subtitle": "Londa bw'omanyi oyagala okufuna kaadi yo empya",
+                "standardDelivery": "Okutwala okwa bulijjo",
+                "expressDelivery": "Okutwala okw'amangu",
+                "businessDays": "Ennaku {day1}-{day2} ez'omulimu",
+                "free": "BWEREERE",
+                "shippingAddress": "Endagiriro y'okutuma",
+                "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma"
+            },
+            "Confirm": {
+                "title": "Kebera okusaba kwo",
+                "subtitle": "Kakasa ebikwata ku kukyusa kaadi yo",
+                "requestSummary": "Akafunze k'okusaba",
+                "issueType": "Ensonga",
+                "delivery": "Okutwala",
+                "deliveryTime": "Obudde bw'okutuusa",
+                "shippingCost": "Bbeeyi y'okutwala",
+                "importantInformation": "Amawulire ag'omugaso",
+                "bullet1": "Kaadi yo ey'omu kaakati ejja kusigala nga ekola okutuusa empya lw'ejja",
+                "bullet2": "Kaadi yo empya ejja kuba n'ennamba ze zimu ng'eza kaadi ey'omu kaakati",
+                "bullet3": "Zikiriza kaadi yo eyonoonese kaadi empya bw'etuuka",
+                "submitRequest": "Weereza okusaba"
+            },
+            "Status": {
+                "title": "Kaadi yo empya eri mu kkubo!",
+                "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
+                "buttonLabel": "Dashiboodi"
+            }
         }
     }
 }

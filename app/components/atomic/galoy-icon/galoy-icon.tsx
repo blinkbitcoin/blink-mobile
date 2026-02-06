@@ -81,6 +81,8 @@ import GooglePay from "@app/assets/icons/google-pay.svg"
 import ApplePay from "@app/assets/icons/apple-pay.svg"
 import Approved from "@app/assets/icons-redesign/approved.svg"
 import Delivery from "@app/assets/icons-redesign/delivery.svg"
+import ErrorIcon from "@app/assets/icons/error.svg"
+import Shield from "@app/assets/icons/shield.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -164,6 +166,8 @@ export const icons = {
   "apple-pay": ApplePay,
   "approved": Approved,
   "delivery": Delivery,
+  "error": ErrorIcon,
+  "shield": Shield,
 } as const
 
 export type IconNamesType = keyof typeof icons

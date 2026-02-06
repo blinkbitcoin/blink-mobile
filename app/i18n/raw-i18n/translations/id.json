@@ -2981,6 +2981,58 @@
                 "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
                 "pinChangedToast": "PIN berhasil diubah"
             }
+        },
+        "ReplaceCard": {
+            "title": "Ganti kartu",
+            "steps": {
+                "reportIssue": "Laporkan",
+                "delivery": "Pengiriman",
+                "confirm": "Konfirmasi"
+            },
+            "ReportIssue": {
+                "title": "Apa yang terjadi dengan kartu Anda?",
+                "subtitle": "Pilih alasan untuk meminta kartu pengganti",
+                "cardManagement": "Manajemen kartu",
+                "lostCard": "Kartu hilang",
+                "lostCardDescription": "Saya tidak dapat menemukan kartu saya",
+                "stolenCard": "Kartu dicuri",
+                "stolenCardDescription": "Kartu saya diambil tanpa izin",
+                "damagedCard": "Kartu rusak",
+                "damagedCardDescription": "Kartu saya rusak secara fisik",
+                "whatHappensNext": "Apa yang terjadi selanjutnya?",
+                "bullet1": "Kartu Anda saat ini akan dibekukan demi keamanan",
+                "bullet2": "Kartu baru dengan nomor berbeda akan diterbitkan",
+                "bullet3": "Anda dapat membuka pembekuan jika menemukan kartu Anda nanti"
+            },
+            "Delivery": {
+                "title": "Pilih kecepatan pengiriman",
+                "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru",
+                "standardDelivery": "Pengiriman standar",
+                "expressDelivery": "Pengiriman ekspres",
+                "businessDays": "{day1}-{day2} hari kerja",
+                "free": "GRATIS",
+                "shippingAddress": "Alamat pengiriman",
+                "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman"
+            },
+            "Confirm": {
+                "title": "Tinjau permintaan Anda",
+                "subtitle": "Konfirmasi detail penggantian kartu Anda",
+                "requestSummary": "Ringkasan permintaan",
+                "issueType": "Alasan",
+                "delivery": "Pengiriman",
+                "deliveryTime": "Waktu pengiriman",
+                "shippingCost": "Biaya pengiriman",
+                "importantInformation": "Informasi penting",
+                "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
+                "bullet2": "Kartu baru Anda akan memiliki nomor yang sama dengan kartu saat ini",
+                "bullet3": "Musnahkan kartu rusak Anda ketika kartu baru tiba",
+                "submitRequest": "Kirim permintaan"
+            },
+            "Status": {
+                "title": "Kartu baru Anda sedang dalam perjalanan!",
+                "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
+                "buttonLabel": "Dasbor"
+            }
         }
     }
 }

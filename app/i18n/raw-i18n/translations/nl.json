@@ -2895,6 +2895,58 @@
                 "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
                 "pinChangedToast": "PIN is succesvol gewijzigd"
             }
+        },
+        "ReplaceCard": {
+            "title": "Kaart vervangen",
+            "steps": {
+                "reportIssue": "Melden",
+                "delivery": "Bezorging",
+                "confirm": "Bevestigen"
+            },
+            "ReportIssue": {
+                "title": "Wat is er met je kaart gebeurd?",
+                "subtitle": "Selecteer de reden voor het aanvragen van een vervangende kaart",
+                "cardManagement": "Kaartbeheer",
+                "lostCard": "Verloren kaart",
+                "lostCardDescription": "Ik kan mijn kaart niet vinden",
+                "stolenCard": "Gestolen kaart",
+                "stolenCardDescription": "Mijn kaart is zonder toestemming meegenomen",
+                "damagedCard": "Beschadigde kaart",
+                "damagedCardDescription": "Mijn kaart is fysiek beschadigd",
+                "whatHappensNext": "Wat gebeurt er nu?",
+                "bullet1": "Je huidige kaart wordt bevroren voor de veiligheid",
+                "bullet2": "Een nieuwe kaart met andere nummers wordt uitgegeven",
+                "bullet3": "Je kunt de kaart ontdooien als je hem later vindt"
+            },
+            "Delivery": {
+                "title": "Kies je bezorgsnelheid",
+                "subtitle": "Selecteer hoe snel je je nieuwe kaart wilt ontvangen",
+                "standardDelivery": "Standaardbezorging",
+                "expressDelivery": "Expresbezorging",
+                "businessDays": "{day1}-{day2} werkdagen",
+                "free": "GRATIS",
+                "shippingAddress": "Verzendadres",
+                "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres"
+            },
+            "Confirm": {
+                "title": "Controleer je aanvraag",
+                "subtitle": "Bevestig de details van je kaartvervanging",
+                "requestSummary": "Aanvraagoverzicht",
+                "issueType": "Reden",
+                "delivery": "Bezorging",
+                "deliveryTime": "Levertijd",
+                "shippingCost": "Bezorgkosten",
+                "importantInformation": "Belangrijke informatie",
+                "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
+                "bullet2": "Je nieuwe kaart heeft dezelfde nummers als je huidige kaart",
+                "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt",
+                "submitRequest": "Aanvraag indienen"
+            },
+            "Status": {
+                "title": "Je nieuwe kaart is onderweg!",
+                "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
+                "buttonLabel": "Dashboard"
+            }
         }
     }
 }

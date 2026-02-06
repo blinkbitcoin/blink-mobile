@@ -2895,6 +2895,58 @@
                 "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
                 "pinChangedToast": "PIN je uspješno promijenjen"
             }
+        },
+        "ReplaceCard": {
+            "title": "Zamijeni karticu",
+            "steps": {
+                "reportIssue": "Prijavi",
+                "delivery": "Dostava",
+                "confirm": "Potvrdi"
+            },
+            "ReportIssue": {
+                "title": "Što se dogodilo s vašom karticom?",
+                "subtitle": "Odaberite razlog za zahtjev zamjenske kartice",
+                "cardManagement": "Upravljanje karticom",
+                "lostCard": "Izgubljena kartica",
+                "lostCardDescription": "Ne mogu pronaći svoju karticu",
+                "stolenCard": "Ukradena kartica",
+                "stolenCardDescription": "Moja kartica je uzeta bez dopuštenja",
+                "damagedCard": "Oštećena kartica",
+                "damagedCardDescription": "Moja kartica je fizički oštećena",
+                "whatHappensNext": "Što slijedi?",
+                "bullet1": "Vaša trenutna kartica bit će zamrznuta radi sigurnosti",
+                "bullet2": "Izdat će se nova kartica s drugim brojevima",
+                "bullet3": "Možete je odmrznuti ako kasnije pronađete svoju karticu"
+            },
+            "Delivery": {
+                "title": "Odaberite brzinu dostave",
+                "subtitle": "Odaberite koliko brzo želite primiti novu karticu",
+                "standardDelivery": "Standardna dostava",
+                "expressDelivery": "Ekspresna dostava",
+                "businessDays": "{day1}-{day2} radnih dana",
+                "free": "BESPLATNO",
+                "shippingAddress": "Adresa za dostavu",
+                "useRegisteredAddress": "Koristi registriranu adresu kao adresu za dostavu"
+            },
+            "Confirm": {
+                "title": "Pregledajte svoj zahtjev",
+                "subtitle": "Potvrdite detalje zamjene kartice",
+                "requestSummary": "Sažetak zahtjeva",
+                "issueType": "Razlog",
+                "delivery": "Dostava",
+                "deliveryTime": "Vrijeme isporuke",
+                "shippingCost": "Trošak dostave",
+                "importantInformation": "Važne informacije",
+                "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
+                "bullet2": "Vaša nova kartica imat će iste brojeve kao trenutna",
+                "bullet3": "Uništite oštećenu karticu kada stigne nova",
+                "submitRequest": "Pošalji zahtjev"
+            },
+            "Status": {
+                "title": "Vaša nova kartica je na putu!",
+                "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
+                "buttonLabel": "Nadzorna ploča"
+            }
         }
     }
 }

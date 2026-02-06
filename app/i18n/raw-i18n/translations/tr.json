@@ -2981,6 +2981,58 @@
                 "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
                 "pinChangedToast": "PIN başarıyla değiştirildi"
             }
+        },
+        "ReplaceCard": {
+            "title": "Kartı değiştir",
+            "steps": {
+                "reportIssue": "Bildir",
+                "delivery": "Teslimat",
+                "confirm": "Onayla"
+            },
+            "ReportIssue": {
+                "title": "Kartınıza ne oldu?",
+                "subtitle": "Yedek kart talebi için nedeni seçin",
+                "cardManagement": "Kart yönetimi",
+                "lostCard": "Kayıp kart",
+                "lostCardDescription": "Kartımı bulamıyorum",
+                "stolenCard": "Çalınan kart",
+                "stolenCardDescription": "Kartım izinsiz alındı",
+                "damagedCard": "Hasarlı kart",
+                "damagedCardDescription": "Kartım fiziksel olarak hasar gördü",
+                "whatHappensNext": "Bundan sonra ne olacak?",
+                "bullet1": "Mevcut kartınız güvenlik için dondurulacak",
+                "bullet2": "Farklı numaralarla yeni bir kart düzenlenecek",
+                "bullet3": "Kartınızı daha sonra bulursanız dondurma işlemini kaldırabilirsiniz"
+            },
+            "Delivery": {
+                "title": "Teslimat hızınızı seçin",
+                "subtitle": "Yeni kartınızı ne kadar hızlı almak istediğinizi seçin",
+                "standardDelivery": "Standart teslimat",
+                "expressDelivery": "Ekspres teslimat",
+                "businessDays": "{day1}-{day2} iş günü",
+                "free": "ÜCRETSİZ",
+                "shippingAddress": "Teslimat adresi",
+                "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan"
+            },
+            "Confirm": {
+                "title": "Talebinizi gözden geçirin",
+                "subtitle": "Lütfen kart değişimi detaylarını onaylayın",
+                "requestSummary": "Talep özeti",
+                "issueType": "Neden",
+                "delivery": "Teslimat",
+                "deliveryTime": "Teslimat süresi",
+                "shippingCost": "Teslimat ücreti",
+                "importantInformation": "Önemli bilgiler",
+                "bullet1": "Mevcut kartınız yeni kart gelene kadar aktif kalacak",
+                "bullet2": "Yeni kartınız mevcut kartınızla aynı numaralara sahip olacak",
+                "bullet3": "Yeni kart geldiğinde hasarlı kartınızı imha edin",
+                "submitRequest": "Talebi gönder"
+            },
+            "Status": {
+                "title": "Yeni kartınız yolda!",
+                "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
+                "buttonLabel": "Gösterge Paneli"
+            }
         }
     }
 }

@@ -1115,6 +1115,58 @@
                 "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
                 "pinChangedToast": "I-PIN itshintshiwe ngempumelelo"
             }
+        },
+        "ReplaceCard": {
+            "title": "Tshintsha ikhadi",
+            "steps": {
+                "reportIssue": "Xela",
+                "delivery": "Ukuhanjiswa",
+                "confirm": "Qinisekisa"
+            },
+            "ReportIssue": {
+                "title": "Kwenzeke ntoni ngekhadi lakho?",
+                "subtitle": "Khetha isizathu sokucela ikhadi lokutshintshwa",
+                "cardManagement": "Ulawulo lwekhadi",
+                "lostCard": "Ikhadi elilahlekileyo",
+                "lostCardDescription": "Andikwazi ukufumana ikhadi lam",
+                "stolenCard": "Ikhadi elibiweyo",
+                "stolenCardDescription": "Ikhadi lam lathathwa ngaphandle kwemvume",
+                "damagedCard": "Ikhadi elonakeleyo",
+                "damagedCardDescription": "Ikhadi lam lonakele ngokwasemzimbeni",
+                "whatHappensNext": "Kuzokwenzeka ntoni ngokulandelayo?",
+                "bullet1": "Ikhadi lakho langoku liza kumiswa ngenxa yokhuseleko",
+                "bullet2": "Ikhadi elitsha elineminani eyahlukileyo liza kukhutshwa",
+                "bullet3": "Ungalicima ukumiswa ukuba ulifumana ikhadi lakho kamva"
+            },
+            "Delivery": {
+                "title": "Khetha isantya sokuhanjiswa",
+                "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani",
+                "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
+                "expressDelivery": "Ukuhanjiswa okukhawulezayo",
+                "businessDays": "Iintsuku {day1}-{day2} zomsebenzi",
+                "free": "SIMAHLA",
+                "shippingAddress": "Idilesi yokuthumela",
+                "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela"
+            },
+            "Confirm": {
+                "title": "Phonononga isicelo sakho",
+                "subtitle": "Nceda uqinisekise iinkcukacha zokutshintsha ikhadi lakho",
+                "requestSummary": "Isishwankathelo sesicelo",
+                "issueType": "Isizathu",
+                "delivery": "Ukuhanjiswa",
+                "deliveryTime": "Ixesha lokunikezela",
+                "shippingCost": "Iindleko zokuhanjiswa",
+                "importantInformation": "Ulwazi olubalulekileyo",
+                "bullet1": "Ikhadi lakho langoku liza kuhlala lisebenza de kufike elitsha",
+                "bullet2": "Ikhadi lakho elitsha liza kuba neminani efanayo nekhadi langoku",
+                "bullet3": "Tshabalalisa ikhadi lakho elonakeleyo xa elitsha lifika",
+                "submitRequest": "Ngenisa isicelo"
+            },
+            "Status": {
+                "title": "Ikhadi lakho elitsha lisendleleni!",
+                "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
+                "buttonLabel": "Ideshibhodi"
+            }
         }
     }
 }

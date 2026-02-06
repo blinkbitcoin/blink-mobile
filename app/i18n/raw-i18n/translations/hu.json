@@ -2981,6 +2981,58 @@
                 "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
                 "pinChangedToast": "A PIN-kód sikeresen módosítva"
             }
+        },
+        "ReplaceCard": {
+            "title": "Kártya cseréje",
+            "steps": {
+                "reportIssue": "Bejelentés",
+                "delivery": "Szállítás",
+                "confirm": "Megerősítés"
+            },
+            "ReportIssue": {
+                "title": "Mi történt a kártyájával?",
+                "subtitle": "Válassza ki a pótlókártya igénylésének okát",
+                "cardManagement": "Kártyakezelés",
+                "lostCard": "Elveszett kártya",
+                "lostCardDescription": "Nem találom a kártyámat",
+                "stolenCard": "Ellopott kártya",
+                "stolenCardDescription": "A kártyámat engedély nélkül elvették",
+                "damagedCard": "Sérült kártya",
+                "damagedCardDescription": "A kártyám fizikailag sérült",
+                "whatHappensNext": "Mi történik ezután?",
+                "bullet1": "Jelenlegi kártyáját biztonsági okokból befagyasztjuk",
+                "bullet2": "Új kártya kerül kiállításra eltérő számokkal",
+                "bullet3": "Feloldhatja a befagyasztást, ha később megtalálja kártyáját"
+            },
+            "Delivery": {
+                "title": "Válassza ki a szállítási sebességet",
+                "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát",
+                "standardDelivery": "Standard szállítás",
+                "expressDelivery": "Expressz szállítás",
+                "businessDays": "{day1}-{day2} munkanap",
+                "free": "INGYENES",
+                "shippingAddress": "Szállítási cím",
+                "useRegisteredAddress": "Regisztrált cím használata szállítási címként"
+            },
+            "Confirm": {
+                "title": "Ellenőrizze a kérelmét",
+                "subtitle": "Kérjük, erősítse meg a kártyacsere részleteit",
+                "requestSummary": "Kérelem összefoglalása",
+                "issueType": "Ok",
+                "delivery": "Szállítás",
+                "deliveryTime": "Szállítási idő",
+                "shippingCost": "Szállítási költség",
+                "importantInformation": "Fontos információk",
+                "bullet1": "Jelenlegi kártyája aktív marad, amíg az új meg nem érkezik",
+                "bullet2": "Az új kártyának ugyanazok lesznek a számai, mint a jelenleginek",
+                "bullet3": "Semmisítse meg a sérült kártyáját, amikor az új megérkezik",
+                "submitRequest": "Kérelem beküldése"
+            },
+            "Status": {
+                "title": "Az új kártyád úton van!",
+                "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
+                "buttonLabel": "Irányítópult"
+            }
         }
     }
 }

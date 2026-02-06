@@ -2785,6 +2785,58 @@
             "closeCardAccountDescription": "Permanently close your Visa card",
             "addToAppleWallet": "Ավելացնել Apple Wallet-ում"
         },
+        "ReplaceCard": {
+            "title": "Փոխարինել քարտը",
+            "steps": {
+                "reportIssue": "Հաղորդել խնդիրը",
+                "delivery": "Առաքում",
+                "confirm": "Հաստատում"
+            },
+            "ReportIssue": {
+                "title": "Ի՞նչ է պատահել ձեր քարտին",
+                "subtitle": "Ընտրեք փոխարինման քարտ պահանջելու պատճառը",
+                "cardManagement": "Քարտի կառավարում",
+                "lostCard": "Կորցրած քարտ",
+                "lostCardDescription": "Չեմ կարող գտնել իմ քարտը",
+                "stolenCard": "Գողացված քարտ",
+                "stolenCardDescription": "Իմ քարտը վերցվել է առանց թույլտվության",
+                "damagedCard": "Վնասված քարտ",
+                "damagedCardDescription": "Իմ քարտը ֆիզիկապես վնասված է",
+                "whatHappensNext": "Ի՞նչ է լինելու հաջորդը",
+                "bullet1": "Ձեր ընթացիկ քարտը անվտանգության համար կսառեցվի",
+                "bullet2": "Կտրամադրվի նոր քարտ տարբեր համարներով",
+                "bullet3": "Եթե հետո գտնեք ձեր քարտը, կարող եք հանել սառեցումը"
+            },
+            "Delivery": {
+                "title": "Ընտրեք առաքման արագությունը",
+                "subtitle": "Ընտրեք՝ որքան արագ եք ցանկանում ստանալ ձեր նոր քարտը",
+                "standardDelivery": "Ստանդարտ առաքում",
+                "expressDelivery": "Արագ առաքում",
+                "businessDays": "{day1}-{day2} աշխատանքային օր",
+                "free": "ԱՆՎՃԱՐ",
+                "shippingAddress": "Առաքման հասցե",
+                "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե"
+            },
+            "Confirm": {
+                "title": "Վերանայեք ձեր հարցումը",
+                "subtitle": "Խնդրում ենք հաստատել ձեր քարտի փոխարինման տվյալները",
+                "requestSummary": "Հարցման ամփոփում",
+                "issueType": "Խնդրի տեսակը",
+                "delivery": "Առաքում",
+                "deliveryTime": "Առաքման ժամկետը",
+                "shippingCost": "Առաքման արժեքը",
+                "importantInformation": "Կարևոր տեղեկություն",
+                "bullet1": "Ձեր ընթացիկ քարտը կմնա ակտիվ, մինչև նորի ստանալը",
+                "bullet2": "Ձեր նոր քարտը կունենա նույն համարները, ինչ ընթացիկ քարտը",
+                "bullet3": "Նոր քարտը ստանալուց հետո ոչնչացրեք վնասված քարտը",
+                "submitRequest": "Ուղարկել հարցումը"
+            },
+            "Status": {
+                "title": "Ձեր նոր քարտը ճանապարհին է!",
+                "subtitle": "Ձեր Blink քարտի առաքման պատվերը ներկայացվել է։",
+                "buttonLabel": "Վահանակ"
+            }
+        },
         "TransactionDetails": {
             "title": "Գdelays մdelays",
             "cardInformation": "Qarти tеghеkаtvутyun",
