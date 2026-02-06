@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { MOCK_USER, ShippingAddress } from "../card-mock-data"
 
 import { IssueType, DeliveryType } from "./steps/types"
 
@@ -18,6 +19,7 @@ type FlowState = {
   selectedIssue: IssueType | null
   selectedDelivery: DeliveryType | null
   useRegisteredAddress: boolean
+  customAddress: ShippingAddress
 }
 
 type UseReplaceCardFlowReturn = {
@@ -26,6 +28,7 @@ type UseReplaceCardFlowReturn = {
   setSelectedIssue: (issue: IssueType) => void
   setSelectedDelivery: (delivery: DeliveryType) => void
   toggleUseRegisteredAddress: () => void
+  setCustomAddress: (address: ShippingAddress) => void
   goToNextStep: () => void
   completeFlow: () => void
 }
@@ -40,6 +43,9 @@ export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
   const [selectedIssue, setSelectedIssue] = useState<IssueType | null>(null)
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType | null>(null)
   const [useRegisteredAddress, setUseRegisteredAddress] = useState(true)
+  const [customAddress, setCustomAddress] = useState<ShippingAddress>(
+    MOCK_USER.registeredAddress,
+  )
   const isCompleteRef = useRef(false)
 
   const goToNextStep = useCallback(() => {
@@ -76,10 +82,12 @@ export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
       selectedIssue,
       selectedDelivery,
       useRegisteredAddress,
+      customAddress,
     },
     setSelectedIssue,
     setSelectedDelivery,
     toggleUseRegisteredAddress,
+    setCustomAddress,
     goToNextStep,
     completeFlow,
   }
