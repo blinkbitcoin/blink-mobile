@@ -193,6 +193,28 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
 
 export const EMPTY_TRANSACTIONS: TransactionGroup[] = []
 
+export type ShippingAddress = {
+  fullName: string
+  addressLine1: string
+  addressLine2: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+}
+
+export const shippingAddressToLines = (
+  address: ShippingAddress,
+  includeFullName = true,
+): string[] =>
+  [
+    includeFullName ? address.fullName : null,
+    address.addressLine1,
+    address.addressLine2 || null,
+    `${address.city}, ${address.state} ${address.postalCode}`,
+    address.country,
+  ].filter((line): line is string => line !== null)
+
 export type UserInfo = {
   firstName: string
   lastName: string
@@ -200,8 +222,8 @@ export type UserInfo = {
   dateOfBirth: string
   email: string
   phone: string
-  registeredAddress: string[]
-  shippingAddress: string[]
+  registeredAddress: ShippingAddress
+  shippingAddress: ShippingAddress
 }
 
 export const MOCK_USER: UserInfo = {
@@ -211,30 +233,24 @@ export const MOCK_USER: UserInfo = {
   dateOfBirth: "1971-01-03",
   email: "email@gmail.com",
   phone: "+1 (555) 123-4567",
-  registeredAddress: [
-    "Satoshi Nakamoto",
-    "123 Main Street",
-    "Apt 4B",
-    "New York, NY 10001",
-    "United States",
-  ],
-  shippingAddress: [
-    "Satoshi Nakamoto",
-    "13 Hash Street",
-    "Apt 21C",
-    "Austin, TX 10001",
-    "United States",
-  ],
-}
-
-export type ShippingAddress = {
-  fullName: string
-  addressLine1: string
-  addressLine2: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
+  registeredAddress: {
+    fullName: "Satoshi Nakamoto",
+    addressLine1: "123 Main Street",
+    addressLine2: "Apt 4B",
+    city: "New York",
+    state: "NY",
+    postalCode: "10001",
+    country: "United States",
+  },
+  shippingAddress: {
+    fullName: "Satoshi Nakamoto",
+    addressLine1: "13 Hash Street",
+    addressLine2: "Apt 21C",
+    city: "Austin",
+    state: "TX",
+    postalCode: "10001",
+    country: "United States",
+  },
 }
 
 export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
