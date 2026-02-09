@@ -1,0 +1,3 @@
+com.facebook.react:react-android
+com.facebook.react:hermes-android
+com.facebook.react:react-native

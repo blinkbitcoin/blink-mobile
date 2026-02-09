@@ -147,6 +147,18 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force AndroidX versions instead of old support library
+        force 'androidx.core:core:1.13.1'
+        force 'androidx.appcompat:appcompat:1.7.0'
+    }
+    // Exclude old Android support library to prevent conflicts with AndroidX
+    exclude group: 'com.android.support', module: 'support-compat'
+    exclude group: 'com.android.support', module: 'appcompat-v7'
+    exclude group: 'com.android.support', module: 'support-v4'
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -163,7 +175,7 @@ dependencies {
     }
 
     androidTestImplementation('com.wix:detox:+')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
 }
 
 

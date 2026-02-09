@@ -8,14 +8,11 @@ import Animated, {
 } from "react-native-reanimated"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { useI18nContext } from "@app/i18n/i18n-react"
-
 const TRACK_WIDTH = 51
 const TRACK_HEIGHT = 31
 const THUMB_SIZE = 27
 const THUMB_OFFSET = 2
 const ANIMATION_DURATION = 150
-const HIT_SLOP = 0
 
 type SwitchProps = {
   value: boolean
@@ -23,7 +20,6 @@ type SwitchProps = {
   disabled?: boolean
   style?: ViewStyle
   testID?: string
-  accessibilityLabel?: string
 }
 
 export const Switch: React.FC<SwitchProps> = ({
@@ -32,29 +28,20 @@ export const Switch: React.FC<SwitchProps> = ({
   disabled = false,
   style,
   testID,
-  accessibilityLabel,
 }) => {
   const {
     theme: { colors },
   } = useTheme()
-  const { LL } = useI18nContext()
   const styles = useStyles()
 
   const progress = useSharedValue(value ? 1 : 0)
-  const skipNextAnimationRef = React.useRef(false)
 
   React.useEffect(() => {
-    if (skipNextAnimationRef.current) {
-      skipNextAnimationRef.current = false
-      return
-    }
     progress.value = withTiming(value ? 1 : 0, { duration: ANIMATION_DURATION })
   }, [value, progress])
 
   const handlePress = () => {
     if (!disabled) {
-      skipNextAnimationRef.current = true
-      progress.value = withTiming(value ? 0 : 1, { duration: ANIMATION_DURATION })
       onValueChange(!value)
     }
   }
@@ -78,16 +65,7 @@ export const Switch: React.FC<SwitchProps> = ({
   })
 
   return (
-    <Pressable
-      accessibilityRole="switch"
-      accessibilityLabel={accessibilityLabel ?? LL.common.switch()}
-      accessibilityState={{ checked: value, disabled }}
-      onPressIn={handlePress}
-      hitSlop={HIT_SLOP}
-      disabled={disabled}
-      style={style}
-      testID={testID}
-    >
+    <Pressable onPress={handlePress} disabled={disabled} style={style} testID={testID}>
       <Animated.View
         style={[styles.track, animatedTrackStyle, disabled && styles.trackDisabled]}
       >

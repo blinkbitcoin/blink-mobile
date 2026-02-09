@@ -4,7 +4,6 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { Switch } from "@app/components/atomic/switch"
-import TypesafeI18n from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 
 jest.mock("react-native-reanimated", () => ({
@@ -19,11 +18,7 @@ jest.mock("react-native-reanimated", () => ({
 }))
 
 const renderWithTheme = (component: React.ReactElement) => {
-  return render(
-    <ThemeProvider theme={theme}>
-      <TypesafeI18n locale="en">{component}</TypesafeI18n>
-    </ThemeProvider>,
-  )
+  return render(<ThemeProvider theme={theme}>{component}</ThemeProvider>)
 }
 
 describe("Switch", () => {
@@ -74,7 +69,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
       expect(mockOnValueChange).toHaveBeenCalledTimes(1)
@@ -86,7 +81,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
       expect(mockOnValueChange).toHaveBeenCalledTimes(1)
@@ -103,7 +98,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).not.toHaveBeenCalled()
     })
@@ -115,18 +110,16 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
 
       rerender(
         <ThemeProvider theme={theme}>
-          <TypesafeI18n locale="en">
-            <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
-          </TypesafeI18n>
+          <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
         </ThemeProvider>,
       )
 
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
 
       expect(mockOnValueChange).toHaveBeenCalledTimes(2)
@@ -145,7 +138,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).not.toHaveBeenCalled()
     })
@@ -161,7 +154,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).toHaveBeenCalledWith(false)
     })
@@ -172,7 +165,7 @@ describe("Switch", () => {
       )
 
       const pressable = getByTestId("switch")
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
 
       expect(mockOnValueChange).toHaveBeenCalledWith(true)
     })
@@ -186,27 +179,23 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(mockOnValueChange).toHaveBeenLastCalledWith(true)
 
       rerender(
         <ThemeProvider theme={theme}>
-          <TypesafeI18n locale="en">
-            <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
-          </TypesafeI18n>
+          <Switch value={true} onValueChange={mockOnValueChange} testID="switch" />
         </ThemeProvider>,
       )
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(mockOnValueChange).toHaveBeenLastCalledWith(false)
 
       rerender(
         <ThemeProvider theme={theme}>
-          <TypesafeI18n locale="en">
-            <Switch value={false} onValueChange={mockOnValueChange} testID="switch" />
-          </TypesafeI18n>
+          <Switch value={false} onValueChange={mockOnValueChange} testID="switch" />
         </ThemeProvider>,
       )
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(mockOnValueChange).toHaveBeenLastCalledWith(true)
     })
 
@@ -220,19 +209,17 @@ describe("Switch", () => {
 
       const pressable = getByTestId("switch")
 
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(firstCallback).toHaveBeenCalledWith(true)
       expect(secondCallback).not.toHaveBeenCalled()
 
       rerender(
         <ThemeProvider theme={theme}>
-          <TypesafeI18n locale="en">
-            <Switch value={false} onValueChange={secondCallback} testID="switch" />
-          </TypesafeI18n>
+          <Switch value={false} onValueChange={secondCallback} testID="switch" />
         </ThemeProvider>,
       )
 
-      fireEvent(pressable, "pressIn")
+      fireEvent.press(pressable)
       expect(secondCallback).toHaveBeenCalledWith(true)
       expect(firstCallback).toHaveBeenCalledTimes(1)
     })
