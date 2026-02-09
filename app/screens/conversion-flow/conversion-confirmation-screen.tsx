@@ -251,7 +251,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
       <ScrollView style={styles.scrollViewContainer}>
         <View style={styles.conversionRate}>
           <Text type="p2" style={styles.conversionRateText}>
-            1 Bitcoin = {btcToUsdRate}
+            1 BTC = {btcToUsdRate}
           </Text>
         </View>
         <View style={styles.conversionInfoCard}>

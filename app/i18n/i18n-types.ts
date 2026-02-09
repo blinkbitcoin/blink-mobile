@@ -1250,7 +1250,7 @@ type RootTranslation = {
 					HighlyDivisible: {
 						answers: {
 							/**
-							 * 0​.​0​0​0​0​0​0​0​1​ ​B​i​t​c​o​i​n
+							 * 0​.​0​0​0​0​0​0​0​1​ ​B​T​C
 							 */
 							'0': string
 							/**
@@ -1258,7 +1258,7 @@ type RootTranslation = {
 							 */
 							'1': string
 							/**
-							 * 0​.​0​1​ ​B​i​t​c​o​i​n
+							 * 0​.​0​1​ ​B​T​C
 							 */
 							'2': string
 						}
@@ -10822,7 +10822,7 @@ export type TranslationFunctions = {
 					HighlyDivisible: {
 						answers: {
 							/**
-							 * 0.00000001 Bitcoin
+							 * 0.00000001 BTC
 							 */
 							'0': () => LocalizedString
 							/**
@@ -10830,7 +10830,7 @@ export type TranslationFunctions = {
 							 */
 							'1': () => LocalizedString
 							/**
-							 * 0.01 Bitcoin
+							 * 0.01 BTC
 							 */
 							'2': () => LocalizedString
 						}

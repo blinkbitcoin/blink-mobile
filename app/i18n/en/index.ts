@@ -390,9 +390,9 @@ const en: BaseTranslation = {
           },
           HighlyDivisible: {
             answers: [
-              "0.00000001 Bitcoin",
+              "0.00000001 BTC",
               "One whole bitcoin. It is not possible to use anything less.",
-              "0.01 Bitcoin",
+              "0.01 BTC",
             ],
             feedback: [
               "Yes. You can divide a bitcoin into 100,000,000 pieces. As you already know, the smallest unit of bitcoin — B0.00000001 — is known as a “sat”.",
