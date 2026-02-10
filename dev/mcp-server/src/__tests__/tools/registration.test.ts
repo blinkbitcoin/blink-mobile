@@ -58,9 +58,10 @@ describe("registerTools", () => {
     ]
 
     for (const tool of expectedTools) {
-      expect(registeredTools.has(tool), `Tool '${tool}' should be registered`).toBe(
-        true,
-      )
+      expect(
+        registeredTools.has(tool),
+        `Tool '${tool}' should be registered`,
+      ).toBe(true)
     }
   })
 
@@ -80,10 +81,9 @@ describe("registerTools", () => {
   it("each tool has a handler function", () => {
     registerTools(server, client)
     for (const [name, { handler }] of registeredTools) {
-      expect(
-        typeof handler,
-        `Tool '${name}' handler should be a function`,
-      ).toBe("function")
+      expect(typeof handler, `Tool '${name}' handler should be a function`).toBe(
+        "function",
+      )
     }
   })
 })
