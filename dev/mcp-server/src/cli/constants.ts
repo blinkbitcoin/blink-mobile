@@ -4,4 +4,4 @@ export const TIMEOUTS = {
   medium: 5000,
   long: 10000,
   captcha: 120000,
-};
+}

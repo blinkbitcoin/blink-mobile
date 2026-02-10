@@ -1,7 +1,7 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { AppiumClient } from "../appium/client.js";
-import { buildSelector } from "../utils/selectors.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
+import { AppiumClient } from "../appium/client.js"
+import { buildSelector } from "../utils/selectors.js"
 
 export function registerTapTool(server: McpServer, client: AppiumClient) {
   server.tool(
@@ -14,17 +14,17 @@ export function registerTapTool(server: McpServer, client: AppiumClient) {
     // @ts-expect-error - MCP SDK has complex recursive types for Zod schema inference
     async ({ id, waitMs = 500 }: { id: string; waitMs?: number }) => {
       try {
-        const browser = await client.getSession();
-        const selector = buildSelector(id);
-        const element = await browser.$(selector);
+        const browser = await client.getSession()
+        const selector = buildSelector(id)
+        const element = await browser.$(selector)
 
-        await element.waitForDisplayed({ timeout: 30000 });
-        await element.click();
-        await browser.pause(waitMs);
+        await element.waitForDisplayed({ timeout: 30000 })
+        await element.click()
+        await browser.pause(waitMs)
 
         return {
           content: [{ type: "text" as const, text: `Tapped: ${id}` }],
-        };
+        }
       } catch (error) {
         return {
           content: [
@@ -34,8 +34,8 @@ export function registerTapTool(server: McpServer, client: AppiumClient) {
             },
           ],
           isError: true,
-        };
+        }
       }
     },
-  );
+  )
 }

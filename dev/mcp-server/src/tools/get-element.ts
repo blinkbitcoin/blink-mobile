@@ -1,10 +1,10 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { AppiumClient } from "../appium/client.js";
-import { buildSelector } from "../utils/selectors.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
+import { AppiumClient } from "../appium/client.js"
+import { buildSelector } from "../utils/selectors.js"
 
 export function registerGetElementTool(server: McpServer, client: AppiumClient) {
-  (server as any).tool(
+  ;(server as any).tool(
     "getElement",
     "Get detailed info about one specific element by testID",
     {
@@ -12,11 +12,11 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
     } as never,
     async ({ id }: { id: string }) => {
       try {
-        const browser = await client.getSession();
-        const selector = buildSelector(id);
-        const element = await browser.$(selector);
+        const browser = await client.getSession()
+        const selector = buildSelector(id)
+        const element = await browser.$(selector)
 
-        const exists = await element.isExisting();
+        const exists = await element.isExisting()
         if (!exists) {
           return {
             content: [
@@ -25,7 +25,7 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
                 text: JSON.stringify({ id, exists: false }, null, 2),
               },
             ],
-          };
+          }
         }
 
         const [displayed, enabled, location, size, text] = await Promise.all([
@@ -34,7 +34,7 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
           element.getLocation().catch(() => ({ x: 0, y: 0 })),
           element.getSize().catch(() => ({ width: 0, height: 0 })),
           element.getText().catch(() => ""),
-        ]);
+        ])
 
         const result = {
           id,
@@ -44,7 +44,7 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
           text: text || undefined,
           location,
           size,
-        };
+        }
 
         return {
           content: [
@@ -53,7 +53,7 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
               text: JSON.stringify(result, null, 2),
             },
           ],
-        };
+        }
       } catch (error) {
         return {
           content: [
@@ -63,8 +63,8 @@ export function registerGetElementTool(server: McpServer, client: AppiumClient) 
             },
           ],
           isError: true,
-        };
+        }
       }
     },
-  );
+  )
 }

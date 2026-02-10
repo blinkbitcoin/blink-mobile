@@ -1,29 +1,32 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { AppiumClient } from "../appium/client.js";
-import { parsePageSource, collectTestIds, type FilterType } from "../utils/xml-parser.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
+import { AppiumClient } from "../appium/client.js"
+import { parsePageSource, collectTestIds, type FilterType } from "../utils/xml-parser.js"
 
 export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
-  (server as any).tool(
+  ;(server as any).tool(
     "getScreen",
     "Get structured representation of all visible elements as JSON. Primary tool for understanding app state.",
     {
       maxDepth: z.number().optional().describe("Max nesting depth (default: 10)"),
-      filter: z.enum(["all", "interactive", "text"]).optional().describe("Filter: all, interactive, or text"),
+      filter: z
+        .enum(["all", "interactive", "text"])
+        .optional()
+        .describe("Filter: all, interactive, or text"),
     } as never,
     async ({ maxDepth = 10, filter = "all" }: { maxDepth?: number; filter?: string }) => {
       try {
-        const xml = await client.getPageSource();
+        const xml = await client.getPageSource()
         const tree = parsePageSource(xml, {
           maxDepth,
           filter: filter as FilterType,
-        });
+        })
 
-        const testIds = collectTestIds(tree);
+        const testIds = collectTestIds(tree)
         const result = {
           testIds,
           tree,
-        };
+        }
 
         return {
           content: [
@@ -32,7 +35,7 @@ export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
               text: JSON.stringify(result, null, 2),
             },
           ],
-        };
+        }
       } catch (error) {
         return {
           content: [
@@ -42,8 +45,8 @@ export function registerGetScreenTool(server: McpServer, client: AppiumClient) {
             },
           ],
           isError: true,
-        };
+        }
       }
     },
-  );
+  )
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types, max-params */
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { AppiumClient } from "../../appium/client.js"
@@ -11,8 +12,10 @@ vi.mock("webdriverio", () => ({
 describe("registerTools", () => {
   let server: McpServer
   let client: AppiumClient
-  const registeredTools: Map<string, { description: string; handler: Function }> =
-    new Map()
+  const registeredTools: Map<
+    string,
+    { description: string; handler: (...args: unknown[]) => unknown }
+  > = new Map()
 
   beforeEach(() => {
     registeredTools.clear()
@@ -21,11 +24,15 @@ describe("registerTools", () => {
     server = new McpServer({ name: "test", version: "1.0.0" })
 
     // Spy on tool registration
-    const originalTool = server.tool.bind(server)
     vi.spyOn(server as any, "tool").mockImplementation(
-      (name: string, description: string, schema: any, handler?: Function) => {
+      (
+        name: string,
+        description: string,
+        _schema: unknown,
+        handler?: (...args: unknown[]) => unknown,
+      ) => {
         // Handle both 3-arg and 4-arg signatures
-        const actualHandler = handler || schema
+        const actualHandler = handler || (_schema as (...args: unknown[]) => unknown)
         registeredTools.set(name, { description, handler: actualHandler })
       },
     )
@@ -51,7 +58,9 @@ describe("registerTools", () => {
     ]
 
     for (const tool of expectedTools) {
-      expect(registeredTools.has(tool), `Tool '${tool}' should be registered`).toBe(true)
+      expect(registeredTools.has(tool), `Tool '${tool}' should be registered`).toBe(
+        true,
+      )
     }
   })
 
@@ -71,9 +80,10 @@ describe("registerTools", () => {
   it("each tool has a handler function", () => {
     registerTools(server, client)
     for (const [name, { handler }] of registeredTools) {
-      expect(typeof handler, `Tool '${name}' handler should be a function`).toBe(
-        "function",
-      )
+      expect(
+        typeof handler,
+        `Tool '${name}' handler should be a function`,
+      ).toBe("function")
     }
   })
 })

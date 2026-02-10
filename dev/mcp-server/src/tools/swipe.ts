@@ -1,51 +1,62 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { AppiumClient } from "../appium/client.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
+import { AppiumClient } from "../appium/client.js"
 
 export function registerSwipeTool(server: McpServer, client: AppiumClient) {
-  (server as any).tool(
+  ;(server as any).tool(
     "swipe",
     "Perform swipe gestures to scroll or navigate. Note: 'up' scrolls content down (finger moves up).",
     {
       direction: z.enum(["up", "down", "left", "right"]).describe("Swipe direction"),
       duration: z.number().optional().describe("Swipe duration in ms (default: 500)"),
-      distance: z.number().optional().describe("Distance as fraction 0-1 (default: 0.75)"),
+      distance: z
+        .number()
+        .optional()
+        .describe("Distance as fraction 0-1 (default: 0.75)"),
     } as never,
-    async ({ direction, duration = 500, distance = 0.75 }: { direction: string; duration?: number; distance?: number }) => {
+    async ({
+      direction,
+      duration = 500,
+      distance = 0.75,
+    }: {
+      direction: string
+      duration?: number
+      distance?: number
+    }) => {
       try {
-        const browser = await client.getSession();
+        const browser = await client.getSession()
 
         // Get screen dimensions
-        const { width, height } = await browser.getWindowSize();
+        const { width, height } = await browser.getWindowSize()
 
         // Calculate start and end points
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const offsetX = (width * distance) / 2;
-        const offsetY = (height * distance) / 2;
+        const centerX = width / 2
+        const centerY = height / 2
+        const offsetX = (width * distance) / 2
+        const offsetY = (height * distance) / 2
 
-        let startX = centerX;
-        let startY = centerY;
-        let endX = centerX;
-        let endY = centerY;
+        let startX = centerX
+        let startY = centerY
+        let endX = centerX
+        let endY = centerY
 
         switch (direction) {
           case "up": // Scroll content down (finger moves up)
-            startY = centerY + offsetY;
-            endY = centerY - offsetY;
-            break;
+            startY = centerY + offsetY
+            endY = centerY - offsetY
+            break
           case "down": // Scroll content up (finger moves down)
-            startY = centerY - offsetY;
-            endY = centerY + offsetY;
-            break;
+            startY = centerY - offsetY
+            endY = centerY + offsetY
+            break
           case "left": // Swipe left
-            startX = centerX + offsetX;
-            endX = centerX - offsetX;
-            break;
+            startX = centerX + offsetX
+            endX = centerX - offsetX
+            break
           case "right": // Swipe right
-            startX = centerX - offsetX;
-            endX = centerX + offsetX;
-            break;
+            startX = centerX - offsetX
+            endX = centerX + offsetX
+            break
         }
 
         await browser
@@ -57,11 +68,11 @@ export function registerSwipeTool(server: McpServer, client: AppiumClient) {
           .pause(duration)
           .move({ x: Math.round(endX), y: Math.round(endY) })
           .up()
-          .perform();
+          .perform()
 
         return {
           content: [{ type: "text", text: `Swiped ${direction}` }],
-        };
+        }
       } catch (error) {
         return {
           content: [
@@ -71,8 +82,8 @@ export function registerSwipeTool(server: McpServer, client: AppiumClient) {
             },
           ],
           isError: true,
-        };
+        }
       }
     },
-  );
+  )
 }

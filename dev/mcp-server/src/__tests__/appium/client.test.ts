@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { AppiumClient } from "../../appium/client.js"
 
@@ -113,7 +114,7 @@ describe("AppiumClient", () => {
       logLevel: "silent",
     })
     expect(call.capabilities).toMatchObject({
-      "platformName": "Android",
+      platformName: "Android",
       "appium:automationName": "UiAutomator2",
       "appium:appPackage": "com.galoyapp",
       "appium:noReset": true,

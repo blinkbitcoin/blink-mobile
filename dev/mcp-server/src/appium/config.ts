@@ -1,9 +1,9 @@
 export interface AppiumConfig {
-  host: string;
-  port: number;
-  deviceName: string;
-  appPath: string;
-  appPackage: string;
+  host: string
+  port: number
+  deviceName: string
+  appPath: string
+  appPackage: string
 }
 
 export function getConfig(): AppiumConfig {
@@ -15,5 +15,5 @@ export function getConfig(): AppiumConfig {
       process.env.TEST_APK_PATH ||
       "./android/app/build/outputs/apk/debug/app-universal-debug.apk",
     appPackage: "com.galoyapp",
-  };
+  }
 }

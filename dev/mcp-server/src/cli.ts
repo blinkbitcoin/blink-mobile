@@ -4,16 +4,13 @@
  * Usage: ./dev/app <command> [args]
  */
 
-import { program } from "commander";
-import { registerBasicCommands } from "./cli/basic.js";
-import { registerUxCommands } from "./cli/ux.js";
+import { program } from "commander"
+import { registerBasicCommands } from "./cli/basic.js"
+import { registerUxCommands } from "./cli/ux.js"
 
-program
-  .name("app")
-  .description("CLI for app interactions")
-  .version("1.0.0");
+program.name("app").description("CLI for app interactions").version("1.0.0")
 
-registerBasicCommands(program);
-registerUxCommands(program);
+registerBasicCommands(program)
+registerUxCommands(program)
 
-program.parse();
+program.parse()
