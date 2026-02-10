@@ -13,6 +13,7 @@ module.exports = {
     "^.+\\.svg$": "jest-transform-stub",
   },
   testRegex: "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
+  testPathIgnorePatterns: ["/node_modules/", "/dev/mcp-server/"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   rootDir: ".",
   moduleNameMapper: {
