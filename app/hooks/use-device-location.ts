@@ -6,16 +6,19 @@ import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
 import { useCountryCodeQuery } from "@app/graphql/generated"
 
+const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
+
 const useDeviceLocation = () => {
   const client = useApolloClient()
   const { data, error } = useCountryCodeQuery()
 
   const [loading, setLoading] = useState(true)
-  const [countryCode, setCountryCode] = useState<CountryCode>("SV")
+  const [countryCode, setCountryCode] = useState<CountryCode | undefined>(undefined)
 
   // if error this will resort to the default "SV" countryCode
   useEffect(() => {
     if (error) {
+      setCountryCode(DEFAULT_COUNTRY_CODE)
       setLoading(false)
     }
   }, [error])
@@ -33,10 +36,11 @@ const useDeviceLocation = () => {
             updateCountryCode(client, _countryCode)
           } else {
             console.warn("no data. default of SV will be used")
+            setCountryCode((data.countryCode as CountryCode) || DEFAULT_COUNTRY_CODE)
           }
           // can throw a 429 for device's rate-limiting. resort to cached value if available
         } catch (err) {
-          setCountryCode(data.countryCode as CountryCode)
+          setCountryCode((data.countryCode as CountryCode) || DEFAULT_COUNTRY_CODE)
         }
         setLoading(false)
       }
