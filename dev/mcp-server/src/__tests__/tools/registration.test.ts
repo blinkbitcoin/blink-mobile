@@ -65,14 +65,7 @@ describe("registerTools", () => {
   it("does NOT register tools covered by appium-mcp", () => {
     registerTools(server, client)
 
-    const removedTools = [
-      "tap",
-      "type",
-      "swipe",
-      "screenshot",
-      "getElement",
-      "launchApp",
-    ]
+    const removedTools = ["tap", "type", "swipe", "screenshot", "getElement", "launchApp"]
 
     for (const tool of removedTools) {
       expect(registeredTools.has(tool), `Tool '${tool}' should NOT be registered`).toBe(
