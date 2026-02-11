@@ -54,6 +54,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
                 ack({ variables: { input: { notificationId: bulletin.id } } })
               }
               loading={ackLoading}
+              buttonLabel={bulletin.bulletinButton?.label}
             />
           ),
         )}

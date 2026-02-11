@@ -132,6 +132,9 @@ gql`
                 url
               }
             }
+            bulletinButton {
+              label
+            }
           }
           cursor
         }
