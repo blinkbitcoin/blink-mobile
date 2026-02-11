@@ -58,10 +58,8 @@ describe("registerTools", () => {
     ]
 
     for (const tool of expectedTools) {
-      expect(
-        registeredTools.has(tool),
-        `Tool '${tool}' should be registered`,
-      ).toBe(true)
+      // prettier-ignore
+      expect(registeredTools.has(tool), `Tool '${tool}' should be registered`).toBe(true)
     }
   })
 
