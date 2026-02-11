@@ -45,6 +45,9 @@ gql`
               url
             }
           }
+          bulletinButton {
+            label
+          }
         }
         pageInfo {
           endCursor
