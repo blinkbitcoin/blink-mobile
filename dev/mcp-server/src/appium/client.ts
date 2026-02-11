@@ -3,26 +3,38 @@ import { getConfig } from "./config.js"
 
 type WdioBrowser = Awaited<ReturnType<typeof remote>>
 
+/**
+ * Minimal Appium client for Blink-specific tools.
+ *
+ * Generic Appium operations (tap, type, swipe, screenshot, find element,
+ * launch app) are handled by the official `appium/appium-mcp` server.
+ *
+ * This client only exposes what the kept blink-dev tools need:
+ * - getPageSource() — used by getScreen, reloadApp
+ * - getSession() — used by waitFor (element waits), reloadApp (shell commands)
+ * - disconnect() — cleanup
+ */
 export class AppiumClient {
   private browser: WdioBrowser | null = null
   private connecting: Promise<WdioBrowser> | null = null
 
-  // Get or create session - always returns a valid browser
+  /** Get or create session — always returns a valid browser */
   async getSession(): Promise<WdioBrowser> {
     if (this.browser?.sessionId) return this.browser
     if (this.connecting) return this.connecting
 
     this.connecting = this.connect()
-    this.browser = await this.connecting
-    this.connecting = null
-    return this.browser
+    try {
+      this.browser = await this.connecting
+      return this.browser
+    } finally {
+      this.connecting = null
+    }
   }
 
-  // Create new Appium session
+  /** Create new Appium session */
   private async connect(): Promise<WdioBrowser> {
     const config = getConfig()
-    // Appium capabilities use vendor-prefixed keys not in WebDriverIO base types
-    // Use appPackage instead of app to avoid reinstalling the 226MB APK every time
     const capabilities = {
       "platformName": "Android",
       "appium:deviceName": config.deviceName,
@@ -42,7 +54,7 @@ export class AppiumClient {
     })
   }
 
-  // Trigger hot reload via Metro dev menu
+  /** Trigger hot reload via Metro dev menu */
   async reloadApp(fullReload: boolean = false): Promise<void> {
     const browser = await this.getSession()
     const config = getConfig()
@@ -65,19 +77,13 @@ export class AppiumClient {
     }
   }
 
-  // Get page source as XML
+  /** Get page source as XML */
   async getPageSource(): Promise<string> {
     const browser = await this.getSession()
     return browser.getPageSource()
   }
 
-  // Take screenshot
-  async takeScreenshot(): Promise<string> {
-    const browser = await this.getSession()
-    return browser.takeScreenshot()
-  }
-
-  // Disconnect session
+  /** Disconnect session */
   async disconnect(): Promise<void> {
     if (this.browser) {
       await this.browser.deleteSession()

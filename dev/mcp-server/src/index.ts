@@ -5,21 +5,23 @@ import { registerTools } from "./tools/index.js"
 
 async function main() {
   const server = new McpServer({
-    name: "blink-appium",
+    name: "blink-dev",
     version: "1.0.0",
   })
 
-  // Single shared Appium client
+  // Single shared Appium client for Blink-specific tools
   const appiumClient = new AppiumClient()
 
-  // Register all tools
+  // Register Blink-specific tools
+  // Generic Appium operations (tap, type, swipe, screenshot, etc.)
+  // are handled by the official appium-mcp server
   registerTools(server, appiumClient)
 
   // Use stdio transport for Claude Code/Desktop
   const transport = new StdioServerTransport()
   await server.connect(transport)
 
-  console.error("Blink Appium MCP server running")
+  console.error("blink-dev MCP server running (Blink-specific tools)")
 }
 
 main().catch(console.error)

@@ -2,6 +2,53 @@
 
 Guide for AI agents interacting with the Blink mobile app via MCP tools.
 
+## Architecture: Dual MCP Server Setup
+
+This project uses **two MCP servers** that work together:
+
+### `appium-mcp` — Official Appium MCP Server
+Handles all **generic Appium operations**:
+- `appium_click` — Tap elements
+- `appium_set_value` — Enter text into fields
+- `appium_swipe` — Scroll and swipe gestures
+- `appium_screenshot` — Capture screen images
+- `appium_find_element` — Find elements by selector
+- `appium_activate_app` — Launch/switch apps
+
+### `blink-dev` — Blink-Specific Tools
+Handles **Blink app-specific operations** not covered by the official server:
+- `getScreen` — Parsed JSON page source with testIDs (much more useful than raw XML)
+- `waitFor` — Wait for element to reach a desired state
+- `reloadApp` — Trigger Metro hot reload after code changes
+- `checkInfrastructure` — Verify dev environment health (emulator, Metro, Appium, app)
+- `startServices` — Start emulator + Metro + Appium + app orchestration
+
+```
+┌─────────────────┐
+│  Claude Code    │
+│  (MCP Client)   │
+└───┬─────────┬───┘
+    │         │
+    │ stdio   │ stdio
+    │         │
+┌───▼───┐ ┌──▼──────────┐
+│appium │ │  blink-dev   │
+│ -mcp  │ │  (TS server) │
+└───┬───┘ └──┬───────────┘
+    │        │
+    └───┬────┘
+        │ WebDriver
+┌───────▼─────────┐
+│     Appium      │
+│   (port 4723)   │
+└───────┬─────────┘
+        │ UiAutomator2
+┌───────▼─────────┐
+│    Emulator     │
+│  (Blink App)    │
+└─────────────────┘
+```
+
 ## Prerequisites
 
 **Nix Environment Required**: All commands must be run inside the Nix development shell.
@@ -22,7 +69,7 @@ The Nix flake provides: Android SDK, emulator, adb, Node.js, and all required de
 1. Enter nix shell:       nix develop
 2. Start infrastructure:  ./dev/mcp/orchestrator.sh
 3. Wait for ready:        .mcp/ready file appears (check timing in output)
-4. Use MCP tools:         checkInfrastructure, getScreen, tap, etc.
+4. Use MCP tools:         checkInfrastructure, getScreen, appium_click, etc.
    Or CLI:                ./dev/app tap "Login"
 5. Stop when done:        ./dev/mcp-stop.sh
 ```
@@ -71,7 +118,7 @@ If `ready: false`, run `startServices()` or `./dev/mcp/orchestrator.sh`.
 ./dev/mcp-stop.sh
 ```
 
-## Core MCP Tools
+## Blink-Specific MCP Tools (blink-dev server)
 
 ### getScreen
 
@@ -97,83 +144,80 @@ Returns:
 
 **Best Practice**: Check `testIds` array first - these are your tap targets.
 
-### tap
-
-**Purpose**: Tap element by testID.
-
-```
-tap({ id: "Accept" })
-tap({ id: "login-button", waitMs: 1000 })  # Wait 1s after tap
-```
-
-**Important**:
-- Uses accessibility ID selector (`~id`)
-- Waits up to 30s for element to appear
-- Default 500ms pause after tap for UI to settle
-
-### type
-
-**Purpose**: Enter text into focused input field.
-
-```
-type({ text: "user@example.com" })
-type({ text: "password123", submit: true })  # Press enter after
-```
-
-**Workflow**:
-1. `tap({ id: "email-input" })` - Focus the field
-2. `type({ text: "user@example.com" })` - Enter text
-
-### swipe
-
-**Purpose**: Scroll or swipe gestures.
-
-```
-swipe({ direction: "up" })     # Scroll down (content moves up)
-swipe({ direction: "down" })   # Scroll up
-swipe({ direction: "left" })   # Next carousel item
-swipe({ direction: "right" })  # Previous carousel item
-```
-
 ### waitFor
 
-**Purpose**: Wait for element to appear.
+**Purpose**: Wait for element to appear or reach a desired state.
 
 ```
-waitFor({ id: "home-screen", timeoutMs: 10000 })
+waitFor({ id: "home-screen", timeout: 10000 })
+waitFor({ id: "loading-spinner", timeout: 5000, state: "gone" })
 ```
 
-Returns success/failure. Use before tapping elements that may take time to load.
+Returns success/failure. Use before interacting with elements that may take time to load.
 
-### screenshot
+### reloadApp
 
-**Purpose**: Visual confirmation of app state.
-
-```
-screenshot()
-screenshot({ path: "/tmp/debug.png" })
-```
-
-Returns base64-encoded PNG. Use sparingly - `getScreen` is more efficient for understanding state.
-
-### getElement
-
-**Purpose**: Get details about specific element.
+**Purpose**: Trigger Metro hot reload after code changes.
 
 ```
-getElement({ id: "balance-display" })
+reloadApp()                        # Hot reload
+reloadApp({ fullReload: true })    # Full reload (kill + restart)
+reloadApp({ waitMs: 3000 })        # Wait longer for reload
 ```
 
-Returns element properties including text content, bounds, clickability.
+Returns current screen state after reload.
 
-### launchApp / reloadApp
+### checkInfrastructure
 
-**Purpose**: App lifecycle control.
+**Purpose**: Verify all dev services are running.
 
 ```
-launchApp()   # Cold start app
-reloadApp()   # Hot reload (keeps JS state, reloads bundle)
+checkInfrastructure()
 ```
+
+### startServices
+
+**Purpose**: Start all infrastructure services.
+
+```
+startServices()  # Runs orchestrator.sh, waits up to 5 min
+```
+
+## Generic Appium Tools (appium-mcp server)
+
+These tools are provided by the official `appium/appium-mcp` server:
+
+### appium_click
+```
+appium_click({ elementId: "..." })
+```
+
+### appium_set_value
+```
+appium_set_value({ elementId: "...", text: "hello" })
+```
+
+### appium_swipe
+```
+appium_swipe({ direction: "up" })
+```
+
+### appium_screenshot
+```
+appium_screenshot()
+```
+
+### appium_find_element
+```
+appium_find_element({ strategy: "accessibility id", selector: "loginButton" })
+```
+
+### appium_activate_app
+```
+appium_activate_app({ appId: "com.galoyapp" })
+```
+
+Refer to the [appium-mcp documentation](https://github.com/nickhudkins/appium-mcp) for full tool details.
 
 ## CLI Tool
 
@@ -365,49 +409,30 @@ Switch to local backend or wait before retrying.
 
 ## Performance Tips
 
-1. **Prefer `ui` over screenshot** - Text is faster than images
+1. **Prefer `getScreen` over screenshot** - JSON is faster and cheaper than images
 2. **Use `-j` for parsing** - JSON output is machine-friendly
 3. **Use UX commands** - `ux login` handles timing/waiting
 4. **Local backend** - Faster, no captcha, deterministic codes
-
-## Architecture
-
-```
-┌─────────────────┐
-│  Claude Code    │
-│  (MCP Client)   │
-└────────┬────────┘
-         │ stdio
-┌────────▼────────┐
-│   MCP Server    │
-│  (TypeScript)   │
-└────────┬────────┘
-         │ WebDriver
-┌────────▼────────┐
-│     Appium      │
-│   (port 4723)   │
-└────────┬────────┘
-         │ UiAutomator2
-┌────────▼────────┐
-│    Emulator     │
-│  (Blink App)    │
-└─────────────────┘
-```
+5. **Use `appium-mcp` for interactions** - Official tools for tap/type/swipe
 
 ## Files Reference
 
 ```
+.mcp.json                 # Dual MCP server config (appium-mcp + blink-dev)
+
 dev/mcp-server/
   src/
-    index.ts              # MCP server entry
+    index.ts              # blink-dev MCP server entry
     cli.ts                # CLI entry point
     cli/
       basic.ts            # Basic commands (tap, ui, type, etc.)
       ux.ts               # UX flows (login, send, etc.)
       helpers.ts          # Shared utilities (adb, element finding)
       config.ts           # Config file loading
-    tools/                # MCP tool implementations
-    appium/               # Appium WebDriver client
+    tools/                # Blink-specific MCP tool implementations
+    appium/               # Minimal Appium client (page source + reload)
+    utils/
+      xml-parser.ts       # XML → JSON page source parser
   config.yaml             # User config (gitignored)
   config.example.yaml     # Example config
 
@@ -419,7 +444,6 @@ dev/mcp/
 dev/app                   # CLI wrapper
 dev/mcp-stop.sh           # Stop all services
 dev/AGENTS.md             # This file - agent guide
-.mcp.json                 # MCP server config
 .mcp/                     # Runtime state (ready, logs/, pids/)
 ```
 

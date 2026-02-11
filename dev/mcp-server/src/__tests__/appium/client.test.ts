@@ -24,7 +24,6 @@ describe("AppiumClient", () => {
     const mockBrowser = {
       sessionId: "test-session-123",
       getPageSource: vi.fn().mockResolvedValue("<hierarchy></hierarchy>"),
-      takeScreenshot: vi.fn().mockResolvedValue("base64data"),
       deleteSession: vi.fn().mockResolvedValue(undefined),
     }
     vi.mocked(remote).mockResolvedValue(mockBrowser as any)
@@ -39,7 +38,6 @@ describe("AppiumClient", () => {
     const mockBrowser = {
       sessionId: "test-session-123",
       getPageSource: vi.fn(),
-      takeScreenshot: vi.fn(),
       deleteSession: vi.fn(),
     }
     vi.mocked(remote).mockResolvedValue(mockBrowser as any)
@@ -50,13 +48,31 @@ describe("AppiumClient", () => {
     expect(remote).toHaveBeenCalledOnce()
   })
 
+  it("getSession clears connecting promise on failure (no leak)", async () => {
+    const { remote } = await import("webdriverio")
+    vi.mocked(remote).mockRejectedValueOnce(new Error("Connection refused"))
+
+    await expect(client.getSession()).rejects.toThrow("Connection refused")
+
+    // Second attempt should try again (not stuck on stale promise)
+    const mockBrowser = {
+      sessionId: "recovered-session",
+      getPageSource: vi.fn(),
+      deleteSession: vi.fn(),
+    }
+    vi.mocked(remote).mockResolvedValue(mockBrowser as any)
+
+    const browser = await client.getSession()
+    expect(browser.sessionId).toBe("recovered-session")
+    expect(remote).toHaveBeenCalledTimes(2)
+  })
+
   it("getPageSource delegates to browser", async () => {
     const { remote } = await import("webdriverio")
     const mockXml = "<hierarchy><android.widget.Button /></hierarchy>"
     const mockBrowser = {
       sessionId: "test-session",
       getPageSource: vi.fn().mockResolvedValue(mockXml),
-      takeScreenshot: vi.fn(),
       deleteSession: vi.fn(),
     }
     vi.mocked(remote).mockResolvedValue(mockBrowser as any)
@@ -66,26 +82,11 @@ describe("AppiumClient", () => {
     expect(mockBrowser.getPageSource).toHaveBeenCalledOnce()
   })
 
-  it("takeScreenshot delegates to browser", async () => {
-    const { remote } = await import("webdriverio")
-    const mockBrowser = {
-      sessionId: "test-session",
-      getPageSource: vi.fn(),
-      takeScreenshot: vi.fn().mockResolvedValue("iVBORw0KGgo="),
-      deleteSession: vi.fn(),
-    }
-    vi.mocked(remote).mockResolvedValue(mockBrowser as any)
-
-    const result = await client.takeScreenshot()
-    expect(result).toBe("iVBORw0KGgo=")
-  })
-
   it("disconnect cleans up session", async () => {
     const { remote } = await import("webdriverio")
     const mockBrowser = {
       sessionId: "test-session",
       getPageSource: vi.fn(),
-      takeScreenshot: vi.fn(),
       deleteSession: vi.fn().mockResolvedValue(undefined),
     }
     vi.mocked(remote).mockResolvedValue(mockBrowser as any)
@@ -100,7 +101,6 @@ describe("AppiumClient", () => {
     vi.mocked(remote).mockResolvedValue({
       sessionId: "test",
       getPageSource: vi.fn(),
-      takeScreenshot: vi.fn(),
       deleteSession: vi.fn(),
     } as any)
 

@@ -7,6 +7,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 MCP_STATE_DIR="$PROJECT_DIR/.mcp"
 PID_DIR="$MCP_STATE_DIR/pids"
 LOG_DIR="$MCP_STATE_DIR/logs"
+AVD_NAME="${AVD_NAME:-Pixel_API_35}"
 
 echo "Stopping MCP services..."
 
@@ -29,7 +30,7 @@ sleep 2
 
 # Kill any orphaned processes by pattern
 echo "  Cleaning up orphaned processes..."
-pkill -f "emulator.*Pixel_API_35" 2>/dev/null || true
+pkill -f "emulator.*${AVD_NAME}" 2>/dev/null || true
 pkill -f "qemu-system" 2>/dev/null || true
 pkill -f "@react-native/community-cli-plugin" 2>/dev/null || true
 pkill -f "appium.*--relaxed-security" 2>/dev/null || true

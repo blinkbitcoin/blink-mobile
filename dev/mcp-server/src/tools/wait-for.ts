@@ -1,7 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import { AppiumClient } from "../appium/client.js"
-import { buildSelector } from "../utils/selectors.js"
 
 export function registerWaitForTool(server: McpServer, client: AppiumClient) {
   ;(server as any).tool(
@@ -26,8 +25,8 @@ export function registerWaitForTool(server: McpServer, client: AppiumClient) {
     }) => {
       try {
         const browser = await client.getSession()
-        const selector = buildSelector(id)
-        const element = await browser.$(selector)
+        // Use accessibility ID selector directly (~ prefix)
+        const element = await browser.$(`~${id}`)
 
         switch (state) {
           case "displayed":

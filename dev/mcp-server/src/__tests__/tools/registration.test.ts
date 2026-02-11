@@ -40,18 +40,12 @@ describe("registerTools", () => {
     client = new AppiumClient()
   })
 
-  it("registers all expected tools", () => {
+  it("registers all expected Blink-specific tools", () => {
     registerTools(server, client)
 
     const expectedTools = [
       "getScreen",
-      "getElement",
-      "screenshot",
-      "tap",
-      "type",
-      "swipe",
       "waitFor",
-      "launchApp",
       "reloadApp",
       "checkInfrastructure",
       "startServices",
@@ -63,9 +57,28 @@ describe("registerTools", () => {
     }
   })
 
-  it("registers exactly 11 tools", () => {
+  it("registers exactly 5 tools (generic ops handled by appium-mcp)", () => {
     registerTools(server, client)
-    expect(registeredTools.size).toBe(11)
+    expect(registeredTools.size).toBe(5)
+  })
+
+  it("does NOT register tools covered by appium-mcp", () => {
+    registerTools(server, client)
+
+    const removedTools = [
+      "tap",
+      "type",
+      "swipe",
+      "screenshot",
+      "getElement",
+      "launchApp",
+    ]
+
+    for (const tool of removedTools) {
+      expect(registeredTools.has(tool), `Tool '${tool}' should NOT be registered`).toBe(
+        false,
+      )
+    }
   })
 
   it("each tool has a description", () => {

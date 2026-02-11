@@ -14,6 +14,7 @@ describe("getConfig", () => {
     delete process.env.APPIUM_PORT
     delete process.env.TEST_DEVICE_ANDROID
     delete process.env.TEST_APK_PATH
+    delete process.env.APP_PACKAGE
 
     const config = getConfig()
     expect(config.host).toBe("127.0.0.1")
@@ -47,7 +48,14 @@ describe("getConfig", () => {
     expect(config.appPath).toBe("/custom/path/app.apk")
   })
 
-  it("always returns com.galoyapp as appPackage", () => {
+  it("uses APP_PACKAGE env var", () => {
+    process.env.APP_PACKAGE = "com.custom.app"
+    const config = getConfig()
+    expect(config.appPackage).toBe("com.custom.app")
+  })
+
+  it("defaults appPackage to com.galoyapp when no env var", () => {
+    delete process.env.APP_PACKAGE
     const config = getConfig()
     expect(config.appPackage).toBe("com.galoyapp")
   })

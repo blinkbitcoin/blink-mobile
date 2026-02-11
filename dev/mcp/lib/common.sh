@@ -115,7 +115,7 @@ start_daemon() {
   nohup bash -c "$cmd" >> "$log_file" 2>&1 &
   local pid=$!
   save_pid "$name" "$pid"
-  disown "$pid"
+  disown "$pid" 2>/dev/null || true
 
   # Brief pause to catch immediate crashes
   sleep 2
