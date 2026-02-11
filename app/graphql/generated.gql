@@ -859,6 +859,10 @@ query Bulletins($first: Int!, $after: String) {
             }
             __typename
           }
+          bulletinButton {
+            label
+            __typename
+          }
           __typename
         }
         cursor
@@ -970,6 +974,10 @@ query StatefulNotifications($after: String) {
             url
             __typename
           }
+          __typename
+        }
+        bulletinButton {
+          label
           __typename
         }
         __typename
