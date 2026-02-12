@@ -6,6 +6,14 @@ import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { BulletinsQuery, Icon } from "@app/graphql/generated"
 
 const mockAck = jest.fn(() => Promise.resolve())
+const mockRefetchQueries = jest.fn()
+
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => ({
+    refetchQueries: mockRefetchQueries,
+  }),
+}))
 
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")

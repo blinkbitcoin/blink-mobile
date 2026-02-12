@@ -1,8 +1,10 @@
 import React from "react"
-import { Linking } from "react-native"
+import { Animated, Linking } from "react-native"
+import { useApolloClient } from "@apollo/client"
 
 import { useNotifications } from "."
 import { NotificationCardUI } from "./notification-card-ui"
+import { useDropInOutAnimation } from "@app/components/animations"
 import {
   BulletinsDocument,
   BulletinsQuery,
@@ -16,22 +18,49 @@ type Props = {
   bulletins: BulletinsQuery | undefined
 }
 
+const BULLETIN_ANIMATION = {
+  delay: 300,
+  distance: 50,
+  durationIn: 200,
+  durationOut: 120,
+}
+
 export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
   const { cardInfo } = useNotifications()
+  const [dismissing, setDismissing] = React.useState(false)
+  const client = useApolloClient()
 
-  const [ack, { loading: ackLoading }] = useStatefulNotificationAcknowledgeMutation({
-    refetchQueries: [BulletinsDocument],
+  const [ack, { loading: ackLoading }] = useStatefulNotificationAcknowledgeMutation()
+
+  const dismissWithAnimation = React.useCallback(
+    async (notificationId: string, afterAck?: () => void) => {
+      await ack({ variables: { input: { notificationId } } })
+      afterAck?.()
+      setDismissing(true)
+      setTimeout(() => {
+        client.refetchQueries({ include: [BulletinsDocument] })
+        setDismissing(false)
+      }, BULLETIN_ANIMATION.durationOut)
+    },
+    [ack, client],
+  )
+
+  const hasBulletins =
+    !loading &&
+    bulletins &&
+    bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges &&
+    bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.length > 0
+
+  const { opacity, translateY } = useDropInOutAnimation({
+    visible: Boolean(hasBulletins) && !dismissing,
+    ...BULLETIN_ANIMATION,
   })
 
   if (loading) return null
 
-  if (
-    bulletins &&
-    bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges &&
-    bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.length > 0
-  ) {
+  if (hasBulletins) {
     return (
-      <>
+      <Animated.View style={{ opacity, transform: [{ translateY }] }}>
         {bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.map(
           ({ node: bulletin }) => (
             <NotificationCardUI
@@ -44,21 +73,19 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
               title={bulletin.title}
               text={bulletin.body}
               action={async () => {
-                ack({ variables: { input: { notificationId: bulletin.id } } })
                 if (bulletin.action?.__typename === "OpenDeepLinkAction")
                   Linking.openURL(BLINK_DEEP_LINK_PREFIX + bulletin.action.deepLink)
                 else if (bulletin.action?.__typename === "OpenExternalLinkAction")
                   Linking.openURL(bulletin.action.url)
+                await dismissWithAnimation(bulletin.id)
               }}
-              dismissAction={() =>
-                ack({ variables: { input: { notificationId: bulletin.id } } })
-              }
+              dismissAction={() => dismissWithAnimation(bulletin.id)}
               loading={ackLoading}
               buttonLabel={bulletin.bulletinButton?.label}
             />
           ),
         )}
-      </>
+      </Animated.View>
     )
   }
 
