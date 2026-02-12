@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useCallback, useEffect, useReducer } from "react"
+import { useCallback, useEffect, useMemo, useReducer } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -15,6 +15,7 @@ import {
 
 import { AmountInputScreenUI } from "./amount-input-screen-ui"
 import {
+  getDisabledKeys,
   Key,
   NumberPadNumber,
   numberPadReducer,
@@ -30,7 +31,6 @@ export type AmountInputScreenProps = {
   convertMoneyAmount: ConvertMoneyAmount
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
-  compact?: boolean
 }
 
 const formatNumberPadNumber = (numberPadNumber: NumberPadNumber) => {
@@ -134,7 +134,6 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   convertMoneyAmount,
   maxAmount,
   minAmount,
-  compact = false,
 }) => {
   const {
     currencyInfo,
@@ -243,6 +242,8 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     })
   }
 
+  const disabledKeys = useMemo(() => getDisabledKeys(numberPadState), [numberPadState])
+
   const primaryCurrencyInfo = currencyInfo[newPrimaryAmount.currency]
   const secondaryCurrencyInfo =
     secondaryNewAmount && currencyInfo[secondaryNewAmount.currency]
@@ -272,7 +273,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       setAmountDisabled={Boolean(errorMessage)}
       onSetAmountPress={setAmount && (() => setAmount(newPrimaryAmount))}
       goBack={goBack}
-      compact={compact}
+      disabledKeys={disabledKeys}
     />
   )
 }

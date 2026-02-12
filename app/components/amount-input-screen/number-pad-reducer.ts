@@ -64,6 +64,17 @@ export type Key = (typeof Key)[keyof typeof Key]
 export type NumberPadReducerActionType =
   (typeof NumberPadReducerActionType)[keyof typeof NumberPadReducerActionType]
 
+export const getDisabledKeys = ({
+  numberPadNumber,
+  numberOfDecimalsAllowed,
+}: NumberPadReducerState): ReadonlySet<Key> => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  const keys = new Set<Key>()
+  if (!majorAmount && !minorAmount && !hasDecimal) keys.add(Key.Backspace)
+  if (numberOfDecimalsAllowed === 0 || hasDecimal) keys.add(Key.Decimal)
+  return keys
+}
+
 export const numberPadReducer = (
   state: NumberPadReducerState,
   action: NumberPadReducerAction,
