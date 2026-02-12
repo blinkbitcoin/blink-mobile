@@ -26,6 +26,7 @@ import {
   UnseenTxAmountBadge,
   useUnseenTxAmountBadge,
   useOutgoingBadgeVisibility,
+  useIncomingBadgeAutoSeen,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -277,6 +278,13 @@ export const HomeScreen: React.FC = () => {
     amountText: unseenAmountText,
     isOutgoing,
     onHide: handleOutgoingBadgeHide,
+  })
+
+  useIncomingBadgeAutoSeen({
+    isFocused,
+    isOutgoing,
+    unseenCurrency: latestUnseenTx?.settlementCurrency,
+    markTxSeen,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
