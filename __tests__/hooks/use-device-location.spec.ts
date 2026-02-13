@@ -44,6 +44,7 @@ describe("useDeviceLocation", () => {
     })
 
     // ipapi will return "PL" (Poland)
+    // eslint-disable-next-line camelcase
     mockedAxios.get.mockResolvedValue({ data: { country_code: "PL" } })
 
     // Track every value emitted by the hook across all renders
@@ -128,6 +129,7 @@ describe("useDeviceLocation", () => {
       error: undefined,
     })
 
+    // eslint-disable-next-line camelcase
     mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
 
     renderHook(() => useDeviceLocation())
