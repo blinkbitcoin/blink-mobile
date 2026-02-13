@@ -16,6 +16,7 @@ type UnseenTxAmountBadgeProps = {
   visible?: boolean
   onPress?: () => void
   isOutgoing?: boolean
+  onExitComplete?: () => void
 }
 
 export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
@@ -23,6 +24,7 @@ export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
   visible = true,
   onPress,
   isOutgoing,
+  onExitComplete,
 }) => {
   const styles = useStyles({ isOutgoing })
   const { opacity, translateY } = useDropInOutAnimation({
@@ -31,6 +33,8 @@ export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
     distance: UNSEEN_BADGE_ANIMATION.distance,
     durationIn: UNSEEN_BADGE_ANIMATION.durationIn,
     durationOut: UNSEEN_BADGE_ANIMATION.durationOut,
+    reverseExit: !isOutgoing,
+    onExitComplete,
   })
 
   const [shouldRender, setShouldRender] = React.useState(visible)
