@@ -13,7 +13,7 @@ const useDeviceLocation = () => {
   const { data, error } = useCountryCodeQuery()
 
   const [loading, setLoading] = useState(true)
-  const [countryCode, setCountryCode] = useState<CountryCode | undefined>(undefined)
+  const [countryCode, setCountryCode] = useState<CountryCode | undefined>()
 
   // if error this will resort to the default "SV" countryCode
   useEffect(() => {
