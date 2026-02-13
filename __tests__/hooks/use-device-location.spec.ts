@@ -23,8 +23,15 @@ jest.mock("@app/graphql/generated", () => ({
 const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe("useDeviceLocation", () => {
+  let warnSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
+    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    warnSpy.mockRestore()
   })
 
   it("should not expose any country code while loading", () => {
@@ -156,5 +163,6 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
+    expect(warnSpy).toHaveBeenCalled()
   })
 })
