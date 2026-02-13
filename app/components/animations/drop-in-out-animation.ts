@@ -11,8 +11,6 @@ type DropInOutAnimationParams = {
   springStiffness?: number
   springDamping?: number
   springVelocity?: number
-  reverseExit?: boolean
-  onExitComplete?: () => void
 }
 
 export const useDropInOutAnimation = ({
@@ -25,8 +23,6 @@ export const useDropInOutAnimation = ({
   springStiffness = 200,
   springDamping = 18,
   springVelocity = 0.4,
-  reverseExit = false,
-  onExitComplete,
 }: DropInOutAnimationParams = {}) => {
   const opacity = useRef(new Animated.Value(0)).current
   const translateY = useRef(new Animated.Value(-distance)).current
@@ -38,7 +34,6 @@ export const useDropInOutAnimation = ({
 
     if (!visible) {
       if (wasVisible.current) {
-        const exitTarget = reverseExit ? distance : -distance
         const exitAnim = Animated.parallel([
           Animated.timing(opacity, {
             toValue: 0,
@@ -47,16 +42,14 @@ export const useDropInOutAnimation = ({
             useNativeDriver: true,
           }),
           Animated.timing(translateY, {
-            toValue: exitTarget,
+            toValue: -distance,
             duration: durationOut,
             easing: Easing.in(Easing.quad),
             useNativeDriver: true,
           }),
         ])
 
-        exitAnim.start(({ finished }) => {
-          if (finished && onExitComplete) onExitComplete()
-        })
+        exitAnim.start()
       } else {
         opacity.setValue(0)
         translateY.setValue(-distance)
@@ -109,8 +102,6 @@ export const useDropInOutAnimation = ({
     springStiffness,
     springDamping,
     springVelocity,
-    reverseExit,
-    onExitComplete,
     opacity,
     translateY,
   ])

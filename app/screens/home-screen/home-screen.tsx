@@ -267,27 +267,6 @@ export const HomeScreen: React.FC = () => {
       hasUnseenUsdTx,
     })
 
-  // Keep a "sticky" key + text so the badge stays mounted during exit animation.
-  // Only update when there's a new transaction to show, not when it goes undefined.
-  const stickyBadgeRef = React.useRef<{
-    key: string | undefined
-    text: string | undefined
-  }>({ key: undefined, text: undefined })
-
-  if (latestUnseenTx?.id) {
-    stickyBadgeRef.current = {
-      key: latestUnseenTx.id,
-      text: unseenAmountText,
-    }
-  }
-
-  const badgeKey = stickyBadgeRef.current.key
-  const badgeText = stickyBadgeRef.current.text
-
-  const handleBadgeExitComplete = React.useCallback(() => {
-    stickyBadgeRef.current = { key: undefined, text: undefined }
-  }, [])
-
   const handleOutgoingBadgeHide = React.useCallback(() => {
     if (latestUnseenTx?.settlementCurrency) {
       markTxSeen(latestUnseenTx.settlementCurrency)
@@ -519,12 +498,11 @@ export const HomeScreen: React.FC = () => {
       <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
-          key={badgeKey}
-          amountText={badgeText ?? ""}
+          key={latestUnseenTx?.id}
+          amountText={unseenAmountText ?? ""}
           visible={isOutgoing ? showOutgoingBadge : Boolean(unseenAmountText)}
           onPress={handleUnseenBadgePress}
           isOutgoing={isOutgoing}
-          onExitComplete={handleBadgeExitComplete}
         />
       </View>
       <ScrollView
