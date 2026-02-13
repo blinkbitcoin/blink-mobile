@@ -30,9 +30,7 @@ describe("useIncomingBadgeAutoSeen", () => {
 
   it("calls markTxSeen after the delay when focused with an incoming tx", () => {
     const markTxSeen = jest.fn()
-    renderHook(() =>
-      useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }),
-    )
+    renderHook(() => useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }))
 
     expect(markTxSeen).not.toHaveBeenCalled()
 
@@ -46,9 +44,7 @@ describe("useIncomingBadgeAutoSeen", () => {
 
   it("does not fire for outgoing transactions", () => {
     const markTxSeen = jest.fn()
-    renderHook(() =>
-      useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }),
-    )
+    renderHook(() => useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }))
 
     act(() => {
       jest.advanceTimersByTime(10000)
@@ -186,7 +182,9 @@ describe("useIncomingBadgeAutoSeen", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
       (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, isFocused: false, markTxSeen } as AutoSeenProps },
+      {
+        initialProps: { ...defaultProps, isFocused: false, markTxSeen } as AutoSeenProps,
+      },
     )
 
     act(() => {
