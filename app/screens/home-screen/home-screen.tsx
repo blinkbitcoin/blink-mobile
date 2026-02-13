@@ -280,7 +280,7 @@ export const HomeScreen: React.FC = () => {
     onHide: handleOutgoingBadgeHide,
   })
 
-  useIncomingBadgeAutoSeen({
+  const showIncomingBadge = useIncomingBadgeAutoSeen({
     isFocused,
     isOutgoing,
     unseenCurrency: latestUnseenTx?.settlementCurrency,
@@ -500,7 +500,11 @@ export const HomeScreen: React.FC = () => {
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
           amountText={unseenAmountText ?? ""}
-          visible={isOutgoing ? showOutgoingBadge : Boolean(unseenAmountText)}
+          visible={
+            isOutgoing
+              ? showOutgoingBadge
+              : showIncomingBadge && Boolean(unseenAmountText)
+          }
           onPress={handleUnseenBadgePress}
           isOutgoing={isOutgoing}
         />

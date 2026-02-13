@@ -28,7 +28,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     markTxSeen: jest.fn(),
   }
 
-  it("calls markTxSeen after the delay when focused with an incoming tx", () => {
+  it("calls markTxSeen after the delay + exit animation when focused with an incoming tx", () => {
     const markTxSeen = jest.fn()
     renderHook(() => useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }))
 
@@ -38,7 +38,35 @@ describe("useIncomingBadgeAutoSeen", () => {
       jest.advanceTimersByTime(5000)
     })
 
+    expect(markTxSeen).not.toHaveBeenCalled()
+
+    act(() => {
+      jest.advanceTimersByTime(180)
+    })
+
     expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
+    expect(markTxSeen).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns visible=false before markTxSeen to allow exit animation", () => {
+    const markTxSeen = jest.fn()
+    const { result } = renderHook(() =>
+      useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }),
+    )
+
+    expect(result.current).toBe(true)
+
+    act(() => {
+      jest.advanceTimersByTime(5000)
+    })
+
+    expect(result.current).toBe(false)
+    expect(markTxSeen).not.toHaveBeenCalled()
+
+    act(() => {
+      jest.advanceTimersByTime(180)
+    })
+
     expect(markTxSeen).toHaveBeenCalledTimes(1)
   })
 
@@ -132,7 +160,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     rerender({ ...defaultProps, markTxSeen })
 
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(5180)
     })
 
     expect(markTxSeen).toHaveBeenCalledTimes(1)
@@ -146,7 +174,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     )
 
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(5180)
     })
 
     expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
@@ -154,7 +182,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     rerender({ ...defaultProps, unseenCurrency: WalletCurrency.Usd, markTxSeen })
 
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(5180)
     })
 
     expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Usd)
@@ -174,7 +202,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     expect(markTxSeen).not.toHaveBeenCalled()
 
     act(() => {
-      jest.advanceTimersByTime(1)
+      jest.advanceTimersByTime(181)
     })
 
     expect(markTxSeen).toHaveBeenCalledTimes(1)
@@ -198,7 +226,7 @@ describe("useIncomingBadgeAutoSeen", () => {
     rerender({ ...defaultProps, isFocused: true, markTxSeen })
 
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(5180)
     })
 
     expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
