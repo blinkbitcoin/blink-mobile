@@ -16,8 +16,10 @@ jest.mock("@apollo/client", () => ({
 }))
 
 const mockUseCountryCodeQuery = jest.fn()
+const mockUseSettingsScreenQuery = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   useCountryCodeQuery: () => mockUseCountryCodeQuery(),
+  useSettingsScreenQuery: (...args: unknown[]) => mockUseSettingsScreenQuery(...args),
 }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
@@ -28,6 +30,7 @@ describe("useDeviceLocation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
   })
 
   afterEach(() => {
@@ -41,6 +44,76 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(true)
     expect(result.current.countryCode).toBeUndefined()
+  })
+
+  it("should resolve country from logged-in user phone without calling ipapi", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+4915112345678" } },
+    })
+
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("DE")
+    expect(mockedAxios.get).not.toHaveBeenCalled()
+  })
+
+  it("should update Apollo cache when resolving from user phone", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+4915112345678" } },
+    })
+
+    renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
+  })
+
+  it("should fall back to ipapi when user has no phone", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: null } },
+    })
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "PL" } })
+
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("PL")
+    expect(mockedAxios.get).toHaveBeenCalled()
+  })
+
+  it("should fall back to ipapi when user is not logged in", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "JP" } })
+
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("JP")
   })
 
   it("should resolve to the ipapi country code and never flash SV as intermediate value", async () => {
