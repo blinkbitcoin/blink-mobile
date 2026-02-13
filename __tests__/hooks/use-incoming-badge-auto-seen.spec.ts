@@ -3,6 +3,14 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useIncomingBadgeAutoSeen } from "@app/components/unseen-tx-amount-badge/use-incoming-badge-auto-seen"
 
+type AutoSeenProps = {
+  isFocused: boolean
+  isOutgoing: boolean | undefined
+  unseenCurrency: WalletCurrency | undefined
+  delayMs?: number
+  markTxSeen: (currency: WalletCurrency) => void
+}
+
 describe("useIncomingBadgeAutoSeen", () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -95,8 +103,8 @@ describe("useIncomingBadgeAutoSeen", () => {
   it("clears the timer when screen loses focus before delay", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
-      (props) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } },
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
     )
 
     act(() => {
@@ -117,8 +125,8 @@ describe("useIncomingBadgeAutoSeen", () => {
   it("does not re-schedule for the same currency on rerender", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
-      (props) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } },
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
     )
 
     // Rerender with same props shouldn't reset the timer
@@ -135,8 +143,8 @@ describe("useIncomingBadgeAutoSeen", () => {
   it("schedules a new timer when currency changes", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
-      (props) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } },
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
     )
 
     act(() => {
@@ -177,8 +185,8 @@ describe("useIncomingBadgeAutoSeen", () => {
   it("fires when screen regains focus after being unfocused", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
-      (props) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, isFocused: false, markTxSeen } },
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, isFocused: false, markTxSeen } as AutoSeenProps },
     )
 
     act(() => {
