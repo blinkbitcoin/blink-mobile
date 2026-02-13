@@ -44,7 +44,9 @@ describe("useIncomingBadgeAutoSeen", () => {
 
   it("does not fire for outgoing transactions", () => {
     const markTxSeen = jest.fn()
-    renderHook(() => useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }))
+    renderHook(() =>
+      useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }),
+    )
 
     act(() => {
       jest.advanceTimersByTime(10000)
