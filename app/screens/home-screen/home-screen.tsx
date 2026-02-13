@@ -26,6 +26,7 @@ import {
   UnseenTxAmountBadge,
   useUnseenTxAmountBadge,
   useOutgoingBadgeVisibility,
+  useIncomingBadgeAutoSeen,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -279,6 +280,13 @@ export const HomeScreen: React.FC = () => {
     onHide: handleOutgoingBadgeHide,
   })
 
+  const showIncomingBadge = useIncomingBadgeAutoSeen({
+    isFocused,
+    isOutgoing,
+    unseenCurrency: latestUnseenTx?.settlementCurrency,
+    markTxSeen,
+  })
+
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
@@ -492,7 +500,11 @@ export const HomeScreen: React.FC = () => {
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
           amountText={unseenAmountText ?? ""}
-          visible={isOutgoing ? showOutgoingBadge : Boolean(unseenAmountText)}
+          visible={
+            isOutgoing
+              ? showOutgoingBadge
+              : showIncomingBadge && Boolean(unseenAmountText)
+          }
           onPress={handleUnseenBadgePress}
           isOutgoing={isOutgoing}
         />
