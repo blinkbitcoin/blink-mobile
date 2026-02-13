@@ -80,6 +80,23 @@ describe("useDeviceLocation", () => {
     expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
   })
 
+  it("should fall back to SV when user phone cannot be parsed", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "invalid-phone" } },
+    })
+
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("SV")
+  })
+
   it("should fall back to ipapi when user has no phone", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },

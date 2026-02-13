@@ -23,10 +23,18 @@ const useDeviceLocation = () => {
 
   useEffect(() => {
     if (!userPhone) return
-    const parsed = parsePhoneNumber(userPhone)
-    if (!parsed?.country) return
-    setCountryCode(parsed.country)
-    updateCountryCode(client, parsed.country)
+    try {
+      const parsed = parsePhoneNumber(userPhone)
+      if (!parsed?.country) {
+        setCountryCode(DEFAULT_COUNTRY_CODE)
+        setLoading(false)
+        return
+      }
+      setCountryCode(parsed.country)
+      updateCountryCode(client, parsed.country)
+    } catch {
+      setCountryCode(DEFAULT_COUNTRY_CODE)
+    }
     setLoading(false)
   }, [userPhone, client])
 
