@@ -6535,6 +6535,124 @@ type RootTranslation = {
 		 * O​o​p​s​.​ ​S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​w​h​i​l​e​ ​g​e​t​t​i​n​g​ ​y​o​u​r​ ​l​o​c​a​t​i​o​n
 		 */
 		error: string
+		categories: {
+			/**
+			 * G​r​o​c​e​r​i​e​s
+			 */
+			Groceries: string
+			/**
+			 * B​a​k​e​r​y
+			 */
+			Bakery: string
+			/**
+			 * R​e​s​t​a​u​r​a​n​t
+			 */
+			Restaurant: string
+			/**
+			 * B​a​r
+			 */
+			Bar: string
+			/**
+			 * C​a​f​e
+			 */
+			Cafe: string
+			/**
+			 * H​o​t​e​l
+			 */
+			Hotel: string
+			/**
+			 * A​T​M​ ​/​ ​M​o​n​e​y​ ​C​h​a​n​g​e​r
+			 */
+			ATM: string
+			/**
+			 * S​h​o​p​p​i​n​g​ ​/​ ​F​a​s​h​i​o​n
+			 */
+			ShoppingFashion: string
+			/**
+			 * E​l​e​c​t​r​o​n​i​c​s
+			 */
+			Electronics: string
+			/**
+			 * B​e​a​u​t​y​ ​&​ ​W​e​l​l​n​e​s​s
+			 */
+			BeautyWellness: string
+			/**
+			 * S​p​o​r​t​ ​&​ ​F​i​t​n​e​s​s
+			 */
+			SportFitness: string
+			/**
+			 * E​n​t​e​r​t​a​i​n​m​e​n​t
+			 */
+			Entertainment: string
+			/**
+			 * S​e​r​v​i​c​e​s​ ​/​ ​M​e​d​i​c​a​l
+			 */
+			ServicesMedical: string
+			/**
+			 * O​t​h​e​r
+			 */
+			Other: string
+		}
+		/**
+		 * A​d​d​r​e​s​s
+		 */
+		address: string
+		/**
+		 * P​h​o​n​e
+		 */
+		phone: string
+		/**
+		 * W​e​b​s​i​t​e
+		 */
+		website: string
+		/**
+		 * C​a​t​e​g​o​r​i​e​s​ ​f​i​l​t​e​r​s
+		 */
+		categoriesFilters: string
+		/**
+		 * C​h​o​o​s​e​ ​w​h​i​c​h​ ​c​a​t​e​g​o​r​i​e​s​ ​y​o​u​ ​w​o​u​l​d​ ​l​i​k​e​ ​t​o​ ​s​h​o​w
+		 */
+		chooseCategories: string
+		/**
+		 * S​e​l​e​c​t​ ​A​l​l
+		 */
+		selectAll: string
+		/**
+		 * A​p​p​l​y
+		 */
+		apply: string
+		search: {
+			/**
+			 * S​e​a​r​c​h​ ​f​o​r​ ​c​i​t​i​e​s​,​ ​l​o​c​a​t​i​o​n​s​.​.​.
+			 */
+			placeholder: string
+			/**
+			 * L​o​a​d​i​n​g​.​.​.
+			 */
+			loading: string
+			/**
+			 * N​o​ ​r​e​s​u​l​t​s​ ​f​o​u​n​d​.
+			 */
+			noResults: string
+			/**
+			 * E​n​t​e​r​ ​a​t​ ​l​e​a​s​t​ ​3​ ​c​h​a​r​a​c​t​e​r​s​ ​t​o​ ​s​e​a​r​c​h​.
+			 */
+			minChars: string
+		}
+		btcmapErrors: {
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​f​e​t​c​h​ ​c​o​m​m​u​n​i​t​y​ ​d​a​t​a​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
+			 */
+			communityData: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​f​e​t​c​h​ ​p​l​a​c​e​ ​d​a​t​a​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
+			 */
+			placeData: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​s​y​n​c​ ​B​T​C​ ​M​a​p​ ​d​a​t​a​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​B​T​C​ ​M​a​p​.
+			 */
+			sync: string
+		}
 	}
 	HomeScreen: {
 		/**
@@ -19680,6 +19798,124 @@ export type TranslationFunctions = {
 		 * Oops. Something went wrong while getting your location
 		 */
 		error: () => LocalizedString
+		categories: {
+			/**
+			 * Groceries
+			 */
+			Groceries: () => LocalizedString
+			/**
+			 * Bakery
+			 */
+			Bakery: () => LocalizedString
+			/**
+			 * Restaurant
+			 */
+			Restaurant: () => LocalizedString
+			/**
+			 * Bar
+			 */
+			Bar: () => LocalizedString
+			/**
+			 * Cafe
+			 */
+			Cafe: () => LocalizedString
+			/**
+			 * Hotel
+			 */
+			Hotel: () => LocalizedString
+			/**
+			 * ATM / Money Changer
+			 */
+			ATM: () => LocalizedString
+			/**
+			 * Shopping / Fashion
+			 */
+			ShoppingFashion: () => LocalizedString
+			/**
+			 * Electronics
+			 */
+			Electronics: () => LocalizedString
+			/**
+			 * Beauty & Wellness
+			 */
+			BeautyWellness: () => LocalizedString
+			/**
+			 * Sport & Fitness
+			 */
+			SportFitness: () => LocalizedString
+			/**
+			 * Entertainment
+			 */
+			Entertainment: () => LocalizedString
+			/**
+			 * Services / Medical
+			 */
+			ServicesMedical: () => LocalizedString
+			/**
+			 * Other
+			 */
+			Other: () => LocalizedString
+		}
+		/**
+		 * Address
+		 */
+		address: () => LocalizedString
+		/**
+		 * Phone
+		 */
+		phone: () => LocalizedString
+		/**
+		 * Website
+		 */
+		website: () => LocalizedString
+		/**
+		 * Categories filters
+		 */
+		categoriesFilters: () => LocalizedString
+		/**
+		 * Choose which categories you would like to show
+		 */
+		chooseCategories: () => LocalizedString
+		/**
+		 * Select All
+		 */
+		selectAll: () => LocalizedString
+		/**
+		 * Apply
+		 */
+		apply: () => LocalizedString
+		search: {
+			/**
+			 * Search for cities, locations...
+			 */
+			placeholder: () => LocalizedString
+			/**
+			 * Loading...
+			 */
+			loading: () => LocalizedString
+			/**
+			 * No results found.
+			 */
+			noResults: () => LocalizedString
+			/**
+			 * Enter at least 3 characters to search.
+			 */
+			minChars: () => LocalizedString
+		}
+		btcmapErrors: {
+			/**
+			 * Could not fetch community data, please try again later
+			 */
+			communityData: () => LocalizedString
+			/**
+			 * Could not fetch place data, please try again later
+			 */
+			placeData: () => LocalizedString
+			/**
+			 * Could not sync BTC Map data, please try again or contact BTC Map.
+			 */
+			sync: () => LocalizedString
+		}
 	}
 	HomeScreen: {
 		/**

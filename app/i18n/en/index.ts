@@ -2106,11 +2106,45 @@ const en: BaseTranslation = {
   MapScreen: {
     navToSettingsTitle: "Location permissions",
     navToSettingsText:
-      "If you'd like to give Blink location permissions, please navigate to your settings and enable it there",
+        "If you'd like to give Blink location permissions, please navigate to your settings and enable it there",
     payBusiness: "Pay this business",
     openSettings: "Open settings",
     title: "Map",
     error: "Oops. Something went wrong while getting your location",
+    categories: {
+      Groceries: "Groceries",
+      Bakery: "Bakery",
+      Restaurant: "Restaurant",
+      Bar: "Bar",
+      Cafe: "Cafe",
+      Hotel: "Hotel",
+      ATM: "ATM / Money Changer",
+      ShoppingFashion: "Shopping / Fashion",
+      Electronics: "Electronics",
+      BeautyWellness: "Beauty & Wellness",
+      SportFitness: "Sport & Fitness",
+      Entertainment: "Entertainment",
+      ServicesMedical: "Services / Medical",
+      Other: "Other"
+    },
+    address: "Address",
+    phone: "Phone",
+    website: "Website",
+    categoriesFilters: "Categories filters",
+    chooseCategories: "Choose which categories you would like to show",
+    selectAll: "Select All",
+    apply: "Apply",
+    search: {
+      placeholder: "Search for cities, locations...",
+      loading: "Loading...",
+      noResults: "No results found.",
+      minChars: "Enter at least 3 characters to search."
+    },
+    btcmapErrors: {
+      communityData: "Could not fetch community data, please try again later",
+      placeData: "Could not fetch place data, please try again later",
+      sync: "Could not sync BTC Map data, please try again or contact BTC Map."
+    }
   },
   HomeScreen: {
     receive: "Receive",

@@ -1,17 +1,12 @@
 import { CountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
 // eslint-disable-next-line react-native/split-platform-components
-import { Alert, Dimensions } from "react-native"
-import { Region, MapMarker as MapMarkerType } from "react-native-maps"
+import { Alert, Dimensions, View, ActivityIndicator } from "react-native"
+import { Region } from "react-native-maps"
 import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
-import { gql } from "@apollo/client"
-import MapComponent from "@app/components/map-component"
-import {
-  MapMarker,
-  useBusinessMapMarkersQuery,
-  useRegionQuery,
-} from "@app/graphql/generated"
+import MapComponent from "@app/components/map-components"
+import { MapMarker, useRegionQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import useDeviceLocation from "@app/hooks/use-device-location"
@@ -21,10 +16,16 @@ import { useFocusEffect } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import countryCodes from "../../../utils/countryInfo.json"
-import { Screen } from "../../components/screen"
+import { Screen } from "@app/components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { toastShow } from "../../utils/toast"
+import { IMarker } from "./btc-map-interface"
 import { LOCATION_PERMISSION, getUserRegion } from "./functions"
+import { useCallback, useMemo } from "react"
+import { Place } from "@app/components/map-components/map-types"
+import { usePlacesData } from "@app/components/map-components/map-hooks/use-places-data"
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import { makeStyles } from "@rn-vui/themed"
 
 const EL_ZONTE_COORDS = {
   latitude: 13.496743,
@@ -49,20 +50,21 @@ Geolocation.setRNConfiguration({
   locationProvider: "auto",
 })
 
-gql`
-  query businessMapMarkers {
-    businessMapMarkers {
-      username
-      mapInfo {
-        title
-        coordinates {
-          longitude
-          latitude
-        }
-      }
-    }
-  }
-`
+const transformPlacesToMarkers = (places: Place[]): IMarker[] => {
+  return places
+    .filter((p) => p && typeof p.lat === "number" && typeof p.lon === "number")
+    .map(({ lon, lat, id, icon, name, category }) => ({
+      id,
+      icon,
+      name: name ?? null,
+      category: category ?? null,
+      location: {
+        latitude: lat,
+        longitude: lon,
+      },
+      tags: {},
+    }))
+}
 
 export const MapScreen: React.FC<Props> = ({ navigation }) => {
   const isAuthed = useIsAuthed()
@@ -71,47 +73,60 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
   const { data: lastRegion, error: lastRegionError } = useRegionQuery()
   const { LL } = useI18nContext()
 
-  const { data, error, refetch } = useBusinessMapMarkersQuery({
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: "cache-and-network",
-  })
+  const styles = useStyles()
 
-  const focusedMarkerRef = React.useRef<MapMarkerType | null>(null)
+  const { places, error, isLoading } = usePlacesData()
 
   const [initialLocation, setInitialLocation] = React.useState<Region>()
-  const [isRefreshed, setIsRefreshed] = React.useState(false)
-  const [focusedMarker, setFocusedMarker] = React.useState<MapMarker | null>(null)
   const [isInitializing, setInitializing] = React.useState(true)
   const [permissionsStatus, setPermissionsStatus] = React.useState<PermissionStatus>()
 
-  useFocusEffect(() => {
-    if (!isRefreshed) {
-      setIsRefreshed(true)
-      refetch()
-    }
-  })
+  const showError = useCallback(
+    (errorMessage: string) => {
+      toastShow({ message: errorMessage, LL })
+    },
+    [LL],
+  )
 
-  if (error) {
-    toastShow({ message: error.message, LL })
-  }
-
-  // On screen load, check (NOT request) if location permissions are given
   React.useEffect(() => {
-    ;(async () => {
+    if (error) {
+      showError(error)
+    }
+  }, [error, showError])
+
+  // Initialization: load fonts + check GPS permission
+  React.useEffect(() => {
+    let isMounted = true
+    const loadResources = async () => {
+      try {
+        await MaterialIcons.loadFont()
+      } catch (err) {
+        console.warn("Failed to load font:", err)
+      }
+
+      if (!isMounted) return
+
+      // Check (NOT request) if location permissions are given
       const status = await check(LOCATION_PERMISSION)
+      if (!isMounted) return
       setPermissionsStatus(status)
+
       if (status === RESULTS.GRANTED) {
-        getUserRegion(async (region) => {
+        getUserRegion((region) => {
+          if (!isMounted) return
           if (region) {
             setInitialLocation(region)
-          } else {
-            setInitializing(false)
           }
+          setInitializing(false)
         })
       } else {
         setInitializing(false)
       }
-    })()
+    }
+    loadResources()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const alertOnLocationError = React.useCallback(() => {
@@ -171,34 +186,34 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const handleMarkerPress = (item: MapMarker, ref?: MapMarkerType) => {
-    setFocusedMarker(item)
-    if (ref) {
-      focusedMarkerRef.current = ref
-    }
-  }
+  const formattedData = useMemo<IMarker[]>(() => {
+    if (!places?.baseData) return []
+    return transformPlacesToMarkers(places.baseData)
+  }, [places?.baseData])
 
-  const handleMapPress = () => {
-    setFocusedMarker(null)
-    focusedMarkerRef.current = null
+  // todo: nicer loading state
+  if (isLoading || isInitializing || !initialLocation) {
+    return (
+      <Screen>
+        <View style={styles.loadingState}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      </Screen>
+    )
   }
-
   return (
     <Screen edges={["left", "right"]}>
       {initialLocation && (
         <MapComponent
-          data={data}
+          data={formattedData}
           userLocation={initialLocation}
-          permissionsStatus={permissionsStatus}
-          setPermissionsStatus={setPermissionsStatus}
-          handleMapPress={handleMapPress}
-          handleMarkerPress={handleMarkerPress}
-          focusedMarker={focusedMarker}
-          focusedMarkerRef={focusedMarkerRef}
-          handleCalloutPress={handleCalloutPress}
-          alertOnLocationError={alertOnLocationError}
+          handlePayButton={handlePayButton}
         />
       )}
     </Screen>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingState: { flex: 1, justifyContent: "center", alignItems: "center" },
+}))
