@@ -28,10 +28,10 @@
         "text": "Kliknutím na \"Prijať\" súhlasíte s našimi zmluvnými podmienkami. Súhlasíte tiež s tým, že nie ste rezidentom ani občanom jednej zo zakázaných krajín."
     },
     "SetAccountModal": {
-        "title": "Nastaviť predvolený účet",
-        "description": "Tento účet bude zvolený na odosielanie a prijímanie platieb. Možno ho kedykoľvek zmeniť.",
-        "stablesatsTag": "Túto možnosť zvoľte, aby ste udržali stabilnú hodnotu USD.",
-        "bitcoinTag": "Zvoľte túto možnosť, aby ste boli na Bitcoin štandarde."
+        "title": "Nastavte si účet na prijímanie",
+        "description": "Toto môžete kedykoľvek neskôr zmeniť v Nastaveniach",
+        "stablesatsTag": "Stablesats účet pre cenovú stabilitu",
+        "bitcoinTag": "Bitcoin účet pre maximalistov"
     },
     "NoteInput": {
         "addNote": "Pridať poznámku"
@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "So Stablesats máte vo svojej peňaženke pridaný účet v USD!",
         "body": "Pomocou tohto účtu môžete odosielať a prijímať bitcoiny a okamžite prevádzať hodnotu medzi svojím BTC a USD účtom. Hodnota na USD účte nebude kolísať s cenou Bitcoinu. Táto funkcia nie je kompatibilná s tradičným bankovým systémom.",
-        "termsAndConditions": "Prečítajte si podmienky používania.",
+        "termsAndConditions": "Prečítajte si podmienky používania",
         "learnMore": "Zistite viac o Stablesats"
     },
     "SplashScreen": {
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Povolený",
+        "switch": "Prepínač",
         "notifications": "Notifikácie",
         "preferences": "Preferencie",
         "onDeviceSecurity": "Zabezpečenie na zariadení",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Tento mesiac",
         "prevMonths": "Predchádzajúce mesiace",
         "problemMaybeReauth": "Vyskytol sa problém s vašou požiadavkou. Skúste to prosím znova o minútu. Ak problém pretrváva, odporúčame odhlásiť sa a prihlásiť sa znova. Odhlásiť sa môžete v Nastavenia > Účet > Odhlásiť.",
-        "warning": "Upozornenie"
+        "warning": "Upozornenie",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",
@@ -2650,7 +2652,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Páči sa vám aplikácia?",
         "statusPage": "Stav",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Ďakujeme za spätnú väzbu, chcete nám nechať návrh na zlepšenie?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Notifikácie",
         "noNotifications": "Momentálne nemáte žiadne upozornenia"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Pri odosielaní správy sa vyskytla chyba",
-        "confirmChatReset": "Naozaj chcete zresetovať čet?",
-        "errorResettingChat": "Pri resetovaní četu sa vyskytla chyba"
     }
 }

@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Laat mensen betalingen incasseren via de Kassa-link, zonder toegang tot uw portemonnee.\n\nZe kunnen facturen maken en betalingen worden rechtstreeks naar uw {bankName: string} Wallet gestuurd."
     },
     "SetAccountModal": {
-        "title": "Standaardaccount instellen",
-        "description": "Dit account wordt in eerste instantie geselecteerd voor het verzenden en ontvangen van betalingen. Het kan op elk moment worden gewijzigd.",
-        "stablesatsTag": "Kies dit om een ​​stabiele USD-waarde te behouden.",
-        "bitcoinTag": "Kies dit voor een Bitcoin-standaard."
+        "title": "Stel je ontvangstrekening in",
+        "description": "Je kunt dit later altijd wijzigen in Instellingen",
+        "stablesatsTag": "Stablesats-rekening voor prijsstabiliteit",
+        "bitcoinTag": "Bitcoin-rekening voor maximalisten"
     },
     "NoteInput": {
         "addNote": "Notitie toevoegen"
@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Met Stablesats heb je nu een USD-account toegevoegd aan je wallet!",
         "body": "U kunt het gebruiken om Bitcoin te verzenden en te ontvangen, en direct waarde over te dragen tussen uw BTC- en USD-account. De waarde op de USD-rekening fluctueert niet met de prijs van Bitcoin. Deze functie is niet compatibel met het traditionele banksysteem.",
-        "termsAndConditions": "Lees de Algemene voorwaarden.",
+        "termsAndConditions": "Lees de Algemene voorwaarden",
         "learnMore": "Meer informatie over Stablesats"
     },
     "SplashScreen": {
@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} succesvol bevestigd"
     },
     "common": {
+        "switch": "Schakelaar",
         "account": "Rekening",
         "transactionLimits": "Transactie Limieten",
         "activateWallet": "Activeer Wallet",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Deze maand",
         "prevMonths": "Vorige maanden",
         "problemMaybeReauth": "Er was een probleem met je verzoek. Probeer het over een minuut opnieuw. Als het probleem zich blijft voordoen, raden we u aan uit te loggen en weer in te loggen. U kunt uitloggen door naar Instellingen > Account > Uitloggen te gaan.",
-        "warning": "Waarschuwing"
+        "warning": "Waarschuwing",
+        "blinkToBlink": "Blink naar Blink"
     },
     "errors": {
         "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",

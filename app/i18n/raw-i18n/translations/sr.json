@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Дозволите особама да примају плаћања преко линка касе, без приступа вашем новчанику.\n\nМогу издати рачуне и плаћања ће бити послата директно на ваш {bankName: string} новчаник."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Podesi svoj nalog za prijem",
+        "description": "Ovo uvek možeš kasnije da promeniš u Podešavanjima",
+        "stablesatsTag": "Stablesats nalog za stabilnost cene",
+        "bitcoinTag": "Bitcoin nalog za maksimaliste"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2295,7 +2295,8 @@
     },
     "DefaultWalletScreen": {
         "title": "Примање валуте",
-        "info": "Користите свој Stablesats налог у Blink-у да бисте новац у свом новчанику одржали стабилним у фиат вредности (долар). Користите свој Bitcoin налог ако сакупљате sats и не смета вам што се фиат стање стално мења."    },
+        "info": "Користите свој Stablesats налог у Blink-у да бисте новац у свом новчанику одржали стабилним у фиат вредности (долар). Користите свој Bitcoin налог ако сакупљате sats и не смета вам што се фиат стање стално мења."
+    },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
@@ -2309,7 +2310,7 @@
     "StablesatsModal": {
         "header": "Са Стејблсатсима, сада имате додатни амерички доларски рачун у свом новчанику!",
         "body": "Можете га користити за слање и примање Биткоина, и моментално преносити вредност између вашег „BTC“ и „USD“ налога. Вредност на „USD“ налогу неће варирати са ценом Биткоина. Ова функција није компатибилна са традиционалним банкарским системом.",
-        "termsAndConditions": "Прочитајте услове коришћења.",
+        "termsAndConditions": "Прочитајте услове коришћења",
         "learnMore": "Сазнајте више о Стејблсатсу"
     },
     "SplashScreen": {
@@ -2434,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Прекидач",
         "account": "Налог",
         "transactionLimits": "Ограничења трансакција",
         "activateWallet": "Активирајте новчаник",
@@ -2521,7 +2523,8 @@
         "thisMonth": "Овог месеца",
         "prevMonths": "Прошли месеци",
         "problemMaybeReauth": "Дошло је до проблема са вашим захтевом. Молимо вас покушајте поново за један минут. Уколико проблем и даље постоји, препоручујемо да се одјавите и поново пријавите. Можете се одјавити преко Подешавања > Налог > Одјави се",
-        "warning": "Упозорење"
+        "warning": "Упозорење",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",

@@ -148,19 +148,19 @@ type RootTranslation = {
 	}
 	SetAccountModal: {
 		/**
-		 * S​e​t​ ​d​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
 		 */
 		title: string
 		/**
-		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​i​t​i​a​l​l​y​ ​s​e​l​e​c​t​e​d​ ​f​o​r​ ​s​e​n​d​i​n​g​ ​a​n​d​ ​r​e​c​e​i​v​i​n​g​ ​p​a​y​m​e​n​t​s​.​ ​I​t​ ​c​a​n​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​t​ ​a​n​y​ ​t​i​m​e​.
+		 * Y​o​u​ ​c​a​n​ ​a​l​w​a​y​s​ ​c​h​a​n​g​e​ ​t​h​i​s​ ​l​a​t​e​r​ ​i​n​ ​t​h​e​ ​S​e​t​t​i​n​g​s
 		 */
 		description: string
 		/**
-		 * C​h​o​o​s​e​ ​t​h​i​s​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​a​ ​s​t​a​b​l​e​ ​U​S​D​ ​v​a​l​u​e​.
+		 * S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​p​r​i​c​e​ ​s​t​a​b​i​l​i​t​y
 		 */
 		stablesatsTag: string
 		/**
-		 * C​h​o​o​s​e​ ​t​h​i​s​ ​t​o​ ​b​e​ ​o​n​ ​a​ ​B​i​t​c​o​i​n​ ​s​t​a​n​d​a​r​d​.
+		 * B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​m​a​x​i​m​a​l​i​s​t​s
 		 */
 		bitcoinTag: string
 	}
@@ -6317,13 +6317,98 @@ type RootTranslation = {
 		 */
 		oneSectionADay: string
 		/**
-		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n​!
+		 * C​o​m​e​ ​b​a​c​k​ ​t​o​m​o​r​r​o​w​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​w​h​i​l​e​ ​l​e​a​r​n​i​n​g​.​
+	​
+	​O​r​,​ ​c​l​i​c​k​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
 		 */
 		availableTomorrow: string
 		/**
 		 * D​i​g​ ​y​o​u​r​ ​w​a​y​ ​t​h​r​o​u​g​h​ ​t​h​e​s​e​ ​l​e​s​s​o​n​s​ ​a​n​d​ ​e​a​r​n​ ​a​s​ ​y​o​u​ ​l​e​a​r​n
 		 */
 		motivatingBadger: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​(​N​o​ ​R​e​w​a​r​d​s​)
+		 */
+		continueNoRewards: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​'​s​ ​N​o​t​ ​R​i​g​h​t​.​.​.
+		 */
+		somethingNotRight: string
+		/**
+		 * {​e​r​r​o​r​M​e​s​s​a​g​e​}​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.​
+	​O​r​,​ ​c​l​i​c​k​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​t​o​ ​k​e​e​p​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​.
+		 * @param {string} errorMessage
+		 */
+		defaultErrorMessage: RequiredParams<'errorMessage'>
+		/**
+		 * I​t​ ​l​o​o​k​s​ ​l​i​k​e​ ​w​e​'​v​e​ ​d​e​t​e​c​t​e​d​ ​s​o​m​e​ ​u​n​u​s​u​a​l​ ​a​c​t​i​v​i​t​y​ ​o​n​ ​y​o​u​r​ ​a​c​c​o​u​n​t​.​ ​T​o​ ​e​n​s​u​r​e​ ​f​a​i​r​ ​p​l​a​y​ ​f​o​r​ ​e​v​e​r​y​o​n​e​,​ ​w​e​'​r​e​ ​u​n​a​b​l​e​ ​t​o​ ​o​f​f​e​r​ ​r​e​w​a​r​d​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e​.​
+	​Y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​c​o​n​t​i​n​u​e​ ​l​e​a​r​n​i​n​g​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​,​ ​o​r​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​f​r​o​m​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​c​o​n​n​e​c​t​i​o​n​.
+		 */
+		customErrorMessage: string
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * T​e​l​c​o​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​t​e​l​c​o​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​e​l​c​o​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			invalidIpMetadata: {
+				/**
+				 * I​P​ ​r​e​s​t​r​i​c​t​e​d
+				 */
+				title: string
+				/**
+				 * W​e​'​r​e​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​a​t​t​a​c​k​ ​f​r​o​m​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​I​P​.​
+			​W​e​'​v​e​ ​d​i​s​a​b​l​e​d​ ​r​e​w​a​r​d​s​ ​f​o​r​ ​t​h​i​s​ ​I​P​ ​u​n​t​i​l​ ​f​u​r​t​h​e​r​ ​n​o​t​i​c​e​.​ ​A​p​o​l​o​g​i​e​s​!
+				 */
+				message: string
+			}
+			claimedTooEarly: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * R​e​w​a​r​d​ ​w​a​l​l​e​t​ ​e​m​p​t​y
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​a​d​d​ ​f​u​n​d​s​ ​s​o​o​n​.​ ​S​o​r​r​y​!
+				 */
+				message: string
+			}
+			oneSectionADay: {
+				/**
+				 * C​o​n​t​i​n​u​e​ ​w​i​t​h​o​u​t​ ​r​e​w​a​r​d​s​?
+				 */
+				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​o​n​l​y​ ​d​o​ ​o​n​e​ ​s​e​c​t​i​o​n​ ​p​e​r​ ​d​a​y​ ​w​h​i​l​e​ ​e​a​r​n​i​n​g​ ​s​a​t​s​ ​r​e​w​a​r​d​s​.
+				 */
+				message: string
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -7003,7 +7088,7 @@ type RootTranslation = {
 		 */
 		usernameNowAddressInfo: RequiredParams<'bankName' | 'bankName' | 'bankName' | 'lnDomain' | 'lnDomain'>
 		/**
-		 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​d​e​s​t​i​n​a​t​i​o​n
+		 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​d​e​s​t​i​n​a​t​i​o​n
 		 */
 		enterValidDestination: string
 		/**
@@ -7110,6 +7195,14 @@ type RootTranslation = {
 		 * P​a​s​t​e​d​ ​f​r​o​m​ ​c​l​i​p​b​o​a​r​d
 		 */
 		pastedClipboardSuccess: string
+		/**
+		 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​m​o​b​i​l​e​ ​n​u​m​b​e​r
+		 */
+		invalidPhoneNumber: string
+		/**
+		 * T​h​i​s​ ​f​i​e​l​d​ ​d​o​e​s​ ​n​o​t​ ​a​c​c​e​p​t​ ​p​h​o​n​e​ ​n​u​m​b​e​r​s
+		 */
+		phoneNotAllowed: string
 	}
 	SendBitcoinScreen: {
 		/**
@@ -7147,9 +7240,9 @@ type RootTranslation = {
 		 */
 		destination: string
 		/**
-		 * D​e​s​t​i​n​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d
+		 * D​e​s​t​i​n​a​t​i​o​n​ ​r​e​q​u​i​r​e​d
 		 */
-		destinationIsRequired: string
+		destinationRequired: string
 		/**
 		 * n​e​t​w​o​r​k​ ​f​e​e
 		 */
@@ -7159,7 +7252,7 @@ type RootTranslation = {
 		 */
 		feeCalculationUnsuccessful: string
 		/**
-		 * U​s​e​r​n​a​m​e​,​ ​i​n​v​o​i​c​e​,​ ​o​r​ ​a​d​d​r​e​s​s
+		 * I​n​v​o​i​c​e​ ​o​r​ ​A​d​d​r​e​s​s
 		 */
 		placeholder: string
 		/**
@@ -7183,7 +7276,7 @@ type RootTranslation = {
 		 */
 		note: string
 		/**
-		 * P​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​s​e​n​t​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 * P​a​y​m​e​n​t​ ​s​u​c​c​e​s​s​f​u​l
 		 */
 		success: string
 		/**
@@ -7260,6 +7353,42 @@ type RootTranslation = {
 		 * E​n​c​r​y​p​t​e​d​ ​m​e​s​s​a​g​e​.​ ​W​a​i​t​i​n​g​ ​f​o​r​ ​p​a​y​m​e​n​t​ ​c​o​n​f​i​r​m​a​t​i​o​n​.
 		 */
 		pendingDecryptionMessage: string
+		/**
+		 * S​e​n​d​ ​t​o
+		 */
+		destinationScreenTitle: string
+		/**
+		 * O​r​ ​M​o​b​i​l​e​ ​N​u​m​b​e​r
+		 */
+		orBySMS: string
+		/**
+		 * O​r​ ​S​a​v​e​d
+		 */
+		orSaved: string
+		/**
+		 * F​e​e
+		 */
+		feeLabel: string
+		/**
+		 * N​o​t​e
+		 */
+		noteLabel: string
+		/**
+		 * S​e​n​d​e​r
+		 */
+		sender: string
+		/**
+		 * R​e​c​i​p​i​e​n​t
+		 */
+		recipient: string
+		/**
+		 * T​i​m​e
+		 */
+		time: string
+		/**
+		 * T​y​p​e
+		 */
+		type: string
 	}
 	SettingsScreen: {
 		/**
@@ -8451,6 +8580,10 @@ type RootTranslation = {
 		 */
 		enabled: string
 		/**
+		 * S​w​i​t​c​h
+		 */
+		'switch': string
+		/**
 		 * N​o​t​i​f​i​c​a​t​i​o​n​s
 		 */
 		notifications: string
@@ -8498,6 +8631,10 @@ type RootTranslation = {
 		 * B​l​i​n​k​ ​U​s​e​r
 		 */
 		blinkUser: string
+		/**
+		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
+		 */
+		blinkToBlink: string
 		/**
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
@@ -8873,6 +9010,14 @@ type RootTranslation = {
 		 */
 		warning: string
 		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		'continue': string
+		/**
+		 * C​o​r​r​e​c​t
+		 */
+		correct: string
+		/**
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
@@ -8918,6 +9063,10 @@ type RootTranslation = {
 		 * P​r​o​f​i​l​e​s
 		 */
 		profiles: string
+		/**
+		 * P​a​s​t​e
+		 */
+		paste: string
 	}
 	errors: {
 		/**
@@ -9024,10 +9173,6 @@ type RootTranslation = {
 		 * S​t​a​t​u​s​ ​p​a​g​e
 		 */
 		statusPage: string
-		/**
-		 * C​h​a​t​b​o​t
-		 */
-		chatbot: string
 		/**
 		 * T​e​l​e​g​r​a​m
 		 */
@@ -9470,20 +9615,6 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
-	SupportChat: {
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​s​e​n​d​i​n​g​ ​t​h​e​ ​m​e​s​s​a​g​e
-		 */
-		errorSendingMessage: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​r​e​s​e​t​ ​t​h​e​ ​c​h​a​t​?
-		 */
-		confirmChatReset: string
-		/**
-		 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​w​h​i​l​e​ ​r​e​s​e​t​t​i​n​g​ ​t​h​e​ ​c​h​a​t
-		 */
-		errorResettingChat: string
-	}
 }
 
 export type TranslationFunctions = {
@@ -9593,19 +9724,19 @@ export type TranslationFunctions = {
 	}
 	SetAccountModal: {
 		/**
-		 * Set default account
+		 * Set up your receive account
 		 */
 		title: () => LocalizedString
 		/**
-		 * This account will be initially selected for sending and receiving payments. It can be changed at any time.
+		 * You can always change this later in the Settings
 		 */
 		description: () => LocalizedString
 		/**
-		 * Choose this to maintain a stable USD value.
+		 * Stablesats account for price stability
 		 */
 		stablesatsTag: () => LocalizedString
 		/**
-		 * Choose this to be on a Bitcoin standard.
+		 * Bitcoin account for maximalists
 		 */
 		bitcoinTag: () => LocalizedString
 	}
@@ -15756,13 +15887,97 @@ export type TranslationFunctions = {
 		 */
 		oneSectionADay: () => LocalizedString
 		/**
-		 * Come back tomorrow to continue learning about Bitcoin!
+		 * Come back tomorrow to continue earning sats while learning.
+
+	Or, click continue to keep learning without rewards.
 		 */
 		availableTomorrow: () => LocalizedString
 		/**
 		 * Dig your way through these lessons and earn as you learn
 		 */
 		motivatingBadger: () => LocalizedString
+		/**
+		 * Continue (No Rewards)
+		 */
+		continueNoRewards: () => LocalizedString
+		/**
+		 * Something's Not Right...
+		 */
+		somethingNotRight: () => LocalizedString
+		/**
+		 * {errorMessage} Please try again later.
+	Or, click to continue to keep learning without rewards.
+		 */
+		defaultErrorMessage: (arg: { errorMessage: string }) => LocalizedString
+		/**
+		 * It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.
+	You can still continue learning without rewards, or please try again later from a different connection.
+		 */
+		customErrorMessage: () => LocalizedString
+		customMessages: {
+			invalidPhoneForQuiz: {
+				/**
+				 * Telco restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this telco.
+			We've disabled rewards for this telco until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			invalidIpMetadata: {
+				/**
+				 * IP restricted
+				 */
+				title: () => LocalizedString
+				/**
+				 * We're experiencing an attack from users with this IP.
+			We've disabled rewards for this IP until further notice. Apologies!
+				 */
+				message: () => LocalizedString
+			}
+			claimedTooEarly: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			notEnoughBalanceForQuiz: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			invalidQuizQuestionId: {
+				/**
+				 * Reward wallet empty
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll add funds soon. Sorry!
+				 */
+				message: () => LocalizedString
+			}
+			oneSectionADay: {
+				/**
+				 * Continue without rewards?
+				 */
+				title: () => LocalizedString
+				/**
+				 * You can only do one section per day while earning sats rewards.
+				 */
+				message: () => LocalizedString
+			}
+		}
 	}
 	GetStartedScreen: {
 		/**
@@ -16423,7 +16638,7 @@ export type TranslationFunctions = {
 		 */
 		usernameNowAddressInfo: (arg: { bankName: string, lnDomain: string }) => LocalizedString
 		/**
-		 * Please enter a valid destination
+		 * Enter a valid destination
 		 */
 		enterValidDestination: () => LocalizedString
 		/**
@@ -16518,6 +16733,14 @@ export type TranslationFunctions = {
 		 * Pasted from clipboard
 		 */
 		pastedClipboardSuccess: () => LocalizedString
+		/**
+		 * Enter a valid mobile number
+		 */
+		invalidPhoneNumber: () => LocalizedString
+		/**
+		 * This field does not accept phone numbers
+		 */
+		phoneNotAllowed: () => LocalizedString
 	}
 	SendBitcoinScreen: {
 		/**
@@ -16553,9 +16776,9 @@ export type TranslationFunctions = {
 		 */
 		destination: () => LocalizedString
 		/**
-		 * Destination is required
+		 * Destination required
 		 */
-		destinationIsRequired: () => LocalizedString
+		destinationRequired: () => LocalizedString
 		/**
 		 * network fee
 		 */
@@ -16565,7 +16788,7 @@ export type TranslationFunctions = {
 		 */
 		feeCalculationUnsuccessful: () => LocalizedString
 		/**
-		 * Username, invoice, or address
+		 * Invoice or Address
 		 */
 		placeholder: () => LocalizedString
 		/**
@@ -16589,7 +16812,7 @@ export type TranslationFunctions = {
 		 */
 		note: () => LocalizedString
 		/**
-		 * Payment has been sent successfully
+		 * Payment successful
 		 */
 		success: () => LocalizedString
 		/**
@@ -16666,6 +16889,42 @@ export type TranslationFunctions = {
 		 * Encrypted message. Waiting for payment confirmation.
 		 */
 		pendingDecryptionMessage: () => LocalizedString
+		/**
+		 * Send to
+		 */
+		destinationScreenTitle: () => LocalizedString
+		/**
+		 * Or Mobile Number
+		 */
+		orBySMS: () => LocalizedString
+		/**
+		 * Or Saved
+		 */
+		orSaved: () => LocalizedString
+		/**
+		 * Fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Note
+		 */
+		noteLabel: () => LocalizedString
+		/**
+		 * Sender
+		 */
+		sender: () => LocalizedString
+		/**
+		 * Recipient
+		 */
+		recipient: () => LocalizedString
+		/**
+		 * Time
+		 */
+		time: () => LocalizedString
+		/**
+		 * Type
+		 */
+		type: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
@@ -17831,6 +18090,10 @@ export type TranslationFunctions = {
 		 */
 		enabled: () => LocalizedString
 		/**
+		 * Switch
+		 */
+		'switch': () => LocalizedString
+		/**
 		 * Notifications
 		 */
 		notifications: () => LocalizedString
@@ -17878,6 +18141,10 @@ export type TranslationFunctions = {
 		 * Blink User
 		 */
 		blinkUser: () => LocalizedString
+		/**
+		 * Blink to Blink
+		 */
+		blinkToBlink: () => LocalizedString
 		/**
 		 * Transaction limits
 		 */
@@ -18251,6 +18518,14 @@ export type TranslationFunctions = {
 		 */
 		warning: () => LocalizedString
 		/**
+		 * Continue
+		 */
+		'continue': () => LocalizedString
+		/**
+		 * Correct
+		 */
+		correct: () => LocalizedString
+		/**
 		 * Recommended
 		 */
 		recommended: () => LocalizedString
@@ -18296,6 +18571,10 @@ export type TranslationFunctions = {
 		 * Profiles
 		 */
 		profiles: () => LocalizedString
+		/**
+		 * Paste
+		 */
+		paste: () => LocalizedString
 	}
 	errors: {
 		/**
@@ -18401,10 +18680,6 @@ export type TranslationFunctions = {
 		 * Status page
 		 */
 		statusPage: () => LocalizedString
-		/**
-		 * Chatbot
-		 */
-		chatbot: () => LocalizedString
 		/**
 		 * Telegram
 		 */
@@ -18827,20 +19102,6 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
-	}
-	SupportChat: {
-		/**
-		 * An error occurred while sending the message
-		 */
-		errorSendingMessage: () => LocalizedString
-		/**
-		 * Are you sure you want to reset the chat?
-		 */
-		confirmChatReset: () => LocalizedString
-		/**
-		 * An error occurred while resetting the chat
-		 */
-		errorResettingChat: () => LocalizedString
 	}
 }
 

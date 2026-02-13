@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Omogućite ljudima da prikupljaju uplate putem poveznice na blagajnu, bez pristupa vašem novčaniku.\n\nOni mogu izraditi fakture i uplate će se slati izravno u vaš novčanik {bankName: string}."
     },
     "SetAccountModal": {
-        "title": "Postavi zadani račun",
-        "description": "Ovaj će račun biti inicijalno odabran za slanje i primanje plaćanja. Može se promijeniti u bilo kojem trenutku.",
-        "stablesatsTag": "Odaberi ovo za održavanje stabilne vrijednosti USD.",
-        "bitcoinTag": "Odaberi ovo da budeš na Bitcoin standardu."
+        "title": "Postavite svoj račun za primanje",
+        "description": "Uvijek to možete kasnije promijeniti u Postavkama",
+        "stablesatsTag": "Stablesats račun za stabilnost cijene",
+        "bitcoinTag": "Bitcoin račun za maksimaliste"
     },
     "NoteInput": {
         "addNote": "Dodaj bilješku"
@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Uz Stablesats, sada imate USD račun dodan u svoj novčanik!",
         "body": "Možete ga koristiti za slanje i primanje Bitcoina i trenutačni prijenos vrijednosti između vašeg BTC i USD računa. Vrijednost na USD računu neće varirati s cijenom Bitcoina. Ova značajka nije kompatibilna s tradicionalnim bankarskim sustavom.",
-        "termsAndConditions": "Pročitajte Uvjete i odredbe.",
+        "termsAndConditions": "Pročitajte Uvjete i odredbe",
         "learnMore": "Saznajte više o Stablesats-u"
     },
     "SplashScreen": {
@@ -2437,6 +2437,7 @@
         "success": "E-pošta {email: string} uspješno je potvrđena"
     },
     "common": {
+        "switch": "Prekidač",
         "account": "Račun",
         "transactionLimits": "Transakcijska ograničenja",
         "activateWallet": "Aktiviraj novčanik",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Ovaj mjesec",
         "prevMonths": "Prethodni mjeseci",
         "problemMaybeReauth": "Došlo je do problema s vašim zahtjevom. Pokušajte ponovno za jednu minutu. Ako se problem nastavi, preporučujemo da se odjavite i ponovno prijavite. Možete se odjaviti tako da odete u Postavke > Račun > Odjava",
-        "warning": "Upozorenje"
+        "warning": "Upozorenje",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",

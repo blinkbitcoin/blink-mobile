@@ -69,11 +69,15 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, "sectionCompleted">>()
 
-  const { amount, sectionTitle } = route.params
+  const { amount, sectionTitle, isAvailable } = route.params
   const { LL } = useI18nContext()
   return (
     <Screen backgroundColor={colors._orange} unsafe>
-      <MountainHeader amount={amount.toString()} color={colors._orange} />
+      <MountainHeader
+        amount={amount.toString()}
+        color={colors._orange}
+        isAvailable={isAvailable}
+      />
       <View style={styles.container}>
         <View style={styles.divider} />
         <BadgerShovelBitcoin />

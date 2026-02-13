@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "ตั้งค่าบัญชีรับของคุณ",
+        "description": "คุณสามารถเปลี่ยนได้เสมอภายหลังในการตั้งค่า",
+        "stablesatsTag": "บัญชี Stablesats สำหรับความเสถียรของราคา",
+        "bitcoinTag": "บัญชี Bitcoin สำหรับแม็กซิมัลลิสต์"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "สวิตช์",
         "account": "บัญชี",
         "transactionLimits": "จำกัดธุรกรรม",
         "activateWallet": "เปิดใช้งานกระเป๋า",
@@ -2522,7 +2523,8 @@
         "thisMonth": "เดือนนี้",
         "prevMonths": "เดือนที่ผ่านมา",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "Blink ไปยัง Blink"
     },
     "errors": {
         "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",

@@ -28,10 +28,10 @@
         "text": "Ao clicar em \"Aceitar\", você concorda com nossos temos e condições. Você também concorda que não é residente ou cidadão de nenhum dos países proibidos."
     },
     "SetAccountModal": {
-        "title": "Defina sua conta padrão",
-        "description": "Essa conta será selecionada inicialmente para envio e recebimento de pagamentos. Você pode alterá-la a qualquer momento.",
-        "stablesatsTag": "Escolha essa opção para manter um valor estável em USD",
-        "bitcoinTag": "Escolha essa opção para estar no padrão Bitcoin"
+        "title": "Configure sua conta de recebimento",
+        "description": "Você sempre pode mudar isso mais tarde nas Configurações",
+        "stablesatsTag": "Conta Stablesats para estabilidade de preço",
+        "bitcoinTag": "Conta Bitcoin para maximalistas"
     },
     "NoteInput": {
         "addNote": "Adicione uma nota"
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Habilitado",
+        "switch": "Interruptor",
         "notifications": "Notificações",
         "preferences": "Preferências",
         "onDeviceSecurity": "Segurança no dispositivo",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Este mês",
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Houve um problema com o seu pedido. Tente novamente em um minuto. Se o problema persistir, recomendamos que você saia e entre no app novamente. Você pode sair acessando Configurações > Conta > Sair",
-        "warning": "Aviso"
+        "warning": "Aviso",
+        "blinkToBlink": "Blink para Blink"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",
@@ -2650,7 +2652,6 @@
         "faq": "FAQ",
         "enjoyingApp": "Gostando do aplicativo?",
         "statusPage": "Página de status",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mais importante",
         "thankYouText": "Obrigado pelo feedback, gostaria de sugerir uma melhoria?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Notificações",
         "noNotifications": "Você não possui notificações no momento"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "An error occurred while sending the message",
-        "confirmChatReset": "Are you sure you want to reset the chat?",
-        "errorResettingChat": "An error occurred while resetting the chat"
     }
 }

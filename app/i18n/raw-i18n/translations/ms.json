@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Benarkan individu lain untuk terima bayaran melalui pautan Cash Register, tanpa akses ke dompet anda\n\nMereka boleh membuat invois baru dan bayaran akan dihantar terus ke dompet {bankName: string} anda."
     },
     "SetAccountModal": {
-        "title": "Tetapkan akaun utama",
-        "description": "Untuk permulaan, akaun ini ditetapkan sebagai tempat menerima dan membuat pembayaran. Ia boleh ditukar pada bila bila masa jika perlu",
-        "stablesatsTag": "Pilih ini untuk mengekalkan nilai USD",
-        "bitcoinTag": "Pilih ini untuk penetapan nilai standard Bitcoin"
+        "title": "Sediakan akaun penerimaan anda",
+        "description": "Anda sentiasa boleh mengubahnya kemudian di Tetapan",
+        "stablesatsTag": "Akaun Stablesats untuk kestabilan harga",
+        "bitcoinTag": "Akaun Bitcoin untuk maksimalis"
     },
     "NoteInput": {
         "addNote": "tambah nota catatan"
@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Dengan stablesats, anda sekarang telah ada Dolar USD dalam dompet anda!",
         "body": "Anda boleh gunakan ia untuk terima dan hantar Bitcoin, dan lakukan pemindahan segera antara nilai BTC dan USD yang ada dalam akaun anda. Nilai USD tidak berubah dengan harga Bitcoin. Fungsi ini tak sesuai dengan sistem perbankan sekarang.",
-        "termsAndConditions": "Baca terma & syarat.",
+        "termsAndConditions": "Baca terma & syarat",
         "learnMore": "Ketahui lebih lanjut tentang stablesats"
     },
     "SplashScreen": {
@@ -2437,6 +2437,7 @@
         "success": "Emel {email: string} telah berjaya disahkan"
     },
     "common": {
+        "switch": "Suis",
         "account": "Akaun",
         "transactionLimits": "Had transaksi",
         "activateWallet": "Aktifkan dompet",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Bulan ini",
         "prevMonths": "Bulan lepas",
         "problemMaybeReauth": "Ada masalah dengan permohonan anda. Silancuba lagi dalam seminit dua. Jika masalah masih terjadi, kami cadangkan anda untuk log keluar dan log masuk semula. Anda boleh log keluar dengan pergi ke bahagian Tetapan > Akaun > Log Keluar",
-        "warning": "Amaran"
+        "warning": "Amaran",
+        "blinkToBlink": "Blink ke Blink"
     },
     "errors": {
         "generic": "Ada masalah timbul\nSila cuba lagi",

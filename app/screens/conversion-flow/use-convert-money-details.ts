@@ -30,7 +30,7 @@ export interface InputValues {
 }
 
 export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) => {
-  const { convertMoneyAmount } = usePriceConversion()
+  const { convertMoneyAmount, convertMoneyAmountWithRounding } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
 
   const [wallets, _setWallets] = React.useState<
@@ -62,18 +62,10 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     fromWallet: WalletFragment
     toWallet: WalletFragment
   }) => {
-    // if the from wallet is empty, swap the wallets
-    if (wallets.fromWallet.balance === 0) {
-      return _setWallets({
-        fromWallet: wallets.toWallet,
-        toWallet: wallets.fromWallet,
-      })
-    }
-
     _setWallets(wallets)
   }
 
-  if (!wallets || !convertMoneyAmount) {
+  if (!wallets || !convertMoneyAmount || !convertMoneyAmountWithRounding) {
     return {
       moneyAmount,
       setMoneyAmount,
@@ -104,24 +96,24 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     )
   }
 
-  const toggleWallet =
-    toWallet.balance > 0
-      ? ({
-          canToggleWallet: true,
-          toggleWallet: () => {
-            setWallets({
-              fromWallet: wallets.toWallet,
-              toWallet: wallets.fromWallet,
-            })
-            setMoneyAmount(convertMoneyAmount(moneyAmount, DisplayCurrency))
-          },
-        } as const)
-      : ({
-          canToggleWallet: false,
-        } as const)
+  const toggleWallet = {
+    canToggleWallet: true,
+    toggleWallet: () => {
+      setWallets({
+        fromWallet: wallets.toWallet,
+        toWallet: wallets.fromWallet,
+      })
+      setMoneyAmount(convertMoneyAmount(moneyAmount, DisplayCurrency))
+    },
+  } as const
 
   const settlementSendAmount = convertMoneyAmount(moneyAmount, fromWallet.walletCurrency)
   const settlementReceiveAmount = convertMoneyAmount(moneyAmount, toWallet.walletCurrency)
+  const settlementReceiveAmountRoundedDown = convertMoneyAmountWithRounding(
+    moneyAmount,
+    toWallet.walletCurrency,
+    Math.floor,
+  )
 
   return {
     moneyAmount,
@@ -136,7 +128,8 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
     toWallet,
     isValidAmount:
       settlementSendAmount.amount <= fromWallet.balance &&
-      settlementSendAmount.amount > 0,
+      settlementSendAmount.amount > 0 &&
+      settlementReceiveAmountRoundedDown.amount > 0,
     ...toggleWallet,
   }
 }

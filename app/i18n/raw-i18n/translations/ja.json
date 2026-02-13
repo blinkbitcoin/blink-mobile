@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。"
     },
     "SetAccountModal": {
-        "title": "メインウォレットを設定する",
-        "description": "メインの送受金ウォレットとして設定されます。この設定はいつでも変更することができます。",
-        "stablesatsTag": "米ドルで保管する場合はこれを選択してください。",
-        "bitcoinTag": "ビットコインで保管する場合はこれを選択してください。"
+        "title": "受取アカウントを設定",
+        "description": "後で「設定」でいつでも変更できます。",
+        "stablesatsTag": "価格安定のためのStablesatsアカウント",
+        "bitcoinTag": "マキシマリスト向けBitcoinアカウント"
     },
     "NoteInput": {
         "addNote": "メモを追加"
@@ -2437,6 +2437,7 @@
         "success": "メールアドレス{email: string}が正常に認証されました"
     },
     "common": {
+        "switch": "スイッチ",
         "account": "ウォレット",
         "transactionLimits": "トランザクション限度額",
         "activateWallet": "ウォレットを有効化する",
@@ -2524,7 +2525,8 @@
         "thisMonth": "今月",
         "prevMonths": "先月",
         "problemMaybeReauth": "リクエストに失敗しました。1分後に再トライしてください。問題が解決しない場合は、一旦ログアウトし、再ログインすることをお勧めします。設定 ＞ウォレット ＞ログアウトで、ログアウトできます。",
-        "warning": "警告"
+        "warning": "警告",
+        "blinkToBlink": "Blink から Blink へ"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",

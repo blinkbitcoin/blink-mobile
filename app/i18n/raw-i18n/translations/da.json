@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Tillad folk at modtage betalinger via kasseapparat-linket uden at få adgang til din wallet.\n\nDe kan oprette fakturaer, og betalinger vil blive sendt direkte til din {bankName: string} wallet."
     },
     "SetAccountModal": {
-        "title": "Vælg primær konto",
-        "description": "Din primær konto vil som udgangspunkt blive valgt til at sende og modtage betalinger. Denne kan ændres når som helst.",
-        "stablesatsTag": "Vælg denne for at sikre en stabil USD værdi.",
-        "bitcoinTag": "Vælg denne for at være på en Bitcoin standard."
+        "title": "Sæt din modtagekonto op",
+        "description": "Du kan altid ændre det senere i Indstillinger",
+        "stablesatsTag": "Stablesats-konto for prisstabilitet",
+        "bitcoinTag": "Bitcoin-konto for maksimalister"
     },
     "NoteInput": {
         "addNote": "Tilføj note"
@@ -2335,7 +2335,7 @@
     "StablesatsModal": {
         "header": "Med Stablesats har du nu en USD-konto tilføjet til din tegnebog!",
         "body": "Du kan bruge den til at sende og modtage Bitcoin og øjeblikkeligt overføre værdi mellem din BTC og USD-konto. Værdien i USD-kontoen vil ikke svinge med prisen på Bitcoin. Denne funktion er ikke kompatibel med det traditionelle banksystem.",
-        "termsAndConditions": "Læs vilkårene.",
+        "termsAndConditions": "Læs vilkårene",
         "learnMore": "Læs mere om Stablesats"
     },
     "SplashScreen": {
@@ -2466,6 +2466,7 @@
         "success": "E-mail {email: string} bekræftet med succes"
     },
     "common": {
+        "switch": "Afbryder",
         "account": "Konto",
         "transactionLimits": "Transaktionsgrænser",
         "activateWallet": "Aktiver Tegnebog",
@@ -2558,7 +2559,8 @@
         "thisMonth": "Denne måned",
         "prevMonths": "Forrige måneder",
         "problemMaybeReauth": "Der opstod et problem med din anmodning. Prøv igen om et minut. Hvis problemet fortsætter, anbefaler vi, at du logger ud og logger ind igen. Du kan logge ud ved at gå til Indstillinger > Konto > Log ud",
-        "warning": "Advarsel"
+        "warning": "Advarsel",
+        "blinkToBlink": "Blink til Blink"
     },
     "errors": {
         "generic": "Der opstod en fejl.\nPrøv igen senere.",

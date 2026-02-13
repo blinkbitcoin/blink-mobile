@@ -13,7 +13,7 @@ export const PREFIX_LINKING = [
 ]
 
 // FIXME this should come from globals.lightningAddressDomainAliases
-export const LNURL_DOMAINS = ["pay.bbw.sv", "blink.sv", "pay.blink.sv"]
+export const LNURL_DOMAINS = ["blink.sv", "pay.blink.sv", "pay.bbw.sv"]
 
 export const getInviteLink = (_username: string | null | undefined) => {
   const username = _username ? `/${_username}` : ""

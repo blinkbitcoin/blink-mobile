@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Umožněte lidem vybírat platby prostřednictvím odkazu Pokladny, aniž by měli přístup k vaší peněžence. Vytvořené faktury a platby budou zasílány přímo na vaši {bankName: string} peněženku."
     },
     "SetAccountModal": {
-        "title": "Nastavit výchozí účet",
-        "description": "Tento účet bude zpočátku vybrán pro odesílání a přijímání plateb. Lze jej kdykoli změnit.",
-        "stablesatsTag": "Tuto možnost zvolte, abyste udrželi stabilní hodnotu USD.",
-        "bitcoinTag": "Zvolte tuto možnost, abyste byli na Bitcoin standardu."
+        "title": "Nastavte si účet pro příjem",
+        "description": "Vždy to můžete později změnit v Nastavení",
+        "stablesatsTag": "Účet Stablesats pro cenovou stabilitu",
+        "bitcoinTag": "Bitcoinový účet pro maximalisty"
     },
     "NoteInput": {
         "addNote": "Přidat poznámku"
@@ -2312,7 +2312,7 @@
     "StablesatsModal": {
         "header": "Se Stablesats máte nyní ve své peněžence přidaný účet v USD!",
         "body": "Pomocí ní můžete posílat a přijímat bitcoiny a okamžitě převádět hodnotu mezi svým účtem v BTC a USD. Hodnota na účtu v USD nebude kolísat s cenou Bitcoinu. Tato funkce není kompatibilní s tradičním bankovním systémem.",
-        "termsAndConditions": "Přečtěte si smluvní podmínky.",
+        "termsAndConditions": "Přečtěte si smluvní podmínky",
         "learnMore": "Zjistěte více o Stablesats"
     },
     "SplashScreen": {
@@ -2437,6 +2437,7 @@
         "success": "E-mail {email: string} úspěšně potvrzen"
     },
     "common": {
+        "switch": "Přepínač",
         "account": "Účet",
         "transactionLimits": "Transakční limity",
         "activateWallet": "Aktivovat peněženku",
@@ -2524,7 +2525,8 @@
         "thisMonth": "Tento měsíc",
         "prevMonths": "Předchozí měsíce",
         "problemMaybeReauth": "Ve vašem požadavku se vyskytl problém. Zkuste to prosím znovu za minutu. Pokud problém přetrvává, doporučujeme se odhlásit a znovu přihlásit. Odhlásit se můžete v Nastavení > Účet > Odhlásit se.",
-        "warning": "Upozornění"
+        "warning": "Upozornění",
+        "blinkToBlink": "Blink na Blink"
     },
     "errors": {
         "generic": "Došlo k chybě.\nZkuste to prosím později.",

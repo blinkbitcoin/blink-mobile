@@ -28,10 +28,10 @@
         "text": "Kwa kubofya 'Kubali', unakubali Sheria na Masharti yetu. Pia unakubali kuwa wewe si mkazi au raia kutoka mojawapo ya nchi zilizopigwa marufuku."
     },
     "SetAccountModal": {
-        "title": "Wekeza akaunti ya chaguo",
-        "description": "Akaunti hii itachaguliwa kwa awali kwa kutuma na kupokea malipo. Inaweza kubadilishwa wakati wowote.",
-        "stablesatsTag": "Chagua hii kudumisha thamani imara ya USD.",
-        "bitcoinTag": "Chagua hii kuwa kwenye kiwango cha Bitcoin."
+        "title": "Sanidi akaunti yako ya kupokea",
+        "description": "Unaweza kubadilisha hili baadaye katika Mipangilio",
+        "stablesatsTag": "Akaunti ya Stablesats kwa uthabiti wa bei",
+        "bitcoinTag": "Akaunti ya Bitcoin kwa maximalisti"
     },
     "NoteInput": {
         "addNote": "Ongeza taarifa"
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Imewashwa",
+        "switch": "Swichi",
         "notifications": "Arifa",
         "preferences": "Mapendeleo",
         "onDeviceSecurity": "Usalama Kwenye Kifaa",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Mwezi huu",
         "prevMonths": "Miezi iliyopita",
         "problemMaybeReauth": "Kulikuwa na tatizo na ombi lako. Tafadhali jaribu baada ya dakika moja. Ikiwa tatizo litasistea, tunapendekeza ujitoke nje na uingie tena. Unaweza kujitokeza kwa kwenda kwenye Mipangilio > Akaunti > Toka",
-        "warning": "Onyo"
+        "warning": "Onyo",
+        "blinkToBlink": "Blink hadi Blink"
     },
     "errors": {
         "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -2650,7 +2652,6 @@
         "faq": "Maswali yanayoulizwa mara kwa mara",
         "enjoyingApp": "Unafurahia programu?",
         "statusPage": "Ukurasa wa Hali",
-        "chatbot": "Gumzo",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Asante kwa maoni, ungependa kupendekeza uboreshaji?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Arifa",
         "noNotifications": "Huna arifa zozote kwa sasa"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Hitilafu ilitokea wakati wa kutuma ujumbe",
-        "confirmChatReset": "Je, una uhakika unataka kuweka upya gumzo?",
-        "errorResettingChat": "Hitilafu ilitokea wakati wa kuweka upya gumzo"
     }
 }

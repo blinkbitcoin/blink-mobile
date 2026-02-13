@@ -18,7 +18,7 @@ export const SettingsGroup: React.FC<{
   return (
     <View>
       {name && (
-        <Text {...testProps(name + "-group")} type="p2" bold>
+        <Text {...testProps(name + "-group")} type="p2">
           {name}
         </Text>
       )}
@@ -44,6 +44,6 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
   },
   divider: {
-    marginHorizontal: 10,
+    marginHorizontal: 14,
   },
 }))

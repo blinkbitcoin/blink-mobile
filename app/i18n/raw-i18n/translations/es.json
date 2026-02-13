@@ -28,10 +28,10 @@
         "text": "Al hacer clic en \"Aceptar\", acepta nuestros Términos y condiciones. También acepta que no es residente ni ciudadano de uno de los países prohibidos."
     },
     "SetAccountModal": {
-        "title": "Establece tu cuenta predeterminada",
-        "description": "Esta cuenta se seleccionará inicialmente para enviar y recibir pagos. La puedes cambiar en cualquier momento.",
-        "stablesatsTag": "Elige esta  opción para mantener un valor de USD estable.",
-        "bitcoinTag": "Elige esta opción para estar en el estándar de Bitcoin."
+        "title": "Configura tu cuenta de recepción",
+        "description": "Siempre puedes cambiar esto más tarde en Configuración",
+        "stablesatsTag": "Cuenta Stablesats para estabilidad de precio",
+        "bitcoinTag": "Cuenta Bitcoin para maximalistas"
     },
     "NoteInput": {
         "addNote": "Añade una nota"
@@ -2006,8 +2006,38 @@
         "registerTitle": "Necesitas actualizar tu cuenta",
         "registerContent": "Regístrate con tu número de teléfono para recibir sats",
         "oneSectionADay": "¡Una sección al día!",
-        "availableTomorrow": "¡Vuelve mañana para seguir aprendiendo sobre Bitcoin!",
-        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes"
+        "availableTomorrow": "Regresa mañana para seguir ganando sats mientras aprendes.\n\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
+        "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "continueNoRewards": "Continuar (Sin Recompensas)",
+        "somethingNotRight": "Algo no está bien...",
+        "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
+        "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
+        "customMessages": {
+            "invalidPhoneForQuiz":{
+                "title": "Operadora restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
+            },
+            "invalidIpMetadata":{
+                "title": "IP restringida",
+                "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
+            },
+            "claimedTooEarly":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "notEnoughBalanceForQuiz":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "invalidQuizQuestionId":{
+                "title": "Billetera de recompensas vacía",
+                "message": "Agregaremos fondos pronto. ¡Disculpa!"
+            },
+            "oneSectionADay":{
+                "title": "¿Continuar sin recompensas?",
+                "message": "Solo puedes hacer una sección por día mientras ganas recompensas sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Log in / Crear Cuenta",
@@ -2190,7 +2220,7 @@
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Los nombres de usuario de {bankName: string} ahora son direcciones de {bankName: string}.",
         "usernameNowAddressInfo": "Cuando ingrese un nombre de usuario de {bankName: string}, le agregaremos \"@{lnDomain: string}\" ( por ejemplo, maria@{lnDomain: string} ) para convertirlo en una dirección. Tu nombre de usuario ahora también es una dirección de {bankName: string}.\n\nLos nombres de usuario de {bankName: string} solo permitían transacciones dentro de {bankName: string}, mientras que las direcciones de {bankName: string} permiten realizar pagos con personas que usan diferentes billeteras.",
-        "enterValidDestination": "Introduce un destino válido.",
+        "enterValidDestination": "Introduzca un destino válido",
         "destinationOptions": "Puede enviar a una dirección {bankName: string}, una dirección LN, una factura LN o una dirección BTC.",
         "expiredInvoice": "Esta factura ha caducado. Por favor, genere una nueva factura.",
         "wrongNetwork": "Esta factura es para una red diferente. Por favor, genere una nueva factura.",
@@ -2214,7 +2244,9 @@
             "confirmButton": "Estoy 100% seguro"
         },
         "clipboardError": "Error al obtener el valor del portapapeles",
-        "pastedClipboardSuccess": "Pegado desde el portapapeles"
+        "pastedClipboardSuccess": "Pegado desde el portapapeles",
+        "invalidPhoneNumber": "Introduzca un número de teléfono válido",
+        "phoneNotAllowed": "Este campo no acepta números de teléfono"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
@@ -2225,15 +2257,15 @@
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
         "destination": "Destino",
-        "destinationIsRequired": "El destino es obligatorio",
+        "destinationRequired": "Destino requerido",
         "fee": "tarifa de red",
         "feeCalculationUnsuccessful": "Error al calcular, inténtelo de nuevo ⚠️",
-        "placeholder": "Nombre de usuario o factura",
+        "placeholder": "Factura o Dirección",
         "invalidUsername": "Nombre de usuario no válido",
         "noAmount": "Esta factura no tiene un monto, por lo que debe especificar manualmente cuánto dinero desea enviar",
         "notConfirmed": "El pago ha sido enviado.\npero aún no está confirmado\n\nPuedes comprobar el estado\ndel pago en Transacciones",
         "note": "Nota",
-        "success": "El pago se ha enviado correctamente.",
+        "success": "Pago exitoso",
         "suggestionInput": "Introduce tu sugerencia",
         "max": "Max",
         "maxAmount": "Monto máximo",
@@ -2247,12 +2279,21 @@
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
-        "copySuccessMessage": "Copy success message to clipboard",
-        "openSuccessUrl": "Open success URL in browser",
-        "copySecretMessage": "Copy secret message to clipboard",
-        "copiedSuccessMessage": "Message copied successfully",
-        "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "copySuccessMessage": "Copiar mensaje de éxito al portapapeles",
+        "openSuccessUrl": "Abrir URL de éxito en el navegador",
+        "copySecretMessage": "Copiar mensaje secreto al portapapeles",
+        "copiedSuccessMessage": "Mensaje copiado exitosamente",
+        "copiedSecretMessage": "Mensaje secreto copiado exitosamente",
+        "pendingDecryptionMessage": "Mensaje cifrado. Esperando confirmación de pago.",
+        "destinationScreenTitle": "Enviar a",
+        "orBySMS": "O Número De Teléfono",
+        "orSaved": "O Guardado",
+        "feeLabel": "Comisión",
+        "noteLabel": "Nota",
+        "sender": "Remitente",
+        "recipient": "Destinatario",
+        "time": "Hora",
+        "type": "Tipo"
     },
     "SettingsScreen": {
         "staticQr": "QR estático imprimible",
@@ -2267,7 +2308,7 @@
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
         "tapUserName": "Ingrese aquí para configurarlo",
-        "notifications": "Notificaciones ",
+        "notifications": "Notificaciones",
         "title": "Configuración",
         "darkMode": "Modo oscuro.",
         "setToDark": "Modo: oscuro.",
@@ -2291,8 +2332,8 @@
         "logoutOneAccountAlertTitle": "¿Está seguro de que desea cerrar la sesión de esta cuenta?",
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
-        "receiveCurrency": "Recibir moneda",
-        "displayCurrency": "Mostrar moneda"
+        "receiveCurrency": "Cuenta a recibir",
+        "displayCurrency": "Moneda"
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de notificaciones",
@@ -2396,7 +2437,7 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Recibir moneda",
+        "title": "Cuenta a recibir",
         "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
     },
     "ThemeScreen": {
@@ -2414,7 +2455,7 @@
     "StablesatsModal": {
         "header": "¡Ya tienes una cuenta en USD agregada a tu billetera con StableSats!",
         "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta BTC y USD. El valor en la cuenta en USD no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
-        "termsAndConditions": "Lee los términos y condiciones.",
+        "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats"
     },
     "SplashScreen": {
@@ -2604,7 +2645,8 @@
     },
     "common": {
         "enabled": "Activado",
-        "notifications": "Notificaciones ",
+        "switch": "Interruptor",
+        "notifications": "Notificaciones",
         "preferences": "Preferencias",
         "onDeviceSecurity": "Seguridad y privacidad",
         "securityAndPrivacy": "Seguridad y privacidad",
@@ -2709,6 +2751,8 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Hubo un problema con tu solicitud. Vuelve a intentarlo en un minuto. Si el problema persiste, te recomendamos que cierres la sesión y vuelvas a iniciar sesión. Puedes cerrar la sesión en Configuración > Cuenta > Cerrar sesión",
         "warning": "Advertencia",
+        "continue": "Continuar",
+        "correct": "Correcto",
         "recommended": "Recomendado",
         "expirationTime": "Tiempo de expiración",
         "minute": "Minuto",
@@ -2719,9 +2763,11 @@
         "dollar": "Dólar",
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
+        "profiles": "Perfiles",
+        "paste": "Pegar",
         "some": "Algunos",
         "support": "Soporte",
-        "profiles": "Perfiles"
+        "blinkToBlink": "Blink a Blink"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2755,7 +2801,6 @@
         "faq": "Preguntas Frecuentes - FAQ",
         "enjoyingApp": "¿Disfrutas de la aplicación?",
         "statusPage": "Página de estado",
-        "chatbot": "Chatbot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Gracias por tus comentarios, ¿te gustaría sugerir una mejora?",
@@ -2872,10 +2917,5 @@
     "NotificationHistory": {
         "title": "Notificaciones ",
         "noNotifications": "No tienes notificaciones en este momento"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Se ha producido un error al enviar el mensaje",
-        "confirmChatReset": "¿Seguro que quieres reiniciar el chat?",
-        "errorResettingChat": "Se ha producido un error al restablecer el chat"
     }
 }

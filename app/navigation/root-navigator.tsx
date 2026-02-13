@@ -3,9 +3,9 @@ import * as React from "react"
 import HomeIcon from "@app/assets/icons/home.svg"
 import LearnIcon from "@app/assets/icons/learn.svg"
 import MapIcon from "@app/assets/icons/map.svg"
+import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { SupportChatScreen } from "@app/screens/support-chat-screen/support-chat"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -54,7 +54,12 @@ import {
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack"
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+  StackNavigationProp,
+} from "@react-navigation/stack"
+
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -96,6 +101,8 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import { TouchableOpacity } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
@@ -107,7 +114,8 @@ export const RootStack = () => {
   } = useTheme()
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -119,6 +127,7 @@ export const RootStack = () => {
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerMode: "screen",
+        headerLeft: headerBackControl(),
       }}
       initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
     >
@@ -174,7 +183,17 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinDestination"
         component={SendBitcoinDestinationScreen}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        options={{
+          title: LL.SendBitcoinScreen.destinationScreenTitle(),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.setParams({ scanPressed: Date.now() })}
+              style={styles.SendBitcoinScreenScanIcon}
+            >
+              <ScanIcon fill={colors.black} />
+            </TouchableOpacity>
+          ),
+        }}
       />
       <RootNavigator.Screen
         name="sendBitcoinDetails"
@@ -189,7 +208,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
@@ -351,7 +370,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="transactionHistory"
         component={TransactionHistoryScreen}
-        options={{ title: LL.TransactionScreen.transactionHistoryTitle() }}
+        options={{
+          title: LL.TransactionScreen.transactionHistoryTitle(),
+          presentation: "modal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
+        }}
       />
       <RootNavigator.Screen
         name="priceHistory"
@@ -471,13 +495,6 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
-        name="supportChat"
-        component={SupportChatScreen}
-        options={{
-          title: LL.support.chatbot(),
-        }}
-      />
-      <RootNavigator.Screen
         name="notificationHistory"
         component={NotificationHistoryScreen}
         options={{ title: LL.NotificationHistory.title() }}
@@ -566,6 +583,7 @@ export const ContactNavigator = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerLeft: headerBackControl(),
       }}
       initialRouteName="peopleHome"
     >
@@ -624,6 +642,7 @@ export const PhoneLoginNavigator = () => {
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerLeft: headerBackControl(),
       }}
     >
       <StackPhoneValidation.Screen
@@ -751,5 +770,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     color: colors.black,
+  },
+  SendBitcoinScreenScanIcon: {
+    marginRight: 20,
   },
 }))

@@ -4,10 +4,7 @@ import ReactNativeModal from "react-native-modal"
 
 import { CONTACT_EMAIL_ADDRESS, WHATSAPP_CONTACT_NUMBER } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openWhatsApp } from "@app/utils/external"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import { Icon, ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import TelegramOutline from "./telegram.svg"
@@ -19,7 +16,6 @@ export const SupportChannels = {
   StatusPage: "statusPage",
   Mattermost: "mattermost",
   Faq: "faq",
-  SupportChat: "supportChat",
 } as const
 
 export type SupportChannels = (typeof SupportChannels)[keyof typeof SupportChannels]
@@ -48,22 +44,11 @@ const ContactModal: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-
   const contactOptionList = [
-    {
-      id: SupportChannels.SupportChat,
-      name: LL.support.chatbot(),
-      icon: <Icon name={"chatbubbles-outline"} type="ionicon" size={24} />,
-      action: () => {
-        navigation.navigate("supportChat")
-        toggleModal()
-      },
-    },
     {
       id: SupportChannels.StatusPage,
       name: LL.support.statusPage(),
-      icon: <Icon name={"alert-circle-outline"} type="ionicon" size={24} />,
+      icon: <Icon name={"alert-circle-outline"} type="ionicon" size={20} />,
       action: () => {
         // TODO: extract in Instance
         Linking.openURL(`https://blink.statuspage.io/`)
@@ -72,7 +57,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Faq,
       name: LL.support.faq(),
-      icon: <Icon name={"book-outline"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"book-outline"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         Linking.openURL(`https://faq.blink.sv`)
         toggleModal()
@@ -81,7 +66,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Telegram,
       name: LL.support.telegram(),
-      icon: <TelegramOutline width={24} height={24} fill={colors.black} />,
+      icon: <TelegramOutline width={20} height={20} fill={colors.black} />,
       action: () => {
         Linking.openURL(`https://t.me/blinkbtc`)
         toggleModal()
@@ -95,7 +80,7 @@ const ContactModal: React.FC<Props> = ({
           name={"chatbubbles-outline"}
           type="ionicon"
           color={colors.black}
-          size={24}
+          size={20}
         />
       ),
       action: () => {
@@ -106,7 +91,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.WhatsApp,
       name: LL.support.whatsapp(),
-      icon: <Icon name={"logo-whatsapp"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"logo-whatsapp"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         openWhatsAppAction(messageBody)
         toggleModal()
@@ -115,7 +100,7 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Email,
       name: LL.support.email(),
-      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={24} />,
+      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={20} />,
       action: () => {
         Linking.openURL(
           `mailto:${CONTACT_EMAIL_ADDRESS}?subject=${encodeURIComponent(
@@ -155,7 +140,7 @@ const ContactModal: React.FC<Props> = ({
                 name={"chevron-forward"}
                 type="ionicon"
                 color={colors.primary}
-                size={24}
+                size={20}
               />
             </ListItem>
           )

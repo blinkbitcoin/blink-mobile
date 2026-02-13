@@ -36,11 +36,10 @@ const en: BaseTranslation = {
     text: "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries.",
   },
   SetAccountModal: {
-    title: "Set default account",
-    description:
-      "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-    stablesatsTag: "Choose this to maintain a stable USD value.",
-    bitcoinTag: "Choose this to be on a Bitcoin standard.",
+    title: "Set up your receive account",
+    description: "You can always change this later in the Settings",
+    stablesatsTag: "Stablesats account for price stability",
+    bitcoinTag: "Bitcoin account for maximalists",
   },
   NoteInput: {
     addNote: "Add note",
@@ -2042,8 +2041,38 @@ const en: BaseTranslation = {
     registerTitle: "Need to upgrade your account",
     registerContent: "Register with your phone number to receive sats",
     oneSectionADay: "One section a day!",
-    availableTomorrow: "Come back tomorrow to continue learning about Bitcoin!",
+    availableTomorrow: "Come back tomorrow to continue earning sats while learning.\n\nOr, click continue to keep learning without rewards.",
     motivatingBadger: "Dig your way through these lessons and earn as you learn",
+    continueNoRewards: "Continue (No Rewards)",
+    somethingNotRight: "Something's Not Right...",
+    defaultErrorMessage: "{errorMessage: string} Please try again later.\nOr, click to continue to keep learning without rewards.",
+    customErrorMessage: "It looks like we've detected some unusual activity on your account. To ensure fair play for everyone, we're unable to offer rewards at this time.\nYou can still continue learning without rewards, or please try again later from a different connection.",
+    customMessages: {
+      invalidPhoneForQuiz:{
+        title: "Telco restricted",
+        message: "We're experiencing an attack from users with this telco.\nWe've disabled rewards for this telco until further notice. Apologies!",
+      },
+      invalidIpMetadata:{
+        title: "IP restricted",
+        message: "We're experiencing an attack from users with this IP.\nWe've disabled rewards for this IP until further notice. Apologies!",
+      },
+      claimedTooEarly:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      notEnoughBalanceForQuiz:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      invalidQuizQuestionId:{
+        title: "Reward wallet empty",
+        message: "We'll add funds soon. Sorry!",
+      },
+      oneSectionADay:{
+        title: "Continue without rewards?",
+        message: "You can only do one section per day while earning sats rewards.",
+      },
+    },
   },
   GetStartedScreen: {
     logInCreateAccount: "Log in / create account",
@@ -2243,7 +2272,7 @@ const en: BaseTranslation = {
       "{bankName: string} usernames are now {bankName: string} addresses.",
     usernameNowAddressInfo:
       'When you enter a {bankName: string} username, we will add "@{lnDomain: string}" to it (e.g maria@{lnDomain: string}) to make it an address. Your username is now a {bankName: string} address too.\n\nGo to your {bankName: string} address page from your Settings to learn how to use it or to share it to receive payments.',
-    enterValidDestination: "Please enter a valid destination",
+    enterValidDestination: "Enter a valid destination",
     destinationOptions:
       "You can send to a {bankName: string} address, LN address, LN invoice, or BTC address.",
     expiredInvoice: "This invoice has expired. Please generate a new invoice.",
@@ -2279,6 +2308,8 @@ const en: BaseTranslation = {
     },
     clipboardError: "Error getting value from clipboard",
     pastedClipboardSuccess: "Pasted from clipboard",
+    invalidPhoneNumber: "Enter a valid mobile number",
+    phoneNotAllowed: "This field does not accept phone numbers",
   },
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
@@ -2289,17 +2320,17 @@ const en: BaseTranslation = {
     amountIsRequired: "Amount is required",
     cost: "Cost",
     destination: "Destination",
-    destinationIsRequired: "Destination is required",
+    destinationRequired: "Destination required",
     fee: "network fee",
     feeCalculationUnsuccessful: "Calculation unsuccessful ⚠️",
-    placeholder: "Username, invoice, or address",
+    placeholder: "Invoice or Address",
     invalidUsername: "Invalid username",
     noAmount:
       "This invoice doesn't have an amount, so you need to manually specify how much money you want to send",
     notConfirmed:
       "Payment has been sent\nbut is not confirmed yet\n\nYou can check the status\nof the payment in Transactions",
     note: "Note or label",
-    success: "Payment has been sent successfully",
+    success: "Payment successful",
     suggestionInput: "Enter your suggestion",
     max: "Max",
     maxAmount: "Max Amount",
@@ -2322,6 +2353,15 @@ const en: BaseTranslation = {
     copiedSuccessMessage: "Message copied successfully",
     copiedSecretMessage: "Secret message copied successfully",
     pendingDecryptionMessage: "Encrypted message. Waiting for payment confirmation.",
+    destinationScreenTitle: "Send to",
+    orBySMS: "Or Mobile Number",
+    orSaved: "Or Saved",
+    feeLabel: "Fee",
+    noteLabel: "Note",
+    sender: "Sender",
+    recipient: "Recipient",
+    time: "Time",
+    type: "Type",
   },
   SettingsScreen: {
     staticQr: "Printable static QR",
@@ -2705,6 +2745,7 @@ const en: BaseTranslation = {
   },
   common: {
     enabled: "Enabled",
+    switch: "Switch",
     notifications: "Notifications",
     preferences: "Preferences",
     onDeviceSecurity: "Security and privacy",
@@ -2717,6 +2758,7 @@ const en: BaseTranslation = {
     accountInformation: "Account Information",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
+    blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
     amountRequired: "Amount is required",
@@ -2811,6 +2853,8 @@ const en: BaseTranslation = {
     problemMaybeReauth:
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
+    continue: "Continue",
+    correct: "Correct",
     recommended: "Recommended",
     expirationTime: "Expiration Time",
     minute: "Minute",
@@ -2824,6 +2868,7 @@ const en: BaseTranslation = {
     some: "Some",
     support: "Support",
     profiles: "Profiles",
+    paste: "Paste",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -2859,7 +2904,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     enjoyingApp: "Enjoying the app?",
     statusPage: "Status page",
-    chatbot: "Chatbot",
     telegram: "Telegram",
     mattermost: "Mattermost",
     thankYouText: "Thank you for the feedback, would you like to suggest an improvement?",
@@ -2997,11 +3041,6 @@ const en: BaseTranslation = {
   NotificationHistory: {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
-  },
-  SupportChat: {
-    errorSendingMessage: "An error occurred while sending the message",
-    confirmChatReset: "Are you sure you want to reset the chat?",
-    errorResettingChat: "An error occurred while resetting the chat",
   },
 }
 

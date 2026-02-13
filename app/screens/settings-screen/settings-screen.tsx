@@ -21,7 +21,7 @@ import { SettingsGroup } from "./group"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
-import { PhoneNAddress } from "./settings/phone-ln-address"
+import { PhoneLnAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
 import { TxLimits } from "./settings/account-tx-limits"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
@@ -84,7 +84,7 @@ export const SettingsScreen: React.FC = () => {
 
   const items = {
     account: [AccountLevelSetting, TxLimits, SwitchAccountSetting],
-    waysToGetPaid: [AccountLNAddress, PhoneNAddress, AccountPOS, AccountStaticQR],
+    waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,
@@ -108,7 +108,13 @@ export const SettingsScreen: React.FC = () => {
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
           <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
-          {count !== 0 && <Text type="p4" style={styles.notificationCount}></Text>}
+          {count !== 0 && (
+            <Text
+              type="p4"
+              style={styles.notificationCount}
+              testID="notification-badge"
+            />
+          )}
         </TouchableOpacity>
       ),
     })

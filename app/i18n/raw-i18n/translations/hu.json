@@ -28,10 +28,10 @@
         "text": "Az 'Elfogadom' gombra kattintva elfogadod a Felhasználási Feltételeinket. Azzal is egyetértesz, hogy nem egy tiltott ország lakosa vagy állampolgára vagy."
     },
     "SetAccountModal": {
-        "title": "Alapértelmezett számla beállítása",
-        "description": "A kezdetben ez a számla lesz kiválasztva a fizetések küldéséhez és fogadásához. Bármikor megváltoztatható.",
-        "stablesatsTag": "Válaszd ezt stabil USD érték fenntartásához.",
-        "bitcoinTag": "Válaszd ezt a Bitcoin alapon való elszámoláshoz."
+        "title": "Állítsd be a fogadó számládat",
+        "description": "Ezt később bármikor módosíthatod a Beállításokban",
+        "stablesatsTag": "Stablesats számla az árstabilitásért",
+        "bitcoinTag": "Bitcoin számla maximalistáknak"
     },
     "NoteInput": {
         "addNote": "Jegyzet hozzáadása"
@@ -2384,7 +2384,7 @@
     "StablesatsModal": {
         "header": "A Stablesats-al most már van egy USD alapú számla a tárcádban!",
         "body": "Ezt használhatod Bitcoin küldésére és fogadására, valamint azonnal átvezethesz összegeket a BTC és az USD számláid között. Az USD számlán lévő érték nem ingadozik a Bitcoin ármozgásával. Ez a funkció nem kompatibilis a hagyományos bankrendszerrel.",
-        "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket.",
+        "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
         "learnMore": "Tudj meg többet a Stablesatsról"
     },
     "SplashScreen": {
@@ -2517,6 +2517,7 @@
     },
     "common": {
         "enabled": "Engedélyezve",
+        "switch": "Kapcsoló",
         "notifications": "Értesítések",
         "preferences": "Preferenciák",
         "onDeviceSecurity": "Eszközön lévő biztonság",
@@ -2617,7 +2618,8 @@
         "thisMonth": "Ez a hónap",
         "prevMonths": "Előző hónapok",
         "problemMaybeReauth": "Probléma merült fel a kérés során. Kérjük, próbáld újra egy perc múlva. Ha a probléma továbbra is fennáll, javasoljuk, hogy jelentkezz ki, majd jelentkezz be újra. Kijelentkezni a Beállítások > Számla > Kijelentkezés menüpontban tudsz.",
-        "warning": "Figyelmeztetés"
+        "warning": "Figyelmeztetés",
+        "blinkToBlink": "Blinkről Blinkre"
     },
     "errors": {
         "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -2650,7 +2652,6 @@
         "faq": "GYIK",
         "enjoyingApp": "Tetszik az alkalmazás?",
         "statusPage": "Állapotoldal",
-        "chatbot": "Csevegőrobot",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
         "thankYouText": "Köszönjük a visszajelzést! Szeretnél javaslatot tenni a fejlesztésre?",
@@ -2766,10 +2767,5 @@
     "NotificationHistory": {
         "title": "Értesítések",
         "noNotifications": "Jelenleg nincsenek értesítéseid"
-    },
-    "SupportChat": {
-        "errorSendingMessage": "Hiba történt az üzenet küldése közben",
-        "confirmChatReset": "Biztos, hogy törölni akarod a chat előzményeit?",
-        "errorResettingChat": "Hiba történt a chat előzmények törlése közben"
     }
 }

@@ -46,7 +46,7 @@ const useStyles = makeStyles(({ colors }) => ({
 }))
 
 const STABLESATS_LINK = "https://www.stablesats.com"
-const STABLESATS_TERMS_LINK = "https://www.bbw.sv/terms"
+const STABLESATS_TERMS_LINK = "https://www.blink.sv/en/terms-conditions"
 
 type Props = {
   isVisible: boolean
@@ -92,6 +92,7 @@ export const StableSatsModal: React.FC<Props> = ({ isVisible, setIsVisible }) =>
               >
                 {LL.StablesatsModal.termsAndConditions()}
               </Text>
+              .
             </Text>
           </View>
           <View style={styles.cardActionsContainer}>

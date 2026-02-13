@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "Set up your receive account",
+        "description": "You can always change this later in the Settings",
+        "stablesatsTag": "Stablesats account for price stability",
+        "bitcoinTag": "Bitcoin account for maximalists"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2295,7 +2295,8 @@
     },
     "DefaultWalletScreen": {
         "title": "Qullqi chaskiy",
-        "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."    },
+        "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."
+    },
     "ThemeScreen": {
         "title": "Theme",
         "info": "Pick your preferred theme for using Blink, or choose to keep it synced with your system settings.",
@@ -2434,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "Interruptor",
         "account": "Qillqa sutiyuq",
         "transactionLimits": "Kawsayniy tukuykuna chiqanakuykuna",
         "activateWallet": "Chaski qillqa kawsayniykita kaniy",
@@ -2521,7 +2523,8 @@
         "thisMonth": "Kay killapi",
         "prevMonths": "Qhipa killapi",
         "problemMaybeReauth": "Ñuqaq kaniyta munanichuqchu. Qhipa kaniyta qayna kani. Mana kaniyta munanichuqchu, ñuqaqa chaskisqa kaniyta kaniy. Chaskisqa kaniyta kaniy, Ajustisqa > Cuenta > Chaskisqa kaniyta kaniy.",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "Blinkmanta Blinkman"
     },
     "errors": {
         "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",

@@ -21,10 +21,10 @@
         "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
     },
     "SetAccountModal": {
-        "title": "Set default account",
-        "description": "This account will be initially selected for sending and receiving payments. It can be changed at any time.",
-        "stablesatsTag": "Choose this to maintain a stable USD value.",
-        "bitcoinTag": "Choose this to be on a Bitcoin standard."
+        "title": "إعداد حساب الاستلام",
+        "description": "يمكنك دائمًا تغيير هذا لاحقًا في الإعدادات",
+        "stablesatsTag": "حساب Stablesats لاستقرار السعر",
+        "bitcoinTag": "حساب بيتكوين للماكسيماليست"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2310,7 +2310,7 @@
     "StablesatsModal": {
         "header": "مع Stablesats، يمكنك أن تضيف حساب دولار أمريكي إلى محفظتك!",
         "body": "يمكنك أن تستعمله لترسل وتتلقى البيتكوين، ولتحول القيمة مباشرة بين حساب البيتكوين وحساب الدولار. لا تتأثر القيمة في حساب الدولار اﻷمريكي بسعر البيتكوين. هذه الميزة لا تتوافق مع النظام المصرفي التقليدي.",
-        "termsAndConditions": "إقرأ الشروط والأحكام.",
+        "termsAndConditions": "إقرأ الشروط والأحكام",
         "learnMore": "تعلم المزيد عن Stablesats"
     },
     "SplashScreen": {
@@ -2435,6 +2435,7 @@
         "success": "Email {email: string} confirmed successfully"
     },
     "common": {
+        "switch": "مفتاح",
         "account": "حساب",
         "transactionLimits": "قيود المعاملات",
         "activateWallet": "تفعيل المحفظة",
@@ -2522,7 +2523,8 @@
         "thisMonth": "هذا الشهر",
         "prevMonths": "الأشهر السابقة",
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
-        "warning": "Warning"
+        "warning": "Warning",
+        "blinkToBlink": "من Blink إلى Blink"
     },
     "errors": {
         "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
