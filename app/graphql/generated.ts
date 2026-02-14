@@ -3164,11 +3164,6 @@ export type UserPhoneRegistrationInitiateMutationVariables = Exact<{
 
 export type UserPhoneRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userPhoneRegistrationInitiate: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
-export type PriceHistoryScreenQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PriceHistoryScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
-
 export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5956,48 +5951,6 @@ export function useUserPhoneRegistrationInitiateMutation(baseOptions?: Apollo.Mu
 export type UserPhoneRegistrationInitiateMutationHookResult = ReturnType<typeof useUserPhoneRegistrationInitiateMutation>;
 export type UserPhoneRegistrationInitiateMutationResult = Apollo.MutationResult<UserPhoneRegistrationInitiateMutation>;
 export type UserPhoneRegistrationInitiateMutationOptions = Apollo.BaseMutationOptions<UserPhoneRegistrationInitiateMutation, UserPhoneRegistrationInitiateMutationVariables>;
-export const PriceHistoryScreenDocument = gql`
-    query priceHistoryScreen {
-  me {
-    id
-    defaultAccount {
-      id
-    }
-  }
-}
-    `;
-
-/**
- * __usePriceHistoryScreenQuery__
- *
- * To run a query within a React component, call `usePriceHistoryScreenQuery` and pass it any options that fit your needs.
- * When your component renders, `usePriceHistoryScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePriceHistoryScreenQuery({
- *   variables: {
- *   },
- * });
- */
-export function usePriceHistoryScreenQuery(baseOptions?: Apollo.QueryHookOptions<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>(PriceHistoryScreenDocument, options);
-      }
-export function usePriceHistoryScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>(PriceHistoryScreenDocument, options);
-        }
-export function usePriceHistoryScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>(PriceHistoryScreenDocument, options);
-        }
-export type PriceHistoryScreenQueryHookResult = ReturnType<typeof usePriceHistoryScreenQuery>;
-export type PriceHistoryScreenLazyQueryHookResult = ReturnType<typeof usePriceHistoryScreenLazyQuery>;
-export type PriceHistoryScreenSuspenseQueryHookResult = ReturnType<typeof usePriceHistoryScreenSuspenseQuery>;
-export type PriceHistoryScreenQueryResult = Apollo.QueryResult<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>;
 export const MyLnUpdatesDocument = gql`
     subscription myLnUpdates {
   myUpdates {
