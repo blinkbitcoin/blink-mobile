@@ -129,7 +129,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
       return false
     }
 
-    return url.protocol === "http:" || url.protocol === "https:"
+    return (
+      url.protocol === "http:" ||
+      url.protocol === "https:" ||
+      url.protocol === "bitcoin:" ||
+      url.protocol === "lightning:"
+    )
   }
 
   const processInvoice = React.useMemo(() => {
