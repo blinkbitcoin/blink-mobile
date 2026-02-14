@@ -99,8 +99,8 @@ const fetchPlacesFromApi = async (
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const fields = includeAllFields
-      ? "id,lat,lon,name,updated_at,icon,deleted_at"
-      : "id,name,updated_at,icon,deleted_at"
+      ? "id,lat,lon,name,updated_at,icon,deleted_at,verified_at,email"
+      : "id,name,updated_at,icon,deleted_at,verified_at,email"
 
     const { data } = await axios.get<Place[] | Omit<Place, "lat" | "lon" | "icon">[]>(
       `${BTCMAP_V4_API_BASE}/places?updated_since=${currentUpdatedSince}&limit=${LIMIT}&fields=${fields}&include_deleted=true`,

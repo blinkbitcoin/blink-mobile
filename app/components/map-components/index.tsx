@@ -1,16 +1,14 @@
 import debounce from "lodash.debounce"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Dimensions, View } from "react-native"
+import { Dimensions, Platform, Pressable, View } from "react-native"
 import MapView, { Region } from "react-native-maps"
 import { useApolloClient } from "@apollo/client"
-import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
-
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { MapMarker } from "@app/graphql/generated"
-import ButtonMapsContainer from "./button-maps-container"
 import MapStyles from "./map-styles.json"
-import { OpenBottomModal, OpenBottomModalElement, TModal } from "./modals/modal-container"
 import { IMarker } from "@app/screens/map-screen/btc-map-interface"
 import { useArea } from "@app/components/map-components/map-hooks/use-community.ts"
 import { Category } from "@app/components/map-components/categories.ts"
@@ -21,7 +19,13 @@ import {
 import { isPointCluster, supercluster, useClusterer } from "react-native-clusterer"
 import ClusterComponent from "@app/components/map-components/map-elements/cluster-component.tsx"
 import MarkerComponent from "@app/components/map-components/map-elements/marker-component.tsx"
-import { Geometry } from "geojson"
+import SearchBar from "./search-bar"
+import SearchScreen from "./search-screen"
+import { FiltersCard } from "@app/components/map-components/modals"
+import BottomSheet from "@app/components/map-components/modals/bottom-sheet.tsx"
+import { MerchantBottomSheet } from "@app/components/map-components/modals/merchant-bottom-sheet.tsx"
+import { SuggestBusinessCard } from "@app/components/map-components/modals/suggest-business-card.tsx"
+
 type Props = {
   data?: IMarker[]
   userLocation: Region
@@ -39,27 +43,27 @@ const CLUSTER_OPTIONS = {
 
 export default function MapComponent({ data, userLocation }: Props) {
   const {
-    theme: { mode: themeMode },
+    theme: { mode: themeMode, colors },
   } = useTheme()
   const styles = useStyles()
   const client = useApolloClient()
+  const insets = useSafeAreaInsets()
 
   const mapViewRef = useRef<MapView>(null)
   const [focusedMarker, setFocusedMarker] = React.useState<IMarker | null>(null)
   const [region, setRegion] = useState(userLocation)
-  const [nameField, setNameField] = useState<string | null>(null)
+  const [searchVisible, setSearchVisible] = useState(false)
 
-  const openBottomModalRef = React.useRef<OpenBottomModalElement>(null)
   const [selectedCommunityId, setSelectedCommunityId] = React.useState<number | null>(
     null,
   )
   const [selectedMarkerId, setSelectedMarkerId] = React.useState<number | null>(null)
   const [categoryFilters, setCategoryFilters] = useState<Set<Category>>(new Set())
 
-  const toggleModal = React.useCallback(
-    (type: TModal) => openBottomModalRef.current?.toggleVisibility(type),
-    [],
-  )
+  const [merchantSheetVisible, setMerchantSheetVisible] = useState(false)
+  const [filterSheetVisibe, setFilterSheetVisibile] = useState(false)
+  const [suggestSheetVisible, setSuggestSheetVisible] = useState(false)
+
   // todo handle loading state and error
   const { community, isLoading, error } = useArea(selectedCommunityId)
 
@@ -70,15 +74,14 @@ export default function MapComponent({ data, userLocation }: Props) {
     const marker = data.find((m) => m.id === selectedMarkerId)
     if (marker) {
       setFocusedMarker(marker)
-      toggleModal("locationEvent")
+      setMerchantSheetVisible(true)
     }
-  }, [selectedMarkerId])
+  }, [data, merchantSheetVisible, selectedMarkerId])
 
   useEffect(() => {
     if (!community && !focusedMarker) {
       return
     }
-    setNameField(community?.tags.name ?? focusedMarker?.name ?? null)
     if (community && community.tags.geo_json) {
       navigateToGeometry(mapViewRef, community.tags.geo_json)
     }
@@ -95,7 +98,13 @@ export default function MapComponent({ data, userLocation }: Props) {
   const handleMarkerSelect = useCallback((pin: IMarker) => {
     setFocusedMarker(pin)
     mapViewRef.current?.animateCamera({ center: pin.location }, { duration: 500 })
-    toggleModal("locationEvent")
+    setMerchantSheetVisible(true)
+  }, [])
+
+  const handleMapClick = useCallback(() => {
+    setMerchantSheetVisible(false)
+    setSelectedMarkerId(null)
+    setFocusedMarker(null)
   }, [])
 
   // Pre-compute all GeoJSON points once (reference, no spread copy)
@@ -205,10 +214,19 @@ export default function MapComponent({ data, userLocation }: Props) {
     <View style={styles.viewContainer}>
       <MapView
         ref={mapViewRef}
-        // onPress={handleMapPress}
         onRegionChangeComplete={handleRegionChange}
         style={styles.map}
-        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+        customMapStyle={
+          // Only Android (Google Maps) supports customMapStyle JSON.
+          // On iOS (Apple Maps) it's ignored; at high zoom iOS 18 simulator
+          // can show red ground – known simulator bug, not present on device.
+          Platform.OS === "android"
+            ? themeMode === "dark"
+              ? MapStyles.dark
+              : MapStyles.light
+            : undefined
+        }
+        onPress={handleMapClick}
         initialRegion={userLocation}
         moveOnMarkerPress={false}
         showsUserLocation={false}
@@ -220,111 +238,166 @@ export default function MapComponent({ data, userLocation }: Props) {
         pitchEnabled={false}
         mapType="standard"
         loadingEnabled={true}
-        loadingIndicatorColor="#666666"
-        loadingBackgroundColor="#eeeeee"
+        loadingIndicatorColor={colors.grey2}
+        loadingBackgroundColor={colors.grey4}
       >
         {renderedMarkers}
       </MapView>
 
-      {nameField && (
-        <ButtonMapsContainer
-          key={focusedMarker?.id}
-          position="topCenter"
-          event={() => {
-            // moveToFocusedMarker()
-            toggleModal("locationEvent")
+      <View style={[styles.topRow, { top: insets.top + 8 }]}>
+        <SearchBar onPress={() => setSearchVisible(true)} />
+        <Pressable
+          onPress={() => {
+            /* TODO: communities */
           }}
+          style={styles.iconButton}
         >
-          <ListItem containerStyle={styles.list}>
-            <Icon
-              name="close"
-              color="white"
-              size={15}
-              onPress={() => {
-                setNameField(null)
-                setSelectedCommunityId(null)
-              }}
-            />
-            <Icon name="location-outline" color="white" size={15} />
-            <ListItem.Title
-              ellipsizeMode="tail"
-              numberOfLines={1}
-              style={styles.listTitle}
-            >
-              {nameField}
-            </ListItem.Title>
-            <Icon name="chevron-down-outline" color="white" />
-          </ListItem>
-        </ButtonMapsContainer>
+          <GaloyIcon name="people-2" size={20} color={colors.primary} />
+        </Pressable>
+        <Pressable onPress={() => setFilterSheetVisibile(true)} style={styles.iconButton}>
+          <GaloyIcon name="list" size={20} color={colors.primary} />
+        </Pressable>
+      </View>
+
+      <Pressable
+        onPress={() => setSuggestSheetVisible(true)}
+        style={styles.addToMapButton}
+      >
+        <Text style={styles.addToMapText}>Add to map</Text>
+        <GaloyIcon name="plus" size={16} color={colors.primary} />
+      </Pressable>
+
+      <Pressable
+        onPress={() => {
+          /* TODO: center on user location */
+        }}
+        style={styles.centerButton}
+      >
+        <GaloyIcon name="gps" size={20} color={colors.primary} />
+      </Pressable>
+
+      {suggestSheetVisible && (
+        <View style={styles.staticMarkerContainer} pointerEvents="none">
+          <View style={styles.placeMarkerLabel}>
+            <Text style={styles.placeMarkerText}>Place the marker</Text>
+          </View>
+          <GaloyIcon name="map" size={24} color={colors.primary} />
+        </View>
       )}
 
-      <ButtonMapsContainer
-        event={() => toggleModal("filter")}
-        position="LeftLv1"
-        iconName="options-outline"
-      />
-      <ButtonMapsContainer
-        event={() => toggleModal("search")}
-        position="LeftLv2"
-        iconName="search"
-      />
-      <OpenBottomModal
-        ref={openBottomModalRef}
-        focusedMarker={focusedMarker}
-        setFocusedMarkerId={setSelectedMarkerId}
-        setSelectedCommunityId={setSelectedCommunityId}
-        filters={categoryFilters}
-        setFilters={setCategoryFilters}
-      />
+      <BottomSheet
+        visible={suggestSheetVisible}
+        onClose={() => setSuggestSheetVisible(false)}
+        peekHeight={380}
+      >
+        <SuggestBusinessCard
+          closeModal={() => setSuggestSheetVisible(false)}
+          centerCoords={{
+            latitude: region.latitude,
+            longitude: region.longitude,
+          }}
+        />
+      </BottomSheet>
+
+      {searchVisible && (
+        <SearchScreen
+          onClose={() => setSearchVisible(false)}
+          setCommunityId={setSelectedCommunityId}
+          setSelectedMarker={setSelectedMarkerId}
+        />
+      )}
+
+      <BottomSheet
+        visible={filterSheetVisibe}
+        onClose={() => setFilterSheetVisibile(false)}
+      >
+        <FiltersCard filters={categoryFilters} setFilters={setCategoryFilters} />
+      </BottomSheet>
+
+      {merchantSheetVisible && (
+        <MerchantBottomSheet
+          visible={merchantSheetVisible}
+          onClose={() => setMerchantSheetVisible(false)}
+          selectedMarker={focusedMarker}
+        />
+      )}
     </View>
   )
 }
 
-export const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   map: {
     height: "100%",
     width: "100%",
   },
-  list: {
-    padding: 0,
-    margin: 0,
-    fontSize: "0.5rem",
-    backgroundColor: "transparent",
-  },
-  listTitle: {
-    maxWidth: 200,
-  },
-
   viewContainer: { flex: 1 },
-
-  clusterContainer: {
+  topRow: {
+    position: "absolute",
+    left: 8,
+    right: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    zIndex: 99,
+  },
+  iconButton: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#4f378c",
-    justifyContent: "center",
     alignItems: "center",
-    // borderWidth: 6,
-    // borderColor: "#4f378cb3"
+    justifyContent: "center",
   },
-  clusterBubble: {
-    backgroundColor: "white",
-    padding: 5,
-    borderRadius: 15,
+  addToMapButton: {
+    position: "absolute",
+    left: 8,
+    bottom: 12,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 5,
+    maxHeight: 40,
   },
-  clusterText: {
+  addToMapText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "white",
+    color: colors.black,
   },
-  iconContainer: {
-    position: "relative",
+  centerButton: {
+    position: "absolute",
+    right: 8,
+    bottom: 12,
+    zIndex: 99,
+    backgroundColor: colors.white,
+    borderRadius: 22,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
   },
-  iconOverlay: {
+  staticMarkerContainer: {
     position: "absolute",
-    top: 10, // ajusta según el pin
-    alignSelf: "center",
+    top: "35%",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    zIndex: 100,
+  },
+  placeMarkerLabel: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 5,
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  placeMarkerText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: colors.black,
+    textAlign: "center",
   },
 }))

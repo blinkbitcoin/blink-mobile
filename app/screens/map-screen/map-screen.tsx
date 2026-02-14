@@ -100,6 +100,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     const loadResources = async () => {
       try {
         await MaterialIcons.loadFont()
+        console.log("loaded")
       } catch (err) {
         console.warn("Failed to load font:", err)
       }
@@ -202,7 +203,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
   return (
-    <Screen edges={["left", "right"]}>
+    <Screen preset="fixed" unsafe>
       {initialLocation && (
         <MapComponent
           data={formattedData}
