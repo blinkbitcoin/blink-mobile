@@ -59,6 +59,13 @@ import Rank from "@app/assets/icons/rank.svg"
 import Refresh from "@app/assets/icons/refresh.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
+import verifiedBadge from "@app/assets/icons-redesign/verified-badge.svg"
+import applePay from "@app/assets/icons-redesign/apple-pay.svg"
+import flashOutline from "@app/assets/icons-redesign/flash-outline.svg"
+import linkOutline from "@app/assets/icons-redesign/link-outline.svg"
+import btcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import checkBadge from "@app/assets/icons-redesign/check-badge.svg"
+import familyOutline from "@app/assets/icons-redesign/family-outline.svg"
 import Calculator from "@app/assets/icons-redesign/calculator.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
@@ -125,6 +132,13 @@ export const icons = {
   "telegram-simple": TelegramSimple,
   "upgrade": Upgrade,
   "welcome": Welcome,
+  "verified-badge": verifiedBadge,
+  "apple-pay": applePay,
+  "flash-outline": flashOutline,
+  "link-outline": linkOutline,
+  "btc-hand": btcHand,
+  "check-badge": checkBadge,
+  "family-outline": familyOutline,
   "calculator": Calculator,
   "document-outline": DocumentIcon,
   "key-outline": KeyIcon,

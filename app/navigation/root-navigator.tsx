@@ -59,7 +59,7 @@ import {
   createStackNavigator,
   StackNavigationProp,
 } from "@react-navigation/stack"
-
+import { useNavigation } from "@react-navigation/native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -101,8 +101,25 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
+import {
+  BitcoinCard,
+  CardDetails,
+  WelcomeCard,
+  CardPayment,
+  LoadingCard,
+  VisaCard,
+  CreditCardLimit,
+  SelectCreditLimit,
+  TermSheetScreen,
+  TranferInvest,
+  TopUpScreen,
+  CompanyValuationScreen,
+  CardPersonalInformationScreen,
+  CardPreapprovedScreen,
+  CardProcessingScreen,
+} from "../screens/bitcoin-card"
+import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { TouchableOpacity } from "react-native"
-import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
@@ -114,8 +131,9 @@ export const RootStack = () => {
   } = useTheme()
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-  const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -504,6 +522,212 @@ export const RootStack = () => {
         component={OnboardingNavigator}
         options={{ headerShown: false }}
       />
+      <RootNavigator.Screen
+        name="bitcoinCard"
+        component={BitcoinCard}
+        options={{
+          title: LL.BitcoinCardScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardDetails"
+        component={CardDetails}
+        options={{
+          title: LL.CardDetailsScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="welcomeCard"
+        component={WelcomeCard}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardSubscribe"
+        component={CardPayment}
+        options={{
+          title: LL.CardSubscribeScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardPayment"
+        component={CardPayment}
+        options={{
+          title: LL.CardPaymentScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="loadingCard"
+        component={LoadingCard}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="visaCard"
+        component={VisaCard}
+        options={{
+          title: LL.VisaCardScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="creditCardLimit"
+        component={CreditCardLimit}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="companyValuation"
+        component={CompanyValuationScreen}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="selectCreditLimit"
+        component={SelectCreditLimit}
+        options={{
+          title: "",
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="termSheetScreem"
+        component={TermSheetScreen}
+        options={{
+          title: LL.TermSheetScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="tranferInvest"
+        component={TranferInvest}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="topUpScreen"
+        component={TopUpScreen}
+        options={{
+          title: LL.TopUpScreen.title(),
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardPersonalInformationScreen"
+        component={CardPersonalInformationScreen}
+        options={{
+          title: LL.PersonalInformationScreen.title(),
+          headerLeft: () => <></>,
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardProcessingScreen"
+        component={CardProcessingScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardPreapprovedScreen"
+        component={CardPreapprovedScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: () => (
+            <GaloyIconButton
+              onPress={() => navigation.navigate("Primary")}
+              size={"medium"}
+              name="close"
+              backgroundColor={colors.grey5}
+              style={{ marginRight: 20 }}
+            />
+          ),
+        }}
+      />
     </RootNavigator.Navigator>
   )
 }
@@ -761,6 +985,8 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomNavigatorStyle: {
+    height: "10%",
+    minHeight: 90,
     paddingTop: 4,
     backgroundColor: colors.white,
     borderTopColor: colors.grey4,

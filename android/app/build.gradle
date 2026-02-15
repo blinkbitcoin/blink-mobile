@@ -162,6 +162,11 @@ dependencies {
         implementation jscFlavor
     }
 
+    implementation 'com.facebook.fresco:animated-gif:3.6.0'
+    implementation 'com.facebook.fresco:animated-webp:3.6.0'
+    implementation 'com.facebook.fresco:webpsupport:3.6.0'
+
+
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
 }
