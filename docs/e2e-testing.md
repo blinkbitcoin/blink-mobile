@@ -1,7 +1,7 @@
 # E2E Testing using Detox
 
 The detox tests uses the local backend. Hence, make sure you have run `make tilt-up` and set everything up using our [dev docs](./dev.md).
-Keep `yarn start` running in the backgroud.
+Keep `yarn start` running in the background.
 
 ### Testing on Android
 
