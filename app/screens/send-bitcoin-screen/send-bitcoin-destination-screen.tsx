@@ -509,10 +509,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const processedPaymentRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (
-      route.params?.payment &&
-      route.params.payment !== processedPaymentRef.current
-    ) {
+    if (route.params?.payment && route.params.payment !== processedPaymentRef.current) {
       processedPaymentRef.current = route.params.payment
       const text = route.params.payment
       const isPhoneNumberValid = parseValidPhone(text)
