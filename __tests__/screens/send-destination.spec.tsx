@@ -704,4 +704,116 @@ describe("SendBitcoinDestinationScreen", () => {
       screen.queryByText(LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()),
     ).toBeNull()
   })
+
+  describe("deep link payment processing (processedPaymentRef)", () => {
+    const createRouteWithPayment = (payment: string) =>
+      ({
+        ...sendBitcoinDestination,
+        params: {
+          ...sendBitcoinDestination.params,
+          payment,
+        },
+      }) as typeof sendBitcoinDestination
+
+    const setupParseDestinationMock = (
+      mock: jest.MockedFunction<typeof parseDestination>,
+    ) => {
+      mock.mockResolvedValue({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: {
+          valid: true,
+          paymentType: PaymentType.Intraledger,
+          handle: "testuser",
+          walletId: "wallet-id",
+        },
+        createPaymentDetail: jest.fn(),
+      })
+    }
+
+    it("processes route.params.payment on initial render", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1testpayment123")
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1testpayment123" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("does NOT re-process when re-rendered with the same payment param", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1testpayment123")
+
+      const { rerender } = render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      parseDestinationMock.mockClear()
+
+      // Re-render with the exact same payment value
+      rerender(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={createRouteWithPayment("lnurl1testpayment123")} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      // The processedPaymentRef should prevent re-processing
+      expect(parseDestinationMock).not.toHaveBeenCalled()
+    })
+
+    it("processes a NEW payment param after a previous one", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1first")
+
+      const { rerender } = render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1first" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      parseDestinationMock.mockClear()
+
+      // Re-render with a DIFFERENT payment value
+      rerender(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={createRouteWithPayment("lnurl1second")} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      // The new payment should be processed
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1second" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+    })
+  })
 })
