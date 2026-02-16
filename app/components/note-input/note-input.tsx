@@ -14,6 +14,8 @@ export type NoteInputProps = {
   editable?: boolean | undefined
   style?: StyleProp<ViewStyle>
   big?: boolean
+  iconSize?: number
+  fontSize?: number
 }
 
 export const NoteInput: React.FC<NoteInputProps> = ({
@@ -23,6 +25,8 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   onBlur,
   style,
   big = true,
+  iconSize = 18,
+  fontSize = 16,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles({ editable: Boolean(editable), big })
@@ -41,7 +45,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
-          style={styles.noteInput}
+          style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}
           placeholderTextColor={colors.black}
           onChangeText={onChangeText}
@@ -53,7 +57,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={18} color={colors.primary} />
+          <GaloyIcon name={"note"} size={iconSize} color={colors.primary} />
         </TouchableOpacity>
       </View>
     </View>
@@ -92,7 +96,8 @@ const useStyles = makeStyles(
     noteInput: {
       flex: 1,
       color: colors.black,
-      fontSize: 16,
+      fontWeight: "400",
+      lineHeight: 20,
     },
   }),
 )
