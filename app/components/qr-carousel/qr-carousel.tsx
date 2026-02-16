@@ -1,5 +1,5 @@
-import React, { forwardRef } from "react"
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native"
+import React, { forwardRef, useMemo } from "react"
+import { StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native"
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel"
 import Animated, {
   interpolate,
@@ -9,14 +9,9 @@ import Animated, {
 
 import { makeStyles } from "@rn-vui/themed"
 
-const { width: screenWidth } = Dimensions.get("window")
-
 // Ratios based on design spec (360px reference width)
 const QR_TO_SCREEN_RATIO = 250 / 360
 const PARALLAX_TO_SCREEN_RATIO = 94 / 360
-
-const QR_CONTAINER_SIZE = Math.round(QR_TO_SCREEN_RATIO * screenWidth)
-const PARALLAX_OFFSET = Math.round(PARALLAX_TO_SCREEN_RATIO * screenWidth)
 const PAGES = [0, 1]
 
 type QRCarouselProps = {
@@ -28,7 +23,7 @@ type QRCarouselProps = {
 const CarouselItem: React.FC<{
   animationValue: SharedValue<number>
   children: React.ReactNode
-  pageStyle: ViewStyle
+  pageStyle: ViewStyle | ViewStyle[]
   overlayStyle: ViewStyle
 }> = ({ animationValue, children, pageStyle, overlayStyle }) => {
   const animatedOverlay = useAnimatedStyle(() => ({
@@ -49,6 +44,16 @@ const CarouselItem: React.FC<{
 export const QRCarousel = forwardRef<ICarouselInstance, QRCarouselProps>(
   ({ page0, page1, onSnap }, ref) => {
     const styles = useStyles()
+    const { width: screenWidth } = useWindowDimensions()
+
+    const qrContainerSize = useMemo(
+      () => Math.round(QR_TO_SCREEN_RATIO * screenWidth),
+      [screenWidth],
+    )
+    const parallaxOffset = useMemo(
+      () => Math.round(PARALLAX_TO_SCREEN_RATIO * screenWidth),
+      [screenWidth],
+    )
 
     const renderItem = ({
       index,
@@ -59,7 +64,7 @@ export const QRCarousel = forwardRef<ICarouselInstance, QRCarouselProps>(
     }) => (
       <CarouselItem
         animationValue={animationValue}
-        pageStyle={styles.page}
+        pageStyle={[styles.page, { width: qrContainerSize, height: qrContainerSize }]}
         overlayStyle={styles.overlay}
       >
         {index === 0 ? page0 : page1}
@@ -72,12 +77,12 @@ export const QRCarousel = forwardRef<ICarouselInstance, QRCarouselProps>(
         data={PAGES}
         renderItem={renderItem}
         width={screenWidth}
-        height={QR_CONTAINER_SIZE}
+        height={qrContainerSize}
         loop={false}
         mode="parallax"
         modeConfig={{
           parallaxScrollingScale: 1,
-          parallaxScrollingOffset: PARALLAX_OFFSET,
+          parallaxScrollingOffset: parallaxOffset,
         }}
         onSnapToItem={onSnap}
       />
@@ -88,8 +93,6 @@ QRCarousel.displayName = "QRCarousel"
 
 const useStyles = makeStyles(({ colors }) => ({
   page: {
-    width: QR_CONTAINER_SIZE,
-    height: QR_CONTAINER_SIZE,
     alignSelf: "center",
   },
   overlay: {
