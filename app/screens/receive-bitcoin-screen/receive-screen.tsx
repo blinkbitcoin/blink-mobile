@@ -314,7 +314,16 @@ const ReceiveScreen = () => {
         onSnap={handleCarouselSnap}
       />
 
-      <Pressable style={styles.paymentIdentifier} onPress={handleCopy}>
+      <Pressable
+        style={styles.paymentIdentifier}
+        onPress={handleCopy}
+        accessibilityRole="button"
+        accessibilityHint={
+          isOnChainPage
+            ? LL.ReceiveScreen.copyClipboardBitcoin()
+            : LL.ReceiveScreen.copyClipboard()
+        }
+      >
         {isOnChainPage || request.type === Invoice.Lightning ? (
           <Text
             {...testProps("readable-payment-request")}
