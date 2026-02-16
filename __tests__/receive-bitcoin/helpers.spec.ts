@@ -133,4 +133,9 @@ describe("truncateMiddle", () => {
   it("handles empty string", () => {
     expect(truncateMiddle("")).toBe("")
   })
+
+  it("handles falsy inputs", () => {
+    expect(truncateMiddle(undefined as unknown as string)).toBe("")
+    expect(truncateMiddle(null as unknown as string)).toBe("")
+  })
 })
