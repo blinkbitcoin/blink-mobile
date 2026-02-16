@@ -367,6 +367,12 @@ const ReceiveScreen = () => {
               {...testProps(LL.ReceiveScreen.copyInvoice())}
               style={styles.actionButton}
               onPress={handleCopy}
+              accessibilityRole="button"
+              accessibilityHint={
+                isOnChainPage
+                  ? LL.ReceiveScreen.copyClipboardBitcoin()
+                  : LL.ReceiveScreen.copyClipboard()
+              }
             >
               <Text style={styles.actionText}>{LL.ReceiveScreen.copyInvoice()}</Text>
               <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
@@ -375,6 +381,10 @@ const ReceiveScreen = () => {
               {...testProps(LL.ReceiveScreen.shareInvoice())}
               style={styles.actionButton}
               onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityHint={
+                isOnChainPage ? LL.common.shareBitcoin() : LL.common.shareLightning()
+              }
             >
               <Text style={styles.actionText}>{LL.ReceiveScreen.shareInvoice()}</Text>
               <GaloyIcon name="share" size={16} color={colors.primary} />
