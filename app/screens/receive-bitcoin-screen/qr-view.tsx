@@ -2,18 +2,21 @@ import * as React from "react"
 import { useMemo } from "react"
 import {
   ActivityIndicator,
+  StyleSheet,
   useWindowDimensions,
   View,
+  Image,
   Platform,
   StyleProp,
   ViewStyle,
-  Pressable,
   Animated,
-  Easing,
 } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { runOnJS } from "react-native-reanimated"
 import QRCode from "react-native-qrcode-svg"
 
 import Logo from "@app/assets/logo/blink-logo-icon.png"
+import { usePressScale } from "@app/components/animations"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { SuccessIconAnimation } from "@app/components/success-animation"
@@ -51,7 +54,6 @@ type Props = {
   loading: boolean
   completed: boolean
   err: string
-  size?: number
   style?: StyleProp<ViewStyle>
   expired: boolean
   regenerateInvoiceFn?: () => void
@@ -67,7 +69,6 @@ export const QRView: React.FC<Props> = ({
   loading,
   completed,
   err,
-  size = 280,
   style,
   expired,
   regenerateInvoiceFn,
@@ -86,30 +87,26 @@ export const QRView: React.FC<Props> = ({
     !completed && isReady && !expired && (!isPayCode || isPayCodeAndCanUsePayCode)
 
   const styles = useStyles()
-  const { scale } = useWindowDimensions()
+  const { width, scale } = useWindowDimensions()
 
   const { LL } = useI18nContext()
 
-  const scaleAnim = React.useRef(new Animated.Value(1)).current
+  const { scaleValue, pressIn, pressOut } = usePressScale()
 
-  const breatheIn = () => {
-    Animated.timing(scaleAnim, {
-      toValue: 0.95,
-      duration: 200,
-      useNativeDriver: true,
-      easing: Easing.inOut(Easing.quad),
-    }).start()
-  }
-
-  const breatheOut = () => {
-    if (!expired && copyToClipboard) copyToClipboard()
-    Animated.timing(scaleAnim, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-      easing: Easing.inOut(Easing.quad),
-    }).start()
-  }
+  const tapGesture = React.useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          runOnJS(pressIn)()
+        })
+        .onEnd(() => {
+          if (copyToClipboard) runOnJS(copyToClipboard)()
+        })
+        .onFinalize(() => {
+          runOnJS(pressOut)()
+        }),
+    [pressIn, pressOut, copyToClipboard],
+  )
 
   const renderSuccessView = useMemo(() => {
     if (completed) {
@@ -125,33 +122,32 @@ export const QRView: React.FC<Props> = ({
   }, [completed, styles, style])
 
   const renderQRCode = useMemo(() => {
-    const getQrLogo = () => {
-      if (type === Invoice.OnChain) return Logo
-      if (type === Invoice.Lightning) return Logo
-      if (type === Invoice.PayCode) return Logo
-      return null
-    }
-
-    const qrSize = Platform.OS === "android" && scale > 3 ? 240 : size
+    const baseSize = Math.round((250 / 360) * width) - 2 * 28
+    const qrSize = Platform.OS === "android" && scale > 3 ? 240 : baseSize
 
     if (displayingQR && getFullUri) {
       const uri = getFullUri({ uppercase: true })
       return (
         <View style={[styles.container, style]} {...testProps("QR-Code")}>
-          <QRCode
-            size={qrSize}
-            value={uri}
-            logoBackgroundColor="white"
-            ecl={type && configByType[type].ecl}
-            logo={getQrLogo() || undefined}
-            logoSize={60}
-            logoBorderRadius={10}
-          />
+          <View>
+            <QRCode
+              size={qrSize}
+              value={uri}
+              logoBackgroundColor="white"
+              ecl={type && configByType[type].ecl}
+              logoSize={60}
+            />
+            <View style={styles.logoOverlay}>
+              <View style={styles.logoCircle}>
+                <Image source={Logo} style={styles.logoImage} />
+              </View>
+            </View>
+          </View>
         </View>
       )
     }
     return null
-  }, [displayingQR, type, getFullUri, size, scale, styles, style])
+  }, [displayingQR, type, getFullUri, width, scale, styles, style])
 
   const renderStatusView = useMemo(() => {
     if (!completed && !isReady) {
@@ -209,16 +205,13 @@ export const QRView: React.FC<Props> = ({
 
   return (
     <View style={styles.qr}>
-      <Pressable
-        onPressIn={displayingQR ? breatheIn : () => {}}
-        onPressOut={displayingQR ? breatheOut : () => {}}
-      >
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <GestureDetector gesture={displayingQR ? tapGesture : Gesture.Manual()}>
+        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
           {renderSuccessView}
           {renderQRCode}
           {renderStatusView}
         </Animated.View>
-      </Pressable>
+      </GestureDetector>
     </View>
   )
 }
@@ -230,13 +223,12 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors._white,
     width: "100%",
     height: undefined,
-    borderRadius: 10,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.grey5,
     aspectRatio: 1,
     alignSelf: "center",
-    padding: 16,
-  },
-  containerSuccess: {
-    backgroundColor: colors.white,
+    padding: 28,
   },
   errorContainer: {
     justifyContent: "center",
@@ -254,6 +246,24 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cantUsePayCodeText: {
     marginBottom: 10,
+  },
+  logoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "white",
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoImage: {
+    width: 48,
+    height: 48,
   },
 }))
 
