@@ -256,7 +256,7 @@ export const useReceiveBitcoin = () => {
 
   // Setting it to idle would trigger last useEffect hook to regenerate invoice
   const regenerateInvoice = () => {
-    setPR((pq) => pq && pq.setState(PaymentRequestState.Idle))
+    if (expiresInSeconds === 0) setPR((pq) => pq && pq.setState(PaymentRequestState.Idle))
   }
 
   // If Username updates
