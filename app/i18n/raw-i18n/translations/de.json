@@ -2155,7 +2155,11 @@
         "receiveViaPaycode": "Durch Zahlungcode empfangen",
         "receiveViaOnchain": "Onchain empfangen",
         "payCodeOrLNURL": "Paycode / LNURL",
-        "cantReceiveZeroSats": "Sie können nicht Null-Sats erhalten. Bitte geben Sie einen Betrag ein, der einem oder mehr Sats entspricht."
+        "cantReceiveZeroSats": "Sie können nicht Null-Sats erhalten. Bitte geben Sie einen Betrag ein, der einem oder mehr Sats entspricht.",
+        "lightningAddress": "Lightning-Adresse",
+        "lightningInvoice": "Lightning-Rechnung",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Einzahlungsgebühr: {fee} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Bitcoin einlösen",

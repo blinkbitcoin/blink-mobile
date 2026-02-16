@@ -2162,7 +2162,11 @@
         "receiveViaPaycode": "ペイコードで受金する",
         "receiveViaOnchain": "オンチェーンで受金する",
         "payCodeOrLNURL": "ペイコード/LNURL",
-        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+        "lightningAddress": "Lightningアドレス",
+        "lightningInvoice": "Lightningインボイス",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "入金手数料: {fee} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",

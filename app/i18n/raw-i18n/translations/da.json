@@ -2158,7 +2158,11 @@
     "receiveViaPaycode": "Modtag via Paycode",
     "receiveViaOnchain": "Modtag via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Du kan ikke modtage nul sats. Indtast venligst et beløb svarende til 1 eller flere sats."
+    "cantReceiveZeroSats": "Du kan ikke modtage nul sats. Indtast venligst et beløb svarende til 1 eller flere sats.",
+    "lightningAddress": "Lightning-adresse",
+    "lightningInvoice": "Lightning-faktura",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Indbetalingsgebyr: {fee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",

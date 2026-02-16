@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Receive via Paycode",
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Не можете примити нула сатошија. Молимо унесите износ који одговара 1 или више сатошија."
+    "cantReceiveZeroSats": "Не можете примити нула сатошија. Молимо унесите износ који одговара 1 или више сатошија.",
+    "lightningAddress": "Lightning adresa",
+    "lightningInvoice": "Lightning faktura",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Naknada za uplatu: {fee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",

@@ -2155,7 +2155,11 @@
         "receiveViaPaycode": "Recibir vía de código de pago",
         "receiveViaOnchain": "Recibir vía Onchain",
         "payCodeOrLNURL": "Código de pago / LNURL",
-        "cantReceiveZeroSats": "No puedes recibir cero sats. Por favor ingrese una cantidad correspondiente a 1 o más sats."
+        "cantReceiveZeroSats": "No puedes recibir cero sats. Por favor ingrese una cantidad correspondiente a 1 o más sats.",
+        "lightningAddress": "Dirección Lightning",
+        "lightningInvoice": "Factura Lightning",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Comisión de depósito: {fee} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",

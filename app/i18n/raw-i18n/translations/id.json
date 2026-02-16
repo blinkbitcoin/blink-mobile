@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Terima melalui Paycode",
     "receiveViaOnchain": "Terima melalui Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Anda tidak dapat menerima nol sats. Silakan masukkan jumlah yang sesuai dengan 1 atau lebih sats."
+    "cantReceiveZeroSats": "Anda tidak dapat menerima nol sats. Silakan masukkan jumlah yang sesuai dengan 1 atau lebih sats.",
+    "lightningAddress": "Alamat Lightning",
+    "lightningInvoice": "Faktur Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Biaya deposit: {fee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Tukarkan Bitcoin",

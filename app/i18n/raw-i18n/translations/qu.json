@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Receive via Paycode",
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Mana ch'usaq sats nisqata chaskiyta atinkichu. Ama hina kaspa 1 utaq aswan sats nisqaman tupaq yupayta churay."
+    "cantReceiveZeroSats": "Mana ch'usaq sats nisqata chaskiyta atinkichu. Ama hina kaspa 1 utaq aswan sats nisqaman tupaq yupayta churay.",
+    "lightningAddress": "Lightning address",
+    "lightningInvoice": "Lightning invoice",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Deposit fee: {fee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",

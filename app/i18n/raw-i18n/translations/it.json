@@ -2155,7 +2155,11 @@
         "receiveViaPaycode": "Ricevi tramite Paycode",
         "receiveViaOnchain": "Ricevi tramite Onchain",
         "payCodeOrLNURL": "Paycode / LNURL",
-        "cantReceiveZeroSats": "Non puoi ricevere zero sat. Inserisci un importo corrispondente a 1 o più sat."
+        "cantReceiveZeroSats": "Non puoi ricevere zero sat. Inserisci un importo corrispondente a 1 o più sat.",
+        "lightningAddress": "Indirizzo Lightning",
+        "lightningInvoice": "Fattura Lightning",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Commissione di deposito: {fee} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Riscatta Bitcoin",
