@@ -522,8 +522,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       handleChangeText(route.params.payment)
       initiateGoToNextScreen(route.params.payment)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route.params?.payment])
+  }, [
+    route.params?.payment,
+    initiateGoToNextScreen,
+    handleChangeText,
+    onFocusedInput,
+    parseValidPhone,
+  ])
 
   useEffect(() => {
     // If we scan a QR code encoded with a payment url for a specific user e.g. https://{domain}/{username}
