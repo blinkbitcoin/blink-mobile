@@ -86,7 +86,7 @@ export const truncateMiddle = (
   text: string,
   { startChars = 10, endChars = 10, separator = "..." }: TruncateMiddleOptions = {},
 ): string => {
-  if (text.length <= startChars + endChars) return text
+  if (!text || text.length <= startChars + endChars) return text ?? ""
   return `${text.slice(0, startChars)}${separator}${text.slice(-endChars)}`
 }
 
