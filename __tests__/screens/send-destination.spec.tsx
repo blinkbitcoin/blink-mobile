@@ -770,7 +770,9 @@ describe("SendBitcoinDestinationScreen", () => {
       // Re-render with the exact same payment value
       rerender(
         <ContextForScreen>
-          <SendBitcoinDestinationScreen route={createRouteWithPayment("lnurl1testpayment123")} />
+          <SendBitcoinDestinationScreen
+            route={createRouteWithPayment("lnurl1testpayment123")}
+          />
         </ContextForScreen>,
       )
 
