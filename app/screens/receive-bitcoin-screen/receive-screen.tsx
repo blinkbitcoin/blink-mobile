@@ -364,7 +364,7 @@ const ReceiveScreen = () => {
           onBlur={request.setMemo}
           onChangeText={request.setMemoChangeText}
           value={request.memoChangeText || ""}
-          editable={request.canSetMemo}
+          editable={isOnChainPage || request.canSetMemo}
           big={false}
           iconSize={16}
           fontSize={14}
