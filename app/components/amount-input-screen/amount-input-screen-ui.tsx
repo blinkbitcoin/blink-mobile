@@ -24,7 +24,7 @@ export type AmountInputScreenUIProps = {
   onToggleCurrency?: () => void
   onClearAmount: () => void
   onSetAmountPress?: () => void
-  goBack: () => void
+  goBack?: () => void
   disabledKeys?: ReadonlySet<Key>
 }
 
@@ -41,7 +41,6 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   onToggleCurrency,
   onSetAmountPress,
   setAmountDisabled,
-  goBack,
   disabledKeys,
 }) => {
   const { LL } = useI18nContext()
@@ -50,10 +49,6 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 
   return (
     <View style={styles.amountInputScreenContainer}>
-      <View style={styles.headerContainer}>
-        <Text type={"h1"}>{LL.AmountInputScreen.enterAmount()}</Text>
-        <GaloyIconButton iconOnly={true} size={"medium"} name="close" onPress={goBack} />
-      </View>
       <View style={styles.bodyContainer}>
         <View style={styles.amountContainer}>
           <View style={styles.primaryAmountContainer}>
@@ -123,17 +118,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  amountInputScreenContainer: {
-    flex: 1,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomColor: colors.primary4,
-    borderBottomWidth: 1,
-  },
+  amountInputScreenContainer: {},
   amountContainer: {
     marginBottom: 16,
   },
@@ -189,14 +174,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   infoContainer: {
-    flex: 1,
     justifyContent: "flex-start",
   },
   bodyContainer: {
-    flex: 1,
     padding: 24,
   },
-  buttonContainer: {},
   keyboardContainer: {
     marginBottom: 28,
     alignSelf: "stretch",
