@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-plusplus": "off",
+    "no-continue": "off",
+    "no-implicit-coercion": "off",
+    "max-params": "off"
+  }
+}

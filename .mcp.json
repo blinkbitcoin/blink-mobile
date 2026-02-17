@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "appium-mcp": {
+      "command": "npx",
+      "args": ["appium-mcp@latest"],
+      "env": {
+        "ANDROID_HOME": "${ANDROID_HOME}",
+        "JAVA_HOME": "${JAVA_HOME}"
+      }
+    },
+    "blink-dev": {
+      "command": "npx",
+      "args": ["tsx", "dev/mcp-server/src/index.ts"],
+      "env": {
+        "APPIUM_HOME": "$HOME/.appium"
+      }
+    }
+  }
+}
