@@ -17,6 +17,7 @@ export const CurrencyPill = ({
   currency,
   label,
   highlighted = true,
+  variant = "filled",
   containerSize = "small",
   containerStyle,
   onLayout,
@@ -25,6 +26,7 @@ export const CurrencyPill = ({
   label?: string
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
+  variant?: "filled" | "outlined"
   containerStyle?: StyleProp<ViewStyle>
   onLayout?: (event: LayoutChangeEvent) => void
 }) => {
@@ -34,6 +36,15 @@ export const CurrencyPill = ({
   const { LL } = useI18nContext()
 
   const getCurrencyProps = () => {
+    if (variant === "outlined") {
+      return {
+        defaultText: "",
+        color: colors.grey1,
+        backgroundColor: colors.transparent,
+        borderColor: colors.grey1,
+      }
+    }
+
     switch (currency) {
       case WalletCurrency.Btc:
         return {
@@ -67,6 +78,7 @@ export const CurrencyPill = ({
       backgroundColor={currencyProps.backgroundColor}
       borderColor={currencyProps.borderColor}
       containerSize={containerSize}
+      variant={variant}
       containerStyle={containerStyle}
       onLayout={onLayout}
     />
@@ -79,6 +91,7 @@ const ContainerBubble = ({
   backgroundColor,
   containerSize = "small",
   borderColor,
+  variant = "filled",
   containerStyle,
   onLayout,
 }: {
@@ -87,14 +100,19 @@ const ContainerBubble = ({
   backgroundColor?: string
   containerSize?: "small" | "medium" | "large"
   borderColor?: string
+  variant?: "filled" | "outlined"
   containerStyle?: StyleProp<ViewStyle>
   onLayout?: (event: LayoutChangeEvent) => void
 }) => {
   const styles = useStyles({ backgroundColor, containerSize, color, borderColor })
+  const isOutlined = variant === "outlined"
 
   return (
-    <View style={[styles.container, containerStyle]} onLayout={onLayout}>
-      <Text type="p3" style={styles.text}>
+    <View
+      style={[styles.container, isOutlined && styles.outlinedContainer, containerStyle]}
+      onLayout={onLayout}
+    >
+      <Text type="p3" style={[styles.text, isOutlined && styles.outlinedText]}>
         {text}
       </Text>
     </View>
@@ -129,9 +147,20 @@ const useStyles = makeStyles(
       borderWidth: CURRENCY_PILL_BORDER_WIDTH,
       flexShrink: 0,
     },
+    outlinedContainer: {
+      minWidth: 52,
+      paddingVertical: 4,
+      paddingHorizontal: 11,
+    },
     text: {
       color,
       ...CURRENCY_PILL_TEXT_STYLE,
+    },
+    outlinedText: {
+      fontFamily: "Source Sans Pro",
+      fontSize: 16,
+      fontWeight: "700",
+      lineHeight: 22,
     },
   }),
 )
