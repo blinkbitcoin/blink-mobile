@@ -155,34 +155,38 @@ jest.mock("@app/hooks", () => {
   }
 })
 
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
-      `$${moneyAmount.amount}`,
-    getSecondaryAmountIfCurrencyIsDifferent: () => null,
-    zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
-    currencyInfo: {
-      USD: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
-      BTC: {
-        symbol: "",
-        minorUnitToMajorUnitOffset: 0,
-        showFractionDigits: false,
-        currencyCode: "SAT",
-      },
-      DisplayCurrency: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
+jest.mock("@app/hooks/use-display-currency", () => {
+  const info = {
+    BTC: {
+      symbol: "",
+      minorUnitToMajorUnitOffset: 0,
+      showFractionDigits: false,
+      currencyCode: "SAT",
     },
-  }),
-}))
+    USD: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+    DisplayCurrency: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+  }
+
+  return {
+    useDisplayCurrency: () => ({
+      currencyInfo: info,
+      zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+      formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+        `$${moneyAmount.amount}`,
+      getSecondaryAmountIfCurrencyIsDifferent: () => null,
+    }),
+  }
+})
 
 jest.mock("@react-native-clipboard/clipboard", () => ({
   setString: jest.fn(),
