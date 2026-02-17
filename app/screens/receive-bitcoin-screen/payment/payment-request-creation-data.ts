@@ -37,7 +37,7 @@ export const createPaymentRequestCreationData = <T extends WalletCurrency>(
   // Permissions for the specified type
   const permissions = {
     canSetReceivingWalletDescriptor: false,
-    canSetMemo: false,
+    canSetMemo: true,
     canSetAmount: true,
     canSetExpirationTime: false,
   }

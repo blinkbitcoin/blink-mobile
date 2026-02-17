@@ -316,18 +316,6 @@ export const useReceiveBitcoin = () => {
     }
   }, [pr?.info?.data, setExpiresInSeconds])
 
-  // Clean Memo
-  useLayoutEffect(() => {
-    if (memoChangeText === "") {
-      setPRCD((pr) => {
-        if (pr && pr.setMemo) {
-          return pr.setMemo("")
-        }
-        return pr
-      })
-    }
-  }, [memoChangeText, setPRCD])
-
   const { copyToClipboard, share } = useMemo(() => {
     if (!pr) {
       return {}
@@ -417,19 +405,12 @@ export const useReceiveBitcoin = () => {
 
   const setType = (type: InvoiceType) => {
     setPRCD((pr) => pr && pr.setType(type))
-    setPRCD((pr) => {
-      if (pr && pr.setMemo) {
-        return pr.setMemo("")
-      }
-      return pr
-    })
-    setMemoChangeText("")
   }
 
   const setMemo = () => {
     setPRCD((pr) => {
-      if (pr && memoChangeText && pr.setMemo) {
-        return pr.setMemo(memoChangeText)
+      if (pr && pr.setMemo) {
+        return pr.setMemo(memoChangeText || "")
       }
       return pr
     })

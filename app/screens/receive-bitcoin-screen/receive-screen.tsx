@@ -75,7 +75,7 @@ const ReceiveScreen = () => {
       : request?.usdWalletId
   const onchain = useOnChainAddress(onchainWalletId, {
     amount: request?.settlementAmount?.amount,
-    memo: request?.memoChangeText || undefined,
+    memo: request?.memo || undefined,
   })
 
   const [isTrialAccountModalVisible, setIsTrialAccountModalVisible] = useState(false)
@@ -120,14 +120,39 @@ const ReceiveScreen = () => {
       if (
         !isNonZeroMoneyAmount(amount) &&
         request.type === Invoice.Lightning &&
-        request.canUsePaycode
+        request.canUsePaycode &&
+        !request.memoChangeText
       ) {
         request.setType(Invoice.PayCode)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [request?.setAmount, request?.type, request?.canUsePaycode],
+    [request?.setAmount, request?.type, request?.canUsePaycode, request?.memoChangeText],
   )
+
+  const handleMemoBlur = useCallback(() => {
+    if (!request) return
+    request.setMemo()
+    if (request.memoChangeText && request.type === Invoice.PayCode) {
+      request.setType(Invoice.Lightning)
+      return
+    }
+    if (
+      !request.memoChangeText &&
+      request.type === Invoice.Lightning &&
+      request.canUsePaycode &&
+      !isNonZeroMoneyAmount(request.unitOfAccountAmount)
+    ) {
+      request.setType(Invoice.PayCode)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    request?.setMemo,
+    request?.memoChangeText,
+    request?.type,
+    request?.canUsePaycode,
+    request?.unitOfAccountAmount,
+  ])
 
   const handleCopy = useCallback(() => {
     if (isOnChainPage) {
@@ -361,10 +386,10 @@ const ReceiveScreen = () => {
         />
 
         <NoteInput
-          onBlur={request.setMemo}
+          onBlur={handleMemoBlur}
           onChangeText={request.setMemoChangeText}
           value={request.memoChangeText || ""}
-          editable={isOnChainPage || request.canSetMemo}
+          editable={request.canSetMemo}
           big={false}
           iconSize={16}
           fontSize={14}
