@@ -1,12 +1,13 @@
 import * as React from "react"
-import { View } from "react-native"
+import { Pressable, StyleSheet, TextInput, View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyErrorBox } from "../atomic/galoy-error-box"
-import { GaloyIconButton } from "../atomic/galoy-icon-button"
+import { GaloyIcon } from "../atomic/galoy-icon/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
+import { CurrencyPill } from "../atomic/currency-pill/currency-pill"
 import { CurrencyKeyboard } from "../currency-keyboard"
 import { Key } from "./number-pad-reducer"
 
@@ -47,66 +48,74 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   const styles = useStyles()
   const { theme } = useTheme()
 
+  const hasSecondary = Boolean(secondaryCurrencyFormattedAmount)
+
   return (
-    <View style={styles.amountInputScreenContainer}>
-      <View style={styles.bodyContainer}>
-        <View style={styles.amountContainer}>
-          <View style={styles.primaryAmountContainer}>
-            {primaryCurrencySymbol && (
-              <Text style={styles.primaryCurrencySymbol}>{primaryCurrencySymbol}</Text>
-            )}
-            <Input
-              value={primaryCurrencyFormattedAmount}
+    <View style={styles.sheet}>
+      <View style={styles.currencyInputGroup}>
+        <View
+          style={[
+            styles.inputRow,
+            styles.primaryRowBg,
+            hasSecondary ? styles.topRow : styles.singleRow,
+          ]}
+        >
+          <CurrencyPill label={primaryCurrencyCode} variant="outlined" />
+          <View style={styles.amountContainer}>
+            <Text style={styles.amountText}>
+              {primaryCurrencySymbol || ""}
+              {primaryCurrencyFormattedAmount || "0"}
+            </Text>
+            <TextInput
+              value=""
               showSoftInputOnFocus={false}
               onChangeText={(e) => {
-                // remove commas for ease of calculation later on
-                const val = e.replaceAll(",", "")
-                // TODO adjust for currencies that use commas instead of decimals
-
-                // test for string input that can be either numerical or float
+                const val = e.replace(/[^0-9.,]/g, "").replaceAll(",", "")
                 if (/^\d*\.?\d*$/.test(val.trim())) {
                   const num = Number(val)
                   onPaste(num)
                 }
               }}
-              containerStyle={styles.primaryNumberContainer}
-              inputStyle={styles.primaryNumberText}
-              placeholder="0"
-              placeholderTextColor={theme.colors.grey3}
-              inputContainerStyle={styles.primaryNumberInputContainer}
-              renderErrorMessage={false}
+              style={styles.hiddenInput}
+              caretHidden
             />
-            <Text style={styles.primaryCurrencyCodeText}>{primaryCurrencyCode}</Text>
           </View>
-          {Boolean(secondaryCurrencyFormattedAmount) && (
-            <>
-              <View style={styles.swapContainer}>
-                <View style={styles.horizontalLine} />
-                <GaloyIconButton
-                  size={"large"}
-                  name="transfer"
-                  onPress={onToggleCurrency}
-                />
-                <View style={styles.horizontalLine} />
-              </View>
-              <View style={styles.secondaryAmountContainer}>
-                <Text style={styles.secondaryAmountText}>
+        </View>
+
+        {hasSecondary && (
+          <>
+            <View style={[styles.inputRow, styles.bottomRow]}>
+              <CurrencyPill label={secondaryCurrencyCode} variant="outlined" />
+              <View style={styles.amountContainer}>
+                <Text style={styles.amountText}>
                   {secondaryCurrencySymbol}
                   {secondaryCurrencyFormattedAmount}
                 </Text>
-                <Text style={styles.secondaryAmountCurrencyCodeText}>
-                  {secondaryCurrencyCode}
-                </Text>
               </View>
-            </>
-          )}
-        </View>
-        <View style={styles.infoContainer}>
-          {errorMessage && <GaloyErrorBox errorMessage={errorMessage} />}
-        </View>
+            </View>
+            <View style={styles.toggleOverlay} pointerEvents="box-none">
+              <Pressable
+                onPress={onToggleCurrency}
+                style={({ pressed }) => [
+                  styles.toggleButton,
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <GaloyIcon name="transfer" size={34} color={theme.colors.primary} />
+              </Pressable>
+            </View>
+          </>
+        )}
+      </View>
+
+      <View>
+        {errorMessage && <GaloyErrorBox errorMessage={errorMessage} />}
         <View style={styles.keyboardContainer}>
           <CurrencyKeyboard onPress={onKeyPress} disabledKeys={disabledKeys} />
         </View>
+      </View>
+
+      <View style={styles.ctaSection}>
         <GaloyPrimaryButton
           disabled={!onSetAmountPress || setAmountDisabled}
           onPress={onSetAmountPress}
@@ -118,69 +127,79 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  amountInputScreenContainer: {},
+  sheet: {
+    paddingTop: 6,
+    paddingHorizontal: 20,
+    gap: 14,
+  },
+  currencyInputGroup: {
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
+  },
+  inputRow: {
+    minHeight: 50,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  primaryRowBg: {
+    backgroundColor: colors.grey6,
+  },
+  singleRow: {
+    borderRadius: 12,
+    paddingVertical: 15,
+  },
+  topRow: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    paddingTop: 15,
+    paddingBottom: 27,
+  },
+  bottomRow: {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    paddingTop: 27,
+    paddingBottom: 15,
+  },
+  toggleOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  toggleButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.grey4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   amountContainer: {
-    marginBottom: 16,
-  },
-  primaryNumberContainer: {
     flex: 1,
+    minWidth: 100,
   },
-  primaryAmountContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  primaryCurrencySymbol: {
-    fontSize: 28,
-    lineHeight: 32,
-    fontWeight: "bold",
-  },
-  primaryNumberText: {
-    fontSize: 28,
-    lineHeight: 32,
-    flex: 1,
-    fontWeight: "bold",
-  },
-  primaryNumberInputContainer: {
-    borderBottomWidth: 0,
-  },
-  primaryCurrencyCodeText: {
-    fontSize: 28,
-    lineHeight: 32,
-    fontWeight: "bold",
+  amountText: {
+    fontSize: 20,
+    fontWeight: "700",
+    lineHeight: 24,
     textAlign: "right",
+    color: colors.black,
   },
-  secondaryAmountContainer: {
-    flexDirection: "row",
-  },
-  secondaryAmountText: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: "bold",
-    flex: 1,
-  },
-  secondaryAmountCurrencyCodeText: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: "bold",
-  },
-  swapContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-    marginVertical: 8,
-  },
-  horizontalLine: {
-    borderBottomColor: colors.primary4,
-    borderBottomWidth: 1,
-    flex: 1,
-  },
-  infoContainer: {
-    justifyContent: "flex-start",
-  },
-  bodyContainer: {
-    padding: 24,
+  hiddenInput: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0,
   },
   keyboardContainer: {
-    marginBottom: 28,
-    alignSelf: "stretch",
+    paddingTop: 40,
+    paddingBottom: 14,
+  },
+  ctaSection: {
+    paddingTop: 10,
+    paddingBottom: 20,
   },
 }))
