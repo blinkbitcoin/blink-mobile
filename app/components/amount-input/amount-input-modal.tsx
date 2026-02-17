@@ -1,12 +1,17 @@
 import * as React from "react"
-import { SafeAreaView } from "react-native"
-import ReactNativeModal from "react-native-modal"
+import { useCallback, useEffect, useRef } from "react"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { makeStyles } from "@rn-vui/themed"
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { timing } from "@app/rne-theme/timing"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
-import { makeStyles } from "@rn-vui/themed"
 
 import { AmountInputScreen } from "../amount-input-screen"
 
@@ -32,15 +37,39 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   close,
 }) => {
   const styles = useStyles()
+  const { bottom } = useSafeAreaInsets()
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      bottomSheetRef.current?.present()
+    }
+  }, [isOpen])
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  )
 
   return (
-    <ReactNativeModal
-      isVisible={isOpen}
-      coverScreen={true}
-      style={styles.modal}
-      animationInTiming={timing.quick}
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      enableDynamicSizing
+      enablePanDownToClose
+      animationConfigs={{ duration: 300 }}
+      backdropComponent={renderBackdrop}
+      handleIndicatorStyle={styles.handleIndicator}
+      backgroundStyle={styles.sheetBackground}
+      onDismiss={close}
     >
-      <SafeAreaView style={styles.amountInputScreenContainer}>
+      <BottomSheetView style={{ paddingBottom: bottom }}>
         <AmountInputScreen
           initialAmount={moneyAmount}
           convertMoneyAmount={convertMoneyAmount}
@@ -50,17 +79,24 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
           minAmount={minAmount}
           goBack={close}
         />
-      </SafeAreaView>
-    </ReactNativeModal>
+      </BottomSheetView>
+    </BottomSheetModal>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  amountInputScreenContainer: {
-    flex: 1,
+  handleIndicator: {
+    backgroundColor: colors.grey3,
+    width: 40,
+    height: 4,
   },
-  modal: {
-    backgroundColor: colors.white,
-    margin: 0,
+  sheetBackground: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.grey4,
+    borderBottomWidth: 0,
+    marginHorizontal: -1,
   },
 }))

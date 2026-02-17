@@ -51,21 +51,6 @@ export const AmountInput: React.FC<AmountInputProps> = ({
     setIsSettingAmount(false)
   }
 
-  if (isSettingAmount) {
-    return (
-      <AmountInputModal
-        moneyAmount={unitOfAccountAmount}
-        isOpen={true}
-        walletCurrency={walletCurrency}
-        convertMoneyAmount={convertMoneyAmount}
-        onSetAmount={onSetAmount}
-        maxAmount={maxAmount}
-        minAmount={minAmount}
-        close={() => setIsSettingAmount(false)}
-      />
-    )
-  }
-
   let formattedPrimaryAmount = undefined
   let formattedSecondaryAmount = undefined
 
@@ -108,32 +93,30 @@ export const AmountInput: React.FC<AmountInputProps> = ({
     setIsSettingAmount(true)
   }
 
-  if (canSetAmount) {
-    return (
+  return (
+    <>
       <AmountInputButton
         placeholder={LL.AmountInputButton.tapToSetAmount()}
-        onPress={onPressInputButton}
+        onPress={canSetAmount ? onPressInputButton : undefined}
         value={formattedPrimaryAmount}
         iconName="pencil"
         secondaryValue={formattedSecondaryAmount}
+        disabled={!canSetAmount}
         primaryTextTestProps={"Amount Input Button Amount"}
+        showValuesIfDisabled={showValuesIfDisabled}
         big={big}
         {...testProps("Amount Input Button")}
       />
-    )
-  }
-
-  return (
-    <AmountInputButton
-      placeholder={LL.AmountInputButton.tapToSetAmount()}
-      iconName="pencil"
-      value={formattedPrimaryAmount}
-      secondaryValue={formattedSecondaryAmount}
-      disabled={true}
-      primaryTextTestProps={"Amount Input Button Amount"}
-      showValuesIfDisabled={showValuesIfDisabled}
-      big={big}
-      {...testProps("Amount Input Button")}
-    />
+      <AmountInputModal
+        moneyAmount={unitOfAccountAmount}
+        isOpen={isSettingAmount}
+        walletCurrency={walletCurrency}
+        convertMoneyAmount={convertMoneyAmount}
+        onSetAmount={onSetAmount}
+        maxAmount={maxAmount}
+        minAmount={minAmount}
+        close={() => setIsSettingAmount(false)}
+      />
+    </>
   )
 }
