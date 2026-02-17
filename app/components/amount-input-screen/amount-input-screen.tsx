@@ -1,7 +1,17 @@
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useReducer } from "react"
 
-import { WalletCurrency } from "@app/graphql/generated"
+import { useApolloClient } from "@apollo/client"
+
+import {
+  PreferredAmountCurrency,
+  savePreferredAmountCurrency,
+} from "@app/graphql/client-only-query"
+import {
+  PreferredAmountCurrencyDocument,
+  PreferredAmountCurrencyQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
@@ -128,11 +138,31 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   } = useDisplayCurrency()
 
   const { LL } = useI18nContext()
+  const client = useApolloClient()
+  const preferredCurrency = client.readQuery<PreferredAmountCurrencyQuery>({
+    query: PreferredAmountCurrencyDocument,
+  })?.preferredAmountCurrency
+
+  const resolvedInitialAmount = (() => {
+    if (initialAmount?.amount) return initialAmount
+    if (preferredCurrency) {
+      const currency =
+        preferredCurrency === PreferredAmountCurrency.Display
+          ? DisplayCurrency
+          : walletCurrency
+      return {
+        amount: 0,
+        currency,
+        currencyCode: currencyInfo[currency].currencyCode,
+      } as MoneyAmount<WalletOrDisplayCurrency>
+    }
+    return initialAmount || zeroDisplayAmount
+  })()
 
   const [numberPadState, dispatchNumberPadAction] = useReducer(
     numberPadReducer,
     moneyAmountToNumberPadReducerState({
-      moneyAmount: initialAmount || zeroDisplayAmount,
+      moneyAmount: resolvedInitialAmount,
       currencyInfo,
     }),
   )
@@ -192,8 +222,19 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       setNumberPadAmount(secondaryNewAmount)
     })
 
+  const onSetAmountPress =
+    setAmount &&
+    (() => {
+      const flag =
+        numberPadState.currency === DisplayCurrency
+          ? PreferredAmountCurrency.Display
+          : PreferredAmountCurrency.Default
+      savePreferredAmountCurrency(client, flag)
+      setAmount(newPrimaryAmount)
+    })
+
   useEffect(() => {
-    if (initialAmount) {
+    if (initialAmount?.amount) {
       setNumberPadAmount(initialAmount)
     }
   }, [initialAmount, setNumberPadAmount])
@@ -261,7 +302,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       onClearAmount={onClear}
       onToggleCurrency={onToggleCurrency}
       setAmountDisabled={Boolean(errorMessage)}
-      onSetAmountPress={setAmount && (() => setAmount(newPrimaryAmount))}
+      onSetAmountPress={onSetAmountPress}
       goBack={goBack}
       disabledKeys={disabledKeys}
     />

@@ -2052,6 +2052,7 @@ export type Query = {
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
   /** Returns the list of available speeds for on-chain payments */
   readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
+  readonly preferredAmountCurrency?: Maybe<Scalars['String']['output']>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -3012,6 +3013,11 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
+
+export type PreferredAmountCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PreferredAmountCurrencyQuery = { readonly __typename: 'Query', readonly preferredAmountCurrency?: string | null };
 
 export type TxLastSeenQueryVariables = Exact<{
   accountId: Scalars['ID']['input'];
@@ -4504,6 +4510,43 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const PreferredAmountCurrencyDocument = gql`
+    query preferredAmountCurrency {
+  preferredAmountCurrency @client
+}
+    `;
+
+/**
+ * __usePreferredAmountCurrencyQuery__
+ *
+ * To run a query within a React component, call `usePreferredAmountCurrencyQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePreferredAmountCurrencyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePreferredAmountCurrencyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePreferredAmountCurrencyQuery(baseOptions?: Apollo.QueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+      }
+export function usePreferredAmountCurrencyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export function usePreferredAmountCurrencySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export type PreferredAmountCurrencyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyQuery>;
+export type PreferredAmountCurrencyLazyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyLazyQuery>;
+export type PreferredAmountCurrencySuspenseQueryHookResult = ReturnType<typeof usePreferredAmountCurrencySuspenseQuery>;
+export type PreferredAmountCurrencyQueryResult = Apollo.QueryResult<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>;
 export const TxLastSeenDocument = gql`
     query txLastSeen($accountId: ID!) {
   txLastSeen(accountId: $accountId) @client {
@@ -10006,6 +10049,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
+  preferredAmountCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;

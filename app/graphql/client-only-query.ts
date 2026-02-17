@@ -27,6 +27,8 @@ import {
   UpgradeModalLastShownAtQuery,
   DeviceSessionCountDocument,
   DeviceSessionCountQuery,
+  PreferredAmountCurrencyDocument,
+  PreferredAmountCurrencyQuery,
   TxLastSeenDocument,
   TxLastSeenQuery,
   WalletCurrency,
@@ -84,6 +86,10 @@ export default gql`
 
   query deviceSessionCount {
     deviceSessionCount @client
+  }
+
+  query preferredAmountCurrency {
+    preferredAmountCurrency @client
   }
 
   query txLastSeen($accountId: ID!) {
@@ -265,6 +271,28 @@ export const setUpgradeModalLastShownAt = (
       },
     })
     return isoDatetime
+  } catch {
+    return null
+  }
+}
+
+export const PreferredAmountCurrency = {
+  Display: "display",
+  Default: "default",
+} as const
+export type PreferredAmountCurrency =
+  (typeof PreferredAmountCurrency)[keyof typeof PreferredAmountCurrency]
+
+export const savePreferredAmountCurrency = (
+  client: ApolloClient<unknown>,
+  currency: PreferredAmountCurrency,
+): PreferredAmountCurrency | null => {
+  try {
+    client.writeQuery<PreferredAmountCurrencyQuery>({
+      query: PreferredAmountCurrencyDocument,
+      data: { __typename: "Query", preferredAmountCurrency: currency },
+    })
+    return currency
   } catch {
     return null
   }
