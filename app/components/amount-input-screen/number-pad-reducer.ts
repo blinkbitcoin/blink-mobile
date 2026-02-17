@@ -1,3 +1,5 @@
+import { WalletCurrency } from "@app/graphql/generated"
+import { CurrencyInfo } from "@app/hooks/use-display-currency"
 import { WalletOrDisplayCurrency } from "@app/types/amounts"
 
 export type NumberPadNumber = {
@@ -63,6 +65,30 @@ export type Key = (typeof Key)[keyof typeof Key]
 
 export type NumberPadReducerActionType =
   (typeof NumberPadReducerActionType)[keyof typeof NumberPadReducerActionType]
+
+export const formatNumberPadNumber = ({
+  numberPadNumber,
+  currency,
+  currencyInfo,
+  noSuffix = false,
+}: {
+  numberPadNumber: NumberPadNumber
+  currency: WalletOrDisplayCurrency
+  currencyInfo: Record<WalletOrDisplayCurrency, CurrencyInfo>
+  noSuffix?: boolean
+}) => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  const currencyCode =
+    currency === WalletCurrency.Btc && !noSuffix
+      ? currencyInfo[currency].currencyCode
+      : undefined
+
+  if (!majorAmount && !minorAmount && !hasDecimal && !currencyCode) return ""
+
+  const major = Number(majorAmount).toLocaleString()
+  const suffix = currencyCode ? ` ${currencyCode}` : ""
+  return hasDecimal ? `${major}.${minorAmount}${suffix}` : `${major}${suffix}`
+}
 
 export const getDisabledKeys = ({
   numberPadNumber,

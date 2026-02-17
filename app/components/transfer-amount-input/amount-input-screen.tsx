@@ -12,6 +12,7 @@ import {
   InputValues,
 } from "@app/screens/conversion-flow/use-convert-money-details"
 import {
+  formatNumberPadNumber,
   getDisabledKeys,
   Key,
   NumberPadNumber,
@@ -48,13 +49,6 @@ export enum ConvertInputType {
   FROM = "fromInput",
   TO = "toInput",
   CURRENCY = "currencyInput",
-}
-
-const formatNumberPadNumber = (n: NumberPadNumber) => {
-  const { majorAmount, minorAmount, hasDecimal } = n
-  if (!majorAmount && !minorAmount && !hasDecimal) return ""
-  const formattedMajor = Number(majorAmount).toLocaleString()
-  return hasDecimal ? `${formattedMajor}.${minorAmount}` : formattedMajor
 }
 
 const numberPadNumberToMoneyAmount = ({
@@ -276,7 +270,11 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       moneyAmount: focusedInput.amount,
       currencyInfo,
     })
-    const formattedOnFocus = formatNumberPadNumber(npState.numberPadNumber)
+    const formattedOnFocus = formatNumberPadNumber({
+      ...npState,
+      currencyInfo,
+      noSuffix: true,
+    })
     const focusStates = createFocusStates(focusedIdRef.current)
     const baseValues = lastValuesRef.current || inputValues
 
@@ -338,8 +336,11 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
   useEffect(() => {
     if (!typingRef.current) return
-    const { numberPadNumber } = numberPadState
-    const formattedAmount = formatNumberPadNumber(numberPadNumber)
+    const formattedAmount = formatNumberPadNumber({
+      ...numberPadState,
+      currencyInfo,
+      noSuffix: true,
+    })
     const baseValues = lastValuesRef.current || inputValues
 
     const payload: InputValues = {
@@ -353,7 +354,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       lastSnapshotRef.current = nextSnap
       lastValuesRef.current = payload
     }
-  }, [numberPadState, inputValues, onSetFormattedAmount])
+  }, [numberPadState, currencyInfo, inputValues, onSetFormattedAmount])
 
   useEffect(() => {
     if (skipNextRecalcRef.current) {
@@ -401,7 +402,11 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
         currencyInfo,
       })
 
-      const formattedFromPrimary = formatNumberPadNumber(primaryNpState.numberPadNumber)
+      const formattedFromPrimary = formatNumberPadNumber({
+        ...primaryNpState,
+        currencyInfo,
+        noSuffix: true,
+      })
 
       const { fromAmount, toAmount, currencyAmount } = convertToInputCurrencies(
         primaryAmount,
@@ -415,7 +420,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
       const formattedForParent = freezeFormatRef.current
         ? lastValuesRef.current?.formattedAmount ??
-          formatNumberPadNumber(numberPadState.numberPadNumber)
+          formatNumberPadNumber({ ...numberPadState, currencyInfo, noSuffix: true })
         : formattedFromPrimary
 
       const getFormattedAmount = (

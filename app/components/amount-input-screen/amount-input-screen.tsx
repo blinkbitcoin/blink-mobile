@@ -15,6 +15,7 @@ import {
 
 import { AmountInputScreenUI } from "./amount-input-screen-ui"
 import {
+  formatNumberPadNumber,
   getDisabledKeys,
   Key,
   NumberPadNumber,
@@ -31,22 +32,6 @@ export type AmountInputScreenProps = {
   convertMoneyAmount: ConvertMoneyAmount
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
-}
-
-const formatNumberPadNumber = (numberPadNumber: NumberPadNumber) => {
-  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
-
-  if (!majorAmount && !minorAmount && !hasDecimal) {
-    return ""
-  }
-
-  const formattedMajorAmount = Number(majorAmount).toLocaleString()
-
-  if (hasDecimal) {
-    return `${formattedMajorAmount}.${minorAmount}`
-  }
-
-  return formattedMajorAmount
 }
 
 const numberPadNumberToMoneyAmount = ({
@@ -248,19 +233,24 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   const secondaryCurrencyInfo =
     secondaryNewAmount && currencyInfo[secondaryNewAmount.currency]
 
+  const pillLabel = (currency: WalletOrDisplayCurrency) =>
+    currency === DisplayCurrency ? currencyInfo[currency].currencyCode : currency
+
   return (
     <AmountInputScreenUI
-      primaryCurrencyCode={primaryCurrencyInfo.currencyCode}
-      primaryCurrencyFormattedAmount={formatNumberPadNumber(
-        numberPadState.numberPadNumber,
-      )}
+      primaryCurrencyCode={pillLabel(newPrimaryAmount.currency)}
+      primaryCurrencyFormattedAmount={formatNumberPadNumber({
+        ...numberPadState,
+        currencyInfo,
+      })}
       primaryCurrencySymbol={primaryCurrencyInfo.symbol}
-      secondaryCurrencyCode={secondaryCurrencyInfo?.currencyCode}
+      secondaryCurrencyCode={
+        secondaryNewAmount ? pillLabel(secondaryNewAmount.currency) : undefined
+      }
       secondaryCurrencyFormattedAmount={
         secondaryNewAmount &&
         formatMoneyAmount({
           moneyAmount: secondaryNewAmount,
-          noSuffix: true,
           noSymbol: true,
         })
       }
