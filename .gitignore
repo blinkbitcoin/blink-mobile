@@ -111,3 +111,4 @@ android-recordings
 bmad-custom-src
 .beads
 .history # a defined place to dump all that intermediate stuff from AI agents
+.mcp.json
