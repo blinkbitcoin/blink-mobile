@@ -25,7 +25,6 @@ export type AmountInputScreenUIProps = {
   onToggleCurrency?: () => void
   onClearAmount: () => void
   onSetAmountPress?: () => void
-  goBack?: () => void
   disabledKeys?: ReadonlySet<Key>
 }
 

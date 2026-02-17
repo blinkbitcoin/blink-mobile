@@ -83,7 +83,6 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
           }
           maxAmount={maxAmount}
           minAmount={minAmount}
-          goBack={close}
         />
       </BottomSheetView>
     </BottomSheetModal>

@@ -35,7 +35,6 @@ import {
 } from "./number-pad-reducer"
 
 export type AmountInputScreenProps = {
-  goBack: () => void
   initialAmount?: MoneyAmount<WalletOrDisplayCurrency>
   setAmount?: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
   walletCurrency: WalletCurrency
@@ -122,7 +121,6 @@ const moneyAmountToNumberPadReducerState = ({
 }
 
 export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
-  goBack,
   initialAmount,
   setAmount,
   walletCurrency,
@@ -303,7 +301,6 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       onToggleCurrency={onToggleCurrency}
       setAmountDisabled={Boolean(errorMessage)}
       onSetAmountPress={onSetAmountPress}
-      goBack={goBack}
       disabledKeys={disabledKeys}
     />
   )

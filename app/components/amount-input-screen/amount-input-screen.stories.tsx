@@ -34,7 +34,6 @@ const amountInputDefaultProps: AmountInputScreenProps = {
   walletCurrency: WalletCurrency.Btc,
   setAmount: (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) =>
     console.log("set amount: ", moneyAmount),
-  goBack: () => console.log("go back"),
   convertMoneyAmount: (moneyAmount, toCurrency) => {
     return {
       amount: moneyAmount.amount,
