@@ -74,7 +74,13 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
           initialAmount={moneyAmount}
           convertMoneyAmount={convertMoneyAmount}
           walletCurrency={walletCurrency}
-          setAmount={onSetAmount}
+          setAmount={
+            onSetAmount &&
+            ((amount) => {
+              onSetAmount(amount)
+              bottomSheetRef.current?.dismiss()
+            })
+          }
           maxAmount={maxAmount}
           minAmount={minAmount}
           goBack={close}
@@ -91,7 +97,7 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 4,
   },
   sheetBackground: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
