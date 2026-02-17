@@ -134,7 +134,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
           accessibilityLabel="Toggle wallet"
         >
           <Animated.View style={spinStyle}>
-            <GaloyIcon name="refresh" size={20} color={colors.grey1} />
+            <GaloyIcon name="refresh" size={16} color={colors.grey1} />
           </Animated.View>
           <CurrencyPill
             currency={walletCurrency}
@@ -203,7 +203,7 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSection: {
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 8,
+    columnGap: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
   },
