@@ -2159,7 +2159,7 @@
     "lightningAddress": "Adresă Lightning",
     "lightningInvoice": "Factură Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Taxă de depunere: {fee} SAT"
+    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Răscumpărați Bitcoin",

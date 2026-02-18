@@ -2159,7 +2159,7 @@
     "lightningAddress": "Adreça Lightning",
     "lightningInvoice": "Factura Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Comissió de dipòsit: {fee} SAT"
+    "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",

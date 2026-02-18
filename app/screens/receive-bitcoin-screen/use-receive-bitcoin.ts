@@ -51,6 +51,7 @@ gql`
         deposit {
           minBankFee
           minBankFeeThreshold
+          ratio
         }
       }
     }

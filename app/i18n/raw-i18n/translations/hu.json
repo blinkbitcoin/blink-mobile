@@ -2159,7 +2159,7 @@
     "lightningAddress": "Lightning cím",
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Befizetési díj: {fee} SAT"
+    "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin beváltása",

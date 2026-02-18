@@ -2166,7 +2166,7 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Naknada za uplatu: {fee} SAT"
+    "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",

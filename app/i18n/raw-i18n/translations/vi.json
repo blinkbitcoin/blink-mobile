@@ -2166,7 +2166,7 @@
     "lightningAddress": "Địa chỉ Lightning",
     "lightningInvoice": "Hóa đơn Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Phí nạp tiền: {fee} SAT"
+    "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Đổi lấy Bitcoin",

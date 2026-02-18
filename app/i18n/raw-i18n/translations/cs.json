@@ -2166,7 +2166,7 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Poplatek za vklad: {fee} SAT"
+    "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Směnit Bitcoin",

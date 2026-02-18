@@ -2166,7 +2166,7 @@
     "lightningAddress": "Lightning-adres",
     "lightningInvoice": "Lightning-factuur",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Stortingskosten: {fee} SAT"
+    "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Wissel Bitcoin",

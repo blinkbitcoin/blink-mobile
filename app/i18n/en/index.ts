@@ -2199,7 +2199,8 @@ const en: BaseTranslation = {
     lightningAddress: "Lightning address",
     lightningInvoice: "Lightning invoice",
     bitcoinOnchain: "Bitcoin onchain",
-    depositFee: "Deposit fee: {fee: string} SAT",
+    depositFee:
+      "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",

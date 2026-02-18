@@ -2166,7 +2166,7 @@
     "lightningAddress": "Alamat Lightning",
     "lightningInvoice": "Invois Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yuran deposit: {fee} SAT"
+    "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Tebus bitcoin",

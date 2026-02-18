@@ -2159,7 +2159,7 @@
     "lightningAddress": "Lightning adresi",
     "lightningInvoice": "Lightning faturası",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yatırma ücreti: {fee} SAT"
+    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",

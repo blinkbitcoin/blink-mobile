@@ -2159,7 +2159,7 @@
     "lightningAddress": "Alamat Lightning",
     "lightningInvoice": "Faktur Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Biaya deposit: {fee} SAT"
+    "depositFee": "Biaya deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit di atas {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Tukarkan Bitcoin",

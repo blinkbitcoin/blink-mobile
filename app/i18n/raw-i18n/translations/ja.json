@@ -2166,7 +2166,7 @@
         "lightningAddress": "Lightningアドレス",
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "入金手数料: {fee} SAT"
+        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",

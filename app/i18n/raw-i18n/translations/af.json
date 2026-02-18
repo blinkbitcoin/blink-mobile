@@ -2166,7 +2166,7 @@
     "lightningAddress": "Lightning-adres",
     "lightningInvoice": "Lightning-faktuur",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Depositofooi: {fee} SAT"
+    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Verkry Bitcoin",

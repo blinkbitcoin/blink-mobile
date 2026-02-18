@@ -2166,7 +2166,7 @@
     "lightningAddress": "ที่อยู่ Lightning",
     "lightningInvoice": "ใบแจ้งหนี้ Lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "ค่าธรรมเนียมฝากเงิน: {fee} SAT"
+    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "แลกรับบิตคอยน์",

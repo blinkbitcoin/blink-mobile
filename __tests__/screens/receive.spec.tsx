@@ -19,7 +19,7 @@ const makeQueryResult = (defaultWalletId = "btc-wallet-id") => ({
       __typename: "Globals" as const,
       network: "signet" as const,
       feesInformation: {
-        deposit: { minBankFee: "3000", minBankFeeThreshold: "1000000" },
+        deposit: { minBankFee: "3000", minBankFeeThreshold: "1000000", ratio: "50" },
       },
     },
     me: {

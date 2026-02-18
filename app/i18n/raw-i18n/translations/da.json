@@ -2162,7 +2162,7 @@
     "lightningAddress": "Lightning-adresse",
     "lightningInvoice": "Lightning-faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Indbetalingsgebyr: {fee} SAT"
+    "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",

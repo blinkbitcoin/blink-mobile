@@ -2159,7 +2159,7 @@
         "lightningAddress": "Endereço lightning",
         "lightningInvoice": "Fatura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Taxa de depósito: {fee} SAT"
+        "depositFee": "Taxa de depósito: {fee} SAT para valores abaixo de {threshold} SAT ou {overFee} SAT para depósitos acima de {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Resgatar Bitcoin",

@@ -2159,7 +2159,7 @@
         "lightningAddress": "Lightning-Adresse",
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Einzahlungsgebühr: {fee} SAT"
+        "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Bitcoin einlösen",

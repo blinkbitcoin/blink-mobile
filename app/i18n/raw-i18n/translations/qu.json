@@ -2166,7 +2166,7 @@
     "lightningAddress": "Lightning address",
     "lightningInvoice": "Lightning invoice",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Deposit fee: {fee} SAT"
+    "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",

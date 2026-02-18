@@ -2166,7 +2166,7 @@
         "lightningAddress": "Adresse lightning",
         "lightningInvoice": "Facture lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Frais de dépôt : {fee} SAT"
+        "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Échanger des Bitcoin",

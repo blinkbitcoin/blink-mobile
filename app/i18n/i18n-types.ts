@@ -6843,10 +6843,12 @@ type RootTranslation = {
 		 */
 		bitcoinOnchain: string
 		/**
-		 * D​e​p​o​s​i​t​ ​f​e​e​:​ ​{​f​e​e​}​ ​S​A​T
+		 * D​e​p​o​s​i​t​ ​f​e​e​:​ ​{​f​e​e​}​ ​S​A​T​ ​f​o​r​ ​a​m​o​u​n​t​s​ ​u​n​d​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T​ ​o​r​ ​{​o​v​e​r​F​e​e​}​ ​S​A​T​ ​f​o​r​ ​d​e​p​o​s​i​t​s​ ​o​v​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
 		 * @param {string} fee
+		 * @param {string} overFee
+		 * @param {string} threshold
 		 */
-		depositFee: RequiredParams<'fee'>
+		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -16423,9 +16425,9 @@ export type TranslationFunctions = {
 		 */
 		bitcoinOnchain: () => LocalizedString
 		/**
-		 * Deposit fee: {fee} SAT
+		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
 		 */
-		depositFee: (arg: { fee: string }) => LocalizedString
+		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**

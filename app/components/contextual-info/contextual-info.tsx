@@ -12,10 +12,13 @@ import {
   InvoiceType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 
+const DEFAULT_OVER_FEE = 5000
+
 type FeesInformation = {
   deposit: {
     minBankFee: string
     minBankFeeThreshold: string
+    ratio: string
   }
 }
 
@@ -77,13 +80,13 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   }
 
   if (type === Invoice.OnChain && feesInformation) {
+    const { fee, threshold, overFee } = formatDepositFees(feesInformation.deposit)
+
     return (
-      <View style={styles.container}>
+      <View style={styles.depositFeeContainer}>
         <GaloyIcon name="warning" size={16} color={colors.grey1} />
-        <Text style={styles.linkText}>
-          {LL.ReceiveScreen.depositFee({
-            fee: feesInformation.deposit.minBankFee,
-          })}
+        <Text style={styles.depositFeeText}>
+          {LL.ReceiveScreen.depositFee({ fee, threshold, overFee })}
         </Text>
       </View>
     )
@@ -121,6 +124,18 @@ const formatExpirationTime = (minutes: number, LL: TranslationFunctions): string
   return `${minutes} ${LL.common.minutes()}`
 }
 
+const formatDepositFees = (deposit: FeesInformation["deposit"]) => {
+  const fee = Number(deposit.minBankFee).toLocaleString("en-US")
+  const threshold = new Intl.NumberFormat("en-US", { notation: "compact" }).format(
+    Number(deposit.minBankFeeThreshold),
+  )
+  const computedOverFee = Math.round(
+    (Number(deposit.minBankFeeThreshold) * Number(deposit.ratio)) / 10000,
+  )
+  const overFee = (computedOverFee || DEFAULT_OVER_FEE).toLocaleString("en-US")
+  return { fee, threshold, overFee }
+}
+
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
@@ -135,5 +150,18 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "400",
     lineHeight: 20,
     textAlign: "center",
+  },
+  depositFeeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    paddingVertical: 4,
+  },
+  depositFeeText: {
+    color: colors.grey1,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 20,
+    flex: 1,
   },
 }))

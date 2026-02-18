@@ -62,7 +62,16 @@ jest.mock("@app/i18n/i18n-react", () => ({
         minutes: () => "minutes",
       },
       ReceiveScreen: {
-        depositFee: ({ fee }: { fee: string }) => `Deposit fee: ${fee}`,
+        depositFee: ({
+          fee,
+          threshold,
+          overFee,
+        }: {
+          fee: string
+          threshold: string
+          overFee: string
+        }) =>
+          `Deposit fee: ${fee} SAT for amounts under ${threshold} SAT or ${overFee} SAT for deposits over ${threshold} SAT`,
       },
     },
   }),
@@ -161,12 +170,16 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2%", minBankFeeThreshold: "1M sats" },
+            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
           }}
         />,
       )
 
-      expect(getByText("Deposit fee: 2%")).toBeTruthy()
+      expect(
+        getByText(
+          "Deposit fee: 2,500 SAT for amounts under 1M SAT or 5,000 SAT for deposits over 1M SAT",
+        ),
+      ).toBeTruthy()
     })
 
     it("renders warning icon", () => {
@@ -176,7 +189,7 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2%", minBankFeeThreshold: "1M sats" },
+            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
           }}
         />,
       )
