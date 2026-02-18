@@ -251,7 +251,8 @@ const ReceiveScreen = () => {
   useEffect(() => {
     ;(async () => {
       const isNfcType =
-        request?.type === Invoice.Lightning || request?.type === Invoice.PayCode
+        !isOnChainPage &&
+        (request?.type === Invoice.Lightning || request?.type === Invoice.PayCode)
       if (
         isNfcType &&
         request?.state === PaymentRequestState.Created &&
@@ -263,7 +264,7 @@ const ReceiveScreen = () => {
               {...testProps("nfc-icon")}
               style={styles.nfcIcon}
               onPress={() => {
-                if (request?.type === Invoice.PayCode) {
+                if (!request?.settlementAmount) {
                   setIsNfcAmountModalOpen(true)
                   return
                 }
@@ -280,7 +281,7 @@ const ReceiveScreen = () => {
     })()
     // Disable exhaustive-deps because styles.nfcIcon was causing an infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [colors.black, navigation, request?.state, request?.type])
+  }, [colors.black, navigation, request?.state, request?.type, isOnChainPage])
 
   useFocusEffect(
     useCallback(() => {

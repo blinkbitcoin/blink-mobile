@@ -611,7 +611,7 @@ describe("ReceiveScreen", () => {
     })
   })
 
-  describe("NFC on PayCode", () => {
+  describe("NFC without amount", () => {
     beforeEach(() => {
       jest.mocked(nfcManager.isSupported).mockResolvedValue(true)
     })
@@ -629,6 +629,36 @@ describe("ReceiveScreen", () => {
 
       await waitFor(() => {
         expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("nfc-icon"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
+      })
+    })
+
+    it("opens amount input when pressing NFC icon on Lightning invoice", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
       })
 
       await flushAsync()
