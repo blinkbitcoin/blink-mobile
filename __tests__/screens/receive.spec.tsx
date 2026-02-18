@@ -11,7 +11,7 @@ import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 
 import { ContextForScreen } from "./helper"
 
-const paymentRequestQueryMock = jest.fn(() => ({
+const makeQueryResult = (defaultWalletId = "btc-wallet-id") => ({
   loading: false,
   data: {
     globals: {
@@ -26,7 +26,7 @@ const paymentRequestQueryMock = jest.fn(() => ({
       username: "test1",
       defaultAccount: {
         id: "account-id",
-        defaultWalletId: "btc-wallet-id",
+        defaultWalletId,
         wallets: [
           {
             id: "btc-wallet-id",
@@ -46,7 +46,9 @@ const paymentRequestQueryMock = jest.fn(() => ({
       __typename: "User" as const,
     },
   },
-}))
+})
+
+const paymentRequestQueryMock = jest.fn(() => makeQueryResult())
 
 const lnNoAmountInvoiceCreateMock = jest.fn(() =>
   Promise.resolve({
@@ -450,6 +452,126 @@ describe("ReceiveScreen", () => {
       })
 
       shareSpy.mockRestore()
+    })
+  })
+
+  describe("Note input", () => {
+    it("is editable on onchain page", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+
+      await flushAsync()
+      await flushAsync()
+
+      expect(screen.getByTestId("add-note").props.editable).toBe(true)
+    })
+  })
+
+  describe("Wallet toggle (BTC default)", () => {
+    it("switches from PayCode to Lightning when toggling wallet", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      })
+    })
+
+    it("reverts to PayCode when toggling back to BTC with no content", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      })
+    })
+  })
+
+  describe("USD default account", () => {
+    beforeEach(() => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
+    })
+
+    afterEach(() => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    })
+
+    it("starts on Lightning instead of PayCode", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      })
+
+      expect(screen.queryByTestId("qr-view-PayCode")).toBeNull()
+    })
+
+    it("reverts to PayCode when toggling to BTC with no content", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      })
     })
   })
 
