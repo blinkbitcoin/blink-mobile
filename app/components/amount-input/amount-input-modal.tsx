@@ -43,7 +43,9 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       bottomSheetRef.current?.present()
+      return
     }
+    bottomSheetRef.current?.dismiss()
   }, [isOpen])
 
   const renderBackdrop = useCallback(

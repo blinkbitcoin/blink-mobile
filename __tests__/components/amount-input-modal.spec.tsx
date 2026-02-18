@@ -140,7 +140,7 @@ describe("AmountInputModal", () => {
     setAmountFn(amount)
 
     expect(mockOnSetAmount).toHaveBeenCalledWith(amount)
-    expect(mockDismiss).toHaveBeenCalledTimes(1)
+    expect(mockDismiss).toHaveBeenCalled()
   })
 
   it("does not pass setAmount when onSetAmount is undefined", () => {
