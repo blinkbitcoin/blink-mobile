@@ -36,8 +36,8 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   isOpen,
   close,
 }) => {
-  const styles = useStyles()
   const { bottom } = useSafeAreaInsets()
+  const styles = useStyles({ bottom })
   const bottomSheetRef = useRef<BottomSheetModal>(null)
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
       backgroundStyle={styles.sheetBackground}
       onDismiss={close}
     >
-      <BottomSheetView style={{ paddingBottom: bottom }}>
+      <BottomSheetView style={styles.sheetContent}>
         <AmountInputScreen
           initialAmount={moneyAmount}
           convertMoneyAmount={convertMoneyAmount}
@@ -91,7 +91,10 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
+  sheetContent: {
+    paddingBottom: bottom,
+  },
   handleIndicator: {
     backgroundColor: colors.grey3,
     width: 40,
