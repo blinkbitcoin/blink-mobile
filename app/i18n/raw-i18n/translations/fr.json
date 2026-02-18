@@ -2,14 +2,14 @@
     "GaloyAddressScreen": {
         "title": "Recevoir le paiement en utilisant :",
         "buttonTitle": "Définir votre adresse",
-        "yourAddress": "Votre adresse {bankName: string} ",
+        "yourLightningAddress": "Votre adresse Lightning",
         "notAbleToChange": "Vous ne pourrez plus modifier votre adresse {bankName: string}.",
         "addressNotAvailable": "Cette adresse {bankName: string} est déjà prise.",
         "somethingWentWrong": "Une erreur est survenue. Merci d’essayer ultérieurement.",
         "merchantTitle": "Pour les commerçants",
         "yourCashRegister": "Votre terminal de paiement Lightning",
         "yourPaycode": "Votre Code de paiement",
-        "copiedAddressToClipboard": "Adresse {bankName: string} copiée dans le presse-papiers",
+        "copiedLightningAddressToClipboard": "Adresse Lightning copiée dans le presse-papiers",
         "copiedPaycodeToClipboard": "Code de paiement copié dans le presse-papiers",
         "copiedCashRegisterLinkToClipboard": "Lien du terminal de paiement copié au presse-papier",
         "howToUseIt": "Comment l’utiliser ?",
@@ -18,7 +18,16 @@
         "howToUseYourCashRegister": "Comment utiliser votre terminal de paiement",
         "howToUseYourAddressExplainer": "Partager avec quelqu’un qui possède un portefeuille compatible, par exemple : ",
         "howToUseYourPaycodeExplainer": "Vous pouvez imprimer votre Code de paiement (techniquement c’est une adresse lnurl-pay) et l’afficher dans votre entreprise pour recevoir des paiements. Les particuliers peuvent vous payer en le scannant avec un portefeuille utilisant Lightning.\n\nCependant, il faut savoir que certains portefeuilles ne peuvent pas scanner un Code de paiement comme par exemple : ",
-        "howToUseYourCashRegisterExplainer": "Accepter que des personnes collectent des paiements via le lien du terminal de paiement, sans avoir accès à votre portefeuille.\n\nIls peuvent créer des factures et les paiements seront envoyés directement à votre portefeuille\n{bankName: string}."
+        "howToUseYourCashRegisterExplainer": "Accepter que des personnes collectent des paiements via le lien du terminal de paiement, sans avoir accès à votre portefeuille.\n\nIls peuvent créer des factures et les paiements seront envoyés directement à votre portefeuille\n{bankName: string}.",
+        "yourAddress": "Votre adresse {bankName: string} ",
+        "copiedAddressToClipboard": "Adresse {bankName: string} copiée dans le presse-papiers"
+    },
+    "AcceptTermsAndConditionsScreen": {
+        "title": "Conditions générales",
+        "accept": "Accepter",
+        "termsAndConditions": "Voir les conditions générales",
+        "prohibitedCountry": "Voir les pays interdits",
+        "text": "En cliquant sur « Accepter », vous acceptez nos conditions générales. Vous confirmez également que vous n'êtes pas résident ou citoyen d'un des pays interdits."
     },
     "SetAccountModal": {
         "title": "Configurez votre compte de réception",
@@ -35,7 +44,8 @@
         "setUpAuthenticationDescription": "Utilisez l’authentification biométrique",
         "skip": "Passez cette étape",
         "unlock": "Déverrouillez",
-        "usePin": "Utilisez un NIP"
+        "usePin": "Utilisez un NIP",
+        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux"
     },
     "PeopleScreen": {
         "title": "Cercles",
@@ -52,18 +62,25 @@
     },
     "ConversionDetailsScreen": {
         "title": "Convertir",
-        "percentageToConvert": "% à convertir"
+        "transfer": "Transférer",
+        "percentageToConvert": "% à convertir",
+        "reviewTransfer": "Vérifier le transfert"
     },
     "ConversionConfirmationScreen": {
         "title": "Vérifier la conversion",
         "youreConverting": "Vous êtes en train de convertir",
-        "receivingAccount": "Compte destinataire"
+        "receivingAccount": "Compte destinataire",
+        "infoBitcoin": "Le montant en Bitcoin est approximatif. Il peut varier légèrement.",
+        "infoDollar": "Le montant en dollars est approximatif. Il peut varier légèrement.",
+        "transferButtonText": "Transférer de {fromWallet} vers {toWallet}"
     },
     "ConversionSuccessScreen": {
-        "title": "Conversion réalisée avec succès",
-        "message": "Conversion réussie"
+        "message": "Conversion réussie",
+        "title": "Conversion réalisée avec succès"
     },
     "EarnScreen": {
+        "satoshi": "sat",
+        "satoshis": "sats",
         "earnSats": "Gagner {formattedNumber | sats}",
         "earnSections": {
             "bitcoinWhatIsIt": {
@@ -1990,12 +2007,46 @@
         "unlockQuestion": "Pour dévérouiller, répondez à la question :",
         "youEarned": "Vous avez gagné",
         "registerTitle": "Besoin de mettre à jour votre compte",
-        "registerContent": "Enregistrer votre numéro de téléphone pour recevoir des sats"
+        "registerContent": "Enregistrer votre numéro de téléphone pour recevoir des sats",
+        "oneSectionADay": "Une section par jour !",
+        "availableTomorrow": "Revenez demain pour continuer à gagner des sats tout en apprenant.\n\nOu cliquez sur continuer pour poursuivre l'apprentissage sans récompenses.",
+        "motivatingBadger": "Parcourez ces leçons et gagnez tout en apprenant",
+        "continueNoRewards": "Continuer (sans récompenses)",
+        "somethingNotRight": "Quelque chose ne va pas…",
+        "defaultErrorMessage": "{errorMessage: string} Veuillez réessayer plus tard.\nOu cliquez sur continuer pour poursuivre l'apprentissage sans récompenses.",
+        "customErrorMessage": "Il semble que nous ayons détecté une activité inhabituelle sur votre compte. Pour garantir l'équité, nous ne pouvons pas offrir de récompenses pour le moment.\nVous pouvez continuer à apprendre sans récompenses, ou réessayez plus tard depuis une autre connexion.",
+        "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "Opérateur restreint",
+                "message": "Nous subissons une attaque d'utilisateurs avec cet opérateur.\nNous avons désactivé les récompenses pour cet opérateur jusqu'à nouvel ordre. Toutes nos excuses !"
+            },
+            "invalidIpMetadata": {
+                "title": "IP restreinte",
+                "message": "Nous subissons une attaque d'utilisateurs avec cette IP.\nNous avons désactivé les récompenses pour cette IP jusqu'à nouvel ordre. Toutes nos excuses !"
+            },
+            "claimedTooEarly": {
+                "title": "Portefeuille de récompenses vide",
+                "message": "Nous ajouterons des fonds bientôt. Désolé !"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "Portefeuille de récompenses vide",
+                "message": "Nous ajouterons des fonds bientôt. Désolé !"
+            },
+            "invalidQuizQuestionId": {
+                "title": "Portefeuille de récompenses vide",
+                "message": "Nous ajouterons des fonds bientôt. Désolé !"
+            },
+            "oneSectionADay": {
+                "title": "Continuer sans récompenses ?",
+                "message": "Vous ne pouvez compléter qu'une section par jour pour gagner des récompenses en sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Se connecter / créer un compte",
         "createAccount": "Créer un nouveau compte",
         "exploreWallet": "Explorer le portefeuille",
+        "login": "Connexion",
         "logBackInWith": "Se reconnecter avec ",
         "headline": "Portefeuille développé par Galoy",
         "startTrialAccount": "Débuter avec un compte test",
@@ -2005,19 +2056,27 @@
         "trialAccountCreationFailedMessage": "Malheureusement nous n’avons pas réussi à créer votre compte test. Merci de réessayer ultérieurement ou de créer un compte avec un numéro de téléphone.",
         "trialAccountHasLimits": "Le compte test a des limites",
         "trialAccountLimits": {
+            "modalTitle": "Mettez à niveau pour plus d'avantages",
             "noBackup": "Pas d’option de sauvegarde",
             "sendingLimit": "Diminuer la limite d’envoi quotidienne",
-            "noOnchain": "Non réception de bitcoin on-chain"
+            "noOnchain": "Non réception de bitcoin on-chain",
+            "recoveryOption": "Récupérer les fonds par SMS ou e-mail",
+            "dailyLimit": "Limite de transaction quotidienne de 1 000 $",
+            "onchainReceive": "Recevoir des bitcoins on-chain"
         }
     },
     "MapScreen": {
+        "navToSettingsTitle": "Permissions de localisation",
+        "navToSettingsText": "Si vous souhaitez accorder les permissions de localisation à Blink, veuillez accéder à vos paramètres et les activer",
+        "payBusiness": "payez cette entreprise",
+        "openSettings": "Ouvrir les paramètres",
+        "title": "Carte",
+        "error": "Oups. Un problème est survenu lors de la récupération de votre position",
         "locationPermissionMessage": "Entrez votre localisation, vous pourrez ainsi être inscrit sur la carte",
         "locationPermissionNegative": "Annuler",
         "locationPermissionNeutral": "Demandez moi plus tard",
         "locationPermissionPositive": "OK",
-        "locationPermissionTitle": "Localisez votre position sur la carte",
-        "payBusiness": "payez cette entreprise",
-        "title": "Carte"
+        "locationPermissionTitle": "Localisez votre position sur la carte"
     },
     "HomeScreen": {
         "receive": "Recevoir",
@@ -2026,7 +2085,8 @@
         "scan": "Scanner",
         "updateAvailable": "Une mise à jour est disponible. Appuyez pour mettre à jour maintenant",
         "useLightning": "Nous utilisons le réseau Lightning.",
-        "myAccounts": "Mes comptes"
+        "myAccounts": "Mes comptes",
+        "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte"
     },
     "PinScreen": {
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",
@@ -2055,6 +2115,7 @@
         "title": "Accueil"
     },
     "ReceiveScreen": {
+        "nfc": "NFC",
         "enterAmountFirst": "Please enter an amount first",
         "activateNotifications": "Souhaitez-vous activer les notifications pour être prévenu lorsque le paiement est bien parvenu ?",
         "copyClipboard": "La facture a été copiée dans le presse-papier",
@@ -2118,13 +2179,19 @@
         "invalidContent": "Nous avons trouvé :\n\n{found: string}\n\nCeci n'est pas une adresse valide pour une facture Lightning.",
         "expiredContent": "Nous avons trouvé : \n\n{found: string}\n\nCette facture a expiré",
         "invalidTitle": "Code QR invalide",
+        "openLinkTitle": "Ouvrir le lien",
+        "confirmOpenLink": "Êtes-vous sûr de vouloir ouvrir ce lien ?",
         "noQrCode": "Nous n’avons pas trouvé de code QR dans l’image",
         "title": "Scanner QR",
         "permissionCamera": "We need permission to use your camera",
+        "noCamera": "Aucune caméra trouvée",
+        "openSettings": "Ouvrir les paramètres",
+        "unableToOpenSettings": "Impossible d'ouvrir les paramètres",
         "invalidContentLnurl": "Nous avons trouvé :\n\n{found: string}\n\n n’est pas supporté",
         "imageLibraryPermissionsNotGranted": "Nous n'avons pas l'autorisation d'accéder à la bibliothèque d'images. Veuillez vérifier les paramètres de l'application pour votre plateforme."
     },
     "SecurityScreen": {
+        "title": "Sécurité et confidentialité",
         "biometricDescription": "Dévérouiller la reconnaissance faciale ou digitale.",
         "biometricTitle": "Biométrie",
         "biometryNotAvailable": "Le capteur biométrique n'est pas disponible.",
@@ -2148,7 +2215,14 @@
         "totalLabel": "Solde :",
         "totalExceed": "Le total excède votre solde de {balance: string}",
         "maxFeeSelected": "Il s’agit des frais maximums qui vous seront facturés pour cette transaction. Il peut s’avérer inférieur une fois le paiement effectué.",
-        "feeError": "Échec du calcul des frais"
+        "feeError": "Échec du calcul des frais",
+        "invoiceAlreadyPaid": "Cette facture a déjà été payée",
+        "somethingWentWrong": "Une erreur est survenue",
+        "paymentAlreadyAttempted": "Paiement déjà tenté.\n\nSi vous souhaitez renvoyer ce paiement, recommencez depuis le début.",
+        "slideToConfirm": "Glissez pour confirmer",
+        "slideConfirming": "Confirmation en cours…",
+        "copiedDestination": "Destination copiée dans le presse-papiers",
+        "lightningRecommended": "Frais élevés ! Nous recommandons Lightning."
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Les identifiants {bankName: string} sont maintenant les adresses {bankName: string}.",
@@ -2167,6 +2241,19 @@
         "unknownLightning": "Nous ne pouvons pas analyser cette adresse Lightning. Merci de réessayer.",
         "unknownOnchain": "Nous ne pouvons pas analyser cette adresse Bitcoin. Merci de réessayer.",
         "newBankAddressUsername": "{lnAddress: string} existe en tant qu’adresse {bankName: string}, mais vous n’y avez jamais envoyé d’argent.",
+        "confirmUsernameModal": {
+            "title": "Vous n'avez jamais envoyé d'argent à cette adresse",
+            "body1": "Veuillez vous assurer que le destinataire vous a donné une adresse {bankName: string},",
+            "bold2bold": "pas un nom d'utilisateur d'un autre portefeuille.",
+            "body3": "Sinon, l'argent sera envoyé à un compte {bankName: string} ayant l'adresse « {lnAddress: string} ».\n\nVérifiez également l'orthographe de la première partie de l'adresse. Par ex. jackie et jack1e sont 2 adresses différentes",
+            "warning": "Si l'adresse {bankName: string} est saisie incorrectement, {bankName: string} ne peut pas annuler la transaction.",
+            "checkBox": "{lnAddress: string} est la bonne adresse.",
+            "confirmButton": "J'en suis sûr à 100 %"
+        },
+        "clipboardError": "Erreur pour obtenir le prix depuis le presse-papier",
+        "pastedClipboardSuccess": "Collé depuis le presse-papiers",
+        "invalidPhoneNumber": "Entrez un numéro de mobile valide",
+        "phoneNotAllowed": "Ce champ n'accepte pas les numéros de téléphone",
         "confirmModal": {
             "title": "Vous n’avez jamais envoyé d’argent à cette adresse",
             "body1": "Merci de vous assurer que le bénéficiaire vous a donné une adresse {bankName: string}, ",
@@ -2175,10 +2262,10 @@
             "warning": "Si l’adresse {bankName: string} est saisie de manière incorrecte, {bankName: string} ne peut pas annuler la transaction.",
             "checkBox": "{lnAddress: string} est la correcte adresse.",
             "confirmButton": "J’en suis sûr-e à 100%"
-        },
-        "clipboardError": "Erreur pour obtenir le prix depuis le presse-papier"
+        }
     },
     "SendBitcoinScreen": {
+        "willBeSentToMempoolBy": "La transaction devrait être soumise au mempool",
         "amount": "Montant",
         "amountExceed": "Le montant excède votre solde de {balance: string}",
         "amountExceedsLimit": "Le montant excède le restant de votre limite journalière qui est de {limit: string}",
@@ -2186,7 +2273,7 @@
         "amountIsRequired": "Un montant est requis",
         "cost": "Coût",
         "destination": "Adresse de destination",
-        "destinationIsRequired": "Adresse de destination requise",
+        "destinationRequired": "Destination requise",
         "fee": "frais de réseau",
         "feeCalculationUnsuccessful": "Calcul infructueux ⚠️",
         "placeholder": "Identifiant, facture ou adresse",
@@ -2201,9 +2288,41 @@
         "title": "Envoyer des bitcoins",
         "failedToFetchLnurlInvoice": "Échec de la récupération de la facture lnurl",
         "lnurlInvoiceIncorrectAmount": "Le serveur lnurl a répondu avec une facture contenant un montant incorrect",
+        "confirmFeesModal": {
+            "title": "Alerte frais élevés !",
+            "content": "Vos frais représentent plus de 50 % du montant envoyé. Êtes-vous sûr de vouloir continuer ?\n\nPour réduire les frais, demandez au destinataire d'accepter la transaction via Lightning",
+            "confirmButton": "J'en suis sûr à 100 %"
+        },
+        "copiedDestination": "Destination copiée dans le presse-papiers",
+        "pendingPayment": "Le paiement a été envoyé, mais n'a pas encore été confirmé.\n\nIl est possible que le paiement ne soit pas confirmé, auquel cas les fonds seront restitués à votre compte.",
+        "copySuccessMessage": "Copier le message de succès dans le presse-papiers",
+        "openSuccessUrl": "Ouvrir l'URL de succès dans le navigateur",
+        "copySecretMessage": "Copier le message secret dans le presse-papiers",
+        "copiedSuccessMessage": "Message copié avec succès",
+        "copiedSecretMessage": "Message secret copié avec succès",
+        "pendingDecryptionMessage": "Message chiffré. En attente de la confirmation du paiement.",
+        "destinationScreenTitle": "Envoyer à",
+        "orBySMS": "Ou numéro de mobile",
+        "orSaved": "Ou enregistrés",
+        "feeLabel": "Frais",
+        "noteLabel": "Note",
+        "sender": "Expéditeur",
+        "recipient": "Destinataire",
+        "time": "Heure",
+        "type": "Type",
+        "destinationIsRequired": "Adresse de destination requise",
         "lnurlInvoiceIncorrectDescription": "Le serveur lnurl a répondu avec une facture contenant un hachage de description incorrect."
     },
     "SettingsScreen": {
+        "staticQr": "QR statique imprimable",
+        "staticQrCopied": "Votre lien de QR code statique a été copié",
+        "setByOs": "Défini par le système",
+        "apiAcess": "Intégration API",
+        "apiDocumentation": "Documentation API",
+        "apiDashboard": "Accès API et tableau de bord",
+        "pos": "Point de vente",
+        "posCopied": "Votre lien de point de vente a été copié",
+        "setYourLightningAddress": "Définir votre adresse Lightning",
         "activated": "Activé",
         "addressScreen": "Moyens de se faire payer",
         "tapUserName": "Appuyez pour définir l’identifiant",
@@ -2226,7 +2345,13 @@
         "nfcOnlyReceive": "Seule la réception depuis NFC est disponible pour le moment",
         "nfcScanNow": "Scanner NFC maintenant",
         "nfcNotSupported": "NFC n’est pas compatible sur cet appareil",
-        "logInOrCreateAccount": "Se connecter ou créer un compte"
+        "logInOrCreateAccount": "Se connecter ou créer un compte",
+        "logOutFromOneAccount": "Se déconnecter de ce compte",
+        "logoutOneAccountAlertTitle": "Êtes-vous sûr de vouloir vous déconnecter de ce compte ?",
+        "logoutOneAccountAlertContent": "Vous serez déconnecté de la session liée à {identifier: string}.\nAssurez-vous d'avoir accès pour vous reconnecter à l'avenir.",
+        "logoutOneAccountConfirm": "Je comprends. Veuillez me déconnecter.",
+        "receiveCurrency": "Devise de réception",
+        "displayCurrency": "Devise d'affichage"
     },
     "NotificationSettingsScreen": {
         "title": "Réglages des notifications",
@@ -2239,10 +2364,29 @@
             "Payments": {
                 "title": "Paiements",
                 "description": "Notifications associées aux paiements envoyés et reçus."
+            },
+            "Marketing": {
+                "title": "Fonctionnalités et mises à jour",
+                "description": "Notifications sur les nouvelles fonctionnalités et mises à jour."
+            },
+            "Price": {
+                "title": "Variations de prix",
+                "description": "Notifications sur le prix du Bitcoin."
             }
         }
     },
     "AccountScreen": {
+        "fundsMoreThan5Dollars": "Votre compte contient plus de 5 $",
+        "itsATrialAccount": "Les comptes d'essai ont des limites de transaction réduites et aucune méthode de récupération. Si vous perdez votre téléphone ou désinstallez l'application, vos fonds seront irrécupérables.",
+        "accountBeingDeleted": "Votre compte est en cours de suppression, veuillez patienter…",
+        "dangerZone": "Zone de danger",
+        "phoneDeletedSuccessfully": "Numéro de téléphone supprimé avec succès",
+        "phoneNumber": "Numéro de téléphone",
+        "tapToAddPhoneNumber": "Appuyez pour ajouter un numéro de téléphone",
+        "loginMethods": "Méthodes de connexion",
+        "level": "Niveau {level: string}",
+        "switchAccount": "Changer de compte",
+        "pleaseWait": "Veuillez patienter.",
         "accountLevel": "Niveau du compte",
         "upgrade": "Mettre à jour votre compte",
         "logOutAndDeleteLocalData": "Se déconnecter et effacer toutes les données locales",
@@ -2255,6 +2399,11 @@
         "btcBalanceWarning": "Vous avez un solde Bitcoin de {balance: string}.",
         "secureYourAccount": "S’inscrire pour sécuriser votre compte",
         "tapToAdd": "Touchez pour ajouter",
+        "tapToAddEmail": "Appuyez pour ajouter un e-mail",
+        "unverifiedEmail": "E-mail (Non vérifié)",
+        "email": "E-mail",
+        "emailDeletedSuccessfully": "E-mail supprimé avec succès",
+        "unverifiedEmailAdvice": "Les e-mails non vérifiés ne peuvent pas être utilisés pour se connecter. Vous devriez vérifier à nouveau votre adresse e-mail.",
         "deleteEmailPromptTitle": "Supprimer l’e-mail",
         "deleteEmailPromptContent": "Êtes-vous sûr de vouloir supprimer votre adresse e-mail ? Vous pourrez vous reconnecter seulement avec votre numéro de téléphone.",
         "deletePhonePromptTitle": "Supprimer le numéro de téléphone",
@@ -2276,10 +2425,20 @@
         "totpDeleteAlertContent": "Êtes-vous sûr de vouloir supprimer votre authentification à deux facteurs ?",
         "copiedAccountId": "Copier votre identifiant de compte dans le presse-papiers",
         "yourAccountId": "Votre identifiant de compte",
-        "copy": "Copier"
+        "accountId": "Identifiant du compte",
+        "copy": "Copier",
+        "identityVerification": "Vérification d'identité"
+    },
+    "ProfileScreen": {
+        "addAccount": "Ajouter un compte",
+        "error": "Impossible de récupérer les profils pour le moment",
+        "fromThisDevice": "depuis cet appareil ?",
+        "switchAccount": "Vous avez changé de compte",
+        "removedAccount": "Vous avez supprimé le compte {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Authentification à deux niveaux",
+        "secret": "Secret/sauvegarde",
         "content": "Scanner ce code QR avec votre application d’authentification. Sinon vous pouvez copier/coller manuellement le code secret dans votre application d’authentification"
     },
     "TotpRegistrationValidateScreen": {
@@ -2304,7 +2463,9 @@
         "info": "Sélectionnez votre thème favori pour utiliser Blink, ou choisissez de le garder synchronisé avec vos Réglages système.",
         "system": "Utiliser les Réglages système",
         "light": "Utiliser le mode clair",
-        "dark": "Utiliser le mode sombre"
+        "dark": "Utiliser le mode sombre",
+        "setToDark": "Mode sombre",
+        "setToLight": "Mode clair"
     },
     "Languages": {
         "DEFAULT": "Par défaut (OS)"
@@ -2322,9 +2483,12 @@
         "paid": "Payé à/de",
         "received": "Vous avez reçu",
         "spent": "Vous avez dépensé",
+        "sending": "Envoi en cours",
         "receivingAccount": "Compte destinataire",
         "sendingAccount": "Compte expéditeur",
-        "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment."
+        "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment.",
+        "momentarily": "dans un instant",
+        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
     },
     "TransactionLimitsScreen": {
         "receive": "Recevoir",
@@ -2355,10 +2519,15 @@
         "receiveOnchain": "Recevoir bitcoin on-chain",
         "onlyAPhoneNumber": "Vérification rapide et facile du numéro de téléphone",
         "letsGo": "C’est parti !",
-        "stayInTrialMode": "Rester en mode test"
+        "stayInTrialMode": "Rester en mode test",
+        "upgradeToLevel": "Passer au niveau {level: number}",
+        "notNow": "Pas maintenant",
+        "setUpLevelAccount": "Configurer un compte niveau {level: number}"
     },
     "SetAddressModal": {
         "title": "Définir l’adresse {bankName: string}",
+        "mainTitle": "Choisir une adresse Lightning",
+        "setLightningAddress": "Définir l'adresse Lightning",
         "Errors": {
             "tooShort": "L’adresse doit contenir au moins 3 caractères",
             "tooLong": "L’adresse ne peut excéder plus de 50 caractères",
@@ -2384,20 +2553,76 @@
         "errorRequestingCode": "Une erreur est survenue au moment de la demande du code reçu sur le téléphone. Merci d’essayer ultérieurement",
         "errorInvalidPhoneNumber": "Numéro de téléphone non valide. Êtes-vous sûr d’avoir saisi le bon numéro ?",
         "errorUnsupportedCountry": "Nous sommes dans l’incapacité d’assister les clients dans votre langue.",
+        "infoArgentina": "Les numéros de téléphone argentins nécessitent l'ajout d'un 9 au début du numéro.",
         "placeholder": "Numéro de téléphone",
         "verify": "Cliquez pour valider",
         "sms": "Envoyer par SMS",
-        "whatsapp": "Envoyer via WhatsApp"
+        "whatsapp": "Envoyer via WhatsApp",
+        "telegram": "Envoyer par Telegram"
+    },
+    "LoginMethodScreen": {
+        "title": "Sélectionnez votre méthode de connexion préférée.",
+        "useTelegram": "Utiliser Telegram",
+        "useSms": "Utiliser le SMS",
+        "useWhatsapp": "Utiliser WhatsApp",
+        "useEmail": "Utiliser l'e-mail",
+        "setupTelegram": "Configurer la connexion par Telegram",
+        "setupSms": "Configurer la connexion par SMS",
+        "setupWhatsapp": "Configurer la connexion par WhatsApp",
+        "setupEmail": "Configurer la connexion par e-mail"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "Bienvenue au niveau 1",
+            "title": "Nouvelles fonctionnalités débloquées pour votre compte :",
+            "receiveBitcoinDescription": "Recevoir du Bitcoin avec votre numéro de téléphone",
+            "dailyLimitDescription": "Envoyez jusqu'à 1 000 $ USD par jour",
+            "onchainDescription": "Recevoir des paiements on-chain"
+        },
+        "emailBenefits": {
+            "mainTitle": "Ajouter la connexion par e-mail",
+            "title": "La connexion par e-mail vous permet de :",
+            "backupDescription": "Avoir une sauvegarde pour accéder à votre compte",
+            "supportDescription": "Faciliter le support que nous pouvons vous apporter",
+            "securityDescription": "Renforcer la sécurité du compte",
+            "primaryButton": "Configurer la connexion par e-mail"
+        },
+        "lightningBenefits": {
+            "mainTitle": "Configurer une adresse Lightning personnalisée",
+            "title": "Avantages de l'adresse Lightning :",
+            "staticAddressDescription": "Une adresse fixe pour recevoir des paiements",
+            "easyToShareDescription": "Facile à mémoriser et à partager publiquement ou en privé",
+            "blinkToolsDescription": "Débloque divers outils Blink utiles pour le commerce",
+            "primaryButton": "Configurer l'adresse personnalisée"
+        },
+        "supportScreen": {
+            "mainTitle": "Nous adorons les retours",
+            "title": "Tout est prêt !",
+            "description": "Tout commentaire est le bienvenu, n'hésitez pas à nous contacter à {email}",
+            "primaryButton": "Terminé"
+        }
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Erreur de connexion. Avez-vous saisi correctement le code ?",
         "errorTooManyAttempts": "Trop de tentatives. Merci d’essayer ultérieurement.",
+        "errorIpNotAllowed": "Cette IP provient d'un pays non pris en charge et les comptes ne peuvent pas y être créés. Si vous êtes dans un pays pris en charge mais utilisez un VPN, essayez de le désactiver.",
+        "errorPhoneNotAllowed": "Les comptes ne peuvent pas être créés à partir de ce numéro de téléphone.",
         "errorCannotUpgradeToExistingAccount": "Ce compte associé au téléphone existe déjà. Merci de vous déconnecter de votre compte test puis de vous connecter avec votre numéro de téléphone.",
         "header": "Pour valider votre numéro de téléphone, saisissez le code que nous venons de vous envoyer via {channel: string} sur le {phoneNumber: string}",
         "placeholder": "Code à 6 chiffres",
         "sendAgain": "Envoyer à nouveau",
         "tryAgain": "Essayer à nouveau",
         "sendViaOtherChannel": "Vous avez choisi de recevoir le code via {channel: string}. Vous pouvez essayer de le recevoir plutôt via {other: string}."
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "Après autorisation sur Telegram, vous serez automatiquement connecté",
+        "loginWithTelegram": "Se connecter avec Telegram",
+        "waitingForAuthorization": "En attente de l'autorisation sur Telegram…",
+        "errorFetchParams": "Échec de la récupération des paramètres d'authentification Telegram",
+        "errorFetchLogin": "Échec de la récupération de la connexion Telegram",
+        "errorAuthTimeout": "L'autorisation a expiré. Veuillez réessayer.",
+        "errorOpenAppError": "Impossible d'ouvrir Telegram. Veuillez vous assurer que l'application est installée."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Téléphone configuré",
@@ -2437,8 +2662,21 @@
         "success": "E-mail {email: string} a été validé avec succès"
     },
     "common": {
+        "enabled": "Activé",
         "switch": "Interrupteur",
+        "notifications": "Notifications",
+        "preferences": "Préférences",
+        "onDeviceSecurity": "Sécurité et confidentialité",
+        "securityAndPrivacy": "Sécurité et confidentialité",
+        "advanced": "Avancé",
+        "community": "Communauté",
         "account": "Compte",
+        "yourAccount": "Votre compte",
+        "accounts": "Comptes",
+        "accountInformation": "Informations du compte",
+        "trialAccount": "Compte d'essai",
+        "blinkUser": "Utilisateur Blink",
+        "blinkToBlink": "Blink à Blink",
         "transactionLimits": "Limite de transaction",
         "activateWallet": "Activer le portefeuille",
         "amountRequired": "Un montant est requis",
@@ -2474,12 +2712,14 @@
         "hour": "heure",
         "hours": "heures",
         "invoice": "Facture",
+        "intraledger": "Intraledger",
         "language": "Langue",
         "languagePreference": "Langue de préférence",
         "lastName": "Nom",
         "later": "Plus tard",
         "loggedOut": "Vous avez été déconnecté-e.",
         "logout": "Déconnexion",
+        "lightning": "Lightning",
         "minutes": "minutes",
         "errorAuthToken": "Token d’identification manquant",
         "needWallet": "Se connecter ou créer un compte pour accéder à votre portefeuille.",
@@ -2490,8 +2730,11 @@
         "ok": "OK",
         "or": "ou",
         "openWallet": "Ouvrir Portefeuille",
+        "onchain": "Onchain",
+        "paymentRequest": "Demande de paiement",
         "phone": "Téléphone",
         "phoneNumber": "Numéro de téléphone",
+        "preimageProofOfPayment": "Preimage / Preuve de paiement",
         "rate": "Taux",
         "reauth": "Session expirée. SVP connectez-vous à nouveau.",
         "restart": "Recommencer",
@@ -2507,6 +2750,7 @@
         "submit": "Soumettre ",
         "success": "Succès !",
         "stablesatsUsd": "Stablesats en dollar US",
+        "dollarStablesats": "Dollar (Stablesats)",
         "to": "À",
         "total": "Total",
         "transactions": "Transactions",
@@ -2526,7 +2770,22 @@
         "prevMonths": "Mois derniers",
         "problemMaybeReauth": "Il y a eu un problème avec votre demande. Merci de réessayer dans une minute. Si le problème persiste, nous vous conseillons de vous déconnecter et de vous connecter à nouveau. Vous pouvez vous déconnecter en allant dans Réglages > Compte > Déconnexion",
         "warning": "Alerte",
-        "blinkToBlink": "Blink à Blink"
+        "continue": "Continuer",
+        "correct": "Correct",
+        "recommended": "Recommandé",
+        "expirationTime": "Délai d'expiration",
+        "minute": "Minute",
+        "day": {
+            "one": "Jour",
+            "other": "Jours"
+        },
+        "dollar": "Dollar",
+        "all": "TOUT",
+        "allAccounts": "Tous les comptes",
+        "some": "Quelques",
+        "support": "Support",
+        "profiles": "Profils",
+        "paste": "Coller"
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
@@ -2556,6 +2815,7 @@
         "joinTheCommunity": "Rejoindre la communauté",
         "whatsapp": "WhatsApp",
         "email": "E-mail",
+        "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Vous aimez l’application ?",
         "statusPage": "Page de configuration",
@@ -2574,7 +2834,8 @@
         "deleteAccountConfirmation": "Votre compte a été inscrit en vue de sa suppression.\n\nLorsque le temps de probation lié aux exigences réglementaires sera terminé, les données restantes associées à votre compte seront supprimées définitivement.",
         "deleteAccountFromPhone": "Bonjour ! Merci de supprimer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
-        "bye": "Salut !"
+        "bye": "Salut !",
+        "deleteAccountWarning": "Attention : la suppression du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la suppression.\nUn compte supprimé ne peut pas être réactivé."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",
@@ -2640,6 +2901,19 @@
         "someones": "de {username: string}",
         "groupEffort": "L’adoption de Bitcoin est un effort collectif.\nInvitez un ami et envoyez lui des sats pour commencer à construire vos cercles.",
         "drivingAdoption": "J’adopte Bitcoin en utilisant Blink.",
+        "connectOnSocial": "Connectez-vous sur les réseaux sociaux : ",
+        "fullDetails": "Détails complets sur ",
+        "learnMore": "En savoir plus sur Adopting Bitcoin sur",
+        "mayChallenge": {
+            "title": "Défi de mai !",
+            "description": "Agrandissez votre cercle intérieur de 6 pour tenter de gagner des pizzas lors de votre prochain Bitcoin Meetup.",
+            "details": "Envie d'une fête Bitcoin Pizza Day ?\n\nÉlargissez votre cercle intérieur de 6 pour tenter de gagner des pizzas pour votre prochain Bitcoin Meetup. Le défi se termine le 15 mai.\n\nPartagez vos cercles sur les réseaux sociaux avec le hashtag #blinkcircles pour participer.\n\nLe prix est de 150 $ pour des pizzas."
+        },
+        "juneChallenge": {
+            "title": "Défi de juin !",
+            "description": "Élargissez votre cercle intérieur de 10 pour tenter de gagner un billet privilège de 1 000 $ pour Adopting Bitcoin El Salvador",
+            "details": "Gagnez un billet privilège pour Adopting Bitcoin El Salvador\n\nÉlargissez votre cercle intérieur de 10 pour tenter de gagner un billet privilège de 1 000 $ pour Adopting Bitcoin El Salvador ! Le billet inclut un accès exclusif à la conférence principale, la mezzanine avec nourriture/boissons/snacks, le dîner des intervenants et le Festival du Film.\n\nPartagez vos cercles sur les réseaux sociaux avec le hashtag #blinkcircles pour participer.\n\nCette fois-ci, il y aura deux gagnants !"
+        },
         "septChallenge": {
             "title": "Défi de septembre !",
             "description": "Cercle interne {innerCircle: number}/21 - Gagnez $21\nTop 3 - Gagnez votre billet pour Adopting Bitcoin !",
@@ -2678,6 +2952,10 @@
         "ERROR": "Erreur",
         "PROCESSING": "En cours de traitement",
         "REVIEW": "Examen"
+    },
+    "NotificationHistory": {
+        "title": "Notifications",
+        "noNotifications": "Vous n'avez aucune notification pour le moment"
     },
     "Fake": {
         "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
