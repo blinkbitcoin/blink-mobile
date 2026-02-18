@@ -16,15 +16,17 @@ const DEFAULT_PEEK_HEIGHT = 175
 const HANDLE_HEIGHT = 28
 
 const SPRING_CONFIG = {
-  damping: 20,
-  stiffness: 150,
-  mass: 0.5,
+  damping: 28,
+  stiffness: 300,
+  mass: 0.4,
+  overshootClamping: false,
 }
 
 const CLOSE_SPRING_CONFIG = {
-  damping: 25,
-  stiffness: 200,
-  mass: 0.4,
+  damping: 32,
+  stiffness: 350,
+  mass: 0.3,
+  overshootClamping: true,
 }
 
 type Props = {
@@ -100,31 +102,31 @@ const BottomSheet: React.FC<Props> = ({
       const velocity = event.velocityY
 
       if (velocity > 500) {
-        translateY.value = withSpring(closedY, CLOSE_SPRING_CONFIG)
+        translateY.value = withSpring(closedY, { ...CLOSE_SPRING_CONFIG, velocity })
         runOnJS(handleClose)()
         return
       }
 
       if (velocity < -500) {
-        translateY.value = withSpring(expandedY, SPRING_CONFIG)
+        translateY.value = withSpring(expandedY, { ...SPRING_CONFIG, velocity })
         return
       }
 
+      // Snap to closest point, biased by velocity direction
+      const projected = currentY + velocity * 0.15
       let closest = snapPoints[0]
-      let minDist = Math.abs(currentY - snapPoints[0])
+      let minDist = Math.abs(projected - snapPoints[0])
       // eslint-disable-next-line no-plusplus
       for (let i = 1; i < snapPoints.length; i++) {
-        const dist = Math.abs(currentY - snapPoints[i])
+        const dist = Math.abs(projected - snapPoints[i])
         if (dist < minDist) {
           minDist = dist
           closest = snapPoints[i]
         }
       }
 
-      translateY.value = withSpring(
-        closest,
-        closest === closedY ? CLOSE_SPRING_CONFIG : SPRING_CONFIG,
-      )
+      const config = closest === closedY ? CLOSE_SPRING_CONFIG : SPRING_CONFIG
+      translateY.value = withSpring(closest, { ...config, velocity })
       if (closest === closedY) {
         runOnJS(handleClose)()
       }

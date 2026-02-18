@@ -36,7 +36,7 @@ const MarkerComponent = React.memo(({ pin, onSelect }: Props) => {
     <Marker
       identifier={`pin-${pin.id}`}
       coordinate={pin.location}
-      onSelect={() => onSelect(pin)}
+      onPress={() => onSelect(pin)}
       tracksViewChanges={false}
     >
       <View style={styles.iconContainer}>

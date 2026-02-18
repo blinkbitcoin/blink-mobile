@@ -86,7 +86,7 @@ export function navigateToGeometry(
   mapRef: React.RefObject<MapView>,
   geometry: Geometry,
   padding: number = 0.1,
-  duration: number = 1000,
+  duration: number = 500,
 ) {
   if (!mapRef.current) return
 

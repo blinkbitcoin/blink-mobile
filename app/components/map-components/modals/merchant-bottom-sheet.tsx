@@ -1,19 +1,22 @@
-import { Platform } from "react-native"
+import React from "react"
 import { IMarker } from "@app/screens/map-screen/btc-map-interface"
 import { usePlace } from "../map-hooks/use-place"
-import { Linking, Pressable, TouchableOpacity, View, Text } from "react-native"
+import { Platform, Linking, Pressable, TouchableOpacity, View, Text } from "react-native"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import BottomSheet from "@app/components/map-components/modals/bottom-sheet.tsx"
 import { makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
+import Clipboard from "@react-native-clipboard/clipboard"
 type Props = {
   visible: boolean
   onClose: () => void
+  onVerify: () => void
   selectedMarker: IMarker | null
 }
 
 export const MerchantBottomSheet: React.FC<Props> = ({
   visible,
   onClose,
+  onVerify,
   selectedMarker,
 }) => {
   const styles = useStyles()
@@ -24,6 +27,12 @@ export const MerchantBottomSheet: React.FC<Props> = ({
   const { placeData, isLoading } = usePlace(selectedMarker?.id)
   const name = placeData?.name ?? selectedMarker?.name ?? "An unnamed place"
 
+  const handleShare = (merchantId?: string) => {
+    if (!merchantId) {
+      return
+    }
+    Clipboard.setString(`https://btcmap.org/merchant/${merchantId}`)
+  }
   const handlePhone = (phone: string) => Linking.openURL(`tel:${phone}`)
   const handleWebsite = (url: string) => {
     const fullUrl = url.startsWith("http") ? url : `https://${url}`
@@ -80,13 +89,13 @@ export const MerchantBottomSheet: React.FC<Props> = ({
           <Text style={styles.title} ellipsizeMode="tail" numberOfLines={1}>
             {name}
           </Text>
-          <TouchableOpacity hitSlop={8}>
+          <TouchableOpacity hitSlop={8} onPress={() => handleShare(placeData?.id)}>
             <GaloyIcon name="share" size={25} color={colors.primary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.infoContainer}>
-          {renderRow("check-fuzzy-circle", "Verified on 00/00/0000")}
+          {renderRow("check-fuzzy-circle", "Verified on 00/00/0000", onVerify)}
           {placeData?.address && renderRow("pin", placeData.address)}
           {renderRow("clock", "Mo-Su 07:00-22:00")}
           {placeData?.phone &&
@@ -103,9 +112,7 @@ export const MerchantBottomSheet: React.FC<Props> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  content: {
-    paddingHorizontal: 20,
-  },
+  content: {},
   titleRow: {
     flexDirection: "row",
     alignItems: "center",

@@ -1,7 +1,9 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Alert, FlatList, Pressable, TextInput, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import MaterialIcon from "@react-native-vector-icons/material-icons"
+import MaterialIcon, {
+  MaterialIconsIconName,
+} from "@react-native-vector-icons/material-icons"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import {
@@ -137,7 +139,10 @@ export const SuggestBusinessCard: FC<Props> = ({ closeModal, centerCoords }) => 
                 onPress={() => handleCategorySelect(item.category)}
               >
                 <MaterialIcon
-                  name={categoryIcons[item.category] || "help-outline"}
+                  name={
+                    (categoryIcons[item.category] as keyof MaterialIconsIconName) ||
+                    "help-outline"
+                  }
                   size={20}
                   color={colors.black}
                 />

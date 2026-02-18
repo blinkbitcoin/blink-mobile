@@ -4,6 +4,12 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import debounce from "lodash.debounce"
 import axios from "axios"
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { BTCMAP_V4_API_BASE } from "@app/config"
@@ -33,11 +39,29 @@ type Props = {
   onClose: () => void
   setCommunityId: (id: number) => void
   setSelectedMarker: (id: number) => void
+  hasLocation?: boolean
 }
+
+const RECENT_SEARCHES = [
+  { name: "Satoshi Burgers", distance: "recent" },
+  { name: "Café BTC", distance: "recent" },
+  { name: "Hodl Hotel", distance: "recent" },
+]
+
+const NEARBY_PLACEHOLDERS = [
+  { name: "Satoshi Burgers", distance: "200 meters away" },
+  { name: "Arts and Crafts", distance: "0.6 km away" },
+  { name: "Lightning Café", distance: "1.2 km away" },
+]
 
 const SEARCH_DEBOUNCE_MS = 300
 
-const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker }) => {
+const SearchScreen: FC<Props> = ({
+  onClose,
+  setCommunityId,
+  setSelectedMarker,
+  hasLocation = false,
+}) => {
   const styles = useStyles()
   const insets = useSafeAreaInsets()
   const {
@@ -50,6 +74,23 @@ const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker })
   const [isLoading, setIsLoading] = useState(false)
   const [searchResponse, setSearchResponse] = useState<SearchResponse | null>(null)
   const [error, setError] = useState<Error | null>(null)
+
+  const opacity = useSharedValue(0)
+
+  const focusInput = useCallback(() => inputRef.current?.focus(), [])
+
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: 180 }, () => runOnJS(focusInput)())
+  }, [])
+
+  const handleClose = useCallback(() => {
+    inputRef.current?.blur()
+    opacity.value = withTiming(0, { duration: 150 }, (finished) => {
+      if (finished) runOnJS(onClose)()
+    })
+  }, [onClose])
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
 
   const debouncedSearch = useMemo(
     () =>
@@ -72,10 +113,6 @@ const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker })
   )
 
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
-
-  useEffect(() => {
     if (search.trim().length >= 3) {
       debouncedSearch(search)
     } else {
@@ -84,11 +121,7 @@ const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker })
     }
   }, [search, debouncedSearch])
 
-  useEffect(() => {
-    return () => {
-      debouncedSearch.cancel()
-    }
-  }, [debouncedSearch])
+  useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch])
 
   const onResultPress = useCallback(
     (item: SearchResult) => {
@@ -97,21 +130,25 @@ const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker })
       } else {
         setSelectedMarker(item.id)
       }
-      onClose()
+      handleClose()
     },
-    [setCommunityId, setSelectedMarker, onClose],
+    [setCommunityId, setSelectedMarker, handleClose],
   )
 
-  const clearSearch = useCallback(() => {
-    setSearch("")
-    setSearchResponse(null)
-    setError(null)
-  }, [])
+  const clearOrClose = useCallback(() => {
+    if (search.length > 0) {
+      setSearch("")
+      setSearchResponse(null)
+      setError(null)
+    } else {
+      handleClose()
+    }
+  }, [search, handleClose])
 
   const renderItem = useCallback(
     ({ item }: { item: SearchResult }) => (
       <Pressable onPress={() => onResultPress(item)} style={styles.listItem}>
-        <GaloyIcon name="map" size={16} color={colors.grey2} />
+        <GaloyIcon name="pin" size={18} color={colors.grey2} />
         <View style={styles.listItemText}>
           <Text style={styles.listItemName}>{item.name}</Text>
           <Text style={styles.listItemSubtitle}>
@@ -125,60 +162,73 @@ const SearchScreen: FC<Props> = ({ onClose, setCommunityId, setSelectedMarker })
 
   const keyExtractor = useCallback((item: SearchResult) => `${item.type}-${item.id}`, [])
 
-  const ItemSeparator = useCallback(
-    () => <View style={styles.divider} />,
-    [styles.divider],
-  )
+  const ItemSeparator = useCallback(() => <View style={styles.divider} />, [styles.divider])
+
+  const placeholders = hasLocation ? NEARBY_PLACEHOLDERS : RECENT_SEARCHES
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 14 }]}>
-      <View style={styles.inputRow}>
-        <View style={styles.inputContainer}>
-          <GaloyIcon name="magnifying-glass" size={16} color={colors.grey2} />
-          <TextInput
-            ref={inputRef}
-            style={styles.input}
-            value={search}
-            onChangeText={setSearch}
-            placeholder={LL.MapScreen.search.placeholder()}
-            placeholderTextColor={colors.grey2}
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {search.length > 0 && (
-            <Pressable onPress={clearSearch} hitSlop={8}>
-              <GaloyIcon name="close" size={16} color={colors.grey2} />
-            </Pressable>
-          )}
-        </View>
-        <Pressable onPress={onClose} hitSlop={8} style={styles.cancelButton}>
-          <Text style={styles.cancelText}>Cancel</Text>
+    <Animated.View style={[styles.container, { paddingTop: insets.top }, animatedStyle]}>
+      {/* Search input - full width */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          ref={inputRef}
+          style={styles.input}
+          value={search}
+          onChangeText={setSearch}
+          placeholder={LL.MapScreen.search.placeholder()}
+          placeholderTextColor={colors.grey2}
+          autoCorrect={false}
+          returnKeyType="search"
+        />
+        <Pressable onPress={clearOrClose} hitSlop={12}>
+          <GaloyIcon name="close" size={16} color={colors.primary} />
         </Pressable>
       </View>
 
+      {/* Status messages */}
       {isLoading && (
         <Text style={styles.statusInfo}>{LL.MapScreen.search.loading()}</Text>
       )}
-
       {error && <Text style={styles.errorText}>{error.message}</Text>}
-
       {!isLoading && search.length > 0 && search.length < 3 && (
         <Text style={styles.statusInfo}>{LL.MapScreen.search.minChars()}</Text>
       )}
-
       {!isLoading && search.length >= 3 && searchResponse?.results?.length === 0 && (
         <Text style={styles.statusInfo}>{LL.MapScreen.search.noResults()}</Text>
       )}
 
-      <FlatList
-        data={searchResponse?.results}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        ItemSeparatorComponent={ItemSeparator}
-        keyboardShouldPersistTaps="handled"
-        style={styles.list}
-      />
-    </View>
+      {/* Placeholder - nearby or recent */}
+      {search.length === 0 && !isLoading && (
+        <FlatList
+          data={placeholders}
+          keyExtractor={(_, i) => `placeholder-${i}`}
+          ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
+          style={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.listItem}>
+              <GaloyIcon name="pin" size={18} color={colors.grey2} />
+              <View style={styles.listItemText}>
+                <Text style={styles.listItemName}>{item.name}</Text>
+                <Text style={styles.listItemSubtitle}>{item.distance}</Text>
+              </View>
+            </View>
+          )}
+        />
+      )}
+
+      {/* Search results */}
+      {search.length >= 3 && (
+        <FlatList
+          data={searchResponse?.results}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
+          style={styles.list}
+        />
+      )}
+    </Animated.View>
   )
 }
 
@@ -193,47 +243,33 @@ const useStyles = makeStyles(({ colors }) => ({
     bottom: 0,
     backgroundColor: colors.white,
     zIndex: 200,
-    paddingHorizontal: 12,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
   },
   inputContainer: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.grey5,
-    borderRadius: 8,
+    borderRadius: 10,
+    marginHorizontal: 12,
+    marginVertical: 10,
     paddingLeft: 14,
-    paddingRight: 10,
-    minHeight: 40,
+    paddingRight: 12,
+    minHeight: 44,
     gap: 10,
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     color: colors.black,
     padding: 0,
   },
-  cancelButton: {
-    paddingVertical: 8,
-  },
-  cancelText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "600",
-  },
   list: {
-    marginTop: 8,
+    paddingHorizontal: 12,
   },
   listItem: {
     flexDirection: "row",
     alignItems: "center",
-    minHeight: 52,
     paddingVertical: 14,
-    gap: 10,
+    gap: 12,
   },
   listItemText: {
     flex: 1,
@@ -243,12 +279,14 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
   },
   listItemSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.grey2,
+    marginTop: 2,
   },
   divider: {
     height: 1,
     backgroundColor: colors.grey4,
+    marginLeft: 46,
   },
   statusInfo: {
     textAlign: "center",

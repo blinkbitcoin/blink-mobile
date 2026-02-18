@@ -209,6 +209,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
           data={formattedData}
           userLocation={initialLocation}
           handlePayButton={handlePayButton}
+          hasLocation={permissionsStatus === RESULTS.GRANTED}
         />
       )}
     </Screen>

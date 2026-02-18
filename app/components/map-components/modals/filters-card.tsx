@@ -1,4 +1,4 @@
-import { FC, useMemo, useCallback, useState, useEffect } from "react"
+import { FC, useMemo, useCallback, useState, useEffect, useRef } from "react"
 import { View, ScrollView, Switch, Pressable } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import MaterialIcon from "@react-native-vector-icons/material-icons"
@@ -21,13 +21,18 @@ export const FiltersCard: FC<Props> = ({ filters, setFilters }) => {
 
   // Local state for instant toggle animation; applied to parent on unmount
   const [local, setLocal] = useState(() => new Set(filters))
+  const localRef = useRef(local)
+  localRef.current = local
 
-  // Sync parent filters on unmount (sheet close)
+  const setFiltersRef = useRef(setFilters)
+  setFiltersRef.current = setFilters
+
+  // Sync parent filters on unmount only (sheet close)
   useEffect(() => {
     return () => {
-      setFilters(local)
+      setFiltersRef.current(localRef.current)
     }
-  }, [local, setFilters])
+  }, [])
 
   const categoryList = useMemo(() => {
     return Object.keys(categoryI18NNames).map((key) => {

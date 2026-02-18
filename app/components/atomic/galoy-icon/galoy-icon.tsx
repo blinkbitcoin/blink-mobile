@@ -125,7 +125,8 @@ import Clock from "@app/assets/icons-redesign/clock.svg"
 import Phone from "@app/assets/icons-redesign/phone.svg"
 import Web from "@app/assets/icons-redesign/web.svg"
 import ArrowRightTurn from "@app/assets/icons-redesign/arrow-right-turn.svg"
-
+import ThumbsUp from "@app/assets/icons-redesign/thumbs-up.svg"
+import ThumbsDown from "@app/assets/icons-redesign/thumbs-down.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 // ── Size presets ────────────────────────────────────────────────────────────
@@ -272,6 +273,8 @@ const customSvgMap = {
   "phone": Phone,
   "web": Web,
   "arrow-right-turn": ArrowRightTurn,
+  "thumbs-up": ThumbsUp,
+  "thumbs-down": ThumbsDown,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
