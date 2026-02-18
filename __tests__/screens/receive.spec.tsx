@@ -206,18 +206,32 @@ jest.mock("react-native-nfc-manager", () => ({
   },
 }))
 
-jest.mock("react-native-modal", () => {
-  const MockedModal = ({
-    isVisible,
-    children,
-  }: {
-    isVisible: boolean
-    children: React.ReactNode
-  }) => {
-    if (!isVisible) return null
-    return <>{children}</>
+jest.mock("@gorhom/bottom-sheet", () => {
+  const RN = jest.requireActual("react-native")
+  const ReactMod = jest.requireActual("react")
+
+  const BottomSheetModal = ReactMod.forwardRef(
+    (
+      { children }: { children: React.ReactNode },
+      ref: React.Ref<{ present: () => void; dismiss: () => void }>,
+    ) => {
+      const [visible, setVisible] = ReactMod.useState(false)
+      ReactMod.useImperativeHandle(ref, () => ({
+        present: () => setVisible(true),
+        dismiss: () => setVisible(false),
+      }))
+      if (!visible) return null
+      return <RN.View testID="bottom-sheet-modal">{children}</RN.View>
+    },
+  )
+
+  return {
+    BottomSheetModal,
+    BottomSheetView: ({ children }: { children: React.ReactNode }) => (
+      <RN.View>{children}</RN.View>
+    ),
+    BottomSheetBackdrop: () => null,
   }
-  return MockedModal
 })
 
 jest.mock("react-native-haptic-feedback", () => ({
@@ -676,7 +690,7 @@ describe("ReceiveScreen", () => {
       await flushAsync()
 
       await waitFor(() => {
-        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
       })
     })
 
@@ -706,7 +720,7 @@ describe("ReceiveScreen", () => {
       await flushAsync()
 
       await waitFor(() => {
-        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
       })
     })
   })
