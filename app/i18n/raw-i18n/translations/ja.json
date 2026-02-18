@@ -2,14 +2,14 @@
     "GaloyAddressScreen": {
         "title": "以下の方法で受金できます：",
         "buttonTitle": "アドレスを設定",
-        "yourAddress": "あなたの{bankName: string}アドレス",
+        "yourLightningAddress": "あなたのLightningアドレス",
         "notAbleToChange": " {bankName: string} アドレス登録後の変更はできません",
         "addressNotAvailable": "{bankName: string}アドレスは既に登録されています",
         "somethingWentWrong": "エラーが発生しました。時間をあけてもう一度トライしてみてください。",
         "merchantTitle": "店舗用",
         "yourCashRegister": "ライトニング・レジ",
         "yourPaycode": "あなたのペイコード",
-        "copiedAddressToClipboard": "{bankName: string} アドレスをクリップボードにコピーしました",
+        "copiedLightningAddressToClipboard": "Lightningアドレスをクリップボードにコピーしました",
         "copiedPaycodeToClipboard": "ペイコードをクリップボードにコピーしました",
         "copiedCashRegisterLinkToClipboard": "レジリンクをクリップボードにコピーしました",
         "howToUseIt": "利用方法",
@@ -18,7 +18,16 @@
         "howToUseYourCashRegister": "レジの使い方",
         "howToUseYourAddressExplainer": "以下の互換ウォレット利用者に共有",
         "howToUseYourPaycodeExplainer": "ペイコード（lnurl-payアドレス）を紙に印刷すれば、それをお客様がライトニング対応ウォレットでスキャンして支払いを行えます。\n\nただし、以下のように、ペイコードのスキャンができないウォレットもあります。",
-        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。"
+        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。",
+        "yourAddress": "あなたの{bankName: string}アドレス",
+        "copiedAddressToClipboard": "{bankName: string} アドレスをクリップボードにコピーしました"
+    },
+    "AcceptTermsAndConditionsScreen": {
+        "title": "利用規約",
+        "accept": "同意する",
+        "termsAndConditions": "利用規約を確認",
+        "prohibitedCountry": "禁止国を確認",
+        "text": "「同意する」をタップすると、利用規約に同意したことになります。また、禁止国の居住者または国民でないことにも同意します。"
     },
     "SetAccountModal": {
         "title": "受取アカウントを設定",
@@ -35,7 +44,8 @@
         "setUpAuthenticationDescription": "生体認証を有効にする",
         "skip": "スキップ",
         "unlock": "ロックを解除",
-        "usePin": "PINを有効にする"
+        "usePin": "PINを有効にする",
+        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます"
     },
     "PeopleScreen": {
         "title": "つながり",
@@ -52,18 +62,25 @@
     },
     "ConversionDetailsScreen": {
         "title": "両替",
-        "percentageToConvert": "%を換える"
+        "transfer": "振替",
+        "percentageToConvert": "%を換える",
+        "reviewTransfer": "振替内容を確認"
     },
     "ConversionConfirmationScreen": {
         "title": "ご確認ください",
         "youreConverting": "両替しています",
-        "receivingAccount": "受金ウォレット"
+        "receivingAccount": "受金ウォレット",
+        "infoBitcoin": "Bitcoin金額は概算です。少額の変動が生じる場合があります。",
+        "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
+        "transferButtonText": "{fromWallet}から{toWallet}へ振替"
     },
     "ConversionSuccessScreen": {
-        "title": "両替完了",
-        "message": "両替が完了しました"
+        "message": "両替が完了しました",
+        "title": "両替完了"
     },
     "EarnScreen": {
+        "satoshi": "sat",
+        "satoshis": "sats",
         "earnSats": "{formattedNumber | sats}を獲得する",
         "earnSections": {
             "bitcoinWhatIsIt": {
@@ -1990,12 +2007,46 @@
         "unlockQuestion": "アンロックするには、質問に答えてください：",
         "youEarned": "獲得額",
         "registerTitle": "ウォレットのアップグレードが必要です",
-        "registerContent": "satsを獲得するために電話番号を登録する"
+        "registerContent": "satsを獲得するために電話番号を登録する",
+        "oneSectionADay": "1日1セクション！",
+        "availableTomorrow": "明日また戻ってきて、学びながらsatsを獲得しましょう。\n\nまたは、「続ける」をタップして報酬なしで学習を続けることもできます。",
+        "motivatingBadger": "レッスンを掘り進めて、学びながら稼ごう",
+        "continueNoRewards": "続ける（報酬なし）",
+        "somethingNotRight": "問題が発生しました...",
+        "defaultErrorMessage": "{errorMessage: string} 後でもう一度お試しください。\nまたは、タップして報酬なしで学習を続けることもできます。",
+        "customErrorMessage": "お客様のアカウントで通常と異なるアクティビティが検出されました。すべてのユーザーの公平性を確保するため、現時点では報酬を提供できません。\n報酬なしで学習を続けるか、別の接続からもう一度お試しください。",
+        "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "通信事業者制限中",
+                "message": "この通信事業者からの攻撃が発生しています。\nこの通信事業者からの報酬は追って通知があるまで無効になっています。申し訳ありません！"
+            },
+            "invalidIpMetadata": {
+                "title": "IP制限中",
+                "message": "このIPからの攻撃が発生しています。\nこのIPからの報酬は追って通知があるまで無効になっています。申し訳ありません！"
+            },
+            "claimedTooEarly": {
+                "title": "報酬ウォレットが空です",
+                "message": "まもなく資金を追加します。申し訳ありません！"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "報酬ウォレットが空です",
+                "message": "まもなく資金を追加します。申し訳ありません！"
+            },
+            "invalidQuizQuestionId": {
+                "title": "報酬ウォレットが空です",
+                "message": "まもなく資金を追加します。申し訳ありません！"
+            },
+            "oneSectionADay": {
+                "title": "報酬なしで続けますか？",
+                "message": "sats報酬を獲得しながら学べるのは1日1セクションまでです。"
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "ログイン / ウォレット作成",
         "createAccount": "新たにウォレットを作成する",
         "exploreWallet": "ウォレットを見つける",
+        "login": "ログイン",
         "logBackInWith": "再ログイン：",
         "headline": "Galoyが提供するウォレット",
         "startTrialAccount": "トライアルウォレットで始める",
@@ -2005,19 +2056,27 @@
         "trialAccountCreationFailedMessage": "トライアルウォレットの作成に失敗しました。後でもう一度お試しいただくか、電話番号を入力して新しいウォレットを作成してください。",
         "trialAccountHasLimits": "トライアルウォレットには制限があります",
         "trialAccountLimits": {
+            "modalTitle": "アップグレードしてさらに多くの機能を利用",
             "noBackup": "バックアップオプションがありません",
             "sendingLimit": "1日あたりの送金上限を引き下げる",
-            "noOnchain": "オンチェーンでのビットコイン受取禁止"
+            "noOnchain": "オンチェーンでのビットコイン受取禁止",
+            "recoveryOption": "SMSまたはメールで資金を復元",
+            "dailyLimit": "1日$1000の取引限度額",
+            "onchainReceive": "Bitcoinのオンチェーン受取"
         }
     },
     "MapScreen": {
+        "navToSettingsTitle": "位置情報の権限",
+        "navToSettingsText": "Blinkに位置情報の権限を付与する場合は、設定に移動して有効にしてください",
+        "payBusiness": "支払う",
+        "openSettings": "設定を開く",
+        "title": "マップ",
+        "error": "位置情報の取得中にエラーが発生しました",
         "locationPermissionMessage": "位置情報を有効にして、マップ上の現在地を確認する",
         "locationPermissionNegative": "キャンセル",
         "locationPermissionNeutral": "あとで確認する",
         "locationPermissionPositive": "OK",
-        "locationPermissionTitle": "マップ上で自分の位置を確認する",
-        "payBusiness": "支払う",
-        "title": "マップ"
+        "locationPermissionTitle": "マップ上で自分の位置を確認する"
     },
     "HomeScreen": {
         "receive": "受金",
@@ -2026,7 +2085,8 @@
         "scan": "スキャン",
         "updateAvailable": "新しいアップデートがあります。\n今すぐ更新をタップして、アップデートしてください",
         "useLightning": "私たちはライトニング・ネットワークを使っています。",
-        "myAccounts": "ウォレット"
+        "myAccounts": "ウォレット",
+        "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
@@ -2055,6 +2115,7 @@
         "title": "ホーム"
     },
     "ReceiveScreen": {
+        "nfc": "NFC",
         "enterAmountFirst": "Please enter an amount first",
         "activateNotifications": "送金が完了したら通知を受け取るようにしますか？",
         "copyClipboard": "インボイスがクリップボードにコピーされました",
@@ -2118,13 +2179,19 @@
         "invalidContent": "無効な情報：\n\n{found: string}\n\nこれは有効なビットコイン・アドレスまたはライトニング・インボイスではありません。",
         "expiredContent": "無効な情報：\n\n{found: string}\n\n有効期限切れのインボイスです",
         "invalidTitle": "無効なQRコード",
+        "openLinkTitle": "リンクを開く",
+        "confirmOpenLink": "このリンクを開いてもよろしいですか？",
         "noQrCode": "QRコードは見つかりませんでした",
         "title": "QRコードをスキャンする",
         "permissionCamera": "We need permission to use your camera",
+        "noCamera": "カメラが見つかりません",
+        "openSettings": "設定を開く",
+        "unableToOpenSettings": "設定を開けません",
         "invalidContentLnurl": "無効な情報\n\n{found: string}\n\nは現在サポートされていません",
         "imageLibraryPermissionsNotGranted": "画像ライブラリにアクセスする権限がありません。 アプリの設定を確認してください。"
     },
     "SecurityScreen": {
+        "title": "セキュリティとプライバシー",
         "biometricDescription": "指紋認証または顔認証でロックを解除する。",
         "biometricTitle": "生体認証",
         "biometryNotAvailable": "生体認証は使用できません。",
@@ -2148,7 +2215,14 @@
         "totalLabel": "総額：",
         "totalExceed": "合計金額が{balance: string}を超えています",
         "maxFeeSelected": "これは今回のトランザクションで請求される手数料の上限です。 お取引完了後に、手数料は少なくなる場合があります。",
-        "feeError": "手数料の計算に失敗しました"
+        "feeError": "手数料の計算に失敗しました",
+        "invoiceAlreadyPaid": "このインボイスは既に支払い済みです",
+        "somethingWentWrong": "エラーが発生しました",
+        "paymentAlreadyAttempted": "支払いは既に試行済みです。\n\nこの支払いを再度送信する場合は、最初からやり直してください。",
+        "slideToConfirm": "スライドして確認",
+        "slideConfirming": "確認中...",
+        "copiedDestination": "送信先をクリップボードにコピーしました",
+        "lightningRecommended": "手数料が高額です！Lightningをお勧めします。"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "ユーザー名{bankName: string}がアドレス{bankName: string}になりました。",
@@ -2167,6 +2241,19 @@
         "unknownLightning": "ライトニング・アドレスを読み込めません。もう一度トライしてみてください。",
         "unknownOnchain": "ビットコイン・アドレスを読み込めません。もう一度トライしてみてください。",
         "newBankAddressUsername": "{lnAddress: string}は、{bankName: string}アドレスとして存在しますが、送金した履歴が一度もありません。",
+        "confirmUsernameModal": {
+            "title": "このアドレスへの送金は初めてです",
+            "body1": "受取人が{bankName: string}アドレスを提供したことを確認してください。",
+            "bold2bold": "他のウォレットのユーザー名ではありません。",
+            "body3": "そうでない場合、「{lnAddress: string}」というアドレスを持つ{bankName: string}アカウントに送金されます。\n\nアドレスの最初の部分のスペルも確認してください。例：jackieとjack1eは異なるアドレスです",
+            "warning": "{bankName: string}アドレスが間違っている場合、{bankName: string}は取引を元に戻すことができません。",
+            "checkBox": "{lnAddress: string} は正しいアドレスです。",
+            "confirmButton": "100%間違いありません"
+        },
+        "clipboardError": "エラー：クリップボードからコピーした値が正しくありません",
+        "pastedClipboardSuccess": "クリップボードから貼り付けました",
+        "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
+        "phoneNotAllowed": "このフィールドでは電話番号を使用できません",
         "confirmModal": {
             "title": "このアドレスに、あなたは一度も送金したことがありません。",
             "body1": "受金者がお伝えした{bankName: string}アドレスが正しいことを確認してください",
@@ -2175,10 +2262,10 @@
             "warning": "{bankName: string}アドレスを誤って入力した場合、{bankName: string}はトランザクションを取り消すことができません。",
             "checkBox": "{lnAddress: string}は正しいアドレスです。",
             "confirmButton": "間違いありません"
-        },
-        "clipboardError": "エラー：クリップボードからコピーした値が正しくありません"
+        }
     },
     "SendBitcoinScreen": {
+        "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
         "amount": "金額",
         "amountExceed": "限度額が{balance: string}を超えています",
         "amountExceedsLimit": "1日の残りの限度額{limit: string}を超えています",
@@ -2186,7 +2273,7 @@
         "amountIsRequired": "金額の入力は必須です",
         "cost": "コスト",
         "destination": "送金先",
-        "destinationIsRequired": "送金先の入力は必須です",
+        "destinationRequired": "送信先が必要です",
         "fee": "ネットワーク手数料",
         "feeCalculationUnsuccessful": "計算に失敗しました ⚠️",
         "placeholder": "ユーザー名、インボイスまたはアドレス",
@@ -2201,9 +2288,41 @@
         "title": "ビットコインを送金する",
         "failedToFetchLnurlInvoice": "lnurlインボイスの取得に失敗しました",
         "lnurlInvoiceIncorrectAmount": "lnurlサーバーが不正な金額のインボイスで応答しました。",
+        "confirmFeesModal": {
+            "title": "手数料が高額です！",
+            "content": "手数料が送金額の50%を超えています。本当に続行しますか？\n\n手数料を削減するには、受取人にLightningでの取引を依頼してください",
+            "confirmButton": "100%間違いありません"
+        },
+        "copiedDestination": "送信先をクリップボードにコピーしました",
+        "pendingPayment": "支払いは送信されましたが、まだ確認されていません。\n\n支払いが確認されない場合、資金はアカウントに返金されます。",
+        "copySuccessMessage": "メッセージをクリップボードにコピー",
+        "openSuccessUrl": "ブラウザで成功URLを開く",
+        "copySecretMessage": "シークレットメッセージをクリップボードにコピー",
+        "copiedSuccessMessage": "メッセージをコピーしました",
+        "copiedSecretMessage": "シークレットメッセージをコピーしました",
+        "pendingDecryptionMessage": "暗号化メッセージ。支払い確認を待っています。",
+        "destinationScreenTitle": "送信先",
+        "orBySMS": "または携帯電話番号",
+        "orSaved": "または保存済み",
+        "feeLabel": "手数料",
+        "noteLabel": "メモ",
+        "sender": "送信者",
+        "recipient": "受取人",
+        "time": "時間",
+        "type": "種類",
+        "destinationIsRequired": "送金先の入力は必須です",
         "lnurlInvoiceIncorrectDescription": "lnurlサーバーが不正な説明ハッシュを持つインボイスで応答しました。"
     },
     "SettingsScreen": {
+        "staticQr": "印刷用静的QR",
+        "staticQrCopied": "静的QRコードのリンクをコピーしました",
+        "setByOs": "OSの設定に準拠",
+        "apiAcess": "API連携",
+        "apiDocumentation": "APIドキュメント",
+        "apiDashboard": "APIアクセスとダッシュボード",
+        "pos": "ポイント・オブ・セール",
+        "posCopied": "ポイント・オブ・セールのリンクをコピーしました",
+        "setYourLightningAddress": "Lightningアドレスを設定",
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
         "tapUserName": "タップしてユーザー名を設定する",
@@ -2226,7 +2345,13 @@
         "nfcOnlyReceive": "現時点ではNFCから受金のみ利用可能です",
         "nfcScanNow": "いますぐNFCをスキャンする",
         "nfcNotSupported": "このデバイスでは NFC がサポートされていません",
-        "logInOrCreateAccount": "ログインまたはウォレットを作成"
+        "logInOrCreateAccount": "ログインまたはウォレットを作成",
+        "logOutFromOneAccount": "このアカウントからログアウト",
+        "logoutOneAccountAlertTitle": "このアカウントからログアウトしてもよろしいですか？",
+        "logoutOneAccountAlertContent": "{identifier: string}にリンクされたセッションからログアウトします。\n今後再度ログインできることを確認してください。",
+        "logoutOneAccountConfirm": "了解しました。ログアウトしてください。",
+        "receiveCurrency": "受取通貨",
+        "displayCurrency": "表示通貨"
     },
     "NotificationSettingsScreen": {
         "title": "通知設定",
@@ -2239,10 +2364,29 @@
             "Payments": {
                 "title": "送受金",
                 "description": "送受金に関する通知。"
+            },
+            "Marketing": {
+                "title": "機能とアップデート",
+                "description": "新機能やアップデートに関する通知"
+            },
+            "Price": {
+                "title": "価格変動",
+                "description": "Bitcoinの価格に関する通知"
             }
         }
     },
     "AccountScreen": {
+        "fundsMoreThan5Dollars": "アカウントの残高が$5を超えています",
+        "itsATrialAccount": "トライアルアカウントは取引限度額が低く、復元方法がありません。携帯電話を紛失したりアプリを削除すると、資金を復元できなくなります。",
+        "accountBeingDeleted": "アカウントを削除中です。しばらくお待ちください...",
+        "dangerZone": "危険ゾーン",
+        "phoneDeletedSuccessfully": "電話番号を削除しました",
+        "phoneNumber": "電話番号",
+        "tapToAddPhoneNumber": "タップして電話番号を追加",
+        "loginMethods": "ログイン方法",
+        "level": "レベル {level: string}",
+        "switchAccount": "アカウントを切り替える",
+        "pleaseWait": "お待ちください。",
         "accountLevel": "ウォレットレベル",
         "upgrade": "ウォレットをアップグレードする",
         "logOutAndDeleteLocalData": "ログアウトしてすべてのローカルデータをクリアする",
@@ -2255,6 +2399,11 @@
         "btcBalanceWarning": "あなたのビットコイン残高は{balance: string}です。",
         "secureYourAccount": "ウォレットを保護するために登録してください",
         "tapToAdd": "タップして追加",
+        "tapToAddEmail": "タップしてメールを追加",
+        "unverifiedEmail": "メール（未認証）",
+        "email": "メール",
+        "emailDeletedSuccessfully": "メールアドレスを削除しました",
+        "unverifiedEmailAdvice": "未認証のメールアドレスはログインに使用できません。メールアドレスを再認証してください。",
         "deleteEmailPromptTitle": "メールアドレスを削除する",
         "deleteEmailPromptContent": "メールアドレスを削除してもよろしいですか？電話番号でのみ再ログインできます。",
         "deletePhonePromptTitle": "電話番号を削除する",
@@ -2276,10 +2425,20 @@
         "totpDeleteAlertContent": "2要素認証（2FA）を削除してもよろしいですか？",
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
-        "copy": "コピー"
+        "accountId": "アカウントID",
+        "copy": "コピー",
+        "identityVerification": "本人確認"
+    },
+    "ProfileScreen": {
+        "addAccount": "アカウントを追加",
+        "error": "現在プロフィールを取得できません",
+        "fromThisDevice": "このデバイスから？",
+        "switchAccount": "別のアカウントに切り替えました",
+        "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
+        "secret": "シークレット/バックアップ",
         "content": "二段階認証アプリでこの QR コードをスキャンします。 または、シークレットコードを手動でコピーして認証アプリに貼り付けるコードできます。"
     },
     "TotpRegistrationValidateScreen": {
@@ -2304,7 +2463,9 @@
         "info": "Blink使用時の好みのテーマを選択するか、システム設定との同期を選択できます。",
         "system": "システム設定を使用する",
         "light": "ライトモードを使用する",
-        "dark": "ダークモードを使用する"
+        "dark": "ダークモードを使用する",
+        "setToDark": "ダークモード",
+        "setToLight": "ライトモード"
     },
     "Languages": {
         "DEFAULT": "デフォルト（OS）"
@@ -2322,9 +2483,12 @@
         "paid": "送金先/送金元",
         "received": "受金完了",
         "spent": "送金完了",
+        "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
-        "txNotBroadcast": "あなたのトランザクションは現在保留中ですが、すぐにビットコインネットワークに反映されます。"
+        "txNotBroadcast": "あなたのトランザクションは現在保留中ですが、すぐにビットコインネットワークに反映されます。",
+        "momentarily": "まもなく",
+        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました"
     },
     "TransactionLimitsScreen": {
         "receive": "受金",
@@ -2355,10 +2519,15 @@
         "receiveOnchain": "オンチェーンでビットコインを受け取る",
         "onlyAPhoneNumber": "手軽で簡単な電話番号認証",
         "letsGo": "レッツゴー！",
-        "stayInTrialMode": "トライアルモードを続ける"
+        "stayInTrialMode": "トライアルモードを続ける",
+        "upgradeToLevel": "レベル{level: number}にアップグレード",
+        "notNow": "今はしない",
+        "setUpLevelAccount": "レベル{level: number}アカウントを設定"
     },
     "SetAddressModal": {
         "title": "{bankName: string}アドレスを設定する",
+        "mainTitle": "Lightningアドレスを選択",
+        "setLightningAddress": "Lightningアドレスを設定",
         "Errors": {
             "tooShort": "アドレスは3文字以上で入力してください",
             "tooLong": "アドレスは50文字以上でなければなりません",
@@ -2384,20 +2553,76 @@
         "errorRequestingCode": "アクセスコードのリクエストに失敗しました。時間をあけてもう一度トライしてみてください。",
         "errorInvalidPhoneNumber": "無効な電話番号です。入力した電話番号は正しいですか？",
         "errorUnsupportedCountry": "お住まいの国では、まだ私たちのサービスがサポートされていません。",
+        "infoArgentina": "アルゼンチンの電話番号は、番号の先頭に9を追加する必要があります。",
         "placeholder": "電話番号",
         "verify": "タップして認証する",
         "sms": "SMSで送信する",
-        "whatsapp": "WhatsAppで送信する"
+        "whatsapp": "WhatsAppで送信する",
+        "telegram": "Telegram経由で送信"
+    },
+    "LoginMethodScreen": {
+        "title": "ログイン方法を選択してください。",
+        "useTelegram": "Telegramを使用",
+        "useSms": "SMSを使用",
+        "useWhatsapp": "WhatsAppを使用",
+        "useEmail": "メールを使用",
+        "setupTelegram": "Telegramログインを設定",
+        "setupSms": "SMSログインを設定",
+        "setupWhatsapp": "WhatsAppログインを設定",
+        "setupEmail": "メールログインを設定"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "レベル1へようこそ",
+            "title": "アカウントで新しい機能が利用可能になりました：",
+            "receiveBitcoinDescription": "電話番号を使ってBitcoinを受取",
+            "dailyLimitDescription": "1日最大$1,000 USDまで送金可能",
+            "onchainDescription": "オンチェーンでの支払いを受取"
+        },
+        "emailBenefits": {
+            "mainTitle": "メールログインを追加",
+            "title": "メールログインで以下が可能になります：",
+            "backupDescription": "アカウントへのアクセスのバックアップ手段を確保",
+            "supportDescription": "サポートを受けやすくなります",
+            "securityDescription": "アカウントのセキュリティを強化",
+            "primaryButton": "メールログインを設定"
+        },
+        "lightningBenefits": {
+            "mainTitle": "カスタムLightningアドレスを設定",
+            "title": "Lightningアドレスのメリット：",
+            "staticAddressDescription": "支払いを受け取るための固定アドレス",
+            "easyToShareDescription": "覚えやすく、公開・非公開で簡単にシェア可能",
+            "blinkToolsDescription": "商取引に便利なBlinkツールを利用可能",
+            "primaryButton": "カスタムアドレスを設定"
+        },
+        "supportScreen": {
+            "mainTitle": "フィードバックをお待ちしています",
+            "title": "設定完了！",
+            "description": "ご意見・ご感想をお待ちしております。お気軽に {email} までご連絡ください",
+            "primaryButton": "完了"
+        }
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "ログインエラーです。正しいコードを入力しましたか？",
         "errorTooManyAttempts": "トライ回数が多すぎます。時間をあけてもう一度トライしてみてください。",
+        "errorIpNotAllowed": "このIPはサポート対象外の国のものであり、このIPからアカウントを作成することはできません。サポート対象国にいてVPNを使用している場合は、VPNを無効にしてみてください。",
+        "errorPhoneNotAllowed": "この電話番号からはアカウントを作成できません。",
         "errorCannotUpgradeToExistingAccount": "この電話番号での登録はすでに存在します。 トライアルウォレットからログアウトし、この電話番号で再ログインしてください。",
         "header": "電話番号を認証するには、{channel: string}から{phoneNumber: string}にお送りしたコードを入力してください",
         "placeholder": "6桁のコード",
         "sendAgain": "もう一度送る",
         "tryAgain": "再トライする",
         "sendViaOtherChannel": "{channel: string}でコードを受信するように選択しました。代わりに{other: string}経由での受信を試してみてください。"
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "Telegramで認証後、自動的にログインされます",
+        "loginWithTelegram": "Telegramでログイン",
+        "waitingForAuthorization": "Telegramでの認証を待っています...",
+        "errorFetchParams": "Telegram認証パラメータの取得に失敗しました",
+        "errorFetchLogin": "Telegramログインの取得に失敗しました",
+        "errorAuthTimeout": "認証がタイムアウトしました。もう一度お試しください。",
+        "errorOpenAppError": "Telegramを開けませんでした。アプリがインストールされていることを確認してください。"
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "電話番号を設定する",
@@ -2437,8 +2662,21 @@
         "success": "メールアドレス{email: string}が正常に認証されました"
     },
     "common": {
+        "enabled": "有効",
         "switch": "スイッチ",
+        "notifications": "通知",
+        "preferences": "設定",
+        "onDeviceSecurity": "セキュリティとプライバシー",
+        "securityAndPrivacy": "セキュリティとプライバシー",
+        "advanced": "詳細設定",
+        "community": "コミュニティ",
         "account": "ウォレット",
+        "yourAccount": "あなたのアカウント",
+        "accounts": "アカウント",
+        "accountInformation": "アカウント情報",
+        "trialAccount": "トライアルアカウント",
+        "blinkUser": "Blinkユーザー",
+        "blinkToBlink": "Blink から Blink へ",
         "transactionLimits": "トランザクション限度額",
         "activateWallet": "ウォレットを有効化する",
         "amountRequired": "金額の入力は必要です",
@@ -2474,12 +2712,14 @@
         "hour": "時間",
         "hours": "時間",
         "invoice": "インボイス",
+        "intraledger": "内部送金",
         "language": "言語",
         "languagePreference": "優先言語",
         "lastName": "姓",
         "later": "後ほど",
         "loggedOut": "ログアウトされました。",
         "logout": "ログアウト",
+        "lightning": "Lightning",
         "minutes": "分間",
         "errorAuthToken": "認証トークンが見つかりません",
         "needWallet": "ウォレットにアクセスするには、ログインするか、新たにウォレットを作成してください",
@@ -2490,8 +2730,11 @@
         "ok": "OK",
         "or": "または",
         "openWallet": "ウォレットを開く",
+        "onchain": "オンチェーン",
+        "paymentRequest": "支払いリクエスト",
         "phone": "スマートフォン",
         "phoneNumber": "電話番号",
+        "preimageProofOfPayment": "プリイメージ / 支払い証明",
         "rate": "レート",
         "reauth": "セッションの有効期限が切れました。再ログインしてください。",
         "restart": "再起動",
@@ -2507,6 +2750,7 @@
         "submit": "提出する",
         "success": "成功！",
         "stablesatsUsd": "ステーブル sats（米国ドル固定）",
+        "dollarStablesats": "ドル（Stablesats）",
         "to": "送金先",
         "total": "合計",
         "transactions": "トランザクション",
@@ -2526,7 +2770,22 @@
         "prevMonths": "先月",
         "problemMaybeReauth": "リクエストに失敗しました。1分後に再トライしてください。問題が解決しない場合は、一旦ログアウトし、再ログインすることをお勧めします。設定 ＞ウォレット ＞ログアウトで、ログアウトできます。",
         "warning": "警告",
-        "blinkToBlink": "Blink から Blink へ"
+        "continue": "続ける",
+        "correct": "正解",
+        "recommended": "おすすめ",
+        "expirationTime": "有効期限",
+        "minute": "分",
+        "day": {
+            "one": "日",
+            "other": "日"
+        },
+        "dollar": "ドル",
+        "all": "すべて",
+        "allAccounts": "すべてのアカウント",
+        "some": "一部",
+        "support": "サポート",
+        "profiles": "プロフィール",
+        "paste": "貼り付け"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",
@@ -2556,6 +2815,7 @@
         "joinTheCommunity": "コミュニティに参加する",
         "whatsapp": "WhatsApp",
         "email": "メールアドレス",
+        "sms": "SMS",
         "faq": "よくある質問",
         "enjoyingApp": "このアプリが気に入りましたか？",
         "statusPage": "ステータス",
@@ -2574,7 +2834,8 @@
         "deleteAccountConfirmation": "あなたのウォレットは削除されました。\n\n規制要件に関連する保護観察期間が終了すると、あなたのアカウントに関連する残りのデータは永久に削除されます。",
         "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
-        "bye": "バイバイ！"
+        "bye": "バイバイ！",
+        "deleteAccountWarning": "ご注意：アカウントの削除は元に戻せません！\n削除前にウォレットに資金がないことを確認してください。\n削除されたアカウントは復元できません。"
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",
@@ -2640,6 +2901,19 @@
         "someones": "{username: string}さんの",
         "groupEffort": "ビットコインの普及にはチームワークが不可欠です。\nお友だちを招待し、あなたのサークルを広げるためにサトシを送ろう。",
         "drivingAdoption": "Blinkと一緒にビットコインの普及を応援しています！",
+        "connectOnSocial": "ソーシャルでつながる：",
+        "fullDetails": "詳細はこちら：",
+        "learnMore": "Adopting Bitcoinの詳細はこちら",
+        "mayChallenge": {
+            "title": "5月チャレンジ！",
+            "description": "インナーサークルを6人拡大して、次のBitcoin Meetupでピザセットを獲得するチャンスを手に入れましょう。",
+            "details": "Bitcoin Pizza Dayパーティーがしたい？\n\nインナーサークルを6人拡大して、次のBitcoin Meetupでピザセットを獲得するチャンスを手に入れましょう。チャレンジは5月15日に終了します。\n\nハッシュタグ #blinkcircles を付けてサークルをソーシャルでシェアして参加しましょう。\n\n賞品はピザ代$150です。"
+        },
+        "juneChallenge": {
+            "title": "6月チャレンジ！",
+            "description": "インナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう",
+            "details": "Adopting Bitcoin El Salvadorの特別チケットを獲得しよう\n\nインナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう！チケットにはメインカンファレンスへの独占アクセス、飲食付きメザニン、スピーカーディナー、フィルムフェスティバルが含まれます。\n\nハッシュタグ #blinkcircles を付けてサークルをソーシャルでシェアして参加しましょう。\n\n今回は当選者が2名です！"
+        },
         "septChallenge": {
             "title": "9月のチャレンジ！",
             "description": "インナーサークル {innerCircle: number}/21 - $21獲得\nトップ3 - Adopting Bitcoinのチケットを獲得できます!",
@@ -2678,6 +2952,10 @@
         "ERROR": "エラー",
         "PROCESSING": "Processing",
         "REVIEW": "Review"
+    },
+    "NotificationHistory": {
+        "title": "通知",
+        "noNotifications": "現在、通知はありません"
     },
     "Fake": {
         "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
