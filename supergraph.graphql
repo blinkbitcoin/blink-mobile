@@ -319,6 +319,12 @@ type BuildInformation
   helmRevision: Int
 }
 
+type BulletinButton
+  @join__type(graph: BLINK)
+{
+  label: String!
+}
+
 type CallbackEndpoint
   @join__type(graph: BLINK)
 {
@@ -864,6 +870,13 @@ enum join__Graph {
   BLINK @join__graph(name: "blink", url: "url")
   CIRCLES @join__graph(name: "circles", url: "url")
   KYC @join__graph(name: "kyc", url: "url")
+}
+
+input KycFlowStartInput
+  @join__type(graph: KYC)
+{
+  firstName: String
+  lastName: String
 }
 
 scalar Language
@@ -1448,7 +1461,7 @@ type Mutation
   userUpdateLanguage(input: UserUpdateLanguageInput!): UserUpdateLanguagePayload! @join__field(graph: BLINK)
   userUpdateUsername(input: UserUpdateUsernameInput!): UserUpdateUsernamePayload! @join__field(graph: BLINK) @deprecated(reason: "Username will be moved to @Handle in Accounts. Also SetUsername naming should be used instead of UpdateUsername to reflect the idempotency of Handles")
   onboardingFlowStart(input: OnboardingFlowStartInput!): OnboardingFlowStartResult! @join__field(graph: KYC) @deprecated(reason: "Deprecated, use kycFlowStart instead.")
-  kycFlowStart: OnboardingFlowStartResult! @join__field(graph: KYC)
+  kycFlowStart(input: KycFlowStartInput): OnboardingFlowStartResult! @join__field(graph: KYC)
 }
 
 type MyUpdatesPayload
@@ -1991,6 +2004,7 @@ type StatefulNotification
   body: String!
   deepLink: String
   action: NotificationAction
+  bulletinButton: BulletinButton
   createdAt: Timestamp!
   acknowledgedAt: Timestamp
   bulletinEnabled: Boolean!
