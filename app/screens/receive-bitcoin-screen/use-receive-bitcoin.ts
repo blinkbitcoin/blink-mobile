@@ -202,9 +202,12 @@ export const useReceiveBitcoin = () => {
         id: bitcoinWallet.id,
       } as BtcWalletDescriptor
 
+      const isBtcDefault = defaultWalletDescriptor.currency === WalletCurrency.Btc
+      const initialType = username && isBtcDefault ? Invoice.PayCode : Invoice.Lightning
+
       const initialPRParams: BaseCreatePaymentRequestCreationDataParams<WalletCurrency> =
         {
-          type: username ? Invoice.PayCode : Invoice.Lightning,
+          type: initialType,
           defaultWalletDescriptor,
           bitcoinWalletDescriptor,
           convertMoneyAmount: _convertMoneyAmount,

@@ -201,13 +201,17 @@ const ReceiveScreen = () => {
       return
     }
 
-    if (request.type === Invoice.PayCode) {
-      request.setType(Invoice.Lightning)
-    }
     const next =
       request.receivingWalletDescriptor.currency === WalletCurrency.Btc
         ? WalletCurrency.Usd
         : WalletCurrency.Btc
+
+    const hasContent =
+      isNonZeroMoneyAmount(request.unitOfAccountAmount) || request.memoChangeText
+    const revertToPaycode =
+      next === WalletCurrency.Btc && request.canUsePaycode && !hasContent
+
+    request.setType(revertToPaycode ? Invoice.PayCode : Invoice.Lightning)
     request.setReceivingWallet(next)
     request.setExpirationTime(0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,6 +223,9 @@ const ReceiveScreen = () => {
     request?.setType,
     request?.setReceivingWallet,
     request?.setExpirationTime,
+    request?.canUsePaycode,
+    request?.unitOfAccountAmount,
+    request?.memoChangeText,
   ])
 
   useEffect(() => {
@@ -381,7 +388,7 @@ const ReceiveScreen = () => {
           setAmount={handleSetAmount}
           canSetAmount={request.canSetAmount}
           onToggleWallet={handleToggleWallet}
-          canToggleWallet={isOnChainPage || request.canSetReceivingWalletDescriptor}
+          canToggleWallet={true}
           disabled={isOnChainPage && onchainWalletCurrency === WalletCurrency.Usd}
         />
 
