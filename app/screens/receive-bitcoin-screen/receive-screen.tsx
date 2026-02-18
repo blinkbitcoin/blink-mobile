@@ -10,7 +10,7 @@ import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/n
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { ActionButton } from "@app/components/action-button"
 import { ContextualInfo } from "@app/components/contextual-info"
 import { CustomIcon } from "@app/components/custom-icon"
 import { ModalNfc } from "@app/components/modal-nfc"
@@ -397,32 +397,24 @@ const ReceiveScreen = () => {
 
         {showActions && (
           <View style={styles.actionsRow}>
-            <Pressable
-              {...testProps(LL.ReceiveScreen.copyInvoice())}
-              style={styles.actionButton}
+            <ActionButton
+              label={LL.ReceiveScreen.copyInvoice()}
+              icon="copy-paste"
               onPress={handleCopy}
-              accessibilityRole="button"
               accessibilityHint={
                 isOnChainPage
                   ? LL.ReceiveScreen.copyClipboardBitcoin()
                   : LL.ReceiveScreen.copyClipboard()
               }
-            >
-              <Text style={styles.actionText}>{LL.ReceiveScreen.copyInvoice()}</Text>
-              <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
-            </Pressable>
-            <Pressable
-              {...testProps(LL.ReceiveScreen.shareInvoice())}
-              style={styles.actionButton}
+            />
+            <ActionButton
+              label={LL.ReceiveScreen.shareInvoice()}
+              icon="share"
               onPress={handleShare}
-              accessibilityRole="button"
               accessibilityHint={
                 isOnChainPage ? LL.common.shareBitcoin() : LL.common.shareLightning()
               }
-            >
-              <Text style={styles.actionText}>{LL.ReceiveScreen.shareInvoice()}</Text>
-              <GaloyIcon name="share" size={16} color={colors.primary} />
-            </Pressable>
+            />
           </View>
         )}
 
@@ -481,20 +473,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "flex-start",
     columnGap: 10,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 5,
-    backgroundColor: colors.grey5,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  actionText: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: colors.black,
   },
   inputsContainer: {
     marginTop: 14,
