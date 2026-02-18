@@ -55,11 +55,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       common: {
         expirationTime: () => "Expiration time",
-        day: { one: () => "day", other: () => "days" },
-        hour: () => "hour",
-        hours: () => "hours",
-        minute: () => "minute",
-        minutes: () => "minutes",
       },
       ReceiveScreen: {
         depositFee: ({
@@ -96,13 +91,13 @@ describe("ContextualInfo", () => {
     it("renders expiration time text", () => {
       const { getByText } = render(<ContextualInfo {...defaultProps} />)
 
-      expect(getByText("Expiration time: 1 hour")).toBeTruthy()
+      expect(getByText("Expiration time: 1h")).toBeTruthy()
     })
 
     it("opens expiration modal on press", () => {
       const { getByText, getByTestId } = render(<ContextualInfo {...defaultProps} />)
 
-      fireEvent.press(getByText("Expiration time: 1 hour"))
+      fireEvent.press(getByText("Expiration time: 1h"))
 
       expect(getByTestId("expiration-modal")).toBeTruthy()
     })
@@ -112,7 +107,7 @@ describe("ContextualInfo", () => {
         <ContextualInfo {...defaultProps} />,
       )
 
-      fireEvent.press(getByText("Expiration time: 1 hour"))
+      fireEvent.press(getByText("Expiration time: 1h"))
       fireEvent.press(getByTestId("set-expiration-30"))
 
       expect(mockSetExpirationTime).toHaveBeenCalledWith(30)
@@ -124,7 +119,7 @@ describe("ContextualInfo", () => {
         <ContextualInfo {...defaultProps} expirationTime={30} />,
       )
 
-      expect(getByText("Expiration time: 30 minutes")).toBeTruthy()
+      expect(getByText("Expiration time: 30m")).toBeTruthy()
     })
 
     it("formats single minute correctly", () => {
@@ -132,15 +127,15 @@ describe("ContextualInfo", () => {
         <ContextualInfo {...defaultProps} expirationTime={1} />,
       )
 
-      expect(getByText("Expiration time: 1 minute")).toBeTruthy()
+      expect(getByText("Expiration time: 1m")).toBeTruthy()
     })
 
-    it("formats days correctly", () => {
+    it("formats large hours correctly", () => {
       const { getByText } = render(
         <ContextualInfo {...defaultProps} expirationTime={2880} />,
       )
 
-      expect(getByText("Expiration time: 2 days")).toBeTruthy()
+      expect(getByText("Expiration time: 48h")).toBeTruthy()
     })
 
     it("shows empty format when expirationTime is 0", () => {

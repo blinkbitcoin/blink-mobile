@@ -52,7 +52,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   }
 
   if (type === Invoice.Lightning && canSetExpirationTime) {
-    const formattedTime = formatExpirationTime(expirationTime, LL)
+    const formattedTime = formatExpirationTime(expirationTime)
 
     return (
       <>
@@ -95,33 +95,21 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   return null
 }
 
-type TranslationFunctions = {
-  common: {
-    day: { one: () => string; other: () => string }
-    hour: () => string
-    hours: () => string
-    minute: () => string
-    minutes: () => string
-  }
-}
-
-const formatExpirationTime = (minutes: number, LL: TranslationFunctions): string => {
+const formatExpirationTime = (minutes: number): string => {
   if (minutes === 0) return ""
-
-  const units = [
-    { threshold: 1440, singular: LL.common.day.one(), plural: LL.common.day.other() },
-    { threshold: 60, singular: LL.common.hour(), plural: LL.common.hours() },
-    { threshold: 1, singular: LL.common.minute(), plural: LL.common.minutes() },
-  ]
-
-  for (const unit of units) {
-    if (minutes >= unit.threshold) {
-      const count = Math.floor(minutes / unit.threshold)
-      return `${count} ${count === 1 ? unit.singular : unit.plural}`
-    }
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60)
+    return new Intl.NumberFormat("en-US", {
+      style: "unit",
+      unit: "hour",
+      unitDisplay: "narrow",
+    }).format(hours)
   }
-
-  return `${minutes} ${LL.common.minutes()}`
+  return new Intl.NumberFormat("en-US", {
+    style: "unit",
+    unit: "minute",
+    unitDisplay: "narrow",
+  }).format(minutes)
 }
 
 const formatDepositFees = (deposit: FeesInformation["deposit"]) => {
