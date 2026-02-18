@@ -11,6 +11,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { ActionButton } from "@app/components/action-button"
+import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
 import { ContextualInfo } from "@app/components/contextual-info"
 import { CustomIcon } from "@app/components/custom-icon"
 import { ModalNfc } from "@app/components/modal-nfc"
@@ -78,8 +79,10 @@ const ReceiveScreen = () => {
     memo: request?.memo || undefined,
   })
 
+  const pendingNfc = useRef(false)
   const [isTrialAccountModalVisible, setIsTrialAccountModalVisible] = useState(false)
   const [displayReceiveNfc, setDisplayReceiveNfc] = useState(false)
+  const [isNfcAmountModalOpen, setIsNfcAmountModalOpen] = useState(false)
 
   const closeTrialAccountModal = () => setIsTrialAccountModalVisible(false)
   const openTrialAccountModal = () => setIsTrialAccountModalVisible(true)
@@ -179,6 +182,15 @@ const ReceiveScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnChainPage, onchain.address, request?.share])
 
+  const handleNfcAmountSet = useCallback(
+    (amount: MoneyAmount<WalletOrDisplayCurrency>) => {
+      handleSetAmount(amount)
+      pendingNfc.current = true
+      setIsNfcAmountModalOpen(false)
+    },
+    [handleSetAmount],
+  )
+
   const handleCarouselSnap = useCallback(
     (index: number) => {
       if (index === CarouselPage.OnChain && isLevelZero) {
@@ -238,16 +250,25 @@ const ReceiveScreen = () => {
 
   useEffect(() => {
     ;(async () => {
+      const isNfcType =
+        request?.type === Invoice.Lightning || request?.type === Invoice.PayCode
       if (
-        request?.type === Invoice.Lightning &&
+        isNfcType &&
         request?.state === PaymentRequestState.Created &&
         (await nfcManager.isSupported())
       ) {
         navigation.setOptions({
           headerRight: () => (
             <TouchableOpacity
+              {...testProps("nfc-icon")}
               style={styles.nfcIcon}
-              onPress={() => setDisplayReceiveNfc(true)}
+              onPress={() => {
+                if (request?.type === Invoice.PayCode) {
+                  setIsNfcAmountModalOpen(true)
+                  return
+                }
+                setDisplayReceiveNfc(true)
+              }}
             >
               <CustomIcon name="nfc" color={colors.black} size={24} />
             </TouchableOpacity>
@@ -287,6 +308,14 @@ const ReceiveScreen = () => {
     }
     return () => timeout && clearTimeout(timeout)
   }, [isAuthed, isFocused, client])
+
+  useEffect(() => {
+    if (!pendingNfc.current) return
+    if (request?.type !== Invoice.Lightning) return
+    if (request?.state !== PaymentRequestState.Created) return
+    pendingNfc.current = false
+    setDisplayReceiveNfc(true)
+  }, [request?.type, request?.state])
 
   useEffect(() => {
     if (request?.state === PaymentRequestState.Paid) {
@@ -445,6 +474,15 @@ const ReceiveScreen = () => {
         setIsActive={setDisplayReceiveNfc}
         settlementAmount={request.settlementAmount}
         receiveViaNFC={request.receiveViaNFC}
+      />
+
+      <AmountInputModal
+        moneyAmount={request.unitOfAccountAmount}
+        walletCurrency={request.receivingWalletDescriptor.currency}
+        convertMoneyAmount={request.convertMoneyAmount}
+        onSetAmount={handleNfcAmountSet}
+        isOpen={isNfcAmountModalOpen}
+        close={() => setIsNfcAmountModalOpen(false)}
       />
 
       <TrialAccountLimitsModal
