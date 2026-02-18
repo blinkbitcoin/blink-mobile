@@ -16,7 +16,7 @@ export const useOnChainAddress = (
 ) => {
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
   const [address, setAddress] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(Boolean(walletId))
   useEffect(() => {
     if (!walletId) return
 

@@ -261,6 +261,8 @@ const ReceiveScreen = () => {
             <TouchableOpacity
               {...testProps("nfc-icon")}
               style={styles.nfcIcon}
+              accessibilityLabel="NFC"
+              accessibilityRole="button"
               onPress={() => {
                 if (!request?.settlementAmount) {
                   setIsNfcAmountModalOpen(true)
