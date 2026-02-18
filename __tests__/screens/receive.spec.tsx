@@ -3,6 +3,7 @@ import { it } from "@jest/globals"
 import { Share } from "react-native"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import Clipboard from "@react-native-clipboard/clipboard"
+import nfcManager from "react-native-nfc-manager"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -125,6 +126,27 @@ jest.mock("@app/hooks/use-display-currency", () => ({
     formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
       `$${moneyAmount.amount}`,
     getSecondaryAmountIfCurrencyIsDifferent: () => null,
+    zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+    currencyInfo: {
+      USD: {
+        symbol: "$",
+        minorUnitToMajorUnitOffset: 2,
+        showFractionDigits: true,
+        currencyCode: "USD",
+      },
+      BTC: {
+        symbol: "",
+        minorUnitToMajorUnitOffset: 0,
+        showFractionDigits: false,
+        currencyCode: "SAT",
+      },
+      DisplayCurrency: {
+        symbol: "$",
+        minorUnitToMajorUnitOffset: 2,
+        showFractionDigits: true,
+        currencyCode: "USD",
+      },
+    },
   }),
 }))
 
@@ -145,6 +167,20 @@ jest.mock("react-native-nfc-manager", () => ({
     stop: jest.fn(),
   },
 }))
+
+jest.mock("react-native-modal", () => {
+  const MockedModal = ({
+    isVisible,
+    children,
+  }: {
+    isVisible: boolean
+    children: React.ReactNode
+  }) => {
+    if (!isVisible) return null
+    return <>{children}</>
+  }
+  return MockedModal
+})
 
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
@@ -571,6 +607,38 @@ describe("ReceiveScreen", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      })
+    })
+  })
+
+  describe("NFC on PayCode", () => {
+    beforeEach(() => {
+      jest.mocked(nfcManager.isSupported).mockResolvedValue(true)
+    })
+
+    afterEach(() => {
+      jest.mocked(nfcManager.isSupported).mockResolvedValue(false)
+    })
+
+    it("opens amount input when pressing NFC icon on PayCode", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("nfc-icon"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
       })
     })
   })
