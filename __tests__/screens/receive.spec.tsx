@@ -698,4 +698,264 @@ describe("ReceiveScreen", () => {
       expect(priceConversionMock).toHaveBeenCalled()
     })
   })
+
+  describe("Wallet toggle preserves wallet across type changes (BTC default)", () => {
+    beforeEach(() => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    })
+
+    it("switches to Dollar wallet when toggling from PayCode", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+    })
+
+    it("round-trips PayCode → Lightning → PayCode", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText("Bitcoin")).toBeTruthy()
+      })
+    })
+  })
+
+  describe("Wallet toggle preserves wallet across type changes (USD default)", () => {
+    beforeEach(() => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
+    })
+
+    afterEach(() => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    })
+
+    it("starts Lightning with Dollar wallet", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+    })
+
+    it("toggles to PayCode with Bitcoin wallet", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText("Bitcoin")).toBeTruthy()
+      })
+    })
+
+    it("round-trips Lightning → PayCode → Lightning", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+    })
+  })
+
+  describe("Carousel page navigation does not change wallet", () => {
+    it("BTC default: swipe to OnChain and back keeps Lightning wallet", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText("Bitcoin")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-0"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText("Bitcoin")).toBeTruthy()
+      })
+    })
+
+    it("USD default: swipe to OnChain and back keeps Lightning wallet", async () => {
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
+
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-0"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+
+      paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    })
+
+    it("toggle USD on OnChain then back shows Dollar on page 0", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-0"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+    })
+
+    it("toggle on OnChain syncs wallet to page 0", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+        expect(screen.getByText("Dollar")).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-0"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+        expect(screen.getByText("Bitcoin")).toBeTruthy()
+      })
+    })
+  })
 })

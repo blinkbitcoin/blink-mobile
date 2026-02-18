@@ -1,5 +1,5 @@
 import fetch from "cross-fetch"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Alert, Share } from "react-native"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
@@ -127,6 +127,11 @@ gql`
   }
 `
 
+const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
+  [WalletCurrency.Btc]: 1440, // 24h
+  [WalletCurrency.Usd]: 5,
+}
+
 export const useReceiveBitcoin = () => {
   const [lnNoAmountInvoiceCreate] = useLnNoAmountInvoiceCreateMutation()
   const [lnUsdInvoiceCreate] = useLnUsdInvoiceCreateMutation()
@@ -145,6 +150,8 @@ export const useReceiveBitcoin = () => {
   )
   const [pr, setPR] = useState<PaymentRequest | null>(null)
   const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
+
+  const expirationPerWallet = useRef({ ...DEFAULT_EXPIRATION_MINUTES })
 
   const [expiresInSeconds, setExpiresInSeconds] = useState<number | null>(null)
   const [isSetLightningAddressModalVisible, setIsSetLightningAddressModalVisible] =
@@ -216,6 +223,7 @@ export const useReceiveBitcoin = () => {
           posUrl,
           lnAddressHostname,
           network: data.globals?.network,
+          expirationTime: DEFAULT_EXPIRATION_MINUTES[defaultWalletDescriptor.currency],
         }
       setPRCD(createPaymentRequestCreationData(initialPRParams))
     }
@@ -421,20 +429,30 @@ export const useReceiveBitcoin = () => {
   }
   const setReceivingWallet = (walletCurrency: WalletCurrency) => {
     setPRCD((pr) => {
-      if (pr && pr.setReceivingWalletDescriptor) {
-        if (walletCurrency === WalletCurrency.Btc && bitcoinWallet) {
-          return pr.setReceivingWalletDescriptor({
-            id: bitcoinWallet.id,
-            currency: WalletCurrency.Btc,
-          })
-        } else if (walletCurrency === WalletCurrency.Usd && usdWallet) {
-          return pr.setReceivingWalletDescriptor({
-            id: usdWallet.id,
-            currency: WalletCurrency.Usd,
-          })
-        }
+      if (!pr?.setReceivingWalletDescriptor) return pr
+
+      if (pr.expirationTime !== undefined) {
+        expirationPerWallet.current[pr.receivingWalletDescriptor.currency] =
+          pr.expirationTime
       }
-      return pr
+
+      let updated: typeof pr | undefined
+      if (walletCurrency === WalletCurrency.Btc && bitcoinWallet) {
+        updated = pr.setReceivingWalletDescriptor({
+          id: bitcoinWallet.id,
+          currency: WalletCurrency.Btc,
+        })
+      } else if (walletCurrency === WalletCurrency.Usd && usdWallet) {
+        updated = pr.setReceivingWalletDescriptor({
+          id: usdWallet.id,
+          currency: WalletCurrency.Usd,
+        })
+      }
+
+      if (updated?.setExpirationTime) {
+        return updated.setExpirationTime(expirationPerWallet.current[walletCurrency])
+      }
+      return updated ?? pr
     })
   }
   const setAmount = (amount: MoneyAmount<WalletOrDisplayCurrency>) => {
@@ -449,6 +467,8 @@ export const useReceiveBitcoin = () => {
   const setExpirationTime = (expirationTime: number) => {
     setPRCD((pr) => {
       if (pr && pr.setExpirationTime) {
+        expirationPerWallet.current[pr.receivingWalletDescriptor.currency] =
+          expirationTime
         return pr.setExpirationTime(expirationTime)
       }
       return pr

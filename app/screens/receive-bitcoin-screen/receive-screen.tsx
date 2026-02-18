@@ -199,42 +199,40 @@ const ReceiveScreen = () => {
         return
       }
       setActivePage(index === 0 ? CarouselPage.Lightning : CarouselPage.OnChain)
+      if (index === CarouselPage.OnChain && request) {
+        setOnchainWalletCurrency(request.receivingWalletDescriptor.currency)
+      }
     },
-    [isLevelZero],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLevelZero, request?.receivingWalletDescriptor?.currency],
   )
 
   const handleToggleWallet = useCallback(() => {
     if (!isReady || !request) return
 
-    if (isOnChainPage) {
-      setOnchainWalletCurrency((prev) =>
-        prev === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc,
-      )
-      return
-    }
-
-    const next =
-      request.receivingWalletDescriptor.currency === WalletCurrency.Btc
-        ? WalletCurrency.Usd
-        : WalletCurrency.Btc
+    const current = isOnChainPage
+      ? onchainWalletCurrency
+      : request.receivingWalletDescriptor.currency
+    const next = current === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
 
     const hasContent =
       isNonZeroMoneyAmount(request.unitOfAccountAmount) || request.memoChangeText
     const revertToPaycode =
       next === WalletCurrency.Btc && request.canUsePaycode && !hasContent
 
+    request.setReceivingWallet(next)
     request.setType(revertToPaycode ? Invoice.PayCode : Invoice.Lightning)
     request.setReceivingWallet(next)
-    request.setExpirationTime(0)
+    setOnchainWalletCurrency(next)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isReady,
     isOnChainPage,
+    onchainWalletCurrency,
     request?.type,
     request?.receivingWalletDescriptor.currency,
     request?.setType,
     request?.setReceivingWallet,
-    request?.setExpirationTime,
     request?.canUsePaycode,
     request?.unitOfAccountAmount,
     request?.memoChangeText,
