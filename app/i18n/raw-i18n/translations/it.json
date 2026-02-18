@@ -2156,8 +2156,8 @@
         "receiveViaOnchain": "Ricevi tramite Onchain",
         "payCodeOrLNURL": "Paycode / LNURL",
         "cantReceiveZeroSats": "Non puoi ricevere zero sat. Inserisci un importo corrispondente a 1 o più sat.",
-        "lightningAddress": "Indirizzo Lightning",
-        "lightningInvoice": "Fattura Lightning",
+        "lightningAddress": "Indirizzo lightning",
+        "lightningInvoice": "Fattura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Commissione di deposito: {fee} SAT"
     },
