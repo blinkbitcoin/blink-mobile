@@ -36,6 +36,7 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
+import { isCompatibleLink } from "./compatible-link"
 import { parseDestination } from "./payment-destination"
 import { DestinationDirection } from "./payment-destination/index.types"
 
@@ -120,23 +121,6 @@ export const ScanningQRCodeScreen: React.FC = () => {
     Linking.openURL(url).catch((err) => Alert.alert(err.toString()))
   }
 
-  function isValidHttpUrl(input: string) {
-    let url
-
-    try {
-      url = new URL(input)
-    } catch (_) {
-      return false
-    }
-
-    return (
-      url.protocol === "http:" ||
-      url.protocol === "https:" ||
-      url.protocol === "bitcoin:" ||
-      url.protocol === "lightning:"
-    )
-  }
-
   const processInvoice = React.useMemo(() => {
     return async (data: string | undefined) => {
       if (pending || !wallets || !bitcoinNetwork || !data) {
@@ -195,7 +179,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
             )
             break
           case "UnknownDestination":
-            if (isValidHttpUrl(data.toString())) {
+            if (isCompatibleLink(data.toString())) {
               Alert.alert(
                 LL.ScanningQRCodeScreen.openLinkTitle(),
                 `${data.toString()}\n\n${LL.ScanningQRCodeScreen.confirmOpenLink()}`,
