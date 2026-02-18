@@ -4,7 +4,10 @@ import { View } from "react-native"
 type Props = { children?: React.ReactNode; onDismiss?: () => void }
 
 const BottomSheetModal = React.forwardRef(
-  ({ children, onDismiss }: Props, ref: React.Ref<{ present: () => void; dismiss: () => void }>) => {
+  (
+    { children, onDismiss }: Props,
+    ref: React.Ref<{ present: () => void; dismiss: () => void }>,
+  ) => {
     React.useImperativeHandle(ref, () => ({
       present: jest.fn(),
       dismiss: () => {
@@ -14,6 +17,7 @@ const BottomSheetModal = React.forwardRef(
     return <View>{children}</View>
   },
 )
+BottomSheetModal.displayName = "BottomSheetModal"
 
 const BottomSheetView = ({ children }: { children?: React.ReactNode }) => (
   <View>{children}</View>
