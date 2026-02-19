@@ -26,25 +26,21 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { testProps } from "../../utils/testProps"
 import { Invoice, InvoiceType, GetFullUriFn } from "./payment/index.types"
 
+// QR code sizing: base size scales with screen width, capped on high-DPI Android devices
+const QR_BASE_RATIO = 250 / 360
+const QR_CONTAINER_PADDING = 28
+const QR_ANDROID_HIGH_DPI_SIZE = 240
+const QR_ANDROID_HIGH_DPI_SCALE = 3
+
 const configByType = {
   [Invoice.Lightning]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboard",
-    shareButtonLabel: "common.shareLightning",
     ecl: "L" as const,
-    icon: "flash",
   },
   [Invoice.OnChain]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboardBitcoin",
-    shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "logo-bitcoin",
   },
-  // TODO: Add them
   [Invoice.PayCode]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboardBitcoin",
-    shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "logo-bitcoin",
   },
 }
 
@@ -57,13 +53,13 @@ type Props = {
   style?: StyleProp<ViewStyle>
   expired: boolean
   regenerateInvoiceFn?: () => void
-  copyToClipboard?: () => void | undefined
+  copyToClipboard?: () => void
   isPayCode: boolean
   canUsePayCode: boolean
   toggleIsSetLightningAddressModalVisible: () => void
 }
 
-export const QRView: React.FC<Props> = ({
+const QRViewBase: React.FC<Props> = ({
   type,
   getFullUri,
   loading,
@@ -88,12 +84,17 @@ export const QRView: React.FC<Props> = ({
 
   const styles = useStyles()
   const { width, scale } = useWindowDimensions()
+  const baseSize = Math.round(QR_BASE_RATIO * width) - 2 * QR_CONTAINER_PADDING
+  const qrSize =
+    Platform.OS === "android" && scale > QR_ANDROID_HIGH_DPI_SCALE
+      ? QR_ANDROID_HIGH_DPI_SIZE
+      : baseSize
 
   const { LL } = useI18nContext()
 
   const { scaleValue, pressIn, pressOut } = usePressScale()
 
-  const tapGesture = React.useMemo(
+  const tapGesture = useMemo(
     () =>
       Gesture.Tap()
         .onBegin(() => {
@@ -108,25 +109,25 @@ export const QRView: React.FC<Props> = ({
     [pressIn, pressOut, copyToClipboard],
   )
 
-  const renderSuccessView = useMemo(() => {
+  const animatedStyle = useMemo(
+    () => ({ transform: [{ scale: scaleValue }] }) as const,
+    [scaleValue],
+  )
+
+  const renderContent = () => {
     if (completed) {
       return (
         <View {...testProps("Success Icon")} style={[styles.container, style]}>
           <SuccessIconAnimation>
-            <GaloyIcon name={"payment-success"} size={128} />
+            <GaloyIcon name="payment-success" size={128} />
           </SuccessIconAnimation>
         </View>
       )
     }
-    return null
-  }, [completed, styles, style])
-
-  const renderQRCode = useMemo(() => {
-    const baseSize = Math.round((250 / 360) * width) - 2 * 28
-    const qrSize = Platform.OS === "android" && scale > 3 ? 240 : baseSize
 
     if (displayingQR && getFullUri) {
       const uri = getFullUri({ uppercase: true })
+
       return (
         <View style={[styles.container, style]} {...testProps("QR-Code")}>
           <View>
@@ -134,7 +135,7 @@ export const QRView: React.FC<Props> = ({
               size={qrSize}
               value={uri}
               logoBackgroundColor="white"
-              ecl={type && configByType[type].ecl}
+              ecl={configByType[type].ecl}
               logoSize={60}
             />
             <View style={styles.logoOverlay}>
@@ -146,23 +147,24 @@ export const QRView: React.FC<Props> = ({
         </View>
       )
     }
-    return null
-  }, [displayingQR, type, getFullUri, width, scale, styles, style])
 
-  const renderStatusView = useMemo(() => {
-    if (!completed && !isReady) {
+    if (!isReady) {
       return (
         <View style={[styles.container, style]}>
           <View style={styles.errorContainer}>
-            {(err !== "" && (
+            {err ? (
               <Text style={styles.error} selectable>
                 {err}
               </Text>
-            )) || <ActivityIndicator size="large" color={colors.primary} />}
+            ) : (
+              <ActivityIndicator size="large" color={colors.primary} />
+            )}
           </View>
         </View>
       )
-    } else if (expired) {
+    }
+
+    if (expired) {
       return (
         <View style={[styles.container, style]}>
           <Text type="p2" style={styles.expiredInvoice}>
@@ -171,10 +173,12 @@ export const QRView: React.FC<Props> = ({
           <GaloyTertiaryButton
             title={LL.ReceiveScreen.regenerateInvoiceButtonTitle()}
             onPress={regenerateInvoiceFn}
-          ></GaloyTertiaryButton>
+          />
         </View>
       )
-    } else if (isPayCode && !canUsePayCode) {
+    }
+
+    if (isPayCode && !canUsePayCode) {
       return (
         <View style={[styles.container, styles.cantUsePayCode, style]}>
           <Text type="p2" style={styles.cantUsePayCodeText}>
@@ -183,38 +187,24 @@ export const QRView: React.FC<Props> = ({
           <GaloyTertiaryButton
             title={LL.ReceiveScreen.setUsernameButtonTitle()}
             onPress={toggleIsSetLightningAddressModalVisible}
-          ></GaloyTertiaryButton>
+          />
         </View>
       )
     }
+
     return null
-  }, [
-    err,
-    isReady,
-    completed,
-    styles,
-    style,
-    colors,
-    expired,
-    isPayCode,
-    canUsePayCode,
-    LL.ReceiveScreen,
-    regenerateInvoiceFn,
-    toggleIsSetLightningAddressModalVisible,
-  ])
+  }
 
   return (
     <View style={styles.qr}>
       <GestureDetector gesture={displayingQR ? tapGesture : Gesture.Manual()}>
-        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-          {renderSuccessView}
-          {renderQRCode}
-          {renderStatusView}
-        </Animated.View>
+        <Animated.View style={animatedStyle}>{renderContent()}</Animated.View>
       </GestureDetector>
     </View>
   )
 }
+
+export const QRView = React.memo(QRViewBase)
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
@@ -266,5 +256,3 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 48,
   },
 }))
-
-export default React.memo(QRView)

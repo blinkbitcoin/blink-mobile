@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useOnChainAddressCurrentMutation } from "@app/graphql/generated"
 
-import { getPaymentRequestFullUri } from "./payment/helpers"
-import { GetFullUriFn, Invoice } from "./payment/index.types"
+import { getPaymentRequestFullUri } from "../payment/helpers"
+import { GetFullUriFn, Invoice } from "../payment/index.types"
 
 type UseOnChainAddressOptions = {
   amount?: number
@@ -15,15 +15,20 @@ export const useOnChainAddress = (
   { amount, memo }: UseOnChainAddressOptions = {},
 ) => {
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
+  const mutationRef = useRef(onChainAddressCurrent)
+  mutationRef.current = onChainAddressCurrent
+
   const [address, setAddress] = useState<string | null>(null)
   const [loading, setLoading] = useState(Boolean(walletId))
+
   useEffect(() => {
     if (!walletId) return
 
     setLoading(true)
-    onChainAddressCurrent({
-      variables: { input: { walletId } },
-    })
+    mutationRef
+      .current({
+        variables: { input: { walletId } },
+      })
       .then((result) => {
         const addr = result.data?.onChainAddressCurrent?.address
         if (addr) setAddress(addr)
@@ -32,7 +37,7 @@ export const useOnChainAddress = (
       .finally(() => {
         setLoading(false)
       })
-  }, [walletId, onChainAddressCurrent])
+  }, [walletId])
 
   const getFullUriFn = useMemo<GetFullUriFn | undefined>(() => {
     if (!address) return undefined
