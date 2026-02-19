@@ -40,6 +40,7 @@ export type AmountInputScreenProps = {
   walletCurrency: WalletCurrency
   convertMoneyAmount: ConvertMoneyAmount
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
 }
 
@@ -126,6 +127,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   walletCurrency,
   convertMoneyAmount,
   maxAmount,
+  maxAmountIsBalance,
   minAmount,
 }) => {
   const {
@@ -250,9 +252,10 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       greaterThan: maxAmountInPrimaryCurrency,
     })
   ) {
-    errorMessage = LL.AmountInputScreen.maxAmountExceeded({
-      maxAmount: formatMoneyAmount({ moneyAmount: maxAmountInPrimaryCurrency }),
-    })
+    const formatted = formatMoneyAmount({ moneyAmount: maxAmountInPrimaryCurrency })
+    errorMessage = maxAmountIsBalance
+      ? LL.AmountInputScreen.exceedsAvailableBalance({ maxAmount: formatted })
+      : LL.AmountInputScreen.maxAmountExceeded({ maxAmount: formatted })
   } else if (
     minAmountInPrimaryCurrency &&
     newPrimaryAmount.amount &&

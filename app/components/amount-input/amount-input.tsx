@@ -22,6 +22,7 @@ export type AmountInputProps = {
   convertMoneyAmount: ConvertMoneyAmount
   setAmount?: (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => void
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
   canSetAmount?: boolean
   isSendingMax?: boolean
@@ -34,6 +35,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   walletCurrency,
   setAmount,
   maxAmount,
+  maxAmountIsBalance,
   minAmount,
   convertMoneyAmount,
   canSetAmount = true,
@@ -114,6 +116,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
         convertMoneyAmount={convertMoneyAmount}
         onSetAmount={onSetAmount}
         maxAmount={maxAmount}
+        maxAmountIsBalance={maxAmountIsBalance}
         minAmount={minAmount}
         close={() => setIsSettingAmount(false)}
       />

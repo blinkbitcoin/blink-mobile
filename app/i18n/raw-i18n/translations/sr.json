@@ -2854,6 +2854,7 @@
     "enterAmount": "Унесите износ",
     "setAmount": "Поставите износ",
     "maxAmountExceeded": "Износ не сме прелазити {maxAmount: string}.",
+    "exceedsAvailableBalance": "Премашује расположиви салдо: {maxAmount: string}",
     "minAmountNotMet": "Износ мора бити најмање {minAmount: string}."
   },
   "AmountInputButton": {

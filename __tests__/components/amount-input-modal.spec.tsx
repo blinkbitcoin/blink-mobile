@@ -121,10 +121,16 @@ describe("AmountInputModal", () => {
     }
 
     render(
-      <AmountInputModal {...defaultProps} maxAmount={maxAmount} minAmount={minAmount} />,
+      <AmountInputModal
+        {...defaultProps}
+        maxAmount={maxAmount}
+        maxAmountIsBalance
+        minAmount={minAmount}
+      />,
     )
 
     expect(capturedAmountInputScreenProps.maxAmount).toBe(maxAmount)
+    expect(capturedAmountInputScreenProps.maxAmountIsBalance).toBe(true)
     expect(capturedAmountInputScreenProps.minAmount).toBe(minAmount)
   })
 

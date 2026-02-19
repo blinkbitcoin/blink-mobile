@@ -2837,6 +2837,7 @@
     "enterAmount": "Tutar Girin",
     "setAmount": "Tutarı Ayarla",
     "maxAmountExceeded": "Tutar {maxAmount: string} değerini aşmamalıdır.",
+    "exceedsAvailableBalance": "Mevcut bakiyeyi aşıyor: {maxAmount: string}",
     "minAmountNotMet": "Tutar en az {minAmount: string} olmalıdır."
   },
   "AmountInputButton": {

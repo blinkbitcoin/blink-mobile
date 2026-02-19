@@ -2837,6 +2837,7 @@
     "enterAmount": "Introduceți suma",
     "setAmount": "Setați suma",
     "maxAmountExceeded": "Suma nu trebuie să depășească {maxAmount: string}.",
+    "exceedsAvailableBalance": "Depășește soldul disponibil: {maxAmount: string}",
     "minAmountNotMet": "Suma trebuie să fie cel puțin {minAmount: string}."
   },
   "AmountInputButton": {

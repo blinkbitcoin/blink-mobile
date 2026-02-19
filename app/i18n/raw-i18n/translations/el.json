@@ -2837,6 +2837,7 @@
     "enterAmount": "Εισάγετε ποσό",
     "setAmount": "Ορίστε ποσό",
     "maxAmountExceeded": "Το ποσό δεν πρέπει να ξεπερνά {maxAmount: string}.",
+    "exceedsAvailableBalance": "Υπερβαίνει το διαθέσιμο υπόλοιπο: {maxAmount: string}",
     "minAmountNotMet": "Το ποσό πρέπει να είναι τουλάχιστον {minAmount: string}."
   },
   "AmountInputButton": {

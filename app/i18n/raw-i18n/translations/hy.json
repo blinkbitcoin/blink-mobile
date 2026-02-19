@@ -2850,6 +2850,7 @@
     "enterAmount": "Մուտքագրել գումարի չափը",
     "setAmount": "Սահմանել գումարի չափը",
     "maxAmountExceeded": "Գումարի չափը չպետք է գերազանցի  {maxAmount: string}։ ",
+    "exceedsAvailableBalance": "Գերազանցում է հասանելի մնացորդը՝ {maxAmount: string}",
     "minAmountNotMet": "Գումարի չափը պետք է լինի առնվազն  {minAmount: string}։ "
   },
   "AmountInputButton": {

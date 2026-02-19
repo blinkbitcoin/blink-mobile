@@ -25,6 +25,7 @@ jest.mock("@rn-vui/themed", () => ({
     theme: {
       colors: {
         primary: "primary",
+        error: "error",
         grey4: "grey4",
         grey5: "grey5",
         grey6: "grey6",
@@ -47,20 +48,11 @@ jest.mock("@rn-vui/themed", () => ({
     amountContainer: {},
     amountText: {},
     hiddenInput: {},
+    errorRow: {},
+    currencyInputGroupError: {},
     keyboardContainer: {},
     ctaSection: {},
   }),
-}))
-
-jest.mock("@app/components/atomic/galoy-error-box", () => ({
-  GaloyErrorBox: ({ errorMessage }: { errorMessage: string }) => {
-    const ReactNative = jest.requireActual("react-native")
-    return (
-      <ReactNative.View testID="error-box">
-        <ReactNative.Text>{errorMessage}</ReactNative.Text>
-      </ReactNative.View>
-    )
-  },
 }))
 
 jest.mock("@app/components/currency-keyboard", () => ({
@@ -99,9 +91,9 @@ jest.mock("@app/components/atomic/currency-pill/currency-pill", () => ({
 }))
 
 jest.mock("@app/components/atomic/galoy-icon/galoy-icon", () => ({
-  GaloyIcon: () => {
+  GaloyIcon: ({ name }: { name: string }) => {
     const ReactNative = jest.requireActual("react-native")
-    return <ReactNative.View testID="galoy-icon-transfer" />
+    return <ReactNative.View testID={`galoy-icon-${name}`} />
   },
 }))
 
@@ -175,18 +167,17 @@ describe("AmountInputScreenUI", () => {
     expect(mockOnToggleCurrency).toHaveBeenCalledTimes(1)
   })
 
-  it("does not render error box when no error message", () => {
-    const { queryByTestId } = render(<AmountInputScreenUI {...defaultProps} />)
+  it("does not render error text when no error message", () => {
+    const { getByTestId } = render(<AmountInputScreenUI {...defaultProps} />)
 
-    expect(queryByTestId("error-box")).toBeNull()
+    expect(getByTestId("galoy-icon-warning")).toBeTruthy()
   })
 
-  it("renders error box with message", () => {
-    const { getByTestId, getByText } = render(
+  it("renders error message text", () => {
+    const { getByText } = render(
       <AmountInputScreenUI {...defaultProps} errorMessage="Maximum exceeded" />,
     )
 
-    expect(getByTestId("error-box")).toBeTruthy()
     expect(getByText("Maximum exceeded")).toBeTruthy()
   })
 

@@ -2854,6 +2854,7 @@
     "enterAmount": "Masukkan amaun",
     "setAmount": "Tetapkan amaun",
     "maxAmountExceeded": "Amaun mestilah tidak melebihi {maxAmount: string}.",
+    "exceedsAvailableBalance": "Melebihi baki yang tersedia: {maxAmount: string}",
     "minAmountNotMet": "Amaun minimum mestilah {minAmount: string}."
   },
   "AmountInputButton": {

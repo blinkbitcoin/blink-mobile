@@ -2837,6 +2837,7 @@
     "enterAmount": "Ssaamu Omuwendo",
     "setAmount": "Teekawo omuwendo",
     "maxAmountExceeded": "Omuwendo tegulina kusukka {maxAmount: string}.",
+    "exceedsAvailableBalance": "Eyitawo omuwendo ogusigadde: {maxAmount: string}",
     "minAmountNotMet": "Omuwendo gulina okuba nga ekitono ennyo waakiri {minAmount: string}."
   },
   "AmountInputButton": {

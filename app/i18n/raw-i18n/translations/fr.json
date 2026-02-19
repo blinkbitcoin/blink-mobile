@@ -2854,6 +2854,7 @@
         "enterAmount": "Indiquer le montant",
         "setAmount": "Fixer le montant",
         "maxAmountExceeded": "Le montant ne doit pas excéder {maxAmount: string}.",
+        "exceedsAvailableBalance": "Dépasse le solde disponible : {maxAmount: string}",
         "minAmountNotMet": "Le montant doit être au minimum de {minAmount: string}."
     },
     "AmountInputButton": {

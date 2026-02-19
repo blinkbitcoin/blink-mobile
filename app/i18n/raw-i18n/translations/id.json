@@ -2837,6 +2837,7 @@
     "enterAmount": "Masukkan Jumlah",
     "setAmount": "Tetapkan Jumlah",
     "maxAmountExceeded": "Jumlah tidak boleh melebihi {maxAmount: string}.",
+    "exceedsAvailableBalance": "Melebihi saldo yang tersedia: {maxAmount: string}",
     "minAmountNotMet": "Jumlah harus minimal {minAmount: string}."
   },
   "AmountInputButton": {

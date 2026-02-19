@@ -21,6 +21,7 @@ export type AmountInputModalProps = {
   convertMoneyAmount: ConvertMoneyAmount
   onSetAmount?: (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => void
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
   isOpen: boolean
   close: () => void
@@ -31,6 +32,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   walletCurrency,
   onSetAmount,
   maxAmount,
+  maxAmountIsBalance,
   minAmount,
   convertMoneyAmount,
   isOpen,
@@ -84,6 +86,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
             })
           }
           maxAmount={maxAmount}
+          maxAmountIsBalance={maxAmountIsBalance}
           minAmount={minAmount}
         />
       </BottomSheetView>

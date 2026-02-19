@@ -65,6 +65,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       AmountInputScreen: {
         maxAmountExceeded: ({ maxAmount }: { maxAmount: string }) =>
           `Maximum amount exceeded: ${maxAmount}`,
+        exceedsAvailableBalance: ({ maxAmount }: { maxAmount: string }) =>
+          `Exceeds available balance: ${maxAmount}`,
         minAmountNotMet: ({ minAmount }: { minAmount: string }) =>
           `Minimum amount not met: ${minAmount}`,
         setAmount: () => "Set Amount",
@@ -223,5 +225,52 @@ describe("AmountInputScreen", () => {
     )
 
     expect(getByTestId("set-amount-disabled").props.children).toBe("true")
+  })
+
+  it("shows maxAmountExceeded error when amount exceeds maxAmount", () => {
+    mockConvertMoneyAmount.mockImplementation((amount) => amount)
+    mockFormatMoneyAmount.mockReturnValue("$1.00")
+
+    const { getByTestId } = render(
+      <AmountInputScreen
+        initialAmount={{
+          amount: 99999,
+          currency: "DisplayCurrency",
+          currencyCode: "USD",
+        }}
+        walletCurrency={WalletCurrency.Btc}
+        convertMoneyAmount={mockConvertMoneyAmount}
+        maxAmount={{ amount: 100, currency: "DisplayCurrency", currencyCode: "USD" }}
+        setAmount={jest.fn()}
+      />,
+    )
+
+    expect(getByTestId("error-message").props.children).toBe(
+      "Maximum amount exceeded: $1.00",
+    )
+  })
+
+  it("shows exceedsAvailableBalance error when maxAmountIsBalance is true", () => {
+    mockConvertMoneyAmount.mockImplementation((amount) => amount)
+    mockFormatMoneyAmount.mockReturnValue("100,000 SAT")
+
+    const { getByTestId } = render(
+      <AmountInputScreen
+        initialAmount={{
+          amount: 99999,
+          currency: "DisplayCurrency",
+          currencyCode: "USD",
+        }}
+        walletCurrency={WalletCurrency.Btc}
+        convertMoneyAmount={mockConvertMoneyAmount}
+        maxAmount={{ amount: 100, currency: "DisplayCurrency", currencyCode: "USD" }}
+        maxAmountIsBalance
+        setAmount={jest.fn()}
+      />,
+    )
+
+    expect(getByTestId("error-message").props.children).toBe(
+      "Exceeds available balance: 100,000 SAT",
+    )
   })
 })

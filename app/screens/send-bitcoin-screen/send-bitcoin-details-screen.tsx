@@ -236,6 +236,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const usdBalanceMoneyAmount = toUsdMoneyAmount(usdWallet?.balance)
 
+  const sendingWalletBalance =
+    sendingWalletDescriptor.currency === WalletCurrency.Btc
+      ? btcBalanceMoneyAmount
+      : usdBalanceMoneyAmount
+
   const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
   const btcSecondaryText = formatMoneyAmount({
     moneyAmount: convertMoneyAmount(btcBalanceMoneyAmount, DisplayCurrency),
@@ -566,7 +571,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               walletCurrency={sendingWalletDescriptor.currency}
               canSetAmount={paymentDetail.canSetAmount}
               isSendingMax={paymentDetail.isSendingMax}
-              maxAmount={lnurlParams?.max ? toBtcMoneyAmount(lnurlParams.max) : undefined}
+              maxAmount={
+                lnurlParams?.max
+                  ? toBtcMoneyAmount(lnurlParams.max)
+                  : sendingWalletBalance
+              }
+              maxAmountIsBalance={!lnurlParams?.max}
               minAmount={lnurlParams?.min ? toBtcMoneyAmount(lnurlParams.min) : undefined}
             />
           </View>

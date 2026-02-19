@@ -2837,6 +2837,7 @@
         "enterAmount": "Inserisci importo",
         "setAmount": "Imposta importo",
         "maxAmountExceeded": "L'importo non deve superare {maxAmount: string}.",
+        "exceedsAvailableBalance": "Supera il saldo disponibile: {maxAmount: string}",
         "minAmountNotMet": "L'importo deve essere almeno {minAmount: string}."
     },
     "AmountInputButton": {

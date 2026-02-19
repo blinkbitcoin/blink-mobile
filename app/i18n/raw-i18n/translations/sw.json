@@ -2837,6 +2837,7 @@
     "enterAmount": "Ingiza Kiasi",
     "setAmount": "Weka Kiasi",
     "maxAmountExceeded": "Kiasi hakitakiwi kuzidi {maxAmount: string}.",
+    "exceedsAvailableBalance": "Inazidi salio inayopatikana: {maxAmount: string}",
     "minAmountNotMet": "Kiasi kinatakiwa kuwa angalau {minAmount: string}."
   },
   "AmountInputButton": {

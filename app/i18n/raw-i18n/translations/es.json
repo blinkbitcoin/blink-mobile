@@ -2836,6 +2836,7 @@
         "enterAmount": "Escribir una cantidad",
         "setAmount": "Establecer una cantidad",
         "maxAmountExceeded": "La cantidad no debe superar {maxAmount: string}.",
+        "exceedsAvailableBalance": "Excede el saldo disponible: {maxAmount: string}",
         "minAmountNotMet": "La cantidad debe ser como mínimo {minAmount: string}."
     },
     "AmountInputButton": {
