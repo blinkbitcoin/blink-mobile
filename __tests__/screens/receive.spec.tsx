@@ -79,6 +79,40 @@ const onChainAddressCurrentMock = jest.fn(() =>
   }),
 )
 
+const lnInvoiceCreateMock = jest.fn(() =>
+  Promise.resolve({
+    data: {
+      lnInvoiceCreate: {
+        errors: [],
+        invoice: {
+          paymentRequest:
+            "lntbs10u1pjt95g2pp5c2nwtj3zpl08suelj8u26tuhnkhkqzd9pcsc7mu9lgpkh3th9k5sdqqcqzpuxqzfvsp5test",
+          paymentHash: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+          __typename: "LnInvoice" as const,
+        },
+        __typename: "LnInvoicePayload" as const,
+      },
+    },
+  }),
+)
+
+const lnUsdInvoiceCreateMock = jest.fn(() =>
+  Promise.resolve({
+    data: {
+      lnUsdInvoiceCreate: {
+        errors: [],
+        invoice: {
+          paymentRequest:
+            "lntbs10u1pjt95g2pp5usd0nwtj3zpl08suelj8u26tuhnkhkqzd9pcsc7mu9lgpkh3th9k5sdqqcqzpuxqzfvsp5test",
+          paymentHash: "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+          __typename: "LnInvoice" as const,
+        },
+        __typename: "LnUsdInvoicePayload" as const,
+      },
+    },
+  }),
+)
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
@@ -86,8 +120,8 @@ jest.mock("@app/graphql/generated", () => {
     usePaymentRequestQuery: () => paymentRequestQueryMock(),
     useRealtimePriceQuery: () => ({ data: null }),
     useLnNoAmountInvoiceCreateMutation: () => [lnNoAmountInvoiceCreateMock],
-    useLnInvoiceCreateMutation: () => [jest.fn()],
-    useLnUsdInvoiceCreateMutation: () => [jest.fn()],
+    useLnInvoiceCreateMutation: () => [lnInvoiceCreateMock],
+    useLnUsdInvoiceCreateMutation: () => [lnUsdInvoiceCreateMock],
     useOnChainAddressCurrentMutation: () => [onChainAddressCurrentMock],
     useMyLnUpdatesSubscription: () => ({ data: null }),
   }
@@ -957,5 +991,276 @@ describe("ReceiveScreen", () => {
         expect(screen.getByText("Bitcoin")).toBeTruthy()
       })
     })
+  })
+})
+
+describe("Setting amount preserves wallet after round-trip toggle", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    LL = i18nObject("en")
+  })
+
+  it("BTC default: keeps Bitcoin wallet", async () => {
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+      expect(screen.getByText("Bitcoin")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText("Bitcoin")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Bitcoin")).toBeTruthy()
+    })
+  })
+
+  it("USD default: keeps Dollar wallet", async () => {
+    paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
+
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+      expect(screen.getByText("Bitcoin")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+  })
+})
+
+describe("Expiration time follows wallet currency", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    LL = i18nObject("en")
+  })
+
+  it("BTC default: direct set amount uses 24h expiration", async () => {
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(lnInvoiceCreateMock).toHaveBeenCalled()
+    })
+
+    expect(lnInvoiceCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({
+          input: expect.objectContaining({
+            expiresIn: "1440",
+          }),
+        }),
+      }),
+    )
+  })
+
+  it("BTC default: uses 24h expiration after round-trip toggle", async () => {
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(lnInvoiceCreateMock).toHaveBeenCalled()
+    })
+
+    expect(lnInvoiceCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({
+          input: expect.objectContaining({
+            expiresIn: "1440",
+          }),
+        }),
+      }),
+    )
+  })
+
+  it("USD default: uses 5m expiration after round-trip toggle", async () => {
+    paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
+
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(screen.getByText("Dollar")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+      expect(lnUsdInvoiceCreateMock).toHaveBeenCalled()
+    })
+
+    expect(lnUsdInvoiceCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({
+          input: expect.objectContaining({
+            expiresIn: "5",
+          }),
+        }),
+      }),
+    )
   })
 })
