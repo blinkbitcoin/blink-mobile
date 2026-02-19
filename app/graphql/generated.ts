@@ -3229,11 +3229,6 @@ export type PriceHistoryScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PriceHistoryScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
-export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
-
 export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3266,6 +3261,11 @@ export type LnUsdInvoiceCreateMutationVariables = Exact<{
 
 
 export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', readonly lnUsdInvoiceCreate: { readonly __typename: 'LnInvoicePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly invoice?: { readonly __typename: 'LnInvoice', readonly createdAt: number, readonly paymentHash: string, readonly paymentRequest: string, readonly paymentStatus: InvoicePaymentStatus, readonly externalId: string, readonly satoshis: number } | null } };
+
+export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
 
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -6058,43 +6058,6 @@ export type PriceHistoryScreenQueryHookResult = ReturnType<typeof usePriceHistor
 export type PriceHistoryScreenLazyQueryHookResult = ReturnType<typeof usePriceHistoryScreenLazyQuery>;
 export type PriceHistoryScreenSuspenseQueryHookResult = ReturnType<typeof usePriceHistoryScreenSuspenseQuery>;
 export type PriceHistoryScreenQueryResult = Apollo.QueryResult<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>;
-export const MyLnUpdatesDocument = gql`
-    subscription myLnUpdates {
-  myUpdates {
-    errors {
-      message
-    }
-    update {
-      ... on LnUpdate {
-        paymentHash
-        status
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useMyLnUpdatesSubscription__
- *
- * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
- * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useMyLnUpdatesSubscription({
- *   variables: {
- *   },
- * });
- */
-export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
-      }
-export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
-export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
 export const PaymentRequestDocument = gql`
     query paymentRequest {
   globals {
@@ -6318,6 +6281,43 @@ export function useLnUsdInvoiceCreateMutation(baseOptions?: Apollo.MutationHookO
 export type LnUsdInvoiceCreateMutationHookResult = ReturnType<typeof useLnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationResult = Apollo.MutationResult<LnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationOptions = Apollo.BaseMutationOptions<LnUsdInvoiceCreateMutation, LnUsdInvoiceCreateMutationVariables>;
+export const MyLnUpdatesDocument = gql`
+    subscription myLnUpdates {
+  myUpdates {
+    errors {
+      message
+    }
+    update {
+      ... on LnUpdate {
+        paymentHash
+        status
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyLnUpdatesSubscription__
+ *
+ * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyLnUpdatesSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
+      }
+export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
+export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {
