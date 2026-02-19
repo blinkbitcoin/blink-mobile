@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-hooks"
 
-import { useOnChainAddress } from "@app/screens/receive-bitcoin-screen/use-onchain-address"
+import { useOnChainAddress } from "@app/screens/receive-bitcoin-screen/hooks/use-onchain-address"
 
 const mockMutationFn = jest.fn()
 
