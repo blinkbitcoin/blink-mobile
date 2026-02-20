@@ -611,6 +611,7 @@ export type ConsumerAccount = Account & {
   readonly defaultWalletId: Scalars['WalletId']['output'];
   readonly displayCurrency: Scalars['DisplayCurrency']['output'];
   readonly firstName?: Maybe<Scalars['String']['output']>;
+  readonly flowType?: Maybe<KycFlowType>;
   readonly id: Scalars['ID']['output'];
   /** A list of all invoices associated with walletIds optionally passed. */
   readonly invoices?: Maybe<InvoiceConnection>;
@@ -972,8 +973,15 @@ export type InvoicePaymentStatus = typeof InvoicePaymentStatus[keyof typeof Invo
 export type KycFlowStartInput = {
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
+  readonly type?: InputMaybe<KycFlowType>;
 };
 
+export const KycFlowType = {
+  Card: 'CARD',
+  UpgradeLevelTwo: 'UPGRADE_LEVEL_TWO'
+} as const;
+
+export type KycFlowType = typeof KycFlowType[keyof typeof KycFlowType];
 export type Leader = {
   readonly __typename: 'Leader';
   readonly name?: Maybe<Scalars['LeaderboardName']['output']>;
@@ -1834,6 +1842,7 @@ export type OnChainUsdTxFee = {
 export type OnboardingFlowStartInput = {
   readonly firstName: Scalars['String']['input'];
   readonly lastName: Scalars['String']['input'];
+  readonly type?: InputMaybe<KycFlowType>;
 };
 
 export type OnboardingFlowStartResult = {
@@ -8688,6 +8697,7 @@ export type ResolversTypes = {
   InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
   InvoicePaymentStatus: InvoicePaymentStatus;
   KycFlowStartInput: KycFlowStartInput;
+  KycFlowType: KycFlowType;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
@@ -9351,6 +9361,7 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
   defaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType>;
   displayCurrency?: Resolver<ResolversTypes['DisplayCurrency'], ParentType, ContextType>;
   firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  flowType?: Resolver<Maybe<ResolversTypes['KycFlowType']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invoices?: Resolver<Maybe<ResolversTypes['InvoiceConnection']>, ParentType, ContextType, Partial<ConsumerAccountInvoicesArgs>>;
   lastName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
