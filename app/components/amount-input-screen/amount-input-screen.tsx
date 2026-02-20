@@ -143,7 +143,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     query: PreferredAmountCurrencyDocument,
   })?.preferredAmountCurrency
 
-  const resolvedInitialAmount = (() => {
+  const resolvedInitialAmount = useMemo(() => {
     if (initialAmount && initialAmount.amount !== undefined) return initialAmount
     if (preferredCurrency) {
       const currency =
@@ -157,7 +157,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       } as MoneyAmount<WalletOrDisplayCurrency>
     }
     return initialAmount || zeroDisplayAmount
-  })()
+  }, [initialAmount, preferredCurrency, walletCurrency, currencyInfo, zeroDisplayAmount])
 
   const [numberPadState, dispatchNumberPadAction] = useReducer(
     numberPadReducer,
