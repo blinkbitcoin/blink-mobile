@@ -206,33 +206,7 @@ jest.mock("react-native-nfc-manager", () => ({
   },
 }))
 
-jest.mock("@gorhom/bottom-sheet", () => {
-  const RN = jest.requireActual("react-native")
-  const ReactMod = jest.requireActual("react")
-
-  const BottomSheetModal = ReactMod.forwardRef(
-    (
-      { children }: { children: React.ReactNode },
-      ref: React.Ref<{ present: () => void; dismiss: () => void }>,
-    ) => {
-      const [visible, setVisible] = ReactMod.useState(false)
-      ReactMod.useImperativeHandle(ref, () => ({
-        present: () => setVisible(true),
-        dismiss: () => setVisible(false),
-      }))
-      if (!visible) return null
-      return <RN.View testID="bottom-sheet-modal">{children}</RN.View>
-    },
-  )
-
-  return {
-    BottomSheetModal,
-    BottomSheetView: ({ children }: { children: React.ReactNode }) => (
-      <RN.View>{children}</RN.View>
-    ),
-    BottomSheetBackdrop: () => null,
-  }
-})
+jest.mock("@gorhom/bottom-sheet")
 
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
@@ -721,6 +695,51 @@ describe("ReceiveScreen", () => {
 
       await waitFor(() => {
         expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
+      })
+    })
+
+    it("applies NFC amount only after modal dismiss animation completes", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("nfc-icon"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("Key 2"))
+      await flushAsync()
+
+      jest.useFakeTimers()
+      try {
+        fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+
+        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+        act(() => {
+          jest.advanceTimersByTime(39)
+        })
+        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+        act(() => {
+          jest.advanceTimersByTime(1)
+        })
+      } finally {
+        jest.useRealTimers()
+      }
+
+      await waitFor(() => {
+        expect(lnInvoiceCreateMock).toHaveBeenCalled()
       })
     })
   })
@@ -1280,5 +1299,68 @@ describe("Expiration time follows wallet currency", () => {
         }),
       }),
     )
+  })
+})
+
+describe("Amount modal lifecycle", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    LL = i18nObject("en")
+  })
+
+  it("applies amount only after modal dismiss animation completes", async () => {
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+    })
+
+    await flushAsync()
+    await flushAsync()
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+
+    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
+
+    fireEvent.press(screen.getByTestId("Key 3"))
+    await flushAsync()
+    jest.useFakeTimers()
+    try {
+      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+
+      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+      act(() => {
+        jest.advanceTimersByTime(39)
+      })
+      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+      act(() => {
+        jest.advanceTimersByTime(1)
+      })
+    } finally {
+      jest.useRealTimers()
+    }
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+    })
+
+    expect(lnInvoiceCreateMock).toHaveBeenCalled()
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.queryByTestId("bottom-sheet-modal")).toBeNull()
   })
 })

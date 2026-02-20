@@ -1,6 +1,8 @@
 import React from "react"
 
-import { act, render } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { i18nObject } from "@app/i18n/i18n-util"
 
 import { Intraledger } from "../../app/screens/send-bitcoin-screen/send-bitcoin-details-screen.stories"
 import { ContextForScreen } from "./helper"
@@ -22,6 +24,8 @@ jest.mock("react-native-config", () => {
   }
 })
 
+jest.mock("@gorhom/bottom-sheet")
+
 it("SendScreen Details", async () => {
   render(
     <ContextForScreen>
@@ -29,4 +33,53 @@ it("SendScreen Details", async () => {
     </ContextForScreen>,
   )
   await act(async () => {})
+})
+
+it("applies send amount only after modal dismiss animation completes", async () => {
+  loadLocale("en")
+  const LL = i18nObject("en")
+
+  render(
+    <ContextForScreen>
+      <Intraledger />
+    </ContextForScreen>,
+  )
+
+  const nextButton = await screen.findByTestId(LL.common.next())
+  expect(nextButton.props.accessibilityState?.disabled).toBe(true)
+
+  fireEvent.press(screen.getByTestId("Amount Input Button"))
+  await waitFor(() => {
+    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
+  })
+
+  fireEvent.press(screen.getByTestId("Key 1"))
+  await act(async () => {})
+
+  jest.useFakeTimers()
+  try {
+    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
+    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    act(() => {
+      jest.advanceTimersByTime(39)
+    })
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    act(() => {
+      jest.advanceTimersByTime(1)
+    })
+  } finally {
+    jest.useRealTimers()
+  }
+
+  await waitFor(() => {
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
+  })
 })
