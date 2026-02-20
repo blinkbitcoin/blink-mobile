@@ -12,6 +12,7 @@ jest.mock("@app/graphql/level-context", () => ({
 const mockOnChainAddress = {
   address: "bc1qtest",
   loading: false,
+  error: null,
   getFullUriFn: jest.fn(),
 }
 

@@ -13,6 +13,7 @@ type RequestState = NonNullable<ReturnType<typeof usePaymentRequest>>
 type OnChainState = {
   address: string | null
   loading: boolean
+  error: string | null
   getFullUriFn: GetFullUriFn | undefined
 }
 

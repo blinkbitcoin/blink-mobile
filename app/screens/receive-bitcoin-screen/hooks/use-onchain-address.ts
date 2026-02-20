@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 
 import { useOnChainAddressCurrentMutation } from "@app/graphql/generated"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
 
 import { getPaymentRequestFullUri } from "../payment/helpers"
 import { GetFullUriFn, Invoice } from "../payment/index.types"
@@ -15,13 +17,16 @@ export const useOnChainAddress = (
   { amount, memo }: UseOnChainAddressOptions = {},
 ) => {
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
+  const { LL } = useI18nContext()
 
   const [address, setAddress] = useState<string | null>(null)
   const [loading, setLoading] = useState(Boolean(walletId))
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!walletId) return
 
+    setError(null)
     setLoading(true)
     onChainAddressCurrent({
       variables: { input: { walletId } },
@@ -30,11 +35,15 @@ export const useOnChainAddress = (
         const addr = result.data?.onChainAddressCurrent?.address
         if (addr) setAddress(addr)
       })
-      .catch(console.error)
+      .catch((err) => {
+        const message = err?.message ?? "Unknown error"
+        setError(message)
+        toastShow({ message, LL, type: "warning" })
+      })
       .finally(() => {
         setLoading(false)
       })
-  }, [walletId, onChainAddressCurrent])
+  }, [walletId, onChainAddressCurrent, LL])
 
   const getFullUriFn = useMemo<GetFullUriFn | undefined>(() => {
     if (!address) return undefined
@@ -49,5 +58,5 @@ export const useOnChainAddress = (
       })
   }, [address, amount, memo])
 
-  return { address, loading, getFullUriFn }
+  return { address, loading, error, getFullUriFn }
 }

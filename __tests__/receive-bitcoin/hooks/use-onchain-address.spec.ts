@@ -8,6 +8,16 @@ jest.mock("@app/graphql/generated", () => ({
   useOnChainAddressCurrentMutation: () => [mockMutationFn],
 }))
 
+const mockLL = {}
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({ LL: mockLL }),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: ReadonlyArray<Record<string, unknown>>) => mockToastShow(...args),
+}))
+
 describe("useOnChainAddress", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -156,5 +166,59 @@ describe("useOnChainAddress", () => {
 
     expect(result.current.address).toBeNull()
     expect(result.current.loading).toBe(false)
+  })
+
+  it("returns null error on success", async () => {
+    mockMutationFn.mockResolvedValue({
+      data: { onChainAddressCurrent: { address: "bc1qtest" } },
+    })
+
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useOnChainAddress("wallet-123"),
+    )
+
+    await waitForNextUpdate()
+
+    expect(result.current.error).toBeNull()
+  })
+
+  it("exposes error when mutation rejects", async () => {
+    mockMutationFn.mockRejectedValue(new Error("Network failure"))
+
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useOnChainAddress("wallet-123"),
+    )
+
+    await waitForNextUpdate()
+
+    expect(result.current.error).toBe("Network failure")
+    expect(result.current.loading).toBe(false)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Network failure", type: "warning" }),
+    )
+  })
+
+  it("resets error when walletId changes", async () => {
+    mockMutationFn.mockRejectedValueOnce(new Error("First error"))
+
+    const { result, waitForNextUpdate, rerender } = renderHook(
+      ({ walletId }: { walletId: string }) => useOnChainAddress(walletId),
+      { initialProps: { walletId: "wallet-1" } },
+    )
+
+    await waitForNextUpdate()
+
+    expect(result.current.error).toBe("First error")
+
+    mockMutationFn.mockResolvedValue({
+      data: { onChainAddressCurrent: { address: "bc1qnew" } },
+    })
+
+    rerender({ walletId: "wallet-2" })
+
+    await waitForNextUpdate()
+
+    expect(result.current.error).toBeNull()
+    expect(result.current.address).toBe("bc1qnew")
   })
 })
