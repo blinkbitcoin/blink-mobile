@@ -103,7 +103,7 @@ export const usePaymentRequest = () => {
     onChainAddressCurrent,
   ])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (pr && pr.state === PaymentRequestState.Idle) {
       setPR((current) => current && current.setState(PaymentRequestState.Loading))
       pr.generateRequest().then((newPR) =>
