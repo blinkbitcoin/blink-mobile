@@ -60,16 +60,21 @@
     },
     "ConversionDetailsScreen": {
         "title": "Konvertieren",
-        "percentageToConvert": "% umtauschen"
+        "transfer": "Übertragen",
+        "percentageToConvert": "% umtauschen",
+        "reviewTransfer": "Transfer überprüfen"
     },
     "ConversionConfirmationScreen": {
         "title": "Umtausch prüfen",
         "youreConverting": "Umtausch läuft",
-        "receivingAccount": "Empfangendes Konto"
+        "receivingAccount": "Empfangendes Konto",
+        "infoBitcoin": "Der Bitcoin-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
+        "infoDollar": "Der Dollar-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
+        "transferButtonText": "{fromWallet} zu {toWallet} transferieren"
     },
     "ConversionSuccessScreen": {
-        "title": "Umtausch erfolgreich",
-        "message": "Das hat geklappt!"
+        "message": "Das hat geklappt!",
+        "title": "Umtausch erfolgreich"
     },
     "EarnScreen": {
         "satoshi": "Sat",
@@ -2003,12 +2008,43 @@
         "registerContent": "Registriere dich mit deiner Telefonnummer, um Sats zu empfangen",
         "oneSectionADay": "Ein Abschnitt pro Tag",
         "availableTomorrow": "Kommen Sie morgen wieder, um mehr über Bitcoin zu erfahren!",
-        "motivatingBadger": "Graben Sie sich durch diese Lektionen und verdienen Sie dabei"
+        "motivatingBadger": "Graben Sie sich durch diese Lektionen und verdienen Sie dabei",
+        "continueNoRewards": "Weiter (ohne Belohnungen)",
+        "somethingNotRight": "Etwas stimmt nicht ...",
+        "defaultErrorMessage": "{errorMessage: string} Bitte versuche es später erneut.\nOder klicke auf Weiter, um ohne Belohnungen weiterzulernen.",
+        "customErrorMessage": "Es sieht so aus, als hätten wir ungewöhnliche Aktivitäten auf deinem Konto festgestellt. Um Fairness für alle zu gewährleisten, können wir derzeit keine Belohnungen anbieten.\nDu kannst trotzdem ohne Belohnungen weiterlernen, oder versuche es später von einer anderen Verbindung aus erneut.",
+        "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "Telekommunikationsanbieter eingeschränkt",
+                "message": "Wir erleben einen Angriff von Nutzern mit diesem Telekommunikationsanbieter.\nWir haben die Belohnungen für diesen Anbieter bis auf Weiteres deaktiviert. Entschuldigung!"
+            },
+            "invalidIpMetadata": {
+                "title": "IP eingeschränkt",
+                "message": "Wir erleben einen Angriff von Nutzern mit dieser IP.\nWir haben die Belohnungen für diese IP bis auf Weiteres deaktiviert. Entschuldigung!"
+            },
+            "claimedTooEarly": {
+                "title": "Belohnungs-Wallet leer",
+                "message": "Wir werden bald Guthaben hinzufügen. Entschuldigung!"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "Belohnungs-Wallet leer",
+                "message": "Wir werden bald Guthaben hinzufügen. Entschuldigung!"
+            },
+            "invalidQuizQuestionId": {
+                "title": "Belohnungs-Wallet leer",
+                "message": "Wir werden bald Guthaben hinzufügen. Entschuldigung!"
+            },
+            "oneSectionADay": {
+                "title": "Ohne Belohnungen fortfahren?",
+                "message": "Du kannst nur einen Abschnitt pro Tag absolvieren, während du Sats-Belohnungen verdienst."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Einloggen / Account erstellen",
         "createAccount": "Neues Konto anlegen",
         "exploreWallet": "Wallet erkunden",
+        "login": "Anmelden",
         "logBackInWith": "Wieder einloggen mit",
         "headline": "Wallet zur Verfügung gestellt von Galoy",
         "startTrialAccount": "Mit einem Demo-Account beginnen",
@@ -2018,9 +2054,13 @@
         "trialAccountCreationFailedMessage": "Leider konnten wir deinen Demo-Account nicht erstellen. Versuche es später erneut oder erstelle einen Account mit deiner Telefonnummer.",
         "trialAccountHasLimits": "Der Demo-Account hat nur einen begrenzten Umfang",
         "trialAccountLimits": {
+            "modalTitle": "Upgrade für mehr Vorteile",
             "noBackup": "Keine Backup-Möglichkeit",
             "sendingLimit": "Reduziertes tägliches Sendelimit",
-            "noOnchain": "Bitcoin können nicht onchain empfangen werden"
+            "noOnchain": "Bitcoin können nicht onchain empfangen werden",
+            "recoveryOption": "Guthaben per SMS oder E-Mail wiederherstellen",
+            "dailyLimit": "1.000 $ tägliches Transaktionslimit",
+            "onchainReceive": "Bitcoin onchain empfangen"
         }
     },
     "MapScreen": {
@@ -2144,6 +2184,7 @@
         "imageLibraryPermissionsNotGranted": "Wir haben keine Berechtigung für den Zugriff auf die Bilderbibliothek. Bitte überprüfen Sie die App-Einstellungen für Ihre Plattform."
     },
     "SecurityScreen": {
+        "title": "Sicherheit und Datenschutz",
         "biometricDescription": "Mit Fingerabdruck oder Gesichtserkennung entsperren.",
         "biometricTitle": "Biometrie",
         "biometryNotAvailable": "Biometrischer Sensor nicht verfügbar.",
@@ -2203,7 +2244,9 @@
             "confirmButton": "Ich bin mir 100% sicher"
         },
         "clipboardError": "Fehler beim Abrufen des Werts aus der Zwischenablage",
-        "pastedClipboardSuccess": "Aus Zwischenablage eingefügt"
+        "pastedClipboardSuccess": "Aus Zwischenablage eingefügt",
+        "invalidPhoneNumber": "Gib eine gültige Mobilnummer ein",
+        "phoneNotAllowed": "Dieses Feld akzeptiert keine Telefonnummern"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
@@ -2214,7 +2257,7 @@
         "amountIsRequired": "Betrag ist erforderlich",
         "cost": "Kosten",
         "destination": "Empfänger",
-        "destinationIsRequired": "Empfänger ist erforderlich",
+        "destinationRequired": "Ziel erforderlich",
         "fee": "Netzwerkgebühr",
         "feeCalculationUnsuccessful": "Konnte nicht berechnet werden ⚠️",
         "placeholder": "Benutzername, Invoice oder Adresse",
@@ -2241,13 +2284,25 @@
         "copySecretMessage": "Copy secret message to clipboard",
         "copiedSuccessMessage": "Message copied successfully",
         "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
+        "destinationScreenTitle": "Senden an",
+        "orBySMS": "Oder Mobilnummer",
+        "orSaved": "Oder Gespeicherte",
+        "feeLabel": "Gebühr",
+        "noteLabel": "Notiz",
+        "sender": "Absender",
+        "recipient": "Empfänger",
+        "time": "Uhrzeit",
+        "type": "Typ",
+        "destinationIsRequired": "Empfänger ist erforderlich"
     },
     "SettingsScreen": {
         "staticQr": "Druckbarer statischer QR-Code",
         "staticQrCopied": "Ihr statischer QR-Code Link wurde kopiert",
         "setByOs": "Durch Betriebssystem gesetzt",
         "apiAcess": "API Zugriff",
+        "apiDocumentation": "API-Dokumentation",
+        "apiDashboard": "API-Zugang und Dashboard",
         "pos": "Point of Sale",
         "posCopied": "Ihr Point of Sale Link wurde kopiert",
         "setYourLightningAddress": "Setze Deine Lightning Adresse",
@@ -2273,7 +2328,13 @@
         "nfcOnlyReceive": "Derzeit kann die NFC-Funktion nur zum Empfangen genutzt werden",
         "nfcScanNow": "NFC jetzt scannen",
         "nfcNotSupported": "NFC wird auf diesem Gerät nicht unterstützt",
-        "logInOrCreateAccount": "Einloggen oder Konto anlegen"
+        "logInOrCreateAccount": "Einloggen oder Konto anlegen",
+        "logOutFromOneAccount": "Von diesem Konto abmelden",
+        "logoutOneAccountAlertTitle": "Bist du sicher, dass du dich von diesem Konto abmelden möchtest?",
+        "logoutOneAccountAlertContent": "Du wirst von der Sitzung abgemeldet, die mit {identifier: string} verknüpft ist.\nStelle sicher, dass du dich in Zukunft wieder anmelden kannst.",
+        "logoutOneAccountConfirm": "Ich verstehe. Bitte abmelden.",
+        "receiveCurrency": "Empfangswährung",
+        "displayCurrency": "Anzeigewährung"
     },
     "NotificationSettingsScreen": {
         "title": "Benachrichtigungseinstellungen",
@@ -2307,6 +2368,8 @@
         "tapToAddPhoneNumber": "Tippen Sie, um eine Telefonnummer hinzuzufügen",
         "loginMethods": "Login-Methoden",
         "level": "Level {level: string}",
+        "switchAccount": "Konto wechseln",
+        "pleaseWait": "Bitte warten.",
         "accountLevel": "Account Level",
         "upgrade": "Deinen Account upgraden",
         "logOutAndDeleteLocalData": "Ausloggen und alle lokalen Daten löschen",
@@ -2346,10 +2409,19 @@
         "copiedAccountId": "Kopieren Sie Ihre Konto-ID in die Zwischenablage",
         "yourAccountId": "Deine Konto ID",
         "accountId": "Konto ID",
-        "copy": "Kopieren"
+        "copy": "Kopieren",
+        "identityVerification": "Identitätsverifizierung"
+    },
+    "ProfileScreen": {
+        "addAccount": "Konto hinzufügen",
+        "error": "Profile können derzeit nicht abgerufen werden",
+        "fromThisDevice": "von diesem Gerät?",
+        "switchAccount": "Du hast zu einem anderen Konto gewechselt",
+        "removedAccount": "Du hast das Konto {identifier: string} entfernt."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
+        "secret": "Geheimnis/Backup",
         "content": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App. Alternativ können Sie das Geheimnis auch manuell in Ihre Authenticator-App kopieren/einfügen."
     },
     "TotpRegistrationValidateScreen": {
@@ -2430,10 +2502,14 @@
         "receiveOnchain": "Bitcoin onchain empfangen",
         "onlyAPhoneNumber": "Einfache und schnelle Verifizierung deiner Telefonnummer",
         "letsGo": "Los geht's!",
-        "stayInTrialMode": "Im Demo-Modus bleiben"
+        "stayInTrialMode": "Im Demo-Modus bleiben",
+        "upgradeToLevel": "Auf Level {level: number} upgraden",
+        "notNow": "Nicht jetzt",
+        "setUpLevelAccount": "Level-{level: number}-Konto einrichten"
     },
     "SetAddressModal": {
         "title": "Erstelle {bankName: string} Adresse",
+        "mainTitle": "Lightning-Adresse wählen",
         "setLightningAddress": "Setze Lightning Adresse",
         "Errors": {
             "tooShort": "Die Adresse muss mindestens drei Zeichen haben",
@@ -2464,7 +2540,50 @@
         "placeholder": "Telefonnummer",
         "verify": "Klicken zur Bestätigung",
         "sms": "Per SMS senden",
-        "whatsapp": "Via WhatsApp senden"
+        "whatsapp": "Via WhatsApp senden",
+        "telegram": "Per Telegram senden"
+    },
+    "LoginMethodScreen": {
+        "title": "Bevorzugte Anmeldemethode wählen.",
+        "useTelegram": "Telegram verwenden",
+        "useSms": "SMS verwenden",
+        "useWhatsapp": "WhatsApp verwenden",
+        "useEmail": "E-Mail verwenden",
+        "setupTelegram": "Telegram-Anmeldung einrichten",
+        "setupSms": "SMS-Anmeldung einrichten",
+        "setupWhatsapp": "WhatsApp-Anmeldung einrichten",
+        "setupEmail": "E-Mail-Anmeldung einrichten"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "Willkommen auf Level 1",
+            "title": "Neue Funktionen für dein Konto freigeschaltet:",
+            "receiveBitcoinDescription": "Bitcoin über deine Telefonnummer empfangen",
+            "dailyLimitDescription": "Sende bis zu 1.000 USD pro Tag",
+            "onchainDescription": "On-Chain-Zahlungen empfangen"
+        },
+        "emailBenefits": {
+            "mainTitle": "E-Mail-Anmeldung hinzufügen",
+            "title": "E-Mail-Anmeldung ermöglicht dir:",
+            "backupDescription": "Einen Backup-Zugang zu deinem Konto haben",
+            "supportDescription": "Erleichtert es uns, dir Support zu geben",
+            "securityDescription": "Kontosicherheit erhöhen",
+            "primaryButton": "E-Mail-Anmeldung einrichten"
+        },
+        "lightningBenefits": {
+            "mainTitle": "Eigene Lightning-Adresse einrichten",
+            "title": "Vorteile der Lightning-Adresse:",
+            "staticAddressDescription": "Eine feste Adresse zum Empfangen von Zahlungen",
+            "easyToShareDescription": "Leicht zu merken und öffentlich oder privat zu teilen",
+            "blinkToolsDescription": "Schaltet verschiedene Blink-Tools frei, die für den Handel nützlich sind",
+            "primaryButton": "Eigene Adresse einrichten"
+        },
+        "supportScreen": {
+            "mainTitle": "Wir freuen uns über Feedback",
+            "title": "Alles bereit!",
+            "description": "Jedes Feedback ist willkommen, kontaktiere uns gerne unter {email}",
+            "primaryButton": "Fertig"
+        }
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Fehler beim Login. Hast Du den richtigen Code verwendet?",
@@ -2477,6 +2596,16 @@
         "sendAgain": "Erneut senden",
         "tryAgain": "Erneut versuchen",
         "sendViaOtherChannel": "Du hast ausgewählt, dass du den Code per {channel: string} empfangen möchtest. Du kannst ihn alternativ auch per {other: string} empfangen."
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "Nach der Autorisierung in Telegram wirst du automatisch angemeldet",
+        "loginWithTelegram": "Mit Telegram anmelden",
+        "waitingForAuthorization": "Warte auf Autorisierung in Telegram...",
+        "errorFetchParams": "Telegram-Autorisierungsparameter konnten nicht abgerufen werden",
+        "errorFetchLogin": "Telegram-Anmeldung konnte nicht abgerufen werden",
+        "errorAuthTimeout": "Die Autorisierung ist abgelaufen. Bitte versuche es erneut.",
+        "errorOpenAppError": "Telegram konnte nicht geöffnet werden. Bitte stelle sicher, dass die App installiert ist."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Telefon aufsetzen",
@@ -2525,8 +2654,12 @@
         "advanced": "Fortgeschritten",
         "community": "Gemeinschaft",
         "account": "Konto",
+        "yourAccount": "Dein Konto",
+        "accounts": "Konten",
+        "accountInformation": "Kontoinformationen",
         "trialAccount": "Probekonto",
         "blinkUser": "Blink Nutzer",
+        "blinkToBlink": "Blink zu Blink",
         "transactionLimits": "Transaktionslimits",
         "activateWallet": "Wallet aktivieren",
         "amountRequired": "Betrag ist erforderlich",
@@ -2600,6 +2733,7 @@
         "submit": "Senden",
         "success": "Erfolgreich!",
         "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dollar (Stablesats)",
         "to": "An",
         "total": "Gesamt",
         "transactions": "Transaktionen",
@@ -2619,7 +2753,22 @@
         "prevMonths": "Vorherige Monate",
         "problemMaybeReauth": "Es gab ein Problem mit deiner Anfrage. Bitte versuche es in einer Minute erneut. Wenn das Problem weiterhin besteht, versuche dich aus- und wieder einzuloggen. Du kannst dich ausloggen unter Einstellungen > Account > Log out",
         "warning": "Warnung",
-        "blinkToBlink": "Blink zu Blink"
+        "continue": "Weiter",
+        "correct": "Richtig",
+        "recommended": "Empfohlen",
+        "expirationTime": "Ablaufzeit",
+        "minute": "Minute",
+        "day": {
+            "one": "Tag",
+            "other": "Tage"
+        },
+        "dollar": "Dollar",
+        "all": "ALLE",
+        "allAccounts": "Alle Konten",
+        "some": "Einige",
+        "support": "Support",
+        "profiles": "Profile",
+        "paste": "Einfügen"
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",
@@ -2649,6 +2798,7 @@
         "joinTheCommunity": "Tritt der Community bei",
         "whatsapp": "WhatsApp",
         "email": "E-Mail",
+        "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Gefällt Dir die App?",
         "statusPage": "Status-Seite",
@@ -2667,7 +2817,8 @@
         "deleteAccountConfirmation": "Dein Account wurde für die Löschung vorgemerkt.\n\nWenn die gesetzliche Übergangsfrist abgelaufen ist, werden alle deine verbleibenden Daten dauerhaft gelöscht.",
         "deleteAccountFromPhone": "Hey, bitte löscht meinen Account. Meine Telefonnummer ist {phoneNumber: string}.",
         "deleteAccountError": "Etwas ist schief gelaufen. Bitte kontaktiere {email: string}, um weitere Hilfe zu erhalten.",
-        "bye": "Auf Wiedersehen!"
+        "bye": "Auf Wiedersehen!",
+        "deleteAccountWarning": "Achtung: Die Kontolöschung ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du löschst.\nEin gelöschtes Konto kann nicht wiederhergestellt werden."
     },
     "lnurl": {
         "overLimit": "Du kannst nicht mehr als den Maximalbetrag senden",

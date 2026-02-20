@@ -9,15 +9,15 @@ import { CurrencyKeyboard } from "@app/components/currency-keyboard"
 export type AmountInputScreenUIProps = {
   errorMessage?: string
   onKeyPress: (key: Key) => void
-  compact?: boolean
+  disabledKeys?: ReadonlySet<Key>
 }
 
 export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   errorMessage,
   onKeyPress,
-  compact = false,
+  disabledKeys,
 }) => {
-  const styles = useStyles(compact)
+  const styles = useStyles()
 
   return (
     <View style={styles.amountInputScreenContainer}>
@@ -26,23 +26,20 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
           {errorMessage && <GaloyErrorBox errorMessage={errorMessage} />}
         </View>
         <View style={styles.keyboardContainer}>
-          <CurrencyKeyboard onPress={onKeyPress} compact={compact} safeMode />
+          <CurrencyKeyboard onPress={onKeyPress} disabledKeys={disabledKeys} safeMode />
         </View>
       </View>
     </View>
   )
 }
 
-const useStyles = makeStyles((_, compact: boolean) => ({
+const useStyles = makeStyles(() => ({
   amountInputScreenContainer: { alignSelf: "stretch" },
   infoContainer: {
     justifyContent: "flex-start",
-    ...(compact ? {} : { flex: 1 }),
   },
-  bodyContainer: {
-    ...(compact ? {} : { padding: 24 }),
-  },
+  bodyContainer: {},
   keyboardContainer: {
-    ...(compact ? { alignSelf: "stretch" } : { paddingHorizontal: 16, marginBottom: 30 }),
+    alignSelf: "stretch",
   },
 }))

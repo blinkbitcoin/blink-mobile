@@ -233,7 +233,6 @@ export type AccountUpdateNotificationSettingsPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
-/** Address input (used for consumer application addresses and card billing addresses) */
 export type AddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
@@ -448,104 +447,92 @@ export type Card = {
   readonly id: Scalars['ID']['output'];
   readonly lastFour: Scalars['String']['output'];
   readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
+  readonly shippingAddress?: Maybe<ShippingAddress>;
   readonly status: CardStatus;
 };
 
+/** Balance in satoshis */
+export type CardBalance = {
+  readonly __typename: 'CardBalance';
+  readonly available: Scalars['Int']['output'];
+  readonly pending: Scalars['Int']['output'];
+  readonly posted: Scalars['Int']['output'];
+};
+
 export type CardConsumerApplicationCreateInput = {
-  /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
-  /** Annual salary range */
   readonly annualSalary: Scalars['String']['input'];
-  /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** Whether the user has completed L2 KYC verification */
   readonly isL2Verified: Scalars['Boolean']['input'];
-  /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** Input for creating a consumer application using manual KYC */
 export type CardConsumerApplicationManualCreateInput = {
-  /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
-  /** Address information */
   readonly address: AddressInput;
-  /** Annual salary range */
   readonly annualSalary: Scalars['String']['input'];
-  /** Birth date in YYYY-MM-DD format */
+  /** YYYY-MM-DD format */
   readonly birthDate: Scalars['String']['input'];
-  /** 2-letter country code of ID issuing country */
+  /** 2-letter country code */
   readonly countryOfIssue: Scalars['String']['input'];
-  /** Email address */
   readonly email: Scalars['String']['input'];
-  /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** First name */
   readonly firstName: Scalars['String']['input'];
-  /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Last name */
   readonly lastName: Scalars['String']['input'];
-  /** National ID (SSN for US) */
   readonly nationalId: Scalars['String']['input'];
-  /** Occupation */
   readonly occupation: Scalars['String']['input'];
-  /** Phone country code (optional) */
   readonly phoneCountryCode?: InputMaybe<Scalars['String']['input']>;
-  /** Phone number (optional) */
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** Input for updating an existing consumer application */
 export type CardConsumerApplicationUpdateInput = {
-  /** Account purpose (optional) */
   readonly accountPurpose?: InputMaybe<Scalars['String']['input']>;
-  /** Address information (optional) */
   readonly address?: InputMaybe<AddressInput>;
-  /** Annual salary range (optional) */
   readonly annualSalary?: InputMaybe<Scalars['String']['input']>;
-  /** Application ID to update */
   readonly applicationId: Scalars['ID']['input'];
-  /** Birth date in YYYY-MM-DD format (optional) */
   readonly birthDate?: InputMaybe<Scalars['String']['input']>;
-  /** 2-letter country code of ID issuing country (optional) */
   readonly countryOfIssue?: InputMaybe<Scalars['String']['input']>;
-  /** Expected monthly volume (optional) */
   readonly expectedMonthlyVolume?: InputMaybe<Scalars['String']['input']>;
-  /** First name (optional) */
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
-  /** Whether to use existing documents for additional verification (optional) */
   readonly hasExistingDocuments?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Terms of service acceptance (optional) */
   readonly isTermsOfServiceAccepted?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Last name (optional) */
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
-  /** National ID (SSN for US) (optional) */
   readonly nationalId?: InputMaybe<Scalars['String']['input']>;
-  /** Occupation (optional) */
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
-  /** Application ID - references the approved consumer application */
   readonly applicationId: Scalars['ID']['input'];
   readonly billingAddress?: InputMaybe<AddressInput>;
   readonly cardType: CardType;
   readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Display name on the card (max 26 characters) */
+  /** Max 26 characters */
   readonly displayName?: InputMaybe<Scalars['String']['input']>;
   readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
   readonly shippingAddress?: InputMaybe<ShippingAddressInput>;
-  /** Initial card status (defaults to Active if not provided) */
   readonly status?: InputMaybe<CardStatus>;
+};
+
+export type CardPinUpdateInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly encryptedPin: Scalars['String']['input'];
+  readonly iv: Scalars['String']['input'];
+  readonly sessionId: Scalars['String']['input'];
+};
+
+export type CardReplaceInput = {
+  readonly cardId: Scalars['ID']['input'];
+};
+
+export type CardSecretsEncrypted = {
+  readonly __typename: 'CardSecretsEncrypted';
+  readonly encryptedCvc: EncryptedData;
+  readonly encryptedPan: EncryptedData;
 };
 
 export const CardStatus = {
@@ -569,6 +556,26 @@ export type CardTransaction = {
   readonly status: TransactionStatus;
 };
 
+export type CardTransactionConnection = {
+  readonly __typename: 'CardTransactionConnection';
+  readonly edges: ReadonlyArray<CardTransactionEdge>;
+  readonly pageInfo: CardTransactionPageInfo;
+};
+
+export type CardTransactionEdge = {
+  readonly __typename: 'CardTransactionEdge';
+  readonly cursor: Scalars['String']['output'];
+  readonly node: CardTransaction;
+};
+
+export type CardTransactionPageInfo = {
+  readonly __typename: 'CardTransactionPageInfo';
+  readonly endCursor?: Maybe<Scalars['String']['output']>;
+  readonly hasNextPage: Scalars['Boolean']['output'];
+  readonly hasPreviousPage: Scalars['Boolean']['output'];
+  readonly startCursor?: Maybe<Scalars['String']['output']>;
+};
+
 export const CardType = {
   Physical: 'PHYSICAL',
   Virtual: 'VIRTUAL'
@@ -576,16 +583,11 @@ export const CardType = {
 
 export type CardType = typeof CardType[keyof typeof CardType];
 export type CardUpdateInput = {
-  /** Billing address (optional) */
   readonly billingAddress?: InputMaybe<AddressInput>;
   readonly cardId: Scalars['ID']['input'];
-  /** Daily spending limit in cents (optional, mutually exclusive with monthly_limit_cents) */
   readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Monthly spending limit in cents (optional, mutually exclusive with daily_limit_cents) */
   readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** New card status (optional) */
   readonly status?: InputMaybe<CardStatus>;
-  /** Virtual card art identifier (optional) */
   readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -669,12 +671,10 @@ export type ConsumerAccountWalletByIdArgs = {
 
 export type ConsumerApplication = {
   readonly __typename: 'ConsumerApplication';
-  /** Application completion link with params (if additional verification needed) */
   readonly applicationCompletionLink?: Maybe<Scalars['String']['output']>;
   readonly applicationReason?: Maybe<Scalars['String']['output']>;
   readonly applicationStatus: ApplicationStatus;
   readonly createdAt: Scalars['DateTime']['output'];
-  /** Application ID */
   readonly id: Scalars['ID']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
 };
@@ -763,6 +763,12 @@ export type Email = {
   readonly __typename: 'Email';
   readonly address?: Maybe<Scalars['EmailAddress']['output']>;
   readonly verified?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type EncryptedData = {
+  readonly __typename: 'EncryptedData';
+  readonly data: Scalars['String']['output'];
+  readonly iv: Scalars['String']['output'];
 };
 
 export type Error = {
@@ -1277,6 +1283,8 @@ export type Mutation = {
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
   readonly cardConsumerApplicationUpdate: ConsumerApplication;
   readonly cardCreate: Card;
+  readonly cardPinUpdate: Scalars['Boolean']['output'];
+  readonly cardReplace: Card;
   readonly cardUpdate: Card;
   readonly contactCreate: ContactPayload;
   readonly deviceNotificationTokenCreate: SuccessPayload;
@@ -1472,6 +1480,16 @@ export type MutationCardConsumerApplicationUpdateArgs = {
 
 export type MutationCardCreateArgs = {
   input: CardCreateInput;
+};
+
+
+export type MutationCardPinUpdateArgs = {
+  input: CardPinUpdateInput;
+};
+
+
+export type MutationCardReplaceArgs = {
+  input: CardReplaceInput;
 };
 
 
@@ -1998,6 +2016,9 @@ export type Query = {
   readonly beta: Scalars['Boolean']['output'];
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
+  readonly cardBalance: CardBalance;
+  readonly cardSecretsEncrypted: CardSecretsEncrypted;
+  readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly colorScheme: Scalars['String']['output'];
   readonly countryCode: Scalars['String']['output'];
   /** Returns an estimated conversion rate for the given amount and currency */
@@ -2043,6 +2064,24 @@ export type QueryAccountDefaultWalletArgs = {
 
 export type QueryBtcPriceListArgs = {
   range: PriceGraphRange;
+};
+
+
+export type QueryCardBalanceArgs = {
+  cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardSecretsEncryptedArgs = {
+  cardId: Scalars['ID']['input'];
+  sessionId: Scalars['String']['input'];
+};
+
+
+export type QueryCardTransactionsPaginatedArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  cardId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2202,11 +2241,23 @@ export type SettlementViaOnChain = {
   readonly vout?: Maybe<Scalars['Int']['output']>;
 };
 
-/** Shipping address input for physical cards */
+export type ShippingAddress = {
+  readonly __typename: 'ShippingAddress';
+  readonly city: Scalars['String']['output'];
+  readonly country?: Maybe<Scalars['String']['output']>;
+  readonly countryCode: Scalars['String']['output'];
+  readonly firstName?: Maybe<Scalars['String']['output']>;
+  readonly lastName?: Maybe<Scalars['String']['output']>;
+  readonly line1: Scalars['String']['output'];
+  readonly line2?: Maybe<Scalars['String']['output']>;
+  readonly phoneNumber: Scalars['String']['output'];
+  readonly postalCode: Scalars['String']['output'];
+  readonly region: Scalars['String']['output'];
+};
+
 export type ShippingAddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
-  /** 2-letter country code */
   readonly countryCode: Scalars['String']['input'];
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
@@ -8573,13 +8624,20 @@ export type ResolversTypes = {
   CaptchaCreateChallengeResult: ResolverTypeWrapper<CaptchaCreateChallengeResult>;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
+  CardBalance: ResolverTypeWrapper<CardBalance>;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardPinUpdateInput: CardPinUpdateInput;
+  CardReplaceInput: CardReplaceInput;
+  CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  CardTransactionConnection: ResolverTypeWrapper<CardTransactionConnection>;
+  CardTransactionEdge: ResolverTypeWrapper<CardTransactionEdge>;
+  CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
   CardType: CardType;
   CardUpdateInput: CardUpdateInput;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
@@ -8606,6 +8664,7 @@ export type ResolversTypes = {
   Email: ResolverTypeWrapper<Email>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']['output']>;
   EmailRegistrationId: ResolverTypeWrapper<Scalars['EmailRegistrationId']['output']>;
+  EncryptedData: ResolverTypeWrapper<EncryptedData>;
   EndpointId: ResolverTypeWrapper<Scalars['EndpointId']['output']>;
   EndpointUrl: ResolverTypeWrapper<Scalars['EndpointUrl']['output']>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
@@ -8733,6 +8792,7 @@ export type ResolversTypes = {
   SettlementViaIntraLedger: ResolverTypeWrapper<SettlementViaIntraLedger>;
   SettlementViaLn: ResolverTypeWrapper<SettlementViaLn>;
   SettlementViaOnChain: ResolverTypeWrapper<SettlementViaOnChain>;
+  ShippingAddress: ResolverTypeWrapper<ShippingAddress>;
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: ResolverTypeWrapper<Scalars['SignedAmount']['output']>;
   SignedDisplayMajorAmount: ResolverTypeWrapper<Scalars['SignedDisplayMajorAmount']['output']>;
@@ -8837,12 +8897,19 @@ export type ResolversParentTypes = {
   CaptchaCreateChallengeResult: CaptchaCreateChallengeResult;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
+  CardBalance: CardBalance;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardPinUpdateInput: CardPinUpdateInput;
+  CardReplaceInput: CardReplaceInput;
+  CardSecretsEncrypted: CardSecretsEncrypted;
   CardTransaction: CardTransaction;
   Float: Scalars['Float']['output'];
+  CardTransactionConnection: CardTransactionConnection;
+  CardTransactionEdge: CardTransactionEdge;
+  CardTransactionPageInfo: CardTransactionPageInfo;
   CardUpdateInput: CardUpdateInput;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
@@ -8867,6 +8934,7 @@ export type ResolversParentTypes = {
   Email: Email;
   EmailAddress: Scalars['EmailAddress']['output'];
   EmailRegistrationId: Scalars['EmailRegistrationId']['output'];
+  EncryptedData: EncryptedData;
   EndpointId: Scalars['EndpointId']['output'];
   EndpointUrl: Scalars['EndpointUrl']['output'];
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
@@ -8983,6 +9051,7 @@ export type ResolversParentTypes = {
   SettlementViaIntraLedger: SettlementViaIntraLedger;
   SettlementViaLn: SettlementViaLn;
   SettlementViaOnChain: SettlementViaOnChain;
+  ShippingAddress: ShippingAddress;
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: Scalars['SignedAmount']['output'];
   SignedDisplayMajorAmount: Scalars['SignedDisplayMajorAmount']['output'];
@@ -9211,7 +9280,21 @@ export type CardResolvers<ContextType = any, ParentType extends ResolversParentT
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  shippingAddress?: Resolver<Maybe<ResolversTypes['ShippingAddress']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardBalanceResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardBalance'] = ResolversParentTypes['CardBalance']> = {
+  available?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pending?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  posted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
+  encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
+  encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9223,6 +9306,26 @@ export type CardTransactionResolvers<ContextType = any, ParentType extends Resol
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionConnection'] = ResolversParentTypes['CardTransactionConnection']> = {
+  edges?: Resolver<ReadonlyArray<ResolversTypes['CardTransactionEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['CardTransactionPageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionEdge'] = ResolversParentTypes['CardTransactionEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['CardTransaction'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionPageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionPageInfo'] = ResolversParentTypes['CardTransactionPageInfo']> = {
+  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9370,6 +9473,12 @@ export interface EmailAddressScalarConfig extends GraphQLScalarTypeConfig<Resolv
 export interface EmailRegistrationIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['EmailRegistrationId'], any> {
   name: 'EmailRegistrationId';
 }
+
+export type EncryptedDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['EncryptedData'] = ResolversParentTypes['EncryptedData']> = {
+  data?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  iv?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export interface EndpointIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['EndpointId'], any> {
   name: 'EndpointId';
@@ -9623,6 +9732,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
   cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
   cardCreate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardCreateArgs, 'input'>>;
+  cardPinUpdate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCardPinUpdateArgs, 'input'>>;
+  cardReplace?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardReplaceArgs, 'input'>>;
   cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
@@ -9859,6 +9970,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   beta?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
+  cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
+  cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currencyConversionEstimation?: Resolver<ResolversTypes['CurrencyConversionEstimation'], ParentType, ContextType, RequireFields<QueryCurrencyConversionEstimationArgs, 'amount' | 'currency'>>;
@@ -9967,6 +10081,20 @@ export type SettlementViaOnChainResolvers<ContextType = any, ParentType extends 
   arrivalInMempoolEstimatedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
   transactionHash?: Resolver<Maybe<ResolversTypes['OnChainTxHash']>, ParentType, ContextType>;
   vout?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ShippingAddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShippingAddress'] = ResolversParentTypes['ShippingAddress']> = {
+  city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lastName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  line1?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line2?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phoneNumber?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  postalCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10288,7 +10416,12 @@ export type Resolvers<ContextType = any> = {
   CaptchaCreateChallengePayload?: CaptchaCreateChallengePayloadResolvers<ContextType>;
   CaptchaCreateChallengeResult?: CaptchaCreateChallengeResultResolvers<ContextType>;
   Card?: CardResolvers<ContextType>;
+  CardBalance?: CardBalanceResolvers<ContextType>;
+  CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
+  CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
+  CardTransactionEdge?: CardTransactionEdgeResolvers<ContextType>;
+  CardTransactionPageInfo?: CardTransactionPageInfoResolvers<ContextType>;
   CentAmount?: GraphQLScalarType;
   CentAmountPayload?: CentAmountPayloadResolvers<ContextType>;
   ConsumerAccount?: ConsumerAccountResolvers<ContextType>;
@@ -10310,6 +10443,7 @@ export type Resolvers<ContextType = any> = {
   Email?: EmailResolvers<ContextType>;
   EmailAddress?: GraphQLScalarType;
   EmailRegistrationId?: GraphQLScalarType;
+  EncryptedData?: EncryptedDataResolvers<ContextType>;
   EndpointId?: GraphQLScalarType;
   EndpointUrl?: GraphQLScalarType;
   Error?: ErrorResolvers<ContextType>;
@@ -10391,6 +10525,7 @@ export type Resolvers<ContextType = any> = {
   SettlementViaIntraLedger?: SettlementViaIntraLedgerResolvers<ContextType>;
   SettlementViaLn?: SettlementViaLnResolvers<ContextType>;
   SettlementViaOnChain?: SettlementViaOnChainResolvers<ContextType>;
+  ShippingAddress?: ShippingAddressResolvers<ContextType>;
   SignedAmount?: GraphQLScalarType;
   SignedDisplayMajorAmount?: GraphQLScalarType;
   StatefulNotification?: StatefulNotificationResolvers<ContextType>;

@@ -506,9 +506,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     [resetInput],
   )
 
+  const processedPaymentRef = useRef<string | null>(null)
+
   useEffect(() => {
-    if (route.params?.payment) {
-      const text = route.params?.payment
+    if (route.params?.payment && route.params.payment !== processedPaymentRef.current) {
+      processedPaymentRef.current = route.params.payment
+      const text = route.params.payment
       const isPhoneNumberValid = parseValidPhone(text)
       if (isPhoneNumberValid && isPhoneNumberValid?.isValid()) {
         onFocusedInput(InputType.Phone)
@@ -516,8 +519,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         return
       }
       onFocusedInput(InputType.Search)
-      handleChangeText(route.params?.payment)
-      initiateGoToNextScreen(route.params?.payment)
+      handleChangeText(route.params.payment)
+      initiateGoToNextScreen(route.params.payment)
     }
   }, [
     route.params?.payment,

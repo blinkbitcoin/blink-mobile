@@ -627,7 +627,6 @@ export const ConversionDetailsScreen = () => {
             onSetFormattedAmount={onSetFormattedValues}
             focusedInput={focusedInputValues}
             initialAmount={initialAmount}
-            compact
             debounceMs={1000}
             lockFormattingUntilBlur={Boolean(lockFormattingInputId)}
             onTypingChange={(typing, focusedId) => {
@@ -741,10 +740,9 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     gap: 12,
   },
   keyboardContainer: {
-    maxWidth: 450,
-    paddingHorizontal: 45,
+    marginHorizontal: 20,
     paddingTop: 15,
-    paddingBottom: 32,
+    paddingBottom: 28,
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },

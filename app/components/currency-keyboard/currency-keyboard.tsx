@@ -1,60 +1,35 @@
 import React, { useEffect, useState } from "react"
-import { makeStyles, useTheme, Text } from "@rn-vui/themed"
-import { Pressable, StyleProp, View, ViewStyle } from "react-native"
+import { makeStyles, Text } from "@rn-vui/themed"
+import { Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-
+import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
 
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
 
-const useStyles = makeStyles(({ colors }, compact: boolean) => ({
-  keyRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: compact ? 15 : 30,
-  },
-  lastKeyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  keyText: {
-    color: colors.grey2,
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlignVertical: "center",
-  },
-  pressedOpacity: {
-    opacity: 0.7,
-  },
-}))
-
 type CurrencyKeyboardProps = {
   onPress: (pressed: KeyType) => void
-  compact?: boolean
   safeMode?: boolean
+  disabledKeys?: ReadonlySet<KeyType>
 }
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   onPress,
-  compact = false,
   safeMode = false,
+  disabledKeys,
 }) => {
-  const styles = useStyles(compact)
+  const styles = useStyles()
 
   const keyRows = [
-    [KeyType[1], KeyType[2], KeyType[3]],
-    [KeyType[4], KeyType[5], KeyType[6]],
-    [KeyType[7], KeyType[8], KeyType[9]],
+    [KeyType[1], KeyType[2], KeyType[3], KeyType.Backspace],
+    [KeyType[4], KeyType[5], KeyType[6], KeyType.Decimal],
+    [KeyType[7], KeyType[8], KeyType[9], KeyType[0]],
   ]
 
-  const lastRow = [KeyType.Decimal, KeyType[0], KeyType.Backspace]
-
   return (
-    <View>
+    <View style={styles.keyboard}>
       {keyRows.map((row, rowIndex) => (
         <View key={`${KEY_ROW_PREFIX}${rowIndex}`} style={styles.keyRow}>
           {row.map((key) => (
@@ -62,23 +37,12 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
               key={key}
               numberPadKey={key}
               handleKeyPress={onPress}
-              compact={compact}
               safeMode={safeMode}
+              disabled={disabledKeys?.has(key) ?? false}
             />
           ))}
         </View>
       ))}
-      <View style={styles.lastKeyRow}>
-        {lastRow.map((key) => (
-          <Key
-            key={key}
-            numberPadKey={key}
-            handleKeyPress={onPress}
-            compact={compact}
-            safeMode={safeMode}
-          />
-        ))}
-      </View>
     </View>
   )
 }
@@ -86,47 +50,24 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
 const Key = ({
   handleKeyPress,
   numberPadKey,
-  compact,
   safeMode,
+  disabled,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => void
-  compact?: boolean
   safeMode?: boolean
+  disabled?: boolean
 }) => {
-  const {
-    theme: { colors },
-  } = useTheme()
-  const styles = useStyles(compact)
-  const pressableStyle = ({ pressed }: { pressed: boolean }): StyleProp<ViewStyle> => {
-    const baseStyle: StyleProp<ViewStyle> = {
-      height: 40,
-      width: 40,
-      borderRadius: 40,
-      maxWidth: 40,
-      maxHeight: 40,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }
-
-    if (pressed) {
-      return {
-        ...baseStyle,
-        backgroundColor: colors.grey4,
-      }
-    }
-    return baseStyle
-  }
+  const styles = useStyles()
+  const isBackspace = numberPadKey === KeyType.Backspace
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
 
-  const handleBackSpacePressIn = (numberPadKey: KeyType) => {
+  const handleBackSpacePressIn = (key: KeyType) => {
     if (safeMode) return
+    if (key !== KeyType.Backspace) return
     const id = setInterval(() => {
-      if (numberPadKey === KeyType.Backspace) {
-        handleKeyPress(numberPadKey)
-      }
+      handleKeyPress(key)
     }, 300)
     setTimerId(id)
   }
@@ -148,22 +89,59 @@ const Key = ({
 
   return (
     <Pressable
-      style={pressableStyle}
-      hitSlop={20}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.key,
+        disabled && styles.keyDisabled,
+        pressed && styles.keyPressedBg,
+      ]}
       onPressIn={() => handleBackSpacePressIn(numberPadKey)}
       onPress={() => handleKeyPress(numberPadKey)}
       onPressOut={handleBackSpacePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
     >
-      {({ pressed }) => {
-        return (
-          <Text
-            style={pressed ? [styles.keyText, styles.pressedOpacity] : styles.keyText}
-          >
-            {numberPadKey}
-          </Text>
-        )
-      }}
+      {isBackspace ? (
+        <GaloyIcon name="back-space" size={28} color={styles.backspaceIcon.color} />
+      ) : (
+        <Text style={styles.keyText}>{numberPadKey}</Text>
+      )}
     </Pressable>
   )
 }
+
+const useStyles = makeStyles(({ colors }) => ({
+  keyboard: {
+    gap: 8,
+    maxWidth: 480,
+    width: "100%",
+    alignSelf: "center",
+  },
+  keyRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  key: {
+    flex: 1,
+    minHeight: 54,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.grey4,
+  },
+  keyDisabled: {
+    opacity: 0.4,
+  },
+  keyPressedBg: {
+    backgroundColor: colors.grey5,
+  },
+  keyText: {
+    fontSize: 28,
+    fontWeight: "700",
+    lineHeight: 32,
+    textAlign: "center",
+  },
+  backspaceIcon: {
+    color: colors.primary,
+  },
+}))

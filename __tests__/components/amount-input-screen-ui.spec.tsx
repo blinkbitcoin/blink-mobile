@@ -28,13 +28,9 @@ jest.mock("@app/components/atomic/galoy-error-box", () => ({
 }))
 
 jest.mock("@app/components/currency-keyboard", () => ({
-  CurrencyKeyboard: ({ compact }: { compact: boolean }) => {
+  CurrencyKeyboard: () => {
     const ReactNative = jest.requireActual("react-native")
-    return (
-      <ReactNative.View testID="currency-keyboard">
-        <ReactNative.Text testID="compact-value">{String(compact)}</ReactNative.Text>
-      </ReactNative.View>
-    )
+    return <ReactNative.View testID="currency-keyboard" />
   },
 }))
 
@@ -62,17 +58,9 @@ describe("AmountInputScreenUI", () => {
     expect(getByText(errorMessage)).toBeTruthy()
   })
 
-  it("passes compact=false to CurrencyKeyboard by default", () => {
-    const { getByText } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
+  it("renders CurrencyKeyboard", () => {
+    const { getByTestId } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
 
-    expect(getByText("false")).toBeTruthy()
-  })
-
-  it("passes compact=true to CurrencyKeyboard when compact prop is true", () => {
-    const { getByText } = render(
-      <AmountInputScreenUI onKeyPress={mockOnKeyPress} compact={true} />,
-    )
-
-    expect(getByText("true")).toBeTruthy()
+    expect(getByTestId("currency-keyboard")).toBeTruthy()
   })
 })
