@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Fogadás Paycode-al",
     "receiveViaOnchain": "Fogadás Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Nem fogadhatsz el nulla satoshit. Kérlek, adj meg olyan összeget, ami legalább 1 vagy annál több sat."
+    "cantReceiveZeroSats": "Nem fogadhatsz el nulla satoshit. Kérlek, adj meg olyan összeget, ami legalább 1 vagy annál több sat.",
+    "lightningAddress": "Lightning cím",
+    "lightningInvoice": "Lightning számla",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin beváltása",

@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Príjem cez Paycode",
     "receiveViaOnchain": "Príjem cez Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Nemôžete prijať nula satov. Zadajte prosím hodnotu väčšiu ako 1 sat."
+    "cantReceiveZeroSats": "Nemôžete prijať nula satov. Zadajte prosím hodnotu väčšiu ako 1 sat.",
+    "lightningAddress": "Lightning adresa",
+    "lightningInvoice": "Lightning faktúra",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Poplatok za vklad: {fee} SAT pre sumy pod {threshold} SAT alebo {overFee} SAT pre vklady nad {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Prijať Bitcoin",

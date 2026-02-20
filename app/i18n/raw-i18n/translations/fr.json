@@ -2162,7 +2162,11 @@
         "receiveViaPaycode": "Recevoir via un code de paiement",
         "receiveViaOnchain": "Recevoir via On-chain",
         "payCodeOrLNURL": "Code de paiement/ LNURL",
-        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+        "lightningAddress": "Adresse lightning",
+        "lightningInvoice": "Facture lightning",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Échanger des Bitcoin",

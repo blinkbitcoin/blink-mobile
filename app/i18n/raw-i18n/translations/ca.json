@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Rebre via codi de pagament",
     "receiveViaOnchain": "Rep via Onchain",
     "payCodeOrLNURL": "Codi de pagament / LNURL",
-    "cantReceiveZeroSats": "No pots rebre zero sats. Introdueix una quantitat corresponent a 1 o més sats."
+    "cantReceiveZeroSats": "No pots rebre zero sats. Introdueix una quantitat corresponent a 1 o més sats.",
+    "lightningAddress": "Adreça Lightning",
+    "lightningInvoice": "Factura Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",

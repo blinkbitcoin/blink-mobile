@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Primește via Paycode",
     "receiveViaOnchain": "Primește via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Nu puteți primi zero sats. Vă rugăm să introduceți o sumă corespunzătoare, de la 1 la mai mulți sats în sus."
+    "cantReceiveZeroSats": "Nu puteți primi zero sats. Vă rugăm să introduceți o sumă corespunzătoare, de la 1 la mai mulți sats în sus.",
+    "lightningAddress": "Adresă Lightning",
+    "lightningInvoice": "Factură Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Răscumpărați Bitcoin",

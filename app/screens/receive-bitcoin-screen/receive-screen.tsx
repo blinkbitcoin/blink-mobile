@@ -1,444 +1,350 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { TouchableOpacity, View } from "react-native"
-import nfcManager from "react-native-nfc-manager"
-import Icon from "react-native-vector-icons/Ionicons"
+import { Pressable, View } from "react-native"
 
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import messaging from "@react-native-firebase/messaging"
+import { makeStyles, Text } from "@rn-vui/themed"
 
-import { useApolloClient } from "@apollo/client"
-import { AmountInput } from "@app/components/amount-input"
-import { ExpirationTimeChooser } from "@app/components/expiration-time-chooser"
-import { GaloyCurrencyBubble } from "@app/components/atomic/galoy-currency-bubble"
-import { ButtonGroup } from "@app/components/button-group"
-import { CustomIcon } from "@app/components/custom-icon"
+import { ActionButton } from "@app/components/action-button"
+import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
+import { ContextualInfo } from "@app/components/contextual-info"
 import { ModalNfc } from "@app/components/modal-nfc"
 import { NoteInput } from "@app/components/note-input"
+import { QRCarousel } from "@app/components/qr-carousel"
+import { ReceiveAmountRow } from "@app/components/receive-amount-row"
 import { Screen } from "@app/components/screen"
-import { useLevel, AccountLevel } from "@app/graphql/level-context"
-import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
+import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useNotificationPermission } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { addDeviceToken, requestNotificationPermission } from "@app/utils/notifications"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { testProps } from "@app/utils/testProps"
 
-import { testProps } from "../../utils/testProps"
+import { NfcHeaderButton } from "./nfc-header-button"
+import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
-import { QRView } from "./qr-view"
-import { useReceiveBitcoin } from "./use-receive-bitcoin"
+import {
+  useDisplayPaymentRequest,
+  useNfcReceive,
+  useOnChainAddress,
+  usePaymentRequest,
+  useReceiveCarousel,
+  useReceiveFlow,
+} from "./hooks"
+
+const AUTO_DISMISS_DELAY = 5000
 
 const ReceiveScreen = () => {
-  const {
-    theme: { colors },
-  } = useTheme()
+  const requestState = usePaymentRequest()
+
+  if (!requestState) return null
+
+  return <ReceiveScreenContent requestState={requestState} />
+}
+
+type ReceiveScreenContentProps = {
+  requestState: NonNullable<ReturnType<typeof usePaymentRequest>>
+}
+
+const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestState }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const client = useApolloClient()
+  useNotificationPermission()
+
+  const [isTrialModalVisible, setIsTrialModalVisible] = useState(false)
+  const openTrialModal = useCallback(() => setIsTrialModalVisible(true), [])
+  const closeTrialModal = useCallback(() => setIsTrialModalVisible(false), [])
   const reopenUpgradeModal = useRef(false)
+  const markReopenUpgradeModal = useCallback(() => {
+    reopenUpgradeModal.current = true
+  }, [])
 
-  const isAuthed = useIsAuthed()
-  const isFocused = useIsFocused()
-  const { currentLevel } = useLevel()
-  const isLevelZero = currentLevel === AccountLevel.Zero
+  const [isLightningModalVisible, setIsLightningModalVisible] = useState(false)
+  const toggleLightningModal = useCallback(
+    () => setIsLightningModalVisible((prev) => !prev),
+    [],
+  )
 
-  const request = useReceiveBitcoin()
+  const carousel = useReceiveCarousel(requestState, openTrialModal)
 
-  const [isTrialAccountModalVisible, setIsTrialAccountModalVisible] = useState(false)
-  const [displayReceiveNfc, setDisplayReceiveNfc] = useState(false)
+  const onchainWalletId =
+    carousel.onchainWalletCurrency === WalletCurrency.Btc
+      ? requestState.btcWalletId
+      : requestState.usdWalletId
 
-  const closeTrialAccountModal = () => setIsTrialAccountModalVisible(false)
-  const openTrialAccountModal = () => setIsTrialAccountModalVisible(true)
+  const onchain = useOnChainAddress(onchainWalletId, {
+    amount: requestState.settlementAmount?.amount,
+    memo: requestState.memo || undefined,
+  })
 
-  const nfcText = LL.ReceiveScreen.nfc()
+  const {
+    handleSetAmount,
+    handleMemoBlur,
+    handleToggleWallet,
+    handleCopy,
+    handleShare,
+    receiveViaNFC,
+  } = useReceiveFlow(requestState, {
+    isOnChainPage: carousel.isOnChainPage,
+    onchainWalletCurrency: carousel.onchainWalletCurrency,
+    syncOnchainWallet: carousel.syncOnchainWallet,
+    onchainAddress: onchain.address,
+  })
+
+  const { displayPaymentRequest, showActions } = useDisplayPaymentRequest(
+    requestState,
+    carousel.isOnChainPage,
+    onchain.address,
+  )
+
+  const {
+    displayReceiveNfc,
+    setDisplayReceiveNfc,
+    isNfcAmountModalOpen,
+    closeNfcAmountModal,
+    handleNfcAmountSet,
+    showNfcButton,
+    onNfcPress,
+  } = useNfcReceive({
+    requestType: requestState.type,
+    requestState: requestState.state,
+    hasSettlementAmount: Boolean(requestState.settlementAmount),
+    handleSetAmount,
+    isOnChainPage: carousel.isOnChainPage,
+  })
+
+  const titleByInvoiceType: Record<InvoiceType, string> = {
+    [Invoice.OnChain]: LL.ReceiveScreen.bitcoinOnchain(),
+    [Invoice.Lightning]: LL.ReceiveScreen.lightningInvoice(),
+    [Invoice.PayCode]: LL.ReceiveScreen.lightningAddress(),
+  }
+  const activeInvoiceType = carousel.isOnChainPage
+    ? Invoice.OnChain
+    : requestState.type ?? Invoice.Lightning
+  const dynamicTitle = titleByInvoiceType[activeInvoiceType]
+
   useEffect(() => {
-    ;(async () => {
-      if (
-        request?.type === "Lightning" &&
-        request?.state === "Created" &&
-        (await nfcManager.isSupported())
-      ) {
-        navigation.setOptions({
-          headerRight: () => (
-            <TouchableOpacity
-              style={styles.nfcIcon}
-              onPress={() => setDisplayReceiveNfc(true)}
-            >
-              <Text type="p2">{nfcText}</Text>
-              <CustomIcon name="nfc" color={colors.black} />
-            </TouchableOpacity>
-          ),
-        })
-      } else {
-        navigation.setOptions({ headerRight: () => <></> })
-      }
-    })()
-    // Disable exhaustive-deps because styles.nfcIcon was causing an infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nfcText, colors.black, navigation, request?.state, request?.type])
+    navigation.setOptions({ title: dynamicTitle })
+  }, [navigation, dynamicTitle])
 
   useFocusEffect(
     useCallback(() => {
       if (reopenUpgradeModal.current) {
-        openTrialAccountModal()
+        openTrialModal()
         reopenUpgradeModal.current = false
       }
-    }, []),
+    }, [openTrialModal]),
   )
 
-  // notification permission
   useEffect(() => {
-    let timeout: NodeJS.Timeout
-    if (isAuthed && isFocused && client) {
-      const WAIT_TIME_TO_PROMPT_USER = 5000
-      timeout = setTimeout(
-        async () => {
-          const result = await requestNotificationPermission()
-          if (
-            result === messaging.AuthorizationStatus.PROVISIONAL ||
-            result === messaging.AuthorizationStatus.AUTHORIZED
-          ) {
-            await addDeviceToken(client)
-          }
-        }, // no op if already requested
-        WAIT_TIME_TO_PROMPT_USER,
-      )
-    }
-    return () => timeout && clearTimeout(timeout)
-  }, [isAuthed, isFocused, client])
+    if (requestState.state !== PaymentRequestState.Paid) return
+    const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
+    return () => clearTimeout(id)
+  }, [requestState.state, navigation])
 
-  useEffect(() => {
-    if (request?.state === PaymentRequestState.Paid) {
-      const id = setTimeout(() => navigation.goBack(), 5000)
-      return () => clearTimeout(id)
-    }
-  }, [request?.state, navigation])
-
-  if (!request) return <></>
-
-  const OnChainCharge =
-    request.feesInformation?.deposit.minBankFee &&
-    request.feesInformation?.deposit.minBankFeeThreshold &&
-    request.type === Invoice.OnChain ? (
-      <View style={styles.onchainCharges}>
-        <Text type="p4">
-          {LL.ReceiveScreen.fees({
-            minBankFee: request.feesInformation?.deposit.minBankFee,
-            minBankFeeThreshold: request.feesInformation?.deposit.minBankFeeThreshold,
-          })}
-        </Text>
-      </View>
-    ) : undefined
-
-  const isReady = request.state !== PaymentRequestState.Loading
-
-  const handlePressWallet = (id: string) => {
-    if (isReady) {
-      request.setReceivingWallet(id as WalletCurrency)
-      request.setExpirationTime(0)
-    }
-  }
   return (
-    <>
-      <Screen
-        preset="scroll"
-        keyboardOffset="navigationHeader"
-        keyboardShouldPersistTaps="handled"
-        style={styles.screenStyle}
-        {...testProps("receive-screen")}
+    <Screen
+      preset="scroll"
+      keyboardOffset="navigationHeader"
+      keyboardShouldPersistTaps="handled"
+      style={styles.screenStyle}
+      {...testProps("receive-screen")}
+    >
+      <QRCarousel
+        ref={carousel.ref}
+        page0={
+          <QRView
+            type={requestState.info?.data?.invoiceType || requestState.type}
+            getFullUri={requestState.info?.data?.getFullUriFn}
+            loading={requestState.state === PaymentRequestState.Loading}
+            completed={requestState.state === PaymentRequestState.Paid}
+            err={
+              requestState.state === PaymentRequestState.Error
+                ? LL.ReceiveScreen.error()
+                : ""
+            }
+            expired={requestState.state === PaymentRequestState.Expired}
+            regenerateInvoiceFn={requestState.regenerateInvoice}
+            copyToClipboard={handleCopy}
+            isPayCode={requestState.type === Invoice.PayCode}
+            canUsePayCode={requestState.canUsePaycode}
+            toggleIsSetLightningAddressModalVisible={toggleLightningModal}
+          />
+        }
+        page1={
+          <QRView
+            type={Invoice.OnChain}
+            getFullUri={onchain.getFullUriFn}
+            loading={onchain.loading}
+            completed={requestState.state === PaymentRequestState.Paid}
+            err=""
+            expired={false}
+            regenerateInvoiceFn={requestState.regenerateInvoice}
+            copyToClipboard={handleCopy}
+            isPayCode={false}
+            canUsePayCode={false}
+            toggleIsSetLightningAddressModalVisible={toggleLightningModal}
+          />
+        }
+        onSnap={carousel.handleSnap}
+      />
+
+      <Pressable
+        style={styles.paymentIdentifier}
+        onPress={handleCopy}
+        accessibilityRole="button"
+        accessibilityHint={
+          carousel.isOnChainPage
+            ? LL.ReceiveScreen.copyClipboardBitcoin()
+            : LL.ReceiveScreen.copyClipboard()
+        }
       >
-        <ButtonGroup
-          selectedId={request.receivingWalletDescriptor.currency}
-          buttons={[
-            {
-              id: WalletCurrency.Btc,
-              text: "Bitcoin",
-              icon: {
-                selected: <GaloyCurrencyBubble currency="BTC" iconSize={16} />,
-                normal: (
-                  <GaloyCurrencyBubble currency="BTC" iconSize={16} highlighted={false} />
-                ),
-              },
-            },
-            {
-              id: WalletCurrency.Usd,
-              text: "Dollar",
-              icon: {
-                selected: <GaloyCurrencyBubble currency="USD" iconSize={16} />,
-                normal: (
-                  <GaloyCurrencyBubble currency="USD" iconSize={16} highlighted={false} />
-                ),
-              },
-            },
-          ]}
-          onPress={handlePressWallet}
-          style={styles.receivingWalletPicker}
-          disabled={!request.canSetReceivingWalletDescriptor}
-        />
+        {carousel.isOnChainPage || requestState.type === Invoice.Lightning ? (
+          <Text
+            {...testProps("readable-payment-request")}
+            style={styles.paymentIdentifierText}
+          >
+            {displayPaymentRequest}
+          </Text>
+        ) : (
+          <Text
+            {...testProps("readable-payment-request")}
+            style={styles.paymentIdentifierText}
+            numberOfLines={1}
+            ellipsizeMode="middle"
+          >
+            {displayPaymentRequest}
+          </Text>
+        )}
+      </Pressable>
 
-        <QRView
-          type={request.info?.data?.invoiceType || Invoice.OnChain}
-          getFullUri={request.info?.data?.getFullUriFn}
-          loading={request.state === PaymentRequestState.Loading}
-          completed={request.state === PaymentRequestState.Paid}
-          err={
-            request.state === PaymentRequestState.Error ? LL.ReceiveScreen.error() : ""
+      <View style={styles.inputsContainer}>
+        <ReceiveAmountRow
+          unitOfAccountAmount={requestState.unitOfAccountAmount}
+          walletCurrency={
+            carousel.isOnChainPage
+              ? carousel.onchainWalletCurrency
+              : requestState.receivingWalletDescriptor.currency
           }
-          style={styles.qrView}
-          expired={request.state === PaymentRequestState.Expired}
-          regenerateInvoiceFn={request.regenerateInvoice}
-          copyToClipboard={request.copyToClipboard}
-          isPayCode={request.type === Invoice.PayCode}
-          canUsePayCode={request.canUsePaycode}
-          toggleIsSetLightningAddressModalVisible={
-            request.toggleIsSetLightningAddressModalVisible
+          convertMoneyAmount={requestState.convertMoneyAmount}
+          setAmount={handleSetAmount}
+          canSetAmount={requestState.canSetAmount}
+          onToggleWallet={handleToggleWallet}
+          canToggleWallet={true}
+          disabled={
+            carousel.isOnChainPage &&
+            carousel.onchainWalletCurrency === WalletCurrency.Usd
           }
         />
 
-        <View style={styles.invoiceActions}>
-          {request.state !== PaymentRequestState.Loading &&
-            (request.type !== Invoice.PayCode ||
-              (request.type === Invoice.PayCode && request.canUsePaycode)) && (
-              <>
-                <View style={styles.copyInvoiceContainer}>
-                  <TouchableOpacity
-                    {...testProps(LL.ReceiveScreen.copyInvoice())}
-                    onPress={request.copyToClipboard}
-                  >
-                    <Text {...testProps("Copy Invoice")} color={colors.grey2}>
-                      <Icon color={colors.grey2} name="copy-outline" />
-                      <Text> </Text>
-                      {LL.ReceiveScreen.copyInvoice()}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <Text color={colors.grey2}>{request.extraDetails || ""}</Text>
-                </View>
-                <View style={styles.shareInvoiceContainer}>
-                  <TouchableOpacity
-                    {...testProps(LL.ReceiveScreen.shareInvoice())}
-                    onPress={request.share}
-                  >
-                    <Text {...testProps("Share Invoice")} color={colors.grey2}>
-                      <Icon color={colors.grey2} name="share-outline" />
-                      <Text> </Text>
-                      {LL.ReceiveScreen.shareInvoice()}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-        </View>
-
-        <TouchableOpacity style={styles.extraDetails} onPress={request.copyToClipboard}>
-          {request.readablePaymentRequest ? (
-            request.type === Invoice.OnChain ? (
-              <View style={styles.btcHighContainer}>
-                <Text ellipsizeMode="middle" numberOfLines={1}>
-                  <Text style={styles.btcHigh}>
-                    {request.readablePaymentRequest.slice(0, 6)}
-                  </Text>
-                  <Text style={styles.btcLow}>
-                    {request.readablePaymentRequest.substring(
-                      6,
-                      request.readablePaymentRequest.length - 6,
-                    )}
-                  </Text>
-                  <Text style={styles.btcHigh}>
-                    {request.readablePaymentRequest.slice(-6)}
-                  </Text>
-                </Text>
-              </View>
-            ) : (
-              <Text {...testProps("readable-payment-request")}>
-                {request.readablePaymentRequest}
-              </Text>
-            )
-          ) : (
-            <></>
-          )}
-        </TouchableOpacity>
-
-        <ButtonGroup
-          selectedId={request.type}
-          buttons={[
-            {
-              id: Invoice.Lightning,
-              text: "Lightning",
-              icon: "flash",
-            },
-            { id: Invoice.PayCode, text: "Paycode", icon: "at" },
-            {
-              id: Invoice.OnChain,
-              text: "Onchain",
-              icon: "logo-bitcoin",
-              disabled: isLevelZero,
-            },
-          ]}
-          onPress={(id) => {
-            const isBlockedOnchain = id === Invoice.OnChain && isLevelZero
-
-            if (isBlockedOnchain) {
-              openTrialAccountModal()
-              return
-            }
-
-            if (isReady) {
-              request.setType(id as InvoiceType)
-            }
-          }}
-          style={styles.invoiceTypePicker}
-        />
-        <AmountInput
-          unitOfAccountAmount={request.unitOfAccountAmount}
-          setAmount={request.setAmount}
-          canSetAmount={request.canSetAmount}
-          convertMoneyAmount={request.convertMoneyAmount}
-          walletCurrency={request.receivingWalletDescriptor.currency}
-          showValuesIfDisabled={false}
-          big={false}
-        />
         <NoteInput
-          onBlur={request.setMemo}
-          onChangeText={request.setMemoChangeText}
-          value={request.memoChangeText || ""}
-          editable={request.canSetMemo}
-          style={styles.note}
+          onBlur={handleMemoBlur}
+          onChangeText={requestState.setMemoChangeText}
+          value={requestState.memoChangeText || ""}
+          editable={requestState.canSetMemo}
           big={false}
-        />
-        <ExpirationTimeChooser
-          expirationTime={request?.expirationTime ?? 0}
-          setExpirationTime={request.setExpirationTime}
-          walletCurrency={request.receivingWalletDescriptor.currency}
-          disabled={!request.canSetExpirationTime}
-          style={styles.note}
+          iconSize={16}
+          fontSize={14}
         />
 
-        {OnChainCharge}
+        {showActions && (
+          <View style={styles.actionsRow}>
+            <ActionButton
+              label={LL.ReceiveScreen.copyInvoice()}
+              icon="copy-paste"
+              onPress={handleCopy}
+              accessibilityHint={
+                carousel.isOnChainPage
+                  ? LL.ReceiveScreen.copyClipboardBitcoin()
+                  : LL.ReceiveScreen.copyClipboard()
+              }
+            />
+            <ActionButton
+              label={LL.ReceiveScreen.shareInvoice()}
+              icon="share"
+              onPress={handleShare}
+              accessibilityHint={
+                carousel.isOnChainPage
+                  ? LL.common.shareBitcoin()
+                  : LL.common.shareLightning()
+              }
+            />
+          </View>
+        )}
 
-        <SetLightningAddressModal
-          isVisible={request.isSetLightningAddressModalVisible}
-          toggleModal={request.toggleIsSetLightningAddressModalVisible}
+        <ContextualInfo
+          type={carousel.isOnChainPage ? Invoice.OnChain : requestState.type}
+          expirationTime={requestState.expirationTime ?? 0}
+          setExpirationTime={requestState.setExpirationTime}
+          walletCurrency={requestState.receivingWalletDescriptor.currency}
+          canSetExpirationTime={requestState.canSetExpirationTime}
+          feesInformation={requestState.feesInformation}
         />
+      </View>
 
-        <ModalNfc
-          isActive={displayReceiveNfc}
-          setIsActive={setDisplayReceiveNfc}
-          settlementAmount={request.settlementAmount}
-          receiveViaNFC={request.receiveViaNFC}
-        />
+      <SetLightningAddressModal
+        isVisible={isLightningModalVisible}
+        toggleModal={toggleLightningModal}
+      />
 
-        <TrialAccountLimitsModal
-          isVisible={isTrialAccountModalVisible}
-          closeModal={closeTrialAccountModal}
-          beforeSubmit={() => {
-            reopenUpgradeModal.current = true
-          }}
-        />
-      </Screen>
-    </>
+      <ModalNfc
+        isActive={displayReceiveNfc}
+        setIsActive={setDisplayReceiveNfc}
+        settlementAmount={requestState.settlementAmount}
+        receiveViaNFC={receiveViaNFC}
+      />
+
+      <AmountInputModal
+        moneyAmount={requestState.unitOfAccountAmount}
+        walletCurrency={requestState.receivingWalletDescriptor.currency}
+        convertMoneyAmount={requestState.convertMoneyAmount}
+        onSetAmount={handleNfcAmountSet}
+        isOpen={isNfcAmountModalOpen}
+        close={closeNfcAmountModal}
+      />
+
+      <NfcHeaderButton visible={showNfcButton} onPress={onNfcPress} />
+
+      <TrialAccountLimitsModal
+        isVisible={isTrialModalVisible}
+        closeModal={closeTrialModal}
+        beforeSubmit={markReopenUpgradeModal}
+      />
+    </Screen>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
     flexGrow: 1,
   },
-  tabRow: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "center",
-    marginTop: 12,
-  },
-  usdActive: {
-    backgroundColor: colors._green,
-    borderRadius: 7,
-    justifyContent: "center",
+  paymentIdentifier: {
     alignItems: "center",
-    width: 150,
-    height: 30,
-    margin: 5,
-  },
-  btcActive: {
-    backgroundColor: colors.primary,
-    borderRadius: 7,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 150,
-    height: 30,
-    margin: 5,
-  },
-  inactiveTab: {
-    backgroundColor: colors.grey3,
-    borderRadius: 7,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 150,
-    height: 30,
-    margin: 5,
-  },
-  qrView: {
-    marginBottom: 10,
-  },
-  receivingWalletPicker: {
-    marginBottom: 10,
-  },
-  invoiceTypePicker: {
-    marginBottom: 10,
-  },
-  note: {
     marginTop: 10,
+    paddingHorizontal: 20,
   },
-  extraDetails: {
+  paymentIdentifierText: {
+    color: colors.black,
+    fontSize: 16,
+    fontWeight: "400",
+    lineHeight: 22,
+    textAlign: "center",
+  },
+  actionsRow: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-    minHeight: 20,
+    alignItems: "flex-start",
+    columnGap: 10,
   },
-  invoiceActions: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-    minHeight: 20,
-  },
-  copyInvoiceContainer: {
-    flex: 2,
-    marginLeft: 10,
-  },
-  shareInvoiceContainer: {
-    flex: 2,
-    alignItems: "flex-end",
-    marginRight: 10,
-  },
-  onchainCharges: { marginTop: 10, alignItems: "center" },
-  btcHighContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  btcHigh: {
-    fontWeight: "700",
-  },
-  btcLow: {},
-  nfcIcon: {
-    marginTop: -1,
-    marginRight: 14,
-    padding: 8,
-    display: "flex",
-    flexDirection: "row",
-    columnGap: 4,
-    backgroundColor: colors.grey5,
-    borderRadius: 4,
+  inputsContainer: {
+    marginTop: 14,
+    paddingHorizontal: 20,
+    rowGap: 14,
   },
 }))
 

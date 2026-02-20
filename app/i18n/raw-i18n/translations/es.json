@@ -2013,27 +2013,27 @@
         "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
         "customErrorMessage": "Parece que hemos detectado actividad inusual en tu cuenta. Para garantizar la equidad, no podemos ofrecer recompensas en este momento.\nPuedes seguir aprendiendo sin recompensas o intentarlo más tarde desde otra conexión.",
         "customMessages": {
-            "invalidPhoneForQuiz":{
+            "invalidPhoneForQuiz": {
                 "title": "Operadora restringida",
                 "message": "Estamos experimentando un ataque de usuarios con esta operadora.\nHemos deshabilitado las recompensas para esta operadora hasta nuevo aviso. ¡Disculpa!"
             },
-            "invalidIpMetadata":{
+            "invalidIpMetadata": {
                 "title": "IP restringida",
                 "message": "Estamos experimentando un ataque de usuarios con esta IP.\nHemos deshabilitado las recompensas para esta IP hasta nuevo aviso. ¡Disculpa!"
             },
-            "claimedTooEarly":{
+            "claimedTooEarly": {
                 "title": "Billetera de recompensas vacía",
                 "message": "Agregaremos fondos pronto. ¡Disculpa!"
             },
-            "notEnoughBalanceForQuiz":{
+            "notEnoughBalanceForQuiz": {
                 "title": "Billetera de recompensas vacía",
                 "message": "Agregaremos fondos pronto. ¡Disculpa!"
             },
-            "invalidQuizQuestionId":{
+            "invalidQuizQuestionId": {
                 "title": "Billetera de recompensas vacía",
                 "message": "Agregaremos fondos pronto. ¡Disculpa!"
             },
-            "oneSectionADay":{
+            "oneSectionADay": {
                 "title": "¿Continuar sin recompensas?",
                 "message": "Solo puedes hacer una sección por día mientras ganas recompensas sats."
             }
@@ -2155,7 +2155,11 @@
         "receiveViaPaycode": "Recibir vía de código de pago",
         "receiveViaOnchain": "Recibir vía Onchain",
         "payCodeOrLNURL": "Código de pago / LNURL",
-        "cantReceiveZeroSats": "No puedes recibir cero sats. Por favor ingrese una cantidad correspondiente a 1 o más sats."
+        "cantReceiveZeroSats": "No puedes recibir cero sats. Por favor ingrese una cantidad correspondiente a 1 o más sats.",
+        "lightningAddress": "Dirección lightning",
+        "lightningInvoice": "Factura lightning",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",

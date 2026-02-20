@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Příjem přes Paycode",
     "receiveViaOnchain": "Příjem přes Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+    "lightningAddress": "Lightning adresa",
+    "lightningInvoice": "Lightning faktura",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Směnit Bitcoin",

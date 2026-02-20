@@ -11,7 +11,15 @@ import ReceiveBitcoinIcon from "@app/assets/icons/receive-bitcoin.svg"
 import ShareIcon from "@app/assets/icons/share.svg"
 import WebLink from "@app/assets/icons/web-link.svg"
 
-export const CustomIcon = ({ name, color }: { name: string; color: string }) => {
+export const CustomIcon = ({
+  name,
+  color,
+  size,
+}: {
+  name: string
+  color: string
+  size?: number
+}) => {
   if (name === "custom-receive-bitcoin") {
     return <ReceiveBitcoinIcon color={color} />
   }
@@ -37,7 +45,7 @@ export const CustomIcon = ({ name, color }: { name: string; color: string }) => 
     return <WebLink color={color} />
   }
   if (name === "nfc") {
-    return <NFCIcon color={color} />
+    return <NFCIcon color={color} width={size} height={size} />
   }
   return <View />
 }

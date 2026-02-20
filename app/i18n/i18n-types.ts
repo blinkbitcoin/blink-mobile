@@ -6830,6 +6830,25 @@ type RootTranslation = {
 		 * Y​o​u​ ​c​a​n​'​t​ ​r​e​c​e​i​v​e​ ​z​e​r​o​ ​s​a​t​s​.​ ​P​l​e​a​s​e​ ​e​n​t​e​r​ ​a​n​ ​a​m​o​u​n​t​ ​c​o​r​r​e​s​p​o​n​d​i​n​g​ ​t​o​ ​1​ ​o​r​ ​m​o​r​e​ ​s​a​t​s​.
 		 */
 		cantReceiveZeroSats: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+		 */
+		lightningAddress: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​i​n​v​o​i​c​e
+		 */
+		lightningInvoice: string
+		/**
+		 * B​i​t​c​o​i​n​ ​o​n​c​h​a​i​n
+		 */
+		bitcoinOnchain: string
+		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e​:​ ​{​f​e​e​}​ ​S​A​T​ ​f​o​r​ ​a​m​o​u​n​t​s​ ​u​n​d​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T​ ​o​r​ ​{​o​v​e​r​F​e​e​}​ ​S​A​T​ ​f​o​r​ ​d​e​p​o​s​i​t​s​ ​o​v​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} overFee
+		 * @param {string} threshold
+		 */
+		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -16393,6 +16412,22 @@ export type TranslationFunctions = {
 		 * You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.
 		 */
 		cantReceiveZeroSats: () => LocalizedString
+		/**
+		 * Lightning address
+		 */
+		lightningAddress: () => LocalizedString
+		/**
+		 * Lightning invoice
+		 */
+		lightningInvoice: () => LocalizedString
+		/**
+		 * Bitcoin onchain
+		 */
+		bitcoinOnchain: () => LocalizedString
+		/**
+		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
+		 */
+		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**

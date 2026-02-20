@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Primi putem Paycode-a",
     "receiveViaOnchain": "Primi putem Onchaina",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+    "lightningAddress": "Lightning adresa",
+    "lightningInvoice": "Lightning račun",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Povuci bitcoin",

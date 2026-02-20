@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Pokea kupitia Paycode",
     "receiveViaOnchain": "Pokea kupitia Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Hauwezi kupokea sats sifuri. Tafadhali ingiza kiwango kinacholingana na sats 1 au zaidi."
+    "cantReceiveZeroSats": "Hauwezi kupokea sats sifuri. Tafadhali ingiza kiwango kinacholingana na sats 1 au zaidi.",
+    "lightningAddress": "Anwani ya Lightning",
+    "lightningInvoice": "Ankara ya Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Badilisha Bitcoin",

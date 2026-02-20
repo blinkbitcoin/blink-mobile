@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Receive via Paycode",
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "لا يمكنك استلام صفر sats. يرجى إدخال مبلغ يعادل 1 sat أو أكثر."
+    "cantReceiveZeroSats": "لا يمكنك استلام صفر sats. يرجى إدخال مبلغ يعادل 1 sat أو أكثر.",
+    "lightningAddress": "عنوان Lightning",
+    "lightningInvoice": "فاتورة Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "حرر البيتكوين",

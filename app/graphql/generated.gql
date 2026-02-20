@@ -1354,6 +1354,7 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
+        ratio
         __typename
       }
       __typename

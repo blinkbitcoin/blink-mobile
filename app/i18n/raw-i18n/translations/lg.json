@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Funa okuva ku Paycode",
     "receiveViaOnchain": "Funa okuva ku Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Tosobola kufuna zero sats. Nsaba oyingize omuwendo ogukwatagana ne sats 1 oba okusingawo."
+    "cantReceiveZeroSats": "Tosobola kufuna zero sats. Nsaba oyingize omuwendo ogukwatagana ne sats 1 oba okusingawo.",
+    "lightningAddress": "Endagiriro ya Lightning",
+    "lightningInvoice": "Invoisi ya Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Nunula Bitcoin",

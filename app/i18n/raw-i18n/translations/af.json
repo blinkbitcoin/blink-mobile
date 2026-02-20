@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Ontvang met LNURL",
     "receiveViaOnchain": "Ontvang opketting",
     "payCodeOrLNURL": "Betaalkode / LNURL",
-    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+    "lightningAddress": "Lightning-adres",
+    "lightningInvoice": "Lightning-faktuur",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Verkry Bitcoin",

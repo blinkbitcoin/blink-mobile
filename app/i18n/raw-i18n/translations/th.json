@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Receive via Paycode",
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "คุณไม่สามารถรับ 0 sats ได้ กรุณาใส่จำนวนที่สอดคล้องกับ 1 sats ขึ้นไป"
+    "cantReceiveZeroSats": "คุณไม่สามารถรับ 0 sats ได้ กรุณาใส่จำนวนที่สอดคล้องกับ 1 sats ขึ้นไป",
+    "lightningAddress": "ที่อยู่ Lightning",
+    "lightningInvoice": "ใบแจ้งหนี้ Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "แลกรับบิตคอยน์",

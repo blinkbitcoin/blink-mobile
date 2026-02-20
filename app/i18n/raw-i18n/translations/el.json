@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Λήψη μέσω Paycode",
     "receiveViaOnchain": "Λήψη μέσω On-chain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Δεν μπορείτε να λαμβάνετε μηδενικά sats. Παρακαλούμε εισάγετε ένα ποσό που αντιστοιχεί σε 1 ή περισσότερα sats."
+    "cantReceiveZeroSats": "Δεν μπορείτε να λαμβάνετε μηδενικά sats. Παρακαλούμε εισάγετε ένα ποσό που αντιστοιχεί σε 1 ή περισσότερα sats.",
+    "lightningAddress": "Διεύθυνση Lightning",
+    "lightningInvoice": "Τιμολόγιο Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Χρέωση κατάθεσης: {fee} SAT για ποσά κάτω από {threshold} SAT ή {overFee} SAT για καταθέσεις πάνω από {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Εξαργύρωση Bitcoin",

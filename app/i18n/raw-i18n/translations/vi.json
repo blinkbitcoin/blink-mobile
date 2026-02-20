@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Receive via Paycode",
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "Bạn không thể nhận 0 sats. Vui lòng nhập số tiền tương ứng với 1 hoặc nhiều sats."
+    "cantReceiveZeroSats": "Bạn không thể nhận 0 sats. Vui lòng nhập số tiền tương ứng với 1 hoặc nhiều sats.",
+    "lightningAddress": "Địa chỉ Lightning",
+    "lightningInvoice": "Hóa đơn Lightning",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Đổi lấy Bitcoin",

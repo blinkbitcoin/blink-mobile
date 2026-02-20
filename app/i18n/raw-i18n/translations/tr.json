@@ -2155,7 +2155,11 @@
     "receiveViaPaycode": "Ödeme Kodu ile al",
     "receiveViaOnchain": "Onchain ile al",
     "payCodeOrLNURL": "Ödeme Kodu / LNURL",
-    "cantReceiveZeroSats": "Sıfır SAT alamazsınız. Lütfen 1 veya daha fazla SAT'a karşılık gelen bir miktar girin.\n"
+    "cantReceiveZeroSats": "Sıfır SAT alamazsınız. Lütfen 1 veya daha fazla SAT'a karşılık gelen bir miktar girin.\n",
+    "lightningAddress": "Lightning adresi",
+    "lightningInvoice": "Lightning faturası",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",

@@ -2196,6 +2196,11 @@ const en: BaseTranslation = {
     payCodeOrLNURL: "Paycode / LNURL",
     cantReceiveZeroSats:
       "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+    lightningAddress: "Lightning address",
+    lightningInvoice: "Lightning invoice",
+    bitcoinOnchain: "Bitcoin onchain",
+    depositFee:
+      "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
