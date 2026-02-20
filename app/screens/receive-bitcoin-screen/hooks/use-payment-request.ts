@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 
 import { gql } from "@apollo/client"
 import {
@@ -9,8 +8,6 @@ import {
   useLnUsdInvoiceCreateMutation,
   useOnChainAddressCurrentMutation,
 } from "@app/graphql/generated"
-import { useLnUpdateHashPaid } from "@app/graphql/ln-update-context"
-import { useCountdown } from "@app/hooks"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { BtcWalletDescriptor } from "@app/types/wallets"
 
@@ -18,12 +15,10 @@ import {
   BaseCreatePaymentRequestCreationDataParams,
   Invoice,
   InvoiceType,
-  PaymentRequest,
-  PaymentRequestState,
   PaymentRequestCreationData,
 } from "../payment/index.types"
-import { createPaymentRequest } from "../payment/payment-request"
 import { createPaymentRequestCreationData } from "../payment/payment-request-creation-data"
+import { useInvoiceLifecycle } from "./use-invoice-lifecycle"
 import { useWalletResolution } from "./use-wallet-resolution"
 
 gql`
@@ -91,7 +86,6 @@ export const usePaymentRequest = () => {
   const [prcd, setPRCD] = useState<PaymentRequestCreationData<WalletCurrency> | null>(
     null,
   )
-  const [pr, setPR] = useState<PaymentRequest | null>(null)
   const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
 
   const expirationPerWallet = useRef({ ...DEFAULT_EXPIRATION_MINUTES })
@@ -131,78 +125,23 @@ export const usePaymentRequest = () => {
     setPRCD(createPaymentRequestCreationData(initialPRParams))
   }, [prcd, wallets])
 
-  useLayoutEffect(() => {
-    if (prcd) {
-      setPR(
-        createPaymentRequest({
-          mutations: {
-            lnNoAmountInvoiceCreate,
-            lnUsdInvoiceCreate,
-            lnInvoiceCreate,
-            onChainAddressCurrent,
-          },
-          creationData: prcd,
-        }),
-      )
-    }
-  }, [
-    prcd,
-    lnNoAmountInvoiceCreate,
-    lnUsdInvoiceCreate,
-    lnInvoiceCreate,
-    onChainAddressCurrent,
-  ])
+  const mutations = useMemo(
+    () => ({
+      lnNoAmountInvoiceCreate,
+      lnUsdInvoiceCreate,
+      lnInvoiceCreate,
+      onChainAddressCurrent,
+    }),
+    [lnNoAmountInvoiceCreate, lnUsdInvoiceCreate, lnInvoiceCreate, onChainAddressCurrent],
+  )
 
-  useEffect(() => {
-    if (pr && pr.state === PaymentRequestState.Idle) {
-      setPR((current) => current && current.setState(PaymentRequestState.Loading))
-      pr.generateRequest().then((newPR) =>
-        setPR((currentPR) => {
-          // don't override payment request if the request is from different request
-          if (currentPR?.creationData === newPR.creationData) return newPR
-          return currentPR
-        }),
-      )
-    }
-  }, [pr])
-
-  // Triggers regeneration by resetting to Idle
-  const regenerateInvoice = useCallback(() => {
-    setPR((current) => current && current.setState(PaymentRequestState.Idle))
-  }, [])
+  const { pr, regenerateInvoice, expiresInSeconds } = useInvoiceLifecycle(prcd, mutations)
 
   useEffect(() => {
     if (wallets?.username && wallets.username !== prcd?.username) {
       setPRCD((current) => current && current.setUsername(wallets.username!))
     }
   }, [wallets?.username, prcd?.username])
-
-  const lastHash = useLnUpdateHashPaid()
-  useEffect(() => {
-    if (
-      pr?.state === PaymentRequestState.Created &&
-      pr.info?.data?.invoiceType === Invoice.Lightning &&
-      lastHash === pr.info.data.paymentHash
-    ) {
-      setPR((current) => current && current.setState(PaymentRequestState.Paid))
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
-    }
-  }, [lastHash, pr])
-
-  const expiresAt =
-    pr?.info?.data?.invoiceType === Invoice.Lightning && pr.info?.data?.expiresAt
-      ? pr.info.data.expiresAt
-      : null
-
-  const { remainingSeconds: expiresInSeconds, isExpired } = useCountdown(expiresAt)
-
-  useEffect(() => {
-    if (isExpired) {
-      setPR((current) => current && current.setState(PaymentRequestState.Expired))
-    }
-  }, [isExpired])
 
   const setType = useCallback((type: InvoiceType) => {
     setPRCD((current) => current && current.setType(type))
