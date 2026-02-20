@@ -2454,7 +2454,7 @@
     "DEFAULT": "Varsayılan (OS)"
   },
   "StablesatsModal": {
-    "header": "Stablesats ile cüzdanınızda artık bir Amerikan Doları hesabınız var. ",
+    "header": "Stablesats ile cüzdanınızda artık bir Dolar hesabınız var. ",
     "body": "Bitcoin göndermek ve almak için kullanabilir ve Bitcoin ile Dollar hesabınız arasında anında değer transferi yapabilirsiniz. Dollar hesabındaki değer Bitcoin fiyatı ile dalgalanmayacaktır. Bu özellik geleneksel bankacılık sistemi ile uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
     "learnMore": "Stablesats'i öğrenin"

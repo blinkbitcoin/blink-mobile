@@ -7942,11 +7942,11 @@ type RootTranslation = {
 	}
 	StablesatsModal: {
 		/**
-		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​U​S​D​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
+		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
 		 */
 		header: string
 		/**
-		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​T​C​ ​a​n​d​ ​U​S​D​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​U​S​D​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​n​d​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
 		 */
 		body: string
 		/**
@@ -8686,7 +8686,7 @@ type RootTranslation = {
 		 */
 		bitcoinPrice: string
 		/**
-		 * B​T​C​ ​A​c​c​o​u​n​t
+		 * B​i​t​c​o​i​n​ ​A​c​c​o​u​n​t
 		 */
 		btcAccount: string
 		/**
@@ -8958,7 +8958,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * U​S​D​ ​A​c​c​o​u​n​t
+		 * D​o​l​l​a​r​ ​A​c​c​o​u​n​t
 		 */
 		usdAccount: string
 		/**
@@ -17468,11 +17468,11 @@ export type TranslationFunctions = {
 	}
 	StablesatsModal: {
 		/**
-		 * With Stablesats, you now have a USD account added to your wallet!
+		 * With Stablesats, you now have a Dollar account added to your wallet!
 		 */
 		header: () => LocalizedString
 		/**
-		 * You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
+		 * You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
 		 */
 		body: () => LocalizedString
 		/**
@@ -18194,7 +18194,7 @@ export type TranslationFunctions = {
 		 */
 		bitcoinPrice: () => LocalizedString
 		/**
-		 * BTC Account
+		 * Bitcoin Account
 		 */
 		btcAccount: () => LocalizedString
 		/**
@@ -18466,7 +18466,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * USD Account
+		 * Dollar Account
 		 */
 		usdAccount: () => LocalizedString
 		/**
