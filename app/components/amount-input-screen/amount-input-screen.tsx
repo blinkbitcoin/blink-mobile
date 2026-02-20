@@ -144,7 +144,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   })?.preferredAmountCurrency
 
   const resolvedInitialAmount = (() => {
-    if (initialAmount?.amount) return initialAmount
+    if (initialAmount && initialAmount.amount !== undefined) return initialAmount
     if (preferredCurrency) {
       const currency =
         preferredCurrency === PreferredAmountCurrency.Display
@@ -234,7 +234,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     })
 
   useEffect(() => {
-    if (initialAmount?.amount) {
+    if (initialAmount && initialAmount.amount !== undefined) {
       setNumberPadAmount(initialAmount)
     }
   }, [initialAmount, setNumberPadAmount])
