@@ -2162,7 +2162,11 @@
     "receiveViaPaycode": "Ստանալ վճարման ծածկագրի միջոցով",
     "receiveViaOnchain": "Ստանալ Onchain-ի միջոցով",
     "payCodeOrLNURL": "Վճարման ծածկագիրը/LNURL",
-    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+    "cantReceiveZeroSats": "Դուք չեք կարող ստանալ զրո sats։ Խնդրում ենք մուտքագրել 1 կամ ավելի sats-ին համապատասխան գումար։",
+    "lightningAddress": "lightning հասցե",
+    "lightningInvoice": "lightning վճարման հարցում",
+    "bitcoinOnchain": "Bitcoin onchain",
+    "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար"
   },
   "RedeemBitcoinScreen": {
     "title": "Հետ գնել Բիթքոյն",
