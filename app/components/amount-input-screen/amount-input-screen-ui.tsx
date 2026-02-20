@@ -79,6 +79,8 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
               }}
               style={styles.hiddenInput}
               caretHidden
+              accessibilityElementsHidden
+              importantForAccessibility="no"
             />
           </View>
         </View>
@@ -97,6 +99,8 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
                 onPress={onToggleCurrency}
+                accessibilityLabel="Switch currencies"
+                accessibilityRole="button"
                 style={({ pressed }) => [
                   styles.toggleButton,
                   pressed && { opacity: 0.7 },
