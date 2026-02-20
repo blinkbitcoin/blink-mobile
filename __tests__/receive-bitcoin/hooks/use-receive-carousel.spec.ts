@@ -9,30 +9,15 @@ jest.mock("@app/graphql/level-context", () => ({
   useLevel: () => mockUseLevel(),
 }))
 
-const mockOnChainAddress = {
-  address: "bc1qtest",
-  loading: false,
-  error: null,
-  getFullUriFn: jest.fn(),
-}
-
-jest.mock("@app/screens/receive-bitcoin-screen/hooks/use-onchain-address", () => ({
-  useOnChainAddress: () => mockOnChainAddress,
-}))
-
 type MockRequest = {
   btcWalletId: string
   usdWalletId: string
-  settlementAmount: { amount: number } | undefined
-  memo: string
   receivingWalletDescriptor: { currency: WalletCurrency }
 }
 
 const createMockRequest = (overrides: Partial<MockRequest> = {}): MockRequest => ({
   btcWalletId: "btc-wallet-id",
   usdWalletId: "usd-wallet-id",
-  settlementAmount: undefined,
-  memo: "",
   receivingWalletDescriptor: { currency: WalletCurrency.Btc },
   ...overrides,
 })
@@ -187,18 +172,5 @@ describe("useReceiveCarousel", () => {
     })
 
     expect(result.current.onchainWalletCurrency).toBe(WalletCurrency.Usd)
-  })
-
-  it("exposes onchain state from useOnChainAddress", () => {
-    const request = createMockRequest()
-    const { result } = renderHook(() =>
-      useReceiveCarousel(
-        request as Parameters<typeof useReceiveCarousel>[0],
-        onLevelZeroBlock,
-      ),
-    )
-
-    expect(result.current.onchain.address).toBe("bc1qtest")
-    expect(result.current.onchain.loading).toBe(false)
   })
 })

@@ -28,6 +28,7 @@ import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types
 import {
   useDisplayPaymentRequest,
   useNfcReceive,
+  useOnChainAddress,
   usePaymentRequest,
   useReceiveCarousel,
   useReceiveFlow,
@@ -70,6 +71,16 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
 
   const carousel = useReceiveCarousel(requestState, openTrialModal)
 
+  const onchainWalletId =
+    carousel.onchainWalletCurrency === WalletCurrency.Btc
+      ? requestState.btcWalletId
+      : requestState.usdWalletId
+
+  const onchain = useOnChainAddress(onchainWalletId, {
+    amount: requestState.settlementAmount?.amount,
+    memo: requestState.memo || undefined,
+  })
+
   const {
     handleSetAmount,
     handleMemoBlur,
@@ -81,13 +92,13 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
     isOnChainPage: carousel.isOnChainPage,
     onchainWalletCurrency: carousel.onchainWalletCurrency,
     syncOnchainWallet: carousel.syncOnchainWallet,
-    onchainAddress: carousel.onchain.address,
+    onchainAddress: onchain.address,
   })
 
   const { displayPaymentRequest, showActions } = useDisplayPaymentRequest(
     requestState,
     carousel.isOnChainPage,
-    carousel.onchain.address,
+    onchain.address,
   )
 
   const {
@@ -167,8 +178,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
         page1={
           <QRView
             type={Invoice.OnChain}
-            getFullUri={carousel.onchain.getFullUriFn}
-            loading={carousel.onchain.loading}
+            getFullUri={onchain.getFullUriFn}
+            loading={onchain.loading}
             completed={requestState.state === PaymentRequestState.Paid}
             err=""
             expired={false}

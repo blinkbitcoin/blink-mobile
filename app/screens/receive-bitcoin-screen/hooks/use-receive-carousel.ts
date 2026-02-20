@@ -4,18 +4,9 @@ import { ICarouselInstance } from "react-native-reanimated-carousel"
 import { WalletCurrency } from "@app/graphql/generated"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 
-import { GetFullUriFn } from "../payment/index.types"
-import { useOnChainAddress } from "./use-onchain-address"
 import { usePaymentRequest } from "./use-payment-request"
 
 type RequestState = NonNullable<ReturnType<typeof usePaymentRequest>>
-
-type OnChainState = {
-  address: string | null
-  loading: boolean
-  error: string | null
-  getFullUriFn: GetFullUriFn | undefined
-}
 
 enum CarouselPage {
   Lightning = 0,
@@ -27,7 +18,6 @@ type CarouselReturn = {
   isOnChainPage: boolean
   onchainWalletCurrency: WalletCurrency
   syncOnchainWallet: (currency: WalletCurrency) => void
-  onchain: OnChainState
   handleSnap: (index: number) => void
 }
 
@@ -45,16 +35,6 @@ export const useReceiveCarousel = (
   const [onchainWalletCurrency, setOnchainWalletCurrency] = useState<WalletCurrency>(
     WalletCurrency.Btc,
   )
-
-  const onchainWalletId =
-    onchainWalletCurrency === WalletCurrency.Btc
-      ? request.btcWalletId
-      : request.usdWalletId
-
-  const onchain = useOnChainAddress(onchainWalletId, {
-    amount: request.settlementAmount?.amount,
-    memo: request.memo || undefined,
-  })
 
   const handleSnap = useCallback(
     (index: number) => {
@@ -76,7 +56,6 @@ export const useReceiveCarousel = (
     isOnChainPage,
     onchainWalletCurrency,
     syncOnchainWallet: setOnchainWalletCurrency,
-    onchain,
     handleSnap,
   }
 }
