@@ -38,19 +38,6 @@ export const usePaymentRequest = () => {
   const [lnInvoiceCreate] = useLnInvoiceCreateMutation()
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
 
-  const mutationsRef = useRef({
-    lnNoAmountInvoiceCreate,
-    lnUsdInvoiceCreate,
-    lnInvoiceCreate,
-    onChainAddressCurrent,
-  })
-  mutationsRef.current = {
-    lnNoAmountInvoiceCreate,
-    lnUsdInvoiceCreate,
-    lnInvoiceCreate,
-    onChainAddressCurrent,
-  }
-
   const [prcd, setPRCD] = useState<PaymentRequestCreationData<WalletCurrency> | null>(
     null,
   )
@@ -98,12 +85,23 @@ export const usePaymentRequest = () => {
     if (prcd) {
       setPR(
         createPaymentRequest({
-          mutations: mutationsRef.current,
+          mutations: {
+            lnNoAmountInvoiceCreate,
+            lnUsdInvoiceCreate,
+            lnInvoiceCreate,
+            onChainAddressCurrent,
+          },
           creationData: prcd,
         }),
       )
     }
-  }, [prcd])
+  }, [
+    prcd,
+    lnNoAmountInvoiceCreate,
+    lnUsdInvoiceCreate,
+    lnInvoiceCreate,
+    onChainAddressCurrent,
+  ])
 
   useLayoutEffect(() => {
     if (pr && pr.state === PaymentRequestState.Idle) {
