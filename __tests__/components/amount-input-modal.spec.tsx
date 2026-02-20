@@ -134,7 +134,7 @@ describe("AmountInputModal", () => {
     expect(capturedAmountInputScreenProps.minAmount).toBe(minAmount)
   })
 
-  it("wraps onSetAmount to also dismiss the sheet", () => {
+  it("defers onSetAmount until sheet dismiss", () => {
     render(<AmountInputModal {...defaultProps} onSetAmount={mockOnSetAmount} />)
 
     const setAmountFn = capturedAmountInputScreenProps.setAmount as (
@@ -145,8 +145,12 @@ describe("AmountInputModal", () => {
     const amount = { amount: 100, currency: "BTC", currencyCode: "SAT" }
     setAmountFn(amount)
 
-    expect(mockOnSetAmount).toHaveBeenCalledWith(amount)
     expect(mockDismiss).toHaveBeenCalled()
+    expect(mockOnSetAmount).not.toHaveBeenCalled()
+
+    capturedOnDismiss?.()
+
+    expect(mockOnSetAmount).toHaveBeenCalledWith(amount)
   })
 
   it("does not pass setAmount when onSetAmount is undefined", () => {

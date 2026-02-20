@@ -41,6 +41,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   const { bottom } = useSafeAreaInsets()
   const styles = useStyles({ bottom })
   const bottomSheetRef = useRef<BottomSheetModal>(null)
+  const pendingSetAmountRef = useRef<MoneyAmount<WalletOrDisplayCurrency>>()
 
   useEffect(() => {
     if (isOpen) {
@@ -49,6 +50,16 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
     }
     bottomSheetRef.current?.dismiss()
   }, [isOpen])
+
+  const handleDismiss = useCallback(() => {
+    close()
+
+    const pendingAmount = pendingSetAmountRef.current
+    if (!pendingAmount || !onSetAmount) return
+
+    pendingSetAmountRef.current = undefined
+    onSetAmount(pendingAmount)
+  }, [close, onSetAmount])
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -71,7 +82,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={styles.handleIndicator}
       backgroundStyle={styles.sheetBackground}
-      onDismiss={close}
+      onDismiss={handleDismiss}
     >
       <BottomSheetView style={styles.sheetContent}>
         <AmountInputScreen
@@ -81,7 +92,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
           setAmount={
             onSetAmount &&
             ((amount) => {
-              onSetAmount(amount)
+              pendingSetAmountRef.current = amount
               bottomSheetRef.current?.dismiss()
             })
           }
