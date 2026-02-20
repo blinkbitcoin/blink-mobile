@@ -2471,8 +2471,8 @@
     "DEFAULT": "Verstek (OS)"
   },
   "StablesatsModal": {
-    "header": "Met Stablesats het jy nou 'n USD-rekening by jou beursie gevoeg!",
-    "body": "Jy kan dit gebruik om Bitcoin te stuur of ontvang, en om onmiddelik fondse tussen jou BTC- en USD-rekening te verskuif. Die waarde van die USD-rekening sal nie wissel saam met die prys van Bitcoin nie. Hierdie funksie kan nie met die tradisionele bankstelsel gebruik word nie. ",
+    "header": "Met Stablesats het jy nou 'n Dollar-rekening by jou beursie gevoeg!",
+    "body": "Jy kan dit gebruik om Bitcoin te stuur of ontvang, en om onmiddelik fondse tussen jou Bitcoin- en Dollar-rekening te verskuif. Die waarde van die Dollar-rekening sal nie wissel saam met die prys van Bitcoin nie. Hierdie funksie kan nie met die tradisionele bankstelsel gebruik word nie. ",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
     "learnMore": "Leer meer van Stablesats"
   },
@@ -2689,7 +2689,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin-prys ",
-    "btcAccount": "BTC-rekening",
+    "btcAccount": "Bitcoin-rekening",
     "cancel": "Kanselleer ",
     "close": "Maak toe",
     "confirm": "Bevestig",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Fout - kan nie transaksies laai nie",
     "tryAgain": "Probeer weer",
     "type": "Tipe",
-    "usdAccount": "USD-rekening ",
+    "usdAccount": "Dollar-rekening ",
     "username": "Gebruikersnaam",
     "usernameRequired": "Gebruikersnaam word vereis",
     "backupAccount": "Rugsteen/opgradeer rekening",

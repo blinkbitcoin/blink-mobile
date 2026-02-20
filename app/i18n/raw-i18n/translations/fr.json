@@ -2471,8 +2471,8 @@
         "DEFAULT": "Par défaut (OS)"
     },
     "StablesatsModal": {
-        "header": "Avec Stablesats, vous avez à présent un compte en dollar US ajouté à votre portefeuille !",
-        "body": "Vous pouvez l’utiliser pour envoyer et recevoir des bitcoins, et instantanément transférer la valeur entre votre compte BTC et Dollar US. La valeur du dollar US ne fluctuera pas avec le prix du bitcoin. Cette fonction n’est pas compatible avec le système bancaire traditionnel.",
+        "header": "Avec Stablesats, vous avez à présent un compte Dollar ajouté à votre portefeuille !",
+        "body": "Vous pouvez l'utiliser pour envoyer et recevoir des bitcoins, et instantanément transférer la valeur entre votre compte Bitcoin et Dollar. La valeur du Dollar ne fluctuera pas avec le prix du bitcoin. Cette fonction n'est pas compatible avec le système bancaire traditionnel.",
         "termsAndConditions": "Lire les Termes & Conditions",
         "learnMore": "En savoir plus sur Stablesats"
     },
@@ -2757,7 +2757,7 @@
         "transactionsError": "Erreur de chargement des transactions",
         "tryAgain": "Essayer à nouveau",
         "type": "Type",
-        "usdAccount": "Compte en dollar US",
+        "usdAccount": "Compte Dollar",
         "username": "Identifiant",
         "usernameRequired": "Un identifiant est requis",
         "backupAccount": "Sauvegarde / Mise à jour du compte",

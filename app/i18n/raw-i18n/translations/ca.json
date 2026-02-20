@@ -2454,8 +2454,8 @@
     "DEFAULT": "Per defecte (OS)"
   },
   "StablesatsModal": {
-    "header": "Amb Stablesats, ara tens un compte en USD afegit al teu moneder!",
-    "body": "Pots utilitzar-lo per enviar i rebre Bitcoin o per transferir  instantàniament entre els teus comptes de BTC i USD. El valor del compte USD no fluctuarà amb el preu de Bitcoin. Aquesta característica no és compatible amb el sistema bancari tradicional.",
+    "header": "Amb Stablesats, ara tens un compte en Dòlar afegit al teu moneder!",
+    "body": "Pots utilitzar-lo per enviar i rebre Bitcoin o per transferir  instantàniament entre els teus comptes de Bitcoin i Dòlar. El valor del compte Dòlar no fluctuarà amb el preu de Bitcoin. Aquesta característica no és compatible amb el sistema bancari tradicional.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
     "learnMore": "Apren més sobre els Stablesats"
   },
@@ -2672,7 +2672,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Preu de Bitcoin",
-    "btcAccount": "Compte BTC",
+    "btcAccount": "Compte Bitcoin",
     "cancel": "Cancela",
     "close": "Tanca",
     "confirm": "Confirma",
@@ -2740,7 +2740,7 @@
     "transactionsError": "S'ha produït un error en carregar les transaccions",
     "tryAgain": "Torna-ho a intentar",
     "type": "Tipus",
-    "usdAccount": "Compte USD",
+    "usdAccount": "Compte Dòlar",
     "username": "Nom d'usuari",
     "usernameRequired": "El nom d'usuari és necessari",
     "backupAccount": "Còpia de seguretat/actualització del compte",

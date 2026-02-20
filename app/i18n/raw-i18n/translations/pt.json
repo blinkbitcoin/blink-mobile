@@ -2454,8 +2454,8 @@
         "DEFAULT": "Padrão (OS)"
     },
     "StablesatsModal": {
-        "header": "Com Stablesats, você tem agora uma conta USD adicionada na sua carteira!",
-        "body": "Você pode usá-lo para enviar e receber Bitcoin e transferir valor instantaneamente entre sua conta BTC e USD. O valor na conta em USD não flutuará com o preço do Bitcoin. Este recurso não é compatível com o sistema bancário tradicional.",
+        "header": "Com Stablesats, você tem agora uma conta Dollar adicionada na sua carteira!",
+        "body": "Você pode usá-lo para enviar e receber Bitcoin e transferir valor instantaneamente entre sua conta Bitcoin e Dollar. O valor na conta em Dollar não flutuará com o preço do Bitcoin. Este recurso não é compatível com o sistema bancário tradicional.",
         "termsAndConditions": "Leia os Termos e Condições",
         "learnMore": "Aprenda mais sobre Stablesats"
     },
@@ -2740,7 +2740,7 @@
         "transactionsError": "Erro ao carregar transações",
         "tryAgain": "Tente novamente",
         "type": "Tipo",
-        "usdAccount": "Conta USD",
+        "usdAccount": "Conta Dollar",
         "username": "Nome de usuário",
         "usernameRequired": "O nome de usuário é obrigatório",
         "backupAccount": "Backup/atualizar conta",

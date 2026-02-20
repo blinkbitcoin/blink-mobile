@@ -2454,8 +2454,8 @@
     "DEFAULT": "Implicit - Default (OS)"
   },
   "StablesatsModal": {
-    "header": "Cu Stablesats, aveți acum un cont USD adăugat la portofel!",
-    "body": "Îl puteți folosi pentru a trimite și primi Bitcoin și pentru a transfera instantaneu valoare între contul BTC și USD. Valoarea din contul USD nu va fluctua cu prețul Bitcoin. Această caracteristică nu este compatibilă cu sistemul bancar tradițional.",
+    "header": "Cu Stablesats, aveți acum un cont Dollar adăugat la portofel!",
+    "body": "Îl puteți folosi pentru a trimite și primi Bitcoin și pentru a transfera instantaneu valoare între contul Bitcoin și Dollar. Valoarea din contul Dollar nu va fluctua cu prețul Bitcoin. Această caracteristică nu este compatibilă cu sistemul bancar tradițional.",
     "termsAndConditions": "Citiți Termenii și condițiile",
     "learnMore": "Aflați mai multe despre Stablesats"
   },
@@ -2672,7 +2672,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Preț Bitcoin",
-    "btcAccount": "Cont BTC",
+    "btcAccount": "Cont Bitcoin",
     "cancel": "Anulare",
     "close": "Închide",
     "confirm": "Confirmare",
@@ -2740,7 +2740,7 @@
     "transactionsError": "Eroare la încărcarea tranzacțiilor",
     "tryAgain": "Încearcă din nou",
     "type": "Tip",
-    "usdAccount": "Cont USD",
+    "usdAccount": "Cont Dollar",
     "username": "Numele de utilizator",
     "usernameRequired": "Numele de utilizator este obligatoriu",
     "backupAccount": "Backup/upgrade cont",

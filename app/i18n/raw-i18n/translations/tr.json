@@ -2455,7 +2455,7 @@
   },
   "StablesatsModal": {
     "header": "Stablesats ile cüzdanınızda artık bir Amerikan Doları hesabınız var. ",
-    "body": "Bitcoin göndermek ve almak için kullanabilir ve BTC ile dolar hesabınız arasında anında değer transferi yapabilirsiniz. Dolar hesabındaki değer Bitcoin fiyatı ile dalgalanmayacaktır. Bu özellik geleneksel bankacılık sistemi ile uyumlu değildir.",
+    "body": "Bitcoin göndermek ve almak için kullanabilir ve Bitcoin ile Dollar hesabınız arasında anında değer transferi yapabilirsiniz. Dollar hesabındaki değer Bitcoin fiyatı ile dalgalanmayacaktır. Bu özellik geleneksel bankacılık sistemi ile uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
     "learnMore": "Stablesats'i öğrenin"
   },
@@ -2740,7 +2740,7 @@
     "transactionsError": "İşlemleri yüklerken hata oluştu",
     "tryAgain": "Tekrar deneyin",
     "type": "Tip",
-    "usdAccount": "USD Hesabı",
+    "usdAccount": "Dollar Hesabı",
     "username": "Kullanıcı adı",
     "usernameRequired": "Kullanıcı adı gerekiyor",
     "backupAccount": "Hesabı yedekleme/yükseltme",

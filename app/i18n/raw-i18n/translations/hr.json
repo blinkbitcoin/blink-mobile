@@ -2471,8 +2471,8 @@
     "DEFAULT": "Zadano (OS)"
   },
   "StablesatsModal": {
-    "header": "Uz Stablesats, sada imate USD račun dodan u svoj novčanik!",
-    "body": "Možete ga koristiti za slanje i primanje Bitcoina i trenutačni prijenos vrijednosti između vašeg BTC i USD računa. Vrijednost na USD računu neće varirati s cijenom Bitcoina. Ova značajka nije kompatibilna s tradicionalnim bankarskim sustavom.",
+    "header": "Uz Stablesats, sada imate Dollar račun dodan u svoj novčanik!",
+    "body": "Možete ga koristiti za slanje i primanje Bitcoina i trenutačni prijenos vrijednosti između vašeg Bitcoin i Dollar računa. Vrijednost na Dollar računu neće varirati s cijenom Bitcoina. Ova značajka nije kompatibilna s tradicionalnim bankarskim sustavom.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
     "learnMore": "Saznajte više o Stablesats-u"
   },
@@ -2689,7 +2689,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cijena Bitcoina",
-    "btcAccount": "BTC račun",
+    "btcAccount": "Bitcoin račun",
     "cancel": "Poništi",
     "close": "Zatvori",
     "confirm": "Potvrdi",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Pogreška pri učitavanju transakcija",
     "tryAgain": "Pokušajte ponovno",
     "type": "Vrsta",
-    "usdAccount": "USD račun",
+    "usdAccount": "Dollar račun",
     "username": "Korisničko ime",
     "usernameRequired": "Korisničko ime je potrebno",
     "backupAccount": "Sigurnosno kopiranje/nadogradnja računa",

@@ -2453,8 +2453,8 @@
         "DEFAULT": "Predeterminado (OS)"
     },
     "StablesatsModal": {
-        "header": "¡Ya tienes una cuenta en USD agregada a tu billetera con StableSats!",
-        "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta BTC y USD. El valor en la cuenta en USD no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
+        "header": "¡Ya tienes una cuenta en Dollar agregada a tu billetera con StableSats!",
+        "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta Bitcoin y Dollar. El valor en la cuenta en Dollar no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
         "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats"
     },
@@ -2670,7 +2670,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Precio de Bitcoin",
-        "btcAccount": "Cuenta BTC",
+        "btcAccount": "Cuenta Bitcoin",
         "cancel": "Cancelar",
         "close": "Cerrar ",
         "confirm": "Confirmar",
@@ -2738,7 +2738,7 @@
         "transactionsError": "Error al cargar las transacciones",
         "tryAgain": "Inténtalo de Nuevo",
         "type": "tipo",
-        "usdAccount": "Cuenta USD",
+        "usdAccount": "Cuenta Dollar",
         "username": "Nombre de usuario",
         "usernameRequired": "El nombre de usuario es requerido",
         "backupAccount": "Copia de seguridad/actualización de la cuenta",

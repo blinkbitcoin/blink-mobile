@@ -2471,8 +2471,8 @@
     "DEFAULT": "Výchozí nastavení (OS)"
   },
   "StablesatsModal": {
-    "header": "Se Stablesats máte nyní ve své peněžence přidaný účet v USD!",
-    "body": "Pomocí ní můžete posílat a přijímat bitcoiny a okamžitě převádět hodnotu mezi svým účtem v BTC a USD. Hodnota na účtu v USD nebude kolísat s cenou Bitcoinu. Tato funkce není kompatibilní s tradičním bankovním systémem.",
+    "header": "Se Stablesats máte nyní ve své peněžence přidaný Dolarový účet!",
+    "body": "Pomocí ní můžete posílat a přijímat bitcoiny a okamžitě převádět hodnotu mezi svým Bitcoin a Dolarovým účtem. Hodnota na Dolarovém účtu nebude kolísat s cenou Bitcoinu. Tato funkce není kompatibilní s tradičním bankovním systémem.",
     "termsAndConditions": "Přečtěte si smluvní podmínky",
     "learnMore": "Zjistěte více o Stablesats"
   },
@@ -2689,7 +2689,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cena bitcoinu",
-    "btcAccount": "BTC Účet",
+    "btcAccount": "Bitcoin Účet",
     "cancel": "Zrušit",
     "close": "Zavřít",
     "confirm": "Potvrdit",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Chyba při načítání transakcí",
     "tryAgain": "Zkusit znovu",
     "type": "Typ",
-    "usdAccount": "USD účet",
+    "usdAccount": "Dolarový účet",
     "username": "Uživatelské jméno",
     "usernameRequired": "Je vyžadováno uživatelské jméno",
     "backupAccount": "Záloha/aktualizace účtu",

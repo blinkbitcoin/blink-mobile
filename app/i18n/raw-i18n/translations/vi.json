@@ -2471,8 +2471,8 @@
     "DEFAULT": "Mặc định (OS)"
   },
   "StablesatsModal": {
-    "header": "Với Stablesats, bây giờ bạn có một tài khoản USD được thêm vào ví của bạn!",
-    "body": "Bạn có thể sử dụng nó để gửi và nhận bitcoin và chuyển giá trị ngay lập tức giữa tài khoản BTC và USD của bạn. Giá trị trong tài khoản USD sẽ không dao động với giá Bitcoin. Tính năng này không tương thích với hệ thống ngân hàng truyền thống.",
+    "header": "Với Stablesats, bây giờ bạn có một tài khoản Dollar được thêm vào ví của bạn!",
+    "body": "Bạn có thể sử dụng nó để gửi và nhận bitcoin và chuyển giá trị ngay lập tức giữa tài khoản Bitcoin và Dollar của bạn. Giá trị trong tài khoản Dollar sẽ không dao động với giá Bitcoin. Tính năng này không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
     "learnMore": "Tìm hiểu thêm về Stablesats"
   },
@@ -2689,7 +2689,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Giá Bitcoin",
-    "btcAccount": "Tài khoản BTC",
+    "btcAccount": "Tài khoản Bitcoin",
     "cancel": "Hủy",
     "close": "Đóng",
     "confirm": "Xác nhận",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Lỗi tải các giao dịch",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
-    "usdAccount": "Tài khoản USD",
+    "usdAccount": "Tài khoản Dollar",
     "username": "Người dùng",
     "usernameRequired": "Tên người dùng là bắt buộc",
     "backupAccount": "Backup/upgrade account",

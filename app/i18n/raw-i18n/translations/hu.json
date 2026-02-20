@@ -2454,8 +2454,8 @@
     "DEFAULT": "Alapértelmezett"
   },
   "StablesatsModal": {
-    "header": "A Stablesats-al most már van egy USD alapú számla a tárcádban!",
-    "body": "Ezt használhatod Bitcoin küldésére és fogadására, valamint azonnal átvezethesz összegeket a BTC és az USD számláid között. Az USD számlán lévő érték nem ingadozik a Bitcoin ármozgásával. Ez a funkció nem kompatibilis a hagyományos bankrendszerrel.",
+    "header": "A Stablesats-al most már van egy Dollar alapú számla a tárcádban!",
+    "body": "Ezt használhatod Bitcoin küldésére és fogadására, valamint azonnal átvezethesz összegeket a Bitcoin és a Dollar számláid között. A Dollar számlán lévő érték nem ingadozik a Bitcoin ármozgásával. Ez a funkció nem kompatibilis a hagyományos bankrendszerrel.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
     "learnMore": "Tudj meg többet a Stablesatsról"
   },
@@ -2672,7 +2672,7 @@
     "beta": "béta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Ár",
-    "btcAccount": "BTC Számla",
+    "btcAccount": "Bitcoin Számla",
     "cancel": "Mégse",
     "close": "Bezárás",
     "confirm": "Megerősítés",
@@ -2740,7 +2740,7 @@
     "transactionsError": "Hiba a tranzakciók betöltése közben",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
-    "usdAccount": "USD Számla",
+    "usdAccount": "Dollar Számla",
     "username": "Felhasználónév",
     "usernameRequired": "Felhasználónév szükséges",
     "backupAccount": "Biztonsági Mentése / Magasabb szintű fiókra váltás",

@@ -2454,8 +2454,8 @@
     "DEFAULT": "Esookerwako (OS)"
   },
   "StablesatsModal": {
-    "header": "Ne Stablesats, kati olina akawunti ya USD eyongeddwa mu waleti yo!",
-    "body": "Osobola okugikozesa okusindika n'okufuna Bitcoin, era amangu ago n'owaanyisa omuwendo wakati w'akawunti yo eya BTC ne USD. Omuwendo oguli ku akawunti ya USD tegujja kukyukakyuka ku bbeeyi ya Bitcoin. Enkola eno tekwatagana na nkola ya bbanka ey'edda.",
+    "header": "Ne Stablesats, kati olina akawunti ya Dollar eyongeddwa mu waleti yo!",
+    "body": "Osobola okugikozesa okusindika n'okufuna Bitcoin, era amangu ago n'owaanyisa omuwendo wakati w'akawunti yo eya Bitcoin ne Dollar. Omuwendo oguli ku akawunti ya Dollar tegujja kukyukakyuka ku bbeeyi ya Bitcoin. Enkola eno tekwatagana na nkola ya bbanka ey'edda.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
     "learnMore": "Yiga ebisingawo ku Stablesats"
   },
@@ -2672,7 +2672,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Okulamula kwa Bitcoin",
-    "btcAccount": "Akawunti ya BTC",
+    "btcAccount": "Akawunti ya Bitcoin",
     "cancel": "Sazaamu",
     "close": "Ggalawo",
     "confirm": "Kakasa",
@@ -2740,7 +2740,7 @@
     "transactionsError": "Ensobi mu kutikka empaanyisiganya",
     "tryAgain": "Ddamu ogezeeko",
     "type": "Kika",
-    "usdAccount": "Akawunti ya USD",
+    "usdAccount": "Akawunti ya Dollar",
     "username": "Erinnya ly'okozesa",
     "usernameRequired": "Errinya ly'okozesa lyetagisa",
     "backupAccount": "Tereka/ yimusa omutindo gwa akawunti yo",

@@ -2454,8 +2454,8 @@
         "DEFAULT": "Standard (OS)"
     },
     "StablesatsModal": {
-        "header": "Mit Stablesats kannst Du ein USD Konto mit deiner Wallet nutzen!",
-        "body": "Du kannst es nutzen, um Bitcoin zu senden und empfangen, und Gelder direkt zwischen deinen BTC und USD Konten zu transferieren. Der Wert in deinem USD Konto wird nicht mit dem Bitcoin-Preis schwanken. Diese Funktion ist nicht kompatibel mit traditionellen Banksystemen.",
+        "header": "Mit Stablesats kannst Du ein Dollar Konto mit deiner Wallet nutzen!",
+        "body": "Du kannst es nutzen, um Bitcoin zu senden und empfangen, und Gelder direkt zwischen deinen Bitcoin und Dollar Konten zu transferieren. Der Wert in deinem Dollar Konto wird nicht mit dem Bitcoin-Preis schwanken. Diese Funktion ist nicht kompatibel mit traditionellen Banksystemen.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über Stablesats erfahren"
     },
@@ -2672,7 +2672,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Preis",
-        "btcAccount": "BTC Konto",
+        "btcAccount": "Bitcoin Konto",
         "cancel": "Abbrechen",
         "close": "Schließen",
         "confirm": "Bestätigen",
@@ -2740,7 +2740,7 @@
         "transactionsError": "Transaktionen konnten nicht geladen werden",
         "tryAgain": "Erneut versuchen",
         "type": "Typ",
-        "usdAccount": "USD Konto",
+        "usdAccount": "Dollar Konto",
         "username": "Benutzername",
         "usernameRequired": "Benutzername ist erforderlich",
         "backupAccount": "Account sichern / upgraden",

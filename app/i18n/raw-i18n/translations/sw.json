@@ -2454,8 +2454,8 @@
     "DEFAULT": "Chaguo msingi (OS)"
   },
   "StablesatsModal": {
-    "header": "Na Stablesats, sasa akaunti ya USD imeongewa kwenye pochi lako.",
-    "body": "Unaweza kuitumia kutuma na kupokea Bitcoin, na kuhamisha thamani kati ya BTC yako na akaunti yako ya USD. Thamani katika akaunti yako ya USD haitabadilika badilika na thamani ya Bitcoin. Hiki kipengele hakiendani na mfumo wa benki wa kizamani.",
+    "header": "Na Stablesats, sasa akaunti ya Dollar imeongewa kwenye pochi lako.",
+    "body": "Unaweza kuitumia kutuma na kupokea Bitcoin, na kuhamisha thamani kati ya Bitcoin yako na akaunti yako ya Dollar. Thamani katika akaunti yako ya Dollar haitabadilika badilika na thamani ya Bitcoin. Hiki kipengele hakiendani na mfumo wa benki wa kizamani.",
     "termsAndConditions": "Soma Sheria na Masharti",
     "learnMore": "Soma zaidi kuhusu Stablesats"
   },
@@ -2672,7 +2672,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bei ya Bitcoin",
-    "btcAccount": "Akaunti ya BTC",
+    "btcAccount": "Akaunti ya Bitcoin",
     "cancel": "Futa",
     "close": "Funga",
     "confirm": "Thibitisha",
@@ -2740,7 +2740,7 @@
     "transactionsError": "Kosa katika kupakua malipo",
     "tryAgain": "Jaribu Tena",
     "type": "Aina",
-    "usdAccount": "Akaunti ya USD",
+    "usdAccount": "Akaunti ya Dollar",
     "username": "Jina la mtumiaji",
     "usernameRequired": "Jina la mtumiaji linahitajika",
     "backupAccount": "Akaunti ya Kuhifadhi/Nyenzo",

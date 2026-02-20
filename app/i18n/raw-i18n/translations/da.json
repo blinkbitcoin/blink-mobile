@@ -2457,8 +2457,8 @@
     "DEFAULT": "Standard (OS)"
   },
   "StablesatsModal": {
-    "header": "Med Stablesats har du nu en USD-konto tilføjet til din tegnebog!",
-    "body": "Du kan bruge den til at sende og modtage Bitcoin og øjeblikkeligt overføre værdi mellem din BTC og USD-konto. Værdien i USD-kontoen vil ikke svinge med prisen på Bitcoin. Denne funktion er ikke kompatibel med det traditionelle banksystem.",
+    "header": "Med Stablesats har du nu en Dollar-konto tilføjet til din tegnebog!",
+    "body": "Du kan bruge den til at sende og modtage Bitcoin og øjeblikkeligt overføre værdi mellem din Bitcoin og Dollar-konto. Værdien i Dollar-kontoen vil ikke svinge med prisen på Bitcoin. Denne funktion er ikke kompatibel med det traditionelle banksystem.",
     "termsAndConditions": "Læs vilkårene",
     "learnMore": "Læs mere om Stablesats"
   },
@@ -2675,7 +2675,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Pris",
-    "btcAccount": "BTC Konto",
+    "btcAccount": "Bitcoin Konto",
     "cancel": "Annuller",
     "close": "Luk",
     "confirm": "Bekræft",
@@ -2743,7 +2743,7 @@
     "transactionsError": "Fejl ved indlæsning af transaktioner",
     "tryAgain": "Prøv igen",
     "type": "Type",
-    "usdAccount": "USD Konto",
+    "usdAccount": "Dollar Konto",
     "username": "Brugernavn",
     "usernameRequired": "Brugernavn påkrævet",
     "backupAccount": "Backup/opgrader konto",

@@ -2454,8 +2454,8 @@
         "DEFAULT": "Default (OS)"
     },
     "StablesatsModal": {
-        "header": "Con Stablesats, ora hai un conto USD aggiunto al tuo wallet!",
-        "body": "Puoi usarlo per inviare e ricevere Bitcoin e trasferire istantaneamente il valore tra il tuo conto BTC e quello USD. Il controvalore del conto USD non fluttuerà con il prezzo dei Bitcoin. Questa funzione non è compatibile con il sistema bancario tradizionale.",
+        "header": "Con Stablesats, ora hai un conto Dollar aggiunto al tuo wallet!",
+        "body": "Puoi usarlo per inviare e ricevere Bitcoin e trasferire istantaneamente il valore tra il tuo conto Bitcoin e quello Dollar. Il controvalore del conto Dollar non fluttuerà con il prezzo dei Bitcoin. Questa funzione non è compatibile con il sistema bancario tradizionale.",
         "termsAndConditions": "Leggi i Terms & Conditions",
         "learnMore": "Scopri di più su Stablesats"
     },
@@ -2672,7 +2672,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Prezzo del Bitcoin",
-        "btcAccount": "Conto BTC",
+        "btcAccount": "Conto Bitcoin",
         "cancel": "Cancella",
         "close": "Chiudi",
         "confirm": "Conferma",
@@ -2740,7 +2740,7 @@
         "transactionsError": "Errore nel caricamento delle transazioni",
         "tryAgain": "Riprova",
         "type": "Tipo",
-        "usdAccount": "Conto USD",
+        "usdAccount": "Conto Dollar",
         "username": "Username",
         "usernameRequired": "L'username è richiesto",
         "backupAccount": "Backup/aggiornamento dell'account",

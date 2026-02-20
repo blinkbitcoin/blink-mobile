@@ -2454,8 +2454,8 @@
     "DEFAULT": "Default (OS)"
   },
   "StablesatsModal": {
-    "header": "Dengan Stablesats, Anda sekarang memiliki akun USD yang ditambahkan ke dompet Anda!",
-    "body": "Anda dapat menggunakannya untuk mengirim dan menerima Bitcoin, serta mentransfer nilai secara instan antara akun BTC dan USD Anda. Nilai di akun USD tidak akan berfluktuasi dengan harga Bitcoin. Fitur ini tidak kompatibel dengan sistem perbankan tradisional.",
+    "header": "Dengan Stablesats, Anda sekarang memiliki akun Dollar yang ditambahkan ke dompet Anda!",
+    "body": "Anda dapat menggunakannya untuk mengirim dan menerima Bitcoin, serta mentransfer nilai secara instan antara akun Bitcoin dan Dollar Anda. Nilai di akun Dollar tidak akan berfluktuasi dengan harga Bitcoin. Fitur ini tidak kompatibel dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
     "learnMore": "Pelajari lebih lanjut tentang Stablesats"
   },
@@ -2672,7 +2672,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Harga Bitcoin",
-    "btcAccount": "Akun BTC",
+    "btcAccount": "Akun Bitcoin",
     "cancel": "Batal",
     "close": "Tutup",
     "confirm": "Konfirmasi",
@@ -2740,7 +2740,7 @@
     "transactionsError": "Kesalahan memuat transaksi",
     "tryAgain": "Coba Lagi",
     "type": "Tipe",
-    "usdAccount": "Akun USD",
+    "usdAccount": "Akun Dollar",
     "username": "Nama Pengguna",
     "usernameRequired": "Nama pengguna diperlukan",
     "backupAccount": "Cadangkan/tingkatkan akun",

@@ -2492,8 +2492,8 @@
     "DEFAULT": "Okuhlala kukho (OS)"
   },
   "StablesatsModal": {
-    "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
-    "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
+    "header": "Nge-Stablesats, ngoku une-akhawunti ye-Dollar eyongeziweyo kwi-wallet yakho!",
+    "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-Bitcoin kunye ne-Dollar. Ixabiso kwi-akhawunti ye-Dollar aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
     "termsAndConditions": "Funda iMigaqo neMiqathango",
     "learnMore": "Funda ngakumbi malunga neStablesats"
   },
@@ -2713,7 +2713,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Price",
-    "btcAccount": "BTC Account",
+    "btcAccount": "Bitcoin Account",
     "cancel": "Rhoxisa",
     "close": "Close",
     "confirm": "Confirm",
@@ -2781,7 +2781,7 @@
     "transactionsError": "Error loading transactions",
     "tryAgain": "Try Again",
     "type": "Type",
-    "usdAccount": "USD Account",
+    "usdAccount": "Dollar Account",
     "username": "Username",
     "usernameRequired": "Username is required",
     "backupAccount": "Backup/upgrade account",

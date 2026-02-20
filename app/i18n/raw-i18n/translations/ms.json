@@ -2471,8 +2471,8 @@
     "DEFAULT": "Ikut ketetapan asal (OS)"
   },
   "StablesatsModal": {
-    "header": "Dengan stablesats, anda sekarang telah ada Dolar USD dalam dompet anda!",
-    "body": "Anda boleh gunakan ia untuk terima dan hantar Bitcoin, dan lakukan pemindahan segera antara nilai BTC dan USD yang ada dalam akaun anda. Nilai USD tidak berubah dengan harga Bitcoin. Fungsi ini tak sesuai dengan sistem perbankan sekarang.",
+    "header": "Dengan stablesats, anda sekarang telah ada akaun Dollar dalam dompet anda!",
+    "body": "Anda boleh gunakan ia untuk terima dan hantar Bitcoin, dan lakukan pemindahan segera antara nilai Bitcoin dan Dollar yang ada dalam akaun anda. Nilai Dollar tidak berubah dengan harga Bitcoin. Fungsi ini tak sesuai dengan sistem perbankan sekarang.",
     "termsAndConditions": "Baca terma & syarat",
     "learnMore": "Ketahui lebih lanjut tentang stablesats"
   },
@@ -2689,7 +2689,7 @@
     "beta": "Beta",
     "bitcoin": "Bitcoin ",
     "bitcoinPrice": "Harga Bitcoin",
-    "btcAccount": "Akaun BTC",
+    "btcAccount": "Akaun Bitcoin",
     "cancel": "Batal",
     "close": "Keluar",
     "confirm": "Pasti",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Ada masalah memuat naik transaksi",
     "tryAgain": "Cuba lagi",
     "type": "Jenis",
-    "usdAccount": "Akaun USD",
+    "usdAccount": "Akaun Dollar",
     "username": "ID pengguna",
     "usernameRequired": "ID pengguna diperlukan",
     "backupAccount": "Backup/Naiktaraf akaun",

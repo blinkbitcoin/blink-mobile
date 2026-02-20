@@ -2471,8 +2471,8 @@
     "DEFAULT": "Standaard (OS)"
   },
   "StablesatsModal": {
-    "header": "Met Stablesats heb je nu een USD-account toegevoegd aan je wallet!",
-    "body": "U kunt het gebruiken om Bitcoin te verzenden en te ontvangen, en direct waarde over te dragen tussen uw BTC- en USD-account. De waarde op de USD-rekening fluctueert niet met de prijs van Bitcoin. Deze functie is niet compatibel met het traditionele banksysteem.",
+    "header": "Met Stablesats heb je nu een Dollar-account toegevoegd aan je wallet!",
+    "body": "U kunt het gebruiken om Bitcoin te verzenden en te ontvangen, en direct waarde over te dragen tussen uw Bitcoin- en Dollar-account. De waarde op de Dollar-rekening fluctueert niet met de prijs van Bitcoin. Deze functie is niet compatibel met het traditionele banksysteem.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
     "learnMore": "Meer informatie over Stablesats"
   },
@@ -2689,7 +2689,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Prijs",
-    "btcAccount": "BTC Rekening",
+    "btcAccount": "Bitcoin Rekening",
     "cancel": "Annuleer",
     "close": "Sluit",
     "confirm": "Bevestig",
@@ -2757,7 +2757,7 @@
     "transactionsError": "Fout bij het laden van transacties",
     "tryAgain": "Probeer opnieuw",
     "type": "Type",
-    "usdAccount": "USD Rekening",
+    "usdAccount": "Dollar Rekening",
     "username": "Gebruikersnaam",
     "usernameRequired": "Gebruikersnaam is vereist",
     "backupAccount": "Back-up/upgrade-account",

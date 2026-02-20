@@ -2471,8 +2471,8 @@
     "DEFAULT": "Chaynamanta kaniy"
   },
   "StablesatsModal": {
-    "header": "Stablesat kawsayniyta, USDpi kawsayniyta qillqata sutichinaqinmi kaniyta munanki, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanki!",
-    "body": "Kawsayniyta qillqata sutichinaqinmi Bitcoinpi yachachinaqinmi, kawsayniyta qillqata sutichinaqinmi BTCpi USDpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki. USDpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, Bitcoinpi qillqata sutichinaqinmi kaniyta rikuyta munanki. Kaymi, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, tradicional bankumanta mana kaniyta rikuchiy.",
+    "header": "Stablesat kawsayniyta, Dollarpi kawsayniyta qillqata sutichinaqinmi kaniyta munanki, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanki!",
+    "body": "Kawsayniyta qillqata sutichinaqinmi Bitcoinpi yachachinaqinmi, kawsayniyta qillqata sutichinaqinmi Bitcoinpi Dollarpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki. Dollarpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, Bitcoinpi qillqata sutichinaqinmi kaniyta rikuyta munanki. Kaymi, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, tradicional bankumanta mana kaniyta rikuchiy.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
     "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki"
   },
@@ -2757,7 +2757,7 @@
     "transactionsError": "Qillqaykuna kargamanta kanilla",
     "tryAgain": "Rikuchiyta kani",
     "type": "Rikch'a",
-    "usdAccount": "USD qillqay",
+    "usdAccount": "Dollar qillqay",
     "username": "Ruraq sutiyuq",
     "usernameRequired": "Ruraqmi sutiyuqmi kani\"",
     "backupAccount": "Backup/upgrade account",

@@ -2452,8 +2452,8 @@
         "DEFAULT": "Default (OS)"
     },
     "StablesatsModal": {
-        "header": "With Stablesats, you now have a USD account added to your wallet!",
-        "body": "You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
+        "header": "With Stablesats, you now have a Dollar account added to your wallet!",
+        "body": "You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
         "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Stablesats"
     },
@@ -2670,7 +2670,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Price",
-        "btcAccount": "BTC Account",
+        "btcAccount": "Bitcoin Account",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
@@ -2738,7 +2738,7 @@
         "transactionsError": "Error loading transactions",
         "tryAgain": "Try Again",
         "type": "Type",
-        "usdAccount": "USD Account",
+        "usdAccount": "Dollar Account",
         "username": "Username",
         "usernameRequired": "Username is required",
         "backupAccount": "Backup/upgrade account",
