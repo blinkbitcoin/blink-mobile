@@ -217,34 +217,37 @@ export const usePaymentRequest = () => {
     })
   }, [memoChangeText])
 
-  const setReceivingWallet = useCallback(
-    (walletCurrency: WalletCurrency) => {
+  const switchReceivingWallet = useCallback(
+    (type: InvoiceType, walletCurrency: WalletCurrency) => {
       setPRCD((current) => {
         if (!current?.setReceivingWalletDescriptor) return current
 
+        const updated = current.setType(type)
+        if (!updated?.setReceivingWalletDescriptor) return updated
+
         if (
-          current.expirationTime !== undefined &&
-          current.receivingWalletDescriptor.currency !== walletCurrency
+          updated.expirationTime !== undefined &&
+          updated.receivingWalletDescriptor.currency !== walletCurrency
         ) {
-          expirationPerWallet.current[current.receivingWalletDescriptor.currency] =
-            current.expirationTime
+          expirationPerWallet.current[updated.receivingWalletDescriptor.currency] =
+            updated.expirationTime
         }
 
         const wallet =
           walletCurrency === WalletCurrency.Btc
             ? wallets?.bitcoinWallet
             : wallets?.usdWallet
-        if (!wallet) return current
+        if (!wallet) return updated
 
-        const updated = current.setReceivingWalletDescriptor({
+        const withWallet = updated.setReceivingWalletDescriptor({
           id: wallet.id,
           currency: walletCurrency,
         })
 
-        if (updated?.setExpirationTime) {
-          return updated.setExpirationTime(expirationPerWallet.current[walletCurrency])
+        if (withWallet?.setExpirationTime) {
+          return withWallet.setExpirationTime(expirationPerWallet.current[walletCurrency])
         }
-        return updated ?? current
+        return withWallet ?? updated
       })
     },
     [wallets?.bitcoinWallet, wallets?.usdWallet],
@@ -278,7 +281,7 @@ export const usePaymentRequest = () => {
     pr,
     setType,
     setMemo,
-    setReceivingWallet,
+    switchReceivingWallet,
     setAmount,
     setExpirationTime,
     regenerateInvoice,

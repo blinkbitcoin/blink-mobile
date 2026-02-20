@@ -35,7 +35,7 @@ export const useReceiveFlow = (
     setAmount,
     setType,
     setMemo,
-    setReceivingWallet,
+    switchReceivingWallet,
     type: requestType,
     state: requestState,
     canUsePaycode,
@@ -105,8 +105,7 @@ export const useReceiveFlow = (
     const hasContent = isNonZeroMoneyAmount(unitOfAccountAmount) || memoChangeText
     const revertToPaycode = next === WalletCurrency.Btc && canUsePaycode && !hasContent
 
-    setType(revertToPaycode ? Invoice.PayCode : Invoice.Lightning)
-    setReceivingWallet(next)
+    switchReceivingWallet(revertToPaycode ? Invoice.PayCode : Invoice.Lightning, next)
     syncOnchainWallet(next)
   }, [
     isReady,
@@ -114,8 +113,7 @@ export const useReceiveFlow = (
     onchainWalletCurrency,
     syncOnchainWallet,
     receivingWalletDescriptor.currency,
-    setType,
-    setReceivingWallet,
+    switchReceivingWallet,
     canUsePaycode,
     unitOfAccountAmount,
     memoChangeText,

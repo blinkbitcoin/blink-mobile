@@ -36,7 +36,7 @@ type MockRequest = {
   setAmount: jest.Mock
   setType: jest.Mock
   setMemo: jest.Mock
-  setReceivingWallet: jest.Mock
+  switchReceivingWallet: jest.Mock
   type: string
   state: string
   canUsePaycode: boolean
@@ -50,7 +50,7 @@ const createMockRequest = (overrides: Partial<MockRequest> = {}): MockRequest =>
   setAmount: jest.fn(),
   setType: jest.fn(),
   setMemo: jest.fn(),
-  setReceivingWallet: jest.fn(),
+  switchReceivingWallet: jest.fn(),
   type: Invoice.Lightning,
   state: "Created",
   canUsePaycode: true,
@@ -230,7 +230,10 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setReceivingWallet).toHaveBeenCalledWith(WalletCurrency.Usd)
+      expect(request.switchReceivingWallet).toHaveBeenCalledWith(
+        Invoice.Lightning,
+        WalletCurrency.Usd,
+      )
       expect(carousel.syncOnchainWallet).toHaveBeenCalledWith(WalletCurrency.Usd)
     })
 
@@ -246,7 +249,10 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setReceivingWallet).toHaveBeenCalledWith(WalletCurrency.Btc)
+      expect(request.switchReceivingWallet).toHaveBeenCalledWith(
+        Invoice.PayCode,
+        WalletCurrency.Btc,
+      )
       expect(carousel.syncOnchainWallet).toHaveBeenCalledWith(WalletCurrency.Btc)
     })
 
@@ -265,7 +271,10 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setType).toHaveBeenCalledWith(Invoice.PayCode)
+      expect(request.switchReceivingWallet).toHaveBeenCalledWith(
+        Invoice.PayCode,
+        WalletCurrency.Btc,
+      )
     })
 
     it("stays on Lightning when switching to BTC with non-zero amount", () => {
@@ -282,7 +291,10 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setType).toHaveBeenCalledWith(Invoice.Lightning)
+      expect(request.switchReceivingWallet).toHaveBeenCalledWith(
+        Invoice.Lightning,
+        WalletCurrency.Btc,
+      )
     })
 
     it("uses onchainWalletCurrency when on chain page", () => {
@@ -301,7 +313,10 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setReceivingWallet).toHaveBeenCalledWith(WalletCurrency.Usd)
+      expect(request.switchReceivingWallet).toHaveBeenCalledWith(
+        Invoice.Lightning,
+        WalletCurrency.Usd,
+      )
     })
 
     it("does nothing when not ready (Loading state)", () => {
@@ -314,7 +329,7 @@ describe("useReceiveFlow", () => {
         result.current.handleToggleWallet()
       })
 
-      expect(request.setReceivingWallet).not.toHaveBeenCalled()
+      expect(request.switchReceivingWallet).not.toHaveBeenCalled()
     })
   })
 
