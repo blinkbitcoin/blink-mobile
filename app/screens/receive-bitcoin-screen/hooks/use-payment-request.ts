@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
+import { gql } from "@apollo/client"
 import {
   WalletCurrency,
   useLnInvoiceCreateMutation,
@@ -24,6 +25,55 @@ import {
 import { createPaymentRequest } from "../payment/payment-request"
 import { createPaymentRequestCreationData } from "../payment/payment-request-creation-data"
 import { useWalletResolution } from "./use-wallet-resolution"
+
+gql`
+  mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
+    lnNoAmountInvoiceCreate(input: $input) {
+      errors {
+        message
+      }
+      invoice {
+        createdAt
+        paymentHash
+        paymentRequest
+        paymentStatus
+        externalId
+      }
+    }
+  }
+
+  mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
+    lnInvoiceCreate(input: $input) {
+      errors {
+        message
+      }
+      invoice {
+        createdAt
+        paymentHash
+        paymentRequest
+        paymentStatus
+        externalId
+        satoshis
+      }
+    }
+  }
+
+  mutation lnUsdInvoiceCreate($input: LnUsdInvoiceCreateInput!) {
+    lnUsdInvoiceCreate(input: $input) {
+      errors {
+        message
+      }
+      invoice {
+        createdAt
+        paymentHash
+        paymentRequest
+        paymentStatus
+        externalId
+        satoshis
+      }
+    }
+  }
+`
 
 const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
   [WalletCurrency.Btc]: 1440, // 24h

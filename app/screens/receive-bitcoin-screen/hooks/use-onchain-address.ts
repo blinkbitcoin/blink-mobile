@@ -1,11 +1,23 @@
 import { useEffect, useMemo, useState } from "react"
 
+import { gql } from "@apollo/client"
 import { useOnChainAddressCurrentMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
 import { getPaymentRequestFullUri } from "../payment/helpers"
 import { GetFullUriFn, Invoice } from "../payment/index.types"
+
+gql`
+  mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
+    onChainAddressCurrent(input: $input) {
+      errors {
+        message
+      }
+      address
+    }
+  }
+`
 
 type UseOnChainAddressOptions = {
   amount?: number

@@ -37,62 +37,6 @@ gql`
       }
     }
   }
-
-  mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
-    lnNoAmountInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-      }
-    }
-  }
-
-  mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
-    lnInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-        satoshis
-      }
-    }
-  }
-
-  mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
-    onChainAddressCurrent(input: $input) {
-      errors {
-        message
-      }
-      address
-    }
-  }
-
-  mutation lnUsdInvoiceCreate($input: LnUsdInvoiceCreateInput!) {
-    lnUsdInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-        satoshis
-      }
-    }
-  }
 `
 
 type Wallet = {
