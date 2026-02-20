@@ -157,7 +157,6 @@ const useStyles = makeStyles(
       ...CURRENCY_PILL_TEXT_STYLE,
     },
     outlinedText: {
-      fontFamily: "Source Sans Pro",
       fontSize: 16,
       fontWeight: "700",
       lineHeight: 22,
