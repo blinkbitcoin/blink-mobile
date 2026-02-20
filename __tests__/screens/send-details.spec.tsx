@@ -26,6 +26,14 @@ jest.mock("react-native-config", () => {
 
 jest.mock("@gorhom/bottom-sheet")
 
+const flushAsync = () =>
+  act(
+    () =>
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, 0)
+      }),
+  )
+
 it("SendScreen Details", async () => {
   render(
     <ContextForScreen>
@@ -48,13 +56,16 @@ it("applies send amount only after modal dismiss animation completes", async () 
   const nextButton = await screen.findByTestId(LL.common.next())
   expect(nextButton.props.accessibilityState?.disabled).toBe(true)
 
+  await flushAsync()
+  await flushAsync()
+
   fireEvent.press(screen.getByTestId("Amount Input Button"))
-  await waitFor(() => {
-    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
-  })
+  await flushAsync()
+
+  expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
 
   fireEvent.press(screen.getByTestId("Key 1"))
-  await act(async () => {})
+  await flushAsync()
 
   jest.useFakeTimers()
   try {
