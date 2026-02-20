@@ -40,7 +40,7 @@ const Wrapper = ({ children, text }) => {
 
 export const Default = () => (
   <View>
-    <Wrapper text="BTC">
+    <Wrapper text="Bitcoin">
       <WalletSummary
         amountType="SEND"
         settlementAmount={{
@@ -51,7 +51,7 @@ export const Default = () => (
         txDisplayCurrency="USD"
       />
     </Wrapper>
-    <Wrapper text="USD">
+    <Wrapper text="Dollar">
       <WalletSummary
         amountType="SEND"
         settlementAmount={{
