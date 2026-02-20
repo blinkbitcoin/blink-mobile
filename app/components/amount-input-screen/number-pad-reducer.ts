@@ -85,7 +85,7 @@ export const formatNumberPadNumber = ({
 
   if (!majorAmount && !minorAmount && !hasDecimal && !currencyCode) return ""
 
-  const major = Number(majorAmount).toLocaleString()
+  const major = Number(majorAmount || "0").toLocaleString()
   const suffix = currencyCode ? ` ${currencyCode}` : ""
   return hasDecimal ? `${major}.${minorAmount}${suffix}` : `${major}${suffix}`
 }
