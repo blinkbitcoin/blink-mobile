@@ -2163,8 +2163,8 @@
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
     "cantReceiveZeroSats": "لا يمكنك استلام صفر sats. يرجى إدخال مبلغ يعادل 1 sat أو أكثر.",
-    "lightningAddress": "عنوان Lightning",
-    "lightningInvoice": "فاتورة Lightning",
+    "lightningAddress": "عنوان lightning",
+    "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT"
   },
@@ -2854,6 +2854,7 @@
     "enterAmount": "Enter Amount",
     "setAmount": "Set Amount",
     "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+    "exceedsAvailableBalance": "يتجاوز الرصيد المتاح: {maxAmount: string}",
     "minAmountNotMet": "Amount must be at least {minAmount: string}."
   },
   "AmountInputButton": {

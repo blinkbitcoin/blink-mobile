@@ -2854,6 +2854,7 @@
     "enterAmount": "Unesi iznos",
     "setAmount": "Postavi iznos",
     "maxAmountExceeded": "Iznos ne smije premašiti {maxAmount: string}.",
+    "exceedsAvailableBalance": "Premašuje dostupni saldo: {maxAmount: string}",
     "minAmountNotMet": "Iznos mora biti najmanje {minAmount: string}."
   },
   "AmountInputButton": {

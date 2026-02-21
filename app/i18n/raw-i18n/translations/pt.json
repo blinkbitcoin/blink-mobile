@@ -2837,6 +2837,7 @@
         "enterAmount": "Confirmar montante",
         "setAmount": "Defina  o montante",
         "maxAmountExceeded": "Valor não deve exceder {maxAmount: string}.",
+        "exceedsAvailableBalance": "Excede o saldo disponível: {maxAmount: string}",
         "minAmountNotMet": "Valor deve ser no mínimo {maxAmount: string}."
     },
     "AmountInputButton": {

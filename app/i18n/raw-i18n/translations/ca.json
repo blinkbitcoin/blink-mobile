@@ -2156,8 +2156,8 @@
     "receiveViaOnchain": "Rep via Onchain",
     "payCodeOrLNURL": "Codi de pagament / LNURL",
     "cantReceiveZeroSats": "No pots rebre zero sats. Introdueix una quantitat corresponent a 1 o més sats.",
-    "lightningAddress": "Adreça Lightning",
-    "lightningInvoice": "Factura Lightning",
+    "lightningAddress": "Adreça lightning",
+    "lightningInvoice": "Factura lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT"
   },
@@ -2837,6 +2837,7 @@
     "enterAmount": "Introdüeix l'import",
     "setAmount": "Estableix l'import",
     "maxAmountExceeded": "l'import no ha de superar {maxAmount: string}.",
+    "exceedsAvailableBalance": "Supera el saldo disponible: {maxAmount: string}",
     "minAmountNotMet": "l'import ha de ser com a mínimt {minAmount: string}."
   },
   "AmountInputButton": {

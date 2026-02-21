@@ -2854,6 +2854,7 @@
     "enterAmount": "Voer een Bedrag In",
     "setAmount": "Stel Bedrag In",
     "maxAmountExceeded": "Bedrag mag niet hoger zijn dan {maxAmount: string}.",
+    "exceedsAvailableBalance": "Overschrijdt beschikbaar saldo: {maxAmount: string}",
     "minAmountNotMet": "Bedrag moet minimaal {minAmount: string} zijn."
   },
   "AmountInputButton": {

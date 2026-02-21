@@ -2163,8 +2163,8 @@
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
     "cantReceiveZeroSats": "คุณไม่สามารถรับ 0 sats ได้ กรุณาใส่จำนวนที่สอดคล้องกับ 1 sats ขึ้นไป",
-    "lightningAddress": "ที่อยู่ Lightning",
-    "lightningInvoice": "ใบแจ้งหนี้ Lightning",
+    "lightningAddress": "ที่อยู่ lightning",
+    "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT"
   },
@@ -2854,6 +2854,7 @@
     "enterAmount": "Enter Amount",
     "setAmount": "Set Amount",
     "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+    "exceedsAvailableBalance": "เกินยอดเงินคงเหลือที่มีอยู่: {maxAmount: string}",
     "minAmountNotMet": "Amount must be at least {minAmount: string}."
   },
   "AmountInputButton": {

@@ -2156,8 +2156,8 @@
     "receiveViaOnchain": "Funa okuva ku Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
     "cantReceiveZeroSats": "Tosobola kufuna zero sats. Nsaba oyingize omuwendo ogukwatagana ne sats 1 oba okusingawo.",
-    "lightningAddress": "Endagiriro ya Lightning",
-    "lightningInvoice": "Invoisi ya Lightning",
+    "lightningAddress": "Endagiriro ya lightning",
+    "lightningInvoice": "Invoisi ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT"
   },
@@ -2837,6 +2837,7 @@
     "enterAmount": "Ssaamu Omuwendo",
     "setAmount": "Teekawo omuwendo",
     "maxAmountExceeded": "Omuwendo tegulina kusukka {maxAmount: string}.",
+    "exceedsAvailableBalance": "Eyitawo omuwendo ogusigadde: {maxAmount: string}",
     "minAmountNotMet": "Omuwendo gulina okuba nga ekitono ennyo waakiri {minAmount: string}."
   },
   "AmountInputButton": {

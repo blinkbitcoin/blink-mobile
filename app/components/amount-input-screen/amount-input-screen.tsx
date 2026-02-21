@@ -1,7 +1,13 @@
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useReducer } from "react"
 
-import { WalletCurrency } from "@app/graphql/generated"
+import { useApolloClient } from "@apollo/client"
+
+import {
+  PreferredAmountCurrency,
+  savePreferredAmountCurrency,
+} from "@app/graphql/client-only-query"
+import { usePreferredAmountCurrencyQuery, WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
@@ -15,6 +21,7 @@ import {
 
 import { AmountInputScreenUI } from "./amount-input-screen-ui"
 import {
+  formatNumberPadNumber,
   getDisabledKeys,
   Key,
   NumberPadNumber,
@@ -24,29 +31,13 @@ import {
 } from "./number-pad-reducer"
 
 export type AmountInputScreenProps = {
-  goBack: () => void
   initialAmount?: MoneyAmount<WalletOrDisplayCurrency>
   setAmount?: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
   walletCurrency: WalletCurrency
   convertMoneyAmount: ConvertMoneyAmount
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
-}
-
-const formatNumberPadNumber = (numberPadNumber: NumberPadNumber) => {
-  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
-
-  if (!majorAmount && !minorAmount && !hasDecimal) {
-    return ""
-  }
-
-  const formattedMajorAmount = Number(majorAmount).toLocaleString()
-
-  if (hasDecimal) {
-    return `${formattedMajorAmount}.${minorAmount}`
-  }
-
-  return formattedMajorAmount
 }
 
 const numberPadNumberToMoneyAmount = ({
@@ -127,12 +118,12 @@ const moneyAmountToNumberPadReducerState = ({
 }
 
 export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
-  goBack,
   initialAmount,
   setAmount,
   walletCurrency,
   convertMoneyAmount,
   maxAmount,
+  maxAmountIsBalance,
   minAmount,
 }) => {
   const {
@@ -143,11 +134,30 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   } = useDisplayCurrency()
 
   const { LL } = useI18nContext()
+  const client = useApolloClient()
+  const { data: preferredData } = usePreferredAmountCurrencyQuery()
+  const preferredCurrency = preferredData?.preferredAmountCurrency
+
+  const resolvedInitialAmount = useMemo(() => {
+    if (initialAmount && initialAmount.amount !== undefined) return initialAmount
+    if (preferredCurrency) {
+      const currency =
+        preferredCurrency === PreferredAmountCurrency.Display
+          ? DisplayCurrency
+          : walletCurrency
+      return {
+        amount: 0,
+        currency,
+        currencyCode: currencyInfo[currency].currencyCode,
+      } as MoneyAmount<WalletOrDisplayCurrency>
+    }
+    return initialAmount || zeroDisplayAmount
+  }, [initialAmount, preferredCurrency, walletCurrency, currencyInfo, zeroDisplayAmount])
 
   const [numberPadState, dispatchNumberPadAction] = useReducer(
     numberPadReducer,
     moneyAmountToNumberPadReducerState({
-      moneyAmount: initialAmount || zeroDisplayAmount,
+      moneyAmount: resolvedInitialAmount,
       currencyInfo,
     }),
   )
@@ -207,8 +217,19 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       setNumberPadAmount(secondaryNewAmount)
     })
 
+  const onSetAmountPress =
+    setAmount &&
+    (() => {
+      const flag =
+        numberPadState.currency === DisplayCurrency
+          ? PreferredAmountCurrency.Display
+          : PreferredAmountCurrency.Default
+      savePreferredAmountCurrency(client, flag)
+      setAmount(newPrimaryAmount)
+    })
+
   useEffect(() => {
-    if (initialAmount) {
+    if (initialAmount && initialAmount.amount !== undefined) {
       setNumberPadAmount(initialAmount)
     }
   }, [initialAmount, setNumberPadAmount])
@@ -226,9 +247,10 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       greaterThan: maxAmountInPrimaryCurrency,
     })
   ) {
-    errorMessage = LL.AmountInputScreen.maxAmountExceeded({
-      maxAmount: formatMoneyAmount({ moneyAmount: maxAmountInPrimaryCurrency }),
-    })
+    const formatted = formatMoneyAmount({ moneyAmount: maxAmountInPrimaryCurrency })
+    errorMessage = maxAmountIsBalance
+      ? LL.AmountInputScreen.exceedsAvailableBalance({ maxAmount: formatted })
+      : LL.AmountInputScreen.maxAmountExceeded({ maxAmount: formatted })
   } else if (
     minAmountInPrimaryCurrency &&
     newPrimaryAmount.amount &&
@@ -248,19 +270,24 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   const secondaryCurrencyInfo =
     secondaryNewAmount && currencyInfo[secondaryNewAmount.currency]
 
+  const pillLabel = (currency: WalletOrDisplayCurrency) =>
+    currency === DisplayCurrency ? currencyInfo[currency].currencyCode : currency
+
   return (
     <AmountInputScreenUI
-      primaryCurrencyCode={primaryCurrencyInfo.currencyCode}
-      primaryCurrencyFormattedAmount={formatNumberPadNumber(
-        numberPadState.numberPadNumber,
-      )}
+      primaryCurrencyCode={pillLabel(newPrimaryAmount.currency)}
+      primaryCurrencyFormattedAmount={formatNumberPadNumber({
+        ...numberPadState,
+        currencyInfo,
+      })}
       primaryCurrencySymbol={primaryCurrencyInfo.symbol}
-      secondaryCurrencyCode={secondaryCurrencyInfo?.currencyCode}
+      secondaryCurrencyCode={
+        secondaryNewAmount ? pillLabel(secondaryNewAmount.currency) : undefined
+      }
       secondaryCurrencyFormattedAmount={
         secondaryNewAmount &&
         formatMoneyAmount({
           moneyAmount: secondaryNewAmount,
-          noSuffix: true,
           noSymbol: true,
         })
       }
@@ -271,8 +298,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       onClearAmount={onClear}
       onToggleCurrency={onToggleCurrency}
       setAmountDisabled={Boolean(errorMessage)}
-      onSetAmountPress={setAmount && (() => setAmount(newPrimaryAmount))}
-      goBack={goBack}
+      onSetAmountPress={onSetAmountPress}
       disabledKeys={disabledKeys}
     />
   )

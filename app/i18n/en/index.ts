@@ -2946,6 +2946,7 @@ const en: BaseTranslation = {
     enterAmount: "Enter Amount",
     setAmount: "Set Amount",
     maxAmountExceeded: "Amount must not exceed {maxAmount: string}.",
+    exceedsAvailableBalance: "Exceeds available balance: {maxAmount: string}",
     minAmountNotMet: "Amount must be at least {minAmount: string}.",
   },
   AmountInputButton: {

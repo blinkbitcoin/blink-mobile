@@ -2163,8 +2163,8 @@
     "receiveViaOnchain": "Terima melalui Onchain",
     "payCodeOrLNURL": "Kod bayaran/LNURL",
     "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
-    "lightningAddress": "Alamat Lightning",
-    "lightningInvoice": "Invois Lightning",
+    "lightningAddress": "Alamat lightning",
+    "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT"
   },
@@ -2854,6 +2854,7 @@
     "enterAmount": "Masukkan amaun",
     "setAmount": "Tetapkan amaun",
     "maxAmountExceeded": "Amaun mestilah tidak melebihi {maxAmount: string}.",
+    "exceedsAvailableBalance": "Melebihi baki yang tersedia: {maxAmount: string}",
     "minAmountNotMet": "Amaun minimum mestilah {minAmount: string}."
   },
   "AmountInputButton": {

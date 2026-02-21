@@ -2837,6 +2837,7 @@
     "enterAmount": "Zadajte sumu",
     "setAmount": "Nastaviť sumu",
     "maxAmountExceeded": "Suma nesmie prekročiť {maxAmount: string}.",
+    "exceedsAvailableBalance": "Prekračuje dostupný zostatok: {maxAmount: string}",
     "minAmountNotMet": "Suma musí byť aspoň {minAmount: string}."
   },
   "AmountInputButton": {

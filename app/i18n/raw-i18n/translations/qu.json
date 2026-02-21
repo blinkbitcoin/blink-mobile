@@ -2854,6 +2854,7 @@
     "enterAmount": "Yanapaq qillqa",
     "setAmount": "Qillqay",
     "maxAmountExceeded": "Kaymi ayqin rantiytaqa kani kaypi qatiq {maxAmount: string} sutiyuqmi kayanman",
+    "exceedsAvailableBalance": "Kaqlla qullqi atipan: {maxAmount: string}",
     "minAmountNotMet": "Kaymi kanchu huk mikhunan kani kaypi qatiq {minAmount: string} sutiyuqmi kayanman"
   },
   "AmountInputButton": {

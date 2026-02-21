@@ -2854,6 +2854,7 @@
     "enterAmount": "Vložte částku",
     "setAmount": "Nastavit částku",
     "maxAmountExceeded": "Částka nesmí překročit {maxAmount: string}.",
+    "exceedsAvailableBalance": "Překračuje dostupný zůstatek: {maxAmount: string}",
     "minAmountNotMet": "Částka musí být alespoň {minAmount: string}."
   },
   "AmountInputButton": {

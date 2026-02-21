@@ -9312,6 +9312,11 @@ type RootTranslation = {
 		 */
 		maxAmountExceeded: RequiredParams<'maxAmount'>
 		/**
+		 * E​x​c​e​e​d​s​ ​a​v​a​i​l​a​b​l​e​ ​b​a​l​a​n​c​e​:​ ​{​m​a​x​A​m​o​u​n​t​}
+		 * @param {string} maxAmount
+		 */
+		exceedsAvailableBalance: RequiredParams<'maxAmount'>
+		/**
 		 * A​m​o​u​n​t​ ​m​u​s​t​ ​b​e​ ​a​t​ ​l​e​a​s​t​ ​{​m​i​n​A​m​o​u​n​t​}​.
 		 * @param {string} minAmount
 		 */
@@ -18825,6 +18830,10 @@ export type TranslationFunctions = {
 		 * Amount must not exceed {maxAmount}.
 		 */
 		maxAmountExceeded: (arg: { maxAmount: string }) => LocalizedString
+		/**
+		 * Exceeds available balance: {maxAmount}
+		 */
+		exceedsAvailableBalance: (arg: { maxAmount: string }) => LocalizedString
 		/**
 		 * Amount must be at least {minAmount}.
 		 */

@@ -155,34 +155,38 @@ jest.mock("@app/hooks", () => {
   }
 })
 
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
-      `$${moneyAmount.amount}`,
-    getSecondaryAmountIfCurrencyIsDifferent: () => null,
-    zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
-    currencyInfo: {
-      USD: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
-      BTC: {
-        symbol: "",
-        minorUnitToMajorUnitOffset: 0,
-        showFractionDigits: false,
-        currencyCode: "SAT",
-      },
-      DisplayCurrency: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
+jest.mock("@app/hooks/use-display-currency", () => {
+  const info = {
+    BTC: {
+      symbol: "",
+      minorUnitToMajorUnitOffset: 0,
+      showFractionDigits: false,
+      currencyCode: "SAT",
     },
-  }),
-}))
+    USD: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+    DisplayCurrency: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+  }
+
+  return {
+    useDisplayCurrency: () => ({
+      currencyInfo: info,
+      zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+      formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+        `$${moneyAmount.amount}`,
+      getSecondaryAmountIfCurrencyIsDifferent: () => null,
+    }),
+  }
+})
 
 jest.mock("@react-native-clipboard/clipboard", () => ({
   setString: jest.fn(),
@@ -202,19 +206,7 @@ jest.mock("react-native-nfc-manager", () => ({
   },
 }))
 
-jest.mock("react-native-modal", () => {
-  const MockedModal = ({
-    isVisible,
-    children,
-  }: {
-    isVisible: boolean
-    children: React.ReactNode
-  }) => {
-    if (!isVisible) return null
-    return <>{children}</>
-  }
-  return MockedModal
-})
+jest.mock("@gorhom/bottom-sheet")
 
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
@@ -672,7 +664,7 @@ describe("ReceiveScreen", () => {
       await flushAsync()
 
       await waitFor(() => {
-        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
       })
     })
 
@@ -702,7 +694,52 @@ describe("ReceiveScreen", () => {
       await flushAsync()
 
       await waitFor(() => {
-        expect(screen.getByText(LL.AmountInputScreen.enterAmount())).toBeTruthy()
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
+      })
+    })
+
+    it("applies NFC amount only after modal dismiss animation completes", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText("QR-PayCode")).toBeTruthy()
+      })
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("nfc-icon"))
+      await flushAsync()
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
+      })
+
+      fireEvent.press(screen.getByTestId("Key 2"))
+      await flushAsync()
+
+      jest.useFakeTimers()
+      try {
+        fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+
+        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+        act(() => {
+          jest.advanceTimersByTime(39)
+        })
+        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+        act(() => {
+          jest.advanceTimersByTime(1)
+        })
+      } finally {
+        jest.useRealTimers()
+      }
+
+      await waitFor(() => {
+        expect(lnInvoiceCreateMock).toHaveBeenCalled()
       })
     })
   })
@@ -1262,5 +1299,68 @@ describe("Expiration time follows wallet currency", () => {
         }),
       }),
     )
+  })
+})
+
+describe("Amount modal lifecycle", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    paymentRequestQueryMock.mockReturnValue(makeQueryResult())
+    LL = i18nObject("en")
+  })
+
+  it("applies amount only after modal dismiss animation completes", async () => {
+    render(
+      <ContextForScreen>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-PayCode")).toBeTruthy()
+    })
+
+    await flushAsync()
+    await flushAsync()
+
+    fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
+    await flushAsync()
+
+    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
+
+    fireEvent.press(screen.getByTestId("Key 3"))
+    await flushAsync()
+    jest.useFakeTimers()
+    try {
+      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+
+      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+      act(() => {
+        jest.advanceTimersByTime(39)
+      })
+      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
+      act(() => {
+        jest.advanceTimersByTime(1)
+      })
+    } finally {
+      jest.useRealTimers()
+    }
+
+    await waitFor(() => {
+      expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
+    })
+
+    expect(lnInvoiceCreateMock).toHaveBeenCalled()
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.queryByTestId("bottom-sheet-modal")).toBeNull()
   })
 })

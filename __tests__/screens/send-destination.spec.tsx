@@ -418,6 +418,7 @@ describe("SendBitcoinDestinationScreen", () => {
     fireEvent.press(pasteButton)
 
     await flushAsync()
+    await flushAsync()
 
     expect(parseDestinationMock).toHaveBeenCalledWith(
       expect.objectContaining({ rawInput: "clipboard" }),

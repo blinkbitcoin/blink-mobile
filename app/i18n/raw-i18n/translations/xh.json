@@ -2180,8 +2180,8 @@
     "receiveViaOnchain": "Fumana nge-Onchain",
     "payCodeOrLNURL": "Ikhowudi yokuhlawula / LNURL",
     "cantReceiveZeroSats": "Awunakufumana i-sats ezingama-0. Nceda ufake isixa esihambelana ne-1 okanye ngaphezulu kwe-sats.",
-    "lightningAddress": "Idilesi ye-Lightning",
-    "lightningInvoice": "I-invoyisi ye-Lightning",
+    "lightningAddress": "Idilesi ye-lightning",
+    "lightningInvoice": "I-invoyisi ye-lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT"
   },
@@ -2878,6 +2878,7 @@
     "enterAmount": "Enter Amount",
     "setAmount": "Set Amount",
     "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+    "exceedsAvailableBalance": "Igqitha ibhalansi efumanekayo: {maxAmount: string}",
     "minAmountNotMet": "Amount must be at least {minAmount: string}."
   },
   "AmountInputButton": {

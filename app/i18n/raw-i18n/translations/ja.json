@@ -2854,6 +2854,7 @@
         "enterAmount": "金額を入力する",
         "setAmount": "金額を設定する",
         "maxAmountExceeded": "最大限度額{maxAmount: string}を超える金額は設定できません。",
+        "exceedsAvailableBalance": "利用可能な残高を超えています: {maxAmount: string}",
         "minAmountNotMet": "最小限度額{minAmount: string}以上の金額を設定してください."
     },
     "AmountInputButton": {

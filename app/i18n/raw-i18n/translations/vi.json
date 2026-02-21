@@ -2163,8 +2163,8 @@
     "receiveViaOnchain": "Receive via Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
     "cantReceiveZeroSats": "Bạn không thể nhận 0 sats. Vui lòng nhập số tiền tương ứng với 1 hoặc nhiều sats.",
-    "lightningAddress": "Địa chỉ Lightning",
-    "lightningInvoice": "Hóa đơn Lightning",
+    "lightningAddress": "Địa chỉ lightning",
+    "lightningInvoice": "Hóa đơn lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT"
   },
@@ -2854,6 +2854,7 @@
     "enterAmount": "Enter Amount",
     "setAmount": "Set Amount",
     "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+    "exceedsAvailableBalance": "Vượt quá số dư khả dụng: {maxAmount: string}",
     "minAmountNotMet": "Amount must be at least {minAmount: string}."
   },
   "AmountInputButton": {

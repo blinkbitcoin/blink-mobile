@@ -2840,6 +2840,7 @@
     "enterAmount": "Indtast beløb",
     "setAmount": "Vælg beløb",
     "maxAmountExceeded": "Beløbet må ikke overstige {maxAmount: string}.",
+    "exceedsAvailableBalance": "Overstiger tilgængelig saldo: {maxAmount: string}",
     "minAmountNotMet": "Beløbet skal være mindst {minAmount: string}."
   },
   "AmountInputButton": {

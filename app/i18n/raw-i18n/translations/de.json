@@ -2837,6 +2837,7 @@
         "enterAmount": "Betrag eingeben",
         "setAmount": "Eingegebener Betrag",
         "maxAmountExceeded": "Der Betrag darf {maxAmount: string} nicht übersteigen.",
+        "exceedsAvailableBalance": "Übersteigt verfügbares Guthaben: {maxAmount: string}",
         "minAmountNotMet": "Der Betrag darf {minAmount: string} nicht unterschreiten."
     },
     "AmountInputButton": {

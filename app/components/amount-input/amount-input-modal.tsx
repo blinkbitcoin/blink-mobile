@@ -1,12 +1,17 @@
 import * as React from "react"
-import { SafeAreaView } from "react-native"
-import ReactNativeModal from "react-native-modal"
+import { useCallback, useEffect, useRef } from "react"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { makeStyles } from "@rn-vui/themed"
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { timing } from "@app/rne-theme/timing"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
-import { makeStyles } from "@rn-vui/themed"
 
 import { AmountInputScreen } from "../amount-input-screen"
 
@@ -16,6 +21,7 @@ export type AmountInputModalProps = {
   convertMoneyAmount: ConvertMoneyAmount
   onSetAmount?: (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => void
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
   isOpen: boolean
   close: () => void
@@ -26,41 +32,95 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   walletCurrency,
   onSetAmount,
   maxAmount,
+  maxAmountIsBalance,
   minAmount,
   convertMoneyAmount,
   isOpen,
   close,
 }) => {
-  const styles = useStyles()
+  const { bottom } = useSafeAreaInsets()
+  const styles = useStyles({ bottom })
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+  const pendingSetAmountRef = useRef<MoneyAmount<WalletOrDisplayCurrency>>()
+
+  useEffect(() => {
+    if (isOpen) {
+      bottomSheetRef.current?.present()
+      return
+    }
+    bottomSheetRef.current?.dismiss()
+  }, [isOpen])
+
+  const handleDismiss = useCallback(() => {
+    close()
+
+    const pendingAmount = pendingSetAmountRef.current
+    if (!pendingAmount || !onSetAmount) return
+
+    pendingSetAmountRef.current = undefined
+    onSetAmount(pendingAmount)
+  }, [close, onSetAmount])
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  )
 
   return (
-    <ReactNativeModal
-      isVisible={isOpen}
-      coverScreen={true}
-      style={styles.modal}
-      animationInTiming={timing.quick}
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      enableDynamicSizing
+      enablePanDownToClose
+      animationConfigs={{ duration: 300 }}
+      backdropComponent={renderBackdrop}
+      handleIndicatorStyle={styles.handleIndicator}
+      backgroundStyle={styles.sheetBackground}
+      onDismiss={handleDismiss}
     >
-      <SafeAreaView style={styles.amountInputScreenContainer}>
+      <BottomSheetView style={styles.sheetContent}>
         <AmountInputScreen
           initialAmount={moneyAmount}
           convertMoneyAmount={convertMoneyAmount}
           walletCurrency={walletCurrency}
-          setAmount={onSetAmount}
+          setAmount={
+            onSetAmount &&
+            ((amount) => {
+              pendingSetAmountRef.current = amount
+              bottomSheetRef.current?.dismiss()
+            })
+          }
           maxAmount={maxAmount}
+          maxAmountIsBalance={maxAmountIsBalance}
           minAmount={minAmount}
-          goBack={close}
         />
-      </SafeAreaView>
-    </ReactNativeModal>
+      </BottomSheetView>
+    </BottomSheetModal>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
-  amountInputScreenContainer: {
-    flex: 1,
+const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
+  sheetContent: {
+    paddingBottom: bottom,
   },
-  modal: {
+  handleIndicator: {
+    backgroundColor: colors.grey3,
+    width: 40,
+    height: 4,
+  },
+  sheetBackground: {
     backgroundColor: colors.white,
-    margin: 0,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.grey4,
+    borderBottomWidth: 0,
+    marginHorizontal: -1,
   },
 }))

@@ -2837,6 +2837,7 @@
     "enterAmount": "Adja meg az összeget",
     "setAmount": "Összeg beállítása",
     "maxAmountExceeded": "Az összeg nem haladhatja meg a következőt: {maxAmount: string}.",
+    "exceedsAvailableBalance": "Meghaladja az elérhető egyenleget: {maxAmount: string}",
     "minAmountNotMet": "Az összeg legalább ennyi kell legyen: {minAmount: string}."
   },
   "AmountInputButton": {
