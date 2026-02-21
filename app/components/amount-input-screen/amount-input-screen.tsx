@@ -7,11 +7,7 @@ import {
   PreferredAmountCurrency,
   savePreferredAmountCurrency,
 } from "@app/graphql/client-only-query"
-import {
-  PreferredAmountCurrencyDocument,
-  PreferredAmountCurrencyQuery,
-  WalletCurrency,
-} from "@app/graphql/generated"
+import { usePreferredAmountCurrencyQuery, WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
@@ -139,9 +135,8 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
   const { LL } = useI18nContext()
   const client = useApolloClient()
-  const preferredCurrency = client.readQuery<PreferredAmountCurrencyQuery>({
-    query: PreferredAmountCurrencyDocument,
-  })?.preferredAmountCurrency
+  const { data: preferredData } = usePreferredAmountCurrencyQuery()
+  const preferredCurrency = preferredData?.preferredAmountCurrency
 
   const resolvedInitialAmount = useMemo(() => {
     if (initialAmount && initialAmount.amount !== undefined) return initialAmount

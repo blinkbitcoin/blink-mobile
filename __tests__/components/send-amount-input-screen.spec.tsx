@@ -7,14 +7,18 @@ import { AmountInputScreen } from "@app/components/amount-input-screen/amount-in
 const mockFormatMoneyAmount = jest.fn()
 const mockGetSecondaryAmount = jest.fn()
 const mockSavePreferredAmountCurrency = jest.fn()
-const mockReadQuery = jest.fn()
+const mockPreferredCurrencyData = { data: null as { preferredAmountCurrency: string } | null }
 
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({
-    readQuery: mockReadQuery,
     writeQuery: jest.fn(),
   }),
+}))
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  usePreferredAmountCurrencyQuery: () => mockPreferredCurrencyData,
 }))
 
 jest.mock("@app/graphql/client-only-query", () => ({
@@ -106,7 +110,7 @@ describe("AmountInputScreen", () => {
     mockConvertMoneyAmount.mockImplementation((amount) => amount)
     mockFormatMoneyAmount.mockReturnValue("$0.00")
     mockGetSecondaryAmount.mockReturnValue(undefined)
-    mockReadQuery.mockReturnValue(null)
+    mockPreferredCurrencyData.data = null
   })
 
   it("renders AmountInputScreenUI", () => {
@@ -144,7 +148,7 @@ describe("AmountInputScreen", () => {
   })
 
   it("uses preferred currency from cache when no initial amount", () => {
-    mockReadQuery.mockReturnValue({ preferredAmountCurrency: "display" })
+    mockPreferredCurrencyData.data = { preferredAmountCurrency: "display" }
 
     const { getByTestId } = render(
       <AmountInputScreen
