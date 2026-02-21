@@ -7,7 +7,9 @@ import { AmountInputScreen } from "@app/components/amount-input-screen/amount-in
 const mockFormatMoneyAmount = jest.fn()
 const mockGetSecondaryAmount = jest.fn()
 const mockSavePreferredAmountCurrency = jest.fn()
-const mockPreferredCurrencyData = { data: null as { preferredAmountCurrency: string } | null }
+const mockPreferredCurrencyData = {
+  data: null as { preferredAmountCurrency: string } | null,
+}
 
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
