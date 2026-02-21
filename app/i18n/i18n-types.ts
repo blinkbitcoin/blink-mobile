@@ -1008,7 +1008,7 @@ type RootTranslation = {
 						}
 						feedback: {
 							/**
-							 * C​o​r​r​e​c​t​.​ ​T​h​i​s​ ​i​s​ ​t​r​u​e​ ​e​v​e​n​ ​f​o​r​ ​U​S​D​,​ ​w​h​i​c​h​ ​h​a​s​ ​l​o​s​t​ ​9​7​%​ ​o​f​ ​i​t​s​ ​v​a​l​u​e​ ​d​u​r​i​n​g​ ​t​h​e​ ​l​a​s​t​ ​1​0​0​ ​y​e​a​r​s​.
+							 * C​o​r​r​e​c​t​.​ ​T​h​i​s​ ​i​s​ ​t​r​u​e​ ​e​v​e​n​ ​f​o​r​ ​t​h​e​ ​U​S​ ​D​o​l​l​a​r​,​ ​w​h​i​c​h​ ​h​a​s​ ​l​o​s​t​ ​9​7​%​ ​o​f​ ​i​t​s​ ​v​a​l​u​e​ ​d​u​r​i​n​g​ ​t​h​e​ ​l​a​s​t​ ​1​0​0​ ​y​e​a​r​s​.
 							 */
 							'0': string
 							/**
@@ -1250,7 +1250,7 @@ type RootTranslation = {
 					HighlyDivisible: {
 						answers: {
 							/**
-							 * 0​.​0​0​0​0​0​0​0​1​ ​B​T​C
+							 * 0​.​0​0​0​0​0​0​0​1​ ​B​i​t​c​o​i​n
 							 */
 							'0': string
 							/**
@@ -1258,7 +1258,7 @@ type RootTranslation = {
 							 */
 							'1': string
 							/**
-							 * 0​.​0​1​ ​B​T​C
+							 * 0​.​0​1​ ​B​i​t​c​o​i​n
 							 */
 							'2': string
 						}
@@ -6680,7 +6680,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​c​e​i​v​e​ ​U​S​D
+		 * R​e​c​e​i​v​e​ ​D​o​l​l​a​r
 		 */
 		usdTitle: string
 		/**
@@ -6856,7 +6856,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​d​e​e​m​ ​f​o​r​ ​U​S​D
+		 * R​e​d​e​e​m​ ​f​o​r​ ​D​o​l​l​a​r
 		 */
 		usdTitle: string
 		/**
@@ -7111,7 +7111,7 @@ type RootTranslation = {
 		 */
 		enterValidDestination: string
 		/**
-		 * Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​t​o​ ​a​ ​{​b​a​n​k​N​a​m​e​}​ ​a​d​d​r​e​s​s​,​ ​L​N​ ​a​d​d​r​e​s​s​,​ ​L​N​ ​i​n​v​o​i​c​e​,​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​.
+		 * Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​t​o​ ​a​ ​{​b​a​n​k​N​a​m​e​}​ ​a​d​d​r​e​s​s​,​ ​L​N​ ​a​d​d​r​e​s​s​,​ ​L​N​ ​i​n​v​o​i​c​e​,​ ​o​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.
 		 * @param {string} bankName
 		 */
 		destinationOptions: RequiredParams<'bankName'>
@@ -7134,7 +7134,7 @@ type RootTranslation = {
 		 */
 		usernameDoesNotExist: RequiredParams<'bankName' | 'lnAddress'>
 		/**
-		 * E​i​t​h​e​r​ ​m​a​k​e​ ​s​u​r​e​ ​t​h​e​ ​s​p​e​l​l​i​n​g​ ​i​s​ ​r​i​g​h​t​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​L​N​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
+		 * E​i​t​h​e​r​ ​m​a​k​e​ ​s​u​r​e​ ​t​h​e​ ​s​p​e​l​l​i​n​g​ ​i​s​ ​r​i​g​h​t​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​L​N​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
 		 */
 		usernameDoesNotExistAdvice: string
 		/**
@@ -7144,7 +7144,7 @@ type RootTranslation = {
 		 */
 		selfPaymentError: RequiredParams<'bankName' | 'lnAddress'>
 		/**
-		 * I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​m​o​n​e​y​ ​t​o​ ​a​n​o​t​h​e​r​ ​a​c​c​o​u​n​t​ ​t​h​a​t​ ​y​o​u​ ​o​w​n​,​ ​y​o​u​ ​c​a​n​ ​u​s​e​ ​a​n​ ​i​n​v​o​i​c​e​,​ ​L​N​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
+		 * I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​m​o​n​e​y​ ​t​o​ ​a​n​o​t​h​e​r​ ​a​c​c​o​u​n​t​ ​t​h​a​t​ ​y​o​u​ ​o​w​n​,​ ​y​o​u​ ​c​a​n​ ​u​s​e​ ​a​n​ ​i​n​v​o​i​c​e​,​ ​L​N​ ​o​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
 		 */
 		selfPaymentAdvice: string
 		/**
@@ -7152,7 +7152,7 @@ type RootTranslation = {
 		 */
 		lnAddressError: string
 		/**
-		 * E​i​t​h​e​r​ ​m​a​k​e​ ​s​u​r​e​ ​t​h​e​ ​s​p​e​l​l​i​n​g​ ​i​s​ ​r​i​g​h​t​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
+		 * E​i​t​h​e​r​ ​m​a​k​e​ ​s​u​r​e​ ​t​h​e​ ​s​p​e​l​l​i​n​g​ ​i​s​ ​r​i​g​h​t​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
 		 */
 		lnAddressAdvice: string
 		/**
@@ -7961,11 +7961,11 @@ type RootTranslation = {
 	}
 	StablesatsModal: {
 		/**
-		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​U​S​D​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
+		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
 		 */
 		header: string
 		/**
-		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​T​C​ ​a​n​d​ ​U​S​D​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​U​S​D​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​n​d​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
 		 */
 		body: string
 		/**
@@ -8315,7 +8315,7 @@ type RootTranslation = {
 			 */
 			receiveBitcoinDescription: string
 			/**
-			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​U​S​D​ ​p​e​r​ ​d​a​y
+			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​p​e​r​ ​d​a​y
 			 */
 			dailyLimitDescription: string
 			/**
@@ -8705,7 +8705,7 @@ type RootTranslation = {
 		 */
 		bitcoinPrice: string
 		/**
-		 * B​T​C​ ​A​c​c​o​u​n​t
+		 * B​i​t​c​o​i​n​ ​A​c​c​o​u​n​t
 		 */
 		btcAccount: string
 		/**
@@ -8945,7 +8945,7 @@ type RootTranslation = {
 		 */
 		success: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​U​S​D
+		 * S​t​a​b​l​e​s​a​t​s​ ​D​o​l​l​a​r
 		 */
 		stablesatsUsd: string
 		/**
@@ -8977,7 +8977,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * U​S​D​ ​A​c​c​o​u​n​t
+		 * D​o​l​l​a​r​ ​A​c​c​o​u​n​t
 		 */
 		usdAccount: string
 		/**
@@ -10604,7 +10604,7 @@ export type TranslationFunctions = {
 						}
 						feedback: {
 							/**
-							 * Correct. This is true even for USD, which has lost 97% of its value during the last 100 years.
+							 * Correct. This is true even for the US Dollar, which has lost 97% of its value during the last 100 years.
 							 */
 							'0': () => LocalizedString
 							/**
@@ -10846,7 +10846,7 @@ export type TranslationFunctions = {
 					HighlyDivisible: {
 						answers: {
 							/**
-							 * 0.00000001 BTC
+							 * 0.00000001 Bitcoin
 							 */
 							'0': () => LocalizedString
 							/**
@@ -10854,7 +10854,7 @@ export type TranslationFunctions = {
 							 */
 							'1': () => LocalizedString
 							/**
-							 * 0.01 BTC
+							 * 0.01 Bitcoin
 							 */
 							'2': () => LocalizedString
 						}
@@ -16272,7 +16272,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Receive USD
+		 * Receive Dollar
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -16440,7 +16440,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Redeem for USD
+		 * Redeem for Dollar
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -16682,7 +16682,7 @@ export type TranslationFunctions = {
 		 */
 		enterValidDestination: () => LocalizedString
 		/**
-		 * You can send to a {bankName} address, LN address, LN invoice, or BTC address.
+		 * You can send to a {bankName} address, LN address, LN invoice, or Bitcoin address.
 		 */
 		destinationOptions: (arg: { bankName: string }) => LocalizedString
 		/**
@@ -16702,7 +16702,7 @@ export type TranslationFunctions = {
 		 */
 		usernameDoesNotExist: (arg: { bankName: string, lnAddress: string }) => LocalizedString
 		/**
-		 * Either make sure the spelling is right or ask the recipient for an LN invoice or BTC address instead.
+		 * Either make sure the spelling is right or ask the recipient for an LN invoice or Bitcoin address instead.
 		 */
 		usernameDoesNotExistAdvice: () => LocalizedString
 		/**
@@ -16710,7 +16710,7 @@ export type TranslationFunctions = {
 		 */
 		selfPaymentError: (arg: { bankName: string, lnAddress: string }) => LocalizedString
 		/**
-		 * If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.
+		 * If you want to send money to another account that you own, you can use an invoice, LN or Bitcoin address instead.
 		 */
 		selfPaymentAdvice: () => LocalizedString
 		/**
@@ -16718,7 +16718,7 @@ export type TranslationFunctions = {
 		 */
 		lnAddressError: () => LocalizedString
 		/**
-		 * Either make sure the spelling is right or ask the recipient for an invoice or BTC address instead.
+		 * Either make sure the spelling is right or ask the recipient for an invoice or Bitcoin address instead.
 		 */
 		lnAddressAdvice: () => LocalizedString
 		/**
@@ -17508,11 +17508,11 @@ export type TranslationFunctions = {
 	}
 	StablesatsModal: {
 		/**
-		 * With Stablesats, you now have a USD account added to your wallet!
+		 * With Stablesats, you now have a Dollar account added to your wallet!
 		 */
 		header: () => LocalizedString
 		/**
-		 * You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
+		 * You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
 		 */
 		body: () => LocalizedString
 		/**
@@ -17855,7 +17855,7 @@ export type TranslationFunctions = {
 			 */
 			receiveBitcoinDescription: () => LocalizedString
 			/**
-			 * Send up to $1,000 USD per day
+			 * Send up to $1,000 per day
 			 */
 			dailyLimitDescription: () => LocalizedString
 			/**
@@ -18234,7 +18234,7 @@ export type TranslationFunctions = {
 		 */
 		bitcoinPrice: () => LocalizedString
 		/**
-		 * BTC Account
+		 * Bitcoin Account
 		 */
 		btcAccount: () => LocalizedString
 		/**
@@ -18474,7 +18474,7 @@ export type TranslationFunctions = {
 		 */
 		success: () => LocalizedString
 		/**
-		 * Stablesats USD
+		 * Stablesats Dollar
 		 */
 		stablesatsUsd: () => LocalizedString
 		/**
@@ -18506,7 +18506,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * USD Account
+		 * Dollar Account
 		 */
 		usdAccount: () => LocalizedString
 		/**

@@ -315,7 +315,7 @@ const en: BaseTranslation = {
               "The look and design of paper bills is updated every 10 years or so.",
             ],
             feedback: [
-              "Correct. This is true even for USD, which has lost 97% of its value during the last 100 years.",
+              "Correct. This is true even for the US Dollar, which has lost 97% of its value during the last 100 years.",
               "Incorrect. Please try again.",
               "Not quite. Although the design of papers bills may change, this has nothing to do with their value.",
             ],
@@ -390,9 +390,9 @@ const en: BaseTranslation = {
           },
           HighlyDivisible: {
             answers: [
-              "0.00000001 BTC",
+              "0.00000001 Bitcoin",
               "One whole bitcoin. It is not possible to use anything less.",
-              "0.01 BTC",
+              "0.01 Bitcoin",
             ],
             feedback: [
               "Yes. You can divide a bitcoin into 100,000,000 pieces. As you already know, the smallest unit of bitcoin — B0.00000001 — is known as a “sat”.",
@@ -2156,7 +2156,7 @@ const en: BaseTranslation = {
     setNote: "set a note",
     tapQrCodeCopy: "Tap QR Code to Copy",
     title: "Receive Bitcoin",
-    usdTitle: "Receive USD",
+    usdTitle: "Receive Dollar",
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     copyInvoice: "Copy",
     shareInvoice: "Share",
@@ -2204,7 +2204,7 @@ const en: BaseTranslation = {
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
-    usdTitle: "Redeem for USD",
+    usdTitle: "Redeem for Dollar",
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     redeemingError:
       "Failed to redeem Bitcoin. Please contact support if this problem persists.",
@@ -2279,7 +2279,7 @@ const en: BaseTranslation = {
       'When you enter a {bankName: string} username, we will add "@{lnDomain: string}" to it (e.g maria@{lnDomain: string}) to make it an address. Your username is now a {bankName: string} address too.\n\nGo to your {bankName: string} address page from your Settings to learn how to use it or to share it to receive payments.',
     enterValidDestination: "Enter a valid destination",
     destinationOptions:
-      "You can send to a {bankName: string} address, LN address, LN invoice, or BTC address.",
+      "You can send to a {bankName: string} address, LN address, LN invoice, or Bitcoin address.",
     expiredInvoice: "This invoice has expired. Please generate a new invoice.",
     wrongNetwork:
       "This invoice is for a different network. Please generate a new invoice.",
@@ -2288,14 +2288,14 @@ const en: BaseTranslation = {
     usernameDoesNotExist:
       "{lnAddress: string} doesn't seem to be a {bankName: string} address that exists.",
     usernameDoesNotExistAdvice:
-      "Either make sure the spelling is right or ask the recipient for an LN invoice or BTC address instead.",
+      "Either make sure the spelling is right or ask the recipient for an LN invoice or Bitcoin address instead.",
     selfPaymentError: "{lnAddress: string} is your {bankName: string} address.",
     selfPaymentAdvice:
-      "If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.",
+      "If you want to send money to another account that you own, you can use an invoice, LN or Bitcoin address instead.",
     lnAddressError:
       "We can't reach this Lightning address. If you are sure it exists, you can try again later.",
     lnAddressAdvice:
-      "Either make sure the spelling is right or ask the recipient for an invoice or BTC address instead.",
+      "Either make sure the spelling is right or ask the recipient for an invoice or Bitcoin address instead.",
     unknownLightning: "We can't parse this Lightning address. Please try again.",
     unknownOnchain: "We can't parse this Bitcoin address. Please try again.",
     newBankAddressUsername:
@@ -2542,8 +2542,8 @@ const en: BaseTranslation = {
     DEFAULT: "Default (OS)",
   },
   StablesatsModal: {
-    header: "With Stablesats, you now have a USD account added to your wallet!",
-    body: "You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
+    header: "With Stablesats, you now have a Dollar account added to your wallet!",
+    body: "You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
     termsAndConditions: "Read the Terms & Conditions.",
     learnMore: "Learn more about Stablesats",
   },
@@ -2655,7 +2655,7 @@ const en: BaseTranslation = {
       mainTitle: "Welcome to Level 1",
       title: "New features unlocked for your account:",
       receiveBitcoinDescription: "Receive Bitcoin using your phone number",
-      dailyLimitDescription: "Send up to $1,000 USD per day",
+      dailyLimitDescription: "Send up to $1,000 per day",
       onchainDescription: "Receive on-chain payments",
     },
     emailBenefits: {
@@ -2776,7 +2776,7 @@ const en: BaseTranslation = {
     beta: "beta",
     bitcoin: "Bitcoin",
     bitcoinPrice: "Bitcoin Price",
-    btcAccount: "BTC Account",
+    btcAccount: "Bitcoin Account",
     cancel: "Cancel",
     close: "Close",
     confirm: "Confirm",
@@ -2836,7 +2836,7 @@ const en: BaseTranslation = {
     soon: "Coming soon!",
     submit: "Submit",
     success: "Success!",
-    stablesatsUsd: "Stablesats USD",
+    stablesatsUsd: "Stablesats Dollar",
     dollarStablesats: "Dollar (Stablesats)",
     to: "To",
     total: "Total",
@@ -2844,7 +2844,7 @@ const en: BaseTranslation = {
     transactionsError: "Error loading transactions",
     tryAgain: "Try Again",
     type: "Type",
-    usdAccount: "USD Account",
+    usdAccount: "Dollar Account",
     username: "Username",
     usernameRequired: "Username is required",
     backupAccount: "Backup/upgrade account",
