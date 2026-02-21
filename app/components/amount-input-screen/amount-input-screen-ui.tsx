@@ -103,7 +103,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
                 accessibilityRole="button"
                 style={({ pressed }) => [
                   styles.toggleButton,
-                  pressed && { opacity: 0.7 },
+                  pressed && styles.toggleButtonPressed,
                 ]}
               >
                 <GaloyIcon name="transfer" size={34} color={theme.colors.primary} />
@@ -197,6 +197,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
     justifyContent: "center",
     alignItems: "center",
+  },
+  toggleButtonPressed: {
+    opacity: 0.7,
   },
   amountContainer: {
     flex: 1,
