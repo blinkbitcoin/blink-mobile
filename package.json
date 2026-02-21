@@ -169,7 +169,7 @@
     "@graphql-inspector/cli": "^4.0.3",
     "@graphql-tools/graphql-tag-pluck": "^8.3.0",
     "@jest/globals": "^30.0.5",
-    "@react-native-community/cli": "^15.0.1",
+    "@react-native-community/cli": "^17.0.1",
     "@react-native-community/cli-platform-android": "^15.0.1",
     "@react-native-community/cli-platform-ios": "^15.0.1",
     "@react-native-community/slider": "^4.5.7",
