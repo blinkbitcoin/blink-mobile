@@ -181,7 +181,7 @@
     "@storybook/addon-actions": "6.5.16",
     "@storybook/addon-backgrounds": "6.5.16",
     "@storybook/addon-controls": "6.5.16",
-    "@storybook/addon-essentials": "6.5.16",
+    "@storybook/addon-essentials": "8.1.11",
     "@storybook/addon-knobs": "6.4.0",
     "@storybook/addon-links": "6.5.16",
     "@storybook/addon-ondevice-actions": "6.5.2",
