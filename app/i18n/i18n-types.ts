@@ -7393,11 +7393,11 @@ type RootTranslation = {
 		 */
 		noteLabel: string
 		/**
-		 * Message
+		 * M​e​s​s​a​g​e
 		 */
 		message: string
 		/**
-		 * no message
+		 * n​o​ ​m​e​s​s​a​g​e
 		 */
 		noMessage: string
 		/**
