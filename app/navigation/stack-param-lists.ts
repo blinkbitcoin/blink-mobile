@@ -68,6 +68,7 @@ export type RootStackParamList = {
     destination?: string
     paymentType?: string
     createdAt?: number
+    note?: string
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined

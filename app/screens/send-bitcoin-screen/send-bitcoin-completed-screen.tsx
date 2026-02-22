@@ -267,19 +267,20 @@ const PaymentDetailsSection: React.FC<{
 
 const NoteSection: React.FC<{
   noteMessage: string
+  userNote?: string
   LL: TranslationFunctions
-}> = ({ noteMessage, LL }) => {
+}> = ({ noteMessage, userNote, LL }) => {
   const styles = useStyles()
 
-  if (!noteMessage) return null
+  const displayText = noteMessage || (userNote ? `"${userNote}"` : LL.SendBitcoinScreen.noMessage())
 
   return (
     <View style={styles.successActionFieldContainer}>
       <SuccessActionComponent
-        title={LL.SendBitcoinScreen.noteLabel()}
-        text={noteMessage}
+        title={LL.SendBitcoinScreen.message()}
+        text={displayText}
         key="note"
-        visible={Boolean(noteMessage)}
+        visible={true}
       />
     </View>
   )
@@ -316,6 +317,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     destination,
     paymentType,
     createdAt,
+    note,
   } = route.params
 
   const styles = useStyles()
@@ -391,7 +393,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
                 LL={LL}
               />
 
-              <NoteSection noteMessage={noteMessage} LL={LL} />
+              <NoteSection noteMessage={noteMessage} userNote={note} LL={LL} />
             </ScrollView>
           </View>
 
