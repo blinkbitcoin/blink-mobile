@@ -69,7 +69,7 @@ const formatPaymentType = ({
   blinkToBlinkLabel: string
   paymentType?: PaymentType | string
 }): string => {
-  return paymentType === PaymentType.Intraledger ? blinkToBlinkLabel : (paymentType ?? "")
+  return paymentType === PaymentType.Intraledger ? blinkToBlinkLabel : paymentType ?? ""
 }
 
 const useSuccessMessage = (
