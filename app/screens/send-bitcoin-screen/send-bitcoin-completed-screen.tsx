@@ -69,7 +69,7 @@ const formatPaymentType = ({
   blinkToBlinkLabel: string
   paymentType?: PaymentType | string
 }): string => {
-  return paymentType === PaymentType.Intraledger ? blinkToBlinkLabel : paymentType ?? ""
+  return paymentType === PaymentType.Intraledger ? blinkToBlinkLabel : (paymentType ?? "")
 }
 
 const useSuccessMessage = (
@@ -272,7 +272,8 @@ const NoteSection: React.FC<{
 }> = ({ noteMessage, userNote, LL }) => {
   const styles = useStyles()
 
-  const displayText = noteMessage || (userNote ? `"${userNote}"` : LL.SendBitcoinScreen.noMessage())
+  const displayText =
+    noteMessage || (userNote ? `"${userNote}"` : LL.SendBitcoinScreen.noMessage())
 
   return (
     <View style={styles.successActionFieldContainer}>
