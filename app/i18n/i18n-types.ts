@@ -16958,7 +16958,6 @@ export type TranslationFunctions = {
 		 */
 		noteLabel: () => LocalizedString
 		/**
-		/**
 		 * Message
 		 */
 		message: () => LocalizedString
@@ -16966,6 +16965,7 @@ export type TranslationFunctions = {
 		 * no message
 		 */
 		noMessage: () => LocalizedString
+		/**
 		 * Sender
 		 */
 		sender: () => LocalizedString
