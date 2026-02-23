@@ -227,6 +227,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                       }),
                 paymentType: paymentDetail?.paymentType,
                 createdAt: transaction?.createdAt,
+                note,
               },
             },
           ]

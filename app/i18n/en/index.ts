@@ -2363,6 +2363,8 @@ const en: BaseTranslation = {
     orSaved: "Or Saved",
     feeLabel: "Fee",
     noteLabel: "Note",
+    message: "Message",
+    noMessage: "no message",
     sender: "Sender",
     recipient: "Recipient",
     time: "Time",

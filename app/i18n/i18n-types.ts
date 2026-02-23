@@ -7393,6 +7393,14 @@ type RootTranslation = {
 		 */
 		noteLabel: string
 		/**
+		 * M​e​s​s​a​g​e
+		 */
+		message: string
+		/**
+		 * n​o​ ​m​e​s​s​a​g​e
+		 */
+		noMessage: string
+		/**
 		 * S​e​n​d​e​r
 		 */
 		sender: string
@@ -16949,6 +16957,14 @@ export type TranslationFunctions = {
 		 * Note
 		 */
 		noteLabel: () => LocalizedString
+		/**
+		 * Message
+		 */
+		message: () => LocalizedString
+		/**
+		 * no message
+		 */
+		noMessage: () => LocalizedString
 		/**
 		 * Sender
 		 */
