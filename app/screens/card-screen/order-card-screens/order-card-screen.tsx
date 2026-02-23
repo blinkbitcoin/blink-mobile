@@ -31,6 +31,7 @@ export const OrderCardScreen: React.FC = () => {
   const {
     step,
     state,
+    isComplete,
     toggleUseRegisteredAddress,
     setCustomAddress,
     goToNextStep,
@@ -43,6 +44,7 @@ export const OrderCardScreen: React.FC = () => {
   ]
 
   const handleSubmit = () => {
+    if (isComplete) return
     completeFlow()
     navigation.replace("cardStatusScreen", {
       title: LL.CardFlow.CardStatus.PhysicalCardOrdered.title(),
