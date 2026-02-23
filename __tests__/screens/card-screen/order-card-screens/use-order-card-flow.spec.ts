@@ -147,11 +147,13 @@ describe("useOrderCardFlow", () => {
     it("marks flow as complete", () => {
       const { result } = renderHook(() => useOrderCardFlow())
 
+      expect(result.current.isComplete).toBe(false)
+
       act(() => {
         result.current.completeFlow()
       })
 
-      expect(result.current).toBeTruthy()
+      expect(result.current.isComplete).toBe(true)
     })
   })
 
