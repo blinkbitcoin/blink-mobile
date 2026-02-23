@@ -3215,10 +3215,7 @@
                 "feature2": "Chip EMV para mayor seguridad",
                 "feature3": "Banda magnética para aceptación universal",
                 "feature4": "Tu nombre grabado en relieve en la tarjeta",
-                "important": "Importante",
-                "importantBullet1": "Tu tarjeta virtual permanecerá activa mientras esperas la tarjeta física",
-                "importantBullet2": "Necesitarás activar tu tarjeta física cuando llegue",
-                "importantBullet3": "Ambas tarjetas tendrán el mismo número y detalles"
+                "important": "Importante"
             },
             "Confirm": {
                 "title": "Confirma tu pedido",

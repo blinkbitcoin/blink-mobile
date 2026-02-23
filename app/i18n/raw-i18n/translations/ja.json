@@ -3256,10 +3256,7 @@
                 "feature2": "セキュリティ強化のためのEMVチップ",
                 "feature3": "世界中で使える磁気ストライプ",
                 "feature4": "カードに名前がエンボス加工されます",
-                "important": "重要",
-                "importantBullet1": "物理カードを待っている間もバーチャルカードは有効です",
-                "importantBullet2": "物理カードが届いたら有効化が必要です",
-                "importantBullet3": "両方のカードは同じカード番号と詳細になります"
+                "important": "重要"
             },
             "Confirm": {
                 "title": "注文を確認",
