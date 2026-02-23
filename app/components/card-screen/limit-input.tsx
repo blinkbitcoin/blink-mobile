@@ -43,7 +43,7 @@ export const LimitInput: React.FC<LimitInputProps> = ({
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { getCurrencySymbol, getFractionDigits } = useDisplayCurrency()
+  const { getCurrencySymbol, getFractionDigits, currencyInfo } = useDisplayCurrency()
 
   const currencySymbol = getCurrencySymbol({ currency })
   const decimalsAllowed = getFractionDigits({ currency })
@@ -91,7 +91,12 @@ export const LimitInput: React.FC<LimitInputProps> = ({
   ]
 
   const formattedValue = `${currencySymbol}${Intl.NumberFormat("en-US").format(Number(value) || 0)}`
-  const modalDisplayValue = formatNumberPadNumber(numberPadState.numberPadNumber)
+  const modalDisplayValue = formatNumberPadNumber({
+    numberPadNumber: numberPadState.numberPadNumber,
+    currency: currency as WalletOrDisplayCurrency,
+    currencyInfo,
+    noSuffix: true,
+  })
 
   return (
     <View style={styles.container}>

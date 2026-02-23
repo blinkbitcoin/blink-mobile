@@ -19,7 +19,6 @@ import {
   numberPadReducer,
   NumberPadReducerActionType,
   NumberPadReducerState,
-  formatNumberPadNumber,
 } from "@app/components/amount-input-screen/number-pad-reducer"
 import {
   greaterThan,
