@@ -12,7 +12,7 @@ type SteppedCardLayoutProps = {
   currentStep: number
   icon: IconNamesType
   iconColor?: string
-  title?: string
+  title: string
   subtitle: string
   buttonLabel: string
   onButtonPress: () => void
