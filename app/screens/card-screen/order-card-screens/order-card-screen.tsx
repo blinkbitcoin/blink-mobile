@@ -78,6 +78,10 @@ export const OrderCardScreen: React.FC = () => {
           onButtonPress: handleSubmit,
           isButtonDisabled: false,
         }
+      default: {
+        const _exhaustive: never = step
+        throw new Error(`Unhandled step: ${_exhaustive}`)
+      }
     }
   }
 
@@ -103,6 +107,10 @@ export const OrderCardScreen: React.FC = () => {
             }
           />
         )
+      default: {
+        const _exhaustive: never = step
+        throw new Error(`Unhandled step: ${_exhaustive}`)
+      }
     }
   }
 
