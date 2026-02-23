@@ -3215,10 +3215,7 @@
                 "feature2": "EMV-Chip für erhöhte Sicherheit",
                 "feature3": "Magnetstreifen für universelle Akzeptanz",
                 "feature4": "Ihr Name ist auf der Karte geprägt",
-                "important": "Wichtig",
-                "importantBullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
-                "importantBullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
-                "importantBullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
+                "important": "Wichtig"
             },
             "Confirm": {
                 "title": "Bestellung bestätigen",

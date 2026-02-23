@@ -3341,9 +3341,6 @@ const en: BaseTranslation = {
         feature3: "Magnetic stripe for universal acceptance",
         feature4: "Your name embossed on the card",
         important: "Important",
-        importantBullet1: "Your virtual card will remain active while you wait for the physical card",
-        importantBullet2: "You'll need to activate your physical card when it arrives",
-        importantBullet3: "Both cards will have the same card number and details",
       },
       Confirm: {
         title: "Confirm your order",

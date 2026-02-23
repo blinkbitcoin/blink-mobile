@@ -3256,10 +3256,7 @@
                 "feature2": "Puce EMV pour une sécurité renforcée",
                 "feature3": "Bande magnétique pour une acceptation universelle",
                 "feature4": "Votre nom embossé sur la carte",
-                "important": "Important",
-                "importantBullet1": "Votre carte virtuelle restera active pendant l'attente de la carte physique",
-                "importantBullet2": "Vous devrez activer votre carte physique à son arrivée",
-                "importantBullet3": "Les deux cartes auront le même numéro et les mêmes détails"
+                "important": "Important"
             },
             "Confirm": {
                 "title": "Confirmez votre commande",
