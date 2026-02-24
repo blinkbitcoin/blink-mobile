@@ -107,19 +107,19 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
     }
   }, [years, selectedYear])
 
-  const handleYearSelect = useCallback(
-    (yearOption: YearOption) => {
-      if (yearOption.disabled) return
-      onYearChange(yearOption.year)
-      closeModal()
-    },
-    [onYearChange, closeModal],
-  )
-
   const isYearDisabled = useCallback((yearOption: YearOption): boolean => {
     const hasItemCount = yearOption.itemCount !== undefined
     return yearOption.disabled === true || (hasItemCount && yearOption.itemCount === 0)
   }, [])
+
+  const handleYearSelect = useCallback(
+    (yearOption: YearOption) => {
+      if (isYearDisabled(yearOption)) return
+      onYearChange(yearOption.year)
+      closeModal()
+    },
+    [onYearChange, closeModal, isYearDisabled],
+  )
 
   return (
     <>
