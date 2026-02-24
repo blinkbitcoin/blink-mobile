@@ -90,7 +90,7 @@ export const CardSettingsScreen: React.FC = () => {
                   title={LL.CardFlow.CardSettings.transactionAlerts()}
                   description={LL.CardFlow.CardSettings.transactionAlertsDescription()}
                   value={transactionAlerts}
-                  onValueChange={() => setTransactionAlerts(!transactionAlerts)}
+                  onValueChange={(value) => setTransactionAlerts(value)}
                 />
               ),
               () => (
@@ -98,7 +98,7 @@ export const CardSettingsScreen: React.FC = () => {
                   title={LL.CardFlow.CardSettings.securityAlerts()}
                   description={LL.CardFlow.CardSettings.securityAlertsDescription()}
                   value={securityAlerts}
-                  onValueChange={() => setSecurityAlerts(!securityAlerts)}
+                  onValueChange={(value) => setSecurityAlerts(value)}
                 />
               ),
               () => (
@@ -106,7 +106,7 @@ export const CardSettingsScreen: React.FC = () => {
                   title={LL.CardFlow.CardSettings.marketingUpdates()}
                   description={LL.CardFlow.CardSettings.marketingUpdatesDescription()}
                   value={marketingUpdates}
-                  onValueChange={() => setMarketingUpdates(!marketingUpdates)}
+                  onValueChange={(value) => setMarketingUpdates(value)}
                 />
               ),
             ]}
