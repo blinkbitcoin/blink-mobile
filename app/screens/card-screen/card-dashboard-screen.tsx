@@ -15,8 +15,7 @@ import { MOCK_CARD, MOCK_TRANSACTIONS, EMPTY_TRANSACTIONS } from "./card-mock-da
 export const CardDashboardScreen: React.FC = () => {
   const styles = useStyles()
   const [isFrozen, setIsFrozen] = useState(false)
-  const [hasTransactions] = useState(true)
-
+  const hasTransactions = true
   const transactions = hasTransactions ? MOCK_TRANSACTIONS : EMPTY_TRANSACTIONS
 
   return (
