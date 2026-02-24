@@ -22,9 +22,9 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ title, items }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.card}>
-        {items.map((item, index) => (
+        {items.map((item) => (
           <InfoRow
-            key={`${item.label}-${index}`}
+            key={item.label}
             label={item.label}
             value={item.value}
             valueColor={item.valueColor}
