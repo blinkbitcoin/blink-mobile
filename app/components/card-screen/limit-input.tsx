@@ -90,7 +90,7 @@ export const LimitInput: React.FC<LimitInputProps> = ({
     pressed && styles.valueCardPressed,
   ]
 
-  const formattedValue = `${currencySymbol}${Intl.NumberFormat("en-US").format(Number(value) || 0)}`
+  const formattedValue = `${currencySymbol}${(Number(value) || 0).toLocaleString()}`
   const modalDisplayValue = formatNumberPadNumber({
     numberPadNumber: numberPadState.numberPadNumber,
     currency: currency as WalletOrDisplayCurrency,
