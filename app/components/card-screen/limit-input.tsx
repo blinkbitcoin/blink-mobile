@@ -105,6 +105,7 @@ export const LimitInput: React.FC<LimitInputProps> = ({
         style={pressableStyle}
         onPress={handleOpen}
         accessibilityLabel={`${label}: ${formattedValue}`}
+        accessibilityHint="Allows editing limit"
         accessibilityRole="button"
       >
         <Text style={styles.value}>{formattedValue}</Text>
