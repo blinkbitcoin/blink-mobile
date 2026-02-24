@@ -2491,8 +2491,7 @@
     "receivingAccount": "Ստացողի հաշիվ",
     "sendingAccount": "Ողւարկողի հաշիվ",
     "txNotBroadcast": "Ձեր գործառնությունն այս պահին ընթացքի մեջ է և հաջորդիվ կհհաղորդվի Բիթքոյնի ցանցին:",
-    "momentarily": "անհապաղ",
-    "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում"
+    "momentarily": "անհապաղ"
   },
   "TransactionLimitsScreen": {
     "receive": "Ստանալ",
@@ -2788,7 +2787,8 @@
     "some": "Որոշ",
     "support": "Աջակցություն",
     "profiles": "Պրոֆիլներ",
-    "paste": "Տեղադրել"
+    "paste": "Տեղադրել",
+    "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում"
   },
   "errors": {
     "generic": "Սխալ\nՓորձեք կրկին ավելի ուշ։ ",

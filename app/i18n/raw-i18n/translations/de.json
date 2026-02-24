@@ -2474,8 +2474,7 @@
         "receivingAccount": "Empfangendes Konto",
         "sendingAccount": "Sendendes Konto",
         "txNotBroadcast": "Ihre Transaktion befindet sich in der Warteschlange. Sie sollte im Mempool erscheinen: {countdown: string} ",
-        "momentarily": "momentan",
-        "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert"
+        "momentarily": "momentan"
     },
     "TransactionLimitsScreen": {
         "receive": "Erhalten",
@@ -2771,7 +2770,8 @@
         "some": "Einige",
         "support": "Support",
         "profiles": "Profile",
-        "paste": "Einfügen"
+        "paste": "Einfügen",
+        "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert"
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",

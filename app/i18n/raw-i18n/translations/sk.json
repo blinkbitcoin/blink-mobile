@@ -2474,8 +2474,7 @@
     "receivingAccount": "Prijímajúci účet",
     "sendingAccount": "Odosielajúci účet",
     "txNotBroadcast": "Vaša transakcia je zaradená do frontu. Mala by sa objaviť v mempoole {countdown: string}.",
-    "momentarily": "momentálne",
-    "hasBeenCopiedToClipboard": "{type: string} bol skopírovaný do schránky"
+    "momentarily": "momentálne"
   },
   "TransactionLimitsScreen": {
     "receive": "Prijať",
@@ -2771,7 +2770,8 @@
     "some": "Niektoré",
     "support": "Podpora",
     "profiles": "Profily",
-    "paste": "Prilepiť"
+    "paste": "Prilepiť",
+    "hasBeenCopiedToClipboard": "{type: string} bol skopírovaný do schránky"
   },
   "errors": {
     "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",

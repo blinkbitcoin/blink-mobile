@@ -2512,8 +2512,7 @@
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "okwethutyana",
-    "hasBeenCopiedToClipboard": "{type: string} ikopishwe kwibhodi eqhotyoshwayo"
+    "momentarily": "okwethutyana"
   },
   "TransactionLimitsScreen": {
     "receive": "Yamkela",
@@ -2812,7 +2811,8 @@
     "some": "Ezinye",
     "support": "Inkxaso",
     "profiles": "Iiprofayili",
-    "paste": "Ncamathisela"
+    "paste": "Ncamathisela",
+    "hasBeenCopiedToClipboard": "{type: string} ikopishwe kwibhodi eqhotyoshwayo"
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",

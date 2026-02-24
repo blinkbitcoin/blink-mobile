@@ -2491,8 +2491,7 @@
     "receivingAccount": "Přijímací účet",
     "sendingAccount": "Odesílající účet",
     "txNotBroadcast": "Vaše transakce právě probíhá a za chvíli bude odeslána do Bitcoinové sítě.",
-    "momentarily": "za okamžik",
-    "hasBeenCopiedToClipboard": "{type: string} byl zkopírován do schránky"
+    "momentarily": "za okamžik"
   },
   "TransactionLimitsScreen": {
     "receive": "Přijmout",
@@ -2788,7 +2787,8 @@
     "some": "Některé",
     "support": "Podpora",
     "profiles": "Profily",
-    "paste": "Vložit"
+    "paste": "Vložit",
+    "hasBeenCopiedToClipboard": "{type: string} byl zkopírován do schránky"
   },
   "errors": {
     "generic": "Došlo k chybě.\nZkuste to prosím později.",

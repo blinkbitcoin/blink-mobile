@@ -2474,8 +2474,7 @@
     "receivingAccount": "Λογαριασμός λήψης",
     "sendingAccount": "Λογαριασμός Αποστολής",
     "txNotBroadcast": "Η συναλλαγή σας βρίσκεται σε ουρά. Θα πρέπει να εμφανιστεί στην mempool {countdown: string}.",
-    "momentarily": "Στιγμιαία",
-    "hasBeenCopiedToClipboard": "{type: string} έχει αντιγραφεί στο πρόχειρο"
+    "momentarily": "Στιγμιαία"
   },
   "TransactionLimitsScreen": {
     "receive": "Λήψη",
@@ -2771,7 +2770,8 @@
     "some": "Μερικά",
     "support": "Υποστήριξη",
     "profiles": "Προφίλ",
-    "paste": "Επικόλληση"
+    "paste": "Επικόλληση",
+    "hasBeenCopiedToClipboard": "{type: string} έχει αντιγραφεί στο πρόχειρο"
   },
   "errors": {
     "generic": "Υπήρξε ένα σφάλμα. \nΠαρακαλούμε δοκιμάστε πάλι αργότερα. ",

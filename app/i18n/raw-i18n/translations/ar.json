@@ -2491,8 +2491,7 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "بعد لحظات",
-    "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة"
+    "momentarily": "بعد لحظات"
   },
   "TransactionLimitsScreen": {
     "receive": "استقبال",
@@ -2788,7 +2787,8 @@
     "some": "بعض",
     "support": "الدعم",
     "profiles": "الملفات الشخصية",
-    "paste": "لصق"
+    "paste": "لصق",
+    "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة"
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",

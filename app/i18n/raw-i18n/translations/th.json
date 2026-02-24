@@ -2491,8 +2491,7 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ในอีกสักครู่",
-    "hasBeenCopiedToClipboard": "คัดลอก {type: string} ไปยังคลิปบอร์ดแล้ว"
+    "momentarily": "ในอีกสักครู่"
   },
   "TransactionLimitsScreen": {
     "receive": "รับเงิน",
@@ -2788,7 +2787,8 @@
     "some": "บางส่วน",
     "support": "สนับสนุน",
     "profiles": "โปรไฟล์",
-    "paste": "วาง"
+    "paste": "วาง",
+    "hasBeenCopiedToClipboard": "คัดลอก {type: string} ไปยังคลิปบอร์ดแล้ว"
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",

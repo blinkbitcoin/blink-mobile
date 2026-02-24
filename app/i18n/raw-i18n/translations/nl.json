@@ -2491,8 +2491,7 @@
     "receivingAccount": "Account voor Ontvangsten",
     "sendingAccount": "Account voor Verzendingen",
     "txNotBroadcast": "Uw transactie is momenteel in behandeling en wordt binnen enkele ogenblikken naar het Bitcoin-netwerk verzonden.",
-    "momentarily": "binnenkort",
-    "hasBeenCopiedToClipboard": "{type: string} is naar het klembord gekopieerd"
+    "momentarily": "binnenkort"
   },
   "TransactionLimitsScreen": {
     "receive": "Ontvang",
@@ -2788,7 +2787,8 @@
     "some": "Sommige",
     "support": "Ondersteuning",
     "profiles": "Profielen",
-    "paste": "Plakken"
+    "paste": "Plakken",
+    "hasBeenCopiedToClipboard": "{type: string} is naar het klembord gekopieerd"
   },
   "errors": {
     "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",

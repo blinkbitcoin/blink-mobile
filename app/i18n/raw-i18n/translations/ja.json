@@ -2491,8 +2491,7 @@
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
         "txNotBroadcast": "あなたのトランザクションは現在保留中ですが、すぐにビットコインネットワークに反映されます。",
-        "momentarily": "まもなく",
-        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました"
+        "momentarily": "まもなく"
     },
     "TransactionLimitsScreen": {
         "receive": "受金",
@@ -2788,7 +2787,8 @@
         "some": "一部",
         "support": "サポート",
         "profiles": "プロフィール",
-        "paste": "貼り付け"
+        "paste": "貼り付け",
+        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",

@@ -2472,8 +2472,7 @@
         "receivingAccount": "Receiving Account",
         "sendingAccount": "Sending Account",
         "txNotBroadcast": "Your transaction is queued. It should appear in the mempool {countdown: string}.",
-        "momentarily": "momentarily",
-        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
+        "momentarily": "momentarily"
     },
     "TransactionLimitsScreen": {
         "receive": "Receive",
@@ -2770,7 +2769,8 @@
         "support": "Support",
         "profiles": "Profiles",
         "paste": "Paste",
-        "copied": "Copied to clipboard"
+        "copied": "Copied to clipboard",
+        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
     },
     "errors": {
         "generic": "There was an error.\nPlease try again later.",

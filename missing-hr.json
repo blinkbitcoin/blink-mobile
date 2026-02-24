@@ -136,7 +136,7 @@
   "ThemeScreen.setToLight": "Light mode",
   "TransactionDetailScreen.sending": "Sending",
   "TransactionDetailScreen.momentarily": "momentarily",
-  "TransactionDetailScreen.hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard",
+  "common.hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard",
   "UpgradeAccountModal.upgradeToLevel": "Upgrade to Level {level: number}",
   "UpgradeAccountModal.notNow": "Not now",
   "UpgradeAccountModal.setUpLevelAccount": "Set up Level {level: number} account",
