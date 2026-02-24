@@ -74,6 +74,7 @@ export const CardDetailsScreen: React.FC = () => {
             label={LL.CardFlow.CardDetails.cardNumber()}
             value={MOCK_CARD.cardNumber}
             icon="copy-paste"
+            testID="card-number-field"
             onAction={() =>
               handleCopy(cardNumberWithoutSpaces, LL.CardFlow.CardDetails.cardNumber())
             }
