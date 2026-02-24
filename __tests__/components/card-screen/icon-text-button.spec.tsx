@@ -23,8 +23,9 @@ jest.mock("@rn-vui/themed", () => ({
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: ({ name, color }: { name: string; size: number; color: string }) => (
-    <View testID={`galoy-icon-${name}`} accessibilityHint={color}>
+    <View testID={`galoy-icon-${name}`}>
       <RNText>{name}</RNText>
+      <RNText testID={`galoy-icon-${name}-color`}>{color}</RNText>
     </View>
   ),
 }))
@@ -121,8 +122,7 @@ describe("IconTextButton", () => {
         <IconTextButton {...defaultProps} iconColor="#FF0000" />,
       )
 
-      const icon = getByTestId("galoy-icon-map")
-      expect(icon.props.accessibilityHint).toBe("#FF0000")
+      expect(getByTestId("galoy-icon-map-color").props.children).toBe("#FF0000")
     })
 
     it("renders with custom text color", () => {
@@ -139,14 +139,13 @@ describe("IconTextButton", () => {
       )
 
       expect(getByText("View on map")).toBeTruthy()
-      expect(getByTestId("galoy-icon-map").props.accessibilityHint).toBe("#FF0000")
+      expect(getByTestId("galoy-icon-map-color").props.children).toBe("#FF0000")
     })
 
     it("uses default colors when not provided", () => {
       const { getByTestId } = render(<IconTextButton {...defaultProps} />)
 
-      const icon = getByTestId("galoy-icon-map")
-      expect(icon.props.accessibilityHint).toBe("#F7931A")
+      expect(getByTestId("galoy-icon-map-color").props.children).toBe("#F7931A")
     })
   })
 

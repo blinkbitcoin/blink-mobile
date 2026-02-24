@@ -25,8 +25,9 @@ jest.mock("@rn-vui/themed", () => ({
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: ({ name, color }: { name: string; size: number; color: string }) => (
-    <View testID={`galoy-icon-${name}`} accessibilityHint={color}>
+    <View testID={`galoy-icon-${name}`}>
       <RNText>{name}</RNText>
+      <RNText testID={`galoy-icon-${name}-color`}>{color}</RNText>
     </View>
   ),
 }))
@@ -130,8 +131,7 @@ describe("WarningCard", () => {
     it("renders icon with warning color", () => {
       const { getByTestId } = render(<WarningCard {...defaultProps} />)
 
-      const icon = getByTestId("galoy-icon-warning")
-      expect(icon.props.accessibilityHint).toBe("#FFA726")
+      expect(getByTestId("galoy-icon-warning-color").props.children).toBe("#FFA726")
     })
   })
 
