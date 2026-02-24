@@ -2964,25 +2964,25 @@
   "Fake": {
     "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "Սպասման մեջ",
-            "completed": "Ավարտված"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "Մանրամասներ",
-                "freeze": "Սառեցնել",
-                "setLimits": "Սdelays",
-                "statements": "Շdelays"
-            },
-            "emptyTransactions": "Դեռ գործարքներ չկան",
-            "addFunds": "Ավելացնել միջոցներ",
-            "transactionsTitle": "Գործարքներ",
-            "title": "Blink քարտ"
-        },
-        "validThruLabel": "Վավեր է մինչև",
-        "cardFrozenTitle": "Քարտը սառեցված է",
-        "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Սպասման մեջ",
+      "completed": "Ավարտված"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Մանրամասներ",
+        "freeze": "Սառեցնել",
+        "setLimits": "Սdelays",
+        "statements": "Շdelays"
+      },
+      "emptyTransactions": "Դեռ գործարքներ չկան",
+      "addFunds": "Ավելացնել միջոցներ",
+      "transactionsTitle": "Գործարքներ",
+      "title": "Blink քարտ"
+    },
+    "validThruLabel": "Վավեր է մինչև",
+    "cardFrozenTitle": "Քարտը սառեցված է",
+    "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է"
+  }
 }

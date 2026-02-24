@@ -2964,25 +2964,25 @@
   "Fake": {
     "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "Na čekanju",
-            "completed": "Dovršeno"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "Detalji",
-                "freeze": "Zamrzni",
-                "setLimits": "Limiti",
-                "statements": "Promet"
-            },
-            "emptyTransactions": "Još nema transakcija",
-            "addFunds": "Dodaj sredstva",
-            "transactionsTitle": "Transakcije",
-            "title": "Blink kartica"
-        },
-        "validThruLabel": "VRIJEDI DO",
-        "cardFrozenTitle": "Kartica zamrznuta",
-        "cardFrozenSubtitle": "Kartica je privremeno onemogućena"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Na čekanju",
+      "completed": "Dovršeno"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detalji",
+        "freeze": "Zamrzni",
+        "setLimits": "Limiti",
+        "statements": "Promet"
+      },
+      "emptyTransactions": "Još nema transakcija",
+      "addFunds": "Dodaj sredstva",
+      "transactionsTitle": "Transakcije",
+      "title": "Blink kartica"
+    },
+    "validThruLabel": "VRIJEDI DO",
+    "cardFrozenTitle": "Kartica zamrznuta",
+    "cardFrozenSubtitle": "Kartica je privremeno onemogućena"
+  }
 }

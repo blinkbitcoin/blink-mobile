@@ -2964,25 +2964,25 @@
   "Fake": {
     "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "Čeká",
-            "completed": "Dokončeno"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "Detaily",
-                "freeze": "Zmrazit",
-                "setLimits": "Limity",
-                "statements": "Pohyby"
-            },
-            "emptyTransactions": "Zatím žádné transakce",
-            "addFunds": "Přidat prostředky",
-            "transactionsTitle": "Transakce",
-            "title": "Karta Blink"
-        },
-        "validThruLabel": "PLATNOST DO",
-        "cardFrozenTitle": "Karta zmrazena",
-        "cardFrozenSubtitle": "Karta je dočasně deaktivována"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Čeká",
+      "completed": "Dokončeno"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detaily",
+        "freeze": "Zmrazit",
+        "setLimits": "Limity",
+        "statements": "Pohyby"
+      },
+      "emptyTransactions": "Zatím žádné transakce",
+      "addFunds": "Přidat prostředky",
+      "transactionsTitle": "Transakce",
+      "title": "Karta Blink"
+    },
+    "validThruLabel": "PLATNOST DO",
+    "cardFrozenTitle": "Karta zmrazena",
+    "cardFrozenSubtitle": "Karta je dočasně deaktivována"
+  }
 }
