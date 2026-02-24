@@ -2961,25 +2961,25 @@
     "title": "การแจ้งเตือน",
     "noNotifications": "คุณไม่มีการแจ้งเตือนในขณะนี้"
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "รอดำเนินการ",
-            "completed": "เสร็จสิ้น"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "รายละเอียด",
-                "freeze": "ระงับ",
-                "setLimits": "วงเงิน",
-                "statements": "รายการ"
-            },
-            "emptyTransactions": "ยังไม่มีธุรกรรม",
-            "addFunds": "เติมเงิน",
-            "transactionsTitle": "ธุรกรรม",
-            "title": "บัตร Blink"
-        },
-        "validThruLabel": "ใช้ได้ถึง",
-        "cardFrozenTitle": "บัตรถูกระงับ",
-        "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "รอดำเนินการ",
+      "completed": "เสร็จสิ้น"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "รายละเอียด",
+        "freeze": "ระงับ",
+        "setLimits": "วงเงิน",
+        "statements": "รายการ"
+      },
+      "emptyTransactions": "ยังไม่มีธุรกรรม",
+      "addFunds": "เติมเงิน",
+      "transactionsTitle": "ธุรกรรม",
+      "title": "บัตร Blink"
+    },
+    "validThruLabel": "ใช้ได้ถึง",
+    "cardFrozenTitle": "บัตรถูกระงับ",
+    "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว"
+  }
 }

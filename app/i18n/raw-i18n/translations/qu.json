@@ -2961,25 +2961,25 @@
     "title": "Willanakuykuna",
     "noNotifications": "Kunan mana willanakuykunayki kanchu"
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "Pendiente",
-            "completed": "Completado"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "Detalles",
-                "freeze": "Congelar",
-                "setLimits": "Límites",
-                "statements": "Kuyuykuna"
-            },
-            "emptyTransactions": "Aún no hay transacciones",
-            "addFunds": "Agregar fondos",
-            "transactionsTitle": "Transacciones",
-            "title": "Tarjeta Blink"
-        },
-        "validThruLabel": "VÁLIDO HASTA",
-        "cardFrozenTitle": "Tarjeta congelada",
-        "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Pendiente",
+      "completed": "Completado"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detalles",
+        "freeze": "Congelar",
+        "setLimits": "Límites",
+        "statements": "Kuyuykuna"
+      },
+      "emptyTransactions": "Aún no hay transacciones",
+      "addFunds": "Agregar fondos",
+      "transactionsTitle": "Transacciones",
+      "title": "Tarjeta Blink"
+    },
+    "validThruLabel": "VÁLIDO HASTA",
+    "cardFrozenTitle": "Tarjeta congelada",
+    "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
+  }
 }

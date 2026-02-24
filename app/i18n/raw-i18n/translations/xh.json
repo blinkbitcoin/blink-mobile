@@ -2970,25 +2970,25 @@
     "noMatchingContacts": "Akukho mfowunelwa othelekisekayo uphendlo lwakho ofunyenweyo",
     "title": "Abafowunelwa\n "
   },
-    "CardFlow": {
-        "TransactionStatus": {
-            "pending": "Kulindile",
-            "completed": "Kugqityiwe"
-        },
-        "CardDashboard": {
-            "Actions": {
-                "details": "Iinkcukacha",
-                "freeze": "Bandisa",
-                "setLimits": "Imida",
-                "statements": "Intshukumo"
-            },
-            "emptyTransactions": "Akukho ntengiselwano okwangoku",
-            "addFunds": "Yongeza imali",
-            "transactionsTitle": "Iintengiselwano",
-            "title": "Ikhadi le-Blink"
-        },
-        "validThruLabel": "ISEBENZA DE KUPHELA",
-        "cardFrozenTitle": "Ikhadi libandisiwe",
-        "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana"
-    }
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Kulindile",
+      "completed": "Kugqityiwe"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Iinkcukacha",
+        "freeze": "Bandisa",
+        "setLimits": "Imida",
+        "statements": "Intshukumo"
+      },
+      "emptyTransactions": "Akukho ntengiselwano okwangoku",
+      "addFunds": "Yongeza imali",
+      "transactionsTitle": "Iintengiselwano",
+      "title": "Ikhadi le-Blink"
+    },
+    "validThruLabel": "ISEBENZA DE KUPHELA",
+    "cardFrozenTitle": "Ikhadi libandisiwe",
+    "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana"
+  }
 }
