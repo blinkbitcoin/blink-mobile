@@ -165,7 +165,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     backgroundColor: colors.grey5,
     borderRadius: 8,
-    height: 80,
+    minHeight: 80,
     paddingVertical: 18,
     paddingHorizontal: 10,
     marginTop: 8,
