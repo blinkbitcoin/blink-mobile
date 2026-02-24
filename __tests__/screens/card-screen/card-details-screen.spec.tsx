@@ -231,7 +231,7 @@ describe("CardDetailsScreen", () => {
 
   describe("copy interactions", () => {
     it("calls copyToClipboard when card number field is pressed", async () => {
-      const { getAllByText } = render(
+      const { getByTestId } = render(
         <ContextForScreen>
           <CardDetailsScreen />
         </ContextForScreen>,
@@ -239,9 +239,8 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      const cardNumbers = getAllByText("4111 1111 1111 1111")
       await act(async () => {
-        fireEvent.press(cardNumbers[1])
+        fireEvent.press(getByTestId("card-number-field"))
       })
 
       expect(mockCopyToClipboard).toHaveBeenCalledWith(

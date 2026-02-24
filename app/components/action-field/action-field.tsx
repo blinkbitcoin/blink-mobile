@@ -9,6 +9,7 @@ type ActionFieldProps = {
   onAction: () => void
   icon: IconNamesType
   label?: string
+  testID?: string
 }
 
 export const ActionField: React.FC<ActionFieldProps> = ({
@@ -16,6 +17,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   onAction,
   icon,
   label,
+  testID,
 }) => {
   const styles = useStyles()
   const {
@@ -25,7 +27,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity onPress={onAction} style={styles.valueContainer}>
+      <TouchableOpacity onPress={onAction} style={styles.valueContainer} testID={testID}>
         <Text style={styles.value}>{value}</Text>
         <View style={styles.actionButton}>
           <GaloyIcon name={icon} size={20} color={colors.primary} />
