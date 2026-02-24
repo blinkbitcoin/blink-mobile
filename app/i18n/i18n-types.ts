@@ -9962,10 +9962,6 @@ type RootTranslation = {
 			 */
 			replaceCard: string
 			/**
-			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
-			 */
-			contactSupport: string
-			/**
 			 * C​a​r​d​ ​T​e​r​m​s​ ​&​ ​C​o​n​d​i​t​i​o​n​s
 			 */
 			termsAndConditions: string
@@ -19819,10 +19815,6 @@ export type TranslationFunctions = {
 			 * Replace card
 			 */
 			replaceCard: () => LocalizedString
-			/**
-			 * Contact support
-			 */
-			contactSupport: () => LocalizedString
 			/**
 			 * Card Terms & Conditions
 			 */
