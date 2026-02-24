@@ -159,7 +159,7 @@ export const CardStatementsScreen: React.FC = () => {
                 <SwitchRow
                   title={LL.CardFlow.CardStatements.notifyNewStatements()}
                   value={notificationsEnabled}
-                  onValueChange={() => setNotificationsEnabled(!notificationsEnabled)}
+                  onValueChange={(value) => setNotificationsEnabled(value)}
                 />
               ),
             ]}
