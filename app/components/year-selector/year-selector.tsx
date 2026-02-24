@@ -123,7 +123,12 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
 
   return (
     <>
-      <TouchableOpacity style={styles.yearSelector} onPress={openModal}>
+      <TouchableOpacity
+        style={styles.yearSelector}
+        onPress={openModal}
+        accessibilityRole="button"
+        accessibilityLabel={`${selectedYear}`}
+      >
         <GaloyIcon name="calendar" size={20} color={colors.black} />
         <Text style={styles.yearText}>{selectedYear}</Text>
         <GaloyIcon name="caret-down" size={20} color={colors.primary} />

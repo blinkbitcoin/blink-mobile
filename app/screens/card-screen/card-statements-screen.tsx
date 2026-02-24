@@ -96,6 +96,8 @@ export const CardStatementsScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.downloadAllButton}
               onPress={handleDownloadAll}
+              accessibilityRole="button"
+              accessibilityLabel={LL.CardFlow.CardStatements.downloadAll()}
             >
               <GaloyIcon name="download" size={16} color={colors.primary} />
               <Text style={styles.downloadAllText}>
@@ -163,7 +165,12 @@ export const CardStatementsScreen: React.FC = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.support()}</Text>
-          <TouchableOpacity style={styles.supportCard} onPress={handleContactSupport}>
+          <TouchableOpacity
+            style={styles.supportCard}
+            onPress={handleContactSupport}
+            accessibilityRole="button"
+            accessibilityLabel={LL.AppUpdate.contactSupport()}
+          >
             <GaloyIcon name="contact-support" size={16} color={colors.black} />
             <View style={styles.supportInfo}>
               <Text style={styles.supportTitle}>{LL.AppUpdate.contactSupport()}</Text>
