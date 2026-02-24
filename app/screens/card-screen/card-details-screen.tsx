@@ -26,6 +26,17 @@ export const CardDetailsScreen: React.FC = () => {
 
   const cardNumberWithoutSpaces = MOCK_CARD.cardNumber.replace(/\s/g, "")
 
+  const getStatusLabel = (status: CardStatus) => {
+    switch (status) {
+      case CardStatus.Active:
+        return LL.CardFlow.CardDetails.statusActive()
+      case CardStatus.Frozen:
+        return LL.CardFlow.CardDetails.statusFrozen()
+      case CardStatus.Inactive:
+        return LL.CardFlow.CardDetails.statusInactive()
+    }
+  }
+
   const handleCopy = (content: string, label: string) => {
     copyToClipboard({
       content,
@@ -109,7 +120,7 @@ export const CardDetailsScreen: React.FC = () => {
               />
               <InfoRow
                 label={LL.CardFlow.CardDetails.status()}
-                value={LL.CardFlow.CardDetails.statusActive()}
+                value={getStatusLabel(MOCK_CARD.status)}
                 valueColor={
                   MOCK_CARD.status === CardStatus.Active ? colors.success : colors.error
                 }
