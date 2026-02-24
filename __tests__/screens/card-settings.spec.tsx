@@ -470,13 +470,13 @@ describe("CardSettingsScreen", () => {
       await act(async () => {})
 
       const switches = getAllByRole("switch")
-      const transactionAlertsSwitch = switches[0]
+      expect(switches[0].props.accessibilityState.checked).toBe(true)
 
       await act(async () => {
-        fireEvent(transactionAlertsSwitch, "pressIn")
+        fireEvent(switches[0], "pressIn")
       })
 
-      expect(transactionAlertsSwitch).toBeTruthy()
+      expect(getAllByRole("switch")[0].props.accessibilityState.checked).toBe(false)
     })
 
     it("toggles security alerts switch", async () => {
@@ -489,13 +489,13 @@ describe("CardSettingsScreen", () => {
       await act(async () => {})
 
       const switches = getAllByRole("switch")
-      const securityAlertsSwitch = switches[1]
+      expect(switches[1].props.accessibilityState.checked).toBe(true)
 
       await act(async () => {
-        fireEvent(securityAlertsSwitch, "pressIn")
+        fireEvent(switches[1], "pressIn")
       })
 
-      expect(securityAlertsSwitch).toBeTruthy()
+      expect(getAllByRole("switch")[1].props.accessibilityState.checked).toBe(false)
     })
 
     it("toggles marketing updates switch", async () => {
@@ -508,13 +508,13 @@ describe("CardSettingsScreen", () => {
       await act(async () => {})
 
       const switches = getAllByRole("switch")
-      const marketingUpdatesSwitch = switches[2]
+      expect(switches[2].props.accessibilityState.checked).toBe(false)
 
       await act(async () => {
-        fireEvent(marketingUpdatesSwitch, "pressIn")
+        fireEvent(switches[2], "pressIn")
       })
 
-      expect(marketingUpdatesSwitch).toBeTruthy()
+      expect(getAllByRole("switch")[2].props.accessibilityState.checked).toBe(true)
     })
   })
 
