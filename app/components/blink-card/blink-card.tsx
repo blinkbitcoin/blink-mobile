@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, View, useWindowDimensions } from "react-native"
 import { BlurView } from "@react-native-community/blur"
 import { LinearGradient } from "react-native-linear-gradient"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -8,6 +8,10 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { maskString } from "@app/utils/helper"
 import { formatCardValidThruDisplay } from "@app/utils/date"
 import { useI18nContext } from "@app/i18n/i18n-react"
+
+const CARD_ASPECT_RATIO = 1.584
+const CARD_MAX_WIDTH = 400
+const CARD_HORIZONTAL_MARGIN = 40
 
 type BlinkCardProps = {
   cardNumber: string
@@ -24,6 +28,10 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   isFrozen,
   showCardDetails = false,
 }) => {
+  const { width: screenWidth } = useWindowDimensions()
+  const cardWidth = Math.min(screenWidth - CARD_HORIZONTAL_MARGIN, CARD_MAX_WIDTH)
+  const cardHeight = cardWidth / CARD_ASPECT_RATIO
+
   const styles = useStyles()
   const {
     theme: { colors },
@@ -40,12 +48,12 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   const maskedValidThru = formatCardValidThruDisplay(validThruDate, showCardDetails)
 
   return (
-    <View style={styles.cardWrapper}>
+    <View style={[styles.cardWrapper, { width: cardWidth, height: cardHeight }]}>
       <LinearGradient
         colors={[colors._primary2, colors._primary1]}
         useAngle={true}
         angle={249}
-        style={styles.card}
+        style={[styles.card, { width: cardWidth, height: cardHeight }]}
       >
         <View style={styles.topRow}>
           <GaloyIcon name="blink-icon" width={98} height={30} color={colors._white} />
@@ -88,14 +96,10 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   cardWrapper: {
-    width: 312,
-    height: 197,
     alignSelf: "center",
     overflow: "hidden",
   },
   card: {
-    width: 312,
-    height: 197,
     borderRadius: 14,
     paddingTop: 7,
     paddingHorizontal: 11,
