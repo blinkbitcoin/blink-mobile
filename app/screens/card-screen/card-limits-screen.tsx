@@ -37,7 +37,7 @@ export const CardLimitsScreen: React.FC = () => {
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
-        <View style={styles.currentLimitsSection}>
+        <View>
           <Text style={styles.sectionTitle}>
             {LL.CardFlow.CardLimits.currentLimitsTitle()}
           </Text>
@@ -62,7 +62,7 @@ export const CardLimitsScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
             {LL.CardFlow.CardLimits.spendingLimitsTitle()}
           </Text>
           <LimitInput
@@ -84,7 +84,7 @@ export const CardLimitsScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
             {LL.CardFlow.CardLimits.atmLimitsTitle()}
           </Text>
           <LimitInput
@@ -161,13 +161,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "600",
     lineHeight: 24,
   },
-  sectionHeader: {
-    color: colors.black,
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 24,
-  },
-  currentLimitsSection: {},
   currentLimitsCard: {
     flexDirection: "row",
     backgroundColor: colors.grey5,
