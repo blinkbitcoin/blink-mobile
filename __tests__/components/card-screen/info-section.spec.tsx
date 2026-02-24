@@ -34,9 +34,8 @@ jest.mock("@app/components/card-screen/info-row", () => ({
   }) => (
     <View testID={`info-row-${label}`}>
       <RNText testID={`label-${label}`}>{label}</RNText>
-      <RNText testID={`value-${label}`} accessibilityHint={valueColor}>
-        {value}
-      </RNText>
+      <RNText testID={`value-${label}`}>{value}</RNText>
+      {valueColor && <RNText testID={`value-color-${label}`}>{valueColor}</RNText>}
     </View>
   ),
 }))
@@ -157,7 +156,7 @@ describe("InfoSection", () => {
         />,
       )
 
-      expect(getByTestId("value-Fee").props.accessibilityHint).toBe("#00C853")
+      expect(getByTestId("value-color-Fee").props.children).toBe("#00C853")
     })
 
     it("handles mixed items with and without colors", () => {
@@ -167,11 +166,13 @@ describe("InfoSection", () => {
         { label: "Total", value: "-$12.50" },
       ]
 
-      const { getByTestId } = render(<InfoSection title="Mixed" items={items} />)
+      const { getByTestId, queryByTestId } = render(
+        <InfoSection title="Mixed" items={items} />,
+      )
 
-      expect(getByTestId("value-Amount").props.accessibilityHint).toBeUndefined()
-      expect(getByTestId("value-Fee").props.accessibilityHint).toBe("#00C853")
-      expect(getByTestId("value-Total").props.accessibilityHint).toBeUndefined()
+      expect(queryByTestId("value-color-Amount")).toBeNull()
+      expect(getByTestId("value-color-Fee").props.children).toBe("#00C853")
+      expect(queryByTestId("value-color-Total")).toBeNull()
     })
   })
 
@@ -230,7 +231,7 @@ describe("InfoSection", () => {
 
       expect(getByText("Currency conversion")).toBeTruthy()
       expect(getByTestId("value-Bitcoin rate").props.children).toBe("$102,450.00")
-      expect(getByTestId("value-Conversion fee").props.accessibilityHint).toBe("#00C853")
+      expect(getByTestId("value-color-Conversion fee").props.children).toBe("#00C853")
     })
   })
 
