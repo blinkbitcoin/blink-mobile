@@ -69,7 +69,7 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
         const isActiveFrozen = action.isFreezeButton && isFrozen
 
         return (
-          <View key={action.label} style={styles.actionButton}>
+          <View key={action.icon} style={styles.actionButton}>
             <GaloyIconButton
               name={action.icon}
               size={42}
