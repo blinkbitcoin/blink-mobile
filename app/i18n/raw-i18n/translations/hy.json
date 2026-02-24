@@ -2973,8 +2973,8 @@
       "Actions": {
         "details": "Մանրամասներ",
         "freeze": "Սառեցնել",
-        "setLimits": "Սdelays",
-        "statements": "Շdelays"
+        "setLimits": "Սահմանել սահմանափակումներ",
+        "statements": "Քաղվածքներ"
       },
       "emptyTransactions": "Դեռ գործարքներ չկան",
       "addFunds": "Ավելացնել միջոցներ",
@@ -3041,8 +3041,8 @@
       "aboutBullet2": "Statements include all transactions and fees for the period",
       "aboutBullet3": "Download statements as PDF",
       "notifyNewStatements": "Notify me when new statements are made available",
-      "noStatements": "Դեdelays delays շdelays չdelays",
-      "statementsCount": "{count} շdelays"
+      "noStatements": "Քաղվածքներ չկան",
+      "statementsCount": "{count} քաղվածք"
     }
   }
 }
