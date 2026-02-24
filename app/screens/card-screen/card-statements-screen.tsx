@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -30,10 +30,13 @@ export const CardStatementsScreen: React.FC = () => {
   const currentStatement = MOCK_STATEMENTS.find((s) => s.isCurrent)
   const monthlyStatements = MOCK_STATEMENTS.filter((s) => s.year === selectedYear)
 
-  const getStatementsLabel = (count: number): string => {
-    if (count === 0) return LL.CardFlow.CardStatements.noStatements()
-    return LL.CardFlow.CardStatements.statementsCount({ count: count.toString() })
-  }
+  const getStatementsLabel = useCallback(
+    (count: number): string => {
+      if (count === 0) return LL.CardFlow.CardStatements.noStatements()
+      return LL.CardFlow.CardStatements.statementsCount({ count: count.toString() })
+    },
+    [LL],
+  )
 
   const handleDownload = (statementId: string) => {
     console.log("Download statement:", statementId)
