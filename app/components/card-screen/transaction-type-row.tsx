@@ -7,7 +7,7 @@ type TransactionTypeRowProps = {
   title: string
   description: string
   value: boolean
-  onValueChange: () => void
+  onValueChange: (value: boolean) => void
 }
 
 export const TransactionTypeRow: React.FC<TransactionTypeRowProps> = ({
