@@ -92,8 +92,8 @@ export const parseCardValidThru = (
   value: string | Date,
 ): { month: string; year: string } | null => {
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    const month = `${value.getMonth() + 1}`.padStart(2, "0")
-    const year = `${value.getFullYear()}`.slice(-2)
+    const month = `${value.getUTCMonth() + 1}`.padStart(2, "0")
+    const year = `${value.getUTCFullYear()}`.slice(-2)
     return { month, year }
   }
 
@@ -101,8 +101,8 @@ export const parseCardValidThru = (
   const parsed = Date.parse(raw)
   if (!Number.isNaN(parsed) && (raw.includes("-") || raw.includes("T"))) {
     const date = new Date(parsed)
-    const month = `${date.getMonth() + 1}`.padStart(2, "0")
-    const year = `${date.getFullYear()}`.slice(-2)
+    const month = `${date.getUTCMonth() + 1}`.padStart(2, "0")
+    const year = `${date.getUTCFullYear()}`.slice(-2)
     return { month, year }
   }
 
