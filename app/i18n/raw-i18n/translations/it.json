@@ -2474,8 +2474,7 @@
         "receivingAccount": "Conto di ricezione",
         "sendingAccount": "Invio dell'account",
         "txNotBroadcast": "La tua transazione è in coda. Dovrebbe apparire nel mempool {countdown: string}.",
-        "momentarily": "momentaneamente",
-        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti"
+        "momentarily": "momentaneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Ricevi",
@@ -2771,7 +2770,8 @@
         "some": "Alcuni",
         "support": "Supporto",
         "profiles": "Profili",
-        "paste": "Incolla"
+        "paste": "Incolla",
+        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti"
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",

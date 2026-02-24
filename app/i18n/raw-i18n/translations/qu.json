@@ -2491,8 +2491,7 @@
     "receivingAccount": "Kawsayniyta qillqata sutichinaqin yachachinaqin sutiyuq",
     "sendingAccount": "Kawsayniyta yachachinaqin qillqata sutiyuq",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "usqhaylla",
-    "hasBeenCopiedToClipboard": "{type: string} clipboard nisqaman churasqa kachkan"
+    "momentarily": "usqhaylla"
   },
   "TransactionLimitsScreen": {
     "receive": "Allinmi",
@@ -2788,7 +2787,8 @@
     "some": "Wakin",
     "support": "Yanapay",
     "profiles": "Perfilkuna",
-    "paste": "P'itiy"
+    "paste": "P'itiy",
+    "hasBeenCopiedToClipboard": "{type: string} clipboard nisqaman churasqa kachkan"
   },
   "errors": {
     "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",

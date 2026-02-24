@@ -2474,8 +2474,7 @@
     "receivingAccount": "Compte receptor",
     "sendingAccount": "Compte d'enviament",
     "txNotBroadcast": "La teva transacció està en cua. Hauria d'aparèixer a la mempool {countdown: string}.",
-    "momentarily": "momentàniament",
-    "hasBeenCopiedToClipboard": "{type: string} s'ha copiat al porta-retalls"
+    "momentarily": "momentàniament"
   },
   "TransactionLimitsScreen": {
     "receive": "Rebre",
@@ -2771,7 +2770,8 @@
     "some": "Alguns",
     "support": "Suport",
     "profiles": "Perfils",
-    "paste": "Enganxa"
+    "paste": "Enganxa",
+    "hasBeenCopiedToClipboard": "{type: string} s'ha copiat al porta-retalls"
   },
   "errors": {
     "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",

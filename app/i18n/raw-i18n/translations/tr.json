@@ -2474,8 +2474,7 @@
     "receivingAccount": "Ödeme Alacak Hesap",
     "sendingAccount": "Gönderen Hesap",
     "txNotBroadcast": "İşleminiz sıraya alındı. Mempool'da görünmelidir {countdown: string}.",
-    "momentarily": "anlık olarak",
-    "hasBeenCopiedToClipboard": "{type: string} panoya kopyalandı"
+    "momentarily": "anlık olarak"
   },
   "TransactionLimitsScreen": {
     "receive": "Al",
@@ -2771,7 +2770,8 @@
     "some": "Bazı",
     "support": "Destek",
     "profiles": "Profiller",
-    "paste": "Yapıştır"
+    "paste": "Yapıştır",
+    "hasBeenCopiedToClipboard": "{type: string} panoya kopyalandı"
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",

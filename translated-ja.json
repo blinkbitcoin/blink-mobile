@@ -189,7 +189,7 @@
   "ThemeScreen.setToDark": "ダークモード",
   "ThemeScreen.setToLight": "ライトモード",
   "TotpRegistrationInitiateScreen.secret": "シークレット/バックアップ",
-  "TransactionDetailScreen.hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました",
+  "common.hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました",
   "TransactionDetailScreen.momentarily": "まもなく",
   "TransactionDetailScreen.sending": "送信中",
   "UpgradeAccountModal.notNow": "今はしない",

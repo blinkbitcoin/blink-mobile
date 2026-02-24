@@ -40,7 +40,7 @@ export const CardDetailsScreen: React.FC = () => {
   const handleCopy = (content: string, label: string) => {
     copyToClipboard({
       content,
-      message: LL.TransactionDetailScreen.hasBeenCopiedToClipboard({ type: label }),
+      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
     })
   }
 

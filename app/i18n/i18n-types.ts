@@ -8019,11 +8019,6 @@ type RootTranslation = {
 		 * m​o​m​e​n​t​a​r​i​l​y
 		 */
 		momentarily: string
-		/**
-		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
-		 * @param {string} type
-		 */
-		hasBeenCopiedToClipboard: RequiredParams<'type'>
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -9086,6 +9081,11 @@ type RootTranslation = {
 		 * C​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copied: string
+		/**
+		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 * @param {string} type
+		 */
+		hasBeenCopiedToClipboard: RequiredParams<'type'>
 	}
 	errors: {
 		/**
@@ -17775,10 +17775,6 @@ export type TranslationFunctions = {
 		 * momentarily
 		 */
 		momentarily: () => LocalizedString
-		/**
-		 * {type} has been copied to clipboard
-		 */
-		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -18825,6 +18821,10 @@ export type TranslationFunctions = {
 		 * Copied to clipboard
 		 */
 		copied: () => LocalizedString
+		/**
+		 * {type} has been copied to clipboard
+		 */
+		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
 	}
 	errors: {
 		/**

@@ -286,7 +286,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   }) => {
     copyToClipboard({
       content,
-      message: LL.TransactionDetailScreen.hasBeenCopiedToClipboard({ type }),
+      message: LL.common.hasBeenCopiedToClipboard({ type }),
     })
   }
 

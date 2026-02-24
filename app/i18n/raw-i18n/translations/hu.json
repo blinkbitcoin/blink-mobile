@@ -2474,8 +2474,7 @@
     "receivingAccount": "Fogadó számla",
     "sendingAccount": "Küldő számla",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
-    "momentarily": "pillanatokon belül",
-    "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva"
+    "momentarily": "pillanatokon belül"
   },
   "TransactionLimitsScreen": {
     "receive": "Fogadás",
@@ -2771,7 +2770,8 @@
     "some": "Néhány",
     "support": "Támogatás",
     "profiles": "Profilok",
-    "paste": "Beillesztés"
+    "paste": "Beillesztés",
+    "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva"
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",

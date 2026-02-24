@@ -2474,8 +2474,7 @@
         "receivingAccount": "Conta de Recebimento",
         "sendingAccount": "Conta de Envio",
         "txNotBroadcast": "Sua transação está na fila. Deve aparecer na mempool {countdown: string}.",
-        "momentarily": "momentaneamente",
-        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
+        "momentarily": "momentaneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",
@@ -2771,7 +2770,8 @@
         "some": "Alguns",
         "support": "Suporte",
         "profiles": "Perfis",
-        "paste": "Colar"
+        "paste": "Colar",
+        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",

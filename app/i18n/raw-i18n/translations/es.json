@@ -2473,8 +2473,7 @@
         "receivingAccount": "Cuenta receptora",
         "sendingAccount": "Cuenta de envio",
         "txNotBroadcast": "Tu transacción está en cola. Debería aparecer en la Mempool en {countdown: string}.",
-        "momentarily": "momentáneamente",
-        "hasBeenCopiedToClipboard": "{type: string}  se ha copiado al portapapeles"
+        "momentarily": "momentáneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Recibir",
@@ -2771,7 +2770,8 @@
         "some": "Algunos",
         "support": "Soporte",
         "blinkToBlink": "Blink a Blink",
-        "copied": "Copied to clipboard"
+        "copied": "Copied to clipboard",
+        "hasBeenCopiedToClipboard": "{type: string} se ha copiado al portapapeles"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

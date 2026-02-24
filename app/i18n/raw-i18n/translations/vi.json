@@ -2491,8 +2491,7 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "trong giây lát",
-    "hasBeenCopiedToClipboard": "{type: string} đã được sao chép vào bộ nhớ tạm"
+    "momentarily": "trong giây lát"
   },
   "TransactionLimitsScreen": {
     "receive": "Nhận",
@@ -2788,7 +2787,8 @@
     "some": "Một số",
     "support": "Hỗ trợ",
     "profiles": "Hồ sơ",
-    "paste": "Dán"
+    "paste": "Dán",
+    "hasBeenCopiedToClipboard": "{type: string} đã được sao chép vào bộ nhớ tạm"
   },
   "errors": {
     "generic": "Đã có lỗi.\nVui lòng thử lại sau.",

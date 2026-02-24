@@ -2474,8 +2474,7 @@
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
     "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
-    "momentarily": "akaseera katono",
-    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
+    "momentarily": "akaseera katono"
   },
   "TransactionLimitsScreen": {
     "receive": "Funa",
@@ -2771,7 +2770,8 @@
     "some": "Ebimu",
     "support": "Obuyambi",
     "profiles": "Profayiro",
-    "paste": "Teeka"
+    "paste": "Teeka",
+    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",

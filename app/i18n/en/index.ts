@@ -2561,7 +2561,6 @@ const en: BaseTranslation = {
     txNotBroadcast:
       "Your transaction is queued. It should appear in the mempool {countdown: string}.",
     momentarily: "momentarily",
-    hasBeenCopiedToClipboard: "{type: string} has been copied to clipboard",
   },
   TransactionLimitsScreen: {
     receive: "Receive",
@@ -2874,6 +2873,7 @@ const en: BaseTranslation = {
     profiles: "Profiles",
     paste: "Paste",
     copied: "Copied to clipboard",
+    hasBeenCopiedToClipboard: "{type: string} has been copied to clipboard",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

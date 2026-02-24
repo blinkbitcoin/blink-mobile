@@ -2491,8 +2491,7 @@
         "receivingAccount": "Compte destinataire",
         "sendingAccount": "Compte expéditeur",
         "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment.",
-        "momentarily": "dans un instant",
-        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
+        "momentarily": "dans un instant"
     },
     "TransactionLimitsScreen": {
         "receive": "Recevoir",
@@ -2788,7 +2787,8 @@
         "some": "Quelques",
         "support": "Support",
         "profiles": "Profils",
-        "paste": "Coller"
+        "paste": "Coller",
+        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
