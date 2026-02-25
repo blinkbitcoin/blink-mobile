@@ -3,11 +3,11 @@ import { View } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { TransactionGroup } from "@app/screens/card-screen/card-mock-data"
+import type { CardTransactionGroup } from "./types"
 import { CardTransactionItem } from "./card-transaction-item"
 
 type CardTransactionsSectionProps = {
-  groups: TransactionGroup[]
+  groups: CardTransactionGroup[]
   onTransactionPress?: (transactionId: string) => void
 }
 
