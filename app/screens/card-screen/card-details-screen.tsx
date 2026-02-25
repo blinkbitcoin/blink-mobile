@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react"
-import { TouchableOpacity, View } from "react-native"
+import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -9,40 +9,51 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
+import { CardStatus } from "@app/graphql/generated"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { formatCardDisplayNumber } from "@app/utils/helper"
 
-import { CardStatus, MOCK_CARD } from "./card-mock-data"
+import { useBiometricGate } from "./hooks/use-biometric-gate"
+import { useCardData } from "./hooks/use-card-data"
+import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
+
+const CLIPBOARD_CLEAR_MS = 60_000
 
 export const CardDetailsScreen: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const { LL } = useI18nContext()
-  const { copyToClipboard } = useClipboard()
+  const { LL, locale } = useI18nContext()
+  const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const cardNumberWithoutSpaces = MOCK_CARD.cardNumber.replace(/\s/g, "")
+  const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
 
-  const getStatusLabel = (status: CardStatus) => {
-    switch (status) {
-      case CardStatus.Active:
-        return LL.CardFlow.CardDetails.statusActive()
-      case CardStatus.Frozen:
-        return LL.CardFlow.CardDetails.statusFrozen()
-      case CardStatus.Inactive:
-        return LL.CardFlow.CardDetails.statusInactive()
+  const authenticated = useBiometricGate({
+    description: LL.CardFlow.CardDetails.authDescription(),
+    onFailure: handleDismiss,
+  })
+
+  const { card, loading: cardLoading } = useCardData()
+
+  useEffect(() => {
+    if (authenticated && !cardLoading && !card) {
+      handleDismiss()
     }
-  }
+  }, [authenticated, cardLoading, card, handleDismiss])
 
-  const handleCopy = (content: string, label: string) => {
-    copyToClipboard({
-      content,
-      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
-    })
-  }
+  const handleCopy = useCallback(
+    (content: string, label: string) => {
+      copyToClipboard({
+        content,
+        message: LL.common.hasBeenCopiedToClipboard({ type: label }),
+      })
+    },
+    [copyToClipboard, LL],
+  )
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
@@ -58,25 +69,66 @@ export const CardDetailsScreen: React.FC = () => {
     })
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
+  if (!authenticated || cardLoading) {
+    return (
+      <Screen preset="scroll">
+        <ActivityIndicator style={styles.loader} color={colors.primary} />
+      </Screen>
+    )
+  }
+
+  if (!card) return null
+
+  const isFrozen = isCardFrozen(card.status)
+
+  const cardStatusConfig = {
+    [CardStatus.Active]: {
+      color: colors.success,
+      text: LL.CardFlow.CardDetails.statusActive(),
+    },
+    [CardStatus.Locked]: {
+      color: colors.grey3,
+      text: LL.CardFlow.CardDetails.statusFrozen(),
+    },
+    [CardStatus.Canceled]: {
+      color: colors.error,
+      text: LL.CardFlow.CardDetails.statusCancelled(),
+    },
+    [CardStatus.NotActivated]: {
+      color: colors.warning,
+      text: LL.CardFlow.CardDetails.statusNotActivated(),
+    },
+    [CardStatus.Requested]: {
+      color: colors.grey3,
+      text: LL.CardFlow.CardDetails.statusPending(),
+    },
+    [CardStatus.Failed]: {
+      color: colors.error,
+      text: LL.CardFlow.CardDetails.statusFailed(),
+    },
+  }
+
+  const statusConfig = cardStatusConfig[card.status]
+
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
         <BlinkCard
-          cardNumber={MOCK_CARD.cardNumber}
-          holderName={MOCK_CARD.holderName}
-          validThruDate={MOCK_CARD.validThruDate}
-          isFrozen={MOCK_CARD.status === CardStatus.Frozen}
+          cardNumber={card.lastFour}
+          holderName=""
+          validThruDate=""
+          isFrozen={isFrozen}
           showCardDetails
         />
 
         <View style={styles.fieldsContainer}>
           <ActionField
             label={LL.CardFlow.CardDetails.cardNumber()}
-            value={MOCK_CARD.cardNumber}
+            value={formatCardDisplayNumber(card.lastFour, true)}
             icon="copy-paste"
             testID="card-number-field"
             onAction={() =>
-              handleCopy(cardNumberWithoutSpaces, LL.CardFlow.CardDetails.cardNumber())
+              handleCopy(card.lastFour, LL.CardFlow.CardDetails.cardNumber())
             }
           />
 
@@ -84,30 +136,26 @@ export const CardDetailsScreen: React.FC = () => {
             <View style={styles.halfField}>
               <ActionField
                 label={LL.CardFlow.CardDetails.expiryDate()}
-                value={MOCK_CARD.expiryDate}
+                value={null}
                 icon="copy-paste"
-                onAction={() =>
-                  handleCopy(MOCK_CARD.expiryDate, LL.CardFlow.CardDetails.expiryDate())
-                }
+                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.expiryDate())}
               />
             </View>
             <View style={styles.halfField}>
               <ActionField
                 label={LL.CardFlow.CardDetails.cvv()}
-                value={MOCK_CARD.cvv}
+                value={null}
                 icon="copy-paste"
-                onAction={() => handleCopy(MOCK_CARD.cvv, LL.CardFlow.CardDetails.cvv())}
+                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cvv())}
               />
             </View>
           </View>
 
           <ActionField
             label={LL.CardFlow.CardDetails.cardholderName()}
-            value={MOCK_CARD.holderName}
+            value={null}
             icon="copy-paste"
-            onAction={() =>
-              handleCopy(MOCK_CARD.holderName, LL.CardFlow.CardDetails.cardholderName())
-            }
+            // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cardholderName())}
           />
 
           <InfoSection
@@ -115,21 +163,20 @@ export const CardDetailsScreen: React.FC = () => {
             items={[
               {
                 label: LL.CardFlow.CardDetails.cardType(),
-                value: MOCK_CARD.cardType,
+                value: formatCardType(card.cardType, LL.CardFlow.CardDetails),
               },
               {
                 label: LL.CardFlow.CardDetails.status(),
-                value: getStatusLabel(MOCK_CARD.status),
-                valueColor:
-                  MOCK_CARD.status === CardStatus.Active ? colors.success : colors.error,
+                value: statusConfig.text,
+                valueColor: statusConfig.color,
               },
               {
                 label: LL.CardFlow.CardDetails.issued(),
-                value: MOCK_CARD.issuedDate,
+                value: formatIssuedDate(card.createdAt, locale),
               },
               {
                 label: LL.CardFlow.CardDetails.network(),
-                value: MOCK_CARD.network,
+                value: "Visa",
               },
             ]}
           />
@@ -163,5 +210,11 @@ const useStyles = makeStyles(() => ({
   },
   halfField: {
     flex: 1,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 40,
   },
 }))
