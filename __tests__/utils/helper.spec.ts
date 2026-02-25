@@ -1,5 +1,6 @@
 import {
   ellipsizeMiddle,
+  formatCardDisplayNumber,
   maskDigits,
   maskString,
   normalizeString,
@@ -105,5 +106,49 @@ describe("maskDigits", () => {
 
   it("uses the provided maskChar", () => {
     expect(maskDigits("9999", { visibleRight: 1, maskChar: "X" })).toBe("XXX9")
+  })
+})
+
+describe("formatCardDisplayNumber", () => {
+  it("masks all but last four when showDetails is false", () => {
+    expect(formatCardDisplayNumber("4242", false)).toBe("•••• •••• •••• 4242")
+  })
+
+  it("pads and shows all digits when showDetails is true", () => {
+    expect(formatCardDisplayNumber("4242", true)).toBe("•••• •••• •••• 4242")
+  })
+
+  it("shows full 16-digit number when showDetails is true", () => {
+    expect(formatCardDisplayNumber("4111111111111111", true)).toBe("4111 1111 1111 1111")
+  })
+
+  it("masks full 16-digit number when showDetails is false", () => {
+    expect(formatCardDisplayNumber("4111111111111111", false)).toBe("•••• •••• •••• 1111")
+  })
+
+  it("strips spaces before processing", () => {
+    expect(formatCardDisplayNumber("4111 1111 1111 1111", false)).toBe(
+      "•••• •••• •••• 1111",
+    )
+  })
+
+  it("handles empty string", () => {
+    expect(formatCardDisplayNumber("", false)).toBe("•••• •••• •••• ••••")
+  })
+
+  it("handles empty string with showDetails true", () => {
+    expect(formatCardDisplayNumber("", true)).toBe("•••• •••• •••• ••••")
+  })
+
+  it("respects custom totalDigits and groupSize", () => {
+    expect(formatCardDisplayNumber("1234", true, { totalDigits: 8, groupSize: 4 })).toBe(
+      "•••• 1234",
+    )
+  })
+
+  it("respects custom visibleDigits", () => {
+    expect(formatCardDisplayNumber("123456", false, { visibleDigits: 2 })).toBe(
+      "•••• •••• •••• ••56",
+    )
   })
 })
