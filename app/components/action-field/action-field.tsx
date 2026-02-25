@@ -4,16 +4,18 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
+const PLACEHOLDER = "—"
+
 type ActionFieldProps = {
-  value: string
-  onAction: () => void
+  value?: string | null
+  onAction?: () => void
   icon: IconNamesType
   label?: string
   testID?: string
 }
 
 export const ActionField: React.FC<ActionFieldProps> = ({
-  value,
+  value = PLACEHOLDER,
   onAction,
   icon,
   label,
@@ -24,13 +26,21 @@ export const ActionField: React.FC<ActionFieldProps> = ({
     theme: { colors },
   } = useTheme()
 
+  const hasValue = value != null && value !== PLACEHOLDER
+  const iconColor = hasValue ? colors.primary : colors.grey3
+
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity onPress={onAction} style={styles.valueContainer} testID={testID}>
-        <Text style={styles.value}>{value}</Text>
+      <TouchableOpacity
+        onPress={hasValue ? onAction : undefined}
+        disabled={!hasValue}
+        style={styles.valueContainer}
+        testID={testID}
+      >
+        <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
         <View style={styles.actionButton}>
-          <GaloyIcon name={icon} size={20} color={colors.primary} />
+          <GaloyIcon name={icon} size={20} color={iconColor} />
         </View>
       </TouchableOpacity>
     </View>
