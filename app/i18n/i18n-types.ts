@@ -156,7 +156,7 @@ type RootTranslation = {
 		 */
 		description: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​p​r​i​c​e​ ​s​t​a​b​i​l​i​t​y
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​—​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		stablesatsTag: string
 		/**
@@ -6481,7 +6481,7 @@ type RootTranslation = {
 			 */
 			recoveryOption: string
 			/**
-			 * $​1​0​0​0​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
+			 * U​S​D​ ​1​,​0​0​0​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
 			 */
 			dailyLimit: string
 			/**
@@ -6680,7 +6680,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​c​e​i​v​e​ ​U​S​D
+		 * R​e​c​e​i​v​e​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
 		 */
 		usdTitle: string
 		/**
@@ -6856,7 +6856,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​d​e​e​m​ ​f​o​r​ ​U​S​D
+		 * R​e​d​e​e​m​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
 		 */
 		usdTitle: string
 		/**
@@ -7704,7 +7704,7 @@ type RootTranslation = {
 		 */
 		logoutAlertContentPhoneEmail: RequiredParams<'email' | 'phoneNumber'>
 		/**
-		 * Y​o​u​ ​h​a​v​e​ ​a​ ​S​t​a​b​l​e​s​a​t​s​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
+		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
 		 * @param {string} balance
 		 */
 		usdBalanceWarning: RequiredParams<'balance'>
@@ -7915,11 +7915,11 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
 		 */
 		title: string
 		/**
-		 * U​s​e​ ​y​o​u​r​ ​S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​i​n​ ​B​l​i​n​k​ ​t​o​ ​k​e​e​p​ ​t​h​e​ ​m​o​n​e​y​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​s​t​a​b​l​e​ ​i​n​ ​f​i​a​t​ ​(​d​o​l​l​a​r​)​ ​t​e​r​m​s​.​ ​U​s​e​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​f​ ​y​o​u​'​r​e​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​ ​a​n​d​ ​a​r​e​ ​o​k​a​y​ ​w​i​t​h​ ​y​o​u​r​ ​f​i​a​t​ ​b​a​l​a​n​c​e​ ​c​h​a​n​g​i​n​g​ ​a​l​l​ ​t​h​e​ ​t​i​m​e​.
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​d​o​l​l​a​r​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.​ ​Y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.
 		 */
 		info: string
 	}
@@ -7961,11 +7961,11 @@ type RootTranslation = {
 	}
 	StablesatsModal: {
 		/**
-		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		header: string
 		/**
-		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​n​d​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * T​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​t​o​ ​h​o​l​d​ ​B​i​t​c​o​i​n​ ​s​t​a​b​l​e​ ​t​o​ ​U​S​D​ ​p​r​i​c​e​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​ ​—​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​ ​—​ ​b​u​t​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​f​l​u​c​t​u​a​t​e​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​,​ ​b​u​t​ ​t​h​i​s​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
 		 */
 		body: string
 		/**
@@ -8051,7 +8051,7 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​t​r​a​n​s​f​e​r​s
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
@@ -8315,7 +8315,7 @@ type RootTranslation = {
 			 */
 			receiveBitcoinDescription: string
 			/**
-			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​U​S​D​ ​p​e​r​ ​d​a​y
+			 * S​e​n​d​ ​u​p​ ​t​o​ ​U​S​D​ ​1​,​0​0​0​ ​p​e​r​ ​d​a​y
 			 */
 			dailyLimitDescription: string
 			/**
@@ -8944,10 +8944,6 @@ type RootTranslation = {
 		 * S​u​c​c​e​s​s​!
 		 */
 		success: string
-		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​U​S​D
-		 */
-		stablesatsUsd: string
 		/**
 		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
 		 */
@@ -9756,7 +9752,7 @@ export type TranslationFunctions = {
 		 */
 		description: () => LocalizedString
 		/**
-		 * Stablesats account for price stability
+		 * Dollar account — powered by Stablesats
 		 */
 		stablesatsTag: () => LocalizedString
 		/**
@@ -17254,7 +17250,7 @@ export type TranslationFunctions = {
 		 */
 		logoutAlertContentPhoneEmail: (arg: { email: string, phoneNumber: string }) => LocalizedString
 		/**
-		 * You have a Stablesats balance of {balance}.
+		 * You have a Dollar account balance of {balance}.
 		 */
 		usdBalanceWarning: (arg: { balance: string }) => LocalizedString
 		/**
@@ -17462,11 +17458,11 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Receive currency
+		 * Default receive account
 		 */
 		title: () => LocalizedString
 		/**
-		 * Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.
+		 * Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market.
 		 */
 		info: () => LocalizedString
 	}
@@ -17508,11 +17504,11 @@ export type TranslationFunctions = {
 	}
 	StablesatsModal: {
 		/**
-		 * With Stablesats, you now have a Dollar account added to your wallet!
+		 * Your Dollar account is powered by Stablesats
 		 */
 		header: () => LocalizedString
 		/**
-		 * You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
+		 * The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.
 		 */
 		body: () => LocalizedString
 		/**
@@ -17596,7 +17592,7 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesats transfers
+		 * Dollar account transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
@@ -17855,7 +17851,7 @@ export type TranslationFunctions = {
 			 */
 			receiveBitcoinDescription: () => LocalizedString
 			/**
-			 * Send up to $1,000 USD per day
+			 * Send up to USD 1,000 per day
 			 */
 			dailyLimitDescription: () => LocalizedString
 			/**
@@ -18473,10 +18469,6 @@ export type TranslationFunctions = {
 		 * Success!
 		 */
 		success: () => LocalizedString
-		/**
-		 * Stablesats USD
-		 */
-		stablesatsUsd: () => LocalizedString
 		/**
 		 * Dollar (Stablesats)
 		 */
