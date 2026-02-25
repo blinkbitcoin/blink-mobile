@@ -133,7 +133,7 @@ For each string: the i18n key, the original text (before PR), Approach A (curren
 - **Original:** "Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time."
 - **A (Dollar):** "Your Dollar account holds Bitcoin that is hedged to stay stable in USD terms — you're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market."
 - **B (Stablesats):** "Your Stablesats account holds Bitcoin that is hedged to stay stable in USD terms — you're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market."
-- **C (Hybrid, current PR):** "Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market."
+- **C (Hybrid, current PR):** "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change."
 - *Used in Settings → Default receive account screen as explanatory text.*
 
 ### 15. `StablesatsModal.header`
@@ -330,7 +330,7 @@ This is what the PR currently implements. The pattern:
 | Key | Text |
 |-----|------|
 | `SetAccountModal.stablesatsTag` | Dollar account — powered by Stablesats |
-| `DefaultWalletScreen.info` | Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market. |
+| `DefaultWalletScreen.info` | Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change. |
 | `StablesatsModal.header` | Your Dollar account is powered by Stablesats |
 | `StablesatsModal.body` | The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system. |
 
