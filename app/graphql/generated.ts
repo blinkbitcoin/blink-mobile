@@ -3069,6 +3069,34 @@ export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUsernamesQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null } | null };
 
+export type CardBalanceQueryVariables = Exact<{
+  cardId: Scalars['ID']['input'];
+}>;
+
+
+export type CardBalanceQuery = { readonly __typename: 'Query', readonly cardBalance: { readonly __typename: 'CardBalance', readonly available: number, readonly pending: number, readonly posted: number } };
+
+export type CardUpdateMutationVariables = Exact<{
+  input: CardUpdateInput;
+}>;
+
+
+export type CardUpdateMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly status: CardStatus } };
+
+export type CardTransactionsPaginatedQueryVariables = Exact<{
+  cardId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
+
+export type CardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string }> } } | null };
+
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4880,6 +4908,192 @@ export type GetUsernamesQueryHookResult = ReturnType<typeof useGetUsernamesQuery
 export type GetUsernamesLazyQueryHookResult = ReturnType<typeof useGetUsernamesLazyQuery>;
 export type GetUsernamesSuspenseQueryHookResult = ReturnType<typeof useGetUsernamesSuspenseQuery>;
 export type GetUsernamesQueryResult = Apollo.QueryResult<GetUsernamesQuery, GetUsernamesQueryVariables>;
+export const CardBalanceDocument = gql`
+    query cardBalance($cardId: ID!) {
+  cardBalance(cardId: $cardId) {
+    available
+    pending
+    posted
+  }
+}
+    `;
+
+/**
+ * __useCardBalanceQuery__
+ *
+ * To run a query within a React component, call `useCardBalanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardBalanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardBalanceQuery({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *   },
+ * });
+ */
+export function useCardBalanceQuery(baseOptions: Apollo.QueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables> & ({ variables: CardBalanceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+      }
+export function useCardBalanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+        }
+export function useCardBalanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+        }
+export type CardBalanceQueryHookResult = ReturnType<typeof useCardBalanceQuery>;
+export type CardBalanceLazyQueryHookResult = ReturnType<typeof useCardBalanceLazyQuery>;
+export type CardBalanceSuspenseQueryHookResult = ReturnType<typeof useCardBalanceSuspenseQuery>;
+export type CardBalanceQueryResult = Apollo.QueryResult<CardBalanceQuery, CardBalanceQueryVariables>;
+export const CardUpdateDocument = gql`
+    mutation cardUpdate($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    status
+  }
+}
+    `;
+export type CardUpdateMutationFn = Apollo.MutationFunction<CardUpdateMutation, CardUpdateMutationVariables>;
+
+/**
+ * __useCardUpdateMutation__
+ *
+ * To run a mutation, you first call `useCardUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardUpdateMutation, { data, loading, error }] = useCardUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardUpdateMutation(baseOptions?: Apollo.MutationHookOptions<CardUpdateMutation, CardUpdateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardUpdateMutation, CardUpdateMutationVariables>(CardUpdateDocument, options);
+      }
+export type CardUpdateMutationHookResult = ReturnType<typeof useCardUpdateMutation>;
+export type CardUpdateMutationResult = Apollo.MutationResult<CardUpdateMutation>;
+export type CardUpdateMutationOptions = Apollo.BaseMutationOptions<CardUpdateMutation, CardUpdateMutationVariables>;
+export const CardTransactionsPaginatedDocument = gql`
+    query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
+  cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        amount
+        currency
+        merchantName
+        status
+        createdAt
+        cardId
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardTransactionsPaginatedQuery__
+ *
+ * To run a query within a React component, call `useCardTransactionsPaginatedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardTransactionsPaginatedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardTransactionsPaginatedQuery({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useCardTransactionsPaginatedQuery(baseOptions: Apollo.QueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables> & ({ variables: CardTransactionsPaginatedQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+      }
+export function useCardTransactionsPaginatedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+        }
+export function useCardTransactionsPaginatedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+        }
+export type CardTransactionsPaginatedQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedQuery>;
+export type CardTransactionsPaginatedLazyQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedLazyQuery>;
+export type CardTransactionsPaginatedSuspenseQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedSuspenseQuery>;
+export type CardTransactionsPaginatedQueryResult = Apollo.QueryResult<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>;
+export const CardDocument = gql`
+    query card {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          id
+          lastFour
+          cardType
+          status
+          createdAt
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardQuery__
+ *
+ * To run a query within a React component, call `useCardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardQuery(baseOptions?: Apollo.QueryHookOptions<CardQuery, CardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+      }
+export function useCardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardQuery, CardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+        }
+export function useCardSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardQuery, CardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+        }
+export type CardQueryHookResult = ReturnType<typeof useCardQuery>;
+export type CardLazyQueryHookResult = ReturnType<typeof useCardLazyQuery>;
+export type CardSuspenseQueryHookResult = ReturnType<typeof useCardSuspenseQuery>;
+export type CardQueryResult = Apollo.QueryResult<CardQuery, CardQueryVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {

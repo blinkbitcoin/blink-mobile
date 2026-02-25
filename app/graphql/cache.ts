@@ -109,6 +109,7 @@ export const createCache = () =>
           deviceSessionCount: {
             read: (value) => value ?? 0,
           },
+          cardTransactionsPaginated: relayStylePagination(["cardId"]),
           txLastSeen: {
             keyArgs: ["accountId"],
             read(value, { args }) {
