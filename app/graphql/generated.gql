@@ -242,6 +242,14 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardUpdate($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    status
+    __typename
+  }
+}
+
 mutation contactCreate($input: ContactCreateInput!) {
   contactCreate(input: $input) {
     errors {
@@ -1077,6 +1085,64 @@ query businessMapMarkers {
         latitude
         __typename
       }
+      __typename
+    }
+    __typename
+  }
+}
+
+query card {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          id
+          lastFour
+          cardType
+          status
+          createdAt
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query cardBalance($cardId: ID!) {
+  cardBalance(cardId: $cardId) {
+    available
+    pending
+    posted
+    __typename
+  }
+}
+
+query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
+  cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        amount
+        currency
+        merchantName
+        status
+        createdAt
+        cardId
+        __typename
+      }
+      __typename
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
       __typename
     }
     __typename
