@@ -30,7 +30,7 @@
     "SetAccountModal": {
         "title": "Configura tu cuenta de recepción",
         "description": "Siempre puedes cambiar esto más tarde en Configuración",
-        "stablesatsTag": "Cuenta Stablesats para estabilidad de precio",
+        "stablesatsTag": "Cuenta Dólar — impulsado por Stablesats",
         "bitcoinTag": "Cuenta Bitcoin para maximalistas"
     },
     "NoteInput": {
@@ -2059,7 +2059,7 @@
             "sendingLimit": "Límite de envíos diarios reducido",
             "noOnchain": "No recibir bitcoin onchain",
             "recoveryOption": "Recupera fondos por SMS o correo",
-            "dailyLimit": "Límite de transacciones diarias de $1000",
+            "dailyLimit": "Límite de transacciones diarias de USD 1,000",
             "onchainReceive": "Recibir bitcoin en cadena"
         }
     },
@@ -2118,7 +2118,7 @@
         "setNote": "ingrese una nota",
         "tapQrCodeCopy": "Toque el código QR para copiar",
         "title": "Recibir Bitcoin",
-        "usdTitle": "Recibir USD",
+        "usdTitle": "Recibir a Cuenta Dólar",
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartir",
@@ -2163,7 +2163,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",
-        "usdTitle": "Canjear a USD",
+        "usdTitle": "Canjear a Cuenta Dólar",
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "redeemingError": "Error al canjear Bitcoin. Póngase en contacto con el soporte técnico si este problema persiste.",
         "submissionError": "No se pudo enviar la solicitud de retiro. Póngase en contacto con el soporte técnico si este problema persiste.",
@@ -2381,7 +2381,7 @@
         "logoutAlertContentPhone": "Deberá volver a ingresar su número de teléfono para volver a iniciar sesión.\nsu número de teléfono es {phoneNumber: string}, así que asegúrese de tener acceso a él para volver a iniciar sesión",
         "logoutAlertContentEmail": "Deberá volver a ingresar su correo electrónico para volver a iniciar sesión.\nsu correo electrónico es {email: string}, así que asegúrese de tener acceso a él para volver a iniciar sesión",
         "logoutAlertContentPhoneEmail": "Deberá volver a ingresar su número de teléfono o correo electrónico para volver a iniciar sesión.\nsu número de teléfono es {phoneNumber: string} y su correo electrónico es {email: string}, así que asegúrese de tener acceso a ellos para volver a iniciar sesión",
-        "usdBalanceWarning": "Tienes un saldo en Stablesats de {balance: string}.",
+        "usdBalanceWarning": "Tienes un saldo en Cuenta Dólar de {balance: string}.",
         "btcBalanceWarning": "Tienes un saldo de bitcoin de {balance: string}.",
         "secureYourAccount": "Registrate para asegurar tu cuenta",
         "tapToAdd": "Toca para agregar",
@@ -2441,8 +2441,8 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Cuenta a recibir",
-        "info": "Usa tu cuenta de Stablesats en Blink para mantener el dinero de tu billetera estable en términos de moneda fiat (dólar). Usa tu cuenta de Bitcoin si estás acumulando sats y no te importa que tu balance en fiat cambie todo el tiempo."
+        "title": "Cuenta de recepción predeterminada",
+        "info": "Tu Cuenta Bitcoin es para acumular sats, donde el valor USD se mueve con el mercado. Tu Cuenta Dólar está impulsado por Stablesats — contiene Bitcoin cubierto para mantenerse estable en términos USD. Siempre tienes Bitcoin, pero el valor en dólares no cambia."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2457,8 +2457,8 @@
         "DEFAULT": "Predeterminado (OS)"
     },
     "StablesatsModal": {
-        "header": "¡Ya tienes una cuenta en USD agregada a tu billetera con StableSats!",
-        "body": "Puedes enviar y recibir bitcoins, transferir el valor instantáneamente entre tu cuenta BTC y USD. El valor en la cuenta en USD no fluctúa con el precio de Bitcoin. Esta función no es compatible con el sistema bancario tradicional.",
+        "header": "Tu Cuenta Dólar está impulsado por Stablesats",
+        "body": "Cuenta Dólar utiliza la tecnología Stablesats para mantener Bitcoin estable al precio USD. Siempre tienes Bitcoin — no dólares reales — pero el valor USD no fluctúa. Puedes enviar y recibir Bitcoin como siempre, pero no es compatible con el sistema bancario tradicional.",
         "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats"
     },
@@ -2483,7 +2483,7 @@
         "perWeek": "por semana",
         "unlimited": "ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferencias de stablesats",
+        "stablesatTransfers": "Transferencias de Cuenta Dólar",
         "internalSend": "Enviar a usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
@@ -2562,7 +2562,7 @@
             "mainTitle": "Bienvenido al Nivel 1",
             "title": "Nuevas funciones desbloqueadas para tu cuenta:",
             "receiveBitcoinDescription": "Recibe Bitcoin usando tu número de teléfono",
-            "dailyLimitDescription": "Envía hasta $1,000 USD por día",
+            "dailyLimitDescription": "Envía hasta USD 1,000 por día",
             "onchainDescription": "Recibe pagos on-chain"
         },
         "emailBenefits": {
@@ -2674,7 +2674,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Precio de Bitcoin",
-        "btcAccount": "Cuenta BTC",
+        "btcAccount": "Cuenta Bitcoin",
         "cancel": "Cancelar",
         "close": "Cerrar ",
         "confirm": "Confirmar",
@@ -2734,7 +2734,6 @@
         "soon": "Próximamente",
         "submit": "Entregar",
         "success": "Éxito",
-        "stablesatsUsd": "Stablesats USD",
         "dollarStablesats": "Dólar (Stablesats)",
         "to": "Para",
         "total": "Total",
@@ -2742,7 +2741,7 @@
         "transactionsError": "Error al cargar las transacciones",
         "tryAgain": "Inténtalo de Nuevo",
         "type": "tipo",
-        "usdAccount": "Cuenta USD",
+        "usdAccount": "Cuenta Dólar",
         "username": "Nombre de usuario",
         "usernameRequired": "El nombre de usuario es requerido",
         "backupAccount": "Copia de seguridad/actualización de la cuenta",

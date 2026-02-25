@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Stel jou ontvangrekening op",
     "description": "Jy kan dit later altyd in die Instellings verander",
-    "stablesatsTag": "Stablesats-rekening vir prysstabiliteit",
+    "stablesatsTag": "Dollar-rekening — aangedryf deur Stablesats",
     "bitcoinTag": "Bitcoin-rekening vir maksimaliste"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Verlaagde daaglikse spandeerbare limiet",
       "noOnchain": "Geen ontvang van Bitcoin-opketting",
       "recoveryOption": "Herwin fondse per SMS of e-pos",
-      "dailyLimit": "$1000 daaglikse transaksielimiet",
+      "dailyLimit": "USD 1,000 daaglikse transaksielimiet",
       "onchainReceive": "Ontvang bitcoin on-chain"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "maak 'n nota",
     "tapQrCodeCopy": "Tik op die QR kode om oor te dra",
     "title": "Ontvang Bitcoin",
-    "usdTitle": "Ontvang USD",
+    "usdTitle": "Ontvang na Dollar-rekening",
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
     "copyInvoice": "Dra oor",
     "shareInvoice": "Deel",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Verkry Bitcoin",
-    "usdTitle": "Verruil vir USD",
+    "usdTitle": "Ruil om na Dollar-rekening",
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
     "redeemingError": "Kon nie Bitcoin verkry nie. Kontak asseblief ondersteuning as hierdie probleem voortduur. ",
     "submissionError": "Kon nie onttrekking aanvraag indien nie. Kontak asseblief ondersteuning as die probleem voortduur.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "Jy sal jou selfoonnommer weer moet invoer om in te teken. \nJou nommer is {phoneNumber: string} so maak seker jy het toegang daartoe om weer in te teken",
     "logoutAlertContentEmail": "Jy sal weer jou epos moet invul om in te teken. \nJou epos is {email: string} so maak seker jy het toegang daartoe om weer in te teken",
     "logoutAlertContentPhoneEmail": "Jy sal jou selfonnommer of epos weer moet invoer om in te teken.\nJou nommer is {phoneNumber: string} en jou epos is {email: string} so maak seker jy het toegang daartoe om weer in te teken",
-    "usdBalanceWarning": "Jy het 'n Stablesats-saldo van {balance: string}s",
+    "usdBalanceWarning": "Jy het 'n Dollar-rekening-balans van {balance: string}.",
     "btcBalanceWarning": "Jy het 'n Bitcoin-saldo van {balance: string}",
     "secureYourAccount": "Registreer om jou rekening sekuur te maak",
     "tapToAdd": "Tik om by te voeg",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Geheim na knipbord!"
   },
   "DefaultWalletScreen": {
-    "title": "Ontvang geldeenheid",
-    "info": "Gebruik jou Stablesats-rekening in Blink om die geld in jou beursie stabiel te hou in fiat-terme (dollar). Gebruik jou Bitcoin-rekening as jy sats opstapel en dit vir jou reg is dat jou fiat-balans heeltyd verander."
+    "title": "Verstek ontvangrekening",
+    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Verstek (OS)"
   },
   "StablesatsModal": {
-    "header": "Met Stablesats het jy nou 'n USD-rekening by jou beursie gevoeg!",
-    "body": "Jy kan dit gebruik om Bitcoin te stuur of ontvang, en om onmiddelik fondse tussen jou BTC- en USD-rekening te verskuif. Die waarde van die USD-rekening sal nie wissel saam met die prys van Bitcoin nie. Hierdie funksie kan nie met die tradisionele bankstelsel gebruik word nie. ",
+    "header": "Jou Dollar-rekening word aangedryf deur Stablesats",
+    "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
     "learnMore": "Leer meer van Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "per week",
     "unlimited": "Onbeperk",
     "remaining": "Oorblywend",
-    "stablesatTransfers": "Stablesat Oorbetalings",
+    "stablesatTransfers": "Dollar-rekening-oordragte",
     "internalSend": "Stuur na {bankName: string} gebruiker",
     "error": "Kan nie nou limiete verkry nie",
     "increaseLimits": "Verhoog jou limiete"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Welkom by Vlak 1",
       "title": "Nuwe funksies ontsluit vir jou rekening:",
       "receiveBitcoinDescription": "Ontvang Bitcoin met jou telefoonnommer",
-      "dailyLimitDescription": "Stuur tot $1,000 USD per dag",
+      "dailyLimitDescription": "Stuur tot USD 1,000 per dag",
       "onchainDescription": "Ontvang on-chain betalings"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin-prys ",
-    "btcAccount": "BTC-rekening",
+    "btcAccount": "Bitcoin-rekening",
     "cancel": "Kanselleer ",
     "close": "Maak toe",
     "confirm": "Bevestig",
@@ -2753,7 +2753,6 @@
     "soon": "Binnekort oppad! ",
     "submit": "Stuur",
     "success": "Sukses!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dollar (Stablesats)",
     "to": "Aan",
     "total": "Totaal",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Fout - kan nie transaksies laai nie",
     "tryAgain": "Probeer weer",
     "type": "Tipe",
-    "usdAccount": "USD-rekening ",
+    "usdAccount": "Dollar-rekening",
     "username": "Gebruikersnaam",
     "usernameRequired": "Gebruikersnaam word vereis",
     "backupAccount": "Rugsteen/opgradeer rekening",

@@ -32,8 +32,8 @@
   "SetAccountModal": {
     "title": "Set up your receive account",
     "description": "You can always change this later in the Settings",
-    "stablesatsTag": "Stablesats account for price stability",
-    "bitcoinTag": "Bitcoin account for maximalists"
+    "stablesatsTag": "Dolar qillqay — Stablesats-wan llamk'achisqa",
+    "bitcoinTag": "Bitcoin qillqa sutiyuq for maximalists"
   },
   "NoteInput": {
     "addNote": "Add note"
@@ -103,7 +103,7 @@
           },
           "sat": {
             "question": "Kani kaniqa 1 sat tukuylla. Imataqmi?",
-            "text": "Huk “Sat”qaqa, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Tukuy pacha, US Dollarpi kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkan, huktaq, 100 centmanta kachkanmi. Kaypiqa, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, 100,000,000 satsmanta kachkanmi. Huktaq, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, bitcoinmanta tukuy pacha kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, mana kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Bitcoinmanta kawsaynin rik'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, 20 satsmanta, 3000 satsmanta, 100,000,000 satsmanta (kaypiqa, huktaq bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi) kani.",
+            "text": "Huk “Sat”qaqa, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Tukuy pacha, US Dolarpi kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkan, huktaq, 100 centmanta kachkanmi. Kaypiqa, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, 100,000,000 satsmanta kachkanmi. Huktaq, bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, bitcoinmanta tukuy pacha kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, mana kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Bitcoinmanta kawsaynin rik'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, 20 satsmanta, 3000 satsmanta, 100,000,000 satsmanta (kaypiqa, huktaq bitcoinmanta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi) kani.",
             "title": "Kani kaniqa 1 sat tukuylla. Imataqmi?",
             "answers": [
               "Bitcoin tukuyta yallinwan chunkawan",
@@ -118,7 +118,7 @@
           },
           "whereBitcoinExist": {
             "question": "Bitcoinmanta yachanapaq kani?",
-            "text": "Bitcoinqa kawsayninmanta kachkan niyku. Kaypiqa, kaypi wata kani -- hamut'aypi.\n\nMana kawsayninmanta (US Dollarpi kani), kaypiqa, rikch'ariy, q'umiriy ukuq kartaqmi.\n\nHuk kawsayninmanta, 100% digital kani. Bitcoinqa, internetpi riykunawan computertinmiqmi kani.\n\nImaynallatak, ñuqa kawsayninmanta, sutiyuqpi kachkanku, smartphonetapas utqhayninmi kachkanku!",
+            "text": "Bitcoinqa kawsayninmanta kachkan niyku. Kaypiqa, kaypi wata kani -- hamut'aypi.\n\nMana kawsayninmanta (US Dolarpi kani), kaypiqa, rikch'ariy, q'umiriy ukuq kartaqmi.\n\nHuk kawsayninmanta, 100% digital kani. Bitcoinqa, internetpi riykunawan computertinmiqmi kani.\n\nImaynallatak, ñuqa kawsayninmanta, sutiyuqpi kachkanku, smartphonetapas utqhayninmi kachkanku!",
             "title": "\"Bitcoinmanta yachanapaq kani?",
             "answers": [
               "Internetpi",
@@ -173,12 +173,12 @@
             "answers": [
               "Kaypiqa, hamut'aypi tukuy pacha, kawsayninmanta, kawsaynin rikch'asqanmanta, llaqtanmanta, ayqa kachkanchuqa, kawsayninmanta rikch'asqanapaq kani.",
               "Ñuqaqmi, ñuqa mamaqmi kani.",
-              "Kaypiqa, US Dollarpi rikch'asqanmanta, q'umiriy ukuqmi kawsaynin rikch'asqanapaq kani."
+              "Kaypiqa, US Dolarpi rikch'asqanmanta, q'umiriy ukuqmi kawsaynin rikch'asqanapaq kani."
             ],
             "feedback": [
               "Allinmi kani. Kaymi kawsayninmanta, kawsaynin rikch'asqanapaq kawsayninmanta rikch'asqanapaq kachkanku!",
               "Kaypiqa, ñuqa mamaqmi kani. Mana allinmi kani kaypiqa!",
-              "Mana, kaypiqa, US Dollarpi q'umiriykuqmi kawsaynin rikch'asqanapaq kawsayninanta rikch'asqanmi kani. Kaypiqa, hukllanmiqmi kani."
+              "Mana, kaypiqa, US Dolarpi q'umiriykuqmi kawsaynin rikch'asqanapaq kawsayninanta rikch'asqanmi kani. Kaypiqa, hukllanmiqmi kani."
             ]
           },
           "coincidenceOfWants": {
@@ -298,7 +298,7 @@
             "answers": [
               "Qhawaykuna paqaqmi k'uchuniwanmi ñuqa k'asqan.",
               "Rikuchiykuqkunaqa kanchu dollar p'isqa qullqitaqmi, tukuy wata munakuywan kanka.",
-              "Dollar p'isqa ch'usaqkunaqa unanchan."
+              "Dolar p'isqa ch'usaqkunaqa unanchan."
             ],
             "feedback": [
               "Allin. Mana yachanichu kani, kamachiykuna, servicioykuna kani willay wata kachunman ch'usaqchanku.",
@@ -388,7 +388,7 @@
           },
           "HighlyDivisible": {
             "question": "Kaypiqaqa, bitcoinpiqa, chaymantam kani, chaymantam k'anchaytaqaqa, hanaypi satoshiqa, kaypiqaqa, 0.00000001piqa.",
-            "text": "Qullqipi qullqitaqmi, hanaypi pennyqa, chaymantam kani, chaymantam k'anchaytaqaqa, llaqtayuqkunataqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi 2 decimalpiqa, US Dollar ($0.01)piqa.\n\nKaypiqaqa, bitcoinpiqa, hanaypi 100,000,000 partiypiqa kani, chaymantam kani, chaymantam k'anchaytaqaqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi ₿0.00000001piqa. Kaypiqaqa, \"₿\" simbolopiqa, kaypiqaqa, \"$\" simbolopiqa, Bitcoinpiqa, kaypiqaqa, BTCpiqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa.\n\nKaypiqaqa, bitcoinpiqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi US pennyqa, chaymantam kani, chaymantam k'anchaytaqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa!",
+            "text": "Qullqipi qullqitaqmi, hanaypi pennyqa, chaymantam kani, chaymantam k'anchaytaqaqa, llaqtayuqkunataqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi 2 decimalpiqa, US Dolar ($0.01)piqa.\n\nKaypiqaqa, bitcoinpiqa, hanaypi 100,000,000 partiypiqa kani, chaymantam kani, chaymantam k'anchaytaqaqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi ₿0.00000001piqa. Kaypiqaqa, \"₿\" simbolopiqa, kaypiqaqa, \"$\" simbolopiqa, Bitcoinpiqa, kaypiqaqa, BTCpiqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, kaypiqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa.\n\nKaypiqaqa, bitcoinpiqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa, hanaypi US pennyqa, chaymantam kani, chaymantam k'anchaytaqaqa, chaymantam rantiqataqmi kani, chaymantam k'anchaytaqaqa!",
             "title": "Qullqitaqmi kaypiqa #4:\nHanaypi partiypiqa kani",
             "answers": [
               "0.00000001 BTC",
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "SMS utaq correo electrónico nisqawan qullqiykita kutichiy",
-      "dailyLimit": "$1000 sapa p'unchaw ruwana tope",
+      "dailyLimit": "USD 1,000 sapa p'unchaw ruwana tope",
       "onchainReceive": "Bitcoin onchain nisqapi chaskiy"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "Rikuchiyta sutichaq",
     "tapQrCodeCopy": "QR code churayta sutichaq",
     "title": "Allinmi Bitcoin",
-    "usdTitle": "Allinmi USD",
+    "usdTitle": "Chaskiy Dolar qillqay-man",
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "copyInvoice": "Copy",
     "shareInvoice": "Ch'usaq k'iru",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",
-    "usdTitle": "USD kawsayniyta qillqata sutichaq",
+    "usdTitle": "Kutichiy Dolar qillqay-man",
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "redeemingError": "Bitcoin kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "submissionError": "Kawsayniyta qillqata sutichinaqinmi, chhikanmi kaniyta rikuyta munan. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+    "usdBalanceWarning": "Dolar qillqay-pi {balance: string} qullqiyki kachkan.",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Qullqi chaskiy",
-    "info": "Blink ka Stablesats cuenta-ta llamk’achiy qullqi wallet-niyki-pi fiats (dólar) nisqapi mana tikrakunanpaq. Bitcoin cuenta-ta llamk’achiy sats huñuykuchkanqa chayqa mana sasachaychu fiats balansi tikrakunan."
+    "title": "Ñawpaq chaskiy cuenta",
+    "info": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun. Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Chaynamanta kaniy"
   },
   "StablesatsModal": {
-    "header": "Stablesat kawsayniyta, USDpi kawsayniyta qillqata sutichinaqinmi kaniyta munanki, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanki!",
-    "body": "Kawsayniyta qillqata sutichinaqinmi Bitcoinpi yachachinaqinmi, kawsayniyta qillqata sutichinaqinmi BTCpi USDpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki. USDpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, Bitcoinpi qillqata sutichinaqinmi kaniyta rikuyta munanki. Kaymi, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiykachkanki, tradicional bankumanta mana kaniyta rikuchiy.",
+    "header": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa",
+    "body": "Dolar qillqay Stablesats yachaykunata llamk'achin Bitcoin-ta USD chaniman sayasqata waqaychispa. Wiñaypaq Bitcoin-ta hap'inki — mana chiqap dólar-tachu — ichaqa USD chanin mana kuyunchu. Bitcoin-ta apachiy hinaspa chaskiy atikunki imaynatachus, ichaqa mana banco kay pachap sistemanwan tupanchu.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
     "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "P'unchaw k'anchayman",
     "unlimited": "Mana kaniyta k'anchay",
     "remaining": "Qatichkan",
-    "stablesatTransfers": "Stablesat kawsayniyta qillqata sutichinaqin",
+    "stablesatTransfers": "Dolar qillqay apachiykuna",
     "internalSend": "{bankName: string} qillqata sutichinaqinmi kawsayniyta yachachiykachkanki",
     "error": "Mana kaniyta rikuchiy kawsayniyta qillqata sutichinaqinmi k'anchayta qallariyta yachanakuyta munanki",
     "increaseLimits": "Increase your limits"
@@ -2580,7 +2580,7 @@
       "mainTitle": "¡Bienvenido Nivel 1 man!",
       "title": "Cuentaykipaq musuq ruwanakuna kichasqa:",
       "receiveBitcoinDescription": "Teléfono yupayniykiwan Bitcoin chaskiy",
-      "dailyLimitDescription": "Sapa p'unchaw $1,000 USD kama apachiy",
+      "dailyLimitDescription": "Apachiy USD 1,000-kama sapa p'unchaw",
       "onchainDescription": "On-chain nisqa pagokunata chaskiy"
     },
     "emailBenefits": {
@@ -2753,7 +2753,6 @@
     "soon": "Qhipa kaniyta chaymi!",
     "submit": "Submit",
     "success": "Yawar wañusqa!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dólar (Stablesats)",
     "to": "Kawsayman",
     "total": "Suma",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Qillqaykuna kargamanta kanilla",
     "tryAgain": "Rikuchiyta kani",
     "type": "Rikch'a",
-    "usdAccount": "USD qillqay",
+    "usdAccount": "Dolar qillqay",
     "username": "Ruraq sutiyuq",
     "usernameRequired": "Ruraqmi sutiyuqmi kani\"",
     "backupAccount": "Backup/upgrade account",

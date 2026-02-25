@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Configurează contul de primire",
     "description": "Poți schimba oricând mai târziu din Setări",
-    "stablesatsTag": "Cont Stablesats pentru stabilitatea prețului",
+    "stablesatsTag": "Cont Dolar — alimentat de Stablesats",
     "bitcoinTag": "Cont Bitcoin pentru maximaliști"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Limită de trimitere zilnică redusă",
       "noOnchain": "Nu primiți bitcoin onchain",
       "recoveryOption": "Recuperați fondurile prin SMS sau email",
-      "dailyLimit": "Limită zilnică de tranzacții de 1000$",
+      "dailyLimit": "Limită zilnică de tranzacții de USD 1,000",
       "onchainReceive": "Primiți bitcoin onchain"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "Setați o notă",
     "tapQrCodeCopy": "Atingeți Codul QR pentru a copia",
     "title": "Primește Bitcoin",
-    "usdTitle": "Primește USD",
+    "usdTitle": "Primire în Cont Dolar",
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "copyInvoice": "Copiați",
     "shareInvoice": "Partajare",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Răscumpărați Bitcoin",
-    "usdTitle": "Răscumpărați pentru USD",
+    "usdTitle": "Răscumpără în Cont Dolar",
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "redeemingError": "Nu s-a reușit răscumpărarea Bitcoin. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "submissionError": "Nu s-a reușit trimiterea cererii de retragere. Vă rugăm să contactați asistența dacă această problemă persistă.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Va trebui să reintroduceți numărul de telefon pentru a vă conecta din nou.\nnumărul dvs. de telefon este {phoneNumber: string}, deci asigurați-vă că aveți acces la acesta pentru a vă conecta din nou",
     "logoutAlertContentEmail": "Va trebui să reintroduceți adresa de e-mail pentru a vă conecta din nou.\nAdresa ta de e-mail este {email: string}, deci asigură-te că ai acces la ea pentru a te conecta din nou",
     "logoutAlertContentPhoneEmail": "Va trebui să reintroduceți fie numărul de telefon, fie adresa de e-mail pentru a vă conecta din nou.\nnumărul dvs. de telefon este {phoneNumber: string} și adresa dvs. de e-mail este {email: string}, deci asigurați-vă că aveți acces la acestea pentru a vă conecta din nou",
-    "usdBalanceWarning": "Aveți un sold Stablesats de {balance: string}.",
+    "usdBalanceWarning": "Ai un sold Cont Dolar de {balance: string}.",
     "btcBalanceWarning": "Aveți un sold bitcoin de {balance: string}.",
     "secureYourAccount": "Înregistrați-vă pentru a vă securiza contul",
     "tapToAdd": "Atingeți pentru a adăuga",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Secret copiat în clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Primește monedă",
-    "info": "Folosește contul tău Stablesats în Blink pentru a menține banii din portofel stabili în termeni de monedă fiat (dolar). Folosește contul tău Bitcoin dacă acumulezi sats și nu te deranjează ca soldul fiat să se schimbe constant."
+    "title": "Cont implicit de primire",
+    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă."
   },
   "ThemeScreen": {
     "title": "Temă",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Implicit - Default (OS)"
   },
   "StablesatsModal": {
-    "header": "Cu Stablesats, aveți acum un cont USD adăugat la portofel!",
-    "body": "Îl puteți folosi pentru a trimite și primi Bitcoin și pentru a transfera instantaneu valoare între contul BTC și USD. Valoarea din contul USD nu va fluctua cu prețul Bitcoin. Această caracteristică nu este compatibilă cu sistemul bancar tradițional.",
+    "header": "Cont Dolar-ul tău este alimentat de Stablesats",
+    "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
     "termsAndConditions": "Citiți Termenii și condițiile",
     "learnMore": "Aflați mai multe despre Stablesats"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "pe săptămână",
     "unlimited": "Nelimitat",
     "remaining": "Rămas",
-    "stablesatTransfers": "Transferuri Stablesat",
+    "stablesatTransfers": "Transferuri Cont Dolar",
     "internalSend": "Trimitere către {bankName: string} Utilizator",
     "error": "Nu se pot obține limitele în acest moment",
     "increaseLimits": "Măriți-vă limitele"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Bine ați venit la Nivelul 1",
       "title": "Funcții noi deblocate pentru contul dvs.:",
       "receiveBitcoinDescription": "Primiți Bitcoin folosind numărul dvs. de telefon",
-      "dailyLimitDescription": "Trimiteți până la 1.000$ USD pe zi",
+      "dailyLimitDescription": "Trimite până la USD 1,000 pe zi",
       "onchainDescription": "Primiți plăți on-chain"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Preț Bitcoin",
-    "btcAccount": "Cont BTC",
+    "btcAccount": "Cont Bitcoin",
     "cancel": "Anulare",
     "close": "Închide",
     "confirm": "Confirmare",
@@ -2736,7 +2736,6 @@
     "soon": "În curând!",
     "submit": "Trimite",
     "success": "Success!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Către",
     "total": "Total",
@@ -2744,7 +2743,7 @@
     "transactionsError": "Eroare la încărcarea tranzacțiilor",
     "tryAgain": "Încearcă din nou",
     "type": "Tip",
-    "usdAccount": "Cont USD",
+    "usdAccount": "Cont Dolar",
     "username": "Numele de utilizator",
     "usernameRequired": "Numele de utilizator este obligatoriu",
     "backupAccount": "Backup/upgrade cont",

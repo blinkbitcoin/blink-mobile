@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "إعداد حساب الاستلام",
     "description": "يمكنك دائمًا تغيير هذا لاحقًا في الإعدادات",
-    "stablesatsTag": "حساب Stablesats لاستقرار السعر",
+    "stablesatsTag": "حساب بالدولار — مدعوم بتقنية Stablesats",
     "bitcoinTag": "حساب بيتكوين للماكسيماليست"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "استرداد الأموال عبر SMS أو البريد الإلكتروني",
-      "dailyLimit": "حد المعاملات اليومي 1000$",
+      "dailyLimit": "حد المعاملات اليومي USD 1,000",
       "onchainReceive": "استلام Bitcoin على السلسلة"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "قم بكتابة ملاحظة",
     "tapQrCodeCopy": "إضغط على كود QR للنسخ",
     "title": "استقبال بيتكوين",
-    "usdTitle": "استقبال دولار",
+    "usdTitle": "استلام إلى حساب بالدولار",
     "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
     "copyInvoice": "Copy",
     "shareInvoice": "مشاركة",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "حرر البيتكوين",
-    "usdTitle": "حرر بالدولار",
+    "usdTitle": "استبدال إلى حساب بالدولار",
     "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
     "redeemingError": "أخفق تحرير البيتكوين. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
     "submissionError": "أخفق تقديم طلب السحب. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+    "usdBalanceWarning": "لديك رصيد حساب بالدولار بقيمة {balance: string}.",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "استلام العملة",
-    "info": "استخدم حساب Stablesats الخاص بك في Blink للحفاظ على الأموال في محفظتك مستقرة من حيث العملة الورقية (الدولار). استخدم حساب Bitcoin إذا كنت تقوم بتجميع sats ولا تمانع تغيّر رصيدك بالعملة الورقية باستمرار."
+    "title": "حساب الاستلام الافتراضي",
+    "info": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق. حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "الافتراضي (OS)"
   },
   "StablesatsModal": {
-    "header": "مع Stablesats، يمكنك أن تضيف حساب دولار أمريكي إلى محفظتك!",
-    "body": "يمكنك أن تستعمله لترسل وتتلقى البيتكوين، ولتحول القيمة مباشرة بين حساب البيتكوين وحساب الدولار. لا تتأثر القيمة في حساب الدولار اﻷمريكي بسعر البيتكوين. هذه الميزة لا تتوافق مع النظام المصرفي التقليدي.",
+    "header": "حساب بالدولار الخاص بك مدعوم بتقنية Stablesats",
+    "body": "يستخدم حساب بالدولار تقنية Stablesats للحفاظ على Bitcoin مستقراً بسعر USD. أنت دائماً تحتفظ بـ Bitcoin — وليس دولارات حقيقية — لكن قيمة USD لا تتقلب. يمكنك إرسال واستقبال Bitcoin كالمعتاد، لكنه غير متوافق مع النظام المصرفي التقليدي.",
     "termsAndConditions": "إقرأ الشروط والأحكام",
     "learnMore": "تعلم المزيد عن Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "في الأسبوع",
     "unlimited": "غير محدود",
     "remaining": "الباقي",
-    "stablesatTransfers": "مناقلات Stablesat",
+    "stablesatTransfers": "تحويلات حساب بالدولار",
     "internalSend": "أرسل إلى مستخدم في {bankName: string}",
     "error": "لم يُستطَع الحصول على القيود الآن",
     "increaseLimits": "Increase your limits"
@@ -2580,7 +2580,7 @@
       "mainTitle": "مرحبًا بك في المستوى 1",
       "title": "ميزات جديدة تم فتحها لحسابك:",
       "receiveBitcoinDescription": "استلام Bitcoin باستخدام رقم هاتفك",
-      "dailyLimitDescription": "إرسال ما يصل إلى 1,000$ USD يوميًا",
+      "dailyLimitDescription": "أرسل حتى USD 1,000 يومياً",
       "onchainDescription": "استلام المدفوعات على السلسلة"
     },
     "emailBenefits": {
@@ -2753,7 +2753,6 @@
     "soon": "سوف يأتي قريبا!",
     "submit": "Submit",
     "success": "تم النجاح!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "الدولار (Stablesats)",
     "to": "الى",
     "total": "المجموع",

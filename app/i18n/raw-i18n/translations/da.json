@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Sæt din modtagekonto op",
     "description": "Du kan altid ændre det senere i Indstillinger",
-    "stablesatsTag": "Stablesats-konto for prisstabilitet",
+    "stablesatsTag": "Dollar-konto — drevet af Stablesats",
     "bitcoinTag": "Bitcoin-konto for maksimalister"
   },
   "NoteInput": {
@@ -262,8 +262,8 @@
         "title": "Hvordan fungerer penge?",
         "questions": {
           "WhatIsFiat": {
-            "question": "Hvem skaber fiatpenge som f.eks. Amerikanske Dollars eller Danske Kroner?",
-            "text": "Alle nationale valutaer, der er i omløb i dag, kaldes \"fiat\"penge. Dette inkluderer Amerikanske Dollars, Japanske Yen, Danske Kroner og så videre. \n\nOrdet \"fiat\" er latin for \"ved dekret\", hvilket betyder \"ved officiel befaling \n\nDette betyder, at alle fiatpenge, herunder den Danske Krone, simpelthen skabes ved den nationale regerings befaling.",
+            "question": "Hvem skaber fiatpenge som f.eks. Amerikanske dollars eller Danske Kroner?",
+            "text": "Alle nationale valutaer, der er i omløb i dag, kaldes \"fiat\"penge. Dette inkluderer Amerikanske dollars, Japanske Yen, Danske Kroner og så videre. \n\nOrdet \"fiat\" er latin for \"ved dekret\", hvilket betyder \"ved officiel befaling \n\nDette betyder, at alle fiatpenge, herunder den Danske Krone, simpelthen skabes ved den nationale regerings befaling.",
             "title": "Fiatvaluta: Hvad er det?",
             "answers": [
               "De bliver lavet efter ordre fra den nationale regering i et givet land.",
@@ -2062,7 +2062,7 @@
       "sendingLimit": "Nedsat daglig afsendelsesgrænse.",
       "noOnchain": "Ingen modtagelse af bitcoin onchain.",
       "recoveryOption": "Gendan midler via SMS eller e-mail",
-      "dailyLimit": "$1000 daglig transaktionsgrænse",
+      "dailyLimit": "USD 1,000 daglig transaktionsgrænse",
       "onchainReceive": "Modtag bitcoin onchain"
     }
   },
@@ -2121,7 +2121,7 @@
     "setNote": "tilføj en note",
     "tapQrCodeCopy": "Tryk på QR-koden for at kopiere.",
     "title": "Modtag bitcoin",
-    "usdTitle": "Modtag USD",
+    "usdTitle": "Modtag til Dollar-konto",
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",
     "copyInvoice": "Kopier",
     "shareInvoice": "Del",
@@ -2166,7 +2166,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",
-    "usdTitle": "Indløs for USD",
+    "usdTitle": "Indløs til Dollar-konto",
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",
     "redeemingError": "Fejl ved indløsning af Bitcoin. Kontakt venligst support, hvis dette problem fortsætter.",
     "submissionError": "Fejl ved indsendelse af udbetalingsanmodning. Kontakt venligst support, hvis dette problem fortsætter.",
@@ -2385,7 +2385,7 @@
     "logoutAlertContentPhone": "Du bliver nødt til at indtaste dit telefonnummer igen for at logge ind igen. Dit telefonnummer er {phoneNumber: string}, så sørg for, at du har adgang til det for at logge ind igen",
     "logoutAlertContentEmail": "Du bliver nødt til at indtaste din e-mail igen for at logge ind igen. Din e-mail er {email: string}, så sørg for, at du har adgang til den for at logge ind igen",
     "logoutAlertContentPhoneEmail": "Du bliver nødt til at indtaste enten dit telefonnummer eller din e-mail igen for at logge ind igen. Dit telefonnummer er {phoneNumber: string} og din e-mail er {email: string}, så sørg for, at du har adgang til dem for at logge ind igen",
-    "usdBalanceWarning": "Du har en Stablesats saldo på {balance: string}.",
+    "usdBalanceWarning": "Du har en Dollar-konto-saldo på {balance: string}.",
     "btcBalanceWarning": "Du har en bitcoin saldo på {balance: string}.",
     "secureYourAccount": "Registrer for at sikre din konto",
     "tapToAdd": "Tryk for at tilføje",
@@ -2445,8 +2445,8 @@
     "toastMessage": "Hemmelig nøgle kopieret til udklipsholderen!"
   },
   "DefaultWalletScreen": {
-    "title": "Modtag valuta",
-    "info": "Brug din Stablesats-konto i Blink til at holde pengene i din wallet stabile i fiat-termer (dollar). Brug din Bitcoin-konto, hvis du samler sats og er okay med, at din fiat-saldo ændrer sig hele tiden."
+    "title": "Standard modtagekonto",
+    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2461,8 +2461,8 @@
     "DEFAULT": "Standard (OS)"
   },
   "StablesatsModal": {
-    "header": "Med Stablesats har du nu en USD-konto tilføjet til din tegnebog!",
-    "body": "Du kan bruge den til at sende og modtage Bitcoin og øjeblikkeligt overføre værdi mellem din BTC og USD-konto. Værdien i USD-kontoen vil ikke svinge med prisen på Bitcoin. Denne funktion er ikke kompatibel med det traditionelle banksystem.",
+    "header": "Din Dollar-konto er drevet af Stablesats",
+    "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
     "termsAndConditions": "Læs vilkårene",
     "learnMore": "Læs mere om Stablesats"
   },
@@ -2487,7 +2487,7 @@
     "perWeek": "pr. uge",
     "unlimited": "Ubegrænset",
     "remaining": "Resterende",
-    "stablesatTransfers": "Stablesat Overførsler",
+    "stablesatTransfers": "Dollar-konto-overførsler",
     "internalSend": "Send til {bankName: string} Bruger",
     "error": "Kunne ikke hente grænser i øjeblikket",
     "increaseLimits": "Øg dine grænser"
@@ -2566,7 +2566,7 @@
       "mainTitle": "Velkommen til niveau 1",
       "title": "Nye funktioner låst op for din konto:",
       "receiveBitcoinDescription": "Modtag Bitcoin med dit telefonnummer",
-      "dailyLimitDescription": "Send op til $1.000 USD om dagen",
+      "dailyLimitDescription": "Send op til USD 1,000 om dagen",
       "onchainDescription": "Modtag on-chain betalinger"
     },
     "emailBenefits": {
@@ -2679,7 +2679,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Pris",
-    "btcAccount": "BTC Konto",
+    "btcAccount": "Bitcoin-konto",
     "cancel": "Annuller",
     "close": "Luk",
     "confirm": "Bekræft",
@@ -2739,15 +2739,14 @@
     "soon": "Kommer snart!",
     "submit": "Indsend",
     "success": "Succes!",
-    "stablesatsUsd": "Stablesats USD",
-    "dollarStablesats": "Dollar (Stablesats)",
+    "dollarStablesats": "dollar (Stablesats)",
     "to": "Til",
     "total": "Total",
     "transactions": "Transaktioner",
     "transactionsError": "Fejl ved indlæsning af transaktioner",
     "tryAgain": "Prøv igen",
     "type": "Type",
-    "usdAccount": "USD Konto",
+    "usdAccount": "Dollar-konto",
     "username": "Brugernavn",
     "usernameRequired": "Brugernavn påkrævet",
     "backupAccount": "Backup/opgrader konto",
@@ -2769,7 +2768,7 @@
       "one": "Dag",
       "other": "Dage"
     },
-    "dollar": "Dollar",
+    "dollar": "dollar",
     "all": "ALLE",
     "allAccounts": "Alle konti",
     "some": "Nogle",

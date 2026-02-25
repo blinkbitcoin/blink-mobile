@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Postavite svoj račun za primanje",
     "description": "Uvijek to možete kasnije promijeniti u Postavkama",
-    "stablesatsTag": "Stablesats račun za stabilnost cijene",
+    "stablesatsTag": "Dolar račun — pokreće Stablesats",
     "bitcoinTag": "Bitcoin račun za maksimaliste"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Smanjeno dnevno ograničenje slanja",
       "noOnchain": "Nema primanja bitcoina na lancu",
       "recoveryOption": "Oporavak sredstava putem SMS-a ili e-pošte",
-      "dailyLimit": "$1000 dnevni limit transakcija",
+      "dailyLimit": "USD 1,000 dnevni limit transakcija",
       "onchainReceive": "Primajte Bitcoin onchain"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "postavi bilješku",
     "tapQrCodeCopy": "Dodirnite QR kod za kopiranje",
     "title": "Primi Bitcoin",
-    "usdTitle": "Primi USD",
+    "usdTitle": "Primi na Dolar račun",
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "copyInvoice": "Kopiraj",
     "shareInvoice": "Podijeli",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Povuci bitcoin",
-    "usdTitle": "Povuci u USD",
+    "usdTitle": "Zamijeni na Dolar račun",
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "redeemingError": "Povlačenje Bitcoina nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "submissionError": "Podnošenje zahtjeva za povlačenje nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "Za ponovnu prijavu morat ćeš ponovno unijeti svoj telefonski broj.\ntvoj telefonski broj je {phoneNumber: string} pa provjeri imaš li mu pristup da bi se ponovno prijavio",
     "logoutAlertContentEmail": "Za ponovnu prijavu morat ćeš ponovno unijeti svoju e-poštu.\ntvoja e-pošta je {email: string} pa provjeri imaš li joj pristup radi ponovne prijave",
     "logoutAlertContentPhoneEmail": "Za ponovnu prijavu morat ćeš ponovno unijeti svoj telefonski broj ili e-mail.\ntvoj telefonski broj je {phoneNumber: string}, a tvoja e-pošta je {email: string} pa provjeri imaš li im pristup za ponovnu prijavu",
-    "usdBalanceWarning": "Imaš Stablesats saldo od {balance: string}.",
+    "usdBalanceWarning": "Imate Dolar račun stanje od {balance: string}.",
     "btcBalanceWarning": "Imaš bitcoin saldo od {balance: string}.",
     "secureYourAccount": "Registriraj se kako bi osiguraoi svoj račun",
     "tapToAdd": "Dodirni za dodavanje",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Tajna kopirana u međuspremnik!"
   },
   "DefaultWalletScreen": {
-    "title": "Primanje valute",
-    "info": "Koristite svoj Stablesats račun u Blinku kako biste zadržali novac u svom novčaniku stabilnim u fiat vrijednosti (dolar). Koristite svoj Bitcoin račun ako skupljate sats i ne smeta vam stalna promjena fiat stanja."
+    "title": "Zadani račun za primanje",
+    "info": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem. Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Zadano (OS)"
   },
   "StablesatsModal": {
-    "header": "Uz Stablesats, sada imate USD račun dodan u svoj novčanik!",
-    "body": "Možete ga koristiti za slanje i primanje Bitcoina i trenutačni prijenos vrijednosti između vašeg BTC i USD računa. Vrijednost na USD računu neće varirati s cijenom Bitcoina. Ova značajka nije kompatibilna s tradicionalnim bankarskim sustavom.",
+    "header": "Vaš Dolar račun pokreće Stablesats",
+    "body": "Dolar račun koristi Stablesats tehnologiju za održavanje Bitcoina stabilnim na USD cijeni. Uvijek držite Bitcoin — ne prave dolare — ali USD vrijednost ne fluktuira. Možete slati i primati Bitcoin kao i obično, ali nije kompatibilan s tradicionalnim bankarskim sustavom.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
     "learnMore": "Saznajte više o Stablesats-u"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "po tjednu",
     "unlimited": "Neograničeno",
     "remaining": "Preostalo",
-    "stablesatTransfers": "Stablesat Transferi",
+    "stablesatTransfers": "Dolar račun prijenosi",
     "internalSend": "Pošalji korisniku {bankName: string}",
     "error": "Trenutačno nije moguće dohvatiti ograničenja",
     "increaseLimits": "Povećajte svoje limite"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Dobrodošli na razinu 1",
       "title": "Nove značajke otključane za vaš račun:",
       "receiveBitcoinDescription": "Primajte Bitcoin koristeći svoj telefonski broj",
-      "dailyLimitDescription": "Šaljite do $1,000 USD dnevno",
+      "dailyLimitDescription": "Pošaljite do USD 1,000 dnevno",
       "onchainDescription": "Primajte onchain plaćanja"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cijena Bitcoina",
-    "btcAccount": "BTC račun",
+    "btcAccount": "Bitcoin račun",
     "cancel": "Poništi",
     "close": "Zatvori",
     "confirm": "Potvrdi",
@@ -2753,7 +2753,6 @@
     "soon": "Dolazi uskoro!",
     "submit": "Podnesi",
     "success": "Uspjeh!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Za",
     "total": "Ukupno",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Pogreška pri učitavanju transakcija",
     "tryAgain": "Pokušajte ponovno",
     "type": "Vrsta",
-    "usdAccount": "USD račun",
+    "usdAccount": "Dolar račun",
     "username": "Korisničko ime",
     "usernameRequired": "Korisničko ime je potrebno",
     "backupAccount": "Sigurnosno kopiranje/nadogradnja računa",

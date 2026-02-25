@@ -30,7 +30,7 @@
     "SetAccountModal": {
         "title": "Richte dein Empfangskonto ein",
         "description": "Du kannst das später jederzeit in den Einstellungen ändern",
-        "stablesatsTag": "Stablesats-Konto für Preisstabilität",
+        "stablesatsTag": "Dollar-Konto — betrieben mit Stablesats",
         "bitcoinTag": "Bitcoin-Konto für Maximalisten"
     },
     "NoteInput": {
@@ -2059,7 +2059,7 @@
             "sendingLimit": "Reduziertes tägliches Sendelimit",
             "noOnchain": "Bitcoin können nicht onchain empfangen werden",
             "recoveryOption": "Guthaben per SMS oder E-Mail wiederherstellen",
-            "dailyLimit": "1.000 $ tägliches Transaktionslimit",
+            "dailyLimit": "USD 1,000 tägliches Transaktionslimit",
             "onchainReceive": "Bitcoin onchain empfangen"
         }
     },
@@ -2118,7 +2118,7 @@
         "setNote": "Notiz erstellen",
         "tapQrCodeCopy": "Tippe den QR Code um zu kopieren",
         "title": "Bitcoin empfangen",
-        "usdTitle": "USD empfangen",
+        "usdTitle": "Empfangen auf Dollar-Konto",
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "copyInvoice": "Kopieren",
         "shareInvoice": "Teilen",
@@ -2163,7 +2163,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "Bitcoin einlösen",
-        "usdTitle": "Gegen USD einlösen",
+        "usdTitle": "Einlösen auf Dollar-Konto",
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "redeemingError": "Bitcoin konnten nicht eingelöst werden. Bitte kontaktiere den Support, wenn das Problem weiterhin besteht.",
         "submissionError": "Auszahlung fehlgeschlagen. Bitte kontaktiere den Support, wenn das Problem weiterhin besteht.",
@@ -2382,7 +2382,7 @@
         "logoutAlertContentPhone": "Um dich erneut einzuloggen, benötigst du deine Telefonnummer. Deine Telefonnummer lautet {phoneNumber: string}. Stelle bitte sicher, dass du Zugriff auf diese hast, um dich erneut einloggen zu können",
         "logoutAlertContentEmail": "Um dich erneut einzuloggen, benötigst du deine Email-Adresse. Diese lautet {email: string}. Stelle bitte sicher, dass du Zugriff darauf hast, um dich erneut einloggen zu können",
         "logoutAlertContentPhoneEmail": "Um dich erneut einzuloggen, benötigst du entweder deine Telefonnummer oder deine Email-Adresse.\nDeine Telefonnummer lautet {phoneNumber: string} und deine Email-Adresse ist {email: string}. Stelle bitte sicher, dass du Zugriff auf diese hast, um dich erneut einloggen zu können.",
-        "usdBalanceWarning": "Dein Stablesats Kontostand beträgt {balance: string}.",
+        "usdBalanceWarning": "Du hast ein Dollar-Konto-Guthaben von {balance: string}.",
         "btcBalanceWarning": "Dein Bitcoin Kontostand beträgt {balance: string}.",
         "secureYourAccount": "Registriere dich, um deinen Account zu sichern",
         "tapToAdd": "Antippen zum Hinzufügen",
@@ -2442,8 +2442,8 @@
         "toastMessage": "Geheimnis in Zwischenablage kopiert!"
     },
     "DefaultWalletScreen": {
-        "title": "Währung empfangen",
-        "info": "Verwenden Sie Ihr Stablesats-Konto in Blink, um das Geld in Ihrer Wallet in Fiat-Werten (Dollar) stabil zu halten. Verwenden Sie Ihr Bitcoin-Konto, wenn Sie Sats sammeln und es für Sie in Ordnung ist, dass sich Ihr Fiat-Guthaben ständig ändert."
+        "title": "Standard-Empfangskonto",
+        "info": "Dein Bitcoin-Konto ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt. Dein Dollar-Konto wird von Stablesats betrieben — er hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht."
     },
     "ThemeScreen": {
         "title": "Design",
@@ -2458,8 +2458,8 @@
         "DEFAULT": "Standard (OS)"
     },
     "StablesatsModal": {
-        "header": "Mit Stablesats kannst Du ein USD Konto mit deiner Wallet nutzen!",
-        "body": "Du kannst es nutzen, um Bitcoin zu senden und empfangen, und Gelder direkt zwischen deinen BTC und USD Konten zu transferieren. Der Wert in deinem USD Konto wird nicht mit dem Bitcoin-Preis schwanken. Diese Funktion ist nicht kompatibel mit traditionellen Banksystemen.",
+        "header": "Dein Dollar-Konto wird von Stablesats betrieben",
+        "body": "Der Dollar-Konto nutzt Stablesats-Technologie, um Bitcoin stabil zum USD-Preis zu halten. Du hältst immer Bitcoin — keine echten Dollar — aber der USD-Wert schwankt nicht. Du kannst Bitcoin wie gewohnt senden und empfangen, aber es ist nicht mit dem traditionellen Bankensystem kompatibel.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über Stablesats erfahren"
     },
@@ -2484,7 +2484,7 @@
         "perWeek": "pro Woche",
         "unlimited": "Unbeschränkt",
         "remaining": "Verbleibend",
-        "stablesatTransfers": "Stablesat-Transaktionen",
+        "stablesatTransfers": "Dollar-Konto-Überweisungen",
         "internalSend": "Sende an {bankName: string} User",
         "error": "Limits können aktuell nicht abgerufen werden",
         "increaseLimits": "Erhöhe deine Limits"
@@ -2563,7 +2563,7 @@
             "mainTitle": "Willkommen auf Level 1",
             "title": "Neue Funktionen für dein Konto freigeschaltet:",
             "receiveBitcoinDescription": "Bitcoin über deine Telefonnummer empfangen",
-            "dailyLimitDescription": "Sende bis zu 1.000 USD pro Tag",
+            "dailyLimitDescription": "Sende bis zu USD 1,000 pro Tag",
             "onchainDescription": "On-Chain-Zahlungen empfangen"
         },
         "emailBenefits": {
@@ -2676,7 +2676,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Preis",
-        "btcAccount": "BTC Konto",
+        "btcAccount": "Bitcoin-Konto",
         "cancel": "Abbrechen",
         "close": "Schließen",
         "confirm": "Bestätigen",
@@ -2736,7 +2736,6 @@
         "soon": "Bald verfügbar!",
         "submit": "Senden",
         "success": "Erfolgreich!",
-        "stablesatsUsd": "Stablesats USD",
         "dollarStablesats": "Dollar (Stablesats)",
         "to": "An",
         "total": "Gesamt",
@@ -2744,7 +2743,7 @@
         "transactionsError": "Transaktionen konnten nicht geladen werden",
         "tryAgain": "Erneut versuchen",
         "type": "Typ",
-        "usdAccount": "USD Konto",
+        "usdAccount": "Dollar-Konto",
         "username": "Benutzername",
         "usernameRequired": "Benutzername ist erforderlich",
         "backupAccount": "Account sichern / upgraden",

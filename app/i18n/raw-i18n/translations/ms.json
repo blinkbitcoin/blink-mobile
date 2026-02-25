@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Sediakan akaun penerimaan anda",
     "description": "Anda sentiasa boleh mengubahnya kemudian di Tetapan",
-    "stablesatsTag": "Akaun Stablesats untuk kestabilan harga",
+    "stablesatsTag": "Akaun Dolar — dikuasakan oleh Stablesats",
     "bitcoinTag": "Akaun Bitcoin untuk maksimalis"
   },
   "NoteInput": {
@@ -178,7 +178,7 @@
             "feedback": [
               "Tepat. Ini yang menjadikan duit itu berfungsi",
               "Jawapan tu hampir tepat. tapi bukan dekat sini.",
-              "Tak. Dulu bolehlah kita nak tukarkan US Dollar kepada emas. Tapi sekarang mana boleh."
+              "Tak. Dulu bolehlah kita nak tukarkan US Dolar kepada emas. Tapi sekarang mana boleh."
             ]
           },
           "coincidenceOfWants": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Hadkan penghantaran harian",
       "noOnchain": "Tiada penerimaan bitcoin dalam rangkaian utama atau on chain",
       "recoveryOption": "Pulihkan dana melalui SMS atau e-mel",
-      "dailyLimit": "Had transaksi harian $1000",
+      "dailyLimit": "Had transaksi harian USD 1,000",
       "onchainReceive": "Terima bitcoin secara onchain"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "Beri pesanan",
     "tapQrCodeCopy": "Tekan untuk salin kod QR",
     "title": "Terima bitcoin",
-    "usdTitle": "Terima dalam USD",
+    "usdTitle": "Terima ke Akaun Dolar",
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",
     "copyInvoice": "Salin",
     "shareInvoice": "Kongsi",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Tebus bitcoin",
-    "usdTitle": "Tebus untuk dapat USD",
+    "usdTitle": "Tebus ke Akaun Dolar",
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",
     "redeemingError": "Gagal untuk rebus bitcoin. hubungi tim sokongan jika masalah tidak selesai",
     "submissionError": "Gagal untuk hantar permohonan pengeluaran. Hubungi tim sokongan jika masalah tetap berlaku",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "Anda perlu untuk masukkan semula nombor telefon untuk log masuk.\nNombor telefon anda {phoneNumber: string} sila pastikan anda mempunyai akses kepada nombor tersebut untuk log masuk",
     "logoutAlertContentEmail": "Anda perlu memasukkan semula emel untuk log masuk.\nemel anda adalah {email: string}. Sila pastikan anda mempunyai akses kepadanya untuk log masuk",
     "logoutAlertContentPhoneEmail": "Anda perlu untuk masukkan semula nombor telefon atau emel untuk log masuk.\nNombor telefon anda {phoneNumber: string} dan emel anda adalah {email: string} jadi pastikan anda mempunyai akses ke atasnya intuk log masik",
-    "usdBalanceWarning": "Baki stablesats anda adalah {balance: string}",
+    "usdBalanceWarning": "Anda mempunyai baki Akaun Dolar sebanyak {balance: string}.",
     "btcBalanceWarning": "Baki Bitcoin anda {balance: string}",
     "secureYourAccount": "Daftar untuk dapatkan akaun anda",
     "tapToAdd": "Tekan untuk tambah",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Kata rahsia telah disalin pada papan klip!"
   },
   "DefaultWalletScreen": {
-    "title": "Terima mata wang",
-    "info": "Gunakan akaun Stablesats anda di Blink untuk mengekalkan wang dalam dompet anda stabil dari segi mata wang fiat (dolar). Gunakan akaun Bitcoin anda jika anda mengumpul sats dan tidak kisah baki fiat anda berubah sepanjang masa."
+    "title": "Akaun penerima lalai",
+    "info": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran. Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Ikut ketetapan asal (OS)"
   },
   "StablesatsModal": {
-    "header": "Dengan stablesats, anda sekarang telah ada Dolar USD dalam dompet anda!",
-    "body": "Anda boleh gunakan ia untuk terima dan hantar Bitcoin, dan lakukan pemindahan segera antara nilai BTC dan USD yang ada dalam akaun anda. Nilai USD tidak berubah dengan harga Bitcoin. Fungsi ini tak sesuai dengan sistem perbankan sekarang.",
+    "header": "Akaun Dolar anda dikuasakan oleh Stablesats",
+    "body": "Akaun Dolar menggunakan teknologi Stablesats untuk mengekalkan Bitcoin stabil pada harga USD. Anda sentiasa memegang Bitcoin — bukan dolar sebenar — tetapi nilai USD tidak turun naik. Anda boleh menghantar dan menerima Bitcoin seperti biasa, tetapi ia tidak serasi dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca terma & syarat",
     "learnMore": "Ketahui lebih lanjut tentang stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "seminggu",
     "unlimited": "Tidak terhad",
     "remaining": "Masih berbaki",
-    "stablesatTransfers": "Pemindahan stablesats",
+    "stablesatTransfers": "Pemindahan Akaun Dolar",
     "internalSend": "Hantar kepada {bankName: string} pengguna",
     "error": "Tak dapat nak ikut had anda buat masa ini",
     "increaseLimits": "Tambahkan had anda"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Selamat Datang ke Tahap 1",
       "title": "Ciri baharu telah dibuka untuk akaun anda:",
       "receiveBitcoinDescription": "Terima Bitcoin menggunakan nombor telefon anda",
-      "dailyLimitDescription": "Hantar sehingga $1,000 USD sehari",
+      "dailyLimitDescription": "Hantar sehingga USD 1,000 sehari",
       "onchainDescription": "Terima bayaran on-chain"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "Beta",
     "bitcoin": "Bitcoin ",
     "bitcoinPrice": "Harga Bitcoin",
-    "btcAccount": "Akaun BTC",
+    "btcAccount": "Akaun Bitcoin",
     "cancel": "Batal",
     "close": "Keluar",
     "confirm": "Pasti",
@@ -2753,7 +2753,6 @@
     "soon": "Akan datang!",
     "submit": "Hantar",
     "success": "Berjaya!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Kepada",
     "total": "Jumlah keseluruhan",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Ada masalah memuat naik transaksi",
     "tryAgain": "Cuba lagi",
     "type": "Jenis",
-    "usdAccount": "Akaun USD",
+    "usdAccount": "Akaun Dolar",
     "username": "ID pengguna",
     "usernameRequired": "ID pengguna diperlukan",
     "backupAccount": "Backup/Naiktaraf akaun",

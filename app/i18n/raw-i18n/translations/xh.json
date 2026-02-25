@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Cwangcisa iakhawunti yakho yokufumana",
     "description": "Ungasoloko ukutshintsha oku kamva kwiZicwangciso",
-    "stablesatsTag": "Iakhawunti ye-Stablesats yokuzinza kwexabiso",
+    "stablesatsTag": "I-Akhawunti ye-Idola — ixhaswa yi-Stablesats",
     "bitcoinTag": "Iakhawunti ye-Bitcoin yabona bangcono"
   },
   "NoteInput": {
@@ -2076,7 +2076,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "Buyisela imali nge-SMS okanye i-imeyili",
-      "dailyLimit": "$1000 umda wentengiselo yosuku",
+      "dailyLimit": "USD 1,000 umda wentengiselo yosuku",
       "onchainReceive": "Fumana iBitcoin kwi-onchain"
     },
     "exploreWalletInstead": "Explore wallet instead",
@@ -2142,7 +2142,7 @@
     "setNote": "seta inqaku",
     "tapQrCodeCopy": "Cofa iKhowudi yeQR ukukopa",
     "title": "Fumana i-Bitcoin",
-    "usdTitle": "Fumana iUSD",
+    "usdTitle": "Yamkela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
     "copyInvoice": "Khuphela i-invoyisi",
     "shareInvoice": "Yabelana nge-invoyisi",
@@ -2187,7 +2187,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Sebenzisa i-Bitcoin",
-    "usdTitle": "Sebenzisa ngeUSD",
+    "usdTitle": "Hlawulela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
     "redeemingError": "Ayiphumelelanga ukusebenzisa iBitcoin. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
     "submissionError": "Ayiphumelelanga ukungenisa isicelo sokurhoxisa. Nceda uqhagamshelane nenkxaso ukuba le ngxaki iyaqhubeka.",
@@ -2418,7 +2418,7 @@
     "logoutAlertContentPhone": "Kuza kufuneka uphinde ufake inombolo yakho yomnxeba ukuze uphinde ungene.\ninombolo yakho yomnxeba ngu-{phoneNumber: string} ke qinisekisa ukuba uyafikelela kuyo ukuze uphinde ungene",
     "logoutAlertContentEmail": "Kuza kufuneka uphinde ufake i-imeyile yakho ukuze uphinde ungene.\ni-imeyile yakho ngu-{email: string} ke qinisekisa ukuba uyafikelela kuyo ukuze uphinde ungene",
     "logoutAlertContentPhoneEmail": "Kuza kufuneka uphinde ufake inombolo yakho yomnxeba okanye i-imeyile ukuze uphinde ungene.\ninombolo yakho yomnxeba ngu-{phoneNumber: string} kwaye i-imeyile yakho ngu-{email: string} ke qinisekisa ukuba uyafikelela kuzo ukuze uphinde ungene",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+    "usdBalanceWarning": "Unebhalansi ye-Akhawunti ye-Idola ka-{balance: string}.",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Cofa ukongeza",
@@ -2480,8 +2480,8 @@
     "toastMessage": "Imfihlo ikopishwe kwibhodi eqhotyoshwayo!"
   },
   "DefaultWalletScreen": {
-    "title": "Iakhawunti ehlala ikho",
-    "info": "Pick which account to set as default for receiving and sending. You can adjust the send and receive account for individual payments in the mobile app. Payments received through the cash register or your Lightning address will always go to the default account.\n\nTo avoid Bitcoin's volatility, choose Stablesats. This allows you to maintain a stable amount of money while still being able to send and receive payments.\n\nYou can change this setting at any time, and it won't affect your current balance."
+    "title": "I-akhawunti yokufumana engagqibekanga",
+    "info": "I-Akhawunti ye-Bitcoin yakho yeyokuqokelela i-sats, apho ixabiso le-USD lihamba nemarike. I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats — igcina i-Bitcoin ekhuselweyo ukuze ihlale izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin, kodwa ixabiso le-idola alitshintshi."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2496,8 +2496,8 @@
     "DEFAULT": "Okuhlala kukho (OS)"
   },
   "StablesatsModal": {
-    "header": "Nge-Stablesats, ngoku une-akhawunti ye-USD eyongeziweyo kwi-wallet yakho!",
-    "body": "Ungayisebenzisa ukuthumela nokufumana i-Bitcoin, kwaye ngokukhawuleza udlulise ixabiso phakathi kwe-akhawunti yakho ye-BTC kunye ne-USD. Ixabiso kwi-akhawunti ye-USD aliyi kutshintsha ngexabiso leBitcoin. Olu phawu aluhambelani nenkqubo yebhanki yesiqhelo.",
+    "header": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats",
+    "body": "I-Akhawunti ye-Idola isebenzisa iteknoloji ye-Stablesats ukugcina i-Bitcoin izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin — hayi iidola zenene — kodwa ixabiso le-USD aliguquguquki. Ungakwazi ukuthumela nokufumana i-Bitcoin njengoko uqhele ukwenza, kodwa ayihambelani nenkqubo yebhanki yesithethe.",
     "termsAndConditions": "Funda iMigaqo neMiqathango",
     "learnMore": "Funda ngakumbi malunga neStablesats"
   },
@@ -2522,7 +2522,7 @@
     "perWeek": "Ngeveki",
     "unlimited": "Engenasiphelo",
     "remaining": "Ekuseleyo",
-    "stablesatTransfers": "iStablesat transifer -Dluliselo",
+    "stablesatTransfers": "Ukudluliswa kwe-Akhawunti ye-Idola",
     "internalSend": "Thumela ku {bankName: string} Umsebenzisi",
     "error": "Ayikwazanga kulanda imida ngeli xesha",
     "increaseLimits": "Increase your limits",
@@ -2604,7 +2604,7 @@
       "mainTitle": "Wamkelekile kwiNqanaba 1",
       "title": "Iimpawu ezintsha ezivuliweyo kwi-akhawunti yakho:",
       "receiveBitcoinDescription": "Fumana Bitcoin usebenzisa inombolo yakho yomnxeba",
-      "dailyLimitDescription": "Thumela ukuya kuthi ga ku-$1,000 USD ngosuku",
+      "dailyLimitDescription": "Thumela ukuya kuthi ga USD 1,000 ngosuku",
       "onchainDescription": "Fumana iintlawulo ze-onchain"
     },
     "emailBenefits": {
@@ -2717,7 +2717,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Price",
-    "btcAccount": "BTC Account",
+    "btcAccount": "I-Akhawunti ye-Bitcoin",
     "cancel": "Rhoxisa",
     "close": "Close",
     "confirm": "Confirm",
@@ -2777,7 +2777,6 @@
     "soon": "Coming soon!",
     "submit": "Thumela",
     "success": "Success!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Idola (Stablesats)",
     "to": "To",
     "total": "Total",
@@ -2785,7 +2784,7 @@
     "transactionsError": "Error loading transactions",
     "tryAgain": "Try Again",
     "type": "Type",
-    "usdAccount": "USD Account",
+    "usdAccount": "I-Akhawunti ye-Idola",
     "username": "Username",
     "usernameRequired": "Username is required",
     "backupAccount": "Backup/upgrade account",

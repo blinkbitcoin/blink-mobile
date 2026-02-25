@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Atur akun penerimaan Anda",
     "description": "Anda selalu bisa mengubahnya nanti di Pengaturan",
-    "stablesatsTag": "Akun Stablesats untuk stabilitas harga",
+    "stablesatsTag": "Akun Dolar — didukung oleh Stablesats",
     "bitcoinTag": "Akun Bitcoin untuk maksimalis"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Batas pengiriman harian dikurangi",
       "noOnchain": "Tidak menerima bitcoin on-chain",
       "recoveryOption": "Pulihkan dana melalui SMS atau email",
-      "dailyLimit": "Batas transaksi harian $1000",
+      "dailyLimit": "Batas transaksi harian USD 1,000",
       "onchainReceive": "Terima bitcoin onchain"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "atur catatan",
     "tapQrCodeCopy": "Ketuk Kode QR untuk Menyalin",
     "title": "Terima Bitcoin",
-    "usdTitle": "Terima USD",
+    "usdTitle": "Terima ke Akun Dolar",
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Tukarkan Bitcoin",
-    "usdTitle": "Tukarkan ke USD",
+    "usdTitle": "Tukarkan ke Akun Dolar",
     "error": "Gagal membuat faktur. Silakan hubungi support jika masalah ini berlanjut.",
     "redeemingError": "Gagal menukarkan Bitcoin. Silakan hubungi support jika masalah ini berlanjut.",
     "submissionError": "Gagal mengajukan permintaan penarikan. Silakan hubungi support jika masalah ini berlanjut.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Anda harus memasukkan kembali nomor telepon Anda untuk masuk kembali.\nNomor telepon Anda adalah {phoneNumber: string}, pastikan Anda memiliki akses untuk masuk kembali.",
     "logoutAlertContentEmail": "Anda harus memasukkan kembali email Anda untuk masuk kembali.\nEmail Anda adalah {email: string}, pastikan Anda memiliki akses untuk masuk kembali.",
     "logoutAlertContentPhoneEmail": "Anda harus memasukkan kembali nomor telepon atau email untuk masuk kembali.\nNomor telepon Anda adalah {phoneNumber: string} dan email Anda adalah {email: string}, pastikan Anda memiliki akses ke keduanya.",
-    "usdBalanceWarning": "Anda memiliki saldo Stablesats sebesar {balance: string}.",
+    "usdBalanceWarning": "Anda memiliki saldo Akun Dolar sebesar {balance: string}.",
     "btcBalanceWarning": "Anda memiliki saldo Bitcoin sebesar {balance: string}.",
     "secureYourAccount": "Daftar untuk mengamankan akun Anda",
     "tapToAdd": "Ketuk untuk menambahkan",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Rahasia disalin ke papan klip!"
   },
   "DefaultWalletScreen": {
-    "title": "Akun Default",
-    "info": "Pilih akun mana yang akan dijadikan default untuk menerima dan mengirim. Anda dapat menyesuaikan akun kirim dan terima untuk pembayaran individu di aplikasi seluler. Pembayaran yang diterima melalui kasir atau alamat Lightning Anda akan selalu masuk ke akun default.\n\nUntuk menghindari volatilitas Bitcoin, pilih Stablesats. Ini memungkinkan Anda mempertahankan jumlah uang yang stabil sambil tetap dapat mengirim dan menerima pembayaran.\n\nAnda dapat mengubah pengaturan ini kapan saja, dan itu tidak akan memengaruhi saldo saat ini."
+    "title": "Akun penerima default",
+    "info": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar. Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Default (OS)"
   },
   "StablesatsModal": {
-    "header": "Dengan Stablesats, Anda sekarang memiliki akun USD yang ditambahkan ke dompet Anda!",
-    "body": "Anda dapat menggunakannya untuk mengirim dan menerima Bitcoin, serta mentransfer nilai secara instan antara akun BTC dan USD Anda. Nilai di akun USD tidak akan berfluktuasi dengan harga Bitcoin. Fitur ini tidak kompatibel dengan sistem perbankan tradisional.",
+    "header": "Akun Dolar Anda didukung oleh Stablesats",
+    "body": "Akun Dolar menggunakan teknologi Stablesats untuk menjaga Bitcoin tetap stabil pada harga USD. Anda selalu memegang Bitcoin — bukan dolar sungguhan — tetapi nilai USD tidak berfluktuasi. Anda dapat mengirim dan menerima Bitcoin seperti biasa, tetapi ini tidak kompatibel dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
     "learnMore": "Pelajari lebih lanjut tentang Stablesats"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "per minggu",
     "unlimited": "Tanpa batas",
     "remaining": "Tersisa",
-    "stablesatTransfers": "Transfer Stablesat",
+    "stablesatTransfers": "Transfer Akun Dolar",
     "internalSend": "Kirim ke Pengguna {bankName: string}",
     "error": "Tidak dapat mengambil batas saat ini",
     "increaseLimits": "Tingkatkan batasan Anda"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Selamat Datang di Level 1",
       "title": "Fitur baru yang terbuka untuk akun Anda:",
       "receiveBitcoinDescription": "Terima Bitcoin menggunakan nomor telepon Anda",
-      "dailyLimitDescription": "Kirim hingga $1.000 USD per hari",
+      "dailyLimitDescription": "Kirim hingga USD 1,000 per hari",
       "onchainDescription": "Terima pembayaran on-chain"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Harga Bitcoin",
-    "btcAccount": "Akun BTC",
+    "btcAccount": "Akun Bitcoin",
     "cancel": "Batal",
     "close": "Tutup",
     "confirm": "Konfirmasi",
@@ -2736,7 +2736,6 @@
     "soon": "Segera hadir!",
     "submit": "Kirim",
     "success": "Berhasil!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Ke",
     "total": "Total",
@@ -2744,7 +2743,7 @@
     "transactionsError": "Kesalahan memuat transaksi",
     "tryAgain": "Coba Lagi",
     "type": "Tipe",
-    "usdAccount": "Akun USD",
+    "usdAccount": "Akun Dolar",
     "username": "Nama Pengguna",
     "usernameRequired": "Nama pengguna diperlukan",
     "backupAccount": "Cadangkan/tingkatkan akun",
