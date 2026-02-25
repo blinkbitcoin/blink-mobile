@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Tertunda",
-      "completed": "Selesai"
+      "completed": "Selesai",
+      "declined": "Ditolak",
+      "reversed": "Dibalik"
     },
     "CardDashboard": {
       "Actions": {

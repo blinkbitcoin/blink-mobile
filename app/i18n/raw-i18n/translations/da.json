@@ -2945,7 +2945,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Afventer",
-      "completed": "Fuldført"
+      "completed": "Fuldført",
+      "declined": "Afvist",
+      "reversed": "Tilbageført"
     },
     "CardDashboard": {
       "Actions": {

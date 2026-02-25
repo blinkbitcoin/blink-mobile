@@ -2968,7 +2968,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Na čekanju",
-      "completed": "Dovršeno"
+      "completed": "Dovršeno",
+      "declined": "Odbijena",
+      "reversed": "Poništena"
     },
     "CardDashboard": {
       "Actions": {

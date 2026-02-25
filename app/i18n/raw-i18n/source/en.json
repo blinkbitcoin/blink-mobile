@@ -2925,7 +2925,9 @@
         "cardFrozenSubtitle": "Card is temporarily disabled",
         "TransactionStatus": {
             "pending": "Pending",
-            "completed": "Completed"
+            "completed": "Completed",
+            "declined": "Declined",
+            "reversed": "Reversed"
         },
         "CardDashboard": {
             "Actions": {
@@ -2937,7 +2939,10 @@
             "title": "Visa card",
             "addFunds": "Add funds",
             "transactionsTitle": "Transactions",
-            "emptyTransactions": "No transactions yet"
+            "emptyTransactions": "No transactions yet",
+            "noCardAvailable": "No cards available",
+            "cardUpdateError": "Could not update card status",
+            "cardNotUsable": "This card is not currently available for use"
         },
         "CardDetails": {
             "title": "Card details",
