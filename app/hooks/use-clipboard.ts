@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
 
 import { toastShow } from "@app/utils/toast"
@@ -9,19 +9,26 @@ type CopyToClipboardParams = {
   message?: string
 }
 
-export const useClipboard = () => {
+export const useClipboard = (clearAfterMs?: number) => {
   const { LL } = useI18nContext()
+  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => () => clearTimeout(timerRef.current), [])
 
   const copyToClipboard = useCallback(
     ({ content, message }: CopyToClipboardParams): void => {
+      clearTimeout(timerRef.current)
       Clipboard.setString(content)
       toastShow({
         type: "success",
         message: message ?? LL.common.copied(),
         LL,
       })
+      if (clearAfterMs) {
+        timerRef.current = setTimeout(() => Clipboard.setString(""), clearAfterMs)
+      }
     },
-    [LL],
+    [LL, clearAfterMs],
   )
 
   return { copyToClipboard }
