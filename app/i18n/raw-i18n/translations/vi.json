@@ -2965,7 +2965,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Đang chờ",
-      "completed": "Đã hoàn tất"
+      "completed": "Đã hoàn tất",
+      "declined": "Bị từ chối",
+      "reversed": "Đã hoàn lại"
     },
     "CardDashboard": {
       "Actions": {

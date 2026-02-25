@@ -2968,7 +2968,9 @@
     "CardFlow": {
         "TransactionStatus": {
             "pending": "保留中",
-            "completed": "完了"
+            "completed": "完了",
+            "declined": "拒否されました",
+            "reversed": "取り消されました"
         },
         "CardDashboard": {
             "Actions": {

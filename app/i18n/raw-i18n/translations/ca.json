@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Pendent",
-      "completed": "Completat"
+      "completed": "Completat",
+      "declined": "Rebutjada",
+      "reversed": "Revertida"
     },
     "CardDashboard": {
       "Actions": {

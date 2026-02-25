@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Kikyali mu kutegeerwa",
-      "completed": "Kiwedde"
+      "completed": "Kiwedde",
+      "declined": "Kigaaniddwa",
+      "reversed": "Kiddizuddwa"
     },
     "CardDashboard": {
       "Actions": {

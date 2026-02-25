@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "În așteptare",
-      "completed": "Finalizat"
+      "completed": "Finalizat",
+      "declined": "Refuzată",
+      "reversed": "Inversată"
     },
     "CardDashboard": {
       "Actions": {

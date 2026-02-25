@@ -2927,7 +2927,9 @@
     "CardFlow": {
         "TransactionStatus": {
             "pending": "In sospeso",
-            "completed": "Completato"
+            "completed": "Completato",
+            "declined": "Rifiutata",
+            "reversed": "Stornata"
         },
         "CardDashboard": {
             "Actions": {
