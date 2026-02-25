@@ -74,3 +74,16 @@ export const maskDigits = (
     maskChar?: string
   },
 ) => maskString(value, { ...options, maskPattern: /\d/ })
+
+export const formatCardDisplayNumber = (
+  cardNumber: string,
+  showDetails: boolean,
+  { totalDigits = 16, groupSize = 4, visibleDigits = 4 } = {},
+): string => {
+  const digits = cardNumber.replaceAll(" ", "")
+  const padded = digits.padStart(totalDigits, MASK_CHAR)
+  const masked = showDetails
+    ? padded
+    : maskString(padded, { visibleRight: visibleDigits })
+  return masked.match(new RegExp(`.{${groupSize}}`, "g"))!.join(" ")
+}
