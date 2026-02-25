@@ -253,7 +253,113 @@ describe("BlinkCard", () => {
     })
   })
 
+  describe("rendering with lastFour only", () => {
+    it("displays masked card number with lastFour", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="1234" />,
+      )
+
+      expect(getByText("•••• •••• •••• 1234")).toBeTruthy()
+    })
+
+    it("displays masked card number with lastFour when showCardDetails is true", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="1234" showCardDetails={true} />,
+      )
+
+      expect(getByText("•••• •••• •••• 1234")).toBeTruthy()
+    })
+  })
+
+  describe("card number without spaces", () => {
+    it("masks card number without spaces same as with spaces", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="4242424242424242" />,
+      )
+
+      expect(getByText("•••• •••• •••• 4242")).toBeTruthy()
+    })
+
+    it("displays full card number without spaces when showCardDetails is true", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard
+          {...defaultProps}
+          cardNumber="4242424242424242"
+          showCardDetails={true}
+        />,
+      )
+
+      expect(getByText("4242 4242 4242 4242")).toBeTruthy()
+    })
+  })
+
+  describe("partial card numbers", () => {
+    it("masks 6-digit input showing only last four", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="123456" />,
+      )
+
+      expect(getByText("•••• •••• •••• 3456")).toBeTruthy()
+    })
+
+    it("pads and shows all 6 digits when showCardDetails is true", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="123456" showCardDetails={true} />,
+      )
+
+      expect(getByText("•••• •••• ••12 3456")).toBeTruthy()
+    })
+
+    it("masks 8-digit input showing only last four", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="12345678" />,
+      )
+
+      expect(getByText("•••• •••• •••• 5678")).toBeTruthy()
+    })
+
+    it("pads and shows all 8 digits when showCardDetails is true", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="12345678" showCardDetails={true} />,
+      )
+
+      expect(getByText("•••• •••• 1234 5678")).toBeTruthy()
+    })
+
+    it("masks 12-digit input showing only last four", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="123456789012" />,
+      )
+
+      expect(getByText("•••• •••• •••• 9012")).toBeTruthy()
+    })
+
+    it("pads and shows all 12 digits when showCardDetails is true", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="123456789012" showCardDetails={true} />,
+      )
+
+      expect(getByText("•••• 1234 5678 9012")).toBeTruthy()
+    })
+  })
+
   describe("edge cases", () => {
+    it("handles empty card number", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="" />,
+      )
+
+      expect(getByText("•••• •••• •••• ••••")).toBeTruthy()
+    })
+
+    it("handles empty card number with showCardDetails", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} cardNumber="" showCardDetails={true} />,
+      )
+
+      expect(getByText("•••• •••• •••• ••••")).toBeTruthy()
+    })
+
     it("handles empty holder name", () => {
       const { toJSON } = renderWithProviders(
         <BlinkCard {...defaultProps} holderName="" />,
