@@ -2460,7 +2460,7 @@
     },
     "DefaultWalletScreen": {
         "title": "Compte de réception par défaut",
-        "info": "Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas. Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché."
+        "info": "Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché. Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas."
     },
     "ThemeScreen": {
         "title": "Thème",

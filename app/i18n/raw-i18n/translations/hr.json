@@ -2460,7 +2460,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Zadani račun za primanje",
-    "info": "Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja. Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem."
+    "info": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem. Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja."
   },
   "ThemeScreen": {
     "title": "Tema",

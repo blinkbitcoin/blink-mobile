@@ -2460,7 +2460,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Standaard ontvangstrekening",
-    "info": "Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet. Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt."
+    "info": "Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt. Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet."
   },
   "ThemeScreen": {
     "title": "Thema",

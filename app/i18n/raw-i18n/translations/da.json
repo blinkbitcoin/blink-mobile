@@ -2446,7 +2446,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Standard modtagekonto",
-    "info": "Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke. Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet."
+    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke."
   },
   "ThemeScreen": {
     "title": "Tema",

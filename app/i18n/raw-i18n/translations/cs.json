@@ -2460,7 +2460,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Výchozí účet pro příjem",
-    "info": "Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění. Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem."
+    "info": "Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem. Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění."
   },
   "ThemeScreen": {
     "title": "Motiv",

@@ -2443,7 +2443,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Varsayılan alma hesabı",
-    "info": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez. Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder."
+    "info": "Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder. Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez."
   },
   "ThemeScreen": {
     "title": "Tema",

@@ -2460,7 +2460,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Verstek ontvangrekening",
-    "info": "Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie. Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg."
+    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie."
   },
   "ThemeScreen": {
     "title": "Tema",

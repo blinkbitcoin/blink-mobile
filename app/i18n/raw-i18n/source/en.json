@@ -2441,7 +2441,7 @@
     },
     "DefaultWalletScreen": {
         "title": "Default receive account",
-        "info": "Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change. Your Bitcoin account is for stacking sats, where the USD value moves with the market."
+        "info": "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change."
     },
     "ThemeScreen": {
         "title": "Theme",

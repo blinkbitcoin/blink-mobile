@@ -2443,7 +2443,7 @@
     },
     "DefaultWalletScreen": {
         "title": "Conto di ricezione predefinito",
-        "info": "Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia. Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato."
+        "info": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato. Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia."
     },
     "ThemeScreen": {
         "title": "Tema",

@@ -2443,7 +2443,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Cont implicit de primire",
-    "info": "Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă. Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața."
+    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă."
   },
   "ThemeScreen": {
     "title": "Temă",

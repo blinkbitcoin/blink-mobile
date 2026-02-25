@@ -2443,7 +2443,7 @@
     },
     "DefaultWalletScreen": {
         "title": "Conta de recebimento padrão",
-        "info": "Sua Conta Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda. Sua Conta Bitcoin é para acumular sats, onde o valor USD se move com o mercado."
+        "info": "Sua Conta Bitcoin é para acumular sats, onde o valor USD se move com o mercado. Sua Conta Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda."
     },
     "ThemeScreen": {
         "title": "Tema",

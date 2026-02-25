@@ -2443,7 +2443,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Compte de recepció predeterminat",
-    "info": "El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia. El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat."
+    "info": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat. El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia."
   },
   "ThemeScreen": {
     "title": "Tema",

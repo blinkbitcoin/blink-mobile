@@ -2443,7 +2443,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Alapértelmezett fogadási fiók",
-    "info": "A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik. A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog."
+    "info": "A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog. A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik."
   },
   "ThemeScreen": {
     "title": "Téma",

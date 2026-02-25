@@ -2443,7 +2443,7 @@
   },
   "DefaultWalletScreen": {
     "title": "Akun penerima default",
-    "info": "Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah. Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar."
+    "info": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar. Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah."
   },
   "ThemeScreen": {
     "title": "Tema",
