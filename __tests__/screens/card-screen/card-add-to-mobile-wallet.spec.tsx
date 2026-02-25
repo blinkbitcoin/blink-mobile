@@ -16,8 +16,8 @@ jest.mock("react-native-linear-gradient", () => ({
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
 jest.mock("@app/utils/helper", () => ({
+  ...jest.requireActual("@app/utils/helper"),
   isIos: false,
-  maskString: (str: string) => str.replace(/\d(?=.{4})/g, "•"),
 }))
 
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
