@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Stel je ontvangstrekening in",
     "description": "Je kunt dit later altijd wijzigen in Instellingen",
-    "stablesatsTag": "Stablesats-rekening voor prijsstabiliteit",
+    "stablesatsTag": "Dollar-rekening — aangedreven door Stablesats",
     "bitcoinTag": "Bitcoin-rekening voor maximalisten"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Verlaagde dagelijkse verzendlimiet",
       "noOnchain": "Geen ontvangen van bitcoin onchain",
       "recoveryOption": "Fondsen herstellen via SMS of e-mail",
-      "dailyLimit": "$1000 dagelijkse transactielimiet",
+      "dailyLimit": "USD 1,000 dagelijkse transactielimiet",
       "onchainReceive": "Bitcoin onchain ontvangen"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "zet een noot",
     "tapQrCodeCopy": "Tik op QR-code om te kopiëren",
     "title": "Ontvang Bitcoin",
-    "usdTitle": "Ontvang USD",
+    "usdTitle": "Ontvangen naar Dollar-rekening",
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Wissel Bitcoin",
-    "usdTitle": "Inwisselen voor USD",
+    "usdTitle": "Inwisselen naar Dollar-rekening",
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "redeemingError": "Kan Bitcoin niet inwisselen. Neem contact op met de technische ondersteuning als dit probleem zich blijft voordoen.",
     "submissionError": "Kan opnameverzoek niet indienen. Neem contact op met de technische ondersteuning als dit probleem zich blijft voordoen.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "Om opnieuw in te loggen, moet u uw telefoonnummer opnieuw invoeren.\nuw telefoonnummer is {phoneNumber: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentEmail": "Om weer in te loggen, moet u uw e-mailadres opnieuw invoeren.\nuw e-mailadres is {email: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentPhoneEmail": "Om weer in te loggen, moet u uw telefoonnummer of e-mailadres opnieuw invoeren.\nje telefoonnummer is {phoneNumber: string} en je e-mailadres is {email: string}, dus zorg ervoor dat je toegang hebt tot de nummers om weer in te loggen",
-    "usdBalanceWarning": "Je hebt een Stablesats-saldo van {balance: string}.",
+    "usdBalanceWarning": "Je hebt een Dollar-rekening-saldo van {balance: string}.",
     "btcBalanceWarning": "U heeft een bitcoin-saldo van {balance: string}.",
     "secureYourAccount": "Registreer om uw account te beveiligen",
     "tapToAdd": "Tik om toe te voegen",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Geheim gekopieerd naar klembord!"
   },
   "DefaultWalletScreen": {
-    "title": "Valuta ontvangen",
-    "info": "Gebruik je Stablesats-account in Blink om het geld in je wallet stabiel te houden in fiat-termen (dollar). Gebruik je Bitcoin-account als je sats spaart en het prima vindt dat je fiat-saldo voortdurend verandert."
+    "title": "Standaard ontvangstrekening",
+    "info": "Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet. Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt."
   },
   "ThemeScreen": {
     "title": "Thema",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Standaard (OS)"
   },
   "StablesatsModal": {
-    "header": "Met Stablesats heb je nu een USD-account toegevoegd aan je wallet!",
-    "body": "U kunt het gebruiken om Bitcoin te verzenden en te ontvangen, en direct waarde over te dragen tussen uw BTC- en USD-account. De waarde op de USD-rekening fluctueert niet met de prijs van Bitcoin. Deze functie is niet compatibel met het traditionele banksysteem.",
+    "header": "Je Dollar-rekening wordt aangedreven door Stablesats",
+    "body": "De Dollar-rekening gebruikt Stablesats-technologie om Bitcoin stabiel te houden op de USD-prijs. Je houdt altijd Bitcoin — geen echte dollars — maar de USD-waarde fluctueert niet. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk, maar het is niet compatibel met het traditionele banksysteem.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
     "learnMore": "Meer informatie over Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "per week",
     "unlimited": "Ongelimiteerd",
     "remaining": "Overig",
-    "stablesatTransfers": "Stablesat Overmakingen",
+    "stablesatTransfers": "Dollar-rekening-overboekingen",
     "internalSend": "Verzenden naar {bankName: string} Gebruiker",
     "error": "Kan momenteel geen limieten ophalen",
     "increaseLimits": "Vergroot je grenzen"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Welkom bij niveau 1",
       "title": "Nieuwe functies ontgrendeld voor je account:",
       "receiveBitcoinDescription": "Bitcoin ontvangen met je telefoonnummer",
-      "dailyLimitDescription": "Verzend tot $1.000 USD per dag",
+      "dailyLimitDescription": "Verstuur tot USD 1,000 per dag",
       "onchainDescription": "Onchain betalingen ontvangen"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Prijs",
-    "btcAccount": "BTC Rekening",
+    "btcAccount": "Bitcoin-rekening",
     "cancel": "Annuleer",
     "close": "Sluit",
     "confirm": "Bevestig",
@@ -2753,15 +2753,14 @@
     "soon": "Binnenkort beschikbaar!",
     "submit": "Indienen",
     "success": "Success!",
-    "stablesatsUsd": "Stablesats USD",
-    "dollarStablesats": "Dollar (Stablesats)",
+    "dollarStablesats": "dollar (Stablesats)",
     "to": "Naar",
     "total": "Totaal",
     "transactions": "Transacties",
     "transactionsError": "Fout bij het laden van transacties",
     "tryAgain": "Probeer opnieuw",
     "type": "Type",
-    "usdAccount": "USD Rekening",
+    "usdAccount": "Dollar-rekening",
     "username": "Gebruikersnaam",
     "usernameRequired": "Gebruikersnaam is vereist",
     "backupAccount": "Back-up/upgrade-account",
@@ -2783,7 +2782,7 @@
       "one": "Dag",
       "other": "Dagen"
     },
-    "dollar": "Dollar",
+    "dollar": "dollar",
     "all": "ALLES",
     "allAccounts": "Alle accounts",
     "some": "Sommige",

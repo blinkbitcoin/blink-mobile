@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Sanidi akaunti yako ya kupokea",
     "description": "Unaweza kubadilisha hili baadaye katika Mipangilio",
-    "stablesatsTag": "Akaunti ya Stablesats kwa uthabiti wa bei",
+    "stablesatsTag": "Akaunti ya Dola — inayoendeshwa na Stablesats",
     "bitcoinTag": "Akaunti ya Bitcoin kwa maximalisti"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Kikomo kidogo cha kutuma kila siku",
       "noOnchain": "Hakuna kupokea bitcoin kwenye onchain",
       "recoveryOption": "Rejesha fedha kupitia SMS au barua pepe",
-      "dailyLimit": "Kikomo cha muamala wa kila siku cha $1000",
+      "dailyLimit": "Kikomo cha muamala wa kila siku cha USD 1,000",
       "onchainReceive": "Pokea Bitcoin kwenye mtandao mkuu"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "weka ujumbe",
     "tapQrCodeCopy": "Gusa Msimbo wa QR kuunakili",
     "title": "Pokea Bitcoin",
-    "usdTitle": "Pokea USD",
+    "usdTitle": "Pokea kwenye Akaunti ya Dola",
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
     "copyInvoice": "Nakili",
     "shareInvoice": "Shiriki",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Badilisha Bitcoin",
-    "usdTitle": "Badilisha kwa USD",
+    "usdTitle": "Komboa kwenye Akaunti ya Dola",
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
     "redeemingError": "Imeshindwa kukomboa Bitcoin. Tafadhali wasiliana na na usaidizi ikiwa tatizo hili litaendelea.",
     "submissionError": "Imeshindwa kuwasilisha ombi la kutoa. Tafadhali wasiliana na usaidizi iwapo tatizo hili litaendelea.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Utahitaji kuingiza namba yako ya simu tena ili kuingia tena.\nNamba yako ya simu ni {phoneNumber: string} kwa hivyo hakikisha unayo nafasi ya kuifikia ili kuingia tena",
     "logoutAlertContentEmail": "Utahitaji kuingiza tena barua pepe yako ili kuingia tena.\nBarua pepe yako ni {email: string} kwa hivyo hakikisha unayo nafasi ya kuifikia ili kuingia tena",
     "logoutAlertContentPhoneEmail": "Utahitaji kuingiza tena au namba yako ya simu au barua pepe ili kuingia tena.\nNamba yako ya simu ni {phoneNumber: string} na barua pepe yako ni {email: string} kwa hivyo hakikisha unayo nafasi ya kuifikia ili kuingia tena",
-    "usdBalanceWarning": "Una Stablesats ya {balance: string}.",
+    "usdBalanceWarning": "Una salio ya Akaunti ya Dola ya {balance: string}.",
     "btcBalanceWarning": "Una salio la bitcoin ya {balance: string}.",
     "secureYourAccount": "Jisajili ili kusimamia akaunti yako",
     "tapToAdd": "Bonyeza kwa kuongeza",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Siri imeakiliwa kwenye ubao wa kunakili!"
   },
   "DefaultWalletScreen": {
-    "title": "Akaunti ya Msingi",
-    "info": "Chagua akaunti ipi kuweka kama msingi wa kupokea na kutuma. Unaweza kubadilisha kutuma na kupokea kwa malipo ya kibinafsi katika programu ya simu. Malipo yaliyopokelewa kupitia kwenye kasha la fedha au anwani yako ya Lightning itaenda daima kwenye akaunti ya msingi.\n\nIli kuepuka mabadiliko ya bei ya Bitcoin, chagua Stablesats. Hii inaruhusu kudumisha kiwango thabiti cha pesa wakati bado unaweza kutuma na kupokea malipo.\n\nUnaweza kubadilisha mipangilio hii wakati wowote, na haitaathiri salio lako la sasa."
+    "title": "Akaunti ya kupokea chaguo-msingi",
+    "info": "Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki. Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko."
   },
   "ThemeScreen": {
     "title": "Mandhari",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Chaguo msingi (OS)"
   },
   "StablesatsModal": {
-    "header": "Na Stablesats, sasa akaunti ya USD imeongewa kwenye pochi lako.",
-    "body": "Unaweza kuitumia kutuma na kupokea Bitcoin, na kuhamisha thamani kati ya BTC yako na akaunti yako ya USD. Thamani katika akaunti yako ya USD haitabadilika badilika na thamani ya Bitcoin. Hiki kipengele hakiendani na mfumo wa benki wa kizamani.",
+    "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
+    "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
     "termsAndConditions": "Soma Sheria na Masharti",
     "learnMore": "Soma zaidi kuhusu Stablesats"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "kwa juma",
     "unlimited": "Bila kikomo",
     "remaining": "Imebakia",
-    "stablesatTransfers": "Mahamisho ya Stablesat",
+    "stablesatTransfers": "Uhamisho wa Akaunti ya Dola",
     "internalSend": "Tuma kwa {bankName: string} Mtumiaji",
     "error": "Hatuwezi kupata mipaka kwa wakati huu",
     "increaseLimits": "Ongeza vikomo vyako"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Karibu Kiwango cha 1",
       "title": "Vipengele vipya vimefunguliwa kwa akaunti yako:",
       "receiveBitcoinDescription": "Pokea Bitcoin kwa kutumia nambari yako ya simu",
-      "dailyLimitDescription": "Tuma hadi $1,000 USD kwa siku",
+      "dailyLimitDescription": "Tuma hadi USD 1,000 kwa siku",
       "onchainDescription": "Pokea malipo ya kwenye mtandao mkuu"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bei ya Bitcoin",
-    "btcAccount": "Akaunti ya BTC",
+    "btcAccount": "Akaunti ya Bitcoin",
     "cancel": "Futa",
     "close": "Funga",
     "confirm": "Thibitisha",
@@ -2736,7 +2736,6 @@
     "soon": "Inakuja hivi karibuni!",
     "submit": "Wasilisha",
     "success": "Fanaka!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dola (Stablesats)",
     "to": "Kwa",
     "total": "Jumla",
@@ -2744,7 +2743,7 @@
     "transactionsError": "Kosa katika kupakua malipo",
     "tryAgain": "Jaribu Tena",
     "type": "Aina",
-    "usdAccount": "Akaunti ya USD",
+    "usdAccount": "Akaunti ya Dola",
     "username": "Jina la mtumiaji",
     "usernameRequired": "Jina la mtumiaji linahitajika",
     "backupAccount": "Akaunti ya Kuhifadhi/Nyenzo",

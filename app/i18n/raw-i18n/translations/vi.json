@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Thiết lập tài khoản nhận",
     "description": "Bạn luôn có thể thay đổi điều này sau trong Cài đặt",
-    "stablesatsTag": "Tài khoản Stablesats để ổn định giá",
+    "stablesatsTag": "Tài khoản Đô la — được hỗ trợ bởi Stablesats",
     "bitcoinTag": "Tài khoản Bitcoin cho các maximalist"
   },
   "NoteInput": {
@@ -71,7 +71,7 @@
     "youreConverting": "Bạn đang chuyển đổi",
     "receivingAccount": "Tài khoản nhận",
     "infoBitcoin": "Số lượng Bitcoin chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
-    "infoDollar": "Số tiền Dollar chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
+    "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "transferButtonText": "Chuyển {fromWallet} sang {toWallet}"
   },
   "ConversionSuccessScreen": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "Khôi phục tiền qua SMS hoặc email",
-      "dailyLimit": "Giới hạn giao dịch $1000 mỗi ngày",
+      "dailyLimit": "Giới hạn giao dịch USD 1,000 mỗi ngày",
       "onchainReceive": "Nhận bitcoin trên chuỗi"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "Viết ghi chú",
     "tapQrCodeCopy": "Nhấn Mã QR để sao chép",
     "title": "Nhận Bitcoin",
-    "usdTitle": "Nhận USD",
+    "usdTitle": "Nhận vào Tài khoản Đô la",
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Đổi lấy Bitcoin",
-    "usdTitle": "Đổi lấy USD\n",
+    "usdTitle": "Đổi sang Tài khoản Đô la",
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "redeemingError": "Không thể đổi lấy Bitcoin. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "submissionError": "Không thể tiến hành yêu cầu rút tiền. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+    "usdBalanceWarning": "Bạn có số dư Tài khoản Đô la là {balance: string}.",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Nhận tiền tệ",
-    "info": "Sử dụng tài khoản Stablesats của bạn trong Blink để giữ tiền trong ví ổn định theo giá trị tiền pháp định (đô la). Sử dụng tài khoản Bitcoin nếu bạn đang tích lũy sats và không ngại việc số dư fiat thay đổi liên tục."
+    "title": "Tài khoản nhận mặc định",
+    "info": "Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi. Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Mặc định (OS)"
   },
   "StablesatsModal": {
-    "header": "Với Stablesats, bây giờ bạn có một tài khoản USD được thêm vào ví của bạn!",
-    "body": "Bạn có thể sử dụng nó để gửi và nhận bitcoin và chuyển giá trị ngay lập tức giữa tài khoản BTC và USD của bạn. Giá trị trong tài khoản USD sẽ không dao động với giá Bitcoin. Tính năng này không tương thích với hệ thống ngân hàng truyền thống.",
+    "header": "Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats",
+    "body": "Tài khoản Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
     "learnMore": "Tìm hiểu thêm về Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "mỗi tuần",
     "unlimited": "Không giới hạn",
     "remaining": "Còn lại",
-    "stablesatTransfers": "Giao dịch Stablesats",
+    "stablesatTransfers": "Chuyển khoản Tài khoản Đô la",
     "internalSend": "Send to {bankName: string} User",
     "error": "Không thể tìm kiếm giới hạn tại thời điểm này",
     "increaseLimits": "Increase your limits"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Chào mừng đến Cấp 1",
       "title": "Các tính năng mới đã được mở khóa cho tài khoản của bạn:",
       "receiveBitcoinDescription": "Nhận Bitcoin bằng số điện thoại của bạn",
-      "dailyLimitDescription": "Gửi tối đa $1,000 USD mỗi ngày",
+      "dailyLimitDescription": "Gửi tối đa USD 1,000 mỗi ngày",
       "onchainDescription": "Nhận thanh toán trên chuỗi"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Giá Bitcoin",
-    "btcAccount": "Tài khoản BTC",
+    "btcAccount": "Tài khoản Bitcoin",
     "cancel": "Hủy",
     "close": "Đóng",
     "confirm": "Xác nhận",
@@ -2753,15 +2753,14 @@
     "soon": "Ra mắt sớm!",
     "submit": "Submit",
     "success": "Thành công!",
-    "stablesatsUsd": "Stablesats USD",
-    "dollarStablesats": "Dollar (Stablesats)",
+    "dollarStablesats": "Đô la (Stablesats)",
     "to": "Tới",
     "total": "Tổng cộng",
     "transactions": "Các giao dịch",
     "transactionsError": "Lỗi tải các giao dịch",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
-    "usdAccount": "Tài khoản USD",
+    "usdAccount": "Tài khoản Đô la",
     "username": "Người dùng",
     "usernameRequired": "Tên người dùng là bắt buộc",
     "backupAccount": "Backup/upgrade account",
@@ -2783,7 +2782,7 @@
       "one": "Ngày",
       "other": "Ngày"
     },
-    "dollar": "Dollar",
+    "dollar": "Đô la",
     "all": "TẤT CẢ",
     "allAccounts": "Tất cả tài khoản",
     "some": "Một số",

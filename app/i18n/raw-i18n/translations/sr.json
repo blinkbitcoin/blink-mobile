@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Podesi svoj nalog za prijem",
     "description": "Ovo uvek možeš kasnije da promeniš u Podešavanjima",
-    "stablesatsTag": "Stablesats nalog za stabilnost cene",
+    "stablesatsTag": "„Долар“ Рачун — покреће Stablesats",
     "bitcoinTag": "Bitcoin nalog za maksimaliste"
   },
   "NoteInput": {
@@ -70,7 +70,7 @@
     "title": "Преглед конверзије",
     "youreConverting": "Конвертујете",
     "receivingAccount": "Рачун прималац",
-    "infoBitcoin": "Bitcoin износ је само приближан. Може варирати за мали износ.",
+    "infoBitcoin": "Биткоин износ је само приближан. Може варирати за мали износ.",
     "infoDollar": "Доларски износ је само приближан. Може варирати за мали износ.",
     "transferButtonText": "Пренеси {fromWallet} на {toWallet}"
   },
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Смањено дневно ограничење слања",
       "noOnchain": "Нема примања биткоина на ланцу",
       "recoveryOption": "Повратак средстава преко SMS-а или е-поште",
-      "dailyLimit": "$1000 дневни лимит за трансакције",
+      "dailyLimit": "USD 1,000 дневни лимит за трансакције",
       "onchainReceive": "Примајте Bitcoin на блокчејну"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "поставите белешку",
     "tapQrCodeCopy": "Додирните QR код да бисте копирали",
     "title": "Примите Биткоин",
-    "usdTitle": "Примите USD",
+    "usdTitle": "Прими на „Долар“ Рачун",
     "error": "Грешка приликом генерисања рачуна. Молимо вас контактирајте подршку ако се проблем настави.",
     "copyInvoice": "Copy",
     "shareInvoice": "Подели",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",
-    "usdTitle": "Откупи за USD",
+    "usdTitle": "Замени на „Долар“ Рачун",
     "error": "Грешка приликом генерисања рачуна. Молимо вас контактирајте подршку ако се проблем настави.",
     "redeemingError": "Грешка приликом откупљивања Биткоина. Молимо вас контактирајте подршку ако се проблем настави.",
     "submissionError": "Грешка приликом подношења захтева за исплату. Молимо вас контактирајте подршку ако се проблем настави.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "Имате Stablesats стање од {balance: string}.",
+    "usdBalanceWarning": "Имате „Долар“ Рачун стање од {balance: string}.",
     "btcBalanceWarning": "Имате биткоин стање од {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Примање валуте",
-    "info": "Користите свој Stablesats налог у Blink-у да бисте новац у свом новчанику одржали стабилним у фиат вредности (долар). Користите свој Bitcoin налог ако сакупљате sats и не смета вам што се фиат стање стално мења."
+    "title": "Подразумевани рачун за пријем",
+    "info": "Ваш „Долар“ Рачун покреће Stablesats — држи Bitcoin заштићен да остане стабилан у USD вредности. Увек држите Bitcoin, али доларска вредност се не мења. Ваш „Биткоин“ Рачун је за сакупљање сатова, где се USD вредност креће са тржиштем."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Подразумевано (ОС)"
   },
   "StablesatsModal": {
-    "header": "Са Стејблсатсима, сада имате додатни амерички доларски рачун у свом новчанику!",
-    "body": "Можете га користити за слање и примање Биткоина, и моментално преносити вредност између вашег „BTC“ и „USD“ налога. Вредност на „USD“ налогу неће варирати са ценом Биткоина. Ова функција није компатибилна са традиционалним банкарским системом.",
+    "header": "Ваш „Долар“ Рачун покреће Stablesats",
+    "body": "„Долар“ Рачун користи Stablesats технологију за одржавање Bitcoin-а стабилним на USD цени. Увек држите Bitcoin — не праве доларе — али USD вредност не флуктуира. Можете слати и примати Bitcoin као и обично, али није компатибилан са традиционалним банкарским системом.",
     "termsAndConditions": "Прочитајте услове коришћења",
     "learnMore": "Сазнајте више о Стејблсатсу"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "по недељи",
     "unlimited": "Неограничено",
     "remaining": "Преостало",
-    "stablesatTransfers": "Трансфери Стејблсатса",
+    "stablesatTransfers": "„Долар“ Рачун преnoси",
     "internalSend": "Пошаљи кориснику {bankName: string}",
     "error": "Неуспешно преузимање ограничења у овом тренутку",
     "increaseLimits": "Increase your limits"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Добродошли на Ниво 1",
       "title": "Нове функције откључане за ваш налог:",
       "receiveBitcoinDescription": "Примајте Bitcoin користећи свој број телефона",
-      "dailyLimitDescription": "Шаљите до $1,000 USD дневно",
+      "dailyLimitDescription": "Пошаљите до USD 1,000 дневно",
       "onchainDescription": "Примајте уплате на блокчејну"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "бета",
     "bitcoin": "Биткоин",
     "bitcoinPrice": "Цена Биткоина",
-    "btcAccount": "„BTC“ Рачун",
+    "btcAccount": "„Биткоин“ Рачун",
     "cancel": "Откажи",
     "close": "Затвори",
     "confirm": "Потврди",
@@ -2753,7 +2753,6 @@
     "soon": "Ускоро!",
     "submit": "Submit",
     "success": "Успех!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Долар (Stablesats)",
     "to": "За",
     "total": "Укупно",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Грешка при учитавању трансакција",
     "tryAgain": "Покушај поново",
     "type": "Тип",
-    "usdAccount": "„USD“ Рачун",
+    "usdAccount": "„Долар“ Рачун",
     "username": "Корисничко име",
     "usernameRequired": "Корисничко име је обавезо",
     "backupAccount": "Backup/upgrade account",

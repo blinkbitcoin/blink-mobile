@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Configura el teu compte de recepció",
     "description": "Sempre ho pots canviar més endavant a Configuració",
-    "stablesatsTag": "Compte Stablesats per a l'estabilitat del preu",
+    "stablesatsTag": "Compte Dòlar — impulsat per Stablesats",
     "bitcoinTag": "Compte Bitcoin per a maximalistes"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Límit diari d'enviament reduït",
       "noOnchain": "No rebre bitcoin \"onchain\"",
       "recoveryOption": "Recupera fons per SMS o correu electrònic",
-      "dailyLimit": "Límit diari de transaccions de $1000",
+      "dailyLimit": "Límit diari de transaccions de USD 1,000",
       "onchainReceive": "Rep bitcoin onchain"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "posa una nota",
     "tapQrCodeCopy": "Toca el codi QR per copiar",
     "title": "Rebre Bitcoin",
-    "usdTitle": "Rebre USD",
+    "usdTitle": "Rebre a Compte Dòlar",
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
     "copyInvoice": "Copiar",
     "shareInvoice": "Comparteix",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",
-    "usdTitle": "Bescanviar per USD",
+    "usdTitle": "Bescanvia a Compte Dòlar",
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
     "redeemingError": "No s'ha pogut bescanviar Bitcoin. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
     "submissionError": "No s'ha pogut enviar la petició de retirada. Si us plau contacta amb el servei d'assisència si aquest problema persisteix.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Hauràs de tornar a introduir el teu número de telèfon per tornar a iniciar sessió. \nEl teu número de telèfon és {phoneNumber: string}, així que assegura't de tenir accés a ell per tornar a iniciar sessió.",
     "logoutAlertContentEmail": "Hauràs de tornar a introduir el teu correu electrònic per tornar a iniciar sessió. \nEl teu correu electrònic és {email: string}, així que assegura't de tenir-hi accés per tornar a iniciar sessió.",
     "logoutAlertContentPhoneEmail": "Hauràs de tornar a introduir el teu número de telèfon o correu electrònic per tornar a iniciar la sessió. El teu número de telèfon és {phoneNumber: string} i el teu correu electrònic és {email: string}. Assegura't de tenir accés a aquests per tornar a iniciar la sessió.",
-    "usdBalanceWarning": "Tens un saldo de {balance: string} Stablesats.",
+    "usdBalanceWarning": "Tens un saldo de Compte Dòlar de {balance: string}.",
     "btcBalanceWarning": "Tens un saldo de {balance: string} bitcoin.",
     "secureYourAccount": "Registra't per protegir el teu compte",
     "tapToAdd": "Prem per afegir",
@@ -2442,8 +2442,8 @@
     "toastMessage": "El secret s'ha copiat al porta-retalls!"
   },
   "DefaultWalletScreen": {
-    "title": "Compte predeterminat",
-    "info": "Tria el compte que vols establir com a predeterminat per rebre i enviar. Pots ajustar el compte d'enviament i recepció per a pagaments individuals a l'aplicació mòbil. Els pagaments rebuts a través de la caixa registradora o de la teva adreça Lightning aniran sempre al compte predeterminat.\n\nPer evitar la volatilitat del Bitcoin, tria Stablesats. Això et permet mantenir una quantitat estable de diners mentre encara pots enviar i rebre pagaments.\n\nPots canviar aquesta configuració en qualsevol moment i no afectarà el teu saldo actual."
+    "title": "Compte de recepció predeterminat",
+    "info": "El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia. El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Per defecte (OS)"
   },
   "StablesatsModal": {
-    "header": "Amb Stablesats, ara tens un compte en USD afegit al teu moneder!",
-    "body": "Pots utilitzar-lo per enviar i rebre Bitcoin o per transferir  instantàniament entre els teus comptes de BTC i USD. El valor del compte USD no fluctuarà amb el preu de Bitcoin. Aquesta característica no és compatible amb el sistema bancari tradicional.",
+    "header": "El teu Compte Dòlar està impulsat per Stablesats",
+    "body": "Compte Dòlar utilitza la tecnologia Stablesats per mantenir Bitcoin estable al preu USD. Sempre tens Bitcoin — no dòlars reals — però el valor USD no fluctua. Pots enviar i rebre Bitcoin com de costum, però no és compatible amb el sistema bancari tradicional.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
     "learnMore": "Apren més sobre els Stablesats"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "per setmana",
     "unlimited": "Il·limitat",
     "remaining": "Restant",
-    "stablesatTransfers": "Transferències de Stablesats",
+    "stablesatTransfers": "Transferències de Compte Dòlar",
     "internalSend": "Enviar a usuari {bankName: string} ",
     "error": "No es poden obtenir els límits en aquest moment",
     "increaseLimits": "Incrementa els teus límits"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Benvingut al nivell 1",
       "title": "Noves funcionalitats desbloquejades per al teu compte:",
       "receiveBitcoinDescription": "Rep Bitcoin utilitzant el teu número de telèfon",
-      "dailyLimitDescription": "Envia fins a $1.000 USD al dia",
+      "dailyLimitDescription": "Envia fins a USD 1,000 al dia",
       "onchainDescription": "Rep pagaments on-chain"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Preu de Bitcoin",
-    "btcAccount": "Compte BTC",
+    "btcAccount": "Compte Bitcoin",
     "cancel": "Cancela",
     "close": "Tanca",
     "confirm": "Confirma",
@@ -2736,7 +2736,6 @@
     "soon": "Pròximament!",
     "submit": "Enviar",
     "success": "Èxit!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dòlar (Stablesats)",
     "to": "a",
     "total": "Total",
@@ -2744,7 +2743,7 @@
     "transactionsError": "S'ha produït un error en carregar les transaccions",
     "tryAgain": "Torna-ho a intentar",
     "type": "Tipus",
-    "usdAccount": "Compte USD",
+    "usdAccount": "Compte Dòlar",
     "username": "Nom d'usuari",
     "usernameRequired": "El nom d'usuari és necessari",
     "backupAccount": "Còpia de seguretat/actualització del compte",

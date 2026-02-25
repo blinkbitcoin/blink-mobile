@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "ตั้งค่าบัญชีรับของคุณ",
     "description": "คุณสามารถเปลี่ยนได้เสมอภายหลังในการตั้งค่า",
-    "stablesatsTag": "บัญชี Stablesats สำหรับความเสถียรของราคา",
+    "stablesatsTag": "บัญชีเงินดอลล่าร์ — ขับเคลื่อนโดย Stablesats",
     "bitcoinTag": "บัญชี Bitcoin สำหรับแม็กซิมัลลิสต์"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "กู้คืนเงินผ่าน SMS หรืออีเมล",
-      "dailyLimit": "วงเงินธุรกรรมรายวัน $1000",
+      "dailyLimit": "วงเงินธุรกรรมรายวัน USD 1,000",
       "onchainReceive": "รับ Bitcoin แบบ Onchain"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "เขียนโน้ต",
     "tapQrCodeCopy": "กดที่ QR Code เพื่อคัดลอก",
     "title": "รับบิตคอยน์",
-    "usdTitle": "รับดอลล่าร์สหรัฐ",
+    "usdTitle": "รับเข้า บัญชีเงินดอลล่าร์",
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "copyInvoice": "Copy",
     "shareInvoice": "แชร์",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "แลกรับบิตคอยน์",
-    "usdTitle": "แลกรับดอลล่าร์สหรัฐ",
+    "usdTitle": "แลกเป็น บัญชีเงินดอลล่าร์",
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "redeemingError": "ไม่สามารถแลกรับบิตคอยน์ได้ โปรดติดต่อทีมซัพพอร์ต หากปัญหานี้ยังคงอยู่",
     "submissionError": "ไม่สามารถส่งคำขอถอนเงินได้ โปรดติดต่อทีมซัพพอร์ต หากปัญหานี้ยังคงอยู่ ",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+    "usdBalanceWarning": "คุณมียอดคงเหลือ บัญชีเงินดอลล่าร์ จำนวน {balance: string}",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "รับสกุลเงิน",
-    "info": "ใช้บัญชี Stablesats ของคุณใน Blink เพื่อรักษาเงินในกระเป๋าให้นิ่งในแง่ของสกุลเงินทั่วไป (ดอลลาร์) ใช้บัญชี Bitcoin หากคุณกำลังสะสม sats และไม่กังวลว่ามูลค่าเงิน fiat จะเปลี่ยนแปลงตลอดเวลา"
+    "title": "บัญชีรับเริ่มต้น",
+    "info": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด"
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "ค่าเริ่มต้น(OS)"
   },
   "StablesatsModal": {
-    "header": "ด้วย Stablesats ตอนนี้คุณก็เลยมีบัญชีเงินดอลลาร์สหรัฐเพิ่มเข้ามาในวอลเล็ตนี้ด้วย!",
-    "body": "คุณสามารถใช้สิ่งนี้ในการรับส่งบิตคอยน์ ซึ่งมันจะแปลงมูลค่าระหว่างบัญชีบิตคอยน์และบัญชีดอลลาร์ของคุณโดยทันที มูลค่าในบัญชีดอลลาร์จะไม่ผันผวนไปตามราคาของบิตคอยน์ ฟีเจอร์นี้ไม่สามารถใช้งานร่วมกับระบบธนาคารดั้งเดิมได้",
+    "header": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats",
+    "body": "บัญชีเงินดอลล่าร์ ใช้เทคโนโลยี Stablesats เพื่อรักษา Bitcoin ให้มีเสถียรภาพตามราคา USD คุณถือ Bitcoin ตลอดเวลา — ไม่ใช่ดอลลาร์จริง — แต่มูลค่า USD ไม่ผันผวน คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ แต่ไม่รองรับระบบธนาคารแบบดั้งเดิม",
     "termsAndConditions": "อ่านข้อกำหนดและเงื่อนไข",
     "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "ต่อสัปดาห์",
     "unlimited": "ไม่จำกัด",
     "remaining": "คงเหลือ",
-    "stablesatTransfers": "ส่งเงิน Stablesats",
+    "stablesatTransfers": "การโอน บัญชีเงินดอลล่าร์",
     "internalSend": "Send to {bankName: string} User",
     "error": "ไม่สามารถเรียกลิมิตได้ในขณะนี้",
     "increaseLimits": "Increase your limits"
@@ -2580,7 +2580,7 @@
       "mainTitle": "ยินดีต้อนรับสู่ระดับ 1",
       "title": "ฟีเจอร์ใหม่ที่ปลดล็อคสำหรับบัญชีของคุณ:",
       "receiveBitcoinDescription": "รับ Bitcoin โดยใช้หมายเลขโทรศัพท์ของคุณ",
-      "dailyLimitDescription": "ส่งได้สูงสุด $1,000 USD ต่อวัน",
+      "dailyLimitDescription": "ส่งได้สูงสุด USD 1,000 ต่อวัน",
       "onchainDescription": "รับการชำระเงินแบบ On-chain"
     },
     "emailBenefits": {
@@ -2753,7 +2753,6 @@
     "soon": "เร็วๆนี้!",
     "submit": "Submit",
     "success": "สำเร็จ!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "ดอลลาร์ (Stablesats)",
     "to": "ถึง",
     "total": "รวม",

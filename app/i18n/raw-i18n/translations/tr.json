@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Alım hesabını ayarla",
     "description": "Bunu daha sonra Ayarlar'da her zaman değiştirebilirsin",
-    "stablesatsTag": "Fiyat istikrarı için Stablesats hesabı",
+    "stablesatsTag": "Dolar Hesabı — Stablesats tarafından desteklenmektedir",
     "bitcoinTag": "Maksimalistler için Bitcoin hesabı"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Günlük gönderim limitinin kısaltılması",
       "noOnchain": "Zincir üzerinde bitcoin alımı yok",
       "recoveryOption": "SMS veya e-posta ile bakiye kurtarma",
-      "dailyLimit": "Günlük 1000$ işlem limiti",
+      "dailyLimit": "Günlük USD 1,000 işlem limiti",
       "onchainReceive": "Bitcoin onchain olarak al"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "Not yazın",
     "tapQrCodeCopy": "QR koda tıklayarak kopyalayın",
     "title": "Bitcoin alın",
-    "usdTitle": "Amerikan Doları Al",
+    "usdTitle": "Dolar Hesabı'a al",
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",
     "copyInvoice": "Kopyala",
     "shareInvoice": "Paylaş",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",
-    "usdTitle": "ABD Doları karşılığında kullan",
+    "usdTitle": "Dolar Hesabı'a aktar",
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",
     "redeemingError": "Bitcoin paraya çevrilemedi. Bu sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
     "submissionError": "Para çekme talebi gönderilemedi. Bu sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Yeniden giriş yapabilmek için telefon numaranızı tekrardan girmeniz gerekiyor.\ntelefon numaranız {phoneNumber: string} olduğundan tekrar giriş yapmak için bu numaraya erişiminiz olduğundan emin olun",
     "logoutAlertContentEmail": "Tekrar giriş yapmak için e-postanızı tekrar girmeniz gerekecektir.\ne-postanız {email: string} olduğundan tekrar giriş yapmak için ona erişiminiz olduğundan emin olun",
     "logoutAlertContentPhoneEmail": "Tekrar giriş yapmak için telefon numaranızı veya e-postanızı tekrar girmeniz gerekecektir.\ntelefon numaranız {phoneNumber: string} ve e-postanız {email: string} olduğundan tekrar giriş yapmak için bunlara erişiminiz olduğundan emin olun",
-    "usdBalanceWarning": "Stablesats bakiyeniz {balance: string}.",
+    "usdBalanceWarning": "Dolar Hesabı bakiyeniz: {balance: string}.",
     "btcBalanceWarning": "Bitcoin bakiyeniz {balance: string}.",
     "secureYourAccount": "Hesabınızı korumak almak için kaydolun",
     "tapToAdd": "Eklemek için dokunun",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Sır panoya kopyalandı"
   },
   "DefaultWalletScreen": {
-    "title": "Para birimi al",
-    "info": "Blink’teki Stablesats hesabınızı kullanarak cüzdanınızdaki parayı itibari para (dolar) cinsinden sabit tutun. Sats biriktiriyorsanız ve itibari bakiyenizin sürekli değişmesinde sorun yoksa Bitcoin hesabınızı kullanın."
+    "title": "Varsayılan alma hesabı",
+    "info": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez. Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Varsayılan (OS)"
   },
   "StablesatsModal": {
-    "header": "Stablesats ile cüzdanınızda artık bir Amerikan Doları hesabınız var. ",
-    "body": "Bitcoin göndermek ve almak için kullanabilir ve BTC ile dolar hesabınız arasında anında değer transferi yapabilirsiniz. Dolar hesabındaki değer Bitcoin fiyatı ile dalgalanmayacaktır. Bu özellik geleneksel bankacılık sistemi ile uyumlu değildir.",
+    "header": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir",
+    "body": "Dolar Hesabı, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
     "learnMore": "Stablesats'i öğrenin"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "hafta başına",
     "unlimited": "Limitsiz",
     "remaining": "Kalan",
-    "stablesatTransfers": "Stablesat Transferleri",
+    "stablesatTransfers": "Dolar Hesabı transferleri",
     "internalSend": "{bankName: string} kullanıcısına gönder",
     "error": "Şu an için limitlere ulaşamıyoruz",
     "increaseLimits": "Limitinizi artırın"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Seviye 1'e hoş geldiniz",
       "title": "Hesabınız için kilidi açılan yeni özellikler:",
       "receiveBitcoinDescription": "Telefon numaranızı kullanarak Bitcoin alın",
-      "dailyLimitDescription": "Günde 1.000$ USD'ye kadar gönderin",
+      "dailyLimitDescription": "Günde USD 1,000'a kadar gönderin",
       "onchainDescription": "On-chain ödemeler alın"
     },
     "emailBenefits": {
@@ -2736,7 +2736,6 @@
     "soon": "Çok yakında!",
     "submit": "Gönder",
     "success": "Başarılı!",
-    "stablesatsUsd": "Stablesats Doları",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Gönderilecek",
     "total": "Toplam",
@@ -2744,7 +2743,7 @@
     "transactionsError": "İşlemleri yüklerken hata oluştu",
     "tryAgain": "Tekrar deneyin",
     "type": "Tip",
-    "usdAccount": "USD Hesabı",
+    "usdAccount": "Dolar Hesabı",
     "username": "Kullanıcı adı",
     "usernameRequired": "Kullanıcı adı gerekiyor",
     "backupAccount": "Hesabı yedekleme/yükseltme",

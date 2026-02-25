@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Teekateeka akawunti yo ey'okufuna",
     "description": "Oyinza okukyusa kino oluvannyuma mu Setingi",
-    "stablesatsTag": "Akawunti ya Stablesats ey'obutebenkevu bw'omuwendo",
+    "stablesatsTag": "Akawunti ya Dola — etambulizibwa Stablesats",
     "bitcoinTag": "Akawunti ya Bitcoin ya maximalist"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Okukendeeza ku kkomo ku kusindika buli lunaku",
       "noOnchain": "Teri kufuna bitcoin onchain",
       "recoveryOption": "Zza ssente zo nga okozesa SMS oba email",
-      "dailyLimit": "Omusasula gw'obusuubuzi gwa buli lunaku gwa $1000",
+      "dailyLimit": "Omusasula gw'obusuubuzi gwa buli lunaku gwa USD 1,000",
       "onchainReceive": "Funa Bitcoin ku onchain"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "Teekawo akawandiiko",
     "tapQrCodeCopy": "Kona ku QR Code okugiwanduukulula",
     "title": "Funa Bitcoin",
-    "usdTitle": "Funa USD",
+    "usdTitle": "Okufuna ku Akawunti ya Dola",
     "error": "Eremereddwa okukola yinivoyisi. Nsaba otutuukirire singa ekizibu kino kisigala nga kigenda mu maaso.",
     "copyInvoice": "Koppa",
     "shareInvoice": "Omugabo",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Nunula Bitcoin",
-    "usdTitle": "Nunula okufuna USD",
+    "usdTitle": "Senda ku Akawunti ya Dola",
     "error": "Eremereddwa okukola yinivoyisi. Nsaba otutuukirire singa ekizibu kino kisigala nga kigenda mu maaso.",
     "redeemingError": "Yalemeddwa okununula Bitcoin. Nsaba otutuukirire singa ekizibu kino kisigala nga kigenda mu maaso.",
     "submissionError": "Yalemereddwa okuleeta okusaba okuggyayo ssente. Nsaba otutuukirire singa ekizibu kino kisigala nga kigenda mu maaso.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Ojja kwetaaga okuddamu okuyingiza ennamba y'essimu yo okuddamu okuyingira.\nEssimu yo eri {phoneNumber: string} n'olwekyo kakasa nti osobola okugiyingira",
     "logoutAlertContentEmail": "Ojja kwetaaga okuddamu okuyingiza e-mail yo okuddamu okuyingira.\nE-mail yo eri {email: string} n'olwekyo kakasa nti osobola okugiyingiramu",
     "logoutAlertContentPhoneEmail": "Ojja kwetaaga okuddamu okuyingiza ennamba yo ey'essimu oba e-mail okuddamu okuyingira.\nnamba y'essimu yo eri {phoneNumber: string} ate e-mail yo eri {email: string} n'olwekyo kakasa nti olina obusobozi ku ezo ez'okuddamu okuyingira",
-    "usdBalanceWarning": "Olina omuwendo gwa Stablesata agusigadewo ogwa {balance: string}.",
+    "usdBalanceWarning": "Olina ssente ku Akawunti ya Dola eya {balance: string}.",
     "btcBalanceWarning": "Olina omuwendo gwa bitcoin agusigadewo ogwa {balance: string}.",
     "secureYourAccount": "Wewandiise okukuuma akawunti yo",
     "tapToAdd": "Nyiga okwongereko",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Ekyama kyiwanduukuluddwa ku lutimbe"
   },
   "DefaultWalletScreen": {
-    "title": "Funa ssente",
-    "info": "Kozesa akawunti yo eya Stablesats mu Blink okukuuma ssente mu wallet yo nga zinywevu mu ssente za fiat (doola). Kozesa akawunti yo eya Bitcoin bw’oba okuŋŋaanya sats era nga tofaayo ku nkyukakyuka mu bbalansi ya fiat."
+    "title": "Akawunti ey'okufuna eyekyamukirizo",
+    "info": "Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka. Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale."
   },
   "ThemeScreen": {
     "title": "Endabika",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Esookerwako (OS)"
   },
   "StablesatsModal": {
-    "header": "Ne Stablesats, kati olina akawunti ya USD eyongeddwa mu waleti yo!",
-    "body": "Osobola okugikozesa okusindika n'okufuna Bitcoin, era amangu ago n'owaanyisa omuwendo wakati w'akawunti yo eya BTC ne USD. Omuwendo oguli ku akawunti ya USD tegujja kukyukakyuka ku bbeeyi ya Bitcoin. Enkola eno tekwatagana na nkola ya bbanka ey'edda.",
+    "header": "Akawunti ya Dola yo etambulizibwa Stablesats",
+    "body": "Akawunti ya Dola ekozesa tekinologiya ya Stablesats okukuuma Bitcoin ennywevu ku bbeeyi ya USD. Bulijjo okutta Bitcoin — si ddoola ennyangu — naye omuwendo gwa USD teguyunjuluka. Osobola okusindika n'okufuna Bitcoin nga bulijjo, naye tekitukayanganye na sisitemu y'amabanka eya bulijjo.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
     "learnMore": "Yiga ebisingawo ku Stablesats"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "buli sabiiti",
     "unlimited": "Ekitaliiko kkomo",
     "remaining": "Ekisigaddewo",
-    "stablesatTransfers": "Empaanyisa za Stablesat",
+    "stablesatTransfers": "Okusindika kwa Akawunti ya Dola",
     "internalSend": "Sindikira {bankName: string} Omukozesa ",
     "error": "Tetusobodde kufuna kkomo mu kiseera kino",
     "increaseLimits": "Yongeza ekkomo lyo"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Tukusanyukira ku Mutendera 1",
       "title": "Ebipya ebikugguddwaako ku akawunti yo:",
       "receiveBitcoinDescription": "Funa Bitcoin ng'okozesa ennamba y'essimu yo",
-      "dailyLimitDescription": "Sindika okutuuka ku $1,000 USD buli lunaku",
+      "dailyLimitDescription": "Senda okutuuka ku USD 1,000 buli lunaku",
       "onchainDescription": "Funa okusasula kwa on-chain"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Okulamula kwa Bitcoin",
-    "btcAccount": "Akawunti ya BTC",
+    "btcAccount": "Akawunti ya Bitcoin",
     "cancel": "Sazaamu",
     "close": "Ggalawo",
     "confirm": "Kakasa",
@@ -2736,7 +2736,6 @@
     "soon": "Kyijja mangu ddala!",
     "submit": "Waayo",
     "success": "Obuwanguzi!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Doola (Stablesats)",
     "to": "Eri",
     "total": "Omugatte",
@@ -2744,7 +2743,7 @@
     "transactionsError": "Ensobi mu kutikka empaanyisiganya",
     "tryAgain": "Ddamu ogezeeko",
     "type": "Kika",
-    "usdAccount": "Akawunti ya USD",
+    "usdAccount": "Akawunti ya Dola",
     "username": "Erinnya ly'okozesa",
     "usernameRequired": "Errinya ly'okozesa lyetagisa",
     "backupAccount": "Tereka/ yimusa omutindo gwa akawunti yo",

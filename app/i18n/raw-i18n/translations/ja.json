@@ -32,7 +32,7 @@
     "SetAccountModal": {
         "title": "受取アカウントを設定",
         "description": "後で「設定」でいつでも変更できます。",
-        "stablesatsTag": "価格安定のためのStablesatsアカウント",
+        "stablesatsTag": "ドルウォレット — Stablesats搭載",
         "bitcoinTag": "マキシマリスト向けBitcoinアカウント"
     },
     "NoteInput": {
@@ -2061,7 +2061,7 @@
             "sendingLimit": "1日あたりの送金上限を引き下げる",
             "noOnchain": "オンチェーンでのビットコイン受取禁止",
             "recoveryOption": "SMSまたはメールで資金を復元",
-            "dailyLimit": "1日$1000の取引限度額",
+            "dailyLimit": "1日USD 1,000の取引限度額",
             "onchainReceive": "Bitcoinのオンチェーン受取"
         }
     },
@@ -2125,7 +2125,7 @@
         "setNote": "メモを追加",
         "tapQrCodeCopy": "QRコードをタップしてコピーしてください",
         "title": "ビットコインで受金する",
-        "usdTitle": "米ドルで受金する",
+        "usdTitle": "ドルウォレットに受け取る",
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "copyInvoice": "コピー",
         "shareInvoice": "共有",
@@ -2170,7 +2170,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",
-        "usdTitle": "米ドルに換金する",
+        "usdTitle": "ドルウォレットに交換する",
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "redeemingError": "ビットコインの換金に失敗しました。この問題が解決しない場合は、サポートにご連絡ください。",
         "submissionError": "出金リクエストの送信に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
@@ -2399,7 +2399,7 @@
         "logoutAlertContentPhone": "再度ログインするには、電話番号を再入力する必要があります。\nあなたの電話番号は{phoneNumber: string}です。再ログインするには、この電話番号が使用できることを確認してください。",
         "logoutAlertContentEmail": "再ログインするには、メールアドレスを再入力する必要があります。\nあなたのメールアドレスは {email: string} です。再ログインするには、このメールアドレスが使用できることを確認してください。",
         "logoutAlertContentPhoneEmail": "再ログインするには、電話番号またはメールアドレスを再入力する必要があります。\nあなたの電話番号は{phoneNumber: string}、メールアドレスは{email: string}です。再ログインするには、このうちのどれかが使用きることを確認してください。",
-        "usdBalanceWarning": "ステーブル satsの残高は{balance: string}です。",
+        "usdBalanceWarning": "ドルウォレットの残高は{balance: string}です。",
         "btcBalanceWarning": "あなたのビットコイン残高は{balance: string}です。",
         "secureYourAccount": "ウォレットを保護するために登録してください",
         "tapToAdd": "タップして追加",
@@ -2459,8 +2459,8 @@
         "toastMessage": "シークレットコードがクリップボードにコピーするされました！"
     },
     "DefaultWalletScreen": {
-        "title": "通貨を受け取る",
-        "info": "Blink の Stablesats アカウントを使用すると、ウォレット内の資金を法定通貨（ドル）ベースで安定させることができます。サッツを積み上げており、法定通貨残高が常に変動しても問題ない場合は、Bitcoin アカウントを使用してください。"
+        "title": "デフォルトの受取アカウント",
+        "info": "ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。"
     },
     "ThemeScreen": {
         "title": "テーマ",
@@ -2475,8 +2475,8 @@
         "DEFAULT": "デフォルト（OS）"
     },
     "StablesatsModal": {
-        "header": "ステーブル satsを選択されましたので、あなたのウォレットに米ドルウォレットが追加されました！",
-        "body": "こちらを選択することで、ビットコイン送受金時に、ビットコインウォレットと米ドルウォレット間で瞬時に交換できます。 米ドルウォレットはビットコインの価格によって変動しません。 ただし、この機能は従来の銀行システムとの互換性はありません。",
+        "header": "あなたのドルウォレットはStablesatsで動いています",
+        "body": "ドルウォレットはStablesats技術を使用してBitcoinをUSD価格で安定させます。常にBitcoinを保有しています — 実際のドルではありません — がUSD価値は変動しません。通常どおりBitcoinの送受信ができますが、従来の銀行システムとは互換性がありません。",
         "termsAndConditions": "利用規約を読む",
         "learnMore": "ステーブル satsについて詳しく見る"
     },
@@ -2501,7 +2501,7 @@
         "perWeek": "1週間あたり",
         "unlimited": "無制限",
         "remaining": "残り",
-        "stablesatTransfers": "ステーブル satsでの送金",
+        "stablesatTransfers": "ドルウォレット送金",
         "internalSend": "{bankName: string}ユーザーへの送金",
         "error": "現時点では制限を取得できません",
         "increaseLimits": "限度額を引き上げる"
@@ -2580,7 +2580,7 @@
             "mainTitle": "レベル1へようこそ",
             "title": "アカウントで新しい機能が利用可能になりました：",
             "receiveBitcoinDescription": "電話番号を使ってBitcoinを受取",
-            "dailyLimitDescription": "1日最大$1,000 USDまで送金可能",
+            "dailyLimitDescription": "1日あたり最大USD 1,000を送金",
             "onchainDescription": "オンチェーンでの支払いを受取"
         },
         "emailBenefits": {
@@ -2753,7 +2753,6 @@
         "soon": "近日公開！",
         "submit": "提出する",
         "success": "成功！",
-        "stablesatsUsd": "ステーブル sats（米国ドル固定）",
         "dollarStablesats": "ドル（Stablesats）",
         "to": "送金先",
         "total": "合計",
@@ -2761,7 +2760,7 @@
         "transactionsError": "トランザクションの読み込みエラー",
         "tryAgain": "再トライする",
         "type": "入力する",
-        "usdAccount": "米ドルウォレット",
+        "usdAccount": "ドルウォレット",
         "username": "ユーザー名",
         "usernameRequired": "ユーザー名は必須です",
         "backupAccount": "ウォレットをバックアップ/アップグレードする",

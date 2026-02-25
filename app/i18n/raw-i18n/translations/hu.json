@@ -30,7 +30,7 @@
   "SetAccountModal": {
     "title": "Állítsd be a fogadó számládat",
     "description": "Ezt később bármikor módosíthatod a Beállításokban",
-    "stablesatsTag": "Stablesats számla az árstabilitásért",
+    "stablesatsTag": "Dollár Számla — Stablesats technológiával",
     "bitcoinTag": "Bitcoin számla maximalistáknak"
   },
   "NoteInput": {
@@ -2059,7 +2059,7 @@
       "sendingLimit": "Csökkentett napi küldési korlát",
       "noOnchain": "Nincs onchain Bitcoin fogadás",
       "recoveryOption": "Pénz visszaszerzése SMS-sel vagy e-maillel",
-      "dailyLimit": "Napi 1000 $ tranzakciós limit",
+      "dailyLimit": "Napi USD 1,000 tranzakciós limit",
       "onchainReceive": "Bitcoin fogadása on-chain"
     }
   },
@@ -2118,7 +2118,7 @@
     "setNote": "jegyzet beállítása",
     "tapQrCodeCopy": "QR kód másolása érintéssel",
     "title": "Bitcoin fogadása",
-    "usdTitle": "USD fogadása",
+    "usdTitle": "Fogadás Dollár Számla-ra",
     "error": "Számla létrehozása sikertelen. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal, ha a probléma továbbra is fennáll.",
     "copyInvoice": "Másolás",
     "shareInvoice": "Megosztás",
@@ -2163,7 +2163,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin beváltása",
-    "usdTitle": "Beváltás USD-re",
+    "usdTitle": "Beváltás Dollár Számla-ra",
     "error": "Nem sikerült fizetési kérelmet generálni. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "redeemingError": "Nem sikerült beváltani a Bitcoint. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "submissionError": "Nem sikerült benyújtani a kifizetési kérelmet. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
@@ -2382,7 +2382,7 @@
     "logoutAlertContentPhone": "Újra meg kell adnod a telefonszámodat a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentEmail": "Újra meg kell adnod az email címedet a bejelentkezéshez.\nAz email címed: {email: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentPhoneEmail": "Újra meg kell adnod a telefonszámodat vagy az email címedet a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, az email címed pedig: {email: string}, győződj meg róla, hogy hozzájuk férsz a bejelentkezéshez.",
-    "usdBalanceWarning": "Stablesats egyenleged: {balance: string}.",
+    "usdBalanceWarning": "Dollár Számla egyenleged: {balance: string}.",
     "btcBalanceWarning": "Bitcoin egyenleged: {balance: string}.",
     "secureYourAccount": "Regisztrálj a fiókod biztonságossá tételéhez",
     "tapToAdd": "Koppints a hozzáadáshoz",
@@ -2442,8 +2442,8 @@
     "toastMessage": "Titok másolva a vágólapra!"
   },
   "DefaultWalletScreen": {
-    "title": "Deviza fogadása",
-    "info": "Használd a Stablesats fiókodat a Blinkben, hogy a pénzed fiat (dollár) értékben stabil maradjon a tárcádban. Használd a Bitcoin fiókodat, ha satsokat gyűjtesz, és nem gond, hogy a fiat egyenleged folyamatosan változik."
+    "title": "Alapértelmezett fogadási fiók",
+    "info": "A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik. A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog."
   },
   "ThemeScreen": {
     "title": "Téma",
@@ -2458,8 +2458,8 @@
     "DEFAULT": "Alapértelmezett"
   },
   "StablesatsModal": {
-    "header": "A Stablesats-al most már van egy USD alapú számla a tárcádban!",
-    "body": "Ezt használhatod Bitcoin küldésére és fogadására, valamint azonnal átvezethesz összegeket a BTC és az USD számláid között. Az USD számlán lévő érték nem ingadozik a Bitcoin ármozgásával. Ez a funkció nem kompatibilis a hagyományos bankrendszerrel.",
+    "header": "A Dollár Számla-odat a Stablesats működteti",
+    "body": "A Dollár Számla Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
     "learnMore": "Tudj meg többet a Stablesatsról"
   },
@@ -2484,7 +2484,7 @@
     "perWeek": "hetente",
     "unlimited": "Korlátlan",
     "remaining": "Hátralévő",
-    "stablesatTransfers": "Stablesat Tranzakciók",
+    "stablesatTransfers": "Dollár Számla átutalások",
     "internalSend": "Küldés {bankName: string} felhasználónak",
     "error": "Jelenleg nem lehet lekérdezni a limitet",
     "increaseLimits": "Növelje a limitet"
@@ -2563,7 +2563,7 @@
       "mainTitle": "Üdvözlünk az 1. szinten",
       "title": "Új funkciók a fiókodban:",
       "receiveBitcoinDescription": "Bitcoin fogadása telefonszámoddal",
-      "dailyLimitDescription": "Napi 1000 USD küldése",
+      "dailyLimitDescription": "Küldj naponta akár USD 1,000-t",
       "onchainDescription": "On-chain fizetések fogadása"
     },
     "emailBenefits": {
@@ -2676,7 +2676,7 @@
     "beta": "béta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Ár",
-    "btcAccount": "BTC Számla",
+    "btcAccount": "Bitcoin Számla",
     "cancel": "Mégse",
     "close": "Bezárás",
     "confirm": "Megerősítés",
@@ -2736,7 +2736,6 @@
     "soon": "Hamarosan!",
     "submit": "Beküldés",
     "success": "Siker!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dollár (Stablesats)",
     "to": "Címzett",
     "total": "Összesen",
@@ -2744,7 +2743,7 @@
     "transactionsError": "Hiba a tranzakciók betöltése közben",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
-    "usdAccount": "USD Számla",
+    "usdAccount": "Dollár Számla",
     "username": "Felhasználónév",
     "usernameRequired": "Felhasználónév szükséges",
     "backupAccount": "Biztonsági Mentése / Magasabb szintű fiókra váltás",

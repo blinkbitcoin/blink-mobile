@@ -32,7 +32,7 @@
     "SetAccountModal": {
         "title": "Configurez votre compte de réception",
         "description": "Vous pouvez toujours changer cela plus tard dans les Réglages",
-        "stablesatsTag": "Compte Stablesats pour la stabilité des prix",
+        "stablesatsTag": "Compte dollar — propulsé par Stablesats",
         "bitcoinTag": "Compte Bitcoin pour les maximalistes"
     },
     "NoteInput": {
@@ -272,8 +272,8 @@
                             "Faux. Une banque locale ne peut que gérer de la monnaie qui a été créée précédemment par le gouvernement.",
                             "Non. Essayez encore !"
                         ],
-                        "question": "Qui crée la monnaie fiduciaire, comme le Dollar US ou l’Euro ?",
-                        "text": "Toutes les monnaies nationales en circulation aujourd’hui sont appelées monnaies fiduciaires. Cela  inclut le Dollar US, le Yen Japonais, le Franc Suisse et ainsi de suite. \n\nLe mot “fiduciaire” vient du latin signifiant \"par décret\", c’est-à-dire \"par ordre officiel\".\n\nCela signifie que toute monnaie fiduciaire, incluant le Dollar US, est simplement créée sous les ordres du gouvernement national.",
+                        "question": "Qui crée la monnaie fiduciaire, comme le dollar US ou l’Euro ?",
+                        "text": "Toutes les monnaies nationales en circulation aujourd’hui sont appelées monnaies fiduciaires. Cela  inclut le dollar US, le Yen Japonais, le Franc Suisse et ainsi de suite. \n\nLe mot “fiduciaire” vient du latin signifiant \"par décret\", c’est-à-dire \"par ordre officiel\".\n\nCela signifie que toute monnaie fiduciaire, incluant le dollar US, est simplement créée sous les ordres du gouvernement national.",
                         "title": "La monnaie fiduciaire : qu’est-ce que c’est ?"
                     },
                     "whyCareAboutFiatMoney": {
@@ -2061,7 +2061,7 @@
             "sendingLimit": "Diminuer la limite d’envoi quotidienne",
             "noOnchain": "Non réception de bitcoin on-chain",
             "recoveryOption": "Récupérer les fonds par SMS ou e-mail",
-            "dailyLimit": "Limite de transaction quotidienne de 1 000 $",
+            "dailyLimit": "Limite de transaction quotidienne de USD 1,000",
             "onchainReceive": "Recevoir des bitcoins on-chain"
         }
     },
@@ -2125,7 +2125,7 @@
         "setNote": "Ajouter un message",
         "tapQrCodeCopy": "Touchez le code QR pour le copier",
         "title": "Recevoir des Bitcoin",
-        "usdTitle": "Recevoir des dollars US",
+        "usdTitle": "Recevoir vers Compte dollar",
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "copyInvoice": "Copier",
         "shareInvoice": "Partager",
@@ -2170,7 +2170,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "Échanger des Bitcoin",
-        "usdTitle": "Recevoir des dollars US",
+        "usdTitle": "Échanger vers Compte dollar",
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "redeemingError": "Impossible d’échanger des Bitcoin. Merci de contacter le support si le problème persiste.",
         "submissionError": "Impossible de soumettre la demande de retrait. Merci de contacter le support si le problème persiste.",
@@ -2399,7 +2399,7 @@
         "logoutAlertContentPhone": "Vous aurez besoin de saisir à nouveau votre numéro de téléphone pour vous reconnecter.\nVotre numéro de téléphone est le {phoneNumber: string}. Veillez à en avoir l’accès pour vous reconnecter.",
         "logoutAlertContentEmail": "Vous aurez besoin de saisir à nouveau votre adresse e-mail pour vous reconnecter.\nVotre e-mail est {email: string}. Veillez à en avoir l’accès pour vous reconnecter.",
         "logoutAlertContentPhoneEmail": "Vous aurez besoin de saisir à nouveau votre numéro de téléphone ou votre adresse e-mail pour vous reconnecter.\nVotre numéro de téléphone est le {phoneNumber: string} et votre e-mail est {email: string}. Veillez à en avoir l’accès pour vous reconnecter.",
-        "usdBalanceWarning": "Vous avec un solde Stablesats de {balance: string}.",
+        "usdBalanceWarning": "Vous avez un solde Compte dollar de {balance: string}.",
         "btcBalanceWarning": "Vous avez un solde Bitcoin de {balance: string}.",
         "secureYourAccount": "S’inscrire pour sécuriser votre compte",
         "tapToAdd": "Touchez pour ajouter",
@@ -2459,8 +2459,8 @@
         "toastMessage": "Le code secret à été copié dans le presse-papiers !"
     },
     "DefaultWalletScreen": {
-        "title": "Recevoir une devise",
-        "info": "Utilisez votre compte Stablesats dans Blink pour garder l’argent de votre portefeuille stable en termes de monnaie fiduciaire (dollar). Utilisez votre compte Bitcoin si vous accumulez des sats et acceptez que votre solde en fiat change en permanence."
+        "title": "Compte de réception par défaut",
+        "info": "Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas. Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché."
     },
     "ThemeScreen": {
         "title": "Thème",
@@ -2475,8 +2475,8 @@
         "DEFAULT": "Par défaut (OS)"
     },
     "StablesatsModal": {
-        "header": "Avec Stablesats, vous avez à présent un compte en dollar US ajouté à votre portefeuille !",
-        "body": "Vous pouvez l’utiliser pour envoyer et recevoir des bitcoins, et instantanément transférer la valeur entre votre compte BTC et Dollar US. La valeur du dollar US ne fluctuera pas avec le prix du bitcoin. Cette fonction n’est pas compatible avec le système bancaire traditionnel.",
+        "header": "Votre Compte dollar est propulsé par Stablesats",
+        "body": "Compte dollar utilise la technologie Stablesats pour maintenir le Bitcoin stable au prix USD. Vous détenez toujours du Bitcoin — pas de vrais dollars — mais la valeur USD ne fluctue pas. Vous pouvez envoyer et recevoir du Bitcoin normalement, mais ce n'est pas compatible avec le système bancaire traditionnel.",
         "termsAndConditions": "Lire les Termes & Conditions",
         "learnMore": "En savoir plus sur Stablesats"
     },
@@ -2501,7 +2501,7 @@
         "perWeek": "par semaine",
         "unlimited": "Illimité",
         "remaining": "Restant",
-        "stablesatTransfers": "Transfert de Stablesats",
+        "stablesatTransfers": "Transferts Compte dollar",
         "internalSend": "Envoyer à l’utilisateur {bankName: string}",
         "error": "Impossible de récupérer les limites de transfert pour le moment",
         "increaseLimits": "Augmenter vos limites"
@@ -2580,7 +2580,7 @@
             "mainTitle": "Bienvenue au niveau 1",
             "title": "Nouvelles fonctionnalités débloquées pour votre compte :",
             "receiveBitcoinDescription": "Recevoir du Bitcoin avec votre numéro de téléphone",
-            "dailyLimitDescription": "Envoyez jusqu'à 1 000 $ USD par jour",
+            "dailyLimitDescription": "Envoyez jusqu'à USD 1,000 par jour",
             "onchainDescription": "Recevoir des paiements on-chain"
         },
         "emailBenefits": {
@@ -2753,15 +2753,14 @@
         "soon": "Bientôt disponible !",
         "submit": "Soumettre ",
         "success": "Succès !",
-        "stablesatsUsd": "Stablesats en dollar US",
-        "dollarStablesats": "Dollar (Stablesats)",
+        "dollarStablesats": "dollar (Stablesats)",
         "to": "À",
         "total": "Total",
         "transactions": "Transactions",
         "transactionsError": "Erreur de chargement des transactions",
         "tryAgain": "Essayer à nouveau",
         "type": "Type",
-        "usdAccount": "Compte en dollar US",
+        "usdAccount": "Compte dollar",
         "username": "Identifiant",
         "usernameRequired": "Un identifiant est requis",
         "backupAccount": "Sauvegarde / Mise à jour du compte",
@@ -2783,7 +2782,7 @@
             "one": "Jour",
             "other": "Jours"
         },
-        "dollar": "Dollar",
+        "dollar": "dollar",
         "all": "TOUT",
         "allAccounts": "Tous les comptes",
         "some": "Quelques",

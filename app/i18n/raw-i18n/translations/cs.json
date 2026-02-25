@@ -32,7 +32,7 @@
   "SetAccountModal": {
     "title": "Nastavte si účet pro příjem",
     "description": "Vždy to můžete později změnit v Nastavení",
-    "stablesatsTag": "Účet Stablesats pro cenovou stabilitu",
+    "stablesatsTag": "Dolarový účet — poháněný technologií Stablesats",
     "bitcoinTag": "Bitcoinový účet pro maximalisty"
   },
   "NoteInput": {
@@ -2061,7 +2061,7 @@
       "sendingLimit": "Snížený denní limit odesílání",
       "noOnchain": "Nelze přijímat bitcoin onchain",
       "recoveryOption": "Obnovení prostředků pomocí SMS nebo e-mailu",
-      "dailyLimit": "Denní transakční limit $1000",
+      "dailyLimit": "Denní transakční limit USD 1,000",
       "onchainReceive": "Příjem Bitcoinu on-chain"
     }
   },
@@ -2125,7 +2125,7 @@
     "setNote": "nastavit poznámku",
     "tapQrCodeCopy": "Klepnutím na QR kód ho zkopírujete",
     "title": "Přijmout Bitcoin",
-    "usdTitle": "Přijmout USD",
+    "usdTitle": "Přijmout na Dolarový účet",
     "error": "Nepodařilo se vygenerovat fakturu. Pokud tento problém přetrvává, kontaktujte prosím podporu.",
     "copyInvoice": "Kopírovat",
     "shareInvoice": "Sdílet",
@@ -2170,7 +2170,7 @@
   },
   "RedeemBitcoinScreen": {
     "title": "Směnit Bitcoin",
-    "usdTitle": "Směnit za USD",
+    "usdTitle": "Směnit na Dolarový účet",
     "error": "Nepodařilo se vygenerovat fakturu. Pokud tento problém přetrvává, kontaktujte prosím podporu.",
     "redeemingError": "Bitcoin se nepodařilo směnit. Pokud tento problém přetrvává, kontaktujte prosím podporu.",
     "submissionError": "Nepodařilo se podat žádost o výběr. Pokud tento problém přetrvává, kontaktujte prosím podporu.",
@@ -2399,7 +2399,7 @@
     "logoutAlertContentPhone": "Pro opětovné přihlášení bude nutné znovu zadat telefonní číslo.\nvaše telefonní číslo je {phoneNumber: string}, takže se ujistěte, že k němu máte přístup, abyste se mohli znovu přihlásit.",
     "logoutAlertContentEmail": "Pro opětovné přihlášení bude nutné znovu zadat e-mail.\nVáš e-mail je {email: string}, takže se ujistěte, že k němu máte přístup, abyste se mohli znovu přihlásit.",
     "logoutAlertContentPhoneEmail": "Pro opětovné přihlášení bude nutné znovu zadat telefonní číslo nebo e-mail.\nvaše telefonní číslo je {phoneNumber: string} a váš e-mail je {email: string}, takže se ujistěte, že k nim máte přístup, abyste se mohli znovu přihlásit.",
-    "usdBalanceWarning": "Váš zůstatek Stablesats je {balance: string}.",
+    "usdBalanceWarning": "Máte zůstatek na Dolarový účet ve výši {balance: string}.",
     "btcBalanceWarning": "Váš zůstatek bitcoinů je {balance: string}.",
     "secureYourAccount": "Zaregistrujte se pro zabezpečení svého účtu",
     "tapToAdd": "Klepnutím přidáte",
@@ -2459,8 +2459,8 @@
     "toastMessage": "Tajemství zkopírováno do schránky!"
   },
   "DefaultWalletScreen": {
-    "title": "Přijmout měnu",
-    "info": "Použijte svůj účet Stablesats v Blink, abyste udrželi peníze ve své peněžence stabilní v hodnotě fiat měny (dolar). Použijte svůj Bitcoin účet, pokud hromadíte sats a nevadí vám, že se vaše fiat zůstatky neustále mění."
+    "title": "Výchozí účet pro příjem",
+    "info": "Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění. Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem."
   },
   "ThemeScreen": {
     "title": "Motiv",
@@ -2475,8 +2475,8 @@
     "DEFAULT": "Výchozí nastavení (OS)"
   },
   "StablesatsModal": {
-    "header": "Se Stablesats máte nyní ve své peněžence přidaný účet v USD!",
-    "body": "Pomocí ní můžete posílat a přijímat bitcoiny a okamžitě převádět hodnotu mezi svým účtem v BTC a USD. Hodnota na účtu v USD nebude kolísat s cenou Bitcoinu. Tato funkce není kompatibilní s tradičním bankovním systémem.",
+    "header": "Váš Dolarový účet je poháněný technologií Stablesats",
+    "body": "Dolarový účet využívá technologii Stablesats k udržení Bitcoinu stabilního na ceně USD. Vždy držíte Bitcoin — ne skutečné dolary — ale hodnota USD nekolísá. Můžete odesílat a přijímat Bitcoin jako obvykle, ale není to kompatibilní s tradičním bankovním systémem.",
     "termsAndConditions": "Přečtěte si smluvní podmínky",
     "learnMore": "Zjistěte více o Stablesats"
   },
@@ -2501,7 +2501,7 @@
     "perWeek": "týdně",
     "unlimited": "Neomezeně",
     "remaining": "Zbývající",
-    "stablesatTransfers": "Převody ze Stablesat",
+    "stablesatTransfers": "Převody Dolarový účet",
     "internalSend": "Odeslat uživateli {bankName: string} ",
     "error": "V tuto chvíli nelze načíst limity",
     "increaseLimits": "Zvýšení transakčních limitů"
@@ -2580,7 +2580,7 @@
       "mainTitle": "Vítejte na úrovni 1",
       "title": "Nové funkce odemčeny pro váš účet:",
       "receiveBitcoinDescription": "Příjem Bitcoinu pomocí telefonního čísla",
-      "dailyLimitDescription": "Posílejte až $1 000 USD denně",
+      "dailyLimitDescription": "Pošlete až USD 1,000 denně",
       "onchainDescription": "Příjem on-chain plateb"
     },
     "emailBenefits": {
@@ -2693,7 +2693,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cena bitcoinu",
-    "btcAccount": "BTC Účet",
+    "btcAccount": "Bitcoin Účet",
     "cancel": "Zrušit",
     "close": "Zavřít",
     "confirm": "Potvrdit",
@@ -2753,7 +2753,6 @@
     "soon": "Již brzy!",
     "submit": "Odeslat",
     "success": "Úspěch!",
-    "stablesatsUsd": "Stablesats USD",
     "dollarStablesats": "Dolar (Stablesats)",
     "to": "Komu",
     "total": "Celkem",
@@ -2761,7 +2760,7 @@
     "transactionsError": "Chyba při načítání transakcí",
     "tryAgain": "Zkusit znovu",
     "type": "Typ",
-    "usdAccount": "USD účet",
+    "usdAccount": "Dolarový účet",
     "username": "Uživatelské jméno",
     "usernameRequired": "Je vyžadováno uživatelské jméno",
     "backupAccount": "Záloha/aktualizace účtu",
