@@ -128,13 +128,12 @@ gql`
             action {
               ... on OpenDeepLinkAction {
                 deepLink
+                label
               }
               ... on OpenExternalLinkAction {
                 url
+                label
               }
-            }
-            bulletinButton {
-              label
             }
           }
           cursor

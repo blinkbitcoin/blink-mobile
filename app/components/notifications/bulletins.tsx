@@ -81,7 +81,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
               }}
               dismissAction={() => dismissWithAnimation(bulletin.id)}
               loading={ackLoading}
-              buttonLabel={bulletin.bulletinButton?.label}
+              buttonLabel={bulletin.action?.label ?? undefined}
             />
           ),
         )}
