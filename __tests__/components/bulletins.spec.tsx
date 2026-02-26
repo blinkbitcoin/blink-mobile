@@ -82,7 +82,6 @@ const makeBulletin = (overrides: Record<string, unknown> = {}) => ({
   bulletinEnabled: true,
   icon: null,
   action: null,
-  bulletinButton: null,
   ...overrides,
 })
 
@@ -130,10 +129,14 @@ describe("BulletinsCard", () => {
     expect(getByText("Test body text")).toBeTruthy()
   })
 
-  it("renders button when bulletinButton is present", () => {
+  it("renders button when action has label", () => {
     const bulletins = makeBulletinsQuery([
       makeBulletin({
-        bulletinButton: { __typename: "BulletinButton", label: "Deposit now" },
+        action: {
+          __typename: "OpenExternalLinkAction",
+          url: "https://example.com",
+          label: "Deposit now",
+        },
       }),
     ])
     const { getByText, queryByTestId } = render(
@@ -144,7 +147,7 @@ describe("BulletinsCard", () => {
     expect(getByText("Deposit now")).toBeTruthy()
   })
 
-  it("does not render button when bulletinButton is null", () => {
+  it("does not render button when action has no label", () => {
     const bulletins = makeBulletinsQuery([makeBulletin()])
     const { queryByTestId } = render(
       <BulletinsCard loading={false} bulletins={bulletins} />,

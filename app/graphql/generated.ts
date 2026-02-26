@@ -1797,6 +1797,7 @@ export type Query = {
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
   /** Returns the list of available speeds for on-chain payments */
   readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
+  readonly preferredAmountCurrency?: Maybe<Scalars['String']['output']>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -2720,6 +2721,11 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
 
+export type PreferredAmountCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PreferredAmountCurrencyQuery = { readonly __typename: 'Query', readonly preferredAmountCurrency?: string | null };
+
 export type TxLastSeenQueryVariables = Exact<{
   accountId: Scalars['ID']['input'];
 }>;
@@ -2936,15 +2942,12 @@ export type PriceHistoryScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PriceHistoryScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
-export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type OnChainAddressCurrentMutationVariables = Exact<{
+  input: OnChainAddressCurrentInput;
+}>;
 
 
-export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
-
-export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+export type OnChainAddressCurrentMutation = { readonly __typename: 'Mutation', readonly onChainAddressCurrent: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
 export type LnNoAmountInvoiceCreateMutationVariables = Exact<{
   input: LnNoAmountInvoiceCreateInput;
@@ -2960,19 +2963,22 @@ export type LnInvoiceCreateMutationVariables = Exact<{
 
 export type LnInvoiceCreateMutation = { readonly __typename: 'Mutation', readonly lnInvoiceCreate: { readonly __typename: 'LnInvoicePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly invoice?: { readonly __typename: 'LnInvoice', readonly createdAt: number, readonly paymentHash: string, readonly paymentRequest: string, readonly paymentStatus: InvoicePaymentStatus, readonly externalId: string, readonly satoshis: number } | null } };
 
-export type OnChainAddressCurrentMutationVariables = Exact<{
-  input: OnChainAddressCurrentInput;
-}>;
-
-
-export type OnChainAddressCurrentMutation = { readonly __typename: 'Mutation', readonly onChainAddressCurrent: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
-
 export type LnUsdInvoiceCreateMutationVariables = Exact<{
   input: LnUsdInvoiceCreateInput;
 }>;
 
 
 export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', readonly lnUsdInvoiceCreate: { readonly __typename: 'LnInvoicePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly invoice?: { readonly __typename: 'LnInvoice', readonly createdAt: number, readonly paymentHash: string, readonly paymentRequest: string, readonly paymentStatus: InvoicePaymentStatus, readonly externalId: string, readonly satoshis: number } | null } };
+
+export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+
+export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
 
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4211,6 +4217,43 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const PreferredAmountCurrencyDocument = gql`
+    query preferredAmountCurrency {
+  preferredAmountCurrency @client
+}
+    `;
+
+/**
+ * __usePreferredAmountCurrencyQuery__
+ *
+ * To run a query within a React component, call `usePreferredAmountCurrencyQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePreferredAmountCurrencyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePreferredAmountCurrencyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePreferredAmountCurrencyQuery(baseOptions?: Apollo.QueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+      }
+export function usePreferredAmountCurrencyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export function usePreferredAmountCurrencySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export type PreferredAmountCurrencyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyQuery>;
+export type PreferredAmountCurrencyLazyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyLazyQuery>;
+export type PreferredAmountCurrencySuspenseQueryHookResult = ReturnType<typeof usePreferredAmountCurrencySuspenseQuery>;
+export type PreferredAmountCurrencyQueryResult = Apollo.QueryResult<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>;
 export const TxLastSeenDocument = gql`
     query txLastSeen($accountId: ID!) {
   txLastSeen(accountId: $accountId) @client {
@@ -5769,101 +5812,42 @@ export type PriceHistoryScreenQueryHookResult = ReturnType<typeof usePriceHistor
 export type PriceHistoryScreenLazyQueryHookResult = ReturnType<typeof usePriceHistoryScreenLazyQuery>;
 export type PriceHistoryScreenSuspenseQueryHookResult = ReturnType<typeof usePriceHistoryScreenSuspenseQuery>;
 export type PriceHistoryScreenQueryResult = Apollo.QueryResult<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>;
-export const MyLnUpdatesDocument = gql`
-    subscription myLnUpdates {
-  myUpdates {
+export const OnChainAddressCurrentDocument = gql`
+    mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
+  onChainAddressCurrent(input: $input) {
     errors {
       message
     }
-    update {
-      ... on LnUpdate {
-        paymentHash
-        status
-      }
-    }
+    address
   }
 }
     `;
+export type OnChainAddressCurrentMutationFn = Apollo.MutationFunction<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 
 /**
- * __useMyLnUpdatesSubscription__
+ * __useOnChainAddressCurrentMutation__
  *
- * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
- * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useOnChainAddressCurrentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOnChainAddressCurrentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useMyLnUpdatesSubscription({
+ * const [onChainAddressCurrentMutation, { data, loading, error }] = useOnChainAddressCurrentMutation({
  *   variables: {
+ *      input: // value for 'input'
  *   },
  * });
  */
-export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
+export function useOnChainAddressCurrentMutation(baseOptions?: Apollo.MutationHookOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
+        return Apollo.useMutation<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>(OnChainAddressCurrentDocument, options);
       }
-export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
-export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
-export const PaymentRequestDocument = gql`
-    query paymentRequest {
-  globals {
-    network
-    feesInformation {
-      deposit {
-        minBankFee
-        minBankFeeThreshold
-      }
-    }
-  }
-  me {
-    id
-    username
-    defaultAccount {
-      id
-      wallets {
-        id
-        balance
-        walletCurrency
-      }
-      defaultWalletId
-    }
-  }
-}
-    `;
-
-/**
- * __usePaymentRequestQuery__
- *
- * To run a query within a React component, call `usePaymentRequestQuery` and pass it any options that fit your needs.
- * When your component renders, `usePaymentRequestQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePaymentRequestQuery({
- *   variables: {
- *   },
- * });
- */
-export function usePaymentRequestQuery(baseOptions?: Apollo.QueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-      }
-export function usePaymentRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-        }
-export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-        }
-export type PaymentRequestQueryHookResult = ReturnType<typeof usePaymentRequestQuery>;
-export type PaymentRequestLazyQueryHookResult = ReturnType<typeof usePaymentRequestLazyQuery>;
-export type PaymentRequestSuspenseQueryHookResult = ReturnType<typeof usePaymentRequestSuspenseQuery>;
-export type PaymentRequestQueryResult = Apollo.QueryResult<PaymentRequestQuery, PaymentRequestQueryVariables>;
+export type OnChainAddressCurrentMutationHookResult = ReturnType<typeof useOnChainAddressCurrentMutation>;
+export type OnChainAddressCurrentMutationResult = Apollo.MutationResult<OnChainAddressCurrentMutation>;
+export type OnChainAddressCurrentMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 export const LnNoAmountInvoiceCreateDocument = gql`
     mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
   lnNoAmountInvoiceCreate(input: $input) {
@@ -5949,42 +5933,6 @@ export function useLnInvoiceCreateMutation(baseOptions?: Apollo.MutationHookOpti
 export type LnInvoiceCreateMutationHookResult = ReturnType<typeof useLnInvoiceCreateMutation>;
 export type LnInvoiceCreateMutationResult = Apollo.MutationResult<LnInvoiceCreateMutation>;
 export type LnInvoiceCreateMutationOptions = Apollo.BaseMutationOptions<LnInvoiceCreateMutation, LnInvoiceCreateMutationVariables>;
-export const OnChainAddressCurrentDocument = gql`
-    mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
-  onChainAddressCurrent(input: $input) {
-    errors {
-      message
-    }
-    address
-  }
-}
-    `;
-export type OnChainAddressCurrentMutationFn = Apollo.MutationFunction<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
-
-/**
- * __useOnChainAddressCurrentMutation__
- *
- * To run a mutation, you first call `useOnChainAddressCurrentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOnChainAddressCurrentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [onChainAddressCurrentMutation, { data, loading, error }] = useOnChainAddressCurrentMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useOnChainAddressCurrentMutation(baseOptions?: Apollo.MutationHookOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>(OnChainAddressCurrentDocument, options);
-      }
-export type OnChainAddressCurrentMutationHookResult = ReturnType<typeof useOnChainAddressCurrentMutation>;
-export type OnChainAddressCurrentMutationResult = Apollo.MutationResult<OnChainAddressCurrentMutation>;
-export type OnChainAddressCurrentMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 export const LnUsdInvoiceCreateDocument = gql`
     mutation lnUsdInvoiceCreate($input: LnUsdInvoiceCreateInput!) {
   lnUsdInvoiceCreate(input: $input) {
@@ -6028,6 +5976,102 @@ export function useLnUsdInvoiceCreateMutation(baseOptions?: Apollo.MutationHookO
 export type LnUsdInvoiceCreateMutationHookResult = ReturnType<typeof useLnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationResult = Apollo.MutationResult<LnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationOptions = Apollo.BaseMutationOptions<LnUsdInvoiceCreateMutation, LnUsdInvoiceCreateMutationVariables>;
+export const PaymentRequestDocument = gql`
+    query paymentRequest {
+  globals {
+    network
+    feesInformation {
+      deposit {
+        minBankFee
+        minBankFeeThreshold
+        ratio
+      }
+    }
+  }
+  me {
+    id
+    username
+    defaultAccount {
+      id
+      wallets {
+        id
+        balance
+        walletCurrency
+      }
+      defaultWalletId
+    }
+  }
+}
+    `;
+
+/**
+ * __usePaymentRequestQuery__
+ *
+ * To run a query within a React component, call `usePaymentRequestQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaymentRequestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaymentRequestQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePaymentRequestQuery(baseOptions?: Apollo.QueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+      }
+export function usePaymentRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+        }
+export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+        }
+export type PaymentRequestQueryHookResult = ReturnType<typeof usePaymentRequestQuery>;
+export type PaymentRequestLazyQueryHookResult = ReturnType<typeof usePaymentRequestLazyQuery>;
+export type PaymentRequestSuspenseQueryHookResult = ReturnType<typeof usePaymentRequestSuspenseQuery>;
+export type PaymentRequestQueryResult = Apollo.QueryResult<PaymentRequestQuery, PaymentRequestQueryVariables>;
+export const MyLnUpdatesDocument = gql`
+    subscription myLnUpdates {
+  myUpdates {
+    errors {
+      message
+    }
+    update {
+      ... on LnUpdate {
+        paymentHash
+        status
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyLnUpdatesSubscription__
+ *
+ * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyLnUpdatesSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
+      }
+export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
+export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {
@@ -9640,6 +9684,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
+  preferredAmountCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
