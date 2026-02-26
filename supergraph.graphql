@@ -319,12 +319,6 @@ type BuildInformation
   helmRevision: Int
 }
 
-type BulletinButton
-  @join__type(graph: BLINK)
-{
-  label: String!
-}
-
 type CallbackEndpoint
   @join__type(graph: BLINK)
 {
@@ -1653,12 +1647,14 @@ type OpenDeepLinkAction
   @join__type(graph: BLINK)
 {
   deepLink: String!
+  label: String
 }
 
 type OpenExternalLinkAction
   @join__type(graph: BLINK)
 {
   url: String!
+  label: String
 }
 
 """Information about pagination in a connection"""
@@ -2004,7 +2000,6 @@ type StatefulNotification
   body: String!
   deepLink: String
   action: NotificationAction
-  bulletinButton: BulletinButton
   createdAt: Timestamp!
   acknowledgedAt: Timestamp
   bulletinEnabled: Boolean!

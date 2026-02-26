@@ -368,11 +368,6 @@ export type BuildInformation = {
   readonly helmRevision?: Maybe<Scalars['Int']['output']>;
 };
 
-export type BulletinButton = {
-  readonly __typename: 'BulletinButton';
-  readonly label: Scalars['String']['output'];
-};
-
 export type CallbackEndpoint = {
   readonly __typename: 'CallbackEndpoint';
   readonly id: Scalars['EndpointId']['output'];
@@ -1629,10 +1624,12 @@ export type OneDayAccountLimit = AccountLimit & {
 export type OpenDeepLinkAction = {
   readonly __typename: 'OpenDeepLinkAction';
   readonly deepLink: Scalars['String']['output'];
+  readonly label?: Maybe<Scalars['String']['output']>;
 };
 
 export type OpenExternalLinkAction = {
   readonly __typename: 'OpenExternalLinkAction';
+  readonly label?: Maybe<Scalars['String']['output']>;
   readonly url: Scalars['String']['output'];
 };
 
@@ -1985,7 +1982,6 @@ export type StatefulNotification = {
   readonly acknowledgedAt?: Maybe<Scalars['Timestamp']['output']>;
   readonly action?: Maybe<NotificationAction>;
   readonly body: Scalars['String']['output'];
-  readonly bulletinButton?: Maybe<BulletinButton>;
   readonly bulletinEnabled: Scalars['Boolean']['output'];
   readonly createdAt: Scalars['Timestamp']['output'];
   readonly deepLink?: Maybe<Scalars['String']['output']>;
@@ -2841,7 +2837,7 @@ export type BulletinsQueryVariables = Exact<{
 }>;
 
 
-export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null, readonly bulletinButton?: { readonly __typename: 'BulletinButton', readonly label: string } | null } }> } } | null };
+export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null } }> } } | null };
 
 export type BusinessMapMarkersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2860,7 +2856,7 @@ export type StatefulNotificationsQueryVariables = Exact<{
 }>;
 
 
-export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null, readonly bulletinButton?: { readonly __typename: 'BulletinButton', readonly label: string } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
+export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
 
 export type CirclesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5066,13 +5062,12 @@ export const BulletinsDocument = gql`
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
             }
             ... on OpenExternalLinkAction {
               url
+              label
             }
-          }
-          bulletinButton {
-            label
           }
         }
         cursor
@@ -5211,13 +5206,12 @@ export const StatefulNotificationsDocument = gql`
         action {
           ... on OpenDeepLinkAction {
             deepLink
+            label
           }
           ... on OpenExternalLinkAction {
             url
+            label
           }
-        }
-        bulletinButton {
-          label
         }
       }
       pageInfo {
@@ -8340,7 +8334,6 @@ export type ResolversTypes = {
   BTCWallet: ResolverTypeWrapper<BtcWallet>;
   BlockInfo: ResolverTypeWrapper<BlockInfo>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
-  BulletinButton: ResolverTypeWrapper<BulletinButton>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
   CallbackEndpointAddPayload: ResolverTypeWrapper<CallbackEndpointAddPayload>;
@@ -8595,7 +8588,6 @@ export type ResolversParentTypes = {
   BTCWallet: BtcWallet;
   BlockInfo: BlockInfo;
   BuildInformation: BuildInformation;
-  BulletinButton: BulletinButton;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
   CallbackEndpointAddPayload: CallbackEndpointAddPayload;
@@ -8985,11 +8977,6 @@ export type BlockInfoResolvers<ContextType = any, ParentType extends ResolversPa
 export type BuildInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['BuildInformation'] = ResolversParentTypes['BuildInformation']> = {
   commitHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   helmRevision?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type BulletinButtonResolvers<ContextType = any, ParentType extends ResolversParentTypes['BulletinButton'] = ResolversParentTypes['BulletinButton']> = {
-  label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9530,10 +9517,12 @@ export interface OneTimeAuthCodeScalarConfig extends GraphQLScalarTypeConfig<Res
 
 export type OpenDeepLinkActionResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenDeepLinkAction'] = ResolversParentTypes['OpenDeepLinkAction']> = {
   deepLink?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type OpenExternalLinkActionResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenExternalLinkAction'] = ResolversParentTypes['OpenExternalLinkAction']> = {
+  label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9753,7 +9742,6 @@ export type StatefulNotificationResolvers<ContextType = any, ParentType extends 
   acknowledgedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
   action?: Resolver<Maybe<ResolversTypes['NotificationAction']>, ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  bulletinButton?: Resolver<Maybe<ResolversTypes['BulletinButton']>, ParentType, ContextType>;
   bulletinEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   deepLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -10063,7 +10051,6 @@ export type Resolvers<ContextType = any> = {
   BTCWallet?: BtcWalletResolvers<ContextType>;
   BlockInfo?: BlockInfoResolvers<ContextType>;
   BuildInformation?: BuildInformationResolvers<ContextType>;
-  BulletinButton?: BulletinButtonResolvers<ContextType>;
   CallbackEndpoint?: CallbackEndpointResolvers<ContextType>;
   CallbackEndpointAddPayload?: CallbackEndpointAddPayloadResolvers<ContextType>;
   CaptchaCreateChallengePayload?: CaptchaCreateChallengePayloadResolvers<ContextType>;
