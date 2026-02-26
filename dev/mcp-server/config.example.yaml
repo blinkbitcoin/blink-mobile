@@ -1,0 +1,6 @@
+login:
+  country: Germany
+  phone: "1234567890"
+  code: "000000"
+
+backend: staging
