@@ -2,14 +2,14 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'fix: remove nix command from check-code (#55)'
-      sha: e186c637e85c89d59f52c3a7ac5a3f23b25b5331
+      commitTitle: 'chore: upgrade shared rust github actions (#57)'
+      sha: 47fcb3b3e18d67f28b551b8aa9a36e01ef635eda
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'fix: remove nix command from check-code (#55)'
-      sha: e186c637e85c89d59f52c3a7ac5a3f23b25b5331
+      commitTitle: 'chore: upgrade shared rust github actions (#57)'
+      sha: 47fcb3b3e18d67f28b551b8aa9a36e01ef635eda
     path: .
   path: vendor
 kind: LockConfig
