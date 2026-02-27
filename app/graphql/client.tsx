@@ -213,7 +213,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       }
 
       // persistedQuery provide client side bandwidth optimization by returning a hash
-      // of the uery instead of the whole query
+      // of the query instead of the whole query
       //
       // use the following line if you want to deactivate in dev
       // const persistedQueryLink = httpLink
