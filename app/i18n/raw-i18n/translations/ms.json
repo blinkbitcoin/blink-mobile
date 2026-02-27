@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Muat turun resit",
       "reportIssue": "Laporkan masalah",
       "transactionHelp": "Bantuan transaksi",
-      "transactionHelpDescription": "Jika anda tidak mengenali transaksi ini atau memerlukan bantuan, hubungi pasukan sokongan kami dengan segera.",
+      "transactionHelpDescription": "Jika anda tidak mengenali transaksi ini atau memerlukan bantuan, hubungi {supportTeam} dengan segera.",
+      "supportTeam": "pasukan sokongan kami",
       "transactionNotFound": "Transaksi tidak dijumpai"
     }
   }

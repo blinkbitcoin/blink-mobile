@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Makbuz indir",
       "reportIssue": "Sorun bildir",
       "transactionHelp": "İşlem yardımı",
-      "transactionHelpDescription": "Bu işlemi tanımıyorsanız veya yardıma ihtiyacınız varsa, derhal destek ekibimizle iletişime geçin.",
+      "transactionHelpDescription": "Bu işlemi tanımıyorsanız veya yardıma ihtiyacınız varsa, derhal {supportTeam} iletişime geçin.",
+      "supportTeam": "destek ekibimizle",
       "transactionNotFound": "İşlem bulunamadı"
     }
   }

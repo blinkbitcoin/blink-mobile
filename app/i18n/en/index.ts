@@ -3166,7 +3166,8 @@ const en: BaseTranslation = {
       reportIssue: "Report issue",
       transactionHelp: "Transaction help",
       transactionHelpDescription:
-        "If you don't recognize this transaction or need assistance, contact our support team immediately.",
+        "If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.",
+      supportTeam: "support team",
       transactionNotFound: "Transaction not found",
     },
   },

@@ -3081,7 +3081,8 @@
       "downloadReceipt": "Tải biên lai",
       "reportIssue": "Báo cáo vấn đề",
       "transactionHelp": "Trợ giúp giao dịch",
-      "transactionHelpDescription": "Nếu bạn không nhận ra giao dịch này hoặc cần hỗ trợ, hãy liên hệ ngay với đội ngũ hỗ trợ của chúng tôi.",
+      "transactionHelpDescription": "Nếu bạn không nhận ra giao dịch này hoặc cần hỗ trợ, hãy liên hệ ngay với {supportTeam}.",
+      "supportTeam": "đội ngũ hỗ trợ của chúng tôi",
       "transactionNotFound": "Không tìm thấy giao dịch"
     }
   }

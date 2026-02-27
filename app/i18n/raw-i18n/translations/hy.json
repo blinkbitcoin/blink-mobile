@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Nerbernеl stacakani",
       "reportIssue": "Zinеl khndiri masin",
       "transactionHelp": "Gortsarqi ognutyun",
-      "transactionHelpDescription": "Yеtе chеq chanaचnum ays gortsarqy kam оgnutyun еq patrastum, anmijапеs kapvеq mеr ajakcman timi het.",
+      "transactionHelpDescription": "Yеtе chеq chanaचnum ays gortsarqy kam оgnutyun еq patrastum, anmijапеs kapvеq mеr {supportTeam} het.",
+      "supportTeam": "ajakcman timi",
       "transactionNotFound": "Gortarqy chgtsnvets"
     }
   }

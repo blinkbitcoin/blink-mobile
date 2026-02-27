@@ -3081,7 +3081,8 @@
       "downloadReceipt": "ดาวน์โหลดใบเสร็จ",
       "reportIssue": "รายงานปัญหา",
       "transactionHelp": "ความช่วยเหลือธุรกรรม",
-      "transactionHelpDescription": "หากคุณไม่รู้จักธุรกรรมนี้หรือต้องการความช่วยเหลือ กรุณาติดต่อทีมสนับสนุนของเราทันที",
+      "transactionHelpDescription": "หากคุณไม่รู้จักธุรกรรมนี้หรือต้องการความช่วยเหลือ กรุณาติดต่อ{supportTeam}",
+      "supportTeam": "ทีมสนับสนุนของเราทันที",
       "transactionNotFound": "ไม่พบรายการธุรกรรม"
     }
   }

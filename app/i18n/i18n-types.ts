@@ -10060,9 +10060,14 @@ type RootTranslation = {
 			 */
 			transactionHelp: string
 			/**
-			 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​ ​o​r​ ​n​e​e​d​ ​a​s​s​i​s​t​a​n​c​e​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​i​m​m​e​d​i​a​t​e​l​y​.
+			 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​ ​o​r​ ​n​e​e​d​ ​a​s​s​i​s​t​a​n​c​e​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​T​e​a​m​}​ ​i​m​m​e​d​i​a​t​e​l​y​.
+			 * @param {unknown} supportTeam
 			 */
-			transactionHelpDescription: string
+			transactionHelpDescription: RequiredParams<'supportTeam'>
+			/**
+			 * s​u​p​p​o​r​t​ ​t​e​a​m
+			 */
+			supportTeam: string
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​n​o​t​ ​f​o​u​n​d
 			 */
@@ -20004,9 +20009,13 @@ export type TranslationFunctions = {
 			 */
 			transactionHelp: () => LocalizedString
 			/**
-			 * If you don't recognize this transaction or need assistance, contact our support team immediately.
+			 * If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.
 			 */
-			transactionHelpDescription: () => LocalizedString
+			transactionHelpDescription: (arg: { supportTeam: unknown }) => LocalizedString
+			/**
+			 * support team
+			 */
+			supportTeam: () => LocalizedString
 			/**
 			 * Transaction not found
 			 */

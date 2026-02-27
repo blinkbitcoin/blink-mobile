@@ -3084,7 +3084,8 @@
             "downloadReceipt": "領収書をダウンロード",
             "reportIssue": "問題を報告",
             "transactionHelp": "取引ヘルプ",
-            "transactionHelpDescription": "この取引に覚えがない場合やサポートが必要な場合は、すぐにサポートチームにご連絡ください。",
+            "transactionHelpDescription": "この取引に覚えがない場合やサポートが必要な場合は、すぐに{supportTeam}にご連絡ください。",
+            "supportTeam": "サポートチーム",
             "transactionNotFound": "取引が見つかりません"
         }
     }

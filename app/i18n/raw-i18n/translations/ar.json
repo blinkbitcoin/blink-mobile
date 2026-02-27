@@ -3081,7 +3081,8 @@
       "downloadReceipt": "تحميل الإيصال",
       "reportIssue": "الإبلاغ عن مشكلة",
       "transactionHelp": "مساعدة المعاملة",
-      "transactionHelpDescription": "إذا لم تتعرف على هذه المعاملة أو تحتاج إلى مساعدة، اتصل بفريق الدعم لدينا فوراً.",
+      "transactionHelpDescription": "إذا لم تتعرف على هذه المعاملة أو تحتاج إلى مساعدة، اتصل ب{supportTeam} فوراً.",
+      "supportTeam": "فريق الدعم لدينا",
       "transactionNotFound": "لم يتم العثور على المعاملة"
     }
   }

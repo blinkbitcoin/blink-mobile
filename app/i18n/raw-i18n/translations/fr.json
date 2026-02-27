@@ -3084,7 +3084,8 @@
             "downloadReceipt": "Télécharger le reçu",
             "reportIssue": "Signaler un problème",
             "transactionHelp": "Aide transaction",
-            "transactionHelpDescription": "Si vous ne reconnaissez pas cette transaction ou avez besoin d'aide, contactez notre équipe de support immédiatement.",
+            "transactionHelpDescription": "Si vous ne reconnaissez pas cette transaction ou avez besoin d'aide, contactez notre {supportTeam} immédiatement.",
+            "supportTeam": "équipe de support",
             "transactionNotFound": "Transaction non trouvée"
         }
     }

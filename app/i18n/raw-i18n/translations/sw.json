@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Pakua risiti",
       "reportIssue": "Ripoti tatizo",
       "transactionHelp": "Msaada wa muamala",
-      "transactionHelpDescription": "Ikiwa hautambui muamala huu au unahitaji msaada, wasiliana na timu yetu ya msaada mara moja.",
+      "transactionHelpDescription": "Ikiwa hautambui muamala huu au unahitaji msaada, wasiliana na {supportTeam} mara moja.",
+      "supportTeam": "timu yetu ya msaada",
       "transactionNotFound": "Muamala haujapatikana"
     }
   }

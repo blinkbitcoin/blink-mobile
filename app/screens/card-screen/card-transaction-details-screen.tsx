@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { View } from "react-native"
+import { Linking, View } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { RouteProp, useRoute } from "@react-navigation/native"
@@ -11,6 +11,7 @@ import {
   WarningCard,
 } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -27,6 +28,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const { feedbackEmailAddress } = useRemoteConfig()
   const route = useRoute<CardTransactionDetailsScreenRouteProp>()
 
   const { transactionId } = route.params
@@ -50,6 +52,12 @@ export const CardTransactionDetailsScreen: React.FC = () => {
       </Screen>
     )
   }
+
+  const supportTeam = LL.CardFlow.TransactionDetails.supportTeam()
+  const helpText = LL.CardFlow.TransactionDetails.transactionHelpDescription({
+    supportTeam,
+  })
+  const [helpBefore, helpAfter] = helpText.split(supportTeam)
 
   const handleViewOnMap = () => {
     console.log("View on map:", transaction.details.location)
@@ -157,7 +165,18 @@ export const CardTransactionDetailsScreen: React.FC = () => {
 
         <WarningCard
           title={LL.CardFlow.TransactionDetails.transactionHelp()}
-          description={LL.CardFlow.TransactionDetails.transactionHelpDescription()}
+          customDescription={
+            <Text style={styles.helpDescription}>
+              {helpBefore}
+              <Text
+                style={styles.helpLink}
+                onPress={() => Linking.openURL(`mailto:${feedbackEmailAddress}`)}
+              >
+                {supportTeam}
+              </Text>
+              {helpAfter}
+            </Text>
+          }
         />
       </View>
     </Screen>
@@ -234,5 +253,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   actionsContainer: {
     gap: 14,
+  },
+  helpDescription: {
+    color: colors.grey2,
+    fontSize: 14,
+    fontFamily: "Source Sans Pro",
+    fontWeight: "400",
+    lineHeight: 16,
+  },
+  helpLink: {
+    color: colors.grey2,
+    textDecorationLine: "underline",
   },
 }))

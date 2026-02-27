@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Stiahnuť potvrdenie",
       "reportIssue": "Nahlásiť problém",
       "transactionHelp": "Pomoc s transakciou",
-      "transactionHelpDescription": "Ak nepoznáte túto transakciu alebo potrebujete pomoc, okamžite kontaktujte náš tím podpory.",
+      "transactionHelpDescription": "Ak nepoznáte túto transakciu alebo potrebujete pomoc, okamžite kontaktujte náš {supportTeam}.",
+      "supportTeam": "tím podpory",
       "transactionNotFound": "Transakcia sa nenašla"
     }
   }

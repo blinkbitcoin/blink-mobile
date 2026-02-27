@@ -3081,7 +3081,8 @@
       "downloadReceipt": "Recibo urquy",
       "reportIssue": "Sasachakuy willay",
       "transactionHelp": "Transacción yanapay",
-      "transactionHelpDescription": "Mana kay transaccionta riqsinkichu utaq yanapata munanki chayqa, yanapaq huñuykuman usqhaylla rimanakuy.",
+      "transactionHelpDescription": "Mana kay transaccionta riqsinkichu utaq yanapata munanki chayqa, {supportTeam} usqhaylla rimanakuy.",
+      "supportTeam": "yanapaq huñuykuman",
       "transactionNotFound": "Mana tarinkichu transaccionta"
     }
   }

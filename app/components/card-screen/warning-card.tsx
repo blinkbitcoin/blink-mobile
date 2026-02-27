@@ -4,16 +4,27 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
-type WarningCardProps = {
+type BaseWarningCardProps = {
   title: string
-  description: string
   icon?: IconNamesType
 }
 
+type WithDescription = BaseWarningCardProps & {
+  description: string
+  customDescription?: never
+}
+
+type WithCustomDescription = BaseWarningCardProps & {
+  description?: never
+  customDescription: React.ReactNode
+}
+
+type WarningCardProps = WithDescription | WithCustomDescription
+
 export const WarningCard: React.FC<WarningCardProps> = ({
   title,
-  description,
   icon = "warning",
+  ...rest
 }) => {
   const styles = useStyles()
   const {
@@ -26,7 +37,11 @@ export const WarningCard: React.FC<WarningCardProps> = ({
         <GaloyIcon name={icon} size={16} color={colors.warning} />
         <Text style={styles.title}>{title}</Text>
       </View>
-      <Text style={styles.description}>{description}</Text>
+      {rest.customDescription ? (
+        rest.customDescription
+      ) : (
+        <Text style={styles.description}>{rest.description}</Text>
+      )}
     </View>
   )
 }

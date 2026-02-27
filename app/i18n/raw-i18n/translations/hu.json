@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Nyugta letöltése",
       "reportIssue": "Probléma jelentése",
       "transactionHelp": "Tranzakció súgó",
-      "transactionHelpDescription": "Ha nem ismeri fel ezt a tranzakciót vagy segítségre van szüksége, azonnal lépjen kapcsolatba ügyfélszolgálatunkkal.",
+      "transactionHelpDescription": "Ha nem ismeri fel ezt a tranzakciót vagy segítségre van szüksége, azonnal lépjen kapcsolatba {supportTeam}.",
+      "supportTeam": "ügyfélszolgálatunkkal",
       "transactionNotFound": "A tranzakció nem található"
     }
   }

@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Unduh struk",
       "reportIssue": "Laporkan masalah",
       "transactionHelp": "Bantuan transaksi",
-      "transactionHelpDescription": "Jika Anda tidak mengenali transaksi ini atau membutuhkan bantuan, segera hubungi tim dukungan kami.",
+      "transactionHelpDescription": "Jika Anda tidak mengenali transaksi ini atau membutuhkan bantuan, segera hubungi {supportTeam}.",
+      "supportTeam": "tim dukungan kami",
       "transactionNotFound": "Transaksi tidak ditemukan"
     }
   }

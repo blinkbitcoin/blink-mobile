@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Ddawuniloda lisiiti",
       "reportIssue": "Loopa obuzibu",
       "transactionHelp": "Obuyambi ku ntuzaanya",
-      "transactionHelpDescription": "Bw'ototegeera ntuzaanya eno oba bw'oba oyagala obuyambi, tuukirira ekibinja kyaffe eky'obuyambi amangu.",
+      "transactionHelpDescription": "Bw'ototegeera ntuzaanya eno oba bw'oba oyagala obuyambi, tuukirira {supportTeam} amangu.",
+      "supportTeam": "ekibinja kyaffe eky'obuyambi",
       "transactionNotFound": "Entuzaanya terabika"
     }
   }

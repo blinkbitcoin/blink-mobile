@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Stáhnout účtenku",
       "reportIssue": "Nahlásit problém",
       "transactionHelp": "Nápověda k transakci",
-      "transactionHelpDescription": "Pokud tuto transakci nepoznáváte nebo potřebujete pomoc, okamžitě kontaktujte náš tým podpory.",
+      "transactionHelpDescription": "Pokud tuto transakci nepoznáváte nebo potřebujete pomoc, okamžitě kontaktujte náš {supportTeam}.",
+      "supportTeam": "tým podpory",
       "transactionNotFound": "Transakce nenalezena"
     }
   }
