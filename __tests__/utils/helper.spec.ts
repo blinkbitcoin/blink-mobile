@@ -1,4 +1,6 @@
 import {
+  toMajorUnit,
+  toMinorUnit,
   ellipsizeMiddle,
   formatCardDisplayNumber,
   maskDigits,
@@ -106,6 +108,54 @@ describe("maskDigits", () => {
 
   it("uses the provided maskChar", () => {
     expect(maskDigits("9999", { visibleRight: 1, maskChar: "X" })).toBe("XXX9")
+  })
+})
+
+describe("toMinorUnit", () => {
+  it("converts whole major units to minor units", () => {
+    expect(toMinorUnit("10")).toBe(1000)
+  })
+
+  it("converts major units with decimals to minor units", () => {
+    expect(toMinorUnit("10.50")).toBe(1050)
+  })
+
+  it("rounds fractional minor units", () => {
+    expect(toMinorUnit("10.555")).toBe(1056)
+  })
+
+  it("converts zero", () => {
+    expect(toMinorUnit("0")).toBe(0)
+  })
+
+  it("handles large amounts", () => {
+    expect(toMinorUnit("99999")).toBe(9999900)
+  })
+
+  it("returns NaN for non-numeric input", () => {
+    expect(toMinorUnit("abc")).toBeNaN()
+  })
+})
+
+describe("toMajorUnit", () => {
+  it("converts minor units to major units", () => {
+    expect(toMajorUnit(1000)).toBe(10)
+  })
+
+  it("converts minor units with remainder", () => {
+    expect(toMajorUnit(1050)).toBe(10.5)
+  })
+
+  it("converts zero", () => {
+    expect(toMajorUnit(0)).toBe(0)
+  })
+
+  it("handles single minor unit", () => {
+    expect(toMajorUnit(1)).toBe(0.01)
+  })
+
+  it("handles large amounts", () => {
+    expect(toMajorUnit(9999900)).toBe(99999)
   })
 })
 

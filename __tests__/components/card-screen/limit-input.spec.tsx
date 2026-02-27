@@ -3,7 +3,9 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { LimitInput } from "@app/components/card-screen"
+import { WalletCurrency } from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -24,6 +26,7 @@ jest.mock("@app/hooks/use-display-currency", () => ({
       }
       return digits[currency] ?? 2
     },
+    currencyInfo: {},
   }),
 }))
 
@@ -60,6 +63,7 @@ describe("LimitInput", () => {
   }
 
   beforeEach(() => {
+    loadLocale("en")
     jest.clearAllMocks()
   })
 
@@ -86,7 +90,7 @@ describe("LimitInput", () => {
 
     it("displays EUR symbol when currency is EUR", () => {
       const { getByText } = renderWithProviders(
-        <LimitInput {...defaultProps} currency="EUR" />,
+        <LimitInput {...defaultProps} currency={"EUR" as WalletCurrency} />,
       )
       expect(getByText("€1,000")).toBeTruthy()
     })
@@ -116,24 +120,84 @@ describe("LimitInput", () => {
     })
   })
 
-  describe("props", () => {
+  describe("loading state", () => {
+    it("disables pressable when loading", () => {
+      const { getByRole } = renderWithProviders(
+        <LimitInput {...defaultProps} loading={true} />,
+      )
+      const button = getByRole("button")
+      expect(button.props.accessibilityState?.disabled).toBe(true)
+    })
+
+    it("does not open modal when loading", () => {
+      const { getByText, queryByTestId } = renderWithProviders(
+        <LimitInput {...defaultProps} loading={true} />,
+      )
+      fireEvent.press(getByText("$1,000"))
+      expect(queryByTestId("modal")).toBeNull()
+    })
+  })
+
+  describe("disabled state", () => {
+    it("disables pressable when disabled", () => {
+      const { getByRole } = renderWithProviders(
+        <LimitInput {...defaultProps} disabled={true} />,
+      )
+      const button = getByRole("button")
+      expect(button.props.accessibilityState?.disabled).toBe(true)
+    })
+
+    it("does not open modal when disabled", () => {
+      const { getByText, queryByTestId } = renderWithProviders(
+        <LimitInput {...defaultProps} disabled={true} />,
+      )
+      fireEvent.press(getByText("$1,000"))
+      expect(queryByTestId("modal")).toBeNull()
+    })
+  })
+
+  describe("confirm behavior", () => {
+    it("does not call onChangeValue when value is unchanged", () => {
+      const { getByText, getByRole } = renderWithProviders(
+        <LimitInput {...defaultProps} />,
+      )
+
+      fireEvent.press(getByText("$1,000"))
+
+      const confirmButton = getByRole("button", { name: /confirm/i })
+      fireEvent.press(confirmButton)
+
+      expect(mockOnChangeValue).not.toHaveBeenCalled()
+    })
+
+    it("calls onChangeValue when value changes", () => {
+      const { getByText, getByRole } = renderWithProviders(
+        <LimitInput {...defaultProps} />,
+      )
+
+      fireEvent.press(getByText("$1,000"))
+      fireEvent.press(getByText("5"))
+
+      const confirmButton = getByRole("button", { name: /confirm/i })
+      fireEvent.press(confirmButton)
+
+      expect(mockOnChangeValue).toHaveBeenCalled()
+    })
+  })
+
+  describe("default props", () => {
+    it("renders with only required props", () => {
+      const { getByText } = renderWithProviders(
+        <LimitInput label="Test" helperText="Helper" />,
+      )
+      expect(getByText("Test")).toBeTruthy()
+      expect(getByText("Helper")).toBeTruthy()
+      expect(getByText("$0")).toBeTruthy()
+    })
+
     it("uses default currency USD", () => {
       const { getByText } = renderWithProviders(<LimitInput {...defaultProps} />)
       expect(getByText("$1,000")).toBeTruthy()
-    })
-
-    it("accepts custom minHeight", () => {
-      const { toJSON } = renderWithProviders(
-        <LimitInput {...defaultProps} minHeight={80} />,
-      )
-      expect(toJSON()).toBeTruthy()
-    })
-
-    it("accepts custom icon", () => {
-      const { toJSON } = renderWithProviders(
-        <LimitInput {...defaultProps} icon="pencil" />,
-      )
-      expect(toJSON()).toBeTruthy()
     })
   })
 })
