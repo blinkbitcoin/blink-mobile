@@ -130,6 +130,22 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
+  bitcoinCard: undefined
+  cardDetails: undefined
+  welcomeCard: undefined
+  cardSubscribe: undefined
+  cardPayment: undefined
+  loadingCard: undefined
+  visaCard: undefined
+  creditCardLimit: undefined
+  selectCreditLimit: undefined
+  termSheetScreem: undefined
+  tranferInvest: undefined
+  topUpScreen: undefined
+  companyValuation: undefined
+  cardPersonalInformationScreen: undefined
+  cardPreapprovedScreen: undefined
+  cardProcessingScreen: undefined
 }
 
 export type OnboardingStackParamList = {

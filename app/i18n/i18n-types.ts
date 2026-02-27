@@ -9067,6 +9067,14 @@ type RootTranslation = {
 		 */
 		allAccounts: string
 		/**
+		 * V​a​l​i​d​ ​t​h​r​u
+		 */
+		validThru: string
+		/**
+		 * T​h​i​s​ ​f​i​e​l​d​ ​i​s​ ​r​e​q​u​i​r​e​d
+		 */
+		fieldRequired: string
+		/**
 		 * S​o​m​e
 		 */
 		some: string
@@ -9634,6 +9642,422 @@ type RootTranslation = {
 		 * Y​o​u​ ​d​o​n​'​t​ ​h​a​v​e​ ​a​n​y​ ​n​o​t​i​f​i​c​a​t​i​o​n​s​ ​r​i​g​h​t​ ​n​o​w
 		 */
 		noNotifications: string
+	}
+	BitcoinCardScreen: {
+		/**
+		 * I​n​t​r​o​d​u​c​i​n​g
+		 */
+		title: string
+		cardInfo: {
+			/**
+			 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+			 */
+			bitcoinCard: string
+			/**
+			 * f​o​r
+			 */
+			'for': string
+			/**
+			 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
+			 */
+			maximalist: string
+		}
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
+	CardDetailsScreen: {
+		/**
+		 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
+		 */
+		title: string
+		features: {
+			/**
+			 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+			 */
+			accountManager: string
+			/**
+			 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+			 */
+			support: string
+			/**
+			 * B​i​t​c​o​i​n​ ​s​t​a​r​t​u​p​ ​d​e​a​l​ ​f​l​o​w
+			 */
+			startup: string
+			/**
+			 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
+			 */
+			onchainDeposits: string
+			/**
+			 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
+			 */
+			circularEconomies: string
+		}
+		/**
+		 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+		 */
+		andMore: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
+	CardWelcomeScreen: {
+		welcomeMessage: {
+			/**
+			 * W​e​l​c​o​m​e​ ​o​n​b​o​a​r​d
+			 */
+			title: string
+			/**
+			 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+			 */
+			subtitle: string
+			paragraphs: {
+				/**
+				 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
+				 */
+				body1: string
+				/**
+				 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * L​e​t​'​s​ ​g​o
+		 */
+		buttonText: string
+	}
+	CardSubscribeScreen: {
+		/**
+		 * S​u​b​s​c​r​i​b​e
+		 */
+		title: string
+		/**
+		 * A​c​c​e​p​t
+		 */
+		acceptButton: string
+	}
+	CardPaymentScreen: {
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		title: string
+		/**
+		 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+		 */
+		cardTitle: string
+		/**
+		 * p​e​r​ ​y​e​a​r
+		 */
+		perYear: string
+		status: {
+			/**
+			 * S​t​a​t​u​s
+			 */
+			label: string
+			/**
+			 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
+			 */
+			paymentPending: string
+			/**
+			 * F​i​r​s​t​ ​y​e​a​r​ ​f​r​e​e
+			 */
+			firstYearFree: string
+		}
+		renewalDate: {
+			/**
+			 * R​e​n​e​w​a​l​ ​d​a​t​e
+			 */
+			label: string
+		}
+		agreement: {
+			/**
+			 * I​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
+			 */
+			text: string
+			/**
+			 * T​e​r​m​s​ ​o​f​ ​S​e​r​v​i​c​e
+			 */
+			termsOfService: string
+			/**
+			 * P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+			 */
+			privacyPolicy: string
+			/**
+			 * C​a​r​d​h​o​l​d​e​r​ ​A​g​r​e​e​m​e​n​t
+			 */
+			cardholderAgreement: string
+			/**
+			 * a​n​d
+			 */
+			and: string
+		}
+		/**
+		 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​t​h​a​t​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​1​ ​y​e​a​r
+		 */
+		renew: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​&​ ​P​a​y
+		 */
+		acceptButton: string
+	}
+	LoadinCardScreen: {
+		/**
+		 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
+		 */
+		title: string
+		/**
+		 * W​e​'​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​'​s​ ​h​e​r​e
+		 */
+		subtitle: string
+		/**
+		 * .​.​.​c​o​d​i​n​g​ ​t​h​e​ ​b​a​c​k​e​n​d
+		 */
+		codingBackend: string
+		/**
+		 * N​i​c​e
+		 */
+		buttonText: string
+	}
+	VisaCardScreen: {
+		/**
+		 * V​i​s​a​ ​C​a​r​d
+		 */
+		title: string
+		/**
+		 * C​o​n​g​r​a​t​u​l​a​t​i​o​n​s​!
+		 */
+		cardTitle: string
+		/**
+		 * Y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
+		 */
+		cardSubTitle: string
+		/**
+		 * A​d​d​ ​t​o
+		 */
+		VisaButtonText: string
+		/**
+		 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+		 */
+		buttonText: string
+	}
+	CardCreditLimit: {
+		welcomeMessage: {
+			/**
+			 * W​e​l​c​o​m​e​ ​t​o​ ​b​e​c​o​m​e​ ​p​a​r​t​ ​o​f​ ​B​l​i​n​k
+			 */
+			title: string
+			paragraphs: {
+				/**
+				 * B​e​f​o​r​e​ ​w​e​ ​r​a​i​s​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​f​r​o​m​ ​p​r​o​f​e​s​s​i​o​n​a​l​ ​i​n​v​e​s​t​o​r​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​e​x​t​e​n​d​ ​a​n​ ​i​n​v​i​t​a​t​i​o​n​ ​t​o​ ​t​h​e​ ​B​l​i​n​k​ ​f​a​m​i​l​y​,​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​ ​a​n​d​ ​s​u​p​p​o​r​t​e​r​s​.​ ​W​h​y​ ​b​r​i​n​g​ ​o​n​b​o​a​r​d​ ​s​t​r​a​n​g​e​r​s​ ​w​h​e​n​ ​w​e​ ​c​a​n​ ​f​i​r​s​t​ ​i​n​v​i​t​e​ ​s​o​m​e​o​n​e​ ​l​i​k​e​ ​y​o​u​?
+				 */
+				body1: string
+				/**
+				 * T​h​i​s​ ​i​s​ ​a​ ​p​e​r​s​o​n​a​l​ ​i​n​v​i​t​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​d​o​ ​n​o​t​ ​f​o​r​w​a​r​d​ ​o​r​ ​s​h​a​r​e​ ​p​u​b​l​i​c​l​y​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * H​o​w​ ​m​u​c​h​ ​w​o​u​l​d​ ​y​o​u​ ​l​i​k​e​ ​t​o​ ​i​n​v​e​s​t​?
+		 */
+		desiredCreditLimit: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+		/**
+		 * f​o​r​ ​~​{​p​e​r​c​e​n​t​}​%
+		 * @param {number} percent
+		 */
+		percent: RequiredParams<'percent'>
+	}
+	CompanyValuationScreen: {
+		welcomeMessage: {
+			/**
+			 * C​o​m​p​a​n​y​ ​v​a​l​u​a​t​i​o​n
+			 */
+			title: string
+			paragraphs: {
+				/**
+				 * I​n​ ​t​h​i​s​ ​i​n​v​e​s​t​m​e​n​t​ ​r​o​u​n​d​ ​t​h​e​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n​ ​o​f​ ​B​l​i​n​k​ ​i​s​ ​$​1​0​ ​m​i​l​l​i​o​n​.
+				 */
+				body1: string
+				/**
+				 * W​e​ ​b​e​l​i​e​v​e​ ​t​h​a​t​ ​w​e​ ​c​o​u​l​d​ ​r​a​i​s​e​ ​a​t​ ​a​ ​h​i​g​h​e​r​ ​v​a​l​u​a​t​i​o​n​ ​f​r​o​m​ ​V​C​s​.​ ​Y​o​u​ ​a​r​e​ ​n​o​t​ ​i​n​v​i​t​e​d​ ​t​o​ ​m​a​x​i​m​i​z​e​ ​o​u​r​ ​s​h​o​r​t​-​t​e​r​m​ ​v​a​l​u​a​t​i​o​n​,​ ​w​e​ ​s​e​e​ ​l​o​n​g​-​t​e​r​m​ ​v​a​l​u​e​ ​i​n​ ​p​a​r​t​n​e​r​i​n​g​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​.
+				 */
+				body2: string
+			}
+		}
+		/**
+		 * G​o​t​ ​i​t
+		 */
+		buttonText: string
+	}
+	TermSheetScreen: {
+		/**
+		 * T​e​r​m​ ​S​h​e​e​t
+		 */
+		title: string
+		equitySection: {
+			/**
+			 * E​q​u​i​t​y​ ​i​n​ ​B​l​i​n​k
+			 */
+			title: string
+			/**
+			 * $​1​0​,​0​0​0​ ​I​n​v​e​s​t​m​e​n​t
+			 */
+			investment: string
+			/**
+			 * A​t​ ​$​1​0​M​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n
+			 */
+			valuation: string
+			/**
+			 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​1​%​ ​o​f​ ​B​l​i​n​k
+			 */
+			units: string
+		}
+		creditBoostSection: {
+			/**
+			 * C​r​e​d​i​t​ ​B​o​o​s​t
+			 */
+			title: string
+			/**
+			 * $​1​1​,​0​0​0​ ​T​o​t​a​l​ ​C​r​e​d​i​t
+			 */
+			totalCredit: string
+		}
+		/**
+		 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
+		 */
+		buttonText: string
+	}
+	TransferInvestment: {
+		/**
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
+		 */
+		title: string
+		paragraphs: {
+			/**
+			 * Y​o​u​ ​h​a​v​e​ ​s​i​g​n​e​d​ ​t​h​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​a​g​r​e​e​m​e​n​t​ ​f​o​r​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​i​n​ ​B​l​i​n​k​.
+			 */
+			body1: string
+			/**
+			 * T​i​m​e​ ​t​o​ ​t​r​a​n​s​f​e​r​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​$​1​0​,​0​0​0​.​ ​Y​o​u​ ​w​i​l​l​ ​p​a​y​ ​w​i​t​h​ ​B​i​t​c​o​i​n​.
+			 */
+			body2: string
+		}
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
+	TopUpScreen: {
+		/**
+		 * T​o​p​-​u​p
+		 */
+		title: string
+		/**
+		 * I​n​s​u​f​f​i​e​n​t​ ​f​u​n​d​s​ ​i​n​ ​y​o​u​r​ ​B​l​i​n​k​ ​w​a​l​l​e​t​.​
+	​T​o​p​-​u​p​ ​m​i​n​i​m​u​m​ ​o​f​ ​{​m​i​n​A​m​o​u​n​t​}​.
+		 * @param {string} minAmount
+		 */
+		qrTitle: RequiredParams<'minAmount'>
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * S​h​a​r​e
+		 */
+		share: string
+		/**
+		 * S​e​t​ ​a​m​o​u​n​t
+		 */
+		placeholder: string
+	}
+	PersonalInformationScreen: {
+		/**
+		 * F​i​n​a​l​ ​s​t​e​p
+		 */
+		title: string
+		fields: {
+			occupation: {
+				/**
+				 * O​c​c​u​p​a​t​i​o​n
+				 */
+				label: string
+				/**
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+				 */
+				placeholder: string
+			}
+			annualSalaryRange: {
+				/**
+				 * A​n​n​u​a​l​ ​s​a​l​a​r​y
+				 */
+				label: string
+				/**
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+				 */
+				placeholder: string
+			}
+			accountPurpose: {
+				/**
+				 * A​c​c​o​u​n​t​ ​p​u​r​p​o​s​e
+				 */
+				label: string
+				/**
+				 * S​e​l​e​c​t​ ​p​u​r​p​o​s​e
+				 */
+				placeholder: string
+			}
+			expectedMonthlyVolume: {
+				/**
+				 * E​x​p​e​c​t​e​d​ ​m​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g
+				 */
+				label: string
+				/**
+				 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​p​e​n​d​i​n​g​ ​r​a​n​g​e
+				 */
+				placeholder: string
+			}
+		}
+		/**
+		 * S​u​b​m​i​t​ ​a​p​l​i​c​a​t​i​o​n
+		 */
+		buttonText: string
+		/**
+		 * S​e​l​e​c​t
+		 */
+		select: string
+	}
+	CardPreapprovedScreen: {
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​V​i​s​a​ ​c​a​r​d​!
+		 */
+		title: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		buttonText: string
+	}
+	CardProcessingScreen: {
+		/**
+		 * P​r​o​c​e​s​s​i​n​g​ ​y​o​u​r​ ​a​p​p​l​i​c​a​t​i​o​n
+		 */
+		title: string
+		/**
+		 * E​s​t​i​m​a​t​e​d​ ​w​a​i​t​ ​t​i​m​e​:​ ​{​w​a​i​t​T​i​m​e​}
+		 * @param {string} waitTime
+		 */
+		subtitle: RequiredParams<'waitTime'>
+		/**
+		 * C​l​o​s​e
+		 */
+		buttonText: string
 	}
 }
 
@@ -18592,6 +19016,14 @@ export type TranslationFunctions = {
 		 */
 		allAccounts: () => LocalizedString
 		/**
+		 * Valid thru
+		 */
+		validThru: () => LocalizedString
+		/**
+		 * This field is required
+		 */
+		fieldRequired: () => LocalizedString
+		/**
 		 * Some
 		 */
 		some: () => LocalizedString
@@ -19138,6 +19570,419 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	BitcoinCardScreen: {
+		/**
+		 * Introducing
+		 */
+		title: () => LocalizedString
+		cardInfo: {
+			/**
+			 * The Blink Visa card
+			 */
+			bitcoinCard: () => LocalizedString
+			/**
+			 * for
+			 */
+			'for': () => LocalizedString
+			/**
+			 * Bitcoin Maximalists
+			 */
+			maximalist: () => LocalizedString
+		}
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardDetailsScreen: {
+		/**
+		 * Additional perks
+		 */
+		title: () => LocalizedString
+		features: {
+			/**
+			 * Dedicated account manager
+			 */
+			accountManager: () => LocalizedString
+			/**
+			 * Priority support
+			 */
+			support: () => LocalizedString
+			/**
+			 * Bitcoin startup deal flow
+			 */
+			startup: () => LocalizedString
+			/**
+			 * 50% back on transaction fees
+			 */
+			onchainDeposits: () => LocalizedString
+			/**
+			 * $100 to circular economies
+			 */
+			circularEconomies: () => LocalizedString
+		}
+		/**
+		 * ... and more coming in 2026
+		 */
+		andMore: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardWelcomeScreen: {
+		welcomeMessage: {
+			/**
+			 * Welcome onboard
+			 */
+			title: () => LocalizedString
+			/**
+			 * To Blink Private
+			 */
+			subtitle: () => LocalizedString
+			paragraphs: {
+				/**
+				 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
+				 */
+				body1: () => LocalizedString
+				/**
+				 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * Let's go
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardSubscribeScreen: {
+		/**
+		 * Subscribe
+		 */
+		title: () => LocalizedString
+		/**
+		 * Accept
+		 */
+		acceptButton: () => LocalizedString
+	}
+	CardPaymentScreen: {
+		/**
+		 * Payment
+		 */
+		title: () => LocalizedString
+		/**
+		 * Blink Private
+		 */
+		cardTitle: () => LocalizedString
+		/**
+		 * per year
+		 */
+		perYear: () => LocalizedString
+		status: {
+			/**
+			 * Status
+			 */
+			label: () => LocalizedString
+			/**
+			 * Payment Pending
+			 */
+			paymentPending: () => LocalizedString
+			/**
+			 * First year free
+			 */
+			firstYearFree: () => LocalizedString
+		}
+		renewalDate: {
+			/**
+			 * Renewal date
+			 */
+			label: () => LocalizedString
+		}
+		agreement: {
+			/**
+			 * I agree to the
+			 */
+			text: () => LocalizedString
+			/**
+			 * Terms of Service
+			 */
+			termsOfService: () => LocalizedString
+			/**
+			 * Privacy Policy
+			 */
+			privacyPolicy: () => LocalizedString
+			/**
+			 * Cardholder Agreement
+			 */
+			cardholderAgreement: () => LocalizedString
+			/**
+			 * and
+			 */
+			and: () => LocalizedString
+		}
+		/**
+		 * I understand that my subscription will automatically renew in 1 year
+		 */
+		renew: () => LocalizedString
+		/**
+		 * Continue & Pay
+		 */
+		acceptButton: () => LocalizedString
+	}
+	LoadinCardScreen: {
+		/**
+		 * We're working on your card
+		 */
+		title: () => LocalizedString
+		/**
+		 * We'll notify you once it's here
+		 */
+		subtitle: () => LocalizedString
+		/**
+		 * ...coding the backend
+		 */
+		codingBackend: () => LocalizedString
+		/**
+		 * Nice
+		 */
+		buttonText: () => LocalizedString
+	}
+	VisaCardScreen: {
+		/**
+		 * Visa Card
+		 */
+		title: () => LocalizedString
+		/**
+		 * Congratulations!
+		 */
+		cardTitle: () => LocalizedString
+		/**
+		 * Your Blink Visa Card has been activated.
+		 */
+		cardSubTitle: () => LocalizedString
+		/**
+		 * Add to
+		 */
+		VisaButtonText: () => LocalizedString
+		/**
+		 * Order physical card
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardCreditLimit: {
+		welcomeMessage: {
+			/**
+			 * Welcome to become part of Blink
+			 */
+			title: () => LocalizedString
+			paragraphs: {
+				/**
+				 * Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?
+				 */
+				body1: () => LocalizedString
+				/**
+				 * This is a personal invitation. Please do not forward or share publicly.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * How much would you like to invest?
+		 */
+		desiredCreditLimit: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+		/**
+		 * for ~{percent}%
+		 */
+		percent: (arg: { percent: number }) => LocalizedString
+	}
+	CompanyValuationScreen: {
+		welcomeMessage: {
+			/**
+			 * Company valuation
+			 */
+			title: () => LocalizedString
+			paragraphs: {
+				/**
+				 * In this investment round the pre-money valuation of Blink is $10 million.
+				 */
+				body1: () => LocalizedString
+				/**
+				 * We believe that we could raise at a higher valuation from VCs. You are not invited to maximize our short-term valuation, we see long-term value in partnering with our superusers.
+				 */
+				body2: () => LocalizedString
+			}
+		}
+		/**
+		 * Got it
+		 */
+		buttonText: () => LocalizedString
+	}
+	TermSheetScreen: {
+		/**
+		 * Term Sheet
+		 */
+		title: () => LocalizedString
+		equitySection: {
+			/**
+			 * Equity in Blink
+			 */
+			title: () => LocalizedString
+			/**
+			 * $10,000 Investment
+			 */
+			investment: () => LocalizedString
+			/**
+			 * At $10M pre-money valuation
+			 */
+			valuation: () => LocalizedString
+			/**
+			 * You receive 10,000 units ~0.1% of Blink
+			 */
+			units: () => LocalizedString
+		}
+		creditBoostSection: {
+			/**
+			 * Credit Boost
+			 */
+			title: () => LocalizedString
+			/**
+			 * $11,000 Total Credit
+			 */
+			totalCredit: () => LocalizedString
+		}
+		/**
+		 * Proceed to Sign
+		 */
+		buttonText: () => LocalizedString
+	}
+	TransferInvestment: {
+		/**
+		 * Transfer your investment
+		 */
+		title: () => LocalizedString
+		paragraphs: {
+			/**
+			 * You have signed the subscription agreement for 10,000 units in Blink.
+			 */
+			body1: () => LocalizedString
+			/**
+			 * Time to transfer the investment amount of $10,000. You will pay with Bitcoin.
+			 */
+			body2: () => LocalizedString
+		}
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	TopUpScreen: {
+		/**
+		 * Top-up
+		 */
+		title: () => LocalizedString
+		/**
+		 * Insuffient funds in your Blink wallet.
+	Top-up minimum of {minAmount}.
+		 */
+		qrTitle: (arg: { minAmount: string }) => LocalizedString
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Share
+		 */
+		share: () => LocalizedString
+		/**
+		 * Set amount
+		 */
+		placeholder: () => LocalizedString
+	}
+	PersonalInformationScreen: {
+		/**
+		 * Final step
+		 */
+		title: () => LocalizedString
+		fields: {
+			occupation: {
+				/**
+				 * Occupation
+				 */
+				label: () => LocalizedString
+				/**
+				 * Select your occupation
+				 */
+				placeholder: () => LocalizedString
+			}
+			annualSalaryRange: {
+				/**
+				 * Annual salary
+				 */
+				label: () => LocalizedString
+				/**
+				 * Select your salary range
+				 */
+				placeholder: () => LocalizedString
+			}
+			accountPurpose: {
+				/**
+				 * Account purpose
+				 */
+				label: () => LocalizedString
+				/**
+				 * Select purpose
+				 */
+				placeholder: () => LocalizedString
+			}
+			expectedMonthlyVolume: {
+				/**
+				 * Expected monthly spending
+				 */
+				label: () => LocalizedString
+				/**
+				 * Select your spending range
+				 */
+				placeholder: () => LocalizedString
+			}
+		}
+		/**
+		 * Submit aplication
+		 */
+		buttonText: () => LocalizedString
+		/**
+		 * Select
+		 */
+		select: () => LocalizedString
+	}
+	CardPreapprovedScreen: {
+		/**
+		 * You have been preapproved for the Bitcoin Visa card!
+		 */
+		title: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		buttonText: () => LocalizedString
+	}
+	CardProcessingScreen: {
+		/**
+		 * Processing your application
+		 */
+		title: () => LocalizedString
+		/**
+		 * Estimated wait time: {waitTime}
+		 */
+		subtitle: (arg: { waitTime: string }) => LocalizedString
+		/**
+		 * Close
+		 */
+		buttonText: () => LocalizedString
 	}
 }
 

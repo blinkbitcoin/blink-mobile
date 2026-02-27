@@ -3,6 +3,7 @@ import "@rn-vui/themed"
 declare module "@rn-vui/themed" {
   export interface Colors {
     red: string
+    orange: string
     transparent: string
 
     // _ are meant to be static across light and dark

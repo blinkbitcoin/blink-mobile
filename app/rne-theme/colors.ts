@@ -43,6 +43,7 @@ const light = {
 
   // same as error
   red: "#DC2626",
+  orange: "#FB5607",
 
   warning: "#F59E0B",
 }
@@ -92,6 +93,7 @@ const dark = {
 
   // same as error
   red: "#DC2626",
+  orange: "#FB5607",
 
   warning: "#F59E0B",
 }

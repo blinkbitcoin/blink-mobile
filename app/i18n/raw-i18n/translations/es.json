@@ -2766,6 +2766,8 @@
         "dollar": "Dólar",
         "all": "TODAS",
         "allAccounts": "Todas las cuentas",
+        "validThru": "Válido hasta",
+        "fieldRequired": "Este campo es requerido",
         "profiles": "Perfiles",
         "paste": "Pegar",
         "some": "Algunos",
@@ -2921,5 +2923,159 @@
     "NotificationHistory": {
         "title": "Notificaciones ",
         "noNotifications": "No tienes notificaciones en este momento"
+    },
+    "BitcoinCardScreen": {
+        "title": "Presentando",
+        "cardInfo": {
+            "bitcoinCard": "La tarjeta Visa de Blink",
+            "for": "para",
+            "maximalist": "Bitcoin Maximalistas"
+        },
+        "buttonText": "Continuar"
+    },
+    "CardDetailsScreen": {
+        "title": "Beneficios adicionales",
+        "features":{
+            "accountManager": "Gestor de cuentas dedicado",
+            "support": "Apoyo prioritario",
+            "startup": "flujo de acuerdos de startups de Bitcoin",
+            "onchainDeposits": "Reembolso del 50% en las comisiones de transacción",
+            "circularEconomies": "$100 para economías circulares"
+        },
+        "andMore": "... y más próximamente en 2026",
+        "buttonText": "Continuar"
+    },
+    "CardWelcomeScreen": {
+        "welcomeMessage": {
+            "title": "Bienvenido a bordo",
+            "subtitle": "A Blink Private",
+            "paragraphs": {
+                "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un increíble Bitcoiner.",
+                "body2": "Nuestra meta para 2026 es llenar el programa con tantas cosas buenas que será obvio renovar el próximo año."
+            }
+        },
+        "buttonText": "Vamos"
+    },
+     "CardSubscribeScreen": {
+        "title": "Suscribir",
+        "acceptButton": "Aceptar"
+    },
+    "CardPaymentScreen": {
+        "title": "Pago",
+        "cardTitle": "Blink Privado",
+        "perYear": "por año",
+        "status": {
+            "label": "Estado",
+            "paymentPending": "Pago Pendiente",
+            "firstYearFree": "Primer año gratis"
+        },
+        "renewalDate": {
+            "label": "Fecha de renovación"
+        },
+        "agreement": {
+            "text": "Acepto los",
+            "termsOfService": "Términos de Servicio",
+            "privacyPolicy": "Política de Privacidad",
+            "cardholderAgreement": "Acuerdo del Titular de la Tarjeta",
+            "and": "y"
+        },
+        "renew": "Entiendo que mi suscripción se renovará automáticamente en 1 año",
+        "acceptButton": "Continuar y Pagar"
+    },
+    "LoadinCardScreen": {
+        "title": "Estamos trabajando en tu tarjeta",
+        "subtitle": "Te notificaremos cuando esté lista",
+        "codingBackend": "...programando el backend",
+        "buttonText": "Genial"
+    },
+    "VisaCardScreen": {
+        "title": "Tarjeta Visa",
+        "cardTitle": "¡Felicidades!",
+        "cardSubTitle": "Tu tarjeta Blink Visa ha sido activada.",
+        "VisaButtonText": "Agregar a",
+        "buttonText": "Solicitar tarjeta física"
+    },
+    "CardCreditLimit": {
+        "welcomeMessage": {
+            "title": "Bienvenido a ser parte de Blink",
+            "paragraphs": {
+                "body1": "Antes de recaudar más fondos de inversores profesionales, decidimos extender una invitación a la familia de Blink, nuestros superusuarios y seguidores. ¿Por qué incorporar a extraños cuando podemos invitar primero a alguien como tú?",
+                "body2": "Esta es una invitación personal. Por favor, no la reenvíes ni compartas públicamente."
+            }
+        },
+        "desiredCreditLimit": "¿Cuánto te gustaría invertir?",
+        "buttonText": "Continuar",
+        "percent": "para ~{percent: number}%"
+    },
+    "CompanyValuationScreen": {
+        "welcomeMessage": {
+            "title": "Valoración de la empresa",
+            "paragraphs": {
+                "body1": "En esta ronda de inversión, la valoración pre-money de Blink es de $10 millones.",
+                "body2": "Creemos que podríamos recaudar con una valoración más alta de VCs. No estás invitado para maximizar nuestra valoración a corto plazo, vemos valor a largo plazo en asociarnos con nuestros superusuarios."
+            }
+        },
+        "buttonText": "Entendido"
+    },
+    "TermSheetScreen": {
+        "title": "Hoja de Términos",
+        "equitySection": {
+            "title": "Participación en Blink",
+            "investment": "Inversión de $10,000",
+            "valuation": "Con valoración pre-money de $10M",
+            "units": "Recibes 10,000 unidades ~0.1% de Blink"
+        },
+        "creditBoostSection": {
+            "title": "Impulso de Crédito",
+            "totalCredit": "Crédito Total de $11,000"
+        },
+        "buttonText": "Proceder a Firmar"
+    },
+    "TransferInvestment": {
+        "title": "Transfiere tu inversión",
+        "paragraphs": {
+            "body1": "Has firmado el acuerdo de suscripción por 10,000 unidades en Blink.",
+            "body2": "Es momento de transferir el monto de inversión de $10,000. Pagarás con Bitcoin."
+        },
+        "buttonText": "Continuar"
+    },
+    "TopUpScreen": {
+        "title": "Recargar",
+        "qrTitle": "Fondos insuficientes en tu billetera Blink.\nRecarga un mínimo de {minAmount: string}.",
+        "copy": "Copiar",
+        "share": "Compartir",
+        "placeholder": "Establecer monto"
+    },
+    "PersonalInformationScreen": {
+        "title": "Paso final",
+        "fields": {
+            "occupation": {
+                "label": "Ocupación",
+                "placeholder": "Selecciona tu ocupación"
+            },
+            "annualSalaryRange": {
+                "label": "Salario anual",
+                "placeholder": "Selecciona tu rango salarial"
+            },
+            "accountPurpose": {
+                "label": "Propósito de la cuenta",
+                "placeholder": "Selecciona el propósito"
+            },
+            "expectedMonthlyVolume": {
+                "label": "Gasto mensual esperado",
+                "placeholder": "Selecciona tu rango de gastos"
+            }
+        },
+        "buttonText": "Enviar solicitud",
+        "select": "seleccionar"
+    },
+    "CardPreapprovedScreen": {
+        "title": "¡Has sido preaprobado para la tarjeta Bitcoin Visa!",
+        "buttonText": "Continuar"
+    },
+    "CardProcessingScreen": {
+        "title": "Procesando tu solicitud",
+        "subtitle": "Tiempo estimado de espera: {waitTime: string}",
+        "buttonText": "Cerrar"
     }
 }
