@@ -1,9 +1,16 @@
-import React, { useEffect } from "react"
-import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native"
+import React, { useCallback, useEffect } from "react"
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
 import {
   CardActionButtons,
@@ -57,6 +64,20 @@ export const CardDashboardScreen: React.FC = () => {
   } = useCardTransactions(card?.id)
 
   const { handleFreeze, loading: freezeLoading } = useCardFreeze()
+
+  const handleSettingsPress = useCallback(() => {
+    navigation.navigate("cardSettingsScreen")
+  }, [navigation])
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
+          <GaloyIcon name="settings" size={24} color={colors.black} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
   useEffect(() => {
     if (isFocused) refetch()
@@ -161,5 +182,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loadMore: {
     marginTop: 16,
+  },
+  headerRight: {
+    padding: 8,
+    marginRight: 16,
   },
 }))
