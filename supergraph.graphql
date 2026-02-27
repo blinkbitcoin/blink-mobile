@@ -866,6 +866,13 @@ enum join__Graph {
   KYC @join__graph(name: "kyc", url: "url")
 }
 
+input KycFlowStartInput
+  @join__type(graph: KYC)
+{
+  firstName: String
+  lastName: String
+}
+
 scalar Language
   @join__type(graph: BLINK)
 
@@ -1448,7 +1455,7 @@ type Mutation
   userUpdateLanguage(input: UserUpdateLanguageInput!): UserUpdateLanguagePayload! @join__field(graph: BLINK)
   userUpdateUsername(input: UserUpdateUsernameInput!): UserUpdateUsernamePayload! @join__field(graph: BLINK) @deprecated(reason: "Username will be moved to @Handle in Accounts. Also SetUsername naming should be used instead of UpdateUsername to reflect the idempotency of Handles")
   onboardingFlowStart(input: OnboardingFlowStartInput!): OnboardingFlowStartResult! @join__field(graph: KYC) @deprecated(reason: "Deprecated, use kycFlowStart instead.")
-  kycFlowStart: OnboardingFlowStartResult! @join__field(graph: KYC)
+  kycFlowStart(input: KycFlowStartInput): OnboardingFlowStartResult! @join__field(graph: KYC)
 }
 
 type MyUpdatesPayload
@@ -1640,12 +1647,14 @@ type OpenDeepLinkAction
   @join__type(graph: BLINK)
 {
   deepLink: String!
+  label: String
 }
 
 type OpenExternalLinkAction
   @join__type(graph: BLINK)
 {
   url: String!
+  label: String
 }
 
 """Information about pagination in a connection"""
