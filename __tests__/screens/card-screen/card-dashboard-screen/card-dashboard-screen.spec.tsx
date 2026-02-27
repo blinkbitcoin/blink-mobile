@@ -16,6 +16,7 @@ jest.mock("react-native-linear-gradient", () => ({
 
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
+const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -23,6 +24,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      setOptions: mockSetOptions,
     }),
     useIsFocused: () => true,
   }
@@ -350,6 +352,26 @@ describe("CardDashboardScreen", () => {
 
       expect(getByText("Card frozen")).toBeTruthy()
       expect(getByText("Card is temporarily disabled")).toBeTruthy()
+    })
+  })
+
+  describe("settings header", () => {
+    it("sets headerRight with settings icon via navigation.setOptions", async () => {
+      mockSetOptions.mockClear()
+
+      render(
+        <ContextForScreen>
+          <CardDashboardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockSetOptions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headerRight: expect.any(Function),
+        }),
+      )
     })
   })
 
