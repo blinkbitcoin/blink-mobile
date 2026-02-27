@@ -139,9 +139,7 @@ describe("ActionField", () => {
     })
 
     it("renders without onAction prop", () => {
-      const { getByText } = render(
-        <ActionField icon="copy-paste" value="Some value" />,
-      )
+      const { getByText } = render(<ActionField icon="copy-paste" value="Some value" />)
 
       expect(getByText("Some value")).toBeTruthy()
     })
