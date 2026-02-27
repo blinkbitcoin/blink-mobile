@@ -250,6 +250,15 @@ mutation cardUpdate($input: CardUpdateInput!) {
   }
 }
 
+mutation cardUpdateLimits($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    dailyLimitCents
+    monthlyLimitCents
+    __typename
+  }
+}
+
 mutation contactCreate($input: ContactCreateInput!) {
   contactCreate(input: $input) {
     errors {
@@ -1103,6 +1112,8 @@ query card {
           cardType
           status
           createdAt
+          dailyLimitCents
+          monthlyLimitCents
           __typename
         }
         __typename
