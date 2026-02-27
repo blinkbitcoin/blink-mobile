@@ -37,7 +37,7 @@ export const CardBalanceSection: React.FC<CardBalanceSectionProps> = ({
         disabled={isDisabled}
         activeOpacity={0.7}
       >
-        <Text type="p4" style={styles.addFundsText}>
+        <Text type="p3" style={styles.addFundsText}>
           {LL.CardFlow.CardDashboard.addFunds()}
         </Text>
         <Icon name="add" size={18} color={styles.primaryColor.color} />
