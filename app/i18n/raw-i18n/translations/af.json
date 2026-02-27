@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Laai kwitansie af",
       "reportIssue": "Rapporteer probleem",
       "transactionHelp": "Transaksie-hulp",
-      "transactionHelpDescription": "As jy hierdie transaksie nie herken nie of hulp nodig het, kontak ons ondersteuningspan onmiddellik.",
+      "transactionHelpDescription": "As jy hierdie transaksie nie herken nie of hulp nodig het, kontak ons {supportTeam} onmiddellik.",
+      "supportTeam": "ondersteuningspan",
       "transactionNotFound": "Transaksie nie gevind nie"
     }
   }

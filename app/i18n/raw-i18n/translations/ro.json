@@ -3043,7 +3043,8 @@
       "downloadReceipt": "Descarcă chitanța",
       "reportIssue": "Raportează o problemă",
       "transactionHelp": "Ajutor tranzacție",
-      "transactionHelpDescription": "Dacă nu recunoașteți această tranzacție sau aveți nevoie de asistență, contactați imediat echipa noastră de suport.",
+      "transactionHelpDescription": "Dacă nu recunoașteți această tranzacție sau aveți nevoie de asistență, contactați imediat {supportTeam}.",
+      "supportTeam": "echipa noastră de suport",
       "transactionNotFound": "Tranzacția nu a fost găsită"
     }
   }

@@ -3043,7 +3043,8 @@
             "downloadReceipt": "Baixar recibo",
             "reportIssue": "Reportar problema",
             "transactionHelp": "Ajuda com transação",
-            "transactionHelpDescription": "Se você não reconhece esta transação ou precisa de ajuda, entre em contato com nossa equipe de suporte imediatamente.",
+            "transactionHelpDescription": "Se você não reconhece esta transação ou precisa de ajuda, entre em contato com nossa {supportTeam} imediatamente.",
+            "supportTeam": "equipe de suporte",
             "transactionNotFound": "Transação não encontrada"
         }
     }

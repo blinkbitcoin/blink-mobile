@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Preuzmi račun",
       "reportIssue": "Prijavi problem",
       "transactionHelp": "Pomoć s transakcijom",
-      "transactionHelpDescription": "Ako ne prepoznajete ovu transakciju ili vam je potrebna pomoć, odmah kontaktirajte naš tim za podršku.",
+      "transactionHelpDescription": "Ako ne prepoznajete ovu transakciju ili vam je potrebna pomoć, odmah kontaktirajte naš {supportTeam}.",
+      "supportTeam": "tim za podršku",
       "transactionNotFound": "Transakcija nije pronađena"
     }
   }

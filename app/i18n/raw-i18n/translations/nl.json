@@ -3084,7 +3084,8 @@
       "downloadReceipt": "Download bon",
       "reportIssue": "Meld probleem",
       "transactionHelp": "Transactiehulp",
-      "transactionHelpDescription": "Als u deze transactie niet herkent of hulp nodig heeft, neem dan onmiddellijk contact op met ons supportteam.",
+      "transactionHelpDescription": "Als u deze transactie niet herkent of hulp nodig heeft, neem dan onmiddellijk contact op met ons {supportTeam}.",
+      "supportTeam": "supportteam",
       "transactionNotFound": "Transactie niet gevonden"
     }
   }
