@@ -3111,6 +3111,10 @@ const en: BaseTranslation = {
       dailyAtmLimitHelper: "Maximum ATM withdrawal per day",
       monthlyAtmLimit: "Monthly ATM limit",
       monthlyAtmLimitHelper: "Maximum ATM withdrawal per month",
+      noLimit: "No limit",
+      limitUpdateSuccess: "Limit updated successfully",
+      limitUpdateError: "Failed to update limit",
+      limitMustBePositive: "Limit must be greater than zero",
       transactionTypesTitle: "Transaction types",
       TransactionTypes: {
         ecommerce: "Online purchases",
