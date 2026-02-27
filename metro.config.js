@@ -18,7 +18,12 @@ const config = {
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
-        inlineRequires: false,
+        // Enable inline requires for improved startup performance
+        // This lazy-loads modules only when they're actually used,
+        // reducing the initial JavaScript bundle parse time.
+        // Expected impact: 0.5-1s faster startup on Android
+        // See: https://reactnative.dev/docs/performance#inline-requires
+        inlineRequires: true,
       },
     }),
   },
