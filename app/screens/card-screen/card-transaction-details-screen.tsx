@@ -177,7 +177,7 @@ const TransactionHero: React.FC<TransactionHeroProps> = ({ transaction }) => {
   return (
     <View style={styles.heroContainer}>
       <View style={styles.iconContainer}>
-        <Icon name="storefront-outline" size={20} color={colors.primary} />
+        <Icon name="storefront-outline" size={34} color={colors.primary} />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.amount}>{transaction.amount}</Text>
