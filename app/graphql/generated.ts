@@ -3140,6 +3140,11 @@ export type BulletinsQueryVariables = Exact<{
 
 export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null } }> } } | null };
 
+export type AccountUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AccountUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate' } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null, readonly me?: { readonly __typename: 'User', readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null } };
+
 export type BusinessMapMarkersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5446,6 +5451,50 @@ export type BulletinsQueryHookResult = ReturnType<typeof useBulletinsQuery>;
 export type BulletinsLazyQueryHookResult = ReturnType<typeof useBulletinsLazyQuery>;
 export type BulletinsSuspenseQueryHookResult = ReturnType<typeof useBulletinsSuspenseQuery>;
 export type BulletinsQueryResult = Apollo.QueryResult<BulletinsQuery, BulletinsQueryVariables>;
+export const AccountUpdatesDocument = gql`
+    subscription accountUpdates {
+  myUpdates {
+    errors {
+      message
+    }
+    update {
+      __typename
+    }
+    me {
+      defaultAccount {
+        id
+        wallets {
+          id
+          balance
+          walletCurrency
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAccountUpdatesSubscription__
+ *
+ * To run a query within a React component, call `useAccountUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useAccountUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountUpdatesSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAccountUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<AccountUpdatesSubscription, AccountUpdatesSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<AccountUpdatesSubscription, AccountUpdatesSubscriptionVariables>(AccountUpdatesDocument, options);
+      }
+export type AccountUpdatesSubscriptionHookResult = ReturnType<typeof useAccountUpdatesSubscription>;
+export type AccountUpdatesSubscriptionResult = Apollo.SubscriptionResult<AccountUpdatesSubscription>;
 export const BusinessMapMarkersDocument = gql`
     query businessMapMarkers {
   businessMapMarkers {

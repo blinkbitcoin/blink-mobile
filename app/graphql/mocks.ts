@@ -1,4 +1,5 @@
 import {
+  AccountUpdatesDocument,
   CurrencyListDocument,
   DisplayCurrencyDocument,
   HomeAuthedDocument,
@@ -43,6 +44,21 @@ const mocks = [
             minSupported: 400,
           },
         ],
+      },
+    },
+  },
+  {
+    request: {
+      query: AccountUpdatesDocument,
+    },
+    result: {
+      data: {
+        myUpdates: {
+          __typename: "MyUpdatesPayload",
+          update: null,
+          errors: [],
+          me: null,
+        },
       },
     },
   },

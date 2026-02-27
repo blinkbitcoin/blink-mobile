@@ -1687,6 +1687,32 @@ query warningSecureAccount {
   }
 }
 
+subscription accountUpdates {
+  myUpdates {
+    errors {
+      message
+      __typename
+    }
+    update {
+      __typename
+    }
+    me {
+      defaultAccount {
+        id
+        wallets {
+          id
+          balance
+          walletCurrency
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 subscription myLnUpdates {
   myUpdates {
     errors {
