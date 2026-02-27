@@ -9668,7 +9668,7 @@ type RootTranslation = {
 				statements: string
 			}
 			/**
-			 * B​l​i​n​k​ ​C​a​r​d
+			 * V​i​s​a​ ​c​a​r​d
 			 */
 			title: string
 			/**
@@ -19232,7 +19232,7 @@ export type TranslationFunctions = {
 				statements: () => LocalizedString
 			}
 			/**
-			 * Blink Card
+			 * Visa card
 			 */
 			title: () => LocalizedString
 			/**
