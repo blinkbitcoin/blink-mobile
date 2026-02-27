@@ -34,8 +34,8 @@ export const IconTextButton: React.FC<IconTextButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
       <Text style={styles.label}>{label}</Text>
+      <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
     </TouchableOpacity>
   )
 }
@@ -59,7 +59,7 @@ const useStyles = makeStyles(({ colors }, { textColor }: StyleProps) => ({
     color: textColor,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 20,
   },
 }))
