@@ -3016,7 +3016,11 @@
         "contactless": "Ukuhlawula ngaphandle kochukumiso",
         "contactlessDescription": "Vumela imisebenzi ngaphandle kochukumiso"
       },
-      "title": "Imida yekhadi"
+      "title": "Imida yekhadi",
+      "noLimit": "Akukho mda",
+      "limitUpdateSuccess": "Umda uhlaziywe ngempumelelo",
+      "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
+      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
     },
     "CardDetails": {
       "title": "Iinkcukacha zekhadi",

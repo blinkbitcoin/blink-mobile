@@ -2969,7 +2969,11 @@
         "contactless": "Temassız ödemeler",
         "contactlessDescription": "Temassız işlemlere izin ver"
       },
-      "title": "Kart limitleri"
+      "title": "Kart limitleri",
+      "noLimit": "Limit yok",
+      "limitUpdateSuccess": "Limit başarıyla güncellendi",
+      "limitUpdateError": "Limit güncellenemedi",
+      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
     },
     "CardDetails": {
       "title": "Kart detayları",

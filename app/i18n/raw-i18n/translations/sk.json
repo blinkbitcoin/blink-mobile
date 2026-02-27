@@ -2969,7 +2969,11 @@
         "contactless": "Bezkontaktné platby",
         "contactlessDescription": "Povoliť bezkontaktné transakcie"
       },
-      "title": "Limity karty"
+      "title": "Limity karty",
+      "noLimit": "Bez limitu",
+      "limitUpdateSuccess": "Limit bol úspešne aktualizovaný",
+      "limitUpdateError": "Nepodarilo sa aktualizovať limit",
+      "limitMustBePositive": "Limit musí byť väčší ako nula"
     },
     "CardDetails": {
       "title": "Detaily karty",

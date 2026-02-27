@@ -3007,7 +3007,11 @@
         "contactless": "Thanh toán không tiếp xúc",
         "contactlessDescription": "Cho phép giao dịch không tiếp xúc"
       },
-      "title": "Hạn mức thẻ"
+      "title": "Hạn mức thẻ",
+      "noLimit": "Không giới hạn",
+      "limitUpdateSuccess": "Cập nhật giới hạn thành công",
+      "limitUpdateError": "Không thể cập nhật giới hạn",
+      "limitMustBePositive": "Giới hạn phải lớn hơn không"
     },
     "CardDetails": {
       "title": "Chi tiết thẻ",

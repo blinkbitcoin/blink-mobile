@@ -2969,7 +2969,11 @@
         "contactless": "Pagaments sense contacte",
         "contactlessDescription": "Permet transaccions sense contacte"
       },
-      "title": "Límits de la targeta"
+      "title": "Límits de la targeta",
+      "noLimit": "Sense límit",
+      "limitUpdateSuccess": "Límit actualitzat correctament",
+      "limitUpdateError": "No s'ha pogut actualitzar el límit",
+      "limitMustBePositive": "El límit ha de ser superior a zero"
     },
     "CardDetails": {
       "title": "Detalls de la targeta",

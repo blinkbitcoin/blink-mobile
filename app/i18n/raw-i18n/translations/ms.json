@@ -3010,7 +3010,11 @@
         "contactless": "Pembayaran tanpa sentuh",
         "contactlessDescription": "Benarkan transaksi tanpa sentuh"
       },
-      "title": "Had kad"
+      "title": "Had kad",
+      "noLimit": "Tiada had",
+      "limitUpdateSuccess": "Had berjaya dikemas kini",
+      "limitUpdateError": "Gagal mengemas kini had",
+      "limitMustBePositive": "Had mestilah lebih besar daripada sifar"
     },
     "CardDetails": {
       "title": "Butiran kad",

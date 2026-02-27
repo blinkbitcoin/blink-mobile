@@ -2993,7 +2993,11 @@
                 "contactless": "Pagamentos sem contato",
                 "contactlessDescription": "Permitir transações sem contato"
             },
-            "title": "Limites do cartão"
+            "title": "Limites do cartão",
+            "noLimit": "Sem limite",
+            "limitUpdateSuccess": "Limite atualizado com sucesso",
+            "limitUpdateError": "Falha ao atualizar o limite",
+            "limitMustBePositive": "O limite deve ser maior que zero"
         },
         "CardStatements": {
             "title": "Movimentos",

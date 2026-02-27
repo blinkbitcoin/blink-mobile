@@ -9860,6 +9860,22 @@ type RootTranslation = {
 			 */
 			monthlyAtmLimitHelper: string
 			/**
+			 * N​o​ ​l​i​m​i​t
+			 */
+			noLimit: string
+			/**
+			 * L​i​m​i​t​ ​u​p​d​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+			 */
+			limitUpdateSuccess: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​l​i​m​i​t
+			 */
+			limitUpdateError: string
+			/**
+			 * L​i​m​i​t​ ​m​u​s​t​ ​b​e​ ​g​r​e​a​t​e​r​ ​t​h​a​n​ ​z​e​r​o
+			 */
+			limitMustBePositive: string
+			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
 			 */
 			transactionTypesTitle: string
@@ -20470,6 +20486,22 @@ export type TranslationFunctions = {
 			 * Maximum ATM withdrawal per month
 			 */
 			monthlyAtmLimitHelper: () => LocalizedString
+			/**
+			 * No limit
+			 */
+			noLimit: () => LocalizedString
+			/**
+			 * Limit updated successfully
+			 */
+			limitUpdateSuccess: () => LocalizedString
+			/**
+			 * Failed to update limit
+			 */
+			limitUpdateError: () => LocalizedString
+			/**
+			 * Limit must be greater than zero
+			 */
+			limitMustBePositive: () => LocalizedString
 			/**
 			 * Transaction types
 			 */

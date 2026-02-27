@@ -2969,7 +2969,11 @@
         "contactless": "Okusasula awatali kukwatagana",
         "contactlessDescription": "Okukkiriza okutunda awatali kukwatagana"
       },
-      "title": "Ensalo z'ekkaadi"
+      "title": "Ensalo z'ekkaadi",
+      "noLimit": "Tewali kkomo",
+      "limitUpdateSuccess": "Kkomo ekyusiddwa obulungi",
+      "limitUpdateError": "Kkomo tesobodde kukyusibwa",
+      "limitMustBePositive": "Kkomo erina okusinga zeero"
     },
     "CardDetails": {
       "title": "Ebikwata ku kaadi",

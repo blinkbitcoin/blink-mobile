@@ -3007,7 +3007,11 @@
         "contactless": "الدفع بدون تلامس",
         "contactlessDescription": "السماح بمعاملات اللمس للدفع"
       },
-      "title": "حدود البطاقة"
+      "title": "حدود البطاقة",
+      "noLimit": "بدون حد",
+      "limitUpdateSuccess": "تم تحديث الحد بنجاح",
+      "limitUpdateError": "فشل تحديث الحد",
+      "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر"
     },
     "CardDetails": {
       "title": "تفاصيل البطاقة",

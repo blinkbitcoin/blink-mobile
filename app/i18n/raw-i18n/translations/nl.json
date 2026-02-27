@@ -3010,7 +3010,11 @@
         "contactless": "Contactloze betalingen",
         "contactlessDescription": "Contactloze transacties toestaan"
       },
-      "title": "Kaartlimieten"
+      "title": "Kaartlimieten",
+      "noLimit": "Geen limiet",
+      "limitUpdateSuccess": "Limiet succesvol bijgewerkt",
+      "limitUpdateError": "Limiet bijwerken mislukt",
+      "limitMustBePositive": "Limiet moet groter zijn dan nul"
     },
     "CardDetails": {
       "title": "Kaartgegevens",

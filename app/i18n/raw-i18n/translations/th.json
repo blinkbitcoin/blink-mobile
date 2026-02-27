@@ -3007,7 +3007,11 @@
         "contactless": "การชำระเงินแบบไร้สัมผัส",
         "contactlessDescription": "อนุญาตธุรกรรมแบบไร้สัมผัส"
       },
-      "title": "วงเงินบัตร"
+      "title": "วงเงินบัตร",
+      "noLimit": "ไม่มีขีดจำกัด",
+      "limitUpdateSuccess": "อัปเดตขีดจำกัดสำเร็จ",
+      "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
+      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์"
     },
     "CardDetails": {
       "title": "รายละเอียดบัตร",

@@ -3034,7 +3034,11 @@
                 "contactless": "Paiements sans contact",
                 "contactlessDescription": "Autoriser les transactions sans contact"
             },
-            "title": "Limites de carte"
+            "title": "Limites de carte",
+            "noLimit": "Sans limite",
+            "limitUpdateSuccess": "Limite mise à jour avec succès",
+            "limitUpdateError": "Échec de la mise à jour de la limite",
+            "limitMustBePositive": "La limite doit être supérieure à zéro"
         },
         "CardStatements": {
             "title": "Mouvements",

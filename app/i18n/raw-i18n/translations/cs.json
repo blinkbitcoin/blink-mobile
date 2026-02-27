@@ -3010,7 +3010,11 @@
         "contactless": "Bezkontaktní platby",
         "contactlessDescription": "Povolit bezkontaktní transakce"
       },
-      "title": "Limity karty"
+      "title": "Limity karty",
+      "noLimit": "Bez limitu",
+      "limitUpdateSuccess": "Limit úspěšně aktualizován",
+      "limitUpdateError": "Nepodařilo se aktualizovat limit",
+      "limitMustBePositive": "Limit musí být větší než nula"
     },
     "CardDetails": {
       "title": "Detaily karty",

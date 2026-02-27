@@ -2969,7 +2969,11 @@
         "contactless": "Érintésmentes fizetések",
         "contactlessDescription": "Érintésmentes tranzakciók engedélyezése"
       },
-      "title": "Kártyakorlátok"
+      "title": "Kártyakorlátok",
+      "noLimit": "Nincs korlát",
+      "limitUpdateSuccess": "Korlát sikeresen frissítve",
+      "limitUpdateError": "Nem sikerült frissíteni a korlátot",
+      "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie"
     },
     "CardDetails": {
       "title": "Kártya részletei",

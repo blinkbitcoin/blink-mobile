@@ -2969,7 +2969,11 @@
         "contactless": "Malipo bila kugusa",
         "contactlessDescription": "Ruhusu miamala bila kugusa"
       },
-      "title": "Vipimo vya kadi"
+      "title": "Vipimo vya kadi",
+      "noLimit": "Hakuna kikomo",
+      "limitUpdateSuccess": "Kikomo kimesasishwa kwa mafanikio",
+      "limitUpdateError": "Imeshindikana kusasisha kikomo",
+      "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri"
     },
     "CardDetails": {
       "title": "Maelezo ya kadi",

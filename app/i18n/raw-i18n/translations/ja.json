@@ -3034,7 +3034,11 @@
                 "contactless": "非接触決済",
                 "contactlessDescription": "非接触取引を許可"
             },
-            "title": "カード限度額"
+            "title": "カード限度額",
+            "noLimit": "制限なし",
+            "limitUpdateSuccess": "制限が正常に更新されました",
+            "limitUpdateError": "制限の更新に失敗しました",
+            "limitMustBePositive": "制限はゼロより大きい必要があります"
         },
         "CardStatements": {
             "title": "明細",

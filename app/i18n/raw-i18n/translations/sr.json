@@ -3007,7 +3007,11 @@
         "contactless": "Бесконтактна плаћања",
         "contactlessDescription": "Дозволи бесконтактне трансакције"
       },
-      "title": "Ограничења картице"
+      "title": "Ограничења картице",
+      "noLimit": "Без ограничења",
+      "limitUpdateSuccess": "Ограничење успешно ажурирано",
+      "limitUpdateError": "Ажурирање ограничења није успело",
+      "limitMustBePositive": "Ограничење мора бити веће од нуле"
     },
     "CardDetails": {
       "title": "Detalji kartice",
