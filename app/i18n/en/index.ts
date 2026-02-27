@@ -3058,7 +3058,7 @@ const en: BaseTranslation = {
         setLimits: "Set limits",
         statements: "Statements",
       },
-      title: "Blink Card",
+      title: "Visa card",
       addFunds: "Add funds",
       transactionsTitle: "Transactions",
       emptyTransactions: "No transactions yet",
