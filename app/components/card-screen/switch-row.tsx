@@ -6,15 +6,15 @@ import { Switch } from "@app/components/atomic/switch"
 type SwitchRowProps = {
   title: string
   description?: string
-  value: boolean
-  onValueChange: (value: boolean) => void
+  value?: boolean
+  onValueChange?: (value: boolean) => void
 }
 
 export const SwitchRow: React.FC<SwitchRowProps> = ({
   title,
   description,
-  value,
-  onValueChange,
+  value = false,
+  onValueChange = () => {},
 }) => {
   const styles = useStyles()
   return (
@@ -48,6 +48,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   listItemSubtitle: {
     color: colors.grey2,
+    fontWeight: "400",
     fontSize: 14,
     lineHeight: 16,
   },

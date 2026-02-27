@@ -1,10 +1,18 @@
-import React, { useReducer, useState } from "react"
+import React, { useMemo, useReducer, useState } from "react"
 import ReactNativeModal from "react-native-modal"
-import { Pressable, SafeAreaView, StyleProp, View, ViewStyle } from "react-native"
+import {
+  ActivityIndicator,
+  Pressable,
+  SafeAreaView,
+  StyleProp,
+  View,
+  ViewStyle,
+} from "react-native"
 import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
   formatNumberPadNumber,
+  getDisabledKeys,
   Key,
   numberPadReducer,
   NumberPadReducerActionType,
@@ -15,28 +23,35 @@ import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"
+import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { WalletOrDisplayCurrency } from "@app/types/amounts"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 type LimitInputProps = {
   label: string
-  value: string
+  value?: string
   helperText: string
-  onChangeValue: (value: string) => void
+  onChangeValue?: (value: string) => void
   icon?: IconNamesType
   minHeight?: number
-  currency?: string
+  currency?: WalletCurrency
+  loading?: boolean
+  disabled?: boolean
+  testID?: string
 }
 
 export const LimitInput: React.FC<LimitInputProps> = ({
   label,
-  value,
+  value = "0",
   helperText,
-  onChangeValue,
+  onChangeValue = () => {},
   icon = "pencil",
   minHeight = 52,
-  currency = "USD",
+  currency = WalletCurrency.Usd,
+  loading = false,
+  disabled = false,
+  testID,
 }) => {
   const styles = useStyles()
   const {
@@ -76,7 +91,9 @@ export const LimitInput: React.FC<LimitInputProps> = ({
 
   const handleConfirm = () => {
     const newValue = numberPadToString(numberPadState.numberPadNumber)
-    onChangeValue(newValue)
+    if (newValue !== value) {
+      onChangeValue(newValue)
+    }
     setIsModalOpen(false)
   }
 
@@ -84,11 +101,16 @@ export const LimitInput: React.FC<LimitInputProps> = ({
     setIsModalOpen(false)
   }
 
+  const isDisabled = loading || disabled
+
   const pressableStyle = ({ pressed }: { pressed: boolean }): StyleProp<ViewStyle> => [
     styles.valueCard,
     { minHeight },
     pressed && styles.valueCardPressed,
+    isDisabled && styles.valueCardDisabled,
   ]
+
+  const disabledKeys = useMemo(() => getDisabledKeys(numberPadState), [numberPadState])
 
   const formattedValue = `${currencySymbol}${(Number(value) || 0).toLocaleString()}`
   const modalDisplayValue = formatNumberPadNumber({
@@ -99,17 +121,22 @@ export const LimitInput: React.FC<LimitInputProps> = ({
   })
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       <Text style={styles.label}>{label}</Text>
       <Pressable
         style={pressableStyle}
         onPress={handleOpen}
+        disabled={isDisabled}
         accessibilityLabel={`${label}: ${formattedValue}`}
         accessibilityHint="Allows editing limit"
         accessibilityRole="button"
       >
         <Text style={styles.value}>{formattedValue}</Text>
-        <GaloyIcon name={icon} size={20} color={colors.primary} />
+        {loading ? (
+          <ActivityIndicator size="small" color={colors.primary} />
+        ) : (
+          <GaloyIcon name={icon} size={20} color={colors.primary} />
+        )}
       </Pressable>
       <Text style={styles.helperText}>{helperText}</Text>
 
@@ -135,7 +162,7 @@ export const LimitInput: React.FC<LimitInputProps> = ({
             </View>
             <View style={styles.spacer} />
             <View style={styles.keyboardContainer}>
-              <CurrencyKeyboard onPress={handleKeyPress} />
+              <CurrencyKeyboard onPress={handleKeyPress} disabledKeys={disabledKeys} />
             </View>
             <GaloyPrimaryButton title={LL.common.confirm()} onPress={handleConfirm} />
           </View>
@@ -168,11 +195,14 @@ const useStyles = makeStyles(({ colors }) => ({
   valueCardPressed: {
     opacity: 0.7,
   },
+  valueCardDisabled: {
+    opacity: 0.5,
+  },
   value: {
     color: colors.black,
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "700",
+    fontWeight: "400",
   },
   helperText: {
     color: colors.black,
@@ -230,6 +260,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   keyboardContainer: {
     marginBottom: 30,
-    paddingHorizontal: 16,
   },
 }))
