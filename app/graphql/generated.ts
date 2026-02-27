@@ -3092,10 +3092,17 @@ export type CardTransactionsPaginatedQueryVariables = Exact<{
 
 export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
 
+export type CardUpdateLimitsMutationVariables = Exact<{
+  input: CardUpdateInput;
+}>;
+
+
+export type CardUpdateLimitsMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null } };
+
 export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string }> } } | null };
+export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }> } } | null };
 
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5043,6 +5050,41 @@ export type CardTransactionsPaginatedQueryHookResult = ReturnType<typeof useCard
 export type CardTransactionsPaginatedLazyQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedLazyQuery>;
 export type CardTransactionsPaginatedSuspenseQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedSuspenseQuery>;
 export type CardTransactionsPaginatedQueryResult = Apollo.QueryResult<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>;
+export const CardUpdateLimitsDocument = gql`
+    mutation cardUpdateLimits($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    dailyLimitCents
+    monthlyLimitCents
+  }
+}
+    `;
+export type CardUpdateLimitsMutationFn = Apollo.MutationFunction<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>;
+
+/**
+ * __useCardUpdateLimitsMutation__
+ *
+ * To run a mutation, you first call `useCardUpdateLimitsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardUpdateLimitsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardUpdateLimitsMutation, { data, loading, error }] = useCardUpdateLimitsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardUpdateLimitsMutation(baseOptions?: Apollo.MutationHookOptions<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>(CardUpdateLimitsDocument, options);
+      }
+export type CardUpdateLimitsMutationHookResult = ReturnType<typeof useCardUpdateLimitsMutation>;
+export type CardUpdateLimitsMutationResult = Apollo.MutationResult<CardUpdateLimitsMutation>;
+export type CardUpdateLimitsMutationOptions = Apollo.BaseMutationOptions<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>;
 export const CardDocument = gql`
     query card {
   me {
@@ -5056,6 +5098,8 @@ export const CardDocument = gql`
           cardType
           status
           createdAt
+          dailyLimitCents
+          monthlyLimitCents
         }
       }
     }

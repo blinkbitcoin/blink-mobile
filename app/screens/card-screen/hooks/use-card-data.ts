@@ -16,6 +16,8 @@ gql`
             cardType
             status
             createdAt
+            dailyLimitCents
+            monthlyLimitCents
           }
         }
       }
