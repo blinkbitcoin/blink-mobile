@@ -1,7 +1,10 @@
-import React, { useState } from "react"
-import { View } from "react-native"
-import { makeStyles } from "@rn-vui/themed"
+import React, { useCallback, useEffect, useState } from "react"
+import { TouchableOpacity, View } from "react-native"
+import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { BlinkCard } from "@app/components/blink-card"
 
@@ -10,11 +13,31 @@ import {
   CardBalanceSection,
   CardTransactionsSection,
 } from "@app/components/card-screen"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { MOCK_CARD, MOCK_TRANSACTIONS, EMPTY_TRANSACTIONS } from "./card-mock-data"
 
 export const CardDashboardScreen: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const [isFrozen, setIsFrozen] = useState(false)
+
+  const handleSettingsPress = useCallback(() => {
+    console.log("Settings pressed")
+  }, [])
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
+          <GaloyIcon name="settings" size={24} color={colors.black} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
+
   const hasTransactions = true
   const transactions = hasTransactions ? MOCK_TRANSACTIONS : EMPTY_TRANSACTIONS
 
@@ -56,5 +79,9 @@ const useStyles = makeStyles(({ colors }) => ({
   content: {
     paddingTop: 16,
     paddingBottom: 40,
+  },
+  headerRight: {
+    padding: 8,
+    marginRight: 16,
   },
 }))
