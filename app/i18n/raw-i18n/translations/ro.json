@@ -2969,7 +2969,11 @@
         "contactless": "Plăți fără contact",
         "contactlessDescription": "Permite tranzacții fără contact"
       },
-      "title": "Limite card"
+      "title": "Limite card",
+      "noLimit": "Fără limită",
+      "limitUpdateSuccess": "Limita a fost actualizată cu succes",
+      "limitUpdateError": "Nu s-a putut actualiza limita",
+      "limitMustBePositive": "Limita trebuie să fie mai mare decât zero"
     },
     "CardDetails": {
       "title": "Detalii card",

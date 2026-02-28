@@ -2969,7 +2969,11 @@
         "contactless": "Pembayaran tanpa kontak",
         "contactlessDescription": "Izinkan transaksi tanpa kontak"
       },
-      "title": "Batas kartu"
+      "title": "Batas kartu",
+      "noLimit": "Tanpa batas",
+      "limitUpdateSuccess": "Batas berhasil diperbarui",
+      "limitUpdateError": "Gagal memperbarui batas",
+      "limitMustBePositive": "Batas harus lebih besar dari nol"
     },
     "CardDetails": {
       "title": "Detail kartu",

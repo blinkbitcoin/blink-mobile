@@ -3007,7 +3007,11 @@
         "contactless": "Mana llamk'ay pagokuna",
         "contactlessDescription": "Mana llamk'ay transaccionkunata saqiy"
       },
-      "title": "Tarjeta limitkuna"
+      "title": "Tarjeta limitkuna",
+      "noLimit": "Mana limitayuq",
+      "limitUpdateSuccess": "Limite allinlla musuqyachisqa",
+      "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
+      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
     },
     "CardDetails": {
       "title": "Tarjeta willayninkunap detallenkunan",

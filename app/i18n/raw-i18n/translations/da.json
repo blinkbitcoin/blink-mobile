@@ -2987,7 +2987,11 @@
         "contactless": "Kontaktløse betalinger",
         "contactlessDescription": "Tillad kontaktløse transaktioner"
       },
-      "title": "Kortgrænser"
+      "title": "Kortgrænser",
+      "noLimit": "Ingen grænse",
+      "limitUpdateSuccess": "Grænse opdateret",
+      "limitUpdateError": "Kunne ikke opdatere grænsen",
+      "limitMustBePositive": "Grænsen skal være større end nul"
     },
     "CardDetails": {
       "title": "Kortoplysninger",

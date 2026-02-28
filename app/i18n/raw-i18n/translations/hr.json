@@ -3010,7 +3010,11 @@
         "contactless": "Beskontaktna plaćanja",
         "contactlessDescription": "Dopusti beskontaktne transakcije"
       },
-      "title": "Ograničenja kartice"
+      "title": "Ograničenja kartice",
+      "noLimit": "Bez ograničenja",
+      "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
+      "limitUpdateError": "Nije moguće ažurirati ograničenje",
+      "limitMustBePositive": "Ograničenje mora biti veće od nule"
     },
     "CardDetails": {
       "title": "Detalji kartice",

@@ -2969,7 +2969,11 @@
         "contactless": "Ανέπαφες πληρωμές",
         "contactlessDescription": "Επιτρέψτε ανέπαφες συναλλαγές"
       },
-      "title": "Όρια κάρτας"
+      "title": "Όρια κάρτας",
+      "noLimit": "Χωρίς όριο",
+      "limitUpdateSuccess": "Το όριο ενημερώθηκε επιτυχώς",
+      "limitUpdateError": "Αποτυχία ενημέρωσης ορίου",
+      "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν"
     },
     "CardDetails": {
       "title": "Στοιχεία κάρτας",

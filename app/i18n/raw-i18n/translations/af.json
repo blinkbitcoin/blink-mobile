@@ -3010,7 +3010,11 @@
         "contactless": "Kontaklose betalings",
         "contactlessDescription": "Laat tik-om-te-betaal transaksies toe"
       },
-      "title": "Kaartlimiete"
+      "title": "Kaartlimiete",
+      "noLimit": "Geen limiet",
+      "limitUpdateSuccess": "Limiet suksesvol opgedateer",
+      "limitUpdateError": "Kon limiet nie opdateer nie",
+      "limitMustBePositive": "Limiet moet groter as nul wees"
     },
     "CardDetails": {
       "title": "Kaartbesonderhede",
