@@ -1,6 +1,6 @@
 import React from "react"
 import { Text as RNText } from "react-native"
-import { render } from "@testing-library/react-native"
+import { render, fireEvent } from "@testing-library/react-native"
 
 import { InputField } from "@app/components/card-screen/input-field"
 
@@ -11,11 +11,13 @@ jest.mock("@rn-vui/themed", () => ({
     label: {},
     valueContainer: {},
     value: {},
+    editableInput: {},
   }),
   useTheme: () => ({
     theme: {
       colors: {
         primary: "#000",
+        grey2: "#666",
       },
     },
   }),
@@ -88,6 +90,40 @@ describe("InputField", () => {
 
       expect(getByText("Phone number")).toBeTruthy()
       expect(getByText("+1 (555) 123-4567")).toBeTruthy()
+    })
+  })
+
+  describe("editable mode", () => {
+    it("renders a TextInput when editable", () => {
+      const { getByLabelText } = render(
+        <InputField label="Full name" value="Satoshi" editable />,
+      )
+
+      expect(getByLabelText("Full name")).toBeTruthy()
+    })
+
+    it("calls onChangeText when text changes", () => {
+      const onChangeText = jest.fn()
+      const { getByLabelText } = render(
+        <InputField
+          label="Full name"
+          value="Satoshi"
+          editable
+          onChangeText={onChangeText}
+        />,
+      )
+
+      fireEvent.changeText(getByLabelText("Full name"), "Nakamoto")
+
+      expect(onChangeText).toHaveBeenCalledWith("Nakamoto")
+    })
+
+    it("displays the label in editable mode", () => {
+      const { getByText } = render(
+        <InputField label="Address" value="123 Main St" editable />,
+      )
+
+      expect(getByText("Address")).toBeTruthy()
     })
   })
 
