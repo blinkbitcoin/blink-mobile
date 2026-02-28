@@ -3209,7 +3209,8 @@
         "businessDays": "{day1}-{day2} hari bekerja",
         "free": "PERCUMA",
         "shippingAddress": "Alamat penghantaran",
-        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran"
+        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
+        "chooseDeliverySpeed": "Pilih kelajuan penghantaran"
       },
       "Confirm": {
         "title": "Semak permintaan anda",

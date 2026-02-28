@@ -3215,7 +3215,8 @@
         "businessDays": "Iintsuku {day1}-{day2} zomsebenzi",
         "free": "SIMAHLA",
         "shippingAddress": "Idilesi yokuthumela",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela"
+        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela",
+        "chooseDeliverySpeed": "Khetha isantya sokuhanjiselwa"
       },
       "Confirm": {
         "title": "Phonononga isicelo sakho",

@@ -3206,7 +3206,8 @@
         "businessDays": "{day1}-{day2} ngày làm việc",
         "free": "MIỄN PHÍ",
         "shippingAddress": "Địa chỉ giao hàng",
-        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng"
+        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng",
+        "chooseDeliverySpeed": "Chọn tốc độ giao hàng"
       },
       "Confirm": {
         "title": "Xem lại yêu cầu của bạn",

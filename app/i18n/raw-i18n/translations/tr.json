@@ -3168,7 +3168,8 @@
         "businessDays": "{day1}-{day2} iş günü",
         "free": "ÜCRETSİZ",
         "shippingAddress": "Teslimat adresi",
-        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan"
+        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan",
+        "chooseDeliverySpeed": "Teslimat hızını seçin"
       },
       "Confirm": {
         "title": "Talebinizi gözden geçirin",

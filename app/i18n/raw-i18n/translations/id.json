@@ -3168,7 +3168,8 @@
         "businessDays": "{day1}-{day2} hari kerja",
         "free": "GRATIS",
         "shippingAddress": "Alamat pengiriman",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman"
+        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
+        "chooseDeliverySpeed": "Pilih kecepatan pengiriman"
       },
       "Confirm": {
         "title": "Tinjau permintaan Anda",

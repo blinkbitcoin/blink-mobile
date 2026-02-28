@@ -3168,7 +3168,8 @@
         "businessDays": "Siku {day1}-{day2} za kazi",
         "free": "BURE",
         "shippingAddress": "Anwani ya usafirishaji",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji"
+        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
+        "chooseDeliverySpeed": "Chagua kasi ya uwasilishaji"
       },
       "Confirm": {
         "title": "Kagua ombi lako",

@@ -3206,7 +3206,8 @@
         "businessDays": "{day1}-{day2} วันทำการ",
         "free": "ฟรี",
         "shippingAddress": "ที่อยู่จัดส่ง",
-        "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง"
+        "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง",
+        "chooseDeliverySpeed": "เลือกความเร็วในการจัดส่ง"
       },
       "Confirm": {
         "title": "ตรวจสอบคำขอของคุณ",

@@ -3206,7 +3206,8 @@
         "businessDays": "{day1}-{day2} أيام عمل",
         "free": "مجاني",
         "shippingAddress": "عنوان الشحن",
-        "useRegisteredAddress": "استخدم العنوان المسجل كعنوان شحن"
+        "useRegisteredAddress": "استخدم العنوان المسجل كعنوان شحن",
+        "chooseDeliverySpeed": "اختر سرعة التوصيل"
       },
       "Confirm": {
         "title": "راجع طلبك",
