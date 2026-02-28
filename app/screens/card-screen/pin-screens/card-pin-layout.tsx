@@ -171,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
   },
   pinContainer: {
-    width: 100,
+    minWidth: 124,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
