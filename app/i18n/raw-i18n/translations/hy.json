@@ -3209,7 +3209,8 @@
         "businessDays": "{day1}-{day2} աշխատանքային օր",
         "free": "ԱՆՎՃԱՐ",
         "shippingAddress": "Առաքման հասցե",
-        "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե"
+        "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե",
+        "chooseDeliverySpeed": "Ընտրեք առաքման արագությունը"
       },
       "Confirm": {
         "title": "Վերանայեք ձեր հարցումը",

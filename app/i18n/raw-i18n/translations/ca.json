@@ -3168,7 +3168,8 @@
         "businessDays": "{day1}-{day2} dies laborables",
         "free": "GRATUÏT",
         "shippingAddress": "Adreça d'enviament",
-        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament"
+        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
+        "chooseDeliverySpeed": "Tria la velocitat de lliurament"
       },
       "Confirm": {
         "title": "Revisa la teva sol·licitud",

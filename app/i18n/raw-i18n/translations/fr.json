@@ -3207,7 +3207,8 @@
                 "businessDays": "{day1}-{day2} jours ouvrables",
                 "free": "GRATUIT",
                 "shippingAddress": "Adresse de livraison",
-                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison"
+                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison",
+                "chooseDeliverySpeed": "Choisir la vitesse de livraison"
             },
             "Confirm": {
                 "title": "Vérifiez votre demande",

@@ -3168,7 +3168,8 @@
         "businessDays": "Ennaku {day1}-{day2} ez'omulimu",
         "free": "BWEREERE",
         "shippingAddress": "Endagiriro y'okutuma",
-        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma"
+        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma",
+        "chooseDeliverySpeed": "Londa embiro y'okutumya"
       },
       "Confirm": {
         "title": "Kebera okusaba kwo",

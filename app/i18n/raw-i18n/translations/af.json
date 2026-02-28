@@ -3209,7 +3209,8 @@
         "businessDays": "{day1}-{day2} besigheidsdae",
         "free": "GRATIS",
         "shippingAddress": "Versendingsadres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres"
+        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
+        "chooseDeliverySpeed": "Kies afleweringspoed"
       },
       "Confirm": {
         "title": "Hersien jou versoek",

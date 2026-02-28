@@ -3209,7 +3209,8 @@
         "businessDays": "{day1}-{day2} pracovních dnů",
         "free": "ZDARMA",
         "shippingAddress": "Doručovací adresa",
-        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací"
+        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací",
+        "chooseDeliverySpeed": "Zvolte rychlost doručení"
       },
       "Confirm": {
         "title": "Zkontrolujte svou žádost",

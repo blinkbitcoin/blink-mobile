@@ -3207,7 +3207,8 @@
                 "businessDays": "{day1}〜{day2}営業日",
                 "free": "無料",
                 "shippingAddress": "配送先住所",
-                "useRegisteredAddress": "登録住所を配送先住所として使用"
+                "useRegisteredAddress": "登録住所を配送先住所として使用",
+                "chooseDeliverySpeed": "配送速度を選択"
             },
             "Confirm": {
                 "title": "リクエストを確認",

@@ -3186,7 +3186,8 @@
         "businessDays": "{day1}-{day2} hverdage",
         "free": "GRATIS",
         "shippingAddress": "Leveringsadresse",
-        "useRegisteredAddress": "Brug registreret adresse som leveringsadresse"
+        "useRegisteredAddress": "Brug registreret adresse som leveringsadresse",
+        "chooseDeliverySpeed": "Vælg leveringshastighed"
       },
       "Confirm": {
         "title": "Gennemgå din anmodning",

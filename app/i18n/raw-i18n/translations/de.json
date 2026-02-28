@@ -3166,7 +3166,8 @@
                 "businessDays": "{day1}-{day2} Werktage",
                 "free": "KOSTENLOS",
                 "shippingAddress": "Lieferadresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden"
+                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
+                "chooseDeliverySpeed": "Liefergeschwindigkeit wählen"
             },
             "Confirm": {
                 "title": "Überprüfen Sie Ihre Anfrage",

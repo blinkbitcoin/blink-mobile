@@ -74,7 +74,9 @@ export const ReplaceCardScreen: React.FC = () => {
           iconColor: colors._green,
           title: LL.CardFlow.ReplaceCard.Delivery.title(),
           subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
-          buttonLabel: LL.common.continue(),
+          buttonLabel: state.selectedDelivery
+            ? LL.common.continue()
+            : LL.CardFlow.ReplaceCard.Delivery.chooseDeliverySpeed(),
           onButtonPress: goToNextStep,
           isButtonDisabled: !state.selectedDelivery,
         }

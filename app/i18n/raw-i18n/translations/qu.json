@@ -3206,7 +3206,8 @@
         "businessDays": "{day1}-{day2} llamk'ay p'unchawkuna",
         "free": "QHASILLA",
         "shippingAddress": "Apachina dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy"
+        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
+        "chooseDeliverySpeed": "Apachiyta ajllay"
       },
       "Confirm": {
         "title": "Mañakusqaykita qhaway",

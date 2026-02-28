@@ -3292,6 +3292,7 @@ const en: BaseTranslation = {
         expressDelivery: "Express delivery",
         shippingAddress: "Shipping address",
         useRegisteredAddress: "Use registered address as shipping address",
+        chooseDeliverySpeed: "Choose delivery speed",
       },
       Confirm: {
         title: "Confirm replacement",

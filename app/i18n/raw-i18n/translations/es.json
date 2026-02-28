@@ -3166,7 +3166,8 @@
                 "businessDays": "{day1}-{day2} días hábiles",
                 "free": "GRATIS",
                 "shippingAddress": "Dirección de envío",
-                "useRegisteredAddress": "Usar dirección registrada como dirección de envío"
+                "useRegisteredAddress": "Usar dirección registrada como dirección de envío",
+                "chooseDeliverySpeed": "Elige velocidad de envío"
             },
             "Confirm": {
                 "title": "Revisa tu solicitud",

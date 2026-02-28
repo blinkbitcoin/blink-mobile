@@ -3206,7 +3206,8 @@
         "businessDays": "{day1}-{day2} радних дана",
         "free": "БЕСПЛАТНО",
         "shippingAddress": "Адреса за доставу",
-        "useRegisteredAddress": "Користи регистровану адресу као адресу за доставу"
+        "useRegisteredAddress": "Користи регистровану адресу као адресу за доставу",
+        "chooseDeliverySpeed": "Изаберите брзину испоруке"
       },
       "Confirm": {
         "title": "Прегледајте свој захтев",

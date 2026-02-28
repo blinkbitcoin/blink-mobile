@@ -3168,7 +3168,8 @@
         "businessDays": "{day1}-{day2} zile lucrătoare",
         "free": "GRATUIT",
         "shippingAddress": "Adresa de expediere",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere"
+        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere",
+        "chooseDeliverySpeed": "Alegeți viteza de livrare"
       },
       "Confirm": {
         "title": "Verifică solicitarea ta",

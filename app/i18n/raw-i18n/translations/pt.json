@@ -3166,7 +3166,8 @@
                 "businessDays": "{day1}-{day2} dias úteis",
                 "free": "GRÁTIS",
                 "shippingAddress": "Endereço de envio",
-                "useRegisteredAddress": "Usar endereço registado como endereço de envio"
+                "useRegisteredAddress": "Usar endereço registado como endereço de envio",
+                "chooseDeliverySpeed": "Escolha a velocidade de entrega"
             },
             "Confirm": {
                 "title": "Revise o seu pedido",
