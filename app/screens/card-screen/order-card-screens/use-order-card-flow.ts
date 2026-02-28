@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
@@ -43,6 +43,7 @@ export const useOrderCardFlow = (): UseOrderCardFlowReturn => {
     MOCK_USER.registeredAddress,
   )
   const [isComplete, setIsComplete] = useState(false)
+  const isCompleteRef = useRef(false)
 
   const goToNextStep = useCallback(() => {
     setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))
@@ -59,18 +60,19 @@ export const useOrderCardFlow = (): UseOrderCardFlowReturn => {
   }, [])
 
   const completeFlow = useCallback(() => {
+    isCompleteRef.current = true
     setIsComplete(true)
   }, [])
 
   useEffect(() => {
     return navigation.addListener("beforeRemove", (e) => {
-      if (isComplete) return
+      if (isCompleteRef.current) return
 
       if (goToPreviousStep()) {
         e.preventDefault()
       }
     })
-  }, [navigation, goToPreviousStep, isComplete])
+  }, [navigation, goToPreviousStep])
 
   return {
     step,
