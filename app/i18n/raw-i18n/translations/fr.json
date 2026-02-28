@@ -2963,5 +2963,26 @@
     },
     "Fake": {
         "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "En attente",
+            "completed": "Terminé"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Détails",
+                "freeze": "Geler",
+                "setLimits": "Limites",
+                "statements": "Mouvements"
+            },
+            "emptyTransactions": "Aucune transaction pour le moment",
+            "addFunds": "Ajouter des fonds",
+            "transactionsTitle": "Transactions",
+            "title": "Carte Visa"
+        },
+        "validThruLabel": "VALIDE JUSQU’À",
+        "cardFrozenTitle": "Carte gelée",
+        "cardFrozenSubtitle": "La carte est temporairement désactivée"
     }
 }

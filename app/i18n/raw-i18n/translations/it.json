@@ -2922,5 +2922,26 @@
     "NotificationHistory": {
         "title": "Notifiche",
         "noNotifications": "Al momento non hai notifiche"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "In sospeso",
+            "completed": "Completato"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Dettagli",
+                "freeze": "Blocca",
+                "setLimits": "Limiti",
+                "statements": "Movimenti"
+            },
+            "emptyTransactions": "Nessuna transazione al momento",
+            "addFunds": "Aggiungi fondi",
+            "transactionsTitle": "Transazioni",
+            "title": "Carta Visa"
+        },
+        "validThruLabel": "VALIDA FINO",
+        "cardFrozenTitle": "Carta bloccata",
+        "cardFrozenSubtitle": "La carta è temporaneamente disabilitata"
     }
 }

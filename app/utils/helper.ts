@@ -1,4 +1,5 @@
 import { Platform } from "react-native"
+import { MASK_CHAR } from "@app/config/appinfo"
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 export const shuffle = <T>(array: T[]): T[] => {
@@ -43,3 +44,33 @@ export const ellipsizeMiddle = (
 export const isIos = Platform.OS === "ios"
 
 export const normalizeString = (value?: string) => (value ?? "").trim().toLowerCase()
+
+export const maskString = (
+  value: string,
+  options: {
+    visibleRight: number
+    maskChar?: string
+    maskPattern?: RegExp
+  },
+) => {
+  const { visibleRight, maskChar = MASK_CHAR, maskPattern = /./ } = options
+  const pattern = new RegExp(
+    maskPattern.source,
+    maskPattern.flags.includes("g") ? maskPattern.flags : `${maskPattern.flags}g`,
+  )
+  const totalMatches = (value.match(pattern) || []).length
+  let seenMatches = 0
+
+  return value.replace(pattern, (char) => {
+    seenMatches += 1
+    return seenMatches <= totalMatches - visibleRight ? maskChar : char
+  })
+}
+
+export const maskDigits = (
+  value: string,
+  options: {
+    visibleRight: number
+    maskChar?: string
+  },
+) => maskString(value, { ...options, maskPattern: /\d/ })

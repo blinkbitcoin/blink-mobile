@@ -2921,5 +2921,26 @@
     "NotificationHistory": {
         "title": "Notificaciones ",
         "noNotifications": "No tienes notificaciones en este momento"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Pendiente",
+            "completed": "Completado"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalles",
+                "freeze": "Congelar",
+                "setLimits": "Límites",
+                "statements": "Movimientos"
+            },
+            "emptyTransactions": "Aún no hay transacciones",
+            "addFunds": "Agregar fondos",
+            "transactionsTitle": "Transacciones",
+            "title": "Tarjeta Visa"
+        },
+        "validThruLabel": "VÁLIDO HASTA",
+        "cardFrozenTitle": "Tarjeta congelada",
+        "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada"
     }
 }

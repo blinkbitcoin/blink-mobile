@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Notificări",
     "noNotifications": "Nu aveți nicio notificare momentan"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "În așteptare",
+      "completed": "Finalizat"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detalii",
+        "freeze": "Blochează",
+        "setLimits": "Limite",
+        "statements": "Mișcări"
+      },
+      "emptyTransactions": "Încă nu există tranzacții",
+      "addFunds": "Adaugă fonduri",
+      "transactionsTitle": "Tranzacții",
+      "title": "Card Visa"
+    },
+    "validThruLabel": "VALABIL PÂNĂ LA",
+    "cardFrozenTitle": "Card blocat",
+    "cardFrozenSubtitle": "Cardul este dezactivat temporar"
   }
 }

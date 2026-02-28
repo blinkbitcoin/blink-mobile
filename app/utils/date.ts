@@ -1,3 +1,4 @@
+import { MASK_CHAR } from "@app/config/appinfo"
 /* eslint-disable no-param-reassign */
 
 export const DEC_1_12_AM_UTC_MINUS_6 = new Date(Date.UTC(2023, 11, 1, 6, 0, 0)).getTime()
@@ -85,4 +86,38 @@ export const formatShortDate = ({
   }
 
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
+}
+
+export const parseCardValidThru = (
+  value: string | Date,
+): { month: string; year: string } | null => {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const month = `${value.getUTCMonth() + 1}`.padStart(2, "0")
+    const year = `${value.getUTCFullYear()}`.slice(-2)
+    return { month, year }
+  }
+
+  const raw = `${value}`.trim()
+  const parsed = Date.parse(raw)
+  if (!Number.isNaN(parsed) && (raw.includes("-") || raw.includes("T"))) {
+    const date = new Date(parsed)
+    const month = `${date.getUTCMonth() + 1}`.padStart(2, "0")
+    const year = `${date.getUTCFullYear()}`.slice(-2)
+    return { month, year }
+  }
+
+  return null
+}
+
+export const formatCardValidThruDisplay = (
+  value: string | Date,
+  showDetails: boolean,
+  maskChar = MASK_CHAR,
+) => {
+  const parts = parseCardValidThru(value)
+  if (!parts) return ""
+
+  if (showDetails) return `${parts.month}/ ${parts.year}`.trim()
+
+  return `${maskChar}${maskChar} / ${maskChar}${maskChar}`
 }
