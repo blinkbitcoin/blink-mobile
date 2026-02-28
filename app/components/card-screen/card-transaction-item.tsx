@@ -69,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     minHeight: 55,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 10,
     backgroundColor: colors.grey5,
   },
   iconContainer: {
