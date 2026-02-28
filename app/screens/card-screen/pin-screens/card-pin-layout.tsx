@@ -111,13 +111,13 @@ export const CardPinLayout: React.FC<CardPinLayoutProps> = ({
 
           {renderPinDisplay()}
         </View>
-
-        {showConfirmButton && confirmButtonLabel && onConfirm && (
-          <View style={styles.buttonWrapper}>
-            <GaloyPrimaryButton title={confirmButtonLabel} onPress={onConfirm} />
-          </View>
-        )}
       </View>
+
+      {showConfirmButton && confirmButtonLabel && onConfirm && (
+        <View style={styles.buttonWrapper}>
+          <GaloyPrimaryButton title={confirmButtonLabel} onPress={onConfirm} />
+        </View>
+      )}
 
       <View style={styles.keypadContainer}>
         <NumericKeypad onKeyPress={handleKeyPress} disabledKeys={[NumericKey.Decimal]} />
@@ -201,11 +201,11 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   buttonWrapper: {
-    flex: 1,
-    justifyContent: "center",
-    width: "100%",
+    paddingTop: 10,
+    paddingBottom: 7,
+    paddingHorizontal: 24,
   },
   keypadContainer: {
-    paddingBottom: 20,
+    paddingVertical: 14,
   },
 }))
