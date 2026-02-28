@@ -17,6 +17,7 @@ jest.mock("@rn-vui/themed", () => ({
       colors: {
         primary: "#F7931A",
         black: "#000000",
+        grey3: "#999999",
         grey5: "#F5F5F5",
       },
     },
@@ -109,6 +110,40 @@ describe("ActionField", () => {
       fireEvent.press(getByText("Test value"))
 
       expect(mockOnAction).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe("placeholder / disabled state", () => {
+    it("shows placeholder when value is null", () => {
+      const { getByText } = render(
+        <ActionField {...defaultProps} value={null} onAction={mockOnAction} />,
+      )
+
+      expect(getByText("—")).toBeTruthy()
+    })
+
+    it("shows placeholder when value prop is omitted", () => {
+      const { getByText } = render(<ActionField icon="copy-paste" />)
+
+      expect(getByText("—")).toBeTruthy()
+    })
+
+    it("does not call onAction when value is null", () => {
+      const { getByText } = render(
+        <ActionField {...defaultProps} value={null} onAction={mockOnAction} />,
+      )
+
+      fireEvent.press(getByText("—"))
+
+      expect(mockOnAction).not.toHaveBeenCalled()
+    })
+
+    it("renders without onAction prop", () => {
+      const { getByText } = render(
+        <ActionField icon="copy-paste" value="Some value" />,
+      )
+
+      expect(getByText("Some value")).toBeTruthy()
     })
   })
 

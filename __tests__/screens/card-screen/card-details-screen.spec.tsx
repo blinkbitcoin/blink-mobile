@@ -3,6 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardDetailsScreen } from "@app/screens/card-screen/card-details-screen"
+import { CardStatus, CardType } from "@app/graphql/generated"
 import { ContextForScreen } from "../helper"
 
 jest.mock("@react-native-community/blur", () => ({
@@ -15,53 +16,153 @@ jest.mock("react-native-linear-gradient", () => ({
 
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
+const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
     useNavigation: () => ({
+      goBack: mockGoBack,
       setOptions: mockSetOptions,
+      navigate: mockNavigate,
     }),
   }
 })
 
 const mockCopyToClipboard = jest.fn()
-
+const mockUseClipboard = jest.fn((_clearAfterMs?: number) => ({
+  copyToClipboard: mockCopyToClipboard,
+}))
 jest.mock("@app/hooks/use-clipboard", () => ({
-  useClipboard: () => ({
-    copyToClipboard: mockCopyToClipboard,
-  }),
+  useClipboard: (clearAfterMs?: number) => mockUseClipboard(clearAfterMs),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  CardStatus: {
-    Active: "active",
-    Frozen: "frozen",
-    Inactive: "inactive",
-  },
-  MOCK_CARD: {
-    cardNumber: "4111 1111 1111 1111",
-    holderName: "TEST USER",
-    validThruDate: "2029-06-01",
-    cvv: "123",
-    expiryDate: "06/29",
-    cardType: "Virtual Visa debit",
-    status: "active",
-    issuedDate: "Jan 15, 2024",
-    network: "Visa",
+const mockIsSensorAvailable = jest.fn()
+const mockAuthenticate = jest.fn()
+jest.mock("@app/utils/biometricAuthentication", () => ({
+  __esModule: true,
+  default: {
+    isSensorAvailable: () => mockIsSensorAvailable(),
+    authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const mockUseCardData = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+  useCardData: () => mockUseCardData(),
+}))
+
+type CardFixture = {
+  id: string
+  lastFour: string
+  status: CardStatus
+  cardType: CardType
+  createdAt: string
+}
+
+const activeCard: CardFixture = {
+  id: "card-1",
+  lastFour: "4242",
+  status: CardStatus.Active,
+  cardType: CardType.Virtual,
+  createdAt: "2025-04-23T12:00:00Z",
+}
+
+const lockedCard: CardFixture = {
+  ...activeCard,
+  status: CardStatus.Locked,
+}
+
+const defaultCardData = {
+  card: activeCard,
+  loading: false,
+  error: undefined,
+  refetch: jest.fn(),
+}
+
+const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
+  mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
+  mockIsSensorAvailable.mockResolvedValue(false)
+}
 
 describe("CardDetailsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
-    mockCopyToClipboard.mockClear()
-    mockSetOptions.mockClear()
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    setupMocks()
   })
 
-  describe("rendering", () => {
-    it("renders without crashing", async () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  describe("biometric authentication", () => {
+    it("skips biometric when sensor is not available", async () => {
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Card number")).toBeTruthy()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+    })
+
+    it("triggers biometric when sensor is available", async () => {
+      mockIsSensorAvailable.mockResolvedValue(true)
+      mockAuthenticate.mockImplementation(
+        (_desc: string, onSuccess: () => void, _onFail: () => void) => {
+          onSuccess()
+        },
+      )
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockAuthenticate).toHaveBeenCalledWith(
+        "Authenticate to view card details",
+        expect.any(Function),
+        expect.any(Function),
+      )
+      expect(getByText("Card number")).toBeTruthy()
+    })
+
+    it("navigates back on biometric failure", async () => {
+      mockIsSensorAvailable.mockResolvedValue(true)
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockGoBack).toHaveBeenCalled()
+    })
+  })
+
+  describe("loading state", () => {
+    it("shows loading indicator when card is loading", async () => {
+      setupMocks({ cardData: { loading: true, card: undefined } })
+
       const { toJSON } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -72,8 +173,26 @@ describe("CardDetailsScreen", () => {
 
       expect(toJSON()).toBeTruthy()
     })
+  })
 
-    it("displays the card holder name", async () => {
+  describe("card not found", () => {
+    it("navigates back when no card", async () => {
+      setupMocks({ cardData: { card: undefined, loading: false } })
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockGoBack).toHaveBeenCalled()
+    })
+  })
+
+  describe("card data rendering", () => {
+    it("renders masked card number", async () => {
       const { getAllByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -82,11 +201,10 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      const holderNames = getAllByText("TEST USER")
-      expect(holderNames.length).toBeGreaterThanOrEqual(1)
+      expect(getAllByText("•••• •••• •••• 4242").length).toBeGreaterThanOrEqual(1)
     })
 
-    it("displays the card number field", async () => {
+    it("displays placeholder for expiry date", async () => {
       const { getAllByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -95,35 +213,10 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      const cardNumbers = getAllByText("4111 1111 1111 1111")
-      expect(cardNumbers.length).toBeGreaterThanOrEqual(1)
+      expect(getAllByText("—").length).toBeGreaterThanOrEqual(1)
     })
 
-    it("displays the expiry date field", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("06/29")).toBeTruthy()
-    })
-
-    it("displays the CVV field", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("123")).toBeTruthy()
-    })
-
-    it("displays the cardholder name field", async () => {
+    it("displays placeholder for CVV", async () => {
       const { getAllByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -132,8 +225,20 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      const holderNames = getAllByText("TEST USER")
-      expect(holderNames.length).toBeGreaterThanOrEqual(1)
+      expect(getAllByText("—").length).toBeGreaterThanOrEqual(1)
+    })
+
+    it("displays placeholder for cardholder name", async () => {
+      const { getAllByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const placeholders = getAllByText("—")
+      expect(placeholders.length).toBeGreaterThanOrEqual(2)
     })
   })
 
@@ -150,7 +255,7 @@ describe("CardDetailsScreen", () => {
       expect(getByText("Card information")).toBeTruthy()
     })
 
-    it("displays card type", async () => {
+    it("displays formatted card type", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -162,7 +267,21 @@ describe("CardDetailsScreen", () => {
       expect(getByText("Virtual Visa debit")).toBeTruthy()
     })
 
-    it("displays status as active", async () => {
+    it("displays physical card type", async () => {
+      setupMocks({ cardData: { card: { ...activeCard, cardType: CardType.Physical } } })
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Physical Visa debit")).toBeTruthy()
+    })
+
+    it("displays active status", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -174,7 +293,9 @@ describe("CardDetailsScreen", () => {
       expect(getByText("Active")).toBeTruthy()
     })
 
-    it("displays issued date", async () => {
+    it("displays frozen status for locked card", async () => {
+      setupMocks({ cardData: { card: lockedCard } })
+
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -183,10 +304,22 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Jan 15, 2024")).toBeTruthy()
+      expect(getByText("Frozen")).toBeTruthy()
     })
 
-    it("displays network", async () => {
+    it("displays formatted issued date", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("April 23, 2025")).toBeTruthy()
+    })
+
+    it("displays network as Visa", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -230,7 +363,7 @@ describe("CardDetailsScreen", () => {
   })
 
   describe("copy interactions", () => {
-    it("calls copyToClipboard when card number field is pressed", async () => {
+    it("copies lastFour when card number field is pressed", async () => {
       const { getByTestId } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -245,13 +378,13 @@ describe("CardDetailsScreen", () => {
 
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: "4111111111111111",
+          content: "4242",
         }),
       )
     })
 
-    it("calls copyToClipboard when expiry date field is pressed", async () => {
-      const { getByText } = render(
+    it("initializes clipboard with 60s auto-clear", async () => {
+      render(
         <ContextForScreen>
           <CardDetailsScreen />
         </ContextForScreen>,
@@ -259,42 +392,12 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      const expiryDate = getByText("06/29")
-      await act(async () => {
-        fireEvent.press(expiryDate)
-      })
-
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: "06/29",
-        }),
-      )
-    })
-
-    it("calls copyToClipboard when CVV field is pressed", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const cvv = getByText("123")
-      await act(async () => {
-        fireEvent.press(cvv)
-      })
-
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: "123",
-        }),
-      )
+      expect(mockUseClipboard).toHaveBeenCalledWith(60_000)
     })
   })
 
   describe("field labels", () => {
-    it("displays card number label", async () => {
+    it("displays all field labels", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -304,47 +407,14 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Card number")).toBeTruthy()
-    })
-
-    it("displays expiry date label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("Expiry date")).toBeTruthy()
-    })
-
-    it("displays CVV label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("CVV")).toBeTruthy()
-    })
-
-    it("displays cardholder name label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("Cardholder name")).toBeTruthy()
     })
   })
 
   describe("info row labels", () => {
-    it("displays card type label", async () => {
+    it("displays all info row labels", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -354,41 +424,8 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Card type")).toBeTruthy()
-    })
-
-    it("displays status label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("Status")).toBeTruthy()
-    })
-
-    it("displays issued label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("Issued")).toBeTruthy()
-    })
-
-    it("displays network label", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
       expect(getByText("Network")).toBeTruthy()
     })
   })
@@ -408,6 +445,22 @@ describe("CardDetailsScreen", () => {
           headerRight: expect.any(Function),
         }),
       )
+    })
+  })
+
+  describe("frozen card rendering", () => {
+    it("renders frozen card overlay", async () => {
+      setupMocks({ cardData: { card: lockedCard } })
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Card frozen")).toBeTruthy()
     })
   })
 })
