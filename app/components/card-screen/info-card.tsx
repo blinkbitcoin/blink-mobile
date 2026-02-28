@@ -165,7 +165,7 @@ const useStyles = makeStyles(
       fontSize: isLg ? 16 : 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
-      lineHeight: isLg ? 22 : 16,
+      lineHeight: isLg ? 24 : 16,
     },
   }),
 )
