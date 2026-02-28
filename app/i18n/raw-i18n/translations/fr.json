@@ -3176,6 +3176,59 @@
                 "pinChangedSubtitle": "Votre PIN a été modifié avec succès.",
                 "pinChangedToast": "Le code PIN a été modifié avec succès"
             }
+        },
+        "ReplaceCard": {
+            "title": "Remplacer la carte",
+            "steps": {
+                "reportIssue": "Signaler",
+                "delivery": "Livraison",
+                "confirm": "Confirmer"
+            },
+            "ReportIssue": {
+                "title": "Que s'est-il passé avec votre carte ?",
+                "subtitle": "Sélectionnez la raison de la demande de carte de remplacement",
+                "cardManagement": "Gestion de carte",
+                "lostCard": "Carte perdue",
+                "lostCardDescription": "Je ne trouve pas ma carte",
+                "stolenCard": "Carte volée",
+                "stolenCardDescription": "Ma carte a été prise sans autorisation",
+                "damagedCard": "Carte endommagée",
+                "damagedCardDescription": "Ma carte est physiquement endommagée",
+                "whatHappensNext": "Que se passe-t-il ensuite ?",
+                "bullet1": "Votre carte actuelle sera gelée pour des raisons de sécurité",
+                "bullet2": "Une nouvelle carte avec des numéros différents sera émise",
+                "bullet3": "Vous pouvez la dégeler si vous retrouvez votre carte plus tard"
+            },
+            "Delivery": {
+                "title": "Choisissez votre vitesse de livraison",
+                "subtitle": "Sélectionnez la rapidité avec laquelle vous souhaitez recevoir votre nouvelle carte",
+                "standardDelivery": "Livraison standard",
+                "expressDelivery": "Livraison express",
+                "businessDays": "{day1}-{day2} jours ouvrables",
+                "free": "GRATUIT",
+                "shippingAddress": "Adresse de livraison",
+                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison",
+                "chooseDeliverySpeed": "Choisir la vitesse de livraison"
+            },
+            "Confirm": {
+                "title": "Vérifiez votre demande",
+                "subtitle": "Veuillez confirmer les détails du remplacement de votre carte",
+                "requestSummary": "Résumé de la demande",
+                "issueType": "Raison",
+                "delivery": "Livraison",
+                "deliveryTime": "Délai de livraison",
+                "shippingCost": "Frais de livraison",
+                "importantInformation": "Informations importantes",
+                "bullet1": "Votre carte actuelle restera active jusqu'à l'arrivée de la nouvelle",
+                "bullet2": "Votre nouvelle carte aura les mêmes numéros que votre carte actuelle",
+                "bullet3": "Détruisez votre carte endommagée lorsque la nouvelle arrive",
+                "submitRequest": "Soumettre la demande"
+            },
+            "Status": {
+                "title": "Votre nouvelle carte est en route !",
+                "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
+                "buttonLabel": "Tableau de bord"
+            }
         }
     }
 }

@@ -3135,6 +3135,68 @@
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
         "pinChangedToast": "El PIN s'ha canviat correctament"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Reportar",
+        "delivery": "Lliurament",
+        "confirm": "Confirmar"
+      },
+      "ReportIssue": {
+        "title": "Què ha passat amb la teva targeta?",
+        "subtitle": "Selecciona el motiu per sol·licitar una targeta de reemplaçament",
+        "lostCard": "Targeta perduda",
+        "lostCardDescription": "No puc trobar la meva targeta",
+        "stolenCard": "Targeta robada",
+        "stolenCardDescription": "La meva targeta ha estat presa sense permís",
+        "damagedCard": "Targeta danyada",
+        "damagedCardDescription": "La meva targeta està físicament danyada",
+        "whatHappensNext": "Què passa després?",
+        "currentCardDeactivated": "La teva targeta actual serà desactivada immediatament",
+        "newCardShipped": "Una nova targeta serà enviada a la teva adreça",
+        "digitalCardAvailable": "La teva targeta digital roman disponible durant aquest procés",
+        "cardManagement": "Gestió de targetes",
+        "bullet1": "La teva targeta actual serà congelada per seguretat",
+        "bullet2": "S'emetrà una nova targeta amb números diferents",
+        "bullet3": "Pots descongelar-la si trobes la teva targeta més tard"
+      },
+      "Delivery": {
+        "title": "Tria la velocitat de lliurament",
+        "subtitle": "Selecciona com de ràpid vols rebre la teva nova targeta",
+        "standardDelivery": "Lliurament estàndard",
+        "expressDelivery": "Lliurament exprés",
+        "businessDays": "{day1}-{day2} dies laborables",
+        "free": "GRATUÏT",
+        "shippingAddress": "Adreça d'enviament",
+        "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
+        "chooseDeliverySpeed": "Tria la velocitat de lliurament"
+      },
+      "Confirm": {
+        "title": "Revisa la teva sol·licitud",
+        "subtitle": "Confirma els detalls del reemplaçament de la teva targeta",
+        "requestSummary": "Resum de la sol·licitud",
+        "reason": "Motiu",
+        "delivery": "Lliurament",
+        "shippingAddress": "Adreça d'enviament",
+        "deliveryCost": "Cost de lliurament",
+        "submitRequest": "Enviar sol·licitud",
+        "importantInformation": "Informació important",
+        "processedImmediately": "La teva sol·licitud serà processada immediatament",
+        "currentCardDeactivated": "La targeta actual serà desactivada en confirmar",
+        "trackStatus": "Pots seguir l'estat del lliurament de la teva nova targeta a l'aplicació",
+        "issueType": "Motiu",
+        "deliveryTime": "Temps de lliurament",
+        "shippingCost": "Cost de lliurament",
+        "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
+        "bullet2": "La teva nova targeta tindrà els mateixos números que l'actual",
+        "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
+      },
+      "Status": {
+        "title": "La teva nova targeta està en camí!",
+        "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
+        "buttonLabel": "Tauler"
+      },
+      "title": "Substituir targeta"
     }
   }
 }

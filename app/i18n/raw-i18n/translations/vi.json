@@ -3173,6 +3173,68 @@
         "pinChangedSubtitle": "PIN của bạn đã được đổi thành công.",
         "pinChangedToast": "Đã thay đổi mã PIN thành công"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Báo cáo",
+        "delivery": "Giao hàng",
+        "confirm": "Xác nhận"
+      },
+      "ReportIssue": {
+        "title": "Chuyện gì đã xảy ra với thẻ của bạn?",
+        "subtitle": "Chọn lý do yêu cầu thẻ thay thế",
+        "lostCard": "Thẻ bị mất",
+        "lostCardDescription": "Tôi không thể tìm thấy thẻ của mình",
+        "stolenCard": "Thẻ bị đánh cắp",
+        "stolenCardDescription": "Thẻ của tôi đã bị lấy mà không được phép",
+        "damagedCard": "Thẻ bị hỏng",
+        "damagedCardDescription": "Thẻ của tôi bị hỏng vật lý",
+        "whatHappensNext": "Điều gì xảy ra tiếp theo?",
+        "currentCardDeactivated": "Thẻ hiện tại của bạn sẽ bị vô hiệu hóa ngay lập tức",
+        "newCardShipped": "Thẻ mới sẽ được gửi đến địa chỉ của bạn",
+        "digitalCardAvailable": "Thẻ kỹ thuật số của bạn vẫn có sẵn trong quá trình này",
+        "cardManagement": "Quản lý thẻ",
+        "bullet1": "Thẻ hiện tại của bạn sẽ bị đóng băng vì lý do bảo mật",
+        "bullet2": "Thẻ mới với số khác sẽ được phát hành",
+        "bullet3": "Bạn có thể mở đóng băng nếu tìm thấy thẻ sau này"
+      },
+      "Delivery": {
+        "title": "Chọn tốc độ giao hàng",
+        "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới",
+        "standardDelivery": "Giao hàng tiêu chuẩn",
+        "expressDelivery": "Giao hàng nhanh",
+        "businessDays": "{day1}-{day2} ngày làm việc",
+        "free": "MIỄN PHÍ",
+        "shippingAddress": "Địa chỉ giao hàng",
+        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng",
+        "chooseDeliverySpeed": "Chọn tốc độ giao hàng"
+      },
+      "Confirm": {
+        "title": "Xem lại yêu cầu của bạn",
+        "subtitle": "Vui lòng xác nhận chi tiết thay thế thẻ của bạn",
+        "requestSummary": "Tóm tắt yêu cầu",
+        "reason": "Lý do",
+        "delivery": "Giao hàng",
+        "shippingAddress": "Địa chỉ giao hàng",
+        "deliveryCost": "Phí giao hàng",
+        "submitRequest": "Gửi yêu cầu",
+        "importantInformation": "Thông tin quan trọng",
+        "processedImmediately": "Yêu cầu của bạn sẽ được xử lý ngay lập tức",
+        "currentCardDeactivated": "Thẻ hiện tại sẽ bị vô hiệu hóa khi xác nhận",
+        "trackStatus": "Bạn có thể theo dõi trạng thái giao hàng của thẻ mới trong ứng dụng",
+        "issueType": "Lý do",
+        "deliveryTime": "Thời gian giao hàng",
+        "shippingCost": "Phí giao hàng",
+        "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
+        "bullet2": "Thẻ mới của bạn sẽ có cùng số với thẻ hiện tại",
+        "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
+      },
+      "Status": {
+        "title": "Thẻ mới của bạn đang trên đường đến!",
+        "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
+        "buttonLabel": "Bảng điều khiển"
+      },
+      "title": "Thay thẻ"
     }
   }
 }

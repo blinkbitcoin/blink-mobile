@@ -3176,6 +3176,59 @@
                 "pinChangedSubtitle": "PINが正常に変更されました。",
                 "pinChangedToast": "PINが正常に変更されました"
             }
+        },
+        "ReplaceCard": {
+            "title": "カードを交換",
+            "steps": {
+                "reportIssue": "報告",
+                "delivery": "配送",
+                "confirm": "確認"
+            },
+            "ReportIssue": {
+                "title": "カードに何が起こりましたか？",
+                "subtitle": "交換カードを依頼する理由を選択してください",
+                "cardManagement": "カード管理",
+                "lostCard": "紛失したカード",
+                "lostCardDescription": "カードが見つかりません",
+                "stolenCard": "盗まれたカード",
+                "stolenCardDescription": "カードが許可なく持ち去られました",
+                "damagedCard": "破損したカード",
+                "damagedCardDescription": "カードが物理的に破損しています",
+                "whatHappensNext": "次に何が起こりますか？",
+                "bullet1": "セキュリティのため現在のカードが凍結されます",
+                "bullet2": "異なる番号の新しいカードが発行されます",
+                "bullet3": "後でカードが見つかった場合は凍結を解除できます"
+            },
+            "Delivery": {
+                "title": "配送速度を選択",
+                "subtitle": "新しいカードをどのくらい早く受け取りたいかを選択してください",
+                "standardDelivery": "通常配送",
+                "expressDelivery": "速達配送",
+                "businessDays": "{day1}〜{day2}営業日",
+                "free": "無料",
+                "shippingAddress": "配送先住所",
+                "useRegisteredAddress": "登録住所を配送先住所として使用",
+                "chooseDeliverySpeed": "配送速度を選択"
+            },
+            "Confirm": {
+                "title": "リクエストを確認",
+                "subtitle": "カード交換の詳細を確認してください",
+                "requestSummary": "リクエスト概要",
+                "issueType": "理由",
+                "delivery": "配送",
+                "deliveryTime": "配達時間",
+                "shippingCost": "配送料",
+                "importantInformation": "重要な情報",
+                "bullet1": "新しいカードが届くまで現在のカードは有効のままです",
+                "bullet2": "新しいカードは現在のカードと同じ番号になります",
+                "bullet3": "新しいカードが届いたら破損したカードを処分してください",
+                "submitRequest": "リクエストを送信"
+            },
+            "Status": {
+                "title": "新しいカードが届きます！",
+                "subtitle": "Blinkカードの配送注文が送信されました。",
+                "buttonLabel": "ダッシュボード"
+            }
         }
     }
 }

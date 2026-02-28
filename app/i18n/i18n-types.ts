@@ -10351,6 +10351,184 @@ type RootTranslation = {
 				pinChangedToast: string
 			}
 		}
+		ReplaceCard: {
+			/**
+			 * R​e​p​l​a​c​e​ ​c​a​r​d
+			 */
+			title: string
+			steps: {
+				/**
+				 * R​e​p​o​r​t​ ​I​s​s​u​e
+				 */
+				reportIssue: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+			}
+			ReportIssue: {
+				/**
+				 * R​e​p​o​r​t​ ​c​a​r​d​ ​I​s​s​u​e
+				 */
+				title: string
+				/**
+				 * L​e​t​ ​u​s​ ​k​n​o​w​ ​w​h​a​t​ ​h​a​p​p​e​n​e​d​ ​t​o​ ​y​o​u​r​ ​c​a​r​d​ ​s​o​ ​w​e​ ​c​a​n​ ​h​e​l​p​ ​y​o​u​ ​g​e​t​ ​a​ ​r​e​p​l​a​c​e​m​e​n​t​.
+				 */
+				subtitle: string
+				/**
+				 * C​a​r​d​ ​m​a​n​a​g​e​m​e​n​t
+				 */
+				cardManagement: string
+				/**
+				 * L​o​s​t​ ​c​a​r​d
+				 */
+				lostCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				lostCardDescription: string
+				/**
+				 * S​t​o​l​e​n​ ​c​a​r​d
+				 */
+				stolenCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				stolenCardDescription: string
+				/**
+				 * D​a​m​a​g​e​d​ ​c​a​r​d
+				 */
+				damagedCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				damagedCardDescription: string
+				/**
+				 * W​h​a​t​ ​h​a​p​p​e​n​s​ ​n​e​x​t​?
+				 */
+				whatHappensNext: string
+				/**
+				 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​f​r​o​z​e​n​ ​f​o​r​ ​s​e​c​u​r​i​t​y
+				 */
+				bullet1: string
+				/**
+				 * A​ ​n​e​w​ ​c​a​r​d​ ​w​i​t​h​ ​d​i​f​f​e​r​e​n​t​ ​n​u​m​b​e​r​s​ ​w​i​l​l​ ​b​e​ ​i​s​s​u​e​d
+				 */
+				bullet2: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​u​n​f​r​e​e​z​e​ ​i​f​ ​y​o​u​ ​f​i​n​d​ ​y​o​u​r​ ​c​a​r​d​ ​l​a​t​e​r
+				 */
+				bullet3: string
+			}
+			Delivery: {
+				/**
+				 * D​e​l​i​v​e​r​y​ ​o​p​t​i​o​n​s
+				 */
+				title: string
+				/**
+				 * C​h​o​o​s​e​ ​h​o​w​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​r​e​c​e​i​v​e​ ​y​o​u​r​ ​r​e​p​l​a​c​e​m​e​n​t​ ​c​a​r​d​.
+				 */
+				subtitle: string
+				/**
+				 * S​t​a​n​d​a​r​d​ ​d​e​l​i​v​e​r​y
+				 */
+				standardDelivery: string
+				/**
+				 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
+				 * @param {unknown} day1
+				 * @param {unknown} day2
+				 */
+				businessDays: RequiredParams<'day1' | 'day2'>
+				/**
+				 * F​R​E​E
+				 */
+				free: string
+				/**
+				 * E​x​p​r​e​s​s​ ​d​e​l​i​v​e​r​y
+				 */
+				expressDelivery: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				shippingAddress: string
+				/**
+				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				useRegisteredAddress: string
+				/**
+				 * C​h​o​o​s​e​ ​d​e​l​i​v​e​r​y​ ​s​p​e​e​d
+				 */
+				chooseDeliverySpeed: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​r​e​p​l​a​c​e​m​e​n​t
+				 */
+				title: string
+				/**
+				 * R​e​v​i​e​w​ ​y​o​u​r​ ​r​e​q​u​e​s​t​ ​b​e​f​o​r​e​ ​s​u​b​m​i​t​t​i​n​g​.
+				 */
+				subtitle: string
+				/**
+				 * R​e​q​u​e​s​t​ ​s​u​m​m​a​r​y
+				 */
+				requestSummary: string
+				/**
+				 * I​s​s​u​e​ ​t​y​p​e
+				 */
+				issueType: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * D​e​l​i​v​e​r​y​ ​t​i​m​e
+				 */
+				deliveryTime: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​c​o​s​t
+				 */
+				shippingCost: string
+				/**
+				 * I​m​p​o​r​t​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
+				 */
+				importantInformation: string
+				/**
+				 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​u​n​t​i​l​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+				 */
+				bullet1: string
+				/**
+				 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​n​u​m​b​e​r​s​ ​a​s​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d
+				 */
+				bullet2: string
+				/**
+				 * D​e​s​t​r​o​y​ ​y​o​u​r​ ​d​a​m​a​g​e​d​ ​c​a​r​d​ ​w​h​e​n​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+				 */
+				bullet3: string
+				/**
+				 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
+				 */
+				submitRequest: string
+			}
+			Status: {
+				/**
+				 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​i​s​ ​o​n​ ​t​h​e​ ​w​a​y​!
+				 */
+				title: string
+				/**
+				 * O​r​d​e​r​ ​f​o​r​ ​d​e​l​i​v​e​r​y​ ​o​f​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​s​u​b​m​i​t​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * D​a​s​h​b​o​a​r​d
+				 */
+				buttonLabel: string
+			}
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -20575,6 +20753,182 @@ export type TranslationFunctions = {
 				 * PIN has been changed successfully
 				 */
 				pinChangedToast: () => LocalizedString
+			}
+		}
+		ReplaceCard: {
+			/**
+			 * Replace card
+			 */
+			title: () => LocalizedString
+			steps: {
+				/**
+				 * Report Issue
+				 */
+				reportIssue: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+			}
+			ReportIssue: {
+				/**
+				 * Report card Issue
+				 */
+				title: () => LocalizedString
+				/**
+				 * Let us know what happened to your card so we can help you get a replacement.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Card management
+				 */
+				cardManagement: () => LocalizedString
+				/**
+				 * Lost card
+				 */
+				lostCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				lostCardDescription: () => LocalizedString
+				/**
+				 * Stolen card
+				 */
+				stolenCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				stolenCardDescription: () => LocalizedString
+				/**
+				 * Damaged card
+				 */
+				damagedCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				damagedCardDescription: () => LocalizedString
+				/**
+				 * What happens next?
+				 */
+				whatHappensNext: () => LocalizedString
+				/**
+				 * Your current card will be frozen for security
+				 */
+				bullet1: () => LocalizedString
+				/**
+				 * A new card with different numbers will be issued
+				 */
+				bullet2: () => LocalizedString
+				/**
+				 * You can unfreeze if you find your card later
+				 */
+				bullet3: () => LocalizedString
+			}
+			Delivery: {
+				/**
+				 * Delivery options
+				 */
+				title: () => LocalizedString
+				/**
+				 * Choose how you'd like to receive your replacement card.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Standard delivery
+				 */
+				standardDelivery: () => LocalizedString
+				/**
+				 * {day1}-{day2} business days
+				 */
+				businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
+				/**
+				 * FREE
+				 */
+				free: () => LocalizedString
+				/**
+				 * Express delivery
+				 */
+				expressDelivery: () => LocalizedString
+				/**
+				 * Shipping address
+				 */
+				shippingAddress: () => LocalizedString
+				/**
+				 * Use registered address as shipping address
+				 */
+				useRegisteredAddress: () => LocalizedString
+				/**
+				 * Choose delivery speed
+				 */
+				chooseDeliverySpeed: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm replacement
+				 */
+				title: () => LocalizedString
+				/**
+				 * Review your request before submitting.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Request summary
+				 */
+				requestSummary: () => LocalizedString
+				/**
+				 * Issue type
+				 */
+				issueType: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Delivery time
+				 */
+				deliveryTime: () => LocalizedString
+				/**
+				 * Shipping cost
+				 */
+				shippingCost: () => LocalizedString
+				/**
+				 * Important information
+				 */
+				importantInformation: () => LocalizedString
+				/**
+				 * Your current card will remain active until the new one arrives
+				 */
+				bullet1: () => LocalizedString
+				/**
+				 * Your new card will have the same numbers as your current card
+				 */
+				bullet2: () => LocalizedString
+				/**
+				 * Destroy your damaged card when the new one arrives
+				 */
+				bullet3: () => LocalizedString
+				/**
+				 * Submit request
+				 */
+				submitRequest: () => LocalizedString
+			}
+			Status: {
+				/**
+				 * Your new card is on the way!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Order for delivery of your Blink Card has been submitted.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Dashboard
+				 */
+				buttonLabel: () => LocalizedString
 			}
 		}
 	}

@@ -18,7 +18,7 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { MOCK_USER } from "./card-mock-data"
+import { MOCK_USER, shippingAddressToLines } from "./card-mock-data"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -96,7 +96,10 @@ export const CardPersonalDetailsScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>
             {LL.CardFlow.PersonalDetails.registeredAddress()}
           </Text>
-          <MultiLineField lines={MOCK_USER.registeredAddress} leftIcon="map-pin" />
+          <MultiLineField
+            lines={shippingAddressToLines(MOCK_USER.registeredAddress)}
+            leftIcon="map-pin"
+          />
         </View>
 
         <View style={styles.section}>
@@ -104,7 +107,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
             {LL.CardFlow.PersonalDetails.shippingAddress()}
           </Text>
           <MultiLineField
-            lines={MOCK_USER.shippingAddress}
+            lines={shippingAddressToLines(MOCK_USER.shippingAddress)}
             leftIcon="map-pin"
             rightIcon="pencil"
             onPress={handleEditShippingAddress}
