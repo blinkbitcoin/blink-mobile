@@ -3111,6 +3111,19 @@
         "noPhysicalCard": "ไม่จำเป็นต้องพกบัตรจริง",
         "worksLocked": "ใช้งานได้แม้โทรศัพท์ถูกล็อค"
       }
+    },
+    "CardStatus": {
+      "title": "บัตร Visa",
+      "CardApproved": {
+        "title": "ยินดีด้วย!",
+        "subtitle": "บัตร Blink Visa ของคุณได้รับการเปิดใช้งานแล้ว",
+        "buttonLabel": "สั่งบัตรจริง"
+      },
+      "PhysicalCardOrdered": {
+        "title": "บัตรจริงของคุณกำลังจัดส่ง!",
+        "subtitle": "คำสั่งซื้อสำหรับการจัดส่งบัตร Blink ของคุณถูกส่งแล้ว",
+        "buttonLabel": "สร้าง PIN"
+      }
     }
   }
 }

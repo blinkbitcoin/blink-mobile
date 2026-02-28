@@ -95,6 +95,7 @@ import {
   CardPersonalDetailsScreen,
   CardSettingsScreen,
   CardStatementsScreen,
+  CardStatusScreen,
   CardTransactionDetailsScreen,
 } from "@app/screens/card-screen"
 import {
@@ -550,6 +551,11 @@ export const RootStack = () => {
         name="cardTransactionDetailsScreen"
         component={CardTransactionDetailsScreen}
         options={{ title: LL.CardFlow.TransactionDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardStatusScreen"
+        component={CardStatusScreen}
+        options={{ title: LL.CardFlow.CardStatus.title() }}
       />
       <RootNavigator.Screen
         name="onboarding"

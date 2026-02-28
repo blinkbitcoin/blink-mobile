@@ -3114,6 +3114,19 @@
         "noPhysicalCard": "Կարիք չկա ձեզ հետ կրել ֆիզիկական քարտը",
         "worksLocked": "Աշխատում է նույնիսկ երբ ձեր հեռախոսը կողպված է"
       }
+    },
+    "CardStatus": {
+      "title": "Վիզա քարտ",
+      "CardApproved": {
+        "title": "Շնորհավորում ենք!",
+        "subtitle": "Ձեր Blink Visa քարտն ակտիվացվել է։",
+        "buttonLabel": "Պատվիրել ֆիզիկական քարտ"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Ձեր ֆիզիկական քարտը ճանապարհին է!",
+        "subtitle": "Ձեր Blink քարտի առաքման պատվերը ներկայացվել է։",
+        "buttonLabel": "Ստեղծել PIN կոդ"
+      }
     }
   }
 }

@@ -3111,6 +3111,19 @@
         "noPhysicalCard": "Khong can mang theo the vat ly",
         "worksLocked": "Hoat dong ngay ca khi dien thoai bi khoa"
       }
+    },
+    "CardStatus": {
+      "title": "Thẻ Visa",
+      "CardApproved": {
+        "title": "Chúc mừng!",
+        "subtitle": "Thẻ Blink Visa của bạn đã được kích hoạt.",
+        "buttonLabel": "Đặt thẻ vật lý"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Thẻ vật lý của bạn đang trên đường!",
+        "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
+        "buttonLabel": "Tạo PIN"
+      }
     }
   }
 }

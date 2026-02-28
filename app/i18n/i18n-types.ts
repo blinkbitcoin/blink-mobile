@@ -10068,6 +10068,40 @@ type RootTranslation = {
 				worksLocked: string
 			}
 		}
+		CardStatus: {
+			/**
+			 * V​i​s​a​ ​c​a​r​d
+			 */
+			title: string
+			CardApproved: {
+				/**
+				 * C​o​n​g​r​a​t​u​l​a​t​i​o​n​s​!
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				buttonLabel: string
+			}
+			PhysicalCardOrdered: {
+				/**
+				 * Y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​ ​i​s​ ​o​n​ ​t​h​e​ ​w​a​y​!
+				 */
+				title: string
+				/**
+				 * O​r​d​e​r​ ​f​o​r​ ​d​e​l​i​v​e​r​y​ ​o​f​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​s​u​b​m​i​t​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * C​r​e​a​t​e​ ​P​I​N
+				 */
+				buttonLabel: string
+			}
+		}
 		TransactionDetails: {
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
@@ -20105,6 +20139,40 @@ export type TranslationFunctions = {
 				 * Works even when your phone is locked
 				 */
 				worksLocked: () => LocalizedString
+			}
+		}
+		CardStatus: {
+			/**
+			 * Visa card
+			 */
+			title: () => LocalizedString
+			CardApproved: {
+				/**
+				 * Congratulations!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your Blink Visa Card has been activated.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Order physical card
+				 */
+				buttonLabel: () => LocalizedString
+			}
+			PhysicalCardOrdered: {
+				/**
+				 * Your physical card is on the way!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Order for delivery of your Blink Card has been submitted.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Create PIN
+				 */
+				buttonLabel: () => LocalizedString
 			}
 		}
 		TransactionDetails: {
