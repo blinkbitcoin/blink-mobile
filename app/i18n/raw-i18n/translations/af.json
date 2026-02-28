@@ -2983,6 +2983,31 @@
     },
     "validThruLabel": "GELDIG TOT",
     "cardFrozenTitle": "Kaart gevries",
-    "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer"
+    "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer",
+    "CardLimits": {
+      "currentLimitsTitle": "Huidige limiete",
+      "dailySpending": "Daaglikse besteding",
+      "monthlySpending": "Maandelikse besteding",
+      "spendingLimitsTitle": "Bestedingslimiete",
+      "dailyLimit": "Daaglikse limiet",
+      "dailyLimitHelper": "Maksimum bedrag wat jy per dag kan spandeer",
+      "monthlyLimit": "Maandelikse bestedingslimiete",
+      "monthlyLimitHelper": "Maksimum bedrag wat jy per maand kan spandeer",
+      "atmLimitsTitle": "OTM-onttrekkingslimiete",
+      "dailyAtmLimit": "Daaglikse OTM-limiete",
+      "dailyAtmLimitHelper": "Maksimum OTM-onttrekking per dag",
+      "monthlyAtmLimit": "Maandelikse OTM-limiet",
+      "monthlyAtmLimitHelper": "Maksimum OTM-onttrekking per maand",
+      "transactionTypesTitle": "Transaksietipes",
+      "TransactionTypes": {
+        "ecommerce": "Aanlynkope",
+        "ecommerceDescription": "Laat aanlyn en e-handel transaksies toe",
+        "atm": "OTM-onttrekkings",
+        "atmDescription": "Laat kontantonttrekkings vanaf OTM's toe",
+        "contactless": "Kontaklose betalings",
+        "contactlessDescription": "Laat tik-om-te-betaal transaksies toe"
+      },
+      "title": "Kaartlimiete"
+    }
   }
 }

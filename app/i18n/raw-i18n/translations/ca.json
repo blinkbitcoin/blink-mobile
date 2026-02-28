@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "VÀLIDA FINS",
     "cardFrozenTitle": "Targeta congelada",
-    "cardFrozenSubtitle": "La targeta està temporalment desactivada"
+    "cardFrozenSubtitle": "La targeta està temporalment desactivada",
+    "CardLimits": {
+      "currentLimitsTitle": "Límits actuals",
+      "dailySpending": "Despesa diària",
+      "monthlySpending": "Despesa mensual",
+      "spendingLimitsTitle": "Límits de despesa",
+      "dailyLimit": "Límit diari",
+      "dailyLimitHelper": "Import màxim que pots gastar per dia",
+      "monthlyLimit": "Límits de despesa mensual",
+      "monthlyLimitHelper": "Import màxim que pots gastar per mes",
+      "atmLimitsTitle": "Límits de retirada al caixer",
+      "dailyAtmLimit": "Límits diaris del caixer",
+      "dailyAtmLimitHelper": "Retirada màxima al caixer per dia",
+      "monthlyAtmLimit": "Límit mensual al caixer",
+      "monthlyAtmLimitHelper": "Retirada màxima al caixer per mes",
+      "transactionTypesTitle": "Tipus de transacció",
+      "TransactionTypes": {
+        "ecommerce": "Compres en línia",
+        "ecommerceDescription": "Permet transaccions de comerç electrònic",
+        "atm": "Retirades al caixer",
+        "atmDescription": "Permet retirades d'efectiu als caixers",
+        "contactless": "Pagaments sense contacte",
+        "contactlessDescription": "Permet transaccions sense contacte"
+      },
+      "title": "Límits de la targeta"
+    }
   }
 }

@@ -88,6 +88,7 @@ import { TransactionHistoryScreen } from "../screens/transaction-history/transac
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
+import { CardLimitsScreen } from "@app/screens/card-screen"
 import {
   WelcomeLevel1Screen,
   EmailBenefitsScreen,
@@ -506,6 +507,11 @@ export const RootStack = () => {
         options={{
           title: LL.CardFlow.CardDashboard.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="cardLimitsScreen"
+        component={CardLimitsScreen}
+        options={{ title: LL.CardFlow.CardLimits.title() }}
       />
       <RootNavigator.Screen
         name="onboarding"

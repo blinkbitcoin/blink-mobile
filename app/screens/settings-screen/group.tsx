@@ -1,13 +1,22 @@
 import React from "react"
-import { View } from "react-native"
+import { View, StyleProp, ViewStyle } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
-export const SettingsGroup: React.FC<{
+type SettingsGroupProps = {
   name?: string
   items: React.FC[]
-}> = ({ name, items }) => {
+  containerStyle?: StyleProp<ViewStyle>
+  dividerStyle?: StyleProp<ViewStyle>
+}
+
+export const SettingsGroup: React.FC<SettingsGroupProps> = ({
+  name,
+  items,
+  containerStyle,
+  dividerStyle,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -22,12 +31,12 @@ export const SettingsGroup: React.FC<{
           {name}
         </Text>
       )}
-      <View style={styles.groupCard}>
+      <View style={[styles.groupCard, containerStyle]}>
         {filteredItems.map((Element, index) => (
           <View key={index}>
             <Element />
             {index < filteredItems.length - 1 && (
-              <Divider color={colors.grey4} style={styles.divider} />
+              <Divider color={colors.grey4} style={[styles.divider, dividerStyle]} />
             )}
           </View>
         ))}

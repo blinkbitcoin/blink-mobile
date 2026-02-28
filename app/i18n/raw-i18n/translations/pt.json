@@ -2942,6 +2942,31 @@
         },
         "validThruLabel": "VÁLIDO ATÉ",
         "cardFrozenTitle": "Cartão congelado",
-        "cardFrozenSubtitle": "O cartão está temporariamente desativado"
+        "cardFrozenSubtitle": "O cartão está temporariamente desativado",
+        "CardLimits": {
+            "currentLimitsTitle": "Limites atuais",
+            "dailySpending": "Gasto diário",
+            "monthlySpending": "Gasto mensal",
+            "spendingLimitsTitle": "Limites de gasto",
+            "dailyLimit": "Limite diário",
+            "dailyLimitHelper": "Valor máximo que você pode gastar por dia",
+            "monthlyLimit": "Limites de gastos mensais",
+            "monthlyLimitHelper": "Valor máximo que você pode gastar por mês",
+            "atmLimitsTitle": "Limites de saque no caixa",
+            "dailyAtmLimit": "Limites diários de caixa",
+            "dailyAtmLimitHelper": "Saque máximo no caixa por dia",
+            "monthlyAtmLimit": "Limite mensal no caixa",
+            "monthlyAtmLimitHelper": "Saque máximo no caixa por mês",
+            "transactionTypesTitle": "Tipos de transação",
+            "TransactionTypes": {
+                "ecommerce": "Compras online",
+                "ecommerceDescription": "Permitir transações de e-commerce",
+                "atm": "Saques no caixa",
+                "atmDescription": "Permitir saques em caixas eletrônicos",
+                "contactless": "Pagamentos sem contato",
+                "contactlessDescription": "Permitir transações sem contato"
+            },
+            "title": "Limites do cartão"
+        }
     }
 }

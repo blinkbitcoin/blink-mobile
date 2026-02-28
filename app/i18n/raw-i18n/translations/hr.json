@@ -2983,6 +2983,31 @@
     },
     "validThruLabel": "VRIJEDI DO",
     "cardFrozenTitle": "Kartica zamrznuta",
-    "cardFrozenSubtitle": "Kartica je privremeno onemogućena"
+    "cardFrozenSubtitle": "Kartica je privremeno onemogućena",
+    "CardLimits": {
+      "currentLimitsTitle": "Trenutna ograničenja",
+      "dailySpending": "Dnevna potrošnja",
+      "monthlySpending": "Mjesečna potrošnja",
+      "spendingLimitsTitle": "Ograničenja potrošnje",
+      "dailyLimit": "Dnevno ograničenje",
+      "dailyLimitHelper": "Maksimalni iznos koji možete potrošiti dnevno",
+      "monthlyLimit": "Mjesečna ograničenja potrošnje",
+      "monthlyLimitHelper": "Maksimalni iznos koji možete potrošiti mjesečno",
+      "atmLimitsTitle": "Ograničenja podizanja na bankomatu",
+      "dailyAtmLimit": "Dnevna ograničenja bankomata",
+      "dailyAtmLimitHelper": "Maksimalno podizanje na bankomatu dnevno",
+      "monthlyAtmLimit": "Mjesečno ograničenje bankomata",
+      "monthlyAtmLimitHelper": "Maksimalno podizanje na bankomatu mjesečno",
+      "transactionTypesTitle": "Vrste transakcija",
+      "TransactionTypes": {
+        "ecommerce": "Online kupnje",
+        "ecommerceDescription": "Dopusti online i e-trgovinske transakcije",
+        "atm": "Podizanja na bankomatu",
+        "atmDescription": "Dopusti podizanja gotovine na bankomatima",
+        "contactless": "Beskontaktna plaćanja",
+        "contactlessDescription": "Dopusti beskontaktne transakcije"
+      },
+      "title": "Ograničenja kartice"
+    }
   }
 }

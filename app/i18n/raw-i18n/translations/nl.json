@@ -2983,6 +2983,31 @@
     },
     "validThruLabel": "GELDIG TOT",
     "cardFrozenTitle": "Kaart bevroren",
-    "cardFrozenSubtitle": "De kaart is tijdelijk uitgeschakeld"
+    "cardFrozenSubtitle": "De kaart is tijdelijk uitgeschakeld",
+    "CardLimits": {
+      "currentLimitsTitle": "Huidige limieten",
+      "dailySpending": "Dagelijkse uitgaven",
+      "monthlySpending": "Maandelijkse uitgaven",
+      "spendingLimitsTitle": "Uitgavenlimieten",
+      "dailyLimit": "Dagelijks limiet",
+      "dailyLimitHelper": "Maximaal bedrag dat u per dag kunt uitgeven",
+      "monthlyLimit": "Maandelijkse bestedingslimieten",
+      "monthlyLimitHelper": "Maximaal bedrag dat u per maand kunt uitgeven",
+      "atmLimitsTitle": "Geldautomaat opnamelimieten",
+      "dailyAtmLimit": "Dagelijkse geldautomaat limieten",
+      "dailyAtmLimitHelper": "Maximale geldautomaat opname per dag",
+      "monthlyAtmLimit": "Maandelijks geldautomaat limiet",
+      "monthlyAtmLimitHelper": "Maximale geldautomaat opname per maand",
+      "transactionTypesTitle": "Transactietypen",
+      "TransactionTypes": {
+        "ecommerce": "Online aankopen",
+        "ecommerceDescription": "E-commerce transacties toestaan",
+        "atm": "Geldautomaat opnames",
+        "atmDescription": "Geldopnames bij geldautomaten toestaan",
+        "contactless": "Contactloze betalingen",
+        "contactlessDescription": "Contactloze transacties toestaan"
+      },
+      "title": "Kaartlimieten"
+    }
   }
 }

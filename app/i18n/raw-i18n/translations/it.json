@@ -2942,6 +2942,31 @@
         },
         "validThruLabel": "VALIDA FINO",
         "cardFrozenTitle": "Carta bloccata",
-        "cardFrozenSubtitle": "La carta è temporaneamente disabilitata"
+        "cardFrozenSubtitle": "La carta è temporaneamente disabilitata",
+        "CardLimits": {
+            "currentLimitsTitle": "Limiti attuali",
+            "dailySpending": "Spesa giornaliera",
+            "monthlySpending": "Spesa mensile",
+            "spendingLimitsTitle": "Limiti di spesa",
+            "dailyLimit": "Limite giornaliero",
+            "dailyLimitHelper": "Importo massimo che puoi spendere al giorno",
+            "monthlyLimit": "Limiti di spesa mensili",
+            "monthlyLimitHelper": "Importo massimo che puoi spendere al mese",
+            "atmLimitsTitle": "Limiti prelievo bancomat",
+            "dailyAtmLimit": "Limiti bancomat giornalieri",
+            "dailyAtmLimitHelper": "Prelievo massimo al bancomat al giorno",
+            "monthlyAtmLimit": "Limite bancomat mensile",
+            "monthlyAtmLimitHelper": "Prelievo massimo al bancomat al mese",
+            "transactionTypesTitle": "Tipi di transazione",
+            "TransactionTypes": {
+                "ecommerce": "Acquisti online",
+                "ecommerceDescription": "Consenti transazioni e-commerce",
+                "atm": "Prelievi bancomat",
+                "atmDescription": "Consenti prelievi di contanti dai bancomat",
+                "contactless": "Pagamenti contactless",
+                "contactlessDescription": "Consenti transazioni contactless"
+            },
+            "title": "Limiti carta"
+        }
     }
 }
