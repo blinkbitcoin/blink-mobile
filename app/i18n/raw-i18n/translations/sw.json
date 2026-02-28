@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Inasubiri",
-      "completed": "Imekamilika"
+      "completed": "Imekamilika",
+      "declined": "Imekataliwa",
+      "reversed": "Imerudishwa"
     },
     "CardDashboard": {
       "Actions": {

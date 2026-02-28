@@ -2965,7 +2965,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "รอดำเนินการ",
-      "completed": "เสร็จสิ้น"
+      "completed": "เสร็จสิ้น",
+      "declined": "ถูกปฏิเสธ",
+      "reversed": "ถูกย้อนกลับ"
     },
     "CardDashboard": {
       "Actions": {

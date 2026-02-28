@@ -9655,6 +9655,14 @@ type RootTranslation = {
 			 * C​o​m​p​l​e​t​e​d
 			 */
 			completed: string
+			/**
+			 * D​e​c​l​i​n​e​d
+			 */
+			declined: string
+			/**
+			 * R​e​v​e​r​s​e​d
+			 */
+			reversed: string
 		}
 		CardDashboard: {
 			Actions: {
@@ -9691,6 +9699,18 @@ type RootTranslation = {
 			 * N​o​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​y​e​t
 			 */
 			emptyTransactions: string
+			/**
+			 * N​o​ ​c​a​r​d​s​ ​a​v​a​i​l​a​b​l​e
+			 */
+			noCardAvailable: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​u​p​d​a​t​e​ ​c​a​r​d​ ​s​t​a​t​u​s
+			 */
+			cardUpdateError: string
+			/**
+			 * T​h​i​s​ ​c​a​r​d​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​a​v​a​i​l​a​b​l​e​ ​f​o​r​ ​u​s​e
+			 */
+			cardNotUsable: string
 		}
 		CardDetails: {
 			/**
@@ -20218,6 +20238,14 @@ export type TranslationFunctions = {
 			 * Completed
 			 */
 			completed: () => LocalizedString
+			/**
+			 * Declined
+			 */
+			declined: () => LocalizedString
+			/**
+			 * Reversed
+			 */
+			reversed: () => LocalizedString
 		}
 		CardDashboard: {
 			Actions: {
@@ -20254,6 +20282,18 @@ export type TranslationFunctions = {
 			 * No transactions yet
 			 */
 			emptyTransactions: () => LocalizedString
+			/**
+			 * No cards available
+			 */
+			noCardAvailable: () => LocalizedString
+			/**
+			 * Could not update card status
+			 */
+			cardUpdateError: () => LocalizedString
+			/**
+			 * This card is not currently available for use
+			 */
+			cardNotUsable: () => LocalizedString
 		}
 		CardDetails: {
 			/**

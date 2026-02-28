@@ -2968,7 +2968,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Menunggu",
-      "completed": "Selesai"
+      "completed": "Selesai",
+      "declined": "Ditolak",
+      "reversed": "Diterbalikkan"
     },
     "CardDashboard": {
       "Actions": {

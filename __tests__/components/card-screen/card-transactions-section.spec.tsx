@@ -17,6 +17,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
         TransactionStatus: {
           pending: () => "Pending",
           completed: () => "Completed",
+          declined: () => "Declined",
+          reversed: () => "Reversed",
         },
       },
     },
@@ -31,6 +33,8 @@ jest.mock("@rn-vui/themed", () => ({
         primary: "#F7931A",
         grey2: "#999999",
         _green: "#00AA00",
+        error: "#FF0000",
+        _orange: "#FF8C00",
         black: "#000000",
         grey1: "#666666",
         grey4: "#E0E0E0",

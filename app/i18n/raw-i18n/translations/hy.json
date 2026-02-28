@@ -2968,7 +2968,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Սպասման մեջ",
-      "completed": "Ավարտված"
+      "completed": "Ավարտված",
+      "declined": "Մերժված",
+      "reversed": "Հետադարձված"
     },
     "CardDashboard": {
       "Actions": {
