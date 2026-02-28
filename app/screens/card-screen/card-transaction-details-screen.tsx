@@ -8,7 +8,7 @@ import {
   IconTextButton,
   InfoSection,
   StatusBadge,
-  WarningCard,
+  InfoCard,
 } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -163,7 +163,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
           />
         </View>
 
-        <WarningCard
+        <InfoCard
           title={LL.CardFlow.TransactionDetails.transactionHelp()}
           customDescription={
             <Text style={styles.helpDescription}>

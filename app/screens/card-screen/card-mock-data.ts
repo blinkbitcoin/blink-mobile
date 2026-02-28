@@ -192,3 +192,37 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
 ]
 
 export const EMPTY_TRANSACTIONS: TransactionGroup[] = []
+
+export type UserInfo = {
+  firstName: string
+  lastName: string
+  fullName: string
+  dateOfBirth: string
+  email: string
+  phone: string
+  registeredAddress: string[]
+  shippingAddress: string[]
+}
+
+export const MOCK_USER: UserInfo = {
+  firstName: "Joe",
+  lastName: "Nakamoto",
+  fullName: "Satoshi Nakamoto",
+  dateOfBirth: "1971-01-03",
+  email: "email@gmail.com",
+  phone: "+1 (555) 123-4567",
+  registeredAddress: [
+    "Satoshi Nakamoto",
+    "123 Main Street",
+    "Apt 4B",
+    "New York, NY 10001",
+    "United States",
+  ],
+  shippingAddress: [
+    "Satoshi Nakamoto",
+    "13 Hash Street",
+    "Apt 21C",
+    "Austin, TX 10001",
+    "United States",
+  ],
+}

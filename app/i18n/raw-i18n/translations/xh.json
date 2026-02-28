@@ -3093,6 +3093,19 @@
       "transactionHelpDescription": "Ukuba awuyiqondi le ntshintshiselwano okanye ufuna uncedo, qhagamshelana {supportTeam} ngokukhawuleza.",
       "supportTeam": "neqela lethu loncedo",
       "transactionNotFound": "Utshintshiselwano alufunyenwanga"
+    },
+    "PersonalDetails": {
+      "title": "Iinkcukacha zobuqu",
+      "blinkVisaCardholder": "Umnini wekhadi ye-Blink Visa",
+      "kycVerifiedInformation": "Ulwazi lwe-KYC oluqinisekisiweyo",
+      "kycVerifiedDescription": "Igama lakho, umhla wokuzalwa nedilesi ziqinisekiswe ngenkqubo yethu ye-KYC. Ungalutshintsha ulwazi ngokuphinda inkqubo ye-KYC. Asiqinisekisi ukuvunywa.",
+      "changeKycInformation": "Tshintsha ulwazi lwe-KYC",
+      "firstName": "Igama lokuqala",
+      "lastName": "Ifani",
+      "dateOfBirth": "Umhla wokuzalwa",
+      "contactInformation": "Ulwazi loqhagamshelwano",
+      "registeredAddress": "Idilesi ebhalisiweyo",
+      "shippingAddress": "Idilesi yokuthumela"
     }
   }
 }

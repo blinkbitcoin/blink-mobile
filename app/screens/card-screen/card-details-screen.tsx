@@ -7,7 +7,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
-import { InfoSection, WarningCard } from "@app/components/card-screen"
+import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -134,7 +134,7 @@ export const CardDetailsScreen: React.FC = () => {
             ]}
           />
 
-          <WarningCard
+          <InfoCard
             title={LL.CardFlow.CardDetails.keepDetailsSafe()}
             description={LL.CardFlow.CardDetails.securityWarning()}
           />

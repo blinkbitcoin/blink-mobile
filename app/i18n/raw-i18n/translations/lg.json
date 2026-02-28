@@ -3046,6 +3046,19 @@
       "transactionHelpDescription": "Bw'ototegeera ntuzaanya eno oba bw'oba oyagala obuyambi, tuukirira {supportTeam} amangu.",
       "supportTeam": "ekibinja kyaffe eky'obuyambi",
       "transactionNotFound": "Entuzaanya terabika"
+    },
+    "PersonalDetails": {
+      "title": "Ebikwata ku muntu",
+      "blinkVisaCardholder": "Nannyini kaadi ya Blink Visa",
+      "kycVerifiedInformation": "Ebikwata ku KYC ebikakasiddwa",
+      "kycVerifiedDescription": "Erinnya lyo, ennaku z'okuzaalibwa n'endagiriro bikakasiddwa okuyita mu nkola yaffe eya KYC. Osobola okukyusa ebikwata ku by'okolera KYC buto. Tetukakasa kwemesa.",
+      "changeKycInformation": "Kyusa ebikwata ku KYC",
+      "firstName": "Erinnya ery'olubereberye",
+      "lastName": "Erinnya ery'ekika",
+      "dateOfBirth": "Ennaku z'okuzaalibwa",
+      "contactInformation": "Ebikwata ku kutuukirira",
+      "registeredAddress": "Endagiriro ewandiisiddwa",
+      "shippingAddress": "Endagiriro y'okutumira"
     }
   }
 }

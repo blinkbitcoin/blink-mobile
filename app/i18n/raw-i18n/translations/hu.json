@@ -3046,6 +3046,19 @@
       "transactionHelpDescription": "Ha nem ismeri fel ezt a tranzakciót vagy segítségre van szüksége, azonnal lépjen kapcsolatba {supportTeam}.",
       "supportTeam": "ügyfélszolgálatunkkal",
       "transactionNotFound": "A tranzakció nem található"
+    },
+    "PersonalDetails": {
+      "title": "Személyes adatok",
+      "blinkVisaCardholder": "Blink Visa kártyabirtokos",
+      "kycVerifiedInformation": "KYC ellenőrzött információk",
+      "kycVerifiedDescription": "A neve, születési dátuma és címe a KYC folyamatunkon keresztül ellenőrizve lett. Az információkat a KYC folyamat megismétlésével módosíthatja. A jóváhagyást nem garantáljuk.",
+      "changeKycInformation": "KYC információk módosítása",
+      "firstName": "Keresztnév",
+      "lastName": "Vezetéknév",
+      "dateOfBirth": "Születési dátum",
+      "contactInformation": "Kapcsolattartási adatok",
+      "registeredAddress": "Regisztrált cím",
+      "shippingAddress": "Szállítási cím"
     }
   }
 }

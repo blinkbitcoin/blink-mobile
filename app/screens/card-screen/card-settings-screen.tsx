@@ -1,11 +1,14 @@
 import React, { useState } from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
 
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -13,13 +16,14 @@ export const CardSettingsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [transactionAlerts, setTransactionAlerts] = useState(true)
   const [securityAlerts, setSecurityAlerts] = useState(true)
   const [marketingUpdates, setMarketingUpdates] = useState(false)
 
   const handlePersonalDetails = () => {
-    console.log("Personal Details pressed")
+    navigation.navigate("cardPersonalDetailsScreen")
   }
 
   const handleChangePin = () => {

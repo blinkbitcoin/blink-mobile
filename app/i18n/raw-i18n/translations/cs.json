@@ -3087,6 +3087,19 @@
       "transactionHelpDescription": "Pokud tuto transakci nepoznáváte nebo potřebujete pomoc, okamžitě kontaktujte náš {supportTeam}.",
       "supportTeam": "tým podpory",
       "transactionNotFound": "Transakce nenalezena"
+    },
+    "PersonalDetails": {
+      "title": "Osobní údaje",
+      "blinkVisaCardholder": "Držitel karty Blink Visa",
+      "kycVerifiedInformation": "Ověřené KYC informace",
+      "kycVerifiedDescription": "Vaše jméno, datum narození a adresa jsou ověřeny prostřednictvím našeho KYC procesu. Informace můžete změnit opětovným provedením KYC procesu. Schválení nezaručujeme.",
+      "changeKycInformation": "Změnit KYC informace",
+      "firstName": "Jméno",
+      "lastName": "Příjmení",
+      "dateOfBirth": "Datum narození",
+      "contactInformation": "Kontaktní informace",
+      "registeredAddress": "Registrovaná adresa",
+      "shippingAddress": "Dodací adresa"
     }
   }
 }
