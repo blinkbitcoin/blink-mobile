@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Όροι και προϋποθέσεις κάρτας",
       "privacyPolicy": "Πολιτική απορρήτου κάρτας",
       "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
-      "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας"
+      "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας",
+      "addToAppleWallet": "Prosthiki sto Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Λεπτομέρειες συναλλαγής",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Στοιχεία επικοινωνίας",
       "registeredAddress": "Καταχωρημένη διεύθυνση",
       "shippingAddress": "Διεύθυνση αποστολής"
+    },
+    "AddToMobileWallet": {
+      "title": "Prosthiki sto kinito portofoli",
+      "addYourCard": "Prostheste tin karta sas",
+      "addYourCardDescription": "Prostheste tin karta Blink Visa sto kinito portofoli gia grigores kai asfales pliromes",
+      "addTo": "Prosthiki se",
+      "Benefits": {
+        "title": "Ofeloi tou kinitou portofoliou",
+        "contactless": "Anepafes pliromes se ekatommyria topothesies",
+        "security": "Enischymeni asfaleia me viometriki pistopoiisi",
+        "noPhysicalCard": "Den chreiazeste ti fysiki karta",
+        "worksLocked": "Leitoyrgei akoma kai otan to tilefono einai kleidomeno"
+      }
     }
   }
 }

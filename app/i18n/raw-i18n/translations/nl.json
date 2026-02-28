@@ -3061,7 +3061,8 @@
       "termsAndConditions": "Kaartvoorwaarden",
       "privacyPolicy": "Privacybeleid kaart",
       "closeCardAccount": "Kaartaccount sluiten",
-      "closeCardAccountDescription": "Sluit uw Visa-kaart permanent"
+      "closeCardAccountDescription": "Sluit uw Visa-kaart permanent",
+      "addToAppleWallet": "Toevoegen aan Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Transactiedetails",
@@ -3100,6 +3101,19 @@
       "contactInformation": "Contactgegevens",
       "registeredAddress": "Geregistreerd adres",
       "shippingAddress": "Verzendadres"
+    },
+    "AddToMobileWallet": {
+      "title": "Toevoegen aan mobiele portemonnee",
+      "addYourCard": "Voeg je kaart toe",
+      "addYourCardDescription": "Voeg je Blink Visa-kaart toe aan je mobiele portemonnee voor snelle en veilige betalingen",
+      "addTo": "Toevoegen aan",
+      "Benefits": {
+        "title": "Voordelen van mobiele portemonnee",
+        "contactless": "Contactloze betalingen op miljoenen locaties",
+        "security": "Verbeterde beveiliging met biometrische authenticatie",
+        "noPhysicalCard": "Geen fysieke kaart nodig",
+        "worksLocked": "Werkt zelfs wanneer je telefoon vergrendeld is"
+      }
     }
   }
 }

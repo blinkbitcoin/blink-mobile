@@ -26,6 +26,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+jest.mock("@app/utils/helper", () => ({
+  isIos: false,
+}))
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -347,9 +351,7 @@ describe("CardSettingsScreen", () => {
       consoleSpy.mockRestore()
     })
 
-    it("allows pressing add to google pay row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("allows pressing add to mobile wallet row and navigates", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -363,8 +365,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Add to Google Pay pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardAddToMobileWalletScreen")
     })
 
     it("allows pressing replace card row", async () => {

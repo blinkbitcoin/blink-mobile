@@ -89,6 +89,7 @@ import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-scr
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
+  CardAddToMobileWalletScreen,
   CardDetailsScreen,
   CardLimitsScreen,
   CardPersonalDetailsScreen,
@@ -524,6 +525,11 @@ export const RootStack = () => {
         name="cardLimitsScreen"
         component={CardLimitsScreen}
         options={{ title: LL.CardFlow.CardLimits.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardAddToMobileWalletScreen"
+        component={CardAddToMobileWalletScreen}
+        options={{ title: LL.CardFlow.AddToMobileWallet.title() }}
       />
       <RootNavigator.Screen
         name="cardPersonalDetailsScreen"

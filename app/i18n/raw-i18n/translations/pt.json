@@ -3020,7 +3020,8 @@
             "termsAndConditions": "Termos e condições do cartão",
             "privacyPolicy": "Política de privacidade do cartão",
             "closeCardAccount": "Encerrar conta do cartão",
-            "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa"
+            "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa",
+            "addToAppleWallet": "Adicionar ao Apple Wallet"
         },
         "TransactionDetails": {
             "title": "Detalhes da transação",
@@ -3059,6 +3060,19 @@
             "contactInformation": "Informações de contato",
             "registeredAddress": "Endereço registrado",
             "shippingAddress": "Endereço de entrega"
+        },
+        "AddToMobileWallet": {
+            "title": "Adicionar à carteira móvel",
+            "addYourCard": "Adicione seu cartão",
+            "addYourCardDescription": "Adicione seu cartão Blink Visa à sua carteira móvel para pagamentos rápidos e seguros",
+            "addTo": "Adicionar a",
+            "Benefits": {
+                "title": "Benefícios da carteira móvel",
+                "contactless": "Pagamentos sem contato em milhões de locais",
+                "security": "Segurança aprimorada com autenticação biométrica",
+                "noPhysicalCard": "Não precisa carregar seu cartão físico",
+                "worksLocked": "Funciona mesmo com o telefone bloqueado"
+            }
         }
     }
 }

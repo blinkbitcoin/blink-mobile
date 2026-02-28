@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Termes i condicions de la targeta",
       "privacyPolicy": "Política de privacitat de la targeta",
       "closeCardAccount": "Tancar compte de targeta",
-      "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa"
+      "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa",
+      "addToAppleWallet": "Afegir a Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Detalls de la transacció",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Informació de contacte",
       "registeredAddress": "Adreça registrada",
       "shippingAddress": "Adreça d'enviament"
+    },
+    "AddToMobileWallet": {
+      "title": "Afegir a la cartera mobil",
+      "addYourCard": "Afegeix la teva targeta",
+      "addYourCardDescription": "Afegeix la teva targeta Blink Visa a la cartera mobil per a pagaments rapids i segurs",
+      "addTo": "Afegir a",
+      "Benefits": {
+        "title": "Avantatges de la cartera mobil",
+        "contactless": "Pagaments sense contacte en milions de llocs",
+        "security": "Seguretat millorada amb autenticacio biometrica",
+        "noPhysicalCard": "No cal portar la targeta fisica",
+        "worksLocked": "Funciona fins i tot amb el telefon bloquejat"
+      }
     }
   }
 }

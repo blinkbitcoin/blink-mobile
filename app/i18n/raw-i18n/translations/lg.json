@@ -3020,7 +3020,8 @@
       "termsAndConditions": "Amateeka g ekkaadi",
       "privacyPolicy": "Enkola y ekyama ey ekkaadi",
       "closeCardAccount": "Ggala akawunti y ekkaadi",
-      "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna"
+      "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna",
+      "addToAppleWallet": "Yongera ku Apple Wallet"
     },
     "TransactionDetails": {
       "title": "Ebikwata ku ntuzaanya",
@@ -3059,6 +3060,19 @@
       "contactInformation": "Ebikwata ku kutuukirira",
       "registeredAddress": "Endagiriro ewandiisiddwa",
       "shippingAddress": "Endagiriro y'okutumira"
+    },
+    "AddToMobileWallet": {
+      "title": "Yongera ku ssaamu ya simu",
+      "addYourCard": "Yongera kaadi yo",
+      "addYourCardDescription": "Yongera kaadi yo eya Blink Visa ku ssaamu ya simu okusasula amangu era n'obukuumi",
+      "addTo": "Yongera ku",
+      "Benefits": {
+        "title": "Ebirungi by'essaamu ya simu",
+        "contactless": "Okusasula awatali kukwata mu bifo obukadde",
+        "security": "Obukuumi obulungi n'okukakasa kw'omubiri",
+        "noPhysicalCard": "Teweetaaga kutambula na kaadi yo",
+        "worksLocked": "Ekola ne singa simu yo erikuggaliddwa"
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+export * from "./card-add-to-mobile-wallet-screen"
 export * from "./card-details-screen"
 export * from "./card-limits-screen"
 export * from "./card-personal-details-screen"

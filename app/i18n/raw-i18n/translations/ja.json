@@ -3061,7 +3061,8 @@
             "termsAndConditions": "カード利用規約",
             "privacyPolicy": "カードプライバシーポリシー",
             "closeCardAccount": "カードアカウントを閉じる",
-            "closeCardAccountDescription": "Visaカードを永久に閉じる"
+            "closeCardAccountDescription": "Visaカードを永久に閉じる",
+            "addToAppleWallet": "Apple Walletに追加"
         },
         "TransactionDetails": {
             "title": "取引詳細",
@@ -3100,6 +3101,19 @@
             "contactInformation": "連絡先情報",
             "registeredAddress": "登録住所",
             "shippingAddress": "配送先住所"
+        },
+        "AddToMobileWallet": {
+            "title": "モバイルウォレットに追加",
+            "addYourCard": "カードを追加",
+            "addYourCardDescription": "Blink Visaカードをモバイルウォレットに追加して迅速で安全な支払いを",
+            "addTo": "追加",
+            "Benefits": {
+                "title": "モバイルウォレットのメリット",
+                "contactless": "数百万の場所で非接触決済",
+                "security": "生体認証によるセキュリティ強化",
+                "noPhysicalCard": "物理カードを持ち歩く必要なし",
+                "worksLocked": "電話がロックされていても動作"
+            }
         }
     }
 }
