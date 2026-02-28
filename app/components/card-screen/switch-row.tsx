@@ -3,14 +3,14 @@ import { ListItem, makeStyles } from "@rn-vui/themed"
 
 import { Switch } from "@app/components/atomic/switch"
 
-type TransactionTypeRowProps = {
+type SwitchRowProps = {
   title: string
-  description: string
+  description?: string
   value: boolean
   onValueChange: (value: boolean) => void
 }
 
-export const TransactionTypeRow: React.FC<TransactionTypeRowProps> = ({
+export const SwitchRow: React.FC<SwitchRowProps> = ({
   title,
   description,
   value,
@@ -21,9 +21,11 @@ export const TransactionTypeRow: React.FC<TransactionTypeRowProps> = ({
     <ListItem containerStyle={styles.listItemContainer}>
       <ListItem.Content>
         <ListItem.Title style={styles.listItemTitle}>{title}</ListItem.Title>
-        <ListItem.Subtitle style={styles.listItemSubtitle}>
-          {description}
-        </ListItem.Subtitle>
+        {description && (
+          <ListItem.Subtitle style={styles.listItemSubtitle}>
+            {description}
+          </ListItem.Subtitle>
+        )}
       </ListItem.Content>
       <Switch value={value} onValueChange={onValueChange} accessibilityLabel={title} />
     </ListItem>

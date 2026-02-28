@@ -18,8 +18,10 @@ import Check from "@app/assets/icons-redesign/check.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
 import Close from "@app/assets/icons-redesign/close.svg"
 import Coins from "@app/assets/icons-redesign/coins.svg"
+import ContactSupport from "@app/assets/icons-redesign/contact-support.svg"
 import CopyPaste from "@app/assets/icons-redesign/copy-paste.svg"
 import Dollar from "@app/assets/icons-redesign/dollar.svg"
+import Download from "@app/assets/icons-redesign/download.svg"
 import EyeSlash from "@app/assets/icons-redesign/eye-slash.svg"
 import Eye from "@app/assets/icons-redesign/eye.svg"
 import Filter from "@app/assets/icons-redesign/filter.svg"
@@ -60,6 +62,7 @@ import Refresh from "@app/assets/icons/refresh.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
 import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import Calendar from "@app/assets/icons-redesign/calendar.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
 import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
@@ -89,9 +92,11 @@ export const icons = {
   "close": Close,
   "close-cross-with-background": CloseCrossWithBackground,
   "coins": Coins,
+  "contact-support": ContactSupport,
   "people": People,
   "copy-paste": CopyPaste,
   "dollar": Dollar,
+  "download": Download,
   "eye-slash": EyeSlash,
   "eye": Eye,
   "filter": Filter,
@@ -132,6 +137,7 @@ export const icons = {
   "upgrade": Upgrade,
   "welcome": Welcome,
   "calculator": Calculator,
+  "calendar": Calendar,
   "document-outline": DocumentIcon,
   "key-outline": KeyIcon,
   "house-outline": HouseIcon,

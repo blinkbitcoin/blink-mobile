@@ -2984,6 +2984,24 @@
                 "contactlessDescription": "Kontaktlose Transaktionen erlauben"
             },
             "title": "Kartenlimits"
+        },
+        "CardStatements": {
+            "title": "Umsätze",
+            "selectYear": "Jahr auswählen",
+            "currentStatement": "Aktueller Umsatz",
+            "statementPeriod": "Umsatzzeitraum",
+            "totalSpent": "Gesamtausgaben",
+            "monthlyStatements": "Monatliche Umsätze",
+            "downloadAll": "Alle herunterladen",
+            "spent": "{amount} ausgegeben",
+            "transactions": "{count} Transaktionen, {amount} ausgegeben",
+            "noStatements": "Noch keine Umsätze",
+            "statementsCount": "{count} Umsätze",
+            "aboutStatements": "Über die Umsätze",
+            "aboutBullet1": "Monatliche Umsätze werden am letzten Tag jedes Monats erstellt",
+            "aboutBullet2": "Umsätze enthalten alle Transaktionen und Gebühren des Zeitraums",
+            "aboutBullet3": "Umsätze als PDF herunterladen",
+            "notifyNewStatements": "Benachrichtigen, wenn neue Umsätze verfügbar sind"
         }
     }
 }
