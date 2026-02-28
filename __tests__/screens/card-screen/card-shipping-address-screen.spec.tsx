@@ -58,7 +58,7 @@ describe("CardShippingAddressScreen", () => {
     })
 
     it("displays full name field", async () => {
-      const { getByText } = render(
+      const { getByText, getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
         </ContextForScreen>,
@@ -67,7 +67,7 @@ describe("CardShippingAddressScreen", () => {
       await act(async () => {})
 
       expect(getByText("Full name")).toBeTruthy()
-      expect(getByText("Joe Nakamoto")).toBeTruthy()
+      expect(getByDisplayValue("Joe Nakamoto")).toBeTruthy()
     })
 
     it("displays address line 1 field", async () => {
@@ -212,8 +212,8 @@ describe("CardShippingAddressScreen", () => {
   })
 
   describe("interactions", () => {
-    it("opens edit modal when full name is pressed", async () => {
-      const { getByText } = render(
+    it("renders editable full name field", async () => {
+      const { getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
         </ContextForScreen>,
@@ -221,12 +221,7 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      const fullNameValue = getByText("Joe Nakamoto")
-      await act(async () => {
-        fireEvent.press(fullNameValue)
-      })
-
-      expect(getByText("Save")).toBeTruthy()
+      expect(getByDisplayValue("Joe Nakamoto")).toBeTruthy()
     })
 
     it("navigates to selection screen for state field", async () => {

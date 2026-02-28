@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as RNText, View } from "react-native"
+import { Text as RNText, TextInput as RNTextInput, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { ShippingAddressForm } from "@app/components/card-screen/shipping-address-form"
@@ -64,23 +64,31 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   ],
 }))
 
-jest.mock("@app/components/card-screen/edit-field-modal", () => ({
-  EditFieldModal: () => null,
-}))
-
 jest.mock("@app/components/card-screen/input-field", () => ({
   InputField: ({
     label,
     value,
     onPress,
+    editable,
+    onChangeText,
   }: {
     label: string
     value: string
     onPress?: () => void
+    editable?: boolean
+    onChangeText?: (text: string) => void
   }) => (
     <View testID={`input-field-${label}`} accessibilityHint={value}>
       <RNText>{label}</RNText>
-      <RNText>{value}</RNText>
+      {editable ? (
+        <RNTextInput
+          testID={`text-input-${label}`}
+          value={value}
+          onChangeText={onChangeText}
+        />
+      ) : (
+        <RNText>{value}</RNText>
+      )}
       {onPress && (
         <View testID={`press-${label}`} onTouchEnd={onPress}>
           <RNText>press</RNText>
@@ -130,18 +138,6 @@ describe("ShippingAddressForm", () => {
       expect(getByText("Postal code")).toBeTruthy()
       expect(getByText("Country")).toBeTruthy()
     })
-
-    it("displays field values", () => {
-      const { getByText } = render(<ShippingAddressForm {...defaultProps} />)
-
-      expect(getByText("Satoshi Nakamoto")).toBeTruthy()
-      expect(getByText("123 Main Street")).toBeTruthy()
-      expect(getByText("Apt 4B")).toBeTruthy()
-      expect(getByText("New York")).toBeTruthy()
-      expect(getByText("NY")).toBeTruthy()
-      expect(getByText("10001")).toBeTruthy()
-      expect(getByText("United States")).toBeTruthy()
-    })
   })
 
   describe("showFullName", () => {
@@ -165,6 +161,41 @@ describe("ShippingAddressForm", () => {
       )
 
       expect(queryByTestId("input-field-Full name")).toBeNull()
+    })
+  })
+
+  describe("inline editing", () => {
+    it("calls onAddressChange when full name changes", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+
+      fireEvent.changeText(getByTestId("text-input-Full name"), "Hal Finney")
+
+      expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
+        ...mockAddress,
+        fullName: "Hal Finney",
+      })
+    })
+
+    it("calls onAddressChange when address line 1 changes", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+
+      fireEvent.changeText(getByTestId("text-input-Address line 1"), "456 Oak Ave")
+
+      expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
+        ...mockAddress,
+        addressLine1: "456 Oak Ave",
+      })
+    })
+
+    it("calls onAddressChange when address line 2 changes", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+
+      fireEvent.changeText(getByTestId("text-input-Address line 2"), "Suite 100")
+
+      expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
+        ...mockAddress,
+        addressLine2: "Suite 100",
+      })
     })
   })
 
