@@ -2724,6 +2724,7 @@
         "rate": "Kurs",
         "reauth": "Deine Sitzung ist abgelaufen. Btte logge dich erneut ein.",
         "restart": "Neustart",
+        "save": "Speichern",
         "sats": "Sats",
         "search": "Suche",
         "security": "Sicherheit",
@@ -3086,6 +3087,21 @@
                 "subtitle": "Die Bestellung zur Lieferung deiner Blink-Karte wurde eingereicht.",
                 "buttonLabel": "PIN erstellen"
             }
+        },
+        "ShippingAddress": {
+            "title": "Lieferadresse",
+            "fullName": "Vollständiger Name",
+            "addressLine1": "Adresszeile 1",
+            "addressLine2": "Adresszeile 2",
+            "city": "Stadt",
+            "state": "Bundesland",
+            "postalCode": "Postleitzahl",
+            "country": "Land",
+            "important": "Wichtig",
+            "importantDescription": "Bitte stellen Sie sicher, dass Ihre Adresse korrekt und vollständig ist.",
+            "noPOBoxes": "Karten können nicht an Postfächer geliefert werden",
+            "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
+            "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
         }
     }
 }

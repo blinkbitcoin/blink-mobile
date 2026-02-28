@@ -2788,7 +2788,8 @@
     "support": "Աջակցություն",
     "profiles": "Պրոֆիլներ",
     "paste": "Տեղադրել",
-    "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում"
+    "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում",
+    "save": "Պահպանել"
   },
   "errors": {
     "generic": "Սխալ\nՓորձեք կրկին ավելի ուշ։ ",
@@ -3127,6 +3128,21 @@
         "subtitle": "Ձեր Blink քարտի առաքման պատվերը ներկայացվել է։",
         "buttonLabel": "Ստեղծել PIN կոդ"
       }
+    },
+    "ShippingAddress": {
+      "title": "Առաքման հասցե",
+      "fullName": "Ամբողջական անուն",
+      "addressLine1": "Հասցեի տող 1",
+      "addressLine2": "Հասցեի տող 2",
+      "city": "Քաղաք",
+      "state": "Նահանգ",
+      "postalCode": "Փոստային կոդ",
+      "country": "Երկիր",
+      "important": "Կարևոր",
+      "importantDescription": "Խնդրում ենք համոզվել, որ ձեր հասցեն ճշգրիտ և ամբողջական է։",
+      "noPOBoxes": "Քարտերը չեն կարող առաքվել փոստային արկղերին",
+      "signatureRequired": "Առաքման պահին կարող է պահանջվել ստորագրություն",
+      "supportedRegions": "Հասցեն պետք է լինի առաքման աջակցվող տարածաշրջաններում"
     }
   }
 }

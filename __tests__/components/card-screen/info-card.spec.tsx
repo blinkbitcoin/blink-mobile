@@ -208,4 +208,82 @@ describe("InfoCard", () => {
       expect(queryByTestId("galoy-icon-warning")).toBeNull()
     })
   })
+
+  describe("bullet items", () => {
+    it("renders without bullet items by default", () => {
+      const { queryByText } = render(<InfoCard {...defaultProps} />)
+
+      expect(queryByText("•")).toBeNull()
+    })
+
+    it("renders bullet items when provided", () => {
+      const bulletItems = [
+        "Cards cannot be delivered to P.O. boxes",
+        "Signature may be required upon delivery",
+      ]
+
+      const { getByText } = render(
+        <InfoCard {...defaultProps} bulletItems={bulletItems} />,
+      )
+
+      expect(getByText("Cards cannot be delivered to P.O. boxes")).toBeTruthy()
+      expect(getByText("Signature may be required upon delivery")).toBeTruthy()
+    })
+
+    it("renders single bullet item", () => {
+      const bulletItems = ["Single bullet point"]
+
+      const { getByText } = render(
+        <InfoCard {...defaultProps} bulletItems={bulletItems} />,
+      )
+
+      expect(getByText("Single bullet point")).toBeTruthy()
+    })
+
+    it("renders multiple bullet items", () => {
+      const bulletItems = ["First item", "Second item", "Third item"]
+
+      const { getByText } = render(
+        <InfoCard {...defaultProps} bulletItems={bulletItems} />,
+      )
+
+      expect(getByText("First item")).toBeTruthy()
+      expect(getByText("Second item")).toBeTruthy()
+      expect(getByText("Third item")).toBeTruthy()
+    })
+
+    it("renders empty bullet items array without error", () => {
+      const { toJSON } = render(<InfoCard {...defaultProps} bulletItems={[]} />)
+
+      expect(toJSON()).toBeTruthy()
+    })
+
+    it("renders bullet items with long text", () => {
+      const bulletItems = [
+        "This is a very long bullet point that should wrap correctly and still be fully visible to the user",
+      ]
+
+      const { getByText } = render(
+        <InfoCard {...defaultProps} bulletItems={bulletItems} />,
+      )
+
+      expect(
+        getByText(
+          "This is a very long bullet point that should wrap correctly and still be fully visible to the user",
+        ),
+      ).toBeTruthy()
+    })
+
+    it("renders bullet items alongside description", () => {
+      const bulletItems = ["Bullet item one", "Bullet item two"]
+
+      const { getByText } = render(
+        <InfoCard {...defaultProps} bulletItems={bulletItems} />,
+      )
+
+      expect(getByText(defaultProps.description)).toBeTruthy()
+      expect(getByText("Bullet item one")).toBeTruthy()
+      expect(getByText("Bullet item two")).toBeTruthy()
+    })
+  })
 })

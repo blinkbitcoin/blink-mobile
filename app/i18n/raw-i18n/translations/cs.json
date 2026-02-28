@@ -2788,7 +2788,8 @@
     "support": "Podpora",
     "profiles": "Profily",
     "paste": "Vložit",
-    "hasBeenCopiedToClipboard": "{type: string} byl zkopírován do schránky"
+    "hasBeenCopiedToClipboard": "{type: string} byl zkopírován do schránky",
+    "save": "Uložit"
   },
   "errors": {
     "generic": "Došlo k chybě.\nZkuste to prosím později.",
@@ -3127,6 +3128,21 @@
         "subtitle": "Objednávka na doručení vaší karty Blink byla odeslána.",
         "buttonLabel": "Vytvořit PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Doručovací adresa",
+      "fullName": "Celé jméno",
+      "addressLine1": "Adresa řádek 1",
+      "addressLine2": "Adresa řádek 2",
+      "city": "Město",
+      "state": "Stát",
+      "postalCode": "PSČ",
+      "country": "Země",
+      "important": "Důležité",
+      "importantDescription": "Ujistěte se, že vaše adresa je přesná a úplná.",
+      "noPOBoxes": "Karty nelze doručit na poštovní schránky",
+      "signatureRequired": "Při doručení může být vyžadován podpis",
+      "supportedRegions": "Adresa musí být v podporovaných oblastech doručení"
     }
   }
 }

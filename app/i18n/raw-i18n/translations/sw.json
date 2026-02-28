@@ -2771,7 +2771,8 @@
     "support": "Msaada",
     "profiles": "Wasifu",
     "paste": "Bandika",
-    "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili"
+    "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili",
+    "save": "Hifadhi"
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -3086,6 +3087,21 @@
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limetumwa.",
         "buttonLabel": "Unda PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Anwani ya usafirishaji",
+      "fullName": "Jina kamili",
+      "addressLine1": "Mstari wa anwani 1",
+      "addressLine2": "Mstari wa anwani 2",
+      "city": "Jiji",
+      "state": "Jimbo",
+      "postalCode": "Msimbo wa posta",
+      "country": "Nchi",
+      "important": "Muhimu",
+      "importantDescription": "Tafadhali hakikisha anwani yako ni sahihi na kamili.",
+      "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
+      "signatureRequired": "Sahihi inaweza kuhitajika wakati wa utoaji",
+      "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji"
     }
   }
 }

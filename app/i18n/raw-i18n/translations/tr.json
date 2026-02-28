@@ -2771,7 +2771,8 @@
     "support": "Destek",
     "profiles": "Profiller",
     "paste": "Yapıştır",
-    "hasBeenCopiedToClipboard": "{type: string} panoya kopyalandı"
+    "hasBeenCopiedToClipboard": "{type: string} panoya kopyalandı",
+    "save": "Kaydet"
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",
@@ -3086,6 +3087,21 @@
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
         "buttonLabel": "PIN oluştur"
       }
+    },
+    "ShippingAddress": {
+      "title": "Teslimat adresi",
+      "fullName": "Tam ad",
+      "addressLine1": "Adres satırı 1",
+      "addressLine2": "Adres satırı 2",
+      "city": "Şehir",
+      "state": "İl",
+      "postalCode": "Posta kodu",
+      "country": "Ülke",
+      "important": "Önemli",
+      "importantDescription": "Lütfen adresinizin doğru ve eksiksiz olduğundan emin olun.",
+      "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
+      "signatureRequired": "Teslimatta imza gerekebilir",
+      "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır"
     }
   }
 }

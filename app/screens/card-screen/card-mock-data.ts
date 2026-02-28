@@ -226,3 +226,56 @@ export const MOCK_USER: UserInfo = {
     "United States",
   ],
 }
+
+export type ShippingAddress = {
+  fullName: string
+  addressLine1: string
+  addressLine2: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+}
+
+export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
+  fullName: "Joe Nakamoto",
+  addressLine1: "Address line 1",
+  addressLine2: "Address line 2",
+  city: "New York",
+  state: "NY",
+  postalCode: "10001",
+  country: "USA",
+}
+
+export type SelectionOption = {
+  value: string
+  label: string
+}
+
+export const US_STATES: SelectionOption[] = [
+  { value: "AZ", label: "Arizona" },
+  { value: "CA", label: "California" },
+  { value: "CO", label: "Colorado" },
+  { value: "FL", label: "Florida" },
+  { value: "GA", label: "Georgia" },
+  { value: "IL", label: "Illinois" },
+  { value: "MA", label: "Massachusetts" },
+  { value: "MI", label: "Michigan" },
+  { value: "NV", label: "Nevada" },
+  { value: "NJ", label: "New Jersey" },
+  { value: "NY", label: "New York" },
+  { value: "NC", label: "North Carolina" },
+  { value: "OH", label: "Ohio" },
+  { value: "OR", label: "Oregon" },
+  { value: "PA", label: "Pennsylvania" },
+  { value: "TN", label: "Tennessee" },
+  { value: "TX", label: "Texas" },
+  { value: "VA", label: "Virginia" },
+  { value: "WA", label: "Washington" },
+]
+
+export const COUNTRIES: SelectionOption[] = [
+  { value: "USA", label: "United States" },
+  { value: "CAN", label: "Canada" },
+  { value: "MEX", label: "Mexico" },
+]

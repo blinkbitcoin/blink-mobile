@@ -2788,7 +2788,8 @@
     "support": "Ondersteuning",
     "profiles": "Profiele",
     "paste": "Plak",
-    "hasBeenCopiedToClipboard": "{type: string} is na knipbord oorgedra"
+    "hasBeenCopiedToClipboard": "{type: string} is na knipbord oorgedra",
+    "save": "Stoor"
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -3127,6 +3128,21 @@
         "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
         "buttonLabel": "Skep PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Afleweringsadres",
+      "fullName": "Volle naam",
+      "addressLine1": "Adreslyn 1",
+      "addressLine2": "Adreslyn 2",
+      "city": "Stad",
+      "state": "Staat",
+      "postalCode": "Poskode",
+      "country": "Land",
+      "important": "Belangrik",
+      "importantDescription": "Maak asseblief seker dat jou adres akkuraat en volledig is.",
+      "noPOBoxes": "Kaarte kan nie by posbusse afgelewer word nie",
+      "signatureRequired": "Handtekening mag by aflewering vereis word",
+      "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees"
     }
   }
 }

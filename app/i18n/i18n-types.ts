@@ -8896,6 +8896,10 @@ type RootTranslation = {
 		 */
 		restart: string
 		/**
+		 * S​a​v​e
+		 */
+		save: string
+		/**
 		 * s​a​t​s
 		 */
 		sats: string
@@ -10101,6 +10105,60 @@ type RootTranslation = {
 				 */
 				buttonLabel: string
 			}
+		}
+		ShippingAddress: {
+			/**
+			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			title: string
+			/**
+			 * F​u​l​l​ ​n​a​m​e
+			 */
+			fullName: string
+			/**
+			 * A​d​d​r​e​s​s​ ​l​i​n​e​ ​1
+			 */
+			addressLine1: string
+			/**
+			 * A​d​d​r​e​s​s​ ​l​i​n​e​ ​2
+			 */
+			addressLine2: string
+			/**
+			 * C​i​t​y
+			 */
+			city: string
+			/**
+			 * S​t​a​t​e
+			 */
+			state: string
+			/**
+			 * P​o​s​t​a​l​ ​c​o​d​e
+			 */
+			postalCode: string
+			/**
+			 * C​o​u​n​t​r​y
+			 */
+			country: string
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			important: string
+			/**
+			 * P​l​e​a​s​e​ ​e​n​s​u​r​e​ ​y​o​u​r​ ​a​d​d​r​e​s​s​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​c​o​m​p​l​e​t​e​.
+			 */
+			importantDescription: string
+			/**
+			 * C​a​r​d​s​ ​c​a​n​n​o​t​ ​b​e​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​P​.​O​.​ ​b​o​x​e​s
+			 */
+			noPOBoxes: string
+			/**
+			 * S​i​g​n​a​t​u​r​e​ ​m​a​y​ ​b​e​ ​r​e​q​u​i​r​e​d​ ​u​p​o​n​ ​d​e​l​i​v​e​r​y
+			 */
+			signatureRequired: string
+			/**
+			 * A​d​d​r​e​s​s​ ​m​u​s​t​ ​b​e​ ​w​i​t​h​i​n​ ​s​u​p​p​o​r​t​e​d​ ​s​h​i​p​p​i​n​g​ ​r​e​g​i​o​n​s
+			 */
+			supportedRegions: string
 		}
 		TransactionDetails: {
 			/**
@@ -18995,6 +19053,10 @@ export type TranslationFunctions = {
 		 */
 		restart: () => LocalizedString
 		/**
+		 * Save
+		 */
+		save: () => LocalizedString
+		/**
 		 * sats
 		 */
 		sats: () => LocalizedString
@@ -20174,6 +20236,60 @@ export type TranslationFunctions = {
 				 */
 				buttonLabel: () => LocalizedString
 			}
+		}
+		ShippingAddress: {
+			/**
+			 * Shipping address
+			 */
+			title: () => LocalizedString
+			/**
+			 * Full name
+			 */
+			fullName: () => LocalizedString
+			/**
+			 * Address line 1
+			 */
+			addressLine1: () => LocalizedString
+			/**
+			 * Address line 2
+			 */
+			addressLine2: () => LocalizedString
+			/**
+			 * City
+			 */
+			city: () => LocalizedString
+			/**
+			 * State
+			 */
+			state: () => LocalizedString
+			/**
+			 * Postal code
+			 */
+			postalCode: () => LocalizedString
+			/**
+			 * Country
+			 */
+			country: () => LocalizedString
+			/**
+			 * Important
+			 */
+			important: () => LocalizedString
+			/**
+			 * Please ensure your address is accurate and complete.
+			 */
+			importantDescription: () => LocalizedString
+			/**
+			 * Cards cannot be delivered to P.O. boxes
+			 */
+			noPOBoxes: () => LocalizedString
+			/**
+			 * Signature may be required upon delivery
+			 */
+			signatureRequired: () => LocalizedString
+			/**
+			 * Address must be within supported shipping regions
+			 */
+			supportedRegions: () => LocalizedString
 		}
 		TransactionDetails: {
 			/**
