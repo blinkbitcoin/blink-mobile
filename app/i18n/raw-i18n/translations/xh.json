@@ -3049,6 +3049,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Akukho ntshukumo okwangoku",
       "statementsCount": "{count} intshukumo"
+    },
+    "CardSettings": {
+      "title": "Iisethingi zekhadi",
+      "personalDetails": "Iinkcukacha zobuqu",
+      "changePin": "Tshintsha i-PIN",
+      "transactionAlerts": "Izilumkiso zentshukumo",
+      "transactionAlertsDescription": "Fumana izaziso kuzo zonke intshukumo",
+      "securityAlerts": "Izilumkiso zokhuseleko",
+      "securityAlertsDescription": "Fumana izaziso kwimisebenzi yokhuseleko",
+      "marketingUpdates": "Uhlaziyo lwentengiso",
+      "marketingUpdatesDescription": "Uhlaziyo lwemveliso kunye nezibonelelo",
+      "cardManagement": "Ulawulo lwekhadi",
+      "orderPhysicalCard": "Odola ikhadi elingokoqobo",
+      "addToGooglePay": "Yongeza kwi-Google Pay",
+      "replaceCard": "Tshintsha ikhadi",
+      "termsAndConditions": "Imiqathango yemiqathango yekhadi",
+      "privacyPolicy": "Umgaqo-nkqubo wobumfihlo bekhadi",
+      "closeCardAccount": "Vala iakhawunti yekhadi",
+      "closeCardAccountDescription": "Vala ikhadi lakho le-Visa ngokusisigxina"
     }
   }
 }

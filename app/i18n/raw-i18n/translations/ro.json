@@ -3002,6 +3002,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Nu există încă mișcări",
       "statementsCount": "{count} mișcări"
+    },
+    "CardSettings": {
+      "title": "Setări card",
+      "personalDetails": "Date personale",
+      "changePin": "Schimbă PIN",
+      "transactionAlerts": "Alerte tranzacții",
+      "transactionAlertsDescription": "Primește notificări pentru toate tranzacțiile",
+      "securityAlerts": "Alerte de securitate",
+      "securityAlertsDescription": "Primește notificări pentru activități de securitate",
+      "marketingUpdates": "Actualizări de marketing",
+      "marketingUpdatesDescription": "Actualizări de produse și oferte",
+      "cardManagement": "Gestionare card",
+      "orderPhysicalCard": "Comandă card fizic",
+      "addToGooglePay": "Adaugă la Google Pay",
+      "replaceCard": "Înlocuiește cardul",
+      "termsAndConditions": "Termeni și condiții card",
+      "privacyPolicy": "Politica de confidențialitate card",
+      "closeCardAccount": "Închide contul cardului",
+      "closeCardAccountDescription": "Închide permanent cardul tău Visa"
     }
   }
 }

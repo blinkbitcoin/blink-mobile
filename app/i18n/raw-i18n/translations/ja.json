@@ -3043,6 +3043,25 @@
             "aboutBullet2": "明細には期間中のすべての取引と手数料が含まれます",
             "aboutBullet3": "明細をPDFでダウンロード",
             "notifyNewStatements": "新しい明細が利用可能になったら通知する"
+        },
+        "CardSettings": {
+            "title": "カード設定",
+            "personalDetails": "個人情報",
+            "changePin": "PIN変更",
+            "transactionAlerts": "取引アラート",
+            "transactionAlertsDescription": "すべての取引の通知を受け取る",
+            "securityAlerts": "セキュリティアラート",
+            "securityAlertsDescription": "セキュリティ関連の通知を受け取る",
+            "marketingUpdates": "マーケティング更新",
+            "marketingUpdatesDescription": "製品の更新とオファー",
+            "cardManagement": "カード管理",
+            "orderPhysicalCard": "物理カードを注文",
+            "addToGooglePay": "Google Payに追加",
+            "replaceCard": "カードを交換",
+            "termsAndConditions": "カード利用規約",
+            "privacyPolicy": "カードプライバシーポリシー",
+            "closeCardAccount": "カードアカウントを閉じる",
+            "closeCardAccountDescription": "Visaカードを永久に閉じる"
         }
     }
 }

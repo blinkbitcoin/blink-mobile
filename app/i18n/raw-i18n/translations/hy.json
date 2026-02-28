@@ -3043,6 +3043,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Քաղվածքներ չկան",
       "statementsCount": "{count} քաղվածք"
+    },
+    "CardSettings": {
+      "title": "Card settings",
+      "personalDetails": "Personal Details",
+      "changePin": "Change PIN",
+      "transactionAlerts": "Transaction alerts",
+      "transactionAlertsDescription": "Get notified for all transactions",
+      "securityAlerts": "Security alerts",
+      "securityAlertsDescription": "Get notified for security-related activities",
+      "marketingUpdates": "Marketing updates",
+      "marketingUpdatesDescription": "Product updates and offers",
+      "cardManagement": "Card management",
+      "orderPhysicalCard": "Order physical card",
+      "addToGooglePay": "Add to Google Pay",
+      "replaceCard": "Replace card",
+      "termsAndConditions": "Card Terms & Conditions",
+      "privacyPolicy": "Card Privacy Policy",
+      "closeCardAccount": "Close card account",
+      "closeCardAccountDescription": "Permanently close your Visa card"
     }
   }
 }

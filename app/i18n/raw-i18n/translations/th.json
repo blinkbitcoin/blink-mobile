@@ -3040,6 +3040,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "ยังไม่มีรายการ",
       "statementsCount": "{count} รายการ"
+    },
+    "CardSettings": {
+      "title": "การตั้งค่าบัตร",
+      "personalDetails": "ข้อมูลส่วนตัว",
+      "changePin": "เปลี่ยน PIN",
+      "transactionAlerts": "การแจ้งเตือนธุรกรรม",
+      "transactionAlertsDescription": "รับการแจ้งเตือนสำหรับธุรกรรมทั้งหมด",
+      "securityAlerts": "การแจ้งเตือนความปลอดภัย",
+      "securityAlertsDescription": "รับการแจ้งเตือนสำหรับกิจกรรมด้านความปลอดภัย",
+      "marketingUpdates": "อัปเดตการตลาด",
+      "marketingUpdatesDescription": "อัปเดตผลิตภัณฑ์และข้อเสนอ",
+      "cardManagement": "การจัดการบัตร",
+      "orderPhysicalCard": "สั่งบัตรจริง",
+      "addToGooglePay": "เพิ่มไปยัง Google Pay",
+      "replaceCard": "เปลี่ยนบัตร",
+      "termsAndConditions": "ข้อกำหนดและเงื่อนไขของบัตร",
+      "privacyPolicy": "นโยบายความเป็นส่วนตัวของบัตร",
+      "closeCardAccount": "ปิดบัญชีบัตร",
+      "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร"
     }
   }
 }

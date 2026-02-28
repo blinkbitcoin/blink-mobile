@@ -3040,6 +3040,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Још нема промета",
       "statementsCount": "{count} промета"
+    },
+    "CardSettings": {
+      "title": "Подешавања картице",
+      "personalDetails": "Лични подаци",
+      "changePin": "Промени ПИН",
+      "transactionAlerts": "Упозорења о трансакцијама",
+      "transactionAlertsDescription": "Примајте обавештења о свим трансакцијама",
+      "securityAlerts": "Безбедносна упозорења",
+      "securityAlertsDescription": "Примајте обавештења о безбедносним активностима",
+      "marketingUpdates": "Маркетиншка ажурирања",
+      "marketingUpdatesDescription": "Ажурирања производа и понуде",
+      "cardManagement": "Управљање картицом",
+      "orderPhysicalCard": "Наручи физичку картицу",
+      "addToGooglePay": "Додај у Google Pay",
+      "replaceCard": "Замени картицу",
+      "termsAndConditions": "Услови и одредбе картице",
+      "privacyPolicy": "Политика приватности картице",
+      "closeCardAccount": "Затвори налог картице",
+      "closeCardAccountDescription": "Трајно затворите своју Visa картицу"
     }
   }
 }

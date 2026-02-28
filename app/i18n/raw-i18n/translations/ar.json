@@ -3040,6 +3040,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "لا توجد حركات بعد",
       "statementsCount": "{count} حركات"
+    },
+    "CardSettings": {
+      "title": "إعدادات البطاقة",
+      "personalDetails": "البيانات الشخصية",
+      "changePin": "تغيير رمز PIN",
+      "transactionAlerts": "تنبيهات المعاملات",
+      "transactionAlertsDescription": "احصل على إشعارات لجميع المعاملات",
+      "securityAlerts": "تنبيهات الأمان",
+      "securityAlertsDescription": "احصل على إشعارات للأنشطة المتعلقة بالأمان",
+      "marketingUpdates": "تحديثات التسويق",
+      "marketingUpdatesDescription": "تحديثات المنتجات والعروض",
+      "cardManagement": "إدارة البطاقة",
+      "orderPhysicalCard": "طلب بطاقة فعلية",
+      "addToGooglePay": "إضافة إلى Google Pay",
+      "replaceCard": "استبدال البطاقة",
+      "termsAndConditions": "شروط وأحكام البطاقة",
+      "privacyPolicy": "سياسة خصوصية البطاقة",
+      "closeCardAccount": "إغلاق حساب البطاقة",
+      "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً"
     }
   }
 }

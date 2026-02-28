@@ -3043,6 +3043,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Nog geen bewegings nie",
       "statementsCount": "{count} bewegings"
+    },
+    "CardSettings": {
+      "title": "Kaartinstellings",
+      "personalDetails": "Persoonlike besonderhede",
+      "changePin": "Verander PIN",
+      "transactionAlerts": "Transaksie-waarskuwings",
+      "transactionAlertsDescription": "Kry kennisgewings vir alle transaksies",
+      "securityAlerts": "Sekuriteitswaarskuwings",
+      "securityAlertsDescription": "Kry kennisgewings vir sekuriteitsverwante aktiwiteite",
+      "marketingUpdates": "Bemarkingsopdaterings",
+      "marketingUpdatesDescription": "Produkopdaterings en aanbiedinge",
+      "cardManagement": "Kaartbestuur",
+      "orderPhysicalCard": "Bestel fisiese kaart",
+      "addToGooglePay": "Voeg by Google Pay",
+      "replaceCard": "Vervang kaart",
+      "termsAndConditions": "Kaart bepalings en voorwaardes",
+      "privacyPolicy": "Kaart privaatheidsbeleid",
+      "closeCardAccount": "Sluit kaartrekening",
+      "closeCardAccountDescription": "Sluit jou Visa-kaart permanent"
     }
   }
 }
