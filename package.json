@@ -227,7 +227,7 @@
     "browserstack-local": "^1.5.1",
     "cross-fetch": "^4.0.0",
     "csv-parse": "^5.5.5",
-    "detox": "^20.20.2",
+    "detox": "^20.28.0",
     "dotenv": "^16.4.5",
     "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.6.0",

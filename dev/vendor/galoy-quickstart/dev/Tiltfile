@@ -8,6 +8,7 @@ DASHBOARD_TEST_LABEL = "dashboard"
 PAY_TEST_LABEL = "pay"
 ADMIN_PANEL_TEST_LABEL = "admin-panel"
 MAP_TEST_LABEL = "map"
+VOUCHER_TEST_LABEL = "voucher"
 MIGRATE_MONGO_TEST_LABEL = "mongodb-migrate"
 
 TEST_RESOURCES = {
@@ -17,6 +18,7 @@ TEST_RESOURCES = {
    PAY_TEST_LABEL: "test-pay",
    ADMIN_PANEL_TEST_LABEL: "test-admin-panel",
    MAP_TEST_LABEL: "test-map",
+   VOUCHER_TEST_LABEL: "test-voucher",
    MIGRATE_MONGO_TEST_LABEL: "test-mongodb-migrate",
 }
 
@@ -56,12 +58,16 @@ def merge_env_file(file_path_str, env_vars={}):
     file_blob = read_file(env_file_path, "")
     lines = str(file_blob).split('\n')
     for raw_line in lines:
-        if raw_line.startswith('#') or raw_line.strip() == '':
+        line_without_comments = raw_line.strip()
+        if '#' in raw_line:
+            line_without_comments = raw_line.split('#')[0].strip()
+
+        if line_without_comments == '':
             continue
 
-        line = raw_line
-        if raw_line.startswith('export '):
-            line = raw_line[len('export '):].strip()
+        line = line_without_comments
+        if line_without_comments.startswith('export '):
+            line = line_without_comments[len('export '):].strip()
 
         key_value = line.split('=', 1)
         if len(key_value) == 2:
@@ -116,7 +122,8 @@ pay_env = {
   "NEXT_PUBLIC_CORE_GQL_URL": "http://localhost:4455/graphql",
   "NEXT_PUBLIC_CORE_GQL_WEB_SOCKET_URL": "ws://localhost:4455/graphqlws",
   "NEXT_PUBLIC_PAY_DOMAIN": "localhost:3002",
-  "NEXTAUTH_URL":"http://localhost:3002"
+  "NEXTAUTH_URL":"http://localhost:3002",
+  "NEXTAUTH_SECRET":"secret"
 }
 local_resource(
     "pay",
@@ -195,7 +202,7 @@ local_resource(
     readiness_probe = probe(
         period_secs  = 5,
         http_get = http_get_action(
-            path = "/",
+            path = "/api/health",
             port = 3005,
         ),
     ),
@@ -208,6 +215,60 @@ local_resource(
     links = [
         link("http://localhost:3005", "map"),
     ],
+)
+
+voucher_target = "//apps/voucher:dev"
+if is_ci:
+  voucher_target = '//apps/voucher:voucher'
+voucher_env = {
+    "PORT": "3006",
+    "NEXTAUTH_URL":"http://localhost:3006",
+    "NEXTAUTH_SECRET":"secret"
+}
+local_resource(
+    "voucher",
+    labels = ["apps"],
+    cmd = "buck2 build {}".format(voucher_target),
+    serve_cmd = ". .envs/voucher.env && buck2 run {}".format(voucher_target),
+    env = voucher_env,
+    serve_env = voucher_env,
+    readiness_probe = probe(
+        period_secs  = 5,
+        http_get = http_get_action(
+            path = "/",
+            port = 3006,
+        ),
+    ),
+    deps = _buck2_dep_inputs(voucher_target),
+    allow_parallel = True,
+    resource_deps = [
+        "api",
+        "apollo-router",
+        "hydra-voucher",
+        "setup-voucher"
+    ],
+    links = [
+        link("http://localhost:3006", "voucher"),
+    ],
+)
+
+local_resource(
+  name='hydra-voucher',
+  labels = ['apps'],
+  cmd=[
+    'buck2',
+    'run',
+    '//dev:setup-hydra-client',
+    '--',
+    'voucher',
+    'authorization_code,refresh_token',
+    'http://localhost:3006/api/auth/callback/blink',
+  ],
+  allow_parallel = True,
+  resource_deps = [
+    "hydra",
+    "api",
+  ]
 )
 
 local_resource(
@@ -249,6 +310,26 @@ local_resource(
   ]
 )
 
+local_resource(
+  name='hydra-consent-test-client',
+  labels = ['auth'],
+  cmd=[
+    'buck2',
+    'run',
+    '//dev:setup-hydra-client',
+    '--',
+    'consent-test',
+    'authorization_code,refresh_token',
+    'http://localhost:3000',
+  ],
+  allow_parallel = True,
+  auto_init = run_apps,
+  resource_deps = [
+    "hydra",
+    "api",
+  ]
+)
+
 consent_test_target = "//apps/consent:test-integration"
 local_resource(
   "test-consent",
@@ -282,7 +363,6 @@ local_resource(
   auto_init = is_ci and PAY_TEST_LABEL in cfg.get("test", []),
   cmd = "buck2 test {}".format(pay_test_target),
   resource_deps = [
-    "api",
     "pay",
     "add-test-users-with-usernames",
     "fund-user",
@@ -299,6 +379,21 @@ local_resource(
     "admin-panel",
   ],
 )
+
+voucher_test_target = "//apps/voucher:test-integration"
+local_resource(
+  "test-voucher",
+  labels = ["test"],
+  auto_init = is_ci and VOUCHER_TEST_LABEL in cfg.get("test", []),
+  cmd = "buck2 test {}".format(voucher_test_target),
+  resource_deps = [
+    "voucher",
+    "consent",
+    "init-test-user",
+    "fund-user",
+  ],
+)
+
 
 map_test_target = "//apps/map:test-integration"
 local_resource(
@@ -372,34 +467,15 @@ local_resource(
     allow_parallel = True,
     auto_init = run_apps,
     resource_deps = [
-        "hydra-consent",
         "apollo-router",
         "hydra",
+        "kratos",
         "api",
+        "hydra-consent-test-client",
     ],
     links = [
         link("http://localhost:3000", "consent"),
     ],
-)
-
-local_resource(
-  name='hydra-consent',
-  labels = ['auth'],
-  cmd=[
-    'buck2',
-    'run',
-    '//dev:setup-hydra-client',
-    '--',
-    'consent',
-    'authorization_code,refresh_token',
-    'http://localhost:3000',
-  ],
-  allow_parallel = True,
-  auto_init = run_apps,
-  resource_deps = [
-    "hydra",
-    "api",
-  ]
 )
 
 env_json = _buck2_dep_inputs("//dev:serve_env")[0]
@@ -445,6 +521,7 @@ local_resource(
         "oathkeeper",
         "svix",
         "notifications",
+        "stablesats",
     ]
 )
 
@@ -543,6 +620,7 @@ local_resource(
     serve_cmd = "buck2 run {}".format(notifications_target),
     serve_env = {
       "PG_CON": "postgres://user:password@localhost:5433/pg",
+      "PG_READ_CON": "postgres://user:password@localhost:5433/pg",
       "NOTIFICATIONS_CONFIG": "./config/notifications/notifications.yml",
       "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
     },
@@ -576,6 +654,15 @@ local_resource(
   ]
 )
 
+local_resource(
+    name="setup-voucher",
+    labels = ["test"],
+    cmd="buck2 run //dev:setup-voucher-escrow",
+    allow_parallel=False,
+    auto_init=run_apps,
+    resource_deps=["voucher-pg", "api-keys"]
+)
+
 api_keys_target = "//core/api-keys:api-keys"
 local_resource(
     "api-keys",
@@ -596,6 +683,9 @@ local_resource(
 )
 
 docker_groups = {
+    "apps": [
+        "voucher-pg",
+    ],
     "auth": [
         "api-keys-pg",
         "oathkeeper",
@@ -621,6 +711,8 @@ docker_groups = {
         "bria",
         "bria-pg",
         "bitcoind",
+        "fulcrum",
+        "bitcoind-signer",
     ],
     "integration": [
         "lnd-outside-1",
@@ -659,6 +751,8 @@ for service in docker_groups["bitcoin"]:
     dc_resource(service, labels = ["bitcoin"])
 for service in docker_groups["tracing"]:
     dc_resource(service, labels = ["tracing"])
+for service in docker_groups["apps"]:
+    dc_resource(service, labels = ["apps"])
 for service in docker_groups["core"]:
     dc_resource(service, labels = ["core"])
 for service in docker_groups["auth"]:
@@ -674,7 +768,9 @@ local_resource(
   labels = ["test"],
   auto_init = is_ci and CORE_TEST_LABEL in cfg.get("test", []),
   cmd = "buck2 test {}".format(api_test_target),
-  resource_deps = [res for sublist in docker_groups.values() for res in sublist] + ["notifications"]
+  resource_deps = [
+    "api",
+  ]
 )
 
 local_resource(

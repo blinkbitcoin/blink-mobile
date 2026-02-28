@@ -1,5 +1,6 @@
 interface Account {
   callbackEndpoints: [CallbackEndpoint!]!
+  callbackPortalUrl: String!
   csvTransactions(walletIds: [WalletId!]!): String!
   defaultWallet: PublicWallet!
   defaultWalletId: WalletId! @deprecated(reason: "Shifting property to 'defaultWallet.id'")
@@ -67,6 +68,7 @@ input AccountEnableNotificationChannelInput {
 
 enum AccountLevel {
   ONE
+  THREE
   TWO
   ZERO
 }
@@ -257,6 +259,7 @@ type CentAmountPayload {
 
 type ConsumerAccount implements Account {
   callbackEndpoints: [CallbackEndpoint!]!
+  callbackPortalUrl: String!
 
   """
   return CSV stream, base64 encoded, of the list of transactions in the wallet
@@ -579,6 +582,7 @@ input LnInvoiceCreateInput {
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -594,6 +598,7 @@ input LnInvoiceCreateOnBehalfOfRecipientInput {
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -662,6 +667,7 @@ type LnNoAmountInvoice implements Invoice {
 input LnNoAmountInvoiceCreateInput {
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -675,6 +681,7 @@ input LnNoAmountInvoiceCreateInput {
 input LnNoAmountInvoiceCreateOnBehalfOfRecipientInput {
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -755,6 +762,7 @@ input LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput {
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """
   Optional memo for the lightning invoice. Acts as a note to the recipient.
@@ -771,6 +779,7 @@ input LnUsdInvoiceCreateInput {
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """Optional memo for the lightning invoice."""
   memo: Memo
@@ -786,6 +795,7 @@ input LnUsdInvoiceCreateOnBehalfOfRecipientInput {
 
   """Optional invoice expiration time in minutes."""
   expiresIn: Minutes
+  externalId: TxExternalId
 
   """
   Optional memo for the lightning invoice. Acts as a note to the recipient.
@@ -985,6 +995,7 @@ type Mutation {
   onChainUsdPaymentSendAsBtcDenominated(input: OnChainUsdPaymentSendAsBtcDenominatedInput!): PaymentSendPayload!
   quizClaim(input: QuizClaimInput!): QuizClaimPayload!
   supportChatMessageAdd(input: SupportChatMessageAddInput!): SupportChatMessageAddPayload!
+  supportChatReset: SuccessPayload!
   userContactUpdateAlias(input: UserContactUpdateAliasInput!): UserContactUpdateAliasPayload! @deprecated(reason: "will be moved to AccountContact")
   userEmailDelete: UserEmailDeletePayload!
   userEmailRegistrationInitiate(input: UserEmailRegistrationInitiateInput!): UserEmailRegistrationInitiatePayload!
