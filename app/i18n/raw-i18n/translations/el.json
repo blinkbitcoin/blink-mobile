@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Πολιτική απορρήτου κάρτας",
       "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
       "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας"
+    },
+    "TransactionDetails": {
+      "title": "Λεπτομέρειες συναλλαγής",
+      "cardInformation": "Πληροφορίες κάρτας",
+      "amount": "Ποσό",
+      "time": "Ώρα",
+      "transactionId": "ID",
+      "cardUsed": "Κάρτα που χρησιμοποιήθηκε",
+      "paymentMethod": "Μέθοδος πληρωμής",
+      "merchantInformation": "Πληροφορίες εμπόρου",
+      "merchant": "Έμπορος",
+      "category": "Κατηγορία",
+      "location": "Τοποθεσία",
+      "mccCode": "Κωδικός MCC",
+      "currencyConversion": "Μετατροπή νομίσματος",
+      "bitcoinRate": "Τιμή Bitcoin",
+      "bitcoinSpent": "Bitcoin που δαπανήθηκε",
+      "conversionFee": "Χρέωση μετατροπής",
+      "viewOnMap": "Προβολή στον χάρτη",
+      "downloadReceipt": "Λήψη απόδειξης",
+      "reportIssue": "Αναφορά προβλήματος",
+      "transactionHelp": "Βοήθεια συναλλαγής",
+      "transactionHelpDescription": "Αν δεν αναγνωρίζετε αυτή τη συναλλαγή ή χρειάζεστε βοήθεια, επικοινωνήστε αμέσως με την {supportTeam}.",
+      "supportTeam": "ομάδα υποστήριξής μας",
+      "transactionNotFound": "Η συναλλαγή δεν βρέθηκε"
     }
   }
 }

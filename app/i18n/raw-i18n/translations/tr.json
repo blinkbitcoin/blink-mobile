@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Kart gizlilik politikası",
       "closeCardAccount": "Kart hesabını kapat",
       "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın"
+    },
+    "TransactionDetails": {
+      "title": "İşlem detayları",
+      "cardInformation": "Kart bilgileri",
+      "amount": "Tutar",
+      "time": "Zaman",
+      "transactionId": "ID",
+      "cardUsed": "Kullanılan kart",
+      "paymentMethod": "Ödeme yöntemi",
+      "merchantInformation": "Satıcı bilgileri",
+      "merchant": "Satıcı",
+      "category": "Kategori",
+      "location": "Konum",
+      "mccCode": "MCC kodu",
+      "currencyConversion": "Döviz çevirimi",
+      "bitcoinRate": "Bitcoin kuru",
+      "bitcoinSpent": "Harcanan Bitcoin",
+      "conversionFee": "Çevirim ücreti",
+      "viewOnMap": "Haritada görüntüle",
+      "downloadReceipt": "Makbuz indir",
+      "reportIssue": "Sorun bildir",
+      "transactionHelp": "İşlem yardımı",
+      "transactionHelpDescription": "Bu işlemi tanımıyorsanız veya yardıma ihtiyacınız varsa, derhal {supportTeam} iletişime geçin.",
+      "supportTeam": "destek ekibimizle",
+      "transactionNotFound": "İşlem bulunamadı"
     }
   }
 }

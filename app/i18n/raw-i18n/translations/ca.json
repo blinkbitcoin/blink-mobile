@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Política de privacitat de la targeta",
       "closeCardAccount": "Tancar compte de targeta",
       "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa"
+    },
+    "TransactionDetails": {
+      "title": "Detalls de la transacció",
+      "cardInformation": "Informació de la targeta",
+      "amount": "Import",
+      "time": "Hora",
+      "transactionId": "ID",
+      "cardUsed": "Targeta utilitzada",
+      "paymentMethod": "Mètode de pagament",
+      "merchantInformation": "Informació del comerciant",
+      "merchant": "Comerciant",
+      "category": "Categoria",
+      "location": "Ubicació",
+      "mccCode": "Codi MCC",
+      "currencyConversion": "Conversió de moneda",
+      "bitcoinRate": "Taxa de Bitcoin",
+      "bitcoinSpent": "Bitcoin gastat",
+      "conversionFee": "Comissió de conversió",
+      "viewOnMap": "Veure al mapa",
+      "downloadReceipt": "Descarregar rebut",
+      "reportIssue": "Informar d'un problema",
+      "transactionHelp": "Ajuda amb la transacció",
+      "transactionHelpDescription": "Si no reconeixeu aquesta transacció o necessiteu assistència, poseu-vos en contacte amb el nostre {supportTeam} immediatament.",
+      "supportTeam": "equip de suport",
+      "transactionNotFound": "Transacció no trobada"
     }
   }
 }

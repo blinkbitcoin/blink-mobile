@@ -3021,6 +3021,31 @@
             "privacyPolicy": "Karten-Datenschutzrichtlinie",
             "closeCardAccount": "Kartenkonto schließen",
             "closeCardAccountDescription": "Schließen Sie Ihre Visa-Karte dauerhaft"
+        },
+        "TransactionDetails": {
+            "title": "Transaktionsdetails",
+            "cardInformation": "Karteninformationen",
+            "amount": "Betrag",
+            "time": "Zeit",
+            "transactionId": "ID",
+            "cardUsed": "Verwendete Karte",
+            "paymentMethod": "Zahlungsmethode",
+            "merchantInformation": "Händlerinformationen",
+            "merchant": "Händler",
+            "category": "Kategorie",
+            "location": "Standort",
+            "mccCode": "MCC-Code",
+            "currencyConversion": "Währungsumrechnung",
+            "bitcoinRate": "Bitcoin-Kurs",
+            "bitcoinSpent": "Ausgegebene Bitcoin",
+            "conversionFee": "Umrechnungsgebühr",
+            "viewOnMap": "Auf Karte anzeigen",
+            "downloadReceipt": "Beleg herunterladen",
+            "reportIssue": "Problem melden",
+            "transactionHelp": "Transaktionshilfe",
+            "transactionHelpDescription": "Wenn Sie diese Transaktion nicht erkennen oder Hilfe benötigen, kontaktieren Sie sofort unser {supportTeam}.",
+            "supportTeam": "Support-Team",
+            "transactionNotFound": "Transaktion nicht gefunden"
         }
     }
 }

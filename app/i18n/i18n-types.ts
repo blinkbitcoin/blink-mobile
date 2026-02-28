@@ -9978,6 +9978,101 @@ type RootTranslation = {
 			 */
 			closeCardAccountDescription: string
 		}
+		TransactionDetails: {
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * C​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			cardInformation: string
+			/**
+			 * A​m​o​u​n​t
+			 */
+			amount: string
+			/**
+			 * T​i​m​e
+			 */
+			time: string
+			/**
+			 * I​D
+			 */
+			transactionId: string
+			/**
+			 * C​a​r​d​ ​u​s​e​d
+			 */
+			cardUsed: string
+			/**
+			 * P​a​y​m​e​n​t​ ​m​e​t​h​o​d
+			 */
+			paymentMethod: string
+			/**
+			 * M​e​r​c​h​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			merchantInformation: string
+			/**
+			 * M​e​r​c​h​a​n​t
+			 */
+			merchant: string
+			/**
+			 * C​a​t​e​g​o​r​y
+			 */
+			category: string
+			/**
+			 * L​o​c​a​t​i​o​n
+			 */
+			location: string
+			/**
+			 * M​C​C​ ​c​o​d​e
+			 */
+			mccCode: string
+			/**
+			 * C​u​r​r​e​n​c​y​ ​c​o​n​v​e​r​s​i​o​n
+			 */
+			currencyConversion: string
+			/**
+			 * B​i​t​c​o​i​n​ ​r​a​t​e
+			 */
+			bitcoinRate: string
+			/**
+			 * B​i​t​c​o​i​n​ ​s​p​e​n​t
+			 */
+			bitcoinSpent: string
+			/**
+			 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+			 */
+			conversionFee: string
+			/**
+			 * V​i​e​w​ ​o​n​ ​m​a​p
+			 */
+			viewOnMap: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​r​e​c​e​i​p​t
+			 */
+			downloadReceipt: string
+			/**
+			 * R​e​p​o​r​t​ ​i​s​s​u​e
+			 */
+			reportIssue: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​h​e​l​p
+			 */
+			transactionHelp: string
+			/**
+			 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​ ​o​r​ ​n​e​e​d​ ​a​s​s​i​s​t​a​n​c​e​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​T​e​a​m​}​ ​i​m​m​e​d​i​a​t​e​l​y​.
+			 * @param {unknown} supportTeam
+			 */
+			transactionHelpDescription: RequiredParams<'supportTeam'>
+			/**
+			 * s​u​p​p​o​r​t​ ​t​e​a​m
+			 */
+			supportTeam: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​n​o​t​ ​f​o​u​n​d
+			 */
+			transactionNotFound: string
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -19831,6 +19926,100 @@ export type TranslationFunctions = {
 			 * Permanently close your Visa card
 			 */
 			closeCardAccountDescription: () => LocalizedString
+		}
+		TransactionDetails: {
+			/**
+			 * Transaction details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Card information
+			 */
+			cardInformation: () => LocalizedString
+			/**
+			 * Amount
+			 */
+			amount: () => LocalizedString
+			/**
+			 * Time
+			 */
+			time: () => LocalizedString
+			/**
+			 * ID
+			 */
+			transactionId: () => LocalizedString
+			/**
+			 * Card used
+			 */
+			cardUsed: () => LocalizedString
+			/**
+			 * Payment method
+			 */
+			paymentMethod: () => LocalizedString
+			/**
+			 * Merchant information
+			 */
+			merchantInformation: () => LocalizedString
+			/**
+			 * Merchant
+			 */
+			merchant: () => LocalizedString
+			/**
+			 * Category
+			 */
+			category: () => LocalizedString
+			/**
+			 * Location
+			 */
+			location: () => LocalizedString
+			/**
+			 * MCC code
+			 */
+			mccCode: () => LocalizedString
+			/**
+			 * Currency conversion
+			 */
+			currencyConversion: () => LocalizedString
+			/**
+			 * Bitcoin rate
+			 */
+			bitcoinRate: () => LocalizedString
+			/**
+			 * Bitcoin spent
+			 */
+			bitcoinSpent: () => LocalizedString
+			/**
+			 * Conversion fee
+			 */
+			conversionFee: () => LocalizedString
+			/**
+			 * View on map
+			 */
+			viewOnMap: () => LocalizedString
+			/**
+			 * Download receipt
+			 */
+			downloadReceipt: () => LocalizedString
+			/**
+			 * Report issue
+			 */
+			reportIssue: () => LocalizedString
+			/**
+			 * Transaction help
+			 */
+			transactionHelp: () => LocalizedString
+			/**
+			 * If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.
+			 */
+			transactionHelpDescription: (arg: { supportTeam: unknown }) => LocalizedString
+			/**
+			 * support team
+			 */
+			supportTeam: () => LocalizedString
+			/**
+			 * Transaction not found
+			 */
+			transactionNotFound: () => LocalizedString
 		}
 	}
 	NotificationHistory: {

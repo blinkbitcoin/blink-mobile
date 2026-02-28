@@ -26,9 +26,10 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   label: {
+    flex: 1,
     color: colors.grey2,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
@@ -36,10 +37,11 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   value: {
+    flex: 1,
     color: colors.black,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 20,
     textAlign: "right",
   },

@@ -1,11 +1,15 @@
 import React, { useCallback, useState } from "react"
-import { TouchableOpacity, View } from "react-native"
+import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { YearSelector } from "@app/components/year-selector"
-import { ContactSupportRow, StatementItem, SwitchRow } from "@app/components/card-screen"
+import {
+  ContactSupportRow,
+  IconTextButton,
+  StatementItem,
+  SwitchRow,
+} from "@app/components/card-screen"
 
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -95,17 +99,11 @@ export const CardStatementsScreen: React.FC = () => {
             {LL.CardFlow.CardStatements.monthlyStatements()}
           </Text>
           <View style={styles.statementsContainer}>
-            <TouchableOpacity
-              style={styles.downloadAllButton}
+            <IconTextButton
+              icon="download"
+              label={LL.CardFlow.CardStatements.downloadAll()}
               onPress={handleDownloadAll}
-              accessibilityRole="button"
-              accessibilityLabel={LL.CardFlow.CardStatements.downloadAll()}
-            >
-              <GaloyIcon name="download" size={16} color={colors.primary} />
-              <Text style={styles.downloadAllText}>
-                {LL.CardFlow.CardStatements.downloadAll()}
-              </Text>
-            </TouchableOpacity>
+            />
 
             {monthlyStatements.map((statement) => (
               <StatementItem
@@ -223,23 +221,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   statementsContainer: {
     gap: 14,
-  },
-  downloadAllButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    paddingHorizontal: 11,
-    paddingVertical: 8,
-    gap: 8,
-  },
-  downloadAllText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "600",
-    lineHeight: 20,
   },
   aboutCard: {
     backgroundColor: colors.grey5,

@@ -3059,6 +3059,31 @@
       "privacyPolicy": "Tarjeta pakasqa kamachiy",
       "closeCardAccount": "Tarjeta kuntata wisqay",
       "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay"
+    },
+    "TransactionDetails": {
+      "title": "Transacción willaykunakuna",
+      "cardInformation": "Tarjeta willakuy",
+      "amount": "Hayka",
+      "time": "Pacha",
+      "transactionId": "ID",
+      "cardUsed": "Tarjeta llamkasqa",
+      "paymentMethod": "Pagay ñan",
+      "merchantInformation": "Ranqhaq willakuy",
+      "merchant": "Ranqhaq",
+      "category": "Rikch'aq",
+      "location": "Maypi",
+      "mccCode": "MCC yupa",
+      "currencyConversion": "Qullqi tikray",
+      "bitcoinRate": "Bitcoin chanin",
+      "bitcoinSpent": "Bitcoin gastasqa",
+      "conversionFee": "Tikray pagay",
+      "viewOnMap": "Mapapi qhaway",
+      "downloadReceipt": "Recibo urquy",
+      "reportIssue": "Sasachakuy willay",
+      "transactionHelp": "Transacción yanapay",
+      "transactionHelpDescription": "Mana kay transaccionta riqsinkichu utaq yanapata munanki chayqa, {supportTeam} usqhaylla rimanakuy.",
+      "supportTeam": "yanapaq huñuykuman",
+      "transactionNotFound": "Mana tarinkichu transaccionta"
     }
   }
 }
