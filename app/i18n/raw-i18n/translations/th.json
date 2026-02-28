@@ -3140,6 +3140,39 @@
       "noPOBoxes": "ไม่สามารถจัดส่งบัตรไปยังตู้ไปรษณีย์ได้",
       "signatureRequired": "อาจต้องเซ็นชื่อเมื่อรับสินค้า",
       "supportedRegions": "ที่อยู่ต้องอยู่ในเขตจัดส่งที่รองรับ"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "ยืนยัน PIN ใหม่",
+        "confirmPinSubtitle": "กรุณาใส่ PIN 4 หลักใหม่ของคุณอีกครั้งเพื่อดำเนินการต่อ",
+        "incorrectPin": "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
+        "pinMismatch": "รหัส PIN ไม่ตรงกัน กรุณากรอกใหม่เพื่อยืนยันหรือย้อนกลับเพื่อเปลี่ยนรหัส PIN ของคุณ"
+      },
+      "CreateFlow": {
+        "title": "สร้าง PIN",
+        "steps": {
+          "setPin": "ตั้งค่า PIN",
+          "confirm": "ยืนยัน"
+        },
+        "enterYourPin": "ใส่ PIN ของคุณ",
+        "enterPinSubtitle": "กรุณาใส่ PIN 4 หลักเพื่อดำเนินการต่อ",
+        "pinCreatedToast": "สร้าง PIN สำเร็จแล้ว"
+      },
+      "ChangeFlow": {
+        "title": "เปลี่ยน PIN",
+        "steps": {
+          "currentPin": "PIN ปัจจุบัน",
+          "newPin": "PIN ใหม่",
+          "confirm": "ยืนยัน"
+        },
+        "enterCurrentPin": "ใส่ PIN ปัจจุบัน",
+        "enterCurrentPinSubtitle": "กรุณาใส่ PIN 4 หลักปัจจุบันของคุณเพื่อดำเนินการต่อ",
+        "enterNewPin": "ใส่ PIN ใหม่",
+        "enterNewPinSubtitle": "กรุณาใส่ PIN 4 หลักใหม่ของคุณ",
+        "pinChangedTitle": "เปลี่ยน PIN แล้ว",
+        "pinChangedSubtitle": "PIN ของคุณถูกเปลี่ยนเรียบร้อยแล้ว",
+        "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว"
+      }
     }
   }
 }

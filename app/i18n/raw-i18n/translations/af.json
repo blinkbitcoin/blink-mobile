@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Kaarte kan nie by posbusse afgelewer word nie",
       "signatureRequired": "Handtekening mag by aflewering vereis word",
       "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Bevestig nuwe PIN",
+        "confirmPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN weer in om voort te gaan.",
+        "incorrectPin": "Verkeerde PIN. Probeer asseblief weer.",
+        "pinMismatch": "PIN's stem nie ooreen nie. Voer weer in om te bevestig of gaan terug om jou PIN te verander."
+      },
+      "CreateFlow": {
+        "title": "Skep PIN",
+        "steps": {
+          "setPin": "Stel PIN",
+          "confirm": "Bevestig"
+        },
+        "enterYourPin": "Voer jou PIN in",
+        "enterPinSubtitle": "Voer asseblief 'n 4-syfer PIN in om voort te gaan.",
+        "pinCreatedToast": "PIN is suksesvol geskep"
+      },
+      "ChangeFlow": {
+        "title": "Verander PIN",
+        "steps": {
+          "currentPin": "Huidige PIN",
+          "newPin": "Nuwe PIN",
+          "confirm": "Bevestig"
+        },
+        "enterCurrentPin": "Voer huidige PIN in",
+        "enterCurrentPinSubtitle": "Voer asseblief jou huidige 4-syfer PIN in om voort te gaan.",
+        "enterNewPin": "Voer nuwe PIN in",
+        "enterNewPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN in.",
+        "pinChangedTitle": "PIN verander",
+        "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
+        "pinChangedToast": "PIN is suksesvol verander"
+      }
     }
   }
 }

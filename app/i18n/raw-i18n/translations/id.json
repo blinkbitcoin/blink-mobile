@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",
       "signatureRequired": "Tanda tangan mungkin diperlukan saat pengiriman",
       "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Konfirmasi PIN baru",
+        "confirmPinSubtitle": "Silakan masukkan kembali PIN 4 digit baru Anda untuk melanjutkan.",
+        "incorrectPin": "PIN salah. Silakan coba lagi.",
+        "pinMismatch": "PIN tidak cocok. Masukkan ulang untuk mengonfirmasi atau kembali untuk mengubah PIN Anda."
+      },
+      "CreateFlow": {
+        "title": "Buat PIN",
+        "steps": {
+          "setPin": "Atur PIN",
+          "confirm": "Konfirmasi"
+        },
+        "enterYourPin": "Masukkan PIN Anda",
+        "enterPinSubtitle": "Silakan masukkan PIN 4 digit untuk melanjutkan.",
+        "pinCreatedToast": "PIN berhasil dibuat"
+      },
+      "ChangeFlow": {
+        "title": "Ubah PIN",
+        "steps": {
+          "currentPin": "PIN saat ini",
+          "newPin": "PIN baru",
+          "confirm": "Konfirmasi"
+        },
+        "enterCurrentPin": "Masukkan PIN saat ini",
+        "enterCurrentPinSubtitle": "Silakan masukkan PIN 4 digit Anda saat ini untuk melanjutkan.",
+        "enterNewPin": "Masukkan PIN baru",
+        "enterNewPinSubtitle": "Silakan masukkan PIN 4 digit baru Anda.",
+        "pinChangedTitle": "PIN diubah",
+        "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
+        "pinChangedToast": "PIN berhasil diubah"
+      }
     }
   }
 }

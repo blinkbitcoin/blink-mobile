@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Les targetes no es poden lliurar a apartats de correus",
       "signatureRequired": "Es pot requerir signatura en el lliurament",
       "supportedRegions": "L'adreça ha de ser dins de les regions d'enviament admeses"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Confirmar nou PIN",
+        "confirmPinSubtitle": "Sisplau, torneu a introduir el vostre nou PIN de 4 dígits per continuar.",
+        "incorrectPin": "PIN incorrecte. Si us plau, torna-ho a provar.",
+        "pinMismatch": "Els PINs no coincideixen. Torna a introduir per confirmar o torna enrere per canviar el teu PIN."
+      },
+      "CreateFlow": {
+        "title": "Crear PIN",
+        "steps": {
+          "setPin": "Establir PIN",
+          "confirm": "Confirmar"
+        },
+        "enterYourPin": "Introduïu el vostre PIN",
+        "enterPinSubtitle": "Sisplau, introduïu un PIN de 4 dígits per continuar.",
+        "pinCreatedToast": "El PIN s'ha creat correctament"
+      },
+      "ChangeFlow": {
+        "title": "Canviar PIN",
+        "steps": {
+          "currentPin": "PIN actual",
+          "newPin": "Nou PIN",
+          "confirm": "Confirmar"
+        },
+        "enterCurrentPin": "Introduïu el PIN actual",
+        "enterCurrentPinSubtitle": "Sisplau, introduïu el vostre PIN actual de 4 dígits per continuar.",
+        "enterNewPin": "Introduïu el nou PIN",
+        "enterNewPinSubtitle": "Sisplau, introduïu el vostre nou PIN de 4 dígits.",
+        "pinChangedTitle": "PIN canviat",
+        "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
+        "pinChangedToast": "El PIN s'ha canviat correctament"
+      }
     }
   }
 }

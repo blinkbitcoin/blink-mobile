@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",
       "signatureRequired": "Tandatangan mungkin diperlukan semasa penghantaran",
       "supportedRegions": "Alamat mesti berada dalam kawasan penghantaran yang disokong"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Sahkan PIN baharu",
+        "confirmPinSubtitle": "Sila masukkan semula PIN 4 digit baharu anda untuk meneruskan.",
+        "incorrectPin": "PIN tidak betul. Sila cuba lagi.",
+        "pinMismatch": "PIN tidak sepadan. Masukkan semula untuk mengesahkan atau kembali untuk menukar PIN anda."
+      },
+      "CreateFlow": {
+        "title": "Cipta PIN",
+        "steps": {
+          "setPin": "Tetapkan PIN",
+          "confirm": "Sahkan"
+        },
+        "enterYourPin": "Masukkan PIN anda",
+        "enterPinSubtitle": "Sila masukkan PIN 4 digit untuk meneruskan.",
+        "pinCreatedToast": "PIN berjaya dicipta"
+      },
+      "ChangeFlow": {
+        "title": "Tukar PIN",
+        "steps": {
+          "currentPin": "PIN semasa",
+          "newPin": "PIN baharu",
+          "confirm": "Sahkan"
+        },
+        "enterCurrentPin": "Masukkan PIN semasa",
+        "enterCurrentPinSubtitle": "Sila masukkan PIN 4 digit semasa anda untuk meneruskan.",
+        "enterNewPin": "Masukkan PIN baharu",
+        "enterNewPinSubtitle": "Sila masukkan PIN 4 digit baharu anda.",
+        "pinChangedTitle": "PIN ditukar",
+        "pinChangedSubtitle": "PIN anda telah berjaya ditukar.",
+        "pinChangedToast": "PIN berjaya ditukar"
+      }
     }
   }
 }

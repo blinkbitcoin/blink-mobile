@@ -3149,6 +3149,39 @@
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Qinisekisa i-PIN entsha",
+        "confirmPinSubtitle": "Nceda ufake kwakhona i-PIN yakho entsha yamanani ama-4 ukuze uqhubeke.",
+        "incorrectPin": "I-PIN ayichanekanga. Nceda uzame kwakhona.",
+        "pinMismatch": "Ii-PIN azifani. Faka kwakhona ukuqinisekisa okanye buyela umva ukutshintsha i-PIN yakho."
+      },
+      "CreateFlow": {
+        "title": "Dala i-PIN",
+        "steps": {
+          "setPin": "Cwangcisa i-PIN",
+          "confirm": "Qinisekisa"
+        },
+        "enterYourPin": "Faka i-PIN yakho",
+        "enterPinSubtitle": "Nceda ufake i-PIN yamanani ama-4 ukuze uqhubeke.",
+        "pinCreatedToast": "I-PIN yenziwe ngempumelelo"
+      },
+      "ChangeFlow": {
+        "title": "Tshintsha i-PIN",
+        "steps": {
+          "currentPin": "I-PIN yangoku",
+          "newPin": "I-PIN entsha",
+          "confirm": "Qinisekisa"
+        },
+        "enterCurrentPin": "Faka i-PIN yangoku",
+        "enterCurrentPinSubtitle": "Nceda ufake i-PIN yakho yangoku yamanani ama-4 ukuze uqhubeke.",
+        "enterNewPin": "Faka i-PIN entsha",
+        "enterNewPinSubtitle": "Nceda ufake i-PIN yakho entsha yamanani ama-4.",
+        "pinChangedTitle": "I-PIN itshintshiwe",
+        "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
+        "pinChangedToast": "I-PIN itshintshiwe ngempumelelo"
+      }
     }
   }
 }
