@@ -3229,6 +3229,50 @@
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "ダッシュボード"
             }
+        },
+        "OrderPhysicalCard": {
+            "title": "物理カードを注文",
+            "steps": {
+                "shipping": "配送",
+                "confirm": "確認"
+            },
+            "Shipping": {
+                "title": "物理カードを注文",
+                "subtitle": "Blink Visaカードを住所へお届けします。",
+                "registeredAddress": "登録済み住所",
+                "useRegisteredAddress": "登録済み住所を配送先住所として使用",
+                "delivery": "配送",
+                "standardDelivery": "通常配送",
+                "expressDelivery": "速達配送",
+                "businessDays": "{day1}-{day2} 営業日",
+                "free": "無料",
+                "deliveryInformation": "配送情報",
+                "bullet1": "追跡情報はメールで届きます",
+                "bullet2": "配達時に署名が必要になる場合があります",
+                "bullet3": "カードは目立たない梱包で発送されます",
+                "bullet4": "到着したらカードを有効化してください",
+                "cardFeatures": "カードの機能",
+                "feature1": "タッチ決済技術",
+                "feature2": "セキュリティ強化のためのEMVチップ",
+                "feature3": "世界中で使える磁気ストライプ",
+                "feature4": "カードに名前がエンボス加工されます",
+                "important": "重要"
+            },
+            "Confirm": {
+                "title": "注文を確認",
+                "subtitle": "送信前に物理カードの注文内容を確認してください。",
+                "orderSummary": "注文概要",
+                "cardDesign": "カードデザイン",
+                "delivery": "配送",
+                "deliveryTime": "配送時間",
+                "shippingCost": "送料",
+                "shippingAddress": "配送先住所",
+                "placeOrder": "注文する",
+                "important": "重要",
+                "bullet1": "物理カードを待っている間もバーチャルカードは有効です",
+                "bullet2": "物理カードが届いたら有効化が必要です",
+                "bullet3": "両方のカードは同じカード番号と詳細になります"
+            }
         }
     }
 }

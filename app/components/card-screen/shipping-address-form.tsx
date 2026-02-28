@@ -1,10 +1,9 @@
-import React, { useState } from "react"
+import React from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { EditFieldModal } from "./edit-field-modal"
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -13,9 +12,6 @@ import {
   ShippingAddress,
   US_STATES,
 } from "@app/screens/card-screen/card-mock-data"
-
-type TextEditingField = "fullName" | "addressLine1" | "addressLine2"
-type EditingField = TextEditingField | null
 
 type ShippingAddressFormProps = {
   address: ShippingAddress
@@ -32,23 +28,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const [editingField, setEditingField] = useState<EditingField>(null)
-
-  const handleOpenEdit = (field: EditingField) => {
-    setEditingField(field)
-  }
-
-  const handleCloseEdit = () => {
-    setEditingField(null)
-  }
-
-  const handleSave = (newValue: string) => {
-    if (editingField) {
-      onAddressChange({
-        ...address,
-        [editingField]: newValue,
-      })
-    }
+  const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
+    onAddressChange({ ...address, [field]: value })
   }
 
   const handleStateSelect = () => {
@@ -75,47 +56,35 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     })
   }
 
-  const getFieldLabel = (field: EditingField): string => {
-    switch (field) {
-      case "fullName":
-        return LL.CardFlow.ShippingAddress.fullName()
-      case "addressLine1":
-        return LL.CardFlow.ShippingAddress.addressLine1()
-      case "addressLine2":
-        return LL.CardFlow.ShippingAddress.addressLine2()
-      default:
-        return ""
-    }
-  }
-
-  const getFieldValue = (field: EditingField): string => (field ? address[field] : "")
-
   return (
     <View style={styles.container}>
       {showFullName && (
         <InputField
           label={LL.CardFlow.ShippingAddress.fullName()}
           value={address.fullName}
+          editable
           rightIcon="pencil"
+          onChangeText={(text) => handleFieldChange("fullName", text)}
           valueStyle={ValueStyle.Bold}
-          onPress={() => handleOpenEdit("fullName")}
         />
       )}
 
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine1()}
         value={address.addressLine1}
+        editable
         rightIcon="pencil"
+        onChangeText={(text) => handleFieldChange("addressLine1", text)}
         valueStyle={ValueStyle.Bold}
-        onPress={() => handleOpenEdit("addressLine1")}
       />
 
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine2()}
         value={address.addressLine2}
+        editable
         rightIcon="pencil"
+        onChangeText={(text) => handleFieldChange("addressLine2", text)}
         valueStyle={ValueStyle.Bold}
-        onPress={() => handleOpenEdit("addressLine2")}
       />
 
       <View style={styles.gridRow}>
@@ -155,14 +124,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           />
         </View>
       </View>
-
-      <EditFieldModal
-        isVisible={editingField !== null}
-        toggleModal={handleCloseEdit}
-        fieldName={getFieldLabel(editingField)}
-        initialValue={getFieldValue(editingField)}
-        onSave={handleSave}
-      />
     </View>
   )
 }

@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { Text, useTheme } from "@rn-vui/themed"
 
-import { SelectableOptionRow, BulletListCard } from "@app/components/card-screen"
+import { SelectableOptionRow, InfoCard } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -68,13 +68,16 @@ export const ReportIssueStep: React.FC<ReportIssueStepProps> = ({
         />
       </View>
 
-      <BulletListCard
+      <InfoCard
         title={LL.CardFlow.ReplaceCard.ReportIssue.whatHappensNext()}
-        items={[
+        bulletItems={[
           LL.CardFlow.ReplaceCard.ReportIssue.bullet1(),
           LL.CardFlow.ReplaceCard.ReportIssue.bullet2(),
           LL.CardFlow.ReplaceCard.ReportIssue.bullet3(),
         ]}
+        showIcon={false}
+        size="lg"
+        bulletSpacing={1}
       />
     </>
   )

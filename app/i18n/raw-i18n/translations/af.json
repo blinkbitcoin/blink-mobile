@@ -3238,6 +3238,53 @@
         "buttonLabel": "Dashboard"
       },
       "title": "Vervang kaart"
+    },
+    "OrderPhysicalCard": {
+      "title": "Bestel fisiese kaart",
+      "steps": {
+        "shipping": "Versending",
+        "confirm": "Bevestig"
+      },
+      "Shipping": {
+        "title": "Bestel jou fisiese kaart",
+        "subtitle": "Kry jou Blink Visa-kaart by jou adres afgelewer.",
+        "registeredAddress": "Geregistreerde adres",
+        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
+        "delivery": "Aflewering",
+        "standardDelivery": "Standaard aflewering",
+        "expressDelivery": "Ekspres aflewering",
+        "businessDays": "{day1}-{day2} werksdae",
+        "free": "GRATIS",
+        "deliveryInformation": "Afleweringsinligting",
+        "bullet1": "Jy sal opsporingsinligting per e-pos ontvang",
+        "bullet2": "Handtekening kan by aflewering vereis word",
+        "bullet3": "Kaart sal in diskrete verpakking gestuur word",
+        "bullet4": "Aktiveer jou kaart wanneer dit aankom",
+        "cardFeatures": "Kaartkenmerke",
+        "feature1": "Kontaklose betalingstegnologie",
+        "feature2": "EMV-skyfie vir verbeterde sekuriteit",
+        "feature3": "Magneetstrook vir universele aanvaarding",
+        "feature4": "Jou naam op die kaart ge-embosseer",
+        "important": "Belangrik",
+        "importantBullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
+        "importantBullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
+        "importantBullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+      },
+      "Confirm": {
+        "title": "Bevestig jou bestelling",
+        "subtitle": "Hersien jou fisiese kaartbestelling voordat jy dit indien.",
+        "orderSummary": "Bestellingopsomming",
+        "cardDesign": "Kaartontwerp",
+        "delivery": "Aflewering",
+        "deliveryTime": "Afleweringstyd",
+        "shippingCost": "Versendingskoste",
+        "shippingAddress": "Versendingsadres",
+        "placeOrder": "Plaas bestelling",
+        "important": "Belangrik",
+        "bullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
+        "bullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
+        "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+      }
     }
   }
 }
