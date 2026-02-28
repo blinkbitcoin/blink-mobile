@@ -17,7 +17,7 @@ import {
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -32,8 +32,6 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -120,6 +118,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
 
   const fee = useFee(getFee)
 
@@ -325,12 +324,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     }
   }
 
-  const copyToClipboard = () => {
-    Clipboard.setString(destination)
-    toastShow({
-      type: "success",
+  const handleCopyToClipboard = () => {
+    copyToClipboard({
+      content: destination,
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
-      LL,
     })
   }
 
@@ -392,7 +389,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             />
             <TouchableOpacity
               style={styles.iconContainer}
-              onPress={copyToClipboard}
+              onPress={handleCopyToClipboard}
               hitSlop={30}
             >
               <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />

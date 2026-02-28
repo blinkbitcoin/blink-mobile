@@ -136,7 +136,7 @@
   "ThemeScreen.setToLight": "Svijetli način",
   "TransactionDetailScreen.sending": "Slanje",
   "TransactionDetailScreen.momentarily": "uskoro",
-  "TransactionDetailScreen.hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik",
+  "common.hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik",
   "UpgradeAccountModal.upgradeToLevel": "Nadogradite na razinu {level: number}",
   "UpgradeAccountModal.notNow": "Ne sada",
   "UpgradeAccountModal.setUpLevelAccount": "Postavite račun razine {level: number}",

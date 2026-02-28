@@ -130,7 +130,8 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
-  cardDashboard: undefined
+  cardDashboardScreen: undefined
+  cardDetailsScreen: undefined
   cardLimitsScreen: undefined
 }
 

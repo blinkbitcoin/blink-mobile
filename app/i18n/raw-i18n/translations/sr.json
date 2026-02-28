@@ -2491,8 +2491,7 @@
     "receivingAccount": "Рачун за примање",
     "sendingAccount": "Рачун за слање",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ускоро",
-    "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд"
+    "momentarily": "ускоро"
   },
   "TransactionLimitsScreen": {
     "receive": "Прими",
@@ -2788,7 +2787,8 @@
     "some": "Неки",
     "support": "Подршка",
     "profiles": "Профили",
-    "paste": "Налепи"
+    "paste": "Налепи",
+    "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд"
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -3005,6 +3005,23 @@
         "contactlessDescription": "Дозволи бесконтактне трансакције"
       },
       "title": "Ограничења картице"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

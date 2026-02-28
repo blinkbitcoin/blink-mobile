@@ -27,7 +27,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { getBtcWallet, getDefaultWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { usePriceConversion } from "@app/hooks"
+import { useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -38,12 +38,10 @@ import {
   toUsdMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import { toastShow } from "@app/utils/toast"
 import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
 } from "@blinkbitcoin/blink-client"
-import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -131,6 +129,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { formatMoneyAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
 
@@ -265,12 +264,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     setIsModalVisible(!isModalVisible)
   }
 
-  const copyToClipboard = () => {
-    Clipboard.setString(paymentDetail.destination)
-    toastShow({
-      type: "success",
+  const handleCopyToClipboard = () => {
+    copyToClipboard({
+      content: paymentDetail.destination,
       message: LL.SendBitcoinScreen.copiedDestination(),
-      LL,
     })
   }
 
@@ -491,7 +488,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             </View>
             <TouchableOpacity
               style={styles.iconContainer}
-              onPress={copyToClipboard}
+              onPress={handleCopyToClipboard}
               hitSlop={30}
             >
               <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />

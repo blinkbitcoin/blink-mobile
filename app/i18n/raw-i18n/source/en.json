@@ -2472,8 +2472,7 @@
         "receivingAccount": "Receiving Account",
         "sendingAccount": "Sending Account",
         "txNotBroadcast": "Your transaction is queued. It should appear in the mempool {countdown: string}.",
-        "momentarily": "momentarily",
-        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
+        "momentarily": "momentarily"
     },
     "TransactionLimitsScreen": {
         "receive": "Receive",
@@ -2769,7 +2768,9 @@
         "some": "Some",
         "support": "Support",
         "profiles": "Profiles",
-        "paste": "Paste"
+        "paste": "Paste",
+        "copied": "Copied to clipboard",
+        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
     },
     "errors": {
         "generic": "There was an error.\nPlease try again later.",
@@ -2936,6 +2937,23 @@
             "addFunds": "Add funds",
             "transactionsTitle": "Transactions",
             "emptyTransactions": "No transactions yet"
+        },
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
         },
         "CardLimits": {
             "title": "Card limits",

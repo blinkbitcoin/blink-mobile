@@ -2474,8 +2474,7 @@
     "receivingAccount": "Λογαριασμός λήψης",
     "sendingAccount": "Λογαριασμός Αποστολής",
     "txNotBroadcast": "Η συναλλαγή σας βρίσκεται σε ουρά. Θα πρέπει να εμφανιστεί στην mempool {countdown: string}.",
-    "momentarily": "Στιγμιαία",
-    "hasBeenCopiedToClipboard": "{type: string} έχει αντιγραφεί στο πρόχειρο"
+    "momentarily": "Στιγμιαία"
   },
   "TransactionLimitsScreen": {
     "receive": "Λήψη",
@@ -2771,7 +2770,8 @@
     "some": "Μερικά",
     "support": "Υποστήριξη",
     "profiles": "Προφίλ",
-    "paste": "Επικόλληση"
+    "paste": "Επικόλληση",
+    "hasBeenCopiedToClipboard": "{type: string} έχει αντιγραφεί στο πρόχειρο"
   },
   "errors": {
     "generic": "Υπήρξε ένα σφάλμα. \nΠαρακαλούμε δοκιμάστε πάλι αργότερα. ",
@@ -2967,6 +2967,23 @@
         "contactlessDescription": "Επιτρέψτε ανέπαφες συναλλαγές"
       },
       "title": "Όρια κάρτας"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

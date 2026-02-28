@@ -2491,8 +2491,7 @@
     "receivingAccount": "Akaun penerimaan",
     "sendingAccount": "Akaun penghantar",
     "txNotBroadcast": "Transaksi anda tergendala dan akan disiarkan dalam rangkaian Bitcoin sebentar lagi",
-    "momentarily": "sebentar lagi",
-    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke clipboard"
+    "momentarily": "sebentar lagi"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",
@@ -2788,7 +2787,8 @@
     "some": "Sebahagian",
     "support": "Sokongan",
     "profiles": "Profil",
-    "paste": "Tampal"
+    "paste": "Tampal",
+    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke clipboard"
   },
   "errors": {
     "generic": "Ada masalah timbul\nSila cuba lagi",
@@ -3008,6 +3008,23 @@
         "contactlessDescription": "Benarkan transaksi tanpa sentuh"
       },
       "title": "Had kad"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

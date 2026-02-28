@@ -2474,8 +2474,7 @@
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
     "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
-    "momentarily": "akaseera katono",
-    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
+    "momentarily": "akaseera katono"
   },
   "TransactionLimitsScreen": {
     "receive": "Funa",
@@ -2771,7 +2770,8 @@
     "some": "Ebimu",
     "support": "Obuyambi",
     "profiles": "Profayiro",
-    "paste": "Teeka"
+    "paste": "Teeka",
+    "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe"
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -2967,6 +2967,23 @@
         "contactlessDescription": "Okukkiriza okutunda awatali kukwatagana"
       },
       "title": "Ensalo z'ekkaadi"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

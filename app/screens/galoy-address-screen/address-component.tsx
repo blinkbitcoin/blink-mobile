@@ -1,9 +1,8 @@
 import { Linking, Pressable, Share, View } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 const addressTypes = {
@@ -28,6 +27,7 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
   useGlobeIcon,
 }) => {
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
   const {
     theme: { colors },
   } = useTheme()
@@ -37,21 +37,21 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
       ? address.replace("https://", "")
       : address
 
-  const copyToClipboard = () => {
-    Clipboard.setString(address)
-    toastShow({
-      message: (translations) => {
-        switch (addressType) {
-          case addressTypes.lightning:
-            return translations.GaloyAddressScreen.copiedLightningAddressToClipboard()
-          case addressTypes.pos:
-            return translations.GaloyAddressScreen.copiedCashRegisterLinkToClipboard()
-          case addressTypes.paycode:
-            return translations.GaloyAddressScreen.copiedPaycodeToClipboard()
-        }
-      },
-      type: "success",
-      LL,
+  const getClipboardMessage = () => {
+    switch (addressType) {
+      case addressTypes.lightning:
+        return LL.GaloyAddressScreen.copiedLightningAddressToClipboard()
+      case addressTypes.pos:
+        return LL.GaloyAddressScreen.copiedCashRegisterLinkToClipboard()
+      case addressTypes.paycode:
+        return LL.GaloyAddressScreen.copiedPaycodeToClipboard()
+    }
+  }
+
+  const handleCopyToClipboard = () => {
+    copyToClipboard({
+      content: address,
+      message: getClipboardMessage(),
     })
   }
 
@@ -76,7 +76,7 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
               <GaloyIcon name="globe" size={20} color={colors.black} />
             </Pressable>
           )}
-          <Pressable onPress={copyToClipboard}>
+          <Pressable onPress={handleCopyToClipboard}>
             <GaloyIcon name="copy-paste" size={20} color={colors.black} />
           </Pressable>
           <Pressable
