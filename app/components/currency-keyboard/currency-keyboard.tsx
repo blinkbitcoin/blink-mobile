@@ -23,9 +23,10 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   const styles = useStyles()
 
   const keyRows = [
-    [KeyType[1], KeyType[2], KeyType[3], KeyType.Backspace],
-    [KeyType[4], KeyType[5], KeyType[6], KeyType.Decimal],
-    [KeyType[7], KeyType[8], KeyType[9], KeyType[0]],
+    [KeyType[1], KeyType[2], KeyType[3]],
+    [KeyType[4], KeyType[5], KeyType[6]],
+    [KeyType[7], KeyType[8], KeyType[9]],
+    [KeyType.Decimal, KeyType[0], KeyType.Backspace],
   ]
 
   return (
@@ -111,18 +112,19 @@ const Key = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   keyboard: {
-    gap: 8,
+    gap: 5,
     maxWidth: 480,
     width: "100%",
     alignSelf: "center",
+    paddingVertical: 0
   },
   keyRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: 5,
   },
   key: {
     flex: 1,
-    minHeight: 54,
+    minHeight: 45,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
@@ -136,9 +138,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
   },
   keyText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
-    lineHeight: 32,
+    lineHeight: 30,
     textAlign: "center",
   },
   backspaceIcon: {

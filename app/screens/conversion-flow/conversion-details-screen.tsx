@@ -741,8 +741,8 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   keyboardContainer: {
     marginHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 28,
+    paddingTop: 5,
+    paddingBottom: 15,
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
