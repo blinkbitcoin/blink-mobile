@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
 import {
@@ -30,7 +30,7 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
-import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
@@ -438,6 +438,8 @@ export const ConversionDetailsScreen = () => {
     })
   }
 
+  const hasError = Boolean(amountFieldError)
+
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
     setUiLocked(true)
@@ -461,7 +463,7 @@ export const ConversionDetailsScreen = () => {
   return (
     <Screen preset="fixed">
       <View style={styles.styleWalletContainer}>
-        <View style={styles.walletSelectorContainer}>
+        <View style={[styles.walletSelectorContainer, hasError && styles.walletSelectorContainerError]}>
           <Animated.View
             style={[
               styles.rowWrapTop,
@@ -596,12 +598,15 @@ export const ConversionDetailsScreen = () => {
           )}
         </View>
 
-        <View style={styles.errorBoxWrapper}>
-          {amountFieldError ? (
-            <GaloyErrorBox errorMessage={amountFieldError} />
-          ) : (
-            <View style={styles.errorBoxSpacer} />
-          )}
+        <View style={styles.errorRow}>
+          <GaloyIcon
+            name="warning"
+            size={14}
+            color={hasError ? colors.error : "transparent"}
+          />
+          <Text type="p3" color={hasError ? colors.error : "transparent"}>
+            {amountFieldError || " "}
+          </Text>
         </View>
       </View>
 
@@ -686,11 +691,16 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "column",
     backgroundColor: colors.grey5,
     borderRadius: 13,
+    borderWidth: 1,
+    borderColor: "transparent",
     paddingHorizontal: 15,
     paddingTop: 0,
     paddingBottom: 0,
     overflow: "hidden",
     position: "relative",
+  },
+  walletSelectorContainerError: {
+    borderColor: colors.error,
   },
   rowWrapTop: {
     marginHorizontal: -15,
@@ -736,16 +746,21 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 0,
     gap: 12,
   },
   keyboardContainer: {
     marginHorizontal: 20,
-    paddingTop: 5,
+    paddingTop: 0,
     paddingBottom: 15,
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
-  errorBoxWrapper: { marginTop: 8 },
-  errorBoxSpacer: { height: 44 },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 3,
+    marginTop: 5,
+  },
 }))

@@ -224,7 +224,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   keyboardContainer: {
     paddingTop: 14,
-    paddingBottom: 14,
+    paddingBottom: 0,
   },
   ctaSection: {
     paddingTop: 10,
