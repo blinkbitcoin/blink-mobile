@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Politica de confidențialitate card",
       "closeCardAccount": "Închide contul cardului",
       "closeCardAccountDescription": "Închide permanent cardul tău Visa"
+    },
+    "TransactionDetails": {
+      "title": "Detalii tranzacție",
+      "cardInformation": "Informații card",
+      "amount": "Sumă",
+      "time": "Ora",
+      "transactionId": "ID",
+      "cardUsed": "Card folosit",
+      "paymentMethod": "Metodă de plată",
+      "merchantInformation": "Informații comerciant",
+      "merchant": "Comerciant",
+      "category": "Categorie",
+      "location": "Locație",
+      "mccCode": "Cod MCC",
+      "currencyConversion": "Conversie valutară",
+      "bitcoinRate": "Curs Bitcoin",
+      "bitcoinSpent": "Bitcoin cheltuit",
+      "conversionFee": "Comision de conversie",
+      "viewOnMap": "Vezi pe hartă",
+      "downloadReceipt": "Descarcă chitanța",
+      "reportIssue": "Raportează o problemă",
+      "transactionHelp": "Ajutor tranzacție",
+      "transactionHelpDescription": "Dacă nu recunoașteți această tranzacție sau aveți nevoie de asistență, contactați imediat {supportTeam}.",
+      "supportTeam": "echipa noastră de suport",
+      "transactionNotFound": "Tranzacția nu a fost găsită"
     }
   }
 }

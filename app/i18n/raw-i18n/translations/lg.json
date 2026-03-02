@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Enkola y ekyama ey ekkaadi",
       "closeCardAccount": "Ggala akawunti y ekkaadi",
       "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna"
+    },
+    "TransactionDetails": {
+      "title": "Ebikwata ku ntuzaanya",
+      "cardInformation": "Ebikwata ku kaadi",
+      "amount": "Omuwendo",
+      "time": "Obudde",
+      "transactionId": "ID",
+      "cardUsed": "Kaadi eyakozesebwa",
+      "paymentMethod": "Enkola y'okusasula",
+      "merchantInformation": "Ebikwata ku musuubuzi",
+      "merchant": "Omusuubuzi",
+      "category": "Ekika",
+      "location": "Ekifo",
+      "mccCode": "Koodi ya MCC",
+      "currencyConversion": "Okukyusa ssente",
+      "bitcoinRate": "Omutindo gwa Bitcoin",
+      "bitcoinSpent": "Bitcoin eyakozesebwa",
+      "conversionFee": "Ssente z'okukyusa",
+      "viewOnMap": "Laba ku mmaapu",
+      "downloadReceipt": "Ddawuniloda lisiiti",
+      "reportIssue": "Loopa obuzibu",
+      "transactionHelp": "Obuyambi ku ntuzaanya",
+      "transactionHelpDescription": "Bw'ototegeera ntuzaanya eno oba bw'oba oyagala obuyambi, tuukirira {supportTeam} amangu.",
+      "supportTeam": "ekibinja kyaffe eky'obuyambi",
+      "transactionNotFound": "Entuzaanya terabika"
     }
   }
 }

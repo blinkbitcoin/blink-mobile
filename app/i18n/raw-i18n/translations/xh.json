@@ -3068,6 +3068,31 @@
       "privacyPolicy": "Umgaqo-nkqubo wobumfihlo bekhadi",
       "closeCardAccount": "Vala iakhawunti yekhadi",
       "closeCardAccountDescription": "Vala ikhadi lakho le-Visa ngokusisigxina"
+    },
+    "TransactionDetails": {
+      "title": "Iinkcukacha zotshintshiselwano",
+      "cardInformation": "Ulwazi lwekhadi",
+      "amount": "Isixa",
+      "time": "Ixesha",
+      "transactionId": "ID",
+      "cardUsed": "Ikhadi elisetyenzisiweyo",
+      "paymentMethod": "Indlela yokuhlawula",
+      "merchantInformation": "Ulwazi lomrhwebi",
+      "merchant": "Umrhwebi",
+      "category": "Udidi",
+      "location": "Indawo",
+      "mccCode": "Ikhowudi ye-MCC",
+      "currencyConversion": "Ukuguqulwa kwemali",
+      "bitcoinRate": "Ireyithi ye-Bitcoin",
+      "bitcoinSpent": "I-Bitcoin esetyenzisiweyo",
+      "conversionFee": "Intlawulo yokuguqulwa",
+      "viewOnMap": "Jonga kwimephu",
+      "downloadReceipt": "Khuphela irisithi",
+      "reportIssue": "Xela ingxaki",
+      "transactionHelp": "Uncedo lwetshintshiselwano",
+      "transactionHelpDescription": "Ukuba awuyiqondi le ntshintshiselwano okanye ufuna uncedo, qhagamshelana {supportTeam} ngokukhawuleza.",
+      "supportTeam": "neqela lethu loncedo",
+      "transactionNotFound": "Utshintshiselwano alufunyenwanga"
     }
   }
 }

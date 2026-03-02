@@ -3062,6 +3062,31 @@
       "privacyPolicy": "Kaart privaatheidsbeleid",
       "closeCardAccount": "Sluit kaartrekening",
       "closeCardAccountDescription": "Sluit jou Visa-kaart permanent"
+    },
+    "TransactionDetails": {
+      "title": "Transaksiebesonderhede",
+      "cardInformation": "Kaartinligting",
+      "amount": "Bedrag",
+      "time": "Tyd",
+      "transactionId": "ID",
+      "cardUsed": "Kaart gebruik",
+      "paymentMethod": "Betalingsmetode",
+      "merchantInformation": "Handelaarinligting",
+      "merchant": "Handelaar",
+      "category": "Kategorie",
+      "location": "Ligging",
+      "mccCode": "MCC-kode",
+      "currencyConversion": "Geldomskakeling",
+      "bitcoinRate": "Bitcoin-koers",
+      "bitcoinSpent": "Bitcoin bestee",
+      "conversionFee": "Omskakelingfooi",
+      "viewOnMap": "Bekyk op kaart",
+      "downloadReceipt": "Laai kwitansie af",
+      "reportIssue": "Rapporteer probleem",
+      "transactionHelp": "Transaksie-hulp",
+      "transactionHelpDescription": "As jy hierdie transaksie nie herken nie of hulp nodig het, kontak ons {supportTeam} onmiddellik.",
+      "supportTeam": "ondersteuningspan",
+      "transactionNotFound": "Transaksie nie gevind nie"
     }
   }
 }

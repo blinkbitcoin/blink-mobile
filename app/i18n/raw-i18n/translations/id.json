@@ -3021,6 +3021,31 @@
       "privacyPolicy": "Kebijakan privasi kartu",
       "closeCardAccount": "Tutup akun kartu",
       "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen"
+    },
+    "TransactionDetails": {
+      "title": "Detail transaksi",
+      "cardInformation": "Informasi kartu",
+      "amount": "Jumlah",
+      "time": "Waktu",
+      "transactionId": "ID",
+      "cardUsed": "Kartu yang digunakan",
+      "paymentMethod": "Metode pembayaran",
+      "merchantInformation": "Informasi merchant",
+      "merchant": "Merchant",
+      "category": "Kategori",
+      "location": "Lokasi",
+      "mccCode": "Kode MCC",
+      "currencyConversion": "Konversi mata uang",
+      "bitcoinRate": "Kurs Bitcoin",
+      "bitcoinSpent": "Bitcoin yang digunakan",
+      "conversionFee": "Biaya konversi",
+      "viewOnMap": "Lihat di peta",
+      "downloadReceipt": "Unduh struk",
+      "reportIssue": "Laporkan masalah",
+      "transactionHelp": "Bantuan transaksi",
+      "transactionHelpDescription": "Jika Anda tidak mengenali transaksi ini atau membutuhkan bantuan, segera hubungi {supportTeam}.",
+      "supportTeam": "tim dukungan kami",
+      "transactionNotFound": "Transaksi tidak ditemukan"
     }
   }
 }

@@ -93,6 +93,7 @@ import {
   CardLimitsScreen,
   CardSettingsScreen,
   CardStatementsScreen,
+  CardTransactionDetailsScreen,
 } from "@app/screens/card-screen"
 import {
   WelcomeLevel1Screen,
@@ -532,6 +533,11 @@ export const RootStack = () => {
         name="cardStatementsScreen"
         component={CardStatementsScreen}
         options={{ title: LL.CardFlow.CardStatements.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardTransactionDetailsScreen"
+        component={CardTransactionDetailsScreen}
+        options={{ title: LL.CardFlow.TransactionDetails.title() }}
       />
       <RootNavigator.Screen
         name="onboarding"

@@ -3059,6 +3059,31 @@
       "privacyPolicy": "Chính sách bảo mật thẻ",
       "closeCardAccount": "Đóng tài khoản thẻ",
       "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn"
+    },
+    "TransactionDetails": {
+      "title": "Chi tiết giao dịch",
+      "cardInformation": "Thông tin thẻ",
+      "amount": "Số tiền",
+      "time": "Thời gian",
+      "transactionId": "ID",
+      "cardUsed": "Thẻ sử dụng",
+      "paymentMethod": "Phương thức thanh toán",
+      "merchantInformation": "Thông tin đơn vị",
+      "merchant": "Đơn vị",
+      "category": "Danh mục",
+      "location": "Vị trí",
+      "mccCode": "Mã MCC",
+      "currencyConversion": "Chuyển đổi tiền tệ",
+      "bitcoinRate": "Tỷ giá Bitcoin",
+      "bitcoinSpent": "Bitcoin đã chi",
+      "conversionFee": "Phí chuyển đổi",
+      "viewOnMap": "Xem trên bản đồ",
+      "downloadReceipt": "Tải biên lai",
+      "reportIssue": "Báo cáo vấn đề",
+      "transactionHelp": "Trợ giúp giao dịch",
+      "transactionHelpDescription": "Nếu bạn không nhận ra giao dịch này hoặc cần hỗ trợ, hãy liên hệ ngay với {supportTeam}.",
+      "supportTeam": "đội ngũ hỗ trợ của chúng tôi",
+      "transactionNotFound": "Không tìm thấy giao dịch"
     }
   }
 }
