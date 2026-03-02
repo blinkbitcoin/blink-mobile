@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { ScrollView, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
@@ -40,8 +40,8 @@ export const ReplaceCardLayout: React.FC<ReplaceCardLayoutProps> = ({
   const resolvedIconColor = iconColor ?? colors.primary
 
   return (
-    <Screen preset="scroll">
-      <View style={styles.container}>
+    <Screen preset="fixed" style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.progressBarContainer}>
           <StepsProgressBar steps={steps} currentStep={currentStep} />
         </View>
@@ -62,20 +62,23 @@ export const ReplaceCardLayout: React.FC<ReplaceCardLayoutProps> = ({
         </View>
 
         <View style={styles.content}>{children}</View>
+      </ScrollView>
 
-        <View style={styles.buttonContainer}>
-          <GaloyPrimaryButton
-            title={buttonLabel}
-            onPress={onButtonPress}
-            disabled={isButtonDisabled}
-          />
-        </View>
+      <View style={styles.buttonContainer}>
+        <GaloyPrimaryButton
+          title={buttonLabel}
+          onPress={onButtonPress}
+          disabled={isButtonDisabled}
+        />
       </View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  screen: {
+    flex: 1,
+  },
   container: {
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -115,6 +118,8 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   buttonContainer: {
-    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
   },
 }))
