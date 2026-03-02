@@ -2,7 +2,7 @@ import React from "react"
 import { render, fireEvent } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
-import { TransactionTypeRow } from "@app/components/card-screen"
+import { SwitchRow } from "@app/components/card-screen"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 
@@ -29,7 +29,7 @@ const renderWithTheme = (component: React.ReactElement) => {
   )
 }
 
-describe("TransactionTypeRow", () => {
+describe("SwitchRow", () => {
   const mockOnValueChange = jest.fn()
 
   const defaultProps = {
@@ -45,38 +45,34 @@ describe("TransactionTypeRow", () => {
 
   describe("rendering", () => {
     it("renders without crashing", () => {
-      const { toJSON } = renderWithTheme(<TransactionTypeRow {...defaultProps} />)
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)
       expect(toJSON()).toBeTruthy()
     })
 
     it("displays title correctly", () => {
-      const { getByText } = renderWithTheme(<TransactionTypeRow {...defaultProps} />)
+      const { getByText } = renderWithTheme(<SwitchRow {...defaultProps} />)
       expect(getByText("E-commerce")).toBeTruthy()
     })
 
     it("displays description correctly", () => {
-      const { getByText } = renderWithTheme(<TransactionTypeRow {...defaultProps} />)
+      const { getByText } = renderWithTheme(<SwitchRow {...defaultProps} />)
       expect(getByText("Online purchases")).toBeTruthy()
     })
 
     it("renders with value true", () => {
-      const { toJSON } = renderWithTheme(
-        <TransactionTypeRow {...defaultProps} value={true} />,
-      )
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} value={true} />)
       expect(toJSON()).toBeTruthy()
     })
 
     it("renders with value false", () => {
-      const { toJSON } = renderWithTheme(
-        <TransactionTypeRow {...defaultProps} value={false} />,
-      )
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} value={false} />)
       expect(toJSON()).toBeTruthy()
     })
   })
 
   describe("interaction", () => {
     it("calls onValueChange when switch is toggled", () => {
-      const { getByRole } = renderWithTheme(<TransactionTypeRow {...defaultProps} />)
+      const { getByRole } = renderWithTheme(<SwitchRow {...defaultProps} />)
 
       const switchElement = getByRole("switch")
       fireEvent(switchElement, "pressIn")

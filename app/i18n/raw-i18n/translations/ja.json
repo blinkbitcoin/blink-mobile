@@ -3025,6 +3025,24 @@
                 "contactlessDescription": "非接触取引を許可"
             },
             "title": "カード限度額"
+        },
+        "CardStatements": {
+            "title": "明細",
+            "selectYear": "年を選択",
+            "currentStatement": "現在の明細",
+            "statementPeriod": "明細期間",
+            "totalSpent": "合計支出",
+            "monthlyStatements": "月間明細",
+            "downloadAll": "すべてダウンロード",
+            "spent": "{amount} 支出",
+            "transactions": "{count} 件の取引、{amount} 支出",
+            "noStatements": "まだ明細がありません",
+            "statementsCount": "{count} 件の明細",
+            "aboutStatements": "明細について",
+            "aboutBullet1": "月間明細は毎月最終日に作成されます",
+            "aboutBullet2": "明細には期間中のすべての取引と手数料が含まれます",
+            "aboutBullet3": "明細をPDFでダウンロード",
+            "notifyNewStatements": "新しい明細が利用可能になったら通知する"
         }
     }
 }

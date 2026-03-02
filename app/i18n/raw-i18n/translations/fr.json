@@ -3025,6 +3025,24 @@
                 "contactlessDescription": "Autoriser les transactions sans contact"
             },
             "title": "Limites de carte"
+        },
+        "CardStatements": {
+            "title": "Mouvements",
+            "selectYear": "Sélectionner l'année",
+            "currentStatement": "Mouvement actuel",
+            "statementPeriod": "Période du mouvement",
+            "totalSpent": "Total dépensé",
+            "monthlyStatements": "Mouvements mensuels",
+            "downloadAll": "Tout télécharger",
+            "spent": "{amount} dépensé",
+            "transactions": "{count} transactions, {amount} dépensé",
+            "noStatements": "Pas encore de mouvements",
+            "statementsCount": "{count} mouvements",
+            "aboutStatements": "À propos des mouvements",
+            "aboutBullet1": "Les mouvements mensuels sont générés le dernier jour de chaque mois",
+            "aboutBullet2": "Les mouvements incluent toutes les transactions et frais de la période",
+            "aboutBullet3": "Téléchargez les mouvements au format PDF",
+            "notifyNewStatements": "Me notifier quand de nouveaux mouvements sont disponibles"
         }
     }
 }

@@ -2984,6 +2984,24 @@
                 "contactlessDescription": "Consenti transazioni contactless"
             },
             "title": "Limiti carta"
+        },
+        "CardStatements": {
+            "title": "Movimenti",
+            "selectYear": "Seleziona anno",
+            "currentStatement": "Movimento attuale",
+            "statementPeriod": "Periodo del movimento",
+            "totalSpent": "Totale speso",
+            "monthlyStatements": "Movimenti mensili",
+            "downloadAll": "Scarica tutti",
+            "spent": "{amount} speso",
+            "transactions": "{count} transazioni, {amount} speso",
+            "noStatements": "Ancora nessun movimento",
+            "statementsCount": "{count} movimenti",
+            "aboutStatements": "Informazioni sui movimenti",
+            "aboutBullet1": "I movimenti mensili vengono generati l'ultimo giorno di ogni mese",
+            "aboutBullet2": "I movimenti includono tutte le transazioni e le commissioni del periodo",
+            "aboutBullet3": "Scarica i movimenti in formato PDF",
+            "notifyNewStatements": "Avvisami quando sono disponibili nuovi movimenti"
         }
     }
 }
