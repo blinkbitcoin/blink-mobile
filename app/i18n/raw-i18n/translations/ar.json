@@ -2788,7 +2788,8 @@
     "support": "الدعم",
     "profiles": "الملفات الشخصية",
     "paste": "لصق",
-    "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة"
+    "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة",
+    "save": "حفظ"
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -3124,6 +3125,21 @@
         "subtitle": "تم تقديم طلب توصيل بطاقة Blink الخاصة بك.",
         "buttonLabel": "إنشاء رمز PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "عنوان الشحن",
+      "fullName": "الاسم الكامل",
+      "addressLine1": "سطر العنوان 1",
+      "addressLine2": "سطر العنوان 2",
+      "city": "المدينة",
+      "state": "الولاية",
+      "postalCode": "الرمز البريدي",
+      "country": "البلد",
+      "important": "مهم",
+      "importantDescription": "يرجى التأكد من أن عنوانك دقيق وكامل.",
+      "noPOBoxes": "لا يمكن توصيل البطاقات إلى صناديق البريد",
+      "signatureRequired": "قد يكون التوقيع مطلوبًا عند التسليم",
+      "supportedRegions": "يجب أن يكون العنوان ضمن مناطق الشحن المدعومة"
     }
   }
 }

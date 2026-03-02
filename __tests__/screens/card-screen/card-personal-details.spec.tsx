@@ -11,10 +11,23 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockNavigate = jest.fn()
+
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native")
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  }
+})
+
 describe("CardPersonalDetailsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockNavigate.mockClear()
   })
 
   describe("rendering", () => {
@@ -278,9 +291,7 @@ describe("CardPersonalDetailsScreen", () => {
       consoleSpy.mockRestore()
     })
 
-    it("allows pressing edit shipping address", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("navigates to shipping address screen when edit shipping address is pressed", async () => {
       const { getByLabelText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -296,8 +307,7 @@ describe("CardPersonalDetailsScreen", () => {
         fireEvent.press(shippingAddress)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Edit shipping address pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardShippingAddressScreen")
     })
 
     it("allows pressing contact support", async () => {
@@ -371,7 +381,7 @@ describe("CardPersonalDetailsScreen", () => {
       })
 
       expect(consoleSpy).toHaveBeenCalledWith("Change KYC information pressed")
-      expect(consoleSpy).toHaveBeenCalledWith("Edit shipping address pressed")
+      expect(mockNavigate).toHaveBeenCalledWith("cardShippingAddressScreen")
       expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
 
       consoleSpy.mockRestore()

@@ -2788,7 +2788,8 @@
     "support": "Подршка",
     "profiles": "Профили",
     "paste": "Налепи",
-    "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд"
+    "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд",
+    "save": "Сачувај"
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -3124,6 +3125,21 @@
         "subtitle": "Поруџбина за испоруку ваше Blink картице је послата.",
         "buttonLabel": "Креирај ПИН"
       }
+    },
+    "ShippingAddress": {
+      "title": "Адреса за испоруку",
+      "fullName": "Пуно име",
+      "addressLine1": "Адреса ред 1",
+      "addressLine2": "Адреса ред 2",
+      "city": "Град",
+      "state": "Држава",
+      "postalCode": "Поштански број",
+      "country": "Земља",
+      "important": "Важно",
+      "importantDescription": "Молимо проверите да је ваша адреса тачна и потпуна.",
+      "noPOBoxes": "Картице се не могу доставити на поштанске сандучиће",
+      "signatureRequired": "Потпис може бити потребан при достави",
+      "supportedRegions": "Адреса мора бити унутар подржаних региона за испоруку"
     }
   }
 }

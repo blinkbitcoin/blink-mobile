@@ -2771,7 +2771,8 @@
     "support": "Dukungan",
     "profiles": "Profil",
     "paste": "Tempel",
-    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip"
+    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip",
+    "save": "Simpan"
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -3086,6 +3087,21 @@
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
         "buttonLabel": "Buat PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Alamat pengiriman",
+      "fullName": "Nama lengkap",
+      "addressLine1": "Alamat baris 1",
+      "addressLine2": "Alamat baris 2",
+      "city": "Kota",
+      "state": "Provinsi",
+      "postalCode": "Kode pos",
+      "country": "Negara",
+      "important": "Penting",
+      "importantDescription": "Pastikan alamat Anda akurat dan lengkap.",
+      "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",
+      "signatureRequired": "Tanda tangan mungkin diperlukan saat pengiriman",
+      "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung"
     }
   }
 }

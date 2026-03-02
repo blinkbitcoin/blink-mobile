@@ -2774,7 +2774,8 @@
     "support": "Support",
     "profiles": "Profiler",
     "paste": "Indsæt",
-    "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen"
+    "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen",
+    "save": "Gem"
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",
@@ -3104,6 +3105,21 @@
         "subtitle": "Bestilling af levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Opret PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "Leveringsadresse",
+      "fullName": "Fulde navn",
+      "addressLine1": "Adresselinje 1",
+      "addressLine2": "Adresselinje 2",
+      "city": "By",
+      "state": "Stat",
+      "postalCode": "Postnummer",
+      "country": "Land",
+      "important": "Vigtigt",
+      "importantDescription": "Sørg for at din adresse er nøjagtig og komplet.",
+      "noPOBoxes": "Kort kan ikke leveres til postbokse",
+      "signatureRequired": "Underskrift kan være påkrævet ved levering",
+      "supportedRegions": "Adressen skal være inden for understøttede leveringsområder"
     }
   }
 }

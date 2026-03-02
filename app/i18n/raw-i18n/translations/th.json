@@ -2788,7 +2788,8 @@
     "support": "สนับสนุน",
     "profiles": "โปรไฟล์",
     "paste": "วาง",
-    "hasBeenCopiedToClipboard": "คัดลอก {type: string} ไปยังคลิปบอร์ดแล้ว"
+    "hasBeenCopiedToClipboard": "คัดลอก {type: string} ไปยังคลิปบอร์ดแล้ว",
+    "save": "บันทึก"
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -3124,6 +3125,21 @@
         "subtitle": "คำสั่งซื้อสำหรับการจัดส่งบัตร Blink ของคุณถูกส่งแล้ว",
         "buttonLabel": "สร้าง PIN"
       }
+    },
+    "ShippingAddress": {
+      "title": "ที่อยู่จัดส่ง",
+      "fullName": "ชื่อเต็ม",
+      "addressLine1": "ที่อยู่บรรทัดที่ 1",
+      "addressLine2": "ที่อยู่บรรทัดที่ 2",
+      "city": "เมือง",
+      "state": "รัฐ/จังหวัด",
+      "postalCode": "รหัสไปรษณีย์",
+      "country": "ประเทศ",
+      "important": "สำคัญ",
+      "importantDescription": "กรุณาตรวจสอบให้แน่ใจว่าที่อยู่ของคุณถูกต้องและครบถ้วน",
+      "noPOBoxes": "ไม่สามารถจัดส่งบัตรไปยังตู้ไปรษณีย์ได้",
+      "signatureRequired": "อาจต้องเซ็นชื่อเมื่อรับสินค้า",
+      "supportedRegions": "ที่อยู่ต้องอยู่ในเขตจัดส่งที่รองรับ"
     }
   }
 }
