@@ -52,7 +52,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginTop: 12,
+    marginTop: 14,
   },
   balanceColumn: {
     flexDirection: "column",

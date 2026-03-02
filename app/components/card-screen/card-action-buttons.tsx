@@ -95,7 +95,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 12,
     height: 94,
     marginHorizontal: 20,
-    marginTop: 15,
+    marginTop: 14,
     paddingHorizontal: 8,
   },
   actionButton: {
