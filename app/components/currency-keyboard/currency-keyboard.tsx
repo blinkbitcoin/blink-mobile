@@ -116,7 +116,7 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: 480,
     width: "100%",
     alignSelf: "center",
-    paddingVertical: 0
+    paddingVertical: 0,
   },
   keyRow: {
     flexDirection: "row",

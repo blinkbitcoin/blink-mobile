@@ -463,7 +463,12 @@ export const ConversionDetailsScreen = () => {
   return (
     <Screen preset="fixed">
       <View style={styles.styleWalletContainer}>
-        <View style={[styles.walletSelectorContainer, hasError && styles.walletSelectorContainerError]}>
+        <View
+          style={[
+            styles.walletSelectorContainer,
+            hasError && styles.walletSelectorContainerError,
+          ]}
+        >
           <Animated.View
             style={[
               styles.rowWrapTop,
