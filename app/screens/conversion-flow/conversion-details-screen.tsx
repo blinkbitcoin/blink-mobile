@@ -745,7 +745,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginVertical: 0,
     gap: 12,
   },
