@@ -1,5 +1,4 @@
 import React from "react"
-import { View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -7,30 +6,19 @@ import { CardLimitsScreen } from "@app/screens/card-screen/card-limits-screen"
 import { CardStatus, CardType } from "@app/graphql/generated"
 import { ContextForScreen } from "../../helper"
 
-jest.mock("react-native-reanimated", () => ({
-  __esModule: true,
-  default: {
-    View,
-    createAnimatedComponent: (component: React.ComponentType) => component,
-  },
-  useSharedValue: (initial: number) => ({ value: initial }),
-  useAnimatedStyle: () => ({}),
-  withTiming: (value: number) => value,
-  interpolateColor: () => "transparent",
-}))
-
-jest.mock("react-native-modal", () => {
-  const MockModal = ({
-    isVisible,
-    children,
-  }: {
-    isVisible: boolean
-    children: React.ReactNode
-  }) => {
-    if (!isVisible) return null
-    return <>{children}</>
+jest.mock("react-native-reanimated", () => {
+  const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
+  return {
+    __esModule: true,
+    default: {
+      View: RNView,
+      createAnimatedComponent: (component: React.ComponentType) => component,
+    },
+    useSharedValue: (initial: number) => ({ value: initial }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (value: number) => value,
+    interpolateColor: () => "transparent",
   }
-  return MockModal
 })
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -206,26 +194,38 @@ describe("CardLimitsScreen", () => {
   })
 
   describe("spending limits interaction", () => {
-    it("opens daily limit modal when daily input is pressed", () => {
-      const { getByTestId, getByText } = render(
+    it("calls handleUpdateDailyLimit when daily field loses focus with a new value", () => {
+      const { getByLabelText } = render(
         <ContextForScreen>
           <CardLimitsScreen />
         </ContextForScreen>,
       )
-      const dailyInput = getByTestId("daily-limit-input")
-      fireEvent.press(dailyInput.findByProps({ accessibilityRole: "button" }))
-      expect(getByText("Confirm")).toBeTruthy()
+      const dailyField = getByLabelText("Daily spending")
+      fireEvent.changeText(dailyField, "2000")
+      fireEvent(dailyField, "blur")
+      expect(mockHandleUpdateDailyLimit).toHaveBeenCalledWith("2000")
     })
 
-    it("opens monthly limit modal when monthly input is pressed", () => {
-      const { getByTestId, getByText } = render(
+    it("does not call handleUpdateDailyLimit when value is unchanged on blur", () => {
+      const { getByLabelText } = render(
         <ContextForScreen>
           <CardLimitsScreen />
         </ContextForScreen>,
       )
-      const monthlyInput = getByTestId("monthly-limit-input")
-      fireEvent.press(monthlyInput.findByProps({ accessibilityRole: "button" }))
-      expect(getByText("Confirm")).toBeTruthy()
+      fireEvent(getByLabelText("Daily spending"), "blur")
+      expect(mockHandleUpdateDailyLimit).not.toHaveBeenCalled()
+    })
+
+    it("calls handleUpdateMonthlyLimit when monthly field loses focus with a new value", () => {
+      const { getByLabelText } = render(
+        <ContextForScreen>
+          <CardLimitsScreen />
+        </ContextForScreen>,
+      )
+      const monthlyField = getByLabelText("Monthly spending limits")
+      fireEvent.changeText(monthlyField, "8000")
+      fireEvent(monthlyField, "blur")
+      expect(mockHandleUpdateMonthlyLimit).toHaveBeenCalledWith("8000")
     })
 
     it("displays helper texts for limit inputs", () => {

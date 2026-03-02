@@ -4,7 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
-import { LimitInput, SwitchRow } from "@app/components/card-screen"
+import { InputField, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -14,6 +14,7 @@ import { toMajorUnit } from "@app/utils/helper"
 import { useCardData } from "../hooks/use-card-data"
 
 import { LimitField, useCardLimits } from "./hooks"
+import { createCurrencyFormatters } from "../utils"
 
 export const CardLimitsScreen: React.FC = () => {
   const styles = useStyles()
@@ -28,6 +29,8 @@ export const CardLimitsScreen: React.FC = () => {
   const { card, loading } = useCardData()
   const { handleUpdateDailyLimit, handleUpdateMonthlyLimit, updatingField } =
     useCardLimits(card?.id ?? "")
+
+  const { formatAmount } = createCurrencyFormatters(currencySymbol)
 
   useEffect(() => {
     if (!loading && !card) {
@@ -50,7 +53,7 @@ export const CardLimitsScreen: React.FC = () => {
   const formatLimitCents = (cents: number | null) =>
     cents === null
       ? LL.CardFlow.CardLimits.noLimit()
-      : `${currencySymbol}${toMajorUnit(cents).toLocaleString()}`
+      : formatAmount(toMajorUnit(cents).toString())
 
   return (
     <Screen preset="scroll">
@@ -83,23 +86,35 @@ export const CardLimitsScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>
             {LL.CardFlow.CardLimits.spendingLimitsTitle()}
           </Text>
-          <LimitInput
+          <InputField
             testID="daily-limit-input"
             label={LL.CardFlow.CardLimits.dailySpending()}
             value={toMajorUnit(card.dailyLimitCents ?? 0).toString()}
             helperText={LL.CardFlow.CardLimits.dailyLimitHelper()}
-            onChangeValue={handleUpdateDailyLimit}
+            size="large"
+            keyboardType="decimal-pad"
+            formatDisplay={formatAmount}
+            onBlur={(value) => {
+              if (Number(value) !== toMajorUnit(card.dailyLimitCents ?? 0))
+                handleUpdateDailyLimit(value)
+            }}
             loading={updatingField === LimitField.Daily}
-            disabled={updatingField === LimitField.Monthly}
+            disabled={updatingField !== null}
           />
-          <LimitInput
+          <InputField
             testID="monthly-limit-input"
             label={LL.CardFlow.CardLimits.monthlyLimit()}
             value={toMajorUnit(card.monthlyLimitCents ?? 0).toString()}
             helperText={LL.CardFlow.CardLimits.monthlyLimitHelper()}
-            onChangeValue={handleUpdateMonthlyLimit}
+            size="large"
+            keyboardType="decimal-pad"
+            formatDisplay={formatAmount}
+            onBlur={(value) => {
+              if (Number(value) !== toMajorUnit(card.monthlyLimitCents ?? 0))
+                handleUpdateMonthlyLimit(value)
+            }}
             loading={updatingField === LimitField.Monthly}
-            disabled={updatingField === LimitField.Daily}
+            disabled={updatingField !== null}
           />
         </View>
 
@@ -110,12 +125,14 @@ export const CardLimitsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>
               {LL.CardFlow.CardLimits.atmLimitsTitle()}
             </Text>
-            <LimitInput
+            <InputField
               label={LL.CardFlow.CardLimits.dailyAtmLimit()}
+              value=""
               helperText={LL.CardFlow.CardLimits.dailyAtmLimitHelper()}
             />
-            <LimitInput
+            <InputField
               label={LL.CardFlow.CardLimits.monthlyAtmLimit()}
+              value=""
               helperText={LL.CardFlow.CardLimits.monthlyAtmLimitHelper()}
             />
           </View>
