@@ -34,7 +34,12 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
 
   const dismissWithAnimation = React.useCallback(
     async (notificationId: string, afterAck?: () => void) => {
-      await ack({ variables: { input: { notificationId } } })
+      try {
+        await ack({ variables: { input: { notificationId } } })
+      } catch (e) {
+        console.error("Failed to acknowledge notification", e)
+        return
+      }
       afterAck?.()
       setDismissing(true)
       setTimeout(() => {
