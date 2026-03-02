@@ -851,10 +851,12 @@ query Bulletins($first: Int!, $after: String) {
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
               __typename
             }
             ... on OpenExternalLinkAction {
               url
+              label
               __typename
             }
             __typename
@@ -964,10 +966,12 @@ query StatefulNotifications($after: String) {
         action {
           ... on OpenDeepLinkAction {
             deepLink
+            label
             __typename
           }
           ... on OpenExternalLinkAction {
             url
+            label
             __typename
           }
           __typename
