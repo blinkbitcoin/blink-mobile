@@ -66,6 +66,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   actionButton: {
-    padding: 8,
+    paddingVertical: 8,
   },
 }))
