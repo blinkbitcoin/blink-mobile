@@ -2980,6 +2980,31 @@
     },
     "validThruLabel": "ใช้ได้ถึง",
     "cardFrozenTitle": "บัตรถูกระงับ",
-    "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว"
+    "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว",
+    "CardLimits": {
+      "currentLimitsTitle": "วงเงินปัจจุบัน",
+      "dailySpending": "การใช้จ่ายรายวัน",
+      "monthlySpending": "การใช้จ่ายรายเดือน",
+      "spendingLimitsTitle": "วงเงินการใช้จ่าย",
+      "dailyLimit": "วงเงินรายวัน",
+      "dailyLimitHelper": "จำนวนเงินสูงสุดที่คุณสามารถใช้ได้ต่อวัน",
+      "monthlyLimit": "ขีดจำกัดการใช้จ่ายรายเดือน",
+      "monthlyLimitHelper": "จำนวนเงินสูงสุดที่คุณสามารถใช้ได้ต่อเดือน",
+      "atmLimitsTitle": "วงเงินถอน ATM",
+      "dailyAtmLimit": "ขีดจำกัด ATM รายวัน",
+      "dailyAtmLimitHelper": "การถอน ATM สูงสุดต่อวัน",
+      "monthlyAtmLimit": "วงเงิน ATM รายเดือน",
+      "monthlyAtmLimitHelper": "การถอน ATM สูงสุดต่อเดือน",
+      "transactionTypesTitle": "ประเภทธุรกรรม",
+      "TransactionTypes": {
+        "ecommerce": "การซื้อออนไลน์",
+        "ecommerceDescription": "อนุญาตธุรกรรมอีคอมเมิร์ซ",
+        "atm": "การถอน ATM",
+        "atmDescription": "อนุญาตการถอนเงินสดจาก ATM",
+        "contactless": "การชำระเงินแบบไร้สัมผัส",
+        "contactlessDescription": "อนุญาตธุรกรรมแบบไร้สัมผัส"
+      },
+      "title": "วงเงินบัตร"
+    }
   }
 }

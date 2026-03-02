@@ -2942,6 +2942,31 @@
     },
     "validThruLabel": "BERLAKU HINGGA",
     "cardFrozenTitle": "Kartu dibekukan",
-    "cardFrozenSubtitle": "Kartu dinonaktifkan sementara"
+    "cardFrozenSubtitle": "Kartu dinonaktifkan sementara",
+    "CardLimits": {
+      "currentLimitsTitle": "Batas saat ini",
+      "dailySpending": "Pengeluaran harian",
+      "monthlySpending": "Pengeluaran bulanan",
+      "spendingLimitsTitle": "Batas pengeluaran",
+      "dailyLimit": "Batas harian",
+      "dailyLimitHelper": "Jumlah maksimum yang dapat Anda belanjakan per hari",
+      "monthlyLimit": "Batas pengeluaran bulanan",
+      "monthlyLimitHelper": "Jumlah maksimum yang dapat Anda belanjakan per bulan",
+      "atmLimitsTitle": "Batas penarikan ATM",
+      "dailyAtmLimit": "Batas ATM harian",
+      "dailyAtmLimitHelper": "Penarikan ATM maksimum per hari",
+      "monthlyAtmLimit": "Batas ATM bulanan",
+      "monthlyAtmLimitHelper": "Penarikan ATM maksimum per bulan",
+      "transactionTypesTitle": "Jenis transaksi",
+      "TransactionTypes": {
+        "ecommerce": "Pembelian online",
+        "ecommerceDescription": "Izinkan transaksi e-commerce",
+        "atm": "Penarikan ATM",
+        "atmDescription": "Izinkan penarikan tunai dari ATM",
+        "contactless": "Pembayaran tanpa kontak",
+        "contactlessDescription": "Izinkan transaksi tanpa kontak"
+      },
+      "title": "Batas kartu"
+    }
   }
 }

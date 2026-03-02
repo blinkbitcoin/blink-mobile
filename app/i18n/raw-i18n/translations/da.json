@@ -2960,6 +2960,31 @@
     },
     "validThruLabel": "GYLDIG TIL",
     "cardFrozenTitle": "Kort spærret",
-    "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret"
+    "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret",
+    "CardLimits": {
+      "currentLimitsTitle": "Nuværende grænser",
+      "dailySpending": "Dagligt forbrug",
+      "monthlySpending": "Månedligt forbrug",
+      "spendingLimitsTitle": "Forbrugsgrænser",
+      "dailyLimit": "Daglig grænse",
+      "dailyLimitHelper": "Maksimalt beløb du kan bruge om dagen",
+      "monthlyLimit": "Månedlige forbrugsgrænser",
+      "monthlyLimitHelper": "Maksimalt beløb du kan bruge om måneden",
+      "atmLimitsTitle": "Hævegrænser",
+      "dailyAtmLimit": "Daglige hæveautomatgrænser",
+      "dailyAtmLimitHelper": "Maksimal hævning om dagen",
+      "monthlyAtmLimit": "Månedlig hævegrænse",
+      "monthlyAtmLimitHelper": "Maksimal hævning om måneden",
+      "transactionTypesTitle": "Transaktionstyper",
+      "TransactionTypes": {
+        "ecommerce": "Online køb",
+        "ecommerceDescription": "Tillad online og e-handel transaktioner",
+        "atm": "Hævninger",
+        "atmDescription": "Tillad kontanthævninger fra hæveautomater",
+        "contactless": "Kontaktløse betalinger",
+        "contactlessDescription": "Tillad kontaktløse transaktioner"
+      },
+      "title": "Kortgrænser"
+    }
   }
 }

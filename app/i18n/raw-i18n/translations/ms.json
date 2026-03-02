@@ -2983,6 +2983,31 @@
     },
     "validThruLabel": "SAH SEHINGGA",
     "cardFrozenTitle": "Kad dibekukan",
-    "cardFrozenSubtitle": "Kad dinyahaktifkan sementara"
+    "cardFrozenSubtitle": "Kad dinyahaktifkan sementara",
+    "CardLimits": {
+      "currentLimitsTitle": "Had semasa",
+      "dailySpending": "Perbelanjaan harian",
+      "monthlySpending": "Perbelanjaan bulanan",
+      "spendingLimitsTitle": "Had perbelanjaan",
+      "dailyLimit": "Had harian",
+      "dailyLimitHelper": "Jumlah maksimum yang boleh anda belanjakan sehari",
+      "monthlyLimit": "Had perbelanjaan bulanan",
+      "monthlyLimitHelper": "Jumlah maksimum yang boleh anda belanjakan sebulan",
+      "atmLimitsTitle": "Had pengeluaran ATM",
+      "dailyAtmLimit": "Had ATM harian",
+      "dailyAtmLimitHelper": "Pengeluaran ATM maksimum sehari",
+      "monthlyAtmLimit": "Had ATM bulanan",
+      "monthlyAtmLimitHelper": "Pengeluaran ATM maksimum sebulan",
+      "transactionTypesTitle": "Jenis transaksi",
+      "TransactionTypes": {
+        "ecommerce": "Pembelian dalam talian",
+        "ecommerceDescription": "Benarkan transaksi e-dagang",
+        "atm": "Pengeluaran ATM",
+        "atmDescription": "Benarkan pengeluaran tunai dari ATM",
+        "contactless": "Pembayaran tanpa sentuh",
+        "contactlessDescription": "Benarkan transaksi tanpa sentuh"
+      },
+      "title": "Had kad"
+    }
   }
 }

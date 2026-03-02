@@ -2980,6 +2980,31 @@
     },
     "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
     "cardFrozenTitle": "Thẻ bị khóa",
-    "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa"
+    "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa",
+    "CardLimits": {
+      "currentLimitsTitle": "Hạn mức hiện tại",
+      "dailySpending": "Chi tiêu hàng ngày",
+      "monthlySpending": "Chi tiêu hàng tháng",
+      "spendingLimitsTitle": "Hạn mức chi tiêu",
+      "dailyLimit": "Hạn mức hàng ngày",
+      "dailyLimitHelper": "Số tiền tối đa bạn có thể chi tiêu mỗi ngày",
+      "monthlyLimit": "Giới hạn chi tiêu hàng tháng",
+      "monthlyLimitHelper": "Số tiền tối đa bạn có thể chi tiêu mỗi tháng",
+      "atmLimitsTitle": "Hạn mức rút ATM",
+      "dailyAtmLimit": "Giới hạn ATM hàng ngày",
+      "dailyAtmLimitHelper": "Rút ATM tối đa mỗi ngày",
+      "monthlyAtmLimit": "Hạn mức ATM hàng tháng",
+      "monthlyAtmLimitHelper": "Rút ATM tối đa mỗi tháng",
+      "transactionTypesTitle": "Loại giao dịch",
+      "TransactionTypes": {
+        "ecommerce": "Mua hàng trực tuyến",
+        "ecommerceDescription": "Cho phép giao dịch thương mại điện tử",
+        "atm": "Rút ATM",
+        "atmDescription": "Cho phép rút tiền mặt từ ATM",
+        "contactless": "Thanh toán không tiếp xúc",
+        "contactlessDescription": "Cho phép giao dịch không tiếp xúc"
+      },
+      "title": "Hạn mức thẻ"
+    }
   }
 }

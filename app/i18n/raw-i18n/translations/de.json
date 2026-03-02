@@ -2942,6 +2942,31 @@
         },
         "validThruLabel": "GÜLTIG BIS",
         "cardFrozenTitle": "Karte eingefroren",
-        "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert"
+        "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",
+        "CardLimits": {
+            "currentLimitsTitle": "Aktuelle Limits",
+            "dailySpending": "Tägliche Ausgaben",
+            "monthlySpending": "Monatliche Ausgaben",
+            "spendingLimitsTitle": "Ausgabenlimits",
+            "dailyLimit": "Tageslimit",
+            "dailyLimitHelper": "Maximaler Betrag, den Sie pro Tag ausgeben können",
+            "monthlyLimit": "Monatliche Ausgabenlimits",
+            "monthlyLimitHelper": "Maximaler Betrag, den Sie pro Monat ausgeben können",
+            "atmLimitsTitle": "Geldautomaten-Limits",
+            "dailyAtmLimit": "Tägliche Geldautomaten-Limits",
+            "dailyAtmLimitHelper": "Maximale Abhebung pro Tag",
+            "monthlyAtmLimit": "Monatliches Geldautomaten-Limit",
+            "monthlyAtmLimitHelper": "Maximale Abhebung pro Monat",
+            "transactionTypesTitle": "Transaktionsarten",
+            "TransactionTypes": {
+                "ecommerce": "Online-Einkäufe",
+                "ecommerceDescription": "Online- und E-Commerce-Transaktionen erlauben",
+                "atm": "Geldautomaten-Abhebungen",
+                "atmDescription": "Bargeldabhebungen an Geldautomaten erlauben",
+                "contactless": "Kontaktlose Zahlungen",
+                "contactlessDescription": "Kontaktlose Transaktionen erlauben"
+            },
+            "title": "Kartenlimits"
+        }
     }
 }
