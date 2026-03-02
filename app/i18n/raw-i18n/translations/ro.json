@@ -3046,6 +3046,19 @@
       "transactionHelpDescription": "Dacă nu recunoașteți această tranzacție sau aveți nevoie de asistență, contactați imediat {supportTeam}.",
       "supportTeam": "echipa noastră de suport",
       "transactionNotFound": "Tranzacția nu a fost găsită"
+    },
+    "PersonalDetails": {
+      "title": "Detalii personale",
+      "blinkVisaCardholder": "Deținător card Blink Visa",
+      "kycVerifiedInformation": "Informații KYC verificate",
+      "kycVerifiedDescription": "Numele, data nașterii și adresa dumneavoastră sunt verificate prin procesul nostru KYC. Puteți modifica informațiile refăcând procesul KYC. Nu garantăm aprobarea.",
+      "changeKycInformation": "Modifică informațiile KYC",
+      "firstName": "Prenume",
+      "lastName": "Nume de familie",
+      "dateOfBirth": "Data nașterii",
+      "contactInformation": "Informații de contact",
+      "registeredAddress": "Adresă înregistrată",
+      "shippingAddress": "Adresă de livrare"
     }
   }
 }

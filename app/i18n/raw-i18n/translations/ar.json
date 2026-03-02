@@ -3084,6 +3084,19 @@
       "transactionHelpDescription": "إذا لم تتعرف على هذه المعاملة أو تحتاج إلى مساعدة، اتصل ب{supportTeam} فوراً.",
       "supportTeam": "فريق الدعم لدينا",
       "transactionNotFound": "لم يتم العثور على المعاملة"
+    },
+    "PersonalDetails": {
+      "title": "البيانات الشخصية",
+      "blinkVisaCardholder": "حامل بطاقة Blink Visa",
+      "kycVerifiedInformation": "معلومات KYC موثقة",
+      "kycVerifiedDescription": "تم التحقق من اسمك وتاريخ ميلادك وعنوانك من خلال عملية KYC. يمكنك تغيير المعلومات بإعادة عملية KYC. لا نضمن الموافقة.",
+      "changeKycInformation": "تغيير معلومات KYC",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "dateOfBirth": "تاريخ الميلاد",
+      "contactInformation": "معلومات الاتصال",
+      "registeredAddress": "العنوان المسجل",
+      "shippingAddress": "عنوان الشحن"
     }
   }
 }

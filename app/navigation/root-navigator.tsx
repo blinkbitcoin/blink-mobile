@@ -91,6 +91,7 @@ import { NotificationHistoryScreen } from "@app/screens/notification-history-scr
 import {
   CardDetailsScreen,
   CardLimitsScreen,
+  CardPersonalDetailsScreen,
   CardSettingsScreen,
   CardStatementsScreen,
   CardTransactionDetailsScreen,
@@ -523,6 +524,11 @@ export const RootStack = () => {
         name="cardLimitsScreen"
         component={CardLimitsScreen}
         options={{ title: LL.CardFlow.CardLimits.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardPersonalDetailsScreen"
+        component={CardPersonalDetailsScreen}
+        options={{ title: LL.CardFlow.PersonalDetails.title() }}
       />
       <RootNavigator.Screen
         name="cardSettingsScreen"

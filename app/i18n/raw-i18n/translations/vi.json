@@ -3084,6 +3084,19 @@
       "transactionHelpDescription": "Nếu bạn không nhận ra giao dịch này hoặc cần hỗ trợ, hãy liên hệ ngay với {supportTeam}.",
       "supportTeam": "đội ngũ hỗ trợ của chúng tôi",
       "transactionNotFound": "Không tìm thấy giao dịch"
+    },
+    "PersonalDetails": {
+      "title": "Thông tin cá nhân",
+      "blinkVisaCardholder": "Chủ thẻ Blink Visa",
+      "kycVerifiedInformation": "Thông tin KYC đã xác minh",
+      "kycVerifiedDescription": "Tên, ngày sinh và địa chỉ của bạn đã được xác minh qua quy trình KYC của chúng tôi. Bạn có thể thay đổi thông tin bằng cách làm lại quy trình KYC. Chúng tôi không đảm bảo phê duyệt.",
+      "changeKycInformation": "Thay đổi thông tin KYC",
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "dateOfBirth": "Ngày sinh",
+      "contactInformation": "Thông tin liên hệ",
+      "registeredAddress": "Địa chỉ đăng ký",
+      "shippingAddress": "Địa chỉ giao hàng"
     }
   }
 }

@@ -3087,6 +3087,19 @@
       "transactionHelpDescription": "Yеtе chеq chanaचnum ays gortsarqy kam оgnutyun еq patrastum, anmijапеs kapvеq mеr {supportTeam} het.",
       "supportTeam": "ajakcman timi",
       "transactionNotFound": "Gortarqy chgtsnvets"
+    },
+    "PersonalDetails": {
+      "title": "Personal details",
+      "blinkVisaCardholder": "Blink Visa Cardholder",
+      "kycVerifiedInformation": "KYC verified information",
+      "kycVerifiedDescription": "Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.",
+      "changeKycInformation": "Change KYC information",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "dateOfBirth": "Date of birth",
+      "contactInformation": "Contact information",
+      "registeredAddress": "Registered address",
+      "shippingAddress": "Shipping address"
     }
   }
 }
