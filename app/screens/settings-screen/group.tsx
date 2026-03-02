@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleProp, ViewStyle } from "react-native"
+import { View, StyleProp, ViewStyle, TextStyle } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
@@ -9,6 +9,7 @@ type SettingsGroupProps = {
   items: React.FC[]
   containerStyle?: StyleProp<ViewStyle>
   dividerStyle?: StyleProp<ViewStyle>
+  titleStyle?: StyleProp<TextStyle>
 }
 
 export const SettingsGroup: React.FC<SettingsGroupProps> = ({
@@ -16,6 +17,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   items,
   containerStyle,
   dividerStyle,
+  titleStyle,
 }) => {
   const styles = useStyles()
   const {
@@ -27,7 +29,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   return (
     <View>
       {name && (
-        <Text {...testProps(name + "-group")} type="p2">
+        <Text {...testProps(name + "-group")} type="p2" style={titleStyle}>
           {name}
         </Text>
       )}

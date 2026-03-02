@@ -3002,6 +3002,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Δεν υπάρχουν ακόμα κινήσεις",
       "statementsCount": "{count} κινήσεις"
+    },
+    "CardSettings": {
+      "title": "Ρυθμίσεις κάρτας",
+      "personalDetails": "Προσωπικά στοιχεία",
+      "changePin": "Αλλαγή PIN",
+      "transactionAlerts": "Ειδοποιήσεις συναλλαγών",
+      "transactionAlertsDescription": "Λάβετε ειδοποιήσεις για όλες τις συναλλαγές",
+      "securityAlerts": "Ειδοποιήσεις ασφαλείας",
+      "securityAlertsDescription": "Λάβετε ειδοποιήσεις για δραστηριότητες ασφαλείας",
+      "marketingUpdates": "Ενημερώσεις μάρκετινγκ",
+      "marketingUpdatesDescription": "Ενημερώσεις προϊόντων και προσφορές",
+      "cardManagement": "Διαχείριση κάρτας",
+      "orderPhysicalCard": "Παραγγελία φυσικής κάρτας",
+      "addToGooglePay": "Προσθήκη στο Google Pay",
+      "replaceCard": "Αντικατάσταση κάρτας",
+      "termsAndConditions": "Όροι και προϋποθέσεις κάρτας",
+      "privacyPolicy": "Πολιτική απορρήτου κάρτας",
+      "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
+      "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας"
     }
   }
 }

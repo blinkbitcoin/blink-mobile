@@ -18,7 +18,6 @@ import Check from "@app/assets/icons-redesign/check.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
 import Close from "@app/assets/icons-redesign/close.svg"
 import Coins from "@app/assets/icons-redesign/coins.svg"
-import ContactSupport from "@app/assets/icons-redesign/contact-support.svg"
 import CopyPaste from "@app/assets/icons-redesign/copy-paste.svg"
 import Dollar from "@app/assets/icons-redesign/dollar.svg"
 import Download from "@app/assets/icons-redesign/download.svg"
@@ -73,6 +72,9 @@ import BookOpen from "@app/assets/icons-redesign/book-open.svg"
 import LockClosed from "@app/assets/icons-redesign/lock-closed.svg"
 import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
 import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
+import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
+import PrivacyPolicy from "@app/assets/icons-redesign/privacy-policy.svg"
+import Trash from "@app/assets/icons-redesign/trash.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -92,7 +94,6 @@ export const icons = {
   "close": Close,
   "close-cross-with-background": CloseCrossWithBackground,
   "coins": Coins,
-  "contact-support": ContactSupport,
   "people": People,
   "copy-paste": CopyPaste,
   "dollar": Dollar,
@@ -148,6 +149,9 @@ export const icons = {
   "lock-closed": LockClosed,
   "visa-platinum": VisaPlatinum,
   "blink-icon": BlinkIcon,
+  "physical-card": PhysicalCard,
+  "privacy-policy": PrivacyPolicy,
+  "trash": Trash,
 } as const
 
 export type IconNamesType = keyof typeof icons

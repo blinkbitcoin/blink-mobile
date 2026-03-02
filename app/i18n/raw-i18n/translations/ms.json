@@ -3043,6 +3043,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Tiada transaksi lagi",
       "statementsCount": "{count} transaksi"
+    },
+    "CardSettings": {
+      "title": "Tetapan kad",
+      "personalDetails": "Butiran peribadi",
+      "changePin": "Tukar PIN",
+      "transactionAlerts": "Amaran transaksi",
+      "transactionAlertsDescription": "Dapatkan pemberitahuan untuk semua transaksi",
+      "securityAlerts": "Amaran keselamatan",
+      "securityAlertsDescription": "Dapatkan pemberitahuan untuk aktiviti keselamatan",
+      "marketingUpdates": "Kemas kini pemasaran",
+      "marketingUpdatesDescription": "Kemas kini produk dan tawaran",
+      "cardManagement": "Pengurusan kad",
+      "orderPhysicalCard": "Pesan kad fizikal",
+      "addToGooglePay": "Tambah ke Google Pay",
+      "replaceCard": "Ganti kad",
+      "termsAndConditions": "Terma dan syarat kad",
+      "privacyPolicy": "Dasar privasi kad",
+      "closeCardAccount": "Tutup akaun kad",
+      "closeCardAccountDescription": "Tutup kad Visa anda secara kekal"
     }
   }
 }

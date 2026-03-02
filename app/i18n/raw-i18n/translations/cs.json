@@ -3043,6 +3043,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Zatím žádné pohyby",
       "statementsCount": "{count} pohybů"
+    },
+    "CardSettings": {
+      "title": "Nastavení karty",
+      "personalDetails": "Osobní údaje",
+      "changePin": "Změnit PIN",
+      "transactionAlerts": "Upozornění na transakce",
+      "transactionAlertsDescription": "Dostávejte oznámení o všech transakcích",
+      "securityAlerts": "Bezpečnostní upozornění",
+      "securityAlertsDescription": "Dostávejte oznámení o bezpečnostních aktivitách",
+      "marketingUpdates": "Marketingové aktualizace",
+      "marketingUpdatesDescription": "Aktualizace produktů a nabídky",
+      "cardManagement": "Správa karty",
+      "orderPhysicalCard": "Objednat fyzickou kartu",
+      "addToGooglePay": "Přidat do Google Pay",
+      "replaceCard": "Vyměnit kartu",
+      "termsAndConditions": "Podmínky karty",
+      "privacyPolicy": "Zásady ochrany osobních údajů karty",
+      "closeCardAccount": "Zrušit účet karty",
+      "closeCardAccountDescription": "Trvale zrušte svou kartu Visa"
     }
   }
 }

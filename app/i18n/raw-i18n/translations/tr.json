@@ -3002,6 +3002,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Henüz hareket yok",
       "statementsCount": "{count} hareket"
+    },
+    "CardSettings": {
+      "title": "Kart ayarları",
+      "personalDetails": "Kişisel bilgiler",
+      "changePin": "PIN değiştir",
+      "transactionAlerts": "İşlem uyarıları",
+      "transactionAlertsDescription": "Tüm işlemler için bildirim al",
+      "securityAlerts": "Güvenlik uyarıları",
+      "securityAlertsDescription": "Güvenlik aktiviteleri için bildirim al",
+      "marketingUpdates": "Pazarlama güncellemeleri",
+      "marketingUpdatesDescription": "Ürün güncellemeleri ve teklifler",
+      "cardManagement": "Kart yönetimi",
+      "orderPhysicalCard": "Fiziksel kart sipariş et",
+      "addToGooglePay": "Google Pay e ekle",
+      "replaceCard": "Kartı değiştir",
+      "termsAndConditions": "Kart şartları ve koşulları",
+      "privacyPolicy": "Kart gizlilik politikası",
+      "closeCardAccount": "Kart hesabını kapat",
+      "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın"
     }
   }
 }

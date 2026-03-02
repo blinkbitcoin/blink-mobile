@@ -4,10 +4,10 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { StatementItem, SwitchRow } from "@app/components/card-screen"
-import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { YearSelector } from "@app/components/year-selector"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { ContactSupportRow, StatementItem, SwitchRow } from "@app/components/card-screen"
+
+import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import {
@@ -22,7 +22,6 @@ export const CardStatementsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { feedbackEmailAddress } = useRemoteConfig()
 
   const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
@@ -168,19 +167,10 @@ export const CardStatementsScreen: React.FC = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.support()}</Text>
-          <TouchableOpacity
-            style={styles.supportCard}
+          <ContactSupportRow
             onPress={handleContactSupport}
-            accessibilityRole="button"
-            accessibilityLabel={LL.AppUpdate.contactSupport()}
-          >
-            <GaloyIcon name="contact-support" size={16} color={colors.black} />
-            <View style={styles.supportInfo}>
-              <Text style={styles.supportTitle}>{LL.AppUpdate.contactSupport()}</Text>
-              <Text style={styles.supportEmail}>{feedbackEmailAddress}</Text>
-            </View>
-            <GaloyIcon name="caret-right" size={16} color={colors.black} />
-          </TouchableOpacity>
+            rightIconColor={colors.black}
+          />
         </View>
       </View>
     </Screen>
@@ -289,31 +279,5 @@ const useStyles = makeStyles(({ colors }) => ({
   settingsGroupContainer: {
     marginTop: 0,
     borderRadius: 8,
-  },
-  supportCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    gap: 14,
-  },
-  supportInfo: {
-    flex: 1,
-  },
-  supportTitle: {
-    color: colors.black,
-    fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
-    lineHeight: 20,
-  },
-  supportEmail: {
-    color: colors.grey2,
-    fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
-    lineHeight: 20,
   },
 }))

@@ -3020,6 +3020,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Ingen bevægelser endnu",
       "statementsCount": "{count} bevægelser"
+    },
+    "CardSettings": {
+      "title": "Kortindstillinger",
+      "personalDetails": "Personlige oplysninger",
+      "changePin": "Skift PIN",
+      "transactionAlerts": "Transaktionsadvarsler",
+      "transactionAlertsDescription": "Få besked om alle transaktioner",
+      "securityAlerts": "Sikkerhedsadvarsler",
+      "securityAlertsDescription": "Få besked om sikkerhedsrelaterede aktiviteter",
+      "marketingUpdates": "Marketingopdateringer",
+      "marketingUpdatesDescription": "Produktopdateringer og tilbud",
+      "cardManagement": "Kortstyring",
+      "orderPhysicalCard": "Bestil fysisk kort",
+      "addToGooglePay": "Tilføj til Google Pay",
+      "replaceCard": "Udskift kort",
+      "termsAndConditions": "Kortvilkår og betingelser",
+      "privacyPolicy": "Kortets privatlivspolitik",
+      "closeCardAccount": "Luk kortkonto",
+      "closeCardAccountDescription": "Luk dit Visa-kort permanent"
     }
   }
 }

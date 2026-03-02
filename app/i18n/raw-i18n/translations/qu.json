@@ -3040,6 +3040,25 @@
       "notifyNewStatements": "Notify me when new statements are made available",
       "noStatements": "Manaraq kuyuykuna kanchu",
       "statementsCount": "{count} kuyuykuna"
+    },
+    "CardSettings": {
+      "title": "Tarjeta wakichiy",
+      "personalDetails": "Kikin willakuykuna",
+      "changePin": "PIN tikray",
+      "transactionAlerts": "Kuyuy yuyarichiy",
+      "transactionAlertsDescription": "Tukuy kuyuykunamanta willakuykunata chaskiy",
+      "securityAlerts": "Waqaychay yuyarichiy",
+      "securityAlertsDescription": "Waqaychay ruwaykunamanta willakuykunata chaskiy",
+      "marketingUpdates": "Rantikuy musuqyachiykuna",
+      "marketingUpdatesDescription": "Rurukuna musuqyachiy qukuykuna",
+      "cardManagement": "Tarjeta kamachiykuna",
+      "orderPhysicalCard": "Tarjeta kikinta mañay",
+      "addToGooglePay": "Google Pay-man yapay",
+      "replaceCard": "Tarjeta tikray",
+      "termsAndConditions": "Tarjeta kamachiykuna",
+      "privacyPolicy": "Tarjeta pakasqa kamachiy",
+      "closeCardAccount": "Tarjeta kuntata wisqay",
+      "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay"
     }
   }
 }
