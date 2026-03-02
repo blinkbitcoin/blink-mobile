@@ -2940,5 +2940,26 @@
   "NotificationHistory": {
     "title": "Notifikationer",
     "noNotifications": "Du har ingen notifikationer lige nu"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Afventer",
+      "completed": "Fuldført"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detaljer",
+        "freeze": "Spær",
+        "setLimits": "Grænser",
+        "statements": "Bevægelser"
+      },
+      "emptyTransactions": "Ingen transaktioner endnu",
+      "addFunds": "Tilføj midler",
+      "transactionsTitle": "Transaktioner",
+      "title": "Visa-kort"
+    },
+    "validThruLabel": "GYLDIG TIL",
+    "cardFrozenTitle": "Kort spærret",
+    "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret"
   }
 }

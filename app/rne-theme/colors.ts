@@ -11,6 +11,8 @@ const light = {
   _orange: "#FF7e1c",
   _sky: "#C3CCFF",
   _green: "#00A700",
+  _primary1: "#FFBE0B",
+  _primary2: "#FB5607",
 
   // adjusted
   white: "#FFFFFF",
@@ -60,6 +62,8 @@ const dark = {
   _orange: "#FF7e1c",
   _sky: "#C3CCFF",
   _green: "#00A700",
+  _primary1: "#FFBE0B",
+  _primary2: "#FB5607",
 
   // adjusted
   white: "#000000",

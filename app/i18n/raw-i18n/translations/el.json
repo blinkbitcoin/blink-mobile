@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Ειδοποιήσεις",
     "noNotifications": "Δεν έχετε καμία ειδοποίηση αυτή τη στιγμή"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Σε αναμονή",
+      "completed": "Ολοκληρώθηκε"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Λεπτομέρειες",
+        "freeze": "Πάγωμα",
+        "setLimits": "Όρια",
+        "statements": "Κινήσεις"
+      },
+      "emptyTransactions": "Δεν υπάρχουν συναλλαγές ακόμη",
+      "addFunds": "Προσθήκη χρημάτων",
+      "transactionsTitle": "Συναλλαγές",
+      "title": "Κάρτα Visa"
+    },
+    "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
+    "cardFrozenTitle": "Κάρτα παγωμένη",
+    "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη"
   }
 }

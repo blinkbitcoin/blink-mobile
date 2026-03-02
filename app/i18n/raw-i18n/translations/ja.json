@@ -2963,5 +2963,26 @@
     },
     "Fake": {
         "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "保留中",
+            "completed": "完了"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "詳細",
+                "freeze": "凍結",
+                "setLimits": "限度額",
+                "statements": "明細"
+            },
+            "emptyTransactions": "取引はまだありません",
+            "addFunds": "入金",
+            "transactionsTitle": "取引",
+            "title": "Visaカード"
+        },
+        "validThruLabel": "有効期限",
+        "cardFrozenTitle": "カードが凍結されました",
+        "cardFrozenSubtitle": "カードは一時的に無効になっています"
     }
 }

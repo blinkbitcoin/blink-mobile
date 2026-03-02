@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Notifikasi",
     "noNotifications": "Anda tidak memiliki notifikasi saat ini"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Tertunda",
+      "completed": "Selesai"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detail",
+        "freeze": "Bekukan",
+        "setLimits": "Batas",
+        "statements": "Mutasi"
+      },
+      "emptyTransactions": "Belum ada transaksi",
+      "addFunds": "Tambah dana",
+      "transactionsTitle": "Transaksi",
+      "title": "Kartu Visa"
+    },
+    "validThruLabel": "BERLAKU HINGGA",
+    "cardFrozenTitle": "Kartu dibekukan",
+    "cardFrozenSubtitle": "Kartu dinonaktifkan sementara"
   }
 }

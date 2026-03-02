@@ -2922,5 +2922,26 @@
   "NotificationHistory": {
     "title": "Notifikácie",
     "noNotifications": "Momentálne nemáte žiadne upozornenia"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Čaká",
+      "completed": "Dokončené"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Podrobnosti",
+        "freeze": "Zmraziť",
+        "setLimits": "Limity",
+        "statements": "Pohyby"
+      },
+      "emptyTransactions": "Zatiaľ žiadne transakcie",
+      "addFunds": "Pridať prostriedky",
+      "transactionsTitle": "Transakcie",
+      "title": "Karta Visa"
+    },
+    "validThruLabel": "PLATNÉ DO",
+    "cardFrozenTitle": "Karta zmrazená",
+    "cardFrozenSubtitle": "Karta je dočasne deaktivovaná"
   }
 }

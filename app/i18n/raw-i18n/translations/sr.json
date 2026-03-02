@@ -2960,5 +2960,26 @@
   "NotificationHistory": {
     "title": "Обавештења",
     "noNotifications": "Тренутно немате обавештења"
+  },
+  "CardFlow": {
+    "TransactionStatus": {
+      "pending": "Na čekanju",
+      "completed": "Završeno"
+    },
+    "CardDashboard": {
+      "Actions": {
+        "details": "Detalji",
+        "freeze": "Zamrzni",
+        "setLimits": "Лимити",
+        "statements": "Промет"
+      },
+      "emptyTransactions": "Još nema transakcija",
+      "addFunds": "Dodaj sredstva",
+      "transactionsTitle": "Transakcije",
+      "title": "Visa kartica"
+    },
+    "validThruLabel": "VAŽI DO",
+    "cardFrozenTitle": "Kartica zamrznuta",
+    "cardFrozenSubtitle": "Kartica je privremeno onemogućena"
   }
 }
