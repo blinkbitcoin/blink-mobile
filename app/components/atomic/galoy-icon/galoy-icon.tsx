@@ -77,6 +77,8 @@ import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
 import PrivacyPolicy from "@app/assets/icons-redesign/privacy-policy.svg"
 import Trash from "@app/assets/icons-redesign/trash.svg"
+import GooglePay from "@app/assets/icons/google-pay.svg"
+import ApplePay from "@app/assets/icons/apple-pay.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -156,6 +158,8 @@ export const icons = {
   "physical-card": PhysicalCard,
   "privacy-policy": PrivacyPolicy,
   "trash": Trash,
+  "google-pay": GooglePay,
+  "apple-pay": ApplePay,
 } as const
 
 export type IconNamesType = keyof typeof icons
