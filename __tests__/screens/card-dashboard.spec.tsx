@@ -73,6 +73,7 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
 describe("CardDashboardScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockNavigate.mockClear()
   })
 
   describe("rendering", () => {
@@ -324,8 +325,6 @@ describe("CardDashboardScreen", () => {
 
   describe("action buttons interaction", () => {
     it("allows pressing details button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -339,13 +338,10 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(detailsButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Details pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardDetailsScreen")
     })
 
     it("allows pressing set limits button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -359,8 +355,7 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(setLimitsButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Set limits pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("cardLimitsScreen")
     })
 
     it("allows pressing statements button", async () => {

@@ -2491,8 +2491,7 @@
     "receivingAccount": "Račun primatelj",
     "sendingAccount": "Račun pošiljatelj",
     "txNotBroadcast": "Vaša transakcija trenutno je na čekanju i bit će emitirana na Bitcoin mrežu za koji trenutak.",
-    "momentarily": "uskoro",
-    "hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik"
+    "momentarily": "uskoro"
   },
   "TransactionLimitsScreen": {
     "receive": "Primi",
@@ -2788,7 +2787,8 @@
     "some": "Neki",
     "support": "Podrška",
     "profiles": "Profili",
-    "paste": "Zalijepi"
+    "paste": "Zalijepi",
+    "hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik"
   },
   "errors": {
     "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",
@@ -3008,6 +3008,23 @@
         "contactlessDescription": "Dopusti beskontaktne transakcije"
       },
       "title": "Ograničenja kartice"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

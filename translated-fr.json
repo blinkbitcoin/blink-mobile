@@ -189,7 +189,7 @@
   "ThemeScreen.setToDark": "Mode sombre",
   "ThemeScreen.setToLight": "Mode clair",
   "TotpRegistrationInitiateScreen.secret": "Secret/sauvegarde",
-  "TransactionDetailScreen.hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers",
+  "common.hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers",
   "TransactionDetailScreen.momentarily": "dans un instant",
   "TransactionDetailScreen.sending": "Envoi en cours",
   "UpgradeAccountModal.notNow": "Pas maintenant",

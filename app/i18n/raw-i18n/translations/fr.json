@@ -2491,8 +2491,7 @@
         "receivingAccount": "Compte destinataire",
         "sendingAccount": "Compte expéditeur",
         "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment.",
-        "momentarily": "dans un instant",
-        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
+        "momentarily": "dans un instant"
     },
     "TransactionLimitsScreen": {
         "receive": "Recevoir",
@@ -2788,7 +2787,8 @@
         "some": "Quelques",
         "support": "Support",
         "profiles": "Profils",
-        "paste": "Coller"
+        "paste": "Coller",
+        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
@@ -2984,6 +2984,23 @@
         "validThruLabel": "VALIDE JUSQU’À",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Limites actuelles",
             "dailySpending": "Dépenses quotidiennes",

@@ -1,3 +1,4 @@
+export * from "./use-clipboard"
 export * from "./use-geetest-captcha"
 export * from "./use-save-session-profile"
 export * from "./use-price-conversion"

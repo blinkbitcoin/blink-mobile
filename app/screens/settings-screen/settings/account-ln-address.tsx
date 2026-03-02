@@ -1,15 +1,13 @@
 import React, { useState } from "react"
+import { useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 
 import { SettingsRow } from "../row"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useTheme } from "@rn-vui/themed"
 
 export const AccountLNAddress: React.FC = () => {
   const { appConfig } = useAppConfig()
@@ -24,6 +22,7 @@ export const AccountLNAddress: React.FC = () => {
   const { data, loading } = useSettingsScreenQuery()
 
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
 
   const hasUsername = Boolean(data?.me?.username)
   const lnAddress = `${data?.me?.username}@${hostName}`
@@ -42,12 +41,9 @@ export const AccountLNAddress: React.FC = () => {
         }
         action={() => {
           if (hasUsername) {
-            Clipboard.setString(lnAddress)
-            toastShow({
-              type: "success",
-              message: (translations) =>
-                translations.GaloyAddressScreen.copiedLightningAddressToClipboard(),
-              LL,
+            copyToClipboard({
+              content: lnAddress,
+              message: LL.GaloyAddressScreen.copiedLightningAddressToClipboard(),
             })
           } else {
             toggleModalVisibility()

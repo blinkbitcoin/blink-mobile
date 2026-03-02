@@ -2474,8 +2474,7 @@
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
     "txNotBroadcast": "Transaksi Anda sedang antri. Itu akan muncul di mempool {countdown: string}.",
-    "momentarily": "sebentar lagi",
-    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip"
+    "momentarily": "sebentar lagi"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",
@@ -2771,7 +2770,8 @@
     "some": "Sebagian",
     "support": "Dukungan",
     "profiles": "Profil",
-    "paste": "Tempel"
+    "paste": "Tempel",
+    "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip"
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -2967,6 +2967,23 @@
         "contactlessDescription": "Izinkan transaksi tanpa kontak"
       },
       "title": "Batas kartu"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

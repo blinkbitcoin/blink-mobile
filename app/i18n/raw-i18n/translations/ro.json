@@ -2474,8 +2474,7 @@
     "receivingAccount": "Cont de primire",
     "sendingAccount": "Cont de trimitere",
     "txNotBroadcast": "Tranzacția dvs. este în așteptare. Ar trebui să apară în mempool {countdown: string}.",
-    "momentarily": "momentan",
-    "hasBeenCopiedToClipboard": "{type: string} a fost copiat în clipboard"
+    "momentarily": "momentan"
   },
   "TransactionLimitsScreen": {
     "receive": "Primește",
@@ -2771,7 +2770,8 @@
     "some": "Unele",
     "support": "Suport",
     "profiles": "Profiluri",
-    "paste": "Lipire"
+    "paste": "Lipire",
+    "hasBeenCopiedToClipboard": "{type: string} a fost copiat în clipboard"
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -2967,6 +2967,23 @@
         "contactlessDescription": "Permite tranzacții fără contact"
       },
       "title": "Limite card"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

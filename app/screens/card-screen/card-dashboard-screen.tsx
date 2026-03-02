@@ -7,7 +7,6 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { BlinkCard } from "@app/components/blink-card"
-
 import {
   CardActionButtons,
   CardBalanceSection,
@@ -60,9 +59,9 @@ export const CardDashboardScreen: React.FC = () => {
 
         <CardActionButtons
           isFrozen={isFrozen}
-          onDetails={() => console.log("Details pressed")}
+          onDetails={() => navigation.navigate("cardDetailsScreen")}
           onFreeze={() => setIsFrozen((prev) => !prev)}
-          onSetLimits={() => console.log("Set limits pressed")}
+          onSetLimits={() => navigation.navigate("cardLimitsScreen")}
           onStatements={() => console.log("Statements pressed")}
         />
 

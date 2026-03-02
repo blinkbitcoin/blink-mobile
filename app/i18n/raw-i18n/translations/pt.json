@@ -2474,8 +2474,7 @@
         "receivingAccount": "Conta de Recebimento",
         "sendingAccount": "Conta de Envio",
         "txNotBroadcast": "Sua transação está na fila. Deve aparecer na mempool {countdown: string}.",
-        "momentarily": "momentaneamente",
-        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
+        "momentarily": "momentaneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",
@@ -2771,7 +2770,8 @@
         "some": "Alguns",
         "support": "Suporte",
         "profiles": "Perfis",
-        "paste": "Colar"
+        "paste": "Colar",
+        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",
@@ -2943,6 +2943,23 @@
         "validThruLabel": "VÁLIDO ATÉ",
         "cardFrozenTitle": "Cartão congelado",
         "cardFrozenSubtitle": "O cartão está temporariamente desativado",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Limites atuais",
             "dailySpending": "Gasto diário",

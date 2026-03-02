@@ -2474,8 +2474,7 @@
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
     "txNotBroadcast": "Muamala wako umeorodheshwa. Unapaswa kuonekana kwenye mempool {countdown: string}.",
-    "momentarily": "muda mfupi",
-    "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili"
+    "momentarily": "muda mfupi"
   },
   "TransactionLimitsScreen": {
     "receive": "Pokea",
@@ -2771,7 +2770,8 @@
     "some": "Baadhi",
     "support": "Msaada",
     "profiles": "Wasifu",
-    "paste": "Bandika"
+    "paste": "Bandika",
+    "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili"
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -2967,6 +2967,23 @@
         "contactlessDescription": "Ruhusu miamala bila kugusa"
       },
       "title": "Vipimo vya kadi"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }

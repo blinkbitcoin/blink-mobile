@@ -8019,11 +8019,6 @@ type RootTranslation = {
 		 * m​o​m​e​n​t​a​r​i​l​y
 		 */
 		momentarily: string
-		/**
-		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
-		 * @param {string} type
-		 */
-		hasBeenCopiedToClipboard: RequiredParams<'type'>
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -9082,6 +9077,15 @@ type RootTranslation = {
 		 * P​a​s​t​e
 		 */
 		paste: string
+		/**
+		 * C​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copied: string
+		/**
+		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 * @param {string} type
+		 */
+		hasBeenCopiedToClipboard: RequiredParams<'type'>
 	}
 	errors: {
 		/**
@@ -9683,6 +9687,68 @@ type RootTranslation = {
 			 * N​o​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​y​e​t
 			 */
 			emptyTransactions: string
+		}
+		CardDetails: {
+			/**
+			 * C​a​r​d​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * C​a​r​d​ ​n​u​m​b​e​r
+			 */
+			cardNumber: string
+			/**
+			 * E​x​p​i​r​y​ ​d​a​t​e
+			 */
+			expiryDate: string
+			/**
+			 * C​V​V
+			 */
+			cvv: string
+			/**
+			 * C​a​r​d​h​o​l​d​e​r​ ​n​a​m​e
+			 */
+			cardholderName: string
+			/**
+			 * C​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			cardInformation: string
+			/**
+			 * C​a​r​d​ ​t​y​p​e
+			 */
+			cardType: string
+			/**
+			 * S​t​a​t​u​s
+			 */
+			status: string
+			/**
+			 * A​c​t​i​v​e
+			 */
+			statusActive: string
+			/**
+			 * F​r​o​z​e​n
+			 */
+			statusFrozen: string
+			/**
+			 * I​n​a​c​t​i​v​e
+			 */
+			statusInactive: string
+			/**
+			 * I​s​s​u​e​d
+			 */
+			issued: string
+			/**
+			 * N​e​t​w​o​r​k
+			 */
+			network: string
+			/**
+			 * K​e​e​p​ ​y​o​u​r​ ​d​e​t​a​i​l​s​ ​s​a​f​e
+			 */
+			keepDetailsSafe: string
+			/**
+			 * N​e​v​e​r​ ​s​h​a​r​e​ ​y​o​u​r​ ​c​a​r​d​ ​d​e​t​a​i​l​s​ ​w​i​t​h​ ​a​n​y​o​n​e​.​ ​B​l​i​n​k​ ​w​i​l​l​ ​n​e​v​e​r​ ​a​s​k​ ​f​o​r​ ​y​o​u​r​ ​c​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​.
+			 */
+			securityWarning: string
 		}
 		CardLimits: {
 			/**
@@ -17709,10 +17775,6 @@ export type TranslationFunctions = {
 		 * momentarily
 		 */
 		momentarily: () => LocalizedString
-		/**
-		 * {type} has been copied to clipboard
-		 */
-		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -18755,6 +18817,14 @@ export type TranslationFunctions = {
 		 * Paste
 		 */
 		paste: () => LocalizedString
+		/**
+		 * Copied to clipboard
+		 */
+		copied: () => LocalizedString
+		/**
+		 * {type} has been copied to clipboard
+		 */
+		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
 	}
 	errors: {
 		/**
@@ -19335,6 +19405,68 @@ export type TranslationFunctions = {
 			 * No transactions yet
 			 */
 			emptyTransactions: () => LocalizedString
+		}
+		CardDetails: {
+			/**
+			 * Card details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Card number
+			 */
+			cardNumber: () => LocalizedString
+			/**
+			 * Expiry date
+			 */
+			expiryDate: () => LocalizedString
+			/**
+			 * CVV
+			 */
+			cvv: () => LocalizedString
+			/**
+			 * Cardholder name
+			 */
+			cardholderName: () => LocalizedString
+			/**
+			 * Card information
+			 */
+			cardInformation: () => LocalizedString
+			/**
+			 * Card type
+			 */
+			cardType: () => LocalizedString
+			/**
+			 * Status
+			 */
+			status: () => LocalizedString
+			/**
+			 * Active
+			 */
+			statusActive: () => LocalizedString
+			/**
+			 * Frozen
+			 */
+			statusFrozen: () => LocalizedString
+			/**
+			 * Inactive
+			 */
+			statusInactive: () => LocalizedString
+			/**
+			 * Issued
+			 */
+			issued: () => LocalizedString
+			/**
+			 * Network
+			 */
+			network: () => LocalizedString
+			/**
+			 * Keep your details safe
+			 */
+			keepDetailsSafe: () => LocalizedString
+			/**
+			 * Never share your card details with anyone. Blink will never ask for your card information via email or phone.
+			 */
+			securityWarning: () => LocalizedString
 		}
 		CardLimits: {
 			/**

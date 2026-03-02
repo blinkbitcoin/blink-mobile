@@ -2473,8 +2473,7 @@
         "receivingAccount": "Cuenta receptora",
         "sendingAccount": "Cuenta de envio",
         "txNotBroadcast": "Tu transacción está en cola. Debería aparecer en la Mempool en {countdown: string}.",
-        "momentarily": "momentáneamente",
-        "hasBeenCopiedToClipboard": "{type: string}  se ha copiado al portapapeles"
+        "momentarily": "momentáneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Recibir",
@@ -2770,7 +2769,9 @@
         "paste": "Pegar",
         "some": "Algunos",
         "support": "Soporte",
-        "blinkToBlink": "Blink a Blink"
+        "blinkToBlink": "Blink a Blink",
+        "copied": "Copied to clipboard",
+        "hasBeenCopiedToClipboard": "{type: string} se ha copiado al portapapeles"
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -2942,6 +2943,23 @@
         "validThruLabel": "VÁLIDO HASTA",
         "cardFrozenTitle": "Tarjeta congelada",
         "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
         "CardLimits": {
             "currentLimitsTitle": "Límites actuales",
             "dailySpending": "Gasto diario",

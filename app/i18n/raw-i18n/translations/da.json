@@ -2477,8 +2477,7 @@
     "receivingAccount": "Modtagelseskonto",
     "sendingAccount": "Afsendelseskonto",
     "txNotBroadcast": "Din transaktion er i kø. Den bør vises i mempoolen om {countdown: string}.",
-    "momentarily": "Et øjeblik",
-    "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen"
+    "momentarily": "Et øjeblik"
   },
   "TransactionLimitsScreen": {
     "receive": "Modtag",
@@ -2774,7 +2773,8 @@
     "some": "Nogle",
     "support": "Support",
     "profiles": "Profiler",
-    "paste": "Indsæt"
+    "paste": "Indsæt",
+    "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen"
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",
@@ -2985,6 +2985,23 @@
         "contactlessDescription": "Tillad kontaktløse transaktioner"
       },
       "title": "Kortgrænser"
+    },
+    "CardDetails": {
+      "title": "Card details",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder name",
+      "cardInformation": "Card information",
+      "cardType": "Card type",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusFrozen": "Frozen",
+      "statusInactive": "Inactive",
+      "issued": "Issued",
+      "network": "Network",
+      "keepDetailsSafe": "Keep your details safe",
+      "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
     }
   }
 }
