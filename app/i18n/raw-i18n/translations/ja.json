@@ -3114,6 +3114,19 @@
                 "noPhysicalCard": "物理カードを持ち歩く必要なし",
                 "worksLocked": "電話がロックされていても動作"
             }
+        },
+        "CardStatus": {
+            "title": "Visaカード",
+            "CardApproved": {
+                "title": "おめでとうございます！",
+                "subtitle": "Blink Visaカードが有効化されました。",
+                "buttonLabel": "物理カードを注文"
+            },
+            "PhysicalCardOrdered": {
+                "title": "物理カードは配送中です！",
+                "subtitle": "Blinkカードの配送注文が送信されました。",
+                "buttonLabel": "PINを作成"
+            }
         }
     }
 }

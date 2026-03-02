@@ -3073,6 +3073,19 @@
         "noPhysicalCard": "Den chreiazeste ti fysiki karta",
         "worksLocked": "Leitoyrgei akoma kai otan to tilefono einai kleidomeno"
       }
+    },
+    "CardStatus": {
+      "title": "Κάρτα Visa",
+      "CardApproved": {
+        "title": "Συγχαρητήρια!",
+        "subtitle": "Η κάρτα Blink Visa σας έχει ενεργοποιηθεί.",
+        "buttonLabel": "Παραγγελία φυσικής κάρτας"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Η φυσική σας κάρτα είναι καθ' οδόν!",
+        "subtitle": "Η παραγγελία για παράδοση της κάρτας Blink σας έχει υποβληθεί.",
+        "buttonLabel": "Δημιουργία PIN"
+      }
     }
   }
 }

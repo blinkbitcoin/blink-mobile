@@ -3114,6 +3114,19 @@
                 "noPhysicalCard": "Pas besoin de transporter votre carte physique",
                 "worksLocked": "Fonctionne même lorsque votre téléphone est verrouillé"
             }
+        },
+        "CardStatus": {
+            "title": "Carte Visa",
+            "CardApproved": {
+                "title": "Félicitations !",
+                "subtitle": "Votre carte Blink Visa a été activée.",
+                "buttonLabel": "Commander une carte physique"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Votre carte physique est en route !",
+                "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
+                "buttonLabel": "Créer un code PIN"
+            }
         }
     }
 }

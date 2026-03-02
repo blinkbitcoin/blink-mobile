@@ -3114,6 +3114,19 @@
         "noPhysicalCard": "Tidak perlu membawa kad fizikal",
         "worksLocked": "Berfungsi walaupun telefon dikunci"
       }
+    },
+    "CardStatus": {
+      "title": "Kad Visa",
+      "CardApproved": {
+        "title": "Tahniah!",
+        "subtitle": "Kad Blink Visa anda telah diaktifkan.",
+        "buttonLabel": "Pesan kad fizikal"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Kad fizikal anda sedang dalam perjalanan!",
+        "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
+        "buttonLabel": "Cipta PIN"
+      }
     }
   }
 }

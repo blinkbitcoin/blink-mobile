@@ -3091,6 +3091,19 @@
         "noPhysicalCard": "Intet behov for at baere dit fysiske kort",
         "worksLocked": "Virker selv nar din telefon er last"
       }
+    },
+    "CardStatus": {
+      "title": "Visa-kort",
+      "CardApproved": {
+        "title": "Tillykke!",
+        "subtitle": "Dit Blink Visa-kort er blevet aktiveret.",
+        "buttonLabel": "Bestil fysisk kort"
+      },
+      "PhysicalCardOrdered": {
+        "title": "Dit fysiske kort er på vej!",
+        "subtitle": "Bestilling af levering af dit Blink-kort er blevet indsendt.",
+        "buttonLabel": "Opret PIN"
+      }
     }
   }
 }
