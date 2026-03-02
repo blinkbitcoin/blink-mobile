@@ -3102,6 +3102,39 @@
       "noPOBoxes": "A kártyák nem kézbesíthetők postafiókokba",
       "signatureRequired": "Aláírás szükséges lehet a kézbesítéskor",
       "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Új PIN megerősítése",
+        "confirmPinSubtitle": "Kérjük, adja meg újra az új 4 számjegyű PIN kódját a folytatáshoz.",
+        "incorrectPin": "Helytelen PIN. Kérjük, próbálja újra.",
+        "pinMismatch": "A PIN-kódok nem egyeznek. Írja be újra a megerősítéshez, vagy lépjen vissza a PIN megváltoztatásához."
+      },
+      "CreateFlow": {
+        "title": "PIN létrehozása",
+        "steps": {
+          "setPin": "PIN beállítása",
+          "confirm": "Megerősítés"
+        },
+        "enterYourPin": "Adja meg a PIN kódját",
+        "enterPinSubtitle": "Kérjük, adjon meg egy 4 számjegyű PIN kódot a folytatáshoz.",
+        "pinCreatedToast": "A PIN-kód sikeresen létrehozva"
+      },
+      "ChangeFlow": {
+        "title": "PIN megváltoztatása",
+        "steps": {
+          "currentPin": "Jelenlegi PIN",
+          "newPin": "Új PIN",
+          "confirm": "Megerősítés"
+        },
+        "enterCurrentPin": "Adja meg a jelenlegi PIN kódot",
+        "enterCurrentPinSubtitle": "Kérjük, adja meg a jelenlegi 4 számjegyű PIN kódját a folytatáshoz.",
+        "enterNewPin": "Adja meg az új PIN kódot",
+        "enterNewPinSubtitle": "Kérjük, adja meg az új 4 számjegyű PIN kódját.",
+        "pinChangedTitle": "PIN megváltoztatva",
+        "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
+        "pinChangedToast": "A PIN-kód sikeresen módosítva"
+      }
     }
   }
 }

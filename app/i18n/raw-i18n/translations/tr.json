@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
       "signatureRequired": "Teslimatta imza gerekebilir",
       "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Yeni PIN'i onayla",
+        "confirmPinSubtitle": "Devam etmek için lütfen yeni 4 haneli PIN'inizi tekrar girin.",
+        "incorrectPin": "Yanlış PIN. Lütfen tekrar deneyin.",
+        "pinMismatch": "PIN'ler eşleşmiyor. Onaylamak için tekrar girin veya PIN'inizi değiştirmek için geri dönün."
+      },
+      "CreateFlow": {
+        "title": "PIN oluştur",
+        "steps": {
+          "setPin": "PIN belirle",
+          "confirm": "Onayla"
+        },
+        "enterYourPin": "PIN'inizi girin",
+        "enterPinSubtitle": "Devam etmek için lütfen 4 haneli bir PIN girin.",
+        "pinCreatedToast": "PIN başarıyla oluşturuldu"
+      },
+      "ChangeFlow": {
+        "title": "PIN değiştir",
+        "steps": {
+          "currentPin": "Mevcut PIN",
+          "newPin": "Yeni PIN",
+          "confirm": "Onayla"
+        },
+        "enterCurrentPin": "Mevcut PIN'i girin",
+        "enterCurrentPinSubtitle": "Devam etmek için lütfen mevcut 4 haneli PIN'inizi girin.",
+        "enterNewPin": "Yeni PIN'i girin",
+        "enterNewPinSubtitle": "Lütfen yeni 4 haneli PIN'inizi girin.",
+        "pinChangedTitle": "PIN değiştirildi",
+        "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
+        "pinChangedToast": "PIN başarıyla değiştirildi"
+      }
     }
   }
 }

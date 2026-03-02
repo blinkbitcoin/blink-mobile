@@ -10255,6 +10255,102 @@ type RootTranslation = {
 			 */
 			transactionNotFound: string
 		}
+		PinScreens: {
+			common: {
+				/**
+				 * C​o​n​f​i​r​m​ ​n​e​w​ ​P​I​N
+				 */
+				confirmNewPin: string
+				/**
+				 * P​l​e​a​s​e​ ​r​e​-​e​n​t​e​r​ ​y​o​u​r​ ​n​e​w​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				confirmPinSubtitle: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				incorrectPin: string
+				/**
+				 * P​I​N​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h​.​ ​R​e​-​e​n​t​e​r​ ​t​o​ ​c​o​n​f​i​r​m​ ​o​r​ ​g​o​ ​b​a​c​k​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
+				 */
+				pinMismatch: string
+			}
+			CreateFlow: {
+				/**
+				 * C​r​e​a​t​e​ ​P​I​N
+				 */
+				title: string
+				steps: {
+					/**
+					 * S​e​t​ ​P​I​N
+					 */
+					setPin: string
+					/**
+					 * C​o​n​f​i​r​m
+					 */
+					confirm: string
+				}
+				/**
+				 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N
+				 */
+				enterYourPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​a​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				enterPinSubtitle: string
+				/**
+				 * P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​r​e​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+				 */
+				pinCreatedToast: string
+			}
+			ChangeFlow: {
+				/**
+				 * C​h​a​n​g​e​ ​P​I​N
+				 */
+				title: string
+				steps: {
+					/**
+					 * C​u​r​r​e​n​t​ ​P​I​N
+					 */
+					currentPin: string
+					/**
+					 * N​e​w​ ​P​I​N
+					 */
+					newPin: string
+					/**
+					 * C​o​n​f​i​r​m
+					 */
+					confirm: string
+				}
+				/**
+				 * E​n​t​e​r​ ​c​u​r​r​e​n​t​ ​P​I​N
+				 */
+				enterCurrentPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				enterCurrentPinSubtitle: string
+				/**
+				 * E​n​t​e​r​ ​n​e​w​ ​P​I​N
+				 */
+				enterNewPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​n​e​w​ ​4​-​d​i​g​i​t​ ​P​I​N​.
+				 */
+				enterNewPinSubtitle: string
+				/**
+				 * P​I​N​ ​c​h​a​n​g​e​d
+				 */
+				pinChangedTitle: string
+				/**
+				 * Y​o​u​r​ ​P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​h​a​n​g​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y​.
+				 */
+				pinChangedSubtitle: string
+				/**
+				 * P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​h​a​n​g​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+				 */
+				pinChangedToast: string
+			}
+		}
 	}
 	NotificationHistory: {
 		/**
@@ -20384,6 +20480,102 @@ export type TranslationFunctions = {
 			 * Transaction not found
 			 */
 			transactionNotFound: () => LocalizedString
+		}
+		PinScreens: {
+			common: {
+				/**
+				 * Confirm new PIN
+				 */
+				confirmNewPin: () => LocalizedString
+				/**
+				 * Please re-enter your new 4-digit PIN to continue.
+				 */
+				confirmPinSubtitle: () => LocalizedString
+				/**
+				 * Incorrect PIN. Please try again.
+				 */
+				incorrectPin: () => LocalizedString
+				/**
+				 * PINs do not match. Re-enter to confirm or go back to change your PIN.
+				 */
+				pinMismatch: () => LocalizedString
+			}
+			CreateFlow: {
+				/**
+				 * Create PIN
+				 */
+				title: () => LocalizedString
+				steps: {
+					/**
+					 * Set PIN
+					 */
+					setPin: () => LocalizedString
+					/**
+					 * Confirm
+					 */
+					confirm: () => LocalizedString
+				}
+				/**
+				 * Enter your PIN
+				 */
+				enterYourPin: () => LocalizedString
+				/**
+				 * Please enter a 4-digit PIN to continue.
+				 */
+				enterPinSubtitle: () => LocalizedString
+				/**
+				 * PIN has been created successfully
+				 */
+				pinCreatedToast: () => LocalizedString
+			}
+			ChangeFlow: {
+				/**
+				 * Change PIN
+				 */
+				title: () => LocalizedString
+				steps: {
+					/**
+					 * Current PIN
+					 */
+					currentPin: () => LocalizedString
+					/**
+					 * New PIN
+					 */
+					newPin: () => LocalizedString
+					/**
+					 * Confirm
+					 */
+					confirm: () => LocalizedString
+				}
+				/**
+				 * Enter current PIN
+				 */
+				enterCurrentPin: () => LocalizedString
+				/**
+				 * Please enter your current 4-digit PIN to continue.
+				 */
+				enterCurrentPinSubtitle: () => LocalizedString
+				/**
+				 * Enter new PIN
+				 */
+				enterNewPin: () => LocalizedString
+				/**
+				 * Please enter your new 4-digit PIN.
+				 */
+				enterNewPinSubtitle: () => LocalizedString
+				/**
+				 * PIN changed
+				 */
+				pinChangedTitle: () => LocalizedString
+				/**
+				 * Your PIN has been changed successfully.
+				 */
+				pinChangedSubtitle: () => LocalizedString
+				/**
+				 * PIN has been changed successfully
+				 */
+				pinChangedToast: () => LocalizedString
+			}
 		}
 	}
 	NotificationHistory: {

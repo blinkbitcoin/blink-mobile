@@ -91,6 +91,8 @@ import { headerBackControl } from "@app/components/header-back-control/header-ba
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
+  CardChangePinScreen,
+  CardCreatePinScreen,
   CardDetailsScreen,
   CardLimitsScreen,
   CardPersonalDetailsScreen,
@@ -563,6 +565,16 @@ export const RootStack = () => {
         name="cardShippingAddressScreen"
         component={CardShippingAddressScreen}
         options={{ title: LL.CardFlow.ShippingAddress.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardCreatePinScreen"
+        component={CardCreatePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.CreateFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardChangePinScreen"
+        component={CardChangePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.ChangeFlow.title() }}
       />
       <RootNavigator.Screen
         name="selectionScreen"

@@ -3102,6 +3102,39 @@
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Kakasa PIN empya",
+        "confirmPinSubtitle": "Nsaba oyingize nate PIN yo empya ey'ennamba 4 okusigala mu maaso.",
+        "incorrectPin": "PIN si tuufu. Gezaako nate.",
+        "pinMismatch": "PIN tezikwatagana. Ddamu okuyingiza okukakasa oba dda emabega okukyusa PIN yo."
+      },
+      "CreateFlow": {
+        "title": "Tonda PIN",
+        "steps": {
+          "setPin": "Teeka PIN",
+          "confirm": "Kakasa"
+        },
+        "enterYourPin": "Yingiza PIN yo",
+        "enterPinSubtitle": "Nsaba oyingize PIN ey'ennamba 4 okusigala mu maaso.",
+        "pinCreatedToast": "PIN ekoledwa obulungi"
+      },
+      "ChangeFlow": {
+        "title": "Kyusa PIN",
+        "steps": {
+          "currentPin": "PIN ey'okukama",
+          "newPin": "PIN empya",
+          "confirm": "Kakasa"
+        },
+        "enterCurrentPin": "Yingiza PIN ey'okukama",
+        "enterCurrentPinSubtitle": "Nsaba oyingize PIN yo ey'okukama ey'ennamba 4 okusigala mu maaso.",
+        "enterNewPin": "Yingiza PIN empya",
+        "enterNewPinSubtitle": "Nsaba oyingize PIN yo empya ey'ennamba 4.",
+        "pinChangedTitle": "PIN ekyusiddwa",
+        "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
+        "pinChangedToast": "PIN ekyusiddwa obulungi"
+      }
     }
   }
 }

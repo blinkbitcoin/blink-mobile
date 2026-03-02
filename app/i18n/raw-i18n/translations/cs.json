@@ -3143,6 +3143,39 @@
       "noPOBoxes": "Karty nelze doručit na poštovní schránky",
       "signatureRequired": "Při doručení může být vyžadován podpis",
       "supportedRegions": "Adresa musí být v podporovaných oblastech doručení"
+    },
+    "PinScreens": {
+      "common": {
+        "confirmNewPin": "Potvrdit nový PIN",
+        "confirmPinSubtitle": "Pro pokračování prosím znovu zadejte svůj nový 4místný PIN.",
+        "incorrectPin": "Nesprávný PIN. Zkuste to prosím znovu.",
+        "pinMismatch": "PINy se neshodují. Zadejte znovu pro potvrzení nebo se vraťte a změňte PIN."
+      },
+      "CreateFlow": {
+        "title": "Vytvořit PIN",
+        "steps": {
+          "setPin": "Nastavit PIN",
+          "confirm": "Potvrdit"
+        },
+        "enterYourPin": "Zadejte svůj PIN",
+        "enterPinSubtitle": "Pro pokračování prosím zadejte 4místný PIN.",
+        "pinCreatedToast": "PIN byl úspěšně vytvořen"
+      },
+      "ChangeFlow": {
+        "title": "Změnit PIN",
+        "steps": {
+          "currentPin": "Současný PIN",
+          "newPin": "Nový PIN",
+          "confirm": "Potvrdit"
+        },
+        "enterCurrentPin": "Zadejte současný PIN",
+        "enterCurrentPinSubtitle": "Pro pokračování prosím zadejte svůj současný 4místný PIN.",
+        "enterNewPin": "Zadejte nový PIN",
+        "enterNewPinSubtitle": "Prosím zadejte svůj nový 4místný PIN.",
+        "pinChangedTitle": "PIN změněn",
+        "pinChangedSubtitle": "Váš PIN byl úspěšně změněn.",
+        "pinChangedToast": "PIN byl úspěšně změněn"
+      }
     }
   }
 }
