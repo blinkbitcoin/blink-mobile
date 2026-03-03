@@ -24,6 +24,8 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     feedbackEmailAddress: "support@blink.sv",
+    cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
+    cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   }),
 }))
 

@@ -10,6 +10,7 @@ import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/ca
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { isIos } from "@app/utils/helper"
 
 import { useCardData } from "../hooks/use-card-data"
@@ -25,6 +26,7 @@ export const CardSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
+  const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl } = useRemoteConfig()
   const { hasPhysicalCard } = useCardData()
   const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
   const {
@@ -86,11 +88,11 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleTermsAndConditions = () => {
-    InAppBrowser.open("https://www.blink.sv/en/terms-conditions")
+    InAppBrowser.open(cardTermsAndConditionsUrl)
   }
 
   const handlePrivacyPolicy = () => {
-    InAppBrowser.open("https://www.blink.sv/en/privacy-policy")
+    InAppBrowser.open(cardPrivacyPolicyUrl)
   }
 
   const cardManagementItems: (() => React.ReactElement)[] = []
