@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -69,6 +69,36 @@ export const CardDetailsScreen: React.FC = () => {
     })
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
+  const cardStatusConfig = useMemo(
+    () => ({
+      [CardStatus.Active]: {
+        color: colors.success,
+        text: LL.CardFlow.CardDetails.statusActive(),
+      },
+      [CardStatus.Locked]: {
+        color: colors.grey3,
+        text: LL.CardFlow.CardDetails.statusFrozen(),
+      },
+      [CardStatus.Canceled]: {
+        color: colors.error,
+        text: LL.CardFlow.CardDetails.statusCancelled(),
+      },
+      [CardStatus.NotActivated]: {
+        color: colors.warning,
+        text: LL.CardFlow.CardDetails.statusNotActivated(),
+      },
+      [CardStatus.Requested]: {
+        color: colors.grey3,
+        text: LL.CardFlow.CardDetails.statusPending(),
+      },
+      [CardStatus.Failed]: {
+        color: colors.error,
+        text: LL.CardFlow.CardDetails.statusFailed(),
+      },
+    }),
+    [colors, LL],
+  )
+
   if (!authenticated || cardLoading) {
     return (
       <Screen preset="scroll">
@@ -80,34 +110,6 @@ export const CardDetailsScreen: React.FC = () => {
   if (!card) return null
 
   const isFrozen = isCardFrozen(card.status)
-
-  const cardStatusConfig = {
-    [CardStatus.Active]: {
-      color: colors.success,
-      text: LL.CardFlow.CardDetails.statusActive(),
-    },
-    [CardStatus.Locked]: {
-      color: colors.grey3,
-      text: LL.CardFlow.CardDetails.statusFrozen(),
-    },
-    [CardStatus.Canceled]: {
-      color: colors.error,
-      text: LL.CardFlow.CardDetails.statusCancelled(),
-    },
-    [CardStatus.NotActivated]: {
-      color: colors.warning,
-      text: LL.CardFlow.CardDetails.statusNotActivated(),
-    },
-    [CardStatus.Requested]: {
-      color: colors.grey3,
-      text: LL.CardFlow.CardDetails.statusPending(),
-    },
-    [CardStatus.Failed]: {
-      color: colors.error,
-      text: LL.CardFlow.CardDetails.statusFailed(),
-    },
-  }
-
   const statusConfig = cardStatusConfig[card.status]
 
   return (
