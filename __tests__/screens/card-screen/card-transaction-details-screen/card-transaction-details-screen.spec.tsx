@@ -53,7 +53,7 @@ jest.mock(
 )
 
 const TRANSACTION_1 = {
-  id: "1",
+  id: "txn-001",
   amount: 12.5,
   currency: "USD",
   merchantName: "SuperSelectos",
@@ -62,7 +62,7 @@ const TRANSACTION_1 = {
 }
 
 const TRANSACTION_2 = {
-  id: "2",
+  id: "txn-002",
   amount: 5.75,
   currency: "USD",
   merchantName: "Starbucks",
@@ -79,7 +79,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("rendering with valid transaction", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
@@ -138,7 +138,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("card information section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
@@ -176,14 +176,14 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("1")).toBeTruthy()
+      expect(getByText("txn-001")).toBeTruthy()
     })
   })
 
   describe("merchant information section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
@@ -204,7 +204,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("currency conversion section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
@@ -225,7 +225,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("warning card", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
@@ -300,7 +300,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("completed transaction", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "2" },
+        params: { transactionId: "txn-002" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_2 })
     })
@@ -360,7 +360,7 @@ describe("CardTransactionDetailsScreen", () => {
   describe("field labels", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
       mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
