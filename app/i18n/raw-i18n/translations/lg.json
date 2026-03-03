@@ -3037,7 +3037,18 @@
       "closeCardAccount": "Ggala akawunti y ekkaadi",
       "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna",
       "addToAppleWallet": "Yongera ku Apple Wallet",
-      "notificationToggleError": "Ensobi okukyusa entegeka z'obubaka"
+      "notificationToggleError": "Ensobi okukyusa entegeka z'obubaka",
+      "closeCardWarning": "Ekikolwa kino kya bwereere. Kaadi yo eya Visa ejja kusazibwamu era tesobola kuddamu kugikozeesa.",
+      "closeCardTypeClose": "Wandiika \"{close}\" okukakasa",
+      "closeCardClose": "ggala",
+      "closeCardFinalConfirmTitle": "Okukakasa Okusembayo",
+      "closeCardFinalConfirmMessage": "Oli mukakafu nti oyagala okuggala akawunti ya kaadi yo? Kino tekisobola kuddibwamu.",
+      "closeCardPendingTransactions": "Olina eby'enfuna ebyali bitannatuukirizibwa. Linda okutuukiririzibwa nga tonnaba kuggala kaadi yo.",
+      "closeCardBalanceWarning": "Kaadi yo erina ebbikka eby'obuwuuzi {balance}. Ggyamu ssente zo nga tonnaba kuggala. Oyagala okweyongera?",
+      "closeCardSuccessTitle": "Akawunti ya Kaadi Eggadde",
+      "closeCardSuccessSubtitle": "Kaadi yo eya Visa eggaddwa bwereere.",
+      "closeCardSuccessButton": "Ddayo ku Maka",
+      "closeCardError": "Tewaasobodde kuggala akawunti ya kaadi. Tuukiriza obuyambi."
     },
     "TransactionDetails": {
       "title": "Ebikwata ku ntuzaanya",

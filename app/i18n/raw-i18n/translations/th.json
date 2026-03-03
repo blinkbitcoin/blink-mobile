@@ -3075,7 +3075,18 @@
       "closeCardAccount": "ปิดบัญชีบัตร",
       "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร",
       "addToAppleWallet": "เพิ่มไปยัง Apple Wallet",
-      "notificationToggleError": "ไม่สามารถอัปเดตการตั้งค่าการแจ้งเตือนได้"
+      "notificationToggleError": "ไม่สามารถอัปเดตการตั้งค่าการแจ้งเตือนได้",
+      "closeCardWarning": "การดำเนินการนี้ถาวร บัตร Visa ของคุณจะถูกยกเลิกและไม่สามารถเปิดใช้งานใหม่ได้",
+      "closeCardTypeClose": "กรุณาพิมพ์ \"{close}\" เพื่อยืนยัน",
+      "closeCardClose": "ปิด",
+      "closeCardFinalConfirmTitle": "การยืนยันขั้นสุดท้าย",
+      "closeCardFinalConfirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการปิดบัญชีบัตรของคุณ? การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+      "closeCardPendingTransactions": "คุณมีธุรกรรมที่รอดำเนินการ กรุณารอจนกว่าจะเสร็จสิ้นก่อนปิดบัตรของคุณ",
+      "closeCardBalanceWarning": "บัตรของคุณมียอดคงเหลือ {balance} กรุณาถอนเงินก่อนปิด คุณต้องการดำเนินการต่อหรือไม่?",
+      "closeCardSuccessTitle": "ปิดบัญชีบัตรแล้ว",
+      "closeCardSuccessSubtitle": "บัตร Visa ของคุณถูกปิดอย่างถาวรแล้ว",
+      "closeCardSuccessButton": "กลับสู่หน้าหลัก",
+      "closeCardError": "ไม่สามารถปิดบัญชีบัตรได้ กรุณาติดต่อฝ่ายสนับสนุน"
     },
     "TransactionDetails": {
       "title": "รายละเอียดธุรกรรม",

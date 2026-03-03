@@ -3075,7 +3075,18 @@
       "closeCardAccount": "Tarjeta kuntata wisqay",
       "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay",
       "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman",
-      "notificationToggleError": "Mana atikurqachu willanakuy churanakuykunata"
+      "notificationToggleError": "Mana atikurqachu willanakuy churanakuykunata",
+      "closeCardWarning": "Kay ruwayqa wiñaypaqmi. Visa tarjetaykiqa chinkachisqa kanqa, manam kutichiyta atikunkichu.",
+      "closeCardTypeClose": "Ama hina kaspa \"{close}\" nispa qillqay takyachinapaq",
+      "closeCardClose": "wisq'ay",
+      "closeCardFinalConfirmTitle": "Qhipa Takyachiy",
+      "closeCardFinalConfirmMessage": "¿Chiqaqtachu tarjeta cuentaykita wisq'ayta munanki? Kayqa manam kutichiy atikun.",
+      "closeCardPendingTransactions": "Suyachkaq ruwanakuna kapusunki. Ama hina kaspa suyay chaykunata tukurunankama tarjetaykita wisq'anaykipaq.",
+      "closeCardBalanceWarning": "Tarjetaykipi {balance} saldo kachkan. Ama hina kaspa qullqiykita hurquy wisq'anaykipaq. ¿Ñawpaqman riyta munankichu?",
+      "closeCardSuccessTitle": "Tarjeta Cuenta Wisq'asqa",
+      "closeCardSuccessSubtitle": "Visa tarjetaykiqa wiñaypaq wisq'asqa.",
+      "closeCardSuccessButton": "Qallariy panaman kutiy",
+      "closeCardError": "Manam atikurqachu tarjeta cuentata wisq'ayta. Ama hina kaspa yanapakuqwan rimanakuy."
     },
     "TransactionDetails": {
       "title": "Transacción willaykunakuna",

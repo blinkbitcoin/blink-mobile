@@ -3078,7 +3078,18 @@
             "closeCardAccount": "Fermer le compte de carte",
             "closeCardAccountDescription": "Fermez définitivement votre carte Visa",
             "addToAppleWallet": "Ajouter a Apple Wallet",
-            "notificationToggleError": "Échec de la mise à jour des paramètres de notification"
+            "notificationToggleError": "Échec de la mise à jour des paramètres de notification",
+            "closeCardWarning": "Cette action est permanente. Ta carte Visa sera annulée et ne pourra pas être réactivée.",
+            "closeCardTypeClose": "Veuillez saisir \"{close}\" pour confirmer",
+            "closeCardClose": "fermer",
+            "closeCardFinalConfirmTitle": "Confirmation Finale",
+            "closeCardFinalConfirmMessage": "Es-tu sûr de vouloir fermer ton compte de carte ? Cela ne peut pas être annulé.",
+            "closeCardPendingTransactions": "Tu as des transactions en attente. Attends qu'elles soient réglées avant de fermer ta carte.",
+            "closeCardBalanceWarning": "Ta carte a un solde de {balance}. Retire tes fonds avant de fermer. Veux-tu continuer quand même ?",
+            "closeCardSuccessTitle": "Compte de Carte Fermé",
+            "closeCardSuccessSubtitle": "Ta carte Visa a été fermée définitivement.",
+            "closeCardSuccessButton": "Retour à l'Accueil",
+            "closeCardError": "Échec de la fermeture du compte de carte. Contacte le support."
         },
         "TransactionDetails": {
             "title": "Détails de la transaction",

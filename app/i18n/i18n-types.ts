@@ -10054,6 +10054,52 @@ type RootTranslation = {
 			 */
 			closeCardAccountDescription: string
 			/**
+			 * T​h​i​s​ ​a​c​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​.​ ​Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​c​a​n​c​e​l​e​d​ ​a​n​d​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​a​c​t​i​v​a​t​e​d​.
+			 */
+			closeCardWarning: string
+			/**
+			 * P​l​e​a​s​e​ ​t​y​p​e​ ​"​{​c​l​o​s​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+			 * @param {unknown} close
+			 */
+			closeCardTypeClose: RequiredParams<'close'>
+			/**
+			 * c​l​o​s​e
+			 */
+			closeCardClose: string
+			/**
+			 * F​i​n​a​l​ ​C​o​n​f​i​r​m​a​t​i​o​n
+			 */
+			closeCardFinalConfirmTitle: string
+			/**
+			 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​c​l​o​s​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​c​c​o​u​n​t​?​ ​T​h​i​s​ ​c​a​n​n​o​t​ ​b​e​ ​u​n​d​o​n​e​.
+			 */
+			closeCardFinalConfirmMessage: string
+			/**
+			 * Y​o​u​ ​h​a​v​e​ ​p​e​n​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​y​ ​a​r​e​ ​s​e​t​t​l​e​d​ ​b​e​f​o​r​e​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​c​a​r​d​.
+			 */
+			closeCardPendingTransactions: string
+			/**
+			 * Y​o​u​r​ ​c​a​r​d​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​P​l​e​a​s​e​ ​w​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​c​l​o​s​i​n​g​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​ ​a​n​y​w​a​y​?
+			 * @param {string} balance
+			 */
+			closeCardBalanceWarning: RequiredParams<'balance'>
+			/**
+			 * C​a​r​d​ ​A​c​c​o​u​n​t​ ​C​l​o​s​e​d
+			 */
+			closeCardSuccessTitle: string
+			/**
+			 * Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​d​.
+			 */
+			closeCardSuccessSubtitle: string
+			/**
+			 * B​a​c​k​ ​t​o​ ​H​o​m​e
+			 */
+			closeCardSuccessButton: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​c​l​o​s​e​ ​c​a​r​d​ ​a​c​c​o​u​n​t​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​.
+			 */
+			closeCardError: string
+			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​n​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
 			 */
 			notificationToggleError: string
@@ -20684,6 +20730,50 @@ export type TranslationFunctions = {
 			 * Permanently close your Visa card
 			 */
 			closeCardAccountDescription: () => LocalizedString
+			/**
+			 * This action is permanent. Your Visa card will be canceled and cannot be reactivated.
+			 */
+			closeCardWarning: () => LocalizedString
+			/**
+			 * Please type "{close}" to confirm
+			 */
+			closeCardTypeClose: (arg: { close: unknown }) => LocalizedString
+			/**
+			 * close
+			 */
+			closeCardClose: () => LocalizedString
+			/**
+			 * Final Confirmation
+			 */
+			closeCardFinalConfirmTitle: () => LocalizedString
+			/**
+			 * Are you sure you want to close your card account? This cannot be undone.
+			 */
+			closeCardFinalConfirmMessage: () => LocalizedString
+			/**
+			 * You have pending transactions. Please wait until they are settled before closing your card.
+			 */
+			closeCardPendingTransactions: () => LocalizedString
+			/**
+			 * Your card has a balance of {balance}. Please withdraw your funds before closing. Do you want to proceed anyway?
+			 */
+			closeCardBalanceWarning: (arg: { balance: string }) => LocalizedString
+			/**
+			 * Card Account Closed
+			 */
+			closeCardSuccessTitle: () => LocalizedString
+			/**
+			 * Your Visa card has been permanently closed.
+			 */
+			closeCardSuccessSubtitle: () => LocalizedString
+			/**
+			 * Back to Home
+			 */
+			closeCardSuccessButton: () => LocalizedString
+			/**
+			 * Failed to close card account. Please contact support.
+			 */
+			closeCardError: () => LocalizedString
 			/**
 			 * Failed to update notification settings
 			 */

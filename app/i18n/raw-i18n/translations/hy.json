@@ -3078,7 +3078,18 @@
       "closeCardAccount": "Փակել քարտային հաշիվը",
       "closeCardAccountDescription": "Մշտապես փակել Ձեր Visa քարտը",
       "addToAppleWallet": "Ավելացնել Apple Wallet-ին",
-      "notificationToggleError": "Չհաջողվեց թարմացնել ծանուցումների կարգավորումները"
+      "notificationToggleError": "Չհաջողվեց թարմացնել ծանուցումների կարգավորումները",
+      "closeCardWarning": "Այս գործողությունը մշտական է։ Ձեր Visa քարտը կչեղարկվի և չի կարող կրկին ակտիվացվել։",
+      "closeCardTypeClose": "Հաստատելու համար մուտքագրեք \"{close}\"",
+      "closeCardClose": "փակել",
+      "closeCardFinalConfirmTitle": "Վերջնական հաստատում",
+      "closeCardFinalConfirmMessage": "Վստա՞հ եք, որ ցանկանում եք փակել Ձեր քարտային հաշիվը։ Այս գործողությունը չի կարող հետարկվել։",
+      "closeCardPendingTransactions": "Դուք ունեք սպասման մեջ գտնվող գործարքներ։ Խնդրում ենք սպասել, մինչև դրանք մշակվեն, նախքան քարտը փակելը։",
+      "closeCardBalanceWarning": "Ձեր քարտի մնացորդը {balance} է։ Խնդրում ենք դուրս բերել Ձեր միջոցները նախքան փակելը։ Ցանկանու՞մ եք, այնուամենայնիվ, շարունակել։",
+      "closeCardSuccessTitle": "Քարտային հաշիվը փակվել է",
+      "closeCardSuccessSubtitle": "Ձեր Visa քարտը մշտապես փակվել է։",
+      "closeCardSuccessButton": "Վերադառնալ գլխավոր էջ",
+      "closeCardError": "Չհաջողվեց փակել քարտային հաշիվը։ Խնդրում ենք կապվել աջակցման թիմի հետ։"
     },
     "TransactionDetails": {
       "title": "Գdelays մdelays",

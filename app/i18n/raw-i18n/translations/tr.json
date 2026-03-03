@@ -3037,7 +3037,18 @@
       "closeCardAccount": "Kart hesabını kapat",
       "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın",
       "addToAppleWallet": "Apple Wallet'a ekle",
-      "notificationToggleError": "Bildirim ayarları güncellenemedi"
+      "notificationToggleError": "Bildirim ayarları güncellenemedi",
+      "closeCardWarning": "Bu işlem kalıcıdır. Visa kartınız iptal edilecek ve yeniden etkinleştirilemez.",
+      "closeCardTypeClose": "Onaylamak için lütfen \"{close}\" yazın",
+      "closeCardClose": "kapat",
+      "closeCardFinalConfirmTitle": "Son Onay",
+      "closeCardFinalConfirmMessage": "Kart hesabınızı kapatmak istediğinizden emin misiniz? Bu geri alınamaz.",
+      "closeCardPendingTransactions": "Bekleyen işlemleriniz var. Kartınızı kapatmadan önce lütfen bunların tamamlanmasını bekleyin.",
+      "closeCardBalanceWarning": "Kartınızda {balance} bakiye var. Lütfen kapatmadan önce paranızı çekin. Yine de devam etmek istiyor musunuz?",
+      "closeCardSuccessTitle": "Kart Hesabı Kapatıldı",
+      "closeCardSuccessSubtitle": "Visa kartınız kalıcı olarak kapatıldı.",
+      "closeCardSuccessButton": "Ana Sayfaya Dön",
+      "closeCardError": "Kart hesabı kapatılamadı. Lütfen destek ile iletişime geçin."
     },
     "TransactionDetails": {
       "title": "İşlem detayları",

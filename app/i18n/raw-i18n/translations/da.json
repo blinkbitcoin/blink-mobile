@@ -3055,7 +3055,18 @@
       "closeCardAccount": "Luk kortkonto",
       "closeCardAccountDescription": "Luk dit Visa-kort permanent",
       "addToAppleWallet": "Tilfoej til Apple Wallet",
-      "notificationToggleError": "Kunne ikke opdatere notifikationsindstillinger"
+      "notificationToggleError": "Kunne ikke opdatere notifikationsindstillinger",
+      "closeCardWarning": "Denne handling er permanent. Dit Visa-kort vil blive annulleret og kan ikke genaktiveres.",
+      "closeCardTypeClose": "Skriv venligst \"{close}\" for at bekræfte",
+      "closeCardClose": "luk",
+      "closeCardFinalConfirmTitle": "Endelig Bekræftelse",
+      "closeCardFinalConfirmMessage": "Er du sikker på, at du vil lukke din kortkonto? Dette kan ikke fortrydes.",
+      "closeCardPendingTransactions": "Du har ventende transaktioner. Vent venligst, indtil de er afviklet, før du lukker dit kort.",
+      "closeCardBalanceWarning": "Dit kort har en saldo på {balance}. Hæv venligst dine midler, før du lukker. Vil du fortsætte alligevel?",
+      "closeCardSuccessTitle": "Kortkonto Lukket",
+      "closeCardSuccessSubtitle": "Dit Visa-kort er blevet permanent lukket.",
+      "closeCardSuccessButton": "Tilbage til Startside",
+      "closeCardError": "Kunne ikke lukke kortkonto. Kontakt venligst support."
     },
     "TransactionDetails": {
       "title": "Transaktionsdetaljer",

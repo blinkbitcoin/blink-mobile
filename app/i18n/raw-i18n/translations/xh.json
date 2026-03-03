@@ -3084,7 +3084,18 @@
       "closeCardAccount": "Vala iakhawunti yekhadi",
       "closeCardAccountDescription": "Vala ikhadi lakho le-Visa ngokusisigxina",
       "addToAppleWallet": "Yongeza ku-Apple Wallet",
-      "notificationToggleError": "Ayiphumelelanga ukuhlaziya izicwangciso zezaziso"
+      "notificationToggleError": "Ayiphumelelanga ukuhlaziya izicwangciso zezaziso",
+      "closeCardWarning": "Esi senzo sisigxina. Ikhadi lakho le-Visa liya kurhoxiswa kwaye alinakuhlaziywa kwakhona.",
+      "closeCardTypeClose": "Nceda uchwetheze \"{close}\" ukuqinisekisa",
+      "closeCardClose": "vala",
+      "closeCardFinalConfirmTitle": "Ukuqinisekisa Kokugqibela",
+      "closeCardFinalConfirmMessage": "Uqinisekile ukuba ufuna ukuvala iakhawunti yakho yekhadi? Oku akunakubuyiselwa.",
+      "closeCardPendingTransactions": "Uneetransekshini ezilindileyo. Nceda ulinde zide zigqitywe phambi kokuvala ikhadi lakho.",
+      "closeCardBalanceWarning": "Ikhadi lakho linebhalansi ye-{balance}. Nceda utsale imali yakho phambi kokuvala. Ngaba ufuna ukuqhubeka?",
+      "closeCardSuccessTitle": "Iakhawunti Yekhadi Ivaliwe",
+      "closeCardSuccessSubtitle": "Ikhadi lakho le-Visa livaliwe ngokusisigxina.",
+      "closeCardSuccessButton": "Buyela eKhaya",
+      "closeCardError": "Koyekile ukuvala iakhawunti yekhadi. Nceda uqhagamshelane nenkxaso."
     },
     "TransactionDetails": {
       "title": "Iinkcukacha zotshintshiselwano",

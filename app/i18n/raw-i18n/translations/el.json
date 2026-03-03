@@ -3037,7 +3037,18 @@
       "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
       "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας",
       "addToAppleWallet": "Prosthiki sto Apple Wallet",
-      "notificationToggleError": "Αποτυχία ενημέρωσης ρυθμίσεων ειδοποιήσεων"
+      "notificationToggleError": "Αποτυχία ενημέρωσης ρυθμίσεων ειδοποιήσεων",
+      "closeCardWarning": "Αυτή η ενέργεια είναι μόνιμη. Η κάρτα Visa σου θα ακυρωθεί και δεν μπορεί να επανενεργοποιηθεί.",
+      "closeCardTypeClose": "Πληκτρολόγησε \"{close}\" για επιβεβαίωση",
+      "closeCardClose": "κλείσιμο",
+      "closeCardFinalConfirmTitle": "Τελική Επιβεβαίωση",
+      "closeCardFinalConfirmMessage": "Είσαι σίγουρος ότι θέλεις να κλείσεις τον λογαριασμό της κάρτας σου; Αυτό δεν μπορεί να αναιρεθεί.",
+      "closeCardPendingTransactions": "Έχεις εκκρεμείς συναλλαγές. Περίμενε μέχρι να εκκαθαριστούν πριν κλείσεις την κάρτα σου.",
+      "closeCardBalanceWarning": "Η κάρτα σου έχει υπόλοιπο {balance}. Κάνε ανάληψη των χρημάτων σου πριν κλείσεις. Θέλεις να συνεχίσεις;",
+      "closeCardSuccessTitle": "Ο Λογαριασμός Κάρτας Έκλεισε",
+      "closeCardSuccessSubtitle": "Η κάρτα Visa σου έχει κλείσει μόνιμα.",
+      "closeCardSuccessButton": "Επιστροφή στην Αρχική",
+      "closeCardError": "Αποτυχία κλεισίματος λογαριασμού κάρτας. Επικοινώνησε με την υποστήριξη."
     },
     "TransactionDetails": {
       "title": "Λεπτομέρειες συναλλαγής",

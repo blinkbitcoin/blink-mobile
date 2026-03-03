@@ -3037,7 +3037,18 @@
       "closeCardAccount": "Închide contul cardului",
       "closeCardAccountDescription": "Închide permanent cardul tău Visa",
       "addToAppleWallet": "Adauga in Apple Wallet",
-      "notificationToggleError": "Actualizarea setărilor de notificare a eșuat"
+      "notificationToggleError": "Actualizarea setărilor de notificare a eșuat",
+      "closeCardWarning": "Această acțiune este permanentă. Cardul tău Visa va fi anulat și nu poate fi reactivat.",
+      "closeCardTypeClose": "Te rugăm să tastezi \"{close}\" pentru a confirma",
+      "closeCardClose": "închide",
+      "closeCardFinalConfirmTitle": "Confirmare Finală",
+      "closeCardFinalConfirmMessage": "Ești sigur că vrei să închizi contul de card? Aceasta nu poate fi anulată.",
+      "closeCardPendingTransactions": "Ai tranzacții în așteptare. Te rugăm să aștepți până sunt procesate înainte de a închide cardul.",
+      "closeCardBalanceWarning": "Cardul tău are un sold de {balance}. Te rugăm să retragi fondurile înainte de a închide. Vrei să continui oricum?",
+      "closeCardSuccessTitle": "Cont de Card Închis",
+      "closeCardSuccessSubtitle": "Cardul tău Visa a fost închis permanent.",
+      "closeCardSuccessButton": "Înapoi la Pagina Principală",
+      "closeCardError": "Nu s-a putut închide contul de card. Te rugăm să contactezi suportul."
     },
     "TransactionDetails": {
       "title": "Detalii tranzacție",
