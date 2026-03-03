@@ -1,7 +1,6 @@
 export const AuthenticationScreenPurpose = {
   Authenticate: "Authenticate",
   TurnOnAuthentication: "TurnOnAuthentication",
-  ViewCardDetails: "ViewCardDetails",
 } as const
 
 export const PinScreenPurpose = {
