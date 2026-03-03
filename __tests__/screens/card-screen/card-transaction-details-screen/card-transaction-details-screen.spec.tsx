@@ -24,6 +24,18 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
+const FORMATTED_TIME = "Jan 30, 10:58 AM"
+jest.spyOn(Intl, "DateTimeFormat").mockImplementation(
+  () =>
+    ({
+      format: () => FORMATTED_TIME,
+      resolvedOptions: () => ({}) as Intl.ResolvedDateTimeFormatOptions,
+      formatToParts: () => [],
+      formatRange: () => "",
+      formatRangeToParts: () => [],
+    }) as Intl.DateTimeFormat,
+)
+
 const mockFormatCurrency = jest.fn(
   ({ amountInMajorUnits }: { amountInMajorUnits: number; currency: string }) =>
     `$${Math.abs(amountInMajorUnits).toFixed(2)}`,
@@ -141,6 +153,18 @@ describe("CardTransactionDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Card information")).toBeTruthy()
+    })
+
+    it("displays formatted transaction time", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardTransactionDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText(FORMATTED_TIME)).toBeTruthy()
     })
 
     it("displays transaction ID", async () => {
