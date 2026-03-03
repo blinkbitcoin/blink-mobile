@@ -12,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isIos } from "@app/utils/helper"
 
+import { useCardData } from "../hooks/use-card-data"
 import { MOCK_CARD_PIN } from "../card-mock-data"
 import { NotificationCategory, useNotificationToggle } from "./hooks"
 
@@ -23,6 +24,7 @@ export const CardSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
+  const { hasPhysicalCard } = useCardData()
   const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
 
   const handlePersonalDetails = () => {
@@ -60,6 +62,39 @@ export const CardSettingsScreen: React.FC = () => {
   const handleCloseCardAccount = () => {
     console.log("Close card account pressed")
   }
+
+  const cardManagementItems: (() => React.ReactElement)[] = []
+
+  if (!hasPhysicalCard) {
+    cardManagementItems.push(() => (
+      <SettingItemRow
+        title={LL.CardFlow.CardSettings.orderPhysicalCard()}
+        leftIcon="physical-card"
+        onPress={handleOrderPhysicalCard}
+      />
+    ))
+  }
+
+  cardManagementItems.push(
+    () => (
+      <SettingItemRow
+        title={
+          isIos
+            ? LL.CardFlow.CardSettings.addToAppleWallet()
+            : LL.CardFlow.CardSettings.addToGooglePay()
+        }
+        leftIonicon="wallet-outline"
+        onPress={handleAddToMobileWallet}
+      />
+    ),
+    () => (
+      <SettingItemRow
+        title={LL.CardFlow.CardSettings.replaceCard()}
+        leftIcon="refresh"
+        onPress={handleReplaceCard}
+      />
+    ),
+  )
 
   return (
     <Screen preset="scroll">
@@ -133,33 +168,7 @@ export const CardSettingsScreen: React.FC = () => {
           name={LL.CardFlow.CardSettings.cardManagement()}
           titleStyle={styles.sectionTitle}
           dividerStyle={styles.dividerStyle}
-          items={[
-            () => (
-              <SettingItemRow
-                title={LL.CardFlow.CardSettings.orderPhysicalCard()}
-                leftIcon="physical-card"
-                onPress={handleOrderPhysicalCard}
-              />
-            ),
-            () => (
-              <SettingItemRow
-                title={
-                  isIos
-                    ? LL.CardFlow.CardSettings.addToAppleWallet()
-                    : LL.CardFlow.CardSettings.addToGooglePay()
-                }
-                leftIonicon="wallet-outline"
-                onPress={handleAddToMobileWallet}
-              />
-            ),
-            () => (
-              <SettingItemRow
-                title={LL.CardFlow.CardSettings.replaceCard()}
-                leftIcon="refresh"
-                onPress={handleReplaceCard}
-              />
-            ),
-          ]}
+          items={cardManagementItems}
         />
 
         <View style={styles.supportSection}>
