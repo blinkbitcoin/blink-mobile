@@ -63,7 +63,7 @@ export const CardDashboardScreen: React.FC = () => {
     handleLoadMore,
     fetchingMore,
     refetch,
-  } = useCardTransactions(card?.id, 4)
+  } = useCardTransactions(card?.id)
 
   const { handleFreeze, loading: freezeLoading } = useCardFreeze()
 
