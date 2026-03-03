@@ -26,7 +26,7 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
           merchantName: "SuperSelectos",
           timeAgo: "2 minutes ago",
           amount: "-$12.50",
-          status: "pending",
+          status: "PENDING",
           details: {
             transactionId: "TXN-2025-000001",
             cardUsed: "Visa •••• 2121",
@@ -46,7 +46,7 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
           merchantName: "Starbucks",
           timeAgo: "1 hour ago",
           amount: "-$5.75",
-          status: "completed",
+          status: "COMPLETED",
           details: {
             transactionId: "TXN-2025-000002",
             cardUsed: "Visa •••• 2121",

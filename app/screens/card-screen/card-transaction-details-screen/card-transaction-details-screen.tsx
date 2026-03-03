@@ -15,7 +15,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardTransaction, MOCK_TRANSACTIONS } from "./card-mock-data"
+import { CardTransaction, MOCK_TRANSACTIONS } from "../card-mock-data"
 
 type CardTransactionDetailsScreenRouteProp = RouteProp<
   RootStackParamList,

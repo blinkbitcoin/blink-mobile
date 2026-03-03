@@ -12,12 +12,14 @@ export type TransactionDetails = {
   conversionFee: string
 }
 
+import { TransactionStatus } from "@app/graphql/generated"
+
 export type CardTransaction = {
   id: string
   merchantName: string
   timeAgo: string
   amount: string
-  status: "pending" | "completed"
+  status: TransactionStatus
   details: TransactionDetails
 }
 
@@ -67,7 +69,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "SuperSelectos",
         timeAgo: "2 minutes ago",
         amount: "-$12.50",
-        status: "pending",
+        status: TransactionStatus.Pending,
         details: {
           transactionId: "TXN-2025-000001",
           cardUsed: "Visa •••• 2121",
@@ -87,7 +89,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "Starbucks",
         timeAgo: "1 hour ago",
         amount: "-$5.75",
-        status: "completed",
+        status: TransactionStatus.Completed,
         details: {
           transactionId: "TXN-2025-000002",
           cardUsed: "Visa •••• 2121",
@@ -107,7 +109,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "Uber Eats",
         timeAgo: "3 hours ago",
         amount: "-$8.99",
-        status: "completed",
+        status: TransactionStatus.Completed,
         details: {
           transactionId: "TXN-2025-000003",
           cardUsed: "Visa •••• 2121",
@@ -132,7 +134,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "Amazon",
         timeAgo: "12 hours ago",
         amount: "-$24.99",
-        status: "completed",
+        status: TransactionStatus.Completed,
         details: {
           transactionId: "TXN-2025-000004",
           cardUsed: "Visa •••• 2121",
@@ -152,7 +154,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "Netflix",
         timeAgo: "18 hours ago",
         amount: "-$15.99",
-        status: "completed",
+        status: TransactionStatus.Completed,
         details: {
           transactionId: "TXN-2025-000005",
           cardUsed: "Visa •••• 2121",
@@ -172,7 +174,7 @@ export const MOCK_TRANSACTIONS: TransactionGroup[] = [
         merchantName: "Walmart",
         timeAgo: "22 hours ago",
         amount: "-$32.40",
-        status: "completed",
+        status: TransactionStatus.Completed,
         details: {
           transactionId: "TXN-2025-000006",
           cardUsed: "Visa •••• 2121",
