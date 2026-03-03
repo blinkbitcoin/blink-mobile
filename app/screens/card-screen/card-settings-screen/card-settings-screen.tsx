@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -23,7 +23,6 @@ export const CardSettingsScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
-  const [securityAlerts, setSecurityAlerts] = useState(true)
 
   const handlePersonalDetails = () => {
     navigation.navigate("cardPersonalDetailsScreen")
@@ -106,14 +105,15 @@ export const CardSettingsScreen: React.FC = () => {
                   }
                 />
               ),
-              () => (
-                <SwitchRow
-                  title={LL.CardFlow.CardSettings.securityAlerts()}
-                  description={LL.CardFlow.CardSettings.securityAlertsDescription()}
-                  value={securityAlerts}
-                  onValueChange={(value) => setSecurityAlerts(value)}
-                />
-              ),
+              // TODO: Temporarily commented out — the NotificationCategory scalar has no "Security" category.
+              // If support is added, uncomment this block. Otherwise, remove it along with
+              // the securityAlerts/securityAlertsDescription translation keys.
+              // () => (
+              //   <SwitchRow
+              //     title={LL.CardFlow.CardSettings.securityAlerts()}
+              //     description={LL.CardFlow.CardSettings.securityAlertsDescription()}
+              //   />
+              // ),
               () => (
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.marketingUpdates()}

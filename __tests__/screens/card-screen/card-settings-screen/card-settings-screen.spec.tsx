@@ -44,6 +44,10 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
 const mockToggleCategory = jest.fn()
 const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
 jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
+  NotificationCategory: {
+    Payments: "Payments",
+    Marketing: "Marketing",
+  },
   useNotificationToggle: () => ({
     isCategoryEnabled: mockIsCategoryEnabled,
     toggleCategory: mockToggleCategory,
@@ -142,19 +146,6 @@ describe("CardSettingsScreen", () => {
 
       expect(getByText("Transaction alerts")).toBeTruthy()
       expect(getByText("Get notified for all transactions")).toBeTruthy()
-    })
-
-    it("displays security alerts switch", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardSettingsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Security alerts")).toBeTruthy()
-      expect(getByText("Get notified for security-related activities")).toBeTruthy()
     })
 
     it("displays marketing updates switch", async () => {
@@ -497,25 +488,6 @@ describe("CardSettingsScreen", () => {
       expect(mockToggleCategory).toHaveBeenCalledWith("Payments", false)
     })
 
-    it("toggles security alerts switch", async () => {
-      const { getAllByRole } = render(
-        <ContextForScreen>
-          <CardSettingsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const switches = getAllByRole("switch")
-      expect(switches[1].props.accessibilityState.checked).toBe(true)
-
-      await act(async () => {
-        fireEvent(switches[1], "pressIn")
-      })
-
-      expect(getAllByRole("switch")[1].props.accessibilityState.checked).toBe(false)
-    })
-
     it("calls toggleCategory with Marketing when marketing updates switch is pressed", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
@@ -526,10 +498,10 @@ describe("CardSettingsScreen", () => {
       await act(async () => {})
 
       const switches = getAllByRole("switch")
-      expect(switches[2].props.accessibilityState.checked).toBe(false)
+      expect(switches[1].props.accessibilityState.checked).toBe(false)
 
       await act(async () => {
-        fireEvent(switches[2], "pressIn")
+        fireEvent(switches[1], "pressIn")
       })
 
       expect(mockToggleCategory).toHaveBeenCalledWith("Marketing", true)
