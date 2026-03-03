@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 import { Linking, View } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -41,6 +41,18 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const { transaction } = useCardTransaction(transactionId)
   const hasNavigatedBack = useRef(false)
 
+  const timeFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }),
+    [locale],
+  )
+
   useEffect(() => {
     if (!transaction && !hasNavigatedBack.current) {
       hasNavigatedBack.current = true
@@ -61,13 +73,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
     currency: transaction.currency,
   })
 
-  const formattedTime = new Intl.DateTimeFormat(locale, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).format(new Date(transaction.createdAt))
+  const formattedTime = timeFormatter.format(new Date(transaction.createdAt))
 
   const supportTeam = LL.CardFlow.TransactionDetails.supportTeam()
   const helpText = LL.CardFlow.TransactionDetails.transactionHelpDescription({
