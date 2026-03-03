@@ -6,6 +6,8 @@ import {
   useNotificationSettingsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
 
 export const NotificationCategory = {
   Payments: "Payments",
@@ -51,6 +53,7 @@ const buildAccountPayload = ({
 }
 
 export const useNotificationToggle = () => {
+  const { LL } = useI18nContext()
   const isAuthed = useIsAuthed()
   const { data } = useNotificationSettingsQuery({
     fetchPolicy: "cache-first",
@@ -94,10 +97,18 @@ export const useNotificationToggle = () => {
     !notificationSettings?.push.disabledCategories.includes(category)
 
   const toggleCategory = async (category: NotificationCategoryType, enabled: boolean) => {
-    const mutation = enabled ? enableNotificationCategory : disableNotificationCategory
-    await mutation({
-      variables: { input: { category, channel: NotificationChannel.Push } },
-    })
+    try {
+      const mutation = enabled ? enableNotificationCategory : disableNotificationCategory
+      await mutation({
+        variables: { input: { category, channel: NotificationChannel.Push } },
+      })
+    } catch {
+      toastShow({
+        message: LL.CardFlow.CardSettings.notificationToggleError(),
+        type: "warning",
+        LL,
+      })
+    }
   }
 
   return { isCategoryEnabled, toggleCategory }
