@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { Linking } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -18,7 +18,11 @@ export const ContactSupportRow: React.FC<ContactSupportRowProps> = ({
   const { LL } = useI18nContext()
   const { feedbackEmailAddress } = useRemoteConfig()
 
-  const handlePress = onPress ?? (() => Linking.openURL(`mailto:${feedbackEmailAddress}`))
+  const defaultPress = useCallback(
+    () => Linking.openURL(`mailto:${feedbackEmailAddress}`),
+    [feedbackEmailAddress],
+  )
+  const handlePress = onPress ?? defaultPress
 
   return (
     <SettingItemRow
