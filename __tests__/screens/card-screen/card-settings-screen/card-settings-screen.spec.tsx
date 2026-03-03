@@ -1,5 +1,5 @@
 import React from "react"
-import { Linking } from "react-native"
+import { Alert, Linking } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -49,6 +49,14 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
 
 const mockToggleCategory = jest.fn()
 const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
+const mockCloseCard = jest.fn()
+let mockCloseCardAccountReturn = {
+  closeCard: mockCloseCard,
+  loading: false,
+  hasPendingTransactions: false,
+  hasPositiveBalance: false,
+  balanceDisplay: "",
+}
 jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
   NotificationCategory: {
     Payments: "Payments",
@@ -58,6 +66,7 @@ jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
     isCategoryEnabled: mockIsCategoryEnabled,
     toggleCategory: mockToggleCategory,
   }),
+  useCloseCardAccount: () => mockCloseCardAccountReturn,
 }))
 
 const mockNavigate = jest.fn()
@@ -451,8 +460,8 @@ describe("CardSettingsScreen", () => {
       )
     })
 
-    it("allows pressing close card account row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
+    it("opens close modal directly when no blockers", async () => {
+      const alertSpy = jest.spyOn(Alert, "alert")
 
       const { getByText } = render(
         <ContextForScreen>
@@ -462,13 +471,83 @@ describe("CardSettingsScreen", () => {
 
       await act(async () => {})
 
-      const row = getByText("Close card account")
       await act(async () => {
-        fireEvent.press(row)
+        fireEvent.press(getByText("Close card account"))
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Close card account pressed")
-      consoleSpy.mockRestore()
+      expect(alertSpy).not.toHaveBeenCalled()
+      expect(
+        getByText(
+          "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+        ),
+      ).toBeTruthy()
+
+      alertSpy.mockRestore()
+    })
+
+    it("shows alert when there are pending transactions", async () => {
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPendingTransactions: true,
+      }
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardSettingsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Close card account"))
+      })
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Warning",
+        "You have pending transactions. Please wait until they are settled before closing your card.",
+      )
+
+      alertSpy.mockRestore()
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPendingTransactions: false,
+      }
+    })
+
+    it("shows balance warning alert when has positive balance", async () => {
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPositiveBalance: true,
+        balanceDisplay: "~$15.00",
+      }
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardSettingsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Close card account"))
+      })
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Warning",
+        expect.stringContaining("~$15.00"),
+        expect.any(Array),
+      )
+
+      alertSpy.mockRestore()
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPositiveBalance: false,
+        balanceDisplay: "",
+      }
     })
   })
 
