@@ -11,7 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isIos } from "@app/utils/helper"
 
-import { MOCK_CARD_PIN } from "./card-mock-data"
+import { MOCK_CARD_PIN } from "../card-mock-data"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()

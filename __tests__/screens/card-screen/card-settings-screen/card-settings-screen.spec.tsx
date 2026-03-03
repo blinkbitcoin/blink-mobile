@@ -4,7 +4,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSettingsScreen } from "@app/screens/card-screen/card-settings-screen"
-import { ContextForScreen } from "./helper"
+import { ContextForScreen } from "../../helper"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
