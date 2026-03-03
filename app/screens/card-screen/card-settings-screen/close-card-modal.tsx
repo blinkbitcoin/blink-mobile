@@ -32,11 +32,19 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
   }
 
   const handleConfirm = () => {
-    handleClose()
     Alert.alert(
       LL.CardFlow.CardSettings.closeCardFinalConfirmTitle(),
       LL.CardFlow.CardSettings.closeCardFinalConfirmMessage(),
-      [{ text: LL.common.cancel() }, { text: LL.common.ok(), onPress: onCloseCard }],
+      [
+        { text: LL.common.cancel() },
+        {
+          text: LL.common.ok(),
+          onPress: () => {
+            handleClose()
+            onCloseCard()
+          },
+        },
+      ],
     )
   }
 
