@@ -37,6 +37,12 @@ jest.mock("react-native/Libraries/Linking/Linking", () => ({
   getInitialURL: jest.fn(() => Promise.resolve(null)),
 }))
 
+const mockInAppBrowserOpen = jest.fn()
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  __esModule: true,
+  default: { open: (...args: readonly unknown[]) => mockInAppBrowserOpen(...args) },
+}))
+
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_CARD_PIN: "1234",
 }))
@@ -407,9 +413,7 @@ describe("CardSettingsScreen", () => {
       expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
 
-    it("allows pressing terms and conditions row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("opens terms and conditions URL in InAppBrowser", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -423,13 +427,12 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Terms and Conditions pressed")
-      consoleSpy.mockRestore()
+      expect(mockInAppBrowserOpen).toHaveBeenCalledWith(
+        "https://www.blink.sv/en/terms-conditions",
+      )
     })
 
-    it("allows pressing privacy policy row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("opens privacy policy URL in InAppBrowser", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -443,8 +446,9 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Privacy Policy pressed")
-      consoleSpy.mockRestore()
+      expect(mockInAppBrowserOpen).toHaveBeenCalledWith(
+        "https://www.blink.sv/en/privacy-policy",
+      )
     })
 
     it("allows pressing close card account row", async () => {
