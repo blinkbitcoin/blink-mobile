@@ -45,10 +45,6 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
   default: { open: (...args: readonly unknown[]) => mockInAppBrowserOpen(...args) },
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_CARD_PIN: "1234",
-}))
-
 const mockToggleCategory = jest.fn()
 const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
 const mockCloseCard = jest.fn()
@@ -87,6 +83,13 @@ describe("CardSettingsScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockNavigate.mockClear()
+    mockCloseCardAccountReturn = {
+      closeCard: mockCloseCard,
+      loading: false,
+      hasPendingTransactions: false,
+      hasPositiveBalance: false,
+      balanceDisplay: "",
+    }
   })
 
   describe("rendering", () => {
@@ -512,10 +515,6 @@ describe("CardSettingsScreen", () => {
       )
 
       alertSpy.mockRestore()
-      mockCloseCardAccountReturn = {
-        ...mockCloseCardAccountReturn,
-        hasPendingTransactions: false,
-      }
     })
 
     it("shows balance warning alert when has positive balance", async () => {
@@ -545,11 +544,6 @@ describe("CardSettingsScreen", () => {
       )
 
       alertSpy.mockRestore()
-      mockCloseCardAccountReturn = {
-        ...mockCloseCardAccountReturn,
-        hasPositiveBalance: false,
-        balanceDisplay: "",
-      }
     })
   })
 
