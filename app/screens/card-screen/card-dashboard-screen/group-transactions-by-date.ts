@@ -37,9 +37,13 @@ export const groupCardTransactionsByDate = ({
   locale: string
   formatCurrency: (input: { amountInMajorUnits: number; currency: string }) => string
 }): CardTransactionGroup[] => {
+  const sorted = [...nodes].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+
   const groupMap: Record<string, CardTransactionGroup> = {}
 
-  for (const node of nodes) {
+  for (const node of sorted) {
     const createdAtSeconds = Math.floor(new Date(node.createdAt).getTime() / 1000)
 
     const dateLabel = getDateLabel(createdAtSeconds, LL, locale)

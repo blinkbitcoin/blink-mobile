@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import {
   ActivityIndicator,
   RefreshControl,
@@ -83,9 +83,14 @@ export const CardDashboardScreen: React.FC = () => {
     if (isFocused) refetch()
   }, [isFocused, refetch])
 
+  const lastErrorRef = useRef<string | null>(null)
   useEffect(() => {
     const error = cardError || balanceError
-    if (error) toastShow({ message: error.message, LL })
+    if (error && error.message !== lastErrorRef.current) {
+      lastErrorRef.current = error.message
+      toastShow({ message: error.message, LL })
+    }
+    if (!error) lastErrorRef.current = null
   }, [cardError, balanceError, LL])
 
   if (cardLoading) {
