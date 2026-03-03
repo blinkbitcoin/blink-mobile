@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
@@ -49,11 +50,11 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleTermsAndConditions = () => {
-    console.log("Terms and Conditions pressed")
+    InAppBrowser.open("https://www.blink.sv/en/terms-conditions")
   }
 
   const handlePrivacyPolicy = () => {
-    console.log("Privacy Policy pressed")
+    InAppBrowser.open("https://www.blink.sv/en/privacy-policy")
   }
 
   const handleCloseCardAccount = () => {
