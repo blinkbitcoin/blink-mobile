@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef } from "react"
 import {
   ActivityIndicator,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   RefreshControl,
   ScrollView,
   TouchableOpacity,
@@ -61,7 +63,7 @@ export const CardDashboardScreen: React.FC = () => {
     handleLoadMore,
     fetchingMore,
     refetch,
-  } = useCardTransactions(card?.id)
+  } = useCardTransactions(card?.id, 4)
 
   const { handleFreeze, loading: freezeLoading } = useCardFreeze()
 
@@ -82,6 +84,16 @@ export const CardDashboardScreen: React.FC = () => {
   useEffect(() => {
     if (isFocused) refetch()
   }, [isFocused, refetch])
+
+  const handleScrollEnd = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent
+      const distanceFromBottom =
+        contentSize.height - layoutMeasurement.height - contentOffset.y
+      if (distanceFromBottom < 300) handleLoadMore()
+    },
+    [handleLoadMore],
+  )
 
   const lastErrorRef = useRef<string | null>(null)
   useEffect(() => {
@@ -114,7 +126,7 @@ export const CardDashboardScreen: React.FC = () => {
     <Screen style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.content}
-        onScrollEndDrag={handleLoadMore}
+        onMomentumScrollEnd={handleScrollEnd}
         refreshControl={
           <RefreshControl
             refreshing={txLoading && isFocused}
