@@ -85,5 +85,5 @@ export const formatCardDisplayNumber = (
   const masked = showDetails
     ? padded
     : maskString(padded, { visibleRight: visibleDigits })
-  return masked.match(new RegExp(`.{${groupSize}}`, "g"))!.join(" ")
+  return (masked.match(new RegExp(`.{1,${groupSize}}`, "g")) ?? [masked]).join(" ")
 }

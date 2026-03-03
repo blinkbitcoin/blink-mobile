@@ -151,4 +151,16 @@ describe("formatCardDisplayNumber", () => {
       "•••• •••• •••• ••56",
     )
   })
+
+  it("handles totalDigits not divisible by groupSize", () => {
+    expect(formatCardDisplayNumber("12345", true, { totalDigits: 5, groupSize: 2 })).toBe(
+      "12 34 5",
+    )
+  })
+
+  it("handles totalDigits smaller than groupSize without crashing", () => {
+    expect(formatCardDisplayNumber("12", true, { totalDigits: 2, groupSize: 4 })).toBe(
+      "12",
+    )
+  })
 })
