@@ -41,6 +41,15 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_CARD_PIN: "1234",
 }))
 
+const mockToggleCategory = jest.fn()
+const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
+jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
+  useNotificationToggle: () => ({
+    isCategoryEnabled: mockIsCategoryEnabled,
+    toggleCategory: mockToggleCategory,
+  }),
+}))
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -469,7 +478,7 @@ describe("CardSettingsScreen", () => {
   })
 
   describe("switch interactions", () => {
-    it("toggles transaction alerts switch", async () => {
+    it("calls toggleCategory with Payments when transaction alerts switch is pressed", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -485,7 +494,7 @@ describe("CardSettingsScreen", () => {
         fireEvent(switches[0], "pressIn")
       })
 
-      expect(getAllByRole("switch")[0].props.accessibilityState.checked).toBe(false)
+      expect(mockToggleCategory).toHaveBeenCalledWith("Payments", false)
     })
 
     it("toggles security alerts switch", async () => {
@@ -507,7 +516,7 @@ describe("CardSettingsScreen", () => {
       expect(getAllByRole("switch")[1].props.accessibilityState.checked).toBe(false)
     })
 
-    it("toggles marketing updates switch", async () => {
+    it("calls toggleCategory with Marketing when marketing updates switch is pressed", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -523,7 +532,7 @@ describe("CardSettingsScreen", () => {
         fireEvent(switches[2], "pressIn")
       })
 
-      expect(getAllByRole("switch")[2].props.accessibilityState.checked).toBe(true)
+      expect(mockToggleCategory).toHaveBeenCalledWith("Marketing", true)
     })
   })
 

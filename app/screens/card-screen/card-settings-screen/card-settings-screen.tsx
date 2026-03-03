@@ -12,6 +12,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isIos } from "@app/utils/helper"
 
 import { MOCK_CARD_PIN } from "../card-mock-data"
+import { NotificationCategory, useNotificationToggle } from "./hooks"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -21,9 +22,8 @@ export const CardSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const [transactionAlerts, setTransactionAlerts] = useState(true)
+  const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
   const [securityAlerts, setSecurityAlerts] = useState(true)
-  const [marketingUpdates, setMarketingUpdates] = useState(false)
 
   const handlePersonalDetails = () => {
     navigation.navigate("cardPersonalDetailsScreen")
@@ -100,8 +100,10 @@ export const CardSettingsScreen: React.FC = () => {
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.transactionAlerts()}
                   description={LL.CardFlow.CardSettings.transactionAlertsDescription()}
-                  value={transactionAlerts}
-                  onValueChange={(value) => setTransactionAlerts(value)}
+                  value={isCategoryEnabled(NotificationCategory.Payments)}
+                  onValueChange={(value) =>
+                    toggleCategory(NotificationCategory.Payments, value)
+                  }
                 />
               ),
               () => (
@@ -116,8 +118,10 @@ export const CardSettingsScreen: React.FC = () => {
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.marketingUpdates()}
                   description={LL.CardFlow.CardSettings.marketingUpdatesDescription()}
-                  value={marketingUpdates}
-                  onValueChange={(value) => setMarketingUpdates(value)}
+                  value={isCategoryEnabled(NotificationCategory.Marketing)}
+                  onValueChange={(value) =>
+                    toggleCategory(NotificationCategory.Marketing, value)
+                  }
                 />
               ),
             ]}
