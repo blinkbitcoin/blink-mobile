@@ -1,4 +1,5 @@
 import React from "react"
+import { Linking } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -28,6 +29,12 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/utils/helper", () => ({
   isIos: false,
+}))
+
+jest.mock("react-native/Libraries/Linking/Linking", () => ({
+  openURL: jest.fn(),
+  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+  getInitialURL: jest.fn(() => Promise.resolve(null)),
 }))
 
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
@@ -383,9 +390,7 @@ describe("CardSettingsScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("replaceCardScreen")
     })
 
-    it("allows pressing contact support row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("allows pressing contact support row and opens mailto", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -399,8 +404,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-      consoleSpy.mockRestore()
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
 
     it("allows pressing terms and conditions row", async () => {
@@ -542,8 +546,6 @@ describe("CardSettingsScreen", () => {
     })
 
     it("user can navigate through all settings", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -566,9 +568,7 @@ describe("CardSettingsScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
       expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-
-      consoleSpy.mockRestore()
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
   })
 })
