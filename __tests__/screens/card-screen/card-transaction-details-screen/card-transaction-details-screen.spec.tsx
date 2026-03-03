@@ -276,10 +276,11 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Transaction not found" }),
       )
-      expect(mockGoBack).toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
     })
 
     it("does not display transaction details for invalid ID", async () => {
