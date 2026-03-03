@@ -1,4 +1,5 @@
 import React from "react"
+import { Linking } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
@@ -11,6 +12,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     feedbackEmailAddress: "support@blink.sv",
   }),
+}))
+
+jest.mock("react-native/Libraries/Linking/Linking", () => ({
+  openURL: jest.fn(),
 }))
 
 const renderWithProviders = (component: React.ReactElement) => {
@@ -80,6 +85,14 @@ describe("ContactSupportRow", () => {
       fireEvent.press(button)
 
       expect(mockOnPress).toHaveBeenCalledTimes(3)
+    })
+
+    it("opens mailto link by default when no onPress is provided", () => {
+      const { getByRole } = renderWithProviders(<ContactSupportRow />)
+
+      fireEvent.press(getByRole("button"))
+
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
   })
 
