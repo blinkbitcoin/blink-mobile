@@ -3099,6 +3099,8 @@ export type CardUpdateLimitsMutationVariables = Exact<{
 
 export type CardUpdateLimitsMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null } };
 
+export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string };
+
 export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3701,6 +3703,16 @@ export const TransactionListFragmentDoc = gql`
   }
 }
     ${TransactionFragmentDoc}`;
+export const CardTransactionDetailsFragmentDoc = gql`
+    fragment CardTransactionDetails on CardTransaction {
+  id
+  amount
+  currency
+  merchantName
+  status
+  createdAt
+}
+    `;
 export const MobileUpdateDocument = gql`
     query mobileUpdate {
   mobileVersions {

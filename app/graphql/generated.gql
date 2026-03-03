@@ -1,3 +1,13 @@
+fragment CardTransactionDetails on CardTransaction {
+  id
+  amount
+  currency
+  merchantName
+  status
+  createdAt
+  __typename
+}
+
 fragment Transaction on Transaction {
   __typename
   id
