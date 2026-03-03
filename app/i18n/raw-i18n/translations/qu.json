@@ -3173,6 +3173,68 @@
         "pinChangedSubtitle": "PIN nisqayki allinta tikrasqa.",
         "pinChangedToast": "PIN allinta tikrasqa"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Willay",
+        "delivery": "Apachiy",
+        "confirm": "Takyachiy"
+      },
+      "ReportIssue": {
+        "title": "¿Imatan tarjetayki pasarqa?",
+        "subtitle": "Akllay imarayku huknin tarjetata mañakunki",
+        "lostCard": "Chinkasqa tarjeta",
+        "lostCardDescription": "Mana tarjetayta tarinchu",
+        "stolenCard": "Suwaykusqa tarjeta",
+        "stolenCardDescription": "Tarjetaytaqa mana rurasqaywanchu aparqanku",
+        "damagedCard": "Waqlisqa tarjeta",
+        "damagedCardDescription": "Tarjetay waqlisqañam",
+        "whatHappensNext": "¿Imatataq qhipa kanqa?",
+        "currentCardDeactivated": "Kunan tarjetayki usqhaylla pisiyachisqa kanqa",
+        "newCardShipped": "Musuq tarjetam direcciónniykiman apachisqa kanqa",
+        "digitalCardAvailable": "Digital tarjetayki kay ruraykuna ukhupi kaqllapi",
+        "cardManagement": "Tarjeta kamachiy",
+        "bullet1": "Kunan tarjetayki chirirachisqa kanqa waqaychanapaq",
+        "bullet2": "Musuq tarjeta huknin yupaywanmi hurqusqa kanqa",
+        "bullet3": "Qhipaman tarjetaykita tarispaqa q'uñichiyta atinki"
+      },
+      "Delivery": {
+        "title": "Akllay imaynapin apachimunki",
+        "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki",
+        "standardDelivery": "Sapaq apachiy",
+        "expressDelivery": "Usqhay apachiy",
+        "businessDays": "{day1}-{day2} llamk'ay p'unchawkuna",
+        "free": "QHASILLA",
+        "shippingAddress": "Apachina dirección",
+        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
+        "chooseDeliverySpeed": "Apachiyta ajllay"
+      },
+      "Confirm": {
+        "title": "Mañakusqaykita qhaway",
+        "subtitle": "Ama hina kaspa tarjeta tikrachiyniykipa willakuykunata takyachiy",
+        "requestSummary": "Mañakuypa pisiyachisqan",
+        "reason": "Imarayku",
+        "delivery": "Apachiy",
+        "shippingAddress": "Apachina dirección",
+        "deliveryCost": "Apachiy chanin",
+        "submitRequest": "Mañakuyta apachiy",
+        "importantInformation": "Allin yuyaykuna",
+        "processedImmediately": "Mañakusqayki usqhaylla ruwasqa kanqa",
+        "currentCardDeactivated": "Kunan tarjeta takyachisqa kaptin pisiyachisqa kanqa",
+        "trackStatus": "Musuq tarjetaykipa apachiy kayninmanta qatipanki app ukhupi",
+        "issueType": "Imarayku",
+        "deliveryTime": "Apachiy pacha",
+        "shippingCost": "Apachiy chanin",
+        "bullet1": "Kunan tarjetayki kawsaqllam kanqa musuq chayamunankama",
+        "bullet2": "Musuq tarjetayki kunan tarjetaykipa kikin yupayniyuqmi kanqa",
+        "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
+      },
+      "Status": {
+        "title": "Musuq tarjetayki ñanpim kachkan!",
+        "subtitle": "Blink tarjetaykipa apachiy kamachikuyqa kachisqañam.",
+        "buttonLabel": "Ñawpaq panqa"
+      },
+      "title": "Tarjetata tikray"
     }
   }
 }

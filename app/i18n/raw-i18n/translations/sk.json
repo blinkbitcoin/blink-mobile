@@ -3135,6 +3135,68 @@
         "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
         "pinChangedToast": "PIN bol úspešne zmenený"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Nahlásiť",
+        "delivery": "Doručenie",
+        "confirm": "Potvrdiť"
+      },
+      "ReportIssue": {
+        "title": "Čo sa stalo s vašou kartou?",
+        "subtitle": "Vyberte dôvod žiadosti o náhradnú kartu",
+        "lostCard": "Stratená karta",
+        "lostCardDescription": "Nemôžem nájsť svoju kartu",
+        "stolenCard": "Ukradnutá karta",
+        "stolenCardDescription": "Moja karta bola odcudzená bez povolenia",
+        "damagedCard": "Poškodená karta",
+        "damagedCardDescription": "Moja karta je fyzicky poškodená",
+        "whatHappensNext": "Čo bude nasledovať?",
+        "currentCardDeactivated": "Vaša aktuálna karta bude okamžite deaktivovaná",
+        "newCardShipped": "Nová karta bude odoslaná na vašu adresu",
+        "digitalCardAvailable": "Vaša digitálna karta zostáva počas tohto procesu dostupná",
+        "cardManagement": "Správa karty",
+        "bullet1": "Vaša aktuálna karta bude z bezpečnostných dôvodov zmrazená",
+        "bullet2": "Bude vydaná nová karta s inými číslami",
+        "bullet3": "Ak kartu neskôr nájdete, môžete ju odblokovať"
+      },
+      "Delivery": {
+        "title": "Vyberte rýchlosť doručenia",
+        "subtitle": "Vyberte, ako rýchlo chcete dostať novú kartu",
+        "standardDelivery": "Štandardné doručenie",
+        "expressDelivery": "Expresné doručenie",
+        "businessDays": "{day1}-{day2} pracovných dní",
+        "free": "ZADARMO",
+        "shippingAddress": "Doručovacia adresa",
+        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu",
+        "chooseDeliverySpeed": "Vyberte rýchlosť doručenia"
+      },
+      "Confirm": {
+        "title": "Skontrolujte svoju žiadosť",
+        "subtitle": "Potvrďte prosím údaje o výmene karty",
+        "requestSummary": "Zhrnutie žiadosti",
+        "reason": "Dôvod",
+        "delivery": "Doručenie",
+        "shippingAddress": "Doručovacia adresa",
+        "deliveryCost": "Cena doručenia",
+        "submitRequest": "Odoslať žiadosť",
+        "importantInformation": "Dôležité informácie",
+        "processedImmediately": "Vaša žiadosť bude spracovaná okamžite",
+        "currentCardDeactivated": "Aktuálna karta bude po potvrdení deaktivovaná",
+        "trackStatus": "Stav doručenia novej karty môžete sledovať v aplikácii",
+        "issueType": "Dôvod",
+        "deliveryTime": "Čas doručenia",
+        "shippingCost": "Cena doručenia",
+        "bullet1": "Vaša aktuálna karta zostane aktívna, kým nedorazí nová",
+        "bullet2": "Vaša nová karta bude mať rovnaké čísla ako súčasná",
+        "bullet3": "Po doručení novej karty zničte poškodenú kartu"
+      },
+      "Status": {
+        "title": "Vaša nová karta je na ceste!",
+        "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
+        "buttonLabel": "Prehľad"
+      },
+      "title": "Vymeniť kartu"
     }
   }
 }

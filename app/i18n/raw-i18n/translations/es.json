@@ -3135,6 +3135,59 @@
                 "pinChangedSubtitle": "Tu PIN se ha cambiado correctamente.",
                 "pinChangedToast": "El PIN se ha cambiado correctamente"
             }
+        },
+        "ReplaceCard": {
+            "title": "Reemplazar tarjeta",
+            "steps": {
+                "reportIssue": "Reportar",
+                "delivery": "Entrega",
+                "confirm": "Confirmar"
+            },
+            "ReportIssue": {
+                "title": "¿Qué pasó con tu tarjeta?",
+                "subtitle": "Selecciona el motivo para solicitar una tarjeta de reemplazo",
+                "cardManagement": "Gestión de tarjeta",
+                "lostCard": "Tarjeta perdida",
+                "lostCardDescription": "No puedo encontrar mi tarjeta",
+                "stolenCard": "Tarjeta robada",
+                "stolenCardDescription": "Mi tarjeta fue tomada sin permiso",
+                "damagedCard": "Tarjeta dañada",
+                "damagedCardDescription": "Mi tarjeta está físicamente dañada",
+                "whatHappensNext": "¿Qué sucede después?",
+                "bullet1": "Tu tarjeta actual será congelada por seguridad",
+                "bullet2": "Se emitirá una nueva tarjeta con números diferentes",
+                "bullet3": "Puedes descongelarla si encuentras tu tarjeta después"
+            },
+            "Delivery": {
+                "title": "Elige tu velocidad de entrega",
+                "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta",
+                "standardDelivery": "Entrega estándar",
+                "expressDelivery": "Entrega exprés",
+                "businessDays": "{day1}-{day2} días hábiles",
+                "free": "GRATIS",
+                "shippingAddress": "Dirección de envío",
+                "useRegisteredAddress": "Usar dirección registrada como dirección de envío",
+                "chooseDeliverySpeed": "Elige velocidad de envío"
+            },
+            "Confirm": {
+                "title": "Revisa tu solicitud",
+                "subtitle": "Por favor confirma los detalles del reemplazo de tu tarjeta",
+                "requestSummary": "Resumen de solicitud",
+                "issueType": "Motivo",
+                "delivery": "Entrega",
+                "deliveryTime": "Tiempo de entrega",
+                "shippingCost": "Costo de entrega",
+                "importantInformation": "Información importante",
+                "bullet1": "Tu tarjeta actual permanecerá activa hasta que llegue la nueva",
+                "bullet2": "Tu nueva tarjeta tendrá los mismos números que tu tarjeta actual",
+                "bullet3": "Destruye tu tarjeta dañada cuando llegue la nueva",
+                "submitRequest": "Enviar solicitud"
+            },
+            "Status": {
+                "title": "¡Tu nueva tarjeta está en camino!",
+                "subtitle": "El pedido de entrega de tu tarjeta Blink ha sido enviado.",
+                "buttonLabel": "Panel"
+            }
         }
     }
 }

@@ -3176,6 +3176,68 @@
         "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
         "pinChangedToast": "PIN is suksesvol verander"
       }
+    },
+    "ReplaceCard": {
+      "steps": {
+        "reportIssue": "Rapporteer",
+        "delivery": "Aflewering",
+        "confirm": "Bevestig"
+      },
+      "ReportIssue": {
+        "title": "Wat het met jou kaart gebeur?",
+        "subtitle": "Kies die rede vir die aanvra van 'n vervangingskaart",
+        "lostCard": "Verlore kaart",
+        "lostCardDescription": "Ek kan nie my kaart vind nie",
+        "stolenCard": "Gesteelde kaart",
+        "stolenCardDescription": "My kaart is sonder toestemming geneem",
+        "damagedCard": "Beskadigde kaart",
+        "damagedCardDescription": "My kaart is fisies beskadig",
+        "whatHappensNext": "Wat gebeur volgende?",
+        "currentCardDeactivated": "Jou huidige kaart sal onmiddellik gedeaktiveer word",
+        "newCardShipped": "'n Nuwe kaart sal na jou adres gestuur word",
+        "digitalCardAvailable": "Jou digitale kaart bly beskikbaar tydens hierdie proses",
+        "cardManagement": "Kaartbestuur",
+        "bullet1": "Jou huidige kaart sal gevries word vir sekuriteit",
+        "bullet2": "'n Nuwe kaart met verskillende nommers sal uitgereik word",
+        "bullet3": "Jy kan ontdooi as jy jou kaart later vind"
+      },
+      "Delivery": {
+        "title": "Kies jou afleweringspoed",
+        "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang",
+        "standardDelivery": "Standaard aflewering",
+        "expressDelivery": "Spoedaflewering",
+        "businessDays": "{day1}-{day2} besigheidsdae",
+        "free": "GRATIS",
+        "shippingAddress": "Versendingsadres",
+        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
+        "chooseDeliverySpeed": "Kies afleweringspoed"
+      },
+      "Confirm": {
+        "title": "Hersien jou versoek",
+        "subtitle": "Bevestig asseblief die besonderhede van jou kaartvervanging",
+        "requestSummary": "Versoekoopsomming",
+        "reason": "Rede",
+        "delivery": "Aflewering",
+        "shippingAddress": "Versendingsadres",
+        "deliveryCost": "Afleweringskoste",
+        "submitRequest": "Dien versoek in",
+        "importantInformation": "Belangrike inligting",
+        "processedImmediately": "Jou versoek sal onmiddellik verwerk word",
+        "currentCardDeactivated": "Huidige kaart sal met bevestiging gedeaktiveer word",
+        "trackStatus": "Jy kan jou nuwe kaart se afleweringstatus in die app volg",
+        "issueType": "Rede",
+        "deliveryTime": "Afleweringstyd",
+        "shippingCost": "Afleweringskoste",
+        "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
+        "bullet2": "Jou nuwe kaart sal dieselfde nommers as jou huidige kaart hê",
+        "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
+      },
+      "Status": {
+        "title": "Jou nuwe kaart is op pad!",
+        "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
+        "buttonLabel": "Dashboard"
+      },
+      "title": "Vervang kaart"
     }
   }
 }

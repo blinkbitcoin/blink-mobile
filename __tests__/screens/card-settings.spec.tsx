@@ -370,8 +370,6 @@ describe("CardSettingsScreen", () => {
     })
 
     it("allows pressing replace card row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -385,8 +383,7 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Replace card pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("replaceCardScreen")
     })
 
     it("allows pressing contact support row", async () => {
