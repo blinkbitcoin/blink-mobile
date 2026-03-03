@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { Linking, View } from "react-native"
 import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -39,9 +39,11 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const { transactionId } = route.params
 
   const { transaction } = useCardTransaction(transactionId)
+  const hasNavigatedBack = useRef(false)
 
   useEffect(() => {
-    if (!transaction) {
+    if (!transaction && !hasNavigatedBack.current) {
+      hasNavigatedBack.current = true
       toastShow({
         message: LL.CardFlow.TransactionDetails.transactionNotFound(),
         LL,
