@@ -94,7 +94,9 @@ export const useNotificationToggle = () => {
   })
 
   const isCategoryEnabled = (category: NotificationCategoryType) =>
-    !notificationSettings?.push.disabledCategories.includes(category)
+    notificationSettings?.push.disabledCategories
+      ? !notificationSettings.push.disabledCategories.includes(category)
+      : false
 
   const toggleCategory = async (category: NotificationCategoryType, enabled: boolean) => {
     try {

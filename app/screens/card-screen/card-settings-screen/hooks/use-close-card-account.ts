@@ -29,7 +29,7 @@ export const useCloseCardAccount = () => {
   const [cardUpdateMutation, { loading }] = useCardUpdateMutation()
 
   const { data: balanceData } = useCardBalanceQuery({
-    variables: { cardId: cardId! },
+    variables: { cardId: cardId ?? "" },
     skip: !isAuthed || !cardId,
     fetchPolicy: "cache-first",
   })
@@ -46,7 +46,7 @@ export const useCloseCardAccount = () => {
     ""
 
   const closeCard = useCallback(async () => {
-    if (!cardId) {
+    if (!cardId || loading) {
       toastShow({
         message: LL.CardFlow.CardSettings.closeCardError(),
         type: "warning",
@@ -87,7 +87,7 @@ export const useCloseCardAccount = () => {
         toastShow({ message: err.message, LL })
       }
     }
-  }, [cardId, cardUpdateMutation, LL, navigation])
+  }, [cardId, loading, cardUpdateMutation, LL, navigation])
 
   return {
     closeCard,

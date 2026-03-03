@@ -31,7 +31,12 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
     onClose()
   }
 
+  const userTypedClose =
+    confirmText.toLowerCase().trim() ===
+    LL.CardFlow.CardSettings.closeCardClose().toLowerCase().trim()
+
   const handleConfirm = () => {
+    if (!userTypedClose) return
     Alert.alert(
       LL.CardFlow.CardSettings.closeCardFinalConfirmTitle(),
       LL.CardFlow.CardSettings.closeCardFinalConfirmMessage(),
@@ -47,10 +52,6 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
       ],
     )
   }
-
-  const userTypedClose =
-    confirmText.toLowerCase().trim() ===
-    LL.CardFlow.CardSettings.closeCardClose().toLowerCase().trim()
 
   return (
     <CustomModal
