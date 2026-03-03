@@ -142,7 +142,8 @@ export const CardTransactionDetailsScreen: React.FC = () => {
             {
               label: LL.CardFlow.TransactionDetails.conversionFee(),
               value: UNAVAILABLE,
-              valueColor: colors.success,
+              // TODO: restore to colors.success when real value is available
+              valueColor: colors.black,
             },
           ]}
         />
