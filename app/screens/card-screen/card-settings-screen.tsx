@@ -1,12 +1,11 @@
 import React, { useState } from "react"
-import { Linking, View } from "react-native"
+import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -21,7 +20,6 @@ export const CardSettingsScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { feedbackEmailAddress } = useRemoteConfig()
 
   const [transactionAlerts, setTransactionAlerts] = useState(true)
   const [securityAlerts, setSecurityAlerts] = useState(true)
@@ -49,10 +47,6 @@ export const CardSettingsScreen: React.FC = () => {
 
   const handleReplaceCard = () => {
     navigation.navigate("replaceCardScreen")
-  }
-
-  const handleContactSupport = () => {
-    Linking.openURL(`mailto:${feedbackEmailAddress}`)
   }
 
   const handleTermsAndConditions = () => {
@@ -165,7 +159,7 @@ export const CardSettingsScreen: React.FC = () => {
 
         <View style={styles.supportSection}>
           <Text style={styles.sectionTitle}>{LL.common.support()}</Text>
-          <ContactSupportRow onPress={handleContactSupport} />
+          <ContactSupportRow />
         </View>
 
         <SettingsGroup
