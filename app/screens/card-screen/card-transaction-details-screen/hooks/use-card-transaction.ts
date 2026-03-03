@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client"
+import { gql, useFragment } from "@apollo/client"
 
 import {
   CardTransactionDetailsFragment,
@@ -17,12 +17,11 @@ gql`
 `
 
 export const useCardTransaction = (transactionId: string) => {
-  const client = useApolloClient()
-
-  const transaction = client.readFragment<CardTransactionDetailsFragment>({
-    id: client.cache.identify({ __typename: "CardTransaction", id: transactionId }),
+  const { data, complete } = useFragment<CardTransactionDetailsFragment>({
     fragment: CardTransactionDetailsFragmentDoc,
+    fragmentName: "CardTransactionDetails",
+    from: { __typename: "CardTransaction", id: transactionId },
   })
 
-  return { transaction: transaction ?? null }
+  return { transaction: complete ? data : null }
 }
