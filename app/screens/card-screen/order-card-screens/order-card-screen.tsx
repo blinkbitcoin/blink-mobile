@@ -6,12 +6,13 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { MOCK_USER } from "../card-mock-data"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { ReportIssueStep, DeliveryStep, ConfirmStep } from "./steps"
-import { useReplaceCardFlow, Step } from "./use-replace-card-flow"
+import { ShippingStep, ConfirmStep } from "./steps"
+import { useOrderCardFlow, Step } from "./use-order-card-flow"
 
 type StepConfig = {
-  icon: "report-flag" | "delivery" | "approved"
+  icon: "delivery"
   iconColor: string
   title: string
   subtitle: string
@@ -20,7 +21,7 @@ type StepConfig = {
   isButtonDisabled: boolean
 }
 
-export const ReplaceCardScreen: React.FC = () => {
+export const OrderCardScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
@@ -30,27 +31,26 @@ export const ReplaceCardScreen: React.FC = () => {
   const {
     step,
     state,
-    setSelectedIssue,
-    setSelectedDelivery,
+    isComplete,
     toggleUseRegisteredAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,
-  } = useReplaceCardFlow()
+  } = useOrderCardFlow()
 
   const steps = [
-    LL.CardFlow.ReplaceCard.steps.reportIssue(),
-    LL.CardFlow.ReplaceCard.steps.delivery(),
-    LL.CardFlow.ReplaceCard.steps.confirm(),
+    LL.CardFlow.OrderPhysicalCard.steps.shipping(),
+    LL.CardFlow.OrderPhysicalCard.steps.confirm(),
   ]
 
   const handleSubmit = () => {
+    if (isComplete) return
     completeFlow()
     navigation.replace("cardStatusScreen", {
-      title: LL.CardFlow.ReplaceCard.Status.title(),
-      subtitle: LL.CardFlow.ReplaceCard.Status.subtitle(),
-      buttonLabel: LL.CardFlow.ReplaceCard.Status.buttonLabel(),
-      navigateTo: "cardDashboardScreen",
+      title: LL.CardFlow.CardStatus.PhysicalCardOrdered.title(),
+      subtitle: LL.CardFlow.CardStatus.PhysicalCardOrdered.subtitle(),
+      buttonLabel: LL.CardFlow.CardStatus.PhysicalCardOrdered.buttonLabel(),
+      navigateTo: "cardCreatePinScreen",
       iconName: "delivery",
       iconColor: colors._green,
     })
@@ -58,55 +58,38 @@ export const ReplaceCardScreen: React.FC = () => {
 
   const getStepConfig = (): StepConfig => {
     switch (step) {
-      case Step.ReportIssue:
-        return {
-          icon: "report-flag",
-          iconColor: colors.primary,
-          title: LL.CardFlow.ReplaceCard.ReportIssue.title(),
-          subtitle: LL.CardFlow.ReplaceCard.ReportIssue.subtitle(),
-          buttonLabel: LL.common.continue(),
-          onButtonPress: goToNextStep,
-          isButtonDisabled: !state.selectedIssue,
-        }
-      case Step.Delivery:
+      case Step.Shipping:
         return {
           icon: "delivery",
           iconColor: colors._green,
-          title: LL.CardFlow.ReplaceCard.Delivery.title(),
-          subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
-          buttonLabel: state.selectedDelivery
-            ? LL.common.continue()
-            : LL.CardFlow.ReplaceCard.Delivery.chooseDeliverySpeed(),
+          title: LL.CardFlow.OrderPhysicalCard.Shipping.title(),
+          subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
+          buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
-          isButtonDisabled: !state.selectedDelivery,
+          isButtonDisabled: false,
         }
       case Step.Confirm:
         return {
-          icon: "approved",
+          icon: "delivery",
           iconColor: colors._green,
-          title: LL.CardFlow.ReplaceCard.Confirm.title(),
-          subtitle: LL.CardFlow.ReplaceCard.Confirm.subtitle(),
-          buttonLabel: LL.CardFlow.ReplaceCard.Confirm.submitRequest(),
+          title: LL.CardFlow.OrderPhysicalCard.Confirm.title(),
+          subtitle: LL.CardFlow.OrderPhysicalCard.Confirm.subtitle(),
+          buttonLabel: LL.CardFlow.OrderPhysicalCard.Confirm.placeOrder(),
           onButtonPress: handleSubmit,
           isButtonDisabled: false,
         }
+      default: {
+        const _exhaustive: never = step
+        throw new Error(`Unhandled step: ${_exhaustive}`)
+      }
     }
   }
 
   const renderStepContent = () => {
     switch (step) {
-      case Step.ReportIssue:
+      case Step.Shipping:
         return (
-          <ReportIssueStep
-            selectedIssue={state.selectedIssue}
-            onSelectIssue={setSelectedIssue}
-          />
-        )
-      case Step.Delivery:
-        return (
-          <DeliveryStep
-            selectedDelivery={state.selectedDelivery}
-            onSelectDelivery={setSelectedDelivery}
+          <ShippingStep
             useRegisteredAddress={state.useRegisteredAddress}
             onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
             customAddress={state.customAddress}
@@ -114,13 +97,20 @@ export const ReplaceCardScreen: React.FC = () => {
           />
         )
       case Step.Confirm:
-        if (!state.selectedIssue || !state.selectedDelivery) return null
         return (
           <ConfirmStep
-            issueType={state.selectedIssue}
             deliveryType={state.selectedDelivery}
+            shippingAddress={
+              state.useRegisteredAddress
+                ? MOCK_USER.registeredAddress
+                : state.customAddress
+            }
           />
         )
+      default: {
+        const _exhaustive: never = step
+        throw new Error(`Unhandled step: ${_exhaustive}`)
+      }
     }
   }
 

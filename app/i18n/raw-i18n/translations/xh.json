@@ -3244,6 +3244,53 @@
         "buttonLabel": "Ideshibhodi"
       },
       "title": "Tshintsha ikhadi"
+    },
+    "OrderPhysicalCard": {
+      "title": "Odola ikhadi elibonakalayo",
+      "steps": {
+        "shipping": "Ukuhanjiswa",
+        "confirm": "Qinisekisa"
+      },
+      "Shipping": {
+        "title": "Odola ikhadi lakho elibonakalayo",
+        "subtitle": "Fumana ikhadi lakho le-Blink Visa lilayishwa kwidilesi yakho.",
+        "registeredAddress": "Idilesi ebhalisiweyo",
+        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengedilesi yokuhanjiswa",
+        "delivery": "Ukuhanjiswa",
+        "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
+        "expressDelivery": "Ukuhanjiswa okukhawulezayo",
+        "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
+        "free": "SIMAHLA",
+        "deliveryInformation": "Ulwazi lokuhanjiswa",
+        "bullet1": "Uya kufumana ulwazi lokulandela nge-imeyile",
+        "bullet2": "Inokusetyenziswa isayini xa kuhanjiswa",
+        "bullet3": "Ikhadi liya kuthunyelwa kwipakethe efihlakeleyo",
+        "bullet4": "Yenza ikhadi lakho lisebenze xa lifika",
+        "cardFeatures": "Iimpawu zekhadi",
+        "feature1": "Itekhnoloji yokuhlawula ngaphandle kokuchukumisa",
+        "feature2": "I-EMV chip yokhuseleko olungcono",
+        "feature3": "Umtya wemagnethi wokwamkelwa jikelele",
+        "feature4": "Igama lakho liya kufakwa ngombhalo ophakamileyo ekhadini",
+        "important": "Kubalulekile",
+        "importantBullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
+        "importantBullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
+        "importantBullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
+      },
+      "Confirm": {
+        "title": "Qinisekisa iodolo yakho",
+        "subtitle": "Phonononga iodolo yekhadi elibonakalayo ngaphambi kokuyithumela.",
+        "orderSummary": "Isishwankathelo se-odolo",
+        "cardDesign": "Uyilo lwekhadi",
+        "delivery": "Ukuhanjiswa",
+        "deliveryTime": "Ixesha lokuhanjiswa",
+        "shippingCost": "Iindleko zokuhanjiswa",
+        "shippingAddress": "Idilesi yokuhanjiswa",
+        "placeOrder": "Beka iodolo",
+        "important": "Kubalulekile",
+        "bullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
+        "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
+        "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
+      }
     }
   }
 }

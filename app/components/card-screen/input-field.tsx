@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity, View } from "react-native"
+import { TextInput, TouchableOpacity, View } from "react-native"
 import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -19,6 +19,9 @@ type InputFieldProps = {
   label: string
   value: string
   onPress?: () => void
+  onChangeText?: (text: string) => void
+  editable?: boolean
+  placeholder?: string
   valueStyle?: ValueStyleType
 } & IconProps
 
@@ -32,6 +35,9 @@ export const InputField: React.FC<InputFieldProps> = ({
   rightIcon,
   rightIonicon,
   onPress,
+  onChangeText,
+  editable = false,
+  placeholder,
   valueStyle = ValueStyle.Bold,
 }) => {
   const styles = useStyles({ valueStyle })
@@ -44,6 +50,26 @@ export const InputField: React.FC<InputFieldProps> = ({
   ) : rightIcon ? (
     <GaloyIcon name={rightIcon} size={20} color={colors.primary} />
   ) : null
+
+  if (editable) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.label}>{label}</Text>
+        <View style={styles.valueContainer}>
+          <TextInput
+            style={[styles.value, styles.editableInput]}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder ?? label}
+            placeholderTextColor={colors.grey2}
+            selectionColor={colors.primary}
+            accessibilityLabel={label}
+          />
+          {rightIconElement}
+        </View>
+      </View>
+    )
+  }
 
   const content = (
     <View style={styles.valueContainer}>
@@ -105,6 +131,9 @@ const useStyles = makeStyles(({ colors }, { valueStyle }: StyleProps) => {
       fontFamily: "Source Sans Pro",
       fontWeight: isBold ? "700" : "400",
       lineHeight: isBold ? 20 : 22,
+    },
+    editableInput: {
+      padding: 0,
     },
   }
 })

@@ -3188,6 +3188,50 @@
                 "subtitle": "El pedido de entrega de tu tarjeta Blink ha sido enviado.",
                 "buttonLabel": "Panel"
             }
+        },
+        "OrderPhysicalCard": {
+            "title": "Pedir tarjeta física",
+            "steps": {
+                "shipping": "Envío",
+                "confirm": "Confirmar"
+            },
+            "Shipping": {
+                "title": "Pide tu tarjeta física",
+                "subtitle": "Recibe tu tarjeta Blink Visa en tu dirección.",
+                "registeredAddress": "Dirección registrada",
+                "useRegisteredAddress": "Usar la dirección registrada como dirección de envío",
+                "delivery": "Entrega",
+                "standardDelivery": "Entrega estándar",
+                "expressDelivery": "Entrega exprés",
+                "businessDays": "{day1}-{day2} días hábiles",
+                "free": "GRATIS",
+                "deliveryInformation": "Información de entrega",
+                "bullet1": "Recibirás la información de seguimiento por correo electrónico",
+                "bullet2": "Puede requerirse firma al momento de la entrega",
+                "bullet3": "La tarjeta se enviará en un embalaje discreto",
+                "bullet4": "Activa tu tarjeta cuando llegue",
+                "cardFeatures": "Características de la tarjeta",
+                "feature1": "Tecnología de pago sin contacto",
+                "feature2": "Chip EMV para mayor seguridad",
+                "feature3": "Banda magnética para aceptación universal",
+                "feature4": "Tu nombre grabado en relieve en la tarjeta",
+                "important": "Importante"
+            },
+            "Confirm": {
+                "title": "Confirma tu pedido",
+                "subtitle": "Revisa tu pedido de tarjeta física antes de enviarlo.",
+                "orderSummary": "Resumen del pedido",
+                "cardDesign": "Diseño de la tarjeta",
+                "delivery": "Entrega",
+                "deliveryTime": "Tiempo de entrega",
+                "shippingCost": "Costo de envío",
+                "shippingAddress": "Dirección de envío",
+                "placeOrder": "Realizar pedido",
+                "important": "Importante",
+                "bullet1": "Tu tarjeta virtual permanecerá activa mientras esperas la tarjeta física",
+                "bullet2": "Necesitarás activar tu tarjeta física cuando llegue",
+                "bullet3": "Ambas tarjetas tendrán el mismo número y detalles"
+            }
         }
     }
 }

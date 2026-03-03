@@ -3238,6 +3238,53 @@
         "buttonLabel": "Nadzorna ploča"
       },
       "title": "Zamijeni karticu"
+    },
+    "OrderPhysicalCard": {
+      "title": "Naruči fizičku karticu",
+      "steps": {
+        "shipping": "Dostava",
+        "confirm": "Potvrdi"
+      },
+      "Shipping": {
+        "title": "Naručite svoju fizičku karticu",
+        "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
+        "registeredAddress": "Registrirana adresa",
+        "useRegisteredAddress": "Koristi registriranu adresu kao adresu dostave",
+        "delivery": "Dostava",
+        "standardDelivery": "Standardna dostava",
+        "expressDelivery": "Ekspresna dostava",
+        "businessDays": "{day1}-{day2} radnih dana",
+        "free": "BESPLATNO",
+        "deliveryInformation": "Informacije o dostavi",
+        "bullet1": "Podatke za praćenje dobit ćete e-poštom",
+        "bullet2": "Pri dostavi može biti potreban potpis",
+        "bullet3": "Kartica će biti poslana u diskretnoj ambalaži",
+        "bullet4": "Aktivirajte karticu kada stigne",
+        "cardFeatures": "Značajke kartice",
+        "feature1": "Tehnologija beskontaktnog plaćanja",
+        "feature2": "EMV čip za veću sigurnost",
+        "feature3": "Magnetska traka za univerzalnu prihvaćenost",
+        "feature4": "Vaše ime utisnuto na kartici",
+        "important": "Važno",
+        "importantBullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
+        "importantBullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
+        "importantBullet3": "Obje kartice imat će isti broj i podatke"
+      },
+      "Confirm": {
+        "title": "Potvrdite narudžbu",
+        "subtitle": "Pregledajte narudžbu fizičke kartice prije slanja.",
+        "orderSummary": "Sažetak narudžbe",
+        "cardDesign": "Dizajn kartice",
+        "delivery": "Dostava",
+        "deliveryTime": "Vrijeme dostave",
+        "shippingCost": "Trošak dostave",
+        "shippingAddress": "Adresa dostave",
+        "placeOrder": "Naruči",
+        "important": "Važno",
+        "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
+        "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
+        "bullet3": "Obje kartice imat će isti broj i podatke"
+      }
     }
   }
 }

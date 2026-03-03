@@ -2,7 +2,7 @@ import React from "react"
 import { Text as RNText, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
-import { ReplaceCardLayout } from "@app/screens/card-screen/replace-card-screens/replace-card-layout"
+import { SteppedCardLayout } from "@app/screens/card-screen/stepped-card-layout"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
@@ -74,7 +74,7 @@ jest.mock("@app/components/steps-progress-bar", () => ({
   ),
 }))
 
-describe("ReplaceCardLayout", () => {
+describe("SteppedCardLayout", () => {
   const defaultProps = {
     steps: ["Report Issue", "Delivery", "Confirm"],
     currentStep: 1,
@@ -90,49 +90,49 @@ describe("ReplaceCardLayout", () => {
 
   describe("rendering", () => {
     it("renders without crashing", () => {
-      const { toJSON } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { toJSON } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(toJSON()).toBeTruthy()
     })
 
     it("displays progress bar", () => {
-      const { getByTestId } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByTestId("steps-progress-bar")).toBeTruthy()
     })
 
     it("displays step count", () => {
-      const { getByText } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByText } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByText("Step 1 of 3")).toBeTruthy()
     })
 
     it("displays icon", () => {
-      const { getByTestId } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByTestId("galoy-icon-report-flag")).toBeTruthy()
     })
 
     it("displays title", () => {
-      const { getByText } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByText } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByText("Report card Issue")).toBeTruthy()
     })
 
     it("displays subtitle", () => {
-      const { getByText } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByText } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByText("Let us know what happened.")).toBeTruthy()
     })
 
     it("displays children", () => {
-      const { getByText } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByText } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByText("Step Content")).toBeTruthy()
     })
 
     it("displays button label", () => {
-      const { getByText } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByText } = render(<SteppedCardLayout {...defaultProps} />)
 
       expect(getByText("Continue")).toBeTruthy()
     })
@@ -140,7 +140,7 @@ describe("ReplaceCardLayout", () => {
 
   describe("button", () => {
     it("calls onButtonPress when pressed", () => {
-      const { getByTestId } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
 
       fireEvent(getByTestId("primary-button"), "touchEnd")
 
@@ -149,7 +149,7 @@ describe("ReplaceCardLayout", () => {
 
     it("disables button when isButtonDisabled is true", () => {
       const { getByTestId } = render(
-        <ReplaceCardLayout {...defaultProps} isButtonDisabled={true} />,
+        <SteppedCardLayout {...defaultProps} isButtonDisabled={true} />,
       )
 
       const button = getByTestId("primary-button")
@@ -157,7 +157,7 @@ describe("ReplaceCardLayout", () => {
     })
 
     it("enables button by default", () => {
-      const { getByTestId } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
 
       const button = getByTestId("primary-button")
       expect(button.props.accessibilityState).toEqual({ disabled: false })
@@ -167,7 +167,7 @@ describe("ReplaceCardLayout", () => {
   describe("custom icon color", () => {
     it("passes custom icon color", () => {
       const { getByTestId } = render(
-        <ReplaceCardLayout {...defaultProps} iconColor="#00FF00" />,
+        <SteppedCardLayout {...defaultProps} iconColor="#00FF00" />,
       )
 
       const icon = getByTestId("galoy-icon-report-flag")
@@ -175,7 +175,7 @@ describe("ReplaceCardLayout", () => {
     })
 
     it("uses primary color by default", () => {
-      const { getByTestId } = render(<ReplaceCardLayout {...defaultProps} />)
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
 
       const icon = getByTestId("galoy-icon-report-flag")
       expect(icon.props.accessibilityHint).toBe("#3B82F6")
