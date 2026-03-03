@@ -2944,6 +2944,7 @@
             "title": "Carta Visa"
         },
         "validThruLabel": "VALIDA FINO",
+        "networkVisa": "Visa",
         "cardFrozenTitle": "Carta bloccata",
         "cardFrozenSubtitle": "La carta è temporaneamente disabilitata",
         "CardDetails": {

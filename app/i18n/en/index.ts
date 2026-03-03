@@ -3047,6 +3047,7 @@ const en: BaseTranslation = {
   },
   CardFlow: {
     validThruLabel: "VALID THRU",
+    networkVisa: "Visa",
     cardFrozenTitle: "Card frozen",
     cardFrozenSubtitle: "Card is temporarily disabled",
     TransactionStatus: {

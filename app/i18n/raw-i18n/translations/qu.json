@@ -2982,6 +2982,7 @@
       "title": "Tarjeta Visa"
     },
     "validThruLabel": "VÁLIDO HASTA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Tarjeta congelada",
     "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
     "CardLimits": {

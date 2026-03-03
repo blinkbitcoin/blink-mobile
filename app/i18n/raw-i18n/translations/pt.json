@@ -2944,6 +2944,7 @@
             "title": "Cartão Visa"
         },
         "validThruLabel": "VÁLIDO ATÉ",
+        "networkVisa": "Visa",
         "cardFrozenTitle": "Cartão congelado",
         "cardFrozenSubtitle": "O cartão está temporariamente desativado",
         "CardDetails": {

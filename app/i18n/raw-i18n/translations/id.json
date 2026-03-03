@@ -2944,6 +2944,7 @@
       "title": "Kartu Visa"
     },
     "validThruLabel": "BERLAKU HINGGA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kartu dibekukan",
     "cardFrozenSubtitle": "Kartu dinonaktifkan sementara",
     "CardLimits": {

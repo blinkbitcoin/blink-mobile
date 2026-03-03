@@ -2944,6 +2944,7 @@
             "title": "Visa-Karte"
         },
         "validThruLabel": "GÜLTIG BIS",
+        "networkVisa": "Visa",
         "cardFrozenTitle": "Karte eingefroren",
         "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",
         "CardDetails": {

@@ -2985,6 +2985,7 @@
             "title": "Visaカード"
         },
         "validThruLabel": "有効期限",
+        "networkVisa": "Visa",
         "cardFrozenTitle": "カードが凍結されました",
         "cardFrozenSubtitle": "カードは一時的に無効になっています",
         "CardDetails": {

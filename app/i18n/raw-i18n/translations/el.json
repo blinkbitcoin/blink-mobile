@@ -2944,6 +2944,7 @@
       "title": "Κάρτα Visa"
     },
     "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Κάρτα παγωμένη",
     "cardFrozenSubtitle": "Η κάρτα είναι προσωρινά απενεργοποιημένη",
     "CardLimits": {

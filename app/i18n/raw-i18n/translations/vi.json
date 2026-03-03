@@ -2982,6 +2982,7 @@
       "title": "Thẻ Visa"
     },
     "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Thẻ bị khóa",
     "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa",
     "CardLimits": {

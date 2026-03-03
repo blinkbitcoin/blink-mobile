@@ -2985,6 +2985,7 @@
       "title": "Karta Visa"
     },
     "validThruLabel": "PLATNOST DO",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Karta zmrazena",
     "cardFrozenSubtitle": "Karta je dočasně deaktivována",
     "CardLimits": {

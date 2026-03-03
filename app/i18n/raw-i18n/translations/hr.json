@@ -2985,6 +2985,7 @@
       "title": "Visa kartica"
     },
     "validThruLabel": "VRIJEDI DO",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kartica zamrznuta",
     "cardFrozenSubtitle": "Kartica je privremeno onemogućena",
     "CardLimits": {

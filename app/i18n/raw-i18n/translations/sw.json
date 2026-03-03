@@ -2944,6 +2944,7 @@
       "title": "Kadi ya Visa"
     },
     "validThruLabel": "INATUMIKA HADI",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kadi imegandishwa",
     "cardFrozenSubtitle": "Kadi imezimwa kwa muda",
     "CardLimits": {

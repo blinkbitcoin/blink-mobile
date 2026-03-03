@@ -2985,6 +2985,7 @@
       "title": "Visa-kaart"
     },
     "validThruLabel": "GELDIG TOT",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kaart bevroren",
     "cardFrozenSubtitle": "De kaart is tijdelijk uitgeschakeld",
     "CardLimits": {

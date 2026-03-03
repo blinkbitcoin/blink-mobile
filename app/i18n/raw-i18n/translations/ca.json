@@ -2944,6 +2944,7 @@
       "title": "Targeta Visa"
     },
     "validThruLabel": "VÀLIDA FINS",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Targeta congelada",
     "cardFrozenSubtitle": "La targeta està temporalment desactivada",
     "CardLimits": {

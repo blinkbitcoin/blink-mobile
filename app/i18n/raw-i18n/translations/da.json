@@ -2962,6 +2962,7 @@
       "title": "Visa-kort"
     },
     "validThruLabel": "GYLDIG TIL",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kort spærret",
     "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret",
     "CardLimits": {

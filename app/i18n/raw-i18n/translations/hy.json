@@ -2985,6 +2985,7 @@
       "title": "Visa քարտ"
     },
     "validThruLabel": "Վավեր է մինչև",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Քարտը սառեցված է",
     "cardFrozenSubtitle": "Քարտը ժամանակավորապես անջատված է",
     "CardLimits": {

@@ -176,7 +176,7 @@ export const CardDetailsScreen: React.FC = () => {
               },
               {
                 label: LL.CardFlow.CardDetails.network(),
-                value: "Visa",
+                value: LL.CardFlow.networkVisa(),
               },
             ]}
           />

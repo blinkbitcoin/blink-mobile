@@ -2982,6 +2982,7 @@
       "title": "บัตร Visa"
     },
     "validThruLabel": "ใช้ได้ถึง",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "บัตรถูกระงับ",
     "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว",
     "CardLimits": {

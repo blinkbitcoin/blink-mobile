@@ -2944,6 +2944,7 @@
       "title": "Card Visa"
     },
     "validThruLabel": "VALABIL PÂNĂ LA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Card blocat",
     "cardFrozenSubtitle": "Cardul este dezactivat temporar",
     "CardLimits": {

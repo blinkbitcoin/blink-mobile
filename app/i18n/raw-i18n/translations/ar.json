@@ -2982,6 +2982,7 @@
       "title": "بطاقة Visa"
     },
     "validThruLabel": "صالح حتى",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "البطاقة مجمدة",
     "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا",
     "CardLimits": {

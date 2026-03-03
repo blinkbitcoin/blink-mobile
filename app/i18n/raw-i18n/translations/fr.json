@@ -2985,6 +2985,7 @@
             "title": "Carte Visa"
         },
         "validThruLabel": "VALIDE JUSQU’À",
+        "networkVisa": "Visa",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",
         "CardDetails": {

@@ -2991,6 +2991,7 @@
       "title": "Ikhadi le-Visa"
     },
     "validThruLabel": "ISEBENZA DE KUPHELA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Ikhadi libandisiwe",
     "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana",
     "CardLimits": {

@@ -2944,6 +2944,7 @@
       "title": "Kaadi ya Visa"
     },
     "validThruLabel": "KIKWATA OKUTUUSA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kaadi ekkuziddwa",
     "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",
     "CardLimits": {

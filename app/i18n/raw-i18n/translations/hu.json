@@ -2944,6 +2944,7 @@
       "title": "Visa kártya"
     },
     "validThruLabel": "ÉRVÉNYES",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kártya befagyasztva",
     "cardFrozenSubtitle": "A kártya ideiglenesen letiltva",
     "CardLimits": {

@@ -9639,6 +9639,10 @@ type RootTranslation = {
 		 */
 		validThruLabel: string
 		/**
+		 * V​i​s​a
+		 */
+		networkVisa: string
+		/**
 		 * C​a​r​d​ ​f​r​o​z​e​n
 		 */
 		cardFrozenTitle: string
@@ -20249,6 +20253,10 @@ export type TranslationFunctions = {
 		 * VALID THRU
 		 */
 		validThruLabel: () => LocalizedString
+		/**
+		 * Visa
+		 */
+		networkVisa: () => LocalizedString
 		/**
 		 * Card frozen
 		 */

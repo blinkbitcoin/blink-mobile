@@ -2985,6 +2985,7 @@
       "title": "Kad Visa"
     },
     "validThruLabel": "SAH SEHINGGA",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kad dibekukan",
     "cardFrozenSubtitle": "Kad dinyahaktifkan sementara",
     "CardLimits": {

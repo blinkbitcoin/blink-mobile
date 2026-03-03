@@ -2944,6 +2944,7 @@
       "title": "Karta Visa"
     },
     "validThruLabel": "PLATNÉ DO",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Karta zmrazená",
     "cardFrozenSubtitle": "Karta je dočasne deaktivovaná",
     "CardLimits": {

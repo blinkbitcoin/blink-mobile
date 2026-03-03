@@ -2944,6 +2944,7 @@
       "title": "Visa Kartı"
     },
     "validThruLabel": "GEÇERLİLİK",
+    "networkVisa": "Visa",
     "cardFrozenTitle": "Kart donduruldu",
     "cardFrozenSubtitle": "Kart geçici olarak devre dışı",
     "CardLimits": {
