@@ -1,5 +1,5 @@
-import React from "react"
-import { View } from "react-native"
+import React, { useState } from "react"
+import { Alert, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -14,7 +14,8 @@ import { isIos } from "@app/utils/helper"
 
 import { useCardData } from "../hooks/use-card-data"
 import { MOCK_CARD_PIN } from "../card-mock-data"
-import { NotificationCategory, useNotificationToggle } from "./hooks"
+import { CloseCardModal } from "./close-card-modal"
+import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -26,6 +27,39 @@ export const CardSettingsScreen: React.FC = () => {
 
   const { hasPhysicalCard } = useCardData()
   const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
+  const {
+    closeCard,
+    loading,
+    hasPendingTransactions,
+    hasPositiveBalance,
+    balanceDisplay,
+  } = useCloseCardAccount()
+
+  const [closeModalVisible, setCloseModalVisible] = useState(false)
+
+  const handleCloseCardPress = () => {
+    if (hasPendingTransactions) {
+      Alert.alert(
+        LL.common.warning(),
+        LL.CardFlow.CardSettings.closeCardPendingTransactions(),
+      )
+      return
+    }
+
+    if (hasPositiveBalance) {
+      Alert.alert(
+        LL.common.warning(),
+        LL.CardFlow.CardSettings.closeCardBalanceWarning({ balance: balanceDisplay }),
+        [
+          { text: LL.common.cancel() },
+          { text: LL.common.yes(), onPress: () => setCloseModalVisible(true) },
+        ],
+      )
+      return
+    }
+
+    setCloseModalVisible(true)
+  }
 
   const handlePersonalDetails = () => {
     navigation.navigate("cardPersonalDetailsScreen")
@@ -57,10 +91,6 @@ export const CardSettingsScreen: React.FC = () => {
 
   const handlePrivacyPolicy = () => {
     InAppBrowser.open("https://www.blink.sv/en/privacy-policy")
-  }
-
-  const handleCloseCardAccount = () => {
-    console.log("Close card account pressed")
   }
 
   const cardManagementItems: (() => React.ReactElement)[] = []
@@ -207,10 +237,16 @@ export const CardSettingsScreen: React.FC = () => {
             leftIconColor={colors.error}
             titleStyle={styles.dangerZoneRowTitle}
             subtitleStyle={styles.dangerZoneRowSubtitle}
-            onPress={handleCloseCardAccount}
+            onPress={handleCloseCardPress}
           />
         </View>
       </View>
+      <CloseCardModal
+        isVisible={closeModalVisible}
+        onClose={() => setCloseModalVisible(false)}
+        onCloseCard={closeCard}
+        loading={loading}
+      />
     </Screen>
   )
 }
