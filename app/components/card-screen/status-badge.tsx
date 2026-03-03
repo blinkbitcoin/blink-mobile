@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -15,19 +15,25 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const backgroundColorMap: Record<TransactionStatus, string> = {
-    [TransactionStatus.Pending]: colors.grey3,
-    [TransactionStatus.Completed]: colors.success,
-    [TransactionStatus.Declined]: colors.error,
-    [TransactionStatus.Reversed]: colors.warning,
-  }
+  const backgroundColorMap = useMemo<Record<TransactionStatus, string>>(
+    () => ({
+      [TransactionStatus.Pending]: colors.grey3,
+      [TransactionStatus.Completed]: colors.success,
+      [TransactionStatus.Declined]: colors.error,
+      [TransactionStatus.Reversed]: colors.warning,
+    }),
+    [colors],
+  )
 
-  const statusTextMap: Record<TransactionStatus, string> = {
-    [TransactionStatus.Pending]: LL.CardFlow.TransactionStatus.pending(),
-    [TransactionStatus.Completed]: LL.CardFlow.TransactionStatus.completed(),
-    [TransactionStatus.Declined]: LL.CardFlow.TransactionStatus.declined(),
-    [TransactionStatus.Reversed]: LL.CardFlow.TransactionStatus.reversed(),
-  }
+  const statusTextMap = useMemo<Record<TransactionStatus, string>>(
+    () => ({
+      [TransactionStatus.Pending]: LL.CardFlow.TransactionStatus.pending(),
+      [TransactionStatus.Completed]: LL.CardFlow.TransactionStatus.completed(),
+      [TransactionStatus.Declined]: LL.CardFlow.TransactionStatus.declined(),
+      [TransactionStatus.Reversed]: LL.CardFlow.TransactionStatus.reversed(),
+    }),
+    [LL],
+  )
 
   const backgroundColor = backgroundColorMap[status] ?? colors.grey3
   const statusText = statusTextMap[status] ?? status
