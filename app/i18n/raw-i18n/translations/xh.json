@@ -3083,7 +3083,8 @@
       "privacyPolicy": "Umgaqo-nkqubo wobumfihlo bekhadi",
       "closeCardAccount": "Vala iakhawunti yekhadi",
       "closeCardAccountDescription": "Vala ikhadi lakho le-Visa ngokusisigxina",
-      "addToAppleWallet": "Yongeza ku-Apple Wallet"
+      "addToAppleWallet": "Yongeza ku-Apple Wallet",
+      "notificationToggleError": "Ayiphumelelanga ukuhlaziya izicwangciso zezaziso"
     },
     "TransactionDetails": {
       "title": "Iinkcukacha zotshintshiselwano",

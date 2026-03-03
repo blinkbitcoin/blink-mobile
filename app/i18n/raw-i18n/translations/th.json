@@ -3074,7 +3074,8 @@
       "privacyPolicy": "นโยบายความเป็นส่วนตัวของบัตร",
       "closeCardAccount": "ปิดบัญชีบัตร",
       "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร",
-      "addToAppleWallet": "เพิ่มไปยัง Apple Wallet"
+      "addToAppleWallet": "เพิ่มไปยัง Apple Wallet",
+      "notificationToggleError": "ไม่สามารถอัปเดตการตั้งค่าการแจ้งเตือนได้"
     },
     "TransactionDetails": {
       "title": "รายละเอียดธุรกรรม",

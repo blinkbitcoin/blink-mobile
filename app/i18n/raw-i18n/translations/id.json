@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Kebijakan privasi kartu",
       "closeCardAccount": "Tutup akun kartu",
       "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen",
-      "addToAppleWallet": "Tambahkan ke Apple Wallet"
+      "addToAppleWallet": "Tambahkan ke Apple Wallet",
+      "notificationToggleError": "Gagal memperbarui pengaturan notifikasi"
     },
     "TransactionDetails": {
       "title": "Detail transaksi",

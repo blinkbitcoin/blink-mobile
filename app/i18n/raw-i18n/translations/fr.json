@@ -3077,7 +3077,8 @@
             "privacyPolicy": "Politique de confidentialité de la carte",
             "closeCardAccount": "Fermer le compte de carte",
             "closeCardAccountDescription": "Fermez définitivement votre carte Visa",
-            "addToAppleWallet": "Ajouter a Apple Wallet"
+            "addToAppleWallet": "Ajouter a Apple Wallet",
+            "notificationToggleError": "Échec de la mise à jour des paramètres de notification"
         },
         "TransactionDetails": {
             "title": "Détails de la transaction",

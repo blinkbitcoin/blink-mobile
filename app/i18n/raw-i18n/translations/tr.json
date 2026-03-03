@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Kart gizlilik politikası",
       "closeCardAccount": "Kart hesabını kapat",
       "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın",
-      "addToAppleWallet": "Apple Wallet'a ekle"
+      "addToAppleWallet": "Apple Wallet'a ekle",
+      "notificationToggleError": "Bildirim ayarları güncellenemedi"
     },
     "TransactionDetails": {
       "title": "İşlem detayları",

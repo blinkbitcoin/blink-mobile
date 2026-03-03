@@ -3162,6 +3162,7 @@ const en: BaseTranslation = {
       privacyPolicy: "Card Privacy Policy",
       closeCardAccount: "Close card account",
       closeCardAccountDescription: "Permanently close your Visa card",
+      notificationToggleError: "Failed to update notification settings",
     },
     PersonalDetails: {
       title: "Personal details",

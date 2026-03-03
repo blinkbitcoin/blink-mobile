@@ -3077,7 +3077,8 @@
       "privacyPolicy": "Dasar privasi kad",
       "closeCardAccount": "Tutup akaun kad",
       "closeCardAccountDescription": "Tutup kad Visa anda secara kekal",
-      "addToAppleWallet": "Tambah ke Apple Wallet"
+      "addToAppleWallet": "Tambah ke Apple Wallet",
+      "notificationToggleError": "Gagal mengemas kini tetapan pemberitahuan"
     },
     "TransactionDetails": {
       "title": "Butiran transaksi",

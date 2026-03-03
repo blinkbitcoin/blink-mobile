@@ -3054,7 +3054,8 @@
       "privacyPolicy": "Kortets privatlivspolitik",
       "closeCardAccount": "Luk kortkonto",
       "closeCardAccountDescription": "Luk dit Visa-kort permanent",
-      "addToAppleWallet": "Tilfoej til Apple Wallet"
+      "addToAppleWallet": "Tilfoej til Apple Wallet",
+      "notificationToggleError": "Kunne ikke opdatere notifikationsindstillinger"
     },
     "TransactionDetails": {
       "title": "Transaktionsdetaljer",

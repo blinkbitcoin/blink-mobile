@@ -10053,6 +10053,10 @@ type RootTranslation = {
 			 * P​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​ ​y​o​u​r​ ​V​i​s​a​ ​c​a​r​d
 			 */
 			closeCardAccountDescription: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​n​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
+			 */
+			notificationToggleError: string
 		}
 		PersonalDetails: {
 			/**
@@ -20680,6 +20684,10 @@ export type TranslationFunctions = {
 			 * Permanently close your Visa card
 			 */
 			closeCardAccountDescription: () => LocalizedString
+			/**
+			 * Failed to update notification settings
+			 */
+			notificationToggleError: () => LocalizedString
 		}
 		PersonalDetails: {
 			/**

@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Kártya adatvédelmi szabályzat",
       "closeCardAccount": "Kártyaszámla bezárása",
       "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját",
-      "addToAppleWallet": "Hozzaadas az Apple Wallethoz"
+      "addToAppleWallet": "Hozzaadas az Apple Wallethoz",
+      "notificationToggleError": "Nem sikerült frissíteni az értesítési beállításokat"
     },
     "TransactionDetails": {
       "title": "Tranzakció részletei",

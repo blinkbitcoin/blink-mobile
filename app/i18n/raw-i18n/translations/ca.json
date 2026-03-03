@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Política de privacitat de la targeta",
       "closeCardAccount": "Tancar compte de targeta",
       "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa",
-      "addToAppleWallet": "Afegir a Apple Wallet"
+      "addToAppleWallet": "Afegir a Apple Wallet",
+      "notificationToggleError": "No s'han pogut actualitzar les preferències de notificació"
     },
     "TransactionDetails": {
       "title": "Detalls de la transacció",

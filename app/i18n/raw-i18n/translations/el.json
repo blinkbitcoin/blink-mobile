@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Πολιτική απορρήτου κάρτας",
       "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
       "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας",
-      "addToAppleWallet": "Prosthiki sto Apple Wallet"
+      "addToAppleWallet": "Prosthiki sto Apple Wallet",
+      "notificationToggleError": "Αποτυχία ενημέρωσης ρυθμίσεων ειδοποιήσεων"
     },
     "TransactionDetails": {
       "title": "Λεπτομέρειες συναλλαγής",

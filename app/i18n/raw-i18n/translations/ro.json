@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Politica de confidențialitate card",
       "closeCardAccount": "Închide contul cardului",
       "closeCardAccountDescription": "Închide permanent cardul tău Visa",
-      "addToAppleWallet": "Adauga in Apple Wallet"
+      "addToAppleWallet": "Adauga in Apple Wallet",
+      "notificationToggleError": "Actualizarea setărilor de notificare a eșuat"
     },
     "TransactionDetails": {
       "title": "Detalii tranzacție",

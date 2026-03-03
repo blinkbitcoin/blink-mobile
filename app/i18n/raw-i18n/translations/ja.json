@@ -3077,7 +3077,8 @@
             "privacyPolicy": "カードプライバシーポリシー",
             "closeCardAccount": "カードアカウントを閉じる",
             "closeCardAccountDescription": "Visaカードを永久に閉じる",
-            "addToAppleWallet": "Apple Walletに追加"
+            "addToAppleWallet": "Apple Walletに追加",
+            "notificationToggleError": "通知設定の更新に失敗しました"
         },
         "TransactionDetails": {
             "title": "取引詳細",

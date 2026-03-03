@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Enkola y ekyama ey ekkaadi",
       "closeCardAccount": "Ggala akawunti y ekkaadi",
       "closeCardAccountDescription": "Ggala ekkaadi yo eya Visa emirembe gyonna",
-      "addToAppleWallet": "Yongera ku Apple Wallet"
+      "addToAppleWallet": "Yongera ku Apple Wallet",
+      "notificationToggleError": "Ensobi okukyusa entegeka z'obubaka"
     },
     "TransactionDetails": {
       "title": "Ebikwata ku ntuzaanya",

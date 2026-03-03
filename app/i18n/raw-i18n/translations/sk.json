@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Zásady ochrany osobných údajov karty",
       "closeCardAccount": "Zrušiť účet karty",
       "closeCardAccountDescription": "Trvalo zrušte svoju kartu Visa",
-      "addToAppleWallet": "Pridat do Apple Wallet"
+      "addToAppleWallet": "Pridat do Apple Wallet",
+      "notificationToggleError": "Nepodarilo sa aktualizovať nastavenia oznámení"
     },
     "TransactionDetails": {
       "title": "Podrobnosti transakcie",

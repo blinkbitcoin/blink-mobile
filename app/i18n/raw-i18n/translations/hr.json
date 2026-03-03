@@ -3077,7 +3077,8 @@
       "privacyPolicy": "Politika privatnosti kartice",
       "closeCardAccount": "Zatvori račun kartice",
       "closeCardAccountDescription": "Trajno zatvorite svoju Visa karticu",
-      "addToAppleWallet": "Dodaj u Apple Wallet"
+      "addToAppleWallet": "Dodaj u Apple Wallet",
+      "notificationToggleError": "Ažuriranje postavki obavijesti nije uspjelo"
     },
     "TransactionDetails": {
       "title": "Detalji transakcije",

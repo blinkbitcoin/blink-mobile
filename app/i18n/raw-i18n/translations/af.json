@@ -3077,7 +3077,8 @@
       "privacyPolicy": "Kaart privaatheidsbeleid",
       "closeCardAccount": "Sluit kaartrekening",
       "closeCardAccountDescription": "Sluit jou Visa-kaart permanent",
-      "addToAppleWallet": "Voeg by Apple Wallet"
+      "addToAppleWallet": "Voeg by Apple Wallet",
+      "notificationToggleError": "Kon kennisgewinginstellings nie opdateer nie"
     },
     "TransactionDetails": {
       "title": "Transaksiebesonderhede",

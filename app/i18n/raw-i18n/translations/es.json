@@ -3036,7 +3036,8 @@
             "privacyPolicy": "Política de privacidad de la tarjeta",
             "closeCardAccount": "Cerrar cuenta de tarjeta",
             "closeCardAccountDescription": "Cierra permanentemente tu tarjeta Visa",
-            "addToAppleWallet": "Agregar a Apple Wallet"
+            "addToAppleWallet": "Agregar a Apple Wallet",
+            "notificationToggleError": "Error al actualizar las preferencias de notificación"
         },
         "TransactionDetails": {
             "title": "Detalles de transacción",

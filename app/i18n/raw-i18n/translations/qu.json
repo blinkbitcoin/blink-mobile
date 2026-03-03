@@ -3074,7 +3074,8 @@
       "privacyPolicy": "Tarjeta pakasqa kamachiy",
       "closeCardAccount": "Tarjeta kuntata wisqay",
       "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay",
-      "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman"
+      "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman",
+      "notificationToggleError": "Mana atikurqachu willanakuy churanakuykunata"
     },
     "TransactionDetails": {
       "title": "Transacción willaykunakuna",

@@ -3036,7 +3036,8 @@
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
       "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa",
-      "addToAppleWallet": "Ongeza kwenye Apple Wallet"
+      "addToAppleWallet": "Ongeza kwenye Apple Wallet",
+      "notificationToggleError": "Imeshindwa kusasisha mipangilio ya arifa"
     },
     "TransactionDetails": {
       "title": "Maelezo ya muamala",

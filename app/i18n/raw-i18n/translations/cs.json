@@ -3077,7 +3077,8 @@
       "privacyPolicy": "Zásady ochrany osobních údajů karty",
       "closeCardAccount": "Zrušit účet karty",
       "closeCardAccountDescription": "Trvale zrušte svou kartu Visa",
-      "addToAppleWallet": "Pridat do Apple Wallet"
+      "addToAppleWallet": "Pridat do Apple Wallet",
+      "notificationToggleError": "Nepodařilo se aktualizovat nastavení oznámení"
     },
     "TransactionDetails": {
       "title": "Detaily transakce",
