@@ -14,7 +14,6 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { isIos } from "@app/utils/helper"
 
 import { useCardData } from "../hooks/use-card-data"
-import { MOCK_CARD_PIN } from "../card-mock-data"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
 
@@ -68,11 +67,9 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleChangePin = () => {
-    if (MOCK_CARD_PIN) {
-      navigation.navigate("cardChangePinScreen")
-      return
-    }
-    navigation.navigate("cardCreatePinScreen")
+    navigation.navigate("cardChangePinScreen")
+    // TODO: When PIN integration is complete, evaluate with real data whether to navigate
+    // to cardCreatePinScreen (user has no PIN) or cardChangePinScreen (user has PIN)
   }
 
   const handleOrderPhysicalCard = () => {
@@ -145,11 +142,7 @@ export const CardSettingsScreen: React.FC = () => {
             ),
             () => (
               <SettingItemRow
-                title={
-                  MOCK_CARD_PIN
-                    ? LL.CardFlow.CardSettings.changePin()
-                    : LL.CardFlow.PinScreens.CreateFlow.title()
-                }
+                title={LL.CardFlow.CardSettings.changePin()}
                 leftIcon="key-outline"
                 onPress={handleChangePin}
               />
