@@ -50,6 +50,7 @@ export const getKycBannerConfig = ({
         description: translations.kycDeclinedDescription(),
         color: colors.error,
       }
+    case null:
     case OnboardingStatus.NotStarted:
       return {
         ionicon: "information-circle-outline",

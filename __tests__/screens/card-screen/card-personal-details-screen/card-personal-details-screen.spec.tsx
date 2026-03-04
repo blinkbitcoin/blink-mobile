@@ -267,6 +267,23 @@ describe("CardPersonalDetailsScreen", () => {
       expect(getByText("KYC verification declined")).toBeTruthy()
     })
 
+    it("displays not started banner when status is null", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: null,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Complete KYC verification")).toBeTruthy()
+    })
+
     it("displays not started banner when not started", async () => {
       mockPersonalDetailsReturn = {
         ...mockPersonalDetailsReturn,
