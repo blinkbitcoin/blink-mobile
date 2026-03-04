@@ -26,7 +26,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const hasValue = value != null && value !== PLACEHOLDER
+  const hasValue = value !== null && value !== undefined && value !== PLACEHOLDER
   const iconColor = hasValue ? colors.primary : colors.grey3
 
   return (
