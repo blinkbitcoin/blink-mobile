@@ -147,6 +147,8 @@ export type RootStackParamList = {
     navigateTo: keyof RootStackParamList
     iconName: IconNamesType
     iconColor?: string
+    showCard?: boolean
+    showAddToWallet?: boolean
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined

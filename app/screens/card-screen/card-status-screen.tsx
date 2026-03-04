@@ -34,6 +34,8 @@ export const CardStatusScreen: React.FC = () => {
     navigateTo,
     iconName,
     iconColor = colors._green,
+    showCard = true,
+    showAddToWallet = true,
   } = route.params
 
   const handleAddToWallet = () => {
@@ -57,14 +59,16 @@ export const CardStatusScreen: React.FC = () => {
           </View>
         </View>
 
-        <BlinkCard
-          cardNumber={MOCK_CARD.cardNumber}
-          holderName={MOCK_CARD.holderName}
-          validThruDate={MOCK_CARD.validThruDate}
-          isFrozen={MOCK_CARD.status === CardStatus.Frozen}
-        />
+        {showCard && (
+          <BlinkCard
+            cardNumber={MOCK_CARD.cardNumber}
+            holderName={MOCK_CARD.holderName}
+            validThruDate={MOCK_CARD.validThruDate}
+            isFrozen={MOCK_CARD.status === CardStatus.Frozen}
+          />
+        )}
 
-        <AddToWalletButton onPress={handleAddToWallet} />
+        {showAddToWallet && <AddToWalletButton onPress={handleAddToWallet} />}
       </View>
 
       <View style={styles.bottomSection}>

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useCardQuery } from "@app/graphql/generated"
+import { CardType, useCardQuery } from "@app/graphql/generated"
 
 gql`
   query card {
@@ -34,7 +34,9 @@ export const useCardData = () => {
     nextFetchPolicy: "cache-first",
   })
 
-  const card = data?.me?.defaultAccount?.cards?.[0]
+  const cards = data?.me?.defaultAccount?.cards
+  const card = cards?.[0]
+  const hasPhysicalCard = cards?.some((c) => c.cardType === CardType.Physical) ?? false
 
-  return { card, loading, error, refetch }
+  return { card, hasPhysicalCard, loading, error, refetch }
 }

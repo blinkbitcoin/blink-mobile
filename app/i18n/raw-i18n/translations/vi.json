@@ -3074,7 +3074,19 @@
       "privacyPolicy": "Chính sách bảo mật thẻ",
       "closeCardAccount": "Đóng tài khoản thẻ",
       "closeCardAccountDescription": "Đóng vĩnh viễn thẻ Visa của bạn",
-      "addToAppleWallet": "Them vao Apple Wallet"
+      "addToAppleWallet": "Them vao Apple Wallet",
+      "notificationToggleError": "Không thể cập nhật cài đặt thông báo",
+      "closeCardWarning": "Hành động này là vĩnh viễn. Thẻ Visa của bạn sẽ bị hủy và không thể kích hoạt lại.",
+      "closeCardTypeClose": "Vui lòng nhập \"{close}\" để xác nhận",
+      "closeCardClose": "đóng",
+      "closeCardFinalConfirmTitle": "Xác Nhận Cuối Cùng",
+      "closeCardFinalConfirmMessage": "Bạn có chắc chắn muốn đóng tài khoản thẻ không? Không thể hoàn tác hành động này.",
+      "closeCardPendingTransactions": "Bạn có giao dịch đang chờ xử lý. Vui lòng đợi cho đến khi chúng được xử lý trước khi đóng thẻ.",
+      "closeCardBalanceWarning": "Thẻ của bạn có số dư {balance}. Vui lòng rút tiền trước khi đóng. Bạn vẫn muốn tiếp tục?",
+      "closeCardSuccessTitle": "Tài Khoản Thẻ Đã Đóng",
+      "closeCardSuccessSubtitle": "Thẻ Visa của bạn đã bị đóng vĩnh viễn.",
+      "closeCardSuccessButton": "Quay Về Trang Chủ",
+      "closeCardError": "Không thể đóng tài khoản thẻ. Vui lòng liên hệ hỗ trợ."
     },
     "TransactionDetails": {
       "title": "Chi tiết giao dịch",

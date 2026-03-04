@@ -3036,7 +3036,19 @@
       "privacyPolicy": "Política de privacitat de la targeta",
       "closeCardAccount": "Tancar compte de targeta",
       "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa",
-      "addToAppleWallet": "Afegir a Apple Wallet"
+      "addToAppleWallet": "Afegir a Apple Wallet",
+      "notificationToggleError": "No s'han pogut actualitzar les preferències de notificació",
+      "closeCardWarning": "Aquesta acció és permanent. La teva targeta Visa serà cancel·lada i no es podrà reactivar.",
+      "closeCardTypeClose": "Si us plau, escriu \"{close}\" per confirmar",
+      "closeCardClose": "tancar",
+      "closeCardFinalConfirmTitle": "Confirmació Final",
+      "closeCardFinalConfirmMessage": "Estàs segur que vols tancar el teu compte de targeta? Això no es pot desfer.",
+      "closeCardPendingTransactions": "Tens transaccions pendents. Si us plau, espera fins que es liquidin abans de tancar la teva targeta.",
+      "closeCardBalanceWarning": "La teva targeta té un saldo de {balance}. Si us plau, retira els teus fons abans de tancar. Vols continuar igualment?",
+      "closeCardSuccessTitle": "Compte de Targeta Tancat",
+      "closeCardSuccessSubtitle": "La teva targeta Visa ha estat tancada permanentment.",
+      "closeCardSuccessButton": "Tornar a l'Inici",
+      "closeCardError": "No s'ha pogut tancar el compte de targeta. Si us plau, contacta amb suport."
     },
     "TransactionDetails": {
       "title": "Detalls de la transacció",

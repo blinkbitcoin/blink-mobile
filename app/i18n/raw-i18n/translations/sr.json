@@ -3074,7 +3074,19 @@
       "privacyPolicy": "Политика приватности картице",
       "closeCardAccount": "Затвори налог картице",
       "closeCardAccountDescription": "Трајно затворите своју Visa картицу",
-      "addToAppleWallet": "Dodaj u Apple Wallet"
+      "addToAppleWallet": "Додај у Apple Wallet",
+      "notificationToggleError": "Ажурирање подешавања обавештења није успело",
+      "closeCardWarning": "Ова радња је трајна. Ваша Visa картица ће бити отказана и не може се поново активирати.",
+      "closeCardTypeClose": "Унесите \"{close}\" за потврду",
+      "closeCardClose": "затвори",
+      "closeCardFinalConfirmTitle": "Завршна потврда",
+      "closeCardFinalConfirmMessage": "Да ли сте сигурни да желите да затворите налог картице? Ово се не може поништити.",
+      "closeCardPendingTransactions": "Имате трансакције на чекању. Сачекајте да се обраде пре затварања картице.",
+      "closeCardBalanceWarning": "Ваша картица има стање од {balance}. Повуците средства пре затварања. Да ли желите да наставите?",
+      "closeCardSuccessTitle": "Налог картице затворен",
+      "closeCardSuccessSubtitle": "Ваша Visa картица је трајно затворена.",
+      "closeCardSuccessButton": "Назад на почетну",
+      "closeCardError": "Затварање налога картице није успело. Контактирајте подршку."
     },
     "TransactionDetails": {
       "title": "Детаљи трансакције",

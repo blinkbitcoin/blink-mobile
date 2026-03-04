@@ -3074,7 +3074,19 @@
       "privacyPolicy": "سياسة خصوصية البطاقة",
       "closeCardAccount": "إغلاق حساب البطاقة",
       "closeCardAccountDescription": "أغلق بطاقة Visa الخاصة بك نهائياً",
-      "addToAppleWallet": "اضافة الى Apple Wallet"
+      "addToAppleWallet": "اضافة الى Apple Wallet",
+      "notificationToggleError": "فشل في تحديث إعدادات الإشعارات",
+      "closeCardWarning": "هذا الإجراء نهائي. سيتم إلغاء بطاقة فيزا الخاصة بك ولا يمكن إعادة تفعيلها.",
+      "closeCardTypeClose": "يرجى كتابة \"{close}\" للتأكيد",
+      "closeCardClose": "إغلاق",
+      "closeCardFinalConfirmTitle": "التأكيد النهائي",
+      "closeCardFinalConfirmMessage": "هل أنت متأكد أنك تريد إغلاق حساب بطاقتك؟ لا يمكن التراجع عن هذا.",
+      "closeCardPendingTransactions": "لديك معاملات معلقة. يرجى الانتظار حتى تتم تسويتها قبل إغلاق بطاقتك.",
+      "closeCardBalanceWarning": "بطاقتك بها رصيد قدره {balance}. يرجى سحب أموالك قبل الإغلاق. هل تريد المتابعة على أي حال؟",
+      "closeCardSuccessTitle": "تم إغلاق حساب البطاقة",
+      "closeCardSuccessSubtitle": "تم إغلاق بطاقة فيزا الخاصة بك نهائياً.",
+      "closeCardSuccessButton": "العودة إلى الرئيسية",
+      "closeCardError": "فشل إغلاق حساب البطاقة. يرجى الاتصال بالدعم."
     },
     "TransactionDetails": {
       "title": "تفاصيل المعاملة",

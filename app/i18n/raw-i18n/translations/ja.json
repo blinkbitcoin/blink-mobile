@@ -3077,7 +3077,19 @@
             "privacyPolicy": "カードプライバシーポリシー",
             "closeCardAccount": "カードアカウントを閉じる",
             "closeCardAccountDescription": "Visaカードを永久に閉じる",
-            "addToAppleWallet": "Apple Walletに追加"
+            "addToAppleWallet": "Apple Walletに追加",
+            "notificationToggleError": "通知設定の更新に失敗しました",
+            "closeCardWarning": "この操作は取り消せません。Visaカードはキャンセルされ、再有効化できません。",
+            "closeCardTypeClose": "確認のために「{close}」と入力してください",
+            "closeCardClose": "閉じる",
+            "closeCardFinalConfirmTitle": "最終確認",
+            "closeCardFinalConfirmMessage": "カードアカウントを閉鎖してもよろしいですか？この操作は元に戻せません。",
+            "closeCardPendingTransactions": "保留中の取引があります。カードを閉鎖する前に決済が完了するまでお待ちください。",
+            "closeCardBalanceWarning": "カードに{balance}の残高があります。閉鎖前に資金を引き出してください。それでも続行しますか？",
+            "closeCardSuccessTitle": "カードアカウント閉鎖完了",
+            "closeCardSuccessSubtitle": "Visaカードは永久に閉鎖されました。",
+            "closeCardSuccessButton": "ホームに戻る",
+            "closeCardError": "カードアカウントの閉鎖に失敗しました。サポートにお問い合わせください。"
         },
         "TransactionDetails": {
             "title": "取引詳細",

@@ -1,17 +1,21 @@
 import React, { useState } from "react"
-import { View } from "react-native"
+import { Alert, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { isIos } from "@app/utils/helper"
 
-import { MOCK_CARD_PIN } from "./card-mock-data"
+import { useCardData } from "../hooks/use-card-data"
+import { CloseCardModal } from "./close-card-modal"
+import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -21,20 +25,51 @@ export const CardSettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const [transactionAlerts, setTransactionAlerts] = useState(true)
-  const [securityAlerts, setSecurityAlerts] = useState(true)
-  const [marketingUpdates, setMarketingUpdates] = useState(false)
+  const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl } = useRemoteConfig()
+  const { hasPhysicalCard } = useCardData()
+  const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
+  const {
+    closeCard,
+    loading,
+    hasPendingTransactions,
+    hasPositiveBalance,
+    balanceDisplay,
+  } = useCloseCardAccount()
+
+  const [closeModalVisible, setCloseModalVisible] = useState(false)
+
+  const handleCloseCardPress = () => {
+    if (hasPendingTransactions) {
+      Alert.alert(
+        LL.common.warning(),
+        LL.CardFlow.CardSettings.closeCardPendingTransactions(),
+      )
+      return
+    }
+
+    if (hasPositiveBalance) {
+      Alert.alert(
+        LL.common.warning(),
+        LL.CardFlow.CardSettings.closeCardBalanceWarning({ balance: balanceDisplay }),
+        [
+          { text: LL.common.cancel() },
+          { text: LL.common.yes(), onPress: () => setCloseModalVisible(true) },
+        ],
+      )
+      return
+    }
+
+    setCloseModalVisible(true)
+  }
 
   const handlePersonalDetails = () => {
     navigation.navigate("cardPersonalDetailsScreen")
   }
 
   const handleChangePin = () => {
-    if (MOCK_CARD_PIN) {
-      navigation.navigate("cardChangePinScreen")
-      return
-    }
-    navigation.navigate("cardCreatePinScreen")
+    navigation.navigate("cardChangePinScreen")
+    // TODO: When PIN integration is complete, evaluate with real data whether to navigate
+    // to cardCreatePinScreen (user has no PIN) or cardChangePinScreen (user has PIN)
   }
 
   const handleOrderPhysicalCard = () => {
@@ -49,21 +84,42 @@ export const CardSettingsScreen: React.FC = () => {
     navigation.navigate("replaceCardScreen")
   }
 
-  const handleContactSupport = () => {
-    console.log("Contact support pressed")
-  }
-
   const handleTermsAndConditions = () => {
-    console.log("Terms and Conditions pressed")
+    InAppBrowser.open(cardTermsAndConditionsUrl)
   }
 
   const handlePrivacyPolicy = () => {
-    console.log("Privacy Policy pressed")
+    InAppBrowser.open(cardPrivacyPolicyUrl)
   }
 
-  const handleCloseCardAccount = () => {
-    console.log("Close card account pressed")
-  }
+  const cardManagementItems = [
+    !hasPhysicalCard &&
+      (() => (
+        <SettingItemRow
+          title={LL.CardFlow.CardSettings.orderPhysicalCard()}
+          leftIcon="physical-card"
+          onPress={handleOrderPhysicalCard}
+        />
+      )),
+    () => (
+      <SettingItemRow
+        title={
+          isIos
+            ? LL.CardFlow.CardSettings.addToAppleWallet()
+            : LL.CardFlow.CardSettings.addToGooglePay()
+        }
+        leftIonicon="wallet-outline"
+        onPress={handleAddToMobileWallet}
+      />
+    ),
+    () => (
+      <SettingItemRow
+        title={LL.CardFlow.CardSettings.replaceCard()}
+        leftIcon="refresh"
+        onPress={handleReplaceCard}
+      />
+    ),
+  ].filter(Boolean) as (() => React.ReactElement)[]
 
   return (
     <Screen preset="scroll">
@@ -82,11 +138,7 @@ export const CardSettingsScreen: React.FC = () => {
             ),
             () => (
               <SettingItemRow
-                title={
-                  MOCK_CARD_PIN
-                    ? LL.CardFlow.CardSettings.changePin()
-                    : LL.CardFlow.PinScreens.CreateFlow.title()
-                }
+                title={LL.CardFlow.CardSettings.changePin()}
                 leftIcon="key-outline"
                 onPress={handleChangePin}
               />
@@ -104,24 +156,29 @@ export const CardSettingsScreen: React.FC = () => {
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.transactionAlerts()}
                   description={LL.CardFlow.CardSettings.transactionAlertsDescription()}
-                  value={transactionAlerts}
-                  onValueChange={(value) => setTransactionAlerts(value)}
+                  value={isCategoryEnabled(NotificationCategory.Payments)}
+                  onValueChange={(value) =>
+                    toggleCategory(NotificationCategory.Payments, value)
+                  }
                 />
               ),
-              () => (
-                <SwitchRow
-                  title={LL.CardFlow.CardSettings.securityAlerts()}
-                  description={LL.CardFlow.CardSettings.securityAlertsDescription()}
-                  value={securityAlerts}
-                  onValueChange={(value) => setSecurityAlerts(value)}
-                />
-              ),
+              // TODO: Temporarily commented out — the NotificationCategory scalar has no "Security" category.
+              // If support is added, uncomment this block. Otherwise, remove it along with
+              // the securityAlerts/securityAlertsDescription translation keys.
+              // () => (
+              //   <SwitchRow
+              //     title={LL.CardFlow.CardSettings.securityAlerts()}
+              //     description={LL.CardFlow.CardSettings.securityAlertsDescription()}
+              //   />
+              // ),
               () => (
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.marketingUpdates()}
                   description={LL.CardFlow.CardSettings.marketingUpdatesDescription()}
-                  value={marketingUpdates}
-                  onValueChange={(value) => setMarketingUpdates(value)}
+                  value={isCategoryEnabled(NotificationCategory.Marketing)}
+                  onValueChange={(value) =>
+                    toggleCategory(NotificationCategory.Marketing, value)
+                  }
                 />
               ),
             ]}
@@ -132,38 +189,12 @@ export const CardSettingsScreen: React.FC = () => {
           name={LL.CardFlow.CardSettings.cardManagement()}
           titleStyle={styles.sectionTitle}
           dividerStyle={styles.dividerStyle}
-          items={[
-            () => (
-              <SettingItemRow
-                title={LL.CardFlow.CardSettings.orderPhysicalCard()}
-                leftIcon="physical-card"
-                onPress={handleOrderPhysicalCard}
-              />
-            ),
-            () => (
-              <SettingItemRow
-                title={
-                  isIos
-                    ? LL.CardFlow.CardSettings.addToAppleWallet()
-                    : LL.CardFlow.CardSettings.addToGooglePay()
-                }
-                leftIonicon="wallet-outline"
-                onPress={handleAddToMobileWallet}
-              />
-            ),
-            () => (
-              <SettingItemRow
-                title={LL.CardFlow.CardSettings.replaceCard()}
-                leftIcon="refresh"
-                onPress={handleReplaceCard}
-              />
-            ),
-          ]}
+          items={cardManagementItems}
         />
 
         <View style={styles.supportSection}>
           <Text style={styles.sectionTitle}>{LL.common.support()}</Text>
-          <ContactSupportRow onPress={handleContactSupport} />
+          <ContactSupportRow />
         </View>
 
         <SettingsGroup
@@ -197,10 +228,16 @@ export const CardSettingsScreen: React.FC = () => {
             leftIconColor={colors.error}
             titleStyle={styles.dangerZoneRowTitle}
             subtitleStyle={styles.dangerZoneRowSubtitle}
-            onPress={handleCloseCardAccount}
+            onPress={handleCloseCardPress}
           />
         </View>
       </View>
+      <CloseCardModal
+        isVisible={closeModalVisible}
+        onClose={() => setCloseModalVisible(false)}
+        onCloseCard={closeCard}
+        loading={loading}
+      />
     </Screen>
   )
 }

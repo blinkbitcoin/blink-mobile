@@ -3036,7 +3036,19 @@
       "privacyPolicy": "Zásady ochrany osobných údajov karty",
       "closeCardAccount": "Zrušiť účet karty",
       "closeCardAccountDescription": "Trvalo zrušte svoju kartu Visa",
-      "addToAppleWallet": "Pridat do Apple Wallet"
+      "addToAppleWallet": "Pridat do Apple Wallet",
+      "notificationToggleError": "Nepodarilo sa aktualizovať nastavenia oznámení",
+      "closeCardWarning": "Táto akcia je trvalá. Vaša karta Visa bude zrušená a nemôže byť znovu aktivovaná.",
+      "closeCardTypeClose": "Prosím, zadajte \"{close}\" na potvrdenie",
+      "closeCardClose": "zavrieť",
+      "closeCardFinalConfirmTitle": "Záverečné Potvrdenie",
+      "closeCardFinalConfirmMessage": "Ste si istí, že chcete zavrieť svoj kartový účet? Toto sa nedá vrátiť.",
+      "closeCardPendingTransactions": "Máte nevybavené transakcie. Prosím, počkajte, kým budú vybavené, než kartu zavriete.",
+      "closeCardBalanceWarning": "Vaša karta má zostatok {balance}. Prosím, vyberte si prostriedky pred zatvorením. Chcete napriek tomu pokračovať?",
+      "closeCardSuccessTitle": "Kartový Účet Zatvorený",
+      "closeCardSuccessSubtitle": "Vaša karta Visa bola trvalo zatvorená.",
+      "closeCardSuccessButton": "Späť na Úvodnú Stránku",
+      "closeCardError": "Nepodarilo sa zavrieť kartový účet. Prosím, kontaktujte podporu."
     },
     "TransactionDetails": {
       "title": "Podrobnosti transakcie",

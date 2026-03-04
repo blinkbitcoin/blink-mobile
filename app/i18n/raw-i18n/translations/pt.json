@@ -3036,7 +3036,19 @@
             "privacyPolicy": "Política de privacidade do cartão",
             "closeCardAccount": "Encerrar conta do cartão",
             "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa",
-            "addToAppleWallet": "Adicionar ao Apple Wallet"
+            "addToAppleWallet": "Adicionar ao Apple Wallet",
+            "notificationToggleError": "Falha ao atualizar as configurações de notificação",
+            "closeCardWarning": "Esta ação é permanente. Seu cartão Visa será cancelado e não poderá ser reativado.",
+            "closeCardTypeClose": "Digite \"{close}\" para confirmar",
+            "closeCardClose": "fechar",
+            "closeCardFinalConfirmTitle": "Confirmação Final",
+            "closeCardFinalConfirmMessage": "Tem certeza de que deseja encerrar sua conta de cartão? Isso não pode ser desfeito.",
+            "closeCardPendingTransactions": "Você tem transações pendentes. Aguarde até que sejam liquidadas antes de fechar seu cartão.",
+            "closeCardBalanceWarning": "Seu cartão tem um saldo de {balance}. Retire seus fundos antes de fechar. Deseja continuar mesmo assim?",
+            "closeCardSuccessTitle": "Conta do Cartão Encerrada",
+            "closeCardSuccessSubtitle": "Seu cartão Visa foi encerrado permanentemente.",
+            "closeCardSuccessButton": "Voltar ao Início",
+            "closeCardError": "Falha ao encerrar a conta do cartão. Entre em contato com o suporte."
         },
         "TransactionDetails": {
             "title": "Detalhes da transação",

@@ -3036,7 +3036,19 @@
       "privacyPolicy": "Kártya adatvédelmi szabályzat",
       "closeCardAccount": "Kártyaszámla bezárása",
       "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját",
-      "addToAppleWallet": "Hozzaadas az Apple Wallethoz"
+      "addToAppleWallet": "Hozzaadas az Apple Wallethoz",
+      "notificationToggleError": "Nem sikerült frissíteni az értesítési beállításokat",
+      "closeCardWarning": "Ez a művelet végleges. A Visa kártyád törlésre kerül, és nem aktiválható újra.",
+      "closeCardTypeClose": "Kérjük, írd be a \"{close}\" szót a megerősítéshez",
+      "closeCardClose": "bezár",
+      "closeCardFinalConfirmTitle": "Végső Megerősítés",
+      "closeCardFinalConfirmMessage": "Biztosan be akarod zárni a kártyaszámládat? Ez nem vonható vissza.",
+      "closeCardPendingTransactions": "Függőben lévő tranzakcióid vannak. Kérjük, várd meg, amíg teljesülnek, mielőtt bezárnád a kártyádat.",
+      "closeCardBalanceWarning": "A kártyádon {balance} egyenleg van. Kérjük, vedd fel a pénzed a bezárás előtt. Mindenképpen folytatod?",
+      "closeCardSuccessTitle": "Kártyaszámla Bezárva",
+      "closeCardSuccessSubtitle": "A Visa kártyád véglegesen bezárásra került.",
+      "closeCardSuccessButton": "Vissza a Kezdőlapra",
+      "closeCardError": "Nem sikerült bezárni a kártyaszámlát. Kérjük, lépj kapcsolatba az ügyfélszolgálattal."
     },
     "TransactionDetails": {
       "title": "Tranzakció részletei",

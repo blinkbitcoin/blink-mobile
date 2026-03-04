@@ -3036,7 +3036,19 @@
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
       "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa",
-      "addToAppleWallet": "Ongeza kwenye Apple Wallet"
+      "addToAppleWallet": "Ongeza kwenye Apple Wallet",
+      "notificationToggleError": "Imeshindwa kusasisha mipangilio ya arifa",
+      "closeCardWarning": "Kitendo hiki ni cha kudumu. Kadi yako ya Visa itafutwa na haiwezi kuamilishwa tena.",
+      "closeCardTypeClose": "Tafadhali andika \"{close}\" kuthibitisha",
+      "closeCardClose": "funga",
+      "closeCardFinalConfirmTitle": "Uthibitisho wa Mwisho",
+      "closeCardFinalConfirmMessage": "Je, una uhakika unataka kufunga akaunti yako ya kadi? Hii haiwezi kutenduliwa.",
+      "closeCardPendingTransactions": "Una miamala inayosubiri. Tafadhali subiri hadi ikamilike kabla ya kufunga kadi yako.",
+      "closeCardBalanceWarning": "Kadi yako ina salio la {balance}. Tafadhali ondoa fedha zako kabla ya kufunga. Je, unataka kuendelea hata hivyo?",
+      "closeCardSuccessTitle": "Akaunti ya Kadi Imefungwa",
+      "closeCardSuccessSubtitle": "Kadi yako ya Visa imefungwa kabisa.",
+      "closeCardSuccessButton": "Rudi Nyumbani",
+      "closeCardError": "Imeshindwa kufunga akaunti ya kadi. Tafadhali wasiliana na msaada."
     },
     "TransactionDetails": {
       "title": "Maelezo ya muamala",

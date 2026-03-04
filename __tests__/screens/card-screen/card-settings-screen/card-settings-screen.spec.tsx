@@ -1,9 +1,10 @@
 import React from "react"
+import { Alert, Linking } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSettingsScreen } from "@app/screens/card-screen/card-settings-screen"
-import { ContextForScreen } from "./helper"
+import { ContextForScreen } from "../../helper"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
@@ -23,6 +24,8 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     feedbackEmailAddress: "support@blink.sv",
+    cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
+    cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   }),
 }))
 
@@ -30,8 +33,38 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_CARD_PIN: "1234",
+jest.mock("react-native/Libraries/Linking/Linking", () => ({
+  openURL: jest.fn(),
+  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+  getInitialURL: jest.fn(() => Promise.resolve(null)),
+}))
+
+const mockInAppBrowserOpen = jest.fn()
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  __esModule: true,
+  default: { open: (...args: readonly unknown[]) => mockInAppBrowserOpen(...args) },
+}))
+
+const mockToggleCategory = jest.fn()
+const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
+const mockCloseCard = jest.fn()
+let mockCloseCardAccountReturn = {
+  closeCard: mockCloseCard,
+  loading: false,
+  hasPendingTransactions: false,
+  hasPositiveBalance: false,
+  balanceDisplay: "",
+}
+jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
+  NotificationCategory: {
+    Payments: "Payments",
+    Marketing: "Marketing",
+  },
+  useNotificationToggle: () => ({
+    isCategoryEnabled: mockIsCategoryEnabled,
+    toggleCategory: mockToggleCategory,
+  }),
+  useCloseCardAccount: () => mockCloseCardAccountReturn,
 }))
 
 const mockNavigate = jest.fn()
@@ -50,6 +83,13 @@ describe("CardSettingsScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockNavigate.mockClear()
+    mockCloseCardAccountReturn = {
+      closeCard: mockCloseCard,
+      loading: false,
+      hasPendingTransactions: false,
+      hasPositiveBalance: false,
+      balanceDisplay: "",
+    }
   })
 
   describe("rendering", () => {
@@ -126,19 +166,6 @@ describe("CardSettingsScreen", () => {
 
       expect(getByText("Transaction alerts")).toBeTruthy()
       expect(getByText("Get notified for all transactions")).toBeTruthy()
-    })
-
-    it("displays security alerts switch", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardSettingsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Security alerts")).toBeTruthy()
-      expect(getByText("Get notified for security-related activities")).toBeTruthy()
     })
 
     it("displays marketing updates switch", async () => {
@@ -383,9 +410,7 @@ describe("CardSettingsScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("replaceCardScreen")
     })
 
-    it("allows pressing contact support row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("allows pressing contact support row and opens mailto", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -399,13 +424,10 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-      consoleSpy.mockRestore()
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
 
-    it("allows pressing terms and conditions row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("opens terms and conditions URL in InAppBrowser", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -419,13 +441,12 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Terms and Conditions pressed")
-      consoleSpy.mockRestore()
+      expect(mockInAppBrowserOpen).toHaveBeenCalledWith(
+        "https://www.blink.sv/en/terms-conditions",
+      )
     })
 
-    it("allows pressing privacy policy row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("opens privacy policy URL in InAppBrowser", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -439,12 +460,13 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Privacy Policy pressed")
-      consoleSpy.mockRestore()
+      expect(mockInAppBrowserOpen).toHaveBeenCalledWith(
+        "https://www.blink.sv/en/privacy-policy",
+      )
     })
 
-    it("allows pressing close card account row", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
+    it("opens close modal directly when no blockers", async () => {
+      const alertSpy = jest.spyOn(Alert, "alert")
 
       const { getByText } = render(
         <ContextForScreen>
@@ -454,18 +476,79 @@ describe("CardSettingsScreen", () => {
 
       await act(async () => {})
 
-      const row = getByText("Close card account")
       await act(async () => {
-        fireEvent.press(row)
+        fireEvent.press(getByText("Close card account"))
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Close card account pressed")
-      consoleSpy.mockRestore()
+      expect(alertSpy).not.toHaveBeenCalled()
+      expect(
+        getByText(
+          "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+        ),
+      ).toBeTruthy()
+
+      alertSpy.mockRestore()
+    })
+
+    it("shows alert when there are pending transactions", async () => {
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPendingTransactions: true,
+      }
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardSettingsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Close card account"))
+      })
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Warning",
+        "You have pending transactions. Please wait until they are settled before closing your card.",
+      )
+
+      alertSpy.mockRestore()
+    })
+
+    it("shows balance warning alert when has positive balance", async () => {
+      mockCloseCardAccountReturn = {
+        ...mockCloseCardAccountReturn,
+        hasPositiveBalance: true,
+        balanceDisplay: "~$15.00",
+      }
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardSettingsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Close card account"))
+      })
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Warning",
+        expect.stringContaining("~$15.00"),
+        expect.any(Array),
+      )
+
+      alertSpy.mockRestore()
     })
   })
 
   describe("switch interactions", () => {
-    it("toggles transaction alerts switch", async () => {
+    it("calls toggleCategory with Payments when transaction alerts switch is pressed", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -481,10 +564,10 @@ describe("CardSettingsScreen", () => {
         fireEvent(switches[0], "pressIn")
       })
 
-      expect(getAllByRole("switch")[0].props.accessibilityState.checked).toBe(false)
+      expect(mockToggleCategory).toHaveBeenCalledWith("Payments", false)
     })
 
-    it("toggles security alerts switch", async () => {
+    it("calls toggleCategory with Marketing when marketing updates switch is pressed", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -494,32 +577,13 @@ describe("CardSettingsScreen", () => {
       await act(async () => {})
 
       const switches = getAllByRole("switch")
-      expect(switches[1].props.accessibilityState.checked).toBe(true)
+      expect(switches[1].props.accessibilityState.checked).toBe(false)
 
       await act(async () => {
         fireEvent(switches[1], "pressIn")
       })
 
-      expect(getAllByRole("switch")[1].props.accessibilityState.checked).toBe(false)
-    })
-
-    it("toggles marketing updates switch", async () => {
-      const { getAllByRole } = render(
-        <ContextForScreen>
-          <CardSettingsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const switches = getAllByRole("switch")
-      expect(switches[2].props.accessibilityState.checked).toBe(false)
-
-      await act(async () => {
-        fireEvent(switches[2], "pressIn")
-      })
-
-      expect(getAllByRole("switch")[2].props.accessibilityState.checked).toBe(true)
+      expect(mockToggleCategory).toHaveBeenCalledWith("Marketing", true)
     })
   })
 
@@ -542,8 +606,6 @@ describe("CardSettingsScreen", () => {
     })
 
     it("user can navigate through all settings", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -566,9 +628,7 @@ describe("CardSettingsScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardPersonalDetailsScreen")
       expect(mockNavigate).toHaveBeenCalledWith("orderCardScreen")
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-
-      consoleSpy.mockRestore()
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
     })
   })
 })

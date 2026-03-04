@@ -3077,7 +3077,19 @@
       "privacyPolicy": "Dasar privasi kad",
       "closeCardAccount": "Tutup akaun kad",
       "closeCardAccountDescription": "Tutup kad Visa anda secara kekal",
-      "addToAppleWallet": "Tambah ke Apple Wallet"
+      "addToAppleWallet": "Tambah ke Apple Wallet",
+      "notificationToggleError": "Gagal mengemas kini tetapan pemberitahuan",
+      "closeCardWarning": "Tindakan ini kekal. Kad Visa anda akan dibatalkan dan tidak boleh diaktifkan semula.",
+      "closeCardTypeClose": "Sila taip \"{close}\" untuk mengesahkan",
+      "closeCardClose": "tutup",
+      "closeCardFinalConfirmTitle": "Pengesahan Akhir",
+      "closeCardFinalConfirmMessage": "Adakah anda pasti mahu menutup akaun kad anda? Ini tidak boleh dibatalkan.",
+      "closeCardPendingTransactions": "Anda mempunyai transaksi tertangguh. Sila tunggu sehingga ia diselesaikan sebelum menutup kad anda.",
+      "closeCardBalanceWarning": "Kad anda mempunyai baki {balance}. Sila keluarkan dana anda sebelum menutup. Adakah anda mahu teruskan?",
+      "closeCardSuccessTitle": "Akaun Kad Ditutup",
+      "closeCardSuccessSubtitle": "Kad Visa anda telah ditutup secara kekal.",
+      "closeCardSuccessButton": "Kembali ke Laman Utama",
+      "closeCardError": "Gagal menutup akaun kad. Sila hubungi sokongan."
     },
     "TransactionDetails": {
       "title": "Butiran transaksi",

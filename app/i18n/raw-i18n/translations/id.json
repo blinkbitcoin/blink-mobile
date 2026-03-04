@@ -3036,7 +3036,19 @@
       "privacyPolicy": "Kebijakan privasi kartu",
       "closeCardAccount": "Tutup akun kartu",
       "closeCardAccountDescription": "Tutup kartu Visa Anda secara permanen",
-      "addToAppleWallet": "Tambahkan ke Apple Wallet"
+      "addToAppleWallet": "Tambahkan ke Apple Wallet",
+      "notificationToggleError": "Gagal memperbarui pengaturan notifikasi",
+      "closeCardWarning": "Tindakan ini bersifat permanen. Kartu Visa Anda akan dibatalkan dan tidak dapat diaktifkan kembali.",
+      "closeCardTypeClose": "Silakan ketik \"{close}\" untuk mengonfirmasi",
+      "closeCardClose": "tutup",
+      "closeCardFinalConfirmTitle": "Konfirmasi Akhir",
+      "closeCardFinalConfirmMessage": "Apakah Anda yakin ingin menutup akun kartu Anda? Ini tidak dapat dibatalkan.",
+      "closeCardPendingTransactions": "Anda memiliki transaksi tertunda. Harap tunggu sampai diselesaikan sebelum menutup kartu Anda.",
+      "closeCardBalanceWarning": "Kartu Anda memiliki saldo {balance}. Harap tarik dana Anda sebelum menutup. Apakah Anda ingin melanjutkan?",
+      "closeCardSuccessTitle": "Akun Kartu Ditutup",
+      "closeCardSuccessSubtitle": "Kartu Visa Anda telah ditutup secara permanen.",
+      "closeCardSuccessButton": "Kembali ke Beranda",
+      "closeCardError": "Gagal menutup akun kartu. Silakan hubungi dukungan."
     },
     "TransactionDetails": {
       "title": "Detail transaksi",

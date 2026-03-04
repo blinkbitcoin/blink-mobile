@@ -3034,7 +3034,19 @@
             "termsAndConditions": "Card Terms & Conditions",
             "privacyPolicy": "Card Privacy Policy",
             "closeCardAccount": "Close card account",
-            "closeCardAccountDescription": "Permanently close your Visa card"
+            "closeCardAccountDescription": "Permanently close your Visa card",
+            "closeCardWarning": "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+            "closeCardTypeClose": "Please type \"{close}\" to confirm",
+            "closeCardClose": "close",
+            "closeCardFinalConfirmTitle": "Final Confirmation",
+            "closeCardFinalConfirmMessage": "Are you sure you want to close your card account? This cannot be undone.",
+            "closeCardPendingTransactions": "You have pending transactions. Please wait until they are settled before closing your card.",
+            "closeCardBalanceWarning": "Your card has a balance of {balance: string}. Please withdraw your funds before closing. Do you want to proceed anyway?",
+            "closeCardSuccessTitle": "Card Account Closed",
+            "closeCardSuccessSubtitle": "Your Visa card has been permanently closed.",
+            "closeCardSuccessButton": "Back to Home",
+            "closeCardError": "Failed to close card account. Please contact support.",
+            "notificationToggleError": "Failed to update notification settings"
         },
         "PersonalDetails": {
             "title": "Personal details",

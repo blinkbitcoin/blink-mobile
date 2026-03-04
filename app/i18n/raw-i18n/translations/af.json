@@ -3077,7 +3077,19 @@
       "privacyPolicy": "Kaart privaatheidsbeleid",
       "closeCardAccount": "Sluit kaartrekening",
       "closeCardAccountDescription": "Sluit jou Visa-kaart permanent",
-      "addToAppleWallet": "Voeg by Apple Wallet"
+      "addToAppleWallet": "Voeg by Apple Wallet",
+      "notificationToggleError": "Kon kennisgewinginstellings nie opdateer nie",
+      "closeCardWarning": "Hierdie aksie is permanent. Jou Visa-kaart sal gekanselleer word en kan nie heraktiveer word nie.",
+      "closeCardTypeClose": "Tik asseblief \"{close}\" om te bevestig",
+      "closeCardClose": "sluit",
+      "closeCardFinalConfirmTitle": "Finale Bevestiging",
+      "closeCardFinalConfirmMessage": "Is jy seker jy wil jou kaartrekening sluit? Dit kan nie ongedaan gemaak word nie.",
+      "closeCardPendingTransactions": "Jy het hangende transaksies. Wag asseblief totdat hulle afgehandel is voordat jy jou kaart sluit.",
+      "closeCardBalanceWarning": "Jou kaart het 'n balans van {balance}. Trek asseblief jou fondse onttrek voordat jy sluit. Wil jy in elk geval voortgaan?",
+      "closeCardSuccessTitle": "Kaartrekening Gesluit",
+      "closeCardSuccessSubtitle": "Jou Visa-kaart is permanent gesluit.",
+      "closeCardSuccessButton": "Terug na Tuis",
+      "closeCardError": "Kon nie kaartrekening sluit nie. Kontak asseblief ondersteuning."
     },
     "TransactionDetails": {
       "title": "Transaksiebesonderhede",

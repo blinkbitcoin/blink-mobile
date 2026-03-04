@@ -11,6 +11,8 @@ const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
 const SuccessIconDurationKey = "successIconDuration"
+const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
+const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 
 type DeliveryOptionConfig = {
@@ -33,6 +35,8 @@ type RemoteConfig = {
   [UpgradeModalShowAtSessionNumberKey]: number
   [FeeReimbursementMemoKey]: string
   [SuccessIconDurationKey]: number
+  [CardTermsAndConditionsUrlKey]: string
+  [CardPrivacyPolicyUrlKey]: string
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
 }
 
@@ -49,6 +53,8 @@ const defaultRemoteConfig: RemoteConfig = {
   upgradeModalShowAtSessionNumber: 1,
   feeReimbursementMemo: "fee reimbursement",
   successIconDuration: 2300,
+  cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
+  cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
 }
 
@@ -112,6 +118,14 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SuccessIconDurationKey)
           .asNumber()
 
+        const cardTermsAndConditionsUrl = remoteConfigInstance()
+          .getValue(CardTermsAndConditionsUrlKey)
+          .asString()
+
+        const cardPrivacyPolicyUrl = remoteConfigInstance()
+          .getValue(CardPrivacyPolicyUrlKey)
+          .asString()
+
         const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
@@ -128,6 +142,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           upgradeModalShowAtSessionNumber,
           feeReimbursementMemo,
           successIconDuration,
+          cardTermsAndConditionsUrl,
+          cardPrivacyPolicyUrl,
           replaceCardDeliveryConfig,
         })
       } catch (err) {
