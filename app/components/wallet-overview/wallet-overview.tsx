@@ -240,6 +240,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     borderRadius: 12,
     padding: 12,
+    paddingBottom: 5,
   },
   loaderBackground: {
     color: colors.loaderBackground,
