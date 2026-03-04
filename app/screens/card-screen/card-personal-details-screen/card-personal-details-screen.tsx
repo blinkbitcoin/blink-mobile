@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -15,10 +15,18 @@ import {
 } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
+import { OnboardingStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { MOCK_USER, shippingAddressToLines } from "../card-mock-data"
+/*
+ * TODO: uncomment and replace mock data with real API data
+ * when dateOfBirth and registeredAddress are available via the API
+ */
+// import { MOCK_USER, shippingAddressToLines } from "../card-mock-data"
+import { addressToLines } from "../utils"
+import { getKycBannerConfig } from "./get-kyc-banner-config"
+import { usePersonalDetailsData } from "./hooks"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -27,8 +35,32 @@ export const CardPersonalDetailsScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const LLPersonalDetails = LL.CardFlow.PersonalDetails
+
+  const {
+    firstName,
+    lastName,
+    fullName,
+    onboardingStatus,
+    email,
+    phone,
+    shippingAddress,
+    loading,
+  } = usePersonalDetailsData()
+
+  const kycBanner = getKycBannerConfig({
+    status: onboardingStatus,
+    translations: LLPersonalDetails,
+    colors: {
+      success: colors._green,
+      warning: colors.warning,
+      error: colors.error,
+      info: colors.primary,
+    },
+  })
 
   const handleChangeKycInformation = () => {
+    // TODO: replace with real KYC action when is available
     console.log("Change KYC information pressed")
   }
 
@@ -36,90 +68,95 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     navigation.navigate("cardShippingAddressScreen")
   }
 
-  const handleContactSupport = () => {
-    console.log("Contact support pressed")
+  if (loading) {
+    return (
+      <Screen preset="scroll">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </Screen>
+    )
   }
 
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
         <View style={styles.headerSection}>
-          <AvatarInitial name={MOCK_USER.fullName} />
+          <AvatarInitial name={fullName} />
           <View style={styles.nameContainer}>
-            <Text style={styles.fullName}>{MOCK_USER.fullName}</Text>
+            <Text style={styles.fullName}>{fullName}</Text>
             <Text style={styles.cardholderLabel}>
-              {LL.CardFlow.PersonalDetails.blinkVisaCardholder()}
+              {LLPersonalDetails.blinkVisaCardholder()}
             </Text>
           </View>
         </View>
 
         <InfoCard
-          ionicon="shield-checkmark-outline"
-          title={LL.CardFlow.PersonalDetails.kycVerifiedInformation()}
-          description={LL.CardFlow.PersonalDetails.kycVerifiedDescription()}
-          titleColor={colors._green}
-          iconColor={colors._green}
+          ionicon={kycBanner.ionicon}
+          title={kycBanner.title}
+          description={kycBanner.description}
+          titleColor={kycBanner.color}
+          iconColor={kycBanner.color}
         />
 
-        <IconTextButton
-          icon="refresh"
-          label={LL.CardFlow.PersonalDetails.changeKycInformation()}
-          onPress={handleChangeKycInformation}
-        />
+        {onboardingStatus === OnboardingStatus.Approved && (
+          <IconTextButton
+            icon="refresh"
+            label={LLPersonalDetails.changeKycInformation()}
+            onPress={handleChangeKycInformation}
+          />
+        )}
 
-        <InputField
-          label={LL.CardFlow.PersonalDetails.firstName()}
-          value={MOCK_USER.firstName}
-        />
+        <InputField label={LLPersonalDetails.firstName()} value={firstName} />
 
-        <InputField
-          label={LL.CardFlow.PersonalDetails.lastName()}
-          value={MOCK_USER.lastName}
-        />
+        <InputField label={LLPersonalDetails.lastName()} value={lastName} />
 
-        <InputField
-          label={LL.CardFlow.PersonalDetails.dateOfBirth()}
-          value={MOCK_USER.dateOfBirth}
-        />
+        {/*
+         * TODO: uncomment and replace mock data with real API data
+         * when dateOfBirth is available via the API
+         * <InputField
+         *   label={LLPersonalDetails.dateOfBirth()}
+         *   value={MOCK_USER.dateOfBirth}
+         * />
+         */}
 
         <SettingsGroup
-          name={LL.CardFlow.PersonalDetails.contactInformation()}
+          name={LLPersonalDetails.contactInformation()}
           titleStyle={styles.sectionTitle}
           dividerStyle={styles.dividerStyle}
           items={[
-            () => <SettingItemRow title={MOCK_USER.email} rightIcon={null} />,
-            () => <SettingItemRow title={MOCK_USER.phone} rightIcon={null} />,
+            () => <SettingItemRow title={email} rightIcon={null} />,
+            () => <SettingItemRow title={phone} rightIcon={null} />,
           ]}
         />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {LL.CardFlow.PersonalDetails.registeredAddress()}
-          </Text>
-          <MultiLineField
-            lines={shippingAddressToLines(MOCK_USER.registeredAddress)}
-            leftIcon="map-pin"
-          />
-        </View>
+        {/*
+         * TODO: uncomment and replace mock data with real API data
+         * when registeredAddress is available via the API
+         * <View style={styles.section}>
+         *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
+         *   <MultiLineField
+         *     lines={shippingAddressToLines(MOCK_USER.registeredAddress)}
+         *     leftIcon="map-pin"
+         *   />
+         * </View>
+         */}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {LL.CardFlow.PersonalDetails.shippingAddress()}
-          </Text>
-          <MultiLineField
-            lines={shippingAddressToLines(MOCK_USER.shippingAddress)}
-            leftIcon="map-pin"
-            rightIcon="pencil"
-            onPress={handleEditShippingAddress}
-          />
-        </View>
+        {shippingAddress && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{LLPersonalDetails.shippingAddress()}</Text>
+            <MultiLineField
+              lines={addressToLines(shippingAddress)}
+              leftIcon="map-pin"
+              rightIcon="pencil"
+              onPress={handleEditShippingAddress}
+            />
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.common.support()}</Text>
-          <ContactSupportRow
-            onPress={handleContactSupport}
-            rightIconColor={colors.primary}
-          />
+          <ContactSupportRow rightIconColor={colors.primary} />
         </View>
       </View>
     </Screen>
@@ -127,6 +164,11 @@ export const CardPersonalDetailsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   content: {
     paddingHorizontal: 24,
     paddingTop: 20,
