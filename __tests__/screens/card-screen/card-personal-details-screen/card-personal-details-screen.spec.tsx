@@ -3,6 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardPersonalDetailsScreen } from "@app/screens/card-screen/card-personal-details-screen"
+import { OnboardingStatus } from "@app/graphql/generated"
 import { ContextForScreen } from "../../helper"
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -23,11 +24,68 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+type MockShippingAddress = {
+  firstName: string | null
+  lastName: string | null
+  line1: string
+  line2: string | null
+  city: string
+  region: string
+  postalCode: string
+  country: string | null
+  countryCode: string
+}
+
+type PersonalDetailsReturn = {
+  firstName: string
+  lastName: string
+  fullName: string
+  onboardingStatus: OnboardingStatus | null
+  email: string
+  phone: string
+  shippingAddress: MockShippingAddress | null
+  loading: boolean
+  error: Error | undefined
+}
+
+const defaultMockShippingAddress: MockShippingAddress = {
+  firstName: "John",
+  lastName: "Doe",
+  line1: "456 Oak Avenue",
+  line2: "Suite 7",
+  city: "Miami",
+  region: "FL",
+  postalCode: "33101",
+  country: "United States",
+  countryCode: "US",
+}
+
+const defaultMockData: PersonalDetailsReturn = {
+  firstName: "John",
+  lastName: "Doe",
+  fullName: "John Doe",
+  onboardingStatus: OnboardingStatus.Approved,
+  email: "john@example.com",
+  phone: "+1 (999) 888-7777",
+  shippingAddress: defaultMockShippingAddress,
+  loading: false,
+  error: undefined,
+}
+
+let mockPersonalDetailsReturn: PersonalDetailsReturn = { ...defaultMockData }
+
+jest.mock(
+  "@app/screens/card-screen/card-personal-details-screen/hooks/use-personal-details-data",
+  () => ({
+    usePersonalDetailsData: () => mockPersonalDetailsReturn,
+  }),
+)
+
 describe("CardPersonalDetailsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockNavigate.mockClear()
+    mockPersonalDetailsReturn = { ...defaultMockData }
   })
 
   describe("rendering", () => {
@@ -43,7 +101,7 @@ describe("CardPersonalDetailsScreen", () => {
       expect(toJSON()).toBeTruthy()
     })
 
-    it("displays user full name in header", async () => {
+    it("displays user full name from hook data", async () => {
       const { getAllByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -52,7 +110,7 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      const nameElements = getAllByText("Satoshi Nakamoto")
+      const nameElements = getAllByText("John Doe")
       expect(nameElements.length).toBeGreaterThanOrEqual(1)
     })
 
@@ -67,10 +125,70 @@ describe("CardPersonalDetailsScreen", () => {
 
       expect(getByText("Blink Visa Cardholder")).toBeTruthy()
     })
+
+    it("shows loading state when loading", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        loading: true,
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("John Doe")).toBeNull()
+      expect(queryByText("First name")).toBeNull()
+      expect(queryByText("KYC verified information")).toBeNull()
+    })
+
+    it("shows partial name when only firstName is provided", async () => {
+      mockPersonalDetailsReturn = {
+        ...defaultMockData,
+        fullName: "John",
+        firstName: "John",
+        lastName: "",
+        shippingAddress: null,
+      }
+
+      const { getAllByText, queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getAllByText("John").length).toBeGreaterThanOrEqual(1)
+      expect(queryByText("John Doe")).toBeNull()
+    })
+
+    it("shows empty name when fullName is empty", async () => {
+      mockPersonalDetailsReturn = {
+        ...defaultMockData,
+        fullName: "",
+        firstName: "",
+        lastName: "",
+        shippingAddress: null,
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("John Doe")).toBeNull()
+    })
   })
 
   describe("kyc information section", () => {
-    it("displays kyc verified information card", async () => {
+    it("displays kyc verified information when approved", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -82,7 +200,7 @@ describe("CardPersonalDetailsScreen", () => {
       expect(getByText("KYC verified information")).toBeTruthy()
     })
 
-    it("displays kyc verified description", async () => {
+    it("displays kyc verified description when approved", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -98,7 +216,126 @@ describe("CardPersonalDetailsScreen", () => {
       ).toBeTruthy()
     })
 
-    it("displays change kyc information button", async () => {
+    it("displays pending banner when processing", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Processing,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("KYC verification pending")).toBeTruthy()
+    })
+
+    it("displays under review banner when in review", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Review,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("KYC under review")).toBeTruthy()
+    })
+
+    it("displays declined banner when declined", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Declined,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("KYC verification declined")).toBeTruthy()
+    })
+
+    it("displays not started banner when not started", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.NotStarted,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Complete KYC verification")).toBeTruthy()
+    })
+
+    it("displays awaiting input banner", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.AwaitingInput,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Continue KYC verification")).toBeTruthy()
+    })
+
+    it("displays error banner when error", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Error,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Verification error")).toBeTruthy()
+    })
+
+    it("displays error banner when abandoned", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Abandoned,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Verification error")).toBeTruthy()
+    })
+
+    it("displays change kyc information button when approved", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -109,10 +346,27 @@ describe("CardPersonalDetailsScreen", () => {
 
       expect(getByText("Change KYC information")).toBeTruthy()
     })
+
+    it("hides change kyc information button when not approved", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        onboardingStatus: OnboardingStatus.Processing,
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Change KYC information")).toBeNull()
+    })
   })
 
   describe("personal information fields", () => {
-    it("displays first name field", async () => {
+    it("displays first name from hook data", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -122,10 +376,10 @@ describe("CardPersonalDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("First name")).toBeTruthy()
-      expect(getByText("Joe")).toBeTruthy()
+      expect(getByText("John")).toBeTruthy()
     })
 
-    it("displays last name field", async () => {
+    it("displays last name from hook data", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -135,11 +389,16 @@ describe("CardPersonalDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Last name")).toBeTruthy()
-      expect(getByText("Nakamoto")).toBeTruthy()
+      expect(getByText("Doe")).toBeTruthy()
     })
 
-    it("displays date of birth field", async () => {
-      const { getByText } = render(
+    it("shows empty first name when empty", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        firstName: "",
+      }
+
+      const { queryByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
         </ContextForScreen>,
@@ -147,8 +406,24 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Date of birth")).toBeTruthy()
-      expect(getByText("1971-01-03")).toBeTruthy()
+      expect(queryByText("John")).toBeNull()
+    })
+
+    it("shows empty last name when empty", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        lastName: "",
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Doe")).toBeNull()
     })
   })
 
@@ -165,7 +440,7 @@ describe("CardPersonalDetailsScreen", () => {
       expect(getByText("Contact information")).toBeTruthy()
     })
 
-    it("displays email", async () => {
+    it("displays email from hook data", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -174,10 +449,10 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("email@gmail.com")).toBeTruthy()
+      expect(getByText("john@example.com")).toBeTruthy()
     })
 
-    it("displays phone number", async () => {
+    it("displays phone from hook data", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
@@ -186,39 +461,47 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("+1 (555) 123-4567")).toBeTruthy()
+      expect(getByText("+1 (999) 888-7777")).toBeTruthy()
+    })
+
+    it("shows empty email when empty", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        email: "",
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("john@example.com")).toBeNull()
+    })
+
+    it("shows empty phone when empty", async () => {
+      mockPersonalDetailsReturn = {
+        ...mockPersonalDetailsReturn,
+        phone: "",
+      }
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardPersonalDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("+1 (999) 888-7777")).toBeNull()
     })
   })
 
-  describe("address sections", () => {
-    it("displays registered address section title", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Registered address")).toBeTruthy()
-    })
-
-    it("displays registered address", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("123 Main Street")).toBeTruthy()
-      expect(getByText("Apt 4B")).toBeTruthy()
-      expect(getByText("New York, NY 10001")).toBeTruthy()
-    })
-
-    it("displays shipping address section title", async () => {
-      const { getByText } = render(
+  describe("shipping address section", () => {
+    it("displays shipping address from hook data", async () => {
+      const { getByText, getAllByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
         </ContextForScreen>,
@@ -227,10 +510,19 @@ describe("CardPersonalDetailsScreen", () => {
       await act(async () => {})
 
       expect(getByText("Shipping address")).toBeTruthy()
+      expect(getByText("456 Oak Avenue")).toBeTruthy()
+      expect(getByText("Suite 7")).toBeTruthy()
+      expect(getByText("Miami, FL 33101")).toBeTruthy()
+      expect(getAllByText("United States").length).toBeGreaterThanOrEqual(1)
     })
 
-    it("displays shipping address", async () => {
-      const { getByText } = render(
+    it("hides shipping address section when null", async () => {
+      mockPersonalDetailsReturn = {
+        ...defaultMockData,
+        shippingAddress: null,
+      }
+
+      const { queryByText } = render(
         <ContextForScreen>
           <CardPersonalDetailsScreen />
         </ContextForScreen>,
@@ -238,9 +530,7 @@ describe("CardPersonalDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("13 Hash Street")).toBeTruthy()
-      expect(getByText("Apt 21C")).toBeTruthy()
-      expect(getByText("Austin, TX 10001")).toBeTruthy()
+      expect(queryByText("Shipping address")).toBeNull()
     })
   })
 
@@ -301,90 +591,13 @@ describe("CardPersonalDetailsScreen", () => {
       await act(async () => {})
 
       const shippingAddress = getByLabelText(
-        "Satoshi Nakamoto, 13 Hash Street, Apt 21C, Austin, TX 10001, United States",
+        "John Doe, 456 Oak Avenue, Suite 7, Miami, FL 33101, United States",
       )
       await act(async () => {
         fireEvent.press(shippingAddress)
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("cardShippingAddressScreen")
-    })
-
-    it("allows pressing contact support", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const contactSupport = getByText("Contact Support")
-      await act(async () => {
-        fireEvent.press(contactSupport)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-      consoleSpy.mockRestore()
-    })
-  })
-
-  describe("complete user flow", () => {
-    it("displays all screen sections", async () => {
-      const { getByText, getAllByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getAllByText("Satoshi Nakamoto").length).toBeGreaterThanOrEqual(1)
-      expect(getByText("Blink Visa Cardholder")).toBeTruthy()
-      expect(getByText("KYC verified information")).toBeTruthy()
-      expect(getByText("First name")).toBeTruthy()
-      expect(getByText("Last name")).toBeTruthy()
-      expect(getByText("Date of birth")).toBeTruthy()
-      expect(getByText("Contact information")).toBeTruthy()
-      expect(getByText("Registered address")).toBeTruthy()
-      expect(getByText("Shipping address")).toBeTruthy()
-      expect(getByText("Support")).toBeTruthy()
-    })
-
-    it("user can interact with all interactive elements", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText, getByLabelText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      await act(async () => {
-        fireEvent.press(getByText("Change KYC information"))
-      })
-
-      await act(async () => {
-        fireEvent.press(
-          getByLabelText(
-            "Satoshi Nakamoto, 13 Hash Street, Apt 21C, Austin, TX 10001, United States",
-          ),
-        )
-      })
-
-      await act(async () => {
-        fireEvent.press(getByText("Contact Support"))
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Change KYC information pressed")
-      expect(mockNavigate).toHaveBeenCalledWith("cardShippingAddressScreen")
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support pressed")
-
-      consoleSpy.mockRestore()
     })
   })
 })
