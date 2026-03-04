@@ -9639,6 +9639,10 @@ type RootTranslation = {
 		 */
 		validThruLabel: string
 		/**
+		 * V​i​s​a
+		 */
+		networkVisa: string
+		/**
 		 * C​a​r​d​ ​f​r​o​z​e​n
 		 */
 		cardFrozenTitle: string
@@ -9757,6 +9761,34 @@ type RootTranslation = {
 			 * I​n​a​c​t​i​v​e
 			 */
 			statusInactive: string
+			/**
+			 * C​a​n​c​e​l​l​e​d
+			 */
+			statusCancelled: string
+			/**
+			 * N​o​t​ ​a​c​t​i​v​a​t​e​d
+			 */
+			statusNotActivated: string
+			/**
+			 * P​e​n​d​i​n​g
+			 */
+			statusPending: string
+			/**
+			 * F​a​i​l​e​d
+			 */
+			statusFailed: string
+			/**
+			 * V​i​r​t​u​a​l​ ​V​i​s​a​ ​d​e​b​i​t
+			 */
+			cardTypeVirtual: string
+			/**
+			 * P​h​y​s​i​c​a​l​ ​V​i​s​a​ ​d​e​b​i​t
+			 */
+			cardTypePhysical: string
+			/**
+			 * A​u​t​h​e​n​t​i​c​a​t​e​ ​t​o​ ​v​i​e​w​ ​c​a​r​d​ ​d​e​t​a​i​l​s
+			 */
+			authDescription: string
 			/**
 			 * I​s​s​u​e​d
 			 */
@@ -20222,6 +20254,10 @@ export type TranslationFunctions = {
 		 */
 		validThruLabel: () => LocalizedString
 		/**
+		 * Visa
+		 */
+		networkVisa: () => LocalizedString
+		/**
 		 * Card frozen
 		 */
 		cardFrozenTitle: () => LocalizedString
@@ -20340,6 +20376,34 @@ export type TranslationFunctions = {
 			 * Inactive
 			 */
 			statusInactive: () => LocalizedString
+			/**
+			 * Cancelled
+			 */
+			statusCancelled: () => LocalizedString
+			/**
+			 * Not activated
+			 */
+			statusNotActivated: () => LocalizedString
+			/**
+			 * Pending
+			 */
+			statusPending: () => LocalizedString
+			/**
+			 * Failed
+			 */
+			statusFailed: () => LocalizedString
+			/**
+			 * Virtual Visa debit
+			 */
+			cardTypeVirtual: () => LocalizedString
+			/**
+			 * Physical Visa debit
+			 */
+			cardTypePhysical: () => LocalizedString
+			/**
+			 * Authenticate to view card details
+			 */
+			authDescription: () => LocalizedString
 			/**
 			 * Issued
 			 */

@@ -5,13 +5,10 @@ import { LinearGradient } from "react-native-linear-gradient"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
-import { MASK_CHAR } from "@app/config/appinfo"
-import { maskString } from "@app/utils/helper"
+import { formatCardDisplayNumber } from "@app/utils/helper"
 import { formatCardValidThruDisplay } from "@app/utils/date"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-const CARD_TOTAL_DIGITS = 16
-const CARD_VISIBLE_DIGITS = 4
 const CARD_ASPECT_RATIO = 1.584
 const CARD_MAX_WIDTH = 400
 const CARD_HORIZONTAL_MARGIN = 40
@@ -41,12 +38,7 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const digits = cardNumber.replaceAll(" ", "")
-  const padded = digits.padStart(CARD_TOTAL_DIGITS, MASK_CHAR)
-  const masked = showCardDetails
-    ? padded
-    : maskString(padded, { visibleRight: CARD_VISIBLE_DIGITS })
-  const maskedCardNumber = masked.match(/.{4}/g)!.join(" ")
+  const maskedCardNumber = formatCardDisplayNumber(cardNumber, showCardDetails)
 
   const maskedValidThru = formatCardValidThruDisplay(validThruDate, showCardDetails)
 

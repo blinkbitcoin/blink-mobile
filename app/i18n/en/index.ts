@@ -3047,6 +3047,7 @@ const en: BaseTranslation = {
   },
   CardFlow: {
     validThruLabel: "VALID THRU",
+    networkVisa: "Visa",
     cardFrozenTitle: "Card frozen",
     cardFrozenSubtitle: "Card is temporarily disabled",
     TransactionStatus: {
@@ -3082,6 +3083,13 @@ const en: BaseTranslation = {
       statusActive: "Active",
       statusFrozen: "Frozen",
       statusInactive: "Inactive",
+      statusCancelled: "Cancelled",
+      statusNotActivated: "Not activated",
+      statusPending: "Pending",
+      statusFailed: "Failed",
+      cardTypeVirtual: "Virtual Visa debit",
+      cardTypePhysical: "Physical Visa debit",
+      authDescription: "Authenticate to view card details",
       issued: "Issued",
       network: "Network",
       keepDetailsSafe: "Keep your details safe",
