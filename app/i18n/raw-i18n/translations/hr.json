@@ -3169,7 +3169,8 @@
     },
     "ShippingAddress": {
       "title": "Adresa za dostavu",
-      "fullName": "Puno ime",
+      "firstName": "Ime",
+      "lastName": "Prezime",
       "addressLine1": "Adresa redak 1",
       "addressLine2": "Adresa redak 2",
       "city": "Grad",

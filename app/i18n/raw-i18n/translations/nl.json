@@ -3169,7 +3169,8 @@
     },
     "ShippingAddress": {
       "title": "Verzendadres",
-      "fullName": "Volledige naam",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
       "addressLine1": "Adresregel 1",
       "addressLine2": "Adresregel 2",
       "city": "Stad",

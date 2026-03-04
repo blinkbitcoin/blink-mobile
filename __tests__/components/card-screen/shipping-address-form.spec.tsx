@@ -40,7 +40,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       CardFlow: {
         ShippingAddress: {
-          fullName: () => "Full name",
+          firstName: () => "First name",
+          lastName: () => "Last name",
           addressLine1: () => "Address line 1",
           addressLine2: () => "Address line 2",
           city: () => "City",
@@ -102,13 +103,14 @@ jest.mock("@app/components/card-screen/input-field", () => ({
 
 describe("ShippingAddressForm", () => {
   const mockAddress: ShippingAddress = {
-    fullName: "Satoshi Nakamoto",
-    addressLine1: "123 Main Street",
-    addressLine2: "Apt 4B",
+    firstName: "Satoshi",
+    lastName: "Nakamoto",
+    line1: "123 Main Street",
+    line2: "Apt 4B",
     city: "New York",
-    state: "NY",
+    region: "NY",
     postalCode: "10001",
-    country: "United States",
+    countryCode: "USA",
   }
 
   const defaultProps = {
@@ -128,7 +130,8 @@ describe("ShippingAddressForm", () => {
     it("displays all field labels", () => {
       const { getByText } = render(<ShippingAddressForm {...defaultProps} />)
 
-      expect(getByText("Full name")).toBeTruthy()
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByText("Last name")).toBeTruthy()
       expect(getByText("Address line 1")).toBeTruthy()
       expect(getByText("Address line 2")).toBeTruthy()
       expect(getByText("City")).toBeTruthy()
@@ -139,38 +142,52 @@ describe("ShippingAddressForm", () => {
   })
 
   describe("showFullName", () => {
-    it("shows full name field by default", () => {
+    it("shows name fields by default", () => {
       const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
 
-      expect(getByTestId("input-field-Full name")).toBeTruthy()
+      expect(getByTestId("input-field-First name")).toBeTruthy()
+      expect(getByTestId("input-field-Last name")).toBeTruthy()
     })
 
-    it("shows full name field when showFullName is true", () => {
+    it("shows name fields when showFullName is true", () => {
       const { getByTestId } = render(
         <ShippingAddressForm {...defaultProps} showFullName={true} />,
       )
 
-      expect(getByTestId("input-field-Full name")).toBeTruthy()
+      expect(getByTestId("input-field-First name")).toBeTruthy()
+      expect(getByTestId("input-field-Last name")).toBeTruthy()
     })
 
-    it("hides full name field when showFullName is false", () => {
+    it("hides name fields when showFullName is false", () => {
       const { queryByTestId } = render(
         <ShippingAddressForm {...defaultProps} showFullName={false} />,
       )
 
-      expect(queryByTestId("input-field-Full name")).toBeNull()
+      expect(queryByTestId("input-field-First name")).toBeNull()
+      expect(queryByTestId("input-field-Last name")).toBeNull()
     })
   })
 
   describe("inline editing", () => {
-    it("calls onAddressChange when full name changes", () => {
+    it("calls onAddressChange when first name changes", () => {
       const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
 
-      fireEvent.changeText(getByTestId("text-input-Full name"), "Hal Finney")
+      fireEvent.changeText(getByTestId("text-input-First name"), "Hal")
 
       expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
         ...mockAddress,
-        fullName: "Hal Finney",
+        firstName: "Hal",
+      })
+    })
+
+    it("calls onAddressChange when last name changes", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+
+      fireEvent.changeText(getByTestId("text-input-Last name"), "Finney")
+
+      expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
+        ...mockAddress,
+        lastName: "Finney",
       })
     })
 
@@ -181,7 +198,7 @@ describe("ShippingAddressForm", () => {
 
       expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
         ...mockAddress,
-        addressLine1: "456 Oak Ave",
+        line1: "456 Oak Ave",
       })
     })
 
@@ -192,7 +209,7 @@ describe("ShippingAddressForm", () => {
 
       expect(defaultProps.onAddressChange).toHaveBeenCalledWith({
         ...mockAddress,
-        addressLine2: "Suite 100",
+        line2: "Suite 100",
       })
     })
   })
@@ -225,7 +242,7 @@ describe("ShippingAddressForm", () => {
           { value: "USA", label: "United States" },
           { value: "CAN", label: "Canada" },
         ],
-        selectedValue: "United States",
+        selectedValue: "USA",
         onSelect: expect.any(Function),
       })
     })

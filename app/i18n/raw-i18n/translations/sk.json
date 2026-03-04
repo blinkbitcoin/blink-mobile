@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Doručovacia adresa",
-      "fullName": "Celé meno",
+      "firstName": "Meno",
+      "lastName": "Priezvisko",
       "addressLine1": "Adresa riadok 1",
       "addressLine2": "Adresa riadok 2",
       "city": "Mesto",

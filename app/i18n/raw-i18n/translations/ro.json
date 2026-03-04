@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Adresa de livrare",
-      "fullName": "Nume complet",
+      "firstName": "Prenume",
+      "lastName": "Nume de familie",
       "addressLine1": "Adresa linia 1",
       "addressLine2": "Adresa linia 2",
       "city": "Oraș",

@@ -3240,7 +3240,8 @@ const en: BaseTranslation = {
     },
     ShippingAddress: {
       title: "Shipping address",
-      fullName: "Full name",
+      firstName: "First name",
+      lastName: "Last name",
       addressLine1: "Address line 1",
       addressLine2: "Address line 2",
       city: "City",

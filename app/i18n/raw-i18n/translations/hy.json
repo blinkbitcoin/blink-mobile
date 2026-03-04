@@ -3169,7 +3169,8 @@
     },
     "ShippingAddress": {
       "title": "Առաքման հասցե",
-      "fullName": "Ամբողջական անուն",
+      "firstName": "Անուն",
+      "lastName": "Ազգանուն",
       "addressLine1": "Հասցեի տող 1",
       "addressLine2": "Հասցեի տող 2",
       "city": "Քաղաք",

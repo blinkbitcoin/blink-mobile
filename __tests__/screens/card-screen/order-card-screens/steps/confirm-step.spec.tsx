@@ -76,14 +76,19 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  shippingAddressToLines: (address: ShippingAddress, includeFullName: boolean) => {
+jest.mock("@app/screens/card-screen/card-mock-data", () => ({}))
+
+jest.mock("@app/screens/card-screen/utils", () => ({
+  addressToLines: (address: ShippingAddress, includeFullName = true) => {
     const lines: string[] = []
-    if (includeFullName) lines.push(address.fullName)
-    lines.push(address.addressLine1)
-    if (address.addressLine2) lines.push(address.addressLine2)
-    lines.push(`${address.city}, ${address.state} ${address.postalCode}`)
-    lines.push(address.country)
+    if (includeFullName) {
+      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
+      if (name) lines.push(name)
+    }
+    lines.push(address.line1)
+    if (address.line2) lines.push(address.line2)
+    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
+    lines.push(address.countryCode)
     return lines
   },
 }))
@@ -123,13 +128,14 @@ jest.mock("@app/components/card-screen", () => ({
 
 describe("ConfirmStep", () => {
   const mockAddress: ShippingAddress = {
-    fullName: "Satoshi Nakamoto",
-    addressLine1: "123 Main Street",
-    addressLine2: "Apt 4B",
+    firstName: "Satoshi",
+    lastName: "Nakamoto",
+    line1: "123 Main Street",
+    line2: "Apt 4B",
     city: "New York",
-    state: "NY",
+    region: "NY",
     postalCode: "10001",
-    country: "United States",
+    countryCode: "USA",
   }
 
   beforeEach(jest.clearAllMocks)
@@ -222,7 +228,7 @@ describe("ConfirmStep", () => {
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("Apt 4B")).toBeTruthy()
       expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("United States")).toBeTruthy()
+      expect(getByText("USA")).toBeTruthy()
     })
   })
 })

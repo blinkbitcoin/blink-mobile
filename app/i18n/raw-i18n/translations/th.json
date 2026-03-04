@@ -3166,7 +3166,8 @@
     },
     "ShippingAddress": {
       "title": "ที่อยู่จัดส่ง",
-      "fullName": "ชื่อเต็ม",
+      "firstName": "ชื่อ",
+      "lastName": "นามสกุล",
       "addressLine1": "ที่อยู่บรรทัดที่ 1",
       "addressLine2": "ที่อยู่บรรทัดที่ 2",
       "city": "เมือง",

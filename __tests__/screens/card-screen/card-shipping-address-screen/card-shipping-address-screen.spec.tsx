@@ -18,13 +18,14 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_SHIPPING_ADDRESS: {
-    fullName: "Joe Nakamoto",
-    addressLine1: "Address line 1",
-    addressLine2: "Address line 2",
+    firstName: "Joe",
+    lastName: "Nakamoto",
+    line1: "Address line 1",
+    line2: "Address line 2",
     city: "New York",
-    state: "NY",
+    region: "NY",
     postalCode: "10001",
-    country: "USA",
+    countryCode: "USA",
   },
   US_STATES: [
     { value: "NY", label: "New York" },
@@ -57,7 +58,7 @@ describe("CardShippingAddressScreen", () => {
       expect(toJSON()).toBeTruthy()
     })
 
-    it("displays full name field", async () => {
+    it("displays first name field", async () => {
       const { getByText, getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
@@ -66,8 +67,21 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Full name")).toBeTruthy()
-      expect(getByDisplayValue("Joe Nakamoto")).toBeTruthy()
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByDisplayValue("Joe")).toBeTruthy()
+    })
+
+    it("displays last name field", async () => {
+      const { getByText, getByDisplayValue } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Last name")).toBeTruthy()
+      expect(getByDisplayValue("Nakamoto")).toBeTruthy()
     })
 
     it("displays address line 1 field", async () => {
@@ -212,7 +226,7 @@ describe("CardShippingAddressScreen", () => {
   })
 
   describe("interactions", () => {
-    it("renders editable full name field", async () => {
+    it("renders editable name fields", async () => {
       const { getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
@@ -221,7 +235,8 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      expect(getByDisplayValue("Joe Nakamoto")).toBeTruthy()
+      expect(getByDisplayValue("Joe")).toBeTruthy()
+      expect(getByDisplayValue("Nakamoto")).toBeTruthy()
     })
 
     it("navigates to selection screen for state field", async () => {
@@ -281,7 +296,8 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Full name")).toBeTruthy()
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByText("Last name")).toBeTruthy()
       expect(getByText("City")).toBeTruthy()
       expect(getByText("State")).toBeTruthy()
       expect(getByText("Postal code")).toBeTruthy()

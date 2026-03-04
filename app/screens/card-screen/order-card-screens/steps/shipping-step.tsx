@@ -14,7 +14,8 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import { MOCK_USER, ShippingAddress, shippingAddressToLines } from "../../card-mock-data"
+import { MOCK_USER, ShippingAddress } from "../../card-mock-data"
+import { addressToLines } from "../../utils"
 import { Delivery } from "../../replace-card-screens/steps/types"
 import { useSharedStepStyles } from "./shared-styles"
 
@@ -66,7 +67,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
       <View style={sharedStyles.section}>
         <Text style={sharedStyles.sectionTitle}>{shippingLL.registeredAddress()}</Text>
         <MultiLineField
-          lines={shippingAddressToLines(currentAddress, false)}
+          lines={addressToLines(currentAddress, false)}
           leftIcon="map-pin"
         />
       </View>

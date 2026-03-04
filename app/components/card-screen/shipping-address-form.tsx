@@ -36,9 +36,9 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     navigation.navigate("selectionScreen", {
       title: LL.CardFlow.ShippingAddress.state(),
       options: US_STATES,
-      selectedValue: address.state,
+      selectedValue: address.region,
       onSelect: (value: string) => {
-        onAddressChange({ ...address, state: value })
+        onAddressChange({ ...address, region: value })
         navigation.goBack()
       },
     })
@@ -48,9 +48,9 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     navigation.navigate("selectionScreen", {
       title: LL.CardFlow.ShippingAddress.country(),
       options: COUNTRIES,
-      selectedValue: address.country,
+      selectedValue: address.countryCode,
       onSelect: (value: string) => {
-        onAddressChange({ ...address, country: value })
+        onAddressChange({ ...address, countryCode: value })
         navigation.goBack()
       },
     })
@@ -60,27 +60,37 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     <View style={styles.container}>
       {showFullName && (
         <InputField
-          label={LL.CardFlow.ShippingAddress.fullName()}
-          value={address.fullName}
+          label={LL.CardFlow.ShippingAddress.firstName()}
+          value={address.firstName}
           rightIcon="pencil"
-          onChangeText={(text) => handleFieldChange("fullName", text)}
+          onChangeText={(text) => handleFieldChange("firstName", text)}
+          valueStyle={ValueStyle.Bold}
+        />
+      )}
+
+      {showFullName && (
+        <InputField
+          label={LL.CardFlow.ShippingAddress.lastName()}
+          value={address.lastName}
+          rightIcon="pencil"
+          onChangeText={(text) => handleFieldChange("lastName", text)}
           valueStyle={ValueStyle.Bold}
         />
       )}
 
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine1()}
-        value={address.addressLine1}
+        value={address.line1}
         rightIcon="pencil"
-        onChangeText={(text) => handleFieldChange("addressLine1", text)}
+        onChangeText={(text) => handleFieldChange("line1", text)}
         valueStyle={ValueStyle.Bold}
       />
 
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine2()}
-        value={address.addressLine2}
+        value={address.line2}
         rightIcon="pencil"
-        onChangeText={(text) => handleFieldChange("addressLine2", text)}
+        onChangeText={(text) => handleFieldChange("line2", text)}
         valueStyle={ValueStyle.Bold}
       />
 
@@ -95,7 +105,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         <View style={styles.gridItem}>
           <InputField
             label={LL.CardFlow.ShippingAddress.state()}
-            value={address.state}
+            value={address.region}
             rightIonicon="chevron-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleStateSelect}
@@ -114,7 +124,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         <View style={styles.gridItem}>
           <InputField
             label={LL.CardFlow.ShippingAddress.country()}
-            value={address.country}
+            value={address.countryCode}
             rightIonicon="chevron-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleCountrySelect}

@@ -10278,9 +10278,13 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * F​u​l​l​ ​n​a​m​e
+			 * F​i​r​s​t​ ​n​a​m​e
 			 */
-			fullName: string
+			firstName: string
+			/**
+			 * L​a​s​t​ ​n​a​m​e
+			 */
+			lastName: string
 			/**
 			 * A​d​d​r​e​s​s​ ​l​i​n​e​ ​1
 			 */
@@ -21001,9 +21005,13 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Full name
+			 * First name
 			 */
-			fullName: () => LocalizedString
+			firstName: () => LocalizedString
+			/**
+			 * Last name
+			 */
+			lastName: () => LocalizedString
 			/**
 			 * Address line 1
 			 */

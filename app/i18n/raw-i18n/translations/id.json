@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Alamat pengiriman",
-      "fullName": "Nama lengkap",
+      "firstName": "Nama depan",
+      "lastName": "Nama belakang",
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Kota",

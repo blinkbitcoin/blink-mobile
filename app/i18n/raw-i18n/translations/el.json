@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Διεύθυνση αποστολής",
-      "fullName": "Πλήρες όνομα",
+      "firstName": "Όνομα",
+      "lastName": "Επώνυμο",
       "addressLine1": "Διεύθυνση γραμμή 1",
       "addressLine2": "Διεύθυνση γραμμή 2",
       "city": "Πόλη",

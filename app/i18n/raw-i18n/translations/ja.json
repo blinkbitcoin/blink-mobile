@@ -3169,7 +3169,8 @@
         },
         "ShippingAddress": {
             "title": "配送先住所",
-            "fullName": "氏名",
+            "firstName": "名",
+            "lastName": "姓",
             "addressLine1": "住所1",
             "addressLine2": "住所2",
             "city": "市区町村",

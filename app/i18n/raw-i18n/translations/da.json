@@ -3146,7 +3146,8 @@
     },
     "ShippingAddress": {
       "title": "Leveringsadresse",
-      "fullName": "Fulde navn",
+      "firstName": "Fornavn",
+      "lastName": "Efternavn",
       "addressLine1": "Adresselinje 1",
       "addressLine2": "Adresselinje 2",
       "city": "By",

@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Anwani ya usafirishaji",
-      "fullName": "Jina kamili",
+      "firstName": "Jina la kwanza",
+      "lastName": "Jina la mwisho",
       "addressLine1": "Mstari wa anwani 1",
       "addressLine2": "Mstari wa anwani 2",
       "city": "Jiji",

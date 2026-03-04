@@ -3166,7 +3166,8 @@
     },
     "ShippingAddress": {
       "title": "Địa chỉ giao hàng",
-      "fullName": "Họ và tên",
+      "firstName": "Tên",
+      "lastName": "Họ",
       "addressLine1": "Địa chỉ dòng 1",
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",

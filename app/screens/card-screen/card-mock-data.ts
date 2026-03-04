@@ -31,33 +31,15 @@ export const MOCK_CARD: CardInfo = {
 }
 
 export type ShippingAddress = {
-  fullName: string
-  addressLine1: string
-  addressLine2: string
+  firstName: string
+  lastName: string
+  line1: string
+  line2: string
   city: string
-  state: string
+  region: string
   postalCode: string
-  country: string
+  countryCode: string
 }
-
-/*
- * TODO: remove when all screens use addressToLines from utils/address.ts
- * Currently used by:
- * - order-card-screens/steps/confirm-step.tsx
- * - order-card-screens/steps/shipping-step.tsx
- * - replace-card-screens/steps/delivery-step.tsx
- */
-export const shippingAddressToLines = (
-  address: ShippingAddress,
-  includeFullName = true,
-): string[] =>
-  [
-    includeFullName ? address.fullName : null,
-    address.addressLine1,
-    address.addressLine2 || null,
-    `${address.city}, ${address.state} ${address.postalCode}`,
-    address.country,
-  ].filter((line): line is string => line !== null)
 
 export type UserInfo = {
   dateOfBirth: string
@@ -67,24 +49,26 @@ export type UserInfo = {
 export const MOCK_USER: UserInfo = {
   dateOfBirth: "1971-01-03",
   registeredAddress: {
-    fullName: "Satoshi Nakamoto",
-    addressLine1: "123 Main Street",
-    addressLine2: "Apt 4B",
+    firstName: "Satoshi",
+    lastName: "Nakamoto",
+    line1: "123 Main Street",
+    line2: "Apt 4B",
     city: "New York",
-    state: "NY",
+    region: "NY",
     postalCode: "10001",
-    country: "United States",
+    countryCode: "USA",
   },
 }
 
 export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
-  fullName: "Joe Nakamoto",
-  addressLine1: "Address line 1",
-  addressLine2: "Address line 2",
+  firstName: "Joe",
+  lastName: "Nakamoto",
+  line1: "Address line 1",
+  line2: "Address line 2",
   city: "New York",
-  state: "NY",
+  region: "NY",
   postalCode: "10001",
-  country: "USA",
+  countryCode: "USA",
 }
 
 export type SelectionOption = {

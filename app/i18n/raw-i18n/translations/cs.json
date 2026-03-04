@@ -3169,7 +3169,8 @@
     },
     "ShippingAddress": {
       "title": "Doručovací adresa",
-      "fullName": "Celé jméno",
+      "firstName": "Jméno",
+      "lastName": "Příjmení",
       "addressLine1": "Adresa řádek 1",
       "addressLine2": "Adresa řádek 2",
       "city": "Město",

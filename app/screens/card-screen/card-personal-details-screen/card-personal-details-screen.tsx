@@ -23,7 +23,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
  * TODO: uncomment and replace mock data with real API data
  * when dateOfBirth and registeredAddress are available via the API
  */
-// import { MOCK_USER, shippingAddressToLines } from "../card-mock-data"
+// import { MOCK_USER } from "../card-mock-data"
 import { addressToLines } from "../utils"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
@@ -136,7 +136,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
          * <View style={styles.section}>
          *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
          *   <MultiLineField
-         *     lines={shippingAddressToLines(MOCK_USER.registeredAddress)}
+         *     lines={addressToLines(MOCK_USER.registeredAddress)}
          *     leftIcon="map-pin"
          *   />
          * </View>

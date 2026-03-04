@@ -3166,7 +3166,8 @@
     },
     "ShippingAddress": {
       "title": "عنوان الشحن",
-      "fullName": "الاسم الكامل",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
       "addressLine1": "سطر العنوان 1",
       "addressLine2": "سطر العنوان 2",
       "city": "المدينة",

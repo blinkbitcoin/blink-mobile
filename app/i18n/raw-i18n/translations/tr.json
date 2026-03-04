@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Teslimat adresi",
-      "fullName": "Tam ad",
+      "firstName": "Ad",
+      "lastName": "Soyad",
       "addressLine1": "Adres satırı 1",
       "addressLine2": "Adres satırı 2",
       "city": "Şehir",

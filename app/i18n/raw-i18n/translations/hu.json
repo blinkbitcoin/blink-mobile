@@ -3128,7 +3128,8 @@
     },
     "ShippingAddress": {
       "title": "Szállítási cím",
-      "fullName": "Teljes név",
+      "firstName": "Keresztnév",
+      "lastName": "Vezetéknév",
       "addressLine1": "Cím 1. sor",
       "addressLine2": "Cím 2. sor",
       "city": "Város",
