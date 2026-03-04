@@ -69,18 +69,16 @@ jest.mock("@app/components/card-screen/input-field", () => ({
     label,
     value,
     onPress,
-    editable,
     onChangeText,
   }: {
     label: string
     value: string
     onPress?: () => void
-    editable?: boolean
     onChangeText?: (text: string) => void
   }) => (
     <View testID={`input-field-${label}`} accessibilityHint={value}>
       <RNText>{label}</RNText>
-      {editable ? (
+      {onChangeText ? (
         <RNTextInput
           testID={`text-input-${label}`}
           value={value}

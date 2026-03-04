@@ -80,4 +80,29 @@ describe("SwitchRow", () => {
       expect(mockOnValueChange).toHaveBeenCalled()
     })
   })
+
+  describe("optional props", () => {
+    it("renders with only title", () => {
+      const { getByText } = renderWithTheme(<SwitchRow title="Toggle" />)
+      expect(getByText("Toggle")).toBeTruthy()
+    })
+
+    it("defaults value to false", () => {
+      const { getByRole } = renderWithTheme(<SwitchRow title="Toggle" />)
+      const switchElement = getByRole("switch")
+      expect(switchElement.props.accessibilityState.checked).toBe(false)
+    })
+
+    it("renders without description", () => {
+      const { getByText, queryByText } = renderWithTheme(<SwitchRow title="Toggle" />)
+      expect(getByText("Toggle")).toBeTruthy()
+      expect(queryByText("Online purchases")).toBeNull()
+    })
+
+    it("handles toggle without onValueChange prop", () => {
+      const { getByRole } = renderWithTheme(<SwitchRow title="Toggle" />)
+      const switchElement = getByRole("switch")
+      fireEvent(switchElement, "pressIn")
+    })
+  })
 })

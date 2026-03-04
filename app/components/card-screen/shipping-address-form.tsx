@@ -62,7 +62,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         <InputField
           label={LL.CardFlow.ShippingAddress.fullName()}
           value={address.fullName}
-          editable
           rightIcon="pencil"
           onChangeText={(text) => handleFieldChange("fullName", text)}
           valueStyle={ValueStyle.Bold}
@@ -72,7 +71,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine1()}
         value={address.addressLine1}
-        editable
         rightIcon="pencil"
         onChangeText={(text) => handleFieldChange("addressLine1", text)}
         valueStyle={ValueStyle.Bold}
@@ -81,7 +79,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       <InputField
         label={LL.CardFlow.ShippingAddress.addressLine2()}
         value={address.addressLine2}
-        editable
         rightIcon="pencil"
         onChangeText={(text) => handleFieldChange("addressLine2", text)}
         valueStyle={ValueStyle.Bold}
