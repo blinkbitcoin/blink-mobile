@@ -1,8 +1,15 @@
 import React from "react"
-import { Pressable, PressableProps, TextStyle, ViewStyle, StyleProp } from "react-native"
+import {
+  ActivityIndicator,
+  Pressable,
+  PressableProps,
+  View,
+  ViewStyle,
+  StyleProp,
+} from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { useTheme, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
   GaloyIcon,
@@ -18,6 +25,7 @@ export type GaloyIconButtonProps = {
   iconOnly?: boolean
   color?: string
   backgroundColor?: string
+  loading?: boolean
 }
 
 const sizeMapping = {
@@ -35,11 +43,14 @@ export const GaloyIconButton = ({
   disabled,
   color,
   backgroundColor,
+  loading,
   ...remainingProps
 }: GaloyIconButtonProps & PressableProps) => {
   const {
     theme: { colors },
   } = useTheme()
+
+  const isDisabled = disabled || loading
 
   const isNumericSize = typeof size === "number"
   const resolvedIconSize = iconSize ?? (isNumericSize ? size : sizeMapping[size])
@@ -47,18 +58,12 @@ export const GaloyIconButton = ({
     ? size
     : circleDiameterThatContainsSquare(resolvedIconSize)
 
-  const pressableStyle = (): StyleProp<ViewStyle> => {
-    if (text) {
-      return {
-        alignItems: "center",
-      }
-    }
-
-    return {
-      width: iconContainerSize,
-      height: iconContainerSize,
-    }
-  }
+  const styles = useStyles({
+    iconContainerSize,
+    isDisabled: Boolean(isDisabled),
+    isIconOnly: Boolean(iconOnly),
+    customBg: backgroundColor,
+  })
 
   const iconProps = (pressed: boolean, iconOnly: boolean, disabled: boolean) => {
     switch (true) {
@@ -101,36 +106,35 @@ export const GaloyIconButton = ({
     }
   }
 
-  const fontStyle = (disabled: boolean): StyleProp<TextStyle> => {
-    return {
-      marginTop: 8,
-      opacity: disabled ? 0.7 : 1,
-      textAlign: "center",
-      fontSize: 11,
-    }
-  }
-
   const testPropId = text || name
 
   return (
     <Pressable
       hitSlop={text ? 0 : iconContainerSize / 2}
-      style={pressableStyle}
-      disabled={disabled}
+      style={text ? styles.pressableWithText : styles.pressableWithIcon}
+      disabled={isDisabled}
       {...testProps(testPropId)}
       {...remainingProps}
     >
       {({ pressed }) => {
+        const resolvedProps = iconProps(pressed, Boolean(iconOnly), Boolean(isDisabled))
+
         return (
           <>
-            <GaloyIcon
-              name={name}
-              size={resolvedIconSize}
-              containerSize={isNumericSize ? size : undefined}
-              {...iconProps(pressed, Boolean(iconOnly), Boolean(disabled))}
-            />
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size={resolvedIconSize} color={resolvedProps.color} />
+              </View>
+            ) : (
+              <GaloyIcon
+                name={name}
+                size={resolvedIconSize}
+                containerSize={isNumericSize ? size : undefined}
+                {...resolvedProps}
+              />
+            )}
             {text && (
-              <Text numberOfLines={1} style={fontStyle(Boolean(disabled))}>
+              <Text numberOfLines={1} style={styles.label}>
                 {text}
               </Text>
             )}
@@ -175,3 +179,37 @@ export const GaloyEditButton = ({ disabled, ...remainingProps }: PressableProps)
     </Pressable>
   )
 }
+
+type StyleProps = {
+  iconContainerSize: number
+  isDisabled: boolean
+  isIconOnly: boolean
+  customBg?: string
+}
+
+const useStyles = makeStyles(
+  ({ colors }, { iconContainerSize, isDisabled, isIconOnly, customBg }: StyleProps) => ({
+    pressableWithText: {
+      alignItems: "center",
+    },
+    pressableWithIcon: {
+      width: iconContainerSize,
+      height: iconContainerSize,
+    },
+    loadingContainer: {
+      width: iconContainerSize,
+      height: iconContainerSize,
+      borderRadius: iconContainerSize / 2,
+      backgroundColor: isIconOnly ? colors.transparent : customBg || colors.grey4,
+      opacity: 0.7,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    label: {
+      marginTop: 8,
+      opacity: isDisabled ? 0.7 : 1,
+      textAlign: "center",
+      fontSize: 11,
+    },
+  }),
+)

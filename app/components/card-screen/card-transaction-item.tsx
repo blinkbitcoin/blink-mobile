@@ -4,22 +4,15 @@ import Icon from "react-native-vector-icons/Ionicons"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { CardTransactionUiStatus } from "./types"
 
 type CardTransactionItemProps = {
   merchantName: string
   timeAgo: string
   amount: string
-  status: CardTransactionStatus
+  status: CardTransactionUiStatus
   onPress?: () => void
 }
-
-const CARD_TRANSACTION_STATUS = {
-  Pending: "pending",
-  Completed: "completed",
-} as const
-
-type CardTransactionStatus =
-  (typeof CARD_TRANSACTION_STATUS)[keyof typeof CARD_TRANSACTION_STATUS]
 
 export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   merchantName,
@@ -34,11 +27,25 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const isPending = status === CARD_TRANSACTION_STATUS.Pending
-  const statusColor = isPending ? colors.grey2 : colors._green
-  const statusText = isPending
-    ? LL.CardFlow.TransactionStatus.pending()
-    : LL.CardFlow.TransactionStatus.completed()
+  const statusConfig = {
+    [CardTransactionUiStatus.Pending]: {
+      color: colors.grey2,
+      text: LL.CardFlow.TransactionStatus.pending(),
+    },
+    [CardTransactionUiStatus.Completed]: {
+      color: colors._green,
+      text: LL.CardFlow.TransactionStatus.completed(),
+    },
+    [CardTransactionUiStatus.Declined]: {
+      color: colors.error,
+      text: LL.CardFlow.TransactionStatus.declined(),
+    },
+    [CardTransactionUiStatus.Reversed]: {
+      color: colors._orange,
+      text: LL.CardFlow.TransactionStatus.reversed(),
+    },
+  }
+  const { color: statusColor, text: statusText } = statusConfig[status]
 
   const content = (
     <>

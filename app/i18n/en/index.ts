@@ -3052,6 +3052,8 @@ const en: BaseTranslation = {
     TransactionStatus: {
       pending: "Pending",
       completed: "Completed",
+      declined: "Declined",
+      reversed: "Reversed",
     },
     CardDashboard: {
       Actions: {
@@ -3064,6 +3066,9 @@ const en: BaseTranslation = {
       addFunds: "Add funds",
       transactionsTitle: "Transactions",
       emptyTransactions: "No transactions yet",
+      noCardAvailable: "No cards available",
+      cardUpdateError: "Could not update card status",
+      cardNotUsable: "This card is not currently available for use",
     },
     CardDetails: {
       title: "Card details",

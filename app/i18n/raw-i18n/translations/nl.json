@@ -2968,7 +2968,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "In behandeling",
-      "completed": "Voltooid"
+      "completed": "Voltooid",
+      "declined": "Geweigerd",
+      "reversed": "Teruggedraaid"
     },
     "CardDashboard": {
       "Actions": {

@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Függőben",
-      "completed": "Teljesítve"
+      "completed": "Teljesítve",
+      "declined": "Elutasítva",
+      "reversed": "Visszafordítva"
     },
     "CardDashboard": {
       "Actions": {

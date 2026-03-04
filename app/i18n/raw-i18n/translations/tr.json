@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Beklemede",
-      "completed": "Tamamlandı"
+      "completed": "Tamamlandı",
+      "declined": "Reddedildi",
+      "reversed": "İptal edildi"
     },
     "CardDashboard": {
       "Actions": {

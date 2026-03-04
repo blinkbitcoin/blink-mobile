@@ -2927,7 +2927,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Σε αναμονή",
-      "completed": "Ολοκληρώθηκε"
+      "completed": "Ολοκληρώθηκε",
+      "declined": "Απορρίφθηκε",
+      "reversed": "Αντιστράφηκε"
     },
     "CardDashboard": {
       "Actions": {

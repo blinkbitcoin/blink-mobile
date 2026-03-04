@@ -2965,7 +2965,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "قيد الانتظار",
-      "completed": "مكتمل"
+      "completed": "مكتمل",
+      "declined": "مرفوضة",
+      "reversed": "معكوسة"
     },
     "CardDashboard": {
       "Actions": {

@@ -2974,7 +2974,9 @@
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Kulindile",
-      "completed": "Kugqityiwe"
+      "completed": "Kugqityiwe",
+      "declined": "Yaliwe",
+      "reversed": "Ibuyiselwe"
     },
     "CardDashboard": {
       "Actions": {

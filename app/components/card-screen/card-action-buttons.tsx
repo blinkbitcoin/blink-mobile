@@ -8,6 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 
 type CardActionButtonsProps = {
   isFrozen: boolean
+  freezeLoading?: boolean
   onDetails: () => void
   onFreeze: () => void
   onSetLimits: () => void
@@ -20,10 +21,12 @@ type ActionItem = {
   onPress: () => void
   isFreezeButton?: boolean
   iconSize?: number
+  loading?: boolean
 }
 
 export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
   isFrozen,
+  freezeLoading,
   onDetails,
   onFreeze,
   onSetLimits,
@@ -48,6 +51,7 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
       onPress: onFreeze,
       isFreezeButton: true,
       iconSize: 32,
+      loading: freezeLoading,
     },
     {
       label: LL.CardFlow.CardDashboard.Actions.setLimits(),
@@ -78,6 +82,7 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
               onPress={action.onPress}
               color={isActiveFrozen ? colors.error : colors.primary}
               backgroundColor={isActiveFrozen ? colors.error9 : colors.grey4}
+              loading={action.loading}
             />
           </View>
         )

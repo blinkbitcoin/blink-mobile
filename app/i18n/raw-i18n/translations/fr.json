@@ -2968,7 +2968,9 @@
     "CardFlow": {
         "TransactionStatus": {
             "pending": "En attente",
-            "completed": "Terminé"
+            "completed": "Terminé",
+            "declined": "Refusée",
+            "reversed": "Annulée"
         },
         "CardDashboard": {
             "Actions": {
