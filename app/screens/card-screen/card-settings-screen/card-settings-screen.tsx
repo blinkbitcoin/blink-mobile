@@ -92,19 +92,15 @@ export const CardSettingsScreen: React.FC = () => {
     InAppBrowser.open(cardPrivacyPolicyUrl)
   }
 
-  const cardManagementItems: (() => React.ReactElement)[] = []
-
-  if (!hasPhysicalCard) {
-    cardManagementItems.push(() => (
-      <SettingItemRow
-        title={LL.CardFlow.CardSettings.orderPhysicalCard()}
-        leftIcon="physical-card"
-        onPress={handleOrderPhysicalCard}
-      />
-    ))
-  }
-
-  cardManagementItems.push(
+  const cardManagementItems = [
+    !hasPhysicalCard &&
+      (() => (
+        <SettingItemRow
+          title={LL.CardFlow.CardSettings.orderPhysicalCard()}
+          leftIcon="physical-card"
+          onPress={handleOrderPhysicalCard}
+        />
+      )),
     () => (
       <SettingItemRow
         title={
@@ -123,7 +119,7 @@ export const CardSettingsScreen: React.FC = () => {
         onPress={handleReplaceCard}
       />
     ),
-  )
+  ].filter(Boolean) as (() => React.ReactElement)[]
 
   return (
     <Screen preset="scroll">
