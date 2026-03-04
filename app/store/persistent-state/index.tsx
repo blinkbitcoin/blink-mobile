@@ -35,37 +35,41 @@ export const PersistentStateContext = createContext<PersistentStateContextType |
 )
 
 export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  // Start with default state immediately to avoid blocking render
-  // This improves startup time by 0.5-1s by not waiting for AsyncStorage
-  const [persistentState, setPersistentState] = React.useState<PersistentState>(
-    defaultPersistentState,
-  )
-  const [isLoaded, setIsLoaded] = React.useState(false)
+  const [persistentState, setPersistentState] =
+    React.useState<PersistentState | null>(null)
+  const hasModified = React.useRef(false)
 
   React.useEffect(() => {
-    // Only save if state has been loaded and potentially modified
-    if (isLoaded && persistentState) {
+    if (hasModified.current && persistentState) {
       savePersistentState(persistentState)
     }
-  }, [persistentState, isLoaded])
+  }, [persistentState])
 
   React.useEffect(() => {
     ;(async () => {
-      // Load persisted state in background without blocking render
       const loadedState = await loadPersistentState()
       setPersistentState(loadedState)
-      setIsLoaded(true)
     })()
   }, [])
 
+  const updateState = React.useCallback(
+    (update: (state: PersistentState | undefined) => PersistentState | undefined) => {
+      hasModified.current = true
+      setPersistentState((prev) => update(prev ?? undefined) ?? prev)
+    },
+    [],
+  )
+
   const resetState = React.useCallback(() => {
+    hasModified.current = true
     setPersistentState(defaultPersistentState)
   }, [])
 
-  // Render immediately with default state instead of blocking
+  if (!persistentState) return null
+
   return (
     <PersistentStateContext.Provider
-      value={{ persistentState, updateState: setPersistentState, resetState }}
+      value={{ persistentState, updateState, resetState }}
     >
       {children}
     </PersistentStateContext.Provider>

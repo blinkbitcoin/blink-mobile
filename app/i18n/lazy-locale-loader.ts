@@ -28,7 +28,7 @@ export const ensureLocaleLoaded = async (locale: Locales): Promise<void> => {
     return
   }
   
-  console.log(`Loading locale on demand: ${locale}`)
+  if (__DEV__) console.log(`Loading locale on demand: ${locale}`)
   await loadLocaleAsync(locale)
 }
 
