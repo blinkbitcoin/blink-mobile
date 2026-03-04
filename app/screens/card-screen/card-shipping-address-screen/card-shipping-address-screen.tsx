@@ -6,7 +6,7 @@ import { InfoCard, ShippingAddressForm } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import { MOCK_SHIPPING_ADDRESS, ShippingAddress } from "./card-mock-data"
+import { MOCK_SHIPPING_ADDRESS, ShippingAddress } from "../card-mock-data"
 
 export const CardShippingAddressScreen: React.FC = () => {
   const styles = useStyles()

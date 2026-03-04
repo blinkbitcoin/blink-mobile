@@ -3,7 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardShippingAddressScreen } from "@app/screens/card-screen/card-shipping-address-screen"
-import { ContextForScreen } from "../helper"
+import { ContextForScreen } from "../../helper"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
