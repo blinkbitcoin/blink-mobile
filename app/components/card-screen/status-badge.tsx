@@ -2,17 +2,11 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { TransactionStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-const STATUS_TYPES = {
-  Pending: "pending",
-  Completed: "completed",
-} as const
-
-type StatusType = (typeof STATUS_TYPES)[keyof typeof STATUS_TYPES]
-
 type StatusBadgeProps = {
-  status: StatusType
+  status: TransactionStatus
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
@@ -21,20 +15,28 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const isPending = status === STATUS_TYPES.Pending
+  const backgroundColorMap: Record<TransactionStatus, string> = {
+    [TransactionStatus.Pending]: colors.grey3,
+    [TransactionStatus.Completed]: colors.success,
+    [TransactionStatus.Declined]: colors.error,
+    [TransactionStatus.Reversed]: colors.warning,
+  }
 
-  const backgroundColor = isPending ? colors.warning : colors.success
-  const textColor = colors.black
+  const statusTextMap: Record<TransactionStatus, string> = {
+    [TransactionStatus.Pending]: LL.CardFlow.TransactionStatus.pending(),
+    [TransactionStatus.Completed]: LL.CardFlow.TransactionStatus.completed(),
+    [TransactionStatus.Declined]: LL.CardFlow.TransactionStatus.declined(),
+    [TransactionStatus.Reversed]: LL.CardFlow.TransactionStatus.reversed(),
+  }
 
-  const statusText = isPending
-    ? LL.CardFlow.TransactionStatus.pending()
-    : LL.CardFlow.TransactionStatus.completed()
+  const backgroundColor = backgroundColorMap[status] ?? colors.grey3
+  const statusText = statusTextMap[status] ?? status
 
   const styles = useStyles({ backgroundColor })
 
   return (
     <View style={styles.badge}>
-      <Text style={[styles.text, { color: textColor }]}>{statusText}</Text>
+      <Text style={[styles.text, { color: colors.black }]}>{statusText}</Text>
     </View>
   )
 }

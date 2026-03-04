@@ -1,70 +1,74 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardTransactionDetailsScreen } from "@app/screens/card-screen/card-transaction-details-screen"
-import { ContextForScreen } from "../helper"
+import { ContextForScreen } from "../../helper"
+import { TransactionStatus } from "@app/graphql/generated"
 
 jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
+const mockGoBack = jest.fn()
 const mockUseRoute = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
+    useNavigation: () => ({ goBack: mockGoBack }),
     useRoute: () => mockUseRoute(),
   }
 })
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_TRANSACTIONS: [
-    {
-      date: "Today",
-      transactions: [
-        {
-          id: "1",
-          merchantName: "SuperSelectos",
-          timeAgo: "2 minutes ago",
-          amount: "-$12.50",
-          status: "pending",
-          details: {
-            transactionId: "TXN-2025-000001",
-            cardUsed: "Visa •••• 2121",
-            paymentMethod: "Chip",
-            time: "Jan 30, 10:58 AM",
-            merchant: "SuperSelectos",
-            category: "Groceries",
-            location: "Blvd. Los Héroes, San Salvador, El Salvador",
-            mccCode: "5411",
-            bitcoinRate: "$102,450.00",
-            bitcoinSpent: "12,203 SAT",
-            conversionFee: "$0.00",
-          },
-        },
-        {
-          id: "2",
-          merchantName: "Starbucks",
-          timeAgo: "1 hour ago",
-          amount: "-$5.75",
-          status: "completed",
-          details: {
-            transactionId: "TXN-2025-000002",
-            cardUsed: "Visa •••• 2121",
-            paymentMethod: "Contactless",
-            time: "Jan 30, 9:00 AM",
-            merchant: "Starbucks",
-            category: "Food & Dining",
-            location: "Prospera Place, Kelowna, BC, Canada",
-            mccCode: "5814",
-            bitcoinRate: "$102,380.00",
-            bitcoinSpent: "5,617 SAT",
-            conversionFee: "$0.00",
-          },
-        },
-      ],
-    },
-  ],
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
+
+const FORMATTED_TIME = "Jan 30, 10:58 AM"
+jest.spyOn(Intl, "DateTimeFormat").mockImplementation(
+  () =>
+    ({
+      format: () => FORMATTED_TIME,
+      resolvedOptions: () => ({}) as Intl.ResolvedDateTimeFormatOptions,
+      formatToParts: () => [],
+      formatRange: () => "",
+      formatRangeToParts: () => [],
+    }) as Intl.DateTimeFormat,
+)
+
+const mockFormatCurrency = jest.fn(
+  ({ amountInMajorUnits }: { amountInMajorUnits: number; currency: string }) =>
+    `$${Math.abs(amountInMajorUnits).toFixed(2)}`,
+)
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatCurrency: mockFormatCurrency }),
+}))
+
+const mockUseCardTransaction = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/card-transaction-details-screen/hooks/use-card-transaction",
+  () => ({
+    useCardTransaction: (id: string) => mockUseCardTransaction(id),
+  }),
+)
+
+const TRANSACTION_1 = {
+  id: "txn-001",
+  amount: 12.5,
+  currency: "USD",
+  merchantName: "SuperSelectos",
+  status: TransactionStatus.Pending,
+  createdAt: "2025-01-30T10:58:00.000Z",
+}
+
+const TRANSACTION_2 = {
+  id: "txn-002",
+  amount: 5.75,
+  currency: "USD",
+  merchantName: "Starbucks",
+  status: TransactionStatus.Completed,
+  createdAt: "2025-01-30T09:00:00.000Z",
+}
 
 describe("CardTransactionDetailsScreen", () => {
   beforeEach(() => {
@@ -75,8 +79,9 @@ describe("CardTransactionDetailsScreen", () => {
   describe("rendering with valid transaction", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("renders without crashing", async () => {
@@ -100,7 +105,7 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      const amounts = getAllByText("-$12.50")
+      const amounts = getAllByText("$12.50")
       expect(amounts.length).toBeGreaterThanOrEqual(1)
     })
 
@@ -133,8 +138,9 @@ describe("CardTransactionDetailsScreen", () => {
   describe("card information section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("displays card information title", async () => {
@@ -149,7 +155,7 @@ describe("CardTransactionDetailsScreen", () => {
       expect(getByText("Card information")).toBeTruthy()
     })
 
-    it("displays transaction time", async () => {
+    it("displays formatted transaction time", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardTransactionDetailsScreen />
@@ -158,7 +164,7 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Jan 30, 10:58 AM")).toBeTruthy()
+      expect(getByText(FORMATTED_TIME)).toBeTruthy()
     })
 
     it("displays transaction ID", async () => {
@@ -170,39 +176,16 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("TXN-2025-000001")).toBeTruthy()
-    })
-
-    it("displays card used", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Visa •••• 2121")).toBeTruthy()
-    })
-
-    it("displays payment method", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Chip")).toBeTruthy()
+      expect(getByText("txn-001")).toBeTruthy()
     })
   })
 
   describe("merchant information section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("displays merchant information title", async () => {
@@ -216,49 +199,14 @@ describe("CardTransactionDetailsScreen", () => {
 
       expect(getByText("Merchant information")).toBeTruthy()
     })
-
-    it("displays category", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Groceries")).toBeTruthy()
-    })
-
-    it("displays location", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Blvd. Los Héroes, San Salvador, El Salvador")).toBeTruthy()
-    })
-
-    it("displays MCC code", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("5411")).toBeTruthy()
-    })
   })
 
   describe("currency conversion section", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("displays currency conversion title", async () => {
@@ -272,159 +220,14 @@ describe("CardTransactionDetailsScreen", () => {
 
       expect(getByText("Currency conversion")).toBeTruthy()
     })
-
-    it("displays bitcoin rate", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("$102,450.00")).toBeTruthy()
-    })
-
-    it("displays bitcoin spent", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("12,203 SAT")).toBeTruthy()
-    })
-
-    it("displays conversion fee", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("$0.00")).toBeTruthy()
-    })
-  })
-
-  describe("action buttons", () => {
-    beforeEach(() => {
-      mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
-      })
-    })
-
-    it("displays view on map button", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("View on map")).toBeTruthy()
-    })
-
-    it("displays download receipt button", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Download receipt")).toBeTruthy()
-    })
-
-    it("displays report issue button", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Report issue")).toBeTruthy()
-    })
-
-    it("handles view on map button press", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const button = getByText("View on map")
-      await act(async () => {
-        fireEvent.press(button)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "View on map:",
-        "Blvd. Los Héroes, San Salvador, El Salvador",
-      )
-
-      consoleSpy.mockRestore()
-    })
-
-    it("handles download receipt button press", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const button = getByText("Download receipt")
-      await act(async () => {
-        fireEvent.press(button)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Download receipt:", "1")
-
-      consoleSpy.mockRestore()
-    })
-
-    it("handles report issue button press", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardTransactionDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const button = getByText("Report issue")
-      await act(async () => {
-        fireEvent.press(button)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Report issue:", "1")
-
-      consoleSpy.mockRestore()
-    })
   })
 
   describe("warning card", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("displays warning title", async () => {
@@ -461,10 +264,11 @@ describe("CardTransactionDetailsScreen", () => {
       mockUseRoute.mockReturnValue({
         params: { transactionId: "nonexistent" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: null })
     })
 
-    it("displays not found message for invalid transaction ID", async () => {
-      const { getByText } = render(
+    it("shows toast and navigates back for invalid transaction ID", async () => {
+      render(
         <ContextForScreen>
           <CardTransactionDetailsScreen />
         </ContextForScreen>,
@@ -472,7 +276,11 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Transaction not found")).toBeTruthy()
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Transaction not found" }),
+      )
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
     })
 
     it("does not display transaction details for invalid ID", async () => {
@@ -484,7 +292,7 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(queryByText("-$12.50")).toBeNull()
+      expect(queryByText("$12.50")).toBeNull()
       expect(queryByText("Card information")).toBeNull()
     })
   })
@@ -492,8 +300,9 @@ describe("CardTransactionDetailsScreen", () => {
   describe("completed transaction", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "2" },
+        params: { transactionId: "txn-002" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_2 })
     })
 
     it("displays completed status badge", async () => {
@@ -530,12 +339,12 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      const amounts = getAllByText("-$5.75")
+      const amounts = getAllByText("$5.75")
       expect(amounts.length).toBeGreaterThanOrEqual(1)
     })
 
     it("displays different payment method for transaction 2", async () => {
-      const { getByText } = render(
+      const { queryByText } = render(
         <ContextForScreen>
           <CardTransactionDetailsScreen />
         </ContextForScreen>,
@@ -543,15 +352,17 @@ describe("CardTransactionDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Contactless")).toBeTruthy()
+      // Payment method is a Phase 2/3 field — not yet from API
+      expect(queryByText("Contactless")).toBeNull()
     })
   })
 
   describe("field labels", () => {
     beforeEach(() => {
       mockUseRoute.mockReturnValue({
-        params: { transactionId: "1" },
+        params: { transactionId: "txn-001" },
       })
+      mockUseCardTransaction.mockReturnValue({ transaction: TRANSACTION_1 })
     })
 
     it("displays amount label", async () => {
