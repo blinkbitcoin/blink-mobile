@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Doğum tarihi",
       "contactInformation": "İletişim bilgileri",
       "registeredAddress": "Kayıtlı adres",
-      "shippingAddress": "Teslimat adresi"
+      "shippingAddress": "Teslimat adresi",
+      "kycPendingTitle": "KYC doğrulaması beklemede",
+      "kycPendingDescription": "KYC doğrulamanız işleniyor. Bu biraz zaman alabilir.",
+      "kycDeclinedTitle": "KYC doğrulaması reddedildi",
+      "kycDeclinedDescription": "KYC doğrulamanız reddedildi. Daha fazla bilgi için lütfen destek ile iletişime geçin.",
+      "kycNotStartedTitle": "KYC doğrulamasını tamamlayın",
+      "kycNotStartedDescription": "Tüm kart özelliklerinin kilidini açmak için KYC doğrulama sürecini tamamlayın.",
+      "kycAwaitingInputTitle": "KYC doğrulamasına devam edin",
+      "kycAwaitingInputDescription": "KYC doğrulamanızı tamamlamak için ek bilgiler gereklidir.",
+      "kycErrorTitle": "Doğrulama hatası",
+      "kycErrorDescription": "Doğrulama sırasında bir hata oluştu. Lütfen tekrar deneyin veya destek ile iletişime geçin.",
+      "kycUnderReviewTitle": "KYC inceleme altında",
+      "kycUnderReviewDescription": "KYC doğrulamanız manuel inceleme altındadır. Bu biraz zaman alabilir."
     },
     "AddToMobileWallet": {
       "title": "Mobil cuzdana ekle",

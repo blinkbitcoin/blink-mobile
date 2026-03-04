@@ -3124,7 +3124,19 @@
       "dateOfBirth": "تاريخ الميلاد",
       "contactInformation": "معلومات الاتصال",
       "registeredAddress": "العنوان المسجل",
-      "shippingAddress": "عنوان الشحن"
+      "shippingAddress": "عنوان الشحن",
+      "kycPendingTitle": "التحقق من الهوية قيد الانتظار",
+      "kycPendingDescription": "يتم معالجة التحقق من هويتك. قد يستغرق هذا بعض الوقت.",
+      "kycDeclinedTitle": "تم رفض التحقق من الهوية",
+      "kycDeclinedDescription": "تم رفض التحقق من هويتك. يرجى التواصل مع الدعم لمزيد من المعلومات.",
+      "kycNotStartedTitle": "أكمل التحقق من الهوية",
+      "kycNotStartedDescription": "أكمل عملية التحقق من الهوية لفتح جميع ميزات البطاقة.",
+      "kycAwaitingInputTitle": "متابعة التحقق من الهوية",
+      "kycAwaitingInputDescription": "مطلوب معلومات إضافية لإكمال التحقق من هويتك.",
+      "kycErrorTitle": "خطأ في التحقق",
+      "kycErrorDescription": "حدث خطأ أثناء التحقق. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.",
+      "kycUnderReviewTitle": "KYC قيد المراجعة",
+      "kycUnderReviewDescription": "تتم مراجعة التحقق من KYC يدويًا. قد يستغرق ذلك بعض الوقت."
     },
     "AddToMobileWallet": {
       "title": "اضافة الى المحفظة",

@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Születési dátum",
       "contactInformation": "Kapcsolattartási adatok",
       "registeredAddress": "Regisztrált cím",
-      "shippingAddress": "Szállítási cím"
+      "shippingAddress": "Szállítási cím",
+      "kycPendingTitle": "KYC ellenőrzés folyamatban",
+      "kycPendingDescription": "A KYC ellenőrzése feldolgozás alatt áll. Ez eltarthat egy ideig.",
+      "kycDeclinedTitle": "KYC ellenőrzés elutasítva",
+      "kycDeclinedDescription": "A KYC ellenőrzése elutasításra került. Kérjük, forduljon az ügyfélszolgálathoz további információkért.",
+      "kycNotStartedTitle": "KYC ellenőrzés befejezése",
+      "kycNotStartedDescription": "Fejezze be a KYC ellenőrzési folyamatot az összes kártyafunkció feloldásához.",
+      "kycAwaitingInputTitle": "KYC ellenőrzés folytatása",
+      "kycAwaitingInputDescription": "További információkra van szükség a KYC ellenőrzés befejezéséhez.",
+      "kycErrorTitle": "Ellenőrzési hiba",
+      "kycErrorDescription": "Hiba történt az ellenőrzés során. Kérjük, próbálja újra, vagy forduljon az ügyfélszolgálathoz.",
+      "kycUnderReviewTitle": "KYC felülvizsgálat alatt",
+      "kycUnderReviewDescription": "A KYC ellenőrzése manuális felülvizsgálat alatt áll. Ez eltarthat egy ideig."
     },
     "AddToMobileWallet": {
       "title": "Hozzaadas a mobil tarcahoz",

@@ -3124,7 +3124,19 @@
       "dateOfBirth": "วันเกิด",
       "contactInformation": "ข้อมูลติดต่อ",
       "registeredAddress": "ที่อยู่ที่ลงทะเบียน",
-      "shippingAddress": "ที่อยู่จัดส่ง"
+      "shippingAddress": "ที่อยู่จัดส่ง",
+      "kycPendingTitle": "การยืนยัน KYC อยู่ระหว่างดำเนินการ",
+      "kycPendingDescription": "การยืนยัน KYC ของคุณกำลังดำเนินการ อาจใช้เวลาสักครู่",
+      "kycDeclinedTitle": "การยืนยัน KYC ถูกปฏิเสธ",
+      "kycDeclinedDescription": "การยืนยัน KYC ของคุณถูกปฏิเสธ กรุณาติดต่อฝ่ายสนับสนุนเพื่อขอข้อมูลเพิ่มเติม",
+      "kycNotStartedTitle": "ดำเนินการยืนยัน KYC ให้เสร็จสมบูรณ์",
+      "kycNotStartedDescription": "ดำเนินการยืนยัน KYC ให้เสร็จสมบูรณ์เพื่อปลดล็อกคุณสมบัติบัตรทั้งหมด",
+      "kycAwaitingInputTitle": "ดำเนินการยืนยัน KYC ต่อ",
+      "kycAwaitingInputDescription": "ต้องการข้อมูลเพิ่มเติมเพื่อดำเนินการยืนยัน KYC ของคุณให้เสร็จสมบูรณ์",
+      "kycErrorTitle": "ข้อผิดพลาดในการยืนยัน",
+      "kycErrorDescription": "เกิดข้อผิดพลาดระหว่างการยืนยัน กรุณาลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
+      "kycUnderReviewTitle": "KYC อยู่ระหว่างการตรวจสอบ",
+      "kycUnderReviewDescription": "การยืนยัน KYC ของคุณอยู่ระหว่างการตรวจสอบด้วยตนเอง อาจใช้เวลาสักครู่"
     },
     "AddToMobileWallet": {
       "title": "เพิ่มไปยังกระเป๋าเงินมือถือ",

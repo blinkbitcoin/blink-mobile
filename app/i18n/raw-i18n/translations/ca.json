@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Data de naixement",
       "contactInformation": "Informació de contacte",
       "registeredAddress": "Adreça registrada",
-      "shippingAddress": "Adreça d'enviament"
+      "shippingAddress": "Adreça d'enviament",
+      "kycPendingTitle": "Verificació KYC pendent",
+      "kycPendingDescription": "La verificació KYC s'està processant. Això pot trigar una estona.",
+      "kycDeclinedTitle": "Verificació KYC rebutjada",
+      "kycDeclinedDescription": "La verificació KYC ha estat rebutjada. Contacteu amb el suport per obtenir més informació.",
+      "kycNotStartedTitle": "Completeu la verificació KYC",
+      "kycNotStartedDescription": "Completeu el procés de verificació KYC per desbloquejar totes les funcions de la targeta.",
+      "kycAwaitingInputTitle": "Continueu la verificació KYC",
+      "kycAwaitingInputDescription": "Es necessita informació addicional per completar la verificació KYC.",
+      "kycErrorTitle": "Error de verificació",
+      "kycErrorDescription": "S'ha produït un error durant la verificació. Torneu-ho a provar o contacteu amb el suport.",
+      "kycUnderReviewTitle": "KYC en revisió",
+      "kycUnderReviewDescription": "La verificació KYC està en revisió manual. Això pot trigar una estona."
     },
     "AddToMobileWallet": {
       "title": "Afegir a la cartera mobil",

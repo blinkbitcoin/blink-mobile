@@ -3127,7 +3127,19 @@
             "dateOfBirth": "生年月日",
             "contactInformation": "連絡先情報",
             "registeredAddress": "登録住所",
-            "shippingAddress": "配送先住所"
+            "shippingAddress": "配送先住所",
+            "kycPendingTitle": "KYC認証保留中",
+            "kycPendingDescription": "KYC認証を処理中です。しばらくお待ちください。",
+            "kycDeclinedTitle": "KYC認証が拒否されました",
+            "kycDeclinedDescription": "KYC認証が拒否されました。詳細についてはサポートにお問い合わせください。",
+            "kycNotStartedTitle": "KYC認証を完了してください",
+            "kycNotStartedDescription": "すべてのカード機能をご利用いただくには、KYC認証プロセスを完了してください。",
+            "kycAwaitingInputTitle": "KYC認証を続行してください",
+            "kycAwaitingInputDescription": "KYC認証を完了するには追加情報が必要です。",
+            "kycErrorTitle": "認証エラー",
+            "kycErrorDescription": "認証中にエラーが発生しました。もう一度お試しいただくか、サポートにお問い合わせください。",
+            "kycUnderReviewTitle": "KYC審査中",
+            "kycUnderReviewDescription": "KYC認証は手動審査中です。しばらくお時間がかかる場合があります。"
         },
         "AddToMobileWallet": {
             "title": "モバイルウォレットに追加",
