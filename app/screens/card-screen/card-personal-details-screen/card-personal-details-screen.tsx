@@ -18,7 +18,7 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { MOCK_USER, shippingAddressToLines } from "./card-mock-data"
+import { MOCK_USER, shippingAddressToLines } from "../card-mock-data"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()

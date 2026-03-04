@@ -3,7 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardPersonalDetailsScreen } from "@app/screens/card-screen/card-personal-details-screen"
-import { ContextForScreen } from "../helper"
+import { ContextForScreen } from "../../helper"
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
