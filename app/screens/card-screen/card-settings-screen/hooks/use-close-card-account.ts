@@ -80,7 +80,9 @@ export const useCloseCardAccount = () => {
         buttonLabel: LL.CardFlow.CardSettings.closeCardSuccessButton(),
         navigateTo: "Primary",
         iconName: "info",
-        iconColor: undefined,
+        iconColor: "red",
+        showCard: false,
+        showAddToWallet: false,
       })
     } catch (err) {
       if (err instanceof Error) {
