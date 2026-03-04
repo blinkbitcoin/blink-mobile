@@ -142,7 +142,9 @@ describe("useCloseCardAccount", () => {
       buttonLabel: "Back to Home",
       navigateTo: "Primary",
       iconName: "info",
-      iconColor: undefined,
+      iconColor: "red",
+      showCard: false,
+      showAddToWallet: false,
     })
   })
 
