@@ -5,7 +5,6 @@ import { render, act, screen, waitFor, fireEvent } from "@testing-library/react-
 import {
   PersistentStateProvider,
   PersistentStateContext,
-  PersistentStateContextType,
 } from "@app/store/persistent-state"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 
@@ -117,7 +116,9 @@ describe("PersistentStateProvider", () => {
 
     // Wait an extra tick to ensure no save was triggered
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 50))
+      await new Promise<void>((r) => {
+        setTimeout(r, 50)
+      })
     })
 
     expect(mockSaveJson).not.toHaveBeenCalled()

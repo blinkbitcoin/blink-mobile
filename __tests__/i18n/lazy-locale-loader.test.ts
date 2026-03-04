@@ -1,4 +1,8 @@
-import { isLocaleLoaded, ensureLocaleLoaded, createLazySetLocale } from "@app/i18n/lazy-locale-loader"
+import {
+  isLocaleLoaded,
+  ensureLocaleLoaded,
+  createLazySetLocale,
+} from "@app/i18n/lazy-locale-loader"
 import { loadedLocales } from "@app/i18n/i18n-util"
 import { loadLocaleAsync } from "@app/i18n/i18n-util.async"
 import type { Locales } from "@app/i18n/i18n-types"
@@ -16,7 +20,9 @@ jest.mock("@app/i18n/i18n-util", () => {
   }
 })
 
-const mockedLoadLocaleAsync = loadLocaleAsync as jest.MockedFunction<typeof loadLocaleAsync>
+const mockedLoadLocaleAsync = loadLocaleAsync as jest.MockedFunction<
+  typeof loadLocaleAsync
+>
 
 describe("lazy-locale-loader", () => {
   beforeEach(() => {
@@ -33,7 +39,7 @@ describe("lazy-locale-loader", () => {
     })
 
     it("returns true for a loaded locale", () => {
-      ;(loadedLocales as Record<string, unknown>)["fr"] = { someKey: "value" }
+      ;(loadedLocales as Record<string, unknown>).fr = { someKey: "value" }
       expect(isLocaleLoaded("fr" as Locales)).toBe(true)
     })
   })
@@ -45,7 +51,7 @@ describe("lazy-locale-loader", () => {
     })
 
     it("skips loadLocaleAsync if locale is already loaded", async () => {
-      ;(loadedLocales as Record<string, unknown>)["de"] = { someKey: "value" }
+      ;(loadedLocales as Record<string, unknown>).de = { someKey: "value" }
       await ensureLocaleLoaded("de" as Locales)
       expect(mockedLoadLocaleAsync).not.toHaveBeenCalled()
     })
@@ -63,7 +69,7 @@ describe("lazy-locale-loader", () => {
     })
 
     it("calls setLocale even if locale is already loaded (no-op load)", async () => {
-      ;(loadedLocales as Record<string, unknown>)["es"] = { someKey: "value" }
+      ;(loadedLocales as Record<string, unknown>).es = { someKey: "value" }
       const mockSetLocale = jest.fn()
       const lazySetLocale = createLazySetLocale(mockSetLocale)
 

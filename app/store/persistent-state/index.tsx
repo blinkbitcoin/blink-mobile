@@ -35,8 +35,9 @@ export const PersistentStateContext = createContext<PersistentStateContextType |
 )
 
 export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [persistentState, setPersistentState] =
-    React.useState<PersistentState | null>(null)
+  const [persistentState, setPersistentState] = React.useState<PersistentState | null>(
+    null,
+  )
   const hasModified = React.useRef(false)
 
   React.useEffect(() => {
@@ -68,9 +69,7 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   if (!persistentState) return null
 
   return (
-    <PersistentStateContext.Provider
-      value={{ persistentState, updateState, resetState }}
-    >
+    <PersistentStateContext.Provider value={{ persistentState, updateState, resetState }}>
       {children}
     </PersistentStateContext.Provider>
   )
