@@ -257,7 +257,7 @@ describe("CloseCardModal", () => {
       alertSpy.mockRestore()
     })
 
-    it("calls onClose and onCloseCard when OK is pressed in alert", async () => {
+    it("calls onCloseCard without closing modal when OK is pressed in alert", async () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
@@ -276,8 +276,8 @@ describe("CloseCardModal", () => {
         okButton.onPress!()
       })
 
-      expect(mockOnClose).toHaveBeenCalledTimes(1)
       expect(mockOnCloseCard).toHaveBeenCalledTimes(1)
+      expect(mockOnClose).not.toHaveBeenCalled()
       alertSpy.mockRestore()
     })
 
@@ -298,7 +298,7 @@ describe("CloseCardModal", () => {
       expect(mockOnCloseCard).not.toHaveBeenCalled()
     })
 
-    it("resets text after OK is pressed in alert", async () => {
+    it("keeps modal open after OK is pressed so user can retry on failure", async () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
@@ -317,14 +317,8 @@ describe("CloseCardModal", () => {
         okButton.onPress!()
       })
 
-      alertSpy.mockClear()
-
-      // After OK, text was reset so pressing confirm again should not trigger alert
-      await act(async () => {
-        fireEvent.press(getByText("Confirm"))
-      })
-
-      expect(alertSpy).not.toHaveBeenCalled()
+      // Modal stays open — text is preserved so user can retry
+      expect(mockOnClose).not.toHaveBeenCalled()
       alertSpy.mockRestore()
     })
   })

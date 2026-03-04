@@ -44,10 +44,7 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
         { text: LL.common.cancel() },
         {
           text: LL.common.ok(),
-          onPress: () => {
-            handleClose()
-            onCloseCard()
-          },
+          onPress: onCloseCard,
         },
       ],
     )
