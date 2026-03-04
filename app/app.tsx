@@ -40,7 +40,7 @@ import { ActionModals, ActionsProvider } from "./components/actions"
 // Other locales are loaded on-demand when user switches language
 const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
-console.log(`Loaded default locale: ${defaultLocale}`)
+if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 
 /**
  * This is the root component of our app.
