@@ -76,32 +76,4 @@ export type SelectionOption = {
   label: string
 }
 
-export const US_STATES: SelectionOption[] = [
-  { value: "AZ", label: "Arizona" },
-  { value: "CA", label: "California" },
-  { value: "CO", label: "Colorado" },
-  { value: "FL", label: "Florida" },
-  { value: "GA", label: "Georgia" },
-  { value: "IL", label: "Illinois" },
-  { value: "MA", label: "Massachusetts" },
-  { value: "MI", label: "Michigan" },
-  { value: "NV", label: "Nevada" },
-  { value: "NJ", label: "New Jersey" },
-  { value: "NY", label: "New York" },
-  { value: "NC", label: "North Carolina" },
-  { value: "OH", label: "Ohio" },
-  { value: "OR", label: "Oregon" },
-  { value: "PA", label: "Pennsylvania" },
-  { value: "TN", label: "Tennessee" },
-  { value: "TX", label: "Texas" },
-  { value: "VA", label: "Virginia" },
-  { value: "WA", label: "Washington" },
-]
-
-export const COUNTRIES: SelectionOption[] = [
-  { value: "USA", label: "United States" },
-  { value: "CAN", label: "Canada" },
-  { value: "MEX", label: "Mexico" },
-]
-
 export const MOCK_CARD_PIN = "1234"

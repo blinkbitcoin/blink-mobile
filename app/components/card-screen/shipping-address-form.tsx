@@ -7,11 +7,11 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
 import {
   COUNTRIES,
-  ShippingAddress,
-  US_STATES,
-} from "@app/screens/card-screen/card-mock-data"
+  getRegionsByCountry,
+} from "@app/screens/card-screen/country-region-data"
 
 type ShippingAddressFormProps = {
   address: ShippingAddress
@@ -35,7 +35,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   const handleStateSelect = () => {
     navigation.navigate("selectionScreen", {
       title: LL.CardFlow.ShippingAddress.state(),
-      options: US_STATES,
+      options: getRegionsByCountry(address.countryCode),
       selectedValue: address.region,
       onSelect: (value: string) => {
         onAddressChange({ ...address, region: value })
@@ -50,7 +50,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       options: COUNTRIES,
       selectedValue: address.countryCode,
       onSelect: (value: string) => {
-        onAddressChange({ ...address, countryCode: value })
+        const firstRegion = getRegionsByCountry(value)[0]?.value ?? ""
+        onAddressChange({ ...address, countryCode: value, region: firstRegion })
         navigation.goBack()
       },
     })
@@ -99,6 +100,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           <InputField
             label={LL.CardFlow.ShippingAddress.city()}
             value={address.city}
+            onChangeText={(text) => handleFieldChange("city", text)}
             valueStyle={ValueStyle.Regular}
           />
         </View>
@@ -118,6 +120,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           <InputField
             label={LL.CardFlow.ShippingAddress.postalCode()}
             value={address.postalCode}
+            onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
           />
         </View>

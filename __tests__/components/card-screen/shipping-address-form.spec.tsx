@@ -54,15 +54,24 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  US_STATES: [
-    { value: "NY", label: "New York" },
-    { value: "CA", label: "California" },
-  ],
+jest.mock("@app/screens/card-screen/country-region-data", () => ({
   COUNTRIES: [
     { value: "USA", label: "United States" },
     { value: "CAN", label: "Canada" },
   ],
+  getRegionsByCountry: (code: string) => {
+    if (code === "USA")
+      return [
+        { value: "NY", label: "New York" },
+        { value: "CA", label: "California" },
+      ]
+    if (code === "CAN")
+      return [
+        { value: "ON", label: "Ontario" },
+        { value: "BC", label: "British Columbia" },
+      ]
+    return []
+  },
 }))
 
 jest.mock("@app/components/card-screen/input-field", () => ({

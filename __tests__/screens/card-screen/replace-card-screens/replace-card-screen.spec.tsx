@@ -53,8 +53,11 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
       countryCode: "USA",
     },
   },
-  US_STATES: [{ value: "NY", label: "New York" }],
+}))
+
+jest.mock("@app/screens/card-screen/country-region-data", () => ({
   COUNTRIES: [{ value: "USA", label: "United States" }],
+  getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({

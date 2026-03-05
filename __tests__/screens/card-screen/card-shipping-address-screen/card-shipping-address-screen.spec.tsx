@@ -21,15 +21,24 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
   useShippingAddressData: () => mockUseShippingAddressData(),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  US_STATES: [
-    { value: "NY", label: "New York" },
-    { value: "CA", label: "California" },
-  ],
+jest.mock("@app/screens/card-screen/country-region-data", () => ({
   COUNTRIES: [
     { value: "USA", label: "United States" },
     { value: "CAN", label: "Canada" },
   ],
+  getRegionsByCountry: (code: string) => {
+    if (code === "USA")
+      return [
+        { value: "NY", label: "New York" },
+        { value: "CA", label: "California" },
+      ]
+    if (code === "CAN")
+      return [
+        { value: "ON", label: "Ontario" },
+        { value: "BC", label: "British Columbia" },
+      ]
+    return []
+  },
 }))
 
 const mockAddress = {
@@ -173,7 +182,7 @@ describe("CardShippingAddressScreen", () => {
     })
 
     it("displays city field", async () => {
-      const { getByText } = render(
+      const { getByText, getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
         </ContextForScreen>,
@@ -182,7 +191,7 @@ describe("CardShippingAddressScreen", () => {
       await act(async () => {})
 
       expect(getByText("City")).toBeTruthy()
-      expect(getByText("New York")).toBeTruthy()
+      expect(getByDisplayValue("New York")).toBeTruthy()
     })
 
     it("displays state field", async () => {
@@ -199,7 +208,7 @@ describe("CardShippingAddressScreen", () => {
     })
 
     it("displays postal code field", async () => {
-      const { getByText } = render(
+      const { getByText, getByDisplayValue } = render(
         <ContextForScreen>
           <CardShippingAddressScreen />
         </ContextForScreen>,
@@ -208,7 +217,7 @@ describe("CardShippingAddressScreen", () => {
       await act(async () => {})
 
       expect(getByText("Postal code")).toBeTruthy()
-      expect(getByText("10001")).toBeTruthy()
+      expect(getByDisplayValue("10001")).toBeTruthy()
     })
 
     it("displays country field", async () => {
