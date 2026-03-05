@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react"
-import { ActivityIndicator, View } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import { ActivityIndicator, Alert, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
 
 import { InfoCard, ShippingAddressForm } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
@@ -27,12 +28,35 @@ export const CardShippingAddressScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
 
+  const navigation = useNavigation()
   const { initialAddress, loading } = useShippingAddressData()
   const [address, setAddress] = useState<ShippingAddress>(EMPTY_ADDRESS)
+  const savedAddressRef = useRef<ShippingAddress>(EMPTY_ADDRESS)
 
   useEffect(() => {
-    if (initialAddress) setAddress(initialAddress)
+    if (initialAddress) {
+      setAddress(initialAddress)
+      savedAddressRef.current = initialAddress
+    }
   }, [initialAddress])
+
+  const isDirty = JSON.stringify(address) !== JSON.stringify(savedAddressRef.current)
+
+  useEffect(() => {
+    return navigation.addListener("beforeRemove", (e) => {
+      if (!isDirty) return
+
+      e.preventDefault()
+      Alert.alert(LL.common.warning(), LL.common.discardChangesMessage(), [
+        { text: LL.common.cancel(), style: "cancel" },
+        {
+          text: LL.common.discard(),
+          style: "destructive",
+          onPress: () => navigation.dispatch(e.data.action),
+        },
+      ])
+    })
+  }, [navigation, isDirty, LL])
 
   if (loading && !initialAddress) {
     return (

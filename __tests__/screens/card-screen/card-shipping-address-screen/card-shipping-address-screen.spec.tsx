@@ -1,4 +1,5 @@
 import React from "react"
+import { Alert } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -7,14 +8,21 @@ import { ContextForScreen } from "../../helper"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockDispatch = jest.fn()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockAddListener = jest.fn((_event: string, _callback: any) => jest.fn())
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
+    dispatch: mockDispatch,
+    addListener: mockAddListener,
   }),
 }))
+
+jest.spyOn(Alert, "alert")
 
 const mockUseShippingAddressData = jest.fn()
 jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
@@ -38,6 +46,11 @@ jest.mock("@app/screens/card-screen/country-region-data", () => ({
         { value: "BC", label: "British Columbia" },
       ]
     return []
+  },
+  getIsoAlpha2: (code: string) => {
+    if (code === "USA") return "US"
+    if (code === "CAN") return "CA"
+    return undefined
   },
 }))
 
@@ -376,6 +389,73 @@ describe("CardShippingAddressScreen", () => {
       expect(getByText("Postal code")).toBeTruthy()
       expect(getByText("Country")).toBeTruthy()
       expect(getByText("Important")).toBeTruthy()
+    })
+  })
+
+  describe("discard changes", () => {
+    it("registers beforeRemove listener on mount", async () => {
+      render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockAddListener).toHaveBeenCalledWith("beforeRemove", expect.any(Function))
+    })
+
+    it("does not show alert when navigating back without changes", async () => {
+      render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const beforeRemoveCalls = mockAddListener.mock.calls.filter(
+        (call) => call[0] === "beforeRemove",
+      )
+      const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
+
+      const mockEvent = { data: { action: { type: "GO_BACK" } }, preventDefault: jest.fn() }
+      beforeRemoveCallback(mockEvent)
+
+      expect(mockEvent.preventDefault).not.toHaveBeenCalled()
+      expect(Alert.alert).not.toHaveBeenCalled()
+    })
+
+    it("shows discard alert when navigating back with unsaved changes", async () => {
+      const { getByDisplayValue } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.changeText(getByDisplayValue("Joe"), "Jane")
+      })
+
+      const beforeRemoveCalls = mockAddListener.mock.calls.filter(
+        (call) => call[0] === "beforeRemove",
+      )
+      const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
+
+      const mockEvent = { data: { action: { type: "GO_BACK" } }, preventDefault: jest.fn() }
+      beforeRemoveCallback(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Warning",
+        "You have unsaved changes. Are you sure you want to discard them?",
+        expect.arrayContaining([
+          expect.objectContaining({ text: "Cancel" }),
+          expect.objectContaining({ text: "Discard" }),
+        ]),
+      )
     })
   })
 })
