@@ -3,15 +3,14 @@ import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { postcodeValidator } from "postcode-validator"
 
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
+import { validatePOBox, validatePostalCode } from "@app/screens/card-screen/utils"
 import {
   COUNTRIES,
-  getIsoAlpha2,
   getRegionsByCountry,
 } from "@app/screens/card-screen/country-region-data"
 
@@ -30,15 +29,15 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const isoAlpha2 = getIsoAlpha2(address.countryCode)
+  const validateAddress = (value: string) =>
+    validatePOBox({ value, errorMessage: LL.CardFlow.ShippingAddress.noPOBoxes() })
 
-  const validatePostalCode = (value: string): string | undefined => {
-    if (!isoAlpha2 || value.length === 0) return undefined
-
-    if (!postcodeValidator(value, isoAlpha2))
-      return LL.common.validation.invalidPostalCode()
-    return undefined
-  }
+  const validatePostal = (value: string) =>
+    validatePostalCode({
+      value,
+      countryCode: address.countryCode,
+      errorMessage: LL.common.validation.invalidPostalCode(),
+    })
 
   const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
     onAddressChange({ ...address, [field]: value })
@@ -103,6 +102,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         valueStyle={ValueStyle.Bold}
         required
         minLength={5}
+        validate={validateAddress}
       />
 
       <InputField
@@ -111,6 +111,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         rightIcon="pencil"
         onChangeText={(text) => handleFieldChange("line2", text)}
         valueStyle={ValueStyle.Bold}
+        validate={validateAddress}
       />
 
       <View style={styles.gridRow}>
@@ -144,7 +145,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
             required
-            validate={validatePostalCode}
+            validate={validatePostal}
           />
         </View>
         <View style={styles.gridItem}>

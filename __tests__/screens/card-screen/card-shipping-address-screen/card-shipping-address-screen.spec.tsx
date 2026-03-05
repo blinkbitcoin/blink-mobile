@@ -419,7 +419,10 @@ describe("CardShippingAddressScreen", () => {
       )
       const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
 
-      const mockEvent = { data: { action: { type: "GO_BACK" } }, preventDefault: jest.fn() }
+      const mockEvent = {
+        data: { action: { type: "GO_BACK" } },
+        preventDefault: jest.fn(),
+      }
       beforeRemoveCallback(mockEvent)
 
       expect(mockEvent.preventDefault).not.toHaveBeenCalled()
@@ -444,7 +447,10 @@ describe("CardShippingAddressScreen", () => {
       )
       const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
 
-      const mockEvent = { data: { action: { type: "GO_BACK" } }, preventDefault: jest.fn() }
+      const mockEvent = {
+        data: { action: { type: "GO_BACK" } },
+        preventDefault: jest.fn(),
+      }
       beforeRemoveCallback(mockEvent)
 
       expect(mockEvent.preventDefault).toHaveBeenCalled()
