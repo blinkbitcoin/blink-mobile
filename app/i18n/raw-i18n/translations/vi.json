@@ -2703,6 +2703,8 @@
     "csvExport": "Xuất các giao dịch ra CSV",
     "date": "Ngày",
     "description": "Mô tả",
+    "discard": "Hủy bỏ",
+    "discardChangesMessage": "Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn hủy bỏ chúng không?",
     "domain": "Tên miền",
     "email": "Email",
     "error": "Lỗi",
@@ -2792,7 +2794,8 @@
     "save": "Lưu",
     "validation": {
       "required": "Trường này là bắt buộc",
-      "minChars": "Phải có ít nhất {min} ký tự"
+      "minChars": "Phải có ít nhất {min} ký tự",
+      "invalidPostalCode": "Mã bưu chính không hợp lệ"
     }
   },
   "errors": {

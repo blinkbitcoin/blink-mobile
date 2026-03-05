@@ -2686,6 +2686,8 @@
     "csvExport": "Exportovať transakcie do CSV",
     "date": "Dátum",
     "description": "Popis",
+    "discard": "Zahodiť",
+    "discardChangesMessage": "Máte neuložené zmeny. Ste si istí, že ich chcete zahodiť?",
     "domain": "Doména",
     "email": "E-mail",
     "error": "Chyba",
@@ -2775,7 +2777,8 @@
     "save": "Uložiť",
     "validation": {
       "required": "Toto pole je povinné",
-      "minChars": "Musí obsahovať aspoň {min} znakov"
+      "minChars": "Musí obsahovať aspoň {min} znakov",
+      "invalidPostalCode": "Neplatné PSČ"
     }
   },
   "errors": {

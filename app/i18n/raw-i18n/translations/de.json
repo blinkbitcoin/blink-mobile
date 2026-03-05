@@ -2686,6 +2686,8 @@
         "csvExport": "Transaktionen als CSV exportieren",
         "date": "Datum",
         "description": "Beschreibung",
+        "discard": "Verwerfen",
+        "discardChangesMessage": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du sie verwerfen möchtest?",
         "domain": "Domain",
         "email": "E-Mail",
         "error": "Fehler",
@@ -2775,7 +2777,8 @@
         "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert",
         "validation": {
             "required": "Dieses Feld ist erforderlich",
-            "minChars": "Muss mindestens {min} Zeichen lang sein"
+            "minChars": "Muss mindestens {min} Zeichen lang sein",
+            "invalidPostalCode": "Ungültige Postleitzahl"
         }
     },
     "errors": {

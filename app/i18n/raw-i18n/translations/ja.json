@@ -2703,6 +2703,8 @@
         "csvExport": "トランザクションをCSVにエクスポートする",
         "date": "日付",
         "description": "説明",
+        "discard": "破棄",
+        "discardChangesMessage": "保存されていない変更があります。破棄してもよろしいですか？",
         "domain": "ドメイン",
         "email": "メールアドレス",
         "error": "エラー",
@@ -2792,7 +2794,8 @@
         "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました",
         "validation": {
             "required": "この項目は必須です",
-            "minChars": "{min}文字以上で入力してください"
+            "minChars": "{min}文字以上で入力してください",
+            "invalidPostalCode": "無効な郵便番号"
         }
     },
     "errors": {

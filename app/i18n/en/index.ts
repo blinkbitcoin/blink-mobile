@@ -2786,6 +2786,8 @@ const en: BaseTranslation = {
     csvExport: "Export all transactions",
     date: "Date",
     description: "Description",
+    discard: "Discard",
+    discardChangesMessage: "You have unsaved changes. Are you sure you want to discard them?",
     domain: "Domain",
     email: "Email",
     error: "Error",
@@ -2878,6 +2880,7 @@ const en: BaseTranslation = {
     validation: {
       required: "This field is required",
       minChars: "Must be at least {min:number} characters",
+      invalidPostalCode: "Invalid postal code",
     },
   },
   errors: {

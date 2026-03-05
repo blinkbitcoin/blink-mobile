@@ -8744,6 +8744,14 @@ type RootTranslation = {
 		 */
 		description: string
 		/**
+		 * D​i​s​c​a​r​d
+		 */
+		discard: string
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​u​n​s​a​v​e​d​ ​c​h​a​n​g​e​s​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​i​s​c​a​r​d​ ​t​h​e​m​?
+		 */
+		discardChangesMessage: string
+		/**
 		 * D​o​m​a​i​n
 		 */
 		domain: string
@@ -9100,6 +9108,10 @@ type RootTranslation = {
 			 * @param {number} min
 			 */
 			minChars: RequiredParams<'min'>
+			/**
+			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e
+			 */
+			invalidPostalCode: string
 		}
 	}
 	errors: {
@@ -19510,6 +19522,14 @@ export type TranslationFunctions = {
 		 */
 		description: () => LocalizedString
 		/**
+		 * Discard
+		 */
+		discard: () => LocalizedString
+		/**
+		 * You have unsaved changes. Are you sure you want to discard them?
+		 */
+		discardChangesMessage: () => LocalizedString
+		/**
 		 * Domain
 		 */
 		domain: () => LocalizedString
@@ -19864,6 +19884,10 @@ export type TranslationFunctions = {
 			 * Must be at least {min} characters
 			 */
 			minChars: (arg: { min: number }) => LocalizedString
+			/**
+			 * Invalid postal code
+			 */
+			invalidPostalCode: () => LocalizedString
 		}
 	}
 	errors: {

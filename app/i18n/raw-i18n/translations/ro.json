@@ -2686,6 +2686,8 @@
     "csvExport": "Exportați tranzacțiile ca CSV",
     "date": "Data",
     "description": "Descriere",
+    "discard": "Renunță",
+    "discardChangesMessage": "Aveți modificări nesalvate. Sunteți sigur că doriți să renunțați la ele?",
     "domain": "Domeniu",
     "email": "Email",
     "error": "Eroare",
@@ -2775,7 +2777,8 @@
     "save": "Salvează",
     "validation": {
       "required": "Acest câmp este obligatoriu",
-      "minChars": "Trebuie să aibă cel puțin {min} caractere"
+      "minChars": "Trebuie să aibă cel puțin {min} caractere",
+      "invalidPostalCode": "Cod poștal invalid"
     }
   },
   "errors": {

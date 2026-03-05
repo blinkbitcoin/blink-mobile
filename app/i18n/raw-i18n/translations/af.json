@@ -2703,6 +2703,8 @@
     "csvExport": "Voer transaksies as CSV uit",
     "date": "Datum",
     "description": "Beskrywing",
+    "discard": "Gooi weg",
+    "discardChangesMessage": "Jy het ongestoorde veranderinge. Is jy seker jy wil dit weggooi?",
     "domain": "Domein",
     "email": "E-pos",
     "error": "Fout",
@@ -2792,7 +2794,8 @@
     "save": "Stoor",
     "validation": {
       "required": "Hierdie veld is verpligtend",
-      "minChars": "Moet ten minste {min} karakters wees"
+      "minChars": "Moet ten minste {min} karakters wees",
+      "invalidPostalCode": "Ongeldige poskode"
     }
   },
   "errors": {

@@ -2686,6 +2686,8 @@
     "csvExport": "Tranzakciók exportálása CSV formátumban",
     "date": "Dátum",
     "description": "Leírás",
+    "discard": "Elvetés",
+    "discardChangesMessage": "Mentetlen módosításai vannak. Biztosan el szeretné vetni őket?",
     "domain": "Domain",
     "email": "Email",
     "error": "Hiba",
@@ -2775,7 +2777,8 @@
     "save": "Mentés",
     "validation": {
       "required": "Ez a mező kötelező",
-      "minChars": "Legalább {min} karakter szükséges"
+      "minChars": "Legalább {min} karakter szükséges",
+      "invalidPostalCode": "Érvénytelen irányítószám"
     }
   },
   "errors": {

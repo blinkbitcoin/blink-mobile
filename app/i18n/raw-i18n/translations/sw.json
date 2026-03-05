@@ -2686,6 +2686,8 @@
     "csvExport": "Hifadhi malipo kama CSV",
     "date": "Tarehe",
     "description": "Maelezo",
+    "discard": "Tupa",
+    "discardChangesMessage": "Una mabadiliko ambayo hayajahifadhiwa. Je, una uhakika unataka kuyatupa?",
     "domain": "Kikoa",
     "email": "Barua pepe",
     "error": "Hitilafu",
@@ -2775,7 +2777,8 @@
     "save": "Hifadhi",
     "validation": {
       "required": "Sehemu hii inahitajika",
-      "minChars": "Lazima iwe na angalau herufi {min}"
+      "minChars": "Lazima iwe na angalau herufi {min}",
+      "invalidPostalCode": "Nambari ya posta si sahihi"
     }
   },
   "errors": {

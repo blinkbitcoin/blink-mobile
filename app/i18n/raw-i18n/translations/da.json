@@ -2689,6 +2689,8 @@
     "csvExport": "Eksportér transaktioner som CSV",
     "date": "Dato",
     "description": "Beskrivelse",
+    "discard": "Kassér",
+    "discardChangesMessage": "Du har ikke-gemte ændringer. Er du sikker på, at du vil kassere dem?",
     "domain": "Domæne",
     "email": "Email",
     "error": "Fejl",
@@ -2778,7 +2780,8 @@
     "save": "Gem",
     "validation": {
       "required": "Dette felt er påkrævet",
-      "minChars": "Skal være mindst {min} tegn"
+      "minChars": "Skal være mindst {min} tegn",
+      "invalidPostalCode": "Ugyldigt postnummer"
     }
   },
   "errors": {

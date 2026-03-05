@@ -2686,6 +2686,8 @@
     "csvExport": "Ekspor transaksi sebagai CSV",
     "date": "Tanggal",
     "description": "Deskripsi",
+    "discard": "Buang",
+    "discardChangesMessage": "Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin membuangnya?",
     "domain": "Domain",
     "email": "Email",
     "error": "Kesalahan",
@@ -2775,7 +2777,8 @@
     "save": "Simpan",
     "validation": {
       "required": "Bidang ini wajib diisi",
-      "minChars": "Harus minimal {min} karakter"
+      "minChars": "Harus minimal {min} karakter",
+      "invalidPostalCode": "Kode pos tidak valid"
     }
   },
   "errors": {

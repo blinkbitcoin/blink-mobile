@@ -2727,6 +2727,8 @@
     "csvExport": "Export transactions as CSV",
     "date": "Date",
     "description": "Description",
+    "discard": "Lahla",
+    "discardChangesMessage": "Unezinguquko ezingagcinwanga. Uqinisekile ukuba ufuna ukuzilahla?",
     "domain": "Domain",
     "email": "Email",
     "error": "Error",
@@ -2816,7 +2818,8 @@
     "save": "Save",
     "validation": {
       "required": "Le ndawo iyafuneka",
-      "minChars": "Kufuneka ibe nobuncinane {min} oonobumba"
+      "minChars": "Kufuneka ibe nobuncinane {min} oonobumba",
+      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni"
     }
   },
   "errors": {

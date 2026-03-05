@@ -2686,6 +2686,8 @@
     "csvExport": "İşlemleri CSV olarak dışa aktar",
     "date": "Tarih",
     "description": "Tanım",
+    "discard": "İptal et",
+    "discardChangesMessage": "Kaydedilmemiş değişiklikleriniz var. Bunları iptal etmek istediğinizden emin misiniz?",
     "domain": "Alan adı",
     "email": "E-posta",
     "error": "Hata",
@@ -2775,7 +2777,8 @@
     "save": "Kaydet",
     "validation": {
       "required": "Bu alan zorunludur",
-      "minChars": "En az {min} karakter olmalıdır"
+      "minChars": "En az {min} karakter olmalıdır",
+      "invalidPostalCode": "Geçersiz posta kodu"
     }
   },
   "errors": {

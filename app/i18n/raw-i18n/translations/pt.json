@@ -2686,6 +2686,8 @@
         "csvExport": "Exportar transações como CSV",
         "date": "Data",
         "description": "Descrição",
+        "discard": "Descartar",
+        "discardChangesMessage": "Você tem alterações não salvas. Tem certeza de que deseja descartá-las?",
         "domain": "Domínio",
         "email": "E-mail",
         "error": "Erro",
@@ -2775,7 +2777,8 @@
         "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência",
         "validation": {
             "required": "Este campo é obrigatório",
-            "minChars": "Deve ter pelo menos {min} caracteres"
+            "minChars": "Deve ter pelo menos {min} caracteres",
+            "invalidPostalCode": "Código postal inválido"
         }
     },
     "errors": {

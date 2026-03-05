@@ -2686,6 +2686,8 @@
     "csvExport": "Exporta les transaccions com a CSV",
     "date": "Data",
     "description": "Descripció",
+    "discard": "Descartar",
+    "discardChangesMessage": "Tens canvis sense desar. Estàs segur que vols descartar-los?",
     "domain": "Domini",
     "email": "Correu electrònic",
     "error": "Error",
@@ -2775,7 +2777,8 @@
     "save": "Desa",
     "validation": {
       "required": "Aquest camp és obligatori",
-      "minChars": "Ha de tenir almenys {min} caràcters"
+      "minChars": "Ha de tenir almenys {min} caràcters",
+      "invalidPostalCode": "Codi postal no vàlid"
     }
   },
   "errors": {

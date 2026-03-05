@@ -2703,6 +2703,8 @@
     "csvExport": "Exportovat transakce ve formátu CSV",
     "date": "Datum",
     "description": "Popis",
+    "discard": "Zahodit",
+    "discardChangesMessage": "Máte neuložené změny. Opravdu je chcete zahodit?",
     "domain": "Doména",
     "email": "Email",
     "error": "Chyba",
@@ -2792,7 +2794,8 @@
     "save": "Uložit",
     "validation": {
       "required": "Toto pole je povinné",
-      "minChars": "Musí obsahovat alespoň {min} znaků"
+      "minChars": "Musí obsahovat alespoň {min} znaků",
+      "invalidPostalCode": "Neplatné PSČ"
     }
   },
   "errors": {

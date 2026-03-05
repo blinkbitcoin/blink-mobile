@@ -2703,6 +2703,8 @@
     "csvExport": "Exporteer transacties als CSV",
     "date": "Datum",
     "description": "Omschrijving",
+    "discard": "Verwijderen",
+    "discardChangesMessage": "Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je ze wilt verwijderen?",
     "domain": "Domein",
     "email": "Email",
     "error": "Fout",
@@ -2792,7 +2794,8 @@
     "save": "Opslaan",
     "validation": {
       "required": "Dit veld is verplicht",
-      "minChars": "Moet minimaal {min} tekens bevatten"
+      "minChars": "Moet minimaal {min} tekens bevatten",
+      "invalidPostalCode": "Ongeldige postcode"
     }
   },
   "errors": {

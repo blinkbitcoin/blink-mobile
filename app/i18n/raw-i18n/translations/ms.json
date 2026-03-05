@@ -2703,6 +2703,8 @@
     "csvExport": "Eksport transaksi kepada fail csv",
     "date": "Tarikh",
     "description": "Penerangan",
+    "discard": "Buang",
+    "discardChangesMessage": "Anda mempunyai perubahan yang belum disimpan. Adakah anda pasti mahu membuangnya?",
     "domain": "Domain",
     "email": "Emel",
     "error": "Masalah",
@@ -2792,7 +2794,8 @@
     "save": "Simpan",
     "validation": {
       "required": "Medan ini diperlukan",
-      "minChars": "Mesti sekurang-kurangnya {min} aksara"
+      "minChars": "Mesti sekurang-kurangnya {min} aksara",
+      "invalidPostalCode": "Poskod tidak sah"
     }
   },
   "errors": {

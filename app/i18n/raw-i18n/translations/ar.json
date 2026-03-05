@@ -2703,6 +2703,8 @@
     "csvExport": "تصدير المُعاملات كملف CSV",
     "date": "تاريخ",
     "description": "وصف",
+    "discard": "تجاهل",
+    "discardChangesMessage": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟",
     "domain": "موقع ويب",
     "email": "عنوان البريد الالكتروني ",
     "error": "خطأ",
@@ -2792,7 +2794,8 @@
     "save": "حفظ",
     "validation": {
       "required": "هذا الحقل مطلوب",
-      "minChars": "يجب أن يكون {min} أحرف على الأقل"
+      "minChars": "يجب أن يكون {min} أحرف على الأقل",
+      "invalidPostalCode": "رمز بريدي غير صالح"
     }
   },
   "errors": {
