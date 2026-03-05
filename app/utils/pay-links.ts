@@ -10,5 +10,6 @@ export const getLightningAddress = (
   lnAddressHostname: string,
   address: string,
 ): string => {
+  if (address.includes("@")) return address
   return `${address}@${lnAddressHostname}`
 }

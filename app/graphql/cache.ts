@@ -103,9 +103,13 @@ export const createCache = () =>
           upgradeModalLastShownAt: {
             read: (value) => value ?? null,
           },
+          preferredAmountCurrency: {
+            read: (value) => value ?? null,
+          },
           deviceSessionCount: {
             read: (value) => value ?? 0,
           },
+          cardTransactionsPaginated: relayStylePagination(["cardId"]),
           txLastSeen: {
             keyArgs: ["accountId"],
             read(value, { args }) {

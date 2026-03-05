@@ -9,32 +9,26 @@ jest.mock("@rn-vui/themed", () => ({
     <ReactNativeText {...props} />
   ),
   makeStyles: () => () => ({
-    amountInputScreenContainer: {},
-    infoContainer: {},
-    bodyContainer: {},
+    container: {},
+    errorRow: {},
     keyboardContainer: {},
+  }),
+  useTheme: () => ({
+    theme: { colors: { error: "red" } },
   }),
 }))
 
-jest.mock("@app/components/atomic/galoy-error-box", () => ({
-  GaloyErrorBox: ({ errorMessage }: { errorMessage: string }) => {
+jest.mock("@app/components/atomic/galoy-icon", () => ({
+  GaloyIcon: () => {
     const ReactNative = jest.requireActual("react-native")
-    return (
-      <ReactNative.View testID="error-box">
-        <ReactNative.Text>{errorMessage}</ReactNative.Text>
-      </ReactNative.View>
-    )
+    return <ReactNative.View testID="galoy-icon" />
   },
 }))
 
 jest.mock("@app/components/currency-keyboard", () => ({
-  CurrencyKeyboard: ({ compact }: { compact: boolean }) => {
+  CurrencyKeyboard: () => {
     const ReactNative = jest.requireActual("react-native")
-    return (
-      <ReactNative.View testID="currency-keyboard">
-        <ReactNative.Text testID="compact-value">{String(compact)}</ReactNative.Text>
-      </ReactNative.View>
-    )
+    return <ReactNative.View testID="currency-keyboard" />
   },
 }))
 
@@ -46,33 +40,26 @@ describe("AmountInputScreenUI", () => {
   })
 
   it("renders without error message", () => {
-    const { queryByTestId } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
+    const { queryByText, getByTestId } = render(
+      <AmountInputScreenUI onKeyPress={mockOnKeyPress} />,
+    )
 
-    expect(queryByTestId("error-box")).toBeNull()
-    expect(queryByTestId("currency-keyboard")).toBeTruthy()
+    expect(queryByText(/invalid/i)).toBeNull()
+    expect(getByTestId("currency-keyboard")).toBeTruthy()
   })
 
   it("renders with error message", () => {
     const errorMessage = "Invalid amount"
-    const { getByTestId, getByText } = render(
+    const { getByText } = render(
       <AmountInputScreenUI errorMessage={errorMessage} onKeyPress={mockOnKeyPress} />,
     )
 
-    expect(getByTestId("error-box")).toBeTruthy()
     expect(getByText(errorMessage)).toBeTruthy()
   })
 
-  it("passes compact=false to CurrencyKeyboard by default", () => {
-    const { getByText } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
+  it("renders CurrencyKeyboard", () => {
+    const { getByTestId } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
 
-    expect(getByText("false")).toBeTruthy()
-  })
-
-  it("passes compact=true to CurrencyKeyboard when compact prop is true", () => {
-    const { getByText } = render(
-      <AmountInputScreenUI onKeyPress={mockOnKeyPress} compact={true} />,
-    )
-
-    expect(getByText("true")).toBeTruthy()
+    expect(getByTestId("currency-keyboard")).toBeTruthy()
   })
 })

@@ -1,48 +1,75 @@
 import axios from "axios"
-import { CountryCode } from "libphonenumber-js/mobile"
+import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
 import { useEffect, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
-import { useCountryCodeQuery } from "@app/graphql/generated"
+import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/generated"
+
+const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
+const IPAPI_URL = "https://ipapi.co/json/"
 
 const useDeviceLocation = () => {
   const client = useApolloClient()
   const { data, error } = useCountryCodeQuery()
+  const { data: settingsData } = useSettingsScreenQuery({
+    fetchPolicy: "cache-first",
+  })
 
   const [loading, setLoading] = useState(true)
-  const [countryCode, setCountryCode] = useState<CountryCode>("SV")
+  const [countryCode, setCountryCode] = useState<CountryCode | undefined>()
+
+  const userPhone = settingsData?.me?.phone
+
+  useEffect(() => {
+    if (!userPhone) return
+    try {
+      const parsed = parsePhoneNumber(userPhone)
+      if (!parsed?.country) {
+        setCountryCode(DEFAULT_COUNTRY_CODE)
+        setLoading(false)
+        return
+      }
+      setCountryCode(parsed.country)
+      updateCountryCode(client, parsed.country)
+    } catch {
+      setCountryCode(DEFAULT_COUNTRY_CODE)
+    }
+    setLoading(false)
+  }, [userPhone, client])
 
   // if error this will resort to the default "SV" countryCode
   useEffect(() => {
-    if (error) {
+    if (error && !userPhone) {
+      setCountryCode(DEFAULT_COUNTRY_CODE)
       setLoading(false)
     }
-  }, [error])
+  }, [error, userPhone])
 
   useEffect(() => {
-    if (data) {
-      const getLocation = async () => {
-        try {
-          const response = await axios.get("https://ipapi.co/json/", {
-            timeout: 5000,
-          })
-          const _countryCode = response?.data?.country_code
-          if (_countryCode) {
-            setCountryCode(_countryCode)
-            updateCountryCode(client, _countryCode)
-          } else {
-            console.warn("no data. default of SV will be used")
-          }
-          // can throw a 429 for device's rate-limiting. resort to cached value if available
-        } catch (err) {
-          setCountryCode(data.countryCode as CountryCode)
+    if (!data || userPhone) return
+    const getLocation = async () => {
+      try {
+        const response = await axios.get(IPAPI_URL, {
+          timeout: 5000,
+        })
+        const _countryCode = response?.data?.country_code
+        if (!_countryCode) {
+          console.warn("no data. default of SV will be used")
+          setCountryCode((data.countryCode as CountryCode) ?? DEFAULT_COUNTRY_CODE)
+          setLoading(false)
+          return
         }
-        setLoading(false)
+        setCountryCode(_countryCode)
+        updateCountryCode(client, _countryCode)
+        // can throw a 429 for device's rate-limiting. resort to cached value if available
+      } catch (err) {
+        setCountryCode((data.countryCode as CountryCode) ?? DEFAULT_COUNTRY_CODE)
       }
-      getLocation()
+      setLoading(false)
     }
-  }, [data, client, setLoading, setCountryCode])
+    getLocation()
+  }, [data, client, userPhone])
 
   return {
     countryCode,

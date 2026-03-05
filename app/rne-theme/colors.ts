@@ -11,6 +11,8 @@ const light = {
   _orange: "#FF7e1c",
   _sky: "#C3CCFF",
   _green: "#00A700",
+  _primary1: "#FFBE0B",
+  _primary2: "#FB5607",
 
   // adjusted
   white: "#FFFFFF",
@@ -24,7 +26,7 @@ const light = {
   blue5: "#4453E2",
 
   grey0: "#3A3C51", // grey1
-  grey1: "#61637A", // grey3
+  grey1: "#393939", // grey3
   grey2: "#9292A0", // grey4
   grey3: "#AEAEB8", // grey5
   grey4: "#E2E2E4", // grey8-ish
@@ -60,6 +62,8 @@ const dark = {
   _orange: "#FF7e1c",
   _sky: "#C3CCFF",
   _green: "#00A700",
+  _primary1: "#FFBE0B",
+  _primary2: "#FB5607",
 
   // adjusted
   white: "#000000",

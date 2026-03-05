@@ -30,7 +30,7 @@
     "SetAccountModal": {
         "title": "Configure sua conta de recebimento",
         "description": "Você sempre pode mudar isso mais tarde nas Configurações",
-        "stablesatsTag": "Conta Stablesats para estabilidade de preço",
+        "stablesatsTag": "Conta Dólar — powered by Stablesats",
         "bitcoinTag": "Conta Bitcoin para maximalistas"
     },
     "NoteInput": {
@@ -60,16 +60,21 @@
     },
     "ConversionDetailsScreen": {
         "title": "Converter",
-        "percentageToConvert": "% para converter"
+        "transfer": "Transferir",
+        "percentageToConvert": "% para converter",
+        "reviewTransfer": "Revisar transferência"
     },
     "ConversionConfirmationScreen": {
         "title": "Revisar conversão",
         "youreConverting": "Você está convertendo",
-        "receivingAccount": "Conta de Recebimento"
+        "receivingAccount": "Conta de Recebimento",
+        "infoBitcoin": "O valor em Bitcoin é apenas aproximado. Ele pode variar uma pequena quantia.",
+        "infoDollar": "O valor em Dólar é apenas aproximado. Ele pode variar uma pequena quantia.",
+        "transferButtonText": "Transferir {fromWallet} para {toWallet}"
     },
     "ConversionSuccessScreen": {
-        "title": "Sucesso na Conversão",
-        "message": "Conversão bem sucedida"
+        "message": "Conversão bem sucedida",
+        "title": "Sucesso na Conversão"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2003,12 +2008,43 @@
         "registerContent": "Registre-se com seu número de telefone para receber sats",
         "oneSectionADay": "Uma seção por dia!",
         "availableTomorrow": "Volte amanhã para continuar aprendendo sobre o Bitcoin!",
-        "motivatingBadger": "Explore estas lições e ganhe enquanto aprende"
+        "motivatingBadger": "Explore estas lições e ganhe enquanto aprende",
+        "continueNoRewards": "Continuar (Sem Recompensas)",
+        "somethingNotRight": "Algo Não Está Certo...",
+        "defaultErrorMessage": "{errorMessage: string} Por favor, tente novamente mais tarde.\nOu clique para continuar aprendendo sem recompensas.",
+        "customErrorMessage": "Parece que detectamos alguma atividade incomum na sua conta. Para garantir a justiça para todos, não podemos oferecer recompensas neste momento.\nVocê ainda pode continuar aprendendo sem recompensas, ou tente novamente mais tarde usando uma conexão diferente.",
+        "customMessages": {
+            "invalidPhoneForQuiz": {
+                "title": "Operadora restrita",
+                "message": "Estamos enfrentando um ataque de usuários com esta operadora.\nDesativamos as recompensas para esta operadora até novo aviso. Desculpe!"
+            },
+            "invalidIpMetadata": {
+                "title": "IP restrito",
+                "message": "Estamos enfrentando um ataque de usuários com este IP.\nDesativamos as recompensas para este IP até novo aviso. Desculpe!"
+            },
+            "claimedTooEarly": {
+                "title": "Carteira de recompensas vazia",
+                "message": "Adicionaremos os fundos em breve. Desculpe!"
+            },
+            "notEnoughBalanceForQuiz": {
+                "title": "Carteira de recompensas vazia",
+                "message": "Adicionaremos os fundos em breve. Desculpe!"
+            },
+            "invalidQuizQuestionId": {
+                "title": "Carteira de recompensas vazia",
+                "message": "Adicionaremos os fundos em breve. Desculpe!"
+            },
+            "oneSectionADay": {
+                "title": "Continuar sem recompensas?",
+                "message": "Você só pode completar uma seção por dia enquanto ganha recompensas em sats."
+            }
+        }
     },
     "GetStartedScreen": {
         "logInCreateAccount": "Login / criar conta",
         "createAccount": "Criar nova conta",
         "exploreWallet": "Explorar carteira",
+        "login": "Entrar",
         "logBackInWith": "Faça login novamente com",
         "headline": "Carteira desenvolvida pela Galoy",
         "startTrialAccount": "Comece com uma conta teste",
@@ -2018,9 +2054,13 @@
         "trialAccountCreationFailedMessage": "Infelizmente, não foi possível criar sua conta teste. Tente novamente mais tarde ou crie uma conta com um número de telefone.",
         "trialAccountHasLimits": "Conta teste possui limites",
         "trialAccountLimits": {
+            "modalTitle": "Faça upgrade para mais benefícios",
             "noBackup": "Sem opção de backup",
             "sendingLimit": "Limite de envio diário reduzido",
-            "noOnchain": "Não receber bitcoin on-chain"
+            "noOnchain": "Não receber bitcoin on-chain",
+            "recoveryOption": "Recuperar fundos por SMS ou e-mail",
+            "dailyLimit": "Limite diário de transações de USD 1,000",
+            "onchainReceive": "Receber bitcoin onchain"
         }
     },
     "MapScreen": {
@@ -2078,7 +2118,7 @@
         "setNote": "Escreva uma nota",
         "tapQrCodeCopy": "Toque no Código QR para copiar",
         "title": "Receber Bitcoin",
-        "usdTitle": "Receber USD",
+        "usdTitle": "Receber na Conta Dólar",
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartilhar",
@@ -2115,11 +2155,15 @@
         "receiveViaPaycode": "Receber via código de pagamento",
         "receiveViaOnchain": "Receber via Onchain",
         "payCodeOrLNURL": "Paycode / LNURL",
-        "cantReceiveZeroSats": "Você não pode receber zero sats. Por favor, insira um valor correspondente a 1 ou mais sats."
+        "cantReceiveZeroSats": "Você não pode receber zero sats. Por favor, insira um valor correspondente a 1 ou mais sats.",
+        "lightningAddress": "Endereço lightning",
+        "lightningInvoice": "Fatura lightning",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Taxa de depósito: {fee} SAT para valores abaixo de {threshold} SAT ou {overFee} SAT para depósitos acima de {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Resgatar Bitcoin",
-        "usdTitle": "Resgatar USD",
+        "usdTitle": "Resgatar na Conta Dólar",
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
         "redeemingError": "Falha ao resgatar Bitcoin. Entre em contato com o suporte se o problema persistir.",
         "submissionError": "Falha ao enviar solicitação de retirada. Entre em contato com o suporte se o problema persistir.",
@@ -2144,6 +2188,7 @@
         "imageLibraryPermissionsNotGranted": "Não temos permissões para acessar a biblioteca de imagens. Por favor, verifique as configurações do aplicativo para a sua plataforma."
     },
     "SecurityScreen": {
+        "title": "Segurança e Privacidade",
         "biometricDescription": "Desbloqueie com impressão digital ou reconhecimento facial.",
         "biometricTitle": "Biometria",
         "biometryNotAvailable": "O sensor biométrico não está disponível.",
@@ -2203,7 +2248,9 @@
             "confirmButton": "Tenho 100% de certeza"
         },
         "clipboardError": "Erro ao obter valor da área de transferência",
-        "pastedClipboardSuccess": "Colado da área de transferência"
+        "pastedClipboardSuccess": "Colado da área de transferência",
+        "invalidPhoneNumber": "Insira um número de celular válido",
+        "phoneNotAllowed": "Este campo não aceita números de telefone"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "A transação deve ser enviada para o mempool.",
@@ -2214,7 +2261,7 @@
         "amountIsRequired": "O valor é obrigatório",
         "cost": "Custo",
         "destination": "Destino",
-        "destinationIsRequired": "Destino é obrigatório",
+        "destinationRequired": "Destino obrigatório",
         "fee": "Taxa da rede",
         "feeCalculationUnsuccessful": "Cálculo sem sucesso ⚠️",
         "placeholder": "nome de usuário ou fatura",
@@ -2241,13 +2288,25 @@
         "copySecretMessage": "Copy secret message to clipboard",
         "copiedSuccessMessage": "Message copied successfully",
         "copiedSecretMessage": "Secret message copied successfully",
-        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation."
+        "pendingDecryptionMessage": "Encrypted message. Waiting for payment confirmation.",
+        "destinationScreenTitle": "Enviar para",
+        "orBySMS": "Ou Número de Celular",
+        "orSaved": "Ou Salvos",
+        "feeLabel": "Taxa",
+        "noteLabel": "Nota",
+        "sender": "Remetente",
+        "recipient": "Destinatário",
+        "time": "Hora",
+        "type": "Tipo",
+        "destinationIsRequired": "Destino é obrigatório"
     },
     "SettingsScreen": {
         "staticQr": "QR Code estático imprimível",
         "staticQrCopied": "O link do seu QR Code estático foi copiado",
         "setByOs": "Definido pelo sistema",
         "apiAcess": "Acesso à API",
+        "apiDocumentation": "Documentação da API",
+        "apiDashboard": "Acesso à API e painel",
         "pos": "Ponto de venda",
         "posCopied": "O link do seu ponto de venda foi copiado",
         "setYourLightningAddress": "Defina seu endereço Lightning",
@@ -2273,7 +2332,13 @@
         "nfcOnlyReceive": "Receber apenas por NFC está disponível por agora.",
         "nfcScanNow": "Scaneie o NFC Agora",
         "nfcNotSupported": "NFC não é suportado neste dispositivo",
-        "logInOrCreateAccount": "Login ou criar conta"
+        "logInOrCreateAccount": "Login ou criar conta",
+        "logOutFromOneAccount": "Sair desta conta",
+        "logoutOneAccountAlertTitle": "Tem certeza de que deseja sair desta conta?",
+        "logoutOneAccountAlertContent": "Você será desconectado da sessão vinculada a {identifier: string}.\nCertifique-se de que tem acesso para entrar novamente no futuro.",
+        "logoutOneAccountConfirm": "Eu entendo. Por favor, sair.",
+        "receiveCurrency": "Moeda de recebimento",
+        "displayCurrency": "Moeda de exibição"
     },
     "NotificationSettingsScreen": {
         "title": "Configurações de Notificação",
@@ -2307,6 +2372,8 @@
         "tapToAddPhoneNumber": "Clique para adicionar um número de telefone",
         "loginMethods": "Métodos de login",
         "level": "Nível {level: string}",
+        "switchAccount": "Trocar conta",
+        "pleaseWait": "Aguarde.",
         "accountLevel": "Nível da Conta",
         "upgrade": "Atualize a sua conta",
         "logOutAndDeleteLocalData": "Sair da conta e apagar toda a informação local",
@@ -2315,7 +2382,7 @@
         "logoutAlertContentPhone": "Você precisará digitar novamente seu número de telefone para fazer entrar novamente.\no seu número de telefone é {phoneNumber: string}, portanto, certifique-se de ter acesso a ele para entrar novamente.",
         "logoutAlertContentEmail": "Você precisará digitar seu e-mail novamente para fazer login.\nseu e-mail é {email: string} então certifique-se de ter acesso a ele para fazer login novamente.",
         "logoutAlertContentPhoneEmail": "Você precisará digitar novamente seu número de telefone ou e-mail para fazer login novamente. Seu número de telefone é {phoneNumber: string} e seu e-mail é {email: string}, então certifique-se de ter acesso a eles para fazer login novamente.",
-        "usdBalanceWarning": "Seu saldo de Stablesats é de {balance: string}.",
+        "usdBalanceWarning": "Você tem um saldo na Conta Dólar de {balance: string}.",
         "btcBalanceWarning": "Seu saldo de bitcoin é de {balance: string}.",
         "secureYourAccount": "Registre-se para proteger sua conta",
         "tapToAdd": "Toque para adicionar",
@@ -2346,10 +2413,19 @@
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "identityVerification": "Verificação de Identidade"
+    },
+    "ProfileScreen": {
+        "addAccount": "Adicionar conta",
+        "error": "Não foi possível buscar perfis no momento",
+        "fromThisDevice": "deste dispositivo?",
+        "switchAccount": "Você trocou para outra conta",
+        "removedAccount": "Você removeu a conta {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticação de dois fatores",
+        "secret": "Segredo/backup",
         "content": "Digitalize este código QR com o seu aplicativo autenticador. Alternativamente, você pode copiar/colar manualmente o segredo no seu aplicativo autenticador."
     },
     "TotpRegistrationValidateScreen": {
@@ -2366,8 +2442,8 @@
         "toastMessage": "Texto copiado para a área de transferência!"
     },
     "DefaultWalletScreen": {
-        "title": "Receber moeda",
-        "info": "Use sua conta Stablesats no Blink para manter o dinheiro da sua carteira estável em termos de moeda fiduciária (dólar). Use sua conta Bitcoin se você estiver acumulando sats e não se importar que seu saldo em fiat mude o tempo todo."
+        "title": "Conta de recebimento padrão",
+        "info": "Sua Conta Bitcoin é para acumular sats, onde o valor USD se move com o mercado. Sua Conta Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2382,8 +2458,8 @@
         "DEFAULT": "Padrão (OS)"
     },
     "StablesatsModal": {
-        "header": "Com Stablesats, você tem agora uma conta USD adicionada na sua carteira!",
-        "body": "Você pode usá-lo para enviar e receber Bitcoin e transferir valor instantaneamente entre sua conta BTC e USD. O valor na conta em USD não flutuará com o preço do Bitcoin. Este recurso não é compatível com o sistema bancário tradicional.",
+        "header": "Sua Conta Dólar é powered by Stablesats",
+        "body": "A Conta Dólar usa tecnologia Stablesats para manter o Bitcoin estável no preço USD. Você sempre tem Bitcoin — não dólares reais — mas o valor USD não flutua. Você pode enviar e receber Bitcoin normalmente, mas não é compatível com o sistema bancário tradicional.",
         "termsAndConditions": "Leia os Termos e Condições",
         "learnMore": "Aprenda mais sobre Stablesats"
     },
@@ -2398,8 +2474,7 @@
         "receivingAccount": "Conta de Recebimento",
         "sendingAccount": "Conta de Envio",
         "txNotBroadcast": "Sua transação está na fila. Deve aparecer na mempool {countdown: string}.",
-        "momentarily": "momentaneamente",
-        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
+        "momentarily": "momentaneamente"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",
@@ -2408,7 +2483,7 @@
         "perWeek": "por semana",
         "unlimited": "Ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferências de Stablesat",
+        "stablesatTransfers": "Transferências de Conta Dólar",
         "internalSend": "Enviar para o usuário {bankName: string} ",
         "error": "Incapaz de atualizar limites agora",
         "increaseLimits": "Aumente seus limites"
@@ -2430,10 +2505,14 @@
         "receiveOnchain": "Receba bitcoin onchain",
         "onlyAPhoneNumber": "Rápida e fácil verificação de número de telefone",
         "letsGo": "Vamos!",
-        "stayInTrialMode": "Continuar em modo de teste"
+        "stayInTrialMode": "Continuar em modo de teste",
+        "upgradeToLevel": "Upgrade para Nível {level: number}",
+        "notNow": "Agora não",
+        "setUpLevelAccount": "Configurar conta Nível {level: number}"
     },
     "SetAddressModal": {
         "title": "Definir endereço {bankName: string}",
+        "mainTitle": "Escolha o Endereço Lightning",
         "setLightningAddress": "Defina seu endereço Lightning",
         "Errors": {
             "tooShort": "O endereço deve ter pelo menos 3 caracteres de comprimento.",
@@ -2464,7 +2543,50 @@
         "placeholder": "Número de Telefone",
         "verify": "Clique para verificar",
         "sms": "Enviar via SMS",
-        "whatsapp": "Enviar via WhatsApp"
+        "whatsapp": "Enviar via WhatsApp",
+        "telegram": "Enviar via Telegram"
+    },
+    "LoginMethodScreen": {
+        "title": "Selecione o método de login preferido.",
+        "useTelegram": "Usar Telegram",
+        "useSms": "Usar SMS",
+        "useWhatsapp": "Usar WhatsApp",
+        "useEmail": "Usar E-mail",
+        "setupTelegram": "Configurar login por Telegram",
+        "setupSms": "Configurar login por SMS",
+        "setupWhatsapp": "Configurar login por WhatsApp",
+        "setupEmail": "Configurar login por E-mail"
+    },
+    "OnboardingScreen": {
+        "welcomeLevel1": {
+            "mainTitle": "Bem-vindo ao Nível 1",
+            "title": "Novos recursos desbloqueados para sua conta:",
+            "receiveBitcoinDescription": "Receba Bitcoin usando seu número de telefone",
+            "dailyLimitDescription": "Envie até USD 1,000 por dia",
+            "onchainDescription": "Receba pagamentos on-chain"
+        },
+        "emailBenefits": {
+            "mainTitle": "Adicionar login por e-mail",
+            "title": "O login por e-mail permite que você:",
+            "backupDescription": "Tenha uma alternativa para acessar sua conta",
+            "supportDescription": "Facilite para que possamos te dar suporte",
+            "securityDescription": "Aumente a segurança da conta",
+            "primaryButton": "Configurar login por e-mail"
+        },
+        "lightningBenefits": {
+            "mainTitle": "Configurar Endereço Lightning Personalizado",
+            "title": "Benefícios do Endereço Lightning:",
+            "staticAddressDescription": "Um endereço fixo para receber pagamentos",
+            "easyToShareDescription": "Fácil de memorizar e compartilhar de forma pública ou privada",
+            "blinkToolsDescription": "Desbloqueia várias ferramentas Blink úteis para comércio",
+            "primaryButton": "Configurar Endereço Personalizado"
+        },
+        "supportScreen": {
+            "mainTitle": "Adoramos feedback",
+            "title": "Tudo pronto!",
+            "description": "Qualquer feedback é muito bem-vindo, fique à vontade para nos contatar em {email}",
+            "primaryButton": "Concluído"
+        }
     },
     "PhoneLoginValidationScreen": {
         "errorLoggingIn": "Erro ao entrar. Você usou o código correto?",
@@ -2477,6 +2599,16 @@
         "sendAgain": "Enviar novamente",
         "tryAgain": "Tente novamente",
         "sendViaOtherChannel": "Você escolheu receber o código via {channel: string}. Em vez disso, você pode tentar receber via {other: string}."
+    },
+    "TelegramValidationScreen": {
+        "text": "Telegram Passport",
+        "description": "Após autorizar no Telegram, você será conectado automaticamente",
+        "loginWithTelegram": "Entrar com Telegram",
+        "waitingForAuthorization": "Aguardando autorização no Telegram...",
+        "errorFetchParams": "Falha ao obter parâmetros de autenticação do Telegram",
+        "errorFetchLogin": "Falha ao obter login do Telegram",
+        "errorAuthTimeout": "A autorização expirou. Por favor, tente novamente.",
+        "errorOpenAppError": "Falha ao abrir o Telegram. Verifique se o aplicativo está instalado."
     },
     "PhoneRegistrationInitiateScreen": {
         "title": "Configuração do telefone",
@@ -2525,8 +2657,12 @@
         "advanced": "Avançado",
         "community": "Comunidade",
         "account": "conta",
+        "yourAccount": "Sua conta",
+        "accounts": "Contas",
+        "accountInformation": "Informações da Conta",
         "trialAccount": "Conta teste",
         "blinkUser": "Usuário Blink",
+        "blinkToBlink": "Blink para Blink",
         "transactionLimits": "Limites de transação",
         "activateWallet": "Ativar Carteira",
         "amountRequired": "O valor é obrigatório",
@@ -2588,6 +2724,7 @@
         "rate": "Taxa",
         "reauth": "Sua sessão expirou. Faça login novamente.",
         "restart": "Reiniciar",
+        "save": "Salvar",
         "sats": "sats",
         "search": "Pesquisar",
         "security": "Segurança",
@@ -2599,14 +2736,14 @@
         "soon": "Em breve!",
         "submit": "Enviar",
         "success": "Sucesso!",
-        "stablesatsUsd": "Stablesats USD",
+        "dollarStablesats": "Dólar (Stablesats)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transações",
         "transactionsError": "Erro ao carregar transações",
         "tryAgain": "Tente novamente",
         "type": "Tipo",
-        "usdAccount": "Conta USD",
+        "usdAccount": "Conta Dólar",
         "username": "Nome de usuário",
         "usernameRequired": "O nome de usuário é obrigatório",
         "backupAccount": "Backup/atualizar conta",
@@ -2619,7 +2756,23 @@
         "prevMonths": "Meses anteriores",
         "problemMaybeReauth": "Houve um problema com o seu pedido. Tente novamente em um minuto. Se o problema persistir, recomendamos que você saia e entre no app novamente. Você pode sair acessando Configurações > Conta > Sair",
         "warning": "Aviso",
-        "blinkToBlink": "Blink para Blink"
+        "continue": "Continuar",
+        "correct": "Correto",
+        "recommended": "Recomendado",
+        "expirationTime": "Tempo de Expiração",
+        "minute": "Minuto",
+        "day": {
+            "one": "Dia",
+            "other": "Dias"
+        },
+        "dollar": "Dólar",
+        "all": "TODOS",
+        "allAccounts": "Todas as contas",
+        "some": "Alguns",
+        "support": "Suporte",
+        "profiles": "Perfis",
+        "paste": "Colar",
+        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",
@@ -2649,6 +2802,7 @@
         "joinTheCommunity": "Junte-se à comunidade",
         "whatsapp": "WhatsApp",
         "email": "E-mail",
+        "sms": "SMS",
         "faq": "FAQ",
         "enjoyingApp": "Gostando do aplicativo?",
         "statusPage": "Página de status",
@@ -2667,7 +2821,8 @@
         "deleteAccountConfirmation": "Sua conta foi configurada para ser apagada.\n\nQuando o período de experiência relacionado ao requisito regulatório terminar, os dados restantes relacionados à sua conta serão excluídos permanentemente.",
         "deleteAccountFromPhone": "Olá! Por favor apague a minha conta. Meu contato telefônico é {phoneNumber: string}.",
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
-        "bye": "Adeus!"
+        "bye": "Adeus!",
+        "deleteAccountWarning": "Atenção: A exclusão da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de excluir.\nContas excluídas não podem ser recuperadas."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",
@@ -2682,6 +2837,7 @@
         "enterAmount": "Confirmar montante",
         "setAmount": "Defina  o montante",
         "maxAmountExceeded": "Valor não deve exceder {maxAmount: string}.",
+        "exceedsAvailableBalance": "Excede o saldo disponível: {maxAmount: string}",
         "minAmountNotMet": "Valor deve ser no mínimo {maxAmount: string}."
     },
     "AmountInputButton": {
@@ -2767,5 +2923,341 @@
     "NotificationHistory": {
         "title": "Notificações",
         "noNotifications": "Você não possui notificações no momento"
+    },
+    "CardFlow": {
+        "TransactionStatus": {
+            "pending": "Pendente",
+            "completed": "Concluído",
+            "declined": "Recusada",
+            "reversed": "Revertida"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Detalhes",
+                "freeze": "Congelar",
+                "setLimits": "Limites",
+                "statements": "Movimentos"
+            },
+            "emptyTransactions": "Nenhuma transação ainda",
+            "addFunds": "Adicionar fundos",
+            "transactionsTitle": "Transações",
+            "title": "Cartão Visa"
+        },
+        "validThruLabel": "VÁLIDO ATÉ",
+        "networkVisa": "Visa",
+        "cardFrozenTitle": "Cartão congelado",
+        "cardFrozenSubtitle": "O cartão está temporariamente desativado",
+        "CardDetails": {
+            "title": "Detalhes do cartão",
+            "cardNumber": "Número do cartão",
+            "expiryDate": "Data de validade",
+            "cvv": "CVV",
+            "cardholderName": "Nome do titular",
+            "cardInformation": "Informações do cartão",
+            "cardType": "Tipo de cartão",
+            "status": "Estado",
+            "statusActive": "Ativo",
+            "statusFrozen": "Congelado",
+            "statusInactive": "Inativo",
+            "issued": "Emitido",
+            "network": "Rede",
+            "keepDetailsSafe": "Mantenha os seus dados seguros",
+            "securityWarning": "Nunca partilhe os dados do seu cartão com ninguém. A Blink nunca pedirá as informações do seu cartão por e-mail ou telefone.",
+            "statusCancelled": "Cancelado",
+            "statusNotActivated": "Não ativado",
+            "statusPending": "Pendente",
+            "statusFailed": "Falhou",
+            "cardTypeVirtual": "Débito Visa virtual",
+            "cardTypePhysical": "Débito Visa físico",
+            "authDescription": "Autentique-se para ver os detalhes do cartão"
+        },
+        "CardLimits": {
+            "currentLimitsTitle": "Limites atuais",
+            "dailySpending": "Gasto diário",
+            "monthlySpending": "Gasto mensal",
+            "spendingLimitsTitle": "Limites de gasto",
+            "dailyLimit": "Limite diário",
+            "dailyLimitHelper": "Valor máximo que você pode gastar por dia",
+            "monthlyLimit": "Limites de gastos mensais",
+            "monthlyLimitHelper": "Valor máximo que você pode gastar por mês",
+            "atmLimitsTitle": "Limites de saque no caixa",
+            "dailyAtmLimit": "Limites diários de caixa",
+            "dailyAtmLimitHelper": "Saque máximo no caixa por dia",
+            "monthlyAtmLimit": "Limite mensal no caixa",
+            "monthlyAtmLimitHelper": "Saque máximo no caixa por mês",
+            "transactionTypesTitle": "Tipos de transação",
+            "TransactionTypes": {
+                "ecommerce": "Compras online",
+                "ecommerceDescription": "Permitir transações de e-commerce",
+                "atm": "Saques no caixa",
+                "atmDescription": "Permitir saques em caixas eletrônicos",
+                "contactless": "Pagamentos sem contato",
+                "contactlessDescription": "Permitir transações sem contato"
+            },
+            "title": "Limites do cartão",
+            "noLimit": "Sem limite",
+            "limitUpdateSuccess": "Limite atualizado com sucesso",
+            "limitUpdateError": "Falha ao atualizar o limite",
+            "limitMustBePositive": "O limite deve ser maior que zero"
+        },
+        "CardStatements": {
+            "title": "Movimentos",
+            "selectYear": "Selecionar ano",
+            "currentStatement": "Movimento atual",
+            "statementPeriod": "Período do movimento",
+            "totalSpent": "Total gasto",
+            "monthlyStatements": "Movimentos mensais",
+            "downloadAll": "Baixar todos",
+            "spent": "{amount} gasto",
+            "transactions": "{count} transações, {amount} gasto",
+            "noStatements": "Ainda não há movimentos",
+            "statementsCount": "{count} movimentos",
+            "aboutStatements": "Sobre os movimentos",
+            "aboutBullet1": "Os movimentos mensais são gerados no último dia de cada mês",
+            "aboutBullet2": "Os movimentos incluem todas as transações e taxas do período",
+            "aboutBullet3": "Baixe os movimentos em formato PDF",
+            "notifyNewStatements": "Notificar-me quando novos movimentos estiverem disponíveis"
+        },
+        "CardSettings": {
+            "title": "Configurações do cartão",
+            "personalDetails": "Dados pessoais",
+            "changePin": "Alterar PIN",
+            "transactionAlerts": "Alertas de transações",
+            "transactionAlertsDescription": "Receba notificações de todas as transações",
+            "securityAlerts": "Alertas de segurança",
+            "securityAlertsDescription": "Receba notificações de atividades de segurança",
+            "marketingUpdates": "Atualizações de marketing",
+            "marketingUpdatesDescription": "Atualizações de produtos e ofertas",
+            "cardManagement": "Gestão do cartão",
+            "orderPhysicalCard": "Solicitar cartão físico",
+            "addToGooglePay": "Adicionar ao Google Pay",
+            "replaceCard": "Substituir cartão",
+            "termsAndConditions": "Termos e condições do cartão",
+            "privacyPolicy": "Política de privacidade do cartão",
+            "closeCardAccount": "Encerrar conta do cartão",
+            "closeCardAccountDescription": "Encerre permanentemente o seu cartão Visa",
+            "addToAppleWallet": "Adicionar ao Apple Wallet",
+            "notificationToggleError": "Falha ao atualizar as configurações de notificação",
+            "closeCardWarning": "Esta ação é permanente. Seu cartão Visa será cancelado e não poderá ser reativado.",
+            "closeCardTypeClose": "Digite \"{close}\" para confirmar",
+            "closeCardClose": "fechar",
+            "closeCardFinalConfirmTitle": "Confirmação Final",
+            "closeCardFinalConfirmMessage": "Tem certeza de que deseja encerrar sua conta de cartão? Isso não pode ser desfeito.",
+            "closeCardPendingTransactions": "Você tem transações pendentes. Aguarde até que sejam liquidadas antes de fechar seu cartão.",
+            "closeCardBalanceWarning": "Seu cartão tem um saldo de {balance}. Retire seus fundos antes de fechar. Deseja continuar mesmo assim?",
+            "closeCardSuccessTitle": "Conta do Cartão Encerrada",
+            "closeCardSuccessSubtitle": "Seu cartão Visa foi encerrado permanentemente.",
+            "closeCardSuccessButton": "Voltar ao Início",
+            "closeCardError": "Falha ao encerrar a conta do cartão. Entre em contato com o suporte."
+        },
+        "TransactionDetails": {
+            "title": "Detalhes da transação",
+            "cardInformation": "Informações do cartão",
+            "amount": "Valor",
+            "time": "Hora",
+            "transactionId": "ID",
+            "cardUsed": "Cartão usado",
+            "paymentMethod": "Método de pagamento",
+            "merchantInformation": "Informações do comerciante",
+            "merchant": "Comerciante",
+            "category": "Categoria",
+            "location": "Localização",
+            "mccCode": "Código MCC",
+            "currencyConversion": "Conversão de moeda",
+            "bitcoinRate": "Taxa do Bitcoin",
+            "bitcoinSpent": "Bitcoin gasto",
+            "conversionFee": "Taxa de conversão",
+            "viewOnMap": "Ver no mapa",
+            "downloadReceipt": "Baixar recibo",
+            "reportIssue": "Reportar problema",
+            "transactionHelp": "Ajuda com transação",
+            "transactionHelpDescription": "Se você não reconhece esta transação ou precisa de ajuda, entre em contato com nossa {supportTeam} imediatamente.",
+            "supportTeam": "equipe de suporte",
+            "transactionNotFound": "Transação não encontrada"
+        },
+        "PersonalDetails": {
+            "title": "Dados pessoais",
+            "blinkVisaCardholder": "Titular do cartão Blink Visa",
+            "kycVerifiedInformation": "Informações KYC verificadas",
+            "kycVerifiedDescription": "Seu nome, data de nascimento e endereço foram verificados através do nosso processo KYC. Você pode alterar as informações refazendo o processo KYC. Não garantimos aprovação.",
+            "changeKycInformation": "Alterar informações KYC",
+            "firstName": "Nome",
+            "lastName": "Sobrenome",
+            "dateOfBirth": "Data de nascimento",
+            "contactInformation": "Informações de contato",
+            "registeredAddress": "Endereço registrado",
+            "shippingAddress": "Endereço de entrega"
+        },
+        "AddToMobileWallet": {
+            "title": "Adicionar à carteira móvel",
+            "addYourCard": "Adicione seu cartão",
+            "addYourCardDescription": "Adicione seu cartão Blink Visa à sua carteira móvel para pagamentos rápidos e seguros",
+            "addTo": "Adicionar a",
+            "Benefits": {
+                "title": "Benefícios da carteira móvel",
+                "contactless": "Pagamentos sem contato em milhões de locais",
+                "security": "Segurança aprimorada com autenticação biométrica",
+                "noPhysicalCard": "Não precisa carregar seu cartão físico",
+                "worksLocked": "Funciona mesmo com o telefone bloqueado"
+            }
+        },
+        "CardStatus": {
+            "title": "Cartão Visa",
+            "CardApproved": {
+                "title": "Parabéns!",
+                "subtitle": "Seu cartão Blink Visa foi ativado.",
+                "buttonLabel": "Solicitar cartão físico"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Seu cartão físico está a caminho!",
+                "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
+                "buttonLabel": "Criar PIN"
+            }
+        },
+        "ShippingAddress": {
+            "title": "Endereço de envio",
+            "fullName": "Nome completo",
+            "addressLine1": "Endereço linha 1",
+            "addressLine2": "Endereço linha 2",
+            "city": "Cidade",
+            "state": "Estado",
+            "postalCode": "Código postal",
+            "country": "País",
+            "important": "Importante",
+            "importantDescription": "Certifique-se de que seu endereço está correto e completo.",
+            "noPOBoxes": "Cartões não podem ser entregues em caixas postais",
+            "signatureRequired": "Pode ser necessária assinatura na entrega",
+            "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Confirmar novo PIN",
+                "confirmPinSubtitle": "Por favor, digite novamente seu novo PIN de 4 dígitos para continuar.",
+                "incorrectPin": "PIN incorreto. Por favor, tente novamente.",
+                "pinMismatch": "Os PINs não coincidem. Digite novamente para confirmar ou volte para alterar seu PIN."
+            },
+            "CreateFlow": {
+                "title": "Criar PIN",
+                "steps": {
+                    "setPin": "Definir PIN",
+                    "confirm": "Confirmar"
+                },
+                "enterYourPin": "Digite seu PIN",
+                "enterPinSubtitle": "Por favor, digite um PIN de 4 dígitos para continuar.",
+                "pinCreatedToast": "O PIN foi criado com sucesso"
+            },
+            "ChangeFlow": {
+                "title": "Alterar PIN",
+                "steps": {
+                    "currentPin": "PIN atual",
+                    "newPin": "Novo PIN",
+                    "confirm": "Confirmar"
+                },
+                "enterCurrentPin": "Digite o PIN atual",
+                "enterCurrentPinSubtitle": "Por favor, digite seu PIN atual de 4 dígitos para continuar.",
+                "enterNewPin": "Digite o novo PIN",
+                "enterNewPinSubtitle": "Por favor, digite seu novo PIN de 4 dígitos.",
+                "pinChangedTitle": "PIN alterado",
+                "pinChangedSubtitle": "Seu PIN foi alterado com sucesso.",
+                "pinChangedToast": "O PIN foi alterado com sucesso"
+            }
+        },
+        "ReplaceCard": {
+            "title": "Substituir cartão",
+            "steps": {
+                "reportIssue": "Reportar",
+                "delivery": "Entrega",
+                "confirm": "Confirmar"
+            },
+            "ReportIssue": {
+                "title": "O que aconteceu com o seu cartão?",
+                "subtitle": "Selecione o motivo para solicitar um cartão de substituição",
+                "cardManagement": "Gestão de cartão",
+                "lostCard": "Cartão perdido",
+                "lostCardDescription": "Não consigo encontrar o meu cartão",
+                "stolenCard": "Cartão roubado",
+                "stolenCardDescription": "O meu cartão foi levado sem permissão",
+                "damagedCard": "Cartão danificado",
+                "damagedCardDescription": "O meu cartão está fisicamente danificado",
+                "whatHappensNext": "O que acontece a seguir?",
+                "bullet1": "O seu cartão atual será congelado por segurança",
+                "bullet2": "Será emitido um novo cartão com números diferentes",
+                "bullet3": "Pode descongelar se encontrar o seu cartão mais tarde"
+            },
+            "Delivery": {
+                "title": "Escolha a velocidade de entrega",
+                "subtitle": "Selecione a rapidez com que deseja receber o seu novo cartão",
+                "standardDelivery": "Entrega padrão",
+                "expressDelivery": "Entrega expresso",
+                "businessDays": "{day1}-{day2} dias úteis",
+                "free": "GRÁTIS",
+                "shippingAddress": "Endereço de envio",
+                "useRegisteredAddress": "Usar endereço registado como endereço de envio",
+                "chooseDeliverySpeed": "Escolha a velocidade de entrega"
+            },
+            "Confirm": {
+                "title": "Revise o seu pedido",
+                "subtitle": "Por favor, confirme os detalhes da substituição do seu cartão",
+                "requestSummary": "Resumo do pedido",
+                "issueType": "Motivo",
+                "delivery": "Entrega",
+                "deliveryTime": "Tempo de entrega",
+                "shippingCost": "Custo de entrega",
+                "importantInformation": "Informações importantes",
+                "bullet1": "O seu cartão atual permanecerá ativo até o novo chegar",
+                "bullet2": "O seu novo cartão terá os mesmos números que o cartão atual",
+                "bullet3": "Destrua o seu cartão danificado quando o novo chegar",
+                "submitRequest": "Enviar pedido"
+            },
+            "Status": {
+                "title": "O seu novo cartão está a caminho!",
+                "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
+                "buttonLabel": "Painel"
+            }
+        },
+        "OrderPhysicalCard": {
+            "title": "Pedir cartão físico",
+            "steps": {
+                "shipping": "Envio",
+                "confirm": "Confirmar"
+            },
+            "Shipping": {
+                "title": "Peça o seu cartão físico",
+                "subtitle": "Receba o seu cartão Blink Visa no seu endereço.",
+                "registeredAddress": "Endereço registado",
+                "useRegisteredAddress": "Usar o endereço registado como endereço de envio",
+                "delivery": "Entrega",
+                "standardDelivery": "Entrega padrão",
+                "expressDelivery": "Entrega expressa",
+                "businessDays": "{day1}-{day2} dias úteis",
+                "free": "GRÁTIS",
+                "deliveryInformation": "Informações de entrega",
+                "bullet1": "Você receberá as informações de rastreamento por e-mail",
+                "bullet2": "Pode ser necessária assinatura na entrega",
+                "bullet3": "O cartão será enviado em embalagem discreta",
+                "bullet4": "Ative o seu cartão quando ele chegar",
+                "cardFeatures": "Características do cartão",
+                "feature1": "Tecnologia de pagamento por aproximação",
+                "feature2": "Chip EMV para maior segurança",
+                "feature3": "Faixa magnética para aceitação universal",
+                "feature4": "Seu nome em relevo no cartão",
+                "important": "Importante"
+            },
+            "Confirm": {
+                "title": "Confirme seu pedido",
+                "subtitle": "Revise o pedido do cartão físico antes de enviar.",
+                "orderSummary": "Resumo do pedido",
+                "cardDesign": "Design do cartão",
+                "delivery": "Entrega",
+                "deliveryTime": "Tempo de entrega",
+                "shippingCost": "Custo de envio",
+                "shippingAddress": "Endereço de envio",
+                "placeOrder": "Fazer pedido",
+                "important": "Importante",
+                "bullet1": "Seu cartão virtual permanecerá ativo enquanto você espera o cartão físico",
+                "bullet2": "Você precisará ativar o cartão físico quando ele chegar",
+                "bullet3": "Ambos os cartões terão o mesmo número e detalhes"
+            }
+        }
     }
 }

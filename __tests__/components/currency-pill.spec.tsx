@@ -29,12 +29,18 @@ jest.mock("@rn-vui/themed", () => {
           _white: "_white",
           primary: "primary",
           _green: "_green",
+          grey1: "grey1",
           grey3: "grey3",
           transparent: "transparent",
         },
       },
     }),
-    makeStyles: () => () => ({ container: {}, text: {} }),
+    makeStyles: () => () => ({
+      container: {},
+      text: {},
+      outlinedContainer: {},
+      outlinedText: {},
+    }),
   }
 })
 
@@ -55,5 +61,32 @@ describe("CurrencyPill", () => {
     const { getByText } = render(<CurrencyPill currency={"ALL"} label="Todos" />)
 
     expect(getByText("Todos")).toBeTruthy()
+  })
+
+  it("outlined variant renders with custom label", () => {
+    const { getByText } = render(<CurrencyPill variant="outlined" label="USD" />)
+
+    expect(getByText("USD")).toBeTruthy()
+  })
+
+  it("outlined variant renders without currency prop", () => {
+    const { getByText } = render(<CurrencyPill variant="outlined" label="SAT" />)
+
+    expect(getByText("SAT")).toBeTruthy()
+  })
+
+  it("outlined variant with BTC currency but label overrides", () => {
+    const { getByText, queryByText } = render(
+      <CurrencyPill currency={WalletCurrency.Btc} variant="outlined" label="Custom" />,
+    )
+
+    expect(getByText("Custom")).toBeTruthy()
+    expect(queryByText("Bitcoin")).toBeNull()
+  })
+
+  it("outlined variant with no label renders empty text", () => {
+    const { getByText } = render(<CurrencyPill variant="outlined" />)
+
+    expect(getByText("")).toBeTruthy()
   })
 })

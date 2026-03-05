@@ -1,3 +1,13 @@
+fragment CardTransactionDetails on CardTransaction {
+  id
+  amount
+  currency
+  merchantName
+  status
+  createdAt
+  __typename
+}
+
 fragment Transaction on Transaction {
   __typename
   id
@@ -238,6 +248,23 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
       __typename
     }
     success
+    __typename
+  }
+}
+
+mutation cardUpdate($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    status
+    __typename
+  }
+}
+
+mutation cardUpdateLimits($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    dailyLimitCents
+    monthlyLimitCents
     __typename
   }
 }
@@ -851,10 +878,12 @@ query Bulletins($first: Int!, $after: String) {
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
               __typename
             }
             ... on OpenExternalLinkAction {
               url
+              label
               __typename
             }
             __typename
@@ -964,10 +993,12 @@ query StatefulNotifications($after: String) {
         action {
           ... on OpenDeepLinkAction {
             deepLink
+            label
             __typename
           }
           ... on OpenExternalLinkAction {
             url
+            label
             __typename
           }
           __typename
@@ -1077,6 +1108,66 @@ query businessMapMarkers {
         latitude
         __typename
       }
+      __typename
+    }
+    __typename
+  }
+}
+
+query card {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          id
+          lastFour
+          cardType
+          status
+          createdAt
+          dailyLimitCents
+          monthlyLimitCents
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query cardBalance($cardId: ID!) {
+  cardBalance(cardId: $cardId) {
+    available
+    pending
+    posted
+    __typename
+  }
+}
+
+query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
+  cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        amount
+        currency
+        merchantName
+        status
+        createdAt
+        cardId
+        __typename
+      }
+      __typename
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
       __typename
     }
     __typename
@@ -1354,6 +1445,7 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
+        ratio
         __typename
       }
       __typename

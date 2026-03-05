@@ -16,6 +16,7 @@ extend type Query {
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
   deviceSessionCount: Int!
+  preferredAmountCurrency: String
   txLastSeen(accountId: ID!): TxLastSeen!
 }
 

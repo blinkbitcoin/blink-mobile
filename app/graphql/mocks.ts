@@ -12,6 +12,7 @@ import {
   SendBitcoinConfirmationScreenDocument,
   SendBitcoinDestinationDocument,
   SendBitcoinDetailsScreenDocument,
+  SendBitcoinInternalLimitsDocument,
   UserUpdateUsernameDocument,
   MyUserIdDocument,
   TransactionListForDefaultAccountDocument,
@@ -284,6 +285,34 @@ const mocks = [
                 __typename: "UsdWallet",
               },
             ],
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: SendBitcoinInternalLimitsDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            limits: {
+              internalSend: [
+                {
+                  totalLimit: 100000000,
+                  remainingLimit: 100000000,
+                  interval: 86400,
+                  __typename: "OneDayAccountLimit",
+                },
+              ],
+              __typename: "AccountLimits",
+            },
             __typename: "ConsumerAccount",
           },
           __typename: "User",

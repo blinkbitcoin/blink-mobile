@@ -20,6 +20,7 @@ import Close from "@app/assets/icons-redesign/close.svg"
 import Coins from "@app/assets/icons-redesign/coins.svg"
 import CopyPaste from "@app/assets/icons-redesign/copy-paste.svg"
 import Dollar from "@app/assets/icons-redesign/dollar.svg"
+import Download from "@app/assets/icons-redesign/download.svg"
 import EyeSlash from "@app/assets/icons-redesign/eye-slash.svg"
 import Eye from "@app/assets/icons-redesign/eye.svg"
 import Filter from "@app/assets/icons-redesign/filter.svg"
@@ -34,6 +35,7 @@ import Loading from "@app/assets/icons-redesign/loading.svg"
 import EmailAdd from "@app/assets/icons-redesign/email-add.svg"
 import MagnifyingGlass from "@app/assets/icons-redesign/magnifying-glass.svg"
 import Map from "@app/assets/icons-redesign/map.svg"
+import MapPin from "@app/assets/icons/map.svg"
 import Menu from "@app/assets/icons-redesign/menu.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
@@ -42,6 +44,7 @@ import Pencil from "@app/assets/icons-redesign/pencil.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import Question from "@app/assets/icons-redesign/question.svg"
 import Receive from "@app/assets/icons-redesign/receive.svg"
+import ReportFlag from "@app/assets/icons-redesign/report-flag.svg"
 import Send from "@app/assets/icons-redesign/send.svg"
 import Settings from "@app/assets/icons-redesign/settings.svg"
 import Support from "@app/assets/icons-redesign/support.svg"
@@ -60,10 +63,26 @@ import Refresh from "@app/assets/icons/refresh.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
 import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import Calendar from "@app/assets/icons-redesign/calendar.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
 import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
 import Headset from "@app/assets/icons-redesign/headset.svg"
+import Snowflake from "@app/assets/icons-redesign/snowflake.svg"
+import Speedometer from "@app/assets/icons-redesign/speedometer.svg"
+import BookOpen from "@app/assets/icons-redesign/book-open.svg"
+import LockClosed from "@app/assets/icons-redesign/lock-closed.svg"
+import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
+import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
+import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
+import PrivacyPolicy from "@app/assets/icons-redesign/privacy-policy.svg"
+import Trash from "@app/assets/icons-redesign/trash.svg"
+import GooglePay from "@app/assets/icons/google-pay.svg"
+import ApplePay from "@app/assets/icons/apple-pay.svg"
+import Approved from "@app/assets/icons-redesign/approved.svg"
+import Delivery from "@app/assets/icons-redesign/delivery.svg"
+import ErrorIcon from "@app/assets/icons/error.svg"
+import Shield from "@app/assets/icons/shield.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export const icons = {
@@ -86,6 +105,7 @@ export const icons = {
   "people": People,
   "copy-paste": CopyPaste,
   "dollar": Dollar,
+  "download": Download,
   "eye-slash": EyeSlash,
   "eye": Eye,
   "filter": Filter,
@@ -100,6 +120,7 @@ export const icons = {
   "email-add": EmailAdd,
   "magnifying-glass": MagnifyingGlass,
   "map": Map,
+  "map-pin": MapPin,
   "menu": Menu,
   "pencil": Pencil,
   "note": Note,
@@ -107,6 +128,7 @@ export const icons = {
   "qr-code": QrCode,
   "question": Question,
   "receive": Receive,
+  "report-flag": ReportFlag,
   "send": Send,
   "settings": Settings,
   "share": Share,
@@ -126,10 +148,26 @@ export const icons = {
   "upgrade": Upgrade,
   "welcome": Welcome,
   "calculator": Calculator,
+  "calendar": Calendar,
   "document-outline": DocumentIcon,
   "key-outline": KeyIcon,
   "house-outline": HouseIcon,
   "headset": Headset,
+  "snowflake": Snowflake,
+  "speedometer": Speedometer,
+  "book-open": BookOpen,
+  "lock-closed": LockClosed,
+  "visa-platinum": VisaPlatinum,
+  "blink-icon": BlinkIcon,
+  "physical-card": PhysicalCard,
+  "privacy-policy": PrivacyPolicy,
+  "trash": Trash,
+  "google-pay": GooglePay,
+  "apple-pay": ApplePay,
+  "approved": Approved,
+  "delivery": Delivery,
+  "error": ErrorIcon,
+  "shield": Shield,
 } as const
 
 export type IconNamesType = keyof typeof icons
@@ -137,12 +175,23 @@ export const IconNames = Object.keys(icons)
 
 type GaloyIconProps = {
   name: IconNamesType
-  size: number
   color?: string
   style?: StyleProp<ViewStyle>
   backgroundColor?: string
   opacity?: number
-}
+  containerSize?: number
+} & (
+  | {
+      size: number
+      width?: never
+      height?: never
+    }
+  | {
+      size?: never
+      width: number
+      height: number
+    }
+)
 
 export const circleDiameterThatContainsSquare = (squareSize: number) => {
   const SQRT2 = 1.414
@@ -152,23 +201,32 @@ export const circleDiameterThatContainsSquare = (squareSize: number) => {
 export const GaloyIcon = ({
   name,
   size,
+  width,
+  height,
   color,
   style,
   backgroundColor,
   opacity,
+  containerSize,
 }: GaloyIconProps) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles({ backgroundColor, opacity, size })
+  const resolvedSize = size ?? Math.max(width ?? 0, height ?? 0)
+  const styles = useStyles({
+    backgroundColor,
+    opacity,
+    size: resolvedSize,
+    containerSize,
+  })
   const Icon = icons[name]
 
   return backgroundColor ? (
     <View style={[style, styles.iconContainerStyle]}>
       <Icon
-        width={size}
+        width={size ?? width}
         opacity={opacity || 1}
-        height={size}
+        height={size ?? height}
         color={color || colors.black}
         fontWeight={"600"}
         testID={`icon-${name}`}
@@ -177,8 +235,8 @@ export const GaloyIcon = ({
   ) : (
     <Icon
       opacity={opacity || 1}
-      width={size}
-      height={size}
+      width={size ?? width}
+      height={size ?? height}
       color={color || colors.black}
       style={style}
       fontWeight={"600"}
@@ -191,19 +249,22 @@ type UseStylesProps = {
   backgroundColor?: string
   opacity?: number
   size: number
+  containerSize?: number
 }
 
-const useStyles = makeStyles((_, { backgroundColor, opacity, size }: UseStylesProps) => {
-  const containerSize = circleDiameterThatContainsSquare(size)
-  return {
-    iconContainerStyle: {
-      opacity: opacity || 1,
-      backgroundColor,
-      borderRadius: containerSize,
-      width: containerSize,
-      height: containerSize,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  }
-})
+const useStyles = makeStyles(
+  (_, { backgroundColor, opacity, size, containerSize }: UseStylesProps) => {
+    const resolvedContainerSize = containerSize ?? circleDiameterThatContainsSquare(size)
+    return {
+      iconContainerStyle: {
+        opacity: opacity || 1,
+        backgroundColor,
+        borderRadius: resolvedContainerSize,
+        width: resolvedContainerSize,
+        height: resolvedContainerSize,
+        alignItems: "center",
+        justifyContent: "center",
+      },
+    }
+  },
+)

@@ -2,18 +2,21 @@ import * as React from "react"
 import { useMemo } from "react"
 import {
   ActivityIndicator,
+  StyleSheet,
   useWindowDimensions,
   View,
+  Image,
   Platform,
   StyleProp,
   ViewStyle,
-  Pressable,
   Animated,
-  Easing,
 } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { runOnJS } from "react-native-reanimated"
 import QRCode from "react-native-qrcode-svg"
 
 import Logo from "@app/assets/logo/blink-logo-icon.png"
+import { usePressScale } from "@app/components/animations"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { SuccessIconAnimation } from "@app/components/success-animation"
@@ -23,25 +26,21 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { testProps } from "../../utils/testProps"
 import { Invoice, InvoiceType, GetFullUriFn } from "./payment/index.types"
 
+// QR code sizing: base size scales with screen width, capped on high-DPI Android devices
+const QR_BASE_RATIO = 250 / 360
+const QR_CONTAINER_PADDING = 28
+const QR_ANDROID_HIGH_DPI_SIZE = 240
+const QR_ANDROID_HIGH_DPI_SCALE = 3
+
 const configByType = {
   [Invoice.Lightning]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboard",
-    shareButtonLabel: "common.shareLightning",
     ecl: "L" as const,
-    icon: "flash",
   },
   [Invoice.OnChain]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboardBitcoin",
-    shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "logo-bitcoin",
   },
-  // TODO: Add them
   [Invoice.PayCode]: {
-    copyToClipboardLabel: "ReceiveScreen.copyClipboardBitcoin",
-    shareButtonLabel: "common.shareBitcoin",
     ecl: "M" as const,
-    icon: "logo-bitcoin",
   },
 }
 
@@ -51,23 +50,21 @@ type Props = {
   loading: boolean
   completed: boolean
   err: string
-  size?: number
   style?: StyleProp<ViewStyle>
   expired: boolean
   regenerateInvoiceFn?: () => void
-  copyToClipboard?: () => void | undefined
+  copyToClipboard?: () => void
   isPayCode: boolean
   canUsePayCode: boolean
   toggleIsSetLightningAddressModalVisible: () => void
 }
 
-export const QRView: React.FC<Props> = ({
+const QRViewBase: React.FC<Props> = ({
   type,
   getFullUri,
   loading,
   completed,
   err,
-  size = 280,
   style,
   expired,
   regenerateInvoiceFn,
@@ -86,87 +83,88 @@ export const QRView: React.FC<Props> = ({
     !completed && isReady && !expired && (!isPayCode || isPayCodeAndCanUsePayCode)
 
   const styles = useStyles()
-  const { scale } = useWindowDimensions()
+  const { width, scale } = useWindowDimensions()
+  const baseSize = Math.round(QR_BASE_RATIO * width) - 2 * QR_CONTAINER_PADDING
+  const qrSize =
+    Platform.OS === "android" && scale > QR_ANDROID_HIGH_DPI_SCALE
+      ? QR_ANDROID_HIGH_DPI_SIZE
+      : baseSize
 
   const { LL } = useI18nContext()
 
-  const scaleAnim = React.useRef(new Animated.Value(1)).current
+  const { scaleValue, pressIn, pressOut } = usePressScale()
 
-  const breatheIn = () => {
-    Animated.timing(scaleAnim, {
-      toValue: 0.95,
-      duration: 200,
-      useNativeDriver: true,
-      easing: Easing.inOut(Easing.quad),
-    }).start()
-  }
+  const tapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          runOnJS(pressIn)()
+        })
+        .onEnd(() => {
+          if (copyToClipboard) runOnJS(copyToClipboard)()
+        })
+        .onFinalize(() => {
+          runOnJS(pressOut)()
+        }),
+    [pressIn, pressOut, copyToClipboard],
+  )
 
-  const breatheOut = () => {
-    if (!expired && copyToClipboard) copyToClipboard()
-    Animated.timing(scaleAnim, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-      easing: Easing.inOut(Easing.quad),
-    }).start()
-  }
+  const animatedStyle = useMemo(
+    () => ({ transform: [{ scale: scaleValue }] }) as const,
+    [scaleValue],
+  )
 
-  const renderSuccessView = useMemo(() => {
+  const renderContent = () => {
     if (completed) {
       return (
         <View {...testProps("Success Icon")} style={[styles.container, style]}>
           <SuccessIconAnimation>
-            <GaloyIcon name={"payment-success"} size={128} />
+            <GaloyIcon name="payment-success" size={128} />
           </SuccessIconAnimation>
         </View>
       )
     }
-    return null
-  }, [completed, styles, style])
-
-  const renderQRCode = useMemo(() => {
-    const getQrLogo = () => {
-      if (type === Invoice.OnChain) return Logo
-      if (type === Invoice.Lightning) return Logo
-      if (type === Invoice.PayCode) return Logo
-      return null
-    }
-
-    const qrSize = Platform.OS === "android" && scale > 3 ? 240 : size
 
     if (displayingQR && getFullUri) {
       const uri = getFullUri({ uppercase: true })
+
       return (
         <View style={[styles.container, style]} {...testProps("QR-Code")}>
-          <QRCode
-            size={qrSize}
-            value={uri}
-            logoBackgroundColor="white"
-            ecl={type && configByType[type].ecl}
-            logo={getQrLogo() || undefined}
-            logoSize={60}
-            logoBorderRadius={10}
-          />
-        </View>
-      )
-    }
-    return null
-  }, [displayingQR, type, getFullUri, size, scale, styles, style])
-
-  const renderStatusView = useMemo(() => {
-    if (!completed && !isReady) {
-      return (
-        <View style={[styles.container, style]}>
-          <View style={styles.errorContainer}>
-            {(err !== "" && (
-              <Text style={styles.error} selectable>
-                {err}
-              </Text>
-            )) || <ActivityIndicator size="large" color={colors.primary} />}
+          <View>
+            <QRCode
+              size={qrSize}
+              value={uri}
+              logoBackgroundColor="white"
+              ecl={configByType[type].ecl}
+              logoSize={60}
+            />
+            <View style={styles.logoOverlay}>
+              <View style={styles.logoCircle}>
+                <Image source={Logo} style={styles.logoImage} />
+              </View>
+            </View>
           </View>
         </View>
       )
-    } else if (expired) {
+    }
+
+    if (!isReady) {
+      return (
+        <View style={[styles.container, style]}>
+          <View style={styles.errorContainer}>
+            {err ? (
+              <Text style={styles.error} selectable>
+                {err}
+              </Text>
+            ) : (
+              <ActivityIndicator size="large" color={colors.primary} />
+            )}
+          </View>
+        </View>
+      )
+    }
+
+    if (expired) {
       return (
         <View style={[styles.container, style]}>
           <Text type="p2" style={styles.expiredInvoice}>
@@ -175,10 +173,12 @@ export const QRView: React.FC<Props> = ({
           <GaloyTertiaryButton
             title={LL.ReceiveScreen.regenerateInvoiceButtonTitle()}
             onPress={regenerateInvoiceFn}
-          ></GaloyTertiaryButton>
+          />
         </View>
       )
-    } else if (isPayCode && !canUsePayCode) {
+    }
+
+    if (isPayCode && !canUsePayCode) {
       return (
         <View style={[styles.container, styles.cantUsePayCode, style]}>
           <Text type="p2" style={styles.cantUsePayCodeText}>
@@ -187,41 +187,24 @@ export const QRView: React.FC<Props> = ({
           <GaloyTertiaryButton
             title={LL.ReceiveScreen.setUsernameButtonTitle()}
             onPress={toggleIsSetLightningAddressModalVisible}
-          ></GaloyTertiaryButton>
+          />
         </View>
       )
     }
+
     return null
-  }, [
-    err,
-    isReady,
-    completed,
-    styles,
-    style,
-    colors,
-    expired,
-    isPayCode,
-    canUsePayCode,
-    LL.ReceiveScreen,
-    regenerateInvoiceFn,
-    toggleIsSetLightningAddressModalVisible,
-  ])
+  }
 
   return (
     <View style={styles.qr}>
-      <Pressable
-        onPressIn={displayingQR ? breatheIn : () => {}}
-        onPressOut={displayingQR ? breatheOut : () => {}}
-      >
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          {renderSuccessView}
-          {renderQRCode}
-          {renderStatusView}
-        </Animated.View>
-      </Pressable>
+      <GestureDetector gesture={displayingQR ? tapGesture : Gesture.Manual()}>
+        <Animated.View style={animatedStyle}>{renderContent()}</Animated.View>
+      </GestureDetector>
     </View>
   )
 }
+
+export const QRView = React.memo(QRViewBase)
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
@@ -230,13 +213,12 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors._white,
     width: "100%",
     height: undefined,
-    borderRadius: 10,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.grey5,
     aspectRatio: 1,
     alignSelf: "center",
-    padding: 16,
-  },
-  containerSuccess: {
-    backgroundColor: colors.white,
+    padding: 28,
   },
   errorContainer: {
     justifyContent: "center",
@@ -255,6 +237,22 @@ const useStyles = makeStyles(({ colors }) => ({
   cantUsePayCodeText: {
     marginBottom: 10,
   },
+  logoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "white",
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoImage: {
+    width: 48,
+    height: 48,
+  },
 }))
-
-export default React.memo(QRView)

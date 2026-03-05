@@ -26,6 +26,7 @@ import {
   UnseenTxAmountBadge,
   useUnseenTxAmountBadge,
   useOutgoingBadgeVisibility,
+  useIncomingBadgeAutoSeen,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -128,9 +129,11 @@ gql`
             action {
               ... on OpenDeepLinkAction {
                 deepLink
+                label
               }
               ... on OpenExternalLinkAction {
                 url
+                label
               }
             }
           }
@@ -278,6 +281,13 @@ export const HomeScreen: React.FC = () => {
     amountText: unseenAmountText,
     isOutgoing,
     onHide: handleOutgoingBadgeHide,
+  })
+
+  const showIncomingBadge = useIncomingBadgeAutoSeen({
+    isFocused,
+    isOutgoing,
+    unseenCurrency: latestUnseenTx?.settlementCurrency,
+    markTxSeen,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -493,7 +503,11 @@ export const HomeScreen: React.FC = () => {
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
           amountText={unseenAmountText ?? ""}
-          visible={isOutgoing ? showOutgoingBadge : Boolean(unseenAmountText)}
+          visible={
+            isOutgoing
+              ? showOutgoingBadge
+              : showIncomingBadge && Boolean(unseenAmountText)
+          }
           onPress={handleUnseenBadgePress}
           isOutgoing={isOutgoing}
         />

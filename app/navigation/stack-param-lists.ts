@@ -1,4 +1,7 @@
+import { NavigatorScreenParams } from "@react-navigation/native"
 import { LNURLPaySuccessAction } from "lnurl-pay"
+
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
@@ -10,7 +13,6 @@ import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { NavigatorScreenParams } from "@react-navigation/native"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
@@ -130,6 +132,35 @@ export type RootStackParamList = {
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
+  cardDashboardScreen: undefined
+  cardAddToMobileWalletScreen: undefined
+  cardDetailsScreen: undefined
+  cardLimitsScreen: undefined
+  cardPersonalDetailsScreen: undefined
+  cardSettingsScreen: undefined
+  cardStatementsScreen: undefined
+  cardTransactionDetailsScreen: { transactionId: string }
+  cardStatusScreen: {
+    title: string
+    subtitle: string
+    buttonLabel: string
+    navigateTo: keyof RootStackParamList
+    iconName: IconNamesType
+    iconColor?: string
+    showCard?: boolean
+    showAddToWallet?: boolean
+  }
+  cardShippingAddressScreen: undefined
+  cardCreatePinScreen: undefined
+  cardChangePinScreen: undefined
+  orderCardScreen: undefined
+  replaceCardScreen: undefined
+  selectionScreen: {
+    title: string
+    options: Array<{ value: string; label: string }>
+    selectedValue: string
+    onSelect: (value: string) => void
+  }
 }
 
 export type OnboardingStackParamList = {

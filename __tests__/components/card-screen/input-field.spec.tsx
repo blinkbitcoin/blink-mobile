@@ -1,0 +1,249 @@
+import React from "react"
+import { Text as RNText } from "react-native"
+import { render, fireEvent } from "@testing-library/react-native"
+
+import { InputField } from "@app/components/card-screen/input-field"
+
+jest.mock("@rn-vui/themed", () => ({
+  Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
+  makeStyles: () => () => ({
+    container: {},
+    label: {},
+    valueContainer: {},
+    valueContainerDisabled: {},
+    value: {},
+    editableInput: {},
+    helperText: {},
+  }),
+  useTheme: () => ({
+    theme: {
+      colors: {
+        primary: "#000",
+        grey2: "#666",
+      },
+    },
+  }),
+  Icon: () => null,
+}))
+
+describe("InputField", () => {
+  const defaultProps = {
+    label: "First name",
+    value: "Satoshi",
+  }
+
+  describe("rendering", () => {
+    it("renders without crashing", () => {
+      const { toJSON } = render(<InputField {...defaultProps} />)
+
+      expect(toJSON()).toBeTruthy()
+    })
+
+    it("displays the label", () => {
+      const { getByText } = render(<InputField {...defaultProps} />)
+
+      expect(getByText("First name")).toBeTruthy()
+    })
+
+    it("displays the value", () => {
+      const { getByText } = render(<InputField {...defaultProps} />)
+
+      expect(getByText("Satoshi")).toBeTruthy()
+    })
+
+    it("displays both label and value together", () => {
+      const { getByText } = render(<InputField {...defaultProps} />)
+
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByText("Satoshi")).toBeTruthy()
+    })
+  })
+
+  describe("different content", () => {
+    it("renders with last name content", () => {
+      const { getByText } = render(<InputField label="Last name" value="Nakamoto" />)
+
+      expect(getByText("Last name")).toBeTruthy()
+      expect(getByText("Nakamoto")).toBeTruthy()
+    })
+
+    it("renders with date of birth content", () => {
+      const { getByText } = render(
+        <InputField label="Date of birth" value="1971-01-03" />,
+      )
+
+      expect(getByText("Date of birth")).toBeTruthy()
+      expect(getByText("1971-01-03")).toBeTruthy()
+    })
+
+    it("renders with email content", () => {
+      const { getByText } = render(
+        <InputField label="Email address" value="satoshi@bitcoin.org" />,
+      )
+
+      expect(getByText("Email address")).toBeTruthy()
+      expect(getByText("satoshi@bitcoin.org")).toBeTruthy()
+    })
+
+    it("renders with phone content", () => {
+      const { getByText } = render(
+        <InputField label="Phone number" value="+1 (555) 123-4567" />,
+      )
+
+      expect(getByText("Phone number")).toBeTruthy()
+      expect(getByText("+1 (555) 123-4567")).toBeTruthy()
+    })
+  })
+
+  describe("editable mode", () => {
+    it("renders a TextInput when editable", () => {
+      const { getByLabelText } = render(
+        <InputField label="Full name" value="Satoshi" editable />,
+      )
+
+      expect(getByLabelText("Full name")).toBeTruthy()
+    })
+
+    it("calls onChangeText when text changes", () => {
+      const onChangeText = jest.fn()
+      const { getByLabelText } = render(
+        <InputField label="Full name" value="Satoshi" onChangeText={onChangeText} />,
+      )
+
+      fireEvent.changeText(getByLabelText("Full name"), "Nakamoto")
+
+      expect(onChangeText).toHaveBeenCalledWith("Nakamoto")
+    })
+
+    it("displays the label in editable mode", () => {
+      const { getByText } = render(
+        <InputField label="Address" value="123 Main St" editable />,
+      )
+
+      expect(getByText("Address")).toBeTruthy()
+    })
+
+    it("calls onBlur with the current value when field loses focus", () => {
+      const onBlur = jest.fn()
+      const { getByLabelText } = render(
+        <InputField label="Amount" value="1000" onBlur={onBlur} />,
+      )
+      fireEvent.changeText(getByLabelText("Amount"), "2000")
+      fireEvent(getByLabelText("Amount"), "blur")
+      expect(onBlur).toHaveBeenCalledWith("2000")
+    })
+
+    it("shows formatted value when not focused and formatDisplay is provided", () => {
+      const { getByDisplayValue } = render(
+        <InputField
+          label="Limit"
+          value="1000"
+          editable
+          formatDisplay={(v) => `$${Intl.NumberFormat("en-US").format(Number(v))}`}
+        />,
+      )
+      expect(getByDisplayValue("$1,000")).toBeTruthy()
+    })
+
+    it("shows raw value when focused and formatDisplay is provided", () => {
+      const { getByLabelText, getByDisplayValue } = render(
+        <InputField
+          label="Limit"
+          value="1000"
+          editable
+          formatDisplay={(v) => `$${Intl.NumberFormat("en-US").format(Number(v))}`}
+        />,
+      )
+      fireEvent(getByLabelText("Limit"), "focus")
+      expect(getByDisplayValue("1000")).toBeTruthy()
+    })
+
+    it("renders helper text when provided", () => {
+      const { getByText } = render(
+        <InputField
+          label="Amount"
+          value="100"
+          editable
+          helperText="Max $10,000 per day"
+        />,
+      )
+      expect(getByText("Max $10,000 per day")).toBeTruthy()
+    })
+  })
+
+  describe("helper text", () => {
+    it("renders helper text in read-only mode", () => {
+      const { getByText } = render(
+        <InputField label="Name" value="Satoshi" helperText="This is your legal name" />,
+      )
+      expect(getByText("This is your legal name")).toBeTruthy()
+    })
+  })
+
+  describe("edge cases", () => {
+    it("renders with empty value", () => {
+      const { getByText } = render(<InputField label="First name" value="" />)
+
+      expect(getByText("First name")).toBeTruthy()
+    })
+
+    it("renders with long value", () => {
+      const longValue = "This is a very long value that should still render correctly"
+      const { getByText } = render(<InputField label="Description" value={longValue} />)
+
+      expect(getByText(longValue)).toBeTruthy()
+    })
+
+    it("renders with special characters in value", () => {
+      const { getByText } = render(<InputField label="Name" value="José García-López" />)
+
+      expect(getByText("José García-López")).toBeTruthy()
+    })
+
+    it("renders with numbers in value", () => {
+      const { getByText } = render(<InputField label="ID" value="123456789" />)
+
+      expect(getByText("123456789")).toBeTruthy()
+    })
+  })
+
+  describe("rerender", () => {
+    it("updates label when prop changes", () => {
+      const { getByText, queryByText, rerender } = render(
+        <InputField {...defaultProps} />,
+      )
+
+      expect(getByText("First name")).toBeTruthy()
+
+      rerender(<InputField label="Last name" value="Satoshi" />)
+
+      expect(getByText("Last name")).toBeTruthy()
+      expect(queryByText("First name")).toBeNull()
+    })
+
+    it("updates value when prop changes", () => {
+      const { getByText, queryByText, rerender } = render(
+        <InputField {...defaultProps} />,
+      )
+
+      expect(getByText("Satoshi")).toBeTruthy()
+
+      rerender(<InputField label="First name" value="Nakamoto" />)
+
+      expect(getByText("Nakamoto")).toBeTruthy()
+      expect(queryByText("Satoshi")).toBeNull()
+    })
+
+    it("updates both label and value when props change", () => {
+      const { getByText, rerender } = render(<InputField {...defaultProps} />)
+
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByText("Satoshi")).toBeTruthy()
+
+      rerender(<InputField label="Email" value="test@example.com" />)
+
+      expect(getByText("Email")).toBeTruthy()
+      expect(getByText("test@example.com")).toBeTruthy()
+    })
+  })
+})

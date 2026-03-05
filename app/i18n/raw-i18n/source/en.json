@@ -30,7 +30,7 @@
     "SetAccountModal": {
         "title": "Set up your receive account",
         "description": "You can always change this later in the Settings",
-        "stablesatsTag": "Stablesats account for price stability",
+        "stablesatsTag": "Dollar account — powered by Stablesats",
         "bitcoinTag": "Bitcoin account for maximalists"
     },
     "NoteInput": {
@@ -2058,7 +2058,7 @@
             "sendingLimit": "Reduced daily sending limit",
             "noOnchain": "No receiving bitcoin onchain",
             "recoveryOption": "Recover funds by SMS or email",
-            "dailyLimit": "$1000 daily transaction limit",
+            "dailyLimit": "USD 1,000 daily transaction limit",
             "onchainReceive": "Receive bitcoin onchain"
         }
     },
@@ -2117,7 +2117,7 @@
         "setNote": "set a note",
         "tapQrCodeCopy": "Tap QR Code to Copy",
         "title": "Receive Bitcoin",
-        "usdTitle": "Receive USD",
+        "usdTitle": "Receive to Dollar account",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "copyInvoice": "Copy",
         "shareInvoice": "Share",
@@ -2154,11 +2154,15 @@
         "receiveViaPaycode": "Receive via Paycode",
         "receiveViaOnchain": "Receive via Onchain",
         "payCodeOrLNURL": "Paycode / LNURL",
-        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats."
+        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+        "lightningAddress": "Lightning address",
+        "lightningInvoice": "Lightning invoice",
+        "bitcoinOnchain": "Bitcoin onchain",
+        "depositFee": "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT"
     },
     "RedeemBitcoinScreen": {
         "title": "Redeem Bitcoin",
-        "usdTitle": "Redeem for USD",
+        "usdTitle": "Redeem to Dollar account",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "redeemingError": "Failed to redeem Bitcoin. Please contact support if this problem persists.",
         "submissionError": "Failed to submit withdrawal request. Please contact support if this problem persists.",
@@ -2376,7 +2380,7 @@
         "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
         "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
         "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-        "usdBalanceWarning": "You have a Stablesats balance of {balance: string}.",
+        "usdBalanceWarning": "You have a Dollar account balance of {balance: string}.",
         "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
         "secureYourAccount": "Register to secure your account",
         "tapToAdd": "Tap to add",
@@ -2436,8 +2440,8 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Receive currency",
-        "info": "Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time."
+        "title": "Default receive account",
+        "info": "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change."
     },
     "ThemeScreen": {
         "title": "Theme",
@@ -2452,8 +2456,8 @@
         "DEFAULT": "Default (OS)"
     },
     "StablesatsModal": {
-        "header": "With Stablesats, you now have a USD account added to your wallet!",
-        "body": "You can use it to send and receive Bitcoin, and instantly transfer value between your BTC and USD account. Value in the USD account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.",
+        "header": "Your Dollar account is powered by Stablesats",
+        "body": "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
         "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Stablesats"
     },
@@ -2468,8 +2472,7 @@
         "receivingAccount": "Receiving Account",
         "sendingAccount": "Sending Account",
         "txNotBroadcast": "Your transaction is queued. It should appear in the mempool {countdown: string}.",
-        "momentarily": "momentarily",
-        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
+        "momentarily": "momentarily"
     },
     "TransactionLimitsScreen": {
         "receive": "Receive",
@@ -2478,7 +2481,7 @@
         "perWeek": "per week",
         "unlimited": "Unlimited",
         "remaining": "Remaining",
-        "stablesatTransfers": "Stablesats transfers",
+        "stablesatTransfers": "Dollar account transfers",
         "internalSend": "Send to {bankName: string} user",
         "error": "Unable to fetch limits at this time",
         "increaseLimits": "Increase your limits"
@@ -2557,7 +2560,7 @@
             "mainTitle": "Welcome to Level 1",
             "title": "New features unlocked for your account:",
             "receiveBitcoinDescription": "Receive Bitcoin using your phone number",
-            "dailyLimitDescription": "Send up to $1,000 USD per day",
+            "dailyLimitDescription": "Send up to USD 1,000 per day",
             "onchainDescription": "Receive on-chain payments"
         },
         "emailBenefits": {
@@ -2670,7 +2673,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Price",
-        "btcAccount": "BTC Account",
+        "btcAccount": "Bitcoin Account",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
@@ -2719,6 +2722,7 @@
         "rate": "Rate",
         "reauth": "Your session has expired. Please log in again.",
         "restart": "Restart",
+        "save": "Save",
         "sats": "sats",
         "search": "Search",
         "security": "Security",
@@ -2730,7 +2734,6 @@
         "soon": "Coming soon!",
         "submit": "Submit",
         "success": "Success!",
-        "stablesatsUsd": "Stablesats USD",
         "dollarStablesats": "Dollar (Stablesats)",
         "to": "To",
         "total": "Total",
@@ -2738,7 +2741,7 @@
         "transactionsError": "Error loading transactions",
         "tryAgain": "Try Again",
         "type": "Type",
-        "usdAccount": "USD Account",
+        "usdAccount": "Dollar Account",
         "username": "Username",
         "usernameRequired": "Username is required",
         "backupAccount": "Backup/upgrade account",
@@ -2766,7 +2769,9 @@
         "some": "Some",
         "support": "Support",
         "profiles": "Profiles",
-        "paste": "Paste"
+        "paste": "Paste",
+        "copied": "Copied to clipboard",
+        "hasBeenCopiedToClipboard": "{type: string} has been copied to clipboard"
     },
     "errors": {
         "generic": "There was an error.\nPlease try again later.",
@@ -2831,6 +2836,7 @@
         "enterAmount": "Enter Amount",
         "setAmount": "Set Amount",
         "maxAmountExceeded": "Amount must not exceed {maxAmount: string}.",
+        "exceedsAvailableBalance": "Exceeds available balance: {maxAmount: string}",
         "minAmountNotMet": "Amount must be at least {minAmount: string}."
     },
     "AmountInputButton": {
@@ -2912,6 +2918,345 @@
         "ERROR": "Error",
         "PROCESSING": "Processing",
         "REVIEW": "Review"
+    },
+    "CardFlow": {
+        "validThruLabel": "VALID THRU",
+        "networkVisa": "Visa",
+        "cardFrozenTitle": "Card frozen",
+        "cardFrozenSubtitle": "Card is temporarily disabled",
+        "TransactionStatus": {
+            "pending": "Pending",
+            "completed": "Completed",
+            "declined": "Declined",
+            "reversed": "Reversed"
+        },
+        "CardDashboard": {
+            "Actions": {
+                "details": "Details",
+                "freeze": "Freeze",
+                "setLimits": "Set limits",
+                "statements": "Statements"
+            },
+            "title": "Visa card",
+            "addFunds": "Add funds",
+            "transactionsTitle": "Transactions",
+            "emptyTransactions": "No transactions yet",
+            "noCardAvailable": "No cards available",
+            "cardUpdateError": "Could not update card status",
+            "cardNotUsable": "This card is not currently available for use"
+        },
+        "CardDetails": {
+            "title": "Card details",
+            "cardNumber": "Card number",
+            "expiryDate": "Expiry date",
+            "cvv": "CVV",
+            "cardholderName": "Cardholder name",
+            "cardInformation": "Card information",
+            "cardType": "Card type",
+            "status": "Status",
+            "statusActive": "Active",
+            "statusFrozen": "Frozen",
+            "statusInactive": "Inactive",
+            "statusCancelled": "Cancelled",
+            "statusNotActivated": "Not activated",
+            "statusPending": "Pending",
+            "statusFailed": "Failed",
+            "cardTypeVirtual": "Virtual Visa debit",
+            "cardTypePhysical": "Physical Visa debit",
+            "authDescription": "Authenticate to view card details",
+            "issued": "Issued",
+            "network": "Network",
+            "keepDetailsSafe": "Keep your details safe",
+            "securityWarning": "Never share your card details with anyone. Blink will never ask for your card information via email or phone."
+        },
+        "CardLimits": {
+            "title": "Card limits",
+            "currentLimitsTitle": "Current limits",
+            "dailySpending": "Daily spending",
+            "monthlySpending": "Monthly spending",
+            "spendingLimitsTitle": "Spending limits",
+            "dailyLimit": "Daily limit",
+            "dailyLimitHelper": "Maximum amount you can spend per day",
+            "monthlyLimit": "Monthly spending limits",
+            "monthlyLimitHelper": "Maximum amount you can spend per month",
+            "atmLimitsTitle": "ATM withdrawal limits",
+            "dailyAtmLimit": "Daily ATM limits",
+            "dailyAtmLimitHelper": "Maximum ATM withdrawal per day",
+            "monthlyAtmLimit": "Monthly ATM limit",
+            "monthlyAtmLimitHelper": "Maximum ATM withdrawal per month",
+            "noLimit": "No limit",
+            "limitUpdateSuccess": "Limit updated successfully",
+            "limitUpdateError": "Failed to update limit",
+            "limitMustBePositive": "Limit must be greater than zero",
+            "transactionTypesTitle": "Transaction types",
+            "TransactionTypes": {
+                "ecommerce": "Online purchases",
+                "ecommerceDescription": "Allow online and e-commerce transactions",
+                "atm": "ATM withdrawals",
+                "atmDescription": "Allow cash withdrawals from ATMs",
+                "contactless": "Contactless payments",
+                "contactlessDescription": "Allow tap-to-pay transactions"
+            }
+        },
+        "CardStatements": {
+            "title": "Statements",
+            "selectYear": "Select year",
+            "currentStatement": "Current statement",
+            "statementPeriod": "Statement period",
+            "totalSpent": "Total spent",
+            "monthlyStatements": "Monthly statements",
+            "downloadAll": "Download all",
+            "spent": "{amount} spent",
+            "transactions": "{count} transactions, {amount} spent",
+            "statementsCount": "{count} statements",
+            "noStatements": "No statements",
+            "aboutStatements": "About statements",
+            "aboutBullet1": "Monthly statements are generated on the last day of each month",
+            "aboutBullet2": "Statements include all transactions and fees for the period",
+            "aboutBullet3": "Download statements as PDF",
+            "notifyNewStatements": "Notify me when new statements are made available"
+        },
+        "CardSettings": {
+            "title": "Card settings",
+            "personalDetails": "Personal Details",
+            "changePin": "Change PIN",
+            "transactionAlerts": "Transaction alerts",
+            "transactionAlertsDescription": "Get notified for all transactions",
+            "securityAlerts": "Security alerts",
+            "securityAlertsDescription": "Get notified for security-related activities",
+            "marketingUpdates": "Marketing updates",
+            "marketingUpdatesDescription": "Product updates and offers",
+            "cardManagement": "Card management",
+            "orderPhysicalCard": "Order physical card",
+            "addToGooglePay": "Add to Google Pay",
+            "addToAppleWallet": "Add to Apple Wallet",
+            "replaceCard": "Replace card",
+            "termsAndConditions": "Card Terms & Conditions",
+            "privacyPolicy": "Card Privacy Policy",
+            "closeCardAccount": "Close card account",
+            "closeCardAccountDescription": "Permanently close your Visa card",
+            "closeCardWarning": "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+            "closeCardTypeClose": "Please type \"{close}\" to confirm",
+            "closeCardClose": "close",
+            "closeCardFinalConfirmTitle": "Final Confirmation",
+            "closeCardFinalConfirmMessage": "Are you sure you want to close your card account? This cannot be undone.",
+            "closeCardPendingTransactions": "You have pending transactions. Please wait until they are settled before closing your card.",
+            "closeCardBalanceWarning": "Your card has a balance of {balance: string}. Please withdraw your funds before closing. Do you want to proceed anyway?",
+            "closeCardSuccessTitle": "Card Account Closed",
+            "closeCardSuccessSubtitle": "Your Visa card has been permanently closed.",
+            "closeCardSuccessButton": "Back to Home",
+            "closeCardError": "Failed to close card account. Please contact support.",
+            "notificationToggleError": "Failed to update notification settings"
+        },
+        "PersonalDetails": {
+            "title": "Personal details",
+            "blinkVisaCardholder": "Blink Visa Cardholder",
+            "kycVerifiedInformation": "KYC verified information",
+            "kycVerifiedDescription": "Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.",
+            "changeKycInformation": "Change KYC information",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "dateOfBirth": "Date of birth",
+            "contactInformation": "Contact information",
+            "registeredAddress": "Registered address",
+            "shippingAddress": "Shipping address"
+        },
+        "AddToMobileWallet": {
+            "title": "Add to mobile wallet",
+            "addYourCard": "Add your card",
+            "addYourCardDescription": "Add your Blink Visa card to your mobile wallet for quick and secure payments",
+            "addTo": "Add to",
+            "Benefits": {
+                "title": "Benefits of mobile wallet",
+                "contactless": "Contactless payments at millions of locations",
+                "security": "Enhanced security with biometric authentication",
+                "noPhysicalCard": "No need to carry your physical card",
+                "worksLocked": "Works even when your phone is locked"
+            }
+        },
+        "CardStatus": {
+            "title": "Visa card",
+            "CardApproved": {
+                "title": "Congratulations!",
+                "subtitle": "Your Blink Visa Card has been activated.",
+                "buttonLabel": "Order physical card"
+            },
+            "PhysicalCardOrdered": {
+                "title": "Your physical card is on the way!",
+                "subtitle": "Order for delivery of your Blink Card has been submitted.",
+                "buttonLabel": "Create PIN"
+            }
+        },
+        "ShippingAddress": {
+            "title": "Shipping address",
+            "fullName": "Full name",
+            "addressLine1": "Address line 1",
+            "addressLine2": "Address line 2",
+            "city": "City",
+            "state": "State",
+            "postalCode": "Postal code",
+            "country": "Country",
+            "important": "Important",
+            "importantDescription": "Please ensure your address is accurate and complete.",
+            "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
+            "signatureRequired": "Signature may be required upon delivery",
+            "supportedRegions": "Address must be within supported shipping regions"
+        },
+        "TransactionDetails": {
+            "title": "Transaction details",
+            "cardInformation": "Card information",
+            "amount": "Amount",
+            "time": "Time",
+            "transactionId": "ID",
+            "cardUsed": "Card used",
+            "paymentMethod": "Payment method",
+            "merchantInformation": "Merchant information",
+            "merchant": "Merchant",
+            "category": "Category",
+            "location": "Location",
+            "mccCode": "MCC code",
+            "currencyConversion": "Currency conversion",
+            "bitcoinRate": "Bitcoin rate",
+            "bitcoinSpent": "Bitcoin spent",
+            "conversionFee": "Conversion fee",
+            "viewOnMap": "View on map",
+            "downloadReceipt": "Download receipt",
+            "reportIssue": "Report issue",
+            "transactionHelp": "Transaction help",
+            "transactionHelpDescription": "If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.",
+            "supportTeam": "support team",
+            "transactionNotFound": "Transaction not found"
+        },
+        "PinScreens": {
+            "common": {
+                "confirmNewPin": "Confirm new PIN",
+                "confirmPinSubtitle": "Please re-enter your new 4-digit PIN to continue.",
+                "incorrectPin": "Incorrect PIN. Please try again.",
+                "pinMismatch": "PINs do not match. Re-enter to confirm or go back to change your PIN."
+            },
+            "CreateFlow": {
+                "title": "Create PIN",
+                "steps": {
+                    "setPin": "Set PIN",
+                    "confirm": "Confirm"
+                },
+                "enterYourPin": "Enter your PIN",
+                "enterPinSubtitle": "Please enter a 4-digit PIN to continue.",
+                "pinCreatedToast": "PIN has been created successfully"
+            },
+            "ChangeFlow": {
+                "title": "Change PIN",
+                "steps": {
+                    "currentPin": "Current PIN",
+                    "newPin": "New PIN",
+                    "confirm": "Confirm"
+                },
+                "enterCurrentPin": "Enter current PIN",
+                "enterCurrentPinSubtitle": "Please enter your current 4-digit PIN to continue.",
+                "enterNewPin": "Enter new PIN",
+                "enterNewPinSubtitle": "Please enter your new 4-digit PIN.",
+                "pinChangedTitle": "PIN changed",
+                "pinChangedSubtitle": "Your PIN has been changed successfully.",
+                "pinChangedToast": "PIN has been changed successfully"
+            }
+        },
+        "ReplaceCard": {
+            "title": "Replace card",
+            "steps": {
+                "reportIssue": "Report Issue",
+                "delivery": "Delivery",
+                "confirm": "Confirm"
+            },
+            "ReportIssue": {
+                "title": "Report card Issue",
+                "subtitle": "Let us know what happened to your card so we can help you get a replacement.",
+                "cardManagement": "Card management",
+                "lostCard": "Lost card",
+                "lostCardDescription": "I misplaced my card and can't find it anywhere.",
+                "stolenCard": "Stolen card",
+                "stolenCardDescription": "I misplaced my card and can't find it anywhere.",
+                "damagedCard": "Damaged card",
+                "damagedCardDescription": "I misplaced my card and can't find it anywhere.",
+                "whatHappensNext": "What happens next?",
+                "bullet1": "Your current card will be frozen for security",
+                "bullet2": "A new card with different numbers will be issued",
+                "bullet3": "You can unfreeze if you find your card later"
+            },
+            "Delivery": {
+                "title": "Delivery options",
+                "subtitle": "Choose how you'd like to receive your replacement card.",
+                "standardDelivery": "Standard delivery",
+                "businessDays": "{day1}-{day2} business days",
+                "free": "FREE",
+                "expressDelivery": "Express delivery",
+                "shippingAddress": "Shipping address",
+                "useRegisteredAddress": "Use registered address as shipping address",
+                "chooseDeliverySpeed": "Choose delivery speed"
+            },
+            "Confirm": {
+                "title": "Confirm replacement",
+                "subtitle": "Review your request before submitting.",
+                "requestSummary": "Request summary",
+                "issueType": "Issue type",
+                "delivery": "Delivery",
+                "deliveryTime": "Delivery time",
+                "shippingCost": "Shipping cost",
+                "importantInformation": "Important information",
+                "bullet1": "Your current card will remain active until the new one arrives",
+                "bullet2": "Your new card will have the same numbers as your current card",
+                "bullet3": "Destroy your damaged card when the new one arrives",
+                "submitRequest": "Submit request"
+            },
+            "Status": {
+                "title": "Your new card is on the way!",
+                "subtitle": "Order for delivery of your Blink Card has been submitted.",
+                "buttonLabel": "Dashboard"
+            }
+        },
+        "OrderPhysicalCard": {
+            "title": "Order physical card",
+            "steps": {
+                "shipping": "Shipping",
+                "confirm": "Confirm"
+            },
+            "Shipping": {
+                "title": "Order your physical card",
+                "subtitle": "Get your Blink Visa card delivered to your address.",
+                "registeredAddress": "Registered address",
+                "useRegisteredAddress": "Use registered address as shipping address",
+                "delivery": "Delivery",
+                "standardDelivery": "Standard delivery",
+                "expressDelivery": "Express delivery",
+                "businessDays": "{day1}-{day2} business days",
+                "free": "FREE",
+                "deliveryInformation": "Delivery information",
+                "bullet1": "You'll receive tracking information via email",
+                "bullet2": "Signature may be required upon delivery",
+                "bullet3": "Card will be shipped in discreet packaging",
+                "bullet4": "Activate your card when it arrives",
+                "cardFeatures": "Card features",
+                "feature1": "Contactless payment technology",
+                "feature2": "EMV chip for enhanced security",
+                "feature3": "Magnetic stripe for universal acceptance",
+                "feature4": "Your name embossed on the card",
+                "important": "Important"
+            },
+            "Confirm": {
+                "title": "Confirm your order",
+                "subtitle": "Review your physical card order before submitting.",
+                "orderSummary": "Order summary",
+                "cardDesign": "Card design",
+                "delivery": "Delivery",
+                "deliveryTime": "Delivery time",
+                "shippingCost": "Shipping cost",
+                "shippingAddress": "Shipping address",
+                "placeOrder": "Place order",
+                "important": "Important",
+                "bullet1": "Your virtual card will remain active while you wait for the physical card",
+                "bullet2": "You'll need to activate your physical card when it arrives",
+                "bullet3": "Both cards will have the same card number and details"
+            }
+        }
     },
     "NotificationHistory": {
         "title": "Notifications",

@@ -81,12 +81,29 @@ import { PriceHistoryScreen } from "../screens/price/price-history-screen"
 import { ScanningQRCodeScreen } from "../screens/send-bitcoin-screen"
 import { SettingsScreen } from "../screens/settings-screen"
 import { LanguageScreen } from "../screens/settings-screen/language-screen"
+import { SelectionScreen } from "../screens/settings-screen/selection-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
 
+import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
+import {
+  CardAddToMobileWalletScreen,
+  CardChangePinScreen,
+  CardCreatePinScreen,
+  OrderCardScreen,
+  ReplaceCardScreen,
+  CardDetailsScreen,
+  CardLimitsScreen,
+  CardPersonalDetailsScreen,
+  CardSettingsScreen,
+  CardShippingAddressScreen,
+  CardStatementsScreen,
+  CardStatusScreen,
+  CardTransactionDetailsScreen,
+} from "@app/screens/card-screen"
 import {
   WelcomeLevel1Screen,
   EmailBenefitsScreen,
@@ -498,6 +515,83 @@ export const RootStack = () => {
         name="notificationHistory"
         component={NotificationHistoryScreen}
         options={{ title: LL.NotificationHistory.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardDashboardScreen"
+        component={CardDashboardScreen}
+        options={{
+          title: LL.CardFlow.CardDashboard.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardDetailsScreen"
+        component={CardDetailsScreen}
+        options={{ title: LL.CardFlow.CardDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardLimitsScreen"
+        component={CardLimitsScreen}
+        options={{ title: LL.CardFlow.CardLimits.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardAddToMobileWalletScreen"
+        component={CardAddToMobileWalletScreen}
+        options={{ title: LL.CardFlow.AddToMobileWallet.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardPersonalDetailsScreen"
+        component={CardPersonalDetailsScreen}
+        options={{ title: LL.CardFlow.PersonalDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardSettingsScreen"
+        component={CardSettingsScreen}
+        options={{ title: LL.CardFlow.CardSettings.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardStatementsScreen"
+        component={CardStatementsScreen}
+        options={{ title: LL.CardFlow.CardStatements.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardTransactionDetailsScreen"
+        component={CardTransactionDetailsScreen}
+        options={{ title: LL.CardFlow.TransactionDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardStatusScreen"
+        component={CardStatusScreen}
+        options={{ title: LL.CardFlow.CardStatus.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardShippingAddressScreen"
+        component={CardShippingAddressScreen}
+        options={{ title: LL.CardFlow.ShippingAddress.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardCreatePinScreen"
+        component={CardCreatePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.CreateFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardChangePinScreen"
+        component={CardChangePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.ChangeFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="orderCardScreen"
+        component={OrderCardScreen}
+        options={{ title: LL.CardFlow.OrderPhysicalCard.title() }}
+      />
+      <RootNavigator.Screen
+        name="replaceCardScreen"
+        component={ReplaceCardScreen}
+        options={{ title: LL.CardFlow.ReplaceCard.title() }}
+      />
+      <RootNavigator.Screen
+        name="selectionScreen"
+        component={SelectionScreen}
+        options={({ route }) => ({ title: route.params.title })}
       />
       <RootNavigator.Screen
         name="onboarding"

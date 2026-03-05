@@ -42,7 +42,7 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
         dynamicStyle = {
           opacity: disabled ? 0.7 : 1,
           backgroundColor: colors.transparent,
-          borderColor: colors.primary5,
+          borderColor: colors.primary,
           borderWidth: 1.5,
         }
         break
@@ -53,7 +53,7 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
         break
       default:
         dynamicStyle = {
-          backgroundColor: colors.primary3,
+          backgroundColor: colors.primary,
         }
     }
 

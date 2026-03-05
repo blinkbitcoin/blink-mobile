@@ -35,34 +35,44 @@ export const PersistentStateContext = createContext<PersistentStateContextType |
 )
 
 export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [persistentState, setPersistentState] = React.useState<
-    PersistentState | undefined
-  >(undefined)
+  const [persistentState, setPersistentState] = React.useState<PersistentState | null>(
+    null,
+  )
+  const hasModified = React.useRef(false)
 
   React.useEffect(() => {
-    if (persistentState) {
+    if (hasModified.current && persistentState) {
       savePersistentState(persistentState)
     }
   }, [persistentState])
 
   React.useEffect(() => {
     ;(async () => {
-      const persistentState = await loadPersistentState()
-      setPersistentState(persistentState)
+      const loadedState = await loadPersistentState()
+      setPersistentState(loadedState)
     })()
   }, [])
 
+  const updateState = React.useCallback(
+    (update: (state: PersistentState | undefined) => PersistentState | undefined) => {
+      hasModified.current = true
+      setPersistentState((prev) => update(prev ?? undefined) ?? prev)
+    },
+    [],
+  )
+
   const resetState = React.useCallback(() => {
+    hasModified.current = true
     setPersistentState(defaultPersistentState)
   }, [])
 
-  return persistentState ? (
-    <PersistentStateContext.Provider
-      value={{ persistentState, updateState: setPersistentState, resetState }}
-    >
+  if (!persistentState) return null
+
+  return (
+    <PersistentStateContext.Provider value={{ persistentState, updateState, resetState }}>
       {children}
     </PersistentStateContext.Provider>
-  ) : null
+  )
 }
 
 export const usePersistentStateContext = (() =>

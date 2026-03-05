@@ -352,6 +352,17 @@ export const useDisplayCurrency = () => {
     [displayCurrencyDictionary],
   )
 
+  const getFractionDigits = useCallback(
+    ({ currency }: { currency: string }) => {
+      const currencyInfo = displayCurrencyDictionary[currency] || {
+        symbol: currency,
+        fractionDigits: 2,
+      }
+      return currencyInfo.fractionDigits
+    },
+    [displayCurrencyDictionary],
+  )
+
   return {
     fractionDigits: displayCurrencyInfo.fractionDigits,
     fiatSymbol: displayCurrencyInfo.symbol,
@@ -371,5 +382,6 @@ export const useDisplayCurrency = () => {
 
     formatCurrency,
     getCurrencySymbol,
+    getFractionDigits,
   }
 }
