@@ -184,6 +184,11 @@ export const InputField: React.FC<InputFieldProps> = ({
     <View style={styles.container} testID={testID}>
       <Text style={styles.label}>{label}</Text>
       {pressableContent}
+      {helperText ? (
+        <Text style={[styles.helperText, isError && styles.helperTextError]}>
+          {helperText}
+        </Text>
+      ) : null}
     </View>
   )
 }

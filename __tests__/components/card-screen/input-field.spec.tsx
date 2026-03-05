@@ -172,10 +172,15 @@ describe("InputField", () => {
   })
 
   describe("helper text", () => {
-    it("does not render helper text in read-only mode", () => {
-      const { queryByText } = render(
+    it("renders helper text in read-only mode when provided", () => {
+      const { getByText } = render(
         <InputField label="Name" value="Satoshi" helperText="This is your legal name" />,
       )
+      expect(getByText("This is your legal name")).toBeTruthy()
+    })
+
+    it("does not render helper text in read-only mode when not provided", () => {
+      const { queryByText } = render(<InputField label="Name" value="Satoshi" />)
       expect(queryByText("This is your legal name")).toBeNull()
     })
   })
