@@ -72,6 +72,11 @@ jest.mock("@app/screens/card-screen/country-region-data", () => ({
       ]
     return []
   },
+  getIsoAlpha2: (code: string) => {
+    if (code === "USA") return "US"
+    if (code === "CAN") return "CA"
+    return undefined
+  },
 }))
 
 jest.mock("@app/components/card-screen/input-field", () => ({

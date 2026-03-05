@@ -43,6 +43,7 @@ type InputFieldProps = {
   error?: boolean
   required?: boolean
   minLength?: number
+  validate?: (value: string) => string | undefined
   loading?: boolean
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
@@ -71,6 +72,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   error = false,
   required = false,
   minLength,
+  validate,
   loading = false,
   disabled = false,
   keyboardType,
@@ -88,6 +90,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const [internalValue, setInternalValue] = useState(value)
   const [isFocused, setIsFocused] = useState(false)
   const [hasBlurred, setHasBlurred] = useState(false)
+  const [hasTyped, setHasTyped] = useState(false)
 
   useEffect(() => {
     if (!isFocused && !disabled) {
@@ -96,12 +99,13 @@ export const InputField: React.FC<InputFieldProps> = ({
   }, [value, isFocused, disabled])
 
   const validationError = (() => {
-    if (!hasBlurred) return undefined
+    if (!hasBlurred && !hasTyped) return undefined
 
     const trimmed = (isEditable ? internalValue : value).trim()
     if (required && trimmed.length === 0) return LL.common.validation.required()
     if (minLength && trimmed.length > 0 && trimmed.length < minLength)
       return LL.common.validation.minChars({ min: minLength })
+    if (validate) return validate(trimmed)
     return undefined
   })()
 
@@ -127,6 +131,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             value={displayValue}
             onChangeText={(text) => {
               setInternalValue(text)
+              setHasTyped(true)
               onChangeText?.(text)
             }}
             placeholder={placeholder ?? label}

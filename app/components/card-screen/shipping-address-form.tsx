@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import { postcodeValidator } from "postcode-validator"
 
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -10,6 +11,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
 import {
   COUNTRIES,
+  getIsoAlpha2,
   getRegionsByCountry,
 } from "@app/screens/card-screen/country-region-data"
 
@@ -27,6 +29,16 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
+  const isoAlpha2 = getIsoAlpha2(address.countryCode)
+
+  const validatePostalCode = (value: string): string | undefined => {
+    if (!isoAlpha2 || value.length === 0) return undefined
+
+    if (!postcodeValidator(value, isoAlpha2))
+      return LL.common.validation.invalidPostalCode()
+    return undefined
+  }
 
   const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
     onAddressChange({ ...address, [field]: value })
@@ -132,6 +144,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
             required
+            validate={validatePostalCode}
           />
         </View>
         <View style={styles.gridItem}>
