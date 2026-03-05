@@ -2789,7 +2789,11 @@
     "profiles": "Profily",
     "paste": "Vložit",
     "hasBeenCopiedToClipboard": "{type: string} byl zkopírován do schránky",
-    "save": "Uložit"
+    "save": "Uložit",
+    "validation": {
+      "required": "Toto pole je povinné",
+      "minChars": "Musí obsahovat alespoň {min} znaků"
+    }
   },
   "errors": {
     "generic": "Došlo k chybě.\nZkuste to prosím později.",

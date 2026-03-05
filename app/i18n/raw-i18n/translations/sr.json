@@ -2789,7 +2789,11 @@
     "profiles": "Профили",
     "paste": "Налепи",
     "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд",
-    "save": "Сачувај"
+    "save": "Сачувај",
+    "validation": {
+      "required": "Ово поље је обавезно",
+      "minChars": "Мора имати најмање {min} знакова"
+    }
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",

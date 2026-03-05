@@ -2789,7 +2789,11 @@
     "profiles": "الملفات الشخصية",
     "paste": "لصق",
     "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة",
-    "save": "حفظ"
+    "save": "حفظ",
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "minChars": "يجب أن يكون {min} أحرف على الأقل"
+    }
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",

@@ -2875,6 +2875,10 @@ const en: BaseTranslation = {
     paste: "Paste",
     copied: "Copied to clipboard",
     hasBeenCopiedToClipboard: "{type: string} has been copied to clipboard",
+    validation: {
+      required: "This field is required",
+      minChars: "Must be at least {min:number} characters",
+    },
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

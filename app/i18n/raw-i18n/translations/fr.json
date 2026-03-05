@@ -2789,7 +2789,11 @@
         "support": "Support",
         "profiles": "Profils",
         "paste": "Coller",
-        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers"
+        "hasBeenCopiedToClipboard": "{type: string} a été copié dans le presse-papiers",
+        "validation": {
+            "required": "Ce champ est obligatoire",
+            "minChars": "Doit contenir au moins {min} caractères"
+        }
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",

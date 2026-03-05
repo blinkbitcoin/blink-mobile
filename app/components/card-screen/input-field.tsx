@@ -9,6 +9,7 @@ import {
 import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { useI18nContext } from "@app/i18n/i18n-react"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -39,6 +40,9 @@ type InputFieldProps = {
   valueStyle?: ValueStyleType
   size?: InputSizeType
   helperText?: string
+  error?: boolean
+  required?: boolean
+  minLength?: number
   loading?: boolean
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
@@ -64,6 +68,9 @@ export const InputField: React.FC<InputFieldProps> = ({
   valueStyle = ValueStyle.Bold,
   size = InputSize.Default,
   helperText,
+  error = false,
+  required = false,
+  minLength,
   loading = false,
   disabled = false,
   keyboardType,
@@ -74,17 +81,32 @@ export const InputField: React.FC<InputFieldProps> = ({
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
 
   const isEditable = editable || onBlur !== undefined || onChangeText !== undefined
 
   const [internalValue, setInternalValue] = useState(value)
   const [isFocused, setIsFocused] = useState(false)
+  const [hasBlurred, setHasBlurred] = useState(false)
 
   useEffect(() => {
     if (!isFocused && !disabled) {
       setInternalValue(value)
     }
   }, [value, isFocused, disabled])
+
+  const validationError = (() => {
+    if (!hasBlurred) return undefined
+
+    const trimmed = (isEditable ? internalValue : value).trim()
+    if (required && trimmed.length === 0) return LL.common.validation.required()
+    if (minLength && trimmed.length > 0 && trimmed.length < minLength)
+      return LL.common.validation.minChars({ min: minLength })
+    return undefined
+  })()
+
+  const displayHelperText = validationError ?? helperText
+  const isError = Boolean(validationError) || error
 
   const rightIconElement = rightIonicon ? (
     <Icon name={rightIonicon} type="ionicon" size={20} color={colors.primary} />
@@ -116,6 +138,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => {
               setIsFocused(false)
+              setHasBlurred(true)
               onBlur?.(internalValue)
             }}
           />
@@ -125,7 +148,9 @@ export const InputField: React.FC<InputFieldProps> = ({
             rightIconElement
           )}
         </View>
-        {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
+        <Text style={[styles.helperText, isError && styles.helperTextError]}>
+          {displayHelperText || " "}
+        </Text>
       </View>
     )
   }
@@ -154,7 +179,6 @@ export const InputField: React.FC<InputFieldProps> = ({
     <View style={styles.container} testID={testID}>
       <Text style={styles.label}>{label}</Text>
       {pressableContent}
-      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
     </View>
   )
 }
@@ -204,6 +228,9 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       fontSize: 10,
       lineHeight: 13,
       fontWeight: "400",
+    },
+    helperTextError: {
+      color: colors.error,
     },
   }
 })

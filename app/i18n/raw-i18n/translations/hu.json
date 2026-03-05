@@ -2772,7 +2772,11 @@
     "profiles": "Profilok",
     "paste": "Beillesztés",
     "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva",
-    "save": "Mentés"
+    "save": "Mentés",
+    "validation": {
+      "required": "Ez a mező kötelező",
+      "minChars": "Legalább {min} karakter szükséges"
+    }
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",

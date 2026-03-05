@@ -2789,7 +2789,11 @@
     "profiles": "Hồ sơ",
     "paste": "Dán",
     "hasBeenCopiedToClipboard": "{type: string} đã được sao chép vào bộ nhớ tạm",
-    "save": "Lưu"
+    "save": "Lưu",
+    "validation": {
+      "required": "Trường này là bắt buộc",
+      "minChars": "Phải có ít nhất {min} ký tự"
+    }
   },
   "errors": {
     "generic": "Đã có lỗi.\nVui lòng thử lại sau.",

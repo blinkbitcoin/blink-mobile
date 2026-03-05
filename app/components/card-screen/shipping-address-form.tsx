@@ -66,6 +66,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           rightIcon="pencil"
           onChangeText={(text) => handleFieldChange("firstName", text)}
           valueStyle={ValueStyle.Bold}
+          required
+          minLength={2}
         />
       )}
 
@@ -76,6 +78,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           rightIcon="pencil"
           onChangeText={(text) => handleFieldChange("lastName", text)}
           valueStyle={ValueStyle.Bold}
+          required
+          minLength={2}
         />
       )}
 
@@ -85,6 +89,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         rightIcon="pencil"
         onChangeText={(text) => handleFieldChange("line1", text)}
         valueStyle={ValueStyle.Bold}
+        required
+        minLength={5}
       />
 
       <InputField
@@ -102,6 +108,8 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             value={address.city}
             onChangeText={(text) => handleFieldChange("city", text)}
             valueStyle={ValueStyle.Regular}
+            required
+            minLength={2}
           />
         </View>
         <View style={styles.gridItem}>
@@ -111,6 +119,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             rightIonicon="chevron-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleStateSelect}
+            required
           />
         </View>
       </View>
@@ -122,6 +131,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             value={address.postalCode}
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
+            required
           />
         </View>
         <View style={styles.gridItem}>
@@ -131,6 +141,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             rightIonicon="chevron-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleCountrySelect}
+            required
           />
         </View>
       </View>
@@ -140,7 +151,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
 
 const useStyles = makeStyles(() => ({
   container: {
-    gap: 20,
+    gap: 4,
   },
   gridRow: {
     flexDirection: "row",

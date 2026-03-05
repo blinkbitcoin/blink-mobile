@@ -2772,7 +2772,11 @@
         "support": "Soporte",
         "blinkToBlink": "Blink a Blink",
         "copied": "Copied to clipboard",
-        "hasBeenCopiedToClipboard": "{type: string} se ha copiado al portapapeles"
+        "hasBeenCopiedToClipboard": "{type: string} se ha copiado al portapapeles",
+        "validation": {
+            "required": "Este campo es obligatorio",
+            "minChars": "Debe tener al menos {min} caracteres"
+        }
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

@@ -2772,7 +2772,11 @@
     "profiles": "Profily",
     "paste": "Prilepiť",
     "hasBeenCopiedToClipboard": "{type: string} bol skopírovaný do schránky",
-    "save": "Uložiť"
+    "save": "Uložiť",
+    "validation": {
+      "required": "Toto pole je povinné",
+      "minChars": "Musí obsahovať aspoň {min} znakov"
+    }
   },
   "errors": {
     "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",

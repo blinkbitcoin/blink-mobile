@@ -9090,6 +9090,17 @@ type RootTranslation = {
 		 * @param {string} type
 		 */
 		hasBeenCopiedToClipboard: RequiredParams<'type'>
+		validation: {
+			/**
+			 * T​h​i​s​ ​f​i​e​l​d​ ​i​s​ ​r​e​q​u​i​r​e​d
+			 */
+			required: string
+			/**
+			 * M​u​s​t​ ​b​e​ ​a​t​ ​l​e​a​s​t​ ​{​m​i​n​}​ ​c​h​a​r​a​c​t​e​r​s
+			 * @param {number} min
+			 */
+			minChars: RequiredParams<'min'>
+		}
 	}
 	errors: {
 		/**
@@ -19844,6 +19855,16 @@ export type TranslationFunctions = {
 		 * {type} has been copied to clipboard
 		 */
 		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
+		validation: {
+			/**
+			 * This field is required
+			 */
+			required: () => LocalizedString
+			/**
+			 * Must be at least {min} characters
+			 */
+			minChars: (arg: { min: number }) => LocalizedString
+		}
 	}
 	errors: {
 		/**

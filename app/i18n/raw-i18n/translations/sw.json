@@ -2772,7 +2772,11 @@
     "profiles": "Wasifu",
     "paste": "Bandika",
     "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili",
-    "save": "Hifadhi"
+    "save": "Hifadhi",
+    "validation": {
+      "required": "Sehemu hii inahitajika",
+      "minChars": "Lazima iwe na angalau herufi {min}"
+    }
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",

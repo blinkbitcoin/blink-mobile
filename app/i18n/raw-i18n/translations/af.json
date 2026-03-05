@@ -2789,7 +2789,11 @@
     "profiles": "Profiele",
     "paste": "Plak",
     "hasBeenCopiedToClipboard": "{type: string} is na knipbord oorgedra",
-    "save": "Stoor"
+    "save": "Stoor",
+    "validation": {
+      "required": "Hierdie veld is verpligtend",
+      "minChars": "Moet ten minste {min} karakters wees"
+    }
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",

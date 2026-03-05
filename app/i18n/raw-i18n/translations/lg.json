@@ -2772,7 +2772,11 @@
     "profiles": "Profayiro",
     "paste": "Teeka",
     "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Ekisenge kino kyetaagibwa",
+      "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo"
+    }
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",

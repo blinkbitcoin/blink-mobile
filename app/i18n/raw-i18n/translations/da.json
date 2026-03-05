@@ -2775,7 +2775,11 @@
     "profiles": "Profiler",
     "paste": "Indsæt",
     "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen",
-    "save": "Gem"
+    "save": "Gem",
+    "validation": {
+      "required": "Dette felt er påkrævet",
+      "minChars": "Skal være mindst {min} tegn"
+    }
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",

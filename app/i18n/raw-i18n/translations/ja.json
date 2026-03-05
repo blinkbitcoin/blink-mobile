@@ -2789,7 +2789,11 @@
         "support": "サポート",
         "profiles": "プロフィール",
         "paste": "貼り付け",
-        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました"
+        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました",
+        "validation": {
+            "required": "この項目は必須です",
+            "minChars": "{min}文字以上で入力してください"
+        }
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",

@@ -2789,7 +2789,11 @@
     "profiles": "Profili",
     "paste": "Zalijepi",
     "hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik",
-    "save": "Spremi"
+    "save": "Spremi",
+    "validation": {
+      "required": "Ovo polje je obavezno",
+      "minChars": "Mora imati najmanje {min} znakova"
+    }
   },
   "errors": {
     "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",

@@ -2813,7 +2813,11 @@
     "profiles": "Iiprofayili",
     "paste": "Ncamathisela",
     "hasBeenCopiedToClipboard": "{type: string} ikopishwe kwibhodi eqhotyoshwayo",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Le ndawo iyafuneka",
+      "minChars": "Kufuneka ibe nobuncinane {min} oonobumba"
+    }
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",

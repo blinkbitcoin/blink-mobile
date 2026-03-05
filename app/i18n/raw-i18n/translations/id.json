@@ -2772,7 +2772,11 @@
     "profiles": "Profil",
     "paste": "Tempel",
     "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip",
-    "save": "Simpan"
+    "save": "Simpan",
+    "validation": {
+      "required": "Bidang ini wajib diisi",
+      "minChars": "Harus minimal {min} karakter"
+    }
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",

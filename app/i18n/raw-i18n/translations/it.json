@@ -2772,7 +2772,11 @@
         "support": "Supporto",
         "profiles": "Profili",
         "paste": "Incolla",
-        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti"
+        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti",
+        "validation": {
+            "required": "Questo campo è obbligatorio",
+            "minChars": "Deve contenere almeno {min} caratteri"
+        }
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",

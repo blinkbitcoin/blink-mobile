@@ -2772,7 +2772,11 @@
         "support": "Suporte",
         "profiles": "Perfis",
         "paste": "Colar",
-        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência"
+        "hasBeenCopiedToClipboard": "{type: string} foi copiado para a área de transferência",
+        "validation": {
+            "required": "Este campo é obrigatório",
+            "minChars": "Deve ter pelo menos {min} caracteres"
+        }
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",

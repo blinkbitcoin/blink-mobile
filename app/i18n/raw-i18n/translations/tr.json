@@ -2772,7 +2772,11 @@
     "profiles": "Profiller",
     "paste": "Yapıştır",
     "hasBeenCopiedToClipboard": "{type: string} panoya kopyalandı",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "validation": {
+      "required": "Bu alan zorunludur",
+      "minChars": "En az {min} karakter olmalıdır"
+    }
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",

@@ -2789,7 +2789,11 @@
     "profiles": "โปรไฟล์",
     "paste": "วาง",
     "hasBeenCopiedToClipboard": "คัดลอก {type: string} ไปยังคลิปบอร์ดแล้ว",
-    "save": "บันทึก"
+    "save": "บันทึก",
+    "validation": {
+      "required": "จำเป็นต้องกรอกข้อมูลนี้",
+      "minChars": "ต้องมีอย่างน้อย {min} ตัวอักษร"
+    }
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",

@@ -2772,7 +2772,11 @@
     "profiles": "Profiluri",
     "paste": "Lipire",
     "hasBeenCopiedToClipboard": "{type: string} a fost copiat în clipboard",
-    "save": "Salvează"
+    "save": "Salvează",
+    "validation": {
+      "required": "Acest câmp este obligatoriu",
+      "minChars": "Trebuie să aibă cel puțin {min} caractere"
+    }
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",

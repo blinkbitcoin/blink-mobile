@@ -2772,7 +2772,11 @@
     "profiles": "Perfils",
     "paste": "Enganxa",
     "hasBeenCopiedToClipboard": "{type: string} s'ha copiat al porta-retalls",
-    "save": "Desa"
+    "save": "Desa",
+    "validation": {
+      "required": "Aquest camp és obligatori",
+      "minChars": "Ha de tenir almenys {min} caràcters"
+    }
   },
   "errors": {
     "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",

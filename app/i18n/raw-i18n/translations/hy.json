@@ -2789,7 +2789,11 @@
     "profiles": "Պրոֆիլներ",
     "paste": "Տեղադրել",
     "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում",
-    "save": "Պահպանել"
+    "save": "Պահպանել",
+    "validation": {
+      "required": "Այս դաշտը պարտադիր է",
+      "minChars": "Պետք է լինի առնվազն {min} նիշ"
+    }
   },
   "errors": {
     "generic": "Սխալ\nՓորձեք կրկին ավելի ուշ։ ",

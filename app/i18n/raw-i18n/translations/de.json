@@ -2772,7 +2772,11 @@
         "support": "Support",
         "profiles": "Profile",
         "paste": "Einfügen",
-        "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert"
+        "hasBeenCopiedToClipboard": "{type: string} wurde in die Zwischenablage kopiert",
+        "validation": {
+            "required": "Dieses Feld ist erforderlich",
+            "minChars": "Muss mindestens {min} Zeichen lang sein"
+        }
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",

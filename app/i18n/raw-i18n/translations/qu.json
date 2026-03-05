@@ -2789,7 +2789,11 @@
     "profiles": "Perfilkuna",
     "paste": "P'itiy",
     "hasBeenCopiedToClipboard": "{type: string} clipboard nisqaman churasqa kachkan",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Kay qillqana kiti rurananchikpaqmi",
+      "minChars": "{min} sanampakama kanan"
+    }
   },
   "errors": {
     "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",
