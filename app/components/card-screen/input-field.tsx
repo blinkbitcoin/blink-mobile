@@ -108,7 +108,7 @@ export const InputField: React.FC<InputFieldProps> = ({
               onChangeText?.(text)
             }}
             placeholder={placeholder ?? label}
-            placeholderTextColor={colors.grey2}
+            placeholderTextColor={colors.grey3}
             selectionColor={colors.primary}
             accessibilityLabel={label}
             keyboardType={keyboardType}
