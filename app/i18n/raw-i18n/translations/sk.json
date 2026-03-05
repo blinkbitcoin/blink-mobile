@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Dátum narodenia",
       "contactInformation": "Kontaktné informácie",
       "registeredAddress": "Registrovaná adresa",
-      "shippingAddress": "Dodacia adresa"
+      "shippingAddress": "Dodacia adresa",
+      "kycPendingTitle": "Overenie KYC čaká na spracovanie",
+      "kycPendingDescription": "Vaše overenie KYC sa spracúva. Môže to chvíľu trvať.",
+      "kycDeclinedTitle": "Overenie KYC zamietnuté",
+      "kycDeclinedDescription": "Vaše overenie KYC bolo zamietnuté. Pre viac informácií kontaktujte podporu.",
+      "kycNotStartedTitle": "Dokončite overenie KYC",
+      "kycNotStartedDescription": "Dokončite proces overenia KYC na odomknutie všetkých funkcií karty.",
+      "kycAwaitingInputTitle": "Pokračujte v overení KYC",
+      "kycAwaitingInputDescription": "Na dokončenie overenia KYC sú potrebné ďalšie informácie.",
+      "kycErrorTitle": "Chyba overenia",
+      "kycErrorDescription": "Počas overenia sa vyskytla chyba. Skúste to znova alebo kontaktujte podporu.",
+      "kycUnderReviewTitle": "KYC v preskúmaní",
+      "kycUnderReviewDescription": "Vaše overenie KYC je v manuálnom preskúmaní. Môže to chvíľu trvať."
     },
     "AddToMobileWallet": {
       "title": "Pridat do mobilnej penazenky",

@@ -3104,7 +3104,19 @@
       "dateOfBirth": "Fødselsdato",
       "contactInformation": "Kontaktoplysninger",
       "registeredAddress": "Registreret adresse",
-      "shippingAddress": "Leveringsadresse"
+      "shippingAddress": "Leveringsadresse",
+      "kycPendingTitle": "KYC-bekræftelse afventer",
+      "kycPendingDescription": "Din KYC-bekræftelse behandles. Det kan tage lidt tid.",
+      "kycDeclinedTitle": "KYC-bekræftelse afvist",
+      "kycDeclinedDescription": "Din KYC-bekræftelse blev afvist. Kontakt venligst support for mere information.",
+      "kycNotStartedTitle": "Gennemfør KYC-bekræftelse",
+      "kycNotStartedDescription": "Gennemfør KYC-bekræftelsesprocessen for at låse op for alle kortfunktioner.",
+      "kycAwaitingInputTitle": "Fortsæt KYC-bekræftelse",
+      "kycAwaitingInputDescription": "Yderligere oplysninger er nødvendige for at fuldføre din KYC-bekræftelse.",
+      "kycErrorTitle": "Bekræftelsesfejl",
+      "kycErrorDescription": "Der opstod en fejl under bekræftelsen. Prøv venligst igen eller kontakt support.",
+      "kycUnderReviewTitle": "KYC under gennemgang",
+      "kycUnderReviewDescription": "Din KYC-verifikation er under manuel gennemgang. Det kan tage lidt tid."
     },
     "AddToMobileWallet": {
       "title": "Tilfoej til mobil tegnebog",

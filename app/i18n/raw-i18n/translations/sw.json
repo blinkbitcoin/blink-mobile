@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Tarehe ya kuzaliwa",
       "contactInformation": "Maelezo ya mawasiliano",
       "registeredAddress": "Anwani iliyosajiliwa",
-      "shippingAddress": "Anwani ya usafirishaji"
+      "shippingAddress": "Anwani ya usafirishaji",
+      "kycPendingTitle": "Uthibitishaji wa KYC unasubiri",
+      "kycPendingDescription": "Uthibitishaji wako wa KYC unashughulikiwa. Hii inaweza kuchukua muda.",
+      "kycDeclinedTitle": "Uthibitishaji wa KYC umekataliwa",
+      "kycDeclinedDescription": "Uthibitishaji wako wa KYC umekataliwa. Tafadhali wasiliana na msaada kwa maelezo zaidi.",
+      "kycNotStartedTitle": "Kamilisha uthibitishaji wa KYC",
+      "kycNotStartedDescription": "Kamilisha mchakato wa uthibitishaji wa KYC ili kufungua vipengele vyote vya kadi.",
+      "kycAwaitingInputTitle": "Endelea na uthibitishaji wa KYC",
+      "kycAwaitingInputDescription": "Maelezo ya ziada yanahitajika kukamilisha uthibitishaji wako wa KYC.",
+      "kycErrorTitle": "Hitilafu ya uthibitishaji",
+      "kycErrorDescription": "Hitilafu ilitokea wakati wa uthibitishaji. Tafadhali jaribu tena au wasiliana na msaada.",
+      "kycUnderReviewTitle": "KYC inakaguliwa",
+      "kycUnderReviewDescription": "Uthibitishaji wako wa KYC unakaguliwa kwa mikono. Hii inaweza kuchukua muda."
     },
     "AddToMobileWallet": {
       "title": "Ongeza kwenye pochi ya simu",

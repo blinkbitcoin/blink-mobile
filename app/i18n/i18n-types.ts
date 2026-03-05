@@ -10149,6 +10149,54 @@ type RootTranslation = {
 			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
 			 */
 			shippingAddress: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​p​e​n​d​i​n​g
+			 */
+			kycPendingTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​i​s​ ​b​e​i​n​g​ ​p​r​o​c​e​s​s​e​d​.​ ​T​h​i​s​ ​m​a​y​ ​t​a​k​e​ ​s​o​m​e​ ​t​i​m​e​.
+			 */
+			kycPendingDescription: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​d​e​c​l​i​n​e​d
+			 */
+			kycDeclinedTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​w​a​s​ ​d​e​c​l​i​n​e​d​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​m​o​r​e​ ​i​n​f​o​r​m​a​t​i​o​n​.
+			 */
+			kycDeclinedDescription: string
+			/**
+			 * C​o​m​p​l​e​t​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycNotStartedTitle: string
+			/**
+			 * C​o​m​p​l​e​t​e​ ​t​h​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​p​r​o​c​e​s​s​ ​t​o​ ​u​n​l​o​c​k​ ​a​l​l​ ​c​a​r​d​ ​f​e​a​t​u​r​e​s​.
+			 */
+			kycNotStartedDescription: string
+			/**
+			 * C​o​n​t​i​n​u​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycAwaitingInputTitle: string
+			/**
+			 * A​d​d​i​t​i​o​n​a​l​ ​i​n​f​o​r​m​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​o​m​p​l​e​t​e​ ​y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​.
+			 */
+			kycAwaitingInputDescription: string
+			/**
+			 * K​Y​C​ ​u​n​d​e​r​ ​r​e​v​i​e​w
+			 */
+			kycUnderReviewTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​i​s​ ​u​n​d​e​r​ ​m​a​n​u​a​l​ ​r​e​v​i​e​w​.​ ​T​h​i​s​ ​m​a​y​ ​t​a​k​e​ ​s​o​m​e​ ​t​i​m​e​.
+			 */
+			kycUnderReviewDescription: string
+			/**
+			 * V​e​r​i​f​i​c​a​t​i​o​n​ ​e​r​r​o​r
+			 */
+			kycErrorTitle: string
+			/**
+			 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​d​u​r​i​n​g​ ​v​e​r​i​f​i​c​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​.
+			 */
+			kycErrorDescription: string
 		}
 		AddToMobileWallet: {
 			/**
@@ -20824,6 +20872,54 @@ export type TranslationFunctions = {
 			 * Shipping address
 			 */
 			shippingAddress: () => LocalizedString
+			/**
+			 * KYC verification pending
+			 */
+			kycPendingTitle: () => LocalizedString
+			/**
+			 * Your KYC verification is being processed. This may take some time.
+			 */
+			kycPendingDescription: () => LocalizedString
+			/**
+			 * KYC verification declined
+			 */
+			kycDeclinedTitle: () => LocalizedString
+			/**
+			 * Your KYC verification was declined. Please contact support for more information.
+			 */
+			kycDeclinedDescription: () => LocalizedString
+			/**
+			 * Complete KYC verification
+			 */
+			kycNotStartedTitle: () => LocalizedString
+			/**
+			 * Complete the KYC verification process to unlock all card features.
+			 */
+			kycNotStartedDescription: () => LocalizedString
+			/**
+			 * Continue KYC verification
+			 */
+			kycAwaitingInputTitle: () => LocalizedString
+			/**
+			 * Additional information is required to complete your KYC verification.
+			 */
+			kycAwaitingInputDescription: () => LocalizedString
+			/**
+			 * KYC under review
+			 */
+			kycUnderReviewTitle: () => LocalizedString
+			/**
+			 * Your KYC verification is under manual review. This may take some time.
+			 */
+			kycUnderReviewDescription: () => LocalizedString
+			/**
+			 * Verification error
+			 */
+			kycErrorTitle: () => LocalizedString
+			/**
+			 * An error occurred during verification. Please try again or contact support.
+			 */
+			kycErrorDescription: () => LocalizedString
 		}
 		AddToMobileWallet: {
 			/**
