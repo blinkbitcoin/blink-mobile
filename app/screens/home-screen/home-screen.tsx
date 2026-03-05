@@ -41,7 +41,6 @@ import {
   useAutoShowUpgradeModal,
   useTransactionSeenState,
 } from "@app/hooks"
-import { BODY_PADDING } from "@app/config"
 import {
   AccountLevel,
   TransactionFragment,
@@ -567,7 +566,7 @@ export const HomeScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   scrollViewContainer: {
-    paddingHorizontal: BODY_PADDING,
+    paddingHorizontal: 20,
     paddingBottom: 20,
     rowGap: 20,
   },
@@ -605,7 +604,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.white,
     height: "30%",
     justifyContent: "flex-end",
-    paddingHorizontal: BODY_PADDING,
+    paddingHorizontal: 20,
   },
   openWalletContainer: {
     alignSelf: "stretch",
