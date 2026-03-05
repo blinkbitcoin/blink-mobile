@@ -2703,8 +2703,8 @@
     "csvExport": "Դուրս բերել գործառնությունները որպես CSV",
     "date": "Տարեթիվ",
     "description": "Տվյալ",
-    "discard": "Discard",
-    "discardChangesMessage": "You have unsaved changes. Are you sure you want to discard them?",
+    "discard": "Չեղարկել",
+    "discardChangesMessage": "Դուք ունեք չպահված փոփոխություններ։ Վստա՞հ եք, որ ցանկանում եք չեղարկել դրանք։",
     "domain": "Տիրույթ",
     "email": "էլ․ հասցե",
     "error": "Սխալ",
@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Այս դաշտը պարտադիր է",
       "minChars": "Պետք է լինի առնվազն {min} նիշ",
-      "invalidPostalCode": "Invalid postal code"
+      "invalidPostalCode": "Անվավեր փոստային կոդ"
     }
   },
   "errors": {
