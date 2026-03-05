@@ -16,17 +16,12 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+const mockUseShippingAddressData = jest.fn()
+jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
+  useShippingAddressData: () => mockUseShippingAddressData(),
+}))
+
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_SHIPPING_ADDRESS: {
-    firstName: "Joe",
-    lastName: "Nakamoto",
-    line1: "Address line 1",
-    line2: "Address line 2",
-    city: "New York",
-    region: "NY",
-    postalCode: "10001",
-    countryCode: "USA",
-  },
   US_STATES: [
     { value: "NY", label: "New York" },
     { value: "CA", label: "California" },
@@ -37,12 +32,81 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   ],
 }))
 
+const mockAddress = {
+  firstName: "Joe",
+  lastName: "Nakamoto",
+  line1: "Address line 1",
+  line2: "Address line 2",
+  city: "New York",
+  region: "NY",
+  postalCode: "10001",
+  countryCode: "USA",
+}
+
 describe("CardShippingAddressScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockNavigate.mockClear()
-    mockGoBack.mockClear()
+    mockUseShippingAddressData.mockReturnValue({
+      initialAddress: mockAddress,
+      loading: false,
+    })
+  })
+
+  describe("loading state", () => {
+    it("shows activity indicator while loading", async () => {
+      mockUseShippingAddressData.mockReturnValue({
+        initialAddress: null,
+        loading: true,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+    })
+
+    it("does not show form while loading", async () => {
+      mockUseShippingAddressData.mockReturnValue({
+        initialAddress: null,
+        loading: true,
+      })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Important")).toBeNull()
+    })
+  })
+
+  describe("empty state", () => {
+    it("renders empty form when no shipping address exists", async () => {
+      mockUseShippingAddressData.mockReturnValue({
+        initialAddress: null,
+        loading: false,
+      })
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("First name")).toBeTruthy()
+      expect(getByText("Important")).toBeTruthy()
+    })
   })
 
   describe("rendering", () => {
