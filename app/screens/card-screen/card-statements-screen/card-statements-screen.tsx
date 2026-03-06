@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react"
 import { View } from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
@@ -24,9 +24,6 @@ import {
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
 
   const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
@@ -53,10 +50,6 @@ export const CardStatementsScreen: React.FC = () => {
    *   console.log("Download all statements")
    * }
    */
-
-  const handleContactSupport = () => {
-    console.log("Contact support")
-  }
 
   return (
     <Screen preset="scroll">
@@ -171,10 +164,7 @@ export const CardStatementsScreen: React.FC = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.support()}</Text>
-          <ContactSupportRow
-            onPress={handleContactSupport}
-            rightIconColor={colors.black}
-          />
+          <ContactSupportRow />
         </View>
       </View>
     </Screen>
