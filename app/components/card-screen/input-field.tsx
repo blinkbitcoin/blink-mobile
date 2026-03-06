@@ -163,13 +163,13 @@ export const InputField: React.FC<InputFieldProps> = ({
             rightIconElement
           )}
         </View>
-        {displayHelperText ? (
-          <Text style={[styles.helperText, isError && styles.helperTextError]}>
-            {displayHelperText}
-          </Text>
-        ) : (
-          <View style={styles.helperTextSpacer} />
-        )}
+        <View style={styles.helperTextContainer}>
+          {displayHelperText ? (
+            <Text style={[styles.helperText, isError && styles.helperTextError]}>
+              {displayHelperText}
+            </Text>
+          ) : null}
+        </View>
       </View>
     )
   }
@@ -256,8 +256,8 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     helperTextError: {
       color: colors.error,
     },
-    helperTextSpacer: {
-      height: 13,
+    helperTextContainer: {
+      minHeight: 13,
     },
   }
 })

@@ -15,7 +15,7 @@ jest.mock("@rn-vui/themed", () => ({
     editableInput: {},
     helperText: {},
     helperTextError: {},
-    helperTextSpacer: { height: 13 },
+    helperTextContainer: { minHeight: 13 },
   }),
   useTheme: () => ({
     theme: {
@@ -172,11 +172,11 @@ describe("InputField", () => {
       expect(getByText("Max $10,000 per day")).toBeTruthy()
     })
 
-    it("renders spacer view when no helper text provided", () => {
+    it("reserves space for helper text when none provided", () => {
       const { toJSON } = render(<InputField label="Amount" value="100" editable />)
       const tree = JSON.stringify(toJSON())
 
-      expect(tree).toContain('"height":13')
+      expect(tree).toContain('"minHeight":13')
       expect(tree).not.toContain("Max $10,000 per day")
     })
   })
