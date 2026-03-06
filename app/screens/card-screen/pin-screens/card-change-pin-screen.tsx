@@ -7,7 +7,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 
 import { CardPinLayout } from "./card-pin-layout"
-import { usePinFlow } from "./use-pin-flow"
+import { usePinFlow } from "./hooks/use-pin-flow"
 import { MOCK_CARD_PIN } from "../card-mock-data"
 
 const Step = {
