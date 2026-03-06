@@ -2703,6 +2703,8 @@
     "csvExport": "Извоз трансакција као „CSV“",
     "date": "Датум",
     "description": "Опис",
+    "discard": "Одбаци",
+    "discardChangesMessage": "Имате несачуване промене. Да ли сте сигурни да желите да их одбаците?",
     "domain": "Домен",
     "email": "Имејл",
     "error": "Грешка",
@@ -2789,7 +2791,12 @@
     "profiles": "Профили",
     "paste": "Налепи",
     "hasBeenCopiedToClipboard": "{type: string} је копиран/а у клипборд",
-    "save": "Сачувај"
+    "save": "Сачувај",
+    "validation": {
+      "required": "Ово поље је обавезно",
+      "minChars": "Мора имати најмање {min} знакова",
+      "invalidPostalCode": "Неважећи поштански број"
+    }
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -3166,7 +3173,8 @@
     },
     "ShippingAddress": {
       "title": "Адреса за испоруку",
-      "fullName": "Пуно име",
+      "firstName": "Име",
+      "lastName": "Презиме",
       "addressLine1": "Адреса ред 1",
       "addressLine2": "Адреса ред 2",
       "city": "Град",

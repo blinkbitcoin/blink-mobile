@@ -2786,6 +2786,8 @@ const en: BaseTranslation = {
     csvExport: "Export all transactions",
     date: "Date",
     description: "Description",
+    discard: "Discard",
+    discardChangesMessage: "You have unsaved changes. Are you sure you want to discard them?",
     domain: "Domain",
     email: "Email",
     error: "Error",
@@ -2875,6 +2877,11 @@ const en: BaseTranslation = {
     paste: "Paste",
     copied: "Copied to clipboard",
     hasBeenCopiedToClipboard: "{type: string} has been copied to clipboard",
+    validation: {
+      required: "This field is required",
+      minChars: "Must be at least {min:number} characters",
+      invalidPostalCode: "Invalid postal code",
+    },
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -3240,7 +3247,8 @@ const en: BaseTranslation = {
     },
     ShippingAddress: {
       title: "Shipping address",
-      fullName: "Full name",
+      firstName: "First name",
+      lastName: "Last name",
       addressLine1: "Address line 1",
       addressLine2: "Address line 2",
       city: "City",

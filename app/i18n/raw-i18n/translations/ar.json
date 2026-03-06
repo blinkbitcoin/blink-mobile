@@ -2703,6 +2703,8 @@
     "csvExport": "تصدير المُعاملات كملف CSV",
     "date": "تاريخ",
     "description": "وصف",
+    "discard": "تجاهل",
+    "discardChangesMessage": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟",
     "domain": "موقع ويب",
     "email": "عنوان البريد الالكتروني ",
     "error": "خطأ",
@@ -2789,7 +2791,12 @@
     "profiles": "الملفات الشخصية",
     "paste": "لصق",
     "hasBeenCopiedToClipboard": "تم نسخ {type: string} إلى الحافظة",
-    "save": "حفظ"
+    "save": "حفظ",
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "minChars": "يجب أن يكون {min} أحرف على الأقل",
+      "invalidPostalCode": "رمز بريدي غير صالح"
+    }
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -3166,7 +3173,8 @@
     },
     "ShippingAddress": {
       "title": "عنوان الشحن",
-      "fullName": "الاسم الكامل",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
       "addressLine1": "سطر العنوان 1",
       "addressLine2": "سطر العنوان 2",
       "city": "المدينة",

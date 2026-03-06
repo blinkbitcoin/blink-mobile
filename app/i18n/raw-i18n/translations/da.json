@@ -2689,6 +2689,8 @@
     "csvExport": "Eksportér transaktioner som CSV",
     "date": "Dato",
     "description": "Beskrivelse",
+    "discard": "Kassér",
+    "discardChangesMessage": "Du har ikke-gemte ændringer. Er du sikker på, at du vil kassere dem?",
     "domain": "Domæne",
     "email": "Email",
     "error": "Fejl",
@@ -2775,7 +2777,12 @@
     "profiles": "Profiler",
     "paste": "Indsæt",
     "hasBeenCopiedToClipboard": "{type: string} blev kopieret til udklipsholderen",
-    "save": "Gem"
+    "save": "Gem",
+    "validation": {
+      "required": "Dette felt er påkrævet",
+      "minChars": "Skal være mindst {min} tegn",
+      "invalidPostalCode": "Ugyldigt postnummer"
+    }
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",
@@ -3146,7 +3153,8 @@
     },
     "ShippingAddress": {
       "title": "Leveringsadresse",
-      "fullName": "Fulde navn",
+      "firstName": "Fornavn",
+      "lastName": "Efternavn",
       "addressLine1": "Adresselinje 1",
       "addressLine2": "Adresselinje 2",
       "city": "By",

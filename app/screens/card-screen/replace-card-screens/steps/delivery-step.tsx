@@ -15,7 +15,9 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { MOCK_USER, ShippingAddress, shippingAddressToLines } from "../../card-mock-data"
+import { MOCK_USER } from "../../card-mock-data"
+import { ShippingAddress } from "../../types"
+import { addressToLines } from "../../utils"
 import { useSharedStepStyles } from "./shared-styles"
 import { Delivery, DeliveryType } from "./types"
 
@@ -102,7 +104,7 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
       <View style={sharedStyles.section}>
         <Text style={sharedStyles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
         <MultiLineField
-          lines={shippingAddressToLines(currentAddress, false)}
+          lines={addressToLines(currentAddress, false)}
           leftIcon="map-pin"
         />
       </View>

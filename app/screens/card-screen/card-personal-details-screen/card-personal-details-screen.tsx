@@ -1,15 +1,12 @@
 import React from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 
 import {
   AvatarInitial,
   ContactSupportRow,
   IconTextButton,
   InfoCard,
-  MultiLineField,
   InputField,
   SettingItemRow,
 } from "@app/components/card-screen"
@@ -17,14 +14,11 @@ import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { OnboardingStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-
 /*
  * TODO: uncomment and replace mock data with real API data
  * when dateOfBirth and registeredAddress are available via the API
  */
-// import { MOCK_USER, shippingAddressToLines } from "../card-mock-data"
-import { addressToLines } from "../utils"
+// import { MOCK_USER } from "../card-mock-data"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
 
@@ -34,7 +28,6 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const LLPersonalDetails = LL.CardFlow.PersonalDetails
 
   const {
@@ -44,7 +37,8 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     onboardingStatus,
     email,
     phone,
-    shippingAddress,
+    // TODO: uncomment when shipping address section is enabled
+    // shippingAddress,
     loading,
   } = usePersonalDetailsData()
 
@@ -64,9 +58,12 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     console.log("Change KYC information pressed")
   }
 
-  const handleEditShippingAddress = () => {
-    navigation.navigate("cardShippingAddressScreen")
-  }
+  /*
+   * TODO: uncomment when shipping address section is enabled
+   * const handleEditShippingAddress = () => {
+   *   navigation.navigate("cardShippingAddressScreen")
+   * }
+   */
 
   if (loading) {
     return (
@@ -136,23 +133,26 @@ export const CardPersonalDetailsScreen: React.FC = () => {
          * <View style={styles.section}>
          *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
          *   <MultiLineField
-         *     lines={shippingAddressToLines(MOCK_USER.registeredAddress)}
+         *     lines={addressToLines(MOCK_USER.registeredAddress)}
          *     leftIcon="map-pin"
          *   />
          * </View>
          */}
 
-        {shippingAddress && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{LLPersonalDetails.shippingAddress()}</Text>
-            <MultiLineField
-              lines={addressToLines(shippingAddress)}
-              leftIcon="map-pin"
-              rightIcon="pencil"
-              onPress={handleEditShippingAddress}
-            />
-          </View>
-        )}
+        {/*
+         * TODO: uncomment when shipping address section is enabled
+         * {shippingAddress && (
+         *   <View style={styles.section}>
+         *     <Text style={styles.sectionTitle}>{LLPersonalDetails.shippingAddress()}</Text>
+         *     <MultiLineField
+         *       lines={addressToLines(shippingAddress)}
+         *       leftIcon="map-pin"
+         *       rightIcon="pencil"
+         *       onPress={handleEditShippingAddress}
+         *     />
+         *   </View>
+         * )}
+         */}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.common.support()}</Text>

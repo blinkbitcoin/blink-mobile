@@ -18,13 +18,14 @@ jest.mock("@react-navigation/native", () => ({
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_USER: {
     registeredAddress: {
-      fullName: "Satoshi Nakamoto",
-      addressLine1: "123 Main Street",
-      addressLine2: "Apt 4B",
+      firstName: "Satoshi",
+      lastName: "Nakamoto",
+      line1: "123 Main Street",
+      line2: "Apt 4B",
       city: "New York",
-      state: "NY",
+      region: "NY",
       postalCode: "10001",
-      country: "United States",
+      countryCode: "USA",
     },
   },
 }))
@@ -58,13 +59,14 @@ describe("useOrderCardFlow", () => {
       const { result } = renderHook(() => useOrderCardFlow())
 
       expect(result.current.state.customAddress).toEqual({
-        fullName: "Satoshi Nakamoto",
-        addressLine1: "123 Main Street",
-        addressLine2: "Apt 4B",
+        firstName: "Satoshi",
+        lastName: "Nakamoto",
+        line1: "123 Main Street",
+        line2: "Apt 4B",
         city: "New York",
-        state: "NY",
+        region: "NY",
         postalCode: "10001",
-        country: "United States",
+        countryCode: "USA",
       })
     })
   })
@@ -100,13 +102,14 @@ describe("useOrderCardFlow", () => {
       const { result } = renderHook(() => useOrderCardFlow())
 
       const newAddress = {
-        fullName: "Joe Nakamoto",
-        addressLine1: "456 Oak Avenue",
-        addressLine2: "",
+        firstName: "Joe",
+        lastName: "Nakamoto",
+        line1: "456 Oak Avenue",
+        line2: "",
         city: "Austin",
-        state: "TX",
+        region: "TX",
         postalCode: "73301",
-        country: "United States",
+        countryCode: "USA",
       }
 
       act(() => {

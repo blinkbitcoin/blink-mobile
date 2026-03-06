@@ -2727,6 +2727,8 @@
     "csvExport": "Export transactions as CSV",
     "date": "Date",
     "description": "Description",
+    "discard": "Lahla",
+    "discardChangesMessage": "Unezinguquko ezingagcinwanga. Uqinisekile ukuba ufuna ukuzilahla?",
     "domain": "Domain",
     "email": "Email",
     "error": "Error",
@@ -2813,7 +2815,12 @@
     "profiles": "Iiprofayili",
     "paste": "Ncamathisela",
     "hasBeenCopiedToClipboard": "{type: string} ikopishwe kwibhodi eqhotyoshwayo",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Le ndawo iyafuneka",
+      "minChars": "Kufuneka ibe nobuncinane {min} oonobumba",
+      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni"
+    }
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",
@@ -3175,7 +3182,8 @@
     },
     "ShippingAddress": {
       "title": "Shipping address",
-      "fullName": "Full name",
+      "firstName": "Igama lokuqala",
+      "lastName": "Ifani",
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",

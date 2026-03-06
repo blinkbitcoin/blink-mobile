@@ -2703,6 +2703,8 @@
     "csvExport": "Izvoz transakcija kao CSV",
     "date": "Datum",
     "description": "Opis",
+    "discard": "Odbaci",
+    "discardChangesMessage": "Imate nespremljene promjene. Jeste li sigurni da ih želite odbaciti?",
     "domain": "Domena",
     "email": "Email",
     "error": "greška",
@@ -2789,7 +2791,12 @@
     "profiles": "Profili",
     "paste": "Zalijepi",
     "hasBeenCopiedToClipboard": "{type: string} kopirano je u međuspremnik",
-    "save": "Spremi"
+    "save": "Spremi",
+    "validation": {
+      "required": "Ovo polje je obavezno",
+      "minChars": "Mora imati najmanje {min} znakova",
+      "invalidPostalCode": "Nevažeći poštanski broj"
+    }
   },
   "errors": {
     "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",
@@ -3169,7 +3176,8 @@
     },
     "ShippingAddress": {
       "title": "Adresa za dostavu",
-      "fullName": "Puno ime",
+      "firstName": "Ime",
+      "lastName": "Prezime",
       "addressLine1": "Adresa redak 1",
       "addressLine2": "Adresa redak 2",
       "city": "Grad",

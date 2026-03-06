@@ -2686,6 +2686,8 @@
     "csvExport": "Ekspor transaksi sebagai CSV",
     "date": "Tanggal",
     "description": "Deskripsi",
+    "discard": "Buang",
+    "discardChangesMessage": "Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin membuangnya?",
     "domain": "Domain",
     "email": "Email",
     "error": "Kesalahan",
@@ -2772,7 +2774,12 @@
     "profiles": "Profil",
     "paste": "Tempel",
     "hasBeenCopiedToClipboard": "{type: string} telah disalin ke papan klip",
-    "save": "Simpan"
+    "save": "Simpan",
+    "validation": {
+      "required": "Bidang ini wajib diisi",
+      "minChars": "Harus minimal {min} karakter",
+      "invalidPostalCode": "Kode pos tidak valid"
+    }
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Alamat pengiriman",
-      "fullName": "Nama lengkap",
+      "firstName": "Nama depan",
+      "lastName": "Nama belakang",
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Kota",

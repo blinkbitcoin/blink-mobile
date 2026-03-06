@@ -2703,6 +2703,8 @@
     "csvExport": "Դուրս բերել գործառնությունները որպես CSV",
     "date": "Տարեթիվ",
     "description": "Տվյալ",
+    "discard": "Չեղարկել",
+    "discardChangesMessage": "Դուք ունեք չպահված փոփոխություններ։ Վստա՞հ եք, որ ցանկանում եք չեղարկել դրանք։",
     "domain": "Տիրույթ",
     "email": "էլ․ հասցե",
     "error": "Սխալ",
@@ -2789,7 +2791,12 @@
     "profiles": "Պրոֆիլներ",
     "paste": "Տեղադրել",
     "hasBeenCopiedToClipboard": "{type: string} պատճենվել է ժամանակավոր շտեմարանում",
-    "save": "Պահպանել"
+    "save": "Պահպանել",
+    "validation": {
+      "required": "Այս դաշտը պարտադիր է",
+      "minChars": "Պետք է լինի առնվազն {min} նիշ",
+      "invalidPostalCode": "Անվավեր փոստային կոդ"
+    }
   },
   "errors": {
     "generic": "Սխալ\nՓորձեք կրկին ավելի ուշ։ ",
@@ -3169,7 +3176,8 @@
     },
     "ShippingAddress": {
       "title": "Առաքման հասցե",
-      "fullName": "Ամբողջական անուն",
+      "firstName": "Անուն",
+      "lastName": "Ազգանուն",
       "addressLine1": "Հասցեի տող 1",
       "addressLine2": "Հասցեի տող 2",
       "city": "Քաղաք",

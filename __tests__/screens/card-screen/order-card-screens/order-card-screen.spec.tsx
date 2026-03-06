@@ -43,36 +43,48 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 jest.mock("@app/screens/card-screen/card-mock-data", () => ({
   MOCK_USER: {
     registeredAddress: {
-      fullName: "Satoshi Nakamoto",
-      addressLine1: "123 Main Street",
-      addressLine2: "Apt 4B",
+      firstName: "Satoshi",
+      lastName: "Nakamoto",
+      line1: "123 Main Street",
+      line2: "Apt 4B",
       city: "New York",
-      state: "NY",
+      region: "NY",
       postalCode: "10001",
-      country: "United States",
+      countryCode: "USA",
     },
   },
-  shippingAddressToLines: (
+}))
+
+jest.mock("@app/screens/card-screen/country-region-data", () => ({
+  COUNTRIES: [{ value: "USA", label: "United States" }],
+  getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
+}))
+
+jest.mock("@app/screens/card-screen/utils", () => ({
+  addressToLines: (
     address: {
-      addressLine1: string
-      addressLine2: string
+      firstName: string
+      lastName: string
+      line1: string
+      line2: string
       city: string
-      state: string
+      region: string
       postalCode: string
-      country: string
+      countryCode: string
     },
-    includeFullName: boolean,
+    includeFullName = true,
   ) => {
     const lines: string[] = []
-    if (includeFullName) lines.push("Satoshi Nakamoto")
-    lines.push(address.addressLine1)
-    if (address.addressLine2) lines.push(address.addressLine2)
-    lines.push(`${address.city}, ${address.state} ${address.postalCode}`)
-    lines.push(address.country)
+    if (includeFullName) {
+      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
+      if (name) lines.push(name)
+    }
+    lines.push(address.line1)
+    if (address.line2) lines.push(address.line2)
+    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
+    lines.push(address.countryCode)
     return lines
   },
-  US_STATES: [{ value: "NY", label: "New York" }],
-  COUNTRIES: [{ value: "USA", label: "United States" }],
 }))
 
 jest.mock("@app/utils/helper", () => ({

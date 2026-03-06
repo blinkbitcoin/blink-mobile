@@ -2686,6 +2686,8 @@
     "csvExport": "Exportovať transakcie do CSV",
     "date": "Dátum",
     "description": "Popis",
+    "discard": "Zahodiť",
+    "discardChangesMessage": "Máte neuložené zmeny. Ste si istí, že ich chcete zahodiť?",
     "domain": "Doména",
     "email": "E-mail",
     "error": "Chyba",
@@ -2772,7 +2774,12 @@
     "profiles": "Profily",
     "paste": "Prilepiť",
     "hasBeenCopiedToClipboard": "{type: string} bol skopírovaný do schránky",
-    "save": "Uložiť"
+    "save": "Uložiť",
+    "validation": {
+      "required": "Toto pole je povinné",
+      "minChars": "Musí obsahovať aspoň {min} znakov",
+      "invalidPostalCode": "Neplatné PSČ"
+    }
   },
   "errors": {
     "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Doručovacia adresa",
-      "fullName": "Celé meno",
+      "firstName": "Meno",
+      "lastName": "Priezvisko",
       "addressLine1": "Adresa riadok 1",
       "addressLine2": "Adresa riadok 2",
       "city": "Mesto",
