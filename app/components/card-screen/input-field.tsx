@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import {
   ActivityIndicator,
   KeyboardTypeOptions,
@@ -92,6 +92,9 @@ export const InputField: React.FC<InputFieldProps> = ({
   const [hasBlurred, setHasBlurred] = useState(false)
   const [hasTyped, setHasTyped] = useState(false)
 
+  const validateRef = useRef(validate)
+  validateRef.current = validate
+
   useEffect(() => {
     if (!isFocused && !disabled) {
       setInternalValue(value)
@@ -105,19 +108,9 @@ export const InputField: React.FC<InputFieldProps> = ({
     if (required && trimmed.length === 0) return LL.common.validation.required()
     if (minLength && trimmed.length > 0 && trimmed.length < minLength)
       return LL.common.validation.minChars({ min: minLength })
-    if (validate) return validate(trimmed)
+    if (validateRef.current) return validateRef.current(trimmed)
     return undefined
-  }, [
-    hasBlurred,
-    hasTyped,
-    isEditable,
-    internalValue,
-    value,
-    required,
-    minLength,
-    validate,
-    LL,
-  ])
+  }, [hasBlurred, hasTyped, isEditable, internalValue, value, required, minLength, LL])
 
   const displayHelperText = validationError ?? helperText
   const isError = Boolean(validationError) || error
