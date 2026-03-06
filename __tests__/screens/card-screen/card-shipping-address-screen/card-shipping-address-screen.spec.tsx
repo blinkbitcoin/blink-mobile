@@ -463,5 +463,72 @@ describe("CardShippingAddressScreen", () => {
         ]),
       )
     })
+
+    it("dispatches navigation action when pressing Discard", async () => {
+      const { getByDisplayValue } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.changeText(getByDisplayValue("Joe"), "Jane")
+      })
+
+      const beforeRemoveCalls = mockAddListener.mock.calls.filter(
+        (call) => call[0] === "beforeRemove",
+      )
+      const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
+
+      const mockAction = { type: "GO_BACK" }
+      const mockEvent = {
+        data: { action: mockAction },
+        preventDefault: jest.fn(),
+      }
+      beforeRemoveCallback(mockEvent)
+
+      const alertButtons = (Alert.alert as jest.Mock).mock.calls[0][2]
+      const discardButton = alertButtons.find(
+        (btn: { text: string }) => btn.text === "Discard",
+      )
+      discardButton.onPress()
+
+      expect(mockDispatch).toHaveBeenCalledWith(mockAction)
+    })
+
+    it("does not dispatch navigation action when pressing Cancel", async () => {
+      const { getByDisplayValue } = render(
+        <ContextForScreen>
+          <CardShippingAddressScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.changeText(getByDisplayValue("Joe"), "Jane")
+      })
+
+      const beforeRemoveCalls = mockAddListener.mock.calls.filter(
+        (call) => call[0] === "beforeRemove",
+      )
+      const beforeRemoveCallback = beforeRemoveCalls[beforeRemoveCalls.length - 1]![1]
+
+      const mockEvent = {
+        data: { action: { type: "GO_BACK" } },
+        preventDefault: jest.fn(),
+      }
+      beforeRemoveCallback(mockEvent)
+
+      const alertButtons = (Alert.alert as jest.Mock).mock.calls[0][2]
+      const cancelButton = alertButtons.find(
+        (btn: { text: string }) => btn.text === "Cancel",
+      )
+
+      expect(cancelButton.onPress).toBeUndefined()
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
   })
 })
