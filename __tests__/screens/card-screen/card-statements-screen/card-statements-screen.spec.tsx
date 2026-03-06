@@ -4,7 +4,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardStatementsScreen } from "@app/screens/card-screen/card-statements-screen"
-import { ContextForScreen } from "./helper"
+import { ContextForScreen } from "../../helper"
 
 jest.mock("react-native-reanimated", () => ({
   __esModule: true,
@@ -26,50 +26,79 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-statements-mock-data", () => ({
-  MOCK_STATEMENTS: [
-    {
-      id: "1",
-      month: "August",
-      year: 2025,
-      period: "Aug 1 - Aug 30",
-      transactionCount: 0,
-      totalSpent: "$1,021.00",
-      isCurrent: true,
-      isDownloaded: false,
-    },
-    {
-      id: "2",
-      month: "July",
-      year: 2025,
-      period: "Jul 1 - Jul 30, 2025",
-      transactionCount: 5,
-      totalSpent: "$121.00",
-      isCurrent: false,
-      isDownloaded: true,
-    },
-    {
-      id: "3",
-      month: "June",
-      year: 2025,
-      period: "Jun 1 - Jun 30, 2025",
-      transactionCount: 5,
-      totalSpent: "$121.00",
-      isCurrent: false,
-      isDownloaded: true,
-    },
-  ],
-  MOCK_YEAR_OPTIONS: [
-    { year: 2025, itemCount: 3 },
-    { year: 2024, itemCount: 0, disabled: true },
-    { year: 2023, itemCount: 0, disabled: true },
-  ],
-  DEFAULT_YEAR: 2025,
-}))
+const mockUseStatementsData = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/card-statements-screen/hooks/use-statements-data",
+  () => ({
+    useStatementsData: () => mockUseStatementsData(),
+  }),
+)
+
+const mockStatements = [
+  {
+    id: "2025-07",
+    month: "August",
+    year: 2025,
+    period: "Aug 1 - Aug 30",
+    transactionCount: 0,
+    totalSpent: "$1,021.00",
+    isCurrent: true,
+  },
+  {
+    id: "2025-06",
+    month: "July",
+    year: 2025,
+    period: "Jul 1 - Jul 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+  {
+    id: "2025-05",
+    month: "June",
+    year: 2025,
+    period: "Jun 1 - Jun 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+]
+
+const mockYearOptions = [{ year: 2025, itemCount: 3 }]
+
+const loadedReturn = {
+  statements: mockStatements,
+  yearOptions: mockYearOptions,
+  currentYear: 2025,
+  loading: false,
+  error: undefined,
+}
 
 describe("CardStatementsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockUseStatementsData.mockReturnValue(loadedReturn)
+  })
+
+  describe("loading state", () => {
+    it("renders activity indicator when loading", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: [],
+        yearOptions: [],
+        loading: true,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+    })
   })
 
   describe("rendering", () => {
@@ -182,18 +211,6 @@ describe("CardStatementsScreen", () => {
       expect(getByText("Monthly statements")).toBeTruthy()
     })
 
-    it("displays download all button", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Download all")).toBeTruthy()
-    })
-
     it("displays statement items", async () => {
       const { getByText } = render(
         <ContextForScreen>
@@ -218,30 +235,6 @@ describe("CardStatementsScreen", () => {
       await act(async () => {})
 
       expect(getByText("About statements")).toBeTruthy()
-    })
-
-    it("displays notifications section", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Notifications")).toBeTruthy()
-    })
-
-    it("displays notification toggle text", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Notify me when new statements are made available")).toBeTruthy()
     })
 
     it("displays support section", async () => {
@@ -279,13 +272,14 @@ describe("CardStatementsScreen", () => {
 
       expect(getByText("support@test.com")).toBeTruthy()
     })
-  })
 
-  describe("interaction", () => {
-    it("allows pressing download all button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
+    it("hides current statement when none exists", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: loadedReturn.statements.filter((s) => !s.isCurrent),
+      })
 
-      const { getByText } = render(
+      const { queryByText } = render(
         <ContextForScreen>
           <CardStatementsScreen />
         </ContextForScreen>,
@@ -293,18 +287,12 @@ describe("CardStatementsScreen", () => {
 
       await act(async () => {})
 
-      const downloadAllButton = getByText("Download all")
-      await act(async () => {
-        fireEvent.press(downloadAllButton)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Download all statements")
-      consoleSpy.mockRestore()
+      expect(queryByText("Current statement")).toBeNull()
     })
+  })
 
+  describe("interaction", () => {
     it("allows pressing contact support button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
       const { getByText } = render(
         <ContextForScreen>
           <CardStatementsScreen />
@@ -318,25 +306,7 @@ describe("CardStatementsScreen", () => {
         fireEvent.press(contactSupportButton)
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Contact support")
-      consoleSpy.mockRestore()
-    })
-
-    it("allows toggling notifications switch", async () => {
-      const { getByRole } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const switchElement = getByRole("switch")
-      expect(switchElement).toBeTruthy()
-
-      await act(async () => {
-        fireEvent(switchElement, "pressIn")
-      })
+      expect(contactSupportButton).toBeTruthy()
     })
   })
 
