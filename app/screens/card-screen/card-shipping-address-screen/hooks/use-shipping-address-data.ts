@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 
 import { usePersonalDetailsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -21,17 +21,14 @@ export const useShippingAddressData = () => {
   }, [error, LL])
 
   const shippingAddress = data?.me?.defaultAccount?.cards?.[0]?.shippingAddress
-  if (!shippingAddress)
+
+  const initialAddress = useMemo(() => {
+    if (!shippingAddress) return null
+
+    const { firstName, lastName, line1, line2, city, region, postalCode, countryCode } =
+      shippingAddress
+
     return {
-      initialAddress: null,
-      loading,
-    }
-
-  const { firstName, lastName, line1, line2, city, region, postalCode, countryCode } =
-    shippingAddress
-
-  return {
-    initialAddress: {
       firstName: firstName ?? "",
       lastName: lastName ?? "",
       line1,
@@ -40,7 +37,8 @@ export const useShippingAddressData = () => {
       region,
       postalCode,
       countryCode,
-    },
-    loading,
-  }
+    }
+  }, [shippingAddress])
+
+  return { initialAddress, loading }
 }
