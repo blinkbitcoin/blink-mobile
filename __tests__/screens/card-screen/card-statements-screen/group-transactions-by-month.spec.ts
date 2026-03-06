@@ -122,9 +122,7 @@ describe("groupTransactionsByMonth", () => {
       locale: "en",
     })
 
-    expect(result.statements[0].period).toBe(
-      `${monthLabel} 1 - ${monthLabel} ${lastDay}`,
-    )
+    expect(result.statements[0].period).toBe(`${monthLabel} 1 - ${monthLabel} ${lastDay}`)
   })
 
   it("derives year options with correct counts", () => {
