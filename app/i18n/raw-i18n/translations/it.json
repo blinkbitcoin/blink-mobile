@@ -3086,7 +3086,19 @@
             "dateOfBirth": "Data di nascita",
             "contactInformation": "Informazioni di contatto",
             "registeredAddress": "Indirizzo registrato",
-            "shippingAddress": "Indirizzo di spedizione"
+            "shippingAddress": "Indirizzo di spedizione",
+            "kycPendingTitle": "Verifica KYC in sospeso",
+            "kycPendingDescription": "La tua verifica KYC è in fase di elaborazione. Potrebbe richiedere del tempo.",
+            "kycDeclinedTitle": "Verifica KYC rifiutata",
+            "kycDeclinedDescription": "La tua verifica KYC è stata rifiutata. Contatta il supporto per maggiori informazioni.",
+            "kycNotStartedTitle": "Completa la verifica KYC",
+            "kycNotStartedDescription": "Completa il processo di verifica KYC per sbloccare tutte le funzionalità della carta.",
+            "kycAwaitingInputTitle": "Continua la verifica KYC",
+            "kycAwaitingInputDescription": "Sono necessarie informazioni aggiuntive per completare la verifica KYC.",
+            "kycErrorTitle": "Errore di verifica",
+            "kycErrorDescription": "Si è verificato un errore durante la verifica. Riprova o contatta il supporto.",
+            "kycUnderReviewTitle": "KYC in revisione",
+            "kycUnderReviewDescription": "La tua verifica KYC è in revisione manuale. Potrebbe richiedere del tempo."
         },
         "AddToMobileWallet": {
             "title": "Aggiungi al portafoglio mobile",

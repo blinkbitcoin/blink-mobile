@@ -3124,7 +3124,19 @@
       "dateOfBirth": "Ngày sinh",
       "contactInformation": "Thông tin liên hệ",
       "registeredAddress": "Địa chỉ đăng ký",
-      "shippingAddress": "Địa chỉ giao hàng"
+      "shippingAddress": "Địa chỉ giao hàng",
+      "kycPendingTitle": "Xác minh KYC đang chờ xử lý",
+      "kycPendingDescription": "Xác minh KYC của bạn đang được xử lý. Quá trình này có thể mất một chút thời gian.",
+      "kycDeclinedTitle": "Xác minh KYC bị từ chối",
+      "kycDeclinedDescription": "Xác minh KYC của bạn đã bị từ chối. Vui lòng liên hệ hỗ trợ để biết thêm thông tin.",
+      "kycNotStartedTitle": "Hoàn thành xác minh KYC",
+      "kycNotStartedDescription": "Hoàn thành quy trình xác minh KYC để mở khóa tất cả tính năng của thẻ.",
+      "kycAwaitingInputTitle": "Tiếp tục xác minh KYC",
+      "kycAwaitingInputDescription": "Cần thêm thông tin để hoàn thành xác minh KYC của bạn.",
+      "kycErrorTitle": "Lỗi xác minh",
+      "kycErrorDescription": "Đã xảy ra lỗi trong quá trình xác minh. Vui lòng thử lại hoặc liên hệ hỗ trợ.",
+      "kycUnderReviewTitle": "KYC đang được xem xét",
+      "kycUnderReviewDescription": "Xác minh KYC của bạn đang được xem xét thủ công. Quá trình này có thể mất một chút thời gian."
     },
     "AddToMobileWallet": {
       "title": "Them vao vi di dong",

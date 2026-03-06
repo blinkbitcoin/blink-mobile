@@ -3124,7 +3124,19 @@
       "dateOfBirth": "Paqarisqa p'unchay",
       "contactInformation": "Tinkuy willakuykuna",
       "registeredAddress": "Qillqasqa tiyana",
-      "shippingAddress": "Apachina tiyana"
+      "shippingAddress": "Apachina tiyana",
+      "kycPendingTitle": "KYC taripay suyachkan",
+      "kycPendingDescription": "KYC taripayki ruwakuchkan. Kayqa pachata hap'inman.",
+      "kycDeclinedTitle": "KYC taripay qhipachisqa",
+      "kycDeclinedDescription": "KYC taripayki qhipachisqa karqa. Yanapakuqwan rimanakuy astawan yachanaykipaq.",
+      "kycNotStartedTitle": "KYC taripayta tukuchiy",
+      "kycNotStartedDescription": "KYC taripay ñanta tukuchiy tukuy tarjeta ruwanakunata kichanaykipaq.",
+      "kycAwaitingInputTitle": "KYC taripayta qatiy",
+      "kycAwaitingInputDescription": "Astawan willakuykuna necesitakun KYC taripayta tukuchinaykipaq.",
+      "kycErrorTitle": "Taripay pantay",
+      "kycErrorDescription": "Huk pantay karqa taripay pachapi. Watiqmanta ruway utaq yanapakuqwan rimanakuy.",
+      "kycUnderReviewTitle": "KYC qhawasqa kachkan",
+      "kycUnderReviewDescription": "KYC chiqapchayniyqi makiwan qhawasqa kachkan. Kayqa tumpa pachata hap'inman."
     },
     "AddToMobileWallet": {
       "title": "Yapaykuy qullqi walitaman",

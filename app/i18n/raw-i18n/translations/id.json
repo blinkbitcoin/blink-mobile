@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Tanggal lahir",
       "contactInformation": "Informasi kontak",
       "registeredAddress": "Alamat terdaftar",
-      "shippingAddress": "Alamat pengiriman"
+      "shippingAddress": "Alamat pengiriman",
+      "kycPendingTitle": "Verifikasi KYC tertunda",
+      "kycPendingDescription": "Verifikasi KYC Anda sedang diproses. Ini mungkin memerlukan waktu.",
+      "kycDeclinedTitle": "Verifikasi KYC ditolak",
+      "kycDeclinedDescription": "Verifikasi KYC Anda ditolak. Silakan hubungi dukungan untuk informasi lebih lanjut.",
+      "kycNotStartedTitle": "Selesaikan verifikasi KYC",
+      "kycNotStartedDescription": "Selesaikan proses verifikasi KYC untuk membuka semua fitur kartu.",
+      "kycAwaitingInputTitle": "Lanjutkan verifikasi KYC",
+      "kycAwaitingInputDescription": "Informasi tambahan diperlukan untuk menyelesaikan verifikasi KYC Anda.",
+      "kycErrorTitle": "Kesalahan verifikasi",
+      "kycErrorDescription": "Terjadi kesalahan saat verifikasi. Silakan coba lagi atau hubungi dukungan.",
+      "kycUnderReviewTitle": "KYC dalam peninjauan",
+      "kycUnderReviewDescription": "Verifikasi KYC Anda sedang dalam peninjauan manual. Ini mungkin memerlukan waktu."
     },
     "AddToMobileWallet": {
       "title": "Tambahkan ke dompet seluler",

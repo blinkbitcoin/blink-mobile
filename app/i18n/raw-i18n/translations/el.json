@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Ημερομηνία γέννησης",
       "contactInformation": "Στοιχεία επικοινωνίας",
       "registeredAddress": "Καταχωρημένη διεύθυνση",
-      "shippingAddress": "Διεύθυνση αποστολής"
+      "shippingAddress": "Διεύθυνση αποστολής",
+      "kycPendingTitle": "Επαλήθευση KYC σε εκκρεμότητα",
+      "kycPendingDescription": "Η επαλήθευση KYC σας επεξεργάζεται. Αυτό μπορεί να πάρει λίγο χρόνο.",
+      "kycDeclinedTitle": "Η επαλήθευση KYC απορρίφθηκε",
+      "kycDeclinedDescription": "Η επαλήθευση KYC σας απορρίφθηκε. Επικοινωνήστε με την υποστήριξη για περισσότερες πληροφορίες.",
+      "kycNotStartedTitle": "Ολοκληρώστε την επαλήθευση KYC",
+      "kycNotStartedDescription": "Ολοκληρώστε τη διαδικασία επαλήθευσης KYC για να ξεκλειδώσετε όλες τις λειτουργίες της κάρτας.",
+      "kycAwaitingInputTitle": "Συνεχίστε την επαλήθευση KYC",
+      "kycAwaitingInputDescription": "Απαιτούνται πρόσθετες πληροφορίες για την ολοκλήρωση της επαλήθευσης KYC.",
+      "kycErrorTitle": "Σφάλμα επαλήθευσης",
+      "kycErrorDescription": "Παρουσιάστηκε σφάλμα κατά την επαλήθευση. Δοκιμάστε ξανά ή επικοινωνήστε με την υποστήριξη.",
+      "kycUnderReviewTitle": "KYC υπό εξέταση",
+      "kycUnderReviewDescription": "Η επαλήθευση KYC σας είναι υπό χειροκίνητη εξέταση. Αυτό μπορεί να πάρει λίγο χρόνο."
     },
     "AddToMobileWallet": {
       "title": "Prosthiki sto kinito portofoli",

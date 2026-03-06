@@ -3127,7 +3127,19 @@
       "dateOfBirth": "Datum narození",
       "contactInformation": "Kontaktní informace",
       "registeredAddress": "Registrovaná adresa",
-      "shippingAddress": "Dodací adresa"
+      "shippingAddress": "Dodací adresa",
+      "kycPendingTitle": "Ověření KYC čeká na vyřízení",
+      "kycPendingDescription": "Vaše ověření KYC se zpracovává. Může to chvíli trvat.",
+      "kycDeclinedTitle": "Ověření KYC zamítnuto",
+      "kycDeclinedDescription": "Vaše ověření KYC bylo zamítnuto. Pro více informací kontaktujte podporu.",
+      "kycNotStartedTitle": "Dokončete ověření KYC",
+      "kycNotStartedDescription": "Dokončete proces ověření KYC pro odemknutí všech funkcí karty.",
+      "kycAwaitingInputTitle": "Pokračujte v ověření KYC",
+      "kycAwaitingInputDescription": "K dokončení ověření KYC jsou potřeba další informace.",
+      "kycErrorTitle": "Chyba ověření",
+      "kycErrorDescription": "Při ověřování došlo k chybě. Zkuste to prosím znovu nebo kontaktujte podporu.",
+      "kycUnderReviewTitle": "KYC v přezkoumání",
+      "kycUnderReviewDescription": "Vaše ověření KYC je v manuálním přezkoumání. Může to chvíli trvat."
     },
     "AddToMobileWallet": {
       "title": "Pridat do mobilni penezenky",
