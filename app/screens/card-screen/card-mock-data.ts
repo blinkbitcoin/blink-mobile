@@ -1,3 +1,5 @@
+import { ShippingAddress } from "./types"
+
 export const CardStatus = {
   Active: "active",
   Frozen: "frozen",
@@ -30,17 +32,6 @@ export const MOCK_CARD: CardInfo = {
   network: "Visa",
 }
 
-export type ShippingAddress = {
-  firstName: string
-  lastName: string
-  line1: string
-  line2: string
-  city: string
-  region: string
-  postalCode: string
-  countryCode: string
-}
-
 export type UserInfo = {
   dateOfBirth: string
   registeredAddress: ShippingAddress
@@ -69,11 +60,6 @@ export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
   region: "NY",
   postalCode: "10001",
   countryCode: "USA",
-}
-
-export type SelectionOption = {
-  value: string
-  label: string
 }
 
 export const MOCK_CARD_PIN = "1234"

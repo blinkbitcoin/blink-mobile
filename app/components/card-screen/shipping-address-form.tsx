@@ -7,7 +7,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 import { validatePOBox, validatePostalCode } from "@app/screens/card-screen/utils"
 import {
   COUNTRIES,

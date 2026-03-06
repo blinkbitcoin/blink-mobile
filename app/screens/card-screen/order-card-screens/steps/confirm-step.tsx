@@ -8,7 +8,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import { ShippingAddress } from "../../card-mock-data"
+import { ShippingAddress } from "../../types"
 import { addressToLines } from "../../utils"
 import { Delivery, DeliveryType } from "../../replace-card-screens/steps/types"
 import { useSharedStepStyles } from "./shared-styles"

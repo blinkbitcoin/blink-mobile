@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   ActivityIndicator,
   KeyboardTypeOptions,
@@ -98,7 +98,7 @@ export const InputField: React.FC<InputFieldProps> = ({
     }
   }, [value, isFocused, disabled])
 
-  const validationError = (() => {
+  const validationError = useMemo(() => {
     if (!hasBlurred && !hasTyped) return undefined
 
     const trimmed = (isEditable ? internalValue : value).trim()
@@ -107,7 +107,17 @@ export const InputField: React.FC<InputFieldProps> = ({
       return LL.common.validation.minChars({ min: minLength })
     if (validate) return validate(trimmed)
     return undefined
-  })()
+  }, [
+    hasBlurred,
+    hasTyped,
+    isEditable,
+    internalValue,
+    value,
+    required,
+    minLength,
+    validate,
+    LL,
+  ])
 
   const displayHelperText = validationError ?? helperText
   const isError = Boolean(validationError) || error
@@ -153,9 +163,13 @@ export const InputField: React.FC<InputFieldProps> = ({
             rightIconElement
           )}
         </View>
-        <Text style={[styles.helperText, isError && styles.helperTextError]}>
-          {displayHelperText || " "}
-        </Text>
+        {displayHelperText ? (
+          <Text style={[styles.helperText, isError && styles.helperTextError]}>
+            {displayHelperText}
+          </Text>
+        ) : (
+          <View style={styles.helperTextSpacer} />
+        )}
       </View>
     )
   }
@@ -241,6 +255,9 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     helperTextError: {
       color: colors.error,
+    },
+    helperTextSpacer: {
+      height: 13,
     },
   }
 })

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { ActivityIndicator, Alert, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -7,7 +7,7 @@ import { InfoCard, ShippingAddressForm } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import { ShippingAddress } from "../card-mock-data"
+import { ShippingAddress } from "../types"
 import { useShippingAddressData } from "./hooks"
 
 const EMPTY_ADDRESS: ShippingAddress = {
@@ -40,7 +40,10 @@ export const CardShippingAddressScreen: React.FC = () => {
     }
   }, [initialAddress])
 
-  const isDirty = JSON.stringify(address) !== JSON.stringify(savedAddressRef.current)
+  const isDirty = useMemo(
+    () => JSON.stringify(address) !== JSON.stringify(savedAddressRef.current),
+    [address],
+  )
 
   useEffect(() => {
     return navigation.addListener("beforeRemove", (e) => {
@@ -81,11 +84,7 @@ export const CardShippingAddressScreen: React.FC = () => {
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
-        <ShippingAddressForm
-          address={address}
-          onAddressChange={setAddress}
-          showFullName={true}
-        />
+        <ShippingAddressForm address={address} onAddressChange={setAddress} />
 
         <InfoCard
           title={LL.CardFlow.ShippingAddress.important()}

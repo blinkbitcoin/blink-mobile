@@ -1,4 +1,7 @@
-import { SelectionOption } from "./card-mock-data"
+export type SelectionOption = {
+  value: string
+  label: string
+}
 
 type CountryWithRegions = SelectionOption & {
   isoAlpha2: string
