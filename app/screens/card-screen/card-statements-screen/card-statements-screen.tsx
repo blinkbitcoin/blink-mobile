@@ -1,28 +1,29 @@
 import React, { useCallback, useState } from "react"
-import { View } from "react-native"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { ActivityIndicator, View } from "react-native"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import {
-  DEFAULT_YEAR,
-  MOCK_STATEMENTS,
-  MOCK_YEAR_OPTIONS,
-} from "./card-statements-mock-data"
+import { useStatementsData } from "./hooks"
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
 
-  const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
+  const { statements, yearOptions, currentYear, loading } = useStatementsData()
+
+  const [selectedYear, setSelectedYear] = useState(currentYear)
   // TODO: uncomment when CardStatements notification category is available in blink core
   // const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
-  const currentStatement = MOCK_STATEMENTS.find((s) => s.isCurrent)
-  const monthlyStatements = MOCK_STATEMENTS.filter((s) => s.year === selectedYear)
+  const currentStatement = statements.find((s) => s.isCurrent)
+  const monthlyStatements = statements.filter((s) => s.year === selectedYear)
 
   const getStatementsLabel = useCallback(
     (count: number): string => {
@@ -43,6 +44,20 @@ export const CardStatementsScreen: React.FC = () => {
    * }
    */
 
+  if (loading) {
+    return (
+      <Screen preset="scroll">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            testID="activity-indicator"
+            size="large"
+            color={colors.primary}
+          />
+        </View>
+      </Screen>
+    )
+  }
+
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
@@ -51,7 +66,7 @@ export const CardStatementsScreen: React.FC = () => {
             {LL.CardFlow.CardStatements.selectYear()}
           </Text>
           <YearSelector
-            years={MOCK_YEAR_OPTIONS}
+            years={yearOptions}
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
             itemLabel={getStatementsLabel}
@@ -167,6 +182,11 @@ export const CardStatementsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   content: {
     paddingHorizontal: 24,
     paddingTop: 20,
