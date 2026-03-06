@@ -116,9 +116,7 @@ jest.mock("@app/components/card-screen/input-field", () => ({
         </View>
       )}
       {validate && (
-        <RNText testID={`validate-${label}`}>
-          {validate(value) ?? "valid"}
-        </RNText>
+        <RNText testID={`validate-${label}`}>{validate(value) ?? "valid"}</RNText>
       )}
     </View>
   ),

@@ -26,21 +26,21 @@ const ERROR_MESSAGE = "Invalid"
 describe("address utils", () => {
   describe("validatePOBox", () => {
     it("detects 'P.O. Box'", () => {
-      expect(
-        validatePOBox({ value: "P.O. Box 123", errorMessage: ERROR_MESSAGE }),
-      ).toBe(ERROR_MESSAGE)
+      expect(validatePOBox({ value: "P.O. Box 123", errorMessage: ERROR_MESSAGE })).toBe(
+        ERROR_MESSAGE,
+      )
     })
 
     it("detects 'PO Box'", () => {
-      expect(
-        validatePOBox({ value: "PO Box 456", errorMessage: ERROR_MESSAGE }),
-      ).toBe(ERROR_MESSAGE)
+      expect(validatePOBox({ value: "PO Box 456", errorMessage: ERROR_MESSAGE })).toBe(
+        ERROR_MESSAGE,
+      )
     })
 
     it("detects 'P O Box'", () => {
-      expect(
-        validatePOBox({ value: "P O Box 789", errorMessage: ERROR_MESSAGE }),
-      ).toBe(ERROR_MESSAGE)
+      expect(validatePOBox({ value: "P O Box 789", errorMessage: ERROR_MESSAGE })).toBe(
+        ERROR_MESSAGE,
+      )
     })
 
     it("detects 'Post Office Box'", () => {
@@ -50,15 +50,15 @@ describe("address utils", () => {
     })
 
     it("detects 'POB'", () => {
-      expect(
-        validatePOBox({ value: "POB 200", errorMessage: ERROR_MESSAGE }),
-      ).toBe(ERROR_MESSAGE)
+      expect(validatePOBox({ value: "POB 200", errorMessage: ERROR_MESSAGE })).toBe(
+        ERROR_MESSAGE,
+      )
     })
 
     it("is case-insensitive", () => {
-      expect(
-        validatePOBox({ value: "p.o. box 123", errorMessage: ERROR_MESSAGE }),
-      ).toBe(ERROR_MESSAGE)
+      expect(validatePOBox({ value: "p.o. box 123", errorMessage: ERROR_MESSAGE })).toBe(
+        ERROR_MESSAGE,
+      )
     })
 
     it("returns undefined for regular addresses", () => {
@@ -68,9 +68,7 @@ describe("address utils", () => {
     })
 
     it("returns undefined for empty string", () => {
-      expect(
-        validatePOBox({ value: "", errorMessage: ERROR_MESSAGE }),
-      ).toBeUndefined()
+      expect(validatePOBox({ value: "", errorMessage: ERROR_MESSAGE })).toBeUndefined()
     })
   })
 
