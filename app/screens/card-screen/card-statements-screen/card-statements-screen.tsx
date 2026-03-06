@@ -4,16 +4,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
-import {
-  ContactSupportRow,
-  // TODO: uncomment when PDF download is available
-  // IconTextButton,
-  InfoCard,
-  StatementItem,
-  SwitchRow,
-} from "@app/components/card-screen"
-
-import { SettingsGroup } from "@app/screens/settings-screen/group"
+import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import {
@@ -27,7 +18,8 @@ export const CardStatementsScreen: React.FC = () => {
   const { LL } = useI18nContext()
 
   const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  // TODO: uncomment when CardStatements notification category is available in blink core
+  // const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
   const currentStatement = MOCK_STATEMENTS.find((s) => s.isCurrent)
   const monthlyStatements = MOCK_STATEMENTS.filter((s) => s.year === selectedYear)
@@ -146,21 +138,24 @@ export const CardStatementsScreen: React.FC = () => {
           bulletSpacing={1}
         />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{LL.common.notifications()}</Text>
-          <SettingsGroup
-            containerStyle={styles.settingsGroupContainer}
-            items={[
-              () => (
-                <SwitchRow
-                  title={LL.CardFlow.CardStatements.notifyNewStatements()}
-                  value={notificationsEnabled}
-                  onValueChange={(value) => setNotificationsEnabled(value)}
-                />
-              ),
-            ]}
-          />
-        </View>
+        {/*
+         * TODO: uncomment when CardStatements notification category is available in blink core
+         * <View style={styles.section}>
+         *   <Text style={styles.sectionLabel}>{LL.common.notifications()}</Text>
+         *   <SettingsGroup
+         *     containerStyle={styles.settingsGroupContainer}
+         *     items={[
+         *       () => (
+         *         <SwitchRow
+         *           title={LL.CardFlow.CardStatements.notifyNewStatements()}
+         *           value={notificationsEnabled}
+         *           onValueChange={(value) => setNotificationsEnabled(value)}
+         *         />
+         *       ),
+         *     ]}
+         *   />
+         * </View>
+         */}
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.support()}</Text>

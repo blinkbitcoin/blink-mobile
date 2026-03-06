@@ -211,30 +211,6 @@ describe("CardStatementsScreen", () => {
       expect(getByText("About statements")).toBeTruthy()
     })
 
-    it("displays notifications section", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Notifications")).toBeTruthy()
-    })
-
-    it("displays notification toggle text", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Notify me when new statements are made available")).toBeTruthy()
-    })
-
     it("displays support section", async () => {
       const { getByText } = render(
         <ContextForScreen>
@@ -288,23 +264,6 @@ describe("CardStatementsScreen", () => {
       })
 
       expect(contactSupportButton).toBeTruthy()
-    })
-
-    it("allows toggling notifications switch", async () => {
-      const { getByRole } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const switchElement = getByRole("switch")
-      expect(switchElement).toBeTruthy()
-
-      await act(async () => {
-        fireEvent(switchElement, "pressIn")
-      })
     })
   })
 
