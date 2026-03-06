@@ -26,46 +26,49 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-statements-screen/card-statements-mock-data", () => ({
-  MOCK_STATEMENTS: [
-    {
-      id: "1",
-      month: "August",
-      year: 2025,
-      period: "Aug 1 - Aug 30",
-      transactionCount: 0,
-      totalSpent: "$1,021.00",
-      isCurrent: true,
-      isDownloaded: false,
-    },
-    {
-      id: "2",
-      month: "July",
-      year: 2025,
-      period: "Jul 1 - Jul 30, 2025",
-      transactionCount: 5,
-      totalSpent: "$121.00",
-      isCurrent: false,
-      isDownloaded: true,
-    },
-    {
-      id: "3",
-      month: "June",
-      year: 2025,
-      period: "Jun 1 - Jun 30, 2025",
-      transactionCount: 5,
-      totalSpent: "$121.00",
-      isCurrent: false,
-      isDownloaded: true,
-    },
-  ],
-  MOCK_YEAR_OPTIONS: [
-    { year: 2025, itemCount: 3 },
-    { year: 2024, itemCount: 0, disabled: true },
-    { year: 2023, itemCount: 0, disabled: true },
-  ],
-  DEFAULT_YEAR: 2025,
-}))
+jest.mock(
+  "@app/screens/card-screen/card-statements-screen/card-statements-mock-data",
+  () => ({
+    MOCK_STATEMENTS: [
+      {
+        id: "1",
+        month: "August",
+        year: 2025,
+        period: "Aug 1 - Aug 30",
+        transactionCount: 0,
+        totalSpent: "$1,021.00",
+        isCurrent: true,
+        isDownloaded: false,
+      },
+      {
+        id: "2",
+        month: "July",
+        year: 2025,
+        period: "Jul 1 - Jul 30, 2025",
+        transactionCount: 5,
+        totalSpent: "$121.00",
+        isCurrent: false,
+        isDownloaded: true,
+      },
+      {
+        id: "3",
+        month: "June",
+        year: 2025,
+        period: "Jun 1 - Jun 30, 2025",
+        transactionCount: 5,
+        totalSpent: "$121.00",
+        isCurrent: false,
+        isDownloaded: true,
+      },
+    ],
+    MOCK_YEAR_OPTIONS: [
+      { year: 2025, itemCount: 3 },
+      { year: 2024, itemCount: 0, disabled: true },
+      { year: 2023, itemCount: 0, disabled: true },
+    ],
+    DEFAULT_YEAR: 2025,
+  }),
+)
 
 describe("CardStatementsScreen", () => {
   beforeEach(() => {
@@ -182,18 +185,6 @@ describe("CardStatementsScreen", () => {
       expect(getByText("Monthly statements")).toBeTruthy()
     })
 
-    it("displays download all button", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Download all")).toBeTruthy()
-    })
-
     it("displays statement items", async () => {
       const { getByText } = render(
         <ContextForScreen>
@@ -282,26 +273,6 @@ describe("CardStatementsScreen", () => {
   })
 
   describe("interaction", () => {
-    it("allows pressing download all button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardStatementsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const downloadAllButton = getByText("Download all")
-      await act(async () => {
-        fireEvent.press(downloadAllButton)
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Download all statements")
-      consoleSpy.mockRestore()
-    })
-
     it("allows pressing contact support button", async () => {
       const consoleSpy = jest.spyOn(console, "log").mockImplementation()
 

@@ -6,7 +6,8 @@ import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import {
   ContactSupportRow,
-  IconTextButton,
+  // TODO: uncomment when PDF download is available
+  // IconTextButton,
   InfoCard,
   StatementItem,
   SwitchRow,
@@ -42,13 +43,16 @@ export const CardStatementsScreen: React.FC = () => {
     [LL],
   )
 
-  const handleDownload = (statementId: string) => {
-    console.log("Download statement:", statementId)
-  }
-
-  const handleDownloadAll = () => {
-    console.log("Download all statements")
-  }
+  /*
+   * TODO: uncomment when PDF download is available
+   * const handleDownload = (statementId: string) => {
+   *   console.log("Download statement:", statementId)
+   * }
+   *
+   * const handleDownloadAll = () => {
+   *   console.log("Download all statements")
+   * }
+   */
 
   const handleContactSupport = () => {
     console.log("Contact support")
@@ -100,11 +104,14 @@ export const CardStatementsScreen: React.FC = () => {
             {LL.CardFlow.CardStatements.monthlyStatements()}
           </Text>
           <View style={styles.statementsContainer}>
-            <IconTextButton
-              icon="download"
-              label={LL.CardFlow.CardStatements.downloadAll()}
-              onPress={handleDownloadAll}
-            />
+            {/*
+             * TODO: uncomment when PDF download is available
+             * <IconTextButton
+             *   icon="download"
+             *   label={LL.CardFlow.CardStatements.downloadAll()}
+             *   onPress={handleDownloadAll}
+             * />
+             */}
 
             {monthlyStatements.map((statement) => (
               <StatementItem
@@ -123,8 +130,11 @@ export const CardStatementsScreen: React.FC = () => {
                         amount: statement.totalSpent,
                       })
                 }
-                onDownload={() => handleDownload(statement.id)}
-                isDownloaded={statement.isDownloaded}
+                /*
+                 * TODO: uncomment when PDF download is available
+                 * onDownload={() => handleDownload(statement.id)}
+                 * isDownloaded={statement.isDownloaded}
+                 */
               />
             ))}
           </View>
@@ -135,7 +145,8 @@ export const CardStatementsScreen: React.FC = () => {
           bulletItems={[
             LL.CardFlow.CardStatements.aboutBullet1(),
             LL.CardFlow.CardStatements.aboutBullet2(),
-            LL.CardFlow.CardStatements.aboutBullet3(),
+            // TODO: uncomment when PDF download is available
+            // LL.CardFlow.CardStatements.aboutBullet3(),
           ]}
           showIcon={false}
           size="lg"
