@@ -26,53 +26,79 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockUseStatementsData = jest.fn()
 jest.mock(
-  "@app/screens/card-screen/card-statements-screen/card-statements-mock-data",
+  "@app/screens/card-screen/card-statements-screen/hooks/use-statements-data",
   () => ({
-    MOCK_STATEMENTS: [
-      {
-        id: "1",
-        month: "August",
-        year: 2025,
-        period: "Aug 1 - Aug 30",
-        transactionCount: 0,
-        totalSpent: "$1,021.00",
-        isCurrent: true,
-        isDownloaded: false,
-      },
-      {
-        id: "2",
-        month: "July",
-        year: 2025,
-        period: "Jul 1 - Jul 30, 2025",
-        transactionCount: 5,
-        totalSpent: "$121.00",
-        isCurrent: false,
-        isDownloaded: true,
-      },
-      {
-        id: "3",
-        month: "June",
-        year: 2025,
-        period: "Jun 1 - Jun 30, 2025",
-        transactionCount: 5,
-        totalSpent: "$121.00",
-        isCurrent: false,
-        isDownloaded: true,
-      },
-    ],
-    MOCK_YEAR_OPTIONS: [
-      { year: 2025, itemCount: 3 },
-      { year: 2024, itemCount: 0, disabled: true },
-      { year: 2023, itemCount: 0, disabled: true },
-    ],
-    DEFAULT_YEAR: 2025,
+    useStatementsData: () => mockUseStatementsData(),
   }),
 )
+
+const mockStatements = [
+  {
+    id: "2025-07",
+    month: "August",
+    year: 2025,
+    period: "Aug 1 - Aug 30",
+    transactionCount: 0,
+    totalSpent: "$1,021.00",
+    isCurrent: true,
+  },
+  {
+    id: "2025-06",
+    month: "July",
+    year: 2025,
+    period: "Jul 1 - Jul 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+  {
+    id: "2025-05",
+    month: "June",
+    year: 2025,
+    period: "Jun 1 - Jun 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+]
+
+const mockYearOptions = [{ year: 2025, itemCount: 3 }]
+
+const loadedReturn = {
+  statements: mockStatements,
+  yearOptions: mockYearOptions,
+  currentYear: 2025,
+  loading: false,
+  error: undefined,
+}
 
 describe("CardStatementsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockUseStatementsData.mockReturnValue(loadedReturn)
+  })
+
+  describe("loading state", () => {
+    it("renders activity indicator when loading", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: [],
+        yearOptions: [],
+        loading: true,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+    })
   })
 
   describe("rendering", () => {
@@ -245,6 +271,23 @@ describe("CardStatementsScreen", () => {
       await act(async () => {})
 
       expect(getByText("support@test.com")).toBeTruthy()
+    })
+
+    it("hides current statement when none exists", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: loadedReturn.statements.filter((s) => !s.isCurrent),
+      })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Current statement")).toBeNull()
     })
   })
 
