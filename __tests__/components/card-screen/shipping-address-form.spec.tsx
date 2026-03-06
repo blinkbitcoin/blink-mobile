@@ -3,7 +3,7 @@ import { Text as RNText, TextInput as RNTextInput, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { ShippingAddressForm } from "@app/components/card-screen/shipping-address-form"
-import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
@@ -48,6 +48,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
           state: () => "State",
           postalCode: () => "Postal code",
           country: () => "Country",
+          noPOBoxes: () => "P.O. Boxes are not allowed",
+        },
+      },
+      common: {
+        validation: {
+          invalidPostalCode: () => "Invalid postal code",
         },
       },
     },
@@ -85,11 +91,13 @@ jest.mock("@app/components/card-screen/input-field", () => ({
     value,
     onPress,
     onChangeText,
+    validate,
   }: {
     label: string
     value: string
     onPress?: () => void
     onChangeText?: (text: string) => void
+    validate?: (value: string) => string | undefined
   }) => (
     <View testID={`input-field-${label}`} accessibilityHint={value}>
       <RNText>{label}</RNText>
@@ -106,6 +114,11 @@ jest.mock("@app/components/card-screen/input-field", () => ({
         <View testID={`press-${label}`} onTouchEnd={onPress}>
           <RNText>press</RNText>
         </View>
+      )}
+      {validate && (
+        <RNText testID={`validate-${label}`}>
+          {validate(value) ?? "valid"}
+        </RNText>
       )}
     </View>
   ),
@@ -225,6 +238,52 @@ describe("ShippingAddressForm", () => {
         ...mockAddress,
         line2: "Suite 100",
       })
+    })
+  })
+
+  describe("validation", () => {
+    it("shows P.O. Box error for address line 1", () => {
+      const address = { ...mockAddress, line1: "P.O. Box 123" }
+      const { getByTestId } = render(
+        <ShippingAddressForm {...defaultProps} address={address} />,
+      )
+      const validateNode = getByTestId("validate-Address line 1")
+
+      expect(validateNode.props.children).toBe("P.O. Boxes are not allowed")
+    })
+
+    it("shows P.O. Box error for address line 2", () => {
+      const address = { ...mockAddress, line2: "PO Box 456" }
+      const { getByTestId } = render(
+        <ShippingAddressForm {...defaultProps} address={address} />,
+      )
+      const validateNode = getByTestId("validate-Address line 2")
+
+      expect(validateNode.props.children).toBe("P.O. Boxes are not allowed")
+    })
+
+    it("shows no error for valid addresses", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+      const validateNode = getByTestId("validate-Address line 1")
+
+      expect(validateNode.props.children).toBe("valid")
+    })
+
+    it("shows error for invalid postal code", () => {
+      const address = { ...mockAddress, postalCode: "ABCDE" }
+      const { getByTestId } = render(
+        <ShippingAddressForm {...defaultProps} address={address} />,
+      )
+      const validateNode = getByTestId("validate-Postal code")
+
+      expect(validateNode.props.children).toBe("Invalid postal code")
+    })
+
+    it("shows no error for valid postal code", () => {
+      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
+      const validateNode = getByTestId("validate-Postal code")
+
+      expect(validateNode.props.children).toBe("valid")
     })
   })
 

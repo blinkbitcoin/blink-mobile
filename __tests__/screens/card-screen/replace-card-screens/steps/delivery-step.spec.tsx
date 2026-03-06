@@ -3,7 +3,7 @@ import { Text as RNText, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { DeliveryStep } from "@app/screens/card-screen/replace-card-screens/steps/delivery-step"
-import { ShippingAddress } from "@app/screens/card-screen/card-mock-data"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
