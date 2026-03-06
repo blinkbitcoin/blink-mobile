@@ -4,7 +4,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardStatementsScreen } from "@app/screens/card-screen/card-statements-screen"
-import { ContextForScreen } from "./helper"
+import { ContextForScreen } from "../../helper"
 
 jest.mock("react-native-reanimated", () => ({
   __esModule: true,
@@ -26,7 +26,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-statements-mock-data", () => ({
+jest.mock("@app/screens/card-screen/card-statements-screen/card-statements-mock-data", () => ({
   MOCK_STATEMENTS: [
     {
       id: "1",
