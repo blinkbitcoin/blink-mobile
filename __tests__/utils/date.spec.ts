@@ -2,7 +2,9 @@ import { it } from "@jest/globals"
 
 import {
   formatCardValidThruDisplay,
+  formatMonth,
   formatShortDate,
+  getLastDayOfMonth,
   isSameDay,
   isToday,
   isYesterday,
@@ -243,6 +245,40 @@ describe("date utils", () => {
       expect(
         formatCardValidThruDisplay(new Date("2031-01-15T12:00:00Z"), true, "*"),
       ).toBe("01/ 31")
+    })
+  })
+
+  describe("getLastDayOfMonth", () => {
+    it.each([
+      { year: 2025, month: 0, expected: 31, name: "January" },
+      { year: 2025, month: 1, expected: 28, name: "February (non-leap)" },
+      { year: 2024, month: 1, expected: 29, name: "February (leap)" },
+      { year: 2025, month: 3, expected: 30, name: "April" },
+      { year: 2025, month: 11, expected: 31, name: "December" },
+    ])("returns $expected for $name $year", ({ year, month, expected }) => {
+      expect(getLastDayOfMonth(year, month)).toBe(expected)
+    })
+  })
+
+  describe("formatMonth", () => {
+    it("returns short month name", () => {
+      const date = new Date(2025, 0, 15)
+      expect(formatMonth("en", date, "short")).toBe("Jan")
+    })
+
+    it("returns long month name", () => {
+      const date = new Date(2025, 0, 15)
+      expect(formatMonth("en", date, "long")).toBe("January")
+    })
+
+    it("respects locale for short month", () => {
+      const date = new Date(2025, 0, 15)
+      expect(formatMonth("es", date, "short")).toBe("ene")
+    })
+
+    it("respects locale for long month", () => {
+      const date = new Date(2025, 0, 15)
+      expect(formatMonth("es", date, "long")).toBe("enero")
     })
   })
 })
