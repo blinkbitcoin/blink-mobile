@@ -3201,7 +3201,10 @@
         "confirmNewPin": "Qinisekisa i-PIN entsha",
         "confirmPinSubtitle": "Nceda ufake kwakhona i-PIN yakho entsha yamanani ama-4 ukuze uqhubeke.",
         "incorrectPin": "I-PIN ayichanekanga. Nceda uzame kwakhona.",
-        "pinMismatch": "Ii-PIN azifani. Faka kwakhona ukuqinisekisa okanye buyela umva ukutshintsha i-PIN yakho."
+        "pinMismatch": "Ii-PIN azifani. Faka kwakhona ukuqinisekisa okanye buyela umva ukutshintsha i-PIN yakho.",
+        "weakPin": "Le PIN ilula kakhulu ukuyiqashela. Nceda ukhethe iPIN enamandla ngakumbi.",
+        "cardNotFound": "Ikhadi alifumanekanga. Nceda uzame kwakhona.",
+        "pinUpdateFailed": "Ayiphumelelanga ukuhlaziya iPIN. Nceda uzame kwakhona."
       },
       "CreateFlow": {
         "title": "Dala i-PIN",
@@ -3226,7 +3229,9 @@
         "enterNewPinSubtitle": "Nceda ufake i-PIN yakho entsha yamanani ama-4.",
         "pinChangedTitle": "I-PIN itshintshiwe",
         "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
-        "pinChangedToast": "I-PIN itshintshiwe ngempumelelo"
+        "pinChangedToast": "I-PIN itshintshiwe ngempumelelo",
+        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN",
+        "biometricRequired": "Ukuqinisekiswa kwe-biometric kuyafuneka ukutshintsha iPIN yakho."
       }
     },
     "ReplaceCard": {

@@ -3195,7 +3195,10 @@
                 "confirmNewPin": "新しいPINを確認",
                 "confirmPinSubtitle": "続行するには、新しい4桁のPINを再入力してください。",
                 "incorrectPin": "PINが正しくありません。もう一度お試しください。",
-                "pinMismatch": "PINが一致しません。確認のため再入力するか、戻ってPINを変更してください。"
+                "pinMismatch": "PINが一致しません。確認のため再入力するか、戻ってPINを変更してください。",
+                "weakPin": "このPINは推測されやすすぎます。より強力なPINを選択してください。",
+                "cardNotFound": "カードが見つかりません。もう一度お試しください。",
+                "pinUpdateFailed": "PINの更新に失敗しました。もう一度お試しください。"
             },
             "CreateFlow": {
                 "title": "PINを作成",
@@ -3220,7 +3223,9 @@
                 "enterNewPinSubtitle": "新しい4桁のPINを入力してください。",
                 "pinChangedTitle": "PINが変更されました",
                 "pinChangedSubtitle": "PINが正常に変更されました。",
-                "pinChangedToast": "PINが正常に変更されました"
+                "pinChangedToast": "PINが正常に変更されました",
+                "biometricDescription": "PINを変更するために本人確認を行ってください",
+                "biometricRequired": "PINを変更するには生体認証が必要です。"
             }
         },
         "ReplaceCard": {

@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Bevestig nuwe PIN",
         "confirmPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN weer in om voort te gaan.",
         "incorrectPin": "Verkeerde PIN. Probeer asseblief weer.",
-        "pinMismatch": "PIN's stem nie ooreen nie. Voer weer in om te bevestig of gaan terug om jou PIN te verander."
+        "pinMismatch": "PIN's stem nie ooreen nie. Voer weer in om te bevestig of gaan terug om jou PIN te verander.",
+        "weakPin": "Hierdie PIN is te maklik om te raai. Kies asseblief 'n sterker PIN.",
+        "cardNotFound": "Kaart nie gevind nie. Probeer asseblief weer.",
+        "pinUpdateFailed": "Kon PIN nie opdateer nie. Probeer asseblief weer."
       },
       "CreateFlow": {
         "title": "Skep PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN in.",
         "pinChangedTitle": "PIN verander",
         "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
-        "pinChangedToast": "PIN is suksesvol verander"
+        "pinChangedToast": "PIN is suksesvol verander",
+        "biometricDescription": "Verifieer jou identiteit om PIN te verander",
+        "biometricRequired": "Biometriese verifikasie is nodig om jou PIN te verander."
       }
     },
     "ReplaceCard": {

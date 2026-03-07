@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Confirmar nou PIN",
         "confirmPinSubtitle": "Sisplau, torneu a introduir el vostre nou PIN de 4 dígits per continuar.",
         "incorrectPin": "PIN incorrecte. Si us plau, torna-ho a provar.",
-        "pinMismatch": "Els PINs no coincideixen. Torna a introduir per confirmar o torna enrere per canviar el teu PIN."
+        "pinMismatch": "Els PINs no coincideixen. Torna a introduir per confirmar o torna enrere per canviar el teu PIN.",
+        "weakPin": "Aquest PIN és massa fàcil d'endevinar. Si us plau, trieu un PIN més fort.",
+        "cardNotFound": "No s'ha trobat la targeta. Si us plau, torneu-ho a provar.",
+        "pinUpdateFailed": "No s'ha pogut actualitzar el PIN. Si us plau, torneu-ho a provar."
       },
       "CreateFlow": {
         "title": "Crear PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Sisplau, introduïu el vostre nou PIN de 4 dígits.",
         "pinChangedTitle": "PIN canviat",
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
-        "pinChangedToast": "El PIN s'ha canviat correctament"
+        "pinChangedToast": "El PIN s'ha canviat correctament",
+        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN",
+        "biometricRequired": "L'autenticació biomètrica és necessària per canviar el vostre PIN."
       }
     },
     "ReplaceCard": {

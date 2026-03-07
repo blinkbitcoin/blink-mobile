@@ -3192,7 +3192,10 @@
         "confirmNewPin": "Xác nhận PIN mới",
         "confirmPinSubtitle": "Vui lòng nhập lại PIN 4 chữ số mới của bạn để tiếp tục.",
         "incorrectPin": "Mã PIN không chính xác. Vui lòng thử lại.",
-        "pinMismatch": "Mã PIN không khớp. Nhập lại để xác nhận hoặc quay lại để thay đổi mã PIN của bạn."
+        "pinMismatch": "Mã PIN không khớp. Nhập lại để xác nhận hoặc quay lại để thay đổi mã PIN của bạn.",
+        "weakPin": "Mã PIN này quá dễ đoán. Vui lòng chọn mã PIN mạnh hơn.",
+        "cardNotFound": "Không tìm thấy thẻ. Vui lòng thử lại.",
+        "pinUpdateFailed": "Cập nhật mã PIN thất bại. Vui lòng thử lại."
       },
       "CreateFlow": {
         "title": "Tạo PIN",
@@ -3217,7 +3220,9 @@
         "enterNewPinSubtitle": "Vui lòng nhập PIN 4 chữ số mới của bạn.",
         "pinChangedTitle": "Đã đổi PIN",
         "pinChangedSubtitle": "PIN của bạn đã được đổi thành công.",
-        "pinChangedToast": "Đã thay đổi mã PIN thành công"
+        "pinChangedToast": "Đã thay đổi mã PIN thành công",
+        "biometricDescription": "Xác minh danh tính của bạn để thay đổi mã PIN",
+        "biometricRequired": "Xác thực sinh trắc học là bắt buộc để thay đổi mã PIN của bạn."
       }
     },
     "ReplaceCard": {

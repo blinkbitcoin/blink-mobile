@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Kakasa PIN empya",
         "confirmPinSubtitle": "Nsaba oyingize nate PIN yo empya ey'ennamba 4 okusigala mu maaso.",
         "incorrectPin": "PIN si tuufu. Gezaako nate.",
-        "pinMismatch": "PIN tezikwatagana. Ddamu okuyingiza okukakasa oba dda emabega okukyusa PIN yo."
+        "pinMismatch": "PIN tezikwatagana. Ddamu okuyingiza okukakasa oba dda emabega okukyusa PIN yo.",
+        "weakPin": "PIN eno yanguwa nnyo okugitegeera. Londa PIN ey'amaanyi.",
+        "cardNotFound": "Kaadi tesuddwa. Gezaako nate.",
+        "pinUpdateFailed": "Ensobi kukyusa PIN. Gezaako nate."
       },
       "CreateFlow": {
         "title": "Tonda PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Nsaba oyingize PIN yo empya ey'ennamba 4.",
         "pinChangedTitle": "PIN ekyusiddwa",
         "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
-        "pinChangedToast": "PIN ekyusiddwa obulungi"
+        "pinChangedToast": "PIN ekyusiddwa obulungi",
+        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN",
+        "biometricRequired": "Okukakasa kw'ebiometrike kwetaagisa okukyusa PIN yo."
       }
     },
     "ReplaceCard": {

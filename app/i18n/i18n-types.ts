@@ -10466,6 +10466,18 @@ type RootTranslation = {
 				 * P​I​N​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h​.​ ​R​e​-​e​n​t​e​r​ ​t​o​ ​c​o​n​f​i​r​m​ ​o​r​ ​g​o​ ​b​a​c​k​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
 				 */
 				pinMismatch: string
+				/**
+				 * T​h​i​s​ ​P​I​N​ ​i​s​ ​t​o​o​ ​e​a​s​y​ ​t​o​ ​g​u​e​s​s​.​ ​P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​ ​s​t​r​o​n​g​e​r​ ​P​I​N​.
+				 */
+				weakPin: string
+				/**
+				 * C​a​r​d​ ​n​o​t​ ​f​o​u​n​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				cardNotFound: string
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				pinUpdateFailed: string
 			}
 			CreateFlow: {
 				/**
@@ -10530,6 +10542,14 @@ type RootTranslation = {
 				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​n​e​w​ ​4​-​d​i​g​i​t​ ​P​I​N​.
 				 */
 				enterNewPinSubtitle: string
+				/**
+				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y​ ​t​o​ ​c​h​a​n​g​e​ ​P​I​N
+				 */
+				biometricDescription: string
+				/**
+				 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
+				 */
+				biometricRequired: string
 				/**
 				 * P​I​N​ ​c​h​a​n​g​e​d
 				 */
@@ -21214,6 +21234,18 @@ export type TranslationFunctions = {
 				 * PINs do not match. Re-enter to confirm or go back to change your PIN.
 				 */
 				pinMismatch: () => LocalizedString
+				/**
+				 * This PIN is too easy to guess. Please choose a stronger PIN.
+				 */
+				weakPin: () => LocalizedString
+				/**
+				 * Card not found. Please try again.
+				 */
+				cardNotFound: () => LocalizedString
+				/**
+				 * Failed to update PIN. Please try again.
+				 */
+				pinUpdateFailed: () => LocalizedString
 			}
 			CreateFlow: {
 				/**
@@ -21278,6 +21310,14 @@ export type TranslationFunctions = {
 				 * Please enter your new 4-digit PIN.
 				 */
 				enterNewPinSubtitle: () => LocalizedString
+				/**
+				 * Verify your identity to change PIN
+				 */
+				biometricDescription: () => LocalizedString
+				/**
+				 * Biometric authentication is required to change your PIN.
+				 */
+				biometricRequired: () => LocalizedString
 				/**
 				 * PIN changed
 				 */

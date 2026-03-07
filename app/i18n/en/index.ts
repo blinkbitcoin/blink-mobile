@@ -3293,6 +3293,9 @@ const en: BaseTranslation = {
         confirmPinSubtitle: "Please re-enter your new 4-digit PIN to continue.",
         incorrectPin: "Incorrect PIN. Please try again.",
         pinMismatch: "PINs do not match. Re-enter to confirm or go back to change your PIN.",
+        weakPin: "This PIN is too easy to guess. Please choose a stronger PIN.",
+        cardNotFound: "Card not found. Please try again.",
+        pinUpdateFailed: "Failed to update PIN. Please try again.",
       },
       CreateFlow: {
         title: "Create PIN",
@@ -3315,6 +3318,9 @@ const en: BaseTranslation = {
         enterCurrentPinSubtitle: "Please enter your current 4-digit PIN to continue.",
         enterNewPin: "Enter new PIN",
         enterNewPinSubtitle: "Please enter your new 4-digit PIN.",
+        biometricDescription: "Verify your identity to change PIN",
+        biometricRequired:
+          "Biometric authentication is required to change your PIN.",
         pinChangedTitle: "PIN changed",
         pinChangedSubtitle: "Your PIN has been changed successfully.",
         pinChangedToast: "PIN has been changed successfully",

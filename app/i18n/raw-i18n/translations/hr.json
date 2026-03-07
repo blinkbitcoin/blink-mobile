@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Potvrdi novi PIN",
         "confirmPinSubtitle": "Molimo ponovno unesite svoj novi 4-znamenkasti PIN za nastavak.",
         "incorrectPin": "Netočan PIN. Molimo pokušajte ponovo.",
-        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promijenite PIN."
+        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promijenite PIN.",
+        "weakPin": "Ovaj PIN je prelagan za pogoditi. Molimo odaberite jači PIN.",
+        "cardNotFound": "Kartica nije pronađena. Molimo pokušajte ponovo.",
+        "pinUpdateFailed": "Ažuriranje PIN-a nije uspjelo. Molimo pokušajte ponovo."
       },
       "CreateFlow": {
         "title": "Stvori PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Molimo unesite svoj novi 4-znamenkasti PIN.",
         "pinChangedTitle": "PIN promijenjen",
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
-        "pinChangedToast": "PIN je uspješno promijenjen"
+        "pinChangedToast": "PIN je uspješno promijenjen",
+        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a",
+        "biometricRequired": "Biometrijska autentifikacija je potrebna za promjenu vašeg PIN-a."
       }
     },
     "ReplaceCard": {

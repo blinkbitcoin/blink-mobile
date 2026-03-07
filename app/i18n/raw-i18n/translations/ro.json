@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Confirmă noul PIN",
         "confirmPinSubtitle": "Vă rugăm să introduceți din nou noul dvs. PIN de 4 cifre pentru a continua.",
         "incorrectPin": "PIN incorect. Vă rugăm să încercați din nou.",
-        "pinMismatch": "PIN-urile nu se potrivesc. Reintroduceți pentru a confirma sau reveniți pentru a vă schimba PIN-ul."
+        "pinMismatch": "PIN-urile nu se potrivesc. Reintroduceți pentru a confirma sau reveniți pentru a vă schimba PIN-ul.",
+        "weakPin": "Acest PIN este prea ușor de ghicit. Vă rugăm să alegeți un PIN mai puternic.",
+        "cardNotFound": "Cardul nu a fost găsit. Vă rugăm să încercați din nou.",
+        "pinUpdateFailed": "Actualizarea PIN-ului a eșuat. Vă rugăm să încercați din nou."
       },
       "CreateFlow": {
         "title": "Creează PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Vă rugăm să introduceți noul dvs. PIN de 4 cifre.",
         "pinChangedTitle": "PIN schimbat",
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
-        "pinChangedToast": "PIN-ul a fost schimbat cu succes"
+        "pinChangedToast": "PIN-ul a fost schimbat cu succes",
+        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul",
+        "biometricRequired": "Autentificarea biometrică este necesară pentru a schimba PIN-ul."
       }
     },
     "ReplaceCard": {

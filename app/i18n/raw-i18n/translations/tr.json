@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Yeni PIN'i onayla",
         "confirmPinSubtitle": "Devam etmek için lütfen yeni 4 haneli PIN'inizi tekrar girin.",
         "incorrectPin": "Yanlış PIN. Lütfen tekrar deneyin.",
-        "pinMismatch": "PIN'ler eşleşmiyor. Onaylamak için tekrar girin veya PIN'inizi değiştirmek için geri dönün."
+        "pinMismatch": "PIN'ler eşleşmiyor. Onaylamak için tekrar girin veya PIN'inizi değiştirmek için geri dönün.",
+        "weakPin": "Bu PIN tahmin edilmesi çok kolay. Lütfen daha güçlü bir PIN seçin.",
+        "cardNotFound": "Kart bulunamadı. Lütfen tekrar deneyin.",
+        "pinUpdateFailed": "PIN güncellenemedi. Lütfen tekrar deneyin."
       },
       "CreateFlow": {
         "title": "PIN oluştur",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Lütfen yeni 4 haneli PIN'inizi girin.",
         "pinChangedTitle": "PIN değiştirildi",
         "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
-        "pinChangedToast": "PIN başarıyla değiştirildi"
+        "pinChangedToast": "PIN başarıyla değiştirildi",
+        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın",
+        "biometricRequired": "PIN'inizi değiştirmek için biyometrik kimlik doğrulama gereklidir."
       }
     },
     "ReplaceCard": {

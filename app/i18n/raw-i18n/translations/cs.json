@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Potvrdit nový PIN",
         "confirmPinSubtitle": "Pro pokračování prosím znovu zadejte svůj nový 4místný PIN.",
         "incorrectPin": "Nesprávný PIN. Zkuste to prosím znovu.",
-        "pinMismatch": "PINy se neshodují. Zadejte znovu pro potvrzení nebo se vraťte a změňte PIN."
+        "pinMismatch": "PINy se neshodují. Zadejte znovu pro potvrzení nebo se vraťte a změňte PIN.",
+        "weakPin": "Tento PIN je příliš snadné uhodnout. Zvolte prosím silnější PIN.",
+        "cardNotFound": "Karta nenalezena. Zkuste to prosím znovu.",
+        "pinUpdateFailed": "Aktualizace PINu se nezdařila. Zkuste to prosím znovu."
       },
       "CreateFlow": {
         "title": "Vytvořit PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Prosím zadejte svůj nový 4místný PIN.",
         "pinChangedTitle": "PIN změněn",
         "pinChangedSubtitle": "Váš PIN byl úspěšně změněn.",
-        "pinChangedToast": "PIN byl úspěšně změněn"
+        "pinChangedToast": "PIN byl úspěšně změněn",
+        "biometricDescription": "Ověřte svou totožnost pro změnu PINu",
+        "biometricRequired": "Pro změnu PINu je vyžadována biometrická autentizace."
       }
     },
     "ReplaceCard": {
