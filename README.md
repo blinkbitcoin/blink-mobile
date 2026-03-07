@@ -1,4 +1,4 @@
-# GaloyMobile
+# Blink Mobile
 
 <img src=".readme/blink-logo-white-bg.png" alt="Blink Logo" width="300">
 
