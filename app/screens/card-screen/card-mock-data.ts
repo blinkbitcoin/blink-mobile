@@ -61,5 +61,3 @@ export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
   postalCode: "10001",
   countryCode: "USA",
 }
-
-export const MOCK_CARD_PIN = "1234"
