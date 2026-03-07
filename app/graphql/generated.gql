@@ -252,6 +252,10 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardPinUpdate($input: CardPinUpdateInput!) {
+  cardPinUpdate(input: $input)
+}
+
 mutation cardUpdate($input: CardUpdateInput!) {
   cardUpdate(input: $input) {
     id

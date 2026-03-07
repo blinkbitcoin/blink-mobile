@@ -3111,6 +3111,13 @@ export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }> } } | null };
 
+export type CardPinUpdateMutationVariables = Exact<{
+  input: CardPinUpdateInput;
+}>;
+
+
+export type CardPinUpdateMutation = { readonly __typename: 'Mutation', readonly cardPinUpdate: boolean };
+
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5220,6 +5227,37 @@ export type CardQueryHookResult = ReturnType<typeof useCardQuery>;
 export type CardLazyQueryHookResult = ReturnType<typeof useCardLazyQuery>;
 export type CardSuspenseQueryHookResult = ReturnType<typeof useCardSuspenseQuery>;
 export type CardQueryResult = Apollo.QueryResult<CardQuery, CardQueryVariables>;
+export const CardPinUpdateDocument = gql`
+    mutation cardPinUpdate($input: CardPinUpdateInput!) {
+  cardPinUpdate(input: $input)
+}
+    `;
+export type CardPinUpdateMutationFn = Apollo.MutationFunction<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
+
+/**
+ * __useCardPinUpdateMutation__
+ *
+ * To run a mutation, you first call `useCardPinUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardPinUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardPinUpdateMutation, { data, loading, error }] = useCardPinUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardPinUpdateMutation(baseOptions?: Apollo.MutationHookOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardPinUpdateMutation, CardPinUpdateMutationVariables>(CardPinUpdateDocument, options);
+      }
+export type CardPinUpdateMutationHookResult = ReturnType<typeof useCardPinUpdateMutation>;
+export type CardPinUpdateMutationResult = Apollo.MutationResult<CardPinUpdateMutation>;
+export type CardPinUpdateMutationOptions = Apollo.BaseMutationOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {
