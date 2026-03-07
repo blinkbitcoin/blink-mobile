@@ -16,7 +16,6 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { Screen } from "@app/components/screen"
 
 import { PhoneLoginInitiateType, useRequestPhoneCodeLogin } from "../phone-auth-screen"
-import { BODY_PADDING } from "@app/config"
 
 export enum LoginChannels {
   Telegram = "TELEGRAM",
@@ -155,9 +154,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     flex: 1,
-    paddingHorizontal: BODY_PADDING,
-    paddingTop: BODY_PADDING,
-    paddingBottom: BODY_PADDING,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   header: {
     paddingTop: 20,

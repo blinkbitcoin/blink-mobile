@@ -19,7 +19,6 @@ import { SuccessIconAnimation } from "@app/components/success-animation"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig } from "@app/hooks"
-import { BODY_PADDING } from "@app/config"
 import {
   useUserUpdateUsernameMutation,
   MyUserIdDocument,
@@ -246,9 +245,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     flex: 1,
-    paddingHorizontal: BODY_PADDING,
-    paddingTop: BODY_PADDING,
-    rowGap: BODY_PADDING,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    rowGap: 20,
   },
   bottom: {
     flex: 1,

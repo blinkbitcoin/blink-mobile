@@ -25,4 +25,3 @@ export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
 export const HIDDEN_AMOUNT_PLACEHOLDER = "****"
 export const APPROXIMATE_PREFIX = "~"
 export const MASK_CHAR = "•"
-export const BODY_PADDING = 20

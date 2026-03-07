@@ -9,7 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
-import { BODY_PADDING, HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
+import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
   useSendBitcoinConfirmationScreenQuery,
   WalletCurrency,
@@ -518,7 +518,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   fieldContainer: {
-    paddingHorizontal: BODY_PADDING,
+    paddingHorizontal: 20,
     marginBottom: 12,
   },
   noteText: {
@@ -613,6 +613,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   sliderContainer: {
-    padding: BODY_PADDING,
+    padding: 20,
   },
 }))
