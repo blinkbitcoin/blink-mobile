@@ -2686,6 +2686,8 @@
     "csvExport": "Exportați tranzacțiile ca CSV",
     "date": "Data",
     "description": "Descriere",
+    "discard": "Renunță",
+    "discardChangesMessage": "Aveți modificări nesalvate. Sunteți sigur că doriți să renunțați la ele?",
     "domain": "Domeniu",
     "email": "Email",
     "error": "Eroare",
@@ -2772,7 +2774,12 @@
     "profiles": "Profiluri",
     "paste": "Lipire",
     "hasBeenCopiedToClipboard": "{type: string} a fost copiat în clipboard",
-    "save": "Salvează"
+    "save": "Salvează",
+    "validation": {
+      "required": "Acest câmp este obligatoriu",
+      "minChars": "Trebuie să aibă cel puțin {min} caractere",
+      "invalidPostalCode": "Cod poștal invalid"
+    }
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Adresa de livrare",
-      "fullName": "Nume complet",
+      "firstName": "Prenume",
+      "lastName": "Nume de familie",
       "addressLine1": "Adresa linia 1",
       "addressLine2": "Adresa linia 2",
       "city": "Oraș",

@@ -2703,6 +2703,8 @@
         "csvExport": "トランザクションをCSVにエクスポートする",
         "date": "日付",
         "description": "説明",
+        "discard": "破棄",
+        "discardChangesMessage": "保存されていない変更があります。破棄してもよろしいですか？",
         "domain": "ドメイン",
         "email": "メールアドレス",
         "error": "エラー",
@@ -2789,7 +2791,12 @@
         "support": "サポート",
         "profiles": "プロフィール",
         "paste": "貼り付け",
-        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました"
+        "hasBeenCopiedToClipboard": "{type: string}をクリップボードにコピーしました",
+        "validation": {
+            "required": "この項目は必須です",
+            "minChars": "{min}文字以上で入力してください",
+            "invalidPostalCode": "無効な郵便番号"
+        }
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",
@@ -3169,7 +3176,8 @@
         },
         "ShippingAddress": {
             "title": "配送先住所",
-            "fullName": "氏名",
+            "firstName": "名",
+            "lastName": "姓",
             "addressLine1": "住所1",
             "addressLine2": "住所2",
             "city": "市区町村",

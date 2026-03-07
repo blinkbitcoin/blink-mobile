@@ -1,38 +1,29 @@
 import React, { useCallback, useState } from "react"
-import { View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
-import {
-  ContactSupportRow,
-  IconTextButton,
-  InfoCard,
-  StatementItem,
-  SwitchRow,
-} from "@app/components/card-screen"
-
-import { SettingsGroup } from "@app/screens/settings-screen/group"
+import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
-import {
-  DEFAULT_YEAR,
-  MOCK_STATEMENTS,
-  MOCK_YEAR_OPTIONS,
-} from "./card-statements-mock-data"
+import { useStatementsData } from "./hooks"
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const {
     theme: { colors },
   } = useTheme()
-  const { LL } = useI18nContext()
 
-  const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  const { statements, yearOptions, currentYear, loading } = useStatementsData()
 
-  const currentStatement = MOCK_STATEMENTS.find((s) => s.isCurrent)
-  const monthlyStatements = MOCK_STATEMENTS.filter((s) => s.year === selectedYear)
+  const [selectedYear, setSelectedYear] = useState(currentYear)
+  // TODO: uncomment when CardStatements notification category is available in blink core
+  // const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+
+  const currentStatement = statements.find((s) => s.isCurrent)
+  const monthlyStatements = statements.filter((s) => s.year === selectedYear)
 
   const getStatementsLabel = useCallback(
     (count: number): string => {
@@ -42,16 +33,29 @@ export const CardStatementsScreen: React.FC = () => {
     [LL],
   )
 
-  const handleDownload = (statementId: string) => {
-    console.log("Download statement:", statementId)
-  }
+  /*
+   * TODO: uncomment when PDF download is available
+   * const handleDownload = (statementId: string) => {
+   *   console.log("Download statement:", statementId)
+   * }
+   *
+   * const handleDownloadAll = () => {
+   *   console.log("Download all statements")
+   * }
+   */
 
-  const handleDownloadAll = () => {
-    console.log("Download all statements")
-  }
-
-  const handleContactSupport = () => {
-    console.log("Contact support")
+  if (loading) {
+    return (
+      <Screen preset="scroll">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            testID="activity-indicator"
+            size="large"
+            color={colors.primary}
+          />
+        </View>
+      </Screen>
+    )
   }
 
   return (
@@ -62,7 +66,7 @@ export const CardStatementsScreen: React.FC = () => {
             {LL.CardFlow.CardStatements.selectYear()}
           </Text>
           <YearSelector
-            years={MOCK_YEAR_OPTIONS}
+            years={yearOptions}
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
             itemLabel={getStatementsLabel}
@@ -100,11 +104,14 @@ export const CardStatementsScreen: React.FC = () => {
             {LL.CardFlow.CardStatements.monthlyStatements()}
           </Text>
           <View style={styles.statementsContainer}>
-            <IconTextButton
-              icon="download"
-              label={LL.CardFlow.CardStatements.downloadAll()}
-              onPress={handleDownloadAll}
-            />
+            {/*
+             * TODO: uncomment when PDF download is available
+             * <IconTextButton
+             *   icon="download"
+             *   label={LL.CardFlow.CardStatements.downloadAll()}
+             *   onPress={handleDownloadAll}
+             * />
+             */}
 
             {monthlyStatements.map((statement) => (
               <StatementItem
@@ -123,8 +130,11 @@ export const CardStatementsScreen: React.FC = () => {
                         amount: statement.totalSpent,
                       })
                 }
-                onDownload={() => handleDownload(statement.id)}
-                isDownloaded={statement.isDownloaded}
+                /*
+                 * TODO: uncomment when PDF download is available
+                 * onDownload={() => handleDownload(statement.id)}
+                 * isDownloaded={statement.isDownloaded}
+                 */
               />
             ))}
           </View>
@@ -135,35 +145,36 @@ export const CardStatementsScreen: React.FC = () => {
           bulletItems={[
             LL.CardFlow.CardStatements.aboutBullet1(),
             LL.CardFlow.CardStatements.aboutBullet2(),
-            LL.CardFlow.CardStatements.aboutBullet3(),
+            // TODO: uncomment when PDF download is available
+            // LL.CardFlow.CardStatements.aboutBullet3(),
           ]}
           showIcon={false}
           size="lg"
           bulletSpacing={1}
         />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{LL.common.notifications()}</Text>
-          <SettingsGroup
-            containerStyle={styles.settingsGroupContainer}
-            items={[
-              () => (
-                <SwitchRow
-                  title={LL.CardFlow.CardStatements.notifyNewStatements()}
-                  value={notificationsEnabled}
-                  onValueChange={(value) => setNotificationsEnabled(value)}
-                />
-              ),
-            ]}
-          />
-        </View>
+        {/*
+         * TODO: uncomment when CardStatements notification category is available in blink core
+         * <View style={styles.section}>
+         *   <Text style={styles.sectionLabel}>{LL.common.notifications()}</Text>
+         *   <SettingsGroup
+         *     containerStyle={styles.settingsGroupContainer}
+         *     items={[
+         *       () => (
+         *         <SwitchRow
+         *           title={LL.CardFlow.CardStatements.notifyNewStatements()}
+         *           value={notificationsEnabled}
+         *           onValueChange={(value) => setNotificationsEnabled(value)}
+         *         />
+         *       ),
+         *     ]}
+         *   />
+         * </View>
+         */}
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{LL.common.support()}</Text>
-          <ContactSupportRow
-            onPress={handleContactSupport}
-            rightIconColor={colors.black}
-          />
+          <ContactSupportRow />
         </View>
       </View>
     </Screen>
@@ -171,6 +182,11 @@ export const CardStatementsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   content: {
     paddingHorizontal: 24,
     paddingTop: 20,

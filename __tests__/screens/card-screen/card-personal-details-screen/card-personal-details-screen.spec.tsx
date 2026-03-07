@@ -24,18 +24,6 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-type MockShippingAddress = {
-  firstName: string | null
-  lastName: string | null
-  line1: string
-  line2: string | null
-  city: string
-  region: string
-  postalCode: string
-  country: string | null
-  countryCode: string
-}
-
 type PersonalDetailsReturn = {
   firstName: string
   lastName: string
@@ -43,21 +31,9 @@ type PersonalDetailsReturn = {
   onboardingStatus: OnboardingStatus | null
   email: string
   phone: string
-  shippingAddress: MockShippingAddress | null
+  shippingAddress: null
   loading: boolean
   error: Error | undefined
-}
-
-const defaultMockShippingAddress: MockShippingAddress = {
-  firstName: "John",
-  lastName: "Doe",
-  line1: "456 Oak Avenue",
-  line2: "Suite 7",
-  city: "Miami",
-  region: "FL",
-  postalCode: "33101",
-  country: "United States",
-  countryCode: "US",
 }
 
 const defaultMockData: PersonalDetailsReturn = {
@@ -67,7 +43,7 @@ const defaultMockData: PersonalDetailsReturn = {
   onboardingStatus: OnboardingStatus.Approved,
   email: "john@example.com",
   phone: "+1 (999) 888-7777",
-  shippingAddress: defaultMockShippingAddress,
+  shippingAddress: null,
   loading: false,
   error: undefined,
 }
@@ -516,41 +492,6 @@ describe("CardPersonalDetailsScreen", () => {
     })
   })
 
-  describe("shipping address section", () => {
-    it("displays shipping address from hook data", async () => {
-      const { getByText, getAllByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Shipping address")).toBeTruthy()
-      expect(getByText("456 Oak Avenue")).toBeTruthy()
-      expect(getByText("Suite 7")).toBeTruthy()
-      expect(getByText("Miami, FL 33101")).toBeTruthy()
-      expect(getAllByText("United States").length).toBeGreaterThanOrEqual(1)
-    })
-
-    it("hides shipping address section when null", async () => {
-      mockPersonalDetailsReturn = {
-        ...defaultMockData,
-        shippingAddress: null,
-      }
-
-      const { queryByText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(queryByText("Shipping address")).toBeNull()
-    })
-  })
-
   describe("support section", () => {
     it("displays support section title", async () => {
       const { getByText } = render(
@@ -596,25 +537,6 @@ describe("CardPersonalDetailsScreen", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith("Change KYC information pressed")
       consoleSpy.mockRestore()
-    })
-
-    it("navigates to shipping address screen when edit shipping address is pressed", async () => {
-      const { getByLabelText } = render(
-        <ContextForScreen>
-          <CardPersonalDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const shippingAddress = getByLabelText(
-        "John Doe, 456 Oak Avenue, Suite 7, Miami, FL 33101, United States",
-      )
-      await act(async () => {
-        fireEvent.press(shippingAddress)
-      })
-
-      expect(mockNavigate).toHaveBeenCalledWith("cardShippingAddressScreen")
     })
   })
 })

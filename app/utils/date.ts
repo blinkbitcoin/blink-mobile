@@ -109,6 +109,15 @@ export const parseCardValidThru = (
   return null
 }
 
+export const getLastDayOfMonth = (year: number, month: number): number =>
+  new Date(year, month + 1, 0).getDate()
+
+export const formatMonth = (
+  locale: string,
+  date: Date,
+  style: "short" | "long",
+): string => date.toLocaleString(locale, { month: style })
+
 export const formatCardValidThruDisplay = (
   value: string | Date,
   showDetails: boolean,

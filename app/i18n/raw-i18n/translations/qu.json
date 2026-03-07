@@ -2703,6 +2703,8 @@
     "csvExport": "Kawsayniyta CSV tukuykunawan kaniy",
     "date": "P'anqa",
     "description": "Riqsichiy",
+    "discard": "Wikchuy",
+    "discardChangesMessage": "Mana waqaychisqa tikraykunayuqmi kanki. ¿Chiqaqtachu wikchuyta munanki?",
     "domain": "Kawsayninchik",
     "email": "Chaskiwillana",
     "error": "Llimphi",
@@ -2789,7 +2791,12 @@
     "profiles": "Perfilkuna",
     "paste": "P'itiy",
     "hasBeenCopiedToClipboard": "{type: string} clipboard nisqaman churasqa kachkan",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Kay qillqana kiti rurananchikpaqmi",
+      "minChars": "{min} sanampakama kanan",
+      "invalidPostalCode": "Mana allin código postal"
+    }
   },
   "errors": {
     "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",
@@ -3166,7 +3173,8 @@
     },
     "ShippingAddress": {
       "title": "Shipping address",
-      "fullName": "Full name",
+      "firstName": "Ñawpaq suti",
+      "lastName": "Ayllu suti",
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",

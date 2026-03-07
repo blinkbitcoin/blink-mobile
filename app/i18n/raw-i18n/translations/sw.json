@@ -2686,6 +2686,8 @@
     "csvExport": "Hifadhi malipo kama CSV",
     "date": "Tarehe",
     "description": "Maelezo",
+    "discard": "Tupa",
+    "discardChangesMessage": "Una mabadiliko ambayo hayajahifadhiwa. Je, una uhakika unataka kuyatupa?",
     "domain": "Kikoa",
     "email": "Barua pepe",
     "error": "Hitilafu",
@@ -2772,7 +2774,12 @@
     "profiles": "Wasifu",
     "paste": "Bandika",
     "hasBeenCopiedToClipboard": "{type: string} imekopishwa kwenye ubao wa kunakili",
-    "save": "Hifadhi"
+    "save": "Hifadhi",
+    "validation": {
+      "required": "Sehemu hii inahitajika",
+      "minChars": "Lazima iwe na angalau herufi {min}",
+      "invalidPostalCode": "Nambari ya posta si sahihi"
+    }
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Anwani ya usafirishaji",
-      "fullName": "Jina kamili",
+      "firstName": "Jina la kwanza",
+      "lastName": "Jina la mwisho",
       "addressLine1": "Mstari wa anwani 1",
       "addressLine2": "Mstari wa anwani 2",
       "city": "Jiji",

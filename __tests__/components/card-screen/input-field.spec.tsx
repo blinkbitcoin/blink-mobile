@@ -14,6 +14,8 @@ jest.mock("@rn-vui/themed", () => ({
     value: {},
     editableInput: {},
     helperText: {},
+    helperTextError: {},
+    helperTextContainer: { minHeight: 13 },
   }),
   useTheme: () => ({
     theme: {
@@ -169,14 +171,27 @@ describe("InputField", () => {
       )
       expect(getByText("Max $10,000 per day")).toBeTruthy()
     })
+
+    it("reserves space for helper text when none provided", () => {
+      const { toJSON } = render(<InputField label="Amount" value="100" editable />)
+      const tree = JSON.stringify(toJSON())
+
+      expect(tree).toContain('"minHeight":13')
+      expect(tree).not.toContain("Max $10,000 per day")
+    })
   })
 
   describe("helper text", () => {
-    it("renders helper text in read-only mode", () => {
+    it("renders helper text in read-only mode when provided", () => {
       const { getByText } = render(
         <InputField label="Name" value="Satoshi" helperText="This is your legal name" />,
       )
       expect(getByText("This is your legal name")).toBeTruthy()
+    })
+
+    it("does not render helper text in read-only mode when not provided", () => {
+      const { queryByText } = render(<InputField label="Name" value="Satoshi" />)
+      expect(queryByText("This is your legal name")).toBeNull()
     })
   })
 

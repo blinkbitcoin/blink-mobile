@@ -2686,6 +2686,8 @@
     "csvExport": "Tranzakciók exportálása CSV formátumban",
     "date": "Dátum",
     "description": "Leírás",
+    "discard": "Elvetés",
+    "discardChangesMessage": "Mentetlen módosításai vannak. Biztosan el szeretné vetni őket?",
     "domain": "Domain",
     "email": "Email",
     "error": "Hiba",
@@ -2772,7 +2774,12 @@
     "profiles": "Profilok",
     "paste": "Beillesztés",
     "hasBeenCopiedToClipboard": "{type: string} a vágólapra másolva",
-    "save": "Mentés"
+    "save": "Mentés",
+    "validation": {
+      "required": "Ez a mező kötelező",
+      "minChars": "Legalább {min} karakter szükséges",
+      "invalidPostalCode": "Érvénytelen irányítószám"
+    }
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Szállítási cím",
-      "fullName": "Teljes név",
+      "firstName": "Keresztnév",
+      "lastName": "Vezetéknév",
       "addressLine1": "Cím 1. sor",
       "addressLine2": "Cím 2. sor",
       "city": "Város",

@@ -2703,6 +2703,8 @@
     "csvExport": "Eksport transaksi kepada fail csv",
     "date": "Tarikh",
     "description": "Penerangan",
+    "discard": "Buang",
+    "discardChangesMessage": "Anda mempunyai perubahan yang belum disimpan. Adakah anda pasti mahu membuangnya?",
     "domain": "Domain",
     "email": "Emel",
     "error": "Masalah",
@@ -2789,7 +2791,12 @@
     "profiles": "Profil",
     "paste": "Tampal",
     "hasBeenCopiedToClipboard": "{type: string} telah disalin ke clipboard",
-    "save": "Simpan"
+    "save": "Simpan",
+    "validation": {
+      "required": "Medan ini diperlukan",
+      "minChars": "Mesti sekurang-kurangnya {min} aksara",
+      "invalidPostalCode": "Poskod tidak sah"
+    }
   },
   "errors": {
     "generic": "Ada masalah timbul\nSila cuba lagi",
@@ -3169,7 +3176,8 @@
     },
     "ShippingAddress": {
       "title": "Alamat penghantaran",
-      "fullName": "Nama penuh",
+      "firstName": "Nama pertama",
+      "lastName": "Nama keluarga",
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Bandar",

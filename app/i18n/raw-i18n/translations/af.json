@@ -2703,6 +2703,8 @@
     "csvExport": "Voer transaksies as CSV uit",
     "date": "Datum",
     "description": "Beskrywing",
+    "discard": "Gooi weg",
+    "discardChangesMessage": "Jy het ongestoorde veranderinge. Is jy seker jy wil dit weggooi?",
     "domain": "Domein",
     "email": "E-pos",
     "error": "Fout",
@@ -2789,7 +2791,12 @@
     "profiles": "Profiele",
     "paste": "Plak",
     "hasBeenCopiedToClipboard": "{type: string} is na knipbord oorgedra",
-    "save": "Stoor"
+    "save": "Stoor",
+    "validation": {
+      "required": "Hierdie veld is verpligtend",
+      "minChars": "Moet ten minste {min} karakters wees",
+      "invalidPostalCode": "Ongeldige poskode"
+    }
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -3169,7 +3176,8 @@
     },
     "ShippingAddress": {
       "title": "Afleweringsadres",
-      "fullName": "Volle naam",
+      "firstName": "Voornaam",
+      "lastName": "Van",
       "addressLine1": "Adreslyn 1",
       "addressLine2": "Adreslyn 2",
       "city": "Stad",

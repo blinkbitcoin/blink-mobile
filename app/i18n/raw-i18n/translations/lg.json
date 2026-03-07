@@ -2686,6 +2686,8 @@
     "csvExport": "Ggyayo empanyisiganya nga CSV",
     "date": "Olunaku olw'omweezi",
     "description": "Okunnyonnyola",
+    "discard": "Suula",
+    "discardChangesMessage": "Olina enkyukakyuka ezitaasaavudde. Oli mukakafu nti oyagala okuzisaanyaawo?",
     "domain": "Amatwale",
     "email": "Email",
     "error": "Ekyonoono",
@@ -2772,7 +2774,12 @@
     "profiles": "Profayiro",
     "paste": "Teeka",
     "hasBeenCopiedToClipboard": "{type: string} ekoppoleddwa ku lutimbe",
-    "save": "Save"
+    "save": "Save",
+    "validation": {
+      "required": "Ekisenge kino kyetaagibwa",
+      "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo",
+      "invalidPostalCode": "Koodi y'eposta si nnungi"
+    }
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -3128,7 +3135,8 @@
     },
     "ShippingAddress": {
       "title": "Shipping address",
-      "fullName": "Full name",
+      "firstName": "Erinnya ery'omu maaso",
+      "lastName": "Erinnya ery'oku nkomerero",
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",

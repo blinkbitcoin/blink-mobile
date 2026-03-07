@@ -3,7 +3,8 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MOCK_USER, ShippingAddress } from "../card-mock-data"
+import { MOCK_USER } from "../card-mock-data"
+import { ShippingAddress } from "../types"
 
 import { IssueType, DeliveryType } from "./steps/types"
 

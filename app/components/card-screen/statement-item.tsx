@@ -10,7 +10,7 @@ type StatementItemProps = {
   title: string
   subtitle1?: string
   subtitle2?: string
-  onDownload: () => void
+  onDownload?: () => void
   isDownloaded?: boolean
 }
 
@@ -29,6 +29,7 @@ export const StatementItem: React.FC<StatementItemProps> = ({
   const [isDownloaded, setIsDownloaded] = useState(initialDownloaded)
 
   const handleDownload = useCallback(() => {
+    if (!onDownload) return
     onDownload()
     setIsDownloaded(true)
   }, [onDownload])
@@ -41,20 +42,22 @@ export const StatementItem: React.FC<StatementItemProps> = ({
         {subtitle1 && <Text style={styles.subtitle1}>{subtitle1}</Text>}
         {subtitle2 && <Text style={styles.subtitle2}>{subtitle2}</Text>}
       </View>
-      <TouchableOpacity
-        testID="statement-download-button"
-        style={styles.downloadButton}
-        onPress={handleDownload}
-        accessibilityRole="button"
-        accessibilityLabel="Download statement"
-      >
-        <GaloyIcon
-          name="download"
-          size={20}
-          color={colors.primary}
-          opacity={isDownloaded ? DOWNLOADED_OPACITY : 1}
-        />
-      </TouchableOpacity>
+      {onDownload && (
+        <TouchableOpacity
+          testID="statement-download-button"
+          style={styles.downloadButton}
+          onPress={handleDownload}
+          accessibilityRole="button"
+          accessibilityLabel="Download statement"
+        >
+          <GaloyIcon
+            name="download"
+            size={20}
+            color={colors.primary}
+            opacity={isDownloaded ? DOWNLOADED_OPACITY : 1}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   )
 }

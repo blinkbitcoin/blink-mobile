@@ -2686,6 +2686,8 @@
         "csvExport": "Esporta le transazioni come CSV",
         "date": "Data",
         "description": "Descrizione",
+        "discard": "Elimina",
+        "discardChangesMessage": "Hai modifiche non salvate. Sei sicuro di volerle eliminare?",
         "domain": "Dominio",
         "email": "Email",
         "error": "Errore",
@@ -2772,7 +2774,12 @@
         "support": "Supporto",
         "profiles": "Profili",
         "paste": "Incolla",
-        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti"
+        "hasBeenCopiedToClipboard": "{type: string} è stato copiato negli appunti",
+        "validation": {
+            "required": "Questo campo è obbligatorio",
+            "minChars": "Deve contenere almeno {min} caratteri",
+            "invalidPostalCode": "Codice postale non valido"
+        }
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",
@@ -3128,7 +3135,8 @@
         },
         "ShippingAddress": {
             "title": "Indirizzo di spedizione",
-            "fullName": "Nome completo",
+            "firstName": "Nome",
+            "lastName": "Cognome",
             "addressLine1": "Indirizzo riga 1",
             "addressLine2": "Indirizzo riga 2",
             "city": "Città",
