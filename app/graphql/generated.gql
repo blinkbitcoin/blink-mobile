@@ -1470,6 +1470,44 @@ query paymentRequest {
   }
 }
 
+query personalDetails {
+  me {
+    id
+    phone
+    email {
+      address
+      __typename
+    }
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        firstName
+        lastName
+        onboardingStatus
+        cards {
+          id
+          shippingAddress {
+            firstName
+            lastName
+            line1
+            line2
+            city
+            region
+            postalCode
+            country
+            countryCode
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query priceHistoryScreen {
   me {
     id

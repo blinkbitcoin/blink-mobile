@@ -3127,7 +3127,19 @@
       "dateOfBirth": "Geboortedatum",
       "contactInformation": "Kontakinligting",
       "registeredAddress": "Geregistreerde adres",
-      "shippingAddress": "Afleweringsadres"
+      "shippingAddress": "Afleweringsadres",
+      "kycPendingTitle": "KYC-verifikasie hangende",
+      "kycPendingDescription": "Jou KYC-verifikasie word verwerk. Dit kan 'n rukkie neem.",
+      "kycDeclinedTitle": "KYC-verifikasie afgewys",
+      "kycDeclinedDescription": "Jou KYC-verifikasie is afgewys. Kontak asseblief ondersteuning vir meer inligting.",
+      "kycNotStartedTitle": "Voltooi KYC-verifikasie",
+      "kycNotStartedDescription": "Voltooi die KYC-verifikasieproses om alle kaartfunksies te ontsluit.",
+      "kycAwaitingInputTitle": "Gaan voort met KYC-verifikasie",
+      "kycAwaitingInputDescription": "Bykomende inligting word benodig om jou KYC-verifikasie te voltooi.",
+      "kycErrorTitle": "Verifikasiefout",
+      "kycErrorDescription": "Daar het 'n fout opgetree tydens verifikasie. Probeer asseblief weer of kontak ondersteuning.",
+      "kycUnderReviewTitle": "KYC onder hersiening",
+      "kycUnderReviewDescription": "Jou KYC-verifikasie word tans handmatig hersien. Dit kan 'n rukkie neem."
     },
     "AddToMobileWallet": {
       "title": "Voeg by mobiele beursie",

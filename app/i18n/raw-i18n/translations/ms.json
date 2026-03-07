@@ -3127,7 +3127,19 @@
       "dateOfBirth": "Tarikh lahir",
       "contactInformation": "Maklumat hubungan",
       "registeredAddress": "Alamat berdaftar",
-      "shippingAddress": "Alamat penghantaran"
+      "shippingAddress": "Alamat penghantaran",
+      "kycPendingTitle": "Pengesahan KYC dalam proses",
+      "kycPendingDescription": "Pengesahan KYC anda sedang diproses. Ini mungkin mengambil sedikit masa.",
+      "kycDeclinedTitle": "Pengesahan KYC ditolak",
+      "kycDeclinedDescription": "Pengesahan KYC anda telah ditolak. Sila hubungi sokongan untuk maklumat lanjut.",
+      "kycNotStartedTitle": "Lengkapkan pengesahan KYC",
+      "kycNotStartedDescription": "Lengkapkan proses pengesahan KYC untuk membuka semua ciri kad.",
+      "kycAwaitingInputTitle": "Teruskan pengesahan KYC",
+      "kycAwaitingInputDescription": "Maklumat tambahan diperlukan untuk melengkapkan pengesahan KYC anda.",
+      "kycErrorTitle": "Ralat pengesahan",
+      "kycErrorDescription": "Ralat berlaku semasa pengesahan. Sila cuba lagi atau hubungi sokongan.",
+      "kycUnderReviewTitle": "KYC dalam semakan",
+      "kycUnderReviewDescription": "Pengesahan KYC anda sedang dalam semakan manual. Ini mungkin mengambil sedikit masa."
     },
     "AddToMobileWallet": {
       "title": "Tambah ke dompet mudah alih",

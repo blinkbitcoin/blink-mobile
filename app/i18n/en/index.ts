@@ -3192,6 +3192,24 @@ const en: BaseTranslation = {
       contactInformation: "Contact information",
       registeredAddress: "Registered address",
       shippingAddress: "Shipping address",
+      kycPendingTitle: "KYC verification pending",
+      kycPendingDescription:
+        "Your KYC verification is being processed. This may take some time.",
+      kycDeclinedTitle: "KYC verification declined",
+      kycDeclinedDescription:
+        "Your KYC verification was declined. Please contact support for more information.",
+      kycNotStartedTitle: "Complete KYC verification",
+      kycNotStartedDescription:
+        "Complete the KYC verification process to unlock all card features.",
+      kycAwaitingInputTitle: "Continue KYC verification",
+      kycAwaitingInputDescription:
+        "Additional information is required to complete your KYC verification.",
+      kycUnderReviewTitle: "KYC under review",
+      kycUnderReviewDescription:
+        "Your KYC verification is under manual review. This may take some time.",
+      kycErrorTitle: "Verification error",
+      kycErrorDescription:
+        "An error occurred during verification. Please try again or contact support.",
     },
     AddToMobileWallet: {
       title: "Add to mobile wallet",

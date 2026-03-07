@@ -3133,7 +3133,19 @@
       "dateOfBirth": "Umhla wokuzalwa",
       "contactInformation": "Ulwazi loqhagamshelwano",
       "registeredAddress": "Idilesi ebhalisiweyo",
-      "shippingAddress": "Idilesi yokuthumela"
+      "shippingAddress": "Idilesi yokuthumela",
+      "kycPendingTitle": "Uqinisekiso lwe-KYC luyalindile",
+      "kycPendingDescription": "Uqinisekiso lwakho lwe-KYC luyenziwa. Oku kunokuthatha ixesha.",
+      "kycDeclinedTitle": "Uqinisekiso lwe-KYC lwalelwa",
+      "kycDeclinedDescription": "Uqinisekiso lwakho lwe-KYC lwalelwa. Nceda uqhagamshelane nenkxaso ukuze ufumane inkcazelo engakumbi.",
+      "kycNotStartedTitle": "Gqibezela uqinisekiso lwe-KYC",
+      "kycNotStartedDescription": "Gqibezela inkqubo yoqinisekiso lwe-KYC ukuvula zonke iimpawu zekhadi.",
+      "kycAwaitingInputTitle": "Qhubeka noqinisekiso lwe-KYC",
+      "kycAwaitingInputDescription": "Kudingeka ulwazi olongezelelweyo ukugqibezela uqinisekiso lwakho lwe-KYC.",
+      "kycErrorTitle": "Impazamo yoqinisekiso",
+      "kycErrorDescription": "Kwenzeke impazamo ngexesha loqinisekiso. Nceda uzame kwakhona okanye uqhagamshelane nenkxaso.",
+      "kycUnderReviewTitle": "KYC iyahlolwa",
+      "kycUnderReviewDescription": "Ukuqinisekiswa kwakho kwe-KYC kuhlolwa ngesandla. Oku kunokuthatha ixesha."
     },
     "AddToMobileWallet": {
       "title": "Yongeza kwisipaji sefowuni",

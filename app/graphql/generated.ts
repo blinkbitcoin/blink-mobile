@@ -3099,6 +3099,11 @@ export type CardUpdateLimitsMutationVariables = Exact<{
 
 export type CardUpdateLimitsMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null } };
 
+export type PersonalDetailsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PersonalDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly firstName?: string | null, readonly lastName?: string | null, readonly onboardingStatus?: OnboardingStatus | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly shippingAddress?: { readonly __typename: 'ShippingAddress', readonly firstName?: string | null, readonly lastName?: string | null, readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly country?: string | null, readonly countryCode: string } | null }> } } | null };
+
 export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string };
 
 export type CardQueryVariables = Exact<{ [key: string]: never; }>;
@@ -5097,6 +5102,71 @@ export function useCardUpdateLimitsMutation(baseOptions?: Apollo.MutationHookOpt
 export type CardUpdateLimitsMutationHookResult = ReturnType<typeof useCardUpdateLimitsMutation>;
 export type CardUpdateLimitsMutationResult = Apollo.MutationResult<CardUpdateLimitsMutation>;
 export type CardUpdateLimitsMutationOptions = Apollo.BaseMutationOptions<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>;
+export const PersonalDetailsDocument = gql`
+    query personalDetails {
+  me {
+    id
+    phone
+    email {
+      address
+    }
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        firstName
+        lastName
+        onboardingStatus
+        cards {
+          id
+          shippingAddress {
+            firstName
+            lastName
+            line1
+            line2
+            city
+            region
+            postalCode
+            country
+            countryCode
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __usePersonalDetailsQuery__
+ *
+ * To run a query within a React component, call `usePersonalDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalDetailsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalDetailsQuery(baseOptions?: Apollo.QueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+      }
+export function usePersonalDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+        }
+export function usePersonalDetailsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+        }
+export type PersonalDetailsQueryHookResult = ReturnType<typeof usePersonalDetailsQuery>;
+export type PersonalDetailsLazyQueryHookResult = ReturnType<typeof usePersonalDetailsLazyQuery>;
+export type PersonalDetailsSuspenseQueryHookResult = ReturnType<typeof usePersonalDetailsSuspenseQuery>;
+export type PersonalDetailsQueryResult = Apollo.QueryResult<PersonalDetailsQuery, PersonalDetailsQueryVariables>;
 export const CardDocument = gql`
     query card {
   me {

@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Data nașterii",
       "contactInformation": "Informații de contact",
       "registeredAddress": "Adresă înregistrată",
-      "shippingAddress": "Adresă de livrare"
+      "shippingAddress": "Adresă de livrare",
+      "kycPendingTitle": "Verificare KYC în așteptare",
+      "kycPendingDescription": "Verificarea KYC este în curs de procesare. Acest lucru poate dura ceva timp.",
+      "kycDeclinedTitle": "Verificare KYC respinsă",
+      "kycDeclinedDescription": "Verificarea KYC a fost respinsă. Contactați suportul pentru mai multe informații.",
+      "kycNotStartedTitle": "Finalizați verificarea KYC",
+      "kycNotStartedDescription": "Finalizați procesul de verificare KYC pentru a debloca toate funcțiile cardului.",
+      "kycAwaitingInputTitle": "Continuați verificarea KYC",
+      "kycAwaitingInputDescription": "Sunt necesare informații suplimentare pentru a finaliza verificarea KYC.",
+      "kycErrorTitle": "Eroare de verificare",
+      "kycErrorDescription": "A apărut o eroare în timpul verificării. Încercați din nou sau contactați suportul.",
+      "kycUnderReviewTitle": "KYC în curs de revizuire",
+      "kycUnderReviewDescription": "Verificarea KYC este în curs de revizuire manuală. Aceasta poate dura ceva timp."
     },
     "AddToMobileWallet": {
       "title": "Adauga in portofelul mobil",

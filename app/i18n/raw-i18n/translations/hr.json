@@ -3127,7 +3127,19 @@
       "dateOfBirth": "Datum rođenja",
       "contactInformation": "Kontakt informacije",
       "registeredAddress": "Registrirana adresa",
-      "shippingAddress": "Adresa za dostavu"
+      "shippingAddress": "Adresa za dostavu",
+      "kycPendingTitle": "KYC provjera na čekanju",
+      "kycPendingDescription": "Vaša KYC provjera se obrađuje. To može potrajati neko vrijeme.",
+      "kycDeclinedTitle": "KYC provjera odbijena",
+      "kycDeclinedDescription": "Vaša KYC provjera je odbijena. Obratite se podršci za više informacija.",
+      "kycNotStartedTitle": "Dovršite KYC provjeru",
+      "kycNotStartedDescription": "Dovršite proces KYC provjere kako biste otključali sve značajke kartice.",
+      "kycAwaitingInputTitle": "Nastavite KYC provjeru",
+      "kycAwaitingInputDescription": "Potrebne su dodatne informacije za dovršetak vaše KYC provjere.",
+      "kycErrorTitle": "Greška provjere",
+      "kycErrorDescription": "Došlo je do greške tijekom provjere. Pokušajte ponovo ili se obratite podršci.",
+      "kycUnderReviewTitle": "KYC na pregledu",
+      "kycUnderReviewDescription": "Vaša KYC verifikacija je na ručnom pregledu. To može potrajati neko vrijeme."
     },
     "AddToMobileWallet": {
       "title": "Dodaj u mobilni novcanik",

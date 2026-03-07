@@ -3086,7 +3086,19 @@
       "dateOfBirth": "Ennaku z'okuzaalibwa",
       "contactInformation": "Ebikwata ku kutuukirira",
       "registeredAddress": "Endagiriro ewandiisiddwa",
-      "shippingAddress": "Endagiriro y'okutumira"
+      "shippingAddress": "Endagiriro y'okutumira",
+      "kycPendingTitle": "Okukakasa KYC kulindiriddwa",
+      "kycPendingDescription": "Okukakasa kwo KYC kukolebwa. Kino kiyinza okumala akaseera.",
+      "kycDeclinedTitle": "Okukakasa KYC kugaaniddwa",
+      "kycDeclinedDescription": "Okukakasa kwo KYC kugaaniddwa. Tuukiriza okutuukirira obuyambi okumanya ebisingawo.",
+      "kycNotStartedTitle": "Mala okukakasa KYC",
+      "kycNotStartedDescription": "Mala enkola y'okukakasa KYC okuggulawo ebikozesebwa byonna eby'akaadi.",
+      "kycAwaitingInputTitle": "Weyongere n'okukakasa KYC",
+      "kycAwaitingInputDescription": "Ebimanyiddwa ebisingawo byetaagisa okumala okukakasa KYC.",
+      "kycErrorTitle": "Ensobi mu kukakasa",
+      "kycErrorDescription": "Wabadewo ensobi mu kukakasa. Gezaako nate oba otuukirire obuyambi.",
+      "kycUnderReviewTitle": "KYC erambibwa",
+      "kycUnderReviewDescription": "Okukakasibwa kwo KYC kurambibwa mu ngalo. Kino kiyinza okutwala akaseera."
     },
     "AddToMobileWallet": {
       "title": "Yongera ku ssaamu ya simu",

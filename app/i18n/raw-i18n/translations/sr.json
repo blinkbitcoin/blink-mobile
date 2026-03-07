@@ -3124,7 +3124,19 @@
       "dateOfBirth": "Датум рођења",
       "contactInformation": "Контакт информације",
       "registeredAddress": "Регистрована адреса",
-      "shippingAddress": "Адреса за доставу"
+      "shippingAddress": "Адреса за доставу",
+      "kycPendingTitle": "КYC верификација на чекању",
+      "kycPendingDescription": "Ваша КYC верификација се обрађује. Ово може потрајати неко време.",
+      "kycDeclinedTitle": "КYC верификација одбијена",
+      "kycDeclinedDescription": "Ваша КYC верификација је одбијена. Контактирајте подршку за више информација.",
+      "kycNotStartedTitle": "Завршите КYC верификацију",
+      "kycNotStartedDescription": "Завршите процес КYC верификације да бисте откључали све функције картице.",
+      "kycAwaitingInputTitle": "Наставите КYC верификацију",
+      "kycAwaitingInputDescription": "Додатне информације су потребне за завршетак ваше КYC верификације.",
+      "kycErrorTitle": "Грешка верификације",
+      "kycErrorDescription": "Дошло је до грешке током верификације. Покушајте поново или контактирајте подршку.",
+      "kycUnderReviewTitle": "KYC на прегледу",
+      "kycUnderReviewDescription": "Ваша KYC верификација је на ручном прегледу. Ово може потрајати неко време."
     },
     "AddToMobileWallet": {
       "title": "Dodaj u mobilni novcanik",
