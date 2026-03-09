@@ -383,7 +383,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         activeInputRef.current === InputType.Phone
       ) {
         const identifier = destination.validDestination.lnurlParams.identifier
-        const normalizedHandle = normalizeString(identifier)
+        const handle = identifier.split("@")[0]
+        const normalizedHandle = normalizeString(handle)
         const hasConfirmedUsername =
           normalizeString(destinationState.confirmationUsernameType?.username) ===
             normalizedHandle && destinationState.unparsedDestination === rawInput
@@ -396,7 +397,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
-                username: identifier,
+                username: handle,
               },
             },
           })
