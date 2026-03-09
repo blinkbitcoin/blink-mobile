@@ -65,6 +65,20 @@ describe("useBiometricGate", () => {
     expect(onFailure).not.toHaveBeenCalled()
   })
 
+  it("calls onFailure when isSensorAvailable throws", async () => {
+    mockIsSensorAvailable.mockRejectedValue(new Error("Permission denied"))
+
+    const onFailure = jest.fn()
+    const { result } = renderHook(() =>
+      useBiometricGate({ description: "test", onFailure }),
+    )
+
+    await act(async () => {})
+
+    expect(result.current).toBe(false)
+    expect(onFailure).toHaveBeenCalledTimes(1)
+  })
+
   it("calls onFailure on failed biometric auth", async () => {
     mockIsSensorAvailable.mockResolvedValue(true)
     mockAuthenticate.mockImplementation(

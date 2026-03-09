@@ -22,4 +22,16 @@ describe("formatPinBlock", () => {
     const block = formatPinBlock("0000")
     expect(block).toBe("240000FFFFFFFFFF")
   })
+
+  it("throws for PIN shorter than 4 digits", () => {
+    expect(() => formatPinBlock("123")).toThrow("PIN must be exactly 4 digits")
+  })
+
+  it("throws for PIN longer than 4 digits", () => {
+    expect(() => formatPinBlock("12345")).toThrow("PIN must be exactly 4 digits")
+  })
+
+  it("throws for empty PIN", () => {
+    expect(() => formatPinBlock("")).toThrow("PIN must be exactly 4 digits")
+  })
 })
