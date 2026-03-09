@@ -1,4 +1,4 @@
-import { formatPinBlock } from "@app/screens/card-screen/pin-screens/format-pin-block"
+import { formatPinBlock } from "@app/screens/card-screen/utils/format-pin-block"
 
 describe("formatPinBlock", () => {
   it("formats a 4-digit PIN correctly", () => {
