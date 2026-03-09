@@ -1151,6 +1151,10 @@ query cardBalance($cardId: ID!) {
   }
 }
 
+query cardEncryptionPublicKey {
+  cardEncryptionPublicKey
+}
+
 query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
   cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
     edges {

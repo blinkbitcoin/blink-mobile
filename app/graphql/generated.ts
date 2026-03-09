@@ -2028,6 +2028,7 @@ export type Query = {
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
   readonly cardBalance: CardBalance;
+  readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly colorScheme: Scalars['String']['output'];
@@ -3110,6 +3111,11 @@ export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }> } } | null };
+
+export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardEncryptionPublicKeyQuery = { readonly __typename: 'Query', readonly cardEncryptionPublicKey: string };
 
 export type CardPinUpdateMutationVariables = Exact<{
   input: CardPinUpdateInput;
@@ -5227,6 +5233,43 @@ export type CardQueryHookResult = ReturnType<typeof useCardQuery>;
 export type CardLazyQueryHookResult = ReturnType<typeof useCardLazyQuery>;
 export type CardSuspenseQueryHookResult = ReturnType<typeof useCardSuspenseQuery>;
 export type CardQueryResult = Apollo.QueryResult<CardQuery, CardQueryVariables>;
+export const CardEncryptionPublicKeyDocument = gql`
+    query cardEncryptionPublicKey {
+  cardEncryptionPublicKey
+}
+    `;
+
+/**
+ * __useCardEncryptionPublicKeyQuery__
+ *
+ * To run a query within a React component, call `useCardEncryptionPublicKeyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardEncryptionPublicKeyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardEncryptionPublicKeyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardEncryptionPublicKeyQuery(baseOptions?: Apollo.QueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+      }
+export function useCardEncryptionPublicKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+        }
+export function useCardEncryptionPublicKeySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+        }
+export type CardEncryptionPublicKeyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyQuery>;
+export type CardEncryptionPublicKeyLazyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyLazyQuery>;
+export type CardEncryptionPublicKeySuspenseQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeySuspenseQuery>;
+export type CardEncryptionPublicKeyQueryResult = Apollo.QueryResult<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>;
 export const CardPinUpdateDocument = gql`
     mutation cardPinUpdate($input: CardPinUpdateInput!) {
   cardPinUpdate(input: $input)
@@ -10412,6 +10455,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
