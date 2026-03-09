@@ -9,8 +9,18 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 let mockCard: { id: string } | undefined = { id: "card-123" }
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+const mockFetchPublicKey = jest.fn()
+jest.mock("@app/screens/card-screen/hooks", () => ({
   useCardData: () => ({ card: mockCard }),
+  useCardEncryption: () => ({ fetchPublicKey: mockFetchPublicKey, loading: false }),
+}))
+
+jest.mock("@app/screens/card-screen/utils/card-encryption", () => ({
+  encryptPin: () => ({
+    encryptedPin: "encrypted-pin-base64",
+    iv: "iv-base64",
+    sessionId: "session-id-base64",
+  }),
 }))
 
 jest.mock("@app/graphql/utils", () => ({
@@ -44,6 +54,9 @@ describe("useCardPinUpdate", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockCard = { id: "card-123" }
+    mockFetchPublicKey.mockResolvedValue({
+      data: { cardEncryptionPublicKey: "-----BEGIN PUBLIC KEY-----\nMOCK\n-----END PUBLIC KEY-----" },
+    })
   })
 
   it("returns true on successful mutation", async () => {
@@ -60,16 +73,38 @@ describe("useCardPinUpdate", () => {
     })
 
     expect(success).toBe(true)
+    expect(mockFetchPublicKey).toHaveBeenCalled()
     expect(mockMutate).toHaveBeenCalledWith({
       variables: {
         input: {
           cardId: "card-123",
-          encryptedPin: "245829FFFFFFFFFF",
-          iv: "",
-          sessionId: "",
+          encryptedPin: "encrypted-pin-base64",
+          iv: "iv-base64",
+          sessionId: "session-id-base64",
         },
       },
     })
+  })
+
+  it("returns false and shows toast when public key not available", async () => {
+    mockFetchPublicKey.mockResolvedValue({
+      data: { cardEncryptionPublicKey: null },
+    })
+
+    const { result } = renderHook(() => useCardPinUpdate())
+
+    let success = true
+    await act(async () => {
+      success = await result.current.updatePin("5829")
+    })
+
+    expect(success).toBe(false)
+    expect(mockMutate).not.toHaveBeenCalled()
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Failed to update PIN. Please try again.",
+      }),
+    )
   })
 
   it("returns false and shows toast on GQL errors", async () => {

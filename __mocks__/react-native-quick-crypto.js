@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mockCipher = {
   update: jest.fn().mockReturnValue(Buffer.from("encrypted")),
   final: jest.fn().mockReturnValue(Buffer.from("")),
