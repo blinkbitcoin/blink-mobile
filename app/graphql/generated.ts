@@ -2028,6 +2028,7 @@ export type Query = {
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
   readonly cardBalance: CardBalance;
+  readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly colorScheme: Scalars['String']['output'];
@@ -10374,6 +10375,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
