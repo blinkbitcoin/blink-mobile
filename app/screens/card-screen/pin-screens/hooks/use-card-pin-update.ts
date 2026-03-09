@@ -1,13 +1,12 @@
 import { useCallback } from "react"
 import { gql } from "@apollo/client"
 
+import { useCardData, useCardEncryption } from "@app/screens/card-screen/hooks"
+import { encryptPin } from "@app/screens/card-screen/utils"
 import { useCardPinUpdateMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
-
-import { useCardData } from "../../hooks/use-card-data"
-import { formatPinBlock } from "../format-pin-block"
 
 gql`
   mutation cardPinUpdate($input: CardPinUpdateInput!) {
@@ -16,7 +15,8 @@ gql`
 `
 
 export const useCardPinUpdate = () => {
-  const [cardPinUpdateMutation, { loading }] = useCardPinUpdateMutation()
+  const [cardPinUpdateMutation, { loading: mutationLoading }] = useCardPinUpdateMutation()
+  const { fetchPublicKey, loading: publicKeyLoading } = useCardEncryption()
   const { card } = useCardData()
   const { LL } = useI18nContext()
 
@@ -28,12 +28,19 @@ export const useCardPinUpdate = () => {
         return false
       }
 
-      // TODO: Replace with real encryption (RSA-OAEP + AES-128-GCM) when crypto library is added
-      const encryptedPin = formatPinBlock(pin)
-      const iv = ""
-      const sessionId = ""
-
       try {
+        const { data: publicKeyData } = await fetchPublicKey()
+        const publicKeyPem = publicKeyData?.cardEncryptionPublicKey
+        if (!publicKeyPem) {
+          toastShow({
+            message: LL.CardFlow.PinScreens.common.pinUpdateFailed(),
+            LL,
+          })
+          return false
+        }
+
+        const { encryptedPin, iv, sessionId } = encryptPin(pin, publicKeyPem)
+
         const { data, errors } = await cardPinUpdateMutation({
           variables: { input: { cardId, encryptedPin, iv, sessionId } },
         })
@@ -59,8 +66,8 @@ export const useCardPinUpdate = () => {
         return false
       }
     },
-    [cardPinUpdateMutation, card, LL],
+    [cardPinUpdateMutation, fetchPublicKey, card, LL],
   )
 
-  return { updatePin, loading }
+  return { updatePin, loading: mutationLoading || publicKeyLoading }
 }
