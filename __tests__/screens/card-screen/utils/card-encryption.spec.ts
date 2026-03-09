@@ -22,7 +22,10 @@ describe("encryptPin", () => {
   })
 
   it("returns encryptedPin, iv, and sessionId", () => {
-    const result = encryptPin("6784", "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----")
+    const result = encryptPin(
+      "6784",
+      "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+    )
 
     expect(result).toEqual({
       encryptedPin: "mock-encrypted-data",

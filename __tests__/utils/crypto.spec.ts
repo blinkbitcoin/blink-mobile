@@ -31,7 +31,10 @@ describe("crypto utils", () => {
 
   describe("encryptRsaOaep", () => {
     it("returns a base64-encoded string", () => {
-      const result = encryptRsaOaep("-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----", "abcd1234abcd1234abcd1234abcd1234")
+      const result = encryptRsaOaep(
+        "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+        "abcd1234abcd1234abcd1234abcd1234",
+      )
       expect(typeof result).toBe("string")
       expect(result.length).toBeGreaterThan(0)
     })
@@ -40,7 +43,10 @@ describe("crypto utils", () => {
       const Crypto = jest.requireMock("react-native-quick-crypto").default
       Crypto.publicEncrypt.mockClear()
 
-      encryptRsaOaep("-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----", "abcd1234abcd1234abcd1234abcd1234")
+      encryptRsaOaep(
+        "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+        "abcd1234abcd1234abcd1234abcd1234",
+      )
 
       expect(Crypto.publicEncrypt).toHaveBeenCalledWith(
         expect.objectContaining({

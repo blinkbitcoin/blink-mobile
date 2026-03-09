@@ -55,7 +55,10 @@ describe("useCardPinUpdate", () => {
     jest.clearAllMocks()
     mockCard = { id: "card-123" }
     mockFetchPublicKey.mockResolvedValue({
-      data: { cardEncryptionPublicKey: "-----BEGIN PUBLIC KEY-----\nMOCK\n-----END PUBLIC KEY-----" },
+      data: {
+        cardEncryptionPublicKey:
+          "-----BEGIN PUBLIC KEY-----\nMOCK\n-----END PUBLIC KEY-----",
+      },
     })
   })
 

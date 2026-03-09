@@ -21,7 +21,10 @@ describe("useCardEncryption", () => {
 
   it("calls the lazy query when fetchPublicKey is invoked", async () => {
     mockLazyQuery.mockResolvedValue({
-      data: { cardEncryptionPublicKey: "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----" },
+      data: {
+        cardEncryptionPublicKey:
+          "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+      },
     })
 
     const { result } = renderHook(() => useCardEncryption())
@@ -33,7 +36,10 @@ describe("useCardEncryption", () => {
 
     expect(mockLazyQuery).toHaveBeenCalled()
     expect(response).toEqual({
-      data: { cardEncryptionPublicKey: "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----" },
+      data: {
+        cardEncryptionPublicKey:
+          "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+      },
     })
   })
 })
