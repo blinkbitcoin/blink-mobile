@@ -2,12 +2,8 @@ const isRepeated = (pin: string): boolean => /^(\d)\1{3}$/.test(pin)
 
 const isSequential = (pin: string): boolean => {
   const digits = pin.split("").map(Number)
-
-  const ascending = digits.every((d, i) => i === 0 || d === digits[i - 1] + 1)
-  if (ascending) return true
-
-  const descending = digits.every((d, i) => i === 0 || d === digits[i - 1] - 1)
-  return descending
+  const diffs = digits.slice(1).map((d, i) => d - digits[i])
+  return diffs.every((d) => d === 1) || diffs.every((d) => d === -1)
 }
 
 export const isWeakPin = (pin: string): boolean => isRepeated(pin) || isSequential(pin)

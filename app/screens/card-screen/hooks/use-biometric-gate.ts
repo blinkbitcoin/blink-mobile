@@ -23,21 +23,25 @@ export const useBiometricGate = ({
 
   useEffect(() => {
     const gate = async () => {
-      const sensorAvailable = await BiometricWrapper.isSensorAvailable()
-      if (!sensorAvailable) {
-        if (requiredRef.current) {
-          onFailureRef.current()
+      try {
+        const sensorAvailable = await BiometricWrapper.isSensorAvailable()
+        if (!sensorAvailable) {
+          if (requiredRef.current) {
+            onFailureRef.current()
+            return
+          }
+          setAuthenticated(true)
           return
         }
-        setAuthenticated(true)
-        return
-      }
 
-      BiometricWrapper.authenticate(
-        descriptionRef.current,
-        () => setAuthenticated(true),
-        onFailureRef.current,
-      )
+        BiometricWrapper.authenticate(
+          descriptionRef.current,
+          () => setAuthenticated(true),
+          onFailureRef.current,
+        )
+      } catch {
+        onFailureRef.current()
+      }
     }
     gate()
   }, [])
