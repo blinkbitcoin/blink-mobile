@@ -257,6 +257,50 @@ describe("SendBitcoinDestinationScreen", () => {
     expect(screen.queryByText(modalTitle)).toBeNull()
   })
 
+  it("does not double the domain in the confirmation modal for phone destinations", async () => {
+    // The LNURL response identifier includes the full address with domain
+    const identifierWithDomain = "+50370000000@blink.sv"
+
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams(identifierWithDomain),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "70000000")
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+    await flushAsync()
+
+    const modalTitle = LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()
+    expect(await screen.findByText(modalTitle)).toBeTruthy()
+
+    // The checkbox should show the correct single-domain address
+    const correctLabel = LL.SendBitcoinDestinationScreen.confirmUsernameModal.checkBox({
+      lnAddress: "+50370000000@blink.sv",
+    })
+    expect(screen.getByLabelText(correctLabel)).toBeTruthy()
+
+    // The doubled domain should NOT appear anywhere
+    const doubledLabel = LL.SendBitcoinDestinationScreen.confirmUsernameModal.checkBox({
+      lnAddress: "+50370000000@blink.sv@blink.sv",
+    })
+    expect(screen.queryByLabelText(doubledLabel)).toBeNull()
+  })
+
   it.each([
     {
       name: "shows invalid phone error for malformed numbers",
