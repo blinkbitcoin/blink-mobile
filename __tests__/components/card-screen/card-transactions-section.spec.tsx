@@ -4,7 +4,6 @@ import { render } from "@testing-library/react-native"
 
 import { CardTransactionsSection } from "@app/components/card-screen/card-transactions-section"
 
-
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {

@@ -13,7 +13,6 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-
 jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
   isIos: false,

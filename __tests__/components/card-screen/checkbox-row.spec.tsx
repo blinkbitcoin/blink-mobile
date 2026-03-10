@@ -24,7 +24,6 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-
 describe("CheckboxRow", () => {
   const defaultProps = {
     label: "I agree to the terms and conditions",

@@ -14,7 +14,6 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {

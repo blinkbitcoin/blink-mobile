@@ -23,7 +23,6 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-
 describe("WalletToggleButton", () => {
   const mockOnPress = jest.fn()
 

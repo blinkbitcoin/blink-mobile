@@ -4,7 +4,6 @@ import { render, fireEvent } from "@testing-library/react-native"
 
 import { CardBalanceSection } from "@app/components/card-screen/card-balance-section"
 
-
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {

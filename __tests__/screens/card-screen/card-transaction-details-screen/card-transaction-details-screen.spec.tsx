@@ -6,7 +6,6 @@ import { CardTransactionDetailsScreen } from "@app/screens/card-screen/card-tran
 import { ContextForScreen } from "../../helper"
 import { TransactionStatus } from "@app/graphql/generated"
 
-
 const mockGoBack = jest.fn()
 const mockUseRoute = jest.fn()
 jest.mock("@react-navigation/native", () => {
