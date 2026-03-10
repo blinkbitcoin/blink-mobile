@@ -3131,6 +3131,13 @@ export type CardPinUpdateMutationVariables = Exact<{
 
 export type CardPinUpdateMutation = { readonly __typename: 'Mutation', readonly cardPinUpdate: boolean };
 
+export type CardReplaceMutationVariables = Exact<{
+  input: CardReplaceInput;
+}>;
+
+
+export type CardReplaceMutation = { readonly __typename: 'Mutation', readonly cardReplace: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
+
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5335,6 +5342,42 @@ export function useCardPinUpdateMutation(baseOptions?: Apollo.MutationHookOption
 export type CardPinUpdateMutationHookResult = ReturnType<typeof useCardPinUpdateMutation>;
 export type CardPinUpdateMutationResult = Apollo.MutationResult<CardPinUpdateMutation>;
 export type CardPinUpdateMutationOptions = Apollo.BaseMutationOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
+export const CardReplaceDocument = gql`
+    mutation cardReplace($input: CardReplaceInput!) {
+  cardReplace(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardReplaceMutationFn = Apollo.MutationFunction<CardReplaceMutation, CardReplaceMutationVariables>;
+
+/**
+ * __useCardReplaceMutation__
+ *
+ * To run a mutation, you first call `useCardReplaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardReplaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardReplaceMutation, { data, loading, error }] = useCardReplaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardReplaceMutation(baseOptions?: Apollo.MutationHookOptions<CardReplaceMutation, CardReplaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardReplaceMutation, CardReplaceMutationVariables>(CardReplaceDocument, options);
+      }
+export type CardReplaceMutationHookResult = ReturnType<typeof useCardReplaceMutation>;
+export type CardReplaceMutationResult = Apollo.MutationResult<CardReplaceMutation>;
+export type CardReplaceMutationOptions = Apollo.BaseMutationOptions<CardReplaceMutation, CardReplaceMutationVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {
