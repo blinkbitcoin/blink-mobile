@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import debounce from "lodash.debounce"
 import axios from "axios"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -14,6 +15,27 @@ import Animated, {
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { BTCMAP_V4_API_BASE } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react.tsx"
+
+const RECENT_SEARCHES_KEY = "btcmap_recent_searches"
+const MAX_RECENT = 5
+
+type RecentSearch = { id: number; name: string; type: "area" | "element" }
+
+const loadRecentSearches = async (): Promise<RecentSearch[]> => {
+  try {
+    const raw = await AsyncStorage.getItem(RECENT_SEARCHES_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+const saveRecentSearch = async (item: RecentSearch) => {
+  const current = await loadRecentSearches()
+  const filtered = current.filter((r) => !(r.id === item.id && r.type === item.type))
+  const updated = [item, ...filtered].slice(0, MAX_RECENT)
+  await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated))
+}
 
 type SearchResponse = {
   results: SearchResult[]
@@ -35,32 +57,50 @@ type PaginationInfo = {
   total: number
 }
 
+type NearbyPlace = {
+  id: number
+  name: string
+  lat: number
+  lon: number
+}
+
 type Props = {
   onClose: () => void
   setCommunityId: (id: number) => void
   setSelectedMarker: (id: number) => void
   hasLocation?: boolean
+  mapCenter: { latitude: number; longitude: number }
 }
 
-const RECENT_SEARCHES = [
-  { name: "Satoshi Burgers", distance: "recent" },
-  { name: "Café BTC", distance: "recent" },
-  { name: "Hodl Hotel", distance: "recent" },
-]
-
-const NEARBY_PLACEHOLDERS = [
-  { name: "Satoshi Burgers", distance: "200 meters away" },
-  { name: "Arts and Crafts", distance: "0.6 km away" },
-  { name: "Lightning Café", distance: "1.2 km away" },
-]
-
 const SEARCH_DEBOUNCE_MS = 300
+const NEARBY_RADIUS_KM = 50
+const NEARBY_LIMIT = 3
+
+const formatDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): string => {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2
+  const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  if (d < 1) return `${Math.round(d * 1000)}m away`
+  return `${d.toFixed(1)}km away`
+}
 
 const SearchScreen: FC<Props> = ({
   onClose,
   setCommunityId,
   setSelectedMarker,
   hasLocation = false,
+  mapCenter,
 }) => {
   const styles = useStyles()
   const insets = useSafeAreaInsets()
@@ -74,6 +114,8 @@ const SearchScreen: FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [searchResponse, setSearchResponse] = useState<SearchResponse | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([])
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([])
 
   const opacity = useSharedValue(0)
 
@@ -81,7 +123,24 @@ const SearchScreen: FC<Props> = ({
 
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 180 }, () => runOnJS(focusInput)())
+    loadRecentSearches().then(setRecentSearches)
   }, [])
+
+  // Fetch nearby places only when location permission is granted
+  useEffect(() => {
+    if (!hasLocation) return
+    const fetchNearby = async () => {
+      try {
+        const { data } = await axios.get<NearbyPlace[]>(
+          `${BTCMAP_V4_API_BASE}/places/search?lat=${mapCenter.latitude}&lon=${mapCenter.longitude}&radius_km=${NEARBY_RADIUS_KM}&limit=${NEARBY_LIMIT}&fields=id,name,lat,lon`,
+        )
+        setNearbyPlaces(data)
+      } catch {
+        // silent - nearby is best-effort
+      }
+    }
+    fetchNearby()
+  }, [hasLocation, mapCenter.latitude, mapCenter.longitude])
 
   const handleClose = useCallback(() => {
     inputRef.current?.blur()
@@ -125,6 +184,7 @@ const SearchScreen: FC<Props> = ({
 
   const onResultPress = useCallback(
     (item: SearchResult) => {
+      saveRecentSearch({ id: item.id, name: item.name, type: item.type })
       if (item.type === "area") {
         setCommunityId(item.id)
       } else {
@@ -164,11 +224,29 @@ const SearchScreen: FC<Props> = ({
 
   const ItemSeparator = useCallback(() => <View style={styles.divider} />, [styles.divider])
 
-  const placeholders = hasLocation ? NEARBY_PLACEHOLDERS : RECENT_SEARCHES
+  const onNearbyPress = useCallback(
+    (place: NearbyPlace) => {
+      saveRecentSearch({ id: place.id, name: place.name ?? "Unnamed place", type: "element" })
+      setSelectedMarker(place.id)
+      handleClose()
+    },
+    [setSelectedMarker, handleClose],
+  )
+
+  const onRecentPress = useCallback(
+    (item: RecentSearch) => {
+      if (item.type === "area") {
+        setCommunityId(item.id)
+      } else {
+        setSelectedMarker(item.id)
+      }
+      handleClose()
+    },
+    [setCommunityId, setSelectedMarker, handleClose],
+  )
 
   return (
     <Animated.View style={[styles.container, { paddingTop: insets.top }, animatedStyle]}>
-      {/* Search input - full width */}
       <View style={styles.inputContainer}>
         <TextInput
           ref={inputRef}
@@ -185,7 +263,6 @@ const SearchScreen: FC<Props> = ({
         </Pressable>
       </View>
 
-      {/* Status messages */}
       {isLoading && (
         <Text style={styles.statusInfo}>{LL.MapScreen.search.loading()}</Text>
       )}
@@ -197,22 +274,57 @@ const SearchScreen: FC<Props> = ({
         <Text style={styles.statusInfo}>{LL.MapScreen.search.noResults()}</Text>
       )}
 
-      {/* Placeholder - nearby or recent */}
-      {search.length === 0 && !isLoading && (
+      {/* Nearby places (only with location permission) */}
+      {search.length === 0 && !isLoading && nearbyPlaces.length > 0 && (
         <FlatList
-          data={placeholders}
-          keyExtractor={(_, i) => `placeholder-${i}`}
+          data={nearbyPlaces}
+          keyExtractor={(item) => `nearby-${item.id}`}
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
           style={styles.list}
+          ListHeaderComponent={
+            <Text style={styles.sectionHeader}>Nearby</Text>
+          }
           renderItem={({ item }) => (
-            <View style={styles.listItem}>
+            <Pressable onPress={() => onNearbyPress(item)} style={styles.listItem}>
+              <GaloyIcon name="pin" size={18} color={colors.grey2} />
+              <View style={styles.listItemText}>
+                <Text style={styles.listItemName}>{item.name ?? "Unnamed place"}</Text>
+                <Text style={styles.listItemSubtitle}>
+                  {formatDistance(
+                    mapCenter.latitude,
+                    mapCenter.longitude,
+                    item.lat,
+                    item.lon,
+                  )}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+        />
+      )}
+
+      {/* Recent searches – shown when idle, as fallback when no nearby or below nearby */}
+      {search.length === 0 && !isLoading && recentSearches.length > 0 && (
+        <FlatList
+          data={recentSearches}
+          keyExtractor={(item) => `recent-${item.type}-${item.id}`}
+          ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
+          style={styles.list}
+          ListHeaderComponent={
+            <Text style={styles.sectionHeader}>Recent searches</Text>
+          }
+          renderItem={({ item }) => (
+            <Pressable onPress={() => onRecentPress(item)} style={styles.listItem}>
               <GaloyIcon name="pin" size={18} color={colors.grey2} />
               <View style={styles.listItemText}>
                 <Text style={styles.listItemName}>{item.name}</Text>
-                <Text style={styles.listItemSubtitle}>{item.distance}</Text>
+                <Text style={styles.listItemSubtitle}>
+                  {item.type === "area" ? "Community" : "Business"}
+                </Text>
               </View>
-            </View>
+            </Pressable>
           )}
         />
       )}
@@ -299,5 +411,12 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 14,
     color: "red",
     fontSize: 14,
+  },
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.grey2,
+    marginTop: 8,
+    marginBottom: 4,
   },
 }))
