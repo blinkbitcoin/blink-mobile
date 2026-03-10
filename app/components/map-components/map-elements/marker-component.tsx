@@ -5,9 +5,13 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { IMarker } from "@app/screens/map-screen/btc-map-interface.ts"
 import PinIcon from "@app/components/map-components/map-elements/pin-icon.tsx"
-import MaterialIcon from "@react-native-vector-icons/material-icons"
+import MaterialIcon, {
+  MaterialIconsIconName,
+} from "@react-native-vector-icons/material-icons"
 
 const DEFAULT_MARKER_ICON = "place"
+const MARKER_SIZE = 35
+const ICON_SIZE = 18
 
 type Props = {
   pin: IMarker
@@ -40,10 +44,10 @@ const MarkerComponent = React.memo(({ pin, onSelect }: Props) => {
       tracksViewChanges={false}
     >
       <View style={styles.iconContainer}>
-        <PinIcon size={styles.marker.size} color={bgColor} />
+        <PinIcon size={MARKER_SIZE} color={bgColor} />
         <MaterialIcon
-          name={iconName}
-          size={styles.marker.iconSize}
+          name={iconName as MaterialIconsIconName}
+          size={ICON_SIZE}
           style={styles.iconOverlay}
         />
       </View>
@@ -56,17 +60,15 @@ const useStyles = makeStyles(({ colors }) => ({
   marker: {
     backgroundColor: colors.primary,
     backgroundColorDark: "#8D9EDD",
-    size: 35,
-    iconSize: 18,
   },
   iconContainer: {
-    position: "relative",
+    width: MARKER_SIZE,
+    height: MARKER_SIZE + MARKER_SIZE * 0.35 + 6,
     alignItems: "center",
-    justifyContent: "center",
   },
   iconOverlay: {
     position: "absolute",
-    top: 10,
+    top: (MARKER_SIZE - ICON_SIZE) / 2,
     alignSelf: "center",
     color: colors.white,
   },

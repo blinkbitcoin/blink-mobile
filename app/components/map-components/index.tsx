@@ -27,6 +27,8 @@ import { MerchantBottomSheet } from "@app/components/map-components/modals/merch
 import { SuggestBusinessCard } from "@app/components/map-components/modals/suggest-business-card.tsx"
 import { VerifyMerchantSheet } from "@app/components/map-components/modals/verify-merchant-sheet"
 import CommunitySearchScreen from "@app/components/map-components/community-search-screen"
+import { request, RESULTS } from "react-native-permissions"
+import { getUserRegion, LOCATION_PERMISSION } from "@app/screens/map-screen/functions"
 
 type Props = {
   data?: IMarker[]
@@ -51,6 +53,8 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
   const styles = useStyles()
   const client = useApolloClient()
   const insets = useSafeAreaInsets()
+
+  const [locationGranted, setLocationGranted] = useState(hasLocation ?? false)
 
   const mapViewRef = useRef<MapView>(null)
   const [focusedMarker, setFocusedMarker] = React.useState<IMarker | null>(null)
@@ -104,6 +108,22 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     setActiveSheet("merchant")
   }, [])
 
+  const handleCenterOnUser = useCallback(async () => {
+    if (locationGranted) {
+      getUserRegion((userRegion) => {
+        if (userRegion) mapViewRef.current?.animateToRegion(userRegion, 500)
+      })
+    } else {
+      const status = await request(LOCATION_PERMISSION)
+      if (status === RESULTS.GRANTED) {
+        setLocationGranted(true)
+        getUserRegion((userRegion) => {
+          if (userRegion) mapViewRef.current?.animateToRegion(userRegion, 500)
+        })
+      }
+    }
+  }, [locationGranted])
+
   const closeSheet = useCallback(() => setActiveSheet(null), [])
 
   const handleMapClick = useCallback((e?: { nativeEvent?: { action?: string } }) => {
@@ -113,7 +133,6 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     setFocusedMarker(null)
   }, [])
 
-  // Pre-compute all GeoJSON points once (reference, no spread copy)
   const allGeoPoints = useMemo<supercluster.PointFeature<IMarker>[]>(() => {
     if (!data || data.length === 0) return []
     return data.map((marker) => ({
@@ -129,12 +148,11 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     }))
   }, [data])
 
-  // Pre-build category index for O(1) lookups per category
   const categoryIndex = useMemo(() => {
     const index = new Map<Category, supercluster.PointFeature<IMarker>[]>()
     for (const point of allGeoPoints) {
       const cat = point.properties.category
-      if (cat != null) {
+      if (cat) {
         let arr = index.get(cat)
         if (!arr) {
           arr = []
@@ -146,7 +164,6 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     return index
   }, [allGeoPoints])
 
-  // Category filter: uses index instead of scanning 26k items
   const categoryFilteredGeoPoints = useMemo(() => {
     if (categoryFilters.size === 0) return allGeoPoints
     const result: supercluster.PointFeature<IMarker>[] = []
@@ -173,7 +190,6 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     CLUSTER_OPTIONS,
   )
 
-  // Stable fingerprint: only re-render markers when the visible set actually changes
   const pointsFingerprint = useMemo(() => {
     return points
       .map((p) =>
@@ -220,8 +236,9 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     }
   }, [debouncedSaveCoords])
 
-  const handleRegionChange = useCallback(
+  const handleRegionChangeComplete = useCallback(
     (newRegion: Region) => {
+      console.log("[map] onRegionChangeComplete", newRegion.latitude.toFixed(4))
       setRegion(newRegion)
       debouncedSaveCoords(newRegion)
     },
@@ -232,12 +249,10 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     <View style={styles.viewContainer}>
       <MapView
         ref={mapViewRef}
-        onRegionChangeComplete={handleRegionChange}
+        onMapReady={() => console.log("[map] onMapReady, data:", data?.length ?? 0)}
+        onRegionChangeComplete={handleRegionChangeComplete}
         style={styles.map}
         customMapStyle={
-          // Only Android (Google Maps) supports customMapStyle JSON.
-          // On iOS (Apple Maps) it's ignored; at high zoom iOS 18 simulator
-          // can show red ground – known simulator bug, not present on device.
           Platform.OS === "android"
             ? themeMode === "dark"
               ? MapStyles.dark
@@ -247,7 +262,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         onPress={handleMapClick}
         initialRegion={userLocation}
         moveOnMarkerPress={false}
-        showsUserLocation={false}
+        showsUserLocation={locationGranted}
         showsMyLocationButton={false}
         toolbarEnabled={false}
         scrollEnabled={true}
@@ -263,32 +278,39 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
       </MapView>
 
       <View style={[styles.topRow, { top: insets.top + 8 }]}>
-        <SearchBar onPress={() => setSearchVisible(true)} />
+        <SearchBar
+          onPress={() => {
+            setActiveSheet(null)
+            setTimeout(() => setSearchVisible(true), 300)
+          }}
+        />
         <Pressable
-          onPress={() => setCommunitySearchVisible(true)}
+          onPress={() => {
+            setActiveSheet(null)
+            setTimeout(() => setCommunitySearchVisible(true), 300)
+          }}
           style={styles.iconButton}
         >
           <GaloyIcon name="people-2" size={20} color={colors.primary} />
         </Pressable>
-        <Pressable onPress={() => setActiveSheet("filter")} style={styles.iconButton}>
+        <Pressable
+          onPress={() => {
+            setSearchVisible(false)
+            setCommunitySearchVisible(false)
+            setActiveSheet("filter")
+          }}
+          style={styles.iconButton}
+        >
           <GaloyIcon name="list" size={20} color={colors.primary} />
         </Pressable>
       </View>
 
-      <Pressable
-        onPress={() => setActiveSheet("suggest")}
-        style={styles.addToMapButton}
-      >
+      <Pressable onPress={() => setActiveSheet("suggest")} style={styles.addToMapButton}>
         <Text style={styles.addToMapText}>Add to map</Text>
         <GaloyIcon name="plus" size={16} color={colors.primary} />
       </Pressable>
 
-      <Pressable
-        onPress={() => {
-          /* TODO: center on user location */
-        }}
-        style={styles.centerButton}
-      >
+      <Pressable onPress={handleCenterOnUser} style={styles.centerButton}>
         <GaloyIcon name="gps" size={20} color={colors.primary} />
       </Pressable>
 
@@ -304,15 +326,9 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
       <BottomSheet
         visible={activeSheet === "suggest"}
         onClose={closeSheet}
-        peekHeight={380}
+        peekHeight={400}
       >
-        <SuggestBusinessCard
-          closeModal={closeSheet}
-          centerCoords={{
-            latitude: region.latitude,
-            longitude: region.longitude,
-          }}
-        />
+        <SuggestBusinessCard closeModal={closeSheet} mapViewRef={mapViewRef} />
       </BottomSheet>
 
       {searchVisible && (
@@ -331,10 +347,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         />
       )}
 
-      <BottomSheet
-        visible={activeSheet === "filter"}
-        onClose={closeSheet}
-      >
+      <BottomSheet visible={activeSheet === "filter"} onClose={closeSheet}>
         <FiltersCard filters={categoryFilters} setFilters={setCategoryFilters} />
       </BottomSheet>
 
@@ -348,7 +361,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
       <VerifyMerchantSheet
         visible={activeSheet === "verify"}
         onClose={closeSheet}
-        merchantName={focusedMarker?.name}
+        merchantName={focusedMarker?.name ?? undefined}
       />
     </View>
   )

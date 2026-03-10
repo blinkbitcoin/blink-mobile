@@ -10,7 +10,7 @@ type Props = {
   merchantName?: string
 }
 
-export const VerifyMerchantSheet: React.FC<Props> = ({ visible, onClose, merchantName }) => {
+export const VerifyMerchantSheet: React.FC<Props> = ({ visible, onClose }) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -39,20 +39,16 @@ export const VerifyMerchantSheet: React.FC<Props> = ({ visible, onClose, merchan
             style={[styles.voteButton, vote === "yes" && styles.voteButtonYesActive]}
             onPress={() => setVote("yes")}
           >
-            <Text style={[styles.voteText, vote === "yes" && styles.voteTextYesActive]}>
-              Yes
-            </Text>
-            <Text style={styles.voteEmoji}>👍</Text>
+            <Text style={styles.voteText}>Yes</Text>
+            <GaloyIcon name={"thumbs-up"} size={16} color={colors.success} />
           </Pressable>
 
           <Pressable
             style={[styles.voteButton, vote === "no" && styles.voteButtonNoActive]}
             onPress={() => setVote("no")}
           >
-            <Text style={[styles.voteText, vote === "no" && styles.voteTextNoActive]}>
-              No
-            </Text>
-            <Text style={styles.voteEmoji}>👎</Text>
+            <Text style={styles.voteText}>No</Text>
+            <GaloyIcon name={"thumbs-down"} size={16} color={colors.error} />
           </Pressable>
         </View>
 
@@ -117,24 +113,17 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: "transparent",
   },
   voteButtonYesActive: {
-    borderColor: "#22C55E",
-    backgroundColor: "#F0FDF4",
+    borderColor: colors.success,
   },
   voteButtonNoActive: {
     borderColor: colors.error,
-    backgroundColor: "#FEF2F2",
   },
   voteText: {
     fontSize: 15,
     fontWeight: "600",
     color: colors.black,
   },
-  voteTextYesActive: {
-    color: "#22C55E",
-  },
-  voteTextNoActive: {
-    color: colors.error,
-  },
+
   voteEmoji: {
     fontSize: 18,
   },

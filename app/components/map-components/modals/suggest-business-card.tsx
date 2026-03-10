@@ -1,5 +1,15 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Alert, FlatList, Pressable, TextInput, View } from "react-native"
+import {
+  Alert,
+  FlatList,
+  Modal,
+  Platform,
+  Pressable,
+  StatusBar,
+  TextInput,
+  View,
+} from "react-native"
+import MapView from "react-native-maps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import MaterialIcon, {
   MaterialIconsIconName,
@@ -14,37 +24,55 @@ import {
 
 type Props = {
   closeModal: () => void
-  centerCoords: { latitude: number; longitude: number }
+  mapViewRef: React.RefObject<MapView>
 }
 
-export const SuggestBusinessCard: FC<Props> = ({ closeModal, centerCoords }) => {
+export const SuggestBusinessCard: FC<Props> = ({ closeModal, mapViewRef }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-
   const [name, setName] = useState("")
-  const [address, setAddress] = useState(
-    `${centerCoords.latitude.toFixed(6)}, ${centerCoords.longitude.toFixed(6)}`,
-  )
+  const [address, setAddress] = useState("")
   const userEditedAddress = useRef(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false)
+  const [categorySearch, setCategorySearch] = useState("")
+  const searchInputRef = useRef<TextInput>(null)
 
+  // Poll the map center so the address stays in sync as the user pans
   useEffect(() => {
-    if (!userEditedAddress.current) {
-      setAddress(
-        `${centerCoords.latitude.toFixed(6)}, ${centerCoords.longitude.toFixed(6)}`,
-      )
-    }
-  }, [centerCoords.latitude, centerCoords.longitude])
+    if (userEditedAddress.current) return
 
-  const categoryList = useMemo(() => {
+    const updateFromCamera = async () => {
+      try {
+        const camera = await mapViewRef.current?.getCamera()
+        if (camera && !userEditedAddress.current) {
+          setAddress(
+            `${camera.center.latitude.toFixed(6)}, ${camera.center.longitude.toFixed(6)}`,
+          )
+        }
+      } catch {}
+    }
+
+    updateFromCamera()
+    const interval = setInterval(updateFromCamera, 1000)
+    return () => clearInterval(interval)
+  }, [mapViewRef])
+
+  const allCategoryList = useMemo(() => {
     return Object.keys(categoryI18NNames).map((key) => {
       const cat = parseInt(key, 10) as Category
       return { category: cat, label: categoryI18NNames[cat] }
     })
   }, [])
+
+  const filteredCategoryList = useMemo(() => {
+    if (!categorySearch.trim()) return allCategoryList
+    return allCategoryList.filter((item) =>
+      item.label.toLowerCase().includes(categorySearch.toLowerCase()),
+    )
+  }, [allCategoryList, categorySearch])
 
   const handleSubmit = useCallback(() => {
     if (!name.trim()) {
@@ -60,13 +88,38 @@ export const SuggestBusinessCard: FC<Props> = ({ closeModal, centerCoords }) => 
   const handleCategorySelect = useCallback((cat: Category) => {
     setSelectedCategory(cat)
     setCategoryPickerOpen(false)
+    setCategorySearch("")
+  }, [])
+
+  const handleClosePicker = useCallback(() => {
+    setCategoryPickerOpen(false)
+    setCategorySearch("")
   }, [])
 
   const selectedLabel = selectedCategory
     ? categoryI18NNames[selectedCategory]
     : "Choose a category"
 
-  // @ts-ignore
+  const renderCategoryItem = useCallback(
+    ({ item }: { item: { category: Category; label: string } }) => (
+      <Pressable
+        style={styles.pickerItem}
+        onPress={() => handleCategorySelect(item.category)}
+      >
+        <MaterialIcon
+          name={(categoryIcons[item.category] as MaterialIconsIconName) || "help-outline"}
+          size={22}
+          color={colors.black}
+        />
+        <Text style={styles.pickerItemLabel}>{item.label}</Text>
+        {selectedCategory === item.category && (
+          <GaloyIcon name="check" size={18} color={colors.primary} />
+        )}
+      </Pressable>
+    ),
+    [handleCategorySelect, selectedCategory, colors, styles],
+  )
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Suggest business</Text>
@@ -113,7 +166,7 @@ export const SuggestBusinessCard: FC<Props> = ({ closeModal, centerCoords }) => 
         <Text style={styles.label}>Category</Text>
         <Pressable
           style={styles.inputContainer}
-          onPress={() => setCategoryPickerOpen(!categoryPickerOpen)}
+          onPress={() => setCategoryPickerOpen(true)}
         >
           <Text style={[styles.inputText, !selectedCategory && { color: colors.grey2 }]}>
             {selectedLabel}
@@ -122,43 +175,56 @@ export const SuggestBusinessCard: FC<Props> = ({ closeModal, centerCoords }) => 
         </Pressable>
       </View>
 
-      {/* Category dropdown */}
-      {categoryPickerOpen && (
-        <View style={styles.dropdown}>
-          <FlatList
-            data={categoryList}
-            keyExtractor={(item) => String(item.category)}
-            renderItem={({ item }) => (
-              <Pressable
-                style={[
-                  styles.dropdownItem,
-                  selectedCategory === item.category && {
-                    backgroundColor: colors.grey5,
-                  },
-                ]}
-                onPress={() => handleCategorySelect(item.category)}
-              >
-                <MaterialIcon
-                  name={
-                    (categoryIcons[item.category] as keyof MaterialIconsIconName) ||
-                    "help-outline"
-                  }
-                  size={20}
-                  color={colors.black}
-                />
-                <Text style={styles.dropdownText}>{item.label}</Text>
-              </Pressable>
-            )}
-            keyboardShouldPersistTaps="handled"
-            style={styles.dropdownList}
-          />
-        </View>
-      )}
-
       {/* Submit */}
       <Pressable style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>Submit request</Text>
       </Pressable>
+
+      {/* Full-screen category picker */}
+      <Modal
+        visible={categoryPickerOpen}
+        animationType="slide"
+        onRequestClose={handleClosePicker}
+      >
+        <View style={styles.pickerContainer}>
+          {/* Header */}
+          <View style={styles.pickerHeader}>
+            <Text style={styles.pickerTitle}>Category</Text>
+            <Pressable onPress={handleClosePicker} hitSlop={12}>
+              <GaloyIcon name="close" size={20} color={colors.primary} />
+            </Pressable>
+          </View>
+
+          {/* Search */}
+          <View style={styles.pickerSearchContainer}>
+            <GaloyIcon name="magnifying-glass" size={16} color={colors.grey2} />
+            <TextInput
+              ref={searchInputRef}
+              style={styles.pickerSearchInput}
+              value={categorySearch}
+              onChangeText={setCategorySearch}
+              placeholder="Search"
+              placeholderTextColor={colors.grey2}
+              autoCorrect={false}
+              returnKeyType="search"
+            />
+            {categorySearch.length > 0 && (
+              <Pressable onPress={() => setCategorySearch("")} hitSlop={12}>
+                <GaloyIcon name="close" size={14} color={colors.grey2} />
+              </Pressable>
+            )}
+          </View>
+
+          {/* Category list */}
+          <FlatList
+            data={filteredCategoryList}
+            keyExtractor={(item) => String(item.category)}
+            renderItem={renderCategoryItem}
+            keyboardShouldPersistTaps="handled"
+            ItemSeparatorComponent={() => <View style={styles.pickerDivider} />}
+          />
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -202,26 +268,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "bold",
     color: colors.black,
   },
-  dropdown: {
-    borderRadius: 8,
-    backgroundColor: colors.grey5,
-    maxHeight: 180,
-    overflow: "hidden",
-  },
-  dropdownList: {
-    paddingVertical: 4,
-  },
-  dropdownItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  dropdownText: {
-    fontSize: 14,
-    color: colors.black,
-  },
   submitButton: {
     backgroundColor: colors.primary,
     borderRadius: 25,
@@ -234,5 +280,57 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 20,
     fontWeight: "bold",
     color: colors.white,
+  },
+  pickerContainer: {
+    flex: 1,
+    backgroundColor: colors.white,
+    paddingTop: Platform.OS === "ios" ? 50 : StatusBar.currentHeight ?? 0,
+  },
+  pickerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: colors.black,
+  },
+  pickerSearchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.grey5,
+    borderRadius: 10,
+    marginHorizontal: 12,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    minHeight: 44,
+    gap: 8,
+  },
+
+  pickerSearchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.black,
+    padding: 0,
+  },
+  pickerItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 14,
+  },
+  pickerItemLabel: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.black,
+  },
+  pickerDivider: {
+    height: 1,
+    backgroundColor: colors.grey5,
+    marginLeft: 52,
   },
 }))

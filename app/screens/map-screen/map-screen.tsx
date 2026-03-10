@@ -192,8 +192,9 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     return transformPlacesToMarkers(places.baseData)
   }, [places?.baseData])
 
-  // todo: nicer loading state
-  if (isLoading || isInitializing || !initialLocation) {
+  console.log("[map-screen] isInitializing:", isInitializing, "initialLocation:", !!initialLocation, "data:", formattedData.length, "isLoading:", isLoading, "error:", error)
+
+  if (isInitializing || !initialLocation) {
     return (
       <Screen>
         <View style={styles.loadingState}>
