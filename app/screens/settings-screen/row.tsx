@@ -69,9 +69,7 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          {hasLeftIcon && leftGaloyIcon && (
-            <GaloyIcon name={leftGaloyIcon} size={20} />
-          )}
+          {hasLeftIcon && leftGaloyIcon && <GaloyIcon name={leftGaloyIcon} size={20} />}
           <View>
             <View style={styles.sidetoside}>
               <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>

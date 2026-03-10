@@ -404,7 +404,7 @@ export const HomeScreen: React.FC = () => {
     {
       title: LL.HomeScreen.scan(),
       target: "scanningQRCode" as Target,
-      icon: "scan" as IconNamesType,
+      icon: "qr-code" as IconNamesType,
     },
   ]
 
@@ -477,7 +477,7 @@ export const HomeScreen: React.FC = () => {
             size={"medium"}
             name="graph"
             iconOnly={true}
-            weight="bold" 
+            weight="bold"
           />
           <View>
             {!loading && usernameTitle && (
@@ -494,7 +494,7 @@ export const HomeScreen: React.FC = () => {
             size={"medium"}
             name="menu"
             iconOnly={true}
-            weight="bold" 
+            weight="bold"
           />
         </View>
       </View>
@@ -535,12 +535,12 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
             <React.Fragment key={item.icon}>
-              {item.icon === "scan" && <View style={styles.actionsSeparator} />}
+              {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
               <View style={styles.button}>
                 <GaloyIconButton
                   name={item.icon}
                   size="large"
-                  weight="regular" 
+                  weight="regular"
                   text={item.title}
                   onPress={() => onMenuClick(item.target)}
                 />

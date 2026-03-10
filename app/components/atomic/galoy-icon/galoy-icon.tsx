@@ -7,7 +7,6 @@ import {
   ArrowRightIcon,
   ArrowsDownUpIcon,
   ArrowsClockwiseIcon,
-  ArrowsLeftRightIcon,
   ArrowSquareOutIcon,
   BackspaceIcon,
   BankIcon,
@@ -59,7 +58,7 @@ import {
   PencilSimpleLineIcon,
   PhoneIcon,
   PlusIcon,
-  QrCodeIcon,
+
   QuestionIcon,
   ScanIcon,
   ShareNetworkIcon,
@@ -103,6 +102,7 @@ import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -176,7 +176,7 @@ const phosphorIconMap = {
   "people": UsersIcon,
   "phone": PhoneIcon,
   "plus": PlusIcon,
-  "qr-code": QrCodeIcon,
+
   "question": QuestionIcon,
   "rank": TrophyIcon,
   "refresh": ArrowsClockwiseIcon,
@@ -227,6 +227,7 @@ const customSvgMap = {
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
   "heart-outline": HeartOutline,
+  "qr-code": QrCode,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
@@ -277,7 +278,9 @@ export const GaloyIcon = ({
   } = useTheme()
 
   const resolvedSize =
-    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width ?? 0, height ?? 0)
+    size ??
+    (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ??
+    Math.max(width ?? 0, height ?? 0)
   const resolvedColor = color || colors.black
 
   const styles = useStyles({
@@ -292,7 +295,12 @@ export const GaloyIcon = ({
     if (backgroundColor) {
       return (
         <View style={[style, styles.iconContainerStyle]}>
-          <PhosphorIcon size={resolvedSize} color={resolvedColor} weight={weight} testID={`icon-${name}`} />
+          <PhosphorIcon
+            size={resolvedSize}
+            color={resolvedColor}
+            weight={weight}
+            testID={`icon-${name}`}
+          />
         </View>
       )
     }
@@ -311,7 +319,12 @@ export const GaloyIcon = ({
   if (backgroundColor) {
     return (
       <View style={[style, styles.iconContainerStyle]}>
-        <SvgIcon width={resolvedSize} height={resolvedSize} color={resolvedColor} testID={`icon-${name}`} />
+        <SvgIcon
+          width={resolvedSize}
+          height={resolvedSize}
+          color={resolvedColor}
+          testID={`icon-${name}`}
+        />
       </View>
     )
   }
@@ -349,7 +362,6 @@ const useStyles = makeStyles(
         alignItems: "center",
         justifyContent: "center",
       },
-
     }
   },
 )

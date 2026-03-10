@@ -80,10 +80,7 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
                   )}
                 </View>
 
-                <OptionIcon
-                  icon={option.icon}
-                  isSelected={isSelected}
-                />
+                <OptionIcon icon={option.icon} isSelected={isSelected} />
               </View>
             </TouchableOpacity>
           )

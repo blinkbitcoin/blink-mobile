@@ -128,7 +128,9 @@ export const AllContactsScreen: React.FC = () => {
         inputContainerStyle={styles.searchBarInputContainerStyle}
         inputStyle={styles.searchBarText}
         rightIconContainerStyle={styles.searchBarRightIconStyle}
-        searchIcon={<GaloyIcon name="magnifying-glass" size={24} color={styles.icon.color} />}
+        searchIcon={
+          <GaloyIcon name="magnifying-glass" size={24} color={styles.icon.color} />
+        }
         clearIcon={
           <TouchableOpacity onPress={reset}>
             <GaloyIcon name="close" size={24} color={styles.icon.color} />

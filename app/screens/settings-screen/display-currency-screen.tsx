@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useCallback } from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { gql } from "@apollo/client"
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
 import {
@@ -15,8 +15,6 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, SearchBar, Text } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { TouchableOpacity } from "react-native"
-
 import { Screen } from "../../components/screen"
 
 gql`
@@ -131,7 +129,11 @@ export const DisplayCurrencyScreen: React.FC = () => {
         inputStyle={styles.searchBarText}
         rightIconContainerStyle={styles.searchBarRightIconStyle}
         searchIcon={<GaloyIcon name="magnifying-glass" size={24} />}
-        clearIcon={<TouchableOpacity onPress={reset}><GaloyIcon name="close" size={24} /></TouchableOpacity>}
+        clearIcon={
+          <TouchableOpacity onPress={reset}>
+            <GaloyIcon name="close" size={24} />
+          </TouchableOpacity>
+        }
       />
       <MenuSelect
         value={newCurrency || displayCurrency || ""}

@@ -75,11 +75,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   return (
     <Screen headerShown={false}>
       <View style={styles.aliasView}>
-        <GaloyIcon
-          name="user"
-          size={86}
-          color={colors.black}
-        />
+        <GaloyIcon name="user" size={86} color={colors.black} />
         <View style={styles.inputContainer}>
           <Input
             style={styles.alias}
