@@ -154,7 +154,7 @@ export type RootStackParamList = {
   cardCreatePinScreen: undefined
   cardChangePinScreen: undefined
   orderCardScreen: undefined
-  replaceCardScreen: undefined
+  replaceCardScreen: { cardId: string }
   selectionScreen: {
     title: string
     options: Array<{ value: string; label: string }>
