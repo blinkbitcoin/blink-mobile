@@ -3247,7 +3247,11 @@
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
         "buttonLabel": "Irányítópult"
       },
-      "title": "Kártya cseréje"
+      "title": "Kártya cseréje",
+      "errors": {
+        "lockFailed": "Nem sikerült zárolni a kártyádat. Kérjük, próbáld újra.",
+        "replaceFailed": "Nem sikerült lecserélni a kártyádat. Kérjük, próbáld újra."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fizikai kártya rendelése",

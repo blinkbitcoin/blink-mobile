@@ -3247,7 +3247,11 @@
         "subtitle": "Comanda pentru livrarea cardului tău Blink a fost trimisă.",
         "buttonLabel": "Panou"
       },
-      "title": "Înlocuire card"
+      "title": "Înlocuire card",
+      "errors": {
+        "lockFailed": "Nu s-a putut bloca cardul tău. Te rugăm să încerci din nou.",
+        "replaceFailed": "Nu s-a putut înlocui cardul tău. Te rugăm să încerci din nou."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Comandă card fizic",

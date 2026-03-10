@@ -3238,6 +3238,10 @@
                 "title": "La tua nuova carta è in arrivo!",
                 "subtitle": "L'ordine per la consegna della tua carta Blink è stato inviato.",
                 "buttonLabel": "Dashboard"
+            },
+            "errors": {
+                "lockFailed": "Impossibile bloccare la tua carta. Per favore riprova.",
+                "replaceFailed": "Impossibile sostituire la tua carta. Per favore riprova."
             }
         },
         "OrderPhysicalCard": {

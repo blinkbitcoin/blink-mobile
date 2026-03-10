@@ -3265,7 +3265,11 @@
         "subtitle": "Ordre til levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Oversigt"
       },
-      "title": "Erstat kort"
+      "title": "Erstat kort",
+      "errors": {
+        "lockFailed": "Kunne ikke låse dit kort. Prøv venligst igen.",
+        "replaceFailed": "Kunne ikke erstatte dit kort. Prøv venligst igen."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Bestil fysisk kort",

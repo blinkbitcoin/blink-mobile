@@ -3247,7 +3247,11 @@
         "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
         "buttonLabel": "Tauler"
       },
-      "title": "Substituir targeta"
+      "title": "Substituir targeta",
+      "errors": {
+        "lockFailed": "No s'ha pogut bloquejar la teva targeta. Si us plau, torna-ho a provar.",
+        "replaceFailed": "No s'ha pogut reemplaçar la teva targeta. Si us plau, torna-ho a provar."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Demanar targeta física",

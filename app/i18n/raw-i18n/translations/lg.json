@@ -3247,7 +3247,11 @@
         "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Dashiboodi"
       },
-      "title": "Kyusa kaadi"
+      "title": "Kyusa kaadi",
+      "errors": {
+        "lockFailed": "Tebisobeddwa kusiba kaadi yo. Gezaako oddemu.",
+        "replaceFailed": "Tebisobeddwa kukyusa kaadi yo. Gezaako oddemu."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Saba kaadi ey'omubiri",

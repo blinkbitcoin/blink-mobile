@@ -3294,7 +3294,11 @@
         "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
         "buttonLabel": "Ideshibhodi"
       },
-      "title": "Tshintsha ikhadi"
+      "title": "Tshintsha ikhadi",
+      "errors": {
+        "lockFailed": "Ayiphumelelanga ukutshixa ikhadi yakho. Nceda uzame kwakhona.",
+        "replaceFailed": "Ayiphumelelanga ukutshintsha ikhadi yakho. Nceda uzame kwakhona."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Odola ikhadi elibonakalayo",

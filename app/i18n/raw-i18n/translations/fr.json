@@ -3279,6 +3279,10 @@
                 "title": "Votre nouvelle carte est en route !",
                 "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
                 "buttonLabel": "Tableau de bord"
+            },
+            "errors": {
+                "lockFailed": "Échec du verrouillage de votre carte. Veuillez réessayer.",
+                "replaceFailed": "Échec du remplacement de votre carte. Veuillez réessayer."
             }
         },
         "OrderPhysicalCard": {

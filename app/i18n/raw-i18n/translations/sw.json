@@ -3247,7 +3247,11 @@
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limewasilishwa.",
         "buttonLabel": "Dashibodi"
       },
-      "title": "Badilisha kadi"
+      "title": "Badilisha kadi",
+      "errors": {
+        "lockFailed": "Imeshindikana kufunga kadi yako. Tafadhali jaribu tena.",
+        "replaceFailed": "Imeshindikana kubadilisha kadi yako. Tafadhali jaribu tena."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Agiza kadi ya kimwili",

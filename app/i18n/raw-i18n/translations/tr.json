@@ -3247,7 +3247,11 @@
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
         "buttonLabel": "Gösterge Paneli"
       },
-      "title": "Kartı değiştir"
+      "title": "Kartı değiştir",
+      "errors": {
+        "lockFailed": "Kartınız kilitlenemedi. Lütfen tekrar deneyin.",
+        "replaceFailed": "Kartınız değiştirilemedi. Lütfen tekrar deneyin."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fiziksel kart sipariş et",

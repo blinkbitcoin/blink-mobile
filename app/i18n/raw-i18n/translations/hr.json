@@ -3288,7 +3288,11 @@
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
         "buttonLabel": "Nadzorna ploča"
       },
-      "title": "Zamijeni karticu"
+      "title": "Zamijeni karticu",
+      "errors": {
+        "lockFailed": "Zaključavanje kartice nije uspjelo. Pokušajte ponovo.",
+        "replaceFailed": "Zamjena kartice nije uspjela. Pokušajte ponovo."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Naruči fizičku karticu",

@@ -3378,6 +3378,10 @@ const en: BaseTranslation = {
         subtitle: "Order for delivery of your Blink Card has been submitted.",
         buttonLabel: "Dashboard",
       },
+      errors: {
+        lockFailed: "Failed to lock your card. Please try again.",
+        replaceFailed: "Failed to replace your card. Please try again.",
+      },
     },
     OrderPhysicalCard: {
       title: "Order physical card",

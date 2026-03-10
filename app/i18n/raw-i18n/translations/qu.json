@@ -3285,7 +3285,11 @@
         "subtitle": "Blink tarjetaykipa apachiy kamachikuyqa kachisqañam.",
         "buttonLabel": "Ñawpaq panqa"
       },
-      "title": "Tarjetata tikray"
+      "title": "Tarjetata tikray",
+      "errors": {
+        "lockFailed": "Mana atikurqachu tarjetaykita wisq'ayta. Musuqmanta ruwayña.",
+        "replaceFailed": "Mana atikurqachu tarjetaykita tikrayta. Musuqmanta ruwayña."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Tarjeta física mañakuy",

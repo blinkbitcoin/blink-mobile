@@ -3288,7 +3288,11 @@
         "subtitle": "Objednávka doručení vaší karty Blink byla odeslána.",
         "buttonLabel": "Přehled"
       },
-      "title": "Vyměnit kartu"
+      "title": "Vyměnit kartu",
+      "errors": {
+        "lockFailed": "Nepodařilo se zamknout vaši kartu. Zkuste to prosím znovu.",
+        "replaceFailed": "Nepodařilo se vyměnit vaši kartu. Zkuste to prosím znovu."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Objednat fyzickou kartu",

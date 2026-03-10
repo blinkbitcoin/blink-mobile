@@ -3288,7 +3288,11 @@
         "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
         "buttonLabel": "Dashboard"
       },
-      "title": "Vervang kaart"
+      "title": "Vervang kaart",
+      "errors": {
+        "lockFailed": "Kon nie jou kaart sluit nie. Probeer asseblief weer.",
+        "replaceFailed": "Kon nie jou kaart vervang nie. Probeer asseblief weer."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Bestel fisiese kaart",

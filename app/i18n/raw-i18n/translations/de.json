@@ -3238,6 +3238,10 @@
                 "title": "Ihre neue Karte ist unterwegs!",
                 "subtitle": "Bestellung zur Lieferung Ihrer Blink-Karte wurde eingereicht.",
                 "buttonLabel": "Dashboard"
+            },
+            "errors": {
+                "lockFailed": "Karte konnte nicht gesperrt werden. Bitte versuche es erneut.",
+                "replaceFailed": "Karte konnte nicht ersetzt werden. Bitte versuche es erneut."
             }
         },
         "OrderPhysicalCard": {

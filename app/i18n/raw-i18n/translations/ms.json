@@ -3288,7 +3288,11 @@
         "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
         "buttonLabel": "Papan Pemuka"
       },
-      "title": "Ganti kad"
+      "title": "Ganti kad",
+      "errors": {
+        "lockFailed": "Gagal mengunci kad anda. Sila cuba lagi.",
+        "replaceFailed": "Gagal menggantikan kad anda. Sila cuba lagi."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Pesan kad fizikal",

@@ -3279,6 +3279,10 @@
                 "title": "新しいカードが届きます！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "ダッシュボード"
+            },
+            "errors": {
+                "lockFailed": "カードのロックに失敗しました。もう一度お試しください。",
+                "replaceFailed": "カードの交換に失敗しました。もう一度お試しください。"
             }
         },
         "OrderPhysicalCard": {

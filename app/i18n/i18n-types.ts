@@ -10741,6 +10741,16 @@ type RootTranslation = {
 				 */
 				buttonLabel: string
 			}
+			errors: {
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​l​o​c​k​ ​y​o​u​r​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				lockFailed: string
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​r​e​p​l​a​c​e​ ​y​o​u​r​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				replaceFailed: string
+			}
 		}
 		OrderPhysicalCard: {
 			/**
@@ -21761,6 +21771,16 @@ export type TranslationFunctions = {
 				 * Dashboard
 				 */
 				buttonLabel: () => LocalizedString
+			}
+			errors: {
+				/**
+				 * Failed to lock your card. Please try again.
+				 */
+				lockFailed: () => LocalizedString
+				/**
+				 * Failed to replace your card. Please try again.
+				 */
+				replaceFailed: () => LocalizedString
 			}
 		}
 		OrderPhysicalCard: {

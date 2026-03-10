@@ -3247,7 +3247,11 @@
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
         "buttonLabel": "Dasbor"
       },
-      "title": "Ganti kartu"
+      "title": "Ganti kartu",
+      "errors": {
+        "lockFailed": "Gagal mengunci kartu Anda. Silakan coba lagi.",
+        "replaceFailed": "Gagal mengganti kartu Anda. Silakan coba lagi."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Pesan kartu fisik",
