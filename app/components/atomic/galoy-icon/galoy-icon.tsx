@@ -58,7 +58,6 @@ import {
   PencilSimpleLineIcon,
   PhoneIcon,
   PlusIcon,
-
   QuestionIcon,
   ScanIcon,
   ShareNetworkIcon,
