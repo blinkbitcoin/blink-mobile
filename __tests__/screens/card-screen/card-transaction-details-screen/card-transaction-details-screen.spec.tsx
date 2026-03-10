@@ -6,7 +6,6 @@ import { CardTransactionDetailsScreen } from "@app/screens/card-screen/card-tran
 import { ContextForScreen } from "../../helper"
 import { TransactionStatus } from "@app/graphql/generated"
 
-jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
 const mockGoBack = jest.fn()
 const mockUseRoute = jest.fn()

@@ -2,9 +2,8 @@ import * as React from "react"
 import { Linking, TouchableWithoutFeedback, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { useFragment } from "@apollo/client"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { TransactionDate } from "@app/components/transaction-date"
@@ -351,8 +350,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         )
                       }
                     >
-                      <Icon
-                        name="open-outline"
+                      <GaloyIcon
+                        name="arrow-square-out"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -371,8 +370,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -412,8 +411,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                     })
                   }
                 >
-                  <Icon
-                    name="copy-outline"
+                  <GaloyIcon
+                    name="copy-paste"
                     size={22}
                     color={colors.primary}
                     style={styles.icon}
@@ -444,8 +443,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -472,8 +471,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -495,8 +494,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         viewInLightningDecoder(initiationVia?.paymentRequest || "")
                       }
                     >
-                      <Icon
-                        name="open-outline"
+                      <GaloyIcon
+                        name="arrow-square-out"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -512,8 +511,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -537,8 +536,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                       })
                     }
                   >
-                    <Icon
-                      name="copy-outline"
+                    <GaloyIcon
+                      name="copy-paste"
                       size={22}
                       color={colors.primary}
                       style={styles.icon}

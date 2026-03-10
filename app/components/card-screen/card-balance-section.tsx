@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -40,7 +40,7 @@ export const CardBalanceSection: React.FC<CardBalanceSectionProps> = ({
         <Text type="p3" style={styles.addFundsText}>
           {LL.CardFlow.CardDashboard.addFunds()}
         </Text>
-        <Icon name="add" size={18} color={styles.primaryColor.color} />
+        <GaloyIcon name="plus" size={18} color={styles.primaryColor.color} />
       </TouchableOpacity>
     </View>
   )

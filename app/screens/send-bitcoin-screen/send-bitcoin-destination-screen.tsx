@@ -8,8 +8,6 @@ import React, {
 } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
@@ -721,13 +719,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           />
           {destinationState.unparsedDestination &&
           activeInputRef.current === InputType.Search ? (
-            <Icon
-              name="close"
-              size={24}
-              onPress={resetInput}
-              color={styles.icon.color}
-              style={styles.iconContainer}
-            />
+            <TouchableOpacity onPress={resetInput} style={styles.iconContainer}>
+              <GaloyIcon name="close" size={24} color={styles.icon.color} />
+            </TouchableOpacity>
           ) : (
             <TouchableOpacity
               onPress={handlePaste}
@@ -995,7 +989,9 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         <PhoneInput
           rightIcon={
             rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
-              <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
+              <TouchableOpacity onPress={resetInput}>
+                <GaloyIcon name="close" size={24} color={colors.primary} />
+              </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 onPress={handlePastePhone}

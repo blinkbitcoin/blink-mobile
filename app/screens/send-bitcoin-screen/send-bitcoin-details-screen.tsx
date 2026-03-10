@@ -2,8 +2,6 @@ import { requestInvoice, utils, Satoshis } from "lnurl-pay"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { gql } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -541,7 +539,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               </View>
 
               <View style={styles.pickWalletIcon}>
-                <Icon name={"chevron-down"} size={24} color={colors.primary} />
+                <GaloyIcon name={"caret-down"} size={24} color={colors.primary} />
               </View>
             </View>
           </TouchableWithoutFeedback>

@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
@@ -16,7 +16,6 @@ type InfoCardProps = {
   description?: string
   customDescription?: React.ReactNode
   icon?: IconNamesType
-  ionicon?: string
   titleColor?: string
   iconColor?: string
   bulletItems?: string[]
@@ -30,7 +29,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   description,
   customDescription,
   icon = "warning",
-  ionicon,
   titleColor,
   iconColor,
   bulletItems,
@@ -48,9 +46,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   const styles = useStyles({ titleColor: resolvedTitleColor, isLg, bulletSpacing })
 
   const renderIcon = () => {
-    if (ionicon) {
-      return <Icon name={ionicon} type="ionicon" size={16} color={resolvedIconColor} />
-    }
     return <GaloyIcon name={icon} size={16} color={resolvedIconColor} />
   }
 

@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -50,7 +50,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   const content = (
     <>
       <View style={styles.iconContainer}>
-        <Icon name="storefront-outline" size={20} color={colors.primary} />
+        <GaloyIcon name="storefront" size={20} color={colors.primary} />
       </View>
       <View style={styles.detailsColumn}>
         <Text type="p3" bold numberOfLines={1} style={styles.merchantName}>

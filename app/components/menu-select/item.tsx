@@ -1,6 +1,6 @@
 import React from "react"
 import { ActivityIndicator, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { testProps } from "@app/utils/testProps"
 import { ListItem, ListItemProps, makeStyles, useTheme } from "@rn-vui/themed"
@@ -50,7 +50,7 @@ export const Item: React.FC<ItemProps> = ({
     <ListItem {...props} key={value} bottomDivider onPress={onPress}>
       <View style={styles.iconContainer}>
         {showActivityIndicator && <ActivityIndicator />}
-        {selected && <Icon name="checkmark-circle" size={18} color={colors._green} />}
+        {selected && <GaloyIcon name="check-circle" size={18} color={colors._green} />}
       </View>
       <ListItem.Title {...(testPropId ? testProps(testPropId) : {})}>
         {children}

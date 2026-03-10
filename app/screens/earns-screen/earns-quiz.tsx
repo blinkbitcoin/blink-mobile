@@ -11,8 +11,6 @@ import {
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { FetchResult, gql } from "@apollo/client"
 import { QuizClaimMutation, useQuizClaimMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -23,6 +21,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CloseCross } from "../../components/close-cross"
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -451,8 +450,8 @@ export const EarnQuiz = ({ route }: Props) => {
         </View>
         <View style={styles.modalBackground}>
           <View style={{ height: 14 }}>
-            <Icon
-              name="remove"
+            <GaloyIcon
+              name="minus"
               size={72}
               color={colors._lightGrey}
               style={{ height: 40, top: -30 }}

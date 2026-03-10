@@ -4,7 +4,6 @@ import { render } from "@testing-library/react-native"
 
 import { CardTransactionItem } from "@app/components/card-screen/card-transaction-item"
 
-jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({

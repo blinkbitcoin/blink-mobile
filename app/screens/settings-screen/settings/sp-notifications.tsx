@@ -13,7 +13,7 @@ export const NotificationSetting: React.FC = () => {
   return (
     <SettingsRow
       title={`${LL.common.notifications()}: ${LL.common.some()}`}
-      leftIcon="notifications-outline"
+      leftGaloyIcon="bell"
       action={() => navigate("notificationSettingsScreen")}
     />
   )

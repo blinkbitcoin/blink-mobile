@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import ReactNativeModal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -90,7 +90,7 @@ export const WalletFilterDropdown: React.FC<{
           </View>
 
           <View style={styles.pickWalletIcon}>
-            <Icon name="chevron-down" size={24} color={colors.black} />
+            <GaloyIcon name="caret-down" size={24} color={colors.black} />
           </View>
         </View>
       </TouchableWithoutFeedback>

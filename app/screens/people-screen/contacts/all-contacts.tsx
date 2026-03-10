@@ -1,9 +1,7 @@
 import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
-import { ActivityIndicator, Text, View } from "react-native"
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"
 import { UserContact, useContactsQuery } from "@app/graphql/generated"
@@ -17,6 +15,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 gql`
   query contacts {
@@ -129,9 +128,11 @@ export const AllContactsScreen: React.FC = () => {
         inputContainerStyle={styles.searchBarInputContainerStyle}
         inputStyle={styles.searchBarText}
         rightIconContainerStyle={styles.searchBarRightIconStyle}
-        searchIcon={<Icon name="search" size={24} color={styles.icon.color} />}
+        searchIcon={<GaloyIcon name="magnifying-glass" size={24} color={styles.icon.color} />}
         clearIcon={
-          <Icon name="close" size={24} onPress={reset} color={styles.icon.color} />
+          <TouchableOpacity onPress={reset}>
+            <GaloyIcon name="close" size={24} color={styles.icon.color} />
+          </TouchableOpacity>
         }
       />
     )
@@ -184,7 +185,7 @@ export const AllContactsScreen: React.FC = () => {
               containerStyle={styles.itemContainer}
               onPress={() => navigation.navigate("contactDetail", { contact: item })}
             >
-              <Icon name={"person-outline"} size={24} color={colors.primary} />
+              <GaloyIcon name={"user"} size={24} color={colors.primary} />
               <ListItem.Content>
                 <ListItem.Title style={styles.itemText}>{displayHandle}</ListItem.Title>
               </ListItem.Content>

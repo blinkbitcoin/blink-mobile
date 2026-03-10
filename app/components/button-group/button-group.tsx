@@ -1,6 +1,5 @@
 import React from "react"
 import { StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
 
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles } from "@rn-vui/themed"
@@ -8,12 +7,10 @@ import { Text, makeStyles } from "@rn-vui/themed"
 type ButtonForButtonGroupProps = {
   id: string
   text: string
-  icon:
-    | string
-    | {
-        selected: React.ReactElement
-        normal: React.ReactElement
-      }
+  icon: {
+    selected: React.ReactElement
+    normal: React.ReactElement
+  }
   disabled?: boolean
 }
 
@@ -35,13 +32,7 @@ const ButtonForButtonGroup: React.FC<
         >
           {text}
         </Text>
-        {typeof icon === "string" ? (
-          <Icon style={styles.text} name={icon} />
-        ) : selected ? (
-          icon.selected
-        ) : (
-          icon.normal
-        )}
+        {selected ? icon.selected : icon.normal}
       </View>
     </TouchableWithoutFeedback>
   )

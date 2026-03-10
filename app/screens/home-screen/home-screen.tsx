@@ -3,7 +3,6 @@ import { useMemo } from "react"
 import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -405,7 +404,7 @@ export const HomeScreen: React.FC = () => {
     {
       title: LL.HomeScreen.scan(),
       target: "scanningQRCode" as Target,
-      icon: "qr-code" as IconNamesType,
+      icon: "scan" as IconNamesType,
     },
   ]
 
@@ -440,7 +439,7 @@ export const HomeScreen: React.FC = () => {
         </TouchableWithoutFeedback>
       </View>
       <View style={styles.viewModal}>
-        <Icon name="remove" size={64} color={colors.grey3} style={styles.icon} />
+        <GaloyIcon name="minus" size={64} color={colors.grey3} style={styles.icon} />
         <Text type="h1">{LL.common.needWallet()}</Text>
         <View style={styles.openWalletContainer}>
           <GaloyPrimaryButton
@@ -478,6 +477,7 @@ export const HomeScreen: React.FC = () => {
             size={"medium"}
             name="graph"
             iconOnly={true}
+            weight="bold" 
           />
           <View>
             {!loading && usernameTitle && (
@@ -494,6 +494,7 @@ export const HomeScreen: React.FC = () => {
             size={"medium"}
             name="menu"
             iconOnly={true}
+            weight="bold" 
           />
         </View>
       </View>
@@ -534,11 +535,12 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
             <React.Fragment key={item.icon}>
-              {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
+              {item.icon === "scan" && <View style={styles.actionsSeparator} />}
               <View style={styles.button}>
                 <GaloyIconButton
                   name={item.icon}
                   size="large"
+                  weight="regular" 
                   text={item.title}
                   onPress={() => onMenuClick(item.target)}
                 />

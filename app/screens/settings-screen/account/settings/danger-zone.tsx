@@ -2,7 +2,8 @@ import { View, TouchableOpacity } from "react-native"
 
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Icon, Text, makeStyles } from "@rn-vui/themed"
+import { Text, makeStyles } from "@rn-vui/themed"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { Delete } from "./delete"
 import { LogOut } from "./logout"
@@ -13,7 +14,6 @@ export const DangerZoneSettings: React.FC = () => {
   const styles = useStyles()
 
   const [expanded, setExpanded] = useState(false)
-  const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
 
   const { currentLevel, isAtLeastLevelOne, isAtLeastLevelZero } = useLevel()
   if (!isAtLeastLevelZero) return <></>
@@ -21,7 +21,7 @@ export const DangerZoneSettings: React.FC = () => {
   return (
     <View style={styles.verticalSpacing}>
       <TouchableOpacity style={styles.titleStyle} onPress={() => setExpanded(!expanded)}>
-        <Icon name={defaultIcon} type="ionicon" size={20} />
+        <GaloyIcon name={expanded ? "caret-down" : "caret-right"} size={20} />
         <Text type="p2" bold>
           {LL.AccountScreen.dangerZone()}
         </Text>

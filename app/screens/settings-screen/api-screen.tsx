@@ -18,7 +18,7 @@ export const ApiScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const LinkIcon = <GaloyIcon name="link" size={20} color={colors.primary} />
+  const LinkIcon = <GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />
 
   const apiSettings = [
     () => (

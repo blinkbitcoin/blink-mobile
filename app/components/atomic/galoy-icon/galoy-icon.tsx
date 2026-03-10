@@ -1,183 +1,240 @@
 import React from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 
-import ArrowLeft from "@app/assets/icons-redesign/arrow-left.svg"
-import ArrowRight from "@app/assets/icons-redesign/arrow-right.svg"
-import BackSpace from "@app/assets/icons-redesign/back-space.svg"
-import Bank from "@app/assets/icons-redesign/bank.svg"
-import Bell from "@app/assets/icons-redesign/bell.svg"
+import {
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowsDownUpIcon,
+  ArrowsClockwiseIcon,
+  ArrowsLeftRightIcon,
+  ArrowSquareOutIcon,
+  BackspaceIcon,
+  BankIcon,
+  BellIcon,
+  BookIcon,
+  BookOpenIcon,
+  CalculatorIcon,
+  CalendarIcon,
+  CaretDownIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  CaretUpIcon,
+  ChartLineIcon,
+  ChatCircleDotsIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  ClipboardIcon,
+  CoinsIcon,
+  CopyIcon,
+  CurrencyDollarIcon,
+  DownloadSimpleIcon,
+  EnvelopeIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  FileIcon,
+  FlagIcon,
+  FingerprintSimpleIcon,
+  FunnelIcon,
+  GaugeIcon,
+  GearSixIcon,
+  GlobeIcon,
+  HeadsetIcon,
+  HouseIcon,
+  ImageIcon,
+  InfoIcon,
+  KeyIcon,
+  LightbulbIcon,
+  LightningIcon,
+  LinkIcon,
+  ListIcon,
+  LockIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  MapTrifoldIcon,
+  MinusIcon,
+  NoteIcon,
+  PackageIcon,
+  PaintBrushIcon,
+  PencilSimpleLineIcon,
+  PhoneIcon,
+  PlusIcon,
+  QrCodeIcon,
+  QuestionIcon,
+  ScanIcon,
+  ShareNetworkIcon,
+  ShieldIcon,
+  SnowflakeIcon,
+  SpinnerGapIcon,
+  StorefrontIcon,
+  TrashIcon,
+  TranslateIcon,
+  TrophyIcon,
+  UserIcon,
+  UsersIcon,
+  VideoIcon,
+  WalletIcon,
+  WarningCircleIcon,
+  WarningIcon,
+  XIcon,
+  XCircleIcon,
+} from "phosphor-react-native"
+
+import ApplePay from "@app/assets/icons/apple-pay.svg"
 import Bitcoin from "@app/assets/icons-redesign/bitcoin.svg"
-import Book from "@app/assets/icons-redesign/book.svg"
+import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import BtcBook from "@app/assets/icons-redesign/btc-book.svg"
-import CaretDown from "@app/assets/icons-redesign/caret-down.svg"
-import CaretLeft from "@app/assets/icons-redesign/caret-left.svg"
-import CaretRight from "@app/assets/icons-redesign/caret-right.svg"
-import CaretUp from "@app/assets/icons-redesign/caret-up.svg"
-import CheckCircle from "@app/assets/icons-redesign/check-circle.svg"
-import Check from "@app/assets/icons-redesign/check.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
-import Close from "@app/assets/icons-redesign/close.svg"
-import Coins from "@app/assets/icons-redesign/coins.svg"
-import CopyPaste from "@app/assets/icons-redesign/copy-paste.svg"
-import Dollar from "@app/assets/icons-redesign/dollar.svg"
-import Download from "@app/assets/icons-redesign/download.svg"
-import EyeSlash from "@app/assets/icons-redesign/eye-slash.svg"
-import Eye from "@app/assets/icons-redesign/eye.svg"
-import Filter from "@app/assets/icons-redesign/filter.svg"
-import Globe from "@app/assets/icons-redesign/globe.svg"
-import Graph from "@app/assets/icons-redesign/graph.svg"
-import Image from "@app/assets/icons-redesign/image.svg"
-import Info from "@app/assets/icons-redesign/info.svg"
-import Lightning from "@app/assets/icons-redesign/lightning.svg"
+import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
-import Link from "@app/assets/icons-redesign/link.svg"
-import Loading from "@app/assets/icons-redesign/loading.svg"
-import EmailAdd from "@app/assets/icons-redesign/email-add.svg"
-import MagnifyingGlass from "@app/assets/icons-redesign/magnifying-glass.svg"
-import Map from "@app/assets/icons-redesign/map.svg"
-import MapPin from "@app/assets/icons/map.svg"
-import Menu from "@app/assets/icons-redesign/menu.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
 import PaymentSuccess from "@app/assets/icons-redesign/payment-success.svg"
-import Pencil from "@app/assets/icons-redesign/pencil.svg"
-import QrCode from "@app/assets/icons-redesign/qr-code.svg"
-import Question from "@app/assets/icons-redesign/question.svg"
-import Receive from "@app/assets/icons-redesign/receive.svg"
-import ReportFlag from "@app/assets/icons-redesign/report-flag.svg"
-import Send from "@app/assets/icons-redesign/send.svg"
-import Settings from "@app/assets/icons-redesign/settings.svg"
-import Support from "@app/assets/icons-redesign/support.svg"
-import Share from "@app/assets/icons-redesign/share.svg"
-import Transfer from "@app/assets/icons-redesign/transfer.svg"
-import User from "@app/assets/icons-redesign/user.svg"
-import Video from "@app/assets/icons-redesign/video.svg"
-import WarningWithBackground from "@app/assets/icons-redesign/warning-with-background.svg"
-import Warning from "@app/assets/icons-redesign/warning.svg"
-import Telegram from "@app/assets/icons/telegram.svg"
-import TelegramSimple from "@app/assets/icons-redesign/telegram-simple.svg"
-import Note from "@app/assets/icons/note.svg"
-import People from "@app/assets/icons/people.svg"
-import Rank from "@app/assets/icons/rank.svg"
-import Refresh from "@app/assets/icons/refresh.svg"
-import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
-import Calculator from "@app/assets/icons-redesign/calculator.svg"
-import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
-import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
-import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
-import Welcome from "@app/assets/icons-redesign/welcome.svg"
-import Calendar from "@app/assets/icons-redesign/calendar.svg"
-import DocumentIcon from "@app/assets/icons-redesign/document.svg"
-import KeyIcon from "@app/assets/icons-redesign/key.svg"
-import HouseIcon from "@app/assets/icons-redesign/house-outline.svg"
-import Headset from "@app/assets/icons-redesign/headset.svg"
-import Snowflake from "@app/assets/icons-redesign/snowflake.svg"
-import Speedometer from "@app/assets/icons-redesign/speedometer.svg"
-import BookOpen from "@app/assets/icons-redesign/book-open.svg"
-import LockClosed from "@app/assets/icons-redesign/lock-closed.svg"
-import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
-import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
 import PrivacyPolicy from "@app/assets/icons-redesign/privacy-policy.svg"
-import Trash from "@app/assets/icons-redesign/trash.svg"
-import GooglePay from "@app/assets/icons/google-pay.svg"
-import ApplePay from "@app/assets/icons/apple-pay.svg"
-import Approved from "@app/assets/icons-redesign/approved.svg"
-import Delivery from "@app/assets/icons-redesign/delivery.svg"
-import ErrorIcon from "@app/assets/icons/error.svg"
-import Shield from "@app/assets/icons/shield.svg"
+import Telegram from "@app/assets/icons/telegram.svg"
+import TelegramSimple from "@app/assets/icons-redesign/telegram-simple.svg"
+import VisaPlatinum from "@app/assets/icons-redesign/visa-platinum.svg"
+import WarningWithBackground from "@app/assets/icons-redesign/warning-with-background.svg"
+import Welcome from "@app/assets/icons-redesign/welcome.svg"
+import Receive from "@app/assets/icons-redesign/receive.svg"
+import Send from "@app/assets/icons-redesign/send.svg"
+import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
+import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
+import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-export const icons = {
-  "arrow-right": ArrowRight,
-  "arrow-left": ArrowLeft,
-  "back-space": BackSpace,
-  "bank": Bank,
-  "bitcoin": Bitcoin,
-  "book": Book,
-  "btc-book": BtcBook,
-  "caret-down": CaretDown,
-  "caret-left": CaretLeft,
-  "caret-right": CaretRight,
-  "caret-up": CaretUp,
-  "check-circle": CheckCircle,
-  "check": Check,
-  "close": Close,
-  "close-cross-with-background": CloseCrossWithBackground,
-  "coins": Coins,
-  "people": People,
-  "copy-paste": CopyPaste,
-  "dollar": Dollar,
-  "download": Download,
-  "eye-slash": EyeSlash,
-  "eye": Eye,
-  "filter": Filter,
-  "globe": Globe,
-  "graph": Graph,
-  "image": Image,
-  "info": Info,
-  "lightning": Lightning,
-  "lightning-address": LightningAddress,
-  "link": Link,
-  "loading": Loading,
-  "email-add": EmailAdd,
-  "magnifying-glass": MagnifyingGlass,
-  "map": Map,
-  "map-pin": MapPin,
-  "menu": Menu,
-  "pencil": Pencil,
-  "note": Note,
-  "rank": Rank,
-  "qr-code": QrCode,
-  "question": Question,
-  "receive": Receive,
-  "report-flag": ReportFlag,
-  "send": Send,
-  "settings": Settings,
-  "share": Share,
-  "support": Support,
-  "transfer": Transfer,
-  "user": User,
-  "video": Video,
-  "warning": Warning,
-  "warning-with-background": WarningWithBackground,
-  "payment-success": PaymentSuccess,
-  "payment-pending": PaymentPending,
-  "payment-error": PaymentError,
-  "bell": Bell,
-  "refresh": Refresh,
-  "telegram": Telegram,
-  "telegram-simple": TelegramSimple,
-  "upgrade": Upgrade,
-  "welcome": Welcome,
-  "calculator": Calculator,
-  "calendar": Calendar,
-  "document-outline": DocumentIcon,
-  "key-outline": KeyIcon,
+// ── Size presets ────────────────────────────────────────────────────────────
+
+export type IconSizeVariant = "sm" | "md" | "lg" | "xl"
+
+export const ICON_SIZES: Record<IconSizeVariant, number> = {
+  sm: 16,
+  md: 24,
+  lg: 32,
+  xl: 48,
+}
+
+// ── Weight presets ──────────────────────────────────────────────────────────
+
+export type IconWeight = "thin" | "regular" | "bold"
+
+// ── Icon maps ───────────────────────────────────────────────────────────────
+
+const phosphorIconMap = {
+  "arrow-down": ArrowDownIcon,
+  "arrow-left": ArrowLeftIcon,
+  "arrow-right": ArrowRightIcon,
+  "arrow-square-out": ArrowSquareOutIcon,
+  "back-space": BackspaceIcon,
+  "bank": BankIcon,
+  "bell": BellIcon,
+  "book": BookIcon,
+  "brush": PaintBrushIcon,
+  "book-open": BookOpenIcon,
+  "calculator": CalculatorIcon,
+  "calendar": CalendarIcon,
+  "caret-down": CaretDownIcon,
+  "caret-left": CaretLeftIcon,
+  "caret-right": CaretRightIcon,
+  "caret-up": CaretUpIcon,
+  "chat": ChatCircleDotsIcon,
+  "check": CheckIcon,
+  "clipboard": ClipboardIcon,
+  "check-circle": CheckCircleIcon,
+  "coins": CoinsIcon,
+  "document-outline": FileIcon,
+  "dollar": CurrencyDollarIcon,
+  "download": DownloadSimpleIcon,
+  "email-add": EnvelopeIcon,
+  "error": XCircleIcon,
+  "eye": EyeIcon,
+  "eye-slash": EyeSlashIcon,
+  "fingerprint": FingerprintSimpleIcon,
+  "filter": FunnelIcon,
+  "globe": GlobeIcon,
+  "graph": ChartLineIcon,
+  "headset": HeadsetIcon,
   "house-outline": HouseIcon,
-  "headset": Headset,
-  "snowflake": Snowflake,
-  "speedometer": Speedometer,
-  "book-open": BookOpen,
-  "lock-closed": LockClosed,
-  "visa-platinum": VisaPlatinum,
+  "image": ImageIcon,
+  "info": InfoIcon,
+  "key-outline": KeyIcon,
+  "lightbulb": LightbulbIcon,
+  "lightning": LightningIcon,
+  "link": LinkIcon,
+  "loading": SpinnerGapIcon,
+  "lock-closed": LockIcon,
+  "magnifying-glass": MagnifyingGlassIcon,
+  "map": MapTrifoldIcon,
+  "map-pin": MapPinIcon,
+  "menu": ListIcon,
+  "minus": MinusIcon,
+  "note": NoteIcon,
+  "pencil": PencilSimpleLineIcon,
+  "people": UsersIcon,
+  "phone": PhoneIcon,
+  "plus": PlusIcon,
+  "qr-code": QrCodeIcon,
+  "question": QuestionIcon,
+  "rank": TrophyIcon,
+  "refresh": ArrowsClockwiseIcon,
+  "report-flag": FlagIcon,
+  "scan": ScanIcon,
+  "settings": GearSixIcon,
+  "share": ShareNetworkIcon,
+  "shield": ShieldIcon,
+  "snowflake": SnowflakeIcon,
+  "speedometer": GaugeIcon,
+  "storefront": StorefrontIcon,
+  "support": HeadsetIcon,
+  "transfer": ArrowsDownUpIcon,
+  "translate": TranslateIcon,
+  "trash": TrashIcon,
+  "user": UserIcon,
+  "video": VideoIcon,
+  "wallet": WalletIcon,
+  "warning": WarningIcon,
+  "warning-circle": WarningCircleIcon,
+  "close": XIcon,
+  "copy-paste": CopyIcon,
+  "delivery": PackageIcon,
+  "approved": CheckCircleIcon,
+} as const
+
+const customSvgMap = {
+  "apple-pay": ApplePay,
+  "bitcoin": Bitcoin,
   "blink-icon": BlinkIcon,
+  "btc-book": BtcBook,
+  "close-cross-with-background": CloseCrossWithBackground,
+  "google-pay": GooglePay,
+  "lightning-address": LightningAddress,
+  "payment-error": PaymentError,
+  "payment-pending": PaymentPending,
+  "payment-success": PaymentSuccess,
   "physical-card": PhysicalCard,
   "privacy-policy": PrivacyPolicy,
-  "trash": Trash,
-  "google-pay": GooglePay,
-  "apple-pay": ApplePay,
-  "approved": Approved,
+  "telegram": Telegram,
+  "telegram-simple": TelegramSimple,
+  "receive": Receive,
+  "send": Send,
+  "upgrade": Upgrade,
+  "visa-platinum": VisaPlatinum,
+  "warning-with-background": WarningWithBackground,
+  "welcome": Welcome,
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
-  "delivery": Delivery,
-  "error": ErrorIcon,
   "heart-outline": HeartOutline,
-  "shield": Shield,
 } as const
+
+export const icons = { ...phosphorIconMap, ...customSvgMap } as const
 
 export type IconNamesType = keyof typeof icons
 export const IconNames = Object.keys(icons)
+
+// ── Props ───────────────────────────────────────────────────────────────────
 
 type GaloyIconProps = {
   name: IconNamesType
@@ -186,27 +243,26 @@ type GaloyIconProps = {
   backgroundColor?: string
   opacity?: number
   containerSize?: number
+  weight?: IconWeight
 } & (
-  | {
-      size: number
-      width?: never
-      height?: never
-    }
-  | {
-      size?: never
-      width: number
-      height: number
-    }
+  | { size: number; sizeVariant?: never; width?: never; height?: never }
+  | { size?: never; sizeVariant: IconSizeVariant; width?: never; height?: never }
+  | { size?: never; sizeVariant?: never; width: number; height: number }
 )
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
 
 export const circleDiameterThatContainsSquare = (squareSize: number) => {
   const SQRT2 = 1.414
   return Math.round(squareSize * SQRT2)
 }
 
+// ── Component ───────────────────────────────────────────────────────────────
+
 export const GaloyIcon = ({
   name,
   size,
+  sizeVariant,
   width,
   height,
   color,
@@ -214,42 +270,64 @@ export const GaloyIcon = ({
   backgroundColor,
   opacity,
   containerSize,
+  weight = "regular",
 }: GaloyIconProps) => {
   const {
     theme: { colors },
   } = useTheme()
-  const resolvedSize = size ?? Math.max(width ?? 0, height ?? 0)
+
+  const resolvedSize =
+    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width ?? 0, height ?? 0)
+  const resolvedColor = color || colors.black
+
   const styles = useStyles({
     backgroundColor,
     opacity,
     size: resolvedSize,
     containerSize,
   })
-  const Icon = icons[name]
 
-  return backgroundColor ? (
-    <View style={[style, styles.iconContainerStyle]}>
-      <Icon
-        width={size ?? width}
-        opacity={opacity || 1}
-        height={size ?? height}
-        color={color || colors.black}
-        fontWeight={"600"}
+  if (name in phosphorIconMap) {
+    const PhosphorIcon = phosphorIconMap[name as keyof typeof phosphorIconMap]
+    if (backgroundColor) {
+      return (
+        <View style={[style, styles.iconContainerStyle]}>
+          <PhosphorIcon size={resolvedSize} color={resolvedColor} weight={weight} testID={`icon-${name}`} />
+        </View>
+      )
+    }
+    return (
+      <PhosphorIcon
+        size={resolvedSize}
+        color={resolvedColor}
+        weight={weight}
+        style={[style, { opacity: opacity || 1 }]}
         testID={`icon-${name}`}
       />
-    </View>
-  ) : (
-    <Icon
+    )
+  }
+
+  const SvgIcon = customSvgMap[name as keyof typeof customSvgMap]
+  if (backgroundColor) {
+    return (
+      <View style={[style, styles.iconContainerStyle]}>
+        <SvgIcon width={resolvedSize} height={resolvedSize} color={resolvedColor} testID={`icon-${name}`} />
+      </View>
+    )
+  }
+  return (
+    <SvgIcon
       opacity={opacity || 1}
       width={size ?? width}
       height={size ?? height}
-      color={color || colors.black}
+      color={resolvedColor}
       style={style}
-      fontWeight={"600"}
       testID={`icon-${name}`}
     />
   )
 }
+
+// ── Styles ──────────────────────────────────────────────────────────────────
 
 type UseStylesProps = {
   backgroundColor?: string
@@ -271,6 +349,7 @@ const useStyles = makeStyles(
         alignItems: "center",
         justifyContent: "center",
       },
+
     }
   },
 )

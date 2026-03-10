@@ -62,9 +62,9 @@ describe("SettingItemRow", () => {
       expect(toJSON()).toBeTruthy()
     })
 
-    it("renders with leftIonicon prop", () => {
+    it("renders with leftIcon wallet prop", () => {
       const { toJSON } = renderWithTheme(
-        <SettingItemRow {...defaultProps} leftIonicon="wallet-outline" />,
+        <SettingItemRow {...defaultProps} leftIcon="wallet" />,
       )
       expect(toJSON()).toBeTruthy()
     })
