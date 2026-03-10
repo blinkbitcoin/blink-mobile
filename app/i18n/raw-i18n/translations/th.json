@@ -3192,7 +3192,10 @@
         "confirmNewPin": "ยืนยัน PIN ใหม่",
         "confirmPinSubtitle": "กรุณาใส่ PIN 4 หลักใหม่ของคุณอีกครั้งเพื่อดำเนินการต่อ",
         "incorrectPin": "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
-        "pinMismatch": "รหัส PIN ไม่ตรงกัน กรุณากรอกใหม่เพื่อยืนยันหรือย้อนกลับเพื่อเปลี่ยนรหัส PIN ของคุณ"
+        "pinMismatch": "รหัส PIN ไม่ตรงกัน กรุณากรอกใหม่เพื่อยืนยันหรือย้อนกลับเพื่อเปลี่ยนรหัส PIN ของคุณ",
+        "weakPin": "รหัส PIN นี้เดาได้ง่ายเกินไป กรุณาเลือกรหัส PIN ที่คาดเดาได้ยากกว่านี้",
+        "cardNotFound": "ไม่พบบัตร กรุณาลองอีกครั้ง",
+        "pinUpdateFailed": "ไม่สามารถอัปเดตรหัส PIN กรุณาลองอีกครั้ง"
       },
       "CreateFlow": {
         "title": "สร้าง PIN",
@@ -3217,7 +3220,9 @@
         "enterNewPinSubtitle": "กรุณาใส่ PIN 4 หลักใหม่ของคุณ",
         "pinChangedTitle": "เปลี่ยน PIN แล้ว",
         "pinChangedSubtitle": "PIN ของคุณถูกเปลี่ยนเรียบร้อยแล้ว",
-        "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว"
+        "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว",
+        "biometricDescription": "ยืนยันตัวตนของคุณเพื่อเปลี่ยนรหัส PIN",
+        "biometricRequired": "ต้องใช้การยืนยันตัวตนด้วยไบโอเมตริกเพื่อเปลี่ยนรหัส PIN ของคุณ"
       }
     },
     "ReplaceCard": {

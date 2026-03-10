@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Bevestig nieuwe PIN",
         "confirmPinSubtitle": "Voer alstublieft uw nieuwe 4-cijferige PIN opnieuw in om door te gaan.",
         "incorrectPin": "Onjuiste PIN. Probeer het opnieuw.",
-        "pinMismatch": "PINs komen niet overeen. Voer opnieuw in om te bevestigen of ga terug om uw PIN te wijzigen."
+        "pinMismatch": "PINs komen niet overeen. Voer opnieuw in om te bevestigen of ga terug om uw PIN te wijzigen.",
+        "weakPin": "Deze PIN is te gemakkelijk te raden. Kies alstublieft een sterkere PIN.",
+        "cardNotFound": "Kaart niet gevonden. Probeer het opnieuw.",
+        "pinUpdateFailed": "PIN bijwerken mislukt. Probeer het opnieuw."
       },
       "CreateFlow": {
         "title": "PIN aanmaken",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Voer alstublieft uw nieuwe 4-cijferige PIN in.",
         "pinChangedTitle": "PIN gewijzigd",
         "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
-        "pinChangedToast": "PIN is succesvol gewijzigd"
+        "pinChangedToast": "PIN is succesvol gewijzigd",
+        "biometricDescription": "Verifieer uw identiteit om uw PIN te wijzigen",
+        "biometricRequired": "Biometrische authenticatie is vereist om uw PIN te wijzigen."
       }
     },
     "ReplaceCard": {

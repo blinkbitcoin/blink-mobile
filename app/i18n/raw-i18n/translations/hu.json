@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Új PIN megerősítése",
         "confirmPinSubtitle": "Kérjük, adja meg újra az új 4 számjegyű PIN kódját a folytatáshoz.",
         "incorrectPin": "Helytelen PIN. Kérjük, próbálja újra.",
-        "pinMismatch": "A PIN-kódok nem egyeznek. Írja be újra a megerősítéshez, vagy lépjen vissza a PIN megváltoztatásához."
+        "pinMismatch": "A PIN-kódok nem egyeznek. Írja be újra a megerősítéshez, vagy lépjen vissza a PIN megváltoztatásához.",
+        "weakPin": "Ez a PIN túl könnyű kitalálni. Kérjük, válasszon erősebb PIN-t.",
+        "cardNotFound": "A kártya nem található. Kérjük, próbálja újra.",
+        "pinUpdateFailed": "A PIN frissítése sikertelen. Kérjük, próbálja újra."
       },
       "CreateFlow": {
         "title": "PIN létrehozása",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Kérjük, adja meg az új 4 számjegyű PIN kódját.",
         "pinChangedTitle": "PIN megváltoztatva",
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
-        "pinChangedToast": "A PIN-kód sikeresen módosítva"
+        "pinChangedToast": "A PIN-kód sikeresen módosítva",
+        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához",
+        "biometricRequired": "Biometrikus hitelesítés szükséges a PIN megváltoztatásához."
       }
     },
     "ReplaceCard": {

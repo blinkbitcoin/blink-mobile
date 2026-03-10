@@ -252,6 +252,10 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardPinUpdate($input: CardPinUpdateInput!) {
+  cardPinUpdate(input: $input)
+}
+
 mutation cardUpdate($input: CardUpdateInput!) {
   cardUpdate(input: $input) {
     id
@@ -1145,6 +1149,10 @@ query cardBalance($cardId: ID!) {
     posted
     __typename
   }
+}
+
+query cardEncryptionPublicKey {
+  cardEncryptionPublicKey
 }
 
 query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {

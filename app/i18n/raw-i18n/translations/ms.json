@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Sahkan PIN baharu",
         "confirmPinSubtitle": "Sila masukkan semula PIN 4 digit baharu anda untuk meneruskan.",
         "incorrectPin": "PIN tidak betul. Sila cuba lagi.",
-        "pinMismatch": "PIN tidak sepadan. Masukkan semula untuk mengesahkan atau kembali untuk menukar PIN anda."
+        "pinMismatch": "PIN tidak sepadan. Masukkan semula untuk mengesahkan atau kembali untuk menukar PIN anda.",
+        "weakPin": "PIN ini terlalu mudah diteka. Sila pilih PIN yang lebih kukuh.",
+        "cardNotFound": "Kad tidak dijumpai. Sila cuba lagi.",
+        "pinUpdateFailed": "Gagal mengemas kini PIN. Sila cuba lagi."
       },
       "CreateFlow": {
         "title": "Cipta PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Sila masukkan PIN 4 digit baharu anda.",
         "pinChangedTitle": "PIN ditukar",
         "pinChangedSubtitle": "PIN anda telah berjaya ditukar.",
-        "pinChangedToast": "PIN berjaya ditukar"
+        "pinChangedToast": "PIN berjaya ditukar",
+        "biometricDescription": "Sahkan identiti anda untuk menukar PIN",
+        "biometricRequired": "Pengesahan biometrik diperlukan untuk menukar PIN anda."
       }
     },
     "ReplaceCard": {

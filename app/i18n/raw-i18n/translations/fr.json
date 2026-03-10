@@ -3195,7 +3195,10 @@
                 "confirmNewPin": "Confirmer le nouveau PIN",
                 "confirmPinSubtitle": "Veuillez entrer à nouveau votre nouveau PIN à 4 chiffres pour continuer.",
                 "incorrectPin": "PIN incorrect. Veuillez réessayer.",
-                "pinMismatch": "Les PIN ne correspondent pas. Ressaisissez pour confirmer ou revenez en arrière pour changer votre PIN."
+                "pinMismatch": "Les PIN ne correspondent pas. Ressaisissez pour confirmer ou revenez en arrière pour changer votre PIN.",
+                "weakPin": "Ce code PIN est trop facile à deviner. Veuillez choisir un code PIN plus sûr.",
+                "cardNotFound": "Carte introuvable. Veuillez réessayer.",
+                "pinUpdateFailed": "Échec de la mise à jour du code PIN. Veuillez réessayer."
             },
             "CreateFlow": {
                 "title": "Créer un PIN",
@@ -3220,7 +3223,9 @@
                 "enterNewPinSubtitle": "Veuillez entrer votre nouveau PIN à 4 chiffres.",
                 "pinChangedTitle": "PIN modifié",
                 "pinChangedSubtitle": "Votre PIN a été modifié avec succès.",
-                "pinChangedToast": "Le code PIN a été modifié avec succès"
+                "pinChangedToast": "Le code PIN a été modifié avec succès",
+                "biometricDescription": "Vérifiez votre identité pour changer le code PIN",
+                "biometricRequired": "L'authentification biométrique est requise pour changer votre code PIN."
             }
         },
         "ReplaceCard": {

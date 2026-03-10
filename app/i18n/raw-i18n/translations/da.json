@@ -3172,7 +3172,10 @@
         "confirmNewPin": "Bekræft ny PIN",
         "confirmPinSubtitle": "Indtast venligst din nye 4-cifrede PIN igen for at fortsætte.",
         "incorrectPin": "Forkert PIN. Prøv venligst igen.",
-        "pinMismatch": "PIN-koderne stemmer ikke overens. Indtast igen for at bekræfte eller gå tilbage for at ændre din PIN."
+        "pinMismatch": "PIN-koderne stemmer ikke overens. Indtast igen for at bekræfte eller gå tilbage for at ændre din PIN.",
+        "weakPin": "Denne PIN-kode er for nem at gætte. Vælg venligst en stærkere PIN-kode.",
+        "cardNotFound": "Kort ikke fundet. Prøv venligst igen.",
+        "pinUpdateFailed": "Kunne ikke opdatere PIN-koden. Prøv venligst igen."
       },
       "CreateFlow": {
         "title": "Opret PIN",
@@ -3197,7 +3200,9 @@
         "enterNewPinSubtitle": "Indtast venligst din nye 4-cifrede PIN.",
         "pinChangedTitle": "PIN ændret",
         "pinChangedSubtitle": "Din PIN er blevet ændret.",
-        "pinChangedToast": "PIN er ændret"
+        "pinChangedToast": "PIN er ændret",
+        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode",
+        "biometricRequired": "Biometrisk godkendelse er påkrævet for at ændre din PIN-kode."
       }
     },
     "ReplaceCard": {

@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Konfirmasi PIN baru",
         "confirmPinSubtitle": "Silakan masukkan kembali PIN 4 digit baru Anda untuk melanjutkan.",
         "incorrectPin": "PIN salah. Silakan coba lagi.",
-        "pinMismatch": "PIN tidak cocok. Masukkan ulang untuk mengonfirmasi atau kembali untuk mengubah PIN Anda."
+        "pinMismatch": "PIN tidak cocok. Masukkan ulang untuk mengonfirmasi atau kembali untuk mengubah PIN Anda.",
+        "weakPin": "PIN ini terlalu mudah ditebak. Silakan pilih PIN yang lebih kuat.",
+        "cardNotFound": "Kartu tidak ditemukan. Silakan coba lagi.",
+        "pinUpdateFailed": "Gagal memperbarui PIN. Silakan coba lagi."
       },
       "CreateFlow": {
         "title": "Buat PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Silakan masukkan PIN 4 digit baru Anda.",
         "pinChangedTitle": "PIN diubah",
         "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
-        "pinChangedToast": "PIN berhasil diubah"
+        "pinChangedToast": "PIN berhasil diubah",
+        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN",
+        "biometricRequired": "Autentikasi biometrik diperlukan untuk mengubah PIN Anda."
       }
     },
     "ReplaceCard": {
