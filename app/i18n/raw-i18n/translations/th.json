@@ -3333,6 +3333,101 @@
         "bullet2": "คุณต้องเปิดใช้งานบัตรจริงเมื่อมาถึง",
         "bullet3": "บัตรทั้งสองใบจะมีหมายเลขและรายละเอียดเดียวกัน"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "สมัครสมาชิก",
+        "paymentTitle": "การชำระเงิน",
+        "acceptButton": "ยอมรับ",
+        "payButton": "ดำเนินการและชำระเงิน",
+        "cardTitle": "Blink ส่วนตัว",
+        "perYear": "ต่อปี",
+        "status": {
+          "label": "สถานะ",
+          "paymentPending": "รอการชำระเงิน",
+          "firstYearFree": "ปีแรกฟรี"
+        },
+        "renewalDate": {
+          "label": "วันที่ต่ออายุ"
+        },
+        "agreement": {
+          "text": "ฉันยอมรับ",
+          "termsOfService": "เงื่อนไขการให้บริการ",
+          "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+          "cardholderAgreement": "ข้อตกลงผู้ถือบัตร",
+          "and": "และ"
+        },
+        "renew": "ฉันเข้าใจว่าการสมัครสมาชิกของฉันจะต่ออายุโดยอัตโนมัติใน 1 ปี"
+      },
+      "CardIntroducing": {
+        "title": "แนะนำ",
+        "cardInfo": {
+          "bitcoinCard": "บัตร Blink Visa",
+          "for": "สำหรับ",
+          "maximalist": "ผู้นิยมบิตคอยน์"
+        },
+        "buttonText": "ดำเนินการต่อ"
+      },
+      "CardDetails": {
+        "title": "สิทธิประโยชน์เพิ่มเติม",
+        "features": {
+          "accountManager": "ผู้จัดการบัญชีเฉพาะ",
+          "support": "การสนับสนุนแบบพิเศษ",
+          "onchainDeposits": "คืนเงิน 50% ค่าธรรมเนียมธุรกรรม",
+          "circularEconomies": "$100 สำหรับเศรษฐกิจหมุนเวียน"
+        },
+        "andMore": "... และอีกมากมายในปี 2026",
+        "buttonText": "ดำเนินการต่อ"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "ยินดีต้อนรับ",
+          "subtitle": "สู่ Blink ส่วนตัว",
+          "paragraphs": {
+            "body1": "มีคนนึกถึงคุณและแนะนำว่าเราควรเชิญคุณเข้าร่วม Blink ส่วนตัว อาจเป็นเพราะคุณเป็นบิตคอยเนอร์ที่ยอดเยี่ยม",
+            "body2": "เป้าหมายของเราในปี 2026 คือเติมโปรแกรมด้วยสิทธิประโยชน์มากมายจนเห็นได้ชัดว่าควรต่ออายุในปีหน้า"
+          }
+        },
+        "buttonText": "ไปกันเลย"
+      },
+      "LoadingCard": {
+        "title": "เรากำลังดำเนินการบัตรของคุณ",
+        "subtitle": "เราจะแจ้งให้คุณทราบเมื่อพร้อม",
+        "codingBackend": "...กำลังเขียนโค้ดแบ็กเอนด์",
+        "buttonText": "เยี่ยม"
+      },
+      "PersonalInformation": {
+        "title": "ขั้นตอนสุดท้าย",
+        "fields": {
+          "occupation": {
+            "label": "อาชีพ",
+            "placeholder": "เลือกอาชีพของคุณ"
+          },
+          "annualSalaryRange": {
+            "label": "เงินเดือนต่อปี",
+            "placeholder": "เลือกช่วงเงินเดือนของคุณ"
+          },
+          "accountPurpose": {
+            "label": "วัตถุประสงค์ของบัญชี",
+            "placeholder": "เลือกวัตถุประสงค์"
+          },
+          "expectedMonthlyVolume": {
+            "label": "การใช้จ่ายรายเดือนที่คาดหวัง",
+            "placeholder": "เลือกช่วงการใช้จ่ายของคุณ"
+          }
+        },
+        "buttonText": "ส่งใบสมัคร",
+        "select": "เลือก"
+      },
+      "CardPreapproved": {
+        "title": "คุณได้รับการอนุมัติล่วงหน้าสำหรับบัตร Blink Visa แล้ว!",
+        "buttonText": "ปิด"
+      },
+      "CardProcessing": {
+        "title": "กำลังดำเนินการใบสมัครของคุณ",
+        "subtitle": "เวลารอโดยประมาณ: {waitTime: string}",
+        "buttonText": "ปิด"
+      }
     }
   }
 }

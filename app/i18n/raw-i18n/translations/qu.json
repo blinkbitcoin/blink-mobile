@@ -3333,6 +3333,101 @@
         "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
         "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Qillqakuy",
+        "paymentTitle": "Pagay",
+        "acceptButton": "Chaskiy",
+        "payButton": "Ñawpaqman rispa Pagay",
+        "cardTitle": "Blink Sapalla",
+        "perYear": "watanpi",
+        "status": {
+          "label": "Kayninpi",
+          "paymentPending": "Pagay Suyachkan",
+          "firstYearFree": "Ñawpaq wata qhasilla"
+        },
+        "renewalDate": {
+          "label": "Musuqyachiy punchaw"
+        },
+        "agreement": {
+          "text": "Ari nispa nisani",
+          "termsOfService": "Yanapay Kamachikuykuna",
+          "privacyPolicy": "Pakasqa Kamachikuy",
+          "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
+          "and": "chaymanta"
+        },
+        "renew": "Entiendeni qillqakuyniyta kikinmanta musuqyachinqa 1 watapi"
+      },
+      "CardIntroducing": {
+        "title": "Riqsichispa",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa tarjeta",
+          "for": "kaqpaq",
+          "maximalist": "Bitcoin Maximalistakuna"
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "CardDetails": {
+        "title": "Yapay allinkunakuna",
+        "features": {
+          "accountManager": "Sapaq kawaq akawuntapaq",
+          "support": "Ñawpaq yanapay",
+          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
+          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+        },
+        "andMore": "... astawanraq 2026-pi hamushan",
+        "buttonText": "Ñawpaqman"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Allin hamusqa",
+          "subtitle": "Blink Sapallaman",
+          "paragraphs": {
+            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Sapallaman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
+            "body2": "2026 watapaq munayninchisqa programata allin kaqkunawan huntachiymi, chayna hamuq watapi musuqyachinapaq allinmi kanqa."
+          }
+        },
+        "buttonText": "Haku"
+      },
+      "LoadingCard": {
+        "title": "Tarjetaykipi llamkachkayku",
+        "subtitle": "Willasqayku listona kaptinña",
+        "codingBackend": "...backend-ta programachkayku",
+        "buttonText": "Allinmi"
+      },
+      "PersonalInformation": {
+        "title": "Qhipa taki",
+        "fields": {
+          "occupation": {
+            "label": "Llamk'ay",
+            "placeholder": "Llamk'ayniykita akllay"
+          },
+          "annualSalaryRange": {
+            "label": "Watantin qullqi",
+            "placeholder": "Qullqi rakinniykita akllay"
+          },
+          "accountPurpose": {
+            "label": "Akawunta munay",
+            "placeholder": "Munayniyta akllay"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Killapi gastay suyasqa",
+            "placeholder": "Gastay rakinniykita akllay"
+          }
+        },
+        "buttonText": "Mañakuyta apachiy",
+        "select": "akllay"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
+        "buttonText": "Wisq'ay"
+      },
+      "CardProcessing": {
+        "title": "Mañakuyniykita rurachkanku",
+        "subtitle": "Suyay pacha: {waitTime: string}",
+        "buttonText": "Wisq'ay"
+      }
     }
   }
 }

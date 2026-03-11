@@ -3336,6 +3336,101 @@
         "bullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
         "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Teken in",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Aanvaar",
+        "payButton": "Gaan voort en Betaal",
+        "cardTitle": "Blink Privaat",
+        "perYear": "per jaar",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling Hangende",
+          "firstYearFree": "Eerste jaar gratis"
+        },
+        "renewalDate": {
+          "label": "Hernuwingsdatum"
+        },
+        "agreement": {
+          "text": "Ek stem in tot die",
+          "termsOfService": "Diensvoorwaardes",
+          "privacyPolicy": "Privaatheidsbeleid",
+          "cardholderAgreement": "Kaarthouer-ooreenkoms",
+          "and": "en"
+        },
+        "renew": "Ek verstaan dat my intekening outomaties oor 1 jaar hernu sal word"
+      },
+      "CardIntroducing": {
+        "title": "Bekendstelling",
+        "cardInfo": {
+          "bitcoinCard": "Die Blink Visa-kaart",
+          "for": "vir",
+          "maximalist": "Bitcoin Maksimaliste"
+        },
+        "buttonText": "Gaan voort"
+      },
+      "CardDetails": {
+        "title": "Bykomende voordele",
+        "features": {
+          "accountManager": "Toegewyde rekeningbestuurder",
+          "support": "Prioriteit-ondersteuning",
+          "onchainDeposits": "50% terug op transaksiegelde",
+          "circularEconomies": "$100 vir sirkulêre ekonomieë"
+        },
+        "andMore": "... en meer kom in 2026",
+        "buttonText": "Gaan voort"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Welkom aan boord",
+          "subtitle": "By Blink Privaat",
+          "paragraphs": {
+            "body1": "Iemand het aan jou gedink en voorgestel dat ons jou na Blink Privaat moet nooi. Waarskynlik omdat jy 'n wonderlike Bitcoiner is.",
+            "body2": "Ons doel vir 2026 is om die program met soveel goedighede te vul dat dit voor die hand liggend sal wees om volgende jaar te hernu."
+          }
+        },
+        "buttonText": "Kom ons gaan"
+      },
+      "LoadingCard": {
+        "title": "Ons werk aan jou kaart",
+        "subtitle": "Ons sal jou in kennis stel sodra dit hier is",
+        "codingBackend": "...kodeer die agterkant",
+        "buttonText": "Lekker"
+      },
+      "PersonalInformation": {
+        "title": "Laaste stap",
+        "fields": {
+          "occupation": {
+            "label": "Beroep",
+            "placeholder": "Kies jou beroep"
+          },
+          "annualSalaryRange": {
+            "label": "Jaarlikse salaris",
+            "placeholder": "Kies jou salarisreeks"
+          },
+          "accountPurpose": {
+            "label": "Rekeningdoel",
+            "placeholder": "Kies die doel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Verwagte maandelikse besteding",
+            "placeholder": "Kies jou bestedingsreeks"
+          }
+        },
+        "buttonText": "Dien aansoek in",
+        "select": "kies"
+      },
+      "CardPreapproved": {
+        "title": "Jy is vooraf goedgekeur vir die Blink Visa-kaart!",
+        "buttonText": "Sluit"
+      },
+      "CardProcessing": {
+        "title": "Verwerk jou aansoek",
+        "subtitle": "Geskatte wagtyd: {waitTime: string}",
+        "buttonText": "Sluit"
+      }
     }
   }
 }

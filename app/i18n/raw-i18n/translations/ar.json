@@ -3333,6 +3333,101 @@
         "bullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
         "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "اشتراك",
+        "paymentTitle": "الدفع",
+        "acceptButton": "قبول",
+        "payButton": "متابعة والدفع",
+        "cardTitle": "بلينك الخاصة",
+        "perYear": "سنوياً",
+        "status": {
+          "label": "الحالة",
+          "paymentPending": "الدفع معلق",
+          "firstYearFree": "السنة الأولى مجانية"
+        },
+        "renewalDate": {
+          "label": "تاريخ التجديد"
+        },
+        "agreement": {
+          "text": "أوافق على",
+          "termsOfService": "شروط الخدمة",
+          "privacyPolicy": "سياسة الخصوصية",
+          "cardholderAgreement": "اتفاقية حامل البطاقة",
+          "and": "و"
+        },
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائياً خلال سنة واحدة"
+      },
+      "CardIntroducing": {
+        "title": "تقديم",
+        "cardInfo": {
+          "bitcoinCard": "بطاقة Blink Visa",
+          "for": "لـ",
+          "maximalist": "أنصار البيتكوين"
+        },
+        "buttonText": "متابعة"
+      },
+      "CardDetails": {
+        "title": "مزايا إضافية",
+        "features": {
+          "accountManager": "مدير حساب مخصص",
+          "support": "دعم ذو أولوية",
+          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
+          "circularEconomies": "100$ للاقتصادات الدائرية"
+        },
+        "andMore": "... والمزيد قادم في 2026",
+        "buttonText": "متابعة"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "مرحباً بك على متن",
+          "subtitle": "إلى Blink الخاصة",
+          "paragraphs": {
+            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink الخاصة. ربما لأنك بيتكويني رائع.",
+            "body2": "هدفنا لعام 2026 هو ملء البرنامج بالكثير من المزايا بحيث سيكون من الواضح التجديد في العام القادم."
+          }
+        },
+        "buttonText": "هيا بنا"
+      },
+      "LoadingCard": {
+        "title": "نعمل على بطاقتك",
+        "subtitle": "سنبلغك عندما تكون جاهزة",
+        "codingBackend": "...نبرمج الخلفية",
+        "buttonText": "رائع"
+      },
+      "PersonalInformation": {
+        "title": "الخطوة الأخيرة",
+        "fields": {
+          "occupation": {
+            "label": "المهنة",
+            "placeholder": "اختر مهنتك"
+          },
+          "annualSalaryRange": {
+            "label": "الراتب السنوي",
+            "placeholder": "اختر نطاق راتبك"
+          },
+          "accountPurpose": {
+            "label": "غرض الحساب",
+            "placeholder": "اختر الغرض"
+          },
+          "expectedMonthlyVolume": {
+            "label": "الإنفاق الشهري المتوقع",
+            "placeholder": "اختر نطاق إنفاقك"
+          }
+        },
+        "buttonText": "تقديم الطلب",
+        "select": "اختر"
+      },
+      "CardPreapproved": {
+        "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
+        "buttonText": "إغلاق"
+      },
+      "CardProcessing": {
+        "title": "جارٍ معالجة طلبك",
+        "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
+        "buttonText": "إغلاق"
+      }
     }
   }
 }

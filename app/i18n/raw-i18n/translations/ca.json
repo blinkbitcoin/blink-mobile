@@ -3295,6 +3295,101 @@
         "bullet2": "Hauràs d'activar la targeta física quan arribi",
         "bullet3": "Totes dues targetes tindran el mateix número i dades"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Subscriure",
+        "paymentTitle": "Pagament",
+        "acceptButton": "Acceptar",
+        "payButton": "Continuar i Pagar",
+        "cardTitle": "Blink Privat",
+        "perYear": "per any",
+        "status": {
+          "label": "Estat",
+          "paymentPending": "Pagament Pendent",
+          "firstYearFree": "Primer any gratuït"
+        },
+        "renewalDate": {
+          "label": "Data de renovació"
+        },
+        "agreement": {
+          "text": "Accepto els",
+          "termsOfService": "Termes del Servei",
+          "privacyPolicy": "Política de Privacitat",
+          "cardholderAgreement": "Acord del Titular de la Targeta",
+          "and": "i"
+        },
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en 1 any"
+      },
+      "CardIntroducing": {
+        "title": "Presentant",
+        "cardInfo": {
+          "bitcoinCard": "La targeta Visa de Blink",
+          "for": "per a",
+          "maximalist": "Bitcoin Maximalistes"
+        },
+        "buttonText": "Continuar"
+      },
+      "CardDetails": {
+        "title": "Avantatges addicionals",
+        "features": {
+          "accountManager": "Gestor de comptes dedicat",
+          "support": "Suport prioritari",
+          "onchainDeposits": "50% de reemborsament en comissions de transacció",
+          "circularEconomies": "100$ per a economies circulars"
+        },
+        "andMore": "... i més per venir el 2026",
+        "buttonText": "Continuar"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Benvingut a bord",
+          "subtitle": "A Blink Privat",
+          "paragraphs": {
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+          }
+        },
+        "buttonText": "Anem-hi"
+      },
+      "LoadingCard": {
+        "title": "Estem treballant en la teva targeta",
+        "subtitle": "Et notificarem quan estigui llesta",
+        "codingBackend": "...programant el backend",
+        "buttonText": "Genial"
+      },
+      "PersonalInformation": {
+        "title": "Últim pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupació",
+            "placeholder": "Selecciona la teva ocupació"
+          },
+          "annualSalaryRange": {
+            "label": "Salari anual",
+            "placeholder": "Selecciona el teu rang salarial"
+          },
+          "accountPurpose": {
+            "label": "Propòsit del compte",
+            "placeholder": "Selecciona el propòsit"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Despesa mensual esperada",
+            "placeholder": "Selecciona el teu rang de despesa"
+          }
+        },
+        "buttonText": "Enviar sol·licitud",
+        "select": "seleccionar"
+      },
+      "CardPreapproved": {
+        "title": "Has estat preaprovat per a la targeta Blink Visa!",
+        "buttonText": "Tancar"
+      },
+      "CardProcessing": {
+        "title": "Processant la teva sol·licitud",
+        "subtitle": "Temps d'espera estimat: {waitTime: string}",
+        "buttonText": "Tancar"
+      }
     }
   }
 }

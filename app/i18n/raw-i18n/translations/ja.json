@@ -3324,6 +3324,101 @@
                 "bullet2": "物理カードが届いたら有効化が必要です",
                 "bullet3": "両方のカードは同じカード番号と詳細になります"
             }
+        },
+        "Onboarding": {
+            "CardSubscription": {
+                "subscribeTitle": "購読",
+                "paymentTitle": "お支払い",
+                "acceptButton": "承諾",
+                "payButton": "続行して支払う",
+                "cardTitle": "Blink プライベート",
+                "perYear": "年額",
+                "status": {
+                    "label": "ステータス",
+                    "paymentPending": "支払い保留中",
+                    "firstYearFree": "初年度無料"
+                },
+                "renewalDate": {
+                    "label": "更新日"
+                },
+                "agreement": {
+                    "text": "以下に同意します",
+                    "termsOfService": "利用規約",
+                    "privacyPolicy": "プライバシーポリシー",
+                    "cardholderAgreement": "カード会員契約",
+                    "and": "および"
+                },
+                "renew": "サブスクリプションが1年後に自動更新されることを理解しています"
+            },
+            "CardIntroducing": {
+                "title": "ご紹介",
+                "cardInfo": {
+                    "bitcoinCard": "Blink Visaカード",
+                    "for": "",
+                    "maximalist": "ビットコインマキシマリスト向け"
+                },
+                "buttonText": "続ける"
+            },
+            "CardDetails": {
+                "title": "追加特典",
+                "features": {
+                    "accountManager": "専任アカウントマネージャー",
+                    "support": "優先サポート",
+                    "onchainDeposits": "取引手数料の50%キャッシュバック",
+                    "circularEconomies": "循環型経済に100ドル"
+                },
+                "andMore": "... さらに2026年に追加予定",
+                "buttonText": "続ける"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "ようこそ",
+                    "subtitle": "Blink プライベートへ",
+                    "paragraphs": {
+                        "body1": "あなたのことを考えた方が、Blink プライベートにお招きすることを提案しました。おそらくあなたが素晴らしいビットコイナーだからです。",
+                        "body2": "2026年の私たちの目標は、来年の更新が当然と思えるほど多くの特典でプログラムを充実させることです。"
+                    }
+                },
+                "buttonText": "始めましょう"
+            },
+            "LoadingCard": {
+                "title": "カードを準備中です",
+                "subtitle": "準備ができましたらお知らせします",
+                "codingBackend": "...バックエンドをコーディング中",
+                "buttonText": "了解"
+            },
+            "PersonalInformation": {
+                "title": "最終ステップ",
+                "fields": {
+                    "occupation": {
+                        "label": "職業",
+                        "placeholder": "職業を選択してください"
+                    },
+                    "annualSalaryRange": {
+                        "label": "年収",
+                        "placeholder": "年収の範囲を選択してください"
+                    },
+                    "accountPurpose": {
+                        "label": "アカウントの目的",
+                        "placeholder": "目的を選択してください"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "予想月間支出",
+                        "placeholder": "支出の範囲を選択してください"
+                    }
+                },
+                "buttonText": "申請を提出",
+                "select": "選択"
+            },
+            "CardPreapproved": {
+                "title": "Blink Visaカードの事前承認が完了しました！",
+                "buttonText": "閉じる"
+            },
+            "CardProcessing": {
+                "title": "申請を処理中",
+                "subtitle": "推定待ち時間: {waitTime: string}",
+                "buttonText": "閉じる"
+            }
         }
     }
 }

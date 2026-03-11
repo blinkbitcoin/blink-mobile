@@ -3313,6 +3313,101 @@
         "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
         "bullet3": "Begge kort vil have samme kortnummer og oplysninger"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abonner",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Acceptér",
+        "payButton": "Fortsæt og Betal",
+        "cardTitle": "Blink Privat",
+        "perYear": "per år",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling Afventer",
+          "firstYearFree": "Første år gratis"
+        },
+        "renewalDate": {
+          "label": "Fornyelsesdato"
+        },
+        "agreement": {
+          "text": "Jeg accepterer",
+          "termsOfService": "Servicevilkårene",
+          "privacyPolicy": "Privatlivspolitikken",
+          "cardholderAgreement": "Kortholderaftalen",
+          "and": "og"
+        },
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om 1 år"
+      },
+      "CardIntroducing": {
+        "title": "Introduktion",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa-kortet",
+          "for": "til",
+          "maximalist": "Bitcoin Maksimalister"
+        },
+        "buttonText": "Fortsæt"
+      },
+      "CardDetails": {
+        "title": "Yderligere fordele",
+        "features": {
+          "accountManager": "Dedikeret kontoadministrator",
+          "support": "Prioriteret support",
+          "onchainDeposits": "50% tilbage på transaktionsgebyrer",
+          "circularEconomies": "$100 til cirkulære økonomier"
+        },
+        "andMore": "... og mere kommer i 2026",
+        "buttonText": "Fortsæt"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Velkommen ombord",
+          "subtitle": "Til Blink Privat",
+          "paragraphs": {
+            "body1": "Nogen tænkte på dig og foreslog, at vi skulle invitere dig til Blink Privat. Sandsynligvis fordi du er en fantastisk Bitcoiner.",
+            "body2": "Vores mål for 2026 er at fylde programmet med så mange goder, at det vil være oplagt at forny næste år."
+          }
+        },
+        "buttonText": "Lad os gå"
+      },
+      "LoadingCard": {
+        "title": "Vi arbejder på dit kort",
+        "subtitle": "Vi giver dig besked, når det er her",
+        "codingBackend": "...koder backend",
+        "buttonText": "Fedt"
+      },
+      "PersonalInformation": {
+        "title": "Sidste trin",
+        "fields": {
+          "occupation": {
+            "label": "Beskæftigelse",
+            "placeholder": "Vælg din beskæftigelse"
+          },
+          "annualSalaryRange": {
+            "label": "Årlig løn",
+            "placeholder": "Vælg dit løninterval"
+          },
+          "accountPurpose": {
+            "label": "Kontoformål",
+            "placeholder": "Vælg formålet"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Forventet månedligt forbrug",
+            "placeholder": "Vælg dit forbrugsinterval"
+          }
+        },
+        "buttonText": "Indsend ansøgning",
+        "select": "vælg"
+      },
+      "CardPreapproved": {
+        "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
+        "buttonText": "Luk"
+      },
+      "CardProcessing": {
+        "title": "Behandler din ansøgning",
+        "subtitle": "Estimeret ventetid: {waitTime: string}",
+        "buttonText": "Luk"
+      }
     }
   }
 }

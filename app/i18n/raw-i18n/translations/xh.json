@@ -3342,6 +3342,101 @@
         "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
         "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Bhalisa",
+        "paymentTitle": "Intlawulo",
+        "acceptButton": "Yamkela",
+        "payButton": "Qhubeka kwaye Uhlawule",
+        "cardTitle": "Blink Yabucala",
+        "perYear": "ngonyaka",
+        "status": {
+          "label": "Isimo",
+          "paymentPending": "Intlawulo Ilindile",
+          "firstYearFree": "Unyaka wokuqala simahla"
+        },
+        "renewalDate": {
+          "label": "Umhla wokuhlaziya"
+        },
+        "agreement": {
+          "text": "Ndiyavuma",
+          "termsOfService": "Imimmiselo yoMsebenzi",
+          "privacyPolicy": "Umgaqo waBucala",
+          "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
+          "and": "kunye"
+        },
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwisithuba sonyaka omnye"
+      },
+      "CardIntroducing": {
+        "title": "Ukwazisa",
+        "cardInfo": {
+          "bitcoinCard": "Ikhadi le-Blink Visa",
+          "for": "le",
+          "maximalist": "Abathandi be-Bitcoin"
+        },
+        "buttonText": "Qhubeka"
+      },
+      "CardDetails": {
+        "title": "Inzuzo ezongezelelweyo",
+        "features": {
+          "accountManager": "Umphathi weakhawunti ozinikeleyo",
+          "support": "Inkxaso ephambili",
+          "onchainDeposits": "50% ubuyiselo kwiimali zotshintsho",
+          "circularEconomies": "$100 kwiikhonomi ezijikeleziyo"
+        },
+        "andMore": "... nokunye okuninzi kuzayo ngo-2026",
+        "buttonText": "Qhubeka"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Wamkelekile",
+          "subtitle": "Kwi-Blink Yabucala",
+          "paragraphs": {
+            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Yabucala. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
+            "body2": "Injongo yethu ngo-2026 kukuzalisa inkqubo ngezinto ezininzi ezintle kangangokuba kuya kucaca ukuba kufanele uhlaziye kunyaka ozayo."
+          }
+        },
+        "buttonText": "Masiye"
+      },
+      "LoadingCard": {
+        "title": "Sisebenza kwikhadi lakho",
+        "subtitle": "Siza kukwazisa xa likulungele",
+        "codingBackend": "...ukubhala ikhowudi ye-backend",
+        "buttonText": "Kuhle"
+      },
+      "PersonalInformation": {
+        "title": "Inyathelo lokugqibela",
+        "fields": {
+          "occupation": {
+            "label": "Umsebenzi",
+            "placeholder": "Khetha umsebenzi wakho"
+          },
+          "annualSalaryRange": {
+            "label": "Umvuzo wonyaka",
+            "placeholder": "Khetha ibanga lomvuzo wakho"
+          },
+          "accountPurpose": {
+            "label": "Injongo yeakhawunti",
+            "placeholder": "Khetha injongo"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Ukuchitha okulindelweyo kwenyanga",
+            "placeholder": "Khetha ibanga lokuchitha kwakho"
+          }
+        },
+        "buttonText": "Ngenisa isicelo",
+        "select": "khetha"
+      },
+      "CardPreapproved": {
+        "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
+        "buttonText": "Vala"
+      },
+      "CardProcessing": {
+        "title": "Siqhuba isicelo sakho",
+        "subtitle": "Ixesha lokulinda eliqikelelweyo: {waitTime: string}",
+        "buttonText": "Vala"
+      }
     }
   }
 }
