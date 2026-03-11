@@ -269,9 +269,7 @@ describe("resolve lnurl destination", () => {
     }
 
     it("resolves username as intraledger destination", async () => {
-      const lnurlPayParams = manualMockLnUrlPayServiceResponse(
-        "alice@ourdomain.com",
-      )
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("alice@ourdomain.com")
       mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
       mockGetParams.mockResolvedValue(manualMockLNURLResponse())
 
@@ -308,9 +306,7 @@ describe("resolve lnurl destination", () => {
     }
 
     it("creates lnurl pay destination instead of intraledger", async () => {
-      const lnurlPayParams = manualMockLnUrlPayServiceResponse(
-        "bob@external.com",
-      )
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("bob@external.com")
       mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
       mockGetParams.mockResolvedValue(manualMockLNURLResponse())
 
