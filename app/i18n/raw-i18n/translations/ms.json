@@ -3336,6 +3336,154 @@
         "bullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
         "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Langgan",
+        "paymentTitle": "Pembayaran",
+        "acceptButton": "Terima",
+        "payButton": "Teruskan dan Bayar",
+        "cardTitle": "Blink Peribadi",
+        "perYear": "setahun",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Pembayaran Tertangguh",
+          "firstYearFree": "Tahun pertama percuma"
+        },
+        "renewalDate": {
+          "label": "Tarikh pembaharuan"
+        },
+        "agreement": {
+          "text": "Saya bersetuju dengan",
+          "termsOfService": "Terma Perkhidmatan",
+          "privacyPolicy": "Dasar Privasi",
+          "cardholderAgreement": "Perjanjian Pemegang Kad",
+          "and": "dan"
+        },
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam 1 tahun"
+      },
+      "CardIntroducing": {
+        "title": "Memperkenalkan",
+        "cardInfo": {
+          "bitcoinCard": "Kad Visa Blink",
+          "for": "untuk",
+          "maximalist": "Maximalis Bitcoin"
+        },
+        "buttonText": "Teruskan"
+      },
+      "CardDetails": {
+        "title": "Faedah tambahan",
+        "features": {
+          "accountManager": "Pengurus akaun khusus",
+          "support": "Sokongan keutamaan",
+          "onchainDeposits": "50% pulangan yuran transaksi",
+          "circularEconomies": "$100 untuk ekonomi pekeliling"
+        },
+        "andMore": "... dan lagi akan datang pada 2026",
+        "buttonText": "Teruskan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Selamat datang",
+          "subtitle": "Di Blink Peribadi",
+          "paragraphs": {
+            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Peribadi. Mungkin kerana anda seorang Bitcoiner yang hebat.",
+            "body2": "Matlamat kami untuk 2026 adalah mengisi program dengan begitu banyak kebaikan sehingga jelas untuk memperbaharui tahun depan."
+          }
+        },
+        "buttonText": "Jom mulakan"
+      },
+      "LoadingCard": {
+        "title": "Kami sedang mengusahakan kad anda",
+        "subtitle": "Kami akan memberitahu anda apabila sudah siap",
+        "codingBackend": "...mengekod bahagian belakang",
+        "buttonText": "Bagus"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Selamat datang untuk menjadi sebahagian daripada Blink",
+          "paragraphs": {
+            "body1": "Sebelum kami mengumpul lebih banyak dana daripada pelabur profesional, kami telah memutuskan untuk menghulurkan jemputan kepada keluarga Blink, pengguna super dan penyokong kami. Mengapa membawa orang asing apabila kami boleh menjemput seseorang seperti anda terlebih dahulu?",
+            "body2": "Ini adalah jemputan peribadi. Sila jangan hantar semula atau kongsi secara terbuka."
+          }
+        },
+        "buttonText": "Teruskan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Berapa banyak yang anda ingin laburkan?",
+        "percent": "untuk ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Penilaian syarikat",
+          "paragraphs": {
+            "body1": "Dalam pusingan pelaburan ini, penilaian pra-wang Blink ialah $10 juta.",
+            "body2": "Kami boleh mengumpul dana pada harga yang lebih tinggi daripada VC. Walau bagaimanapun, kami melihat manfaat bersama jangka panjang dalam bekerjasama dengan pengguna super kami. Oleh itu, kami menawarkan tawaran ini dengan syarat yang lebih baik untuk anda."
+          }
+        },
+        "buttonText": "Faham"
+      },
+      "TermSheet": {
+        "title": "Lembaran Terma",
+        "equitySection": {
+          "title": "Ekuiti dalam Blink",
+          "investment": "Pelaburan $10,000",
+          "valuation": "Pada penilaian pra-wang $10M",
+          "units": "Anda menerima 10,000 unit ~0.1% daripada Blink"
+        },
+        "creditBoostSection": {
+          "title": "Peningkatan Kredit",
+          "totalCredit": "Jumlah Kredit $11,000"
+        },
+        "buttonText": "Teruskan ke Tandatangan"
+      },
+      "TransferInvest": {
+        "title": "Pindahkan pelaburan anda",
+        "paragraphs": {
+          "body1": "Anda telah menandatangani perjanjian langganan untuk 10,000 unit dalam Blink.",
+          "body2": "Masa untuk memindahkan jumlah pelaburan $10,000. Anda akan membayar dengan Bitcoin."
+        },
+        "buttonText": "Teruskan"
+      },
+      "TopUp": {
+        "title": "Tambah nilai",
+        "qrTitle": "Dana tidak mencukupi dalam dompet Blink anda.\nTambah nilai minimum {minAmount: string}.",
+        "copy": "Salin",
+        "share": "Kongsi",
+        "placeholder": "Tetapkan jumlah"
+      },
+      "PersonalInformation": {
+        "title": "Langkah terakhir",
+        "fields": {
+          "occupation": {
+            "label": "Pekerjaan",
+            "placeholder": "Pilih pekerjaan anda"
+          },
+          "annualSalaryRange": {
+            "label": "Gaji tahunan",
+            "placeholder": "Pilih julat gaji anda"
+          },
+          "accountPurpose": {
+            "label": "Tujuan akaun",
+            "placeholder": "Pilih tujuan"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Perbelanjaan bulanan yang dijangka",
+            "placeholder": "Pilih julat perbelanjaan anda"
+          }
+        },
+        "buttonText": "Hantar permohonan",
+        "select": "pilih"
+      },
+      "CardPreapproved": {
+        "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
+        "buttonText": "Tutup"
+      },
+      "CardProcessing": {
+        "title": "Memproses permohonan anda",
+        "subtitle": "Anggaran masa menunggu: {waitTime: string}",
+        "buttonText": "Tutup"
+      }
     }
   }
 }

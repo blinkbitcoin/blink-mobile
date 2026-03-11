@@ -3423,6 +3423,154 @@ const en: BaseTranslation = {
         bullet3: "Both cards will have the same card number and details",
       },
     },
+    Onboarding: {
+      CardIntroducing: {
+        title: "Introducing",
+        cardInfo: {
+          bitcoinCard: "The Blink Visa card",
+          for: "for",
+          maximalist: "Bitcoin Maximalists",
+        },
+        buttonText: "Continue",
+      },
+      CardDetails: {
+        title: "Additional perks",
+        features: {
+          accountManager: "Dedicated account manager",
+          support: "Priority support",
+          onchainDeposits: "50% back on transaction fees",
+          circularEconomies: "$100 to circular economies",
+        },
+        andMore: "... and more coming in 2026",
+        buttonText: "Continue",
+      },
+      WelcomeOnboard: {
+        welcomeMessage: {
+          title: "Welcome onboard",
+          subtitle: "To Blink Private",
+          paragraphs: {
+            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
+            body2: "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
+          },
+        },
+        buttonText: "Let's go",
+      },
+      CardSubscription: {
+        subscribeTitle: "Subscribe",
+        paymentTitle: "Payment",
+        acceptButton: "Accept",
+        payButton: "Continue & Pay",
+        cardTitle: "Blink Private",
+        perYear: "per year",
+        status: {
+          label: "Status",
+          paymentPending: "Payment Pending",
+          firstYearFree: "First year free",
+        },
+        renewalDate: {
+          label: "Renewal date",
+        },
+        agreement: {
+          text: "I agree to the",
+          termsOfService: "Terms of Service",
+          privacyPolicy: "Privacy Policy",
+          cardholderAgreement: "Cardholder Agreement",
+          and: "and",
+        },
+        renew: "I understand that my subscription will automatically renew in 1 year",
+      },
+      LoadingCard: {
+        title: "We're working on your card",
+        subtitle: "We'll notify you once it's here",
+        codingBackend: "...coding the backend",
+        buttonText: "Nice",
+      },
+      WelcomeInvest: {
+        welcomeMessage: {
+          title: "Welcome to become part of Blink",
+          paragraphs: {
+            body1: "Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?",
+            body2: "This is a personal invitation. Please do not forward or share publicly.",
+          },
+        },
+        buttonText: "Continue",
+      },
+      SelectInvest: {
+        desiredCreditLimit: "How much would you like to invest?",
+        percent: "for ~{percent: number}%",
+      },
+      CompanyValuation: {
+        welcomeMessage: {
+          title: "Company valuation",
+          paragraphs: {
+            body1: "In this investment round the pre-money valuation of Blink is $10 million.",
+            body2: "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you.",
+          },
+        },
+        buttonText: "Got it",
+      },
+      TermSheet: {
+        title: "Term Sheet",
+        equitySection: {
+          title: "Equity in Blink",
+          investment: "$10,000 Investment",
+          valuation: "At $10M pre-money valuation",
+          units: "You receive 10,000 units ~0.1% of Blink",
+        },
+        creditBoostSection: {
+          title: "Credit Boost",
+          totalCredit: "$11,000 Total Credit",
+        },
+        buttonText: "Proceed to Sign",
+      },
+      TransferInvest: {
+        title: "Transfer your investment",
+        paragraphs: {
+          body1: "You have signed the subscription agreement for 10,000 units in Blink.",
+          body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
+        },
+        buttonText: "Continue",
+      },
+      TopUp: {
+        title: "Top-up",
+        qrTitle: "Insufficient funds in your Blink wallet.\nTop-up minimum of {minAmount: string}.",
+        copy: "Copy",
+        share: "Share",
+        placeholder: "Set amount",
+      },
+      PersonalInformation: {
+        title: "Final step",
+        fields: {
+          occupation: {
+            label: "Occupation",
+            placeholder: "Select your occupation",
+          },
+          annualSalaryRange: {
+            label: "Annual salary",
+            placeholder: "Select your salary range",
+          },
+          accountPurpose: {
+            label: "Account purpose",
+            placeholder: "Select purpose",
+          },
+          expectedMonthlyVolume: {
+            label: "Expected monthly spending",
+            placeholder: "Select your spending range",
+          },
+        },
+        buttonText: "Submit application",
+        select: "Select",
+      },
+      CardPreapproved: {
+        title: "You have been pre-approved for the Blink Visa card!",
+        buttonText: "Close",
+      },
+      CardProcessing: {
+        title: "Processing your application",
+        subtitle: "Estimated wait time: {waitTime: string}",
+        buttonText: "Close",
+      },
+    },
   },
   NotificationHistory: {
     title: "Notifications",

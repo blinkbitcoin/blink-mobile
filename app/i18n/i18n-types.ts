@@ -11114,7 +11114,7 @@ type RootTranslation = {
 						 */
 						body1: string
 						/**
-						 * W​e​ ​b​e​l​i​e​v​e​ ​t​h​a​t​ ​w​e​ ​c​o​u​l​d​ ​r​a​i​s​e​ ​a​t​ ​a​ ​h​i​g​h​e​r​ ​v​a​l​u​a​t​i​o​n​ ​f​r​o​m​ ​V​C​s​.​ ​Y​o​u​ ​a​r​e​ ​n​o​t​ ​i​n​v​i​t​e​d​ ​t​o​ ​m​a​x​i​m​i​z​e​ ​o​u​r​ ​s​h​o​r​t​-​t​e​r​m​ ​v​a​l​u​a​t​i​o​n​,​ ​w​e​ ​s​e​e​ ​l​o​n​g​-​t​e​r​m​ ​v​a​l​u​e​ ​i​n​ ​p​a​r​t​n​e​r​i​n​g​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​.
+						 * W​e​ ​c​o​u​l​d​ ​r​a​i​s​e​ ​a​t​ ​a​ ​h​i​g​h​e​r​ ​p​r​i​c​e​ ​f​r​o​m​ ​V​C​s​.​ ​H​o​w​e​v​e​r​,​ ​w​e​ ​s​e​e​ ​l​o​n​g​-​t​e​r​m​ ​m​u​t​u​a​l​ ​b​e​n​e​f​i​t​s​ ​i​n​ ​p​a​r​t​n​e​r​i​n​g​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​.​ ​T​h​e​r​e​f​o​r​e​,​ ​w​e​ ​a​r​e​ ​e​x​t​e​n​d​i​n​g​ ​t​h​i​s​ ​o​f​f​e​r​ ​a​t​ ​b​e​t​t​e​r​ ​t​e​r​m​s​ ​f​o​r​ ​y​o​u​.
 						 */
 						body2: string
 					}
@@ -11264,11 +11264,11 @@ type RootTranslation = {
 			}
 			CardPreapproved: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​V​i​s​a​ ​c​a​r​d​!
+				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
 				 */
 				title: string
 				/**
-				 * C​o​n​t​i​n​u​e
+				 * C​l​o​s​e
 				 */
 				buttonText: string
 			}
@@ -22269,7 +22269,7 @@ export type TranslationFunctions = {
 						 */
 						body1: () => LocalizedString
 						/**
-						 * We believe that we could raise at a higher valuation from VCs. You are not invited to maximize our short-term valuation, we see long-term value in partnering with our superusers.
+						 * We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you.
 						 */
 						body2: () => LocalizedString
 					}
@@ -22418,11 +22418,11 @@ export type TranslationFunctions = {
 			}
 			CardPreapproved: {
 				/**
-				 * You have been preapproved for the Bitcoin Visa card!
+				 * You have been pre-approved for the Blink Visa card!
 				 */
 				title: () => LocalizedString
 				/**
-				 * Continue
+				 * Close
 				 */
 				buttonText: () => LocalizedString
 			}

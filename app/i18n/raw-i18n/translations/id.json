@@ -3295,6 +3295,154 @@
         "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
         "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Berlangganan",
+        "paymentTitle": "Pembayaran",
+        "acceptButton": "Terima",
+        "payButton": "Lanjutkan dan Bayar",
+        "cardTitle": "Blink Pribadi",
+        "perYear": "per tahun",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Pembayaran Tertunda",
+          "firstYearFree": "Tahun pertama gratis"
+        },
+        "renewalDate": {
+          "label": "Tanggal perpanjangan"
+        },
+        "agreement": {
+          "text": "Saya menyetujui",
+          "termsOfService": "Ketentuan Layanan",
+          "privacyPolicy": "Kebijakan Privasi",
+          "cardholderAgreement": "Perjanjian Pemegang Kartu",
+          "and": "dan"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+      },
+      "CardIntroducing": {
+        "title": "Memperkenalkan",
+        "cardInfo": {
+          "bitcoinCard": "Kartu Visa Blink",
+          "for": "untuk",
+          "maximalist": "Maksimalis Bitcoin"
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "CardDetails": {
+        "title": "Keuntungan tambahan",
+        "features": {
+          "accountManager": "Manajer akun khusus",
+          "support": "Dukungan prioritas",
+          "onchainDeposits": "Pengembalian 50% biaya transaksi",
+          "circularEconomies": "$100 untuk ekonomi sirkular"
+        },
+        "andMore": "... dan lainnya segera hadir di 2026",
+        "buttonText": "Lanjutkan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Selamat datang",
+          "subtitle": "Di Blink Pribadi",
+          "paragraphs": {
+            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Pribadi. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
+            "body2": "Tujuan kami untuk 2026 adalah mengisi program dengan begitu banyak keuntungan sehingga sudah jelas untuk memperbarui tahun depan."
+          }
+        },
+        "buttonText": "Ayo mulai"
+      },
+      "LoadingCard": {
+        "title": "Kami sedang mengerjakan kartu Anda",
+        "subtitle": "Kami akan memberitahu Anda setelah siap",
+        "codingBackend": "...membuat kode backend",
+        "buttonText": "Bagus"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Selamat datang untuk menjadi bagian dari Blink",
+          "paragraphs": {
+            "body1": "Sebelum kami mengumpulkan lebih banyak dana dari investor profesional, kami memutuskan untuk memperluas undangan kepada keluarga Blink, pengguna super dan pendukung kami. Mengapa membawa orang asing ketika kami bisa mengundang seseorang seperti Anda terlebih dahulu?",
+            "body2": "Ini adalah undangan pribadi. Mohon jangan meneruskan atau membagikan secara publik."
+          }
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Berapa banyak yang ingin Anda investasikan?",
+        "percent": "untuk ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Valuasi perusahaan",
+          "paragraphs": {
+            "body1": "Dalam putaran investasi ini, valuasi pre-money Blink adalah $10 juta.",
+            "body2": "Kami bisa menggalang dana dengan harga lebih tinggi dari VC. Namun, kami melihat manfaat timbal balik jangka panjang dalam bermitra dengan pengguna super kami. Oleh karena itu, kami menawarkan penawaran ini dengan ketentuan yang lebih baik untuk Anda."
+          }
+        },
+        "buttonText": "Mengerti"
+      },
+      "TermSheet": {
+        "title": "Lembar Ketentuan",
+        "equitySection": {
+          "title": "Ekuitas di Blink",
+          "investment": "Investasi $10,000",
+          "valuation": "Pada valuasi pre-money $10M",
+          "units": "Anda menerima 10,000 unit ~0.1% dari Blink"
+        },
+        "creditBoostSection": {
+          "title": "Peningkatan Kredit",
+          "totalCredit": "Total Kredit $11,000"
+        },
+        "buttonText": "Lanjut ke Penandatanganan"
+      },
+      "TransferInvest": {
+        "title": "Transfer investasi Anda",
+        "paragraphs": {
+          "body1": "Anda telah menandatangani perjanjian langganan untuk 10,000 unit di Blink.",
+          "body2": "Saatnya mentransfer jumlah investasi $10,000. Anda akan membayar dengan Bitcoin."
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "TopUp": {
+        "title": "Isi ulang",
+        "qrTitle": "Dana tidak mencukupi di dompet Blink Anda.\nIsi ulang minimum {minAmount: string}.",
+        "copy": "Salin",
+        "share": "Bagikan",
+        "placeholder": "Tentukan jumlah"
+      },
+      "PersonalInformation": {
+        "title": "Langkah terakhir",
+        "fields": {
+          "occupation": {
+            "label": "Pekerjaan",
+            "placeholder": "Pilih pekerjaan Anda"
+          },
+          "annualSalaryRange": {
+            "label": "Gaji tahunan",
+            "placeholder": "Pilih rentang gaji Anda"
+          },
+          "accountPurpose": {
+            "label": "Tujuan akun",
+            "placeholder": "Pilih tujuan"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Pengeluaran bulanan yang diharapkan",
+            "placeholder": "Pilih rentang pengeluaran Anda"
+          }
+        },
+        "buttonText": "Kirim aplikasi",
+        "select": "pilih"
+      },
+      "CardPreapproved": {
+        "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
+        "buttonText": "Tutup"
+      },
+      "CardProcessing": {
+        "title": "Memproses aplikasi Anda",
+        "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
+        "buttonText": "Tutup"
+      }
     }
   }
 }

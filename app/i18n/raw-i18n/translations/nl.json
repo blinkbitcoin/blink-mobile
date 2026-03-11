@@ -3336,6 +3336,154 @@
         "bullet2": "Je moet je fysieke kaart activeren zodra deze aankomt",
         "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abonneren",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Accepteren",
+        "payButton": "Doorgaan en Betalen",
+        "cardTitle": "Blink Privé",
+        "perYear": "per jaar",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling in Afwachting",
+          "firstYearFree": "Eerste jaar gratis"
+        },
+        "renewalDate": {
+          "label": "Verlengingsdatum"
+        },
+        "agreement": {
+          "text": "Ik ga akkoord met de",
+          "termsOfService": "Servicevoorwaarden",
+          "privacyPolicy": "Privacybeleid",
+          "cardholderAgreement": "Kaarthouderovereenkomst",
+          "and": "en"
+        },
+        "renew": "Ik begrijp dat mijn abonnement automatisch wordt verlengd over 1 jaar"
+      },
+      "CardIntroducing": {
+        "title": "Introductie",
+        "cardInfo": {
+          "bitcoinCard": "De Blink Visa-kaart",
+          "for": "voor",
+          "maximalist": "Bitcoin Maximalisten"
+        },
+        "buttonText": "Doorgaan"
+      },
+      "CardDetails": {
+        "title": "Extra voordelen",
+        "features": {
+          "accountManager": "Toegewezen accountmanager",
+          "support": "Prioriteitsondersteuning",
+          "onchainDeposits": "50% terug op transactiekosten",
+          "circularEconomies": "$100 voor circulaire economieën"
+        },
+        "andMore": "... en meer komt in 2026",
+        "buttonText": "Doorgaan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Welkom aan boord",
+          "subtitle": "Bij Blink Privé",
+          "paragraphs": {
+            "body1": "Iemand dacht aan jou en stelde voor dat we je moesten uitnodigen voor Blink Privé. Waarschijnlijk omdat je een geweldige Bitcoiner bent.",
+            "body2": "Ons doel voor 2026 is het programma te vullen met zoveel voordelen dat het vanzelfsprekend is om volgend jaar te verlengen."
+          }
+        },
+        "buttonText": "Laten we gaan"
+      },
+      "LoadingCard": {
+        "title": "We werken aan je kaart",
+        "subtitle": "We laten je weten zodra het klaar is",
+        "codingBackend": "...backend coderen",
+        "buttonText": "Mooi"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Welkom om deel uit te maken van Blink",
+          "paragraphs": {
+            "body1": "Voordat we meer fondsen ophalen bij professionele investeerders, hebben we besloten een uitnodiging te sturen aan de Blink-familie, onze supergebruikers en supporters. Waarom vreemden aan boord brengen als we eerst iemand zoals jij kunnen uitnodigen?",
+            "body2": "Dit is een persoonlijke uitnodiging. Stuur deze alsjeblieft niet door en deel het niet openbaar."
+          }
+        },
+        "buttonText": "Doorgaan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hoeveel wil je investeren?",
+        "percent": "voor ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Bedrijfswaardering",
+          "paragraphs": {
+            "body1": "In deze investeringsronde is de pre-money waardering van Blink $10 miljoen.",
+            "body2": "We zouden tegen een hogere prijs kapitaal kunnen ophalen bij durfkapitalisten. We zien echter langetermijn wederzijdse voordelen in een partnerschap met onze supergebruikers. Daarom bieden we dit aanbod aan tegen betere voorwaarden voor jou."
+          }
+        },
+        "buttonText": "Begrepen"
+      },
+      "TermSheet": {
+        "title": "Termsheet",
+        "equitySection": {
+          "title": "Aandeel in Blink",
+          "investment": "$10.000 Investering",
+          "valuation": "Bij $10M pre-money waardering",
+          "units": "Je ontvangt 10.000 eenheden ~0,1% van Blink"
+        },
+        "creditBoostSection": {
+          "title": "Kredietverhoging",
+          "totalCredit": "$11.000 Totaal Krediet"
+        },
+        "buttonText": "Ga naar Ondertekening"
+      },
+      "TransferInvest": {
+        "title": "Draag je investering over",
+        "paragraphs": {
+          "body1": "Je hebt de inschrijvingsovereenkomst voor 10.000 eenheden in Blink ondertekend.",
+          "body2": "Tijd om het investeringsbedrag van $10.000 over te maken. Je betaalt met Bitcoin."
+        },
+        "buttonText": "Doorgaan"
+      },
+      "TopUp": {
+        "title": "Opwaarderen",
+        "qrTitle": "Onvoldoende saldo in je Blink-wallet.\nWaardeer op met minimaal {minAmount: string}.",
+        "copy": "Kopiëren",
+        "share": "Delen",
+        "placeholder": "Bedrag instellen"
+      },
+      "PersonalInformation": {
+        "title": "Laatste stap",
+        "fields": {
+          "occupation": {
+            "label": "Beroep",
+            "placeholder": "Selecteer je beroep"
+          },
+          "annualSalaryRange": {
+            "label": "Jaarsalaris",
+            "placeholder": "Selecteer je salarisniveau"
+          },
+          "accountPurpose": {
+            "label": "Accountdoel",
+            "placeholder": "Selecteer het doel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Verwachte maandelijkse uitgaven",
+            "placeholder": "Selecteer je uitgavenniveau"
+          }
+        },
+        "buttonText": "Aanvraag indienen",
+        "select": "selecteer"
+      },
+      "CardPreapproved": {
+        "title": "U bent vooraf goedgekeurd voor de Blink Visa-kaart!",
+        "buttonText": "Sluiten"
+      },
+      "CardProcessing": {
+        "title": "Je aanvraag wordt verwerkt",
+        "subtitle": "Geschatte wachttijd: {waitTime: string}",
+        "buttonText": "Sluiten"
+      }
     }
   }
 }

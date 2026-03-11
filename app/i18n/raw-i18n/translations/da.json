@@ -3313,6 +3313,154 @@
         "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
         "bullet3": "Begge kort vil have samme kortnummer og oplysninger"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abonner",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Acceptér",
+        "payButton": "Fortsæt og Betal",
+        "cardTitle": "Blink Privat",
+        "perYear": "per år",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling Afventer",
+          "firstYearFree": "Første år gratis"
+        },
+        "renewalDate": {
+          "label": "Fornyelsesdato"
+        },
+        "agreement": {
+          "text": "Jeg accepterer",
+          "termsOfService": "Servicevilkårene",
+          "privacyPolicy": "Privatlivspolitikken",
+          "cardholderAgreement": "Kortholderaftalen",
+          "and": "og"
+        },
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om 1 år"
+      },
+      "CardIntroducing": {
+        "title": "Introduktion",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa-kortet",
+          "for": "til",
+          "maximalist": "Bitcoin Maksimalister"
+        },
+        "buttonText": "Fortsæt"
+      },
+      "CardDetails": {
+        "title": "Yderligere fordele",
+        "features": {
+          "accountManager": "Dedikeret kontoadministrator",
+          "support": "Prioriteret support",
+          "onchainDeposits": "50% tilbage på transaktionsgebyrer",
+          "circularEconomies": "$100 til cirkulære økonomier"
+        },
+        "andMore": "... og mere kommer i 2026",
+        "buttonText": "Fortsæt"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Velkommen ombord",
+          "subtitle": "Til Blink Privat",
+          "paragraphs": {
+            "body1": "Nogen tænkte på dig og foreslog, at vi skulle invitere dig til Blink Privat. Sandsynligvis fordi du er en fantastisk Bitcoiner.",
+            "body2": "Vores mål for 2026 er at fylde programmet med så mange goder, at det vil være oplagt at forny næste år."
+          }
+        },
+        "buttonText": "Lad os gå"
+      },
+      "LoadingCard": {
+        "title": "Vi arbejder på dit kort",
+        "subtitle": "Vi giver dig besked, når det er her",
+        "codingBackend": "...koder backend",
+        "buttonText": "Fedt"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Velkommen til at blive en del af Blink",
+          "paragraphs": {
+            "body1": "Før vi rejser flere midler fra professionelle investorer, besluttede vi at udvide en invitation til Blink-familien, vores superbrugere og støtter. Hvorfor bringe fremmede ombord, når vi først kan invitere nogen som dig?",
+            "body2": "Dette er en personlig invitation. Del den venligst ikke videre eller offentligt."
+          }
+        },
+        "buttonText": "Fortsæt"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hvor meget vil du gerne investere?",
+        "percent": "for ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Virksomhedsvurdering",
+          "paragraphs": {
+            "body1": "I denne investeringsrunde er pre-money-vurderingen af Blink 10 millioner dollars.",
+            "body2": "Vi kunne rejse kapital til en højere pris fra venturekapitalister. Vi ser dog langsigtede gensidige fordele i at samarbejde med vores superbrugere. Derfor tilbyder vi dette tilbud til bedre vilkår for dig."
+          }
+        },
+        "buttonText": "Forstået"
+      },
+      "TermSheet": {
+        "title": "Termblad",
+        "equitySection": {
+          "title": "Egenkapital i Blink",
+          "investment": "$10,000 Investering",
+          "valuation": "Ved $10M pre-money vurdering",
+          "units": "Du modtager 10,000 enheder ~0.1% af Blink"
+        },
+        "creditBoostSection": {
+          "title": "Kredit Boost",
+          "totalCredit": "$11,000 Samlet Kredit"
+        },
+        "buttonText": "Fortsæt til Underskrift"
+      },
+      "TransferInvest": {
+        "title": "Overfør din investering",
+        "paragraphs": {
+          "body1": "Du har underskrevet tegningsaftalen for 10,000 enheder i Blink.",
+          "body2": "Det er tid til at overføre investeringsbeløbet på $10,000. Du betaler med Bitcoin."
+        },
+        "buttonText": "Fortsæt"
+      },
+      "TopUp": {
+        "title": "Opfyldning",
+        "qrTitle": "Utilstrækkelige midler i din Blink-tegnebog.\nOpfyld minimum {minAmount: string}.",
+        "copy": "Kopiér",
+        "share": "Del",
+        "placeholder": "Angiv beløb"
+      },
+      "PersonalInformation": {
+        "title": "Sidste trin",
+        "fields": {
+          "occupation": {
+            "label": "Beskæftigelse",
+            "placeholder": "Vælg din beskæftigelse"
+          },
+          "annualSalaryRange": {
+            "label": "Årlig løn",
+            "placeholder": "Vælg dit løninterval"
+          },
+          "accountPurpose": {
+            "label": "Kontoformål",
+            "placeholder": "Vælg formålet"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Forventet månedligt forbrug",
+            "placeholder": "Vælg dit forbrugsinterval"
+          }
+        },
+        "buttonText": "Indsend ansøgning",
+        "select": "vælg"
+      },
+      "CardPreapproved": {
+        "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
+        "buttonText": "Luk"
+      },
+      "CardProcessing": {
+        "title": "Behandler din ansøgning",
+        "subtitle": "Estimeret ventetid: {waitTime: string}",
+        "buttonText": "Luk"
+      }
     }
   }
 }

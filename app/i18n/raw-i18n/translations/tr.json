@@ -3295,6 +3295,154 @@
         "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
         "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abone Ol",
+        "paymentTitle": "Ödeme",
+        "acceptButton": "Kabul Et",
+        "payButton": "Devam Et ve Öde",
+        "cardTitle": "Blink Özel",
+        "perYear": "yıllık",
+        "status": {
+          "label": "Durum",
+          "paymentPending": "Ödeme Bekliyor",
+          "firstYearFree": "İlk yıl ücretsiz"
+        },
+        "renewalDate": {
+          "label": "Yenileme tarihi"
+        },
+        "agreement": {
+          "text": "Kabul ediyorum",
+          "termsOfService": "Hizmet Şartları",
+          "privacyPolicy": "Gizlilik Politikası",
+          "cardholderAgreement": "Kart Sahibi Sözleşmesi",
+          "and": "ve"
+        },
+        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+      },
+      "CardIntroducing": {
+        "title": "Tanıtım",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa kartı",
+          "for": "için",
+          "maximalist": "Bitcoin Maksimalistleri"
+        },
+        "buttonText": "Devam Et"
+      },
+      "CardDetails": {
+        "title": "Ek avantajlar",
+        "features": {
+          "accountManager": "Özel hesap yöneticisi",
+          "support": "Öncelikli destek",
+          "onchainDeposits": "İşlem ücretlerinden %50 geri ödeme",
+          "circularEconomies": "Döngüsel ekonomilere 100 $"
+        },
+        "andMore": "... ve 2026'da daha fazlası geliyor",
+        "buttonText": "Devam Et"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Hoş geldiniz",
+          "subtitle": "Blink Özel'e",
+          "paragraphs": {
+            "body1": "Biri sizi düşündü ve sizi Blink Özel'e davet etmemizi önerdi. Muhtemelen harika bir Bitcoiner olduğunuz için.",
+            "body2": "2026 hedefimiz programı o kadar çok avantajla doldurmak ki gelecek yıl yenilemenin mantıklı olacağı açık olsun."
+          }
+        },
+        "buttonText": "Hadi başlayalım"
+      },
+      "LoadingCard": {
+        "title": "Kartınız üzerinde çalışıyoruz",
+        "subtitle": "Hazır olduğunda size bildireceğiz",
+        "codingBackend": "...backend kodlanıyor",
+        "buttonText": "Güzel"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Blink'in bir parçası olmaya hoş geldiniz",
+          "paragraphs": {
+            "body1": "Profesyonel yatırımcılardan daha fazla fon toplamadan önce, Blink ailesine, süper kullanıcılarımıza ve destekçilerimize bir davetiye göndermeye karar verdik. Önce sizin gibi birini davet edebilecekken neden yabancıları getirelim?",
+            "body2": "Bu kişisel bir davettir. Lütfen iletmeyin veya herkese açık paylaşmayın."
+          }
+        },
+        "buttonText": "Devam Et"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ne kadar yatırım yapmak istersiniz?",
+        "percent": "~{percent: number}% için"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Şirket değerlemesi",
+          "paragraphs": {
+            "body1": "Bu yatırım turunda Blink'in ön para değerlemesi 10 milyon dolardır.",
+            "body2": "VC'lerden daha yüksek bir fiyatla fon toplayabiliriz. Ancak, süper kullanıcılarımızla ortaklıkta uzun vadeli karşılıklı faydalar görüyoruz. Bu nedenle, bu teklifi sizin için daha iyi koşullarla sunuyoruz."
+          }
+        },
+        "buttonText": "Anladım"
+      },
+      "TermSheet": {
+        "title": "Şartname",
+        "equitySection": {
+          "title": "Blink'te Pay",
+          "investment": "10.000 $ Yatırım",
+          "valuation": "10M $ ön para değerlemesinde",
+          "units": "10.000 birim alırsınız ~Blink'in %0,1'i"
+        },
+        "creditBoostSection": {
+          "title": "Kredi Artışı",
+          "totalCredit": "11.000 $ Toplam Kredi"
+        },
+        "buttonText": "İmzaya Geç"
+      },
+      "TransferInvest": {
+        "title": "Yatırımınızı transfer edin",
+        "paragraphs": {
+          "body1": "Blink'te 10.000 birim için abonelik sözleşmesini imzaladınız.",
+          "body2": "10.000 $ yatırım tutarını transfer etme zamanı. Bitcoin ile ödeyeceksiniz."
+        },
+        "buttonText": "Devam Et"
+      },
+      "TopUp": {
+        "title": "Yükleme",
+        "qrTitle": "Blink cüzdanınızda yetersiz bakiye.\nMinimum {minAmount: string} yükleyin.",
+        "copy": "Kopyala",
+        "share": "Paylaş",
+        "placeholder": "Tutar belirle"
+      },
+      "PersonalInformation": {
+        "title": "Son adım",
+        "fields": {
+          "occupation": {
+            "label": "Meslek",
+            "placeholder": "Mesleğinizi seçin"
+          },
+          "annualSalaryRange": {
+            "label": "Yıllık maaş",
+            "placeholder": "Maaş aralığınızı seçin"
+          },
+          "accountPurpose": {
+            "label": "Hesap amacı",
+            "placeholder": "Amacı seçin"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Beklenen aylık harcama",
+            "placeholder": "Harcama aralığınızı seçin"
+          }
+        },
+        "buttonText": "Başvuruyu gönder",
+        "select": "seç"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa kartı için ön onay aldınız!",
+        "buttonText": "Kapat"
+      },
+      "CardProcessing": {
+        "title": "Başvurunuz işleniyor",
+        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "buttonText": "Kapat"
+      }
     }
   }
 }

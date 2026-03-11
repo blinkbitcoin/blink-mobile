@@ -3342,6 +3342,154 @@
         "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
         "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Bhalisa",
+        "paymentTitle": "Intlawulo",
+        "acceptButton": "Yamkela",
+        "payButton": "Qhubeka kwaye Uhlawule",
+        "cardTitle": "Blink Yabucala",
+        "perYear": "ngonyaka",
+        "status": {
+          "label": "Isimo",
+          "paymentPending": "Intlawulo Ilindile",
+          "firstYearFree": "Unyaka wokuqala simahla"
+        },
+        "renewalDate": {
+          "label": "Umhla wokuhlaziya"
+        },
+        "agreement": {
+          "text": "Ndiyavuma",
+          "termsOfService": "Imimmiselo yoMsebenzi",
+          "privacyPolicy": "Umgaqo waBucala",
+          "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
+          "and": "kunye"
+        },
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwisithuba sonyaka omnye"
+      },
+      "CardIntroducing": {
+        "title": "Ukwazisa",
+        "cardInfo": {
+          "bitcoinCard": "Ikhadi le-Blink Visa",
+          "for": "le",
+          "maximalist": "Abathandi be-Bitcoin"
+        },
+        "buttonText": "Qhubeka"
+      },
+      "CardDetails": {
+        "title": "Inzuzo ezongezelelweyo",
+        "features": {
+          "accountManager": "Umphathi weakhawunti ozinikeleyo",
+          "support": "Inkxaso ephambili",
+          "onchainDeposits": "50% ubuyiselo kwiimali zotshintsho",
+          "circularEconomies": "$100 kwiikhonomi ezijikeleziyo"
+        },
+        "andMore": "... nokunye okuninzi kuzayo ngo-2026",
+        "buttonText": "Qhubeka"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Wamkelekile",
+          "subtitle": "Kwi-Blink Yabucala",
+          "paragraphs": {
+            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Yabucala. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
+            "body2": "Injongo yethu ngo-2026 kukuzalisa inkqubo ngezinto ezininzi ezintle kangangokuba kuya kucaca ukuba kufanele uhlaziye kunyaka ozayo."
+          }
+        },
+        "buttonText": "Masiye"
+      },
+      "LoadingCard": {
+        "title": "Sisebenza kwikhadi lakho",
+        "subtitle": "Siza kukwazisa xa likulungele",
+        "codingBackend": "...ukubhala ikhowudi ye-backend",
+        "buttonText": "Kuhle"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Wamkelekile ukuba ube yinxalenye yeBlink",
+          "paragraphs": {
+            "body1": "Phambi kokuba siqokelele iimali ezingakumbi kubatyali-mali abanobuchule, sigqibe ekubeni sandise isimemo kusapho lweBlink, abasebenzisi bethu abakhulu nabaxhasi. Kutheni sizise abangaziwayo xa sinokumema kuqala umntu onjenganwe?",
+            "body2": "Esi sisimemo sobuqu. Nceda ungasigqithiseli okanye wasabelane esidlangalaleni."
+          }
+        },
+        "buttonText": "Qhubeka"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ungathanda ukutyala malini?",
+        "percent": "nge-~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Uxabiso lwenkampani",
+          "paragraphs": {
+            "body1": "Kumjikelo wokutyala imali, uxabiso lwangaphambi kwemali lweBlink luyi-$10 yezigidi.",
+            "body2": "Sinokunyusa imali ngexabiso eliphezulu kwi-VCs. Nangona kunjalo, sibona iinzuzo zexesha elide ezabelwana ngabasebenzisi bethu abakhulu. Ngoko ke, sikunika esi sithembiso ngemiqathango engcono kuwe."
+          }
+        },
+        "buttonText": "Ndiyaqonda"
+      },
+      "TermSheet": {
+        "title": "Iphepha leMiqathango",
+        "equitySection": {
+          "title": "Isabelo kwiBlink",
+          "investment": "Utyalo-mali lwe-$10,000",
+          "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
+          "units": "Ufumana iiyunithi ezili-10,000 ~0.1% yeBlink"
+        },
+        "creditBoostSection": {
+          "title": "Ukuphakamisa iKredithi",
+          "totalCredit": "Iyonke iKredithi $11,000"
+        },
+        "buttonText": "Qhubeka ukuya kuSayina"
+      },
+      "TransferInvest": {
+        "title": "Dlulisela utyalo-mali lwakho",
+        "paragraphs": {
+          "body1": "Usayine isivumelwano sobhaliso lweeyunithi ezili-10,000 kwiBlink.",
+          "body2": "Lixesha lokudlulisela isixa sotyalo-mali se-$10,000. Uza kuhlawula ngeBitcoin."
+        },
+        "buttonText": "Qhubeka"
+      },
+      "TopUp": {
+        "title": "Gcwalisa",
+        "qrTitle": "Imali enganelanga kwisipaji sakho seBlink.\nGcwalisa ubuncinane be-{minAmount: string}.",
+        "copy": "Khuphela",
+        "share": "Yabelana",
+        "placeholder": "Cwangcisa isixa"
+      },
+      "PersonalInformation": {
+        "title": "Inyathelo lokugqibela",
+        "fields": {
+          "occupation": {
+            "label": "Umsebenzi",
+            "placeholder": "Khetha umsebenzi wakho"
+          },
+          "annualSalaryRange": {
+            "label": "Umvuzo wonyaka",
+            "placeholder": "Khetha ibanga lomvuzo wakho"
+          },
+          "accountPurpose": {
+            "label": "Injongo yeakhawunti",
+            "placeholder": "Khetha injongo"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Ukuchitha okulindelweyo kwenyanga",
+            "placeholder": "Khetha ibanga lokuchitha kwakho"
+          }
+        },
+        "buttonText": "Ngenisa isicelo",
+        "select": "khetha"
+      },
+      "CardPreapproved": {
+        "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
+        "buttonText": "Vala"
+      },
+      "CardProcessing": {
+        "title": "Siqhuba isicelo sakho",
+        "subtitle": "Ixesha lokulinda eliqikelelweyo: {waitTime: string}",
+        "buttonText": "Vala"
+      }
     }
   }
 }

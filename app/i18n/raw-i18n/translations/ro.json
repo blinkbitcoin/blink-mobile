@@ -3295,6 +3295,154 @@
         "bullet2": "Va trebui să activezi cardul fizic când ajunge",
         "bullet3": "Ambele carduri vor avea același număr și aceleași detalii"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abonare",
+        "paymentTitle": "Plată",
+        "acceptButton": "Acceptă",
+        "payButton": "Continuă și Plătește",
+        "cardTitle": "Blink Privat",
+        "perYear": "pe an",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Plată în Așteptare",
+          "firstYearFree": "Primul an gratuit"
+        },
+        "renewalDate": {
+          "label": "Data de reînoire"
+        },
+        "agreement": {
+          "text": "Sunt de acord cu",
+          "termsOfService": "Termenii Serviciului",
+          "privacyPolicy": "Politica de Confidențialitate",
+          "cardholderAgreement": "Acordul Deținătorului de Card",
+          "and": "și"
+        },
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în 1 an"
+      },
+      "CardIntroducing": {
+        "title": "Prezentare",
+        "cardInfo": {
+          "bitcoinCard": "Cardul Visa Blink",
+          "for": "pentru",
+          "maximalist": "Maximaliștii Bitcoin"
+        },
+        "buttonText": "Continuă"
+      },
+      "CardDetails": {
+        "title": "Avantaje suplimentare",
+        "features": {
+          "accountManager": "Manager de cont dedicat",
+          "support": "Suport prioritar",
+          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
+          "circularEconomies": "100 $ pentru economii circulare"
+        },
+        "andMore": "... și mai multe vin în 2026",
+        "buttonText": "Continuă"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Bun venit la bord",
+          "subtitle": "La Blink Privat",
+          "paragraphs": {
+            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Privat. Probabil pentru că ești un Bitcoiner grozav.",
+            "body2": "Obiectivul nostru pentru 2026 este să umplem programul cu atâtea avantaje încât va fi evident să reînnoiești anul viitor."
+          }
+        },
+        "buttonText": "Hai să mergem"
+      },
+      "LoadingCard": {
+        "title": "Lucrăm la cardul tău",
+        "subtitle": "Te vom notifica când va fi gata",
+        "codingBackend": "...programăm backend-ul",
+        "buttonText": "Grozav"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Bun venit pentru a deveni parte din Blink",
+          "paragraphs": {
+            "body1": "Înainte de a strânge mai multe fonduri de la investitori profesioniști, am decis să extindem o invitație familiei Blink, superutilizatorilor și susținătorilor noștri. De ce să aducem străini când putem mai întâi să invităm pe cineva ca tine?",
+            "body2": "Aceasta este o invitație personală. Te rugăm să nu o retransmiti sau să o distribui public."
+          }
+        },
+        "buttonText": "Continuă"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Cât ai dori să investești?",
+        "percent": "pentru ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Evaluarea companiei",
+          "paragraphs": {
+            "body1": "În această rundă de investiții, evaluarea pre-money a Blink este de 10 milioane de dolari.",
+            "body2": "Am putea strânge fonduri la un preț mai mare de la investitorii de capital de risc. Cu toate acestea, vedem beneficii reciproce pe termen lung în parteneriatul cu superutilizatorii noștri. Prin urmare, vă oferim această ofertă în condiții mai bune."
+          }
+        },
+        "buttonText": "Am înțeles"
+      },
+      "TermSheet": {
+        "title": "Foaie de Termeni",
+        "equitySection": {
+          "title": "Participație în Blink",
+          "investment": "Investiție de $10,000",
+          "valuation": "La o evaluare pre-money de $10M",
+          "units": "Primești 10,000 de unități ~0,1% din Blink"
+        },
+        "creditBoostSection": {
+          "title": "Creștere Credit",
+          "totalCredit": "Credit Total de $11,000"
+        },
+        "buttonText": "Continuă la Semnătură"
+      },
+      "TransferInvest": {
+        "title": "Transferă-ți investiția",
+        "paragraphs": {
+          "body1": "Ai semnat acordul de subscriere pentru 10,000 de unități în Blink.",
+          "body2": "E timpul să transferi suma de investiție de $10,000. Vei plăti cu Bitcoin."
+        },
+        "buttonText": "Continuă"
+      },
+      "TopUp": {
+        "title": "Încărcare",
+        "qrTitle": "Fonduri insuficiente în portofelul tău Blink.\nÎncarcă minim {minAmount: string}.",
+        "copy": "Copiază",
+        "share": "Distribuie",
+        "placeholder": "Setează suma"
+      },
+      "PersonalInformation": {
+        "title": "Ultimul pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupație",
+            "placeholder": "Selectează ocupația ta"
+          },
+          "annualSalaryRange": {
+            "label": "Salariu anual",
+            "placeholder": "Selectează intervalul salarial"
+          },
+          "accountPurpose": {
+            "label": "Scopul contului",
+            "placeholder": "Selectează scopul"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Cheltuieli lunare estimate",
+            "placeholder": "Selectează intervalul de cheltuieli"
+          }
+        },
+        "buttonText": "Trimite cererea",
+        "select": "selectează"
+      },
+      "CardPreapproved": {
+        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "buttonText": "Închide"
+      },
+      "CardProcessing": {
+        "title": "Se procesează cererea ta",
+        "subtitle": "Timp estimat de așteptare: {waitTime: string}",
+        "buttonText": "Închide"
+      }
     }
   }
 }

@@ -3336,6 +3336,154 @@
         "bullet2": "Ֆիզիկական քարտը ստանալուց հետո պետք է այն ակտիվացնեք",
         "bullet3": "Երկու քարտերն էլ կունենան նույն քարտի համարը և տվյալները"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Բաժանորդագրվել",
+        "paymentTitle": "Վճարում",
+        "acceptButton": "Ընդունել",
+        "payButton": "Շարունակել և վճարել",
+        "cardTitle": "Blink Private",
+        "perYear": "տարեկան",
+        "status": {
+          "label": "Կարգավիճակ",
+          "paymentPending": "Վճարումը սպասման մեջ է",
+          "firstYearFree": "Առաջին տարին անվճար է"
+        },
+        "renewalDate": {
+          "label": "Երկարաձգման ամսաթիվ"
+        },
+        "agreement": {
+          "text": "Ես համաձայն եմ",
+          "termsOfService": "Ծառայության պայմաններին",
+          "privacyPolicy": "Գաղտնիության քաղաքականությանը",
+          "cardholderAgreement": "Քարտապանի համաձայնագրին",
+          "and": "և"
+        },
+        "renew": "Ես հասկանում եմ, որ իմ բաժանորդագրությունը ավտոմատ կերկարաձգվի 1 տարի հետո"
+      },
+      "CardIntroducing": {
+        "title": "Ներկայացնում ենք",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa քարտը",
+          "for": "համար",
+          "maximalist": "Bitcoin մաքսիմալիստների"
+        },
+        "buttonText": "Շարունակել"
+      },
+      "CardDetails": {
+        "title": "Լրացուցիչ առավելություններ",
+        "features": {
+          "accountManager": "Անձնական հաշվի կառավարիչ",
+          "support": "Առաջնահերթ աջակցություն",
+          "onchainDeposits": "Գործարքի վճարների 50% վերադարձ",
+          "circularEconomies": "$100 շրջանաձև տնտեսություններին"
+        },
+        "andMore": "... և ավելին` 2026-ին",
+        "buttonText": "Շարունակել"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Բարի գալուստ",
+          "subtitle": "Blink Private",
+          "paragraphs": {
+            "body1": "Ինչ-որ մեկը մտածել է Ձեր մասին և առաջարկել, որ մենք Ձեզ հրավիրենք Blink Private։ Հավանաբար այն պատճառով, որ Դուք հիանալի բիթքոյներ եք։",
+            "body2": "Մեր նպատակը 2026-ի համար ծրագրում այնքան շատ առավելություններ ավելացնելն է, որ հաջորդ տարի երկարաձգելը դառնա ինքնըստինքյան ակնհայտ։"
+          }
+        },
+        "buttonText": "Սկսենք"
+      },
+      "LoadingCard": {
+        "title": "Մենք աշխատում ենք Ձեր քարտի վրա",
+        "subtitle": "Կտեղեկացնենք Ձեզ, երբ այն պատրաստ լինի",
+        "codingBackend": "...մշակում ենք backend-ը",
+        "buttonText": "Հիանալի"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Բարի գալուստ Blink-ի մի մասը դառնալու",
+          "paragraphs": {
+            "body1": "Մինչ մասնագիտական ներդրողներից ավելի շատ միջոցներ ներգրավելը, մենք որոշեցինք հրավեր ուղարկել Blink ընտանիքին, մեր ամենաակտիվ օգտատերերին և աջակիցներին։ Ինչո՞ւ նախ հրավիրել անծանոթների, եթե նախ կարող ենք հրավիրել Ձեզ նման մեկին։",
+            "body2": "Սա անձնական հրավեր է։ Խնդրում ենք այն չվերահասցեագրել և հրապարակային չկիսվել։"
+          }
+        },
+        "buttonText": "Շարունակել"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Որքա՞ն կցանկանայիք ներդնել։",
+        "percent": "~{percent: number}% դիմաց"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ընկերության գնահատում",
+          "paragraphs": {
+            "body1": "Այս ներդրումային փուլում Blink-ի pre-money գնահատումը $10 միլիոն է։",
+            "body2": "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you."
+          }
+        },
+        "buttonText": "Պարզ է"
+      },
+      "TermSheet": {
+        "title": "Պայմանների թերթիկ",
+        "equitySection": {
+          "title": "Բաժնեմաս Blink-ում",
+          "investment": "$10,000 ներդրում",
+          "valuation": "$10 մլն pre-money գնահատմամբ",
+          "units": "Դուք ստանում եք 10,000 միավոր` Blink-ի մոտ 0.1%-ը"
+        },
+        "creditBoostSection": {
+          "title": "Վարկային աճ",
+          "totalCredit": "$11,000 ընդհանուր վարկ"
+        },
+        "buttonText": "Անցնել ստորագրմանը"
+      },
+      "TransferInvest": {
+        "title": "Փոխանցեք Ձեր ներդրումը",
+        "paragraphs": {
+          "body1": "Դուք ստորագրել եք Blink-ի 10,000 միավորի բաժանորդագրման համաձայնագիրը։",
+          "body2": "Ժամանակն է փոխանցել $10,000 ներդրման գումարը։ Դուք կվճարեք Bitcoin-ով։"
+        },
+        "buttonText": "Շարունակել"
+      },
+      "TopUp": {
+        "title": "Լիցքավորում",
+        "qrTitle": "Ձեր Blink դրամապանակում բավարար միջոցներ չկան։\nԼիցքավորեք առնվազն {minAmount: string}։",
+        "copy": "Պատճենել",
+        "share": "Կիսվել",
+        "placeholder": "Սահմանել գումարը"
+      },
+      "PersonalInformation": {
+        "title": "Վերջին քայլը",
+        "fields": {
+          "occupation": {
+            "label": "Զբաղմունք",
+            "placeholder": "Ընտրեք Ձեր զբաղմունքը"
+          },
+          "annualSalaryRange": {
+            "label": "Տարեկան աշխատավարձ",
+            "placeholder": "Ընտրեք Ձեր աշխատավարձի միջակայքը"
+          },
+          "accountPurpose": {
+            "label": "Հաշվի նպատակը",
+            "placeholder": "Ընտրեք նպատակը"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Սպասվող ամսական ծախս",
+            "placeholder": "Ընտրեք Ձեր ծախսերի միջակայքը"
+          }
+        },
+        "buttonText": "Ուղարկել հայտը",
+        "select": "ընտրել"
+      },
+      "CardPreapproved": {
+        "title": "You have been pre-approved for the Blink Visa card!",
+        "buttonText": "Close"
+      },
+      "CardProcessing": {
+        "title": "Մշակվում է Ձեր հայտը",
+        "subtitle": "Սպասման գնահատված ժամանակը՝ {waitTime: string}",
+        "buttonText": "Փակել"
+      }
     }
   }
 }

@@ -3295,6 +3295,154 @@
         "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
         "bullet3": "Obe karty budú mať rovnaké číslo a údaje"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Predplatiť",
+        "paymentTitle": "Platba",
+        "acceptButton": "Prijať",
+        "payButton": "Pokračovať a Zaplatiť",
+        "cardTitle": "Blink Súkromný",
+        "perYear": "za rok",
+        "status": {
+          "label": "Stav",
+          "paymentPending": "Platba Čaká",
+          "firstYearFree": "Prvý rok zadarmo"
+        },
+        "renewalDate": {
+          "label": "Dátum obnovenia"
+        },
+        "agreement": {
+          "text": "Súhlasím s",
+          "termsOfService": "Podmienkami služby",
+          "privacyPolicy": "Zásadami ochrany osobných údajov",
+          "cardholderAgreement": "Zmluvou držiteľa karty",
+          "and": "a"
+        },
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví za 1 rok"
+      },
+      "CardIntroducing": {
+        "title": "Predstavujeme",
+        "cardInfo": {
+          "bitcoinCard": "Karta Blink Visa",
+          "for": "pre",
+          "maximalist": "Bitcoin maximalistov"
+        },
+        "buttonText": "Pokračovať"
+      },
+      "CardDetails": {
+        "title": "Ďalšie výhody",
+        "features": {
+          "accountManager": "Vyhradený správca účtu",
+          "support": "Prioritná podpora",
+          "onchainDeposits": "50% späť z transakčných poplatkov",
+          "circularEconomies": "100 $ pre cirkulárne ekonomiky"
+        },
+        "andMore": "... a ďalšie prídu v roku 2026",
+        "buttonText": "Pokračovať"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Vitajte na palube",
+          "subtitle": "V Blink Súkromný",
+          "paragraphs": {
+            "body1": "Niekto na vás myslel a navrhol, aby sme vás pozvali do Blink Súkromný. Pravdepodobne preto, že ste skvelý Bitcoiner.",
+            "body2": "Naším cieľom pre rok 2026 je naplniť program toľkými výhodami, že bude zrejmé, že sa oplatí budúci rok obnoviť."
+          }
+        },
+        "buttonText": "Poďme na to"
+      },
+      "LoadingCard": {
+        "title": "Pracujeme na vašej karte",
+        "subtitle": "Upozorníme vás, keď bude pripravená",
+        "codingBackend": "...kódujeme backend",
+        "buttonText": "Super"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Vitajte, staňte sa súčasťou Blink",
+          "paragraphs": {
+            "body1": "Predtým, než získame ďalšie prostriedky od profesionálnych investorov, rozhodli sme sa rozšíriť pozvánku na rodinu Blink, našich superpoužívateľov a podporovateľov. Prečo privádzať cudzincov, keď môžeme najprv pozvať niekoho ako vy?",
+            "body2": "Toto je osobná pozvánka. Prosím, nepreposielajte ju ani ju nezdieľajte verejne."
+          }
+        },
+        "buttonText": "Pokračovať"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Koľko by ste chceli investovať?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ocenenie spoločnosti",
+          "paragraphs": {
+            "body1": "V tomto investičnom kole je pre-money ocenenie Blink 10 miliónov dolárov.",
+            "body2": "Mohli by sme získať prostriedky za vyššiu cenu od rizikových kapitalistov. Vidíme však dlhodobé vzájomné výhody v partnerstve s našimi superpoužívateľmi. Preto vám ponúkame túto ponuku za lepších podmienok."
+          }
+        },
+        "buttonText": "Rozumiem"
+      },
+      "TermSheet": {
+        "title": "Podmienky",
+        "equitySection": {
+          "title": "Podiel v Blink",
+          "investment": "Investícia $10,000",
+          "valuation": "Pri pre-money ocenení $10M",
+          "units": "Dostanete 10,000 jednotiek ~0,1% Blink"
+        },
+        "creditBoostSection": {
+          "title": "Zvýšenie kreditu",
+          "totalCredit": "Celkový kredit $11,000"
+        },
+        "buttonText": "Pokračovať k Podpisu"
+      },
+      "TransferInvest": {
+        "title": "Preveďte svoju investíciu",
+        "paragraphs": {
+          "body1": "Podpísali ste zmluvu o úpise 10,000 jednotiek v Blink.",
+          "body2": "Je čas previesť investičnú sumu $10,000. Zaplatíte Bitcoinom."
+        },
+        "buttonText": "Pokračovať"
+      },
+      "TopUp": {
+        "title": "Dobitie",
+        "qrTitle": "Nedostatočné prostriedky vo vašej peňaženke Blink.\nDobite minimálne {minAmount: string}.",
+        "copy": "Kopírovať",
+        "share": "Zdieľať",
+        "placeholder": "Nastaviť sumu"
+      },
+      "PersonalInformation": {
+        "title": "Posledný krok",
+        "fields": {
+          "occupation": {
+            "label": "Povolanie",
+            "placeholder": "Vyberte svoje povolanie"
+          },
+          "annualSalaryRange": {
+            "label": "Ročný plat",
+            "placeholder": "Vyberte svoj platový rozsah"
+          },
+          "accountPurpose": {
+            "label": "Účel účtu",
+            "placeholder": "Vyberte účel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očakávané mesačné výdavky",
+            "placeholder": "Vyberte svoj rozsah výdavkov"
+          }
+        },
+        "buttonText": "Odoslať žiadosť",
+        "select": "vybrať"
+      },
+      "CardPreapproved": {
+        "title": "Boli ste predbežne schválení pre kartu Blink Visa!",
+        "buttonText": "Zavrieť"
+      },
+      "CardProcessing": {
+        "title": "Spracúvame vašu žiadosť",
+        "subtitle": "Odhadovaný čas čakania: {waitTime: string}",
+        "buttonText": "Zavrieť"
+      }
     }
   }
 }

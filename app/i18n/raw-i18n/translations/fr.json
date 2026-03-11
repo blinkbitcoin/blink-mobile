@@ -3324,6 +3324,154 @@
                 "bullet2": "Vous devrez activer votre carte physique à son arrivée",
                 "bullet3": "Les deux cartes auront le même numéro et les mêmes détails"
             }
+        },
+        "Onboarding": {
+            "CardSubscription": {
+                "subscribeTitle": "S'abonner",
+                "paymentTitle": "Paiement",
+                "acceptButton": "Accepter",
+                "payButton": "Continuer et Payer",
+                "cardTitle": "Blink Privé",
+                "perYear": "par an",
+                "status": {
+                    "label": "Statut",
+                    "paymentPending": "Paiement en Attente",
+                    "firstYearFree": "Première année gratuite"
+                },
+                "renewalDate": {
+                    "label": "Date de renouvellement"
+                },
+                "agreement": {
+                    "text": "J'accepte les",
+                    "termsOfService": "Conditions d'Utilisation",
+                    "privacyPolicy": "Politique de Confidentialité",
+                    "cardholderAgreement": "Accord du Titulaire de la Carte",
+                    "and": "et"
+                },
+                "renew": "Je comprends que mon abonnement sera automatiquement renouvelé dans 1 an"
+            },
+            "CardIntroducing": {
+                "title": "Présentation",
+                "cardInfo": {
+                    "bitcoinCard": "La carte Visa Blink",
+                    "for": "pour",
+                    "maximalist": "Maximalistes Bitcoin"
+                },
+                "buttonText": "Continuer"
+            },
+            "CardDetails": {
+                "title": "Avantages supplémentaires",
+                "features": {
+                    "accountManager": "Gestionnaire de compte dédié",
+                    "support": "Support prioritaire",
+                    "onchainDeposits": "50% de remboursement sur les frais de transaction",
+                    "circularEconomies": "100 $ pour les économies circulaires"
+                },
+                "andMore": "... et plus à venir en 2026",
+                "buttonText": "Continuer"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "Bienvenue à bord",
+                    "subtitle": "Chez Blink Privé",
+                    "paragraphs": {
+                        "body1": "Quelqu'un a pensé à vous et a suggéré que nous devrions vous inviter à Blink Privé. Probablement parce que vous êtes un Bitcoiner formidable.",
+                        "body2": "Notre objectif pour 2026 est de remplir le programme avec tellement d'avantages qu'il sera évident de renouveler l'année prochaine."
+                    }
+                },
+                "buttonText": "Allons-y"
+            },
+            "LoadingCard": {
+                "title": "Nous travaillons sur votre carte",
+                "subtitle": "Nous vous notifierons dès qu'elle sera prête",
+                "codingBackend": "...programmation du backend",
+                "buttonText": "Super"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Bienvenue pour devenir partie de Blink",
+                    "paragraphs": {
+                        "body1": "Avant de lever plus de fonds auprès d'investisseurs professionnels, nous avons décidé d'étendre une invitation à la famille Blink, nos superutilisateurs et supporters. Pourquoi embarquer des inconnus quand nous pouvons d'abord inviter quelqu'un comme vous ?",
+                        "body2": "Ceci est une invitation personnelle. Veuillez ne pas la transférer ni la partager publiquement."
+                    }
+                },
+                "buttonText": "Continuer"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "Combien aimeriez-vous investir ?",
+                "percent": "pour ~{percent: number}%"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "Valorisation de l'entreprise",
+                    "paragraphs": {
+                        "body1": "Dans ce tour d'investissement, la valorisation pré-money de Blink est de 10 millions de dollars.",
+                        "body2": "Nous pourrions lever des fonds à un prix plus élevé auprès des investisseurs en capital-risque. Cependant, nous voyons des avantages mutuels à long terme dans un partenariat avec nos superutilisateurs. C'est pourquoi nous vous proposons cette offre à de meilleures conditions."
+                    }
+                },
+                "buttonText": "Compris"
+            },
+            "TermSheet": {
+                "title": "Feuille de Termes",
+                "equitySection": {
+                    "title": "Participation dans Blink",
+                    "investment": "Investissement de 10 000 $",
+                    "valuation": "À une valorisation pré-money de 10M $",
+                    "units": "Vous recevez 10 000 unités ~0,1% de Blink"
+                },
+                "creditBoostSection": {
+                    "title": "Boost de Crédit",
+                    "totalCredit": "Crédit Total de 11 000 $"
+                },
+                "buttonText": "Procéder à la Signature"
+            },
+            "TransferInvest": {
+                "title": "Transférez votre investissement",
+                "paragraphs": {
+                    "body1": "Vous avez signé l'accord de souscription pour 10 000 unités dans Blink.",
+                    "body2": "Il est temps de transférer le montant de l'investissement de 10 000 $. Vous paierez en Bitcoin."
+                },
+                "buttonText": "Continuer"
+            },
+            "TopUp": {
+                "title": "Recharger",
+                "qrTitle": "Fonds insuffisants dans votre portefeuille Blink.\nRechargez un minimum de {minAmount: string}.",
+                "copy": "Copier",
+                "share": "Partager",
+                "placeholder": "Définir le montant"
+            },
+            "PersonalInformation": {
+                "title": "Dernière étape",
+                "fields": {
+                    "occupation": {
+                        "label": "Profession",
+                        "placeholder": "Sélectionnez votre profession"
+                    },
+                    "annualSalaryRange": {
+                        "label": "Salaire annuel",
+                        "placeholder": "Sélectionnez votre fourchette salariale"
+                    },
+                    "accountPurpose": {
+                        "label": "Objectif du compte",
+                        "placeholder": "Sélectionnez l'objectif"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "Dépenses mensuelles prévues",
+                        "placeholder": "Sélectionnez votre fourchette de dépenses"
+                    }
+                },
+                "buttonText": "Soumettre la demande",
+                "select": "sélectionner"
+            },
+            "CardPreapproved": {
+                "title": "Vous avez été pré-approuvé pour la carte Blink Visa !",
+                "buttonText": "Fermer"
+            },
+            "CardProcessing": {
+                "title": "Traitement de votre demande",
+                "subtitle": "Temps d'attente estimé : {waitTime: string}",
+                "buttonText": "Fermer"
+            }
         }
     }
 }

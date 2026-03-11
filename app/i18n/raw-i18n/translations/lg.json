@@ -3295,6 +3295,154 @@
         "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
         "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Wewandise",
+        "paymentTitle": "Okusasula",
+        "acceptButton": "Kkiriza",
+        "payButton": "Weyongere era Osasula",
+        "cardTitle": "Blink Ekyama",
+        "perYear": "buli mwaka",
+        "status": {
+          "label": "Embeera",
+          "paymentPending": "Okusasula Kulindirira",
+          "firstYearFree": "Omwaka ogusooka ogw'obwereere"
+        },
+        "renewalDate": {
+          "label": "Ennaku ey'okuddamu okuwandiisa"
+        },
+        "agreement": {
+          "text": "Nzikiriza",
+          "termsOfService": "Amateeka g'Obuweereza",
+          "privacyPolicy": "Enkola y'Ekyama",
+          "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
+          "and": "ne"
+        },
+        "renew": "Ntegeera nti obuwandiisi bwange bujja kuddamu okuwandiisibwa mu mwaka 1"
+      },
+      "CardIntroducing": {
+        "title": "Okwanjula",
+        "cardInfo": {
+          "bitcoinCard": "Kaadi ya Blink Visa",
+          "for": "ya",
+          "maximalist": "Abantu ba Bitcoin"
+        },
+        "buttonText": "Weyongere"
+      },
+      "CardDetails": {
+        "title": "Ebirala ebirungi",
+        "features": {
+          "accountManager": "Omukozi w'akawunti ow'enjawulo",
+          "support": "Obuyambi obw'okusooka",
+          "onchainDeposits": "50% okuddizibwa ku ssente z'okutambula",
+          "circularEconomies": "$100 eri ekonomiya ezeetooloola"
+        },
+        "andMore": "... n'ebirala bijja mu 2026",
+        "buttonText": "Weyongere"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Tukusanyukidde",
+          "subtitle": "Mu Blink Ekyama",
+          "paragraphs": {
+            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Ekyama. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
+            "body2": "Ekigendererwa kyaffe mu 2026 kwe kutekamu pulogulamu ebirungi ebingi nti kiriba kirabika okuddamu okuwandiisa omwaka ogujja."
+          }
+        },
+        "buttonText": "Ka tugende"
+      },
+      "LoadingCard": {
+        "title": "Tukola ku kaadi yo",
+        "subtitle": "Tujja kukumanya nga efunze",
+        "codingBackend": "...kukola backend",
+        "buttonText": "Kirungi"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Tukusanyukidde okuba ekitundu kya Blink",
+          "paragraphs": {
+            "body1": "Nga tetunnaba kukungaanya ssente endala okuva mu bateekamusaako ab'obukugu, twasalawo okugaza okuyita eri ab'omuka wa Blink, abakozesa baffe abakulu n'abawagizi. Lwaki twandireetera abannaggwanga bwe tusobola okusooka okuyita omuntu ng'ogwe?",
+            "body2": "Kino kiyitira ky'obwannannyini. Tosaasaanya wadde okugabana mu lujjudde."
+          }
+        },
+        "buttonText": "Weyongere"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ssente mmeka z'oyagala okuteekawo?",
+        "percent": "ku ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Omuwendo gw'kkampuni",
+          "paragraphs": {
+            "body1": "Mu kuzuula kuno okw'okuteekawo, omuwendo gwa Blink nga temunnaba kufuna ssente guli $10 miliyoni.",
+            "body2": "Tusobola okukuŋŋaanya ssente ku bbeeyi ennene okuva mu VC. Naye tulaba ebirungi eby'okuwakana eby'ekiseera ekiwanvu mu kukola wamu n'abakozesa baffe abakugu. Kale, tukuwa omukisa guno ku mbeera ennungi."
+          }
+        },
+        "buttonText": "Kitegeeredwa"
+      },
+      "TermSheet": {
+        "title": "Olupapula lw'Amateeka",
+        "equitySection": {
+          "title": "Ekitundu mu Blink",
+          "investment": "Okuteekawo $10,000",
+          "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
+          "units": "Ofuna ebitundu 10,000 ~0.1% ebya Blink"
+        },
+        "creditBoostSection": {
+          "title": "Okwongera Ekkreditta",
+          "totalCredit": "Ekkreditta yonna $11,000"
+        },
+        "buttonText": "Weyongere Okusayina"
+      },
+      "TransferInvest": {
+        "title": "Sindika ebintu byo",
+        "paragraphs": {
+          "body1": "Osaainye endagaano ey'okuwandiisa ebitundu 10,000 mu Blink.",
+          "body2": "Kiseera okusindika ssente z'okuteekawo eza $10,000. Olisasula ne Bitcoin."
+        },
+        "buttonText": "Weyongere"
+      },
+      "TopUp": {
+        "title": "Jjuzuza",
+        "qrTitle": "Ssente tezimala mu Blink wallet yo.\nJjuzuza obunene bwa {minAmount: string}.",
+        "copy": "Koppa",
+        "share": "Gabana",
+        "placeholder": "Teeka omuwendo"
+      },
+      "PersonalInformation": {
+        "title": "Olugendo olw'enkomerero",
+        "fields": {
+          "occupation": {
+            "label": "Omulimu",
+            "placeholder": "Londa omulimu gwo"
+          },
+          "annualSalaryRange": {
+            "label": "Omusaala gw'omwaka",
+            "placeholder": "Londa ebbanga ly'omusaala gwo"
+          },
+          "accountPurpose": {
+            "label": "Ekigendererwa ky'akawunti",
+            "placeholder": "Londa ekigendererwa"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Enfuna ey'omwezi esuubirwa",
+            "placeholder": "Londa ebbanga ly'enfuna yo"
+          }
+        },
+        "buttonText": "Sindika esabibu",
+        "select": "londa"
+      },
+      "CardPreapproved": {
+        "title": "Okakasiddwa okusookera ku kaadi ya Blink Visa!",
+        "buttonText": "Ggalawo"
+      },
+      "CardProcessing": {
+        "title": "Tukola ku sabiibu yo",
+        "subtitle": "Obudde obw'okulinda obusuubirwa: {waitTime: string}",
+        "buttonText": "Ggala"
+      }
     }
   }
 }

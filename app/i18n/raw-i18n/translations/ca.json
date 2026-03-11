@@ -3295,6 +3295,154 @@
         "bullet2": "Hauràs d'activar la targeta física quan arribi",
         "bullet3": "Totes dues targetes tindran el mateix número i dades"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Subscriure",
+        "paymentTitle": "Pagament",
+        "acceptButton": "Acceptar",
+        "payButton": "Continuar i Pagar",
+        "cardTitle": "Blink Privat",
+        "perYear": "per any",
+        "status": {
+          "label": "Estat",
+          "paymentPending": "Pagament Pendent",
+          "firstYearFree": "Primer any gratuït"
+        },
+        "renewalDate": {
+          "label": "Data de renovació"
+        },
+        "agreement": {
+          "text": "Accepto els",
+          "termsOfService": "Termes del Servei",
+          "privacyPolicy": "Política de Privacitat",
+          "cardholderAgreement": "Acord del Titular de la Targeta",
+          "and": "i"
+        },
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en 1 any"
+      },
+      "CardIntroducing": {
+        "title": "Presentant",
+        "cardInfo": {
+          "bitcoinCard": "La targeta Visa de Blink",
+          "for": "per a",
+          "maximalist": "Bitcoin Maximalistes"
+        },
+        "buttonText": "Continuar"
+      },
+      "CardDetails": {
+        "title": "Avantatges addicionals",
+        "features": {
+          "accountManager": "Gestor de comptes dedicat",
+          "support": "Suport prioritari",
+          "onchainDeposits": "50% de reemborsament en comissions de transacció",
+          "circularEconomies": "100$ per a economies circulars"
+        },
+        "andMore": "... i més per venir el 2026",
+        "buttonText": "Continuar"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Benvingut a bord",
+          "subtitle": "A Blink Privat",
+          "paragraphs": {
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+          }
+        },
+        "buttonText": "Anem-hi"
+      },
+      "LoadingCard": {
+        "title": "Estem treballant en la teva targeta",
+        "subtitle": "Et notificarem quan estigui llesta",
+        "codingBackend": "...programant el backend",
+        "buttonText": "Genial"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Benvingut a formar part de Blink",
+          "paragraphs": {
+            "body1": "Abans de recaptar més fons d'inversors professionals, hem decidit estendre una invitació a la família Blink, els nostres superusuaris i seguidors. Per què portar desconeguts quan podem convidar primer algú com tu?",
+            "body2": "Aquesta és una invitació personal. Si us plau, no la reenviïs ni comparteixis públicament."
+          }
+        },
+        "buttonText": "Continuar"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Quant t'agradaria invertir?",
+        "percent": "per ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Valoració de l'empresa",
+          "paragraphs": {
+            "body1": "En aquesta ronda d'inversió, la valoració pre-money de Blink és de 10 milions de dòlars.",
+            "body2": "Podríem recaptar a un preu més alt dels inversors de capital risc. No obstant això, veiem beneficis mutus a llarg termini en associar-nos amb els nostres superusuaris. Per tant, estem oferint aquesta oferta en millors condicions per a tu."
+          }
+        },
+        "buttonText": "Entesos"
+      },
+      "TermSheet": {
+        "title": "Full de Termes",
+        "equitySection": {
+          "title": "Participació a Blink",
+          "investment": "Inversió de $10,000",
+          "valuation": "Amb valoració pre-money de $10M",
+          "units": "Reps 10,000 unitats ~0.1% de Blink"
+        },
+        "creditBoostSection": {
+          "title": "Impuls de Crèdit",
+          "totalCredit": "Crèdit Total de $11,000"
+        },
+        "buttonText": "Procedir a Signar"
+      },
+      "TransferInvest": {
+        "title": "Transfereix la teva inversió",
+        "paragraphs": {
+          "body1": "Has signat l'acord de subscripció per 10,000 unitats a Blink.",
+          "body2": "És el moment de transferir l'import d'inversió de $10,000. Pagaràs amb Bitcoin."
+        },
+        "buttonText": "Continuar"
+      },
+      "TopUp": {
+        "title": "Recarregar",
+        "qrTitle": "Fons insuficients a la teva cartera Blink.\nRecàrrega un mínim de {minAmount: string}.",
+        "copy": "Copiar",
+        "share": "Compartir",
+        "placeholder": "Establir import"
+      },
+      "PersonalInformation": {
+        "title": "Últim pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupació",
+            "placeholder": "Selecciona la teva ocupació"
+          },
+          "annualSalaryRange": {
+            "label": "Salari anual",
+            "placeholder": "Selecciona el teu rang salarial"
+          },
+          "accountPurpose": {
+            "label": "Propòsit del compte",
+            "placeholder": "Selecciona el propòsit"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Despesa mensual esperada",
+            "placeholder": "Selecciona el teu rang de despesa"
+          }
+        },
+        "buttonText": "Enviar sol·licitud",
+        "select": "seleccionar"
+      },
+      "CardPreapproved": {
+        "title": "Has estat preaprovat per a la targeta Blink Visa!",
+        "buttonText": "Tancar"
+      },
+      "CardProcessing": {
+        "title": "Processant la teva sol·licitud",
+        "subtitle": "Temps d'espera estimat: {waitTime: string}",
+        "buttonText": "Tancar"
+      }
     }
   }
 }

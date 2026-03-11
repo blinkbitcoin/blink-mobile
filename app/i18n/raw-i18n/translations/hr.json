@@ -3336,6 +3336,154 @@
         "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
         "bullet3": "Obje kartice imat će isti broj i podatke"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Pretplatiti se",
+        "paymentTitle": "Plaćanje",
+        "acceptButton": "Prihvati",
+        "payButton": "Nastavi i Plati",
+        "cardTitle": "Blink Privatni",
+        "perYear": "godišnje",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Plaćanje na Čekanju",
+          "firstYearFree": "Prva godina besplatno"
+        },
+        "renewalDate": {
+          "label": "Datum obnove"
+        },
+        "agreement": {
+          "text": "Prihvaćam",
+          "termsOfService": "Uvjete korištenja",
+          "privacyPolicy": "Politiku privatnosti",
+          "cardholderAgreement": "Ugovor vlasnika kartice",
+          "and": "i"
+        },
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za 1 godinu"
+      },
+      "CardIntroducing": {
+        "title": "Predstavljamo",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa kartica",
+          "for": "za",
+          "maximalist": "Bitcoin Maksimaliste"
+        },
+        "buttonText": "Nastavi"
+      },
+      "CardDetails": {
+        "title": "Dodatne pogodnosti",
+        "features": {
+          "accountManager": "Posvećeni upravitelj računa",
+          "support": "Prioritetna podrška",
+          "onchainDeposits": "50% povrata na naknade za transakcije",
+          "circularEconomies": "100 $ za kružne ekonomije"
+        },
+        "andMore": "... i još toga dolazi 2026.",
+        "buttonText": "Nastavi"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Dobrodošli na brod",
+          "subtitle": "U Blink Privatni",
+          "paragraphs": {
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+          }
+        },
+        "buttonText": "Idemo"
+      },
+      "LoadingCard": {
+        "title": "Radimo na vašoj kartici",
+        "subtitle": "Obavijestit ćemo vas kad bude gotova",
+        "codingBackend": "...kodiramo backend",
+        "buttonText": "Super"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Dobrodošli da postanete dio Blinka",
+          "paragraphs": {
+            "body1": "Prije nego što prikupimo više sredstava od profesionalnih investitora, odlučili smo proširiti pozivnicu obitelji Blink, našim superkorisnicima i podržavateljima. Zašto dovoditi strance kad prvo možemo pozvati nekoga poput vas?",
+            "body2": "Ovo je osobna pozivnica. Molimo ne prosljeđujte je i ne dijelite javno."
+          }
+        },
+        "buttonText": "Nastavi"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Procjena tvrtke",
+          "paragraphs": {
+            "body1": "U ovom investicijskom krugu, pre-money procjena Blinka je 10 milijuna dolara.",
+            "body2": "Mogli bismo prikupiti sredstva po višoj cijeni od VC-ova. Međutim, vidimo dugoročne obostrane koristi u partnerstvu s našim superkorisnicima. Stoga vam nudimo ovu ponudu pod boljim uvjetima."
+          }
+        },
+        "buttonText": "Razumijem"
+      },
+      "TermSheet": {
+        "title": "Uvjeti",
+        "equitySection": {
+          "title": "Udio u Blinku",
+          "investment": "Ulaganje od $10,000",
+          "valuation": "Uz pre-money procjenu od $10M",
+          "units": "Primate 10,000 jedinica ~0.1% Blinka"
+        },
+        "creditBoostSection": {
+          "title": "Pojačanje kredita",
+          "totalCredit": "Ukupni kredit $11,000"
+        },
+        "buttonText": "Nastavi na Potpis"
+      },
+      "TransferInvest": {
+        "title": "Prenesite svoje ulaganje",
+        "paragraphs": {
+          "body1": "Potpisali ste ugovor o pretplati za 10,000 jedinica u Blinku.",
+          "body2": "Vrijeme je za prijenos iznosa ulaganja od $10,000. Platit ćete Bitcoinom."
+        },
+        "buttonText": "Nastavi"
+      },
+      "TopUp": {
+        "title": "Nadoplata",
+        "qrTitle": "Nedovoljno sredstava u vašem Blink novčaniku.\nNadoplatite minimalno {minAmount: string}.",
+        "copy": "Kopiraj",
+        "share": "Podijeli",
+        "placeholder": "Postavi iznos"
+      },
+      "PersonalInformation": {
+        "title": "Posljednji korak",
+        "fields": {
+          "occupation": {
+            "label": "Zanimanje",
+            "placeholder": "Odaberite svoje zanimanje"
+          },
+          "annualSalaryRange": {
+            "label": "Godišnja plaća",
+            "placeholder": "Odaberite svoj raspon plaće"
+          },
+          "accountPurpose": {
+            "label": "Svrha računa",
+            "placeholder": "Odaberite svrhu"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očekivana mjesečna potrošnja",
+            "placeholder": "Odaberite svoj raspon potrošnje"
+          }
+        },
+        "buttonText": "Pošalji prijavu",
+        "select": "odaberi"
+      },
+      "CardPreapproved": {
+        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "buttonText": "Zatvori"
+      },
+      "CardProcessing": {
+        "title": "Obrađujemo vašu prijavu",
+        "subtitle": "Procijenjeno vrijeme čekanja: {waitTime: string}",
+        "buttonText": "Zatvori"
+      }
     }
   }
 }

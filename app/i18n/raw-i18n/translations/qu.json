@@ -3333,6 +3333,154 @@
         "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
         "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Qillqakuy",
+        "paymentTitle": "Pagay",
+        "acceptButton": "Chaskiy",
+        "payButton": "Ñawpaqman rispa Pagay",
+        "cardTitle": "Blink Sapalla",
+        "perYear": "watanpi",
+        "status": {
+          "label": "Kayninpi",
+          "paymentPending": "Pagay Suyachkan",
+          "firstYearFree": "Ñawpaq wata qhasilla"
+        },
+        "renewalDate": {
+          "label": "Musuqyachiy punchaw"
+        },
+        "agreement": {
+          "text": "Ari nispa nisani",
+          "termsOfService": "Yanapay Kamachikuykuna",
+          "privacyPolicy": "Pakasqa Kamachikuy",
+          "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
+          "and": "chaymanta"
+        },
+        "renew": "Entiendeni qillqakuyniyta kikinmanta musuqyachinqa 1 watapi"
+      },
+      "CardIntroducing": {
+        "title": "Riqsichispa",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa tarjeta",
+          "for": "kaqpaq",
+          "maximalist": "Bitcoin Maximalistakuna"
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "CardDetails": {
+        "title": "Yapay allinkunakuna",
+        "features": {
+          "accountManager": "Sapaq kawaq akawuntapaq",
+          "support": "Ñawpaq yanapay",
+          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
+          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+        },
+        "andMore": "... astawanraq 2026-pi hamushan",
+        "buttonText": "Ñawpaqman"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Allin hamusqa",
+          "subtitle": "Blink Sapallaman",
+          "paragraphs": {
+            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Sapallaman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
+            "body2": "2026 watapaq munayninchisqa programata allin kaqkunawan huntachiymi, chayna hamuq watapi musuqyachinapaq allinmi kanqa."
+          }
+        },
+        "buttonText": "Haku"
+      },
+      "LoadingCard": {
+        "title": "Tarjetaykipi llamkachkayku",
+        "subtitle": "Willasqayku listona kaptinña",
+        "codingBackend": "...backend-ta programachkayku",
+        "buttonText": "Allinmi"
+      },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Allin hamusqa Blink-pa huk rakiynin kanaykipaq",
+          "paragraphs": {
+            "body1": "Profesional inversionistakuna qullqita huñunaykumantaqa ñawpaqta Blink aylluta waqyayta munarqayku. Imaraykutaq mana riqsisqa runakunata pusamanchis ñawpaqta qan hina runata waqyaspa?",
+            "body2": "Kayqa sapalla waqyaymin. Ama kachaychu nitaq runakunaman quychu."
+          }
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hayk'ata invertiy munawaq?",
+        "percent": "~{percent: number}%-paq"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Empresa chaninchaynin",
+          "paragraphs": {
+            "body1": "Kay inversión muyupi, Blink-pa pre-money chaninchaynin $10 millón.",
+            "body2": "VCkunamanta aswan chaniyuq preciowan qullqita huñuchiykuman. Ichaqa, superusuariukunawan llamk'aspa unay pachapaq iskayninchikpaq allin kaqkunata rikuschkaniku. Chayrayku, kay ufricimiyntuta aswan allin condicionkunawan qanpaq rikhurichischkaniku."
+          }
+        },
+        "buttonText": "Entiendeni"
+      },
+      "TermSheet": {
+        "title": "Kamachikuy Qillqa",
+        "equitySection": {
+          "title": "Rakiy Blink-pi",
+          "investment": "$10,000 Invertiy",
+          "valuation": "$10M pre-money chaninchaypi",
+          "units": "10,000 rakinkunata chaskiwaq ~0.1% Blink-manta"
+        },
+        "creditBoostSection": {
+          "title": "Crédito Hatunchay",
+          "totalCredit": "$11,000 Tukuy Crédito"
+        },
+        "buttonText": "Ñawpaqman Firmaman"
+      },
+      "TransferInvest": {
+        "title": "Invertiyniykita apachiy",
+        "paragraphs": {
+          "body1": "10,000 rakikunapaq suscripción rimanakuyta firmarqanki Blink-pi.",
+          "body2": "Kunanmi $10,000 invertiy qullqita apachinay pacha. Bitcoin-wan pagankí."
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "TopUp": {
+        "title": "Huntachiy",
+        "qrTitle": "Mana allin qullqi Blink billetera-ykipi.\nHuntachiy {minAmount: string} aswan pisita.",
+        "copy": "Kopiyay",
+        "share": "Rakiy",
+        "placeholder": "Qullqita churay"
+      },
+      "PersonalInformation": {
+        "title": "Qhipa taki",
+        "fields": {
+          "occupation": {
+            "label": "Llamk'ay",
+            "placeholder": "Llamk'ayniykita akllay"
+          },
+          "annualSalaryRange": {
+            "label": "Watantin qullqi",
+            "placeholder": "Qullqi rakinniykita akllay"
+          },
+          "accountPurpose": {
+            "label": "Akawunta munay",
+            "placeholder": "Munayniyta akllay"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Killapi gastay suyasqa",
+            "placeholder": "Gastay rakinniykita akllay"
+          }
+        },
+        "buttonText": "Mañakuyta apachiy",
+        "select": "akllay"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
+        "buttonText": "Wisq'ay"
+      },
+      "CardProcessing": {
+        "title": "Mañakuyniykita rurachkanku",
+        "subtitle": "Suyay pacha: {waitTime: string}",
+        "buttonText": "Wisq'ay"
+      }
     }
   }
 }
