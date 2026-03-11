@@ -60,9 +60,12 @@ import Note from "@app/assets/icons/note.svg"
 import People from "@app/assets/icons/people.svg"
 import Rank from "@app/assets/icons/rank.svg"
 import Refresh from "@app/assets/icons/refresh.svg"
+import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
+import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import Welcome from "@app/assets/icons-redesign/welcome.svg"
-import Calculator from "@app/assets/icons-redesign/calculator.svg"
 import Calendar from "@app/assets/icons-redesign/calendar.svg"
 import DocumentIcon from "@app/assets/icons-redesign/document.svg"
 import KeyIcon from "@app/assets/icons-redesign/key.svg"
@@ -165,8 +168,11 @@ export const icons = {
   "google-pay": GooglePay,
   "apple-pay": ApplePay,
   "approved": Approved,
+  "btc-hand": BtcHand,
+  "check-badge": CheckBadge,
   "delivery": Delivery,
   "error": ErrorIcon,
+  "heart-outline": HeartOutline,
   "shield": Shield,
 } as const
 
