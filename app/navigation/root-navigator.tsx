@@ -88,6 +88,7 @@ import { TransactionHistoryScreen } from "../screens/transaction-history/transac
 
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import { headerCloseControl } from "@app/components/header-close-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -104,6 +105,23 @@ import {
   CardStatusScreen,
   CardTransactionDetailsScreen,
 } from "@app/screens/card-screen"
+import {
+  CardIntroducingScreen,
+  CardDetailsScreen as OnboardingCardDetailsScreen,
+  WelcomeOnboardScreen,
+  CardSubscriptionScreen,
+  LoadingCardScreen,
+  WelcomeInvestScreen,
+  SelectInvestScreen,
+  TermSheetScreen,
+  TransferInvestScreen,
+  TopUpScreen,
+  CompanyValuationScreen,
+  CardPersonalInformationScreen,
+  CardPreapprovedScreen,
+  CardProcessingScreen,
+  CardApprovedScreen,
+} from "@app/screens/card-screen/onboarding"
 import {
   WelcomeLevel1Screen,
   EmailBenefitsScreen,
@@ -131,8 +149,7 @@ export const RootStack = () => {
   } = useTheme()
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-  const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -597,6 +614,136 @@ export const RootStack = () => {
         name="onboarding"
         component={OnboardingNavigator}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingIntroducingScreen"
+        component={CardIntroducingScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardIntroducing.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDetailsScreen"
+        component={OnboardingCardDetailsScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardDetails.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingWelcomeScreen"
+        component={WelcomeOnboardScreen}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingSubscribeScreen"
+        component={CardSubscriptionScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPaymentScreen"
+        component={CardSubscriptionScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardSubscription.paymentTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingLoadingScreen"
+        component={LoadingCardScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingWelcomeInvestScreen"
+        component={WelcomeInvestScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingCompanyValuationScreen"
+        component={CompanyValuationScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingSelectInvestScreen"
+        component={SelectInvestScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTermSheetScreen"
+        component={TermSheetScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.TermSheet.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTransferInvestScreen"
+        component={TransferInvestScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTopUpScreen"
+        component={TopUpScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.TopUp.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPersonalInfoScreen"
+        component={CardPersonalInformationScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.PersonalInformation.title(),
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingProcessingScreen"
+        component={CardProcessingScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPreapprovedScreen"
+        component={CardPreapprovedScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingApprovedScreen"
+        component={CardApprovedScreen}
+        options={{
+          title: LL.CardFlow.CardStatus.title(),
+          headerRight: headerCloseControl(),
+        }}
       />
     </RootNavigator.Navigator>
   )
