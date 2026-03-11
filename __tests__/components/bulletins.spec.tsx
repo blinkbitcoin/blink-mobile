@@ -3,6 +3,7 @@ import { Text as ReactNativeText, TouchableOpacity, View, Linking } from "react-
 import { render, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { BulletinsCard } from "@app/components/notifications/bulletins"
+import { testBulletinsStore } from "@app/components/notifications/test-bulletins-store"
 import { BulletinsQuery, Icon } from "@app/graphql/generated"
 
 const mockAck = jest.fn(() => Promise.resolve())
@@ -112,6 +113,7 @@ const makeBulletinsQuery = (
 
 beforeEach(() => {
   jest.clearAllMocks()
+  testBulletinsStore.clear()
 })
 
 describe("BulletinsCard", () => {
@@ -239,5 +241,151 @@ describe("BulletinsCard", () => {
     const { toJSON } = render(<BulletinsCard loading={false} bulletins={undefined} />)
 
     expect(toJSON()).toBeNull()
+  })
+
+  describe("test bulletins (__DEV__)", () => {
+    it("renders test bulletins when no real bulletins exist", () => {
+      testBulletinsStore.add({
+        id: "test-1",
+        title: "Test Notification",
+        body: "This is a test",
+        type: "none",
+      })
+
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      expect(getByText("Test Notification")).toBeTruthy()
+      expect(getByText("This is a test")).toBeTruthy()
+    })
+
+    it("renders test bulletins alongside real bulletins", () => {
+      testBulletinsStore.add({
+        id: "test-1",
+        title: "Dev Bulletin",
+        body: "Dev body",
+        type: "none",
+      })
+
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "real-1", title: "Real Bulletin" }),
+      ])
+
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(getByText("Real Bulletin")).toBeTruthy()
+      expect(getByText("Dev Bulletin")).toBeTruthy()
+    })
+
+    it("renders icon for deep-link test bulletin", () => {
+      testBulletinsStore.add({
+        id: "test-dl",
+        title: "Deep Link Test",
+        body: "Tap to open",
+        icon: "bitcoin",
+        type: "deep-link",
+        deepLink: "card/onboarding",
+      })
+
+      const { getByText, queryByTestId } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      expect(getByText("Deep Link Test")).toBeTruthy()
+      expect(queryByTestId("galoy-icon-bitcoin")).toBeTruthy()
+    })
+
+    it("opens deep link on test bulletin action press", async () => {
+      testBulletinsStore.add({
+        id: "test-dl",
+        title: "Deep Link Test",
+        body: "Tap to open",
+        type: "deep-link",
+        deepLink: "card/onboarding",
+      })
+
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      fireEvent.press(getByText("Deep Link Test"))
+
+      await waitFor(() => {
+        expect(Linking.openURL).toHaveBeenCalledWith("blink:/card/onboarding")
+      })
+    })
+
+    it("opens external URL on test bulletin action press", async () => {
+      testBulletinsStore.add({
+        id: "test-ext",
+        title: "External Test",
+        body: "Tap to visit",
+        type: "external-link",
+        url: "https://www.blink.sv",
+      })
+
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      fireEvent.press(getByText("External Test"))
+
+      await waitFor(() => {
+        expect(Linking.openURL).toHaveBeenCalledWith("https://www.blink.sv")
+      })
+    })
+
+    it("removes test bulletin on dismiss", async () => {
+      testBulletinsStore.add({
+        id: "test-dismiss",
+        title: "Dismissable",
+        body: "Dismiss me",
+        type: "none",
+      })
+
+      const { getByTestId } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      fireEvent.press(getByTestId("icon-button-close"))
+
+      await waitFor(() => {
+        expect(testBulletinsStore.getSnapshot()).toEqual([])
+      })
+    })
+
+    it("does not render button for no-action test bulletin", () => {
+      testBulletinsStore.add({
+        id: "test-none",
+        title: "No Action",
+        body: "Just info",
+        type: "none",
+      })
+
+      const { queryByTestId } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      expect(queryByTestId("primary-button")).toBeNull()
+    })
+
+    it("renders icon for test bulletin with icon", () => {
+      testBulletinsStore.add({
+        id: "test-icon",
+        title: "With Icon",
+        body: "Has icon",
+        icon: "info",
+        type: "none",
+      })
+
+      const { queryByTestId } = render(
+        <BulletinsCard loading={false} bulletins={undefined} />,
+      )
+
+      expect(queryByTestId("galoy-icon-info")).toBeTruthy()
+    })
   })
 })

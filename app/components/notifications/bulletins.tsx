@@ -4,6 +4,7 @@ import { useApolloClient } from "@apollo/client"
 
 import { useNotifications } from "."
 import { NotificationCardUI } from "./notification-card-ui"
+import { testBulletinsStore, useTestBulletins } from "./test-bulletins-store"
 import { useDropInOutAnimation } from "@app/components/animations"
 import {
   BulletinsDocument,
@@ -29,6 +30,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
   const { cardInfo } = useNotifications()
   const [dismissing, setDismissing] = React.useState(false)
   const client = useApolloClient()
+  const testBulletins = useTestBulletins()
 
   const [ack, { loading: ackLoading }] = useStatefulNotificationAcknowledgeMutation()
 
@@ -56,17 +58,19 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
     bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges &&
     bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.length > 0
 
+  const hasTestBulletins = __DEV__ && testBulletins.length > 0
+
   const { opacity, translateY } = useDropInOutAnimation({
-    visible: Boolean(hasBulletins) && !dismissing,
+    visible: (Boolean(hasBulletins) || hasTestBulletins) && !dismissing,
     ...BULLETIN_ANIMATION,
   })
 
   if (loading) return null
 
-  if (hasBulletins) {
+  if (hasBulletins || hasTestBulletins) {
     return (
       <Animated.View style={{ opacity, transform: [{ translateY }] }}>
-        {bulletins.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.map(
+        {bulletins?.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.map(
           ({ node: bulletin }) => (
             <NotificationCardUI
               icon={
@@ -90,6 +94,22 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
             />
           ),
         )}
+        {hasTestBulletins &&
+          testBulletins.map((bulletin) => (
+            <NotificationCardUI
+              key={bulletin.id}
+              title={bulletin.title}
+              text={bulletin.body}
+              icon={bulletin.icon}
+              action={async () => {
+                if (bulletin.type === "deep-link")
+                  Linking.openURL(BLINK_DEEP_LINK_PREFIX + bulletin.deepLink)
+                if (bulletin.type === "external-link") Linking.openURL(bulletin.url)
+                testBulletinsStore.remove(bulletin.id)
+              }}
+              dismissAction={() => testBulletinsStore.remove(bulletin.id)}
+            />
+          ))}
       </Animated.View>
     )
   }
