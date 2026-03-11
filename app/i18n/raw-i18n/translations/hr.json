@@ -3399,6 +3399,59 @@
         "codingBackend": "...kodiramo backend",
         "buttonText": "Super"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Dobrodošli da postanete dio Blinka",
+          "paragraphs": {
+            "body1": "Prije nego što prikupimo više sredstava od profesionalnih investitora, odlučili smo proširiti pozivnicu obitelji Blink, našim superkorisnicima i podržavateljima. Zašto dovoditi strance kad prvo možemo pozvati nekoga poput vas?",
+            "body2": "Ovo je osobna pozivnica. Molimo ne prosljeđujte je i ne dijelite javno."
+          }
+        },
+        "buttonText": "Nastavi"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Procjena tvrtke",
+          "paragraphs": {
+            "body1": "U ovom investicijskom krugu, pre-money procjena Blinka je 10 milijuna dolara.",
+            "body2": "Mogli bismo prikupiti sredstva po višoj cijeni od VC-ova. Međutim, vidimo dugoročne obostrane koristi u partnerstvu s našim superkorisnicima. Stoga vam nudimo ovu ponudu pod boljim uvjetima."
+          }
+        },
+        "buttonText": "Razumijem"
+      },
+      "TermSheet": {
+        "title": "Uvjeti",
+        "equitySection": {
+          "title": "Udio u Blinku",
+          "investment": "Ulaganje od $10,000",
+          "valuation": "Uz pre-money procjenu od $10M",
+          "units": "Primate 10,000 jedinica ~0.1% Blinka"
+        },
+        "creditBoostSection": {
+          "title": "Pojačanje kredita",
+          "totalCredit": "Ukupni kredit $11,000"
+        },
+        "buttonText": "Nastavi na Potpis"
+      },
+      "TransferInvest": {
+        "title": "Prenesite svoje ulaganje",
+        "paragraphs": {
+          "body1": "Potpisali ste ugovor o pretplati za 10,000 jedinica u Blinku.",
+          "body2": "Vrijeme je za prijenos iznosa ulaganja od $10,000. Platit ćete Bitcoinom."
+        },
+        "buttonText": "Nastavi"
+      },
+      "TopUp": {
+        "title": "Nadoplata",
+        "qrTitle": "Nedovoljno sredstava u vašem Blink novčaniku.\nNadoplatite minimalno {minAmount: string}.",
+        "copy": "Kopiraj",
+        "share": "Podijeli",
+        "placeholder": "Postavi iznos"
+      },
       "PersonalInformation": {
         "title": "Posljednji korak",
         "fields": {

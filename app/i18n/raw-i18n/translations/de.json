@@ -3377,6 +3377,59 @@
                 "title": "Dein Antrag wird bearbeitet",
                 "subtitle": "Geschätzte Wartezeit: {waitTime: string}",
                 "buttonText": "Schließen"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Willkommen, werde Teil von Blink",
+                    "paragraphs": {
+                        "body1": "Bevor wir weitere Mittel von professionellen Investoren einwerben, haben wir beschlossen, eine Einladung an die Blink-Familie, unsere Supernutzer und Unterstützer, auszusprechen. Warum Fremde an Bord holen, wenn wir zuerst jemanden wie dich einladen können?",
+                        "body2": "Dies ist eine persönliche Einladung. Bitte leite sie nicht weiter und teile sie nicht öffentlich."
+                    }
+                },
+                "buttonText": "Weiter"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "Wie viel möchtest du investieren?",
+                "percent": "für ~{percent: number}%"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "Unternehmensbewertung",
+                    "paragraphs": {
+                        "body1": "In dieser Investitionsrunde beträgt die Pre-Money-Bewertung von Blink 10 Millionen Dollar.",
+                        "body2": "Wir könnten zu einem höheren Preis von VCs Kapital aufnehmen. Wir sehen jedoch langfristige gegenseitige Vorteile in der Partnerschaft mit unseren Supernutzern. Daher bieten wir dieses Angebot zu besseren Konditionen für dich an."
+                    }
+                },
+                "buttonText": "Verstanden"
+            },
+            "TermSheet": {
+                "title": "Termsheet",
+                "equitySection": {
+                    "title": "Beteiligung an Blink",
+                    "investment": "$10.000 Investition",
+                    "valuation": "Bei $10M Pre-Money-Bewertung",
+                    "units": "Du erhältst 10.000 Einheiten ~0,1% von Blink"
+                },
+                "creditBoostSection": {
+                    "title": "Kredit-Boost",
+                    "totalCredit": "$11.000 Gesamtkredit"
+                },
+                "buttonText": "Weiter zur Unterschrift"
+            },
+            "TransferInvest": {
+                "title": "Übertrage deine Investition",
+                "paragraphs": {
+                    "body1": "Du hast die Zeichnungsvereinbarung über 10.000 Einheiten in Blink unterzeichnet.",
+                    "body2": "Es ist Zeit, den Investitionsbetrag von $10.000 zu überweisen. Du zahlst mit Bitcoin."
+                },
+                "buttonText": "Weiter"
+            },
+            "TopUp": {
+                "title": "Aufladen",
+                "qrTitle": "Unzureichende Mittel in deiner Blink-Wallet.\nMindestaufladung von {minAmount: string}.",
+                "copy": "Kopieren",
+                "share": "Teilen",
+                "placeholder": "Betrag festlegen"
             }
         }
     }

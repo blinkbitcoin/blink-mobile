@@ -3396,6 +3396,59 @@
         "codingBackend": "...đang viết mã backend",
         "buttonText": "Tuyệt"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Chào mừng bạn trở thành một phần của Blink",
+          "paragraphs": {
+            "body1": "Trước khi huy động thêm vốn từ các nhà đầu tư chuyên nghiệp, chúng tôi quyết định gửi lời mời đến gia đình Blink, những người dùng cao cấp và người ủng hộ của chúng tôi. Tại sao mời người lạ khi chúng tôi có thể mời ai đó như bạn trước?",
+            "body2": "Đây là lời mời cá nhân. Vui lòng không chuyển tiếp hoặc chia sẻ công khai."
+          }
+        },
+        "buttonText": "Tiếp tục"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Bạn muốn đầu tư bao nhiêu?",
+        "percent": "cho ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Định giá công ty",
+          "paragraphs": {
+            "body1": "Trong vòng đầu tư này, định giá trước khi gọi vốn của Blink là 10 triệu đô la.",
+            "body2": "Chúng tôi có thể huy động vốn với giá cao hơn từ các quỹ đầu tư mạo hiểm. Tuy nhiên, chúng tôi nhìn thấy lợi ích chung lâu dài trong việc hợp tác với các siêu người dùng của mình. Do đó, chúng tôi đang mở rộng ưu đãi này với các điều khoản tốt hơn cho bạn."
+          }
+        },
+        "buttonText": "Đã hiểu"
+      },
+      "TermSheet": {
+        "title": "Bảng Điều khoản",
+        "equitySection": {
+          "title": "Cổ phần trong Blink",
+          "investment": "Đầu tư $10,000",
+          "valuation": "Ở định giá trước vốn $10M",
+          "units": "Bạn nhận được 10,000 đơn vị ~0,1% của Blink"
+        },
+        "creditBoostSection": {
+          "title": "Tăng Tín dụng",
+          "totalCredit": "Tổng Tín dụng $11,000"
+        },
+        "buttonText": "Tiến hành Ký"
+      },
+      "TransferInvest": {
+        "title": "Chuyển khoản đầu tư của bạn",
+        "paragraphs": {
+          "body1": "Bạn đã ký thỏa thuận đăng ký cho 10,000 đơn vị trong Blink.",
+          "body2": "Đã đến lúc chuyển khoản đầu tư $10,000. Bạn sẽ thanh toán bằng Bitcoin."
+        },
+        "buttonText": "Tiếp tục"
+      },
+      "TopUp": {
+        "title": "Nạp tiền",
+        "qrTitle": "Số dư không đủ trong ví Blink của bạn.\nNạp tối thiểu {minAmount: string}.",
+        "copy": "Sao chép",
+        "share": "Chia sẻ",
+        "placeholder": "Đặt số tiền"
+      },
       "PersonalInformation": {
         "title": "Bước cuối cùng",
         "fields": {

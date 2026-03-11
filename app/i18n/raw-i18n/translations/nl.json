@@ -3399,6 +3399,59 @@
         "codingBackend": "...backend coderen",
         "buttonText": "Mooi"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Welkom om deel uit te maken van Blink",
+          "paragraphs": {
+            "body1": "Voordat we meer fondsen ophalen bij professionele investeerders, hebben we besloten een uitnodiging te sturen aan de Blink-familie, onze supergebruikers en supporters. Waarom vreemden aan boord brengen als we eerst iemand zoals jij kunnen uitnodigen?",
+            "body2": "Dit is een persoonlijke uitnodiging. Stuur deze alsjeblieft niet door en deel het niet openbaar."
+          }
+        },
+        "buttonText": "Doorgaan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hoeveel wil je investeren?",
+        "percent": "voor ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Bedrijfswaardering",
+          "paragraphs": {
+            "body1": "In deze investeringsronde is de pre-money waardering van Blink $10 miljoen.",
+            "body2": "We zouden tegen een hogere prijs kapitaal kunnen ophalen bij durfkapitalisten. We zien echter langetermijn wederzijdse voordelen in een partnerschap met onze supergebruikers. Daarom bieden we dit aanbod aan tegen betere voorwaarden voor jou."
+          }
+        },
+        "buttonText": "Begrepen"
+      },
+      "TermSheet": {
+        "title": "Termsheet",
+        "equitySection": {
+          "title": "Aandeel in Blink",
+          "investment": "$10.000 Investering",
+          "valuation": "Bij $10M pre-money waardering",
+          "units": "Je ontvangt 10.000 eenheden ~0,1% van Blink"
+        },
+        "creditBoostSection": {
+          "title": "Kredietverhoging",
+          "totalCredit": "$11.000 Totaal Krediet"
+        },
+        "buttonText": "Ga naar Ondertekening"
+      },
+      "TransferInvest": {
+        "title": "Draag je investering over",
+        "paragraphs": {
+          "body1": "Je hebt de inschrijvingsovereenkomst voor 10.000 eenheden in Blink ondertekend.",
+          "body2": "Tijd om het investeringsbedrag van $10.000 over te maken. Je betaalt met Bitcoin."
+        },
+        "buttonText": "Doorgaan"
+      },
+      "TopUp": {
+        "title": "Opwaarderen",
+        "qrTitle": "Onvoldoende saldo in je Blink-wallet.\nWaardeer op met minimaal {minAmount: string}.",
+        "copy": "Kopiëren",
+        "share": "Delen",
+        "placeholder": "Bedrag instellen"
+      },
       "PersonalInformation": {
         "title": "Laatste stap",
         "fields": {

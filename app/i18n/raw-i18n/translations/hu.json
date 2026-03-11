@@ -3358,6 +3358,59 @@
         "codingBackend": "...a backend kódolása",
         "buttonText": "Szuper"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Üdvözöljük, legyen a Blink része",
+          "paragraphs": {
+            "body1": "Mielőtt további forrásokat gyűjtünk professzionális befektetőktől, úgy döntöttünk, hogy meghívást küldünk a Blink családnak, szuperfelhasználóinknak és támogatóinknak. Miért hoznánk idegeneket, ha először olyasvalakit hívhatunk meg, mint te?",
+            "body2": "Ez egy személyes meghívó. Kérjük, ne továbbítsd és ne oszd meg nyilvánosan."
+          }
+        },
+        "buttonText": "Tovább"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Mennyit szeretnél befektetni?",
+        "percent": "~{percent: number}%-ért"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Cégértékelés",
+          "paragraphs": {
+            "body1": "Ebben a befektetési körben a Blink pre-money értékelése 10 millió dollár.",
+            "body2": "Magasabb áron is bevonhatnánk tőkét kockázati tőkebefektetőktől. Azonban hosszú távú kölcsönös előnyöket látunk a szuperfelhasználóinkkal való partnerségben. Ezért jobb feltételekkel kínáljuk neked ezt az ajánlatot."
+          }
+        },
+        "buttonText": "Értem"
+      },
+      "TermSheet": {
+        "title": "Feltételek",
+        "equitySection": {
+          "title": "Részesedés a Blinkben",
+          "investment": "$10,000 Befektetés",
+          "valuation": "$10M pre-money értékelésnél",
+          "units": "10,000 egységet kapsz ~0,1%-ot a Blinkből"
+        },
+        "creditBoostSection": {
+          "title": "Hitel Növelés",
+          "totalCredit": "$11,000 Teljes Hitel"
+        },
+        "buttonText": "Tovább az Aláíráshoz"
+      },
+      "TransferInvest": {
+        "title": "Utald át a befektetésedet",
+        "paragraphs": {
+          "body1": "Aláírtad az előfizetési megállapodást 10,000 egységre a Blinkben.",
+          "body2": "Ideje átutalni a $10,000 befektetési összeget. Bitcoinnal fizetsz."
+        },
+        "buttonText": "Tovább"
+      },
+      "TopUp": {
+        "title": "Feltöltés",
+        "qrTitle": "Nincs elegendő egyenleg a Blink tárcádban.\nTölts fel minimum {minAmount: string}-t.",
+        "copy": "Másolás",
+        "share": "Megosztás",
+        "placeholder": "Összeg beállítása"
+      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {

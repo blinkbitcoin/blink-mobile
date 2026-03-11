@@ -3399,6 +3399,59 @@
         "codingBackend": "...kodeer die agterkant",
         "buttonText": "Lekker"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Welkom om deel van Blink te word",
+          "paragraphs": {
+            "body1": "Voordat ons meer fondse van professionele beleggers insamel, het ons besluit om 'n uitnodiging aan die Blink-familie, ons supergebruikers en ondersteuners, te rig. Hoekom vreemdelinge aan boord bring as ons eers iemand soos jy kan nooi?",
+            "body2": "Dit is 'n persoonlike uitnodiging. Moet dit asseblief nie aanstuur of openbaar deel nie."
+          }
+        },
+        "buttonText": "Gaan voort"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hoeveel wil jy belê?",
+        "percent": "vir ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Maatskappywaardasie",
+          "paragraphs": {
+            "body1": "In hierdie beleggingsronde is die pre-geld-waardasie van Blink $10 miljoen.",
+            "body2": "Ons kan teen 'n hoër prys by risikokapitaliste fondse insamel. Ons sien egter langtermyn wedersydse voordele in 'n vennootskap met ons supergebruikers. Daarom bied ons hierdie aanbod teen beter voorwaardes vir jou aan."
+          }
+        },
+        "buttonText": "Verstaan"
+      },
+      "TermSheet": {
+        "title": "Termynstaat",
+        "equitySection": {
+          "title": "Aandeel in Blink",
+          "investment": "$10,000 Belegging",
+          "valuation": "Teen $10M pre-geld-waardasie",
+          "units": "Jy ontvang 10,000 eenhede ~0.1% van Blink"
+        },
+        "creditBoostSection": {
+          "title": "Kredietverhoging",
+          "totalCredit": "$11,000 Totale Krediet"
+        },
+        "buttonText": "Gaan voort om te Teken"
+      },
+      "TransferInvest": {
+        "title": "Dra jou belegging oor",
+        "paragraphs": {
+          "body1": "Jy het die intekeningsooreenkoms vir 10,000 eenhede in Blink onderteken.",
+          "body2": "Dit is tyd om die beleggingsbedrag van $10,000 oor te dra. Jy sal met Bitcoin betaal."
+        },
+        "buttonText": "Gaan voort"
+      },
+      "TopUp": {
+        "title": "Herlaai",
+        "qrTitle": "Onvoldoende fondse in jou Blink-beursie.\nHerlaai minimum van {minAmount: string}.",
+        "copy": "Kopieer",
+        "share": "Deel",
+        "placeholder": "Stel bedrag"
+      },
       "PersonalInformation": {
         "title": "Laaste stap",
         "fields": {
