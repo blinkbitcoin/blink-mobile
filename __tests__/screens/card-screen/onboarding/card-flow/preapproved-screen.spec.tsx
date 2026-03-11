@@ -52,7 +52,7 @@ describe("CardPreapprovedScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("You have been preapproved for the Bitcoin Visa card!")).toBeTruthy()
+    expect(getByText("You have been pre-approved for the Blink Visa card!")).toBeTruthy()
   })
 
   it("displays continue button", async () => {
@@ -64,7 +64,7 @@ describe("CardPreapprovedScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Continue")).toBeTruthy()
+    expect(getByText("Close")).toBeTruthy()
   })
 
   it("navigates to Primary on button press", async () => {
@@ -76,7 +76,7 @@ describe("CardPreapprovedScreen", () => {
 
     await act(async () => {})
 
-    const button = getByText("Continue")
+    const button = getByText("Close")
     await act(async () => {
       fireEvent.press(button)
     })

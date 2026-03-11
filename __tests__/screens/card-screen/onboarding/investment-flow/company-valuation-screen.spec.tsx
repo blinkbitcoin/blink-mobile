@@ -77,7 +77,7 @@ describe("CompanyValuationScreen", () => {
     await act(async () => {})
 
     expect(
-      getByText(/we see long-term value in partnering with our superusers/),
+      getByText(/we see long-term mutual benefits in partnering with our superusers/),
     ).toBeTruthy()
   })
 
