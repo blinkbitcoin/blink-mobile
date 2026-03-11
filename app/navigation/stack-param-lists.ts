@@ -161,6 +161,16 @@ export type RootStackParamList = {
     selectedValue: string
     onSelect: (value: string) => void
   }
+  cardOnboardingIntroducingScreen: undefined
+  cardOnboardingDetailsScreen: undefined
+  cardOnboardingWelcomeScreen: undefined
+  cardOnboardingSubscribeScreen: undefined
+  cardOnboardingPaymentScreen: undefined
+  cardOnboardingLoadingScreen: undefined
+  cardOnboardingPersonalInfoScreen: undefined
+  cardOnboardingPreapprovedScreen: undefined
+  cardOnboardingProcessingScreen: undefined
+  cardOnboardingApprovedScreen: undefined
 }
 
 export type OnboardingStackParamList = {
