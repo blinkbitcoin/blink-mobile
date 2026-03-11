@@ -122,6 +122,12 @@ import {
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
   LoadingCardScreen,
+  WelcomeInvestScreen,
+  SelectInvestScreen,
+  TermSheetScreen,
+  TransferInvestScreen,
+  TopUpScreen,
+  CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
@@ -821,6 +827,55 @@ export const RootStack = () => {
         options={{
           title: "",
           ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingWelcomeInvestScreen"
+        component={WelcomeInvestScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingCompanyValuationScreen"
+        component={CompanyValuationScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingSelectInvestScreen"
+        component={SelectInvestScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTermSheetScreen"
+        component={TermSheetScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.TermSheet.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTransferInvestScreen"
+        component={TransferInvestScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingTopUpScreen"
+        component={TopUpScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.TopUp.title(),
+          headerRight: headerCloseControl(),
         }}
       />
       <RootNavigator.Screen
