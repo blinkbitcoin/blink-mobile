@@ -45,6 +45,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
             bullet1: () => "Your card will be shipped to the address provided",
             bullet2: () => "Delivery times are estimates and may vary",
             bullet3: () => "You will receive a notification when your card ships",
+            bullet4: () => "Shipping address cannot be changed after order is placed",
           },
         },
       },
@@ -75,8 +76,6 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
-
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({}))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
   addressToLines: (address: ShippingAddress, includeFullName = true) => {
