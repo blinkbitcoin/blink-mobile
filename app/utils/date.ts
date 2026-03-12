@@ -109,6 +109,16 @@ export const parseCardValidThru = (
   return null
 }
 
+export const formatDateFromNow = (years: number, locale: string): string => {
+  const date = new Date()
+  date.setFullYear(date.getFullYear() + years)
+  return date.toLocaleDateString(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 export const getLastDayOfMonth = (year: number, month: number): number =>
   new Date(year, month + 1, 0).getDate()
 

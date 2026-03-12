@@ -9,6 +9,7 @@ import { useKycFlow } from "@app/hooks"
 import { KycFlowType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { formatDateFromNow } from "@app/utils/date"
 
 import { MOCK_CARD_PAYMENT } from "../onboarding-mock-data"
 
@@ -16,12 +17,14 @@ const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen
 
 export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
-  const { LL } = useI18nContext()
+  const { LL, locale } = useI18nContext()
   const route = useRoute<RouteProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
   const { startKyc } = useKycFlow({ type: KycFlowType.Card })
+
+  const renewalDate = formatDateFromNow(1, locale)
 
   const [isAgreed, setIsAgreed] = React.useState(false)
   const [isRenew, setIsRenew] = React.useState(false)
@@ -74,7 +77,7 @@ export const CardSubscriptionScreen: React.FC = () => {
               {LL.CardFlow.Onboarding.CardSubscription.renewalDate.label()}
             </Text>
             <Text type="p3" style={styles.value}>
-              {MOCK_CARD_PAYMENT.renewalDate}
+              {renewalDate}
             </Text>
           </View>
         </View>

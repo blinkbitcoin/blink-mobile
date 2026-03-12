@@ -2,6 +2,7 @@ import { it } from "@jest/globals"
 
 import {
   formatCardValidThruDisplay,
+  formatDateFromNow,
   formatMonth,
   formatShortDate,
   getLastDayOfMonth,
@@ -279,6 +280,34 @@ describe("date utils", () => {
     it("respects locale for long month", () => {
       const date = new Date(2025, 0, 15)
       expect(formatMonth("es", date, "long")).toBe("enero")
+    })
+  })
+
+  describe("formatDateFromNow", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date("2026-03-12T12:00:00Z"))
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("returns date 1 year from now", () => {
+      expect(formatDateFromNow(1, "en-US")).toBe("Mar 12, 2027")
+    })
+
+    it("returns date 2 years from now", () => {
+      expect(formatDateFromNow(2, "en-US")).toBe("Mar 12, 2028")
+    })
+
+    it("returns current date for 0 years", () => {
+      expect(formatDateFromNow(0, "en-US")).toBe("Mar 12, 2026")
+    })
+
+    it("handles leap year edge case", () => {
+      jest.setSystemTime(new Date("2024-02-29T12:00:00Z"))
+      expect(formatDateFromNow(1, "en-US")).toBe("Mar 1, 2025")
     })
   })
 })
