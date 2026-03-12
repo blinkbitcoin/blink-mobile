@@ -40,23 +40,11 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_USER: {
-    registeredAddress: {
-      firstName: "Satoshi",
-      lastName: "Nakamoto",
-      line1: "123 Main Street",
-      line2: "Apt 4B",
-      city: "New York",
-      region: "NY",
-      postalCode: "10001",
-      countryCode: "USA",
-    },
-  },
-}))
-
 jest.mock("@app/screens/card-screen/country-region-data", () => ({
   COUNTRIES: [{ value: "USA", label: "United States" }],
+  SUPPORTED_COUNTRIES: [
+    { value: "USA", label: "United States", isoAlpha2: "US", regions: [] },
+  ],
   getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
 }))
 
@@ -91,6 +79,46 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
+const mockCreateCard = jest.fn()
+
+jest.mock("@app/screens/card-screen/hooks", () => ({
+  useCardData: () => ({
+    card: { id: "card-1" },
+    hasPhysicalCard: false,
+    applicationId: "app-123",
+    loading: false,
+    error: undefined,
+    refetch: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
+  useShippingAddressData: () => ({
+    initialAddress: {
+      firstName: "Satoshi",
+      lastName: "Nakamoto",
+      line1: "123 Main Street",
+      line2: "Apt 4B",
+      city: "New York",
+      region: "NY",
+      postalCode: "10001",
+      countryCode: "USA",
+    },
+    loading: false,
+  }),
+}))
+
+jest.mock("@app/screens/card-screen/order-card-screens/hooks", () => {
+  const actual = jest.requireActual("@app/screens/card-screen/order-card-screens/hooks")
+  return {
+    ...actual,
+    useCreateCard: () => ({
+      createCard: mockCreateCard,
+      loading: false,
+    }),
+  }
+})
+
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockAddListener = jest.fn().mockReturnValue(jest.fn())
@@ -112,6 +140,7 @@ describe("OrderCardScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
+    mockCreateCard.mockResolvedValue({ lastFour: "1234", cardType: "PHYSICAL" })
   })
 
   describe("rendering", () => {
@@ -232,7 +261,7 @@ describe("OrderCardScreen", () => {
       expect(getByText("Place order")).toBeTruthy()
     })
 
-    it("submits and navigates to status screen", async () => {
+    it("calls createCard and navigates to status screen on submit", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <OrderCardScreen />
@@ -247,6 +276,21 @@ describe("OrderCardScreen", () => {
         fireEvent.press(getByText("Place order"))
       })
 
+      expect(mockCreateCard).toHaveBeenCalledWith({
+        applicationId: "app-123",
+        shippingAddress: {
+          firstName: "Satoshi",
+          lastName: "Nakamoto",
+          line1: "123 Main Street",
+          line2: "Apt 4B",
+          city: "New York",
+          region: "NY",
+          postalCode: "10001",
+          countryCode: "USA",
+          phoneNumber: "",
+        },
+      })
+
       expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
         title: "Your physical card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
@@ -254,7 +298,29 @@ describe("OrderCardScreen", () => {
         navigateTo: "cardCreatePinScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        lastFour: "1234",
       })
+    })
+
+    it("does not navigate when createCard fails", async () => {
+      mockCreateCard.mockResolvedValue(null)
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await advanceToStep2(getByText)
+
+      await act(async () => {
+        fireEvent.press(getByText("Place order"))
+      })
+
+      expect(mockCreateCard).toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
     })
   })
 
