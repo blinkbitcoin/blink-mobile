@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useMemo } from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -17,12 +17,14 @@ import {
 type ShippingAddressFormProps = {
   address: ShippingAddress
   onAddressChange: (address: ShippingAddress) => void
+  onValidityChange?: (isValid: boolean) => void
   showFullName?: boolean
 }
 
 export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   address,
   onAddressChange,
+  onValidityChange,
   showFullName = true,
 }) => {
   const styles = useStyles()
@@ -38,6 +40,41 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       countryCode: address.countryCode,
       errorMessage: LL.common.validation.invalidPostalCode(),
     })
+
+  const isValid = useMemo(() => {
+    const hasPOBox =
+      validatePOBox({ value: address.line1, errorMessage: "" }) !== undefined ||
+      (address.line2 !== "" &&
+        validatePOBox({ value: address.line2, errorMessage: "" }) !== undefined)
+
+    const hasInvalidPostal =
+      validatePostalCode({
+        value: address.postalCode,
+        countryCode: address.countryCode,
+        errorMessage: "",
+      }) !== undefined
+
+    const hasRequiredFields =
+      address.line1.trim().length >= 5 &&
+      !hasPOBox &&
+      address.city.trim().length >= 2 &&
+      address.region.trim().length > 0 &&
+      address.postalCode.trim().length > 0 &&
+      !hasInvalidPostal &&
+      address.countryCode.trim().length > 0
+
+    if (!showFullName) return hasRequiredFields
+
+    return (
+      hasRequiredFields &&
+      address.firstName.trim().length >= 2 &&
+      address.lastName.trim().length >= 2
+    )
+  }, [address, showFullName])
+
+  useEffect(() => {
+    onValidityChange?.(isValid)
+  }, [isValid, onValidityChange])
 
   const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
     onAddressChange({ ...address, [field]: value })
