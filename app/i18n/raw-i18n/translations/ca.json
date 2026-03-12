@@ -3305,7 +3305,11 @@
         "important": "Important",
         "bullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
         "bullet2": "Hauràs d'activar la targeta física quan arribi",
-        "bullet3": "Totes dues targetes tindran el mateix número i dades"
+        "bullet3": "Totes dues targetes tindran el mateix número i dades",
+        "bullet4": "L'adreça d'enviament no es pot canviar un cop feta la comanda"
+      },
+      "errors": {
+        "createFailed": "No s'ha pogut demanar la teva targeta física. Si us plau, torna-ho a provar."
       }
     },
     "Onboarding": {

@@ -3346,7 +3346,11 @@
         "important": "Belangrijk",
         "bullet1": "Je virtuele kaart blijft actief terwijl je op de fysieke kaart wacht",
         "bullet2": "Je moet je fysieke kaart activeren zodra deze aankomt",
-        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens"
+        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens",
+        "bullet4": "Het verzendadres kan niet worden gewijzigd nadat de bestelling is geplaatst"
+      },
+      "errors": {
+        "createFailed": "Het bestellen van je fysieke kaart is mislukt. Probeer het opnieuw."
       }
     },
     "Onboarding": {

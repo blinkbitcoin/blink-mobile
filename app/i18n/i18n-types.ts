@@ -10924,6 +10924,16 @@ type RootTranslation = {
 				 * B​o​t​h​ ​c​a​r​d​s​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​c​a​r​d​ ​n​u​m​b​e​r​ ​a​n​d​ ​d​e​t​a​i​l​s
 				 */
 				bullet3: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s​ ​c​a​n​n​o​t​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​f​t​e​r​ ​o​r​d​e​r​ ​i​s​ ​p​l​a​c​e​d
+				 */
+				bullet4: string
+			}
+			errors: {
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​o​r​d​e​r​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				createFailed: string
 			}
 		}
 		Onboarding: {
@@ -21977,6 +21987,16 @@ export type TranslationFunctions = {
 				 * Both cards will have the same card number and details
 				 */
 				bullet3: () => LocalizedString
+				/**
+				 * Shipping address cannot be changed after order is placed
+				 */
+				bullet4: () => LocalizedString
+			}
+			errors: {
+				/**
+				 * Failed to order your physical card. Please try again.
+				 */
+				createFailed: () => LocalizedString
 			}
 		}
 		Onboarding: {

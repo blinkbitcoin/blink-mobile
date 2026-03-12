@@ -3434,6 +3434,10 @@ const en: BaseTranslation = {
         bullet1: "Your virtual card will remain active while you wait for the physical card",
         bullet2: "You'll need to activate your physical card when it arrives",
         bullet3: "Both cards will have the same card number and details",
+        bullet4: "Shipping address cannot be changed after order is placed",
+      },
+      errors: {
+        createFailed: "Failed to order your physical card. Please try again.",
       },
     },
     Onboarding: {

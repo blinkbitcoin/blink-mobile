@@ -3343,7 +3343,11 @@
         "important": "Allin yuyaykuna",
         "bullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
         "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
-        "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
+        "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa",
+        "bullet4": "Apachiy suti mana tikrayta atinchu rantiyta ruwasqamanta qhipaman"
+      },
+      "errors": {
+        "createFailed": "Mana atinichu tarjeta físicaykita mañayta. Ama hina kaspa, musuqmanta ruway."
       }
     },
     "Onboarding": {

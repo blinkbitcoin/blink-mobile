@@ -3305,7 +3305,11 @@
         "important": "Önemli",
         "bullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
         "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak",
+        "bullet4": "Kargo adresi sipariş verildikten sonra değiştirilemez"
+      },
+      "errors": {
+        "createFailed": "Fiziksel kartınız sipariş edilemedi. Lütfen tekrar deneyin."
       }
     },
     "Onboarding": {

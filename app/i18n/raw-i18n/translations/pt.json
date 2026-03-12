@@ -3293,7 +3293,11 @@
                 "important": "Importante",
                 "bullet1": "Seu cartão virtual permanecerá ativo enquanto você espera o cartão físico",
                 "bullet2": "Você precisará ativar o cartão físico quando ele chegar",
-                "bullet3": "Ambos os cartões terão o mesmo número e detalhes"
+                "bullet3": "Ambos os cartões terão o mesmo número e detalhes",
+                "bullet4": "A morada de envio não pode ser alterada após a encomenda ser feita"
+            },
+            "errors": {
+                "createFailed": "Falha ao solicitar seu cartão físico. Por favor, tente novamente."
             }
         },
         "Onboarding": {

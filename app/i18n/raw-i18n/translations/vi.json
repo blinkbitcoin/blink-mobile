@@ -3343,7 +3343,11 @@
         "important": "Quan trọng",
         "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
         "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin",
+        "bullet4": "Không thể thay đổi địa chỉ giao hàng sau khi đặt hàng"
+      },
+      "errors": {
+        "createFailed": "Không thể đặt thẻ vật lý của bạn. Vui lòng thử lại."
       }
     },
     "Onboarding": {

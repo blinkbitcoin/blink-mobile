@@ -3293,7 +3293,11 @@
                 "important": "Importante",
                 "bullet1": "La tua carta virtuale rimarrà attiva mentre aspetti la carta fisica",
                 "bullet2": "Dovrai attivare la tua carta fisica quando arriva",
-                "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli"
+                "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli",
+                "bullet4": "L'indirizzo di spedizione non può essere modificato dopo l'ordine"
+            },
+            "errors": {
+                "createFailed": "Impossibile ordinare la tua carta fisica. Per favore riprova."
             }
         },
         "Onboarding": {

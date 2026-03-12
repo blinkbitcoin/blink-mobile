@@ -3346,7 +3346,11 @@
         "important": "Důležité",
         "bullet1": "Virtuální karta zůstane aktivní, zatímco budete čekat na fyzickou kartu",
         "bullet2": "Po doručení budete muset fyzickou kartu aktivovat",
-        "bullet3": "Obě karty budou mít stejné číslo a údaje"
+        "bullet3": "Obě karty budou mít stejné číslo a údaje",
+        "bullet4": "Doručovací adresu nelze po zadání objednávky změnit"
+      },
+      "errors": {
+        "createFailed": "Nepodařilo se objednat vaši fyzickou kartu. Zkuste to prosím znovu."
       }
     },
     "Onboarding": {

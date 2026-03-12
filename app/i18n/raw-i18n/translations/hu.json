@@ -3305,7 +3305,11 @@
         "important": "Fontos",
         "bullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
         "bullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
-        "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
+        "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik",
+        "bullet4": "A szállítási cím a rendelés leadása után nem módosítható"
+      },
+      "errors": {
+        "createFailed": "Nem sikerült megrendelni a fizikai kártyádat. Kérjük, próbáld újra."
       }
     },
     "Onboarding": {

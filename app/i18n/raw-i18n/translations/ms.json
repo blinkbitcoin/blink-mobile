@@ -3346,7 +3346,11 @@
         "important": "Penting",
         "bullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
         "bullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
-        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama",
+        "bullet4": "Alamat penghantaran tidak boleh ditukar selepas pesanan dibuat"
+      },
+      "errors": {
+        "createFailed": "Gagal membuat pesanan kad fizikal anda. Sila cuba lagi."
       }
     },
     "Onboarding": {

@@ -3293,7 +3293,11 @@
                 "important": "Wichtig",
                 "bullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
                 "bullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
-                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
+                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten",
+                "bullet4": "Die Lieferadresse kann nach Aufgabe der Bestellung nicht mehr geändert werden"
+            },
+            "errors": {
+                "createFailed": "Die Bestellung Ihrer physischen Karte ist fehlgeschlagen. Bitte versuchen Sie es erneut."
             }
         },
         "Onboarding": {

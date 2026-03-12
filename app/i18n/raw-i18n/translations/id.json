@@ -3305,7 +3305,11 @@
         "important": "Penting",
         "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
         "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama",
+        "bullet4": "Alamat pengiriman tidak dapat diubah setelah pesanan dibuat"
+      },
+      "errors": {
+        "createFailed": "Gagal memesan kartu fisik Anda. Silakan coba lagi."
       }
     },
     "Onboarding": {
