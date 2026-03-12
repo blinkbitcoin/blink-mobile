@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from "react"
-import { useTheme } from "@rn-vui/themed"
+import { ActivityIndicator, View } from "react-native"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import { Screen } from "@app/components/screen"
 import { CardType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -31,6 +33,7 @@ type StepConfig = {
 }
 
 export const ReplaceCardScreen: React.FC = () => {
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -39,8 +42,8 @@ export const ReplaceCardScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "replaceCardScreen">>()
   const { cardId } = route.params
 
-  const { card } = useCardData()
-  const { initialAddress } = useShippingAddressData()
+  const { card, loading: cardLoading } = useCardData()
+  const { initialAddress, loading: addressLoading } = useShippingAddressData()
   const { replaceCard, loading: replaceLoading } = useReplaceCard()
   const { lockCard, loading: lockLoading } = useLockCard()
 
@@ -194,6 +197,16 @@ export const ReplaceCardScreen: React.FC = () => {
     isVirtualCard,
   ])
 
+  if (cardLoading || addressLoading) {
+    return (
+      <Screen>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </Screen>
+    )
+  }
+
   return (
     <SteppedCardLayout
       steps={stepLabels}
@@ -211,3 +224,11 @@ export const ReplaceCardScreen: React.FC = () => {
     </SteppedCardLayout>
   )
 }
+
+const useStyles = makeStyles((_) => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+}))
