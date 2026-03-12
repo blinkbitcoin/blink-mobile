@@ -15,7 +15,7 @@ export const CardApprovedScreen: React.FC = () => {
   const { card } = useCardData()
 
   const handlePrimaryButtonPress = () => {
-    navigation.dispatch(CommonActions.navigate("cardOrderScreen"))
+    navigation.dispatch(CommonActions.navigate("orderCardScreen"))
   }
 
   const handleAddToWallet = () => {
