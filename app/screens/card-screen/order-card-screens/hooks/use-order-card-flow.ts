@@ -3,10 +3,25 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MOCK_USER } from "../card-mock-data"
-import { ShippingAddress } from "../types"
+import {
+  SUPPORTED_COUNTRIES,
+  getRegionsByCountry,
+} from "@app/screens/card-screen/country-region-data"
+import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
-import { Delivery, DeliveryType } from "../replace-card-screens/steps/types"
+const DEFAULT_COUNTRY = SUPPORTED_COUNTRIES[0].value
+const DEFAULT_REGION = getRegionsByCountry(DEFAULT_COUNTRY)[0]?.value ?? ""
+
+const DEFAULT_ADDRESS: ShippingAddress = {
+  firstName: "",
+  lastName: "",
+  line1: "",
+  line2: "",
+  city: "",
+  region: DEFAULT_REGION,
+  postalCode: "",
+  countryCode: DEFAULT_COUNTRY,
+}
 
 export const Step = {
   Shipping: 1,
@@ -21,10 +36,13 @@ type FlowState = {
   customAddress: ShippingAddress
 }
 
+type UseOrderCardFlowParams = {
+  initialAddress: ShippingAddress | null
+}
+
 type UseOrderCardFlowReturn = {
   step: StepType
   state: FlowState
-  isComplete: boolean
   toggleUseRegisteredAddress: () => void
   setCustomAddress: (address: ShippingAddress) => void
   goToNextStep: () => void
@@ -34,16 +52,19 @@ type UseOrderCardFlowReturn = {
 const FIRST_STEP = Step.Shipping
 const LAST_STEP = Step.Confirm
 
-export const useOrderCardFlow = (): UseOrderCardFlowReturn => {
+export const useOrderCardFlow = ({
+  initialAddress,
+}: UseOrderCardFlowParams): UseOrderCardFlowReturn => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)
   const [selectedDelivery] = useState<DeliveryType>(Delivery.Standard)
-  const [useRegisteredAddress, setUseRegisteredAddress] = useState(true)
-  const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    MOCK_USER.registeredAddress,
+  const [useRegisteredAddress, setUseRegisteredAddress] = useState(
+    initialAddress !== null,
   )
-  const [isComplete, setIsComplete] = useState(false)
+  const [customAddress, setCustomAddress] = useState<ShippingAddress>(
+    initialAddress ?? DEFAULT_ADDRESS,
+  )
   const isCompleteRef = useRef(false)
 
   const goToNextStep = useCallback(() => {
@@ -62,7 +83,6 @@ export const useOrderCardFlow = (): UseOrderCardFlowReturn => {
 
   const completeFlow = useCallback(() => {
     isCompleteRef.current = true
-    setIsComplete(true)
   }, [])
 
   useEffect(() => {
@@ -82,7 +102,6 @@ export const useOrderCardFlow = (): UseOrderCardFlowReturn => {
       useRegisteredAddress,
       customAddress,
     },
-    isComplete,
     toggleUseRegisteredAddress,
     setCustomAddress,
     goToNextStep,
