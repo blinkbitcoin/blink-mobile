@@ -13,25 +13,29 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { Delivery, ShippingAddress } from "@app/screens/card-screen/types"
+import { addressToLines } from "@app/screens/card-screen/utils"
 
-import { MOCK_USER } from "../../card-mock-data"
-import { ShippingAddress } from "../../types"
-import { addressToLines } from "../../utils"
-import { Delivery } from "../../replace-card-screens/steps/types"
 import { useSharedStepStyles } from "./shared-styles"
 
 type ShippingStepProps = {
+  hasRegisteredAddress: boolean
+  registeredAddress: ShippingAddress
   useRegisteredAddress: boolean
   onToggleUseRegisteredAddress: () => void
   customAddress: ShippingAddress
   onCustomAddressChange: (address: ShippingAddress) => void
+  onFormValidityChange?: (isValid: boolean) => void
 }
 
 export const ShippingStep: React.FC<ShippingStepProps> = ({
+  hasRegisteredAddress,
+  registeredAddress,
   useRegisteredAddress,
   onToggleUseRegisteredAddress,
   customAddress,
   onCustomAddressChange,
+  onFormValidityChange,
 }) => {
   const sharedStyles = useSharedStepStyles()
   const localStyles = useLocalStyles()
@@ -43,10 +47,6 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
   const { formatCurrency } = useDisplayCurrency()
 
   const { Shipping: shippingLL } = LL.CardFlow.OrderPhysicalCard
-
-  const currentAddress = useRegisteredAddress
-    ? MOCK_USER.registeredAddress
-    : customAddress
 
   const standardConfig = replaceCardDeliveryConfig[Delivery.Standard]
 
@@ -65,27 +65,31 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
 
   return (
     <>
-      <View style={sharedStyles.section}>
-        <Text style={sharedStyles.sectionTitle}>{shippingLL.registeredAddress()}</Text>
-        <MultiLineField
-          lines={addressToLines(currentAddress, false)}
-          leftIcon="map-pin"
-        />
-      </View>
+      {hasRegisteredAddress && useRegisteredAddress && (
+        <View style={sharedStyles.section}>
+          <Text style={sharedStyles.sectionTitle}>{shippingLL.registeredAddress()}</Text>
+          <MultiLineField
+            lines={addressToLines(registeredAddress, false)}
+            leftIcon="map-pin"
+          />
+        </View>
+      )}
 
       <View style={localStyles.checkboxFormGroup}>
-        <CheckboxRow
-          label={shippingLL.useRegisteredAddress()}
-          isChecked={useRegisteredAddress}
-          onPress={onToggleUseRegisteredAddress}
-        />
+        {hasRegisteredAddress && (
+          <CheckboxRow
+            label={shippingLL.useRegisteredAddress()}
+            isChecked={useRegisteredAddress}
+            onPress={onToggleUseRegisteredAddress}
+          />
+        )}
 
         {!useRegisteredAddress && (
           <>
             <ShippingAddressForm
               address={customAddress}
               onAddressChange={onCustomAddressChange}
-              showFullName={true}
+              onValidityChange={onFormValidityChange}
             />
             <InfoCard
               title={LL.CardFlow.ShippingAddress.important()}
