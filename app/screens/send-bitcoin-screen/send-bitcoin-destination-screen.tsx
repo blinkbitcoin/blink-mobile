@@ -396,7 +396,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
-                username: identifier,
+                username: identifier.includes("@")
+                  ? identifier.split("@")[0]
+                  : identifier,
               },
             },
           })
