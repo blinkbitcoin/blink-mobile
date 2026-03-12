@@ -91,21 +91,6 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_USER: {
-    registeredAddress: {
-      firstName: "Satoshi",
-      lastName: "Nakamoto",
-      line1: "123 Main Street",
-      line2: "Apt 4B",
-      city: "New York",
-      region: "NY",
-      postalCode: "10001",
-      countryCode: "USA",
-    },
-  },
-}))
-
 jest.mock("@app/screens/card-screen/utils", () => ({
   addressToLines: (address: ShippingAddress, includeFullName = true) => {
     const lines: string[] = []
@@ -162,11 +147,22 @@ jest.mock("@app/components/card-screen", () => ({
       <RNText>{label}</RNText>
     </View>
   ),
-  ShippingAddressForm: ({ address }: { address: ShippingAddress }) => (
-    <View testID="shipping-address-form">
-      <RNText>{address.line1}</RNText>
-    </View>
-  ),
+  ShippingAddressForm: ({
+    address,
+    onValidityChange,
+  }: {
+    address: ShippingAddress
+    onValidityChange?: (isValid: boolean) => void
+  }) => {
+    React.useEffect(() => {
+      onValidityChange?.(true)
+    }, [onValidityChange])
+    return (
+      <View testID="shipping-address-form">
+        <RNText>{address.line1}</RNText>
+      </View>
+    )
+  },
   InfoCard: ({ title, bulletItems }: { title: string; bulletItems: string[] }) => (
     <View testID="info-card">
       <RNText>{title}</RNText>
@@ -188,6 +184,8 @@ describe("ShippingStep", () => {
   }
 
   const defaultProps = {
+    hasRegisteredAddress: true,
+    registeredAddress: mockCustomAddress,
     useRegisteredAddress: true,
     onToggleUseRegisteredAddress: jest.fn(),
     customAddress: mockCustomAddress,
@@ -290,7 +288,7 @@ describe("ShippingStep", () => {
       expect(getByText("USA")).toBeTruthy()
     })
 
-    it("shows custom address when unchecked", () => {
+    it("shows address form with custom address when unchecked", () => {
       const customAddr: ShippingAddress = {
         firstName: "Joe",
         lastName: "Nakamoto",
@@ -302,7 +300,7 @@ describe("ShippingStep", () => {
         countryCode: "USA",
       }
 
-      const { getByTestId, getAllByText } = render(
+      const { getByTestId } = render(
         <ShippingStep
           {...defaultProps}
           useRegisteredAddress={false}
@@ -310,9 +308,7 @@ describe("ShippingStep", () => {
         />,
       )
 
-      expect(getByTestId("multi-line-field")).toBeTruthy()
-      expect(getAllByText("456 Oak Avenue").length).toBeGreaterThanOrEqual(1)
-      expect(getAllByText("Austin, TX 73301").length).toBeGreaterThanOrEqual(1)
+      expect(getByTestId("shipping-address-form")).toBeTruthy()
     })
   })
 
@@ -334,6 +330,32 @@ describe("ShippingStep", () => {
       expect(getByText("No PO Boxes")).toBeTruthy()
       expect(getByText("Signature required")).toBeTruthy()
       expect(getByText("US only")).toBeTruthy()
+    })
+  })
+
+  describe("no registered address", () => {
+    const noAddressProps = {
+      ...defaultProps,
+      hasRegisteredAddress: false,
+      useRegisteredAddress: false,
+    }
+
+    it("hides registered address section", () => {
+      const { queryByText } = render(<ShippingStep {...noAddressProps} />)
+
+      expect(queryByText("Registered address")).toBeNull()
+    })
+
+    it("hides checkbox", () => {
+      const { queryByTestId } = render(<ShippingStep {...noAddressProps} />)
+
+      expect(queryByTestId("checkbox-row")).toBeNull()
+    })
+
+    it("shows shipping form", () => {
+      const { getByTestId } = render(<ShippingStep {...noAddressProps} />)
+
+      expect(getByTestId("shipping-address-form")).toBeTruthy()
     })
   })
 })
