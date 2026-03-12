@@ -64,6 +64,18 @@ jest.mock("@app/graphql/generated", () => ({
   KycFlowType: { Card: "Card" },
 }))
 
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  open: jest.fn(),
+}))
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    cardTermsAndConditionsUrl: "https://example.com/terms",
+    cardPrivacyPolicyUrl: "https://example.com/privacy",
+    cardCardholderAgreementUrl: "https://example.com/cardholder",
+  }),
+}))
+
 describe("CardSubscriptionScreen - subscribe variant", () => {
   beforeEach(() => {
     loadLocale("en")

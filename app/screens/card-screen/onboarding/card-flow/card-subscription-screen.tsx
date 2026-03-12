@@ -2,9 +2,11 @@ import * as React from "react"
 import { View } from "react-native"
 import { RouteProp, useRoute } from "@react-navigation/native"
 import { CheckBox, makeStyles, Text } from "@rn-vui/themed"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
 import { KycFlowType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -21,6 +23,12 @@ export const CardSubscriptionScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
+
+  const {
+    cardTermsAndConditionsUrl,
+    cardPrivacyPolicyUrl,
+    cardCardholderAgreementUrl,
+  } = useRemoteConfig()
 
   const { startKyc } = useKycFlow({
     type: KycFlowType.Card,
@@ -99,21 +107,21 @@ export const CardSubscriptionScreen: React.FC = () => {
               {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Terms of Service")}
+                onPress={() => InAppBrowser.open(cardTermsAndConditionsUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
               </Text>
               ,{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Privacy Policy")}
+                onPress={() => InAppBrowser.open(cardPrivacyPolicyUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
               </Text>
               , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Cardholder Agreement")}
+                onPress={() => InAppBrowser.open(cardCardholderAgreementUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
               </Text>
