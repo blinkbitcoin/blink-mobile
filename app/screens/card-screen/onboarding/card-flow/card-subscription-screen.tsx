@@ -8,12 +8,11 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
-import { KycFlowType } from "@app/graphql/generated"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { KycFlowType, WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
-
-import { MOCK_CARD_PAYMENT } from "../onboarding-mock-data"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 
@@ -28,11 +27,18 @@ export const CardSubscriptionScreen: React.FC = () => {
     cardTermsAndConditionsUrl,
     cardPrivacyPolicyUrl,
     cardCardholderAgreementUrl,
+    cardSubscriptionPriceUsd,
   } = useRemoteConfig()
+  const { formatCurrency } = useDisplayCurrency()
 
   const { startKyc } = useKycFlow({
     type: KycFlowType.Card,
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
+  })
+
+  const price = formatCurrency({
+    amountInMajorUnits: cardSubscriptionPriceUsd,
+    currency: WalletCurrency.Usd,
   })
 
   const renewalDate = formatDateFromNow(1, locale)
@@ -61,7 +67,7 @@ export const CardSubscriptionScreen: React.FC = () => {
           </Text>
 
           <Text type="h1" style={styles.price}>
-            {MOCK_CARD_PAYMENT.price}
+            {price}
           </Text>
 
           <Text type="p3" style={styles.perYear}>

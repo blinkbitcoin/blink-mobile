@@ -5,11 +5,6 @@ export const MOCK_CARD_DISPLAY = {
   validThruDate: "2028-01-01",
 }
 
-export const MOCK_CARD_PAYMENT = {
-  price: "$1,000",
-  renewalDate: "Aug 21, 2026",
-}
-
 export const MOCK_OCCUPATION_OPTIONS = [
   { value: "15-1132", label: "Software Developers, Applications" },
   { value: "11-1021", label: "General and Operations Managers" },

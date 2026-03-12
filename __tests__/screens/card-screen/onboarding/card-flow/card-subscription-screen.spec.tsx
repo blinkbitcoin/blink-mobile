@@ -62,6 +62,7 @@ jest.mock("@app/hooks", () => ({
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   KycFlowType: { Card: "Card" },
+  WalletCurrency: { Usd: "USD" },
 }))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
@@ -73,6 +74,13 @@ jest.mock("@app/config/feature-flags-context", () => ({
     cardTermsAndConditionsUrl: "https://example.com/terms",
     cardPrivacyPolicyUrl: "https://example.com/privacy",
     cardCardholderAgreementUrl: "https://example.com/cardholder",
+    cardSubscriptionPriceUsd: 1000,
+  }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatCurrency: () => "$1,000",
   }),
 }))
 
