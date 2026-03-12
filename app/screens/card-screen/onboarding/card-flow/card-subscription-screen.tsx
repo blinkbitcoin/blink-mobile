@@ -22,7 +22,10 @@ export const CardSubscriptionScreen: React.FC = () => {
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
-  const { startKyc } = useKycFlow({ type: KycFlowType.Card })
+  const { startKyc } = useKycFlow({
+    type: KycFlowType.Card,
+    headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
+  })
 
   const renewalDate = formatDateFromNow(1, locale)
 

@@ -3347,6 +3347,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Xác minh",
       "CardSubscription": {
         "subscribeTitle": "Đăng ký",
         "paymentTitle": "Thanh toán",

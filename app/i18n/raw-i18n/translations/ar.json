@@ -3347,6 +3347,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "التحقق",
       "CardSubscription": {
         "subscribeTitle": "اشتراك",
         "paymentTitle": "الدفع",

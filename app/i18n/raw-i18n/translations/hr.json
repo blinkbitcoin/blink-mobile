@@ -3350,6 +3350,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verifikacija",
       "CardSubscription": {
         "subscribeTitle": "Pretplatiti se",
         "paymentTitle": "Plaćanje",

@@ -3350,6 +3350,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Ověření",
       "CardSubscription": {
         "subscribeTitle": "Předplatit",
         "paymentTitle": "Platba",

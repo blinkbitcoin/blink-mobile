@@ -3347,6 +3347,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "การยืนยันตัวตน",
       "CardSubscription": {
         "subscribeTitle": "สมัครสมาชิก",
         "paymentTitle": "การชำระเงิน",

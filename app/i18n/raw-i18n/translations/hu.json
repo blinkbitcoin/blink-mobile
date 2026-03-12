@@ -3309,6 +3309,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Ellenőrzés",
       "CardSubscription": {
         "subscribeTitle": "Feliratkozás",
         "paymentTitle": "Fizetés",

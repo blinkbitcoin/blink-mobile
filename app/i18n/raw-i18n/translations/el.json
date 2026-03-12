@@ -3309,6 +3309,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Επαλήθευση",
       "CardSubscription": {
         "subscribeTitle": "Εγγραφή",
         "paymentTitle": "Πληρωμή",

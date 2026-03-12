@@ -3350,6 +3350,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verifikasie",
       "CardSubscription": {
         "subscribeTitle": "Teken in",
         "paymentTitle": "Betaling",

@@ -3309,6 +3309,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Doğrulama",
       "CardSubscription": {
         "subscribeTitle": "Abone Ol",
         "paymentTitle": "Ödeme",

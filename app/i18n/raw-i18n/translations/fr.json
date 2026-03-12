@@ -3338,6 +3338,7 @@
             }
         },
         "Onboarding": {
+            "kycHeaderTitle": "Vérification",
             "CardSubscription": {
                 "subscribeTitle": "S'abonner",
                 "paymentTitle": "Paiement",

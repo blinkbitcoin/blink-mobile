@@ -3295,6 +3295,7 @@
             }
         },
         "Onboarding": {
+            "kycHeaderTitle": "Verification",
             "CardIntroducing": {
                 "title": "Introducing",
                 "cardInfo": {

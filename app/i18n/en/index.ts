@@ -3437,6 +3437,7 @@ const en: BaseTranslation = {
       },
     },
     Onboarding: {
+      kycHeaderTitle: "Verification",
       CardIntroducing: {
         title: "Introducing",
         cardInfo: {
