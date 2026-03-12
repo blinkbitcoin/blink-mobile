@@ -1,20 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MOCK_USER } from "../card-mock-data"
-import { ShippingAddress } from "../types"
 
-import { IssueType, DeliveryType } from "./steps/types"
+import { EMPTY_ADDRESS, ShippingAddress } from "../../types"
+
+import { IssueType, DeliveryType } from "../steps/types"
 
 export const Step = {
-  ReportIssue: 1,
-  Delivery: 2,
-  Confirm: 3,
+  ReportIssue: "ReportIssue",
+  Delivery: "Delivery",
+  Confirm: "Confirm",
 } as const
 
-export type StepType = (typeof Step)[keyof typeof Step]
+export type StepName = (typeof Step)[keyof typeof Step]
+
+const PHYSICAL_STEPS: StepName[] = [Step.ReportIssue, Step.Delivery, Step.Confirm]
+const VIRTUAL_STEPS: StepName[] = [Step.ReportIssue, Step.Confirm]
 
 type FlowState = {
   selectedIssue: IssueType | null
@@ -23,8 +26,16 @@ type FlowState = {
   customAddress: ShippingAddress
 }
 
+type UseReplaceCardFlowParams = {
+  isVirtualCard: boolean
+  initialAddress: ShippingAddress | null
+}
+
 type UseReplaceCardFlowReturn = {
-  step: StepType
+  currentStep: StepName
+  stepNumber: number
+  totalSteps: number
+  stepOrder: StepName[]
   state: FlowState
   setSelectedIssue: (issue: IssueType) => void
   setSelectedDelivery: (delivery: DeliveryType) => void
@@ -34,30 +45,41 @@ type UseReplaceCardFlowReturn = {
   completeFlow: () => void
 }
 
-const FIRST_STEP = Step.ReportIssue
-const LAST_STEP = Step.Confirm
-
-export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
+export const useReplaceCardFlow = ({
+  isVirtualCard,
+  initialAddress,
+}: UseReplaceCardFlowParams): UseReplaceCardFlowReturn => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const [step, setStep] = useState<StepType>(FIRST_STEP)
+  const stepOrder = useMemo(
+    () => (isVirtualCard ? VIRTUAL_STEPS : PHYSICAL_STEPS),
+    [isVirtualCard],
+  )
+
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [selectedIssue, setSelectedIssue] = useState<IssueType | null>(null)
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType | null>(null)
-  const [useRegisteredAddress, setUseRegisteredAddress] = useState(true)
+  const [useRegisteredAddress, setUseRegisteredAddress] = useState(
+    initialAddress !== null,
+  )
   const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    MOCK_USER.registeredAddress,
+    initialAddress ?? EMPTY_ADDRESS,
   )
   const isCompleteRef = useRef(false)
 
+  const currentStep = stepOrder[currentStepIndex]
+  const stepNumber = currentStepIndex + 1
+  const totalSteps = stepOrder.length
+
   const goToNextStep = useCallback(() => {
-    setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))
-  }, [])
+    setCurrentStepIndex((prev) => Math.min(prev + 1, stepOrder.length - 1))
+  }, [stepOrder.length])
 
   const goToPreviousStep = useCallback(() => {
-    if (step === FIRST_STEP) return false
-    setStep((prev) => (prev - 1) as StepType)
+    if (currentStepIndex === 0) return false
+    setCurrentStepIndex((prev) => prev - 1)
     return true
-  }, [step])
+  }, [currentStepIndex])
 
   const toggleUseRegisteredAddress = useCallback(() => {
     setUseRegisteredAddress((prev) => !prev)
@@ -78,7 +100,10 @@ export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
   }, [navigation, goToPreviousStep])
 
   return {
-    step,
+    currentStep,
+    stepNumber,
+    totalSteps,
+    stepOrder,
     state: {
       selectedIssue,
       selectedDelivery,

@@ -3285,16 +3285,28 @@
         "issueType": "Isizathu",
         "deliveryTime": "Ixesha lokunikezela",
         "shippingCost": "Iindleko zokuhanjiswa",
-        "bullet1": "Ikhadi lakho langoku liza kuhlala lisebenza de kufike elitsha",
-        "bullet2": "Ikhadi lakho elitsha liza kuba neminani efanayo nekhadi langoku",
-        "bullet3": "Tshabalalisa ikhadi lakho elonakeleyo xa elitsha lifika"
+        "DamagedInfo": {
+          "bullet1": "Ikhadi lakho langoku liya kuhlala lisebenza de kufike elitsha",
+          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
+          "bullet3": "Tshabalalisa ikhadi lakho elonakalisiweyo xa kufika elitsha"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Ikhadi lakho litshixiwe ukukhusela wena",
+          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
+          "bullet3": "Ikhadi lakho elidala liya kurhoxiswa ngokupheleleyo"
+        }
       },
       "Status": {
         "title": "Ikhadi lakho elitsha lisendleleni!",
         "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
         "buttonLabel": "Ideshibhodi"
       },
-      "title": "Tshintsha ikhadi"
+      "title": "Tshintsha ikhadi",
+      "errors": {
+        "lockFailed": "Ayiphumelelanga ukutshixa ikhadi yakho. Nceda uzame kwakhona.",
+        "replaceFailed": "Ayiphumelelanga ukutshintsha ikhadi yakho. Nceda uzame kwakhona.",
+        "replaceFailedCardLocked": "Ikhadi lakho litshixiwe kodwa ukutshintsha akuphumelelanga. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Odola ikhadi elibonakalayo",

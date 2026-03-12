@@ -3256,16 +3256,28 @@
         "issueType": "Årsag",
         "deliveryTime": "Leveringstid",
         "shippingCost": "Leveringsomkostninger",
-        "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
-        "bullet2": "Dit nye kort vil have de samme numre som dit nuværende kort",
-        "bullet3": "Destruer dit beskadigede kort, når det nye ankommer"
+        "DamagedInfo": {
+          "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
+          "bullet2": "Dit nye kort vil have et nyt kortnummer",
+          "bullet3": "Destruér dit beskadigede kort, når det nye ankommer"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Dit kort er blevet låst for din beskyttelse",
+          "bullet2": "Dit nye kort vil have et nyt kortnummer",
+          "bullet3": "Dit gamle kort vil blive permanent annulleret"
+        }
       },
       "Status": {
         "title": "Dit nye kort er på vej!",
         "subtitle": "Ordre til levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Oversigt"
       },
-      "title": "Erstat kort"
+      "title": "Erstat kort",
+      "errors": {
+        "lockFailed": "Kunne ikke låse dit kort. Prøv venligst igen.",
+        "replaceFailed": "Kunne ikke erstatte dit kort. Prøv venligst igen.",
+        "replaceFailedCardLocked": "Dit kort blev låst, men udskiftningen mislykkedes. Kontakt venligst support for hjælp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Bestil fysisk kort",

@@ -3238,16 +3238,28 @@
         "issueType": "Ensonga",
         "deliveryTime": "Obudde bw'okutuusa",
         "shippingCost": "Bbeeyi y'okutwala",
-        "bullet1": "Kaadi yo ey'omu kaakati ejja kusigala nga ekola okutuusa empya lw'ejja",
-        "bullet2": "Kaadi yo empya ejja kuba n'ennamba ze zimu ng'eza kaadi ey'omu kaakati",
-        "bullet3": "Zikiriza kaadi yo eyonoonese kaadi empya bw'etuuka"
+        "DamagedInfo": {
+          "bullet1": "Kaadi yo ey'obukakafu ejja kusigala nga ekola okutuusa empya lw'ejja",
+          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
+          "bullet3": "Zikiriza kaadi yo eyonoonese empya bw'ejja"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kaadi yo ekkomeddwa okukulabirira",
+          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
+          "bullet3": "Kaadi yo enkadde ejja kusazibwamu ddala"
+        }
       },
       "Status": {
         "title": "Kaadi yo empya eri mu kkubo!",
         "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Dashiboodi"
       },
-      "title": "Kyusa kaadi"
+      "title": "Kyusa kaadi",
+      "errors": {
+        "lockFailed": "Tebisobeddwa kusiba kaadi yo. Gezaako oddemu.",
+        "replaceFailed": "Tebisobeddwa kukyusa kaadi yo. Gezaako oddemu.",
+        "replaceFailedCardLocked": "Kaadi yo yakkomeddwa naye okukyusa kwagaanye. Tuukirira bambi okusobola okuyambibwa."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Saba kaadi ey'omubiri",

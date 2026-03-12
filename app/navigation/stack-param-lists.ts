@@ -149,12 +149,13 @@ export type RootStackParamList = {
     iconColor?: string
     showCard?: boolean
     showAddToWallet?: boolean
+    lastFour?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined
   cardChangePinScreen: undefined
   orderCardScreen: undefined
-  replaceCardScreen: undefined
+  replaceCardScreen: { cardId: string }
   selectionScreen: {
     title: string
     options: Array<{ value: string; label: string }>

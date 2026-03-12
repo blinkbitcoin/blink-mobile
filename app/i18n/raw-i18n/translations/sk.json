@@ -3238,16 +3238,28 @@
         "issueType": "Dôvod",
         "deliveryTime": "Čas doručenia",
         "shippingCost": "Cena doručenia",
-        "bullet1": "Vaša aktuálna karta zostane aktívna, kým nedorazí nová",
-        "bullet2": "Vaša nová karta bude mať rovnaké čísla ako súčasná",
-        "bullet3": "Po doručení novej karty zničte poškodenú kartu"
+        "DamagedInfo": {
+          "bullet1": "Vaša súčasná karta zostane aktívna, kým nedorazí nová",
+          "bullet2": "Vaša nová karta bude mať nové číslo karty",
+          "bullet3": "Zničte svoju poškodenú kartu, keď dorazí nová"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaša karta bola uzamknutá pre vašu ochranu",
+          "bullet2": "Vaša nová karta bude mať nové číslo karty",
+          "bullet3": "Vaša stará karta bude trvalo zrušená"
+        }
       },
       "Status": {
         "title": "Vaša nová karta je na ceste!",
         "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
         "buttonLabel": "Prehľad"
       },
-      "title": "Vymeniť kartu"
+      "title": "Vymeniť kartu",
+      "errors": {
+        "lockFailed": "Nepodarilo sa zamknúť vašu kartu. Skúste to prosím znova.",
+        "replaceFailed": "Nepodarilo sa vymeniť vašu kartu. Skúste to prosím znova.",
+        "replaceFailedCardLocked": "Vaša karta bola uzamknutá, ale výmena zlyhala. Kontaktujte prosím podporu pre pomoc."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Objednať fyzickú kartu",

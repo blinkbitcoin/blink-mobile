@@ -3279,16 +3279,28 @@
         "issueType": "Reden",
         "deliveryTime": "Levertijd",
         "shippingCost": "Bezorgkosten",
-        "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
-        "bullet2": "Je nieuwe kaart heeft dezelfde nummers als je huidige kaart",
-        "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
+        "DamagedInfo": {
+          "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
+          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
+          "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Je kaart is vergrendeld voor je bescherming",
+          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
+          "bullet3": "Je oude kaart wordt permanent geannuleerd"
+        }
       },
       "Status": {
         "title": "Je nieuwe kaart is onderweg!",
         "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
         "buttonLabel": "Dashboard"
       },
-      "title": "Kaart vervangen"
+      "title": "Kaart vervangen",
+      "errors": {
+        "lockFailed": "Kan je kaart niet vergrendelen. Probeer het opnieuw.",
+        "replaceFailed": "Kan je kaart niet vervangen. Probeer het opnieuw.",
+        "replaceFailedCardLocked": "Je kaart is vergrendeld maar de vervanging is mislukt. Neem contact op met de klantenservice voor hulp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fysieke kaart bestellen",

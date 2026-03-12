@@ -3238,16 +3238,28 @@
         "issueType": "Ok",
         "deliveryTime": "Szállítási idő",
         "shippingCost": "Szállítási költség",
-        "bullet1": "Jelenlegi kártyája aktív marad, amíg az új meg nem érkezik",
-        "bullet2": "Az új kártyának ugyanazok lesznek a számai, mint a jelenleginek",
-        "bullet3": "Semmisítse meg a sérült kártyáját, amikor az új megérkezik"
+        "DamagedInfo": {
+          "bullet1": "A jelenlegi kártyád aktív marad, amíg az új meg nem érkezik",
+          "bullet2": "Az új kártyád új kártyaszámot kap",
+          "bullet3": "Semmisítsd meg a sérült kártyádat, amikor megérkezik az új"
+        },
+        "LostStolenInfo": {
+          "bullet1": "A kártyádat a védelmed érdekében zároltuk",
+          "bullet2": "Az új kártyád új kártyaszámot kap",
+          "bullet3": "A régi kártyád véglegesen törlésre kerül"
+        }
       },
       "Status": {
         "title": "Az új kártyád úton van!",
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
         "buttonLabel": "Irányítópult"
       },
-      "title": "Kártya cseréje"
+      "title": "Kártya cseréje",
+      "errors": {
+        "lockFailed": "Nem sikerült zárolni a kártyádat. Kérjük, próbáld újra.",
+        "replaceFailed": "Nem sikerült lecserélni a kártyádat. Kérjük, próbáld újra.",
+        "replaceFailedCardLocked": "A kártyád zárolva lett, de a csere sikertelen volt. Kérjük, lépj kapcsolatba az ügyfélszolgálattal segítségért."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fizikai kártya rendelése",

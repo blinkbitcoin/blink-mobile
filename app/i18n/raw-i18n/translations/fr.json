@@ -3270,15 +3270,27 @@
                 "deliveryTime": "Délai de livraison",
                 "shippingCost": "Frais de livraison",
                 "importantInformation": "Informations importantes",
-                "bullet1": "Votre carte actuelle restera active jusqu'à l'arrivée de la nouvelle",
-                "bullet2": "Votre nouvelle carte aura les mêmes numéros que votre carte actuelle",
-                "bullet3": "Détruisez votre carte endommagée lorsque la nouvelle arrive",
+                "DamagedInfo": {
+                    "bullet1": "Votre carte actuelle restera active jusqu'à l'arrivée de la nouvelle",
+                    "bullet2": "Votre nouvelle carte aura un nouveau numéro de carte",
+                    "bullet3": "Détruisez votre carte endommagée quand la nouvelle arrivera"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "Votre carte a été verrouillée pour votre protection",
+                    "bullet2": "Votre nouvelle carte aura un nouveau numéro de carte",
+                    "bullet3": "Votre ancienne carte sera définitivement annulée"
+                },
                 "submitRequest": "Soumettre la demande"
             },
             "Status": {
                 "title": "Votre nouvelle carte est en route !",
                 "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
                 "buttonLabel": "Tableau de bord"
+            },
+            "errors": {
+                "lockFailed": "Échec du verrouillage de votre carte. Veuillez réessayer.",
+                "replaceFailed": "Échec du remplacement de votre carte. Veuillez réessayer.",
+                "replaceFailedCardLocked": "Votre carte a été verrouillée mais le remplacement a échoué. Veuillez contacter le support pour obtenir de l'aide."
             }
         },
         "OrderPhysicalCard": {

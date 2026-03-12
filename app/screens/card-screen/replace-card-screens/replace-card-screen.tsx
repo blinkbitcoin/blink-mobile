@@ -1,14 +1,27 @@
-import React from "react"
-import { useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
+import React, { useCallback, useMemo } from "react"
+import { ActivityIndicator, View } from "react-native"
+import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import { Screen } from "@app/components/screen"
+import { CardType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toastShow } from "@app/utils/toast"
 
+import { useCardData } from "../hooks"
+import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { ReportIssueStep, DeliveryStep, ConfirmStep } from "./steps"
-import { useReplaceCardFlow, Step } from "./use-replace-card-flow"
+import { EMPTY_ADDRESS } from "../types"
+import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue, Delivery } from "./steps"
+import {
+  useLockCard,
+  useReplaceCard,
+  useReplaceCardFlow,
+  Step,
+  type StepName,
+} from "./hooks"
 
 type StepConfig = {
   icon: "report-flag" | "delivery" | "approved"
@@ -21,14 +34,26 @@ type StepConfig = {
 }
 
 export const ReplaceCardScreen: React.FC = () => {
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const route = useRoute<RouteProp<RootStackParamList, "replaceCardScreen">>()
+  const { cardId } = route.params
+
+  const { card, loading: cardLoading } = useCardData()
+  const { initialAddress, loading: addressLoading } = useShippingAddressData()
+  const { replaceCard, loading: replaceLoading } = useReplaceCard()
+  const { lockCard, loading: lockLoading } = useLockCard()
+
+  const isVirtualCard = card?.cardType === CardType.Virtual
 
   const {
-    step,
+    currentStep,
+    stepNumber,
+    stepOrder,
     state,
     setSelectedIssue,
     setSelectedDelivery,
@@ -36,15 +61,48 @@ export const ReplaceCardScreen: React.FC = () => {
     setCustomAddress,
     goToNextStep,
     completeFlow,
-  } = useReplaceCardFlow()
+  } = useReplaceCardFlow({ isVirtualCard, initialAddress })
 
-  const steps = [
-    LL.CardFlow.ReplaceCard.steps.reportIssue(),
-    LL.CardFlow.ReplaceCard.steps.delivery(),
-    LL.CardFlow.ReplaceCard.steps.confirm(),
-  ]
+  const stepLabels = useMemo(() => {
+    const labelMap: Record<StepName, string> = {
+      [Step.ReportIssue]: LL.CardFlow.ReplaceCard.steps.reportIssue(),
+      [Step.Delivery]: LL.CardFlow.ReplaceCard.steps.delivery(),
+      [Step.Confirm]: LL.CardFlow.ReplaceCard.steps.confirm(),
+    }
+    return stepOrder.map((step) => labelMap[step])
+  }, [LL, stepOrder])
 
-  const handleSubmit = () => {
+  const registeredAddress = useMemo(
+    () => initialAddress ?? EMPTY_ADDRESS,
+    [initialAddress],
+  )
+
+  const handleReportIssueContinue = useCallback(async () => {
+    if (!state.selectedIssue) return
+
+    if (state.selectedIssue === Issue.Damaged) {
+      goToNextStep()
+      return
+    }
+
+    const locked = await lockCard(cardId)
+    if (!locked) return
+
+    goToNextStep()
+  }, [state.selectedIssue, lockCard, cardId, goToNextStep])
+
+  const handleSubmit = useCallback(async () => {
+    const result = await replaceCard(cardId)
+    if (!result) {
+      if (state.selectedIssue !== Issue.Damaged) {
+        toastShow({
+          message: LL.CardFlow.ReplaceCard.errors.replaceFailedCardLocked(),
+          LL,
+        })
+      }
+      return
+    }
+
     completeFlow()
     navigation.replace("cardStatusScreen", {
       title: LL.CardFlow.ReplaceCard.Status.title(),
@@ -53,11 +111,22 @@ export const ReplaceCardScreen: React.FC = () => {
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
       iconColor: colors._green,
+      lastFour: result.lastFour,
     })
-  }
+  }, [
+    replaceCard,
+    cardId,
+    state.selectedIssue,
+    completeFlow,
+    navigation,
+    LL,
+    colors._green,
+  ])
 
-  const getStepConfig = (): StepConfig => {
-    switch (step) {
+  const loading = replaceLoading || lockLoading
+
+  const stepConfig = useMemo((): StepConfig => {
+    switch (currentStep) {
       case Step.ReportIssue:
         return {
           icon: "report-flag",
@@ -65,7 +134,7 @@ export const ReplaceCardScreen: React.FC = () => {
           title: LL.CardFlow.ReplaceCard.ReportIssue.title(),
           subtitle: LL.CardFlow.ReplaceCard.ReportIssue.subtitle(),
           buttonLabel: LL.common.continue(),
-          onButtonPress: goToNextStep,
+          onButtonPress: handleReportIssueContinue,
           isButtonDisabled: !state.selectedIssue,
         }
       case Step.Delivery:
@@ -91,10 +160,19 @@ export const ReplaceCardScreen: React.FC = () => {
           isButtonDisabled: false,
         }
     }
-  }
+  }, [
+    currentStep,
+    colors,
+    LL,
+    handleReportIssueContinue,
+    state.selectedIssue,
+    state.selectedDelivery,
+    goToNextStep,
+    handleSubmit,
+  ])
 
-  const renderStepContent = () => {
-    switch (step) {
+  const stepContent = useMemo((): React.ReactNode => {
+    switch (currentStep) {
       case Step.ReportIssue:
         return (
           <ReportIssueStep
@@ -107,6 +185,8 @@ export const ReplaceCardScreen: React.FC = () => {
           <DeliveryStep
             selectedDelivery={state.selectedDelivery}
             onSelectDelivery={setSelectedDelivery}
+            hasRegisteredAddress={initialAddress !== null}
+            registeredAddress={registeredAddress}
             useRegisteredAddress={state.useRegisteredAddress}
             onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
             customAddress={state.customAddress}
@@ -114,22 +194,42 @@ export const ReplaceCardScreen: React.FC = () => {
           />
         )
       case Step.Confirm:
-        if (!state.selectedIssue || !state.selectedDelivery) return null
+        if (!state.selectedIssue) return null
+        if (!isVirtualCard && !state.selectedDelivery) return null
         return (
           <ConfirmStep
             issueType={state.selectedIssue}
-            deliveryType={state.selectedDelivery}
+            deliveryType={state.selectedDelivery ?? Delivery.Standard}
+            isVirtualCard={isVirtualCard}
           />
         )
     }
-  }
+  }, [
+    currentStep,
+    state,
+    setSelectedIssue,
+    setSelectedDelivery,
+    initialAddress,
+    registeredAddress,
+    toggleUseRegisteredAddress,
+    setCustomAddress,
+    isVirtualCard,
+  ])
 
-  const stepConfig = getStepConfig()
+  if (cardLoading || addressLoading) {
+    return (
+      <Screen>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </Screen>
+    )
+  }
 
   return (
     <SteppedCardLayout
-      steps={steps}
-      currentStep={step}
+      steps={stepLabels}
+      currentStep={stepNumber}
       icon={stepConfig.icon}
       iconColor={stepConfig.iconColor}
       title={stepConfig.title}
@@ -137,8 +237,17 @@ export const ReplaceCardScreen: React.FC = () => {
       buttonLabel={stepConfig.buttonLabel}
       onButtonPress={stepConfig.onButtonPress}
       isButtonDisabled={stepConfig.isButtonDisabled}
+      loading={loading}
     >
-      {renderStepContent()}
+      {stepContent}
     </SteppedCardLayout>
   )
 }
+
+const useStyles = makeStyles((_) => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+}))

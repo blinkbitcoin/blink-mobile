@@ -3279,16 +3279,28 @@
         "issueType": "Razlog",
         "deliveryTime": "Vrijeme isporuke",
         "shippingCost": "Trošak dostave",
-        "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
-        "bullet2": "Vaša nova kartica imat će iste brojeve kao trenutna",
-        "bullet3": "Uništite oštećenu karticu kada stigne nova"
+        "DamagedInfo": {
+          "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
+          "bullet2": "Vaša nova kartica imat će novi broj kartice",
+          "bullet3": "Uništite svoju oštećenu karticu kad stigne nova"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaša kartica je zaključana za vašu zaštitu",
+          "bullet2": "Vaša nova kartica imat će novi broj kartice",
+          "bullet3": "Vaša stara kartica bit će trajno otkazana"
+        }
       },
       "Status": {
         "title": "Vaša nova kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
         "buttonLabel": "Nadzorna ploča"
       },
-      "title": "Zamijeni karticu"
+      "title": "Zamijeni karticu",
+      "errors": {
+        "lockFailed": "Zaključavanje kartice nije uspjelo. Pokušajte ponovo.",
+        "replaceFailed": "Zamjena kartice nije uspjela. Pokušajte ponovo.",
+        "replaceFailedCardLocked": "Vaša kartica je zaključana, ali zamjena nije uspjela. Molimo kontaktirajte podršku za pomoć."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Naruči fizičku karticu",

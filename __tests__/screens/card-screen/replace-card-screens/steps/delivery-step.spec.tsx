@@ -72,21 +72,6 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_USER: {
-    registeredAddress: {
-      firstName: "Satoshi",
-      lastName: "Nakamoto",
-      line1: "123 Main Street",
-      line2: "Apt 4B",
-      city: "New York",
-      region: "NY",
-      postalCode: "10001",
-      countryCode: "USA",
-    },
-  },
-}))
-
 jest.mock("@app/screens/card-screen/utils", () => ({
   addressToLines: (address: ShippingAddress, includeFullName = true) => {
     const lines: string[] = []
@@ -184,6 +169,8 @@ describe("DeliveryStep", () => {
   const defaultProps = {
     selectedDelivery: null,
     onSelectDelivery: jest.fn(),
+    hasRegisteredAddress: true,
+    registeredAddress: mockCustomAddress,
     useRegisteredAddress: true,
     onToggleUseRegisteredAddress: jest.fn(),
     customAddress: mockCustomAddress,
@@ -283,29 +270,13 @@ describe("DeliveryStep", () => {
       expect(getByText("USA")).toBeTruthy()
     })
 
-    it("displays custom address when checkbox unchecked", () => {
-      const customAddr: ShippingAddress = {
-        firstName: "Joe",
-        lastName: "Nakamoto",
-        line1: "456 Oak Avenue",
-        line2: "",
-        city: "Austin",
-        region: "TX",
-        postalCode: "73301",
-        countryCode: "USA",
-      }
-
-      const { getByTestId, getAllByText } = render(
-        <DeliveryStep
-          {...defaultProps}
-          useRegisteredAddress={false}
-          customAddress={customAddr}
-        />,
+    it("hides address preview and shows form when checkbox unchecked", () => {
+      const { queryByTestId, getByTestId } = render(
+        <DeliveryStep {...defaultProps} useRegisteredAddress={false} />,
       )
 
-      expect(getByTestId("multi-line-field")).toBeTruthy()
-      expect(getAllByText("456 Oak Avenue").length).toBeGreaterThanOrEqual(1)
-      expect(getAllByText("Austin, TX 73301").length).toBeGreaterThanOrEqual(1)
+      expect(queryByTestId("multi-line-field")).toBeNull()
+      expect(getByTestId("shipping-address-form")).toBeTruthy()
     })
   })
 
@@ -344,6 +315,40 @@ describe("DeliveryStep", () => {
 
       const option = getByTestId("option-Express delivery")
       expect(option.props.accessibilityState).toEqual({ selected: true })
+    })
+  })
+
+  describe("no registered address", () => {
+    it("hides checkbox when hasRegisteredAddress is false", () => {
+      const { queryByTestId } = render(
+        <DeliveryStep
+          {...defaultProps}
+          hasRegisteredAddress={false}
+          useRegisteredAddress={false}
+        />,
+      )
+
+      expect(queryByTestId("checkbox-row")).toBeNull()
+    })
+
+    it("shows form when hasRegisteredAddress is false", () => {
+      const { getByTestId } = render(
+        <DeliveryStep
+          {...defaultProps}
+          hasRegisteredAddress={false}
+          useRegisteredAddress={false}
+        />,
+      )
+
+      expect(getByTestId("shipping-address-form")).toBeTruthy()
+    })
+
+    it("shows checkbox when hasRegisteredAddress is true", () => {
+      const { getByTestId } = render(
+        <DeliveryStep {...defaultProps} hasRegisteredAddress={true} />,
+      )
+
+      expect(getByTestId("checkbox-row")).toBeTruthy()
     })
   })
 })

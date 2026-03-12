@@ -256,6 +256,16 @@ mutation cardPinUpdate($input: CardPinUpdateInput!) {
   cardPinUpdate(input: $input)
 }
 
+mutation cardReplace($input: CardReplaceInput!) {
+  cardReplace(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+    __typename
+  }
+}
+
 mutation cardUpdate($input: CardUpdateInput!) {
   cardUpdate(input: $input) {
     id

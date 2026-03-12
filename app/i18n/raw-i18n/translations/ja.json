@@ -3270,15 +3270,27 @@
                 "deliveryTime": "配達時間",
                 "shippingCost": "配送料",
                 "importantInformation": "重要な情報",
-                "bullet1": "新しいカードが届くまで現在のカードは有効のままです",
-                "bullet2": "新しいカードは現在のカードと同じ番号になります",
-                "bullet3": "新しいカードが届いたら破損したカードを処分してください",
+                "DamagedInfo": {
+                    "bullet1": "現在のカードは新しいカードが届くまでアクティブなままです",
+                    "bullet2": "新しいカードには新しいカード番号が付きます",
+                    "bullet3": "新しいカードが届いたら破損したカードを破棄してください"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "お客様の保護のためカードがロックされました",
+                    "bullet2": "新しいカードには新しいカード番号が付きます",
+                    "bullet3": "古いカードは永久にキャンセルされます"
+                },
                 "submitRequest": "リクエストを送信"
             },
             "Status": {
                 "title": "新しいカードが届きます！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "ダッシュボード"
+            },
+            "errors": {
+                "lockFailed": "カードのロックに失敗しました。もう一度お試しください。",
+                "replaceFailed": "カードの交換に失敗しました。もう一度お試しください。",
+                "replaceFailedCardLocked": "カードはロックされましたが、交換に失敗しました。サポートにお問い合わせください。"
             }
         },
         "OrderPhysicalCard": {

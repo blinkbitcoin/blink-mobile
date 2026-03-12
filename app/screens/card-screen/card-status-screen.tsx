@@ -30,6 +30,7 @@ export const CardStatusScreen: React.FC = () => {
     iconColor = colors._green,
     showCard = true,
     showAddToWallet = true,
+    lastFour,
   } = route.params
 
   const handlePrimaryButtonPress = () => {
@@ -49,7 +50,7 @@ export const CardStatusScreen: React.FC = () => {
       iconName={iconName}
       iconColor={iconColor}
       showCard={showCard}
-      cardNumber={MOCK_CARD.cardNumber}
+      cardNumber={lastFour ?? MOCK_CARD.cardNumber}
       holderName={MOCK_CARD.holderName}
       validThruDate={MOCK_CARD.validThruDate}
       isFrozen={MOCK_CARD.status === CardStatus.Frozen}
