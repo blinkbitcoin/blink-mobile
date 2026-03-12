@@ -149,6 +149,7 @@ export type RootStackParamList = {
     iconColor?: string
     showCard?: boolean
     showAddToWallet?: boolean
+    lastFour?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined

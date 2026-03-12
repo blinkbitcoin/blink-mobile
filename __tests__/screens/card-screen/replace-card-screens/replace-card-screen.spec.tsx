@@ -386,6 +386,7 @@ describe("ReplaceCardScreen", () => {
         navigateTo: "cardDashboardScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        lastFour: "4321",
       })
     })
 

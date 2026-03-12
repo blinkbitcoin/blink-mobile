@@ -8,6 +8,7 @@ import { Screen } from "@app/components/screen"
 import { CardType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toastShow } from "@app/utils/toast"
 
 import { useCardData } from "../hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
@@ -92,7 +93,15 @@ export const ReplaceCardScreen: React.FC = () => {
 
   const handleSubmit = useCallback(async () => {
     const result = await replaceCard(cardId)
-    if (!result) return
+    if (!result) {
+      if (state.selectedIssue !== Issue.Damaged) {
+        toastShow({
+          message: LL.CardFlow.ReplaceCard.errors.replaceFailedCardLocked(),
+          LL,
+        })
+      }
+      return
+    }
 
     completeFlow()
     navigation.replace("cardStatusScreen", {
@@ -102,8 +111,17 @@ export const ReplaceCardScreen: React.FC = () => {
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
       iconColor: colors._green,
+      lastFour: result.lastFour,
     })
-  }, [replaceCard, cardId, completeFlow, navigation, LL, colors._green])
+  }, [
+    replaceCard,
+    cardId,
+    state.selectedIssue,
+    completeFlow,
+    navigation,
+    LL,
+    colors._green,
+  ])
 
   const loading = replaceLoading || lockLoading
 
@@ -182,6 +200,7 @@ export const ReplaceCardScreen: React.FC = () => {
           <ConfirmStep
             issueType={state.selectedIssue}
             deliveryType={state.selectedDelivery ?? Delivery.Standard}
+            isVirtualCard={isVirtualCard}
           />
         )
     }
