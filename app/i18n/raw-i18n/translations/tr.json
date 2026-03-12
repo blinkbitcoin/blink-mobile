@@ -3295,6 +3295,101 @@
         "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
         "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abone Ol",
+        "paymentTitle": "Ödeme",
+        "acceptButton": "Kabul Et",
+        "payButton": "Devam Et ve Öde",
+        "cardTitle": "Blink Özel",
+        "perYear": "yıllık",
+        "status": {
+          "label": "Durum",
+          "paymentPending": "Ödeme Bekliyor",
+          "firstYearFree": "İlk yıl ücretsiz"
+        },
+        "renewalDate": {
+          "label": "Yenileme tarihi"
+        },
+        "agreement": {
+          "text": "Kabul ediyorum",
+          "termsOfService": "Hizmet Şartları",
+          "privacyPolicy": "Gizlilik Politikası",
+          "cardholderAgreement": "Kart Sahibi Sözleşmesi",
+          "and": "ve"
+        },
+        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+      },
+      "CardIntroducing": {
+        "title": "Tanıtım",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa kartı",
+          "for": "için",
+          "maximalist": "Bitcoin Maksimalistleri"
+        },
+        "buttonText": "Devam Et"
+      },
+      "CardDetails": {
+        "title": "Ek avantajlar",
+        "features": {
+          "accountManager": "Özel hesap yöneticisi",
+          "support": "Öncelikli destek",
+          "onchainDeposits": "İşlem ücretlerinden %50 geri ödeme",
+          "circularEconomies": "Döngüsel ekonomilere 100 $"
+        },
+        "andMore": "... ve 2026'da daha fazlası geliyor",
+        "buttonText": "Devam Et"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Hoş geldiniz",
+          "subtitle": "Blink Özel'e",
+          "paragraphs": {
+            "body1": "Biri sizi düşündü ve sizi Blink Özel'e davet etmemizi önerdi. Muhtemelen harika bir Bitcoiner olduğunuz için.",
+            "body2": "2026 hedefimiz programı o kadar çok avantajla doldurmak ki gelecek yıl yenilemenin mantıklı olacağı açık olsun."
+          }
+        },
+        "buttonText": "Hadi başlayalım"
+      },
+      "LoadingCard": {
+        "title": "Kartınız üzerinde çalışıyoruz",
+        "subtitle": "Hazır olduğunda size bildireceğiz",
+        "codingBackend": "...backend kodlanıyor",
+        "buttonText": "Güzel"
+      },
+      "PersonalInformation": {
+        "title": "Son adım",
+        "fields": {
+          "occupation": {
+            "label": "Meslek",
+            "placeholder": "Mesleğinizi seçin"
+          },
+          "annualSalaryRange": {
+            "label": "Yıllık maaş",
+            "placeholder": "Maaş aralığınızı seçin"
+          },
+          "accountPurpose": {
+            "label": "Hesap amacı",
+            "placeholder": "Amacı seçin"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Beklenen aylık harcama",
+            "placeholder": "Harcama aralığınızı seçin"
+          }
+        },
+        "buttonText": "Başvuruyu gönder",
+        "select": "seç"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa kartı için ön onay aldınız!",
+        "buttonText": "Kapat"
+      },
+      "CardProcessing": {
+        "title": "Başvurunuz işleniyor",
+        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "buttonText": "Kapat"
+      }
     }
   }
 }

@@ -3295,6 +3295,101 @@
         "bullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
         "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Feliratkozás",
+        "paymentTitle": "Fizetés",
+        "acceptButton": "Elfogadás",
+        "payButton": "Folytatás és Fizetés",
+        "cardTitle": "Blink Privát",
+        "perYear": "évente",
+        "status": {
+          "label": "Állapot",
+          "paymentPending": "Fizetés Függőben",
+          "firstYearFree": "Első év ingyenes"
+        },
+        "renewalDate": {
+          "label": "Megújítás dátuma"
+        },
+        "agreement": {
+          "text": "Elfogadom a",
+          "termsOfService": "Szolgáltatási Feltételeket",
+          "privacyPolicy": "Adatvédelmi Irányelveket",
+          "cardholderAgreement": "Kártyabirtokosi Megállapodást",
+          "and": "és"
+        },
+        "renew": "Megértem, hogy az előfizetésem automatikusan megújul 1 év múlva"
+      },
+      "CardIntroducing": {
+        "title": "Bemutatjuk",
+        "cardInfo": {
+          "bitcoinCard": "A Blink Visa kártya",
+          "for": "a",
+          "maximalist": "Bitcoin Maximalistáknak"
+        },
+        "buttonText": "Tovább"
+      },
+      "CardDetails": {
+        "title": "További előnyök",
+        "features": {
+          "accountManager": "Dedikált fiókkezelő",
+          "support": "Elsőbbségi támogatás",
+          "onchainDeposits": "50% visszatérítés a tranzakciós díjakból",
+          "circularEconomies": "100 $ körkörös gazdaságoknak"
+        },
+        "andMore": "... és még több jön 2026-ban",
+        "buttonText": "Tovább"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Üdvözöljük a fedélzeten",
+          "subtitle": "A Blink Privátban",
+          "paragraphs": {
+            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Privátba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
+            "body2": "Célunk 2026-ra az, hogy a programot annyi jósággal töltsük meg, hogy nyilvánvaló legyen jövőre megújítani."
+          }
+        },
+        "buttonText": "Rajta"
+      },
+      "LoadingCard": {
+        "title": "Dolgozunk a kártyádon",
+        "subtitle": "Értesítünk, amint elkészül",
+        "codingBackend": "...a backend kódolása",
+        "buttonText": "Szuper"
+      },
+      "PersonalInformation": {
+        "title": "Utolsó lépés",
+        "fields": {
+          "occupation": {
+            "label": "Foglalkozás",
+            "placeholder": "Válaszd ki a foglalkozásodat"
+          },
+          "annualSalaryRange": {
+            "label": "Éves fizetés",
+            "placeholder": "Válaszd ki a fizetési sávodat"
+          },
+          "accountPurpose": {
+            "label": "Fiók célja",
+            "placeholder": "Válaszd ki a célt"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Várható havi költés",
+            "placeholder": "Válaszd ki a költési sávodat"
+          }
+        },
+        "buttonText": "Pályázat beküldése",
+        "select": "kiválaszt"
+      },
+      "CardPreapproved": {
+        "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
+        "buttonText": "Bezárás"
+      },
+      "CardProcessing": {
+        "title": "Pályázatod feldolgozása",
+        "subtitle": "Becsült várakozási idő: {waitTime: string}",
+        "buttonText": "Bezárás"
+      }
     }
   }
 }

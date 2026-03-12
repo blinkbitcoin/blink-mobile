@@ -3336,6 +3336,101 @@
         "bullet2": "Ֆիզիկական քարտը ստանալուց հետո պետք է այն ակտիվացնեք",
         "bullet3": "Երկու քարտերն էլ կունենան նույն քարտի համարը և տվյալները"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Բաժանորդագրվել",
+        "paymentTitle": "Վճարում",
+        "acceptButton": "Ընդունել",
+        "payButton": "Շարունակել և վճարել",
+        "cardTitle": "Blink Private",
+        "perYear": "տարեկան",
+        "status": {
+          "label": "Կարգավիճակ",
+          "paymentPending": "Վճարումը սպասման մեջ է",
+          "firstYearFree": "Առաջին տարին անվճար է"
+        },
+        "renewalDate": {
+          "label": "Երկարաձգման ամսաթիվ"
+        },
+        "agreement": {
+          "text": "Ես համաձայն եմ",
+          "termsOfService": "Ծառայության պայմաններին",
+          "privacyPolicy": "Գաղտնիության քաղաքականությանը",
+          "cardholderAgreement": "Քարտապանի համաձայնագրին",
+          "and": "և"
+        },
+        "renew": "Ես հասկանում եմ, որ իմ բաժանորդագրությունը ավտոմատ կերկարաձգվի 1 տարի հետո"
+      },
+      "CardIntroducing": {
+        "title": "Ներկայացնում ենք",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa քարտը",
+          "for": "համար",
+          "maximalist": "Bitcoin մաքսիմալիստների"
+        },
+        "buttonText": "Շարունակել"
+      },
+      "CardDetails": {
+        "title": "Լրացուցիչ առավելություններ",
+        "features": {
+          "accountManager": "Անձնական հաշվի կառավարիչ",
+          "support": "Առաջնահերթ աջակցություն",
+          "onchainDeposits": "Գործարքի վճարների 50% վերադարձ",
+          "circularEconomies": "$100 շրջանաձև տնտեսություններին"
+        },
+        "andMore": "... և ավելին` 2026-ին",
+        "buttonText": "Շարունակել"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Բարի գալուստ",
+          "subtitle": "Blink Private",
+          "paragraphs": {
+            "body1": "Ինչ-որ մեկը մտածել է Ձեր մասին և առաջարկել, որ մենք Ձեզ հրավիրենք Blink Private։ Հավանաբար այն պատճառով, որ Դուք հիանալի բիթքոյներ եք։",
+            "body2": "Մեր նպատակը 2026-ի համար ծրագրում այնքան շատ առավելություններ ավելացնելն է, որ հաջորդ տարի երկարաձգելը դառնա ինքնըստինքյան ակնհայտ։"
+          }
+        },
+        "buttonText": "Սկսենք"
+      },
+      "LoadingCard": {
+        "title": "Մենք աշխատում ենք Ձեր քարտի վրա",
+        "subtitle": "Կտեղեկացնենք Ձեզ, երբ այն պատրաստ լինի",
+        "codingBackend": "...մշակում ենք backend-ը",
+        "buttonText": "Հիանալի"
+      },
+      "PersonalInformation": {
+        "title": "Վերջին քայլը",
+        "fields": {
+          "occupation": {
+            "label": "Զբաղմունք",
+            "placeholder": "Ընտրեք Ձեր զբաղմունքը"
+          },
+          "annualSalaryRange": {
+            "label": "Տարեկան աշխատավարձ",
+            "placeholder": "Ընտրեք Ձեր աշխատավարձի միջակայքը"
+          },
+          "accountPurpose": {
+            "label": "Հաշվի նպատակը",
+            "placeholder": "Ընտրեք նպատակը"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Սպասվող ամսական ծախս",
+            "placeholder": "Ընտրեք Ձեր ծախսերի միջակայքը"
+          }
+        },
+        "buttonText": "Ուղարկել հայտը",
+        "select": "ընտրել"
+      },
+      "CardPreapproved": {
+        "title": "You have been pre-approved for the Blink Visa card!",
+        "buttonText": "Close"
+      },
+      "CardProcessing": {
+        "title": "Մշակվում է Ձեր հայտը",
+        "subtitle": "Սպասման գնահատված ժամանակը՝ {waitTime: string}",
+        "buttonText": "Փակել"
+      }
     }
   }
 }

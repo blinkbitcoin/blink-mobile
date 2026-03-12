@@ -9,6 +9,7 @@ import {
   KycFlowStartDocument,
   OnboardingStatus,
 } from "@app/graphql/generated"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ContextForScreen } from "./helper"
 
 let currentMocks: MockedResponse[] = []
@@ -40,19 +41,15 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-jest.mock("@app/hooks", () => {
-  const actual = jest.requireActual("@app/hooks")
-  return {
-    ...actual,
-    useAppConfig: () => ({
-      appConfig: {
-        galoyInstance: {
-          kycUrl: "https://kyc.example.com",
-        },
+jest.mock("@app/hooks/use-app-config", () => ({
+  useAppConfig: () => ({
+    appConfig: {
+      galoyInstance: {
+        kycUrl: "https://kyc.example.com",
       },
-    }),
-  }
-})
+    },
+  }),
+}))
 
 const generateFullOnboardingMock = ({
   onboardingStatus,
@@ -101,6 +98,7 @@ const generateFullOnboardingMock = ({
 
 describe("FullOnboardingFlowScreen", () => {
   beforeEach(() => {
+    loadLocale("en")
     currentMocks = []
     jest.clearAllMocks()
   })

@@ -3295,6 +3295,101 @@
         "bullet2": "Va trebui să activezi cardul fizic când ajunge",
         "bullet3": "Ambele carduri vor avea același număr și aceleași detalii"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Abonare",
+        "paymentTitle": "Plată",
+        "acceptButton": "Acceptă",
+        "payButton": "Continuă și Plătește",
+        "cardTitle": "Blink Privat",
+        "perYear": "pe an",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Plată în Așteptare",
+          "firstYearFree": "Primul an gratuit"
+        },
+        "renewalDate": {
+          "label": "Data de reînoire"
+        },
+        "agreement": {
+          "text": "Sunt de acord cu",
+          "termsOfService": "Termenii Serviciului",
+          "privacyPolicy": "Politica de Confidențialitate",
+          "cardholderAgreement": "Acordul Deținătorului de Card",
+          "and": "și"
+        },
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în 1 an"
+      },
+      "CardIntroducing": {
+        "title": "Prezentare",
+        "cardInfo": {
+          "bitcoinCard": "Cardul Visa Blink",
+          "for": "pentru",
+          "maximalist": "Maximaliștii Bitcoin"
+        },
+        "buttonText": "Continuă"
+      },
+      "CardDetails": {
+        "title": "Avantaje suplimentare",
+        "features": {
+          "accountManager": "Manager de cont dedicat",
+          "support": "Suport prioritar",
+          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
+          "circularEconomies": "100 $ pentru economii circulare"
+        },
+        "andMore": "... și mai multe vin în 2026",
+        "buttonText": "Continuă"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Bun venit la bord",
+          "subtitle": "La Blink Privat",
+          "paragraphs": {
+            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Privat. Probabil pentru că ești un Bitcoiner grozav.",
+            "body2": "Obiectivul nostru pentru 2026 este să umplem programul cu atâtea avantaje încât va fi evident să reînnoiești anul viitor."
+          }
+        },
+        "buttonText": "Hai să mergem"
+      },
+      "LoadingCard": {
+        "title": "Lucrăm la cardul tău",
+        "subtitle": "Te vom notifica când va fi gata",
+        "codingBackend": "...programăm backend-ul",
+        "buttonText": "Grozav"
+      },
+      "PersonalInformation": {
+        "title": "Ultimul pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupație",
+            "placeholder": "Selectează ocupația ta"
+          },
+          "annualSalaryRange": {
+            "label": "Salariu anual",
+            "placeholder": "Selectează intervalul salarial"
+          },
+          "accountPurpose": {
+            "label": "Scopul contului",
+            "placeholder": "Selectează scopul"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Cheltuieli lunare estimate",
+            "placeholder": "Selectează intervalul de cheltuieli"
+          }
+        },
+        "buttonText": "Trimite cererea",
+        "select": "selectează"
+      },
+      "CardPreapproved": {
+        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "buttonText": "Închide"
+      },
+      "CardProcessing": {
+        "title": "Se procesează cererea ta",
+        "subtitle": "Timp estimat de așteptare: {waitTime: string}",
+        "buttonText": "Închide"
+      }
     }
   }
 }

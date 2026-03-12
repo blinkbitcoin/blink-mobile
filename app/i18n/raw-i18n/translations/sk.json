@@ -3295,6 +3295,101 @@
         "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
         "bullet3": "Obe karty budú mať rovnaké číslo a údaje"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Predplatiť",
+        "paymentTitle": "Platba",
+        "acceptButton": "Prijať",
+        "payButton": "Pokračovať a Zaplatiť",
+        "cardTitle": "Blink Súkromný",
+        "perYear": "za rok",
+        "status": {
+          "label": "Stav",
+          "paymentPending": "Platba Čaká",
+          "firstYearFree": "Prvý rok zadarmo"
+        },
+        "renewalDate": {
+          "label": "Dátum obnovenia"
+        },
+        "agreement": {
+          "text": "Súhlasím s",
+          "termsOfService": "Podmienkami služby",
+          "privacyPolicy": "Zásadami ochrany osobných údajov",
+          "cardholderAgreement": "Zmluvou držiteľa karty",
+          "and": "a"
+        },
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví za 1 rok"
+      },
+      "CardIntroducing": {
+        "title": "Predstavujeme",
+        "cardInfo": {
+          "bitcoinCard": "Karta Blink Visa",
+          "for": "pre",
+          "maximalist": "Bitcoin maximalistov"
+        },
+        "buttonText": "Pokračovať"
+      },
+      "CardDetails": {
+        "title": "Ďalšie výhody",
+        "features": {
+          "accountManager": "Vyhradený správca účtu",
+          "support": "Prioritná podpora",
+          "onchainDeposits": "50% späť z transakčných poplatkov",
+          "circularEconomies": "100 $ pre cirkulárne ekonomiky"
+        },
+        "andMore": "... a ďalšie prídu v roku 2026",
+        "buttonText": "Pokračovať"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Vitajte na palube",
+          "subtitle": "V Blink Súkromný",
+          "paragraphs": {
+            "body1": "Niekto na vás myslel a navrhol, aby sme vás pozvali do Blink Súkromný. Pravdepodobne preto, že ste skvelý Bitcoiner.",
+            "body2": "Naším cieľom pre rok 2026 je naplniť program toľkými výhodami, že bude zrejmé, že sa oplatí budúci rok obnoviť."
+          }
+        },
+        "buttonText": "Poďme na to"
+      },
+      "LoadingCard": {
+        "title": "Pracujeme na vašej karte",
+        "subtitle": "Upozorníme vás, keď bude pripravená",
+        "codingBackend": "...kódujeme backend",
+        "buttonText": "Super"
+      },
+      "PersonalInformation": {
+        "title": "Posledný krok",
+        "fields": {
+          "occupation": {
+            "label": "Povolanie",
+            "placeholder": "Vyberte svoje povolanie"
+          },
+          "annualSalaryRange": {
+            "label": "Ročný plat",
+            "placeholder": "Vyberte svoj platový rozsah"
+          },
+          "accountPurpose": {
+            "label": "Účel účtu",
+            "placeholder": "Vyberte účel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očakávané mesačné výdavky",
+            "placeholder": "Vyberte svoj rozsah výdavkov"
+          }
+        },
+        "buttonText": "Odoslať žiadosť",
+        "select": "vybrať"
+      },
+      "CardPreapproved": {
+        "title": "Boli ste predbežne schválení pre kartu Blink Visa!",
+        "buttonText": "Zavrieť"
+      },
+      "CardProcessing": {
+        "title": "Spracúvame vašu žiadosť",
+        "subtitle": "Odhadovaný čas čakania: {waitTime: string}",
+        "buttonText": "Zavrieť"
+      }
     }
   }
 }

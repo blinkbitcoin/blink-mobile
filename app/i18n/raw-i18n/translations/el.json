@@ -3295,6 +3295,101 @@
         "bullet2": "Θα χρειαστεί να ενεργοποιήσετε τη φυσική κάρτα όταν φτάσει",
         "bullet3": "Και οι δύο κάρτες θα έχουν τον ίδιο αριθμό και στοιχεία"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Εγγραφή",
+        "paymentTitle": "Πληρωμή",
+        "acceptButton": "Αποδοχή",
+        "payButton": "Συνέχεια και πληρωμή",
+        "cardTitle": "Blink Private",
+        "perYear": "ανά έτος",
+        "status": {
+          "label": "Κατάσταση",
+          "paymentPending": "Η πληρωμή εκκρεμεί",
+          "firstYearFree": "Πρώτος χρόνος δωρεάν"
+        },
+        "renewalDate": {
+          "label": "Ημερομηνία ανανέωσης"
+        },
+        "agreement": {
+          "text": "Συμφωνώ με τους",
+          "termsOfService": "Όρους Χρήσης",
+          "privacyPolicy": "Πολιτική Απορρήτου",
+          "cardholderAgreement": "Συμφωνία Κατόχου Κάρτας",
+          "and": "και"
+        },
+        "renew": "Κατανοώ ότι η συνδρομή μου θα ανανεωθεί αυτόματα σε 1 χρόνο"
+      },
+      "CardIntroducing": {
+        "title": "Σας παρουσιάζουμε",
+        "cardInfo": {
+          "bitcoinCard": "Την κάρτα Visa της Blink",
+          "for": "για",
+          "maximalist": "Bitcoin maximalists"
+        },
+        "buttonText": "Συνέχεια"
+      },
+      "CardDetails": {
+        "title": "Επιπλέον προνόμια",
+        "features": {
+          "accountManager": "Αποκλειστικός διαχειριστής λογαριασμού",
+          "support": "Υποστήριξη κατά προτεραιότητα",
+          "onchainDeposits": "50% επιστροφή στα τέλη συναλλαγών",
+          "circularEconomies": "$100 σε κυκλικές οικονομίες"
+        },
+        "andMore": "... και περισσότερα μέσα στο 2026",
+        "buttonText": "Συνέχεια"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Καλώς ήρθατε",
+          "subtitle": "στο Blink Private",
+          "paragraphs": {
+            "body1": "Κάποιος σας σκέφτηκε και πρότεινε να σας προσκαλέσουμε στο Blink Private. Πιθανότατα επειδή είστε ένας εξαιρετικός Bitcoiner.",
+            "body2": "Ο στόχος μας για το 2026 είναι να γεμίσουμε το πρόγραμμα με τόσα πολλά οφέλη, ώστε η ανανέωση την επόμενη χρονιά να είναι αυτονόητη."
+          }
+        },
+        "buttonText": "Πάμε"
+      },
+      "LoadingCard": {
+        "title": "Ετοιμάζουμε την κάρτα σας",
+        "subtitle": "Θα σας ειδοποιήσουμε μόλις είναι έτοιμη",
+        "codingBackend": "...γράφουμε το backend",
+        "buttonText": "Τέλεια"
+      },
+      "PersonalInformation": {
+        "title": "Τελικό βήμα",
+        "fields": {
+          "occupation": {
+            "label": "Επάγγελμα",
+            "placeholder": "Επιλέξτε το επάγγελμά σας"
+          },
+          "annualSalaryRange": {
+            "label": "Ετήσιος μισθός",
+            "placeholder": "Επιλέξτε το εύρος του μισθού σας"
+          },
+          "accountPurpose": {
+            "label": "Σκοπός λογαριασμού",
+            "placeholder": "Επιλέξτε τον σκοπό"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Αναμενόμενες μηνιαίες δαπάνες",
+            "placeholder": "Επιλέξτε το εύρος των δαπανών σας"
+          }
+        },
+        "buttonText": "Υποβολή αίτησης",
+        "select": "επιλογή"
+      },
+      "CardPreapproved": {
+        "title": "You have been pre-approved for the Blink Visa card!",
+        "buttonText": "Close"
+      },
+      "CardProcessing": {
+        "title": "Η αίτησή σας επεξεργάζεται",
+        "subtitle": "Εκτιμώμενος χρόνος αναμονής: {waitTime: string}",
+        "buttonText": "Κλείσιμο"
+      }
     }
   }
 }

@@ -3333,6 +3333,101 @@
         "bullet2": "Физичку картицу треба да активирате када стигне",
         "bullet3": "Обе картице ће имати исти број и податке"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Претплатити се",
+        "paymentTitle": "Плаћање",
+        "acceptButton": "Прихвати",
+        "payButton": "Настави и Плати",
+        "cardTitle": "Blink Приватни",
+        "perYear": "годишње",
+        "status": {
+          "label": "Статус",
+          "paymentPending": "Плаћање на Чекању",
+          "firstYearFree": "Прва година бесплатно"
+        },
+        "renewalDate": {
+          "label": "Датум обнове"
+        },
+        "agreement": {
+          "text": "Прихватам",
+          "termsOfService": "Услове коришћења",
+          "privacyPolicy": "Политику приватности",
+          "cardholderAgreement": "Уговор власника картице",
+          "and": "и"
+        },
+        "renew": "Разумем да ће се моја претплата аутоматски обновити за 1 годину"
+      },
+      "CardIntroducing": {
+        "title": "Представљамо",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa картица",
+          "for": "за",
+          "maximalist": "Биткоин Максималисте"
+        },
+        "buttonText": "Настави"
+      },
+      "CardDetails": {
+        "title": "Додатне погодности",
+        "features": {
+          "accountManager": "Посвећени менаџер налога",
+          "support": "Приоритетна подршка",
+          "onchainDeposits": "50% повраћаја на провизије за трансакције",
+          "circularEconomies": "100 $ за циркуларне економије"
+        },
+        "andMore": "... и још тога долази 2026.",
+        "buttonText": "Настави"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Добродошли на борд",
+          "subtitle": "У Blink Приватни",
+          "paragraphs": {
+            "body1": "Неко је мислио на вас и предложио да вас позовемо у Blink Приватни. Вероватно зато што сте сјајан Биткоинер.",
+            "body2": "Наш циљ за 2026. је да напунимо програм са толико погодности да ће бити очигледно да се исплати обновити следеће године."
+          }
+        },
+        "buttonText": "Хајде"
+      },
+      "LoadingCard": {
+        "title": "Радимо на вашој картици",
+        "subtitle": "Обавестићемо вас кад буде готова",
+        "codingBackend": "...кодирамо бекенд",
+        "buttonText": "Одлично"
+      },
+      "PersonalInformation": {
+        "title": "Последњи корак",
+        "fields": {
+          "occupation": {
+            "label": "Занимање",
+            "placeholder": "Изаберите своје занимање"
+          },
+          "annualSalaryRange": {
+            "label": "Годишња плата",
+            "placeholder": "Изаберите свој распон плате"
+          },
+          "accountPurpose": {
+            "label": "Сврха налога",
+            "placeholder": "Изаберите сврху"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Очекивана месечна потрошња",
+            "placeholder": "Изаберите свој распон потрошње"
+          }
+        },
+        "buttonText": "Пошаљи пријаву",
+        "select": "изабери"
+      },
+      "CardPreapproved": {
+        "title": "Претходно сте одобрени за Blink Visa картицу!",
+        "buttonText": "Затвори"
+      },
+      "CardProcessing": {
+        "title": "Обрађујемо вашу пријаву",
+        "subtitle": "Процењено време чекања: {waitTime: string}",
+        "buttonText": "Затвори"
+      }
     }
   }
 }

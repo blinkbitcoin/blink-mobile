@@ -3283,6 +3283,101 @@
                 "bullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
                 "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
             }
+        },
+        "Onboarding": {
+            "CardSubscription": {
+                "subscribeTitle": "Abonnieren",
+                "paymentTitle": "Zahlung",
+                "acceptButton": "Akzeptieren",
+                "payButton": "Fortfahren und Bezahlen",
+                "cardTitle": "Blink Privat",
+                "perYear": "pro Jahr",
+                "status": {
+                    "label": "Status",
+                    "paymentPending": "Zahlung Ausstehend",
+                    "firstYearFree": "Erstes Jahr kostenlos"
+                },
+                "renewalDate": {
+                    "label": "Verlängerungsdatum"
+                },
+                "agreement": {
+                    "text": "Ich stimme den",
+                    "termsOfService": "Nutzungsbedingungen",
+                    "privacyPolicy": "Datenschutzrichtlinie",
+                    "cardholderAgreement": "Karteninhabervereinbarung",
+                    "and": "und"
+                },
+                "renew": "Ich verstehe, dass mein Abonnement automatisch in 1 Jahr verlängert wird"
+            },
+            "CardIntroducing": {
+                "title": "Vorstellung",
+                "cardInfo": {
+                    "bitcoinCard": "Die Blink Visa-Karte",
+                    "for": "für",
+                    "maximalist": "Bitcoin-Maximalisten"
+                },
+                "buttonText": "Weiter"
+            },
+            "CardDetails": {
+                "title": "Zusätzliche Vorteile",
+                "features": {
+                    "accountManager": "Persönlicher Kontobetreuer",
+                    "support": "Prioritärer Support",
+                    "onchainDeposits": "50% Rückerstattung auf Transaktionsgebühren",
+                    "circularEconomies": "100 $ für zirkuläre Wirtschaften"
+                },
+                "andMore": "... und mehr kommt 2026",
+                "buttonText": "Weiter"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "Willkommen an Bord",
+                    "subtitle": "Bei Blink Privat",
+                    "paragraphs": {
+                        "body1": "Jemand hat an dich gedacht und vorgeschlagen, dass wir dich zu Blink Privat einladen sollten. Wahrscheinlich weil du ein großartiger Bitcoiner bist.",
+                        "body2": "Unser Ziel für 2026 ist es, das Programm mit so vielen Vorteilen zu füllen, dass es offensichtlich sein wird, nächstes Jahr zu verlängern."
+                    }
+                },
+                "buttonText": "Los geht's"
+            },
+            "LoadingCard": {
+                "title": "Wir arbeiten an deiner Karte",
+                "subtitle": "Wir benachrichtigen dich, sobald sie da ist",
+                "codingBackend": "...Backend programmieren",
+                "buttonText": "Super"
+            },
+            "PersonalInformation": {
+                "title": "Letzter Schritt",
+                "fields": {
+                    "occupation": {
+                        "label": "Beruf",
+                        "placeholder": "Wähle deinen Beruf"
+                    },
+                    "annualSalaryRange": {
+                        "label": "Jahresgehalt",
+                        "placeholder": "Wähle deine Gehaltsspanne"
+                    },
+                    "accountPurpose": {
+                        "label": "Kontozweck",
+                        "placeholder": "Wähle den Zweck"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "Erwartete monatliche Ausgaben",
+                        "placeholder": "Wähle deine Ausgabenspanne"
+                    }
+                },
+                "buttonText": "Antrag einreichen",
+                "select": "auswählen"
+            },
+            "CardPreapproved": {
+                "title": "Sie wurden für die Blink Visa-Karte vorab genehmigt!",
+                "buttonText": "Schließen"
+            },
+            "CardProcessing": {
+                "title": "Dein Antrag wird bearbeitet",
+                "subtitle": "Geschätzte Wartezeit: {waitTime: string}",
+                "buttonText": "Schließen"
+            }
         }
     }
 }

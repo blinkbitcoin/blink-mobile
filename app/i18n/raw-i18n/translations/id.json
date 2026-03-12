@@ -3295,6 +3295,101 @@
         "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
         "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
       }
+    },
+    "Onboarding": {
+      "CardSubscription": {
+        "subscribeTitle": "Berlangganan",
+        "paymentTitle": "Pembayaran",
+        "acceptButton": "Terima",
+        "payButton": "Lanjutkan dan Bayar",
+        "cardTitle": "Blink Pribadi",
+        "perYear": "per tahun",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Pembayaran Tertunda",
+          "firstYearFree": "Tahun pertama gratis"
+        },
+        "renewalDate": {
+          "label": "Tanggal perpanjangan"
+        },
+        "agreement": {
+          "text": "Saya menyetujui",
+          "termsOfService": "Ketentuan Layanan",
+          "privacyPolicy": "Kebijakan Privasi",
+          "cardholderAgreement": "Perjanjian Pemegang Kartu",
+          "and": "dan"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+      },
+      "CardIntroducing": {
+        "title": "Memperkenalkan",
+        "cardInfo": {
+          "bitcoinCard": "Kartu Visa Blink",
+          "for": "untuk",
+          "maximalist": "Maksimalis Bitcoin"
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "CardDetails": {
+        "title": "Keuntungan tambahan",
+        "features": {
+          "accountManager": "Manajer akun khusus",
+          "support": "Dukungan prioritas",
+          "onchainDeposits": "Pengembalian 50% biaya transaksi",
+          "circularEconomies": "$100 untuk ekonomi sirkular"
+        },
+        "andMore": "... dan lainnya segera hadir di 2026",
+        "buttonText": "Lanjutkan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Selamat datang",
+          "subtitle": "Di Blink Pribadi",
+          "paragraphs": {
+            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Pribadi. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
+            "body2": "Tujuan kami untuk 2026 adalah mengisi program dengan begitu banyak keuntungan sehingga sudah jelas untuk memperbarui tahun depan."
+          }
+        },
+        "buttonText": "Ayo mulai"
+      },
+      "LoadingCard": {
+        "title": "Kami sedang mengerjakan kartu Anda",
+        "subtitle": "Kami akan memberitahu Anda setelah siap",
+        "codingBackend": "...membuat kode backend",
+        "buttonText": "Bagus"
+      },
+      "PersonalInformation": {
+        "title": "Langkah terakhir",
+        "fields": {
+          "occupation": {
+            "label": "Pekerjaan",
+            "placeholder": "Pilih pekerjaan Anda"
+          },
+          "annualSalaryRange": {
+            "label": "Gaji tahunan",
+            "placeholder": "Pilih rentang gaji Anda"
+          },
+          "accountPurpose": {
+            "label": "Tujuan akun",
+            "placeholder": "Pilih tujuan"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Pengeluaran bulanan yang diharapkan",
+            "placeholder": "Pilih rentang pengeluaran Anda"
+          }
+        },
+        "buttonText": "Kirim aplikasi",
+        "select": "pilih"
+      },
+      "CardPreapproved": {
+        "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
+        "buttonText": "Tutup"
+      },
+      "CardProcessing": {
+        "title": "Memproses aplikasi Anda",
+        "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
+        "buttonText": "Tutup"
+      }
     }
   }
 }
