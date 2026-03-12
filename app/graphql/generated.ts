@@ -3166,12 +3166,19 @@ export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransac
 export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }> } } | null };
+export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }>, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
 
 export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CardEncryptionPublicKeyQuery = { readonly __typename: 'Query', readonly cardEncryptionPublicKey: string };
+
+export type CardCreateMutationVariables = Exact<{
+  input: CardCreateInput;
+}>;
+
+
+export type CardCreateMutation = { readonly __typename: 'Mutation', readonly cardCreate: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
 
 export type CardPinUpdateMutationVariables = Exact<{
   input: CardPinUpdateInput;
@@ -5286,6 +5293,10 @@ export const CardDocument = gql`
           dailyLimitCents
           monthlyLimitCents
         }
+        cardConsumerApplications {
+          id
+          applicationStatus
+        }
       }
     }
   }
@@ -5360,6 +5371,42 @@ export type CardEncryptionPublicKeyQueryHookResult = ReturnType<typeof useCardEn
 export type CardEncryptionPublicKeyLazyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyLazyQuery>;
 export type CardEncryptionPublicKeySuspenseQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeySuspenseQuery>;
 export type CardEncryptionPublicKeyQueryResult = Apollo.QueryResult<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>;
+export const CardCreateDocument = gql`
+    mutation cardCreate($input: CardCreateInput!) {
+  cardCreate(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardCreateMutationFn = Apollo.MutationFunction<CardCreateMutation, CardCreateMutationVariables>;
+
+/**
+ * __useCardCreateMutation__
+ *
+ * To run a mutation, you first call `useCardCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCreateMutation, { data, loading, error }] = useCardCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardCreateMutation, CardCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCreateMutation, CardCreateMutationVariables>(CardCreateDocument, options);
+      }
+export type CardCreateMutationHookResult = ReturnType<typeof useCardCreateMutation>;
+export type CardCreateMutationResult = Apollo.MutationResult<CardCreateMutation>;
+export type CardCreateMutationOptions = Apollo.BaseMutationOptions<CardCreateMutation, CardCreateMutationVariables>;
 export const CardPinUpdateDocument = gql`
     mutation cardPinUpdate($input: CardPinUpdateInput!) {
   cardPinUpdate(input: $input)

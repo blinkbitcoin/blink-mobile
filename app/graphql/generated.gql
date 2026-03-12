@@ -252,6 +252,16 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardCreate($input: CardCreateInput!) {
+  cardCreate(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+    __typename
+  }
+}
+
 mutation cardPinUpdate($input: CardPinUpdateInput!) {
   cardPinUpdate(input: $input)
 }
@@ -1142,6 +1152,11 @@ query card {
           createdAt
           dailyLimitCents
           monthlyLimitCents
+          __typename
+        }
+        cardConsumerApplications {
+          id
+          applicationStatus
           __typename
         }
         __typename
