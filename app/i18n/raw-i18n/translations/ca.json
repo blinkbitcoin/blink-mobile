@@ -3238,9 +3238,16 @@
         "issueType": "Motiu",
         "deliveryTime": "Temps de lliurament",
         "shippingCost": "Cost de lliurament",
-        "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
-        "bullet2": "La teva nova targeta tindrà els mateixos números que l'actual",
-        "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
+        "DamagedInfo": {
+          "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
+          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
+          "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
+        },
+        "LostStolenInfo": {
+          "bullet1": "La teva targeta ha estat bloquejada per a la teva protecció",
+          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
+          "bullet3": "La teva targeta antiga serà cancel·lada permanentment"
+        }
       },
       "Status": {
         "title": "La teva nova targeta està en camí!",
@@ -3250,7 +3257,8 @@
       "title": "Substituir targeta",
       "errors": {
         "lockFailed": "No s'ha pogut bloquejar la teva targeta. Si us plau, torna-ho a provar.",
-        "replaceFailed": "No s'ha pogut reemplaçar la teva targeta. Si us plau, torna-ho a provar."
+        "replaceFailed": "No s'ha pogut reemplaçar la teva targeta. Si us plau, torna-ho a provar.",
+        "replaceFailedCardLocked": "La teva targeta va ser bloquejada però el reemplaçament va fallar. Si us plau contacta amb suport per obtenir assistència."
       }
     },
     "OrderPhysicalCard": {

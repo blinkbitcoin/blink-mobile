@@ -3238,9 +3238,16 @@
         "issueType": "Sababu",
         "deliveryTime": "Muda wa uwasilishaji",
         "shippingCost": "Gharama ya utoaji",
-        "bullet1": "Kadi yako ya sasa itabaki hai hadi mpya itakapofika",
-        "bullet2": "Kadi yako mpya itakuwa na nambari sawa na kadi ya sasa",
-        "bullet3": "Haribu kadi yako iliyoharibiwa kadi mpya itakapofika"
+        "DamagedInfo": {
+          "bullet1": "Kadi yako ya sasa itaendelea kutumika hadi mpya ifike",
+          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
+          "bullet3": "Haribu kadi yako iliyoharibika wakati mpya inafika"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kadi yako imefungwa kwa ulinzi wako",
+          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
+          "bullet3": "Kadi yako ya zamani itafutwa kabisa"
+        }
       },
       "Status": {
         "title": "Kadi yako mpya iko njiani!",
@@ -3250,7 +3257,8 @@
       "title": "Badilisha kadi",
       "errors": {
         "lockFailed": "Imeshindikana kufunga kadi yako. Tafadhali jaribu tena.",
-        "replaceFailed": "Imeshindikana kubadilisha kadi yako. Tafadhali jaribu tena."
+        "replaceFailed": "Imeshindikana kubadilisha kadi yako. Tafadhali jaribu tena.",
+        "replaceFailedCardLocked": "Kadi yako ilifungwa lakini ubadilishaji umeshindwa. Tafadhali wasiliana na msaada kwa usaidizi."
       }
     },
     "OrderPhysicalCard": {

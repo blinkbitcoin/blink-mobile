@@ -3279,9 +3279,16 @@
         "issueType": "Sebab",
         "deliveryTime": "Masa penghantaran",
         "shippingCost": "Kos penghantaran",
-        "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baharu tiba",
-        "bullet2": "Kad baharu anda akan mempunyai nombor yang sama dengan kad semasa",
-        "bullet3": "Musnahkan kad rosak anda apabila kad baharu tiba"
+        "DamagedInfo": {
+          "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baru tiba",
+          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
+          "bullet3": "Musnahkan kad rosak anda apabila kad baru tiba"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kad anda telah dikunci untuk perlindungan anda",
+          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
+          "bullet3": "Kad lama anda akan dibatalkan secara kekal"
+        }
       },
       "Status": {
         "title": "Kad baharu anda sedang dalam perjalanan!",
@@ -3291,7 +3298,8 @@
       "title": "Ganti kad",
       "errors": {
         "lockFailed": "Gagal mengunci kad anda. Sila cuba lagi.",
-        "replaceFailed": "Gagal menggantikan kad anda. Sila cuba lagi."
+        "replaceFailed": "Gagal menggantikan kad anda. Sila cuba lagi.",
+        "replaceFailedCardLocked": "Kad anda telah dikunci tetapi penggantian gagal. Sila hubungi sokongan untuk bantuan."
       }
     },
     "OrderPhysicalCard": {

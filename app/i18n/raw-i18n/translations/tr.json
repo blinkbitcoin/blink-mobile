@@ -3238,9 +3238,16 @@
         "issueType": "Neden",
         "deliveryTime": "Teslimat süresi",
         "shippingCost": "Teslimat ücreti",
-        "bullet1": "Mevcut kartınız yeni kart gelene kadar aktif kalacak",
-        "bullet2": "Yeni kartınız mevcut kartınızla aynı numaralara sahip olacak",
-        "bullet3": "Yeni kart geldiğinde hasarlı kartınızı imha edin"
+        "DamagedInfo": {
+          "bullet1": "Mevcut kartınız yenisi gelene kadar aktif kalacak",
+          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
+          "bullet3": "Yenisi geldiğinde hasarlı kartınızı imha edin"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kartınız korumanız için kilitlendi",
+          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
+          "bullet3": "Eski kartınız kalıcı olarak iptal edilecek"
+        }
       },
       "Status": {
         "title": "Yeni kartınız yolda!",
@@ -3250,7 +3257,8 @@
       "title": "Kartı değiştir",
       "errors": {
         "lockFailed": "Kartınız kilitlenemedi. Lütfen tekrar deneyin.",
-        "replaceFailed": "Kartınız değiştirilemedi. Lütfen tekrar deneyin."
+        "replaceFailed": "Kartınız değiştirilemedi. Lütfen tekrar deneyin.",
+        "replaceFailedCardLocked": "Kartınız kilitlendi ancak değiştirme başarısız oldu. Lütfen yardım için destek ile iletişime geçin."
       }
     },
     "OrderPhysicalCard": {

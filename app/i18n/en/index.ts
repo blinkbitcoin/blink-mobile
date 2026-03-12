@@ -3368,9 +3368,16 @@ const en: BaseTranslation = {
         deliveryTime: "Delivery time",
         shippingCost: "Shipping cost",
         importantInformation: "Important information",
-        bullet1: "Your current card will remain active until the new one arrives",
-        bullet2: "Your new card will have the same numbers as your current card",
-        bullet3: "Destroy your damaged card when the new one arrives",
+        DamagedInfo: {
+          bullet1: "Your current card will remain active until the new one arrives",
+          bullet2: "Your new card will have a new card number",
+          bullet3: "Destroy your damaged card when the new one arrives",
+        },
+        LostStolenInfo: {
+          bullet1: "Your card has been locked for your protection",
+          bullet2: "Your new card will have a new card number",
+          bullet3: "Your old card will be permanently canceled",
+        },
         submitRequest: "Submit request",
       },
       Status: {
@@ -3381,6 +3388,8 @@ const en: BaseTranslation = {
       errors: {
         lockFailed: "Failed to lock your card. Please try again.",
         replaceFailed: "Failed to replace your card. Please try again.",
+        replaceFailedCardLocked:
+          "Your card was locked but the replacement failed. Please contact support for assistance.",
       },
     },
     OrderPhysicalCard: {

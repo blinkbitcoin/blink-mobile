@@ -10710,18 +10710,34 @@ type RootTranslation = {
 				 * I​m​p​o​r​t​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
 				 */
 				importantInformation: string
-				/**
-				 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​u​n​t​i​l​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
-				 */
-				bullet1: string
-				/**
-				 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​n​u​m​b​e​r​s​ ​a​s​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d
-				 */
-				bullet2: string
-				/**
-				 * D​e​s​t​r​o​y​ ​y​o​u​r​ ​d​a​m​a​g​e​d​ ​c​a​r​d​ ​w​h​e​n​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
-				 */
-				bullet3: string
+				DamagedInfo: {
+					/**
+					 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​u​n​t​i​l​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+					 */
+					bullet1: string
+					/**
+					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
+					 */
+					bullet2: string
+					/**
+					 * D​e​s​t​r​o​y​ ​y​o​u​r​ ​d​a​m​a​g​e​d​ ​c​a​r​d​ ​w​h​e​n​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+					 */
+					bullet3: string
+				}
+				LostStolenInfo: {
+					/**
+					 * Y​o​u​r​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​l​o​c​k​e​d​ ​f​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n
+					 */
+					bullet1: string
+					/**
+					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
+					 */
+					bullet2: string
+					/**
+					 * Y​o​u​r​ ​o​l​d​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​a​n​c​e​l​e​d
+					 */
+					bullet3: string
+				}
 				/**
 				 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
 				 */
@@ -10750,6 +10766,10 @@ type RootTranslation = {
 				 * F​a​i​l​e​d​ ​t​o​ ​r​e​p​l​a​c​e​ ​y​o​u​r​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 				 */
 				replaceFailed: string
+				/**
+				 * Y​o​u​r​ ​c​a​r​d​ ​w​a​s​ ​l​o​c​k​e​d​ ​b​u​t​ ​t​h​e​ ​r​e​p​l​a​c​e​m​e​n​t​ ​f​a​i​l​e​d​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​a​s​s​i​s​t​a​n​c​e​.
+				 */
+				replaceFailedCardLocked: string
 			}
 		}
 		OrderPhysicalCard: {
@@ -21741,18 +21761,34 @@ export type TranslationFunctions = {
 				 * Important information
 				 */
 				importantInformation: () => LocalizedString
-				/**
-				 * Your current card will remain active until the new one arrives
-				 */
-				bullet1: () => LocalizedString
-				/**
-				 * Your new card will have the same numbers as your current card
-				 */
-				bullet2: () => LocalizedString
-				/**
-				 * Destroy your damaged card when the new one arrives
-				 */
-				bullet3: () => LocalizedString
+				DamagedInfo: {
+					/**
+					 * Your current card will remain active until the new one arrives
+					 */
+					bullet1: () => LocalizedString
+					/**
+					 * Your new card will have a new card number
+					 */
+					bullet2: () => LocalizedString
+					/**
+					 * Destroy your damaged card when the new one arrives
+					 */
+					bullet3: () => LocalizedString
+				}
+				LostStolenInfo: {
+					/**
+					 * Your card has been locked for your protection
+					 */
+					bullet1: () => LocalizedString
+					/**
+					 * Your new card will have a new card number
+					 */
+					bullet2: () => LocalizedString
+					/**
+					 * Your old card will be permanently canceled
+					 */
+					bullet3: () => LocalizedString
+				}
 				/**
 				 * Submit request
 				 */
@@ -21781,6 +21817,10 @@ export type TranslationFunctions = {
 				 * Failed to replace your card. Please try again.
 				 */
 				replaceFailed: () => LocalizedString
+				/**
+				 * Your card was locked but the replacement failed. Please contact support for assistance.
+				 */
+				replaceFailedCardLocked: () => LocalizedString
 			}
 		}
 		OrderPhysicalCard: {

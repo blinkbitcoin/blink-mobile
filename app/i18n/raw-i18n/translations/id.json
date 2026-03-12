@@ -3238,9 +3238,16 @@
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
-        "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
-        "bullet2": "Kartu baru Anda akan memiliki nomor yang sama dengan kartu saat ini",
-        "bullet3": "Musnahkan kartu rusak Anda ketika kartu baru tiba"
+        "DamagedInfo": {
+          "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
+          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
+          "bullet3": "Hancurkan kartu rusak Anda saat kartu baru tiba"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kartu Anda telah dikunci untuk perlindungan Anda",
+          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
+          "bullet3": "Kartu lama Anda akan dibatalkan secara permanen"
+        }
       },
       "Status": {
         "title": "Kartu baru Anda sedang dalam perjalanan!",
@@ -3250,7 +3257,8 @@
       "title": "Ganti kartu",
       "errors": {
         "lockFailed": "Gagal mengunci kartu Anda. Silakan coba lagi.",
-        "replaceFailed": "Gagal mengganti kartu Anda. Silakan coba lagi."
+        "replaceFailed": "Gagal mengganti kartu Anda. Silakan coba lagi.",
+        "replaceFailedCardLocked": "Kartu Anda telah dikunci tetapi penggantian gagal. Silakan hubungi dukungan untuk bantuan."
       }
     },
     "OrderPhysicalCard": {

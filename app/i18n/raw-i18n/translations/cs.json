@@ -3279,9 +3279,16 @@
         "issueType": "Důvod",
         "deliveryTime": "Doba doručení",
         "shippingCost": "Cena doručení",
-        "bullet1": "Vaše aktuální karta zůstane aktivní, dokud nedorazí nová",
-        "bullet2": "Vaše nová karta bude mít stejná čísla jako současná",
-        "bullet3": "Po doručení nové karty zničte poškozenou kartu"
+        "DamagedInfo": {
+          "bullet1": "Vaše současná karta zůstane aktivní, dokud nedorazí nová",
+          "bullet2": "Vaše nová karta bude mít nové číslo karty",
+          "bullet3": "Zničte svou poškozenou kartu, když dorazí nová"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaše karta byla uzamčena pro vaši ochranu",
+          "bullet2": "Vaše nová karta bude mít nové číslo karty",
+          "bullet3": "Vaše stará karta bude trvale zrušena"
+        }
       },
       "Status": {
         "title": "Vaše nová karta je na cestě!",
@@ -3291,7 +3298,8 @@
       "title": "Vyměnit kartu",
       "errors": {
         "lockFailed": "Nepodařilo se zamknout vaši kartu. Zkuste to prosím znovu.",
-        "replaceFailed": "Nepodařilo se vyměnit vaši kartu. Zkuste to prosím znovu."
+        "replaceFailed": "Nepodařilo se vyměnit vaši kartu. Zkuste to prosím znovu.",
+        "replaceFailedCardLocked": "Vaše karta byla uzamčena, ale výměna selhala. Kontaktujte prosím podporu pro pomoc."
       }
     },
     "OrderPhysicalCard": {

@@ -3279,9 +3279,16 @@
         "issueType": "Rede",
         "deliveryTime": "Afleweringstyd",
         "shippingCost": "Afleweringskoste",
-        "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
-        "bullet2": "Jou nuwe kaart sal dieselfde nommers as jou huidige kaart hê",
-        "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
+        "DamagedInfo": {
+          "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
+          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
+          "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Jou kaart is gesluit vir jou beskerming",
+          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
+          "bullet3": "Jou ou kaart sal permanent gekanselleer word"
+        }
       },
       "Status": {
         "title": "Jou nuwe kaart is op pad!",
@@ -3291,7 +3298,8 @@
       "title": "Vervang kaart",
       "errors": {
         "lockFailed": "Kon nie jou kaart sluit nie. Probeer asseblief weer.",
-        "replaceFailed": "Kon nie jou kaart vervang nie. Probeer asseblief weer."
+        "replaceFailed": "Kon nie jou kaart vervang nie. Probeer asseblief weer.",
+        "replaceFailedCardLocked": "Jou kaart is gesluit maar die vervanging het misluk. Kontak asseblief ondersteuning vir hulp."
       }
     },
     "OrderPhysicalCard": {

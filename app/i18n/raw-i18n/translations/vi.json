@@ -3276,9 +3276,16 @@
         "issueType": "Lý do",
         "deliveryTime": "Thời gian giao hàng",
         "shippingCost": "Phí giao hàng",
-        "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
-        "bullet2": "Thẻ mới của bạn sẽ có cùng số với thẻ hiện tại",
-        "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
+        "DamagedInfo": {
+          "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
+          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
+          "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Thẻ của bạn đã được khóa để bảo vệ bạn",
+          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
+          "bullet3": "Thẻ cũ của bạn sẽ bị hủy vĩnh viễn"
+        }
       },
       "Status": {
         "title": "Thẻ mới của bạn đang trên đường đến!",
@@ -3288,7 +3295,8 @@
       "title": "Thay thẻ",
       "errors": {
         "lockFailed": "Không thể khóa thẻ của bạn. Vui lòng thử lại.",
-        "replaceFailed": "Không thể thay thế thẻ của bạn. Vui lòng thử lại."
+        "replaceFailed": "Không thể thay thế thẻ của bạn. Vui lòng thử lại.",
+        "replaceFailedCardLocked": "Thẻ của bạn đã bị khóa nhưng việc thay thế không thành công. Vui lòng liên hệ hỗ trợ để được trợ giúp."
       }
     },
     "OrderPhysicalCard": {

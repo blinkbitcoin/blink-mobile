@@ -3276,9 +3276,16 @@
         "issueType": "Imarayku",
         "deliveryTime": "Apachiy pacha",
         "shippingCost": "Apachiy chanin",
-        "bullet1": "Kunan tarjetayki kawsaqllam kanqa musuq chayamunankama",
-        "bullet2": "Musuq tarjetayki kunan tarjetaykipa kikin yupayniyuqmi kanqa",
-        "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
+        "DamagedInfo": {
+          "bullet1": "Kunan tarjetayki kawsaqlla kanqa musuq chayamunankama",
+          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
+          "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Tarjetayki wichqasqa karqan qamta waqaychasunaykirayku",
+          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
+          "bullet3": "Ñawpa tarjetayki wiñaypaq huchusqa kanqa"
+        }
       },
       "Status": {
         "title": "Musuq tarjetayki ñanpim kachkan!",
@@ -3288,7 +3295,8 @@
       "title": "Tarjetata tikray",
       "errors": {
         "lockFailed": "Mana atikurqachu tarjetaykita wisq'ayta. Musuqmanta ruwayña.",
-        "replaceFailed": "Mana atikurqachu tarjetaykita tikrayta. Musuqmanta ruwayña."
+        "replaceFailed": "Mana atikurqachu tarjetaykita tikrayta. Musuqmanta ruwayña.",
+        "replaceFailedCardLocked": "Tarjetayki wichqasqa karqan ichaqa tikrayqa mana allinchu karqan. Yanapakuqkunawan rimanakuy."
       }
     },
     "OrderPhysicalCard": {

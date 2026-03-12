@@ -3229,9 +3229,16 @@
                 "deliveryTime": "Tempo di consegna",
                 "shippingCost": "Costo di consegna",
                 "importantInformation": "Informazioni importanti",
-                "bullet1": "La tua carta attuale rimarrà attiva fino all'arrivo della nuova",
-                "bullet2": "La tua nuova carta avrà gli stessi numeri della carta attuale",
-                "bullet3": "Distruggi la tua carta danneggiata quando arriva la nuova",
+                "DamagedInfo": {
+                    "bullet1": "La tua carta attuale rimarrà attiva fino all'arrivo della nuova",
+                    "bullet2": "La tua nuova carta avrà un nuovo numero di carta",
+                    "bullet3": "Distruggi la tua carta danneggiata quando arriva la nuova"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "La tua carta è stata bloccata per la tua protezione",
+                    "bullet2": "La tua nuova carta avrà un nuovo numero di carta",
+                    "bullet3": "La tua vecchia carta verrà cancellata permanentemente"
+                },
                 "submitRequest": "Invia richiesta"
             },
             "Status": {
@@ -3241,7 +3248,8 @@
             },
             "errors": {
                 "lockFailed": "Impossibile bloccare la tua carta. Per favore riprova.",
-                "replaceFailed": "Impossibile sostituire la tua carta. Per favore riprova."
+                "replaceFailed": "Impossibile sostituire la tua carta. Per favore riprova.",
+                "replaceFailedCardLocked": "La tua carta è stata bloccata ma la sostituzione è fallita. Contatta il supporto per assistenza."
             }
         },
         "OrderPhysicalCard": {
