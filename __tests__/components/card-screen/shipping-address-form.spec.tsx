@@ -356,6 +356,72 @@ describe("ShippingAddressForm", () => {
     })
   })
 
+  describe("onValidityChange", () => {
+    it("calls onValidityChange with true for a complete address", () => {
+      const onValidityChange = jest.fn()
+      render(
+        <ShippingAddressForm {...defaultProps} onValidityChange={onValidityChange} />,
+      )
+
+      expect(onValidityChange).toHaveBeenCalledWith(true)
+    })
+
+    it("calls onValidityChange with false for an incomplete address", () => {
+      const onValidityChange = jest.fn()
+      const emptyAddress: ShippingAddress = {
+        firstName: "",
+        lastName: "",
+        line1: "",
+        line2: "",
+        city: "",
+        region: "",
+        postalCode: "",
+        countryCode: "",
+      }
+      render(
+        <ShippingAddressForm
+          {...defaultProps}
+          address={emptyAddress}
+          onValidityChange={onValidityChange}
+        />,
+      )
+
+      expect(onValidityChange).toHaveBeenCalledWith(false)
+    })
+
+    it("calls onValidityChange with false when firstName is too short", () => {
+      const onValidityChange = jest.fn()
+      render(
+        <ShippingAddressForm
+          {...defaultProps}
+          address={{ ...mockAddress, firstName: "A" }}
+          onValidityChange={onValidityChange}
+        />,
+      )
+
+      expect(onValidityChange).toHaveBeenCalledWith(false)
+    })
+
+    it("calls onValidityChange with false for PO Box address", () => {
+      const onValidityChange = jest.fn()
+      render(
+        <ShippingAddressForm
+          {...defaultProps}
+          address={{ ...mockAddress, line1: "P.O. Box 123" }}
+          onValidityChange={onValidityChange}
+        />,
+      )
+
+      expect(onValidityChange).toHaveBeenCalledWith(false)
+    })
+
+    it("does not crash when onValidityChange is not provided", () => {
+      expect(() => {
+        render(<ShippingAddressForm {...defaultProps} />)
+      }).not.toThrow()
+    })
+  })
+
   describe("interactions", () => {
     it("navigates to state selection screen", () => {
       const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)

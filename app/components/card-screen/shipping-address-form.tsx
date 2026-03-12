@@ -56,6 +56,41 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     onValidityChange?.(isValid)
   }, [isValid, onValidityChange])
 
+  const isValid = useMemo(() => {
+    const hasPOBox =
+      validatePOBox({ value: address.line1, errorMessage: "" }) !== undefined ||
+      (address.line2 !== "" &&
+        validatePOBox({ value: address.line2, errorMessage: "" }) !== undefined)
+
+    const hasInvalidPostal =
+      validatePostalCode({
+        value: address.postalCode,
+        countryCode: address.countryCode,
+        errorMessage: "",
+      }) !== undefined
+
+    const hasRequiredFields =
+      address.line1.trim().length >= 5 &&
+      !hasPOBox &&
+      address.city.trim().length >= 2 &&
+      address.region.trim().length > 0 &&
+      address.postalCode.trim().length > 0 &&
+      !hasInvalidPostal &&
+      address.countryCode.trim().length > 0
+
+    if (!showFullName) return hasRequiredFields
+
+    return (
+      hasRequiredFields &&
+      address.firstName.trim().length >= 2 &&
+      address.lastName.trim().length >= 2
+    )
+  }, [address, showFullName])
+
+  useEffect(() => {
+    onValidityChange?.(isValid)
+  }, [isValid, onValidityChange])
+
   const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
     onAddressChange({ ...address, [field]: value })
   }
