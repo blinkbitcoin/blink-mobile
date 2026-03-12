@@ -3399,6 +3399,59 @@
         "codingBackend": "...մշակում ենք backend-ը",
         "buttonText": "Հիանալի"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Բարի գալուստ Blink-ի մի մասը դառնալու",
+          "paragraphs": {
+            "body1": "Մինչ մասնագիտական ներդրողներից ավելի շատ միջոցներ ներգրավելը, մենք որոշեցինք հրավեր ուղարկել Blink ընտանիքին, մեր ամենաակտիվ օգտատերերին և աջակիցներին։ Ինչո՞ւ նախ հրավիրել անծանոթների, եթե նախ կարող ենք հրավիրել Ձեզ նման մեկին։",
+            "body2": "Սա անձնական հրավեր է։ Խնդրում ենք այն չվերահասցեագրել և հրապարակային չկիսվել։"
+          }
+        },
+        "buttonText": "Շարունակել"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Որքա՞ն կցանկանայիք ներդնել։",
+        "percent": "~{percent: number}% դիմաց"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ընկերության գնահատում",
+          "paragraphs": {
+            "body1": "Այս ներդրումային փուլում Blink-ի pre-money գնահատումը $10 միլիոն է։",
+            "body2": "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you."
+          }
+        },
+        "buttonText": "Պարզ է"
+      },
+      "TermSheet": {
+        "title": "Պայմանների թերթիկ",
+        "equitySection": {
+          "title": "Բաժնեմաս Blink-ում",
+          "investment": "$10,000 ներդրում",
+          "valuation": "$10 մլն pre-money գնահատմամբ",
+          "units": "Դուք ստանում եք 10,000 միավոր` Blink-ի մոտ 0.1%-ը"
+        },
+        "creditBoostSection": {
+          "title": "Վարկային աճ",
+          "totalCredit": "$11,000 ընդհանուր վարկ"
+        },
+        "buttonText": "Անցնել ստորագրմանը"
+      },
+      "TransferInvest": {
+        "title": "Փոխանցեք Ձեր ներդրումը",
+        "paragraphs": {
+          "body1": "Դուք ստորագրել եք Blink-ի 10,000 միավորի բաժանորդագրման համաձայնագիրը։",
+          "body2": "Ժամանակն է փոխանցել $10,000 ներդրման գումարը։ Դուք կվճարեք Bitcoin-ով։"
+        },
+        "buttonText": "Շարունակել"
+      },
+      "TopUp": {
+        "title": "Լիցքավորում",
+        "qrTitle": "Ձեր Blink դրամապանակում բավարար միջոցներ չկան։\nԼիցքավորեք առնվազն {minAmount: string}։",
+        "copy": "Պատճենել",
+        "share": "Կիսվել",
+        "placeholder": "Սահմանել գումարը"
+      },
       "PersonalInformation": {
         "title": "Վերջին քայլը",
         "fields": {

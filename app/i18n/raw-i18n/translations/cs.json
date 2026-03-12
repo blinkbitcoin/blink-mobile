@@ -3399,6 +3399,59 @@
         "codingBackend": "...kódujeme backend",
         "buttonText": "Skvěle"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Vítejte, staňte se součástí Blink",
+          "paragraphs": {
+            "body1": "Než získáme další prostředky od profesionálních investorů, rozhodli jsme se rozšířit pozvánku rodině Blink, našim superuživatelům a podporovatelům. Proč přivádět cizince, když můžeme nejprve pozvat někoho jako jste vy?",
+            "body2": "Toto je osobní pozvánka. Prosím, nepřeposílejte ji ani ji nesdílejte veřejně."
+          }
+        },
+        "buttonText": "Pokračovat"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Kolik byste chtěli investovat?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ocenění společnosti",
+          "paragraphs": {
+            "body1": "V tomto investičním kole je pre-money ocenění Blink 10 milionů dolarů.",
+            "body2": "Mohli bychom získat prostředky za vyšší cenu od rizikových kapitalistů. Nicméně vidíme dlouhodobé vzájemné výhody v partnerství s našimi superuživateli. Proto vám nabízíme tuto nabídku za lepších podmínek."
+          }
+        },
+        "buttonText": "Rozumím"
+      },
+      "TermSheet": {
+        "title": "Termínový list",
+        "equitySection": {
+          "title": "Podíl v Blink",
+          "investment": "Investice $10,000",
+          "valuation": "Při pre-money ocenění $10M",
+          "units": "Obdržíte 10,000 jednotek ~0.1% Blink"
+        },
+        "creditBoostSection": {
+          "title": "Zvýšení kreditu",
+          "totalCredit": "Celkový kredit $11,000"
+        },
+        "buttonText": "Přejít k Podpisu"
+      },
+      "TransferInvest": {
+        "title": "Převeďte svou investici",
+        "paragraphs": {
+          "body1": "Podepsali jste smlouvu o úpisu 10,000 jednotek v Blink.",
+          "body2": "Je čas převést investiční částku $10,000. Zaplatíte Bitcoinem."
+        },
+        "buttonText": "Pokračovat"
+      },
+      "TopUp": {
+        "title": "Dobití",
+        "qrTitle": "Nedostatečné prostředky ve vaší peněžence Blink.\nDobijte minimálně {minAmount: string}.",
+        "copy": "Kopírovat",
+        "share": "Sdílet",
+        "placeholder": "Nastavit částku"
+      },
       "PersonalInformation": {
         "title": "Poslední krok",
         "fields": {

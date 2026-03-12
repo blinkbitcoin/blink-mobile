@@ -3358,6 +3358,59 @@
         "codingBackend": "...programăm backend-ul",
         "buttonText": "Grozav"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Bun venit pentru a deveni parte din Blink",
+          "paragraphs": {
+            "body1": "Înainte de a strânge mai multe fonduri de la investitori profesioniști, am decis să extindem o invitație familiei Blink, superutilizatorilor și susținătorilor noștri. De ce să aducem străini când putem mai întâi să invităm pe cineva ca tine?",
+            "body2": "Aceasta este o invitație personală. Te rugăm să nu o retransmiti sau să o distribui public."
+          }
+        },
+        "buttonText": "Continuă"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Cât ai dori să investești?",
+        "percent": "pentru ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Evaluarea companiei",
+          "paragraphs": {
+            "body1": "În această rundă de investiții, evaluarea pre-money a Blink este de 10 milioane de dolari.",
+            "body2": "Am putea strânge fonduri la un preț mai mare de la investitorii de capital de risc. Cu toate acestea, vedem beneficii reciproce pe termen lung în parteneriatul cu superutilizatorii noștri. Prin urmare, vă oferim această ofertă în condiții mai bune."
+          }
+        },
+        "buttonText": "Am înțeles"
+      },
+      "TermSheet": {
+        "title": "Foaie de Termeni",
+        "equitySection": {
+          "title": "Participație în Blink",
+          "investment": "Investiție de $10,000",
+          "valuation": "La o evaluare pre-money de $10M",
+          "units": "Primești 10,000 de unități ~0,1% din Blink"
+        },
+        "creditBoostSection": {
+          "title": "Creștere Credit",
+          "totalCredit": "Credit Total de $11,000"
+        },
+        "buttonText": "Continuă la Semnătură"
+      },
+      "TransferInvest": {
+        "title": "Transferă-ți investiția",
+        "paragraphs": {
+          "body1": "Ai semnat acordul de subscriere pentru 10,000 de unități în Blink.",
+          "body2": "E timpul să transferi suma de investiție de $10,000. Vei plăti cu Bitcoin."
+        },
+        "buttonText": "Continuă"
+      },
+      "TopUp": {
+        "title": "Încărcare",
+        "qrTitle": "Fonduri insuficiente în portofelul tău Blink.\nÎncarcă minim {minAmount: string}.",
+        "copy": "Copiază",
+        "share": "Distribuie",
+        "placeholder": "Setează suma"
+      },
       "PersonalInformation": {
         "title": "Ultimul pas",
         "fields": {

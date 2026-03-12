@@ -3358,6 +3358,59 @@
         "codingBackend": "...kuandika msimbo wa nyuma",
         "buttonText": "Vizuri"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Karibu kuwa sehemu ya Blink",
+          "paragraphs": {
+            "body1": "Kabla ya kukusanya fedha zaidi kutoka kwa wawekezaji wa kitaalamu, tuliamua kutuma mwaliko kwa familia ya Blink, watumiaji wetu wakuu na wafuasi. Kwa nini kuleta wageni wakati tunaweza kwanza kumwalika mtu kama wewe?",
+            "body2": "Hii ni mwaliko wa kibinafsi. Tafadhali usisambaze au kushiriki hadharani."
+          }
+        },
+        "buttonText": "Endelea"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ungependa kuwekeza kiasi gani?",
+        "percent": "kwa ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Thamani ya kampuni",
+          "paragraphs": {
+            "body1": "Katika duru hii ya uwekezaji, thamani ya awali ya Blink ni dola milioni 10.",
+            "body2": "Tungeweza kukusanya fedha kwa bei ya juu zaidi kutoka kwa VCs. Hata hivyo, tunaona faida za pande zote za muda mrefu katika ushirikiano na watumiaji wetu wakuu. Kwa hivyo, tunakupa ofa hii kwa masharti bora zaidi."
+          }
+        },
+        "buttonText": "Nimeelewa"
+      },
+      "TermSheet": {
+        "title": "Hati ya Masharti",
+        "equitySection": {
+          "title": "Hisa katika Blink",
+          "investment": "Uwekezaji wa $10,000",
+          "valuation": "Kwa thamani ya awali ya $10M",
+          "units": "Unapokea vitengo 10,000 ~0.1% vya Blink"
+        },
+        "creditBoostSection": {
+          "title": "Ongezeko la Mkopo",
+          "totalCredit": "Jumla ya Mkopo $11,000"
+        },
+        "buttonText": "Endelea kwa Kusaini"
+      },
+      "TransferInvest": {
+        "title": "Hamisha uwekezaji wako",
+        "paragraphs": {
+          "body1": "Umesaini makubaliano ya usajili kwa vitengo 10,000 katika Blink.",
+          "body2": "Ni wakati wa kuhamisha kiasi cha uwekezaji cha $10,000. Utalipa kwa Bitcoin."
+        },
+        "buttonText": "Endelea"
+      },
+      "TopUp": {
+        "title": "Jaza",
+        "qrTitle": "Fedha hazitoshi katika pochi yako ya Blink.\nJaza kiwango cha chini cha {minAmount: string}.",
+        "copy": "Nakili",
+        "share": "Shiriki",
+        "placeholder": "Weka kiasi"
+      },
       "PersonalInformation": {
         "title": "Hatua ya mwisho",
         "fields": {

@@ -3418,6 +3418,59 @@
                 "title": "申請を処理中",
                 "subtitle": "推定待ち時間: {waitTime: string}",
                 "buttonText": "閉じる"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Blinkの一員になりませんか",
+                    "paragraphs": {
+                        "body1": "プロの投資家からさらに資金を調達する前に、Blinkファミリー、つまりスーパーユーザーやサポーターの皆さんに招待状をお送りすることにしました。あなたのような方を差し置いて、なぜ見知らぬ人を招くのでしょうか？",
+                        "body2": "これは個人的な招待です。転送や公開での共有はお控えください。"
+                    }
+                },
+                "buttonText": "続ける"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "いくら投資したいですか？",
+                "percent": "約{percent: number}%に相当"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "企業評価",
+                    "paragraphs": {
+                        "body1": "この投資ラウンドにおけるBlinkのプレマネー評価額は1,000万ドルです。",
+                        "body2": "私たちはVCからより高い価格で資金を調達することができます。しかし、スーパーユーザーの皆様とのパートナーシップに長期的な相互利益を見出しています。そのため、より良い条件でこのオファーをご提供しています。"
+                    }
+                },
+                "buttonText": "了解"
+            },
+            "TermSheet": {
+                "title": "条件概要書",
+                "equitySection": {
+                    "title": "Blinkの株式",
+                    "investment": "10,000ドルの投資",
+                    "valuation": "プレマネー評価額1,000万ドル",
+                    "units": "10,000ユニット（Blinkの約0.1%）を受け取ります"
+                },
+                "creditBoostSection": {
+                    "title": "クレジットブースト",
+                    "totalCredit": "合計クレジット11,000ドル"
+                },
+                "buttonText": "署名に進む"
+            },
+            "TransferInvest": {
+                "title": "投資額を送金してください",
+                "paragraphs": {
+                    "body1": "Blinkの10,000ユニットに対するサブスクリプション契約に署名しました。",
+                    "body2": "10,000ドルの投資額を送金する時です。ビットコインでお支払いいただきます。"
+                },
+                "buttonText": "続ける"
+            },
+            "TopUp": {
+                "title": "チャージ",
+                "qrTitle": "Blinkウォレットの残高が不足しています。\n最低{minAmount: string}をチャージしてください。",
+                "copy": "コピー",
+                "share": "共有",
+                "placeholder": "金額を設定"
             }
         }
     }
