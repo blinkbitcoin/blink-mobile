@@ -13,8 +13,8 @@ import { toastShow } from "@app/utils/toast"
 import { useCardData } from "../hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { EMPTY_ADDRESS } from "../types"
-import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue, Delivery } from "./steps"
+import { Delivery, EMPTY_ADDRESS } from "../types"
+import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue } from "./steps"
 import {
   useLockCard,
   useReplaceCard,
