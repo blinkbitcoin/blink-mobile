@@ -3347,7 +3347,7 @@
         "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
         "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
         "bullet3": "Obje kartice imat će isti broj i podatke",
-        "bullet4": "Shipping address cannot be changed after order is placed"
+        "bullet4": "Adresa za dostavu ne može se promijeniti nakon što je narudžba poslana"
       },
       "errors": {
         "createFailed": "Naručivanje vaše fizičke kartice nije uspjelo. Pokušajte ponovo."

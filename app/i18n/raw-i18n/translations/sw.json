@@ -3306,7 +3306,7 @@
         "bullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
         "bullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
         "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale",
-        "bullet4": "Shipping address cannot be changed after order is placed"
+        "bullet4": "Anwani ya usafirishaji haiwezi kubadilishwa baada ya agizo kutolewa"
       },
       "errors": {
         "createFailed": "Imeshindikana kuagiza kadi yako halisi. Tafadhali jaribu tena."

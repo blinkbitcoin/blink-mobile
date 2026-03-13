@@ -34,6 +34,7 @@ const mapToShippingInput = (address: ShippingAddress) => ({
   region: address.region,
   postalCode: address.postalCode,
   countryCode: address.countryCode,
+  // TODO: GQL schema requires phoneNumber but ShippingAddress doesn't have it yet
   phoneNumber: "",
 })
 
@@ -120,6 +121,10 @@ export const OrderCardScreen: React.FC = () => {
           onButtonPress: handleSubmit,
           isButtonDisabled: !applicationId,
         }
+      default: {
+        const _exhaustive: never = step
+        return _exhaustive
+      }
     }
   }
 
@@ -146,6 +151,10 @@ export const OrderCardScreen: React.FC = () => {
             }
           />
         )
+      default: {
+        const _exhaustive: never = step
+        return _exhaustive
+      }
     }
   }
 

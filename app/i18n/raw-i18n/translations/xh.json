@@ -3353,11 +3353,11 @@
         "bullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
         "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
         "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha",
-        "bullet4": "Shipping address cannot be changed after order is placed"
+        "bullet4": "Idilesi yokuhanjiswa ayinakutshintshwa emva kokuba iodolo ithunyelwe"
       },
-    "errors": {
-      "createFailed": "Ayiphumelelanga ukuodola ikhadi lakho lokwenyani. Nceda uzame kwakhona."
-    }
+      "errors": {
+        "createFailed": "Ayiphumelelanga ukuodola ikhadi lakho lokwenyani. Nceda uzame kwakhona."
+      }
     },
     "Onboarding": {
       "kycHeaderTitle": "Ukuqinisekisa",

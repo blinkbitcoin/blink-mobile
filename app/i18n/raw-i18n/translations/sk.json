@@ -3306,7 +3306,7 @@
         "bullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
         "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
         "bullet3": "Obe karty budú mať rovnaké číslo a údaje",
-        "bullet4": "Shipping address cannot be changed after order is placed"
+        "bullet4": "Doručovaciu adresu nie je možné po zadaní objednávky zmeniť"
       },
       "errors": {
         "createFailed": "Nepodarilo sa objednať vašu fyzickú kartu. Skúste to prosím znova."

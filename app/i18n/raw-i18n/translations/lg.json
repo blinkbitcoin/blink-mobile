@@ -3306,7 +3306,7 @@
         "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
         "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
         "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu",
-        "bullet4": "Shipping address cannot be changed after order is placed"
+        "bullet4": "Endereesi y'okutumira tesobola kukyusibwa oluvannyuma lw'okuteeka ekiragiro"
       },
       "errors": {
         "createFailed": "Tekulemezeka kuteekawo kaadi yo eyiriimu. Gezaako nate."

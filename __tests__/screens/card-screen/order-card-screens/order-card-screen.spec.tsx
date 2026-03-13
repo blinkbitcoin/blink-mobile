@@ -81,6 +81,17 @@ jest.mock("@app/utils/helper", () => ({
 
 const mockCreateCard = jest.fn()
 
+const mockAddress = {
+  firstName: "Satoshi",
+  lastName: "Nakamoto",
+  line1: "123 Main Street",
+  line2: "Apt 4B",
+  city: "New York",
+  region: "NY",
+  postalCode: "10001",
+  countryCode: "USA",
+}
+
 jest.mock("@app/screens/card-screen/hooks", () => ({
   useCardData: () => ({
     card: { id: "card-1" },
@@ -94,16 +105,7 @@ jest.mock("@app/screens/card-screen/hooks", () => ({
 
 jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
   useShippingAddressData: () => ({
-    initialAddress: {
-      firstName: "Satoshi",
-      lastName: "Nakamoto",
-      line1: "123 Main Street",
-      line2: "Apt 4B",
-      city: "New York",
-      region: "NY",
-      postalCode: "10001",
-      countryCode: "USA",
-    },
+    initialAddress: mockAddress,
     loading: false,
   }),
 }))
