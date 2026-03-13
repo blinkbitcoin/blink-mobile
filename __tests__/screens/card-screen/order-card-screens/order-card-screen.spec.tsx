@@ -147,6 +147,7 @@ describe("OrderCardScreen", () => {
     })
     mockUseShippingAddressData.mockReturnValue({
       initialAddress: mockAddress,
+      phone: "+1234567890",
       loading: false,
     })
   })
@@ -295,7 +296,7 @@ describe("OrderCardScreen", () => {
           region: "NY",
           postalCode: "10001",
           countryCode: "USA",
-          phoneNumber: "",
+          phoneNumber: "+1234567890",
         },
       })
 
@@ -384,6 +385,7 @@ describe("OrderCardScreen", () => {
     it("shows spinner when address data is loading", async () => {
       mockUseShippingAddressData.mockReturnValue({
         initialAddress: null,
+        phone: "",
         loading: true,
       })
 

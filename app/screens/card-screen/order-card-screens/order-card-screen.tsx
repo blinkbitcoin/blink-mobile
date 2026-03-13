@@ -26,7 +26,7 @@ type StepConfig = {
   isButtonDisabled: boolean
 }
 
-const mapToShippingInput = (address: ShippingAddress) => ({
+const mapToShippingInput = (address: ShippingAddress, phoneNumber: string) => ({
   firstName: address.firstName,
   lastName: address.lastName,
   line1: address.line1,
@@ -35,8 +35,8 @@ const mapToShippingInput = (address: ShippingAddress) => ({
   region: address.region,
   postalCode: address.postalCode,
   countryCode: address.countryCode,
-  // TODO: GQL schema requires phoneNumber but ShippingAddress doesn't have it yet
-  phoneNumber: "",
+  // TODO: UI has no phone number input field — using account phone as fallback
+  phoneNumber,
 })
 
 export const OrderCardScreen: React.FC = () => {
@@ -48,7 +48,7 @@ export const OrderCardScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { applicationId, loading: cardLoading, error: cardError } = useCardData()
-  const { initialAddress, loading: addressLoading } = useShippingAddressData()
+  const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
   const [isFormValid, setIsFormValid] = useState(false)
 
@@ -96,7 +96,7 @@ export const OrderCardScreen: React.FC = () => {
     const address = state.useRegisteredAddress ? registeredAddress : state.customAddress
     const result = await createCard({
       applicationId,
-      shippingAddress: mapToShippingInput(address),
+      shippingAddress: mapToShippingInput(address, phone),
     })
     if (!result) return
 
@@ -115,6 +115,7 @@ export const OrderCardScreen: React.FC = () => {
     state.useRegisteredAddress,
     state.customAddress,
     registeredAddress,
+    phone,
     createCard,
     completeFlow,
     navigation,
