@@ -3338,6 +3338,7 @@
             }
         },
         "Onboarding": {
+            "kycHeaderTitle": "本人確認",
             "CardSubscription": {
                 "subscribeTitle": "購読",
                 "paymentTitle": "お支払い",

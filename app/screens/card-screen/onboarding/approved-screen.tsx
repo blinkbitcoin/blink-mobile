@@ -6,11 +6,13 @@ import { CardStatusLayout } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardStatus, MOCK_CARD } from "../card-mock-data"
+import { useCardData } from "../hooks/use-card-data"
+import { isCardFrozen } from "../utils/card-display"
 
 export const CardApprovedScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
+  const { card } = useCardData()
 
   const handlePrimaryButtonPress = () => {
     navigation.dispatch(CommonActions.navigate("cardOrderScreen"))
@@ -27,10 +29,8 @@ export const CardApprovedScreen: React.FC = () => {
       buttonLabel={LL.CardFlow.CardStatus.CardApproved.buttonLabel()}
       onPrimaryButtonPress={handlePrimaryButtonPress}
       iconName="check-badge"
-      cardNumber={MOCK_CARD.cardNumber}
-      holderName={MOCK_CARD.holderName}
-      validThruDate={MOCK_CARD.validThruDate}
-      isFrozen={MOCK_CARD.status === CardStatus.Frozen}
+      cardNumber={card?.lastFour}
+      isFrozen={card ? isCardFrozen(card.status) : false}
       onAddToWallet={handleAddToWallet}
     />
   )

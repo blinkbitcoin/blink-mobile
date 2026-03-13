@@ -3309,6 +3309,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verificare",
       "CardSubscription": {
         "subscribeTitle": "Abonare",
         "paymentTitle": "Plată",

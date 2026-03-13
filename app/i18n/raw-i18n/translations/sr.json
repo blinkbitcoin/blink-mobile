@@ -3347,6 +3347,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Верификација",
       "CardSubscription": {
         "subscribeTitle": "Претплатити се",
         "paymentTitle": "Плаћање",

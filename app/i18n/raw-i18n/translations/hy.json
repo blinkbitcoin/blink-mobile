@@ -3350,6 +3350,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Հաստատում",
       "CardSubscription": {
         "subscribeTitle": "Բաժանորդագրվել",
         "paymentTitle": "Վճարում",

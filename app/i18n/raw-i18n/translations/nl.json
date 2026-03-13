@@ -3350,6 +3350,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verificatie",
       "CardSubscription": {
         "subscribeTitle": "Abonneren",
         "paymentTitle": "Betaling",

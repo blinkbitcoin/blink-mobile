@@ -2,6 +2,8 @@ import { it } from "@jest/globals"
 
 import {
   formatCardValidThruDisplay,
+  formatDateFromNow,
+  formatDurationHours,
   formatMonth,
   formatShortDate,
   getLastDayOfMonth,
@@ -279,6 +281,56 @@ describe("date utils", () => {
     it("respects locale for long month", () => {
       const date = new Date(2025, 0, 15)
       expect(formatMonth("es", date, "long")).toBe("enero")
+    })
+  })
+
+  describe("formatDateFromNow", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date("2026-03-12T12:00:00Z"))
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("returns date 1 year from now", () => {
+      expect(formatDateFromNow({ years: 1, locale: "en-US" })).toBe("Mar 12, 2027")
+    })
+
+    it("returns date 2 years from now", () => {
+      expect(formatDateFromNow({ years: 2, locale: "en-US" })).toBe("Mar 12, 2028")
+    })
+
+    it("returns current date for 0 years", () => {
+      expect(formatDateFromNow({ years: 0, locale: "en-US" })).toBe("Mar 12, 2026")
+    })
+
+    it("handles leap year edge case", () => {
+      jest.setSystemTime(new Date("2024-02-29T12:00:00Z"))
+      expect(formatDateFromNow({ years: 1, locale: "en-US" })).toBe("Mar 1, 2025")
+    })
+
+    it("returns ISO format", () => {
+      expect(formatDateFromNow({ years: 5, format: "iso" })).toBe("2031-03-12")
+    })
+  })
+
+  describe("formatDurationHours", () => {
+    it("formats hours with narrow display", () => {
+      expect(formatDurationHours(24, "en-US")).toBe("24h")
+    })
+
+    it("formats single hour", () => {
+      expect(formatDurationHours(1, "en-US")).toBe("1h")
+    })
+
+    it("formats large values", () => {
+      expect(formatDurationHours(72, "en-US")).toBe("72h")
+    })
+
+    it("defaults to en-US when no locale provided", () => {
+      expect(formatDurationHours(48)).toBe("48h")
     })
   })
 })

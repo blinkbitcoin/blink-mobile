@@ -3347,6 +3347,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verificación",
       "CardSubscription": {
         "subscribeTitle": "Qillqakuy",
         "paymentTitle": "Pagay",

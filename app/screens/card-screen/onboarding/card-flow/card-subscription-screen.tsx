@@ -2,26 +2,53 @@ import * as React from "react"
 import { View } from "react-native"
 import { RouteProp, useRoute } from "@react-navigation/native"
 import { CheckBox, makeStyles, Text } from "@rn-vui/themed"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
-import { KycFlowType } from "@app/graphql/generated"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { KycFlowType, WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-
-import { MOCK_CARD_PAYMENT } from "../onboarding-mock-data"
+import { formatDateFromNow } from "@app/utils/date"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 
 export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
-  const { LL } = useI18nContext()
+  const { LL, locale } = useI18nContext()
   const route = useRoute<RouteProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
-  const { startKyc } = useKycFlow({ type: KycFlowType.Card })
+  const {
+    cardTermsAndConditionsUrl,
+    cardPrivacyPolicyUrl,
+    cardCardholderAgreementUrl,
+    cardSubscriptionPriceUsd,
+  } = useRemoteConfig()
+  const { formatCurrency } = useDisplayCurrency()
+
+  const { startKyc } = useKycFlow({
+    type: KycFlowType.Card,
+    headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
+  })
+
+  const price = React.useMemo(
+    () =>
+      formatCurrency({
+        amountInMajorUnits: cardSubscriptionPriceUsd,
+        currency: WalletCurrency.Usd,
+      }),
+    [formatCurrency, cardSubscriptionPriceUsd],
+  )
+
+  const renewalDate = React.useMemo(
+    () => formatDateFromNow({ years: 1, locale }),
+    [locale],
+  )
 
   const [isAgreed, setIsAgreed] = React.useState(false)
   const [isRenew, setIsRenew] = React.useState(false)
@@ -47,7 +74,7 @@ export const CardSubscriptionScreen: React.FC = () => {
           </Text>
 
           <Text type="h1" style={styles.price}>
-            {MOCK_CARD_PAYMENT.price}
+            {price}
           </Text>
 
           <Text type="p3" style={styles.perYear}>
@@ -74,7 +101,7 @@ export const CardSubscriptionScreen: React.FC = () => {
               {LL.CardFlow.Onboarding.CardSubscription.renewalDate.label()}
             </Text>
             <Text type="p3" style={styles.value}>
-              {MOCK_CARD_PAYMENT.renewalDate}
+              {renewalDate}
             </Text>
           </View>
         </View>
@@ -93,21 +120,21 @@ export const CardSubscriptionScreen: React.FC = () => {
               {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Terms of Service")}
+                onPress={() => InAppBrowser.open(cardTermsAndConditionsUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
               </Text>
               ,{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Privacy Policy")}
+                onPress={() => InAppBrowser.open(cardPrivacyPolicyUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
               </Text>
               , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => console.log("TODO: Cardholder Agreement")}
+                onPress={() => InAppBrowser.open(cardCardholderAgreementUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
               </Text>

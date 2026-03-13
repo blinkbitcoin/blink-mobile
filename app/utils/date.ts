@@ -109,6 +109,26 @@ export const parseCardValidThru = (
   return null
 }
 
+export const formatDateFromNow = ({
+  years,
+  locale,
+  format = "display",
+}: {
+  years: number
+  locale?: string
+  format?: "display" | "iso"
+}): string => {
+  const date = new Date()
+  date.setFullYear(date.getFullYear() + years)
+  if (format === "iso") return date.toISOString().split("T")[0]
+
+  return date.toLocaleDateString(locale ?? "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 export const getLastDayOfMonth = (year: number, month: number): number =>
   new Date(year, month + 1, 0).getDate()
 
@@ -130,3 +150,10 @@ export const formatCardValidThruDisplay = (
 
   return `${maskChar}${maskChar} / ${maskChar}${maskChar}`
 }
+
+export const formatDurationHours = (hours: number, locale?: string): string =>
+  new Intl.NumberFormat(locale || "en-US", {
+    style: "unit",
+    unit: "hour",
+    unitDisplay: "narrow",
+  }).format(hours)

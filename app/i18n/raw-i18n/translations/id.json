@@ -3309,6 +3309,7 @@
       }
     },
     "Onboarding": {
+      "kycHeaderTitle": "Verifikasi",
       "CardSubscription": {
         "subscribeTitle": "Berlangganan",
         "paymentTitle": "Pembayaran",

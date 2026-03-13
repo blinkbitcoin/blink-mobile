@@ -10927,6 +10927,10 @@ type RootTranslation = {
 			}
 		}
 		Onboarding: {
+			/**
+			 * V​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycHeaderTitle: string
 			CardIntroducing: {
 				/**
 				 * I​n​t​r​o​d​u​c​i​n​g
@@ -21976,6 +21980,10 @@ export type TranslationFunctions = {
 			}
 		}
 		Onboarding: {
+			/**
+			 * Verification
+			 */
+			kycHeaderTitle: () => LocalizedString
 			CardIntroducing: {
 				/**
 				 * Introducing
