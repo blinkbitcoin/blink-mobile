@@ -138,6 +138,30 @@ describe("useCreateCard", () => {
     )
   })
 
+  it("shows toast on non-Error throw", async () => {
+    mockMutate.mockRejectedValue("string error")
+
+    const { result } = renderHook(() => useCreateCard())
+
+    let createResult: { lastFour: string; cardType: string } | null = {
+      lastFour: "",
+      cardType: "",
+    }
+    await act(async () => {
+      createResult = await result.current.createCard({
+        applicationId: "app-123",
+        shippingAddress: mockShippingAddress,
+      })
+    })
+
+    expect(createResult).toBeNull()
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Failed to order your physical card. Please try again.",
+      }),
+    )
+  })
+
   it("shows toast on network error", async () => {
     mockMutate.mockRejectedValue(new Error("Network error"))
 

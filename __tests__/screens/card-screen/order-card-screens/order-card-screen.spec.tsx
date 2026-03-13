@@ -80,6 +80,7 @@ jest.mock("@app/utils/helper", () => ({
 }))
 
 const mockCreateCard = jest.fn()
+const mockGoBack = jest.fn()
 
 const mockAddress = {
   firstName: "Satoshi",
@@ -92,22 +93,14 @@ const mockAddress = {
   countryCode: "USA",
 }
 
+const mockUseCardData = jest.fn()
 jest.mock("@app/screens/card-screen/hooks", () => ({
-  useCardData: () => ({
-    card: { id: "card-1" },
-    hasPhysicalCard: false,
-    applicationId: "app-123",
-    loading: false,
-    error: undefined,
-    refetch: jest.fn(),
-  }),
+  useCardData: () => mockUseCardData(),
 }))
 
+const mockUseShippingAddressData = jest.fn()
 jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
-  useShippingAddressData: () => ({
-    initialAddress: mockAddress,
-    loading: false,
-  }),
+  useShippingAddressData: () => mockUseShippingAddressData(),
 }))
 
 jest.mock("@app/screens/card-screen/order-card-screens/hooks", () => {
@@ -132,6 +125,7 @@ jest.mock("@react-navigation/native", () => {
     useNavigation: () => ({
       navigate: mockNavigate,
       replace: mockReplace,
+      goBack: mockGoBack,
       addListener: mockAddListener,
     }),
   }
@@ -143,6 +137,18 @@ describe("OrderCardScreen", () => {
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
     mockCreateCard.mockResolvedValue({ lastFour: "1234", cardType: "PHYSICAL" })
+    mockUseCardData.mockReturnValue({
+      card: { id: "card-1" },
+      hasPhysicalCard: false,
+      applicationId: "app-123",
+      loading: false,
+      error: undefined,
+      refetch: jest.fn(),
+    })
+    mockUseShippingAddressData.mockReturnValue({
+      initialAddress: mockAddress,
+      loading: false,
+    })
   })
 
   describe("rendering", () => {
@@ -349,6 +355,92 @@ describe("OrderCardScreen", () => {
       })
 
       expect(mockReplace).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("loading state", () => {
+    it("shows spinner when card data is loading", async () => {
+      mockUseCardData.mockReturnValue({
+        card: undefined,
+        hasPhysicalCard: false,
+        applicationId: null,
+        loading: true,
+        error: undefined,
+        refetch: jest.fn(),
+      })
+
+      const { getByTestId, queryByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+      expect(queryByText("Order your physical card")).toBeNull()
+    })
+
+    it("shows spinner when address data is loading", async () => {
+      mockUseShippingAddressData.mockReturnValue({
+        initialAddress: null,
+        loading: true,
+      })
+
+      const { getByTestId, queryByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+      expect(queryByText("Order your physical card")).toBeNull()
+    })
+  })
+
+  describe("error states", () => {
+    it("navigates back when card query fails", async () => {
+      mockUseCardData.mockReturnValue({
+        card: undefined,
+        hasPhysicalCard: false,
+        applicationId: null,
+        loading: false,
+        error: new Error("Card query failed"),
+        refetch: jest.fn(),
+      })
+
+      render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockGoBack).toHaveBeenCalled()
+    })
+
+    it("navigates back when applicationId is null", async () => {
+      mockUseCardData.mockReturnValue({
+        card: { id: "card-1" },
+        hasPhysicalCard: false,
+        applicationId: null,
+        loading: false,
+        error: undefined,
+        refetch: jest.fn(),
+      })
+
+      render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockGoBack).toHaveBeenCalled()
     })
   })
 })

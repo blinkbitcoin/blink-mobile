@@ -98,6 +98,38 @@ describe("useOrderCardFlow", () => {
     })
   })
 
+  describe("late initialAddress sync", () => {
+    it("syncs when initialAddress transitions from null to a value", () => {
+      const { result, rerender } = renderHook(
+        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
+        { initialProps: { initialAddress: null as ShippingAddress | null } },
+      )
+
+      expect(result.current.state.useRegisteredAddress).toBe(false)
+
+      rerender({ initialAddress: mockAddress })
+
+      expect(result.current.state.useRegisteredAddress).toBe(true)
+      expect(result.current.state.customAddress).toEqual(mockAddress)
+    })
+
+    it("does not re-sync if already initialized with an address", () => {
+      const newAddress: ShippingAddress = {
+        ...mockAddress,
+        firstName: "Different",
+      }
+
+      const { result, rerender } = renderHook(
+        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
+        { initialProps: { initialAddress: mockAddress as ShippingAddress | null } },
+      )
+
+      rerender({ initialAddress: newAddress })
+
+      expect(result.current.state.customAddress).toEqual(mockAddress)
+    })
+  })
+
   describe("toggleUseRegisteredAddress", () => {
     it("toggles from true to false", () => {
       const { result } = renderHook(() =>
