@@ -4,7 +4,11 @@ import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 
-const isStorybook = __DEV__ && Boolean((global as any).STORYBOOK_ENABLED)
+const isStorybook =
+  __DEV__ &&
+  Boolean(
+    (global as typeof globalThis & { STORYBOOK_ENABLED?: boolean }).STORYBOOK_ENABLED,
+  )
 
 const theme = createTheme({
   lightColors: light,
