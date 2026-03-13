@@ -20,7 +20,10 @@ export const CardIntroducingScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const validThruDate = formatDateFromNow({ years: 5, format: "iso" })
+  const validThruDate = React.useMemo(
+    () => formatDateFromNow({ years: 5, format: "iso" }),
+    [],
+  )
 
   return (
     <Screen>

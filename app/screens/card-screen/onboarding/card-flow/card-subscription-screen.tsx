@@ -36,12 +36,19 @@ export const CardSubscriptionScreen: React.FC = () => {
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
   })
 
-  const price = formatCurrency({
-    amountInMajorUnits: cardSubscriptionPriceUsd,
-    currency: WalletCurrency.Usd,
-  })
+  const price = React.useMemo(
+    () =>
+      formatCurrency({
+        amountInMajorUnits: cardSubscriptionPriceUsd,
+        currency: WalletCurrency.Usd,
+      }),
+    [formatCurrency, cardSubscriptionPriceUsd],
+  )
 
-  const renewalDate = formatDateFromNow({ years: 1, locale })
+  const renewalDate = React.useMemo(
+    () => formatDateFromNow({ years: 1, locale }),
+    [locale],
+  )
 
   const [isAgreed, setIsAgreed] = React.useState(false)
   const [isRenew, setIsRenew] = React.useState(false)
