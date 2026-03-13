@@ -9,21 +9,26 @@ import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { formatDateFromNow } from "@app/utils/date"
 
-import { MOCK_CARD_DISPLAY } from "../onboarding-mock-data"
+const CARD_DISPLAY_PLACEHOLDER = {
+  cardNumber: "2121212121212121",
+  holderName: "SATOSHI NAKAMOTO",
+}
 
 export const CardIntroducingScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const validThruDate = formatDateFromNow({ years: 5, format: "iso" })
 
   return (
     <Screen>
       <View style={styles.cardStyle}>
         <BlinkCard
-          cardNumber={MOCK_CARD_DISPLAY.cardNumber}
-          holderName={MOCK_CARD_DISPLAY.holderName}
-          validThruDate={MOCK_CARD_DISPLAY.validThruDate}
+          cardNumber={CARD_DISPLAY_PLACEHOLDER.cardNumber}
+          holderName={CARD_DISPLAY_PLACEHOLDER.holderName}
+          validThruDate={validThruDate}
           showCardDetails
           isFrozen={false}
         />
