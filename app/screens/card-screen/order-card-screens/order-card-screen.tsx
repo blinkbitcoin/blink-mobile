@@ -143,7 +143,7 @@ export const OrderCardScreen: React.FC = () => {
           subtitle: LL.CardFlow.OrderPhysicalCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.OrderPhysicalCard.Confirm.placeOrder(),
           onButtonPress: handleSubmit,
-          isButtonDisabled: !applicationId,
+          isButtonDisabled: !applicationId || createLoading,
         }
       default: {
         const _exhaustive: never = step
