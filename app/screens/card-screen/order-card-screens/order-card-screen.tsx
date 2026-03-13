@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -7,6 +7,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toastShow } from "@app/utils/toast"
 
 import { useCardData } from "../hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
@@ -46,10 +47,29 @@ export const OrderCardScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const { applicationId, loading: cardLoading } = useCardData()
+  const { applicationId, loading: cardLoading, error: cardError } = useCardData()
   const { initialAddress, loading: addressLoading } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
   const [isFormValid, setIsFormValid] = useState(false)
+
+  useEffect(() => {
+    if (cardLoading) return
+
+    if (cardError) {
+      toastShow({ message: cardError.message, type: "warning", LL })
+      navigation.goBack()
+      return
+    }
+
+    if (!applicationId) {
+      toastShow({
+        message: LL.CardFlow.OrderPhysicalCard.errors.createFailed(),
+        type: "warning",
+        LL,
+      })
+      navigation.goBack()
+    }
+  }, [cardLoading, cardError, applicationId, LL, navigation])
 
   const {
     step,
@@ -65,7 +85,10 @@ export const OrderCardScreen: React.FC = () => {
     LL.CardFlow.OrderPhysicalCard.steps.confirm(),
   ]
 
-  const registeredAddress = initialAddress ?? EMPTY_ADDRESS
+  const registeredAddress = useMemo(
+    () => initialAddress ?? EMPTY_ADDRESS,
+    [initialAddress],
+  )
 
   const handleSubmit = useCallback(async () => {
     if (!applicationId) return
@@ -123,7 +146,7 @@ export const OrderCardScreen: React.FC = () => {
         }
       default: {
         const _exhaustive: never = step
-        return _exhaustive
+        throw new Error(`Unknown step: ${_exhaustive}`)
       }
     }
   }
@@ -153,7 +176,7 @@ export const OrderCardScreen: React.FC = () => {
         )
       default: {
         const _exhaustive: never = step
-        return _exhaustive
+        throw new Error(`Unknown step: ${_exhaustive}`)
       }
     }
   }
@@ -162,7 +185,11 @@ export const OrderCardScreen: React.FC = () => {
     return (
       <Screen>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator
+            testID="activity-indicator"
+            size="large"
+            color={colors.primary}
+          />
         </View>
       </Screen>
     )
