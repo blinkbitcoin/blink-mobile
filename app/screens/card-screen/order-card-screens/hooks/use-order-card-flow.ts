@@ -3,13 +3,10 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  SUPPORTED_COUNTRIES,
-  getRegionsByCountry,
-} from "@app/screens/card-screen/country-region-data"
+import { getRegionsByCountry } from "@app/screens/card-screen/country-region-data"
 import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
-const DEFAULT_COUNTRY = SUPPORTED_COUNTRIES[0].value
+const DEFAULT_COUNTRY = "USA"
 const DEFAULT_REGION = getRegionsByCountry(DEFAULT_COUNTRY)[0]?.value ?? ""
 
 const DEFAULT_ADDRESS: ShippingAddress = {
@@ -66,6 +63,16 @@ export const useOrderCardFlow = ({
     initialAddress ?? DEFAULT_ADDRESS,
   )
   const isCompleteRef = useRef(false)
+  const hasInitializedRef = useRef(initialAddress !== null)
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return
+    if (!initialAddress) return
+
+    hasInitializedRef.current = true
+    setUseRegisteredAddress(true)
+    setCustomAddress(initialAddress)
+  }, [initialAddress])
 
   const goToNextStep = useCallback(() => {
     setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))

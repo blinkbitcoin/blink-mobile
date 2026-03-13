@@ -69,9 +69,11 @@ export const useCreateCard = () => {
           cardType: data.cardCreate.cardType,
         }
       } catch (err) {
-        if (err instanceof Error) {
-          toastShow({ message: err.message, LL })
-        }
+        const message =
+          err instanceof Error
+            ? err.message
+            : LL.CardFlow.OrderPhysicalCard.errors.createFailed()
+        toastShow({ message, LL })
         return null
       }
     },
