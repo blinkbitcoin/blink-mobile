@@ -150,3 +150,10 @@ export const formatCardValidThruDisplay = (
 
   return `${maskChar}${maskChar} / ${maskChar}${maskChar}`
 }
+
+export const formatDurationHours = (hours: number, locale?: string): string =>
+  new Intl.NumberFormat(locale || "en-US", {
+    style: "unit",
+    unit: "hour",
+    unitDisplay: "narrow",
+  }).format(hours)

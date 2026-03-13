@@ -3,6 +3,7 @@ import { it } from "@jest/globals"
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
+  formatDurationHours,
   formatMonth,
   formatShortDate,
   getLastDayOfMonth,
@@ -312,6 +313,24 @@ describe("date utils", () => {
 
     it("returns ISO format", () => {
       expect(formatDateFromNow({ years: 5, format: "iso" })).toBe("2031-03-12")
+    })
+  })
+
+  describe("formatDurationHours", () => {
+    it("formats hours with narrow display", () => {
+      expect(formatDurationHours(24, "en-US")).toBe("24h")
+    })
+
+    it("formats single hour", () => {
+      expect(formatDurationHours(1, "en-US")).toBe("1h")
+    })
+
+    it("formats large values", () => {
+      expect(formatDurationHours(72, "en-US")).toBe("72h")
+    })
+
+    it("defaults to en-US when no locale provided", () => {
+      expect(formatDurationHours(48)).toBe("48h")
     })
   })
 })

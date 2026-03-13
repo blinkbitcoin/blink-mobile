@@ -15,6 +15,7 @@ const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
 const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
+const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 
 type DeliveryOptionConfig = {
@@ -41,6 +42,7 @@ type RemoteConfig = {
   [CardPrivacyPolicyUrlKey]: string
   [CardCardholderAgreementUrlKey]: string
   [CardSubscriptionPriceUsdKey]: number
+  [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
 }
 
@@ -61,6 +63,7 @@ const defaultRemoteConfig: RemoteConfig = {
   cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   cardCardholderAgreementUrl: "https://www.blink.sv",
   cardSubscriptionPriceUsd: 1000,
+  cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
 }
 
@@ -140,6 +143,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardSubscriptionPriceUsdKey)
           .asNumber()
 
+        const cardProcessingWaitTimeHours = remoteConfigInstance()
+          .getValue(CardProcessingWaitTimeHoursKey)
+          .asNumber()
+
         const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
@@ -160,6 +167,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardPrivacyPolicyUrl,
           cardCardholderAgreementUrl,
           cardSubscriptionPriceUsd,
+          cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,
         })
       } catch (err) {
