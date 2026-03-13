@@ -109,12 +109,12 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 export type IconSizeVariant = "sm" | "md" | "lg" | "xl"
 
-export const ICON_SIZES: Record<IconSizeVariant, number> = {
+export const ICON_SIZES = {
   sm: 16,
   md: 24,
   lg: 32,
   xl: 48,
-}
+} as const
 
 // ── Weight presets ──────────────────────────────────────────────────────────
 
@@ -236,6 +236,12 @@ export const IconNames = Object.keys(icons)
 
 // ── Props ───────────────────────────────────────────────────────────────────
 
+/** Mutually exclusive size specification: numeric `size`, a preset `sizeVariant`, or explicit `width`/`height`. */
+type IconSizeProps =
+  | { size: number; sizeVariant?: never; width?: never; height?: never }
+  | { size?: never; sizeVariant: IconSizeVariant; width?: never; height?: never }
+  | { size?: never; sizeVariant?: never; width: number; height: number }
+
 type GaloyIconProps = {
   name: IconNamesType
   color?: string
@@ -244,11 +250,7 @@ type GaloyIconProps = {
   opacity?: number
   containerSize?: number
   weight?: IconWeight
-} & (
-  | { size: number; sizeVariant?: never; width?: never; height?: never }
-  | { size?: never; sizeVariant: IconSizeVariant; width?: never; height?: never }
-  | { size?: never; sizeVariant?: never; width: number; height: number }
-)
+} & IconSizeProps
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -259,6 +261,18 @@ export const circleDiameterThatContainsSquare = (squareSize: number) => {
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+/**
+ * Unified icon component supporting two rendering strategies:
+ *
+ * - **Phosphor icons** — vector icons from `phosphor-react-native`, looked up via
+ *   `phosphorIconMap`. Supports `size`, `color`, and `weight` props natively.
+ *
+ * - **Custom SVGs** — project-specific SVG assets (e.g. payment status, brand logos),
+ *   looked up via `customSvgMap`. Rendered via `react-native-svg`.
+ *
+ * Icon resolution falls back to the custom SVG map when the name is not found in the
+ * Phosphor map. Use `IconNamesType` (derived from both maps) for type-safe name values.
+ */
 export const GaloyIcon = ({
   name,
   size,
