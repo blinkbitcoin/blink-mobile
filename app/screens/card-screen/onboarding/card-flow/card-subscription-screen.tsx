@@ -41,7 +41,7 @@ export const CardSubscriptionScreen: React.FC = () => {
     currency: WalletCurrency.Usd,
   })
 
-  const renewalDate = formatDateFromNow(1, locale)
+  const renewalDate = formatDateFromNow({ years: 1, locale })
 
   const [isAgreed, setIsAgreed] = React.useState(false)
   const [isRenew, setIsRenew] = React.useState(false)
