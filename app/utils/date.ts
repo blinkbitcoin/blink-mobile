@@ -109,10 +109,20 @@ export const parseCardValidThru = (
   return null
 }
 
-export const formatDateFromNow = (years: number, locale: string): string => {
+export const formatDateFromNow = ({
+  years,
+  locale,
+  format = "display",
+}: {
+  years: number
+  locale?: string
+  format?: "display" | "iso"
+}): string => {
   const date = new Date()
   date.setFullYear(date.getFullYear() + years)
-  return date.toLocaleDateString(locale, {
+  if (format === "iso") return date.toISOString().split("T")[0]
+
+  return date.toLocaleDateString(locale ?? "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
