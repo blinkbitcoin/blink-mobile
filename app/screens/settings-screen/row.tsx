@@ -9,7 +9,7 @@ type Props = {
   title: string
   subtitle?: string
   subtitleShorter?: boolean
-  leftGaloyIcon?: IconNamesType
+  leftGaloyIcon?: IconNamesType | React.ReactElement
   rightIcon?: IconNamesType | null | React.ReactElement
   extraComponentBesideTitle?: React.ReactElement
   action: (() => void | Promise<void>) | null
@@ -48,6 +48,11 @@ export const SettingsRow: React.FC<Props> = ({
 
   const defaultIcon: IconNamesType = expanded ? "caret-down" : "caret-right"
   const hasLeftIcon = Boolean(leftGaloyIcon)
+  const LeftIcon = hasLeftIcon && leftGaloyIcon && (
+    typeof leftGaloyIcon === "string"
+      ? <GaloyIcon name={leftGaloyIcon as IconNamesType} size={20} />
+      : leftGaloyIcon
+  )
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
@@ -69,7 +74,7 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          {hasLeftIcon && leftGaloyIcon && <GaloyIcon name={leftGaloyIcon} size={20} />}
+          {LeftIcon}
           <View>
             <View style={styles.sidetoside}>
               <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>

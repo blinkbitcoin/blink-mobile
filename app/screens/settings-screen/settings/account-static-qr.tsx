@@ -2,6 +2,7 @@ import React from "react"
 import { Linking } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { QrCodeIcon } from "phosphor-react-native"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -28,7 +29,7 @@ export const AccountStaticQR: React.FC = () => {
       loading={loading}
       title={LL.SettingsScreen.staticQr()}
       subtitleShorter={true}
-      leftGaloyIcon="qr-code"
+      leftGaloyIcon={<QrCodeIcon size={20} color={colors.black} />}
       rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
       action={() => {
         Linking.openURL(qrUrl)

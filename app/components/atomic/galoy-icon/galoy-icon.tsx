@@ -98,10 +98,10 @@ import Welcome from "@app/assets/icons-redesign/welcome.svg"
 import Receive from "@app/assets/icons-redesign/receive.svg"
 import Send from "@app/assets/icons-redesign/send.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
+import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
-import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -175,7 +175,6 @@ const phosphorIconMap = {
   "people": UsersIcon,
   "phone": PhoneIcon,
   "plus": PlusIcon,
-
   "question": QuestionIcon,
   "rank": TrophyIcon,
   "refresh": ArrowsClockwiseIcon,
@@ -223,10 +222,10 @@ const customSvgMap = {
   "visa-platinum": VisaPlatinum,
   "warning-with-background": WarningWithBackground,
   "welcome": Welcome,
+  "qr-code": QrCode,
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
   "heart-outline": HeartOutline,
-  "qr-code": QrCode,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
