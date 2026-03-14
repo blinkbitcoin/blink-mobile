@@ -7,11 +7,18 @@ import {
 
 import { ShippingAddress } from "@app/screens/card-screen/types"
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  SUPPORTED_COUNTRIES: [
-    { value: "USA", label: "United States", isoAlpha2: "US", regions: [] },
-  ],
+jest.mock("@app/utils/country-region-data", () => ({
   getRegionsByCountry: () => [{ value: "AL", label: "Alabama" }],
+}))
+
+const mockDeviceLocation = jest.fn(() => ({
+  countryCode: "US",
+  loading: false,
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => mockDeviceLocation(),
 }))
 
 const mockAddListener = jest.fn()
@@ -32,13 +39,14 @@ const mockAddress: ShippingAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
 }
 
 describe("useOrderCardFlow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
+    mockDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
   })
 
   describe("initial state with existing address", () => {
@@ -93,8 +101,29 @@ describe("useOrderCardFlow", () => {
         city: "",
         region: "AL",
         postalCode: "",
-        countryCode: "USA",
+        countryCode: "US",
       })
+    })
+  })
+
+  describe("device location default", () => {
+    it("uses detected country as default when no initial address", () => {
+      mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+
+      const { result } = renderHook(() => useOrderCardFlow({ initialAddress: null }))
+
+      expect(result.current.state.customAddress.countryCode).toBe("AR")
+      expect(result.current.state.customAddress.region).toBe("AL")
+    })
+
+    it("ignores detected country when initial address is provided", () => {
+      mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+
+      const { result } = renderHook(() =>
+        useOrderCardFlow({ initialAddress: mockAddress }),
+      )
+
+      expect(result.current.state.customAddress.countryCode).toBe("US")
     })
   })
 
@@ -174,7 +203,7 @@ describe("useOrderCardFlow", () => {
         city: "Austin",
         region: "TX",
         postalCode: "73301",
-        countryCode: "USA",
+        countryCode: "US",
       }
 
       act(() => {

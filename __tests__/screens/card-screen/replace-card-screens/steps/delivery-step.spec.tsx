@@ -163,7 +163,7 @@ describe("DeliveryStep", () => {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   }
 
   const defaultProps = {
@@ -267,7 +267,7 @@ describe("DeliveryStep", () => {
 
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("US")).toBeTruthy()
     })
 
     it("hides address preview and shows form when checkbox unchecked", () => {

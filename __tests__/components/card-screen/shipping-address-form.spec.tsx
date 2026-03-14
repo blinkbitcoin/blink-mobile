@@ -46,6 +46,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
           addressLine2: () => "Address line 2",
           city: () => "City",
           state: () => "State",
+          region: () => "Region",
           postalCode: () => "Postal code",
           country: () => "Country",
           noPOBoxes: () => "P.O. Boxes are not allowed",
@@ -60,28 +61,36 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  COUNTRIES: [
-    { value: "USA", label: "United States" },
-    { value: "CAN", label: "Canada" },
+jest.mock("postcode-validator", () => ({
+  postcodeValidator: (value: string, country: string) => {
+    if (country === "US") return /^\d{5}(-\d{4})?$/.test(value)
+    if (country === "CA") return /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(value)
+    return true
+  },
+  postcodeValidatorExistsForCountry: (country: string) => ["US", "CA"].includes(country),
+}))
+
+jest.mock("@app/utils/country-region-data", () => ({
+  getAllCountries: () => [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
   ],
   getRegionsByCountry: (code: string) => {
-    if (code === "USA")
+    if (code === "US")
       return [
         { value: "NY", label: "New York" },
         { value: "CA", label: "California" },
       ]
-    if (code === "CAN")
+    if (code === "CA")
       return [
         { value: "ON", label: "Ontario" },
         { value: "BC", label: "British Columbia" },
       ]
     return []
   },
-  getIsoAlpha2: (code: string) => {
-    if (code === "USA") return "US"
-    if (code === "CAN") return "CA"
-    return undefined
+  getCountryLabel: (code: string) => {
+    const labels: Record<string, string> = { US: "United States", CA: "Canada" }
+    return labels[code] ?? code
   },
 }))
 
@@ -135,7 +144,7 @@ describe("ShippingAddressForm", () => {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   }
 
   const defaultProps = {
@@ -376,10 +385,10 @@ describe("ShippingAddressForm", () => {
       expect(mockNavigate).toHaveBeenCalledWith("selectionScreen", {
         title: "Country",
         options: [
-          { value: "USA", label: "United States" },
-          { value: "CAN", label: "Canada" },
+          { value: "US", label: "United States" },
+          { value: "CA", label: "Canada" },
         ],
-        selectedValue: "USA",
+        selectedValue: "US",
         onSelect: expect.any(Function),
       })
     })

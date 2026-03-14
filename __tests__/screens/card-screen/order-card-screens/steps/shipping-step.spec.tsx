@@ -180,7 +180,7 @@ describe("ShippingStep", () => {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   }
 
   const defaultProps = {
@@ -212,7 +212,7 @@ describe("ShippingStep", () => {
 
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("US")).toBeTruthy()
     })
 
     it("displays checkbox", () => {
@@ -285,7 +285,7 @@ describe("ShippingStep", () => {
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("Apt 4B")).toBeTruthy()
       expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("US")).toBeTruthy()
     })
 
     it("shows address form with custom address when unchecked", () => {
@@ -297,7 +297,7 @@ describe("ShippingStep", () => {
         city: "Austin",
         region: "TX",
         postalCode: "73301",
-        countryCode: "USA",
+        countryCode: "US",
       }
 
       const { getByTestId } = render(

@@ -40,9 +40,15 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  COUNTRIES: [{ value: "USA", label: "United States" }],
+jest.mock("postcode-validator", () => ({
+  postcodeValidator: () => true,
+  postcodeValidatorExistsForCountry: () => true,
+}))
+
+jest.mock("@app/utils/country-region-data", () => ({
+  getAllCountries: () => [{ value: "US", label: "United States" }],
   getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
+  getCountryLabel: (code: string) => (code === "US" ? "United States" : code),
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
@@ -93,7 +99,7 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
       city: "New York",
       region: "NY",
       postalCode: "10001",
-      countryCode: "USA",
+      countryCode: "US",
     },
     loading: false,
   }),

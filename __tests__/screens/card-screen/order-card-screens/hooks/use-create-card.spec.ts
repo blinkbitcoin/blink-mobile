@@ -41,7 +41,7 @@ const mockShippingAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
   phoneNumber: "",
 }
 

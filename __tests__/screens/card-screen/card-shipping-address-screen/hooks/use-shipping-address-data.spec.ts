@@ -31,7 +31,7 @@ const mockShippingAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
   country: "United States",
   phoneNumber: "+1234567890",
 }
@@ -87,7 +87,7 @@ describe("useShippingAddressData", () => {
       city: "New York",
       region: "NY",
       postalCode: "10001",
-      countryCode: "USA",
+      countryCode: "US",
     })
   })
 

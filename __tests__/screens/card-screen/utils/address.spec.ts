@@ -11,13 +11,18 @@ jest.mock("postcode-validator", () => ({
     if (country === "CA") return /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(value)
     return true
   },
+  postcodeValidatorExistsForCountry: (country: string) => {
+    return ["US", "CA"].includes(country)
+  },
 }))
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  getIsoAlpha2: (code: string) => {
-    if (code === "USA") return "US"
-    if (code === "CAN") return "CA"
-    return undefined
+jest.mock("@app/utils/country-region-data", () => ({
+  getCountryLabel: (code: string) => {
+    const labels: Record<string, string> = {
+      US: "United States",
+      CA: "Canada",
+    }
+    return labels[code] ?? code
   },
 }))
 
@@ -61,6 +66,27 @@ describe("address utils", () => {
       )
     })
 
+    it("detects French 'Boîte postale'", () => {
+      expect(
+        validatePOBox({ value: "Boîte postale 42", errorMessage: ERROR_MESSAGE }),
+      ).toBe(ERROR_MESSAGE)
+    })
+
+    it("detects Spanish 'Apartado'", () => {
+      expect(
+        validatePOBox({ value: "Apartado postal 100", errorMessage: ERROR_MESSAGE }),
+      ).toBe(ERROR_MESSAGE)
+    })
+
+    it("detects German 'Postfach'", () => {
+      expect(
+        validatePOBox({
+          value: "Postfach 1234",
+          errorMessage: ERROR_MESSAGE,
+        }),
+      ).toBe(ERROR_MESSAGE)
+    })
+
     it("returns undefined for regular addresses", () => {
       expect(
         validatePOBox({ value: "123 Main Street", errorMessage: ERROR_MESSAGE }),
@@ -77,7 +103,7 @@ describe("address utils", () => {
       expect(
         validatePostalCode({
           value: "10001",
-          countryCode: "USA",
+          countryCode: "US",
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBeUndefined()
@@ -87,7 +113,7 @@ describe("address utils", () => {
       expect(
         validatePostalCode({
           value: "ABCDE",
-          countryCode: "USA",
+          countryCode: "US",
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBe(ERROR_MESSAGE)
@@ -97,7 +123,7 @@ describe("address utils", () => {
       expect(
         validatePostalCode({
           value: "K1A 0B1",
-          countryCode: "CAN",
+          countryCode: "CA",
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBeUndefined()
@@ -107,7 +133,7 @@ describe("address utils", () => {
       expect(
         validatePostalCode({
           value: "12345",
-          countryCode: "CAN",
+          countryCode: "CA",
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBe(ERROR_MESSAGE)
@@ -117,7 +143,7 @@ describe("address utils", () => {
       expect(
         validatePostalCode({
           value: "",
-          countryCode: "USA",
+          countryCode: "US",
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBeUndefined()
@@ -144,7 +170,7 @@ describe("address utils", () => {
       region: "NY",
       postalCode: "10001",
       country: "United States",
-      countryCode: "USA",
+      countryCode: "US",
     }
 
     it("returns all lines including full name by default", () => {
@@ -152,7 +178,7 @@ describe("address utils", () => {
         "Satoshi Nakamoto",
         "123 Main Street",
         "Apt 4B",
-        "New York, NY 10001",
+        "New York, NY, 10001",
         "United States",
       ])
     })
@@ -161,7 +187,7 @@ describe("address utils", () => {
       expect(addressToLines(fullAddress, false)).toEqual([
         "123 Main Street",
         "Apt 4B",
-        "New York, NY 10001",
+        "New York, NY, 10001",
         "United States",
       ])
     })
@@ -182,11 +208,11 @@ describe("address utils", () => {
       expect(lines).toHaveLength(4)
     })
 
-    it("falls back to countryCode when country is null", () => {
+    it("falls back to countryCode label when country is null", () => {
       const address = { ...fullAddress, country: null }
       const lines = addressToLines(address)
 
-      expect(lines[lines.length - 1]).toBe("USA")
+      expect(lines[lines.length - 1]).toBe("United States")
     })
 
     it("handles missing firstName gracefully", () => {

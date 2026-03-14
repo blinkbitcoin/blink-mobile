@@ -29,28 +29,32 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
   useShippingAddressData: () => mockUseShippingAddressData(),
 }))
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  COUNTRIES: [
-    { value: "USA", label: "United States" },
-    { value: "CAN", label: "Canada" },
+jest.mock("postcode-validator", () => ({
+  postcodeValidator: () => true,
+  postcodeValidatorExistsForCountry: () => true,
+}))
+
+jest.mock("@app/utils/country-region-data", () => ({
+  getAllCountries: () => [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
   ],
   getRegionsByCountry: (code: string) => {
-    if (code === "USA")
+    if (code === "US")
       return [
         { value: "NY", label: "New York" },
         { value: "CA", label: "California" },
       ]
-    if (code === "CAN")
+    if (code === "CA")
       return [
         { value: "ON", label: "Ontario" },
         { value: "BC", label: "British Columbia" },
       ]
     return []
   },
-  getIsoAlpha2: (code: string) => {
-    if (code === "USA") return "US"
-    if (code === "CAN") return "CA"
-    return undefined
+  getCountryLabel: (code: string) => {
+    const labels: Record<string, string> = { US: "United States", CA: "Canada" }
+    return labels[code] ?? code
   },
 }))
 
@@ -62,7 +66,7 @@ const mockAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
 }
 
 describe("CardShippingAddressScreen", () => {
@@ -243,7 +247,7 @@ describe("CardShippingAddressScreen", () => {
       await act(async () => {})
 
       expect(getByText("Country")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
     })
   })
 
@@ -357,7 +361,7 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      const countryValue = getByText("USA")
+      const countryValue = getByText("United States")
       await act(async () => {
         fireEvent.press(countryValue)
       })
@@ -366,7 +370,7 @@ describe("CardShippingAddressScreen", () => {
         "selectionScreen",
         expect.objectContaining({
           title: "Country",
-          selectedValue: "USA",
+          selectedValue: "US",
         }),
       )
     })
