@@ -129,7 +129,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           <InputField
             label={LL.CardFlow.ShippingAddress.state()}
             value={address.region}
-            rightIonicon="chevron-down"
+            rightIcon="caret-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleStateSelect}
             required
@@ -152,7 +152,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           <InputField
             label={LL.CardFlow.ShippingAddress.country()}
             value={address.countryCode}
-            rightIonicon="chevron-down"
+            rightIcon="caret-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleCountrySelect}
             required

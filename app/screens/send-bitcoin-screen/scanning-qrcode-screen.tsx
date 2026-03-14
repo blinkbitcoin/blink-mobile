@@ -10,7 +10,6 @@ import {
 } from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
-import Icon from "react-native-vector-icons/Ionicons"
 import { Camera, CameraType } from "react-native-camera-kit"
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
@@ -34,6 +33,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { parseDestination } from "./payment-destination"
@@ -375,12 +375,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
             <Svg viewBox="0 0 100 100">
               <Circle cx={50} cy={50} r={50} fill={colors._white} opacity={0.5} />
             </Svg>
-            <Icon name="close" size={64} style={styles.iconClose} />
+            <GaloyIcon name="close" size={64} style={styles.iconClose} />
           </View>
         </Pressable>
         <View style={styles.openGallery}>
           <Pressable onPress={showImagePicker}>
-            <Icon
+            <GaloyIcon
               name="image"
               size={64}
               color={colors._lightGrey}
@@ -389,8 +389,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
           </Pressable>
           <Pressable onPress={handleInvoicePaste}>
             {/* we could Paste from "FontAwesome" but as svg*/}
-            <Icon
-              name="clipboard-outline"
+            <GaloyIcon
+              name="clipboard"
               size={64}
               color={colors._lightGrey}
               style={styles.iconClipboard}

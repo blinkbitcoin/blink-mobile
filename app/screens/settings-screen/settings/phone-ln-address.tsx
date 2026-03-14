@@ -27,7 +27,7 @@ export const PhoneLnAddress: React.FC = () => {
     <SettingsRow
       loading={loading}
       title={lnAddress}
-      leftIcon="call-outline"
+      leftGaloyIcon="phone"
       rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
       action={() =>
         copyToClipboard({

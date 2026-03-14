@@ -1,8 +1,6 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, Text, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -10,6 +8,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -177,7 +176,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.pinPadButtonContainer}>
             <Button
               buttonStyle={styles.pinPadButton}
-              icon={<Icon style={styles.pinPadButtonIcon} name="arrow-back" />}
+              icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
               onPress={() => setEnteredPIN(enteredPIN.slice(0, -1))}
             />
           </View>

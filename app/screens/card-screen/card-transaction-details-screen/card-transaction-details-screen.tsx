@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef } from "react"
 import { Linking, View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { InfoSection, StatusBadge, InfoCard } from "@app/components/card-screen"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -201,7 +201,7 @@ const TransactionHero: React.FC<TransactionHeroProps> = ({
   return (
     <View style={styles.heroContainer}>
       <View style={styles.iconContainer}>
-        <Icon name="storefront-outline" size={34} color={colors.primary} />
+        <GaloyIcon name="storefront" size={34} color={colors.primary} />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.amount}>{formattedAmount}</Text>

@@ -4,7 +4,7 @@ import ReactNativeModal from "react-native-modal"
 
 import { timing } from "@app/rne-theme/timing"
 import { ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -76,7 +76,7 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
             bottomDivider
           >
             {value === minutes ? (
-              <Icon name="checkmark-circle" size={18} color={colors._green} />
+              <GaloyIcon name="check-circle" size={18} color={colors._green} />
             ) : (
               <View style={styles.emptySpacer} />
             )}

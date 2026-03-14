@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 type CheckboxRowProps = {
   label: string
@@ -27,7 +27,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       accessibilityState={{ checked: isChecked }}
     >
       <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-        {isChecked && <Icon name="checkmark" size={14} color={colors.white} />}
+        {isChecked && <GaloyIcon name="check" size={14} color={colors.white} />}
       </View>
       <Text style={styles.label}>{label}</Text>
     </Pressable>

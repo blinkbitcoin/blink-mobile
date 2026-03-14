@@ -13,7 +13,7 @@ export const TxLimits: React.FC = () => {
   return (
     <SettingsRow
       title={LL.common.transactionLimits()}
-      leftIcon="information-circle-outline"
+      leftGaloyIcon="info"
       action={() => navigate("transactionLimitsScreen")}
     />
   )

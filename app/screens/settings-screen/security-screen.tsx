@@ -9,6 +9,7 @@ import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, ListItem } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import {
   saveHiddenBalanceToolTip,
@@ -116,6 +117,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     <Screen style={styles.container} preset="scroll">
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name="fingerprint" size={24} />
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.biometricTitle()}</ListItem.Title>
             <ListItem.Subtitle style={styles.textContainer}>
@@ -128,6 +130,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name="lock-closed" size={24} />
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.pinTitle()}</ListItem.Title>
             <ListItem.Subtitle style={styles.textContainer}>
@@ -140,6 +143,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name="eye-slash" size={24} />
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
           </ListItem.Content>

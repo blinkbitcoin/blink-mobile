@@ -1,14 +1,12 @@
 import React from "react"
 import { View } from "react-native"
-import { makeStyles, useTheme, Icon } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 export const OptionIcon = ({
-  ionicon,
   icon,
   isSelected,
 }: {
-  ionicon?: string
   icon?: IconNamesType
   isSelected: boolean
 }) => {
@@ -16,19 +14,6 @@ export const OptionIcon = ({
   const {
     theme: { colors },
   } = useTheme()
-
-  if (ionicon) {
-    return (
-      <View style={styles.iconContainer}>
-        <Icon
-          name={ionicon}
-          size={24}
-          type="ionicon"
-          color={isSelected ? colors.primary : colors.grey3}
-        />
-      </View>
-    )
-  }
 
   if (icon) {
     return (

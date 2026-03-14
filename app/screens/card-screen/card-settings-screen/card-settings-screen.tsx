@@ -109,7 +109,7 @@ export const CardSettingsScreen: React.FC = () => {
             ? LL.CardFlow.CardSettings.addToAppleWallet()
             : LL.CardFlow.CardSettings.addToGooglePay()
         }
-        leftIonicon="wallet-outline"
+        leftIcon="wallet"
         onPress={handleAddToMobileWallet}
       />
     ),

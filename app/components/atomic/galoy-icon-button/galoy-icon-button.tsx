@@ -14,6 +14,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import {
   GaloyIcon,
   IconNamesType,
+  IconWeight,
   circleDiameterThatContainsSquare,
 } from "../galoy-icon/galoy-icon"
 
@@ -26,6 +27,7 @@ export type GaloyIconButtonProps = {
   color?: string
   backgroundColor?: string
   loading?: boolean
+  weight?: IconWeight
 }
 
 const sizeMapping = {
@@ -44,6 +46,7 @@ export const GaloyIconButton = ({
   color,
   backgroundColor,
   loading,
+  weight,
   ...remainingProps
 }: GaloyIconButtonProps & PressableProps) => {
   const {
@@ -130,6 +133,7 @@ export const GaloyIconButton = ({
                 name={name}
                 size={resolvedIconSize}
                 containerSize={isNumericSize ? size : undefined}
+                weight={weight}
                 {...resolvedProps}
               />
             )}

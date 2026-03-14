@@ -24,8 +24,6 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
-
 describe("CheckboxRow", () => {
   const defaultProps = {
     label: "I agree to the terms and conditions",

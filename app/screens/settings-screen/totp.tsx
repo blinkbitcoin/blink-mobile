@@ -85,7 +85,7 @@ export const TotpSetting: React.FC = () => {
       spinner={spinner}
       title={LL.AccountScreen.totp()}
       subtitle={totpEnabled ? LL.common.enabled() : undefined}
-      leftIcon="lock-closed-outline"
+      leftGaloyIcon="lock-closed"
       action={
         totpEnabled
           ? null
