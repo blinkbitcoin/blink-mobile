@@ -1,5 +1,3 @@
-import { ShippingAddress } from "./types"
-
 export const CardStatus = {
   Active: "active",
   Frozen: "frozen",
@@ -30,34 +28,4 @@ export const MOCK_CARD: CardInfo = {
   status: CardStatus.Active,
   issuedDate: "April 23, 2025",
   network: "Visa",
-}
-
-export type UserInfo = {
-  dateOfBirth: string
-  registeredAddress: ShippingAddress
-}
-
-export const MOCK_USER: UserInfo = {
-  dateOfBirth: "1971-01-03",
-  registeredAddress: {
-    firstName: "Satoshi",
-    lastName: "Nakamoto",
-    line1: "123 Main Street",
-    line2: "Apt 4B",
-    city: "New York",
-    region: "NY",
-    postalCode: "10001",
-    countryCode: "US",
-  },
-}
-
-export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
-  firstName: "Joe",
-  lastName: "Nakamoto",
-  line1: "Address line 1",
-  line2: "Address line 2",
-  city: "New York",
-  region: "NY",
-  postalCode: "10001",
-  countryCode: "US",
 }
