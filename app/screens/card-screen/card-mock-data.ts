@@ -47,7 +47,7 @@ export const MOCK_USER: UserInfo = {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   },
 }
 
@@ -59,5 +59,5 @@ export const MOCK_SHIPPING_ADDRESS: ShippingAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
 }

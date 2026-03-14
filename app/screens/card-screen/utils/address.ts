@@ -1,12 +1,17 @@
-import { postcodeValidator } from "postcode-validator"
+import { postcodeValidator, postcodeValidatorExistsForCountry } from "postcode-validator"
 
 import { ShippingAddress as GqlShippingAddress } from "@app/graphql/generated"
 
-import { getIsoAlpha2 } from "../country-region-data"
+import { getCountryLabel } from "@app/utils/country-region-data"
 
-// TODO: replace with a more robust solution (e.g. pobox-regex library) that also
-// covers other languages if needed when adding support for more countries
-const PO_BOX_REGEX = /\bP\.?\s*O\.?\s*B(ox)?\.?\b|Post\s*Office\s*Box/i
+// Multilingual PO Box patterns:
+// English: P.O. Box, PO Box, POB, Post Office Box
+// French: Boîte postale, Case postale, BP
+// Spanish: Apartado, Apartado postal, Apdo
+// German: Postfach
+// Portuguese: Caixa postal, CP
+const PO_BOX_REGEX =
+  /\bP\.?\s*O\.?\s*B(ox)?\.?\b|Post\s*Office\s*Box|Bo[îi]te\s*postale|Case\s*postale|\bBP\s*\d|Apartado(\s*postal)?|\bApdo\.?\b|Postfach|Caixa\s*postal|\bCP\s*\d/i
 
 export const validatePOBox = ({
   value,
@@ -28,9 +33,9 @@ export const validatePostalCode = ({
   countryCode: string
   errorMessage: string
 }): string | undefined => {
-  const isoAlpha2 = getIsoAlpha2(countryCode)
-  if (!isoAlpha2 || value.length === 0) return undefined
-  if (!postcodeValidator(value, isoAlpha2)) return errorMessage
+  if (value.length === 0) return undefined
+  if (!postcodeValidatorExistsForCountry(countryCode)) return undefined
+  if (!postcodeValidator(value, countryCode)) return errorMessage
   return undefined
 }
 
@@ -57,6 +62,6 @@ export const addressToLines = (
       : null,
     address.line1,
     address.line2 || null,
-    `${address.city}, ${address.region} ${address.postalCode}`,
-    address.country ?? address.countryCode,
+    [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
+    address.country ?? getCountryLabel(address.countryCode),
   ].filter((line): line is string => line !== null)

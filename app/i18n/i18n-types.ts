@@ -10325,6 +10325,10 @@ type RootTranslation = {
 			 */
 			state: string
 			/**
+			 * R​e​g​i​o​n
+			 */
+			region: string
+			/**
 			 * P​o​s​t​a​l​ ​c​o​d​e
 			 */
 			postalCode: string
@@ -21392,6 +21396,10 @@ export type TranslationFunctions = {
 			 * State
 			 */
 			state: () => LocalizedString
+			/**
+			 * Region
+			 */
+			region: () => LocalizedString
 			/**
 			 * Postal code
 			 */

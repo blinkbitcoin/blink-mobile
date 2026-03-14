@@ -3182,6 +3182,7 @@
       "addressLine2": "Adresa řádek 2",
       "city": "Město",
       "state": "Stát",
+      "region": "Kraj",
       "postalCode": "PSČ",
       "country": "Země",
       "important": "Důležité",

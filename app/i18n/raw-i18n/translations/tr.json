@@ -3141,6 +3141,7 @@
       "addressLine2": "Adres satırı 2",
       "city": "Şehir",
       "state": "İl",
+      "region": "Bölge",
       "postalCode": "Posta kodu",
       "country": "Ülke",
       "important": "Önemli",

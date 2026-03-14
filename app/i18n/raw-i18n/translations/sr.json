@@ -3179,6 +3179,7 @@
       "addressLine2": "Адреса ред 2",
       "city": "Град",
       "state": "Држава",
+      "region": "Регион",
       "postalCode": "Поштански број",
       "country": "Земља",
       "important": "Важно",

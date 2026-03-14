@@ -3182,6 +3182,7 @@
       "addressLine2": "Adresa redak 2",
       "city": "Grad",
       "state": "Država",
+      "region": "Regija",
       "postalCode": "Poštanski broj",
       "country": "Zemlja",
       "important": "Važno",

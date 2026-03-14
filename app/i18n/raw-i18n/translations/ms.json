@@ -3182,6 +3182,7 @@
       "addressLine2": "Alamat baris 2",
       "city": "Bandar",
       "state": "Negeri",
+      "region": "Wilayah",
       "postalCode": "Poskod",
       "country": "Negara",
       "important": "Penting",

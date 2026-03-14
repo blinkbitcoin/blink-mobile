@@ -3179,6 +3179,7 @@
       "addressLine2": "Address line 2",
       "city": "City",
       "state": "State",
+      "region": "Suyu",
       "postalCode": "Postal code",
       "country": "Country",
       "important": "Important",

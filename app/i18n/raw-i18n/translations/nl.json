@@ -3182,6 +3182,7 @@
       "addressLine2": "Adresregel 2",
       "city": "Stad",
       "state": "Provincie",
+      "region": "Regio",
       "postalCode": "Postcode",
       "country": "Land",
       "important": "Belangrijk",

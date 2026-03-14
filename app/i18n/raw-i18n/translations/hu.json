@@ -3141,6 +3141,7 @@
       "addressLine2": "Cím 2. sor",
       "city": "Város",
       "state": "Állam",
+      "region": "Régió",
       "postalCode": "Irányítószám",
       "country": "Ország",
       "important": "Fontos",

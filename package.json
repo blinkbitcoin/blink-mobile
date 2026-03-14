@@ -93,6 +93,7 @@
     "axios": "^1.11.0",
     "bech32": "^2.0.0",
     "bitcoinjs-lib": "^6.1.5",
+    "country-region-data": "^4.1.0",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.16.0",
     "intl": "^1.2.5",

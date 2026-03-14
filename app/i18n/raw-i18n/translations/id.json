@@ -3141,6 +3141,7 @@
       "addressLine2": "Alamat baris 2",
       "city": "Kota",
       "state": "Provinsi",
+      "region": "Wilayah",
       "postalCode": "Kode pos",
       "country": "Negara",
       "important": "Penting",

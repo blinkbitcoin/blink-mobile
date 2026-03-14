@@ -3182,6 +3182,7 @@
       "addressLine2": "Adreslyn 2",
       "city": "Stad",
       "state": "Staat",
+      "region": "Streek",
       "postalCode": "Poskode",
       "country": "Land",
       "important": "Belangrik",

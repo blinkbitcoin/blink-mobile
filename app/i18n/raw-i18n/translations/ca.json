@@ -3141,6 +3141,7 @@
       "addressLine2": "Adreça línia 2",
       "city": "Ciutat",
       "state": "Estat",
+      "region": "Regió",
       "postalCode": "Codi postal",
       "country": "País",
       "important": "Important",

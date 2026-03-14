@@ -3141,6 +3141,7 @@
             "addressLine2": "Indirizzo riga 2",
             "city": "Città",
             "state": "Stato",
+            "region": "Regione",
             "postalCode": "Codice postale",
             "country": "Paese",
             "important": "Importante",

@@ -3159,6 +3159,7 @@
       "addressLine2": "Adresselinje 2",
       "city": "By",
       "state": "Stat",
+      "region": "Region",
       "postalCode": "Postnummer",
       "country": "Land",
       "important": "Vigtigt",

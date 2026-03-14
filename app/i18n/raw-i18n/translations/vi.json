@@ -3179,6 +3179,7 @@
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",
       "state": "Tỉnh/Bang",
+      "region": "Vùng",
       "postalCode": "Mã bưu điện",
       "country": "Quốc gia",
       "important": "Quan trọng",

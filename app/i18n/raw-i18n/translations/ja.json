@@ -3182,6 +3182,7 @@
             "addressLine2": "住所2",
             "city": "市区町村",
             "state": "都道府県",
+            "region": "地域",
             "postalCode": "郵便番号",
             "country": "国",
             "important": "重要",

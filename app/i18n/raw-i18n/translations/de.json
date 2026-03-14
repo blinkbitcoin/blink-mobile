@@ -3141,6 +3141,7 @@
             "addressLine2": "Adresszeile 2",
             "city": "Stadt",
             "state": "Bundesland",
+            "region": "Region",
             "postalCode": "Postleitzahl",
             "country": "Land",
             "important": "Wichtig",

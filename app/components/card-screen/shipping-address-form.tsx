@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import { postcodeValidatorExistsForCountry } from "postcode-validator"
 
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -10,9 +11,10 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ShippingAddress } from "@app/screens/card-screen/types"
 import { validatePOBox, validatePostalCode } from "@app/screens/card-screen/utils"
 import {
-  COUNTRIES,
+  getAllCountries,
+  getCountryLabel,
   getRegionsByCountry,
-} from "@app/screens/card-screen/country-region-data"
+} from "@app/utils/country-region-data"
 
 type ShippingAddressFormProps = {
   address: ShippingAddress
@@ -21,7 +23,7 @@ type ShippingAddressFormProps = {
   showFullName?: boolean
 }
 
-const isAddressValid = (
+export const isAddressValid = (
   address: ShippingAddress,
   { checkFullName = true }: { checkFullName?: boolean } = {},
 ): boolean => {
@@ -37,13 +39,16 @@ const isAddressValid = (
       errorMessage: "",
     }) !== undefined
 
+  const postalRequired = postcodeValidatorExistsForCountry(address.countryCode)
+  const postalCodeOk = postalRequired
+    ? address.postalCode.trim().length > 0 && !hasInvalidPostal
+    : address.postalCode.trim().length === 0 || !hasInvalidPostal
+
   const hasRequiredFields =
-    address.line1.trim().length >= 5 &&
+    address.line1.trim().length >= 2 &&
     !hasPOBox &&
     address.city.trim().length >= 2 &&
-    address.region.trim().length > 0 &&
-    address.postalCode.trim().length > 0 &&
-    !hasInvalidPostal &&
+    postalCodeOk &&
     address.countryCode.trim().length > 0
 
   if (!checkFullName) return hasRequiredFields
@@ -88,10 +93,14 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
     onAddressChange({ ...address, [field]: value })
   }
 
+  const regions = getRegionsByCountry(address.countryCode)
+  const countryHasRegions = regions.length > 0
+  const postalRequired = postcodeValidatorExistsForCountry(address.countryCode)
+
   const handleStateSelect = () => {
     navigation.navigate("selectionScreen", {
       title: LL.CardFlow.ShippingAddress.state(),
-      options: getRegionsByCountry(address.countryCode),
+      options: regions,
       selectedValue: address.region,
       onSelect: (value: string) => {
         onAddressChange({ ...address, region: value })
@@ -103,11 +112,16 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
   const handleCountrySelect = () => {
     navigation.navigate("selectionScreen", {
       title: LL.CardFlow.ShippingAddress.country(),
-      options: COUNTRIES,
+      options: getAllCountries(),
       selectedValue: address.countryCode,
       onSelect: (value: string) => {
         const firstRegion = getRegionsByCountry(value)[0]?.value ?? ""
-        onAddressChange({ ...address, countryCode: value, region: firstRegion })
+        onAddressChange({
+          ...address,
+          countryCode: value,
+          region: firstRegion,
+          postalCode: "",
+        })
         navigation.goBack()
       },
     })
@@ -146,7 +160,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         onChangeText={(text) => handleFieldChange("line1", text)}
         valueStyle={ValueStyle.Bold}
         required
-        minLength={5}
+        minLength={2}
         validate={validateAddress}
       />
 
@@ -171,14 +185,24 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           />
         </View>
         <View style={styles.gridItem}>
-          <InputField
-            label={LL.CardFlow.ShippingAddress.state()}
-            value={address.region}
-            rightIcon="caret-down"
-            valueStyle={ValueStyle.Regular}
-            onPress={handleStateSelect}
-            required
-          />
+          {countryHasRegions ? (
+            <InputField
+              label={LL.CardFlow.ShippingAddress.state()}
+              value={address.region}
+              rightIcon="caret-down"
+              valueStyle={ValueStyle.Regular}
+              onPress={handleStateSelect}
+              required
+            />
+          ) : (
+            <InputField
+              label={LL.CardFlow.ShippingAddress.region()}
+              value={address.region}
+              rightIcon="pencil"
+              onChangeText={(text) => handleFieldChange("region", text)}
+              valueStyle={ValueStyle.Regular}
+            />
+          )}
         </View>
       </View>
 
@@ -189,14 +213,14 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             value={address.postalCode}
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
-            required
+            required={postalRequired}
             validate={validatePostal}
           />
         </View>
         <View style={styles.gridItem}>
           <InputField
             label={LL.CardFlow.ShippingAddress.country()}
-            value={address.countryCode}
+            value={getCountryLabel(address.countryCode)}
             rightIcon="caret-down"
             valueStyle={ValueStyle.Regular}
             onPress={handleCountrySelect}

@@ -3182,6 +3182,7 @@
       "addressLine2": "Հասցեի տող 2",
       "city": "Քաղաք",
       "state": "Նահանգ",
+      "region": "Տարածաշրջան",
       "postalCode": "Փոստային կոդ",
       "country": "Երկիր",
       "important": "Կարևոր",

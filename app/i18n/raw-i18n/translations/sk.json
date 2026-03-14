@@ -3141,6 +3141,7 @@
       "addressLine2": "Adresa riadok 2",
       "city": "Mesto",
       "state": "Štát",
+      "region": "Región",
       "postalCode": "PSČ",
       "country": "Krajina",
       "important": "Dôležité",

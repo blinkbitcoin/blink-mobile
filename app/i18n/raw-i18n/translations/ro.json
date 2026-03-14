@@ -3141,6 +3141,7 @@
       "addressLine2": "Adresa linia 2",
       "city": "Oraș",
       "state": "Stat",
+      "region": "Regiune",
       "postalCode": "Cod poștal",
       "country": "Țară",
       "important": "Important",
