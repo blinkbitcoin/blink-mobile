@@ -2,23 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { getRegionsByCountry } from "@app/screens/card-screen/country-region-data"
+import { getRegionsByCountry } from "@app/utils/country-region-data"
 import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
-const DEFAULT_COUNTRY = "USA"
-const DEFAULT_REGION = getRegionsByCountry(DEFAULT_COUNTRY)[0]?.value ?? ""
+const FALLBACK_COUNTRY = "US"
 
-const DEFAULT_ADDRESS: ShippingAddress = {
+const buildDefaultAddress = (countryCode: string): ShippingAddress => ({
   firstName: "",
   lastName: "",
   line1: "",
   line2: "",
   city: "",
-  region: DEFAULT_REGION,
+  region: getRegionsByCountry(countryCode)[0]?.value ?? "",
   postalCode: "",
-  countryCode: DEFAULT_COUNTRY,
-}
+  countryCode,
+})
 
 export const Step = {
   Shipping: 1,
@@ -53,6 +53,7 @@ export const useOrderCardFlow = ({
   initialAddress,
 }: UseOrderCardFlowParams): UseOrderCardFlowReturn => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { countryCode: detectedCountry } = useDeviceLocation()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)
   const [selectedDelivery] = useState<DeliveryType>(Delivery.Standard)
@@ -60,10 +61,11 @@ export const useOrderCardFlow = ({
     initialAddress !== null,
   )
   const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    initialAddress ?? DEFAULT_ADDRESS,
+    initialAddress ?? buildDefaultAddress(FALLBACK_COUNTRY),
   )
   const isCompleteRef = useRef(false)
   const hasInitializedRef = useRef(initialAddress !== null)
+  const hasAppliedLocationRef = useRef(false)
 
   useEffect(() => {
     if (hasInitializedRef.current) return
@@ -73,6 +75,15 @@ export const useOrderCardFlow = ({
     setUseRegisteredAddress(true)
     setCustomAddress(initialAddress)
   }, [initialAddress])
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return
+    if (hasAppliedLocationRef.current) return
+    if (!detectedCountry) return
+
+    hasAppliedLocationRef.current = true
+    setCustomAddress(buildDefaultAddress(detectedCountry))
+  }, [detectedCountry])
 
   const goToNextStep = useCallback(() => {
     setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))
