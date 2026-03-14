@@ -91,6 +91,8 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
+const countryLabels: Record<string, string> = { US: "United States", CA: "Canada" }
+
 jest.mock("@app/screens/card-screen/utils", () => ({
   addressToLines: (address: ShippingAddress, includeFullName = true) => {
     const lines: string[] = []
@@ -100,8 +102,10 @@ jest.mock("@app/screens/card-screen/utils", () => ({
     }
     lines.push(address.line1)
     if (address.line2) lines.push(address.line2)
-    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
-    lines.push(address.countryCode)
+    lines.push(
+      [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
+    )
+    lines.push(countryLabels[address.countryCode] ?? address.countryCode)
     return lines
   },
 }))
@@ -211,8 +215,8 @@ describe("ShippingStep", () => {
       const { getByText } = render(<ShippingStep {...defaultProps} />)
 
       expect(getByText("123 Main Street")).toBeTruthy()
-      expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("US")).toBeTruthy()
+      expect(getByText("New York, NY, 10001")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
     })
 
     it("displays checkbox", () => {
@@ -284,8 +288,8 @@ describe("ShippingStep", () => {
 
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("Apt 4B")).toBeTruthy()
-      expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("US")).toBeTruthy()
+      expect(getByText("New York, NY, 10001")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
     })
 
     it("shows address form with custom address when unchecked", () => {

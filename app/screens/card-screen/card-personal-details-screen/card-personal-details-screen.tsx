@@ -107,7 +107,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
          * TODO: uncomment when dateOfBirth is available via the API
          * <InputField
          *   label={LLPersonalDetails.dateOfBirth()}
-         *   value={dateOfBirth}
+         *   value={...}
          * />
          */}
 
@@ -126,7 +126,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
          * <View style={styles.section}>
          *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
          *   <MultiLineField
-         *     lines={addressToLines(registeredAddress)}
+         *     lines={addressToLines(...)}
          *     leftIcon="map-pin"
          *   />
          * </View>

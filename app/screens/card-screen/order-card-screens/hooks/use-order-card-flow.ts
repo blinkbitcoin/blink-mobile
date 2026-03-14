@@ -79,7 +79,7 @@ export const useOrderCardFlow = ({
   useEffect(() => {
     if (hasInitializedRef.current) return
     if (hasAppliedLocationRef.current) return
-    if (!detectedCountry) return
+    if (!detectedCountry || detectedCountry === FALLBACK_COUNTRY) return
 
     hasAppliedLocationRef.current = true
     setCustomAddress(buildDefaultAddress(detectedCountry))

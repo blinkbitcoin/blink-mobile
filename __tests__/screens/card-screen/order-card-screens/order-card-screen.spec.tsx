@@ -65,6 +65,7 @@ jest.mock("@app/screens/card-screen/utils", () => ({
     },
     includeFullName = true,
   ) => {
+    const countryLabels: Record<string, string> = { US: "United States", CA: "Canada" }
     const lines: string[] = []
     if (includeFullName) {
       const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
@@ -72,8 +73,10 @@ jest.mock("@app/screens/card-screen/utils", () => ({
     }
     lines.push(address.line1)
     if (address.line2) lines.push(address.line2)
-    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
-    lines.push(address.countryCode)
+    lines.push(
+      [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
+    )
+    lines.push(countryLabels[address.countryCode] ?? address.countryCode)
     return lines
   },
 }))

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -51,17 +51,20 @@ export const OrderCardScreen: React.FC = () => {
   const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
   const [isFormValid, setIsFormValid] = useState(false)
+  const hasHandledErrorRef = useRef(false)
 
   useEffect(() => {
-    if (cardLoading) return
+    if (cardLoading || hasHandledErrorRef.current) return
 
     if (cardError) {
+      hasHandledErrorRef.current = true
       toastShow({ message: cardError.message, type: "warning", LL })
       navigation.goBack()
       return
     }
 
     if (!applicationId) {
+      hasHandledErrorRef.current = true
       toastShow({
         message: LL.CardFlow.OrderPhysicalCard.errors.createFailed(),
         type: "warning",
