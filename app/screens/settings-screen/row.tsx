@@ -48,11 +48,14 @@ export const SettingsRow: React.FC<Props> = ({
 
   const defaultIcon: IconNamesType = expanded ? "caret-down" : "caret-right"
   const hasLeftIcon = Boolean(leftGaloyIcon)
-  const LeftIcon = hasLeftIcon && leftGaloyIcon && (
-    typeof leftGaloyIcon === "string"
-      ? <GaloyIcon name={leftGaloyIcon as IconNamesType} size={20} />
-      : leftGaloyIcon
-  )
+  const LeftIcon =
+    hasLeftIcon &&
+    leftGaloyIcon &&
+    (typeof leftGaloyIcon === "string" ? (
+      <GaloyIcon name={leftGaloyIcon as IconNamesType} size={20} />
+    ) : (
+      leftGaloyIcon
+    ))
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
