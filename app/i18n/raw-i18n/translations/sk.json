@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Potvrdiť nový PIN",
         "confirmPinSubtitle": "Pre pokračovanie prosím znova zadajte svoj nový 4-miestny PIN.",
         "incorrectPin": "Nesprávny PIN. Skúste to prosím znova.",
-        "pinMismatch": "PINy sa nezhodujú. Zadajte znova na potvrdenie alebo sa vráťte a zmeňte PIN."
+        "pinMismatch": "PINy sa nezhodujú. Zadajte znova na potvrdenie alebo sa vráťte a zmeňte PIN.",
+        "weakPin": "Tento PIN je príliš ľahké uhádnuť. Zvoľte prosím silnejší PIN.",
+        "cardNotFound": "Karta nebola nájdená. Skúste to prosím znova.",
+        "pinUpdateFailed": "Aktualizácia PINu zlyhala. Skúste to prosím znova."
       },
       "CreateFlow": {
         "title": "Vytvoriť PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Prosím zadajte svoj nový 4-miestny PIN.",
         "pinChangedTitle": "PIN zmenený",
         "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
-        "pinChangedToast": "PIN bol úspešne zmenený"
+        "pinChangedToast": "PIN bol úspešne zmenený",
+        "biometricDescription": "Overte svoju totožnosť na zmenu PINu",
+        "biometricRequired": "Na zmenu PINu je vyžadovaná biometrická autentifikácia."
       }
     },
     "ReplaceCard": {
@@ -3233,16 +3238,28 @@
         "issueType": "Dôvod",
         "deliveryTime": "Čas doručenia",
         "shippingCost": "Cena doručenia",
-        "bullet1": "Vaša aktuálna karta zostane aktívna, kým nedorazí nová",
-        "bullet2": "Vaša nová karta bude mať rovnaké čísla ako súčasná",
-        "bullet3": "Po doručení novej karty zničte poškodenú kartu"
+        "DamagedInfo": {
+          "bullet1": "Vaša súčasná karta zostane aktívna, kým nedorazí nová",
+          "bullet2": "Vaša nová karta bude mať nové číslo karty",
+          "bullet3": "Zničte svoju poškodenú kartu, keď dorazí nová"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaša karta bola uzamknutá pre vašu ochranu",
+          "bullet2": "Vaša nová karta bude mať nové číslo karty",
+          "bullet3": "Vaša stará karta bude trvalo zrušená"
+        }
       },
       "Status": {
         "title": "Vaša nová karta je na ceste!",
         "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
         "buttonLabel": "Prehľad"
       },
-      "title": "Vymeniť kartu"
+      "title": "Vymeniť kartu",
+      "errors": {
+        "lockFailed": "Nepodarilo sa zamknúť vašu kartu. Skúste to prosím znova.",
+        "replaceFailed": "Nepodarilo sa vymeniť vašu kartu. Skúste to prosím znova.",
+        "replaceFailedCardLocked": "Vaša karta bola uzamknutá, ale výmena zlyhala. Kontaktujte prosím podporu pre pomoc."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Objednať fyzickú kartu",
@@ -3289,6 +3306,102 @@
         "bullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
         "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
         "bullet3": "Obe karty budú mať rovnaké číslo a údaje"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Overenie",
+      "CardSubscription": {
+        "subscribeTitle": "Predplatiť",
+        "paymentTitle": "Platba",
+        "acceptButton": "Prijať",
+        "payButton": "Pokračovať a Zaplatiť",
+        "cardTitle": "Blink Súkromný",
+        "perYear": "za rok",
+        "status": {
+          "label": "Stav",
+          "paymentPending": "Platba Čaká",
+          "firstYearFree": "Prvý rok zadarmo"
+        },
+        "renewalDate": {
+          "label": "Dátum obnovenia"
+        },
+        "agreement": {
+          "text": "Súhlasím s",
+          "termsOfService": "Podmienkami služby",
+          "privacyPolicy": "Zásadami ochrany osobných údajov",
+          "cardholderAgreement": "Zmluvou držiteľa karty",
+          "and": "a"
+        },
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví za 1 rok"
+      },
+      "CardIntroducing": {
+        "title": "Predstavujeme",
+        "cardInfo": {
+          "bitcoinCard": "Karta Blink Visa",
+          "for": "pre",
+          "maximalist": "Bitcoin maximalistov"
+        },
+        "buttonText": "Pokračovať"
+      },
+      "CardDetails": {
+        "title": "Ďalšie výhody",
+        "features": {
+          "accountManager": "Vyhradený správca účtu",
+          "support": "Prioritná podpora",
+          "onchainDeposits": "50% späť z transakčných poplatkov",
+          "circularEconomies": "100 $ pre cirkulárne ekonomiky"
+        },
+        "andMore": "... a ďalšie prídu v roku 2026",
+        "buttonText": "Pokračovať"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Vitajte na palube",
+          "subtitle": "V Blink Súkromný",
+          "paragraphs": {
+            "body1": "Niekto na vás myslel a navrhol, aby sme vás pozvali do Blink Súkromný. Pravdepodobne preto, že ste skvelý Bitcoiner.",
+            "body2": "Naším cieľom pre rok 2026 je naplniť program toľkými výhodami, že bude zrejmé, že sa oplatí budúci rok obnoviť."
+          }
+        },
+        "buttonText": "Poďme na to"
+      },
+      "LoadingCard": {
+        "title": "Pracujeme na vašej karte",
+        "subtitle": "Upozorníme vás, keď bude pripravená",
+        "codingBackend": "...kódujeme backend",
+        "buttonText": "Super"
+      },
+      "PersonalInformation": {
+        "title": "Posledný krok",
+        "fields": {
+          "occupation": {
+            "label": "Povolanie",
+            "placeholder": "Vyberte svoje povolanie"
+          },
+          "annualSalaryRange": {
+            "label": "Ročný plat",
+            "placeholder": "Vyberte svoj platový rozsah"
+          },
+          "accountPurpose": {
+            "label": "Účel účtu",
+            "placeholder": "Vyberte účel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očakávané mesačné výdavky",
+            "placeholder": "Vyberte svoj rozsah výdavkov"
+          }
+        },
+        "buttonText": "Odoslať žiadosť",
+        "select": "vybrať"
+      },
+      "CardPreapproved": {
+        "title": "Boli ste predbežne schválení pre kartu Blink Visa!",
+        "buttonText": "Zavrieť"
+      },
+      "CardProcessing": {
+        "title": "Spracúvame vašu žiadosť",
+        "subtitle": "Odhadovaný čas čakania: {waitTime: string}",
+        "buttonText": "Zavrieť"
       }
     }
   }

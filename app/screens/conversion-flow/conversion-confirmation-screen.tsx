@@ -2,7 +2,6 @@ import { GraphQLError } from "graphql"
 import React, { useMemo, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
 import { PanGestureHandler, ScrollView } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -34,6 +33,7 @@ import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { Screen } from "@app/components/screen"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
@@ -275,7 +275,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.walletSeparator}>
             <View style={styles.line}></View>
             <TouchableOpacity style={styles.switchButton} disabled>
-              <Icon name="arrow-down-outline" color={colors.grey3} size={25} />
+              <GaloyIcon name="arrow-down" color={colors.grey3} size={25} />
             </TouchableOpacity>
           </View>
           <View style={styles.toFieldContainer}>

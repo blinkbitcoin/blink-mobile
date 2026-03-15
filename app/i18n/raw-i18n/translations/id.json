@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Konfirmasi PIN baru",
         "confirmPinSubtitle": "Silakan masukkan kembali PIN 4 digit baru Anda untuk melanjutkan.",
         "incorrectPin": "PIN salah. Silakan coba lagi.",
-        "pinMismatch": "PIN tidak cocok. Masukkan ulang untuk mengonfirmasi atau kembali untuk mengubah PIN Anda."
+        "pinMismatch": "PIN tidak cocok. Masukkan ulang untuk mengonfirmasi atau kembali untuk mengubah PIN Anda.",
+        "weakPin": "PIN ini terlalu mudah ditebak. Silakan pilih PIN yang lebih kuat.",
+        "cardNotFound": "Kartu tidak ditemukan. Silakan coba lagi.",
+        "pinUpdateFailed": "Gagal memperbarui PIN. Silakan coba lagi."
       },
       "CreateFlow": {
         "title": "Buat PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Silakan masukkan PIN 4 digit baru Anda.",
         "pinChangedTitle": "PIN diubah",
         "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
-        "pinChangedToast": "PIN berhasil diubah"
+        "pinChangedToast": "PIN berhasil diubah",
+        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN",
+        "biometricRequired": "Autentikasi biometrik diperlukan untuk mengubah PIN Anda."
       }
     },
     "ReplaceCard": {
@@ -3233,16 +3238,28 @@
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
-        "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
-        "bullet2": "Kartu baru Anda akan memiliki nomor yang sama dengan kartu saat ini",
-        "bullet3": "Musnahkan kartu rusak Anda ketika kartu baru tiba"
+        "DamagedInfo": {
+          "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
+          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
+          "bullet3": "Hancurkan kartu rusak Anda saat kartu baru tiba"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kartu Anda telah dikunci untuk perlindungan Anda",
+          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
+          "bullet3": "Kartu lama Anda akan dibatalkan secara permanen"
+        }
       },
       "Status": {
         "title": "Kartu baru Anda sedang dalam perjalanan!",
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
         "buttonLabel": "Dasbor"
       },
-      "title": "Ganti kartu"
+      "title": "Ganti kartu",
+      "errors": {
+        "lockFailed": "Gagal mengunci kartu Anda. Silakan coba lagi.",
+        "replaceFailed": "Gagal mengganti kartu Anda. Silakan coba lagi.",
+        "replaceFailedCardLocked": "Kartu Anda telah dikunci tetapi penggantian gagal. Silakan hubungi dukungan untuk bantuan."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Pesan kartu fisik",
@@ -3289,6 +3306,102 @@
         "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
         "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
         "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verifikasi",
+      "CardSubscription": {
+        "subscribeTitle": "Berlangganan",
+        "paymentTitle": "Pembayaran",
+        "acceptButton": "Terima",
+        "payButton": "Lanjutkan dan Bayar",
+        "cardTitle": "Blink Pribadi",
+        "perYear": "per tahun",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Pembayaran Tertunda",
+          "firstYearFree": "Tahun pertama gratis"
+        },
+        "renewalDate": {
+          "label": "Tanggal perpanjangan"
+        },
+        "agreement": {
+          "text": "Saya menyetujui",
+          "termsOfService": "Ketentuan Layanan",
+          "privacyPolicy": "Kebijakan Privasi",
+          "cardholderAgreement": "Perjanjian Pemegang Kartu",
+          "and": "dan"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+      },
+      "CardIntroducing": {
+        "title": "Memperkenalkan",
+        "cardInfo": {
+          "bitcoinCard": "Kartu Visa Blink",
+          "for": "untuk",
+          "maximalist": "Maksimalis Bitcoin"
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "CardDetails": {
+        "title": "Keuntungan tambahan",
+        "features": {
+          "accountManager": "Manajer akun khusus",
+          "support": "Dukungan prioritas",
+          "onchainDeposits": "Pengembalian 50% biaya transaksi",
+          "circularEconomies": "$100 untuk ekonomi sirkular"
+        },
+        "andMore": "... dan lainnya segera hadir di 2026",
+        "buttonText": "Lanjutkan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Selamat datang",
+          "subtitle": "Di Blink Pribadi",
+          "paragraphs": {
+            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Pribadi. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
+            "body2": "Tujuan kami untuk 2026 adalah mengisi program dengan begitu banyak keuntungan sehingga sudah jelas untuk memperbarui tahun depan."
+          }
+        },
+        "buttonText": "Ayo mulai"
+      },
+      "LoadingCard": {
+        "title": "Kami sedang mengerjakan kartu Anda",
+        "subtitle": "Kami akan memberitahu Anda setelah siap",
+        "codingBackend": "...membuat kode backend",
+        "buttonText": "Bagus"
+      },
+      "PersonalInformation": {
+        "title": "Langkah terakhir",
+        "fields": {
+          "occupation": {
+            "label": "Pekerjaan",
+            "placeholder": "Pilih pekerjaan Anda"
+          },
+          "annualSalaryRange": {
+            "label": "Gaji tahunan",
+            "placeholder": "Pilih rentang gaji Anda"
+          },
+          "accountPurpose": {
+            "label": "Tujuan akun",
+            "placeholder": "Pilih tujuan"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Pengeluaran bulanan yang diharapkan",
+            "placeholder": "Pilih rentang pengeluaran Anda"
+          }
+        },
+        "buttonText": "Kirim aplikasi",
+        "select": "pilih"
+      },
+      "CardPreapproved": {
+        "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
+        "buttonText": "Tutup"
+      },
+      "CardProcessing": {
+        "title": "Memproses aplikasi Anda",
+        "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
+        "buttonText": "Tutup"
       }
     }
   }

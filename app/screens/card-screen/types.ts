@@ -8,3 +8,14 @@ export type ShippingAddress = {
   postalCode: string
   countryCode: string
 }
+
+export const EMPTY_ADDRESS: ShippingAddress = {
+  firstName: "",
+  lastName: "",
+  line1: "",
+  line2: "",
+  city: "",
+  region: "",
+  postalCode: "",
+  countryCode: "",
+}

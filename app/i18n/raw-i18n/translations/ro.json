@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Confirmă noul PIN",
         "confirmPinSubtitle": "Vă rugăm să introduceți din nou noul dvs. PIN de 4 cifre pentru a continua.",
         "incorrectPin": "PIN incorect. Vă rugăm să încercați din nou.",
-        "pinMismatch": "PIN-urile nu se potrivesc. Reintroduceți pentru a confirma sau reveniți pentru a vă schimba PIN-ul."
+        "pinMismatch": "PIN-urile nu se potrivesc. Reintroduceți pentru a confirma sau reveniți pentru a vă schimba PIN-ul.",
+        "weakPin": "Acest PIN este prea ușor de ghicit. Vă rugăm să alegeți un PIN mai puternic.",
+        "cardNotFound": "Cardul nu a fost găsit. Vă rugăm să încercați din nou.",
+        "pinUpdateFailed": "Actualizarea PIN-ului a eșuat. Vă rugăm să încercați din nou."
       },
       "CreateFlow": {
         "title": "Creează PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Vă rugăm să introduceți noul dvs. PIN de 4 cifre.",
         "pinChangedTitle": "PIN schimbat",
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
-        "pinChangedToast": "PIN-ul a fost schimbat cu succes"
+        "pinChangedToast": "PIN-ul a fost schimbat cu succes",
+        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul",
+        "biometricRequired": "Autentificarea biometrică este necesară pentru a schimba PIN-ul."
       }
     },
     "ReplaceCard": {
@@ -3233,16 +3238,28 @@
         "issueType": "Motiv",
         "deliveryTime": "Timp de livrare",
         "shippingCost": "Cost de livrare",
-        "bullet1": "Cardul tău actual va rămâne activ până când sosește cel nou",
-        "bullet2": "Cardul tău nou va avea aceleași numere ca cel actual",
-        "bullet3": "Distruge cardul deteriorat când sosește cel nou"
+        "DamagedInfo": {
+          "bullet1": "Cardul tău actual va rămâne activ până când sosește cel nou",
+          "bullet2": "Noul tău card va avea un număr de card nou",
+          "bullet3": "Distruge cardul tău deteriorat când sosește cel nou"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Cardul tău a fost blocat pentru protecția ta",
+          "bullet2": "Noul tău card va avea un număr de card nou",
+          "bullet3": "Cardul tău vechi va fi anulat permanent"
+        }
       },
       "Status": {
         "title": "Noul tău card este pe drum!",
         "subtitle": "Comanda pentru livrarea cardului tău Blink a fost trimisă.",
         "buttonLabel": "Panou"
       },
-      "title": "Înlocuire card"
+      "title": "Înlocuire card",
+      "errors": {
+        "lockFailed": "Nu s-a putut bloca cardul tău. Te rugăm să încerci din nou.",
+        "replaceFailed": "Nu s-a putut înlocui cardul tău. Te rugăm să încerci din nou.",
+        "replaceFailedCardLocked": "Cardul tău a fost blocat dar înlocuirea a eșuat. Te rugăm să contactezi suportul pentru asistență."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Comandă card fizic",
@@ -3289,6 +3306,102 @@
         "bullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
         "bullet2": "Va trebui să activezi cardul fizic când ajunge",
         "bullet3": "Ambele carduri vor avea același număr și aceleași detalii"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verificare",
+      "CardSubscription": {
+        "subscribeTitle": "Abonare",
+        "paymentTitle": "Plată",
+        "acceptButton": "Acceptă",
+        "payButton": "Continuă și Plătește",
+        "cardTitle": "Blink Privat",
+        "perYear": "pe an",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Plată în Așteptare",
+          "firstYearFree": "Primul an gratuit"
+        },
+        "renewalDate": {
+          "label": "Data de reînoire"
+        },
+        "agreement": {
+          "text": "Sunt de acord cu",
+          "termsOfService": "Termenii Serviciului",
+          "privacyPolicy": "Politica de Confidențialitate",
+          "cardholderAgreement": "Acordul Deținătorului de Card",
+          "and": "și"
+        },
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în 1 an"
+      },
+      "CardIntroducing": {
+        "title": "Prezentare",
+        "cardInfo": {
+          "bitcoinCard": "Cardul Visa Blink",
+          "for": "pentru",
+          "maximalist": "Maximaliștii Bitcoin"
+        },
+        "buttonText": "Continuă"
+      },
+      "CardDetails": {
+        "title": "Avantaje suplimentare",
+        "features": {
+          "accountManager": "Manager de cont dedicat",
+          "support": "Suport prioritar",
+          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
+          "circularEconomies": "100 $ pentru economii circulare"
+        },
+        "andMore": "... și mai multe vin în 2026",
+        "buttonText": "Continuă"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Bun venit la bord",
+          "subtitle": "La Blink Privat",
+          "paragraphs": {
+            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Privat. Probabil pentru că ești un Bitcoiner grozav.",
+            "body2": "Obiectivul nostru pentru 2026 este să umplem programul cu atâtea avantaje încât va fi evident să reînnoiești anul viitor."
+          }
+        },
+        "buttonText": "Hai să mergem"
+      },
+      "LoadingCard": {
+        "title": "Lucrăm la cardul tău",
+        "subtitle": "Te vom notifica când va fi gata",
+        "codingBackend": "...programăm backend-ul",
+        "buttonText": "Grozav"
+      },
+      "PersonalInformation": {
+        "title": "Ultimul pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupație",
+            "placeholder": "Selectează ocupația ta"
+          },
+          "annualSalaryRange": {
+            "label": "Salariu anual",
+            "placeholder": "Selectează intervalul salarial"
+          },
+          "accountPurpose": {
+            "label": "Scopul contului",
+            "placeholder": "Selectează scopul"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Cheltuieli lunare estimate",
+            "placeholder": "Selectează intervalul de cheltuieli"
+          }
+        },
+        "buttonText": "Trimite cererea",
+        "select": "selectează"
+      },
+      "CardPreapproved": {
+        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "buttonText": "Închide"
+      },
+      "CardProcessing": {
+        "title": "Se procesează cererea ta",
+        "subtitle": "Timp estimat de așteptare: {waitTime: string}",
+        "buttonText": "Închide"
       }
     }
   }

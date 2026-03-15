@@ -17,6 +17,7 @@ type SteppedCardLayoutProps = {
   buttonLabel: string
   onButtonPress: () => void
   isButtonDisabled?: boolean
+  loading?: boolean
   children: React.ReactNode
 }
 
@@ -30,6 +31,7 @@ export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
   buttonLabel,
   onButtonPress,
   isButtonDisabled = false,
+  loading = false,
   children,
 }) => {
   const styles = useStyles()
@@ -68,7 +70,8 @@ export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
         <GaloyPrimaryButton
           title={buttonLabel}
           onPress={onButtonPress}
-          disabled={isButtonDisabled}
+          disabled={isButtonDisabled || loading}
+          loading={loading}
         />
       </View>
     </Screen>

@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react-hooks"
 
-import { usePinFlow } from "@app/screens/card-screen/pin-screens/use-pin-flow"
+import { usePinFlow } from "@app/screens/card-screen/pin-screens/hooks/use-pin-flow"
 
 const mockAddListener = jest.fn()
 const mockNavigate = jest.fn()

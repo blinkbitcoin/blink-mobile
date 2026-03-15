@@ -4,8 +4,7 @@ import { Dimensions, Text, View, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 import Carousel from "react-native-reanimated-carousel"
-import Icon from "react-native-vector-icons/Ionicons"
-
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { PaginationItem } from "@app/components/pagination"
 import { useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -267,8 +266,8 @@ export const EarnSection = ({ route }: Props) => {
               }
               icon={
                 item.completed ? (
-                  <Icon
-                    name="checkmark-circle-outline"
+                  <GaloyIcon
+                    name="check-circle"
                     size={36}
                     color={colors._white}
                     style={styles.icon}

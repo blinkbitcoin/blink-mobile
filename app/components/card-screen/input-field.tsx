@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -25,9 +25,9 @@ const InputSize = {
 
 type InputSizeType = (typeof InputSize)[keyof typeof InputSize]
 
-type IconProps =
-  | { rightIcon?: IconNamesType; rightIonicon?: never }
-  | { rightIcon?: never; rightIonicon?: string }
+type IconProps = {
+  rightIcon?: IconNamesType
+}
 
 type InputFieldProps = {
   label: string
@@ -60,7 +60,6 @@ export const InputField: React.FC<InputFieldProps> = ({
   label,
   value,
   rightIcon,
-  rightIonicon,
   onPress,
   onChangeText,
   onBlur,
@@ -115,9 +114,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const displayHelperText = validationError ?? helperText
   const isError = Boolean(validationError) || error
 
-  const rightIconElement = rightIonicon ? (
-    <Icon name={rightIonicon} type="ionicon" size={20} color={colors.primary} />
-  ) : rightIcon ? (
+  const rightIconElement = rightIcon ? (
     <GaloyIcon name={rightIcon} size={20} color={colors.primary} />
   ) : null
 

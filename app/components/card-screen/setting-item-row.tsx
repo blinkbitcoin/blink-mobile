@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { Pressable, StyleProp, TextStyle, View } from "react-native"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
@@ -15,7 +15,6 @@ type SettingItemRowProps = {
   title: string
   subtitle?: string
   leftIcon?: IconNamesType
-  leftIonicon?: string
   leftIconColor?: string
   titleStyle?: StyleProp<TextStyle>
   subtitleStyle?: StyleProp<TextStyle>
@@ -28,7 +27,6 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
   title,
   subtitle,
   leftIcon,
-  leftIonicon,
   leftIconColor,
   titleStyle,
   subtitleStyle,
@@ -48,9 +46,6 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
   const renderLeftIcon = () => {
     if (leftIcon) {
       return <GaloyIcon name={leftIcon} size={ICON_SIZE} color={iconColor} />
-    }
-    if (leftIonicon) {
-      return <Icon name={leftIonicon} type="ionicon" size={ICON_SIZE} color={iconColor} />
     }
     return null
   }

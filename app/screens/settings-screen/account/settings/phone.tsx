@@ -80,7 +80,7 @@ export const PhoneSetting: React.FC = () => {
     <SettingsRow
       loading={loading}
       title={phoneVerified ? phone || "" : LL.AccountScreen.tapToAddPhoneNumber()}
-      leftIcon="call-outline"
+      leftGaloyIcon="phone"
       action={phoneVerified ? null : () => navigate("phoneRegistrationInitiate")}
       spinner={phoneDeleteLoading}
       rightIcon={
@@ -89,7 +89,7 @@ export const PhoneSetting: React.FC = () => {
             <GaloyIcon name="close" size={20} color={colors.red} />
           ) : null
         ) : (
-          "chevron-forward"
+          "caret-right"
         )
       }
       rightIconAction={phoneVerified && emailVerified ? deletePhonePrompt : undefined}

@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Bevestig nuwe PIN",
         "confirmPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN weer in om voort te gaan.",
         "incorrectPin": "Verkeerde PIN. Probeer asseblief weer.",
-        "pinMismatch": "PIN's stem nie ooreen nie. Voer weer in om te bevestig of gaan terug om jou PIN te verander."
+        "pinMismatch": "PIN's stem nie ooreen nie. Voer weer in om te bevestig of gaan terug om jou PIN te verander.",
+        "weakPin": "Hierdie PIN is te maklik om te raai. Kies asseblief 'n sterker PIN.",
+        "cardNotFound": "Kaart nie gevind nie. Probeer asseblief weer.",
+        "pinUpdateFailed": "Kon PIN nie opdateer nie. Probeer asseblief weer."
       },
       "CreateFlow": {
         "title": "Skep PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Voer asseblief jou nuwe 4-syfer PIN in.",
         "pinChangedTitle": "PIN verander",
         "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
-        "pinChangedToast": "PIN is suksesvol verander"
+        "pinChangedToast": "PIN is suksesvol verander",
+        "biometricDescription": "Verifieer jou identiteit om PIN te verander",
+        "biometricRequired": "Biometriese verifikasie is nodig om jou PIN te verander."
       }
     },
     "ReplaceCard": {
@@ -3274,16 +3279,28 @@
         "issueType": "Rede",
         "deliveryTime": "Afleweringstyd",
         "shippingCost": "Afleweringskoste",
-        "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
-        "bullet2": "Jou nuwe kaart sal dieselfde nommers as jou huidige kaart hê",
-        "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
+        "DamagedInfo": {
+          "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
+          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
+          "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Jou kaart is gesluit vir jou beskerming",
+          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
+          "bullet3": "Jou ou kaart sal permanent gekanselleer word"
+        }
       },
       "Status": {
         "title": "Jou nuwe kaart is op pad!",
         "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
         "buttonLabel": "Dashboard"
       },
-      "title": "Vervang kaart"
+      "title": "Vervang kaart",
+      "errors": {
+        "lockFailed": "Kon nie jou kaart sluit nie. Probeer asseblief weer.",
+        "replaceFailed": "Kon nie jou kaart vervang nie. Probeer asseblief weer.",
+        "replaceFailedCardLocked": "Jou kaart is gesluit maar die vervanging het misluk. Kontak asseblief ondersteuning vir hulp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Bestel fisiese kaart",
@@ -3330,6 +3347,102 @@
         "bullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
         "bullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
         "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verifikasie",
+      "CardSubscription": {
+        "subscribeTitle": "Teken in",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Aanvaar",
+        "payButton": "Gaan voort en Betaal",
+        "cardTitle": "Blink Privaat",
+        "perYear": "per jaar",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling Hangende",
+          "firstYearFree": "Eerste jaar gratis"
+        },
+        "renewalDate": {
+          "label": "Hernuwingsdatum"
+        },
+        "agreement": {
+          "text": "Ek stem in tot die",
+          "termsOfService": "Diensvoorwaardes",
+          "privacyPolicy": "Privaatheidsbeleid",
+          "cardholderAgreement": "Kaarthouer-ooreenkoms",
+          "and": "en"
+        },
+        "renew": "Ek verstaan dat my intekening outomaties oor 1 jaar hernu sal word"
+      },
+      "CardIntroducing": {
+        "title": "Bekendstelling",
+        "cardInfo": {
+          "bitcoinCard": "Die Blink Visa-kaart",
+          "for": "vir",
+          "maximalist": "Bitcoin Maksimaliste"
+        },
+        "buttonText": "Gaan voort"
+      },
+      "CardDetails": {
+        "title": "Bykomende voordele",
+        "features": {
+          "accountManager": "Toegewyde rekeningbestuurder",
+          "support": "Prioriteit-ondersteuning",
+          "onchainDeposits": "50% terug op transaksiegelde",
+          "circularEconomies": "$100 vir sirkulêre ekonomieë"
+        },
+        "andMore": "... en meer kom in 2026",
+        "buttonText": "Gaan voort"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Welkom aan boord",
+          "subtitle": "By Blink Privaat",
+          "paragraphs": {
+            "body1": "Iemand het aan jou gedink en voorgestel dat ons jou na Blink Privaat moet nooi. Waarskynlik omdat jy 'n wonderlike Bitcoiner is.",
+            "body2": "Ons doel vir 2026 is om die program met soveel goedighede te vul dat dit voor die hand liggend sal wees om volgende jaar te hernu."
+          }
+        },
+        "buttonText": "Kom ons gaan"
+      },
+      "LoadingCard": {
+        "title": "Ons werk aan jou kaart",
+        "subtitle": "Ons sal jou in kennis stel sodra dit hier is",
+        "codingBackend": "...kodeer die agterkant",
+        "buttonText": "Lekker"
+      },
+      "PersonalInformation": {
+        "title": "Laaste stap",
+        "fields": {
+          "occupation": {
+            "label": "Beroep",
+            "placeholder": "Kies jou beroep"
+          },
+          "annualSalaryRange": {
+            "label": "Jaarlikse salaris",
+            "placeholder": "Kies jou salarisreeks"
+          },
+          "accountPurpose": {
+            "label": "Rekeningdoel",
+            "placeholder": "Kies die doel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Verwagte maandelikse besteding",
+            "placeholder": "Kies jou bestedingsreeks"
+          }
+        },
+        "buttonText": "Dien aansoek in",
+        "select": "kies"
+      },
+      "CardPreapproved": {
+        "title": "Jy is vooraf goedgekeur vir die Blink Visa-kaart!",
+        "buttonText": "Sluit"
+      },
+      "CardProcessing": {
+        "title": "Verwerk jou aansoek",
+        "subtitle": "Geskatte wagtyd: {waitTime: string}",
+        "buttonText": "Sluit"
       }
     }
   }

@@ -2187,7 +2187,7 @@
         "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
     },
     "SecurityScreen": {
-        "title": "Security and Privacy",
+        "title": "Security and privacy",
         "biometricDescription": "Unlock with fingerprint or facial recognition.",
         "biometricTitle": "Biometric",
         "biometryNotAvailable": "Biometric sensor is not available.",
@@ -2651,7 +2651,7 @@
         "notifications": "Notifications",
         "preferences": "Preferences",
         "onDeviceSecurity": "Security and privacy",
-        "securityAndPrivacy": "Security and Privacy",
+        "securityAndPrivacy": "Security and privacy",
         "advanced": "Advanced",
         "community": "Community",
         "account": "Account",
@@ -3152,7 +3152,10 @@
                 "confirmNewPin": "Confirm new PIN",
                 "confirmPinSubtitle": "Please re-enter your new 4-digit PIN to continue.",
                 "incorrectPin": "Incorrect PIN. Please try again.",
-                "pinMismatch": "PINs do not match. Re-enter to confirm or go back to change your PIN."
+                "pinMismatch": "PINs do not match. Re-enter to confirm or go back to change your PIN.",
+                "weakPin": "This PIN is too easy to guess. Please choose a stronger PIN.",
+                "cardNotFound": "Card not found. Please try again.",
+                "pinUpdateFailed": "Failed to update PIN. Please try again."
             },
             "CreateFlow": {
                 "title": "Create PIN",
@@ -3175,6 +3178,8 @@
                 "enterCurrentPinSubtitle": "Please enter your current 4-digit PIN to continue.",
                 "enterNewPin": "Enter new PIN",
                 "enterNewPinSubtitle": "Please enter your new 4-digit PIN.",
+                "biometricDescription": "Verify your identity to change PIN",
+                "biometricRequired": "Biometric authentication is required to change your PIN.",
                 "pinChangedTitle": "PIN changed",
                 "pinChangedSubtitle": "Your PIN has been changed successfully.",
                 "pinChangedToast": "PIN has been changed successfully"
@@ -3222,15 +3227,27 @@
                 "deliveryTime": "Delivery time",
                 "shippingCost": "Shipping cost",
                 "importantInformation": "Important information",
-                "bullet1": "Your current card will remain active until the new one arrives",
-                "bullet2": "Your new card will have the same numbers as your current card",
-                "bullet3": "Destroy your damaged card when the new one arrives",
+                "DamagedInfo": {
+                    "bullet1": "Your current card will remain active until the new one arrives",
+                    "bullet2": "Your new card will have a new card number",
+                    "bullet3": "Destroy your damaged card when the new one arrives"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "Your card has been locked for your protection",
+                    "bullet2": "Your new card will have a new card number",
+                    "bullet3": "Your old card will be permanently canceled"
+                },
                 "submitRequest": "Submit request"
             },
             "Status": {
                 "title": "Your new card is on the way!",
                 "subtitle": "Order for delivery of your Blink Card has been submitted.",
                 "buttonLabel": "Dashboard"
+            },
+            "errors": {
+                "lockFailed": "Failed to lock your card. Please try again.",
+                "replaceFailed": "Failed to replace your card. Please try again.",
+                "replaceFailedCardLocked": "Your card was locked but the replacement failed. Please contact support for assistance."
             }
         },
         "OrderPhysicalCard": {
@@ -3275,6 +3292,102 @@
                 "bullet1": "Your virtual card will remain active while you wait for the physical card",
                 "bullet2": "You'll need to activate your physical card when it arrives",
                 "bullet3": "Both cards will have the same card number and details"
+            }
+        },
+        "Onboarding": {
+            "kycHeaderTitle": "Verification",
+            "CardIntroducing": {
+                "title": "Introducing",
+                "cardInfo": {
+                    "bitcoinCard": "The Blink Visa card",
+                    "for": "for",
+                    "maximalist": "Bitcoin Maximalists"
+                },
+                "buttonText": "Continue"
+            },
+            "CardDetails": {
+                "title": "Additional perks",
+                "features": {
+                    "accountManager": "Dedicated account manager",
+                    "support": "Priority support",
+                    "onchainDeposits": "50% back on transaction fees",
+                    "circularEconomies": "$100 to circular economies"
+                },
+                "andMore": "... and more coming in 2026",
+                "buttonText": "Continue"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "Welcome onboard",
+                    "subtitle": "To Blink Private",
+                    "paragraphs": {
+                        "body1": "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
+                        "body2": "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year."
+                    }
+                },
+                "buttonText": "Let's go"
+            },
+            "CardSubscription": {
+                "subscribeTitle": "Subscribe",
+                "paymentTitle": "Payment",
+                "acceptButton": "Accept",
+                "payButton": "Continue & Pay",
+                "cardTitle": "Blink Private",
+                "perYear": "per year",
+                "status": {
+                    "label": "Status",
+                    "paymentPending": "Payment Pending",
+                    "firstYearFree": "First year free"
+                },
+                "renewalDate": {
+                    "label": "Renewal date"
+                },
+                "agreement": {
+                    "text": "I agree to the",
+                    "termsOfService": "Terms of Service",
+                    "privacyPolicy": "Privacy Policy",
+                    "cardholderAgreement": "Cardholder Agreement",
+                    "and": "and"
+                },
+                "renew": "I understand that my subscription will automatically renew in 1 year"
+            },
+            "LoadingCard": {
+                "title": "We're working on your card",
+                "subtitle": "We'll notify you once it's here",
+                "codingBackend": "...coding the backend",
+                "buttonText": "Nice"
+            },
+            "PersonalInformation": {
+                "title": "Final step",
+                "fields": {
+                    "occupation": {
+                        "label": "Occupation",
+                        "placeholder": "Select your occupation"
+                    },
+                    "annualSalaryRange": {
+                        "label": "Annual salary",
+                        "placeholder": "Select your salary range"
+                    },
+                    "accountPurpose": {
+                        "label": "Account purpose",
+                        "placeholder": "Select purpose"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "Expected monthly spending",
+                        "placeholder": "Select your spending range"
+                    }
+                },
+                "buttonText": "Submit application",
+                "select": "Select"
+            },
+            "CardPreapproved": {
+                "title": "You have been pre-approved for the Blink Visa card!",
+                "buttonText": "Close"
+            },
+            "CardProcessing": {
+                "title": "Processing your application",
+                "subtitle": "Estimated wait time: {waitTime: string}",
+                "buttonText": "Close"
             }
         }
     },

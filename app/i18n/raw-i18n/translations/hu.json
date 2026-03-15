@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Új PIN megerősítése",
         "confirmPinSubtitle": "Kérjük, adja meg újra az új 4 számjegyű PIN kódját a folytatáshoz.",
         "incorrectPin": "Helytelen PIN. Kérjük, próbálja újra.",
-        "pinMismatch": "A PIN-kódok nem egyeznek. Írja be újra a megerősítéshez, vagy lépjen vissza a PIN megváltoztatásához."
+        "pinMismatch": "A PIN-kódok nem egyeznek. Írja be újra a megerősítéshez, vagy lépjen vissza a PIN megváltoztatásához.",
+        "weakPin": "Ez a PIN túl könnyű kitalálni. Kérjük, válasszon erősebb PIN-t.",
+        "cardNotFound": "A kártya nem található. Kérjük, próbálja újra.",
+        "pinUpdateFailed": "A PIN frissítése sikertelen. Kérjük, próbálja újra."
       },
       "CreateFlow": {
         "title": "PIN létrehozása",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Kérjük, adja meg az új 4 számjegyű PIN kódját.",
         "pinChangedTitle": "PIN megváltoztatva",
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
-        "pinChangedToast": "A PIN-kód sikeresen módosítva"
+        "pinChangedToast": "A PIN-kód sikeresen módosítva",
+        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához",
+        "biometricRequired": "Biometrikus hitelesítés szükséges a PIN megváltoztatásához."
       }
     },
     "ReplaceCard": {
@@ -3233,16 +3238,28 @@
         "issueType": "Ok",
         "deliveryTime": "Szállítási idő",
         "shippingCost": "Szállítási költség",
-        "bullet1": "Jelenlegi kártyája aktív marad, amíg az új meg nem érkezik",
-        "bullet2": "Az új kártyának ugyanazok lesznek a számai, mint a jelenleginek",
-        "bullet3": "Semmisítse meg a sérült kártyáját, amikor az új megérkezik"
+        "DamagedInfo": {
+          "bullet1": "A jelenlegi kártyád aktív marad, amíg az új meg nem érkezik",
+          "bullet2": "Az új kártyád új kártyaszámot kap",
+          "bullet3": "Semmisítsd meg a sérült kártyádat, amikor megérkezik az új"
+        },
+        "LostStolenInfo": {
+          "bullet1": "A kártyádat a védelmed érdekében zároltuk",
+          "bullet2": "Az új kártyád új kártyaszámot kap",
+          "bullet3": "A régi kártyád véglegesen törlésre kerül"
+        }
       },
       "Status": {
         "title": "Az új kártyád úton van!",
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
         "buttonLabel": "Irányítópult"
       },
-      "title": "Kártya cseréje"
+      "title": "Kártya cseréje",
+      "errors": {
+        "lockFailed": "Nem sikerült zárolni a kártyádat. Kérjük, próbáld újra.",
+        "replaceFailed": "Nem sikerült lecserélni a kártyádat. Kérjük, próbáld újra.",
+        "replaceFailedCardLocked": "A kártyád zárolva lett, de a csere sikertelen volt. Kérjük, lépj kapcsolatba az ügyfélszolgálattal segítségért."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fizikai kártya rendelése",
@@ -3289,6 +3306,102 @@
         "bullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
         "bullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
         "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Ellenőrzés",
+      "CardSubscription": {
+        "subscribeTitle": "Feliratkozás",
+        "paymentTitle": "Fizetés",
+        "acceptButton": "Elfogadás",
+        "payButton": "Folytatás és Fizetés",
+        "cardTitle": "Blink Privát",
+        "perYear": "évente",
+        "status": {
+          "label": "Állapot",
+          "paymentPending": "Fizetés Függőben",
+          "firstYearFree": "Első év ingyenes"
+        },
+        "renewalDate": {
+          "label": "Megújítás dátuma"
+        },
+        "agreement": {
+          "text": "Elfogadom a",
+          "termsOfService": "Szolgáltatási Feltételeket",
+          "privacyPolicy": "Adatvédelmi Irányelveket",
+          "cardholderAgreement": "Kártyabirtokosi Megállapodást",
+          "and": "és"
+        },
+        "renew": "Megértem, hogy az előfizetésem automatikusan megújul 1 év múlva"
+      },
+      "CardIntroducing": {
+        "title": "Bemutatjuk",
+        "cardInfo": {
+          "bitcoinCard": "A Blink Visa kártya",
+          "for": "a",
+          "maximalist": "Bitcoin Maximalistáknak"
+        },
+        "buttonText": "Tovább"
+      },
+      "CardDetails": {
+        "title": "További előnyök",
+        "features": {
+          "accountManager": "Dedikált fiókkezelő",
+          "support": "Elsőbbségi támogatás",
+          "onchainDeposits": "50% visszatérítés a tranzakciós díjakból",
+          "circularEconomies": "100 $ körkörös gazdaságoknak"
+        },
+        "andMore": "... és még több jön 2026-ban",
+        "buttonText": "Tovább"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Üdvözöljük a fedélzeten",
+          "subtitle": "A Blink Privátban",
+          "paragraphs": {
+            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Privátba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
+            "body2": "Célunk 2026-ra az, hogy a programot annyi jósággal töltsük meg, hogy nyilvánvaló legyen jövőre megújítani."
+          }
+        },
+        "buttonText": "Rajta"
+      },
+      "LoadingCard": {
+        "title": "Dolgozunk a kártyádon",
+        "subtitle": "Értesítünk, amint elkészül",
+        "codingBackend": "...a backend kódolása",
+        "buttonText": "Szuper"
+      },
+      "PersonalInformation": {
+        "title": "Utolsó lépés",
+        "fields": {
+          "occupation": {
+            "label": "Foglalkozás",
+            "placeholder": "Válaszd ki a foglalkozásodat"
+          },
+          "annualSalaryRange": {
+            "label": "Éves fizetés",
+            "placeholder": "Válaszd ki a fizetési sávodat"
+          },
+          "accountPurpose": {
+            "label": "Fiók célja",
+            "placeholder": "Válaszd ki a célt"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Várható havi költés",
+            "placeholder": "Válaszd ki a költési sávodat"
+          }
+        },
+        "buttonText": "Pályázat beküldése",
+        "select": "kiválaszt"
+      },
+      "CardPreapproved": {
+        "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
+        "buttonText": "Bezárás"
+      },
+      "CardProcessing": {
+        "title": "Pályázatod feldolgozása",
+        "subtitle": "Becsült várakozási idő: {waitTime: string}",
+        "buttonText": "Bezárás"
       }
     }
   }

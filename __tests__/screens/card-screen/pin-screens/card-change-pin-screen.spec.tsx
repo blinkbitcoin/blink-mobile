@@ -6,12 +6,14 @@ import { CardChangePinScreen } from "@app/screens/card-screen/pin-screens/card-c
 import { ContextForScreen } from "../../helper"
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
 const mockAddListener = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    goBack: mockGoBack,
     addListener: mockAddListener,
   }),
 }))
@@ -20,8 +22,14 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: jest.fn(),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_CARD_PIN: "1234",
+const mockUseBiometricGate = jest.fn().mockReturnValue(true)
+jest.mock("@app/screens/card-screen/hooks/use-biometric-gate", () => ({
+  useBiometricGate: (...args: unknown[]) => mockUseBiometricGate(...args),
+}))
+
+const mockUpdatePin = jest.fn().mockResolvedValue(true)
+jest.mock("@app/screens/card-screen/pin-screens/hooks/use-card-pin-update", () => ({
+  useCardPinUpdate: () => ({ updatePin: mockUpdatePin, loading: false }),
 }))
 
 import { toastShow } from "@app/utils/toast"
@@ -31,7 +39,41 @@ describe("CardChangePinScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockNavigate.mockClear()
+    mockGoBack.mockClear()
     mockAddListener.mockReturnValue(jest.fn())
+    mockUseBiometricGate.mockReturnValue(true)
+    mockUpdatePin.mockResolvedValue(true)
+  })
+
+  describe("biometric gate", () => {
+    it("does not render when biometric not authenticated", async () => {
+      mockUseBiometricGate.mockReturnValue(false)
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Enter new PIN")).toBeNull()
+      expect(queryByText("New PIN")).toBeNull()
+    })
+
+    it("calls useBiometricGate with required true", async () => {
+      render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockUseBiometricGate).toHaveBeenCalledWith(
+        expect.objectContaining({ required: true }),
+      )
+    })
   })
 
   describe("rendering", () => {
@@ -47,7 +89,7 @@ describe("CardChangePinScreen", () => {
       expect(toJSON()).toBeTruthy()
     })
 
-    it("displays enter current pin title on first step", async () => {
+    it("displays enter new pin title on first step", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardChangePinScreen />
@@ -56,10 +98,10 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Enter current PIN")).toBeTruthy()
+      expect(getByText("Enter new PIN")).toBeTruthy()
     })
 
-    it("displays enter current pin subtitle on first step", async () => {
+    it("displays enter new pin subtitle on first step", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardChangePinScreen />
@@ -68,12 +110,12 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Please enter your current 4-digit PIN to continue.")).toBeTruthy()
+      expect(getByText("Please enter your new 4-digit PIN.")).toBeTruthy()
     })
   })
 
   describe("steps progress bar", () => {
-    it("displays three steps", async () => {
+    it("displays two steps", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardChangePinScreen />
@@ -82,8 +124,8 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Current PIN")).toBeTruthy()
       expect(getByText("New PIN")).toBeTruthy()
+      expect(getByText("Confirm")).toBeTruthy()
     })
   })
 
@@ -103,68 +145,6 @@ describe("CardChangePinScreen", () => {
     })
   })
 
-  describe("current pin verification", () => {
-    it("shows error when current PIN is incorrect", async () => {
-      const { getByTestId, getByText } = render(
-        <ContextForScreen>
-          <CardChangePinScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
-      })
-
-      expect(getByText("Incorrect PIN. Please try again.")).toBeTruthy()
-    })
-
-    it("advances to new pin step when current PIN is correct", async () => {
-      const { getByTestId, getByText } = render(
-        <ContextForScreen>
-          <CardChangePinScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      fireEvent.press(getByTestId("NumericKey-1"))
-      fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
-      })
-
-      expect(getByText("Enter new PIN")).toBeTruthy()
-    })
-
-    it("shows new pin subtitle after entering correct current PIN", async () => {
-      const { getByTestId, getByText } = render(
-        <ContextForScreen>
-          <CardChangePinScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      fireEvent.press(getByTestId("NumericKey-1"))
-      fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
-      })
-
-      expect(getByText("Please enter your new 4-digit PIN.")).toBeTruthy()
-    })
-  })
-
   describe("new pin flow", () => {
     it("advances to confirm step after entering new PIN", async () => {
       const { getByTestId, getByText } = render(
@@ -175,20 +155,12 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
-      fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
-      })
-
       fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       expect(getByText("Confirm new PIN")).toBeTruthy()
@@ -203,13 +175,27 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
+
+      expect(getByText("Please re-enter your new 4-digit PIN to continue.")).toBeTruthy()
+    })
+  })
+
+  describe("weak PIN validation", () => {
+    it("shows weak PIN error on new PIN step", async () => {
+      const { getByTestId, getByText } = render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-6"))
@@ -219,7 +205,9 @@ describe("CardChangePinScreen", () => {
         fireEvent.press(getByTestId("NumericKey-8"))
       })
 
-      expect(getByText("Please re-enter your new 4-digit PIN to continue.")).toBeTruthy()
+      expect(
+        getByText("This PIN is too easy to guess. Please choose a stronger PIN."),
+      ).toBeTruthy()
     })
   })
 
@@ -233,20 +221,12 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
-      fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
-      })
-
       fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       fireEvent.press(getByTestId("NumericKey-9"))
@@ -273,28 +253,20 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
-      })
-
-      fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       const confirmElements = getAllByText("Confirm")
@@ -312,28 +284,20 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
-      })
-
-      fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       const confirmButtons = getAllByText("Confirm")
@@ -341,7 +305,44 @@ describe("CardChangePinScreen", () => {
         fireEvent.press(confirmButtons[confirmButtons.length - 1])
       })
 
+      expect(mockUpdatePin).toHaveBeenCalled()
       expect(mockNavigate).toHaveBeenCalledWith("cardSettingsScreen")
+    })
+
+    it("does not navigate when mutation fails", async () => {
+      mockUpdatePin.mockResolvedValue(false)
+
+      const { getByTestId, getAllByText } = render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
+
+      await act(async () => {
+        fireEvent.press(getByTestId("NumericKey-9"))
+      })
+
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
+
+      await act(async () => {
+        fireEvent.press(getByTestId("NumericKey-9"))
+      })
+
+      const confirmButtons = getAllByText("Confirm")
+      await act(async () => {
+        fireEvent.press(confirmButtons[confirmButtons.length - 1])
+      })
+
+      expect(mockUpdatePin).toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it("shows success toast when PIN is changed", async () => {
@@ -353,28 +354,20 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
-      })
-
-      fireEvent.press(getByTestId("NumericKey-5"))
-      fireEvent.press(getByTestId("NumericKey-6"))
-      fireEvent.press(getByTestId("NumericKey-7"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-8"))
+        fireEvent.press(getByTestId("NumericKey-9"))
       })
 
       const confirmButtons = getAllByText("Confirm")
@@ -400,36 +393,25 @@ describe("CardChangePinScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Enter current PIN")).toBeTruthy()
-      expect(getByText("Current PIN")).toBeTruthy()
+      expect(getByText("Enter new PIN")).toBeTruthy()
       expect(getByText("New PIN")).toBeTruthy()
 
-      fireEvent.press(getByTestId("NumericKey-1"))
-      fireEvent.press(getByTestId("NumericKey-2"))
-      fireEvent.press(getByTestId("NumericKey-3"))
-
-      await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-4"))
-      })
-
-      expect(getByText("Enter new PIN")).toBeTruthy()
-
-      fireEvent.press(getByTestId("NumericKey-9"))
-      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-9"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-6"))
+        fireEvent.press(getByTestId("NumericKey-3"))
       })
 
       expect(getByText("Confirm new PIN")).toBeTruthy()
 
-      fireEvent.press(getByTestId("NumericKey-9"))
-      fireEvent.press(getByTestId("NumericKey-8"))
       fireEvent.press(getByTestId("NumericKey-7"))
+      fireEvent.press(getByTestId("NumericKey-1"))
+      fireEvent.press(getByTestId("NumericKey-9"))
 
       await act(async () => {
-        fireEvent.press(getByTestId("NumericKey-6"))
+        fireEvent.press(getByTestId("NumericKey-3"))
       })
 
       const confirmButtons = getAllByText("Confirm")

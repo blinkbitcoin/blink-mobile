@@ -89,7 +89,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
         </View>
 
         <InfoCard
-          ionicon={kycBanner.ionicon}
+          icon={kycBanner.icon}
           title={kycBanner.title}
           description={kycBanner.description}
           titleColor={kycBanner.color}

@@ -68,8 +68,8 @@ export const ExportCsvSetting: React.FC = () => {
       loading={loading}
       spinner={spinner}
       title={LL.common.csvExport()}
-      leftIcon="list-outline"
-      rightIcon={"download-outline"}
+      leftGaloyIcon="menu"
+      rightIcon={"download"}
       action={fetchCsvTransactions}
     />
   )

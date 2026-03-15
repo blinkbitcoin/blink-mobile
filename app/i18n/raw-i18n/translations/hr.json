@@ -3195,7 +3195,10 @@
         "confirmNewPin": "Potvrdi novi PIN",
         "confirmPinSubtitle": "Molimo ponovno unesite svoj novi 4-znamenkasti PIN za nastavak.",
         "incorrectPin": "Netočan PIN. Molimo pokušajte ponovo.",
-        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promijenite PIN."
+        "pinMismatch": "PIN-ovi se ne podudaraju. Ponovo unesite za potvrdu ili se vratite da promijenite PIN.",
+        "weakPin": "Ovaj PIN je prelagan za pogoditi. Molimo odaberite jači PIN.",
+        "cardNotFound": "Kartica nije pronađena. Molimo pokušajte ponovo.",
+        "pinUpdateFailed": "Ažuriranje PIN-a nije uspjelo. Molimo pokušajte ponovo."
       },
       "CreateFlow": {
         "title": "Stvori PIN",
@@ -3220,7 +3223,9 @@
         "enterNewPinSubtitle": "Molimo unesite svoj novi 4-znamenkasti PIN.",
         "pinChangedTitle": "PIN promijenjen",
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
-        "pinChangedToast": "PIN je uspješno promijenjen"
+        "pinChangedToast": "PIN je uspješno promijenjen",
+        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a",
+        "biometricRequired": "Biometrijska autentifikacija je potrebna za promjenu vašeg PIN-a."
       }
     },
     "ReplaceCard": {
@@ -3274,16 +3279,28 @@
         "issueType": "Razlog",
         "deliveryTime": "Vrijeme isporuke",
         "shippingCost": "Trošak dostave",
-        "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
-        "bullet2": "Vaša nova kartica imat će iste brojeve kao trenutna",
-        "bullet3": "Uništite oštećenu karticu kada stigne nova"
+        "DamagedInfo": {
+          "bullet1": "Vaša trenutna kartica ostat će aktivna dok ne stigne nova",
+          "bullet2": "Vaša nova kartica imat će novi broj kartice",
+          "bullet3": "Uništite svoju oštećenu karticu kad stigne nova"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaša kartica je zaključana za vašu zaštitu",
+          "bullet2": "Vaša nova kartica imat će novi broj kartice",
+          "bullet3": "Vaša stara kartica bit će trajno otkazana"
+        }
       },
       "Status": {
         "title": "Vaša nova kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
         "buttonLabel": "Nadzorna ploča"
       },
-      "title": "Zamijeni karticu"
+      "title": "Zamijeni karticu",
+      "errors": {
+        "lockFailed": "Zaključavanje kartice nije uspjelo. Pokušajte ponovo.",
+        "replaceFailed": "Zamjena kartice nije uspjela. Pokušajte ponovo.",
+        "replaceFailedCardLocked": "Vaša kartica je zaključana, ali zamjena nije uspjela. Molimo kontaktirajte podršku za pomoć."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Naruči fizičku karticu",
@@ -3330,6 +3347,102 @@
         "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
         "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
         "bullet3": "Obje kartice imat će isti broj i podatke"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verifikacija",
+      "CardSubscription": {
+        "subscribeTitle": "Pretplatiti se",
+        "paymentTitle": "Plaćanje",
+        "acceptButton": "Prihvati",
+        "payButton": "Nastavi i Plati",
+        "cardTitle": "Blink Privatni",
+        "perYear": "godišnje",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Plaćanje na Čekanju",
+          "firstYearFree": "Prva godina besplatno"
+        },
+        "renewalDate": {
+          "label": "Datum obnove"
+        },
+        "agreement": {
+          "text": "Prihvaćam",
+          "termsOfService": "Uvjete korištenja",
+          "privacyPolicy": "Politiku privatnosti",
+          "cardholderAgreement": "Ugovor vlasnika kartice",
+          "and": "i"
+        },
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za 1 godinu"
+      },
+      "CardIntroducing": {
+        "title": "Predstavljamo",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa kartica",
+          "for": "za",
+          "maximalist": "Bitcoin Maksimaliste"
+        },
+        "buttonText": "Nastavi"
+      },
+      "CardDetails": {
+        "title": "Dodatne pogodnosti",
+        "features": {
+          "accountManager": "Posvećeni upravitelj računa",
+          "support": "Prioritetna podrška",
+          "onchainDeposits": "50% povrata na naknade za transakcije",
+          "circularEconomies": "100 $ za kružne ekonomije"
+        },
+        "andMore": "... i još toga dolazi 2026.",
+        "buttonText": "Nastavi"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Dobrodošli na brod",
+          "subtitle": "U Blink Privatni",
+          "paragraphs": {
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+          }
+        },
+        "buttonText": "Idemo"
+      },
+      "LoadingCard": {
+        "title": "Radimo na vašoj kartici",
+        "subtitle": "Obavijestit ćemo vas kad bude gotova",
+        "codingBackend": "...kodiramo backend",
+        "buttonText": "Super"
+      },
+      "PersonalInformation": {
+        "title": "Posljednji korak",
+        "fields": {
+          "occupation": {
+            "label": "Zanimanje",
+            "placeholder": "Odaberite svoje zanimanje"
+          },
+          "annualSalaryRange": {
+            "label": "Godišnja plaća",
+            "placeholder": "Odaberite svoj raspon plaće"
+          },
+          "accountPurpose": {
+            "label": "Svrha računa",
+            "placeholder": "Odaberite svrhu"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očekivana mjesečna potrošnja",
+            "placeholder": "Odaberite svoj raspon potrošnje"
+          }
+        },
+        "buttonText": "Pošalji prijavu",
+        "select": "odaberi"
+      },
+      "CardPreapproved": {
+        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "buttonText": "Zatvori"
+      },
+      "CardProcessing": {
+        "title": "Obrađujemo vašu prijavu",
+        "subtitle": "Procijenjeno vrijeme čekanja: {waitTime: string}",
+        "buttonText": "Zatvori"
       }
     }
   }

@@ -3192,7 +3192,10 @@
         "confirmNewPin": "Musuq PIN nisqa takyachiy",
         "confirmPinSubtitle": "Ama hina kaspa, musuq 4 yupay PIN nisqaykita kutichiy ñawpaqman rinaykipaq.",
         "incorrectPin": "PIN mana allinchu. Ama hina kaspa, hukmanta ruwapay.",
-        "pinMismatch": "PIN nisqakuna manam tupanchu. Hukmanta yaykuchiy takyachinapaq utaq kutiy PIN niykita tikranapaq."
+        "pinMismatch": "PIN nisqakuna manam tupanchu. Hukmanta yaykuchiy takyachinapaq utaq kutiy PIN niykita tikranapaq.",
+        "weakPin": "Kay PIN nisqaqa ancha facilmi yuyarinapaq. Ama hina kaspa, aswan sinchi PIN-ta akllay.",
+        "cardNotFound": "Tarjeta mana tarisqachu. Ama hina kaspa, musuqmanta ruraykuy.",
+        "pinUpdateFailed": "PIN tikray mana atisqachu. Ama hina kaspa, musuqmanta ruraykuy."
       },
       "CreateFlow": {
         "title": "PIN ruray",
@@ -3217,7 +3220,9 @@
         "enterNewPinSubtitle": "Ama hina kaspa, musuq 4 yupay PIN nisqaykita yaykuchiy.",
         "pinChangedTitle": "PIN tikrasqa",
         "pinChangedSubtitle": "PIN nisqayki allinta tikrasqa.",
-        "pinChangedToast": "PIN allinta tikrasqa"
+        "pinChangedToast": "PIN allinta tikrasqa",
+        "biometricDescription": "Kikinykita qhaway PIN-ta tikranapaq",
+        "biometricRequired": "Biométrica takyachiy ruranayuqmi PIN-ta tikranapaq."
       }
     },
     "ReplaceCard": {
@@ -3271,16 +3276,28 @@
         "issueType": "Imarayku",
         "deliveryTime": "Apachiy pacha",
         "shippingCost": "Apachiy chanin",
-        "bullet1": "Kunan tarjetayki kawsaqllam kanqa musuq chayamunankama",
-        "bullet2": "Musuq tarjetayki kunan tarjetaykipa kikin yupayniyuqmi kanqa",
-        "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
+        "DamagedInfo": {
+          "bullet1": "Kunan tarjetayki kawsaqlla kanqa musuq chayamunankama",
+          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
+          "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Tarjetayki wichqasqa karqan qamta waqaychasunaykirayku",
+          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
+          "bullet3": "Ñawpa tarjetayki wiñaypaq huchusqa kanqa"
+        }
       },
       "Status": {
         "title": "Musuq tarjetayki ñanpim kachkan!",
         "subtitle": "Blink tarjetaykipa apachiy kamachikuyqa kachisqañam.",
         "buttonLabel": "Ñawpaq panqa"
       },
-      "title": "Tarjetata tikray"
+      "title": "Tarjetata tikray",
+      "errors": {
+        "lockFailed": "Mana atikurqachu tarjetaykita wisq'ayta. Musuqmanta ruwayña.",
+        "replaceFailed": "Mana atikurqachu tarjetaykita tikrayta. Musuqmanta ruwayña.",
+        "replaceFailedCardLocked": "Tarjetayki wichqasqa karqan ichaqa tikrayqa mana allinchu karqan. Yanapakuqkunawan rimanakuy."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Tarjeta física mañakuy",
@@ -3327,6 +3344,102 @@
         "bullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
         "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
         "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verificación",
+      "CardSubscription": {
+        "subscribeTitle": "Qillqakuy",
+        "paymentTitle": "Pagay",
+        "acceptButton": "Chaskiy",
+        "payButton": "Ñawpaqman rispa Pagay",
+        "cardTitle": "Blink Sapalla",
+        "perYear": "watanpi",
+        "status": {
+          "label": "Kayninpi",
+          "paymentPending": "Pagay Suyachkan",
+          "firstYearFree": "Ñawpaq wata qhasilla"
+        },
+        "renewalDate": {
+          "label": "Musuqyachiy punchaw"
+        },
+        "agreement": {
+          "text": "Ari nispa nisani",
+          "termsOfService": "Yanapay Kamachikuykuna",
+          "privacyPolicy": "Pakasqa Kamachikuy",
+          "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
+          "and": "chaymanta"
+        },
+        "renew": "Entiendeni qillqakuyniyta kikinmanta musuqyachinqa 1 watapi"
+      },
+      "CardIntroducing": {
+        "title": "Riqsichispa",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa tarjeta",
+          "for": "kaqpaq",
+          "maximalist": "Bitcoin Maximalistakuna"
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "CardDetails": {
+        "title": "Yapay allinkunakuna",
+        "features": {
+          "accountManager": "Sapaq kawaq akawuntapaq",
+          "support": "Ñawpaq yanapay",
+          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
+          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+        },
+        "andMore": "... astawanraq 2026-pi hamushan",
+        "buttonText": "Ñawpaqman"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Allin hamusqa",
+          "subtitle": "Blink Sapallaman",
+          "paragraphs": {
+            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Sapallaman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
+            "body2": "2026 watapaq munayninchisqa programata allin kaqkunawan huntachiymi, chayna hamuq watapi musuqyachinapaq allinmi kanqa."
+          }
+        },
+        "buttonText": "Haku"
+      },
+      "LoadingCard": {
+        "title": "Tarjetaykipi llamkachkayku",
+        "subtitle": "Willasqayku listona kaptinña",
+        "codingBackend": "...backend-ta programachkayku",
+        "buttonText": "Allinmi"
+      },
+      "PersonalInformation": {
+        "title": "Qhipa taki",
+        "fields": {
+          "occupation": {
+            "label": "Llamk'ay",
+            "placeholder": "Llamk'ayniykita akllay"
+          },
+          "annualSalaryRange": {
+            "label": "Watantin qullqi",
+            "placeholder": "Qullqi rakinniykita akllay"
+          },
+          "accountPurpose": {
+            "label": "Akawunta munay",
+            "placeholder": "Munayniyta akllay"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Killapi gastay suyasqa",
+            "placeholder": "Gastay rakinniykita akllay"
+          }
+        },
+        "buttonText": "Mañakuyta apachiy",
+        "select": "akllay"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
+        "buttonText": "Wisq'ay"
+      },
+      "CardProcessing": {
+        "title": "Mañakuyniykita rurachkanku",
+        "subtitle": "Suyay pacha: {waitTime: string}",
+        "buttonText": "Wisq'ay"
       }
     }
   }

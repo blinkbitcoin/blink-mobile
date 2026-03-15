@@ -16,7 +16,7 @@ export const CurrencySetting: React.FC = () => {
   return (
     <SettingsRow
       title={`${LL.SettingsScreen.displayCurrency()}: ${displayCurrency}`}
-      leftIcon="cash-outline"
+      leftGaloyIcon="dollar"
       action={() => navigate("currency")}
     />
   )

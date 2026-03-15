@@ -57,6 +57,12 @@ export const usePinFlow = ({ totalSteps }: UsePinFlowOptions) => {
   }, [step, totalSteps])
 
   useEffect(() => {
+    return () => {
+      setStoredPin("")
+    }
+  }, [])
+
+  useEffect(() => {
     return navigation.addListener("beforeRemove", (e) => {
       if (isCompleteRef.current) return
 

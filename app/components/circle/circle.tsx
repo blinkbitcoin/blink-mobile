@@ -1,8 +1,8 @@
 import { forwardRef, useImperativeHandle } from "react"
-import { View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { TouchableOpacity, View } from "react-native"
 import { useCountUp } from "use-count-up"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -90,12 +90,9 @@ export const Circle = forwardRef<CircleRef, CircleProps>(
           {helpBtnModal && (
             <View style={styles.helpBtn}>
               {helpBtnModal}
-              <Icon
-                color={colors.primary}
-                name="help-circle-outline"
-                size={23}
-                onPress={helpBtnModalEnable}
-              />
+              <TouchableOpacity onPress={helpBtnModalEnable}>
+                <GaloyIcon name="question" size={23} color={colors.primary} />
+              </TouchableOpacity>
             </View>
           )}
         </View>

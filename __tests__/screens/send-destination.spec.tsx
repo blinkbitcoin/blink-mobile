@@ -257,6 +257,48 @@ describe("SendBitcoinDestinationScreen", () => {
     expect(screen.queryByText(modalTitle)).toBeNull()
   })
 
+  it("strips domain from LNURL identifier to prevent doubled @blink.sv in confirm modal", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("+50370000000@blink.sv"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "70000000")
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+    await flushAsync()
+
+    expect(
+      await screen.findByText(
+        LL.SendBitcoinDestinationScreen.confirmUsernameModal.title(),
+      ),
+    ).toBeTruthy()
+
+    // The checkbox label should show +50370000000@blink.sv (single domain),
+    // NOT +50370000000@blink.sv@blink.sv (doubled domain)
+    expect(
+      screen.getByLabelText(
+        LL.SendBitcoinDestinationScreen.confirmUsernameModal.checkBox({
+          lnAddress: "+50370000000@blink.sv",
+        }),
+      ),
+    ).toBeTruthy()
+  })
+
   it.each([
     {
       name: "shows invalid phone error for malformed numbers",

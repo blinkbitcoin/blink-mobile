@@ -13,9 +13,14 @@ import { Delivery, DeliveryType, Issue, IssueType } from "./types"
 type ConfirmStepProps = {
   issueType: IssueType
   deliveryType: DeliveryType
+  isVirtualCard: boolean
 }
 
-export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryType }) => {
+export const ConfirmStep: React.FC<ConfirmStepProps> = ({
+  issueType,
+  deliveryType,
+  isVirtualCard,
+}) => {
   const {
     theme: { colors },
   } = useTheme()
@@ -23,7 +28,6 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
   const { replaceCardDeliveryConfig } = useRemoteConfig()
   const { formatCurrency } = useDisplayCurrency()
 
-  const deliveryConfig = replaceCardDeliveryConfig[deliveryType]
   const {
     ReportIssue: reportIssueLL,
     Delivery: deliveryLL,
@@ -39,53 +43,72 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, deliveryTyp
     [reportIssueLL],
   )
 
-  const deliveryLabels = useMemo<Record<DeliveryType, string>>(
-    () => ({
-      [Delivery.Standard]: deliveryLL.standardDelivery(),
-      [Delivery.Express]: deliveryLL.expressDelivery(),
-    }),
-    [deliveryLL],
-  )
+  const summaryItems = useMemo(() => {
+    const items: { label: string; value: string; valueColor?: string }[] = [
+      {
+        label: confirmLL.issueType(),
+        value: issueTypeLabels[issueType],
+      },
+    ]
 
-  const deliveryPrice =
-    deliveryConfig.priceUsd === 0
-      ? deliveryLL.free()
-      : formatCurrency({
-          amountInMajorUnits: deliveryConfig.priceUsd,
-          currency: WalletCurrency.Usd,
-        })
+    if (!isVirtualCard) {
+      const deliveryConfig = replaceCardDeliveryConfig[deliveryType]
+      const deliveryLabels: Record<DeliveryType, string> = {
+        [Delivery.Standard]: deliveryLL.standardDelivery(),
+        [Delivery.Express]: deliveryLL.expressDelivery(),
+      }
+      const deliveryPrice =
+        deliveryConfig.priceUsd === 0
+          ? deliveryLL.free()
+          : formatCurrency({
+              amountInMajorUnits: deliveryConfig.priceUsd,
+              currency: WalletCurrency.Usd,
+            })
+
+      items.push(
+        {
+          label: confirmLL.delivery(),
+          value: deliveryLabels[deliveryType],
+        },
+        {
+          label: confirmLL.deliveryTime(),
+          value: deliveryLL.businessDays({
+            day1: deliveryConfig.minDays.toString(),
+            day2: deliveryConfig.maxDays.toString(),
+          }),
+        },
+        {
+          label: confirmLL.shippingCost(),
+          value: deliveryPrice,
+          valueColor: deliveryType === Delivery.Standard ? colors._green : undefined,
+        },
+      )
+    }
+
+    return items
+  }, [
+    confirmLL,
+    issueTypeLabels,
+    issueType,
+    isVirtualCard,
+    replaceCardDeliveryConfig,
+    deliveryType,
+    deliveryLL,
+    formatCurrency,
+    colors._green,
+  ])
 
   return (
     <>
-      <InfoSection
-        title={confirmLL.requestSummary()}
-        items={[
-          {
-            label: confirmLL.issueType(),
-            value: issueTypeLabels[issueType],
-          },
-          {
-            label: confirmLL.delivery(),
-            value: deliveryLabels[deliveryType],
-          },
-          {
-            label: confirmLL.deliveryTime(),
-            value: deliveryLL.businessDays({
-              day1: deliveryConfig.minDays.toString(),
-              day2: deliveryConfig.maxDays.toString(),
-            }),
-          },
-          {
-            label: confirmLL.shippingCost(),
-            value: deliveryPrice,
-            valueColor: deliveryType === Delivery.Standard ? colors._green : undefined,
-          },
-        ]}
-      />
+      <InfoSection title={confirmLL.requestSummary()} items={summaryItems} />
 
       <InfoCard
         title={confirmLL.importantInformation()}
-        bulletItems={[confirmLL.bullet1(), confirmLL.bullet2(), confirmLL.bullet3()]}
+        bulletItems={(() => {
+          const info =
+            issueType === Issue.Damaged ? confirmLL.DamagedInfo : confirmLL.LostStolenInfo
+          return [info.bullet1(), info.bullet2(), info.bullet3()]
+        })()}
         showIcon={false}
         size="lg"
       />

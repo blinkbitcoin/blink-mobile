@@ -3201,7 +3201,10 @@
         "confirmNewPin": "Qinisekisa i-PIN entsha",
         "confirmPinSubtitle": "Nceda ufake kwakhona i-PIN yakho entsha yamanani ama-4 ukuze uqhubeke.",
         "incorrectPin": "I-PIN ayichanekanga. Nceda uzame kwakhona.",
-        "pinMismatch": "Ii-PIN azifani. Faka kwakhona ukuqinisekisa okanye buyela umva ukutshintsha i-PIN yakho."
+        "pinMismatch": "Ii-PIN azifani. Faka kwakhona ukuqinisekisa okanye buyela umva ukutshintsha i-PIN yakho.",
+        "weakPin": "Le PIN ilula kakhulu ukuyiqashela. Nceda ukhethe iPIN enamandla ngakumbi.",
+        "cardNotFound": "Ikhadi alifumanekanga. Nceda uzame kwakhona.",
+        "pinUpdateFailed": "Ayiphumelelanga ukuhlaziya iPIN. Nceda uzame kwakhona."
       },
       "CreateFlow": {
         "title": "Dala i-PIN",
@@ -3226,7 +3229,9 @@
         "enterNewPinSubtitle": "Nceda ufake i-PIN yakho entsha yamanani ama-4.",
         "pinChangedTitle": "I-PIN itshintshiwe",
         "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
-        "pinChangedToast": "I-PIN itshintshiwe ngempumelelo"
+        "pinChangedToast": "I-PIN itshintshiwe ngempumelelo",
+        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN",
+        "biometricRequired": "Ukuqinisekiswa kwe-biometric kuyafuneka ukutshintsha iPIN yakho."
       }
     },
     "ReplaceCard": {
@@ -3280,16 +3285,28 @@
         "issueType": "Isizathu",
         "deliveryTime": "Ixesha lokunikezela",
         "shippingCost": "Iindleko zokuhanjiswa",
-        "bullet1": "Ikhadi lakho langoku liza kuhlala lisebenza de kufike elitsha",
-        "bullet2": "Ikhadi lakho elitsha liza kuba neminani efanayo nekhadi langoku",
-        "bullet3": "Tshabalalisa ikhadi lakho elonakeleyo xa elitsha lifika"
+        "DamagedInfo": {
+          "bullet1": "Ikhadi lakho langoku liya kuhlala lisebenza de kufike elitsha",
+          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
+          "bullet3": "Tshabalalisa ikhadi lakho elonakalisiweyo xa kufika elitsha"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Ikhadi lakho litshixiwe ukukhusela wena",
+          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
+          "bullet3": "Ikhadi lakho elidala liya kurhoxiswa ngokupheleleyo"
+        }
       },
       "Status": {
         "title": "Ikhadi lakho elitsha lisendleleni!",
         "subtitle": "Iodolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
         "buttonLabel": "Ideshibhodi"
       },
-      "title": "Tshintsha ikhadi"
+      "title": "Tshintsha ikhadi",
+      "errors": {
+        "lockFailed": "Ayiphumelelanga ukutshixa ikhadi yakho. Nceda uzame kwakhona.",
+        "replaceFailed": "Ayiphumelelanga ukutshintsha ikhadi yakho. Nceda uzame kwakhona.",
+        "replaceFailedCardLocked": "Ikhadi lakho litshixiwe kodwa ukutshintsha akuphumelelanga. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Odola ikhadi elibonakalayo",
@@ -3336,6 +3353,102 @@
         "bullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
         "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
         "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Ukuqinisekisa",
+      "CardSubscription": {
+        "subscribeTitle": "Bhalisa",
+        "paymentTitle": "Intlawulo",
+        "acceptButton": "Yamkela",
+        "payButton": "Qhubeka kwaye Uhlawule",
+        "cardTitle": "Blink Yabucala",
+        "perYear": "ngonyaka",
+        "status": {
+          "label": "Isimo",
+          "paymentPending": "Intlawulo Ilindile",
+          "firstYearFree": "Unyaka wokuqala simahla"
+        },
+        "renewalDate": {
+          "label": "Umhla wokuhlaziya"
+        },
+        "agreement": {
+          "text": "Ndiyavuma",
+          "termsOfService": "Imimmiselo yoMsebenzi",
+          "privacyPolicy": "Umgaqo waBucala",
+          "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
+          "and": "kunye"
+        },
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwisithuba sonyaka omnye"
+      },
+      "CardIntroducing": {
+        "title": "Ukwazisa",
+        "cardInfo": {
+          "bitcoinCard": "Ikhadi le-Blink Visa",
+          "for": "le",
+          "maximalist": "Abathandi be-Bitcoin"
+        },
+        "buttonText": "Qhubeka"
+      },
+      "CardDetails": {
+        "title": "Inzuzo ezongezelelweyo",
+        "features": {
+          "accountManager": "Umphathi weakhawunti ozinikeleyo",
+          "support": "Inkxaso ephambili",
+          "onchainDeposits": "50% ubuyiselo kwiimali zotshintsho",
+          "circularEconomies": "$100 kwiikhonomi ezijikeleziyo"
+        },
+        "andMore": "... nokunye okuninzi kuzayo ngo-2026",
+        "buttonText": "Qhubeka"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Wamkelekile",
+          "subtitle": "Kwi-Blink Yabucala",
+          "paragraphs": {
+            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Yabucala. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
+            "body2": "Injongo yethu ngo-2026 kukuzalisa inkqubo ngezinto ezininzi ezintle kangangokuba kuya kucaca ukuba kufanele uhlaziye kunyaka ozayo."
+          }
+        },
+        "buttonText": "Masiye"
+      },
+      "LoadingCard": {
+        "title": "Sisebenza kwikhadi lakho",
+        "subtitle": "Siza kukwazisa xa likulungele",
+        "codingBackend": "...ukubhala ikhowudi ye-backend",
+        "buttonText": "Kuhle"
+      },
+      "PersonalInformation": {
+        "title": "Inyathelo lokugqibela",
+        "fields": {
+          "occupation": {
+            "label": "Umsebenzi",
+            "placeholder": "Khetha umsebenzi wakho"
+          },
+          "annualSalaryRange": {
+            "label": "Umvuzo wonyaka",
+            "placeholder": "Khetha ibanga lomvuzo wakho"
+          },
+          "accountPurpose": {
+            "label": "Injongo yeakhawunti",
+            "placeholder": "Khetha injongo"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Ukuchitha okulindelweyo kwenyanga",
+            "placeholder": "Khetha ibanga lokuchitha kwakho"
+          }
+        },
+        "buttonText": "Ngenisa isicelo",
+        "select": "khetha"
+      },
+      "CardPreapproved": {
+        "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
+        "buttonText": "Vala"
+      },
+      "CardProcessing": {
+        "title": "Siqhuba isicelo sakho",
+        "subtitle": "Ixesha lokulinda eliqikelelweyo: {waitTime: string}",
+        "buttonText": "Vala"
       }
     }
   }

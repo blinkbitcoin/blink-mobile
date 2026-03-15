@@ -7,18 +7,35 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 
 import { CardPinLayout } from "./card-pin-layout"
-import { usePinFlow } from "./use-pin-flow"
-import { MOCK_CARD_PIN } from "../card-mock-data"
+import { useCardPinUpdate } from "./hooks/use-card-pin-update"
+import { usePinFlow } from "./hooks/use-pin-flow"
+import { isWeakPin } from "./validate-pin"
+import { useBiometricGate } from "../hooks/use-biometric-gate"
 
 const Step = {
-  CurrentPin: 1,
-  NewPin: 2,
-  Confirm: 3,
+  NewPin: 1,
+  Confirm: 2,
 } as const
 
 export const CardChangePinScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { updatePin, loading } = useCardPinUpdate()
+
+  const handleBiometricFailure = useCallback(() => {
+    toastShow({
+      message: LL.CardFlow.PinScreens.ChangeFlow.biometricRequired(),
+      LL,
+    })
+    navigation.goBack()
+  }, [navigation, LL])
+
+  const authenticated = useBiometricGate({
+    description: LL.CardFlow.PinScreens.ChangeFlow.biometricDescription(),
+    onFailure: handleBiometricFailure,
+    required: true,
+  })
+
   const {
     step,
     storedPin,
@@ -34,23 +51,17 @@ export const CardChangePinScreen: React.FC = () => {
   } = usePinFlow({ totalSteps: Step.Confirm })
 
   const steps = [
-    LL.CardFlow.PinScreens.ChangeFlow.steps.currentPin(),
     LL.CardFlow.PinScreens.ChangeFlow.steps.newPin(),
     LL.CardFlow.PinScreens.ChangeFlow.steps.confirm(),
   ]
 
   const handlePinComplete = useCallback(
     (pin: string) => {
-      if (step === Step.CurrentPin) {
-        if (pin === MOCK_CARD_PIN) {
-          goToNextStep()
+      if (step === Step.NewPin) {
+        if (isWeakPin(pin)) {
+          showError(LL.CardFlow.PinScreens.common.weakPin())
           return
         }
-        showError(LL.CardFlow.PinScreens.common.incorrectPin())
-        return
-      }
-
-      if (step === Step.NewPin) {
         setStoredPin(pin)
         goToNextStep()
         return
@@ -66,7 +77,10 @@ export const CardChangePinScreen: React.FC = () => {
     [step, storedPin, setStoredPin, goToNextStep, confirmPin, showError, LL],
   )
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
+    const success = await updatePin(storedPin)
+    if (!success) return
+
     completeFlow()
     navigation.navigate("cardSettingsScreen")
 
@@ -75,19 +89,19 @@ export const CardChangePinScreen: React.FC = () => {
       type: "success",
       LL,
     })
-  }, [completeFlow, navigation, LL])
+  }, [updatePin, storedPin, completeFlow, navigation, LL])
 
   const titles = [
-    LL.CardFlow.PinScreens.ChangeFlow.enterCurrentPin(),
     LL.CardFlow.PinScreens.ChangeFlow.enterNewPin(),
     LL.CardFlow.PinScreens.common.confirmNewPin(),
   ]
 
   const subtitles = [
-    LL.CardFlow.PinScreens.ChangeFlow.enterCurrentPinSubtitle(),
     LL.CardFlow.PinScreens.ChangeFlow.enterNewPinSubtitle(),
     LL.CardFlow.PinScreens.common.confirmPinSubtitle(),
   ]
+
+  if (!authenticated) return null
 
   return (
     <CardPinLayout
@@ -98,6 +112,7 @@ export const CardChangePinScreen: React.FC = () => {
       errorMessage={errorMessage}
       showConfirmButton={showConfirmButton}
       confirmButtonLabel={LL.common.confirm()}
+      loading={loading}
       resetTrigger={resetTrigger}
       onPinComplete={handlePinComplete}
       onPinChange={handlePinChange}

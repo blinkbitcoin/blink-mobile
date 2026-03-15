@@ -18,6 +18,7 @@ type CardPinLayoutProps = {
   errorMessage?: string
   showConfirmButton?: boolean
   confirmButtonLabel?: string
+  loading?: boolean
   resetTrigger?: number
   onPinComplete: (pin: string) => void
   onPinChange?: () => void
@@ -32,6 +33,7 @@ export const CardPinLayout: React.FC<CardPinLayoutProps> = ({
   errorMessage,
   showConfirmButton,
   confirmButtonLabel,
+  loading,
   resetTrigger,
   onPinComplete,
   onPinChange,
@@ -115,7 +117,12 @@ export const CardPinLayout: React.FC<CardPinLayoutProps> = ({
 
       {showConfirmButton && confirmButtonLabel && onConfirm && (
         <View style={styles.buttonWrapper}>
-          <GaloyPrimaryButton title={confirmButtonLabel} onPress={onConfirm} />
+          <GaloyPrimaryButton
+            title={confirmButtonLabel}
+            onPress={onConfirm}
+            loading={loading}
+            disabled={loading}
+          />
         </View>
       )}
 

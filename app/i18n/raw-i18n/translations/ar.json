@@ -3192,7 +3192,10 @@
         "confirmNewPin": "تأكيد رقم التعريف الشخصي الجديد",
         "confirmPinSubtitle": "الرجاء إعادة إدخال رقم التعريف الشخصي المكون من 4 أرقام للمتابعة.",
         "incorrectPin": "رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.",
-        "pinMismatch": "أرقام PIN غير متطابقة. أعد الإدخال للتأكيد أو عد لتغيير رمز PIN الخاص بك."
+        "pinMismatch": "أرقام PIN غير متطابقة. أعد الإدخال للتأكيد أو عد لتغيير رمز PIN الخاص بك.",
+        "weakPin": "رمز PIN هذا سهل التخمين جدًا. يرجى اختيار رمز PIN أقوى.",
+        "cardNotFound": "لم يتم العثور على البطاقة. يرجى المحاولة مرة أخرى.",
+        "pinUpdateFailed": "فشل تحديث رمز PIN. يرجى المحاولة مرة أخرى."
       },
       "CreateFlow": {
         "title": "إنشاء رقم التعريف الشخصي",
@@ -3217,7 +3220,9 @@
         "enterNewPinSubtitle": "الرجاء إدخال رقم التعريف الشخصي الجديد المكون من 4 أرقام.",
         "pinChangedTitle": "تم تغيير رقم التعريف",
         "pinChangedSubtitle": "تم تغيير رقم التعريف الشخصي بنجاح.",
-        "pinChangedToast": "تم تغيير رمز PIN بنجاح"
+        "pinChangedToast": "تم تغيير رمز PIN بنجاح",
+        "biometricDescription": "تحقق من هويتك لتغيير رمز PIN",
+        "biometricRequired": "المصادقة البيومترية مطلوبة لتغيير رمز PIN الخاص بك."
       }
     },
     "ReplaceCard": {
@@ -3271,16 +3276,28 @@
         "issueType": "السبب",
         "deliveryTime": "وقت التسليم",
         "shippingCost": "تكلفة التوصيل",
-        "bullet1": "ستبقى بطاقتك الحالية نشطة حتى وصول البطاقة الجديدة",
-        "bullet2": "ستحمل بطاقتك الجديدة نفس أرقام بطاقتك الحالية",
-        "bullet3": "أتلف بطاقتك التالفة عند وصول البطاقة الجديدة"
+        "DamagedInfo": {
+          "bullet1": "ستبقى بطاقتك الحالية نشطة حتى وصول البطاقة الجديدة",
+          "bullet2": "ستحصل بطاقتك الجديدة على رقم بطاقة جديد",
+          "bullet3": "أتلف بطاقتك التالفة عند وصول البطاقة الجديدة"
+        },
+        "LostStolenInfo": {
+          "bullet1": "تم قفل بطاقتك لحمايتك",
+          "bullet2": "ستحصل بطاقتك الجديدة على رقم بطاقة جديد",
+          "bullet3": "سيتم إلغاء بطاقتك القديمة نهائياً"
+        }
       },
       "Status": {
         "title": "بطاقتك الجديدة في الطريق!",
         "subtitle": "تم تقديم طلب توصيل بطاقة Blink الخاصة بك.",
         "buttonLabel": "لوحة التحكم"
       },
-      "title": "استبدال البطاقة"
+      "title": "استبدال البطاقة",
+      "errors": {
+        "lockFailed": "فشل في قفل بطاقتك. يرجى المحاولة مرة أخرى.",
+        "replaceFailed": "فشل في استبدال بطاقتك. يرجى المحاولة مرة أخرى.",
+        "replaceFailedCardLocked": "تم قفل بطاقتك لكن الاستبدال فشل. يرجى الاتصال بالدعم للمساعدة."
+      }
     },
     "OrderPhysicalCard": {
       "title": "اطلب بطاقة فعلية",
@@ -3327,6 +3344,102 @@
         "bullet1": "ستظل بطاقتك الافتراضية نشطة أثناء انتظار البطاقة الفعلية",
         "bullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
         "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "التحقق",
+      "CardSubscription": {
+        "subscribeTitle": "اشتراك",
+        "paymentTitle": "الدفع",
+        "acceptButton": "قبول",
+        "payButton": "متابعة والدفع",
+        "cardTitle": "بلينك الخاصة",
+        "perYear": "سنوياً",
+        "status": {
+          "label": "الحالة",
+          "paymentPending": "الدفع معلق",
+          "firstYearFree": "السنة الأولى مجانية"
+        },
+        "renewalDate": {
+          "label": "تاريخ التجديد"
+        },
+        "agreement": {
+          "text": "أوافق على",
+          "termsOfService": "شروط الخدمة",
+          "privacyPolicy": "سياسة الخصوصية",
+          "cardholderAgreement": "اتفاقية حامل البطاقة",
+          "and": "و"
+        },
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائياً خلال سنة واحدة"
+      },
+      "CardIntroducing": {
+        "title": "تقديم",
+        "cardInfo": {
+          "bitcoinCard": "بطاقة Blink Visa",
+          "for": "لـ",
+          "maximalist": "أنصار البيتكوين"
+        },
+        "buttonText": "متابعة"
+      },
+      "CardDetails": {
+        "title": "مزايا إضافية",
+        "features": {
+          "accountManager": "مدير حساب مخصص",
+          "support": "دعم ذو أولوية",
+          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
+          "circularEconomies": "100$ للاقتصادات الدائرية"
+        },
+        "andMore": "... والمزيد قادم في 2026",
+        "buttonText": "متابعة"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "مرحباً بك على متن",
+          "subtitle": "إلى Blink الخاصة",
+          "paragraphs": {
+            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink الخاصة. ربما لأنك بيتكويني رائع.",
+            "body2": "هدفنا لعام 2026 هو ملء البرنامج بالكثير من المزايا بحيث سيكون من الواضح التجديد في العام القادم."
+          }
+        },
+        "buttonText": "هيا بنا"
+      },
+      "LoadingCard": {
+        "title": "نعمل على بطاقتك",
+        "subtitle": "سنبلغك عندما تكون جاهزة",
+        "codingBackend": "...نبرمج الخلفية",
+        "buttonText": "رائع"
+      },
+      "PersonalInformation": {
+        "title": "الخطوة الأخيرة",
+        "fields": {
+          "occupation": {
+            "label": "المهنة",
+            "placeholder": "اختر مهنتك"
+          },
+          "annualSalaryRange": {
+            "label": "الراتب السنوي",
+            "placeholder": "اختر نطاق راتبك"
+          },
+          "accountPurpose": {
+            "label": "غرض الحساب",
+            "placeholder": "اختر الغرض"
+          },
+          "expectedMonthlyVolume": {
+            "label": "الإنفاق الشهري المتوقع",
+            "placeholder": "اختر نطاق إنفاقك"
+          }
+        },
+        "buttonText": "تقديم الطلب",
+        "select": "اختر"
+      },
+      "CardPreapproved": {
+        "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
+        "buttonText": "إغلاق"
+      },
+      "CardProcessing": {
+        "title": "جارٍ معالجة طلبك",
+        "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
+        "buttonText": "إغلاق"
       }
     }
   }

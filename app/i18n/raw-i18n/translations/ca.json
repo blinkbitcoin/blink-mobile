@@ -3154,7 +3154,10 @@
         "confirmNewPin": "Confirmar nou PIN",
         "confirmPinSubtitle": "Sisplau, torneu a introduir el vostre nou PIN de 4 dígits per continuar.",
         "incorrectPin": "PIN incorrecte. Si us plau, torna-ho a provar.",
-        "pinMismatch": "Els PINs no coincideixen. Torna a introduir per confirmar o torna enrere per canviar el teu PIN."
+        "pinMismatch": "Els PINs no coincideixen. Torna a introduir per confirmar o torna enrere per canviar el teu PIN.",
+        "weakPin": "Aquest PIN és massa fàcil d'endevinar. Si us plau, trieu un PIN més fort.",
+        "cardNotFound": "No s'ha trobat la targeta. Si us plau, torneu-ho a provar.",
+        "pinUpdateFailed": "No s'ha pogut actualitzar el PIN. Si us plau, torneu-ho a provar."
       },
       "CreateFlow": {
         "title": "Crear PIN",
@@ -3179,7 +3182,9 @@
         "enterNewPinSubtitle": "Sisplau, introduïu el vostre nou PIN de 4 dígits.",
         "pinChangedTitle": "PIN canviat",
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
-        "pinChangedToast": "El PIN s'ha canviat correctament"
+        "pinChangedToast": "El PIN s'ha canviat correctament",
+        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN",
+        "biometricRequired": "L'autenticació biomètrica és necessària per canviar el vostre PIN."
       }
     },
     "ReplaceCard": {
@@ -3233,16 +3238,28 @@
         "issueType": "Motiu",
         "deliveryTime": "Temps de lliurament",
         "shippingCost": "Cost de lliurament",
-        "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
-        "bullet2": "La teva nova targeta tindrà els mateixos números que l'actual",
-        "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
+        "DamagedInfo": {
+          "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
+          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
+          "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
+        },
+        "LostStolenInfo": {
+          "bullet1": "La teva targeta ha estat bloquejada per a la teva protecció",
+          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
+          "bullet3": "La teva targeta antiga serà cancel·lada permanentment"
+        }
       },
       "Status": {
         "title": "La teva nova targeta està en camí!",
         "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
         "buttonLabel": "Tauler"
       },
-      "title": "Substituir targeta"
+      "title": "Substituir targeta",
+      "errors": {
+        "lockFailed": "No s'ha pogut bloquejar la teva targeta. Si us plau, torna-ho a provar.",
+        "replaceFailed": "No s'ha pogut reemplaçar la teva targeta. Si us plau, torna-ho a provar.",
+        "replaceFailedCardLocked": "La teva targeta va ser bloquejada però el reemplaçament va fallar. Si us plau contacta amb suport per obtenir assistència."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Demanar targeta física",
@@ -3289,6 +3306,102 @@
         "bullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
         "bullet2": "Hauràs d'activar la targeta física quan arribi",
         "bullet3": "Totes dues targetes tindran el mateix número i dades"
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verificació",
+      "CardSubscription": {
+        "subscribeTitle": "Subscriure",
+        "paymentTitle": "Pagament",
+        "acceptButton": "Acceptar",
+        "payButton": "Continuar i Pagar",
+        "cardTitle": "Blink Privat",
+        "perYear": "per any",
+        "status": {
+          "label": "Estat",
+          "paymentPending": "Pagament Pendent",
+          "firstYearFree": "Primer any gratuït"
+        },
+        "renewalDate": {
+          "label": "Data de renovació"
+        },
+        "agreement": {
+          "text": "Accepto els",
+          "termsOfService": "Termes del Servei",
+          "privacyPolicy": "Política de Privacitat",
+          "cardholderAgreement": "Acord del Titular de la Targeta",
+          "and": "i"
+        },
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en 1 any"
+      },
+      "CardIntroducing": {
+        "title": "Presentant",
+        "cardInfo": {
+          "bitcoinCard": "La targeta Visa de Blink",
+          "for": "per a",
+          "maximalist": "Bitcoin Maximalistes"
+        },
+        "buttonText": "Continuar"
+      },
+      "CardDetails": {
+        "title": "Avantatges addicionals",
+        "features": {
+          "accountManager": "Gestor de comptes dedicat",
+          "support": "Suport prioritari",
+          "onchainDeposits": "50% de reemborsament en comissions de transacció",
+          "circularEconomies": "100$ per a economies circulars"
+        },
+        "andMore": "... i més per venir el 2026",
+        "buttonText": "Continuar"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Benvingut a bord",
+          "subtitle": "A Blink Privat",
+          "paragraphs": {
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+          }
+        },
+        "buttonText": "Anem-hi"
+      },
+      "LoadingCard": {
+        "title": "Estem treballant en la teva targeta",
+        "subtitle": "Et notificarem quan estigui llesta",
+        "codingBackend": "...programant el backend",
+        "buttonText": "Genial"
+      },
+      "PersonalInformation": {
+        "title": "Últim pas",
+        "fields": {
+          "occupation": {
+            "label": "Ocupació",
+            "placeholder": "Selecciona la teva ocupació"
+          },
+          "annualSalaryRange": {
+            "label": "Salari anual",
+            "placeholder": "Selecciona el teu rang salarial"
+          },
+          "accountPurpose": {
+            "label": "Propòsit del compte",
+            "placeholder": "Selecciona el propòsit"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Despesa mensual esperada",
+            "placeholder": "Selecciona el teu rang de despesa"
+          }
+        },
+        "buttonText": "Enviar sol·licitud",
+        "select": "seleccionar"
+      },
+      "CardPreapproved": {
+        "title": "Has estat preaprovat per a la targeta Blink Visa!",
+        "buttonText": "Tancar"
+      },
+      "CardProcessing": {
+        "title": "Processant la teva sol·licitud",
+        "subtitle": "Temps d'espera estimat: {waitTime: string}",
+        "buttonText": "Tancar"
       }
     }
   }

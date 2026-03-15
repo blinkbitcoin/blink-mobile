@@ -9,7 +9,7 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { gql } from "@apollo/client"
 import Logo from "@app/assets/logo/blink-logo-icon.png"
@@ -138,7 +138,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
             <View style={styles.copyContainer}>
               <TouchableOpacity onPress={handleCopyToClipboard}>
                 <Text color={colors.grey2}>
-                  <Icon color={colors.grey2} name="copy-outline" />
+                  <GaloyIcon name="copy-paste" size={16} color={colors.grey2} />
                   <Text> </Text>
                   {LL.PeopleScreen.copy()}
                 </Text>
@@ -147,7 +147,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
             <View style={styles.shareContainer}>
               <TouchableOpacity onPress={share}>
                 <Text color={colors.grey2}>
-                  <Icon color={colors.grey2} name="share-outline" />
+                  <GaloyIcon name="share" size={16} color={colors.grey2} />
                   <Text> </Text>
                   {LL.Circles.share()}
                 </Text>

@@ -149,18 +149,29 @@ export type RootStackParamList = {
     iconColor?: string
     showCard?: boolean
     showAddToWallet?: boolean
+    lastFour?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined
   cardChangePinScreen: undefined
   orderCardScreen: undefined
-  replaceCardScreen: undefined
+  replaceCardScreen: { cardId: string }
   selectionScreen: {
     title: string
     options: Array<{ value: string; label: string }>
     selectedValue: string
     onSelect: (value: string) => void
   }
+  cardOnboardingIntroducingScreen: undefined
+  cardOnboardingDetailsScreen: undefined
+  cardOnboardingWelcomeScreen: undefined
+  cardOnboardingSubscribeScreen: undefined
+  cardOnboardingPaymentScreen: undefined
+  cardOnboardingLoadingScreen: undefined
+  cardOnboardingPersonalInfoScreen: undefined
+  cardOnboardingPreapprovedScreen: undefined
+  cardOnboardingProcessingScreen: undefined
+  cardOnboardingApprovedScreen: undefined
 }
 
 export type OnboardingStackParamList = {

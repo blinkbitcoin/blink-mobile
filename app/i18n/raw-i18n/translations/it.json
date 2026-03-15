@@ -3154,7 +3154,10 @@
                 "confirmNewPin": "Conferma nuovo PIN",
                 "confirmPinSubtitle": "Per continuare, reinserisci il tuo nuovo PIN a 4 cifre.",
                 "incorrectPin": "PIN errato. Per favore riprova.",
-                "pinMismatch": "I PIN non corrispondono. Reinserisci per confermare o torna indietro per cambiare il tuo PIN."
+                "pinMismatch": "I PIN non corrispondono. Reinserisci per confermare o torna indietro per cambiare il tuo PIN.",
+                "weakPin": "Questo PIN è troppo facile da indovinare. Scegli un PIN più sicuro.",
+                "cardNotFound": "Carta non trovata. Per favore, riprova.",
+                "pinUpdateFailed": "Aggiornamento del PIN non riuscito. Per favore, riprova."
             },
             "CreateFlow": {
                 "title": "Crea PIN",
@@ -3179,7 +3182,9 @@
                 "enterNewPinSubtitle": "Inserisci il tuo nuovo PIN a 4 cifre.",
                 "pinChangedTitle": "PIN cambiato",
                 "pinChangedSubtitle": "Il tuo PIN è stato cambiato con successo.",
-                "pinChangedToast": "Il PIN è stato modificato con successo"
+                "pinChangedToast": "Il PIN è stato modificato con successo",
+                "biometricDescription": "Verifica la tua identità per cambiare il PIN",
+                "biometricRequired": "L'autenticazione biometrica è necessaria per cambiare il PIN."
             }
         },
         "ReplaceCard": {
@@ -3224,15 +3229,27 @@
                 "deliveryTime": "Tempo di consegna",
                 "shippingCost": "Costo di consegna",
                 "importantInformation": "Informazioni importanti",
-                "bullet1": "La tua carta attuale rimarrà attiva fino all'arrivo della nuova",
-                "bullet2": "La tua nuova carta avrà gli stessi numeri della carta attuale",
-                "bullet3": "Distruggi la tua carta danneggiata quando arriva la nuova",
+                "DamagedInfo": {
+                    "bullet1": "La tua carta attuale rimarrà attiva fino all'arrivo della nuova",
+                    "bullet2": "La tua nuova carta avrà un nuovo numero di carta",
+                    "bullet3": "Distruggi la tua carta danneggiata quando arriva la nuova"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "La tua carta è stata bloccata per la tua protezione",
+                    "bullet2": "La tua nuova carta avrà un nuovo numero di carta",
+                    "bullet3": "La tua vecchia carta verrà cancellata permanentemente"
+                },
                 "submitRequest": "Invia richiesta"
             },
             "Status": {
                 "title": "La tua nuova carta è in arrivo!",
                 "subtitle": "L'ordine per la consegna della tua carta Blink è stato inviato.",
                 "buttonLabel": "Dashboard"
+            },
+            "errors": {
+                "lockFailed": "Impossibile bloccare la tua carta. Per favore riprova.",
+                "replaceFailed": "Impossibile sostituire la tua carta. Per favore riprova.",
+                "replaceFailedCardLocked": "La tua carta è stata bloccata ma la sostituzione è fallita. Contatta il supporto per assistenza."
             }
         },
         "OrderPhysicalCard": {
@@ -3277,6 +3294,102 @@
                 "bullet1": "La tua carta virtuale rimarrà attiva mentre aspetti la carta fisica",
                 "bullet2": "Dovrai attivare la tua carta fisica quando arriva",
                 "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli"
+            }
+        },
+        "Onboarding": {
+            "kycHeaderTitle": "Verifica",
+            "CardSubscription": {
+                "subscribeTitle": "Iscriversi",
+                "paymentTitle": "Pagamento",
+                "acceptButton": "Accetta",
+                "payButton": "Continua e Paga",
+                "cardTitle": "Blink Privato",
+                "perYear": "all'anno",
+                "status": {
+                    "label": "Stato",
+                    "paymentPending": "Pagamento in Sospeso",
+                    "firstYearFree": "Primo anno gratuito"
+                },
+                "renewalDate": {
+                    "label": "Data di rinnovo"
+                },
+                "agreement": {
+                    "text": "Accetto i",
+                    "termsOfService": "Termini di Servizio",
+                    "privacyPolicy": "Informativa sulla Privacy",
+                    "cardholderAgreement": "Contratto del Titolare della Carta",
+                    "and": "e"
+                },
+                "renew": "Comprendo che il mio abbonamento si rinnoverà automaticamente tra 1 anno"
+            },
+            "CardIntroducing": {
+                "title": "Presentazione",
+                "cardInfo": {
+                    "bitcoinCard": "La carta Visa Blink",
+                    "for": "per",
+                    "maximalist": "Massimalisti Bitcoin"
+                },
+                "buttonText": "Continua"
+            },
+            "CardDetails": {
+                "title": "Vantaggi aggiuntivi",
+                "features": {
+                    "accountManager": "Account manager dedicato",
+                    "support": "Supporto prioritario",
+                    "onchainDeposits": "50% di rimborso sulle commissioni di transazione",
+                    "circularEconomies": "100 $ per le economie circolari"
+                },
+                "andMore": "... e altro in arrivo nel 2026",
+                "buttonText": "Continua"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "Benvenuto a bordo",
+                    "subtitle": "In Blink Privato",
+                    "paragraphs": {
+                        "body1": "Qualcuno ha pensato a te e ha suggerito che dovremmo invitarti a Blink Privato. Probabilmente perché sei un fantastico Bitcoiner.",
+                        "body2": "Il nostro obiettivo per il 2026 è riempire il programma con tanti vantaggi che sarà ovvio rinnovare l'anno prossimo."
+                    }
+                },
+                "buttonText": "Andiamo"
+            },
+            "LoadingCard": {
+                "title": "Stiamo lavorando alla tua carta",
+                "subtitle": "Ti avviseremo quando sarà pronta",
+                "codingBackend": "...programmando il backend",
+                "buttonText": "Bene"
+            },
+            "PersonalInformation": {
+                "title": "Ultimo passaggio",
+                "fields": {
+                    "occupation": {
+                        "label": "Occupazione",
+                        "placeholder": "Seleziona la tua occupazione"
+                    },
+                    "annualSalaryRange": {
+                        "label": "Stipendio annuale",
+                        "placeholder": "Seleziona la tua fascia di stipendio"
+                    },
+                    "accountPurpose": {
+                        "label": "Scopo dell'account",
+                        "placeholder": "Seleziona lo scopo"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "Spesa mensile prevista",
+                        "placeholder": "Seleziona la tua fascia di spesa"
+                    }
+                },
+                "buttonText": "Invia richiesta",
+                "select": "seleziona"
+            },
+            "CardPreapproved": {
+                "title": "Sei stato pre-approvato per la carta Blink Visa!",
+                "buttonText": "Chiudi"
+            },
+            "CardProcessing": {
+                "title": "Elaborazione della tua richiesta",
+                "subtitle": "Tempo di attesa stimato: {waitTime: string}",
+                "buttonText": "Chiudi"
             }
         }
     }
