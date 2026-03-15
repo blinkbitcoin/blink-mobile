@@ -1,7 +1,7 @@
 import debounce from "lodash.debounce"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Dimensions, Platform, Pressable, View } from "react-native"
-import MapView, { Region } from "react-native-maps"
+import MapView, { Geojson, Region } from "react-native-maps"
 import { useApolloClient } from "@apollo/client"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -12,10 +12,7 @@ import MapStyles from "./map-styles.json"
 import { IMarker } from "@app/screens/map-screen/btc-map-interface"
 import { useArea } from "@app/components/map-components/map-hooks/use-community.ts"
 import { Category } from "@app/components/map-components/categories.ts"
-import {
-  isPointInArea,
-  navigateToGeometry,
-} from "@app/components/map-components/map-utils"
+import { navigateToGeometry } from "@app/components/map-components/map-utils"
 import { isPointCluster, supercluster, useClusterer } from "react-native-clusterer"
 import ClusterComponent from "@app/components/map-components/map-elements/cluster-component.tsx"
 import MarkerComponent from "@app/components/map-components/map-elements/marker-component.tsx"
@@ -26,6 +23,7 @@ import BottomSheet from "@app/components/map-components/modals/bottom-sheet.tsx"
 import { MerchantBottomSheet } from "@app/components/map-components/modals/merchant-bottom-sheet.tsx"
 import { SuggestBusinessCard } from "@app/components/map-components/modals/suggest-business-card.tsx"
 import { VerifyMerchantSheet } from "@app/components/map-components/modals/verify-merchant-sheet"
+import { AreaBottomSheet } from "@app/components/map-components/modals/area-bottom-sheet"
 import CommunitySearchScreen from "@app/components/map-components/community-search-screen"
 import { request, RESULTS } from "react-native-permissions"
 import { getUserRegion, LOCATION_PERMISSION } from "@app/screens/map-screen/functions"
@@ -68,7 +66,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
   const [selectedMarkerId, setSelectedMarkerId] = React.useState<number | null>(null)
   const [categoryFilters, setCategoryFilters] = useState<Set<Category>>(new Set())
 
-  type Sheet = "merchant" | "filter" | "suggest" | "verify" | null
+  type Sheet = "merchant" | "filter" | "suggest" | "verify" | "area" | null
   const [activeSheet, setActiveSheet] = useState<Sheet>(null)
 
   // todo handle loading state and error
@@ -81,18 +79,18 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     const marker = data.find((m) => m.id === selectedMarkerId)
     if (marker) {
       setFocusedMarker(marker)
+      mapViewRef.current?.setCamera({ center: marker.location, zoom: 14 })
       setActiveSheet("merchant")
     }
   }, [data, selectedMarkerId])
 
   useEffect(() => {
-    if (!community && !focusedMarker) {
-      return
-    }
-    if (community && community.tags.geo_json) {
+    if (!community) return
+    if (community.tags.geo_json) {
       navigateToGeometry(mapViewRef, community.tags.geo_json)
     }
-  }, [community, focusedMarker])
+    setActiveSheet("area")
+  }, [community])
 
   const handleClusterClick = useCallback(
     (cluster: supercluster.ClusterFeature<IMarker>) => {
@@ -174,17 +172,8 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     return result
   }, [allGeoPoints, categoryIndex, categoryFilters])
 
-  // FIXME - this is unfortunately freezing the UI on weaker phones
-  const filteredGeoPoints = useMemo(() => {
-    if (!community) return categoryFilteredGeoPoints
-    if (categoryFilteredGeoPoints.length === 0 || !community.tags.geo_json) return []
-    return categoryFilteredGeoPoints.filter((p) =>
-      isPointInArea(p.properties.location, community.tags.geo_json!),
-    )
-  }, [community, categoryFilteredGeoPoints])
-
   const [points] = useClusterer<IMarker, IMarker>(
-    filteredGeoPoints,
+    categoryFilteredGeoPoints,
     { width, height },
     region,
     CLUSTER_OPTIONS,
@@ -236,6 +225,20 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     }
   }, [debouncedSaveCoords])
 
+  const communityGeoJson = useMemo(() => {
+    if (!community?.tags.geo_json) return null
+    return {
+      type: "FeatureCollection" as const,
+      features: [
+        {
+          type: "Feature" as const,
+          properties: {},
+          geometry: community.tags.geo_json,
+        },
+      ],
+    }
+  }, [community])
+
   const handleRegionChangeComplete = useCallback(
     (newRegion: Region) => {
       console.log("[map] onRegionChangeComplete", newRegion.latitude.toFixed(4))
@@ -275,6 +278,14 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         loadingBackgroundColor={colors.grey4}
       >
         {renderedMarkers}
+        {communityGeoJson && (
+          <Geojson
+            geojson={communityGeoJson}
+            strokeColor="#000000"
+            strokeWidth={2}
+            fillColor="rgba(0, 0, 0, 0.05)"
+          />
+        )}
       </MapView>
 
       <View style={[styles.topRow, { top: insets.top + 8 }]}>
@@ -334,9 +345,9 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
       {searchVisible && (
         <SearchScreen
           onClose={() => setSearchVisible(false)}
-          setCommunityId={setSelectedCommunityId}
           setSelectedMarker={setSelectedMarkerId}
           hasLocation={hasLocation}
+          mapCenter={{ latitude: region.latitude, longitude: region.longitude }}
         />
       )}
 
@@ -362,6 +373,16 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         visible={activeSheet === "verify"}
         onClose={closeSheet}
         merchantName={focusedMarker?.name ?? undefined}
+      />
+
+      <AreaBottomSheet
+        visible={activeSheet === "area"}
+        onClose={() => {
+          setSelectedCommunityId(null)
+          closeSheet()
+        }}
+        community={community}
+        isLoading={isLoading}
       />
     </View>
   )

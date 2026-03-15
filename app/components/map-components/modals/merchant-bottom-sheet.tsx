@@ -1,11 +1,10 @@
 import React from "react"
 import { IMarker } from "@app/screens/map-screen/btc-map-interface"
 import { usePlace } from "../map-hooks/use-place"
-import { Platform, Linking, Pressable, TouchableOpacity, View, Text } from "react-native"
+import { Platform, Linking, Pressable, Share, TouchableOpacity, View, Text } from "react-native"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import BottomSheet from "@app/components/map-components/modals/bottom-sheet.tsx"
 import { makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
-import Clipboard from "@react-native-clipboard/clipboard"
 type Props = {
   visible: boolean
   onClose: () => void
@@ -28,10 +27,8 @@ export const MerchantBottomSheet: React.FC<Props> = ({
   const name = placeData?.name ?? selectedMarker?.name ?? "An unnamed place"
 
   const handleShare = (merchantId?: string) => {
-    if (!merchantId) {
-      return
-    }
-    Clipboard.setString(`https://btcmap.org/merchant/${merchantId}`)
+    if (!merchantId) return
+    Share.share({ message: `https://btcmap.org/merchant/${merchantId}` })
   }
   const handlePhone = (phone: string) => Linking.openURL(`tel:${phone}`)
   const handleWebsite = (url: string) => {

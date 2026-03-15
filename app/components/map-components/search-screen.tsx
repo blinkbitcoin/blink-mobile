@@ -66,7 +66,6 @@ type NearbyPlace = {
 
 type Props = {
   onClose: () => void
-  setCommunityId: (id: number) => void
   setSelectedMarker: (id: number) => void
   hasLocation?: boolean
   mapCenter: { latitude: number; longitude: number }
@@ -97,7 +96,6 @@ const formatDistance = (
 
 const SearchScreen: FC<Props> = ({
   onClose,
-  setCommunityId,
   setSelectedMarker,
   hasLocation = false,
   mapCenter,
@@ -157,7 +155,7 @@ const SearchScreen: FC<Props> = ({
         try {
           setIsLoading(true)
           const { data } = await axios.get<SearchResponse>(
-            `${BTCMAP_V4_API_BASE}/search?q=${query}`,
+            `${BTCMAP_V4_API_BASE}/search?q=${query}&type=element`,
           )
           setSearchResponse(data)
           setError(null)
@@ -185,14 +183,10 @@ const SearchScreen: FC<Props> = ({
   const onResultPress = useCallback(
     (item: SearchResult) => {
       saveRecentSearch({ id: item.id, name: item.name, type: item.type })
-      if (item.type === "area") {
-        setCommunityId(item.id)
-      } else {
-        setSelectedMarker(item.id)
-      }
+      setSelectedMarker(item.id)
       handleClose()
     },
-    [setCommunityId, setSelectedMarker, handleClose],
+    [setSelectedMarker, handleClose],
   )
 
   const clearOrClose = useCallback(() => {
@@ -235,14 +229,10 @@ const SearchScreen: FC<Props> = ({
 
   const onRecentPress = useCallback(
     (item: RecentSearch) => {
-      if (item.type === "area") {
-        setCommunityId(item.id)
-      } else {
-        setSelectedMarker(item.id)
-      }
+      setSelectedMarker(item.id)
       handleClose()
     },
-    [setCommunityId, setSelectedMarker, handleClose],
+    [setSelectedMarker, handleClose],
   )
 
   return (
