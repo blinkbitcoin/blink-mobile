@@ -353,7 +353,10 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     }
   }, [feedbackShownData?.data?.feedbackModalShown, requestFeedback])
 
-  const handleNavigateHome = useCallback(() => navigation.navigate("Primary"), [navigation])
+  const handleNavigateHome = useCallback(
+    () => navigation.navigate("Primary"),
+    [navigation],
+  )
 
   const appState = useRef(AppState.currentState)
   useEffect(() => {
