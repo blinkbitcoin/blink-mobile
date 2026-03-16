@@ -38,27 +38,17 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
   // so there is no need to pass loading from parent?
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
-      {hideAmount ? (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
+      <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
+        {hideAmount ? (
           <HiddenBalanceIndicator size="large" />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <View>
-            {loading ? (
-              <Loader />
-            ) : (
-              <Text
-                style={styles.primaryBalanceText}
-                allowFontScaling
-                adjustsFontSizeToFit
-              >
-                {formattedBalance}
-              </Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      )}
+        ) : loading ? (
+          <Loader />
+        ) : (
+          <Text style={styles.primaryBalanceText} allowFontScaling adjustsFontSizeToFit>
+            {formattedBalance}
+          </Text>
+        )}
+      </TouchableOpacity>
     </View>
   )
 }
@@ -67,6 +57,11 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
     textAlign: "center",
+  },
+  balanceWrapper: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
