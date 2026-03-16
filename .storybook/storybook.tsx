@@ -1,6 +1,9 @@
 import React from "react"
 import { getStorybookUI } from "@storybook/react-native"
 
+// Set global flag to detect Storybook environment in theme
+;(global as typeof globalThis & { STORYBOOK_ENABLED?: boolean }).STORYBOOK_ENABLED = true
+
 import { NavigationContainer } from "@react-navigation/native"
 import { ThemeProvider } from "@rn-vui/themed"
 import { createStackNavigator } from "@react-navigation/stack"
