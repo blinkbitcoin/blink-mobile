@@ -10,6 +10,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
+import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
 import { Screen } from "@app/components/screen"
 import {
   Network,
@@ -502,21 +503,25 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               </View>
               <View style={styles.walletSelectorInfoContainer}>
                 <View style={styles.walletSelectorTypeTextContainer}>
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                  {hideAmount ? (
+                    <HiddenBalanceIndicator size="small" />
+                  ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                     <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
                   ) : (
                     <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
                   )}
                 </View>
-                <View style={styles.walletSelectorBalanceContainer}>
-                  <Text
-                    {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
-                  >
-                    {sendingWalletDescriptor.currency === WalletCurrency.Btc
-                      ? btcSecondaryText
-                      : usdSecondaryText}
-                  </Text>
-                </View>
+                {!hideAmount && (
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    <Text
+                      {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
+                    >
+                      {sendingWalletDescriptor.currency === WalletCurrency.Btc
+                        ? btcSecondaryText
+                        : usdSecondaryText}
+                    </Text>
+                  </View>
+                )}
               </View>
 
               <View style={styles.pickWalletIcon}>
