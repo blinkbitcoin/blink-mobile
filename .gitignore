@@ -106,6 +106,7 @@ android-recordings
 
 # As long asd we haven't agreed on an AI agent strategy, let's ignore any AI agent data
 .claude
+CLAUDE.local.md
 .augment
 .bmad
 bmad-custom-src
