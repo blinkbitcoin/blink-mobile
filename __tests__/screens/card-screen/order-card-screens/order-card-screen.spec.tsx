@@ -52,33 +52,9 @@ jest.mock("@app/utils/country-region-data", () => ({
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
-  addressToLines: (
-    address: {
-      firstName: string
-      lastName: string
-      line1: string
-      line2: string
-      city: string
-      region: string
-      postalCode: string
-      countryCode: string
-    },
-    includeFullName = true,
-  ) => {
-    const countryLabels: Record<string, string> = { US: "United States", CA: "Canada" }
-    const lines: string[] = []
-    if (includeFullName) {
-      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
-      if (name) lines.push(name)
-    }
-    lines.push(address.line1)
-    if (address.line2) lines.push(address.line2)
-    lines.push(
-      [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
-    )
-    lines.push(countryLabels[address.countryCode] ?? address.countryCode)
-    return lines
-  },
+  addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(
+    "../helpers/mock-address-utils",
+  ).mockAddressToLines,
 }))
 
 jest.mock("@app/utils/helper", () => ({
