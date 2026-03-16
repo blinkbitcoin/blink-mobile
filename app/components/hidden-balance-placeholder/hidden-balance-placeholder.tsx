@@ -18,7 +18,7 @@ const CIRCLE_SIZES = {
 
 const CIRCLES = [0, 1, 2, 3] as const
 
-export const HiddenBalanceIndicator: React.FC<Props> = ({ size }) => {
+export const HiddenBalancePlaceholder: React.FC<Props> = ({ size }) => {
   const styles = useStyles(CIRCLE_SIZES[size])
 
   return (

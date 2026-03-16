@@ -410,7 +410,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <View style={styles.walletSelectorInfoContainer}>
               <View style={styles.walletSelectorTypeTextContainer}>
                 {hideAmount ? (
-                  <HiddenBalanceIndicator size="small" />
+                  <HiddenBalancePlaceholder size="small" />
                 ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                   <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
                 ) : (

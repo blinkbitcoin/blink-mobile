@@ -1,7 +1,7 @@
 import React from "react"
 import { render } from "@testing-library/react-native"
 
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 
 jest.mock("@rn-vui/themed", () => ({
   makeStyles:
@@ -15,10 +15,10 @@ jest.mock("@rn-vui/themed", () => ({
       factory({ colors: { grey4: "#CCCCCC" } }, props),
 }))
 
-describe("HiddenBalanceIndicator", () => {
+describe("HiddenBalancePlaceholder", () => {
   describe('size="small"', () => {
     it("renders 4 circles", () => {
-      const { UNSAFE_getAllByType } = render(<HiddenBalanceIndicator size="small" />)
+      const { UNSAFE_getAllByType } = render(<HiddenBalancePlaceholder size="small" />)
       const { View } = jest.requireActual("react-native")
       // The component renders a container View plus 4 circle Views
       const allViews = UNSAFE_getAllByType(View)
@@ -30,7 +30,7 @@ describe("HiddenBalanceIndicator", () => {
     })
 
     it("uses diameter 12 for small circles", () => {
-      const { UNSAFE_getAllByType } = render(<HiddenBalanceIndicator size="small" />)
+      const { UNSAFE_getAllByType } = render(<HiddenBalancePlaceholder size="small" />)
       const { View } = jest.requireActual("react-native")
       const allViews = UNSAFE_getAllByType(View)
       const circles = allViews.filter(
@@ -45,7 +45,7 @@ describe("HiddenBalanceIndicator", () => {
 
   describe('size="large"', () => {
     it("renders 4 circles", () => {
-      const { UNSAFE_getAllByType } = render(<HiddenBalanceIndicator size="large" />)
+      const { UNSAFE_getAllByType } = render(<HiddenBalancePlaceholder size="large" />)
       const { View } = jest.requireActual("react-native")
       const allViews = UNSAFE_getAllByType(View)
       const circles = allViews.filter(
@@ -55,7 +55,7 @@ describe("HiddenBalanceIndicator", () => {
     })
 
     it("uses diameter 17 for large circles", () => {
-      const { UNSAFE_getAllByType } = render(<HiddenBalanceIndicator size="large" />)
+      const { UNSAFE_getAllByType } = render(<HiddenBalancePlaceholder size="large" />)
       const { View } = jest.requireActual("react-native")
       const allViews = UNSAFE_getAllByType(View)
       const circles = allViews.filter(

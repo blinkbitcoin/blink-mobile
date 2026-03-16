@@ -10,7 +10,7 @@ import {
   TransactionFragmentDoc,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -200,7 +200,7 @@ const TransactionItem: React.FC<Props> = ({
         <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
           <View style={styles.amountWrapper}>
             {hideAmount ? (
-              <HiddenBalanceIndicator size="small" />
+              <HiddenBalancePlaceholder size="small" />
             ) : (
               <>
                 <Text style={amountStyle}>{formattedDisplayAmount}</Text>

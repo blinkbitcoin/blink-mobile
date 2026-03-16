@@ -6,7 +6,7 @@ import { useFragment } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
@@ -324,7 +324,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
               <View style={styles.amountWrapper}>
                 {hideAmount ? (
-                  <HiddenBalanceIndicator size="small" />
+                  <HiddenBalancePlaceholder size="small" />
                 ) : (
                   <Text type="h1">{displayAmount}</Text>
                 )}

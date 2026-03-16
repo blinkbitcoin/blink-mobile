@@ -10,7 +10,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { Screen } from "@app/components/screen"
 import {
   Network,
@@ -509,7 +509,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                 }
               >
                 {hideAmount ? (
-                  <HiddenBalanceIndicator size="small" />
+                  <HiddenBalancePlaceholder size="small" />
                 ) : (
                   <>
                     <View style={styles.walletSelectorTypeTextContainer}>

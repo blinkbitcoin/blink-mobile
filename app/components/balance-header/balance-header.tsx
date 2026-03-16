@@ -4,7 +4,7 @@ import { TouchableOpacity, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
 
@@ -40,7 +40,7 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
         {hideAmount ? (
-          <HiddenBalanceIndicator size="large" />
+          <HiddenBalancePlaceholder size="large" />
         ) : loading ? (
           <Loader />
         ) : (

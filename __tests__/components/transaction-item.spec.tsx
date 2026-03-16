@@ -65,10 +65,13 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
-// --- HiddenBalanceIndicator ---
-jest.mock("@app/components/hidden-balance-indicator/hidden-balance-indicator", () => ({
-  HiddenBalanceIndicator: () => <View testID="hidden-balance-indicator" />,
-}))
+// --- HiddenBalancePlaceholder ---
+jest.mock(
+  "@app/components/hidden-balance-placeholder/hidden-balance-placeholder",
+  () => ({
+    HiddenBalancePlaceholder: () => <View testID="hidden-balance-placeholder" />,
+  }),
+)
 
 // --- child components that would otherwise require native modules ---
 jest.mock("@app/components/icon-transactions", () => ({
@@ -197,9 +200,9 @@ describe("MemoizedTransactionItem", () => {
       expect(getByText("$10.00")).toBeTruthy()
     })
 
-    it("does not render the HiddenBalanceIndicator", () => {
+    it("does not render the HiddenBalancePlaceholder", () => {
       const { queryByTestId } = render(<MemoizedTransactionItem txid="tx-1" />)
-      expect(queryByTestId("hidden-balance-indicator")).toBeNull()
+      expect(queryByTestId("hidden-balance-placeholder")).toBeNull()
     })
   })
 
@@ -216,9 +219,9 @@ describe("MemoizedTransactionItem", () => {
       expect(queryByText("$10.00")).toBeNull()
     })
 
-    it("renders the HiddenBalanceIndicator", () => {
+    it("renders the HiddenBalancePlaceholder", () => {
       const { getByTestId } = render(<MemoizedTransactionItem txid="tx-1" />)
-      expect(getByTestId("hidden-balance-indicator")).toBeTruthy()
+      expect(getByTestId("hidden-balance-placeholder")).toBeTruthy()
     })
   })
 
