@@ -501,26 +501,34 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                   onLayout={onPillLayout(sendingWalletDescriptor.currency)}
                 />
               </View>
-              <View style={styles.walletSelectorInfoContainer}>
-                <View style={styles.walletSelectorTypeTextContainer}>
-                  {hideAmount ? (
-                    <HiddenBalanceIndicator size="small" />
-                  ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                  ) : (
-                    <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                  )}
-                </View>
-                {!hideAmount && (
-                  <View style={styles.walletSelectorBalanceContainer}>
-                    <Text
-                      {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
-                    >
-                      {sendingWalletDescriptor.currency === WalletCurrency.Btc
-                        ? btcSecondaryText
-                        : usdSecondaryText}
-                    </Text>
-                  </View>
+              <View
+                style={
+                  hideAmount
+                    ? styles.walletSelectorInfoContainerHidden
+                    : styles.walletSelectorInfoContainer
+                }
+              >
+                {hideAmount ? (
+                  <HiddenBalanceIndicator size="small" />
+                ) : (
+                  <>
+                    <View style={styles.walletSelectorTypeTextContainer}>
+                      {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                        <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                      ) : (
+                        <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                      )}
+                    </View>
+                    <View style={styles.walletSelectorBalanceContainer}>
+                      <Text
+                        {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
+                      >
+                        {sendingWalletDescriptor.currency === WalletCurrency.Btc
+                          ? btcSecondaryText
+                          : usdSecondaryText}
+                      </Text>
+                    </View>
+                  </>
                 )}
               </View>
 
@@ -641,6 +649,10 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorInfoContainer: {
     flex: 1,
     flexDirection: "column",
+  },
+  walletSelectorInfoContainerHidden: {
+    flex: 1,
+    justifyContent: "center",
   },
   walletCurrencyText: {
     fontWeight: "bold",
