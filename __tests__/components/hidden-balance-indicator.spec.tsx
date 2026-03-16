@@ -4,8 +4,15 @@ import { render } from "@testing-library/react-native"
 import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
 
 jest.mock("@rn-vui/themed", () => ({
-  makeStyles: () => () => ({ container: {} }),
-  useTheme: () => ({ theme: { colors: { grey4: "#CCCCCC" } } }),
+  makeStyles:
+    (
+      factory: (
+        theme: { colors: Record<string, string> },
+        props: { diameter: number },
+      ) => object,
+    ) =>
+    (props: { diameter: number }) =>
+      factory({ colors: { grey4: "#CCCCCC" } }, props),
 }))
 
 describe("HiddenBalanceIndicator", () => {
