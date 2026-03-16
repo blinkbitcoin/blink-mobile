@@ -3252,7 +3252,7 @@ const en: BaseTranslation = {
       addressLine1: "Address line 1",
       addressLine2: "Address line 2",
       city: "City",
-      state: "State",
+      state: "State / Province",
       region: "Region",
       postalCode: "Postal code",
       country: "Country",

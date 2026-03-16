@@ -10321,7 +10321,7 @@ type RootTranslation = {
 			 */
 			city: string
 			/**
-			 * S​t​a​t​e
+			 * S​t​a​t​e​ ​/​ ​P​r​o​v​i​n​c​e
 			 */
 			state: string
 			/**
@@ -21393,7 +21393,7 @@ export type TranslationFunctions = {
 			 */
 			city: () => LocalizedString
 			/**
-			 * State
+			 * State / Province
 			 */
 			state: () => LocalizedString
 			/**

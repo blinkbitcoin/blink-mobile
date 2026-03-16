@@ -3140,7 +3140,7 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Kota",
-      "state": "Provinsi",
+      "state": "Negara Bagian / Provinsi",
       "region": "Wilayah",
       "postalCode": "Kode pos",
       "country": "Negara",

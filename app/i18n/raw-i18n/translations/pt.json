@@ -3140,7 +3140,7 @@
             "addressLine1": "Endereço linha 1",
             "addressLine2": "Endereço linha 2",
             "city": "Cidade",
-            "state": "Estado",
+            "state": "Estado / Província",
             "region": "Região",
             "postalCode": "Código postal",
             "country": "País",

@@ -2187,7 +2187,7 @@
         "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
     },
     "SecurityScreen": {
-        "title": "Security and privacy",
+        "title": "Security and Privacy",
         "biometricDescription": "Unlock with fingerprint or facial recognition.",
         "biometricTitle": "Biometric",
         "biometryNotAvailable": "Biometric sensor is not available.",
@@ -2651,7 +2651,7 @@
         "notifications": "Notifications",
         "preferences": "Preferences",
         "onDeviceSecurity": "Security and privacy",
-        "securityAndPrivacy": "Security and privacy",
+        "securityAndPrivacy": "Security and Privacy",
         "advanced": "Advanced",
         "community": "Community",
         "account": "Account",
@@ -3113,7 +3113,7 @@
             "addressLine1": "Address line 1",
             "addressLine2": "Address line 2",
             "city": "City",
-            "state": "State",
+            "state": "State / Province",
             "region": "Region",
             "postalCode": "Postal code",
             "country": "Country",
