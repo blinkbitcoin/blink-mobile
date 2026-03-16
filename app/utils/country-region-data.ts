@@ -25,7 +25,7 @@ const countries: SelectionOption[] = data
   .map((c) => ({ value: c.countryShortCode, label: c.countryName }))
   .sort((a, b) => a.label.localeCompare(b.label))
 
-export const getAllCountries = (): SelectionOption[] => [...countries]
+export const getAllCountries = (): SelectionOption[] => countries
 
 export const getRegionsByCountry = (countryCode: string): SelectionOption[] =>
   regionMap.get(countryCode) ?? []
