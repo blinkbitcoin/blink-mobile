@@ -521,7 +521,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                     </View>
                     <View style={styles.walletSelectorBalanceContainer}>
                       <Text
-                        {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
+                        {...testProps(
+                          `${sendingWalletDescriptor.currency} Wallet Balance`,
+                        )}
                       >
                         {sendingWalletDescriptor.currency === WalletCurrency.Btc
                           ? btcSecondaryText
