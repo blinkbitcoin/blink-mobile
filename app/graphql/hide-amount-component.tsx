@@ -1,5 +1,5 @@
 import * as React from "react"
-import { PropsWithChildren, useEffect, useState } from "react"
+import { PropsWithChildren } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { useHideBalanceQuery } from "@app/graphql/generated"
@@ -9,16 +9,11 @@ import { HideAmountContextProvider } from "./hide-amount-context"
 
 export const HideAmountContainer: React.FC<PropsWithChildren> = ({ children }) => {
   const client = useApolloClient()
-  const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
-  const [hideAmount, setHideAmount] = useState(hideBalance)
-
-  useEffect(() => {
-    setHideAmount(hideBalance)
-  }, [hideBalance])
+  const { data: { hideBalance: hideAmount } = { hideBalance: false } } =
+    useHideBalanceQuery()
 
   const switchMemoryHideAmount = () => {
     const shouldHideBalance = !hideAmount
-    setHideAmount(shouldHideBalance)
     saveHideBalance(client, shouldHideBalance)
     saveHiddenBalanceToolTip(client, shouldHideBalance)
   }
