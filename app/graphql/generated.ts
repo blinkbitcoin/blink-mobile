@@ -488,6 +488,25 @@ export type CardBalance = {
   readonly posted: Scalars['Int']['output'];
 };
 
+export type CardCollateralBalance = {
+  readonly __typename: 'CardCollateralBalance';
+  readonly availableSats: Scalars['Int']['output'];
+  readonly pendingSats: Scalars['Int']['output'];
+  readonly settledSats: Scalars['Int']['output'];
+};
+
+export type CardCollateralDeposit = {
+  readonly __typename: 'CardCollateralDeposit';
+  readonly newAvailableBalance: Scalars['Int']['output'];
+  readonly satAmount: Scalars['Int']['output'];
+  readonly transferId: Scalars['ID']['output'];
+};
+
+export type CardCollateralDepositInput = {
+  readonly amountSats: Scalars['Int']['input'];
+  readonly blinkTxId: Scalars['String']['input'];
+};
+
 export type CardConsumerApplicationCreateInput = {
   readonly accountPurpose: Scalars['String']['input'];
   readonly annualSalary: Scalars['String']['input'];
@@ -1326,6 +1345,7 @@ export type Mutation = {
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly cardCollateralDeposit: CardCollateralDeposit;
   readonly cardConsumerApplicationCreate: ConsumerApplication;
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
   readonly cardConsumerApplicationUpdate: ConsumerApplication;
@@ -1517,6 +1537,11 @@ export type MutationCallbackEndpointDeleteArgs = {
 
 export type MutationCaptchaRequestAuthCodeArgs = {
   input: CaptchaRequestAuthCodeInput;
+};
+
+
+export type MutationCardCollateralDepositArgs = {
+  input: CardCollateralDepositInput;
 };
 
 
@@ -2077,6 +2102,7 @@ export type Query = {
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
   readonly cardBalance: CardBalance;
+  readonly cardCollateralBalance: CardCollateralBalance;
   readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
@@ -9248,6 +9274,9 @@ export type ResolversTypes = {
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
   CardBalance: ResolverTypeWrapper<CardBalance>;
+  CardCollateralBalance: ResolverTypeWrapper<CardCollateralBalance>;
+  CardCollateralDeposit: ResolverTypeWrapper<CardCollateralDeposit>;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -9527,6 +9556,9 @@ export type ResolversParentTypes = {
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
   CardBalance: CardBalance;
+  CardCollateralBalance: CardCollateralBalance;
+  CardCollateralDeposit: CardCollateralDeposit;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -9936,6 +9968,20 @@ export type CardBalanceResolvers<ContextType = any, ParentType extends Resolvers
   available?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   pending?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   posted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralBalanceResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralBalance'] = ResolversParentTypes['CardCollateralBalance']> = {
+  availableSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pendingSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  settledSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralDepositResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralDeposit'] = ResolversParentTypes['CardCollateralDeposit']> = {
+  newAvailableBalance?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  satAmount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  transferId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10378,6 +10424,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  cardCollateralDeposit?: Resolver<ResolversTypes['CardCollateralDeposit'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositArgs, 'input'>>;
   cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
   cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
@@ -10623,6 +10670,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
   cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
@@ -11073,6 +11121,8 @@ export type Resolvers<ContextType = any> = {
   CaptchaCreateChallengeResult?: CaptchaCreateChallengeResultResolvers<ContextType>;
   Card?: CardResolvers<ContextType>;
   CardBalance?: CardBalanceResolvers<ContextType>;
+  CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
+  CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
   CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
