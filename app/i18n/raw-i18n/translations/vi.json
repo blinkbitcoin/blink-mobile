@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Trường này là bắt buộc",
       "minChars": "Phải có ít nhất {min} ký tự",
-      "invalidPostalCode": "Mã bưu chính không hợp lệ"
+      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy"
     }
   },
   "errors": {

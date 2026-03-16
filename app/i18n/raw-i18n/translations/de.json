@@ -2778,7 +2778,7 @@
         "validation": {
             "required": "Dieses Feld ist erforderlich",
             "minChars": "Muss mindestens {min} Zeichen lang sein",
-            "invalidPostalCode": "Ungültige Postleitzahl"
+            "invalidPostalCode": "Ungültige Postleitzahl, wahrscheinlich ein Tippfehler"
         }
     },
     "errors": {

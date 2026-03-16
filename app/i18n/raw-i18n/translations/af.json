@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Hierdie veld is verpligtend",
       "minChars": "Moet ten minste {min} karakters wees",
-      "invalidPostalCode": "Ongeldige poskode"
+      "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout"
     }
   },
   "errors": {

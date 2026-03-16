@@ -2880,7 +2880,7 @@ const en: BaseTranslation = {
     validation: {
       required: "This field is required",
       minChars: "Must be at least {min:number} characters",
-      invalidPostalCode: "Invalid postal code",
+      invalidPostalCode: "Invalid postal code, probably a typo",
     },
   },
   errors: {

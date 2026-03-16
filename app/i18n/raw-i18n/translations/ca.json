@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Aquest camp és obligatori",
       "minChars": "Ha de tenir almenys {min} caràcters",
-      "invalidPostalCode": "Codi postal no vàlid"
+      "invalidPostalCode": "Codi postal no vàlid, probablement un error tipogràfic"
     }
   },
   "errors": {

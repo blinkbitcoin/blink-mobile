@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Ez a mező kötelező",
       "minChars": "Legalább {min} karakter szükséges",
-      "invalidPostalCode": "Érvénytelen irányítószám"
+      "invalidPostalCode": "Érvénytelen irányítószám, valószínűleg elgépelés"
     }
   },
   "errors": {

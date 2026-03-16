@@ -2781,7 +2781,7 @@
     "validation": {
       "required": "Dette felt er påkrævet",
       "minChars": "Skal være mindst {min} tegn",
-      "invalidPostalCode": "Ugyldigt postnummer"
+      "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl"
     }
   },
   "errors": {

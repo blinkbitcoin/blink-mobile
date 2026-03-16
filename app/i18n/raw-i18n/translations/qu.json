@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Kay qillqana kiti rurananchikpaqmi",
       "minChars": "{min} sanampakama kanan",
-      "invalidPostalCode": "Mana allin código postal"
+      "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay"
     }
   },
   "errors": {

@@ -9109,7 +9109,7 @@ type RootTranslation = {
 			 */
 			minChars: RequiredParams<'min'>
 			/**
-			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e
+			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e​,​ ​p​r​o​b​a​b​l​y​ ​a​ ​t​y​p​o
 			 */
 			invalidPostalCode: string
 		}
@@ -20208,7 +20208,7 @@ export type TranslationFunctions = {
 			 */
 			minChars: (arg: { min: number }) => LocalizedString
 			/**
-			 * Invalid postal code
+			 * Invalid postal code, probably a typo
 			 */
 			invalidPostalCode: () => LocalizedString
 		}

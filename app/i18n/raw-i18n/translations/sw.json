@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Sehemu hii inahitajika",
       "minChars": "Lazima iwe na angalau herufi {min}",
-      "invalidPostalCode": "Nambari ya posta si sahihi"
+      "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika"
     }
   },
   "errors": {

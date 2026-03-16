@@ -2795,7 +2795,7 @@
         "validation": {
             "required": "この項目は必須です",
             "minChars": "{min}文字以上で入力してください",
-            "invalidPostalCode": "無効な郵便番号"
+            "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります"
         }
     },
     "errors": {

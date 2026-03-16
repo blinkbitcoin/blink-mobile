@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Medan ini diperlukan",
       "minChars": "Mesti sekurang-kurangnya {min} aksara",
-      "invalidPostalCode": "Poskod tidak sah"
+      "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip"
     }
   },
   "errors": {

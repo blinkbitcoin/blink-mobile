@@ -2795,7 +2795,7 @@
         "validation": {
             "required": "Ce champ est obligatoire",
             "minChars": "Doit contenir au moins {min} caractères",
-            "invalidPostalCode": "Code postal invalide"
+            "invalidPostalCode": "Code postal invalide, probablement une faute de frappe"
         }
     },
     "errors": {

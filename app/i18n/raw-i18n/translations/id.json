@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Bidang ini wajib diisi",
       "minChars": "Harus minimal {min} karakter",
-      "invalidPostalCode": "Kode pos tidak valid"
+      "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik"
     }
   },
   "errors": {

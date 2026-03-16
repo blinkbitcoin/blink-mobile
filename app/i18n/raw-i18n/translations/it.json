@@ -2778,7 +2778,7 @@
         "validation": {
             "required": "Questo campo è obbligatorio",
             "minChars": "Deve contenere almeno {min} caratteri",
-            "invalidPostalCode": "Codice postale non valido"
+            "invalidPostalCode": "Codice postale non valido, probabilmente un errore di battitura"
         }
     },
     "errors": {

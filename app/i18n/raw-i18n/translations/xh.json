@@ -2819,7 +2819,7 @@
     "validation": {
       "required": "Le ndawo iyafuneka",
       "minChars": "Kufuneka ibe nobuncinane {min} oonobumba",
-      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni"
+      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni, mhlawumbi yimpazamo yokutayipha"
     }
   },
   "errors": {

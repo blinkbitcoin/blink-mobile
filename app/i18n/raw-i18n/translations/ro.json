@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Acest câmp este obligatoriu",
       "minChars": "Trebuie să aibă cel puțin {min} caractere",
-      "invalidPostalCode": "Cod poștal invalid"
+      "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare"
     }
   },
   "errors": {

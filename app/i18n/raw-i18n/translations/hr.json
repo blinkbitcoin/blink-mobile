@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Ovo polje je obavezno",
       "minChars": "Mora imati najmanje {min} znakova",
-      "invalidPostalCode": "Nevažeći poštanski broj"
+      "invalidPostalCode": "Nevažeći poštanski broj, vjerojatno tipfeler"
     }
   },
   "errors": {

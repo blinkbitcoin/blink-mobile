@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "هذا الحقل مطلوب",
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
-      "invalidPostalCode": "رمز بريدي غير صالح"
+      "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي"
     }
   },
   "errors": {

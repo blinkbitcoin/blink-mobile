@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Bu alan zorunludur",
       "minChars": "En az {min} karakter olmalıdır",
-      "invalidPostalCode": "Geçersiz posta kodu"
+      "invalidPostalCode": "Geçersiz posta kodu, muhtemelen yazım hatası"
     }
   },
   "errors": {

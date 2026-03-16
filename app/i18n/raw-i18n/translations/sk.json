@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Toto pole je povinné",
       "minChars": "Musí obsahovať aspoň {min} znakov",
-      "invalidPostalCode": "Neplatné PSČ"
+      "invalidPostalCode": "Neplatné PSČ, pravdepodobne preklep"
     }
   },
   "errors": {

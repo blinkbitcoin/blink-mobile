@@ -2778,7 +2778,7 @@
     "validation": {
       "required": "Ekisenge kino kyetaagibwa",
       "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo",
-      "invalidPostalCode": "Koodi y'eposta si nnungi"
+      "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika"
     }
   },
   "errors": {

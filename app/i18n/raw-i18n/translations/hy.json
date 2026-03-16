@@ -2795,7 +2795,7 @@
     "validation": {
       "required": "Այս դաշտը պարտադիր է",
       "minChars": "Պետք է լինի առնվազն {min} նիշ",
-      "invalidPostalCode": "Անվավեր փոստային կոդ"
+      "invalidPostalCode": "Անվավեր փոստային կոդ, հավանաբար տպագրական սխալ"
     }
   },
   "errors": {
