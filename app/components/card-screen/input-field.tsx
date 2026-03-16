@@ -156,7 +156,9 @@ export const InputField: React.FC<InputFieldProps> = ({
         <View style={styles.helperTextContainer}>
           {displayHelperText ? (
             <View style={styles.helperTextRow}>
-              {isError && <GaloyIcon name="warning" size={12} color={colors.error} />}
+              {isError && (
+                <GaloyIcon name="warning-circle" size={12} color={colors.error} />
+              )}
               <Text style={[styles.helperText, isError && styles.helperTextError]}>
                 {displayHelperText}
               </Text>
