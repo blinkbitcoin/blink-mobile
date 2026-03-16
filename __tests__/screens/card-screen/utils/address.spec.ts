@@ -1,9 +1,11 @@
 import {
   validatePOBox,
   validatePostalCode,
+  isAddressValid,
   addressToLines,
   AddressFields,
 } from "@app/screens/card-screen/utils/address"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 jest.mock("postcode-validator", () => ({
   postcodeValidator: (value: string, country: string) => {
@@ -157,6 +159,74 @@ describe("address utils", () => {
           errorMessage: ERROR_MESSAGE,
         }),
       ).toBeUndefined()
+    })
+  })
+
+  describe("isAddressValid", () => {
+    const validAddress: ShippingAddress = {
+      firstName: "Satoshi",
+      lastName: "Nakamoto",
+      line1: "123 Main Street",
+      line2: "",
+      city: "New York",
+      region: "NY",
+      postalCode: "10001",
+      countryCode: "US",
+    }
+
+    it("returns true for a complete valid address", () => {
+      expect(isAddressValid(validAddress)).toBe(true)
+    })
+
+    it("returns false when line1 is too short", () => {
+      expect(isAddressValid({ ...validAddress, line1: "A" })).toBe(false)
+    })
+
+    it("returns false when city is too short", () => {
+      expect(isAddressValid({ ...validAddress, city: "X" })).toBe(false)
+    })
+
+    it("returns false when countryCode is empty", () => {
+      expect(isAddressValid({ ...validAddress, countryCode: "" })).toBe(false)
+    })
+
+    it("returns false when firstName is too short", () => {
+      expect(isAddressValid({ ...validAddress, firstName: "S" })).toBe(false)
+    })
+
+    it("returns false when lastName is too short", () => {
+      expect(isAddressValid({ ...validAddress, lastName: "N" })).toBe(false)
+    })
+
+    it("returns true without checking fullName when checkFullName is false", () => {
+      const address = { ...validAddress, firstName: "", lastName: "" }
+      expect(isAddressValid(address, { checkFullName: false })).toBe(true)
+    })
+
+    it("returns false when line1 contains a PO Box", () => {
+      expect(isAddressValid({ ...validAddress, line1: "PO Box 123" })).toBe(false)
+    })
+
+    it("returns false when line2 contains a PO Box", () => {
+      expect(isAddressValid({ ...validAddress, line2: "P.O. Box 456" })).toBe(false)
+    })
+
+    it("returns false for invalid postal code in a supported country", () => {
+      expect(isAddressValid({ ...validAddress, postalCode: "ABCDE" })).toBe(false)
+    })
+
+    it("returns false when postal code is empty for a supported country", () => {
+      expect(isAddressValid({ ...validAddress, postalCode: "" })).toBe(false)
+    })
+
+    it("returns true when postal code is empty for an unsupported country", () => {
+      const address = { ...validAddress, countryCode: "XYZ", postalCode: "" }
+      expect(isAddressValid(address)).toBe(true)
+    })
+
+    it("returns true when postal code is provided for an unsupported country", () => {
+      const address = { ...validAddress, countryCode: "XYZ", postalCode: "12345" }
+      expect(isAddressValid(address)).toBe(true)
     })
   })
 

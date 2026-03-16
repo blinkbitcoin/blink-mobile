@@ -9,7 +9,11 @@ import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ShippingAddress } from "@app/screens/card-screen/types"
-import { validatePOBox, validatePostalCode } from "@app/screens/card-screen/utils"
+import {
+  isAddressValid,
+  validatePOBox,
+  validatePostalCode,
+} from "@app/screens/card-screen/utils"
 import {
   getAllCountries,
   getCountryLabel,
@@ -21,43 +25,6 @@ type ShippingAddressFormProps = {
   onAddressChange: (address: ShippingAddress) => void
   onValidityChange?: (isValid: boolean) => void
   showFullName?: boolean
-}
-
-export const isAddressValid = (
-  address: ShippingAddress,
-  { checkFullName = true }: { checkFullName?: boolean } = {},
-): boolean => {
-  const hasPOBox =
-    validatePOBox({ value: address.line1, errorMessage: "" }) !== undefined ||
-    (address.line2 !== "" &&
-      validatePOBox({ value: address.line2, errorMessage: "" }) !== undefined)
-
-  const hasInvalidPostal =
-    validatePostalCode({
-      value: address.postalCode,
-      countryCode: address.countryCode,
-      errorMessage: "",
-    }) !== undefined
-
-  const postalRequired = postcodeValidatorExistsForCountry(address.countryCode)
-  const postalCodeOk = postalRequired
-    ? address.postalCode.trim().length > 0 && !hasInvalidPostal
-    : address.postalCode.trim().length === 0 || !hasInvalidPostal
-
-  const hasRequiredFields =
-    address.line1.trim().length >= 2 &&
-    !hasPOBox &&
-    address.city.trim().length >= 2 &&
-    postalCodeOk &&
-    address.countryCode.trim().length > 0
-
-  if (!checkFullName) return hasRequiredFields
-
-  return (
-    hasRequiredFields &&
-    address.firstName.trim().length >= 2 &&
-    address.lastName.trim().length >= 2
-  )
 }
 
 export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
@@ -95,7 +62,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
 
   const regions = getRegionsByCountry(address.countryCode)
   const countryHasRegions = regions.length > 0
-  const postalRequired = postcodeValidatorExistsForCountry(address.countryCode)
+  const isPostalCodeRequired = postcodeValidatorExistsForCountry(address.countryCode)
 
   const handleStateSelect = () => {
     navigation.navigate("selectionScreen", {
@@ -213,7 +180,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             value={address.postalCode}
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}
-            required={postalRequired}
+            required={isPostalCodeRequired}
             validate={validatePostal}
           />
         </View>

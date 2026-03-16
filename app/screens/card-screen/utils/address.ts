@@ -1,6 +1,7 @@
 import { postcodeValidator, postcodeValidatorExistsForCountry } from "postcode-validator"
 
 import { ShippingAddress as GqlShippingAddress } from "@app/graphql/generated"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 import { getCountryLabel } from "@app/utils/country-region-data"
 
@@ -51,6 +52,43 @@ export type AddressFields = Pick<
   | "country"
   | "countryCode"
 >
+
+export const isAddressValid = (
+  address: ShippingAddress,
+  { checkFullName = true }: { checkFullName?: boolean } = {},
+): boolean => {
+  const hasPOBox =
+    validatePOBox({ value: address.line1, errorMessage: "" }) !== undefined ||
+    (address.line2 !== "" &&
+      validatePOBox({ value: address.line2, errorMessage: "" }) !== undefined)
+
+  const hasValidPostalCode =
+    validatePostalCode({
+      value: address.postalCode,
+      countryCode: address.countryCode,
+      errorMessage: "",
+    }) === undefined
+
+  const isPostalCodeRequired = postcodeValidatorExistsForCountry(address.countryCode)
+  const isPostalCodeValid = isPostalCodeRequired
+    ? address.postalCode.trim().length > 0 && hasValidPostalCode
+    : address.postalCode.trim().length === 0 || hasValidPostalCode
+
+  const hasRequiredFields =
+    address.line1.trim().length >= 2 &&
+    !hasPOBox &&
+    address.city.trim().length >= 2 &&
+    isPostalCodeValid &&
+    address.countryCode.trim().length > 0
+
+  if (!checkFullName) return hasRequiredFields
+
+  return (
+    hasRequiredFields &&
+    address.firstName.trim().length >= 2 &&
+    address.lastName.trim().length >= 2
+  )
+}
 
 export const addressToLines = (
   address: AddressFields,
