@@ -8,7 +8,6 @@ import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
-import { HiddenBalanceIndicator } from "@app/components/hidden-balance-indicator/hidden-balance-indicator"
 import { Screen } from "@app/components/screen"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
@@ -410,18 +409,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
             <View style={styles.walletSelectorInfoContainer}>
               <View style={styles.walletSelectorTypeTextContainer}>
-                {hideAmount ? (
-                  <HiddenBalanceIndicator size="small" />
-                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                   <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
                 ) : (
                   <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
                 )}
               </View>
               <View style={styles.walletSelectorBalanceContainer}>
-                {hideAmount ? (
-                  <HiddenBalanceIndicator size="small" />
-                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                   <Text>{btcSecondaryText}</Text>
                 ) : (
                   <Text>{usdSecondaryText}</Text>
