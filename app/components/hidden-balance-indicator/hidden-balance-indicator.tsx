@@ -19,11 +19,10 @@ const CIRCLE_SIZES = {
 const CIRCLES = [0, 1, 2, 3] as const
 
 export const HiddenBalanceIndicator: React.FC<Props> = ({ size }) => {
-  const { diameter, gap } = CIRCLE_SIZES[size]
-  const styles = useStyles({ diameter })
+  const styles = useStyles(CIRCLE_SIZES[size])
 
   return (
-    <View style={[styles.container, { gap }]}>
+    <View style={styles.container}>
       {CIRCLES.map((i) => (
         <View key={i} style={styles.circle} />
       ))}
@@ -31,15 +30,18 @@ export const HiddenBalanceIndicator: React.FC<Props> = ({ size }) => {
   )
 }
 
-const useStyles = makeStyles(({ colors }, { diameter }: { diameter: number }) => ({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  circle: {
-    width: diameter,
-    height: diameter,
-    borderRadius: diameter / 2,
-    backgroundColor: colors.grey4,
-  },
-}))
+const useStyles = makeStyles(
+  ({ colors }, { diameter, gap }: { diameter: number; gap: number }) => ({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap,
+    },
+    circle: {
+      width: diameter,
+      height: diameter,
+      borderRadius: diameter / 2,
+      backgroundColor: colors.grey4,
+    },
+  }),
+)
