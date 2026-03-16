@@ -8,10 +8,10 @@ jest.mock("@rn-vui/themed", () => ({
     (
       factory: (
         theme: { colors: Record<string, string> },
-        props: { diameter: number },
+        props: { diameter: number; gap: number },
       ) => object,
     ) =>
-    (props: { diameter: number }) =>
+    (props: { diameter: number; gap: number }) =>
       factory({ colors: { grey4: "#CCCCCC" } }, props),
 }))
 
