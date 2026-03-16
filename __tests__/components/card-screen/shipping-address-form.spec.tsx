@@ -54,6 +54,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       common: {
         validation: {
+          required: () => "Required",
+          minChars: ({ min }: { min: number }) => `Min ${min} chars`,
           invalidPostalCode: () => "Invalid postal code",
         },
       },
@@ -100,13 +102,13 @@ jest.mock("@app/components/card-screen/input-field", () => ({
     value,
     onPress,
     onChangeText,
-    validate,
+    errorMessage,
   }: {
     label: string
     value: string
     onPress?: () => void
     onChangeText?: (text: string) => void
-    validate?: (value: string) => string | undefined
+    errorMessage?: string
   }) => (
     <View testID={`input-field-${label}`} accessibilityHint={value}>
       <RNText>{label}</RNText>
@@ -124,8 +126,8 @@ jest.mock("@app/components/card-screen/input-field", () => ({
           <RNText>press</RNText>
         </View>
       )}
-      {validate && (
-        <RNText testID={`validate-${label}`}>{validate(value) ?? "valid"}</RNText>
+      {errorMessage !== undefined && (
+        <RNText testID={`error-${label}`}>{errorMessage}</RNText>
       )}
     </View>
   ),
@@ -248,49 +250,52 @@ describe("ShippingAddressForm", () => {
     })
   })
 
-  describe("validation", () => {
-    it("shows P.O. Box error for address line 1", () => {
+  describe("validation errors via errorMessage", () => {
+    it("passes PO Box error to line1 errorMessage", () => {
       const address = { ...mockAddress, line1: "P.O. Box 123" }
       const { getByTestId } = render(
         <ShippingAddressForm {...defaultProps} address={address} />,
       )
-      const validateNode = getByTestId("validate-Address line 1")
 
-      expect(validateNode.props.children).toBe("P.O. Boxes are not allowed")
+      expect(getByTestId("error-Address line 1").props.children).toBe(
+        "P.O. Boxes are not allowed",
+      )
     })
 
-    it("shows P.O. Box error for address line 2", () => {
+    it("passes PO Box error to line2 errorMessage", () => {
       const address = { ...mockAddress, line2: "PO Box 456" }
       const { getByTestId } = render(
         <ShippingAddressForm {...defaultProps} address={address} />,
       )
-      const validateNode = getByTestId("validate-Address line 2")
 
-      expect(validateNode.props.children).toBe("P.O. Boxes are not allowed")
+      expect(getByTestId("error-Address line 2").props.children).toBe(
+        "P.O. Boxes are not allowed",
+      )
     })
 
-    it("shows no error for valid addresses", () => {
-      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
-      const validateNode = getByTestId("validate-Address line 1")
+    it("does not pass errorMessage for valid address fields", () => {
+      const { queryByTestId } = render(<ShippingAddressForm {...defaultProps} />)
 
-      expect(validateNode.props.children).toBe("valid")
+      expect(queryByTestId("error-Address line 1")).toBeNull()
+      expect(queryByTestId("error-Postal code")).toBeNull()
     })
 
-    it("shows error for invalid postal code", () => {
+    it("passes invalid postal code error to errorMessage", () => {
       const address = { ...mockAddress, postalCode: "ABCDE" }
       const { getByTestId } = render(
         <ShippingAddressForm {...defaultProps} address={address} />,
       )
-      const validateNode = getByTestId("validate-Postal code")
 
-      expect(validateNode.props.children).toBe("Invalid postal code")
+      expect(getByTestId("error-Postal code").props.children).toBe("Invalid postal code")
     })
 
-    it("shows no error for valid postal code", () => {
-      const { getByTestId } = render(<ShippingAddressForm {...defaultProps} />)
-      const validateNode = getByTestId("validate-Postal code")
+    it("passes minChars error for short city", () => {
+      const address = { ...mockAddress, city: "X" }
+      const { getByTestId } = render(
+        <ShippingAddressForm {...defaultProps} address={address} />,
+      )
 
-      expect(validateNode.props.children).toBe("valid")
+      expect(getByTestId("error-City").props.children).toBe("Min 2 chars")
     })
   })
 
