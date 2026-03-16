@@ -155,9 +155,12 @@ export const InputField: React.FC<InputFieldProps> = ({
         </View>
         <View style={styles.helperTextContainer}>
           {displayHelperText ? (
-            <Text style={[styles.helperText, isError && styles.helperTextError]}>
-              {displayHelperText}
-            </Text>
+            <View style={styles.helperTextRow}>
+              {isError && <GaloyIcon name="warning" size={12} color={colors.error} />}
+              <Text style={[styles.helperText, isError && styles.helperTextError]}>
+                {displayHelperText}
+              </Text>
+            </View>
           ) : null}
         </View>
       </View>
@@ -248,6 +251,11 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     helperTextContainer: {
       minHeight: 13,
+    },
+    helperTextRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
     },
   }
 })
