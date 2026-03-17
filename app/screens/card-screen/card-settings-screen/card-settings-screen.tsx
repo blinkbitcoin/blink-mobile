@@ -77,7 +77,10 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleAddToMobileWallet = () => {
-    navigation.navigate("cardAddToMobileWalletScreen")
+    navigation.navigate("cardAddToMobileWalletScreen", {
+      lastFour: card?.lastFour ?? "",
+      holderName: "",
+    })
   }
 
   const handleReplaceCard = () => {
