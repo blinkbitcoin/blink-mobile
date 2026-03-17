@@ -22,7 +22,6 @@ type CardStatusLayoutProps = {
   validThruDate?: string | Date
   isFrozen?: boolean
   showAddToWallet?: boolean
-  onAddToWallet?: () => void
 }
 
 export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
@@ -38,7 +37,6 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   validThruDate = "",
   isFrozen = false,
   showAddToWallet = true,
-  onAddToWallet,
 }) => {
   const styles = useStyles()
   const {
@@ -46,6 +44,11 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   } = useTheme()
 
   const resolvedIconColor = iconColor ?? colors._green
+
+  const handleAddToWallet = () => {
+    // TODO: Phase 3 - Implement MeaWallet SDK integration
+    console.log("Add to wallet pressed")
+  }
 
   return (
     <Screen style={styles.screen}>
@@ -70,9 +73,7 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
             />
           )}
 
-          {showAddToWallet && onAddToWallet ? (
-            <AddToWalletButton onPress={onAddToWallet} />
-          ) : null}
+          {showAddToWallet ? <AddToWalletButton onPress={handleAddToWallet} /> : null}
         </View>
       </View>
 
