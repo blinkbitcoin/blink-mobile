@@ -14,7 +14,7 @@ import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { GateReason } from "@app/types/account"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -93,6 +93,9 @@ type Props = {
   cardLastFour?: string | null
   showBtcNotification?: boolean
   showUsdNotification?: boolean
+  showCardRow?: boolean
+  cardBalancePrimary?: string
+  cardBalanceSecondary?: string
 }
 
 const WalletOverview: React.FC<Props> = ({
@@ -104,6 +107,9 @@ const WalletOverview: React.FC<Props> = ({
   cardLastFour,
   showBtcNotification = false,
   showUsdNotification = false,
+  showCardRow = false,
+  cardBalancePrimary,
+  cardBalanceSecondary,
 }) => {
   const {
     isGated: isDollarBalanceGated,
@@ -178,6 +184,7 @@ const WalletOverview: React.FC<Props> = ({
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
+  const [pressedCard, setPressedCard] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const showCardLastFour = Boolean(cardLastFour) && !hideAmount
@@ -333,6 +340,44 @@ const WalletOverview: React.FC<Props> = ({
               <Text type="p1" bold>
                 {maskedCardNumber}
               </Text>
+            </View>
+          </Pressable>
+        </>
+      )}
+
+      {showCardRow && (
+        <>
+          <View style={styles.separator} />
+          <Pressable
+            onPressIn={() => setPressedCard(true)}
+            onPressOut={() => setPressedCard(false)}
+            onPress={() => navigation.navigate("cardDashboardScreen")}
+          >
+            <View style={styles.displayTextView}>
+              <View style={styles.currency}>
+                <View style={styles.bubbleWrapper} pointerEvents="box-none">
+                  <View style={pressedCard && styles.pressedOpacity}>
+                    <CurrencyPill
+                      currency={CARD}
+                      containerSize="medium"
+                      containerStyle={pillWidthStyle}
+                      onLayout={onPillLayout(CARD)}
+                    />
+                  </View>
+                </View>
+              </View>
+              {loading ? (
+                <Loader />
+              ) : hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
+                <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
+                  <Text type="p1" bold style={styles.boldBalance}>
+                    {cardBalanceSecondary}
+                  </Text>
+                  <Text type="p3">{cardBalancePrimary}</Text>
+                </View>
+              )}
             </View>
           </Pressable>
         </>
