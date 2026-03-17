@@ -3,13 +3,14 @@ import { LayoutChangeEvent } from "react-native"
 import rnTextSize from "react-native-text-size-latest"
 
 import type { WalletCurrency } from "@app/graphql/generated"
+import { CARD } from "@app/types/amounts"
 import {
   CURRENCY_PILL_BORDER_WIDTH,
   CURRENCY_PILL_PADDING_HORIZONTAL,
   CURRENCY_PILL_TEXT_STYLE,
 } from "./currency-pill"
 
-type PillKey = typeof BTC | typeof USD
+type PillKey = typeof BTC | typeof USD | typeof CARD
 type UseEqualPillWidthOptions = {
   labels?: Partial<Record<PillKey, string>>
 }
@@ -21,15 +22,18 @@ export const useEqualPillWidth = (options?: UseEqualPillWidthOptions) => {
   const labels = options?.labels
   const btcLabel = labels?.[BTC] ?? ""
   const usdLabel = labels?.[USD] ?? ""
+  const cardLabel = labels?.[CARD] ?? ""
   const [pillWidths, setPillWidths] = useState<Partial<Record<PillKey, number>>>({})
   const [measuredWidth, setMeasuredWidth] = useState(0)
   const btcWidth = pillWidths[BTC] ?? 0
   const usdWidth = pillWidths[USD] ?? 0
-  const maxWidth = btcWidth > 0 && usdWidth > 0 ? Math.max(btcWidth, usdWidth) : 0
+  const cardWidth = pillWidths[CARD] ?? 0
+  const maxWidth =
+    btcWidth > 0 && usdWidth > 0 ? Math.max(btcWidth, usdWidth, cardWidth) : 0
 
   useEffect(() => {
     let isMounted = true
-    const labelValues = [btcLabel, usdLabel].filter(Boolean)
+    const labelValues = [btcLabel, usdLabel, cardLabel].filter(Boolean)
 
     if (!labelValues.length) {
       setMeasuredWidth(0)
@@ -64,7 +68,7 @@ export const useEqualPillWidth = (options?: UseEqualPillWidthOptions) => {
     return () => {
       isMounted = false
     }
-  }, [btcLabel, usdLabel])
+  }, [btcLabel, usdLabel, cardLabel])
 
   const minWidth = Math.max(maxWidth, measuredWidth)
   const widthStyle = minWidth ? { minWidth } : undefined
