@@ -27,10 +27,10 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData, useCardBalance } from "@app/hooks"
 import { isCardFrozen, isCardUsable } from "../utils/card-display"
 
-import { useCardBalance, useCardFreeze, useCardTransactions } from "./hooks"
+import { useCardFreeze, useCardTransactions } from "./hooks"
 
 const EmptyScreen = ({ message }: { message: string }) => {
   const styles = useStyles()
