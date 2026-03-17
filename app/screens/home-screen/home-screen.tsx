@@ -82,7 +82,12 @@ import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import { useAppConfig, useAutoShowUpgradeModal, useCardData } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useCardBalance,
+  useCardData,
+} from "@app/hooks"
 import {
   AccountLevel,
   useBulletinsQuery,
@@ -337,14 +342,18 @@ export const HomeScreen: React.FC = () => {
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
   const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
+  const {
+    availableSats: cardBalanceSats,
+    balancePrimary: cardBalancePrimary,
+    balanceSecondary: cardBalanceSecondary,
+  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
 
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
     isLoading: balanceConversionLoading,
-  } = useTotalBalance(wallets)
+  } = useTotalBalance(wallets, showCardRow ? cardBalanceSats : undefined)
 
   const loading = queryLoading || balanceConversionLoading
 
@@ -943,10 +952,11 @@ export const HomeScreen: React.FC = () => {
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onGatedTap={onGatedDollarTap}
           wallets={wallets}
-          hasCard={hasCard}
-          cardLastFour={cardLastFour}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
+          showCardRow={showCardRow}
+          cardBalancePrimary={cardBalancePrimary}
+          cardBalanceSecondary={cardBalanceSecondary}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>

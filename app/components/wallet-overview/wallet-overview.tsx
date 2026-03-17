@@ -26,8 +26,6 @@ import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
-const CARD_NUMBER_MASK = "••••"
-
 const Loader = () => {
   const styles = useStyles()
   return (
@@ -89,8 +87,6 @@ type Props = {
   setIsStablesatModalVisible: (value: boolean) => void
   onGatedTap?: () => void
   wallets?: readonly WalletBalance[]
-  hasCard?: boolean
-  cardLastFour?: string | null
   showBtcNotification?: boolean
   showUsdNotification?: boolean
   showCardRow?: boolean
@@ -103,8 +99,6 @@ const WalletOverview: React.FC<Props> = ({
   setIsStablesatModalVisible,
   onGatedTap,
   wallets,
-  hasCard = false,
-  cardLastFour,
   showBtcNotification = false,
   showUsdNotification = false,
   showCardRow = false,
@@ -186,11 +180,6 @@ const WalletOverview: React.FC<Props> = ({
   const [pressedUsd, setPressedUsd] = useState(false)
   const [pressedCard, setPressedCard] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
-
-  const showCardLastFour = Boolean(cardLastFour) && !hideAmount
-  const maskedCardNumber = showCardLastFour
-    ? `${CARD_NUMBER_MASK} ${cardLastFour}`
-    : CARD_NUMBER_MASK
 
   /** The dollar row rides the same loader while the region resolves, and stays inert
    *  meanwhile: reading the unresolved region as unrestricted is what showed a restricted
@@ -323,28 +312,6 @@ const WalletOverview: React.FC<Props> = ({
         </Pressable>
       </DisabledFeature>
 
-      {hasCard && (
-        <>
-          <View style={styles.separator} />
-          <Pressable onPress={() => navigation.navigate("cardDashboardScreen")}>
-            <View style={styles.displayTextView}>
-              <View style={styles.currency}>
-                <CurrencyPill
-                  currency={WalletCurrency.Usd}
-                  label={LL.common.card()}
-                  highlighted={false}
-                  containerSize="medium"
-                  containerStyle={[pillWidthStyle, styles.cardPillBackground]}
-                />
-              </View>
-              <Text type="p1" bold>
-                {maskedCardNumber}
-              </Text>
-            </View>
-          </Pressable>
-        </>
-      )}
-
       {showCardRow && (
         <>
           <View style={styles.separator} />
@@ -456,7 +423,4 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 5,
   },
   pressedOpacity: { opacity: 0.7 },
-  cardPillBackground: {
-    backgroundColor: colors._cardPill,
-  },
 }))

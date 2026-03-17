@@ -63,7 +63,7 @@ export const CurrencyPill = ({
         return {
           defaultText: LL.common.card(),
           color: colors._white,
-          backgroundColor: colors.grey4,
+          backgroundColor: colors._cardPill,
         }
       default:
         return {
