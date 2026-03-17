@@ -40,16 +40,13 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-jest.mock("postcode-validator", () => ({
-  postcodeValidator: () => true,
-  postcodeValidatorExistsForCountry: () => true,
-}))
-
-jest.mock("@app/utils/country-region-data", () => ({
-  getAllCountries: () => [{ value: "US", label: "United States" }],
-  getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
-  getCountryLabel: (code: string) => (code === "US" ? "United States" : code),
-}))
+jest.mock(
+  "@app/utils/address-metadata",
+  () =>
+    jest.requireActual<typeof import("../helpers/mock-address-metadata")>(
+      "../helpers/mock-address-metadata",
+    ).mockAddressMetadata,
+)
 
 jest.mock("@app/screens/card-screen/utils", () => ({
   addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(

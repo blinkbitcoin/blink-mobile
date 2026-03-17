@@ -45,10 +45,25 @@ jest.mock("@app/i18n/i18n-react", () => ({
           addressLine1: () => "Address line 1",
           addressLine2: () => "Address line 2",
           city: () => "City",
-          state: () => "State",
-          region: () => "Region",
-          postalCode: () => "Postal code",
           country: () => "Country",
+          labels: {
+            state: () => "State",
+            province: () => "Province",
+            prefecture: () => "Prefecture",
+            oblast: () => "Oblast",
+            department: () => "Department",
+            county: () => "County",
+            district: () => "District",
+            doSi: () => "Do/Si",
+            island: () => "Island",
+            emirate: () => "Emirate",
+            parish: () => "Parish",
+            region: () => "Region",
+            zip: () => "ZIP code",
+            postalCode: () => "Postal code",
+            eircode: () => "Eircode",
+            pin: () => "PIN code",
+          },
           noPOBoxes: () => "P.O. Boxes are not allowed",
         },
       },
@@ -57,44 +72,20 @@ jest.mock("@app/i18n/i18n-react", () => ({
           required: () => "Required",
           minChars: ({ min }: { min: number }) => `Min ${min} chars`,
           invalidPostalCode: () => "Invalid postal code",
+          invalidRegion: () => "Invalid region",
         },
       },
     },
   }),
 }))
 
-jest.mock("postcode-validator", () => ({
-  postcodeValidator: (value: string, country: string) => {
-    if (country === "US") return /^\d{5}(-\d{4})?$/.test(value)
-    if (country === "CA") return /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(value)
-    return true
-  },
-  postcodeValidatorExistsForCountry: (country: string) => ["US", "CA"].includes(country),
-}))
-
-jest.mock("@app/utils/country-region-data", () => ({
-  getAllCountries: () => [
-    { value: "US", label: "United States" },
-    { value: "CA", label: "Canada" },
-  ],
-  getRegionsByCountry: (code: string) => {
-    if (code === "US")
-      return [
-        { value: "NY", label: "New York" },
-        { value: "CA", label: "California" },
-      ]
-    if (code === "CA")
-      return [
-        { value: "ON", label: "Ontario" },
-        { value: "BC", label: "British Columbia" },
-      ]
-    return []
-  },
-  getCountryLabel: (code: string) => {
-    const labels: Record<string, string> = { US: "United States", CA: "Canada" }
-    return labels[code] ?? code
-  },
-}))
+jest.mock(
+  "@app/utils/address-metadata",
+  () =>
+    jest.requireActual<
+      typeof import("../../screens/card-screen/helpers/mock-address-metadata")
+    >("../../screens/card-screen/helpers/mock-address-metadata").mockAddressMetadata,
+)
 
 jest.mock("@app/components/card-screen/input-field", () => ({
   InputField: ({
@@ -172,7 +163,7 @@ describe("ShippingAddressForm", () => {
       expect(getByText("Address line 2")).toBeTruthy()
       expect(getByText("City")).toBeTruthy()
       expect(getByText("State")).toBeTruthy()
-      expect(getByText("Postal code")).toBeTruthy()
+      expect(getByText("ZIP code")).toBeTruthy()
       expect(getByText("Country")).toBeTruthy()
     })
   })
@@ -277,7 +268,7 @@ describe("ShippingAddressForm", () => {
       const { queryByTestId } = render(<ShippingAddressForm {...defaultProps} />)
 
       expect(queryByTestId("error-Address line 1")).toBeNull()
-      expect(queryByTestId("error-Postal code")).toBeNull()
+      expect(queryByTestId("error-ZIP code")).toBeNull()
     })
 
     it("passes invalid postal code error to errorMessage", () => {
@@ -286,16 +277,16 @@ describe("ShippingAddressForm", () => {
         <ShippingAddressForm {...defaultProps} address={address} />,
       )
 
-      expect(getByTestId("error-Postal code").props.children).toBe("Invalid postal code")
+      expect(getByTestId("error-ZIP code").props.children).toBe("Invalid postal code")
     })
 
-    it("passes minChars error for short city", () => {
+    it("does not flag city with 1 character (minLength is 1)", () => {
       const address = { ...mockAddress, city: "X" }
-      const { getByTestId } = render(
+      const { queryByTestId } = render(
         <ShippingAddressForm {...defaultProps} address={address} />,
       )
 
-      expect(getByTestId("error-City").props.children).toBe("Min 2 chars")
+      expect(queryByTestId("error-City")).toBeNull()
     })
   })
 
@@ -392,6 +383,9 @@ describe("ShippingAddressForm", () => {
         options: [
           { value: "US", label: "United States" },
           { value: "CA", label: "Canada" },
+          { value: "SV", label: "El Salvador" },
+          { value: "JP", label: "Japan" },
+          { value: "GB", label: "United Kingdom" },
         ],
         selectedValue: "US",
         onSelect: expect.any(Function),

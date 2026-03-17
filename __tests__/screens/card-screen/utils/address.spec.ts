@@ -7,32 +7,20 @@ import {
 } from "@app/screens/card-screen/utils/address"
 import { ShippingAddress } from "@app/screens/card-screen/types"
 
-jest.mock("postcode-validator", () => ({
-  postcodeValidator: (value: string, country: string) => {
-    if (country === "US") return /^\d{5}(-\d{4})?$/.test(value)
-    if (country === "CA") return /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(value)
-    return true
-  },
-  postcodeValidatorExistsForCountry: (country: string) => {
-    return ["US", "CA"].includes(country)
-  },
-}))
-
-jest.mock("@app/utils/country-region-data", () => ({
-  getCountryLabel: (code: string) => {
-    const labels: Record<string, string> = {
-      US: "United States",
-      CA: "Canada",
-    }
-    return labels[code] ?? code
-  },
-}))
+jest.mock(
+  "@app/utils/address-metadata",
+  () =>
+    jest.requireActual<typeof import("../helpers/mock-address-metadata")>(
+      "../helpers/mock-address-metadata",
+    ).mockAddressMetadata,
+)
 
 const messages: ValidationMessages = {
   required: "Required",
   minChars: ({ min }) => `Min ${min} chars`,
   noPOBoxes: "No PO Boxes",
   invalidPostalCode: "Invalid postal code",
+  invalidRegion: "Invalid region",
 }
 
 const validAddress: ShippingAddress = {
@@ -78,9 +66,9 @@ describe("validateAddress", () => {
   })
 
   describe("address lines", () => {
-    it("flags line1 when too short", () => {
+    it("does not flag line1 with 1 character (minLength is 1)", () => {
       const { errors } = validateAddress({ ...validAddress, line1: "A" }, messages)
-      expect(errors.line1).toBe("Min 2 chars")
+      expect(errors.line1).toBeUndefined()
     })
 
     it("flags line1 when it contains a PO Box", () => {
@@ -120,9 +108,9 @@ describe("validateAddress", () => {
   })
 
   describe("city", () => {
-    it("flags city when too short", () => {
+    it("does not flag city with 1 character (minLength is 1)", () => {
       const { errors } = validateAddress({ ...validAddress, city: "X" }, messages)
-      expect(errors.city).toBe("Min 2 chars")
+      expect(errors.city).toBeUndefined()
     })
   })
 
@@ -227,7 +215,7 @@ describe("isAddressValid", () => {
   })
 
   it("returns false when any field is invalid", () => {
-    expect(isAddressValid({ ...validAddress, line1: "A" })).toBe(false)
+    expect(isAddressValid({ ...validAddress, firstName: "A" })).toBe(false)
   })
 
   it("returns true without checking fullName when checkFullName is false", () => {

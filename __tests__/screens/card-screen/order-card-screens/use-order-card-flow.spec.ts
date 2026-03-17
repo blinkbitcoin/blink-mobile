@@ -7,7 +7,7 @@ import {
 
 import { ShippingAddress } from "@app/screens/card-screen/types"
 
-jest.mock("@app/utils/country-region-data", () => ({
+jest.mock("@app/utils/address-metadata", () => ({
   getRegionsByCountry: () => [{ value: "AL", label: "Alabama" }],
 }))
 

@@ -29,34 +29,13 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
   useShippingAddressData: () => mockUseShippingAddressData(),
 }))
 
-jest.mock("postcode-validator", () => ({
-  postcodeValidator: () => true,
-  postcodeValidatorExistsForCountry: () => true,
-}))
-
-jest.mock("@app/utils/country-region-data", () => ({
-  getAllCountries: () => [
-    { value: "US", label: "United States" },
-    { value: "CA", label: "Canada" },
-  ],
-  getRegionsByCountry: (code: string) => {
-    if (code === "US")
-      return [
-        { value: "NY", label: "New York" },
-        { value: "CA", label: "California" },
-      ]
-    if (code === "CA")
-      return [
-        { value: "ON", label: "Ontario" },
-        { value: "BC", label: "British Columbia" },
-      ]
-    return []
-  },
-  getCountryLabel: (code: string) => {
-    const labels: Record<string, string> = { US: "United States", CA: "Canada" }
-    return labels[code] ?? code
-  },
-}))
+jest.mock(
+  "@app/utils/address-metadata",
+  () =>
+    jest.requireActual<typeof import("../helpers/mock-address-metadata")>(
+      "../helpers/mock-address-metadata",
+    ).mockAddressMetadata,
+)
 
 const mockAddress = {
   firstName: "Joe",
@@ -233,7 +212,7 @@ describe("CardShippingAddressScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Postal code")).toBeTruthy()
+      expect(getByText("ZIP code")).toBeTruthy()
       expect(getByDisplayValue("10001")).toBeTruthy()
     })
 
@@ -390,7 +369,7 @@ describe("CardShippingAddressScreen", () => {
       expect(getByText("Last name")).toBeTruthy()
       expect(getByText("City")).toBeTruthy()
       expect(getByText("State")).toBeTruthy()
-      expect(getByText("Postal code")).toBeTruthy()
+      expect(getByText("ZIP code")).toBeTruthy()
       expect(getByText("Country")).toBeTruthy()
       expect(getByText("Important")).toBeTruthy()
     })
