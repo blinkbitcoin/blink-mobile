@@ -133,7 +133,10 @@ export type RootStackParamList = {
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
   cardDashboardScreen: undefined
-  cardAddToMobileWalletScreen: undefined
+  cardAddToMobileWalletScreen: {
+    lastFour: string
+    holderName: string
+  }
   cardDetailsScreen: undefined
   cardLimitsScreen: undefined
   cardPersonalDetailsScreen: undefined
@@ -150,6 +153,7 @@ export type RootStackParamList = {
     showCard?: boolean
     showAddToWallet?: boolean
     lastFour?: string
+    holderName?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined
