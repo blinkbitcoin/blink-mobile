@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Medan ini diperlukan",
       "minChars": "Mesti sekurang-kurangnya {min} aksara",
-      "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip"
+      "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
+      "invalidRegion": "Pilihan wilayah tidak sah"
     }
   },
   "errors": {
@@ -3181,10 +3182,25 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Bandar",
-      "state": "Negeri / Wilayah",
-      "region": "Wilayah",
-      "postalCode": "Poskod",
       "country": "Negara",
+      "labels": {
+        "state": "Negeri",
+        "province": "Wilayah",
+        "prefecture": "Prefektur",
+        "oblast": "Oblast",
+        "department": "Jabatan",
+        "county": "Daerah",
+        "district": "Daerah",
+        "doSi": "Do/Si",
+        "island": "Pulau",
+        "emirate": "Emirat",
+        "parish": "Parish",
+        "region": "Wilayah",
+        "zip": "Kod ZIP",
+        "postalCode": "Kod pos",
+        "eircode": "Eircode",
+        "pin": "Kod PIN"
+      },
       "important": "Penting",
       "importantDescription": "Sila pastikan alamat anda tepat dan lengkap.",
       "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",

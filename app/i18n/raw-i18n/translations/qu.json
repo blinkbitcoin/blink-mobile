@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Kay qillqana kiti rurananchikpaqmi",
       "minChars": "{min} sanampakama kanan",
-      "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay"
+      "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay",
+      "invalidRegion": "Mana allin suyu akllay"
     }
   },
   "errors": {
@@ -3178,10 +3179,25 @@
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",
-      "state": "State / Province",
-      "region": "Suyu",
-      "postalCode": "Postal code",
       "country": "Country",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Important",
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",

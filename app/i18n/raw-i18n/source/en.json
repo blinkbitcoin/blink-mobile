@@ -2777,7 +2777,8 @@
         "validation": {
             "required": "This field is required",
             "minChars": "Must be at least {min:number} characters",
-            "invalidPostalCode": "Invalid postal code, probably a typo"
+            "invalidPostalCode": "Invalid postal code, probably a typo",
+            "invalidRegion": "Invalid region selection"
         }
     },
     "errors": {
@@ -3113,10 +3114,25 @@
             "addressLine1": "Address line 1",
             "addressLine2": "Address line 2",
             "city": "City",
-            "state": "State / Province",
-            "region": "Region",
-            "postalCode": "Postal code",
             "country": "Country",
+            "labels": {
+                "state": "State",
+                "province": "Province",
+                "prefecture": "Prefecture",
+                "oblast": "Oblast",
+                "department": "Department",
+                "county": "County",
+                "district": "District",
+                "doSi": "Do/Si",
+                "island": "Island",
+                "emirate": "Emirate",
+                "parish": "Parish",
+                "region": "Region",
+                "zip": "ZIP code",
+                "postalCode": "Postal code",
+                "eircode": "Eircode",
+                "pin": "PIN code"
+            },
             "important": "Important",
             "importantDescription": "Please ensure your address is accurate and complete.",
             "noPOBoxes": "Cards cannot be delivered to P.O. boxes",

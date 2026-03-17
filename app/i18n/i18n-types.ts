@@ -9112,6 +9112,10 @@ type RootTranslation = {
 			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e​,​ ​p​r​o​b​a​b​l​y​ ​a​ ​t​y​p​o
 			 */
 			invalidPostalCode: string
+			/**
+			 * I​n​v​a​l​i​d​ ​r​e​g​i​o​n​ ​s​e​l​e​c​t​i​o​n
+			 */
+			invalidRegion: string
 		}
 	}
 	errors: {
@@ -10321,21 +10325,75 @@ type RootTranslation = {
 			 */
 			city: string
 			/**
-			 * S​t​a​t​e​ ​/​ ​P​r​o​v​i​n​c​e
-			 */
-			state: string
-			/**
-			 * R​e​g​i​o​n
-			 */
-			region: string
-			/**
-			 * P​o​s​t​a​l​ ​c​o​d​e
-			 */
-			postalCode: string
-			/**
 			 * C​o​u​n​t​r​y
 			 */
 			country: string
+			labels: {
+				/**
+				 * S​t​a​t​e
+				 */
+				state: string
+				/**
+				 * P​r​o​v​i​n​c​e
+				 */
+				province: string
+				/**
+				 * P​r​e​f​e​c​t​u​r​e
+				 */
+				prefecture: string
+				/**
+				 * O​b​l​a​s​t
+				 */
+				oblast: string
+				/**
+				 * D​e​p​a​r​t​m​e​n​t
+				 */
+				department: string
+				/**
+				 * C​o​u​n​t​y
+				 */
+				county: string
+				/**
+				 * D​i​s​t​r​i​c​t
+				 */
+				district: string
+				/**
+				 * D​o​/​S​i
+				 */
+				doSi: string
+				/**
+				 * I​s​l​a​n​d
+				 */
+				island: string
+				/**
+				 * E​m​i​r​a​t​e
+				 */
+				emirate: string
+				/**
+				 * P​a​r​i​s​h
+				 */
+				parish: string
+				/**
+				 * R​e​g​i​o​n
+				 */
+				region: string
+				/**
+				 * Z​I​P​ ​c​o​d​e
+				 */
+				zip: string
+				/**
+				 * P​o​s​t​a​l​ ​c​o​d​e
+				 */
+				postalCode: string
+				/**
+				 * E​i​r​c​o​d​e
+				 */
+				eircode: string
+				/**
+				 * P​I​N​ ​c​o​d​e
+				 */
+				pin: string
+			}
 			/**
 			 * I​m​p​o​r​t​a​n​t
 			 */
@@ -20211,6 +20269,10 @@ export type TranslationFunctions = {
 			 * Invalid postal code, probably a typo
 			 */
 			invalidPostalCode: () => LocalizedString
+			/**
+			 * Invalid region selection
+			 */
+			invalidRegion: () => LocalizedString
 		}
 	}
 	errors: {
@@ -21393,21 +21455,75 @@ export type TranslationFunctions = {
 			 */
 			city: () => LocalizedString
 			/**
-			 * State / Province
-			 */
-			state: () => LocalizedString
-			/**
-			 * Region
-			 */
-			region: () => LocalizedString
-			/**
-			 * Postal code
-			 */
-			postalCode: () => LocalizedString
-			/**
 			 * Country
 			 */
 			country: () => LocalizedString
+			labels: {
+				/**
+				 * State
+				 */
+				state: () => LocalizedString
+				/**
+				 * Province
+				 */
+				province: () => LocalizedString
+				/**
+				 * Prefecture
+				 */
+				prefecture: () => LocalizedString
+				/**
+				 * Oblast
+				 */
+				oblast: () => LocalizedString
+				/**
+				 * Department
+				 */
+				department: () => LocalizedString
+				/**
+				 * County
+				 */
+				county: () => LocalizedString
+				/**
+				 * District
+				 */
+				district: () => LocalizedString
+				/**
+				 * Do/Si
+				 */
+				doSi: () => LocalizedString
+				/**
+				 * Island
+				 */
+				island: () => LocalizedString
+				/**
+				 * Emirate
+				 */
+				emirate: () => LocalizedString
+				/**
+				 * Parish
+				 */
+				parish: () => LocalizedString
+				/**
+				 * Region
+				 */
+				region: () => LocalizedString
+				/**
+				 * ZIP code
+				 */
+				zip: () => LocalizedString
+				/**
+				 * Postal code
+				 */
+				postalCode: () => LocalizedString
+				/**
+				 * Eircode
+				 */
+				eircode: () => LocalizedString
+				/**
+				 * PIN code
+				 */
+				pin: () => LocalizedString
+			}
 			/**
 			 * Important
 			 */

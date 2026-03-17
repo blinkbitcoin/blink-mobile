@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "จำเป็นต้องกรอกข้อมูลนี้",
       "minChars": "ต้องมีอย่างน้อย {min} ตัวอักษร",
-      "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด"
+      "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด",
+      "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
     }
   },
   "errors": {
@@ -3178,10 +3179,25 @@
       "addressLine1": "ที่อยู่บรรทัดที่ 1",
       "addressLine2": "ที่อยู่บรรทัดที่ 2",
       "city": "เมือง",
-      "state": "รัฐ / จังหวัด",
-      "region": "ภูมิภาค",
-      "postalCode": "รหัสไปรษณีย์",
       "country": "ประเทศ",
+      "labels": {
+        "state": "รัฐ",
+        "province": "จังหวัด",
+        "prefecture": "จังหวัด",
+        "oblast": "แคว้น",
+        "department": "แผนก",
+        "county": "เทศมณฑล",
+        "district": "เขต",
+        "doSi": "โด/ซี",
+        "island": "เกาะ",
+        "emirate": "เอมิเรต",
+        "parish": "ตำบล",
+        "region": "ภูมิภาค",
+        "zip": "รหัสไปรษณีย์",
+        "postalCode": "รหัสไปรษณีย์",
+        "eircode": "Eircode",
+        "pin": "รหัส PIN"
+      },
       "important": "สำคัญ",
       "importantDescription": "กรุณาตรวจสอบให้แน่ใจว่าที่อยู่ของคุณถูกต้องและครบถ้วน",
       "noPOBoxes": "ไม่สามารถจัดส่งบัตรไปยังตู้ไปรษณีย์ได้",

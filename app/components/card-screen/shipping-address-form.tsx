@@ -7,13 +7,17 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { ShippingAddress } from "@app/screens/card-screen/types"
-import { validateAddress } from "@app/screens/card-screen/utils"
 import {
   getAllCountries,
   getCountryLabel,
   getRegionsByCountry,
-} from "@app/utils/country-region-data"
+} from "@app/utils/address-metadata"
+import { ShippingAddress } from "@app/screens/card-screen/types"
+import {
+  getPostalLabelKey,
+  getStateLabelKey,
+  validateAddress,
+} from "@app/screens/card-screen/utils"
 
 type ShippingAddressFormProps = {
   address: ShippingAddress
@@ -41,6 +45,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
           minChars: LL.common.validation.minChars,
           noPOBoxes: LL.CardFlow.ShippingAddress.noPOBoxes(),
           invalidPostalCode: LL.common.validation.invalidPostalCode(),
+          invalidRegion: LL.common.validation.invalidRegion(),
         },
         { checkFullName: showFullName },
       ),
@@ -57,10 +62,17 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
 
   const regions = getRegionsByCountry(address.countryCode)
   const countryHasRegions = regions.length > 0
+  const labels = LL.CardFlow.ShippingAddress.labels
+
+  const stateLabelKey = getStateLabelKey(address.countryCode)
+  const postalLabelKey = getPostalLabelKey(address.countryCode)
+
+  const stateLabel = labels[stateLabelKey as keyof typeof labels]()
+  const postalLabel = labels[postalLabelKey as keyof typeof labels]()
 
   const handleStateSelect = () => {
     navigation.navigate("selectionScreen", {
-      title: LL.CardFlow.ShippingAddress.state(),
+      title: stateLabel,
       options: regions,
       selectedValue: address.region,
       onSelect: (value: string) => {
@@ -143,7 +155,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
         <View style={styles.gridItem}>
           {countryHasRegions ? (
             <InputField
-              label={LL.CardFlow.ShippingAddress.state()}
+              label={stateLabel}
               value={address.region}
               rightIcon="caret-down"
               valueStyle={ValueStyle.Regular}
@@ -151,7 +163,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
             />
           ) : (
             <InputField
-              label={LL.CardFlow.ShippingAddress.region()}
+              label={labels.region()}
               value={address.region}
               rightIcon="pencil"
               onChangeText={(text) => handleFieldChange("region", text)}
@@ -164,7 +176,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       <View style={styles.gridRow}>
         <View style={styles.gridItem}>
           <InputField
-            label={LL.CardFlow.ShippingAddress.postalCode()}
+            label={postalLabel}
             value={address.postalCode}
             onChangeText={(text) => handleFieldChange("postalCode", text)}
             valueStyle={ValueStyle.Regular}

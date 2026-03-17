@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Ovo polje je obavezno",
       "minChars": "Mora imati najmanje {min} znakova",
-      "invalidPostalCode": "Nevažeći poštanski broj, vjerojatno tipfeler"
+      "invalidPostalCode": "Nevažeći poštanski broj, vjerojatno tipfeler",
+      "invalidRegion": "Nevažeći odabir regije"
     }
   },
   "errors": {
@@ -3181,10 +3182,25 @@
       "addressLine1": "Adresa redak 1",
       "addressLine2": "Adresa redak 2",
       "city": "Grad",
-      "state": "Država / Pokrajina",
-      "region": "Regija",
-      "postalCode": "Poštanski broj",
       "country": "Zemlja",
+      "labels": {
+        "state": "Država",
+        "province": "Pokrajina",
+        "prefecture": "Prefektura",
+        "oblast": "Oblast",
+        "department": "Odjel",
+        "county": "Županija",
+        "district": "Okrug",
+        "doSi": "Do/Si",
+        "island": "Otok",
+        "emirate": "Emirat",
+        "parish": "Župa",
+        "region": "Regija",
+        "zip": "Poštanski broj",
+        "postalCode": "Poštanski broj",
+        "eircode": "Eircode",
+        "pin": "PIN kod"
+      },
       "important": "Važno",
       "importantDescription": "Molimo provjerite da je vaša adresa točna i potpuna.",
       "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",

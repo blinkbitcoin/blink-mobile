@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Trường này là bắt buộc",
       "minChars": "Phải có ít nhất {min} ký tự",
-      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy"
+      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
+      "invalidRegion": "Lựa chọn vùng không hợp lệ"
     }
   },
   "errors": {
@@ -3178,10 +3179,25 @@
       "addressLine1": "Địa chỉ dòng 1",
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",
-      "state": "Bang / Tỉnh",
-      "region": "Vùng",
-      "postalCode": "Mã bưu điện",
       "country": "Quốc gia",
+      "labels": {
+        "state": "Bang",
+        "province": "Tỉnh",
+        "prefecture": "Quận",
+        "oblast": "Vùng",
+        "department": "Sở",
+        "county": "Huyện",
+        "district": "Quận",
+        "doSi": "Do/Si",
+        "island": "Đảo",
+        "emirate": "Tiểu vương quốc",
+        "parish": "Xứ đạo",
+        "region": "Vùng",
+        "zip": "Mã ZIP",
+        "postalCode": "Mã bưu điện",
+        "eircode": "Eircode",
+        "pin": "Mã PIN"
+      },
       "important": "Quan trọng",
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",

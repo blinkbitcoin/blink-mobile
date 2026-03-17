@@ -1,9 +1,8 @@
-import { postcodeValidator, postcodeValidatorExistsForCountry } from "postcode-validator"
-
 import { ShippingAddress as GqlShippingAddress } from "@app/graphql/generated"
+import { getCountryLabel } from "@app/utils/address-metadata"
 import { ShippingAddress } from "@app/screens/card-screen/types"
 
-import { getCountryLabel } from "@app/utils/country-region-data"
+import { buildAddressSchema, FieldRule } from "./address-schema"
 
 // Multilingual PO Box patterns:
 // English: P.O. Box, PO Box, POB, Post Office Box
@@ -16,10 +15,29 @@ const PO_BOX_REGEX =
 
 const isPOBox = (value: string): boolean => PO_BOX_REGEX.test(value)
 
-const isPostalCodeInvalid = (value: string, countryCode: string): boolean => {
-  if (value.length === 0) return false
-  if (!postcodeValidatorExistsForCountry(countryCode)) return false
-  return !postcodeValidator(value, countryCode)
+type FieldCheck = {
+  trimmed: string
+  raw: string
+  rule: FieldRule
+}
+
+const validateField = (
+  { trimmed, raw, rule }: FieldCheck,
+  messages: ValidationMessages,
+): string | undefined => {
+  if (rule.required && trimmed.length === 0) return messages.required
+  if (trimmed.length === 0) return undefined
+
+  if (rule.minLength && trimmed.length < rule.minLength)
+    return messages.minChars({ min: rule.minLength })
+
+  if (rule.noPOBox && isPOBox(raw)) return messages.noPOBoxes
+
+  if (rule.pattern && !rule.pattern.test(trimmed)) return messages.invalidPostalCode
+
+  if (rule.enum && !rule.enum.includes(trimmed)) return messages.invalidRegion
+
+  return undefined
 }
 
 export type ValidationMessages = {
@@ -27,6 +45,7 @@ export type ValidationMessages = {
   minChars: (params: { min: number }) => string
   noPOBoxes: string
   invalidPostalCode: string
+  invalidRegion: string
 }
 
 export type AddressErrors = Partial<Record<keyof ShippingAddress, string>>
@@ -42,46 +61,34 @@ export const validateAddress = (
   messages: ValidationMessages,
   { checkFullName = true }: { checkFullName?: boolean } = {},
 ): AddressValidation => {
+  const schema = buildAddressSchema(address.countryCode)
   const errors: AddressErrors = {}
 
-  if (checkFullName) {
-    if (address.firstName.trim().length < 2)
-      errors.firstName = messages.minChars({ min: 2 })
-    if (address.lastName.trim().length < 2)
-      errors.lastName = messages.minChars({ min: 2 })
+  const fieldsToCheck: (keyof ShippingAddress)[] = checkFullName
+    ? [
+        "firstName",
+        "lastName",
+        "line1",
+        "line2",
+        "city",
+        "region",
+        "postalCode",
+        "countryCode",
+      ]
+    : ["line1", "line2", "city", "region", "postalCode", "countryCode"]
+
+  for (const field of fieldsToCheck) {
+    const rule = schema.fields[field]
+    const raw = address[field]
+    const trimmed = raw.trim()
+    const error = validateField({ trimmed, raw, rule }, messages)
+    if (error !== undefined) errors[field] = error
   }
-
-  const line1Error =
-    address.line1.trim().length < 2
-      ? messages.minChars({ min: 2 })
-      : isPOBox(address.line1)
-        ? messages.noPOBoxes
-        : undefined
-  if (line1Error !== undefined) errors.line1 = line1Error
-
-  if (address.line2 !== "" && isPOBox(address.line2)) {
-    errors.line2 = messages.noPOBoxes
-  }
-
-  if (address.city.trim().length < 2) errors.city = messages.minChars({ min: 2 })
-
-  const isPostalCodeRequired = postcodeValidatorExistsForCountry(address.countryCode)
-  const postalTrimmed = address.postalCode.trim()
-
-  const postalError =
-    isPostalCodeRequired && postalTrimmed.length === 0
-      ? messages.required
-      : isPostalCodeInvalid(address.postalCode, address.countryCode)
-        ? messages.invalidPostalCode
-        : undefined
-  if (postalError !== undefined) errors.postalCode = postalError
-
-  if (address.countryCode.trim().length === 0) errors.countryCode = messages.required
 
   return {
     errors,
     isValid: Object.keys(errors).length === 0,
-    isPostalCodeRequired,
+    isPostalCodeRequired: schema.fields.postalCode.required,
   }
 }
 
@@ -90,6 +97,7 @@ const EMPTY_MESSAGES: ValidationMessages = {
   minChars: () => "",
   noPOBoxes: "",
   invalidPostalCode: "",
+  invalidRegion: "",
 }
 
 export const isAddressValid = (

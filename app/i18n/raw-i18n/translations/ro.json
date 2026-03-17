@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Acest câmp este obligatoriu",
       "minChars": "Trebuie să aibă cel puțin {min} caractere",
-      "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare"
+      "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare",
+      "invalidRegion": "Selectarea regiunii este invalidă"
     }
   },
   "errors": {
@@ -3140,10 +3141,25 @@
       "addressLine1": "Adresa linia 1",
       "addressLine2": "Adresa linia 2",
       "city": "Oraș",
-      "state": "Stat / Provincie",
-      "region": "Regiune",
-      "postalCode": "Cod poștal",
       "country": "Țară",
+      "labels": {
+        "state": "Stat",
+        "province": "Provincie",
+        "prefecture": "Prefectură",
+        "oblast": "Oblast",
+        "department": "Departament",
+        "county": "Județ",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Insulă",
+        "emirate": "Emirat",
+        "parish": "Parohie",
+        "region": "Regiune",
+        "zip": "Cod ZIP",
+        "postalCode": "Cod poștal",
+        "eircode": "Eircode",
+        "pin": "Cod PIN"
+      },
       "important": "Important",
       "importantDescription": "Asigurați-vă că adresa dumneavoastră este corectă și completă.",
       "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",

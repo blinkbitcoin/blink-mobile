@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Dit veld is verplicht",
       "minChars": "Moet minimaal {min} tekens bevatten",
-      "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout"
+      "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout",
+      "invalidRegion": "Ongeldige regioselectie"
     }
   },
   "errors": {
@@ -3181,10 +3182,25 @@
       "addressLine1": "Adresregel 1",
       "addressLine2": "Adresregel 2",
       "city": "Stad",
-      "state": "Staat / Provincie",
-      "region": "Regio",
-      "postalCode": "Postcode",
       "country": "Land",
+      "labels": {
+        "state": "Staat",
+        "province": "Provincie",
+        "prefecture": "Prefectuur",
+        "oblast": "Oblast",
+        "department": "Departement",
+        "county": "Provincie",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Eiland",
+        "emirate": "Emiraat",
+        "parish": "Parochie",
+        "region": "Regio",
+        "zip": "Postcode",
+        "postalCode": "Postcode",
+        "eircode": "Eircode",
+        "pin": "PIN-code"
+      },
       "important": "Belangrijk",
       "importantDescription": "Zorg ervoor dat uw adres nauwkeurig en volledig is.",
       "noPOBoxes": "Kaarten kunnen niet worden bezorgd bij postbussen",

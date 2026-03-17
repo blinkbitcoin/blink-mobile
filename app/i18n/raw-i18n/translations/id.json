@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Bidang ini wajib diisi",
       "minChars": "Harus minimal {min} karakter",
-      "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik"
+      "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik",
+      "invalidRegion": "Pilihan wilayah tidak valid"
     }
   },
   "errors": {
@@ -3140,10 +3141,25 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Kota",
-      "state": "Negara Bagian / Provinsi",
-      "region": "Wilayah",
-      "postalCode": "Kode pos",
       "country": "Negara",
+      "labels": {
+        "state": "Negara Bagian",
+        "province": "Provinsi",
+        "prefecture": "Prefektur",
+        "oblast": "Oblast",
+        "department": "Departemen",
+        "county": "Kabupaten",
+        "district": "Kecamatan",
+        "doSi": "Do/Si",
+        "island": "Pulau",
+        "emirate": "Emirat",
+        "parish": "Paroki",
+        "region": "Wilayah",
+        "zip": "Kode ZIP",
+        "postalCode": "Kode pos",
+        "eircode": "Eircode",
+        "pin": "Kode PIN"
+      },
       "important": "Penting",
       "importantDescription": "Pastikan alamat Anda akurat dan lengkap.",
       "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",

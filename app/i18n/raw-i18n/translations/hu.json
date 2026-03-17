@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Ez a mező kötelező",
       "minChars": "Legalább {min} karakter szükséges",
-      "invalidPostalCode": "Érvénytelen irányítószám, valószínűleg elgépelés"
+      "invalidPostalCode": "Érvénytelen irányítószám, valószínűleg elgépelés",
+      "invalidRegion": "Érvénytelen régióválasztás"
     }
   },
   "errors": {
@@ -3140,10 +3141,25 @@
       "addressLine1": "Cím 1. sor",
       "addressLine2": "Cím 2. sor",
       "city": "Város",
-      "state": "Állam / Tartomány",
-      "region": "Régió",
-      "postalCode": "Irányítószám",
       "country": "Ország",
+      "labels": {
+        "state": "Állam",
+        "province": "Tartomány",
+        "prefecture": "Prefektúra",
+        "oblast": "Körzet",
+        "department": "Megye",
+        "county": "Megye",
+        "district": "Kerület",
+        "doSi": "Do/Si",
+        "island": "Sziget",
+        "emirate": "Emírség",
+        "parish": "Egyházközség",
+        "region": "Régió",
+        "zip": "Irányítószám",
+        "postalCode": "Irányítószám",
+        "eircode": "Eircode",
+        "pin": "PIN-kód"
+      },
       "important": "Fontos",
       "importantDescription": "Kérjük, győződjön meg róla, hogy címe pontos és teljes.",
       "noPOBoxes": "A kártyák nem kézbesíthetők postafiókokba",

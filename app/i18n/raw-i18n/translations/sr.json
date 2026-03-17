@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Ово поље је обавезно",
       "minChars": "Мора имати најмање {min} знакова",
-      "invalidPostalCode": "Неважећи поштански број, вероватно грешка у куцању"
+      "invalidPostalCode": "Неважећи поштански број, вероватно грешка у куцању",
+      "invalidRegion": "Неважећи избор региона"
     }
   },
   "errors": {
@@ -3178,10 +3179,25 @@
       "addressLine1": "Адреса ред 1",
       "addressLine2": "Адреса ред 2",
       "city": "Град",
-      "state": "Држава / Покрајина",
-      "region": "Регион",
-      "postalCode": "Поштански број",
       "country": "Земља",
+      "labels": {
+        "state": "Држава",
+        "province": "Покрајина",
+        "prefecture": "Префектура",
+        "oblast": "Област",
+        "department": "Одељenje",
+        "county": "Округ",
+        "district": "Округ",
+        "doSi": "До/Си",
+        "island": "Острво",
+        "emirate": "Емират",
+        "parish": "Парохија",
+        "region": "Регион",
+        "zip": "Поштански број",
+        "postalCode": "Поштански број",
+        "eircode": "Eircode",
+        "pin": "ПИН код"
+      },
       "important": "Важно",
       "importantDescription": "Молимо проверите да је ваша адреса тачна и потпуна.",
       "noPOBoxes": "Картице се не могу доставити на поштанске сандучиће",

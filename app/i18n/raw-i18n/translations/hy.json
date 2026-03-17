@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Այս դաշտը պարտադիր է",
       "minChars": "Պետք է լինի առնվազն {min} նիշ",
-      "invalidPostalCode": "Անվավեր փոստային կոդ, հավանաբար տպագրական սխալ"
+      "invalidPostalCode": "Անվավեր փոստային կոդ, հավանաբար տպագրական սխալ",
+      "invalidRegion": "Անվավեր տարածաշրջանի ընտրություն"
     }
   },
   "errors": {
@@ -3181,10 +3182,25 @@
       "addressLine1": "Հասցեի տող 1",
       "addressLine2": "Հասցեի տող 2",
       "city": "Քաղաք",
-      "state": "Նահանգ / Մարզ",
-      "region": "Տարածաշրջան",
-      "postalCode": "Փոստային կոդ",
       "country": "Երկիր",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Կարևոր",
       "importantDescription": "Խնդրում ենք համոզվել, որ ձեր հասցեն ճշգրիտ և ամբողջական է։",
       "noPOBoxes": "Քարտերը չեն կարող առաքվել փոստային արկղերին",

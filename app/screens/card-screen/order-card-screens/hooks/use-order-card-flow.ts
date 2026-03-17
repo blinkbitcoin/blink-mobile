@@ -4,7 +4,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { getRegionsByCountry } from "@app/utils/country-region-data"
+import { getRegionsByCountry } from "@app/utils/address-metadata"
 import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
 const FALLBACK_COUNTRY = "US"

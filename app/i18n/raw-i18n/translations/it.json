@@ -2778,7 +2778,8 @@
         "validation": {
             "required": "Questo campo è obbligatorio",
             "minChars": "Deve contenere almeno {min} caratteri",
-            "invalidPostalCode": "Codice postale non valido, probabilmente un errore di battitura"
+            "invalidPostalCode": "Codice postale non valido, probabilmente un errore di battitura",
+            "invalidRegion": "Selezione regione non valida"
         }
     },
     "errors": {
@@ -3140,12 +3141,27 @@
             "addressLine1": "Indirizzo riga 1",
             "addressLine2": "Indirizzo riga 2",
             "city": "Città",
-            "state": "Stato / Provincia",
-            "region": "Regione",
-            "postalCode": "Codice postale",
             "country": "Paese",
             "important": "Importante",
             "importantDescription": "Assicurati che il tuo indirizzo sia accurato e completo.",
+            "labels": {
+                "state": "Stato",
+                "province": "Provincia",
+                "prefecture": "Prefettura",
+                "oblast": "Oblast",
+                "department": "Dipartimento",
+                "county": "Contea",
+                "district": "Distretto",
+                "doSi": "Do/Si",
+                "island": "Isola",
+                "emirate": "Emirato",
+                "parish": "Parrocchia",
+                "region": "Regione",
+                "zip": "CAP",
+                "postalCode": "Codice postale",
+                "eircode": "Eircode",
+                "pin": "Codice PIN"
+            },
             "noPOBoxes": "Le carte non possono essere consegnate alle caselle postali",
             "signatureRequired": "Potrebbe essere richiesta la firma alla consegna",
             "supportedRegions": "L'indirizzo deve essere all'interno delle regioni di spedizione supportate"

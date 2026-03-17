@@ -2778,7 +2778,8 @@
         "validation": {
             "required": "Este campo é obrigatório",
             "minChars": "Deve ter pelo menos {min} caracteres",
-            "invalidPostalCode": "Código postal inválido, provavelmente um erro de digitação"
+            "invalidPostalCode": "Código postal inválido, provavelmente um erro de digitação",
+            "invalidRegion": "Seleção de região inválida"
         }
     },
     "errors": {
@@ -3140,12 +3141,27 @@
             "addressLine1": "Endereço linha 1",
             "addressLine2": "Endereço linha 2",
             "city": "Cidade",
-            "state": "Estado / Província",
-            "region": "Região",
-            "postalCode": "Código postal",
             "country": "País",
             "important": "Importante",
             "importantDescription": "Certifique-se de que seu endereço está correto e completo.",
+            "labels": {
+                "state": "Estado",
+                "province": "Província",
+                "prefecture": "Prefeitura",
+                "oblast": "Oblast",
+                "department": "Departamento",
+                "county": "Condado",
+                "district": "Distrito",
+                "doSi": "Do/Si",
+                "island": "Ilha",
+                "emirate": "Emirado",
+                "parish": "Freguesia",
+                "region": "Região",
+                "zip": "CEP",
+                "postalCode": "Código postal",
+                "eircode": "Eircode",
+                "pin": "Código PIN"
+            },
             "noPOBoxes": "Cartões não podem ser entregues em caixas postais",
             "signatureRequired": "Pode ser necessária assinatura na entrega",
             "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas"

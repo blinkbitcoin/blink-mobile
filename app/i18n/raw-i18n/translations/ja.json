@@ -2795,7 +2795,8 @@
         "validation": {
             "required": "この項目は必須です",
             "minChars": "{min}文字以上で入力してください",
-            "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります"
+            "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります",
+            "invalidRegion": "地域の選択が無効です"
         }
     },
     "errors": {
@@ -3181,12 +3182,27 @@
             "addressLine1": "住所1",
             "addressLine2": "住所2",
             "city": "市区町村",
-            "state": "州 / 都道府県",
-            "region": "地域",
-            "postalCode": "郵便番号",
             "country": "国",
             "important": "重要",
             "importantDescription": "住所が正確で完全であることを確認してください。",
+            "labels": {
+                "state": "州",
+                "province": "州",
+                "prefecture": "都道府県",
+                "oblast": "州",
+                "department": "県",
+                "county": "郡",
+                "district": "区",
+                "doSi": "道/市",
+                "island": "島",
+                "emirate": "首長国",
+                "parish": "教区",
+                "region": "地域",
+                "zip": "郵便番号",
+                "postalCode": "郵便番号",
+                "eircode": "Eircode",
+                "pin": "PINコード"
+            },
             "noPOBoxes": "私書箱には配達できません",
             "signatureRequired": "配達時に署名が必要な場合があります",
             "supportedRegions": "配送対応地域内の住所である必要があります"
