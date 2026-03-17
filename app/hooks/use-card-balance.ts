@@ -38,5 +38,5 @@ export const useCardBalance = (cardId: string | undefined) => {
   const balanceSecondary =
     formatMoneyAmount({ moneyAmount: btcAmount, isApproximate: false }) ?? ""
 
-  return { balancePrimary, balanceSecondary, loading, error }
+  return { balancePrimary, balanceSecondary, availableSats, loading, error }
 }

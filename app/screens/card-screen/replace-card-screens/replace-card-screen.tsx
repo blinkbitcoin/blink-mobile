@@ -10,7 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "../hooks"
+import { useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
 import { Delivery, EMPTY_ADDRESS } from "../types"
