@@ -86,14 +86,13 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal, useCardData } from "@app/hooks"
 import {
   AccountLevel,
   useBulletinsQuery,

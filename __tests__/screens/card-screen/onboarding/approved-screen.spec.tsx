@@ -54,7 +54,7 @@ jest.mock("@react-navigation/native", () => {
 let mockHasPhysicalCard = false
 let mockCardLastFour: string | undefined = "1234"
 
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({
     card: mockCardLastFour ? { id: "card-123", lastFour: mockCardLastFour } : null,
     hasPhysicalCard: mockHasPhysicalCard,
