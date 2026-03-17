@@ -12,6 +12,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         bitcoin: () => "Bitcoin",
         dollar: () => "Dollar",
         all: () => "All",
+        card: () => "Card",
       },
     },
   }),
@@ -31,6 +32,7 @@ jest.mock("@rn-vui/themed", () => {
           _green: "_green",
           grey1: "grey1",
           grey3: "grey3",
+          grey4: "grey4",
           transparent: "transparent",
         },
       },
@@ -88,5 +90,11 @@ describe("CurrencyPill", () => {
     const { getByText } = render(<CurrencyPill variant="outlined" />)
 
     expect(getByText("")).toBeTruthy()
+  })
+
+  it("renders Card label for CARD currency", () => {
+    const { getByText } = render(<CurrencyPill currency={"CARD"} />)
+
+    expect(getByText("Card")).toBeTruthy()
   })
 })
