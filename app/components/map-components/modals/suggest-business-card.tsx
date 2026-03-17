@@ -9,7 +9,6 @@ import {
   TextInput,
   View,
 } from "react-native"
-import MapView from "react-native-maps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import MaterialIcon, {
   MaterialIconsIconName,
@@ -24,10 +23,10 @@ import {
 
 type Props = {
   closeModal: () => void
-  mapViewRef: React.RefObject<MapView>
+  mapCenter: { latitude: number; longitude: number }
 }
 
-export const SuggestBusinessCard: FC<Props> = ({ closeModal, mapViewRef }) => {
+export const SuggestBusinessCard: FC<Props> = ({ closeModal, mapCenter }) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -40,25 +39,10 @@ export const SuggestBusinessCard: FC<Props> = ({ closeModal, mapViewRef }) => {
   const [categorySearch, setCategorySearch] = useState("")
   const searchInputRef = useRef<TextInput>(null)
 
-  // Poll the map center so the address stays in sync as the user pans
   useEffect(() => {
     if (userEditedAddress.current) return
-
-    const updateFromCamera = async () => {
-      try {
-        const camera = await mapViewRef.current?.getCamera()
-        if (camera && !userEditedAddress.current) {
-          setAddress(
-            `${camera.center.latitude.toFixed(6)}, ${camera.center.longitude.toFixed(6)}`,
-          )
-        }
-      } catch {}
-    }
-
-    updateFromCamera()
-    const interval = setInterval(updateFromCamera, 1000)
-    return () => clearInterval(interval)
-  }, [mapViewRef])
+    setAddress(`${mapCenter.latitude.toFixed(6)}, ${mapCenter.longitude.toFixed(6)}`)
+  }, [mapCenter.latitude, mapCenter.longitude])
 
   const allCategoryList = useMemo(() => {
     return Object.keys(categoryI18NNames).map((key) => {

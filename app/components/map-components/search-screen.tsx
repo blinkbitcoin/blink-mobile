@@ -12,6 +12,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 
+import Geolocation from "@react-native-community/geolocation"
+
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { BTCMAP_V4_API_BASE } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react.tsx"
@@ -121,24 +123,31 @@ const SearchScreen: FC<Props> = ({
 
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 180 }, () => runOnJS(focusInput)())
-    loadRecentSearches().then(setRecentSearches)
+    loadRecentSearches().then((all) =>
+      setRecentSearches(all.filter((r) => r.type === "element")),
+    )
   }, [])
 
-  // Fetch nearby places only when location permission is granted
+  // Fetch nearby places using GPS when permission is granted
   useEffect(() => {
     if (!hasLocation) return
-    const fetchNearby = async () => {
-      try {
-        const { data } = await axios.get<NearbyPlace[]>(
-          `${BTCMAP_V4_API_BASE}/places/search?lat=${mapCenter.latitude}&lon=${mapCenter.longitude}&radius_km=${NEARBY_RADIUS_KM}&limit=${NEARBY_LIMIT}&fields=id,name,lat,lon`,
-        )
-        setNearbyPlaces(data)
-      } catch {
-        // silent - nearby is best-effort
-      }
-    }
-    fetchNearby()
-  }, [hasLocation, mapCenter.latitude, mapCenter.longitude])
+    Geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const { data } = await axios.get<NearbyPlace[]>(
+            `${BTCMAP_V4_API_BASE}/places/search?lat=${coords.latitude}&lon=${coords.longitude}&radius_km=${NEARBY_RADIUS_KM}&limit=${NEARBY_LIMIT}&fields=id,name,lat,lon`,
+          )
+          setNearbyPlaces(data)
+        } catch {
+          // silent - nearby is best-effort
+        }
+      },
+      () => {
+        // silent - fall through, no nearby shown
+      },
+      { timeout: 5000 },
+    )
+  }, [hasLocation])
 
   const handleClose = useCallback(() => {
     inputRef.current?.blur()
@@ -216,11 +225,18 @@ const SearchScreen: FC<Props> = ({
 
   const keyExtractor = useCallback((item: SearchResult) => `${item.type}-${item.id}`, [])
 
-  const ItemSeparator = useCallback(() => <View style={styles.divider} />, [styles.divider])
+  const ItemSeparator = useCallback(
+    () => <View style={styles.divider} />,
+    [styles.divider],
+  )
 
   const onNearbyPress = useCallback(
-    (place: NearbyPlace) => {
-      saveRecentSearch({ id: place.id, name: place.name ?? "Unnamed place", type: "element" })
+    async (place: NearbyPlace) => {
+      await saveRecentSearch({
+        id: place.id,
+        name: place.name ?? "Unnamed place",
+        type: "element",
+      })
       setSelectedMarker(place.id)
       handleClose()
     },
@@ -272,9 +288,7 @@ const SearchScreen: FC<Props> = ({
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
           style={styles.list}
-          ListHeaderComponent={
-            <Text style={styles.sectionHeader}>Nearby</Text>
-          }
+          ListHeaderComponent={<Text style={styles.sectionHeader}>Nearby</Text>}
           renderItem={({ item }) => (
             <Pressable onPress={() => onNearbyPress(item)} style={styles.listItem}>
               <GaloyIcon name="pin" size={18} color={colors.grey2} />
@@ -302,9 +316,7 @@ const SearchScreen: FC<Props> = ({
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
           style={styles.list}
-          ListHeaderComponent={
-            <Text style={styles.sectionHeader}>Recent searches</Text>
-          }
+          ListHeaderComponent={<Text style={styles.sectionHeader}>Recent searches</Text>}
           renderItem={({ item }) => (
             <Pressable onPress={() => onRecentPress(item)} style={styles.listItem}>
               <GaloyIcon name="pin" size={18} color={colors.grey2} />

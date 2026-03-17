@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import debounce from "lodash.debounce"
 import axios from "axios"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -13,6 +14,39 @@ import Animated, {
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { BTCMAP_V4_API_BASE } from "@app/config"
+
+const RECENT_SEARCHES_KEY = "btcmap_recent_searches"
+const MAX_RECENT = 5
+
+type RecentCommunity = { id: number; name: string; businessCount: number }
+
+const loadRecentCommunities = async (): Promise<RecentCommunity[]> => {
+  try {
+    const raw = await AsyncStorage.getItem(RECENT_SEARCHES_KEY)
+    const all: Array<{ id: number; name: string; type: string; businessCount?: number }> = raw
+      ? JSON.parse(raw)
+      : []
+    return all
+      .filter((r) => r.type === "area")
+      .map((r) => ({ id: r.id, name: r.name, businessCount: r.businessCount ?? 0 }))
+  } catch {
+    return []
+  }
+}
+
+const saveRecentCommunity = async (item: RecentCommunity) => {
+  try {
+    const raw = await AsyncStorage.getItem(RECENT_SEARCHES_KEY)
+    const all: Array<{ id: number; name: string; type: string; businessCount?: number }> = raw
+      ? JSON.parse(raw)
+      : []
+    const filtered = all.filter((r) => !(r.id === item.id && r.type === "area"))
+    const updated = [{ ...item, type: "area" }, ...filtered].slice(0, MAX_RECENT)
+    await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated))
+  } catch {
+    // silent
+  }
+}
 
 type CommunityResult = {
   id: number
@@ -47,6 +81,7 @@ const CommunitySearchScreen: FC<Props> = ({ onClose, setCommunityId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<CommunityResult[] | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const [recentCommunities, setRecentCommunities] = useState<RecentCommunity[]>([])
 
   const opacity = useSharedValue(0)
 
@@ -54,6 +89,7 @@ const CommunitySearchScreen: FC<Props> = ({ onClose, setCommunityId }) => {
 
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 180 }, () => runOnJS(focusInput)())
+    loadRecentCommunities().then(setRecentCommunities)
   }, [])
 
   const handleClose = useCallback(() => {
@@ -97,8 +133,17 @@ const CommunitySearchScreen: FC<Props> = ({ onClose, setCommunityId }) => {
   useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch])
 
   const onResultPress = useCallback(
-    (id: number) => {
-      setCommunityId(id)
+    (item: CommunityResult) => {
+      saveRecentCommunity({ id: item.id, name: item.name, businessCount: item.businessCount })
+      setCommunityId(item.id)
+      handleClose()
+    },
+    [setCommunityId, handleClose],
+  )
+
+  const onRecentPress = useCallback(
+    (item: RecentCommunity) => {
+      setCommunityId(item.id)
       handleClose()
     },
     [setCommunityId, handleClose],
@@ -116,7 +161,12 @@ const CommunitySearchScreen: FC<Props> = ({ onClose, setCommunityId }) => {
 
   const ItemSeparator = useCallback(() => <View style={styles.divider} />, [styles.divider])
 
-  const displayData = search.length >= 3 ? (results ?? []) : PLACEHOLDER_COMMUNITIES
+  const idleData: CommunityResult[] =
+    recentCommunities.length > 0
+      ? recentCommunities
+      : PLACEHOLDER_COMMUNITIES
+  const displayData = search.length >= 3 ? (results ?? []) : idleData
+  const idleLabel = recentCommunities.length > 0 ? "Recent communities" : "Popular communities"
 
   return (
     <Animated.View style={[styles.container, { paddingTop: insets.top }, animatedStyle]}>
@@ -151,10 +201,13 @@ const CommunitySearchScreen: FC<Props> = ({ onClose, setCommunityId }) => {
         ItemSeparatorComponent={ItemSeparator}
         keyboardShouldPersistTaps="handled"
         style={styles.list}
+        ListHeaderComponent={
+          search.length < 3 ? <Text style={styles.sectionHeader}>{idleLabel}</Text> : null
+        }
         renderItem={({ item }) => (
           <Pressable
             style={styles.listItem}
-            onPress={() => onResultPress(item.id)}
+            onPress={() => onResultPress(item)}
             disabled={item.id === 0}
           >
             <GaloyIcon name="pin" size={18} color={colors.grey2} />
@@ -236,5 +289,12 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 14,
     color: "red",
     fontSize: 14,
+  },
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.grey2,
+    marginTop: 8,
+    marginBottom: 4,
   },
 }))

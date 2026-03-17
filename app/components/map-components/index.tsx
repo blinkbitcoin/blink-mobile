@@ -40,7 +40,7 @@ const { width, height } = Dimensions.get("window")
 const CLUSTER_OPTIONS = {
   radius: 50,
   maxZoom: 16,
-  minPoints: 2,
+  minPoints: 5,
   extent: 512,
 }
 
@@ -55,6 +55,8 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
   const [locationGranted, setLocationGranted] = useState(hasLocation ?? false)
 
   const mapViewRef = useRef<MapView>(null)
+  const pinIconRef = useRef<View>(null)
+  const [pinCoords, setPinCoords] = useState<{ latitude: number; longitude: number } | null>(null)
   const [focusedMarker, setFocusedMarker] = React.useState<IMarker | null>(null)
   const [region, setRegion] = useState(userLocation)
   const [searchVisible, setSearchVisible] = useState(false)
@@ -79,30 +81,51 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
     const marker = data.find((m) => m.id === selectedMarkerId)
     if (marker) {
       setFocusedMarker(marker)
-      mapViewRef.current?.setCamera({ center: marker.location, zoom: 14 })
+      mapViewRef.current?.animateToRegion(
+        {
+          latitude: marker.location.latitude,
+          longitude: marker.location.longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        },
+        400,
+      )
       setActiveSheet("merchant")
     }
   }, [data, selectedMarkerId])
+
+  useEffect(() => {
+    if (selectedCommunityId !== null) {
+      setActiveSheet("area")
+    }
+  }, [selectedCommunityId])
 
   useEffect(() => {
     if (!community) return
     if (community.tags.geo_json) {
       navigateToGeometry(mapViewRef, community.tags.geo_json)
     }
-    setActiveSheet("area")
   }, [community])
 
   const handleClusterClick = useCallback(
     (cluster: supercluster.ClusterFeature<IMarker>) => {
       const toRegion = cluster.properties.getExpansionRegion()
-      mapViewRef.current?.animateToRegion(toRegion, 150)
+      mapViewRef.current?.animateToRegion(toRegion, 300)
     },
     [],
   )
 
   const handleMarkerSelect = useCallback((pin: IMarker) => {
     setFocusedMarker(pin)
-    mapViewRef.current?.animateCamera({ center: pin.location }, { duration: 250 })
+    mapViewRef.current?.animateToRegion(
+      {
+        latitude: pin.location.latitude,
+        longitude: pin.location.longitude,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      },
+      250,
+    )
     setActiveSheet("merchant")
   }, [])
 
@@ -123,6 +146,27 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
   }, [locationGranted])
 
   const closeSheet = useCallback(() => setActiveSheet(null), [])
+
+  const measurePin = useCallback(() => {
+    pinIconRef.current?.measure((_x, _y, _w, h, _pageX, pageY) => {
+      const pinCenterY = pageY + h / 2
+      const offsetY = pinCenterY - height / 2
+      const latOffset = -(offsetY / height) * region.latitudeDelta
+      setPinCoords({
+        latitude: region.latitude + latOffset,
+        longitude: region.longitude,
+      })
+    })
+  }, [region])
+
+  useEffect(() => {
+    if (activeSheet === "suggest") measurePin()
+  }, [region, activeSheet, measurePin])
+
+  const closeCommunitySheet = useCallback(() => {
+    setSelectedCommunityId(null)
+    setActiveSheet(null)
+  }, [])
 
   const handleMapClick = useCallback((e?: { nativeEvent?: { action?: string } }) => {
     if (e?.nativeEvent?.action === "marker-press") return
@@ -283,7 +327,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
             geojson={communityGeoJson}
             strokeColor="#000000"
             strokeWidth={2}
-            fillColor="rgba(0, 0, 0, 0.05)"
+            fillColor="rgba(247, 147, 26, 0.15)"
           />
         )}
       </MapView>
@@ -330,7 +374,9 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
           <View style={styles.placeMarkerLabel}>
             <Text style={styles.placeMarkerText}>Place the marker</Text>
           </View>
-          <GaloyIcon name="map" size={24} color={colors.primary} />
+          <View ref={pinIconRef} onLayout={measurePin}>
+            <GaloyIcon name="map" size={24} color={colors.primary} />
+          </View>
         </View>
       )}
 
@@ -339,7 +385,10 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         onClose={closeSheet}
         peekHeight={400}
       >
-        <SuggestBusinessCard closeModal={closeSheet} mapViewRef={mapViewRef} />
+        <SuggestBusinessCard
+          closeModal={closeSheet}
+          mapCenter={pinCoords ?? { latitude: region.latitude, longitude: region.longitude }}
+        />
       </BottomSheet>
 
       {searchVisible && (
@@ -377,10 +426,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
 
       <AreaBottomSheet
         visible={activeSheet === "area"}
-        onClose={() => {
-          setSelectedCommunityId(null)
-          closeSheet()
-        }}
+        onClose={closeCommunitySheet}
         community={community}
         isLoading={isLoading}
       />
