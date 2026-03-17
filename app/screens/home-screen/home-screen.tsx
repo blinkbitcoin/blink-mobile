@@ -38,10 +38,13 @@ import { isIos } from "@app/utils/helper"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
+  useCardBalance,
+  useCardData,
   useTransactionSeenState,
 } from "@app/hooks"
 import {
   AccountLevel,
+  CardStatus,
   TransactionFragment,
   TxDirection,
   TxStatus,
@@ -230,7 +233,20 @@ export const HomeScreen: React.FC = () => {
   const usernameTitle = username || phone || LL.common.blinkUser()
 
   const wallets = dataAuthed?.me?.defaultAccount?.wallets
-  const { formattedBalance, satsBalance } = useTotalBalance(wallets)
+
+  const { card } = useCardData()
+  const showCardRow =
+    card?.status === CardStatus.Active || card?.status === CardStatus.Locked
+  const {
+    availableSats: cardBalanceSats,
+    balancePrimary: cardBalancePrimary,
+    balanceSecondary: cardBalanceSecondary,
+  } = useCardBalance(showCardRow ? card?.id : undefined)
+
+  const { formattedBalance, satsBalance } = useTotalBalance(
+    wallets,
+    showCardRow ? cardBalanceSats : undefined,
+  )
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount.level
@@ -530,6 +546,9 @@ export const HomeScreen: React.FC = () => {
           wallets={wallets}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
+          showCardRow={showCardRow}
+          cardBalancePrimary={cardBalancePrimary}
+          cardBalanceSecondary={cardBalanceSecondary}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
