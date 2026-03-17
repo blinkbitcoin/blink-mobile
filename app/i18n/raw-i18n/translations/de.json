@@ -2778,7 +2778,8 @@
         "validation": {
             "required": "Dieses Feld ist erforderlich",
             "minChars": "Muss mindestens {min} Zeichen lang sein",
-            "invalidPostalCode": "Ungültige Postleitzahl"
+            "invalidPostalCode": "Ungültige Postleitzahl, wahrscheinlich ein Tippfehler",
+            "invalidRegion": "Ungültige Regionsauswahl"
         }
     },
     "errors": {
@@ -3140,11 +3141,27 @@
             "addressLine1": "Adresszeile 1",
             "addressLine2": "Adresszeile 2",
             "city": "Stadt",
-            "state": "Bundesland",
-            "postalCode": "Postleitzahl",
             "country": "Land",
             "important": "Wichtig",
             "importantDescription": "Bitte stellen Sie sicher, dass Ihre Adresse korrekt und vollständig ist.",
+            "labels": {
+                "state": "Bundesland",
+                "province": "Provinz",
+                "prefecture": "Präfektur",
+                "oblast": "Oblast",
+                "department": "Departement",
+                "county": "Landkreis",
+                "district": "Bezirk",
+                "doSi": "Do/Si",
+                "island": "Insel",
+                "emirate": "Emirat",
+                "parish": "Gemeinde",
+                "region": "Region",
+                "zip": "Postleitzahl",
+                "postalCode": "Postleitzahl",
+                "eircode": "Eircode",
+                "pin": "PIN-Code"
+            },
             "noPOBoxes": "Karten können nicht an Postfächer geliefert werden",
             "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
             "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
@@ -3293,7 +3310,11 @@
                 "important": "Wichtig",
                 "bullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
                 "bullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
-                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten"
+                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten",
+                "bullet4": "Die Lieferadresse kann nach Aufgabe der Bestellung nicht mehr geändert werden"
+            },
+            "errors": {
+                "createFailed": "Die Bestellung Ihrer physischen Karte ist fehlgeschlagen. Bitte versuchen Sie es erneut."
             }
         },
         "Onboarding": {

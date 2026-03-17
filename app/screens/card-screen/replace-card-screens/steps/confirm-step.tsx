@@ -7,8 +7,9 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { Delivery, DeliveryType } from "@app/screens/card-screen/types"
 
-import { Delivery, DeliveryType, Issue, IssueType } from "./types"
+import { Issue, IssueType } from "./types"
 
 type ConfirmStepProps = {
   issueType: IssueType

@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Acest câmp este obligatoriu",
       "minChars": "Trebuie să aibă cel puțin {min} caractere",
-      "invalidPostalCode": "Cod poștal invalid"
+      "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare",
+      "invalidRegion": "Selectarea regiunii este invalidă"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Adresa linia 1",
       "addressLine2": "Adresa linia 2",
       "city": "Oraș",
-      "state": "Stat",
-      "postalCode": "Cod poștal",
       "country": "Țară",
+      "labels": {
+        "state": "Stat",
+        "province": "Provincie",
+        "prefecture": "Prefectură",
+        "oblast": "Oblast",
+        "department": "Departament",
+        "county": "Județ",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Insulă",
+        "emirate": "Emirat",
+        "parish": "Parohie",
+        "region": "Regiune",
+        "zip": "Cod ZIP",
+        "postalCode": "Cod poștal",
+        "eircode": "Eircode",
+        "pin": "Cod PIN"
+      },
       "important": "Important",
       "importantDescription": "Asigurați-vă că adresa dumneavoastră este corectă și completă.",
       "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",
@@ -3305,7 +3322,11 @@
         "important": "Important",
         "bullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
         "bullet2": "Va trebui să activezi cardul fizic când ajunge",
-        "bullet3": "Ambele carduri vor avea același număr și aceleași detalii"
+        "bullet3": "Ambele carduri vor avea același număr și aceleași detalii",
+        "bullet4": "Adresa de livrare nu poate fi schimbată după plasarea comenzii"
+      },
+      "errors": {
+        "createFailed": "Nu s-a putut comanda cardul tău fizic. Te rugăm să încerci din nou."
       }
     },
     "Onboarding": {

@@ -2781,7 +2781,8 @@
     "validation": {
       "required": "Dette felt er påkrævet",
       "minChars": "Skal være mindst {min} tegn",
-      "invalidPostalCode": "Ugyldigt postnummer"
+      "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl",
+      "invalidRegion": "Ugyldigt regionsvalg"
     }
   },
   "errors": {
@@ -3158,9 +3159,25 @@
       "addressLine1": "Adresselinje 1",
       "addressLine2": "Adresselinje 2",
       "city": "By",
-      "state": "Stat",
-      "postalCode": "Postnummer",
       "country": "Land",
+      "labels": {
+        "state": "Stat",
+        "province": "Provins",
+        "prefecture": "Præfektur",
+        "oblast": "Oblast",
+        "department": "Afdeling",
+        "county": "Amt",
+        "district": "Distrikt",
+        "doSi": "Do/Si",
+        "island": "Ø",
+        "emirate": "Emirat",
+        "parish": "Sogn",
+        "region": "Region",
+        "zip": "Postnummer",
+        "postalCode": "Postnummer",
+        "eircode": "Eircode",
+        "pin": "PIN-kode"
+      },
       "important": "Vigtigt",
       "importantDescription": "Sørg for at din adresse er nøjagtig og komplet.",
       "noPOBoxes": "Kort kan ikke leveres til postbokse",
@@ -3323,7 +3340,11 @@
         "important": "Vigtigt",
         "bullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
         "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
-        "bullet3": "Begge kort vil have samme kortnummer og oplysninger"
+        "bullet3": "Begge kort vil have samme kortnummer og oplysninger",
+        "bullet4": "Leveringsadressen kan ikke ændres, efter ordren er afgivet"
+      },
+      "errors": {
+        "createFailed": "Det lykkedes ikke at bestille dit fysiske kort. Prøv venligst igen."
       }
     },
     "Onboarding": {

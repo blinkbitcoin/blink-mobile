@@ -7,22 +7,27 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import {
+  CardDesign,
+  CardDesignType,
+  Delivery,
+  DeliveryType,
+  ShippingAddress,
+} from "@app/screens/card-screen/types"
+import { addressToLines } from "@app/screens/card-screen/utils"
 
-import { ShippingAddress } from "../../types"
-import { addressToLines } from "../../utils"
-import { Delivery, DeliveryType } from "../../replace-card-screens/steps/types"
 import { useSharedStepStyles } from "./shared-styles"
-
-const MOCK_CARD_DESIGN = "Maxi orange"
 
 type ConfirmStepProps = {
   deliveryType: DeliveryType
   shippingAddress: ShippingAddress
+  cardDesign?: CardDesignType
 }
 
 export const ConfirmStep: React.FC<ConfirmStepProps> = ({
   deliveryType,
   shippingAddress,
+  cardDesign = CardDesign.MaxiOrange,
 }) => {
   const sharedStyles = useSharedStepStyles()
   const {
@@ -58,7 +63,7 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
         items={[
           {
             label: confirmLL.cardDesign(),
-            value: MOCK_CARD_DESIGN,
+            value: cardDesign,
           },
           {
             label: confirmLL.delivery(),
@@ -89,7 +94,12 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
 
       <InfoCard
         title={confirmLL.important()}
-        bulletItems={[confirmLL.bullet1(), confirmLL.bullet2(), confirmLL.bullet3()]}
+        bulletItems={[
+          confirmLL.bullet1(),
+          confirmLL.bullet2(),
+          confirmLL.bullet3(),
+          confirmLL.bullet4(),
+        ]}
         size="lg"
       />
     </>

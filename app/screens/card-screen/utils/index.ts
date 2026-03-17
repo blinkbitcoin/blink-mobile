@@ -1,4 +1,6 @@
 export * from "./address"
+export * from "./address-labels"
+export * from "./address-schema"
 export * from "./amount"
 export * from "./card-display"
 export * from "./card-encryption"

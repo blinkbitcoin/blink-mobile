@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Toto pole je povinné",
       "minChars": "Musí obsahovať aspoň {min} znakov",
-      "invalidPostalCode": "Neplatné PSČ"
+      "invalidPostalCode": "Neplatné PSČ, pravdepodobne preklep",
+      "invalidRegion": "Neplatný výber regiónu"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Adresa riadok 1",
       "addressLine2": "Adresa riadok 2",
       "city": "Mesto",
-      "state": "Štát",
-      "postalCode": "PSČ",
       "country": "Krajina",
+      "labels": {
+        "state": "Štát",
+        "province": "Provincia",
+        "prefecture": "Prefektúra",
+        "oblast": "Oblasť",
+        "department": "Departement",
+        "county": "Okres",
+        "district": "Okres",
+        "doSi": "Do/Si",
+        "island": "Ostrov",
+        "emirate": "Emirát",
+        "parish": "Farnosť",
+        "region": "Región",
+        "zip": "PSČ",
+        "postalCode": "Poštové smerovacie číslo",
+        "eircode": "Eircode",
+        "pin": "PIN kód"
+      },
       "important": "Dôležité",
       "importantDescription": "Uistite sa, že vaša adresa je presná a úplná.",
       "noPOBoxes": "Karty nemožno doručiť na poštové schránky",
@@ -3305,7 +3322,11 @@
         "important": "Dôležité",
         "bullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
         "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
-        "bullet3": "Obe karty budú mať rovnaké číslo a údaje"
+        "bullet3": "Obe karty budú mať rovnaké číslo a údaje",
+        "bullet4": "Doručovaciu adresu nie je možné po zadaní objednávky zmeniť"
+      },
+      "errors": {
+        "createFailed": "Nepodarilo sa objednať vašu fyzickú kartu. Skúste to prosím znova."
       }
     },
     "Onboarding": {

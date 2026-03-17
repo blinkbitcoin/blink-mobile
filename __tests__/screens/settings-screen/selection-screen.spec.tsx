@@ -163,11 +163,11 @@ describe("SelectionScreen", () => {
     beforeEach(() => {
       mockRouteParams.title = "Country"
       mockRouteParams.options = [
-        { value: "USA", label: "United States" },
-        { value: "CAN", label: "Canada" },
-        { value: "MEX", label: "Mexico" },
+        { value: "US", label: "United States" },
+        { value: "CA", label: "Canada" },
+        { value: "MX", label: "Mexico" },
       ]
-      mockRouteParams.selectedValue = "USA"
+      mockRouteParams.selectedValue = "US"
     })
 
     it("renders country selection options", async () => {
@@ -194,7 +194,7 @@ describe("SelectionScreen", () => {
       await act(async () => {})
 
       const menuSelect = getByTestId("menu-select")
-      expect(menuSelect.props.accessibilityHint).toBe("USA")
+      expect(menuSelect.props.accessibilityHint).toBe("US")
     })
   })
 

@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Sehemu hii inahitajika",
       "minChars": "Lazima iwe na angalau herufi {min}",
-      "invalidPostalCode": "Nambari ya posta si sahihi"
+      "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika",
+      "invalidRegion": "Uchaguzi wa eneo si sahihi"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Mstari wa anwani 1",
       "addressLine2": "Mstari wa anwani 2",
       "city": "Jiji",
-      "state": "Jimbo",
-      "postalCode": "Msimbo wa posta",
       "country": "Nchi",
+      "labels": {
+        "state": "Jimbo",
+        "province": "Mkoa",
+        "prefecture": "Wilaya",
+        "oblast": "Oblast",
+        "department": "Idara",
+        "county": "Kaunti",
+        "district": "Wilaya",
+        "doSi": "Do/Si",
+        "island": "Kisiwa",
+        "emirate": "Emirate",
+        "parish": "Parokia",
+        "region": "Eneo",
+        "zip": "Msimbo wa ZIP",
+        "postalCode": "Msimbo wa posta",
+        "eircode": "Eircode",
+        "pin": "Msimbo wa PIN"
+      },
       "important": "Muhimu",
       "importantDescription": "Tafadhali hakikisha anwani yako ni sahihi na kamili.",
       "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
@@ -3305,7 +3322,11 @@
         "important": "Muhimu",
         "bullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
         "bullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
-        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale"
+        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale",
+        "bullet4": "Anwani ya usafirishaji haiwezi kubadilishwa baada ya agizo kutolewa"
+      },
+      "errors": {
+        "createFailed": "Imeshindikana kuagiza kadi yako halisi. Tafadhali jaribu tena."
       }
     },
     "Onboarding": {

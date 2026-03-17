@@ -21,7 +21,7 @@ const mockAddress: ShippingAddress = {
   city: "New York",
   region: "NY",
   postalCode: "10001",
-  countryCode: "USA",
+  countryCode: "US",
 }
 
 const emptyAddress: ShippingAddress = {
@@ -209,7 +209,7 @@ describe("useReplaceCardFlow", () => {
         city: "Austin",
         region: "TX",
         postalCode: "73301",
-        countryCode: "USA",
+        countryCode: "US",
       }
 
       act(() => {

@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Bu alan zorunludur",
       "minChars": "En az {min} karakter olmalıdır",
-      "invalidPostalCode": "Geçersiz posta kodu"
+      "invalidPostalCode": "Geçersiz posta kodu, muhtemelen yazım hatası",
+      "invalidRegion": "Geçersiz bölge seçimi"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Adres satırı 1",
       "addressLine2": "Adres satırı 2",
       "city": "Şehir",
-      "state": "İl",
-      "postalCode": "Posta kodu",
       "country": "Ülke",
+      "labels": {
+        "state": "İl",
+        "province": "Eyalet",
+        "prefecture": "Vilayet",
+        "oblast": "Oblast",
+        "department": "İlçe",
+        "county": "İlçe",
+        "district": "İlçe",
+        "doSi": "Do/Si",
+        "island": "Ada",
+        "emirate": "Emirlik",
+        "parish": "Bucak",
+        "region": "Bölge",
+        "zip": "Posta kodu",
+        "postalCode": "Posta kodu",
+        "eircode": "Eircode",
+        "pin": "PIN kodu"
+      },
       "important": "Önemli",
       "importantDescription": "Lütfen adresinizin doğru ve eksiksiz olduğundan emin olun.",
       "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
@@ -3305,7 +3322,11 @@
         "important": "Önemli",
         "bullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
         "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak",
+        "bullet4": "Kargo adresi sipariş verildikten sonra değiştirilemez"
+      },
+      "errors": {
+        "createFailed": "Fiziksel kartınız sipariş edilemedi. Lütfen tekrar deneyin."
       }
     },
     "Onboarding": {

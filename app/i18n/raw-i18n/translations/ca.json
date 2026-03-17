@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Aquest camp és obligatori",
       "minChars": "Ha de tenir almenys {min} caràcters",
-      "invalidPostalCode": "Codi postal no vàlid"
+      "invalidPostalCode": "Codi postal no vàlid, probablement un error tipogràfic",
+      "invalidRegion": "Selecció de regió no vàlida"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Adreça línia 1",
       "addressLine2": "Adreça línia 2",
       "city": "Ciutat",
-      "state": "Estat",
-      "postalCode": "Codi postal",
       "country": "País",
+      "labels": {
+        "state": "Estat",
+        "province": "Província",
+        "prefecture": "Prefectura",
+        "oblast": "Oblast",
+        "department": "Departament",
+        "county": "Comtat",
+        "district": "Districte",
+        "doSi": "Do/Si",
+        "island": "Illa",
+        "emirate": "Emirat",
+        "parish": "Parròquia",
+        "region": "Regió",
+        "zip": "Codi ZIP",
+        "postalCode": "Codi postal",
+        "eircode": "Eircode",
+        "pin": "Codi PIN"
+      },
       "important": "Important",
       "importantDescription": "Assegureu-vos que la vostra adreça sigui precisa i completa.",
       "noPOBoxes": "Les targetes no es poden lliurar a apartats de correus",
@@ -3305,7 +3322,11 @@
         "important": "Important",
         "bullet1": "La teva targeta virtual romandrà activa mentre esperes la targeta física",
         "bullet2": "Hauràs d'activar la targeta física quan arribi",
-        "bullet3": "Totes dues targetes tindran el mateix número i dades"
+        "bullet3": "Totes dues targetes tindran el mateix número i dades",
+        "bullet4": "L'adreça d'enviament no es pot canviar un cop feta la comanda"
+      },
+      "errors": {
+        "createFailed": "No s'ha pogut demanar la teva targeta física. Si us plau, torna-ho a provar."
       }
     },
     "Onboarding": {

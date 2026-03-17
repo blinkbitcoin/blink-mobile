@@ -118,7 +118,7 @@ describe("CardApprovedScreen", () => {
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: "NAVIGATE",
-      payload: { name: "cardOrderScreen" },
+      payload: { name: "orderCardScreen" },
     })
   })
 })

@@ -15,10 +15,10 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { ShippingAddress } from "../../types"
-import { addressToLines } from "../../utils"
+import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
+import { addressToLines } from "@app/screens/card-screen/utils"
+
 import { useSharedStepStyles } from "./shared-styles"
-import { Delivery, DeliveryType } from "./types"
 
 type DeliveryStepProps = {
   selectedDelivery: DeliveryType | null

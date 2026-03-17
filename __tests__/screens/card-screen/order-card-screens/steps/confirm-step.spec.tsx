@@ -45,6 +45,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
             bullet1: () => "Your card will be shipped to the address provided",
             bullet2: () => "Delivery times are estimates and may vary",
             bullet3: () => "You will receive a notification when your card ships",
+            bullet4: () => "Shipping address cannot be changed after order is placed",
           },
         },
       },
@@ -76,21 +77,10 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Usd: "USD" },
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({}))
-
 jest.mock("@app/screens/card-screen/utils", () => ({
-  addressToLines: (address: ShippingAddress, includeFullName = true) => {
-    const lines: string[] = []
-    if (includeFullName) {
-      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
-      if (name) lines.push(name)
-    }
-    lines.push(address.line1)
-    if (address.line2) lines.push(address.line2)
-    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
-    lines.push(address.countryCode)
-    return lines
-  },
+  addressToLines: jest.requireActual<typeof import("../../helpers/mock-address-utils")>(
+    "../../helpers/mock-address-utils",
+  ).mockAddressToLines,
 }))
 
 jest.mock("@app/components/card-screen", () => ({
@@ -135,7 +125,7 @@ describe("ConfirmStep", () => {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   }
 
   beforeEach(jest.clearAllMocks)
@@ -227,8 +217,8 @@ describe("ConfirmStep", () => {
       expect(getByText("Satoshi Nakamoto")).toBeTruthy()
       expect(getByText("123 Main Street")).toBeTruthy()
       expect(getByText("Apt 4B")).toBeTruthy()
-      expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("New York, NY, 10001")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
     })
   })
 })

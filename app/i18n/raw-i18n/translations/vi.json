@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Trường này là bắt buộc",
       "minChars": "Phải có ít nhất {min} ký tự",
-      "invalidPostalCode": "Mã bưu chính không hợp lệ"
+      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
+      "invalidRegion": "Lựa chọn vùng không hợp lệ"
     }
   },
   "errors": {
@@ -3178,9 +3179,25 @@
       "addressLine1": "Địa chỉ dòng 1",
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",
-      "state": "Tỉnh/Bang",
-      "postalCode": "Mã bưu điện",
       "country": "Quốc gia",
+      "labels": {
+        "state": "Bang",
+        "province": "Tỉnh",
+        "prefecture": "Quận",
+        "oblast": "Vùng",
+        "department": "Sở",
+        "county": "Huyện",
+        "district": "Quận",
+        "doSi": "Do/Si",
+        "island": "Đảo",
+        "emirate": "Tiểu vương quốc",
+        "parish": "Xứ đạo",
+        "region": "Vùng",
+        "zip": "Mã ZIP",
+        "postalCode": "Mã bưu điện",
+        "eircode": "Eircode",
+        "pin": "Mã PIN"
+      },
       "important": "Quan trọng",
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
@@ -3343,7 +3360,11 @@
         "important": "Quan trọng",
         "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
         "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin",
+        "bullet4": "Không thể thay đổi địa chỉ giao hàng sau khi đặt hàng"
+      },
+      "errors": {
+        "createFailed": "Không thể đặt thẻ vật lý của bạn. Vui lòng thử lại."
       }
     },
     "Onboarding": {

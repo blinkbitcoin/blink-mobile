@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Hierdie veld is verpligtend",
       "minChars": "Moet ten minste {min} karakters wees",
-      "invalidPostalCode": "Ongeldige poskode"
+      "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
+      "invalidRegion": "Ongeldige streekkeuse"
     }
   },
   "errors": {
@@ -3181,9 +3182,25 @@
       "addressLine1": "Adreslyn 1",
       "addressLine2": "Adreslyn 2",
       "city": "Stad",
-      "state": "Staat",
-      "postalCode": "Poskode",
       "country": "Land",
+      "labels": {
+        "state": "Staat",
+        "province": "Provinsie",
+        "prefecture": "Prefektuur",
+        "oblast": "Oblast",
+        "department": "Departement",
+        "county": "Graafskap",
+        "district": "Distrik",
+        "doSi": "Do/Si",
+        "island": "Eiland",
+        "emirate": "Emiraat",
+        "parish": "Gemeente",
+        "region": "Streek",
+        "zip": "Poskode",
+        "postalCode": "Poskode",
+        "eircode": "Eircode",
+        "pin": "PIN-kode"
+      },
       "important": "Belangrik",
       "importantDescription": "Maak asseblief seker dat jou adres akkuraat en volledig is.",
       "noPOBoxes": "Kaarte kan nie by posbusse afgelewer word nie",
@@ -3346,7 +3363,11 @@
         "important": "Belangrik",
         "bullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
         "bullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
-        "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+        "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê",
+        "bullet4": "Versendadres kan nie verander word nadat die bestelling geplaas is nie"
+      },
+      "errors": {
+        "createFailed": "Kon nie jou fisiese kaart bestel nie. Probeer asseblief weer."
       }
     },
     "Onboarding": {

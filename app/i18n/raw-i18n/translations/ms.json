@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Medan ini diperlukan",
       "minChars": "Mesti sekurang-kurangnya {min} aksara",
-      "invalidPostalCode": "Poskod tidak sah"
+      "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
+      "invalidRegion": "Pilihan wilayah tidak sah"
     }
   },
   "errors": {
@@ -3181,9 +3182,25 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Bandar",
-      "state": "Negeri",
-      "postalCode": "Poskod",
       "country": "Negara",
+      "labels": {
+        "state": "Negeri",
+        "province": "Wilayah",
+        "prefecture": "Prefektur",
+        "oblast": "Oblast",
+        "department": "Jabatan",
+        "county": "Daerah",
+        "district": "Daerah",
+        "doSi": "Do/Si",
+        "island": "Pulau",
+        "emirate": "Emirat",
+        "parish": "Parish",
+        "region": "Wilayah",
+        "zip": "Kod ZIP",
+        "postalCode": "Kod pos",
+        "eircode": "Eircode",
+        "pin": "Kod PIN"
+      },
       "important": "Penting",
       "importantDescription": "Sila pastikan alamat anda tepat dan lengkap.",
       "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",
@@ -3346,7 +3363,11 @@
         "important": "Penting",
         "bullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
         "bullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
-        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama",
+        "bullet4": "Alamat penghantaran tidak boleh ditukar selepas pesanan dibuat"
+      },
+      "errors": {
+        "createFailed": "Gagal membuat pesanan kad fizikal anda. Sila cuba lagi."
       }
     },
     "Onboarding": {

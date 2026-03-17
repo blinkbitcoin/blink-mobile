@@ -1,38 +1,109 @@
-import { postcodeValidator } from "postcode-validator"
-
 import { ShippingAddress as GqlShippingAddress } from "@app/graphql/generated"
+import { getCountryLabel } from "@app/utils/address-metadata"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
-import { getIsoAlpha2 } from "../country-region-data"
+import { buildAddressSchema, FieldRule } from "./address-schema"
 
-// TODO: replace with a more robust solution (e.g. pobox-regex library) that also
-// covers other languages if needed when adding support for more countries
-const PO_BOX_REGEX = /\bP\.?\s*O\.?\s*B(ox)?\.?\b|Post\s*Office\s*Box/i
+// Multilingual PO Box patterns:
+// English: P.O. Box, PO Box, POB, Post Office Box
+// French: Boîte postale, Case postale, BP
+// Spanish: Apartado, Apartado postal, Apdo
+// German: Postfach
+// Portuguese: Caixa postal, CP
+const PO_BOX_REGEX =
+  /\bP\.?\s*O\.?\s*B(ox)?\.?\b|Post\s*Office\s*Box|Bo[îi]te\s*postale|Case\s*postale|\bBP\s*\d|Apartado(\s*postal)?|\bApdo\.?\b|Postfach|Caixa\s*postal|\bCP\s*\d/i
 
-export const validatePOBox = ({
-  value,
-  errorMessage,
-}: {
-  value: string
-  errorMessage: string
-}): string | undefined => {
-  if (PO_BOX_REGEX.test(value)) return errorMessage
+const isPOBox = (value: string): boolean => PO_BOX_REGEX.test(value)
+
+type FieldCheck = {
+  trimmed: string
+  raw: string
+  rule: FieldRule
+}
+
+const validateField = (
+  { trimmed, raw, rule }: FieldCheck,
+  messages: ValidationMessages,
+): string | undefined => {
+  if (rule.required && trimmed.length === 0) return messages.required
+  if (trimmed.length === 0) return undefined
+
+  if (rule.minLength && trimmed.length < rule.minLength)
+    return messages.minChars({ min: rule.minLength })
+
+  if (rule.noPOBox && isPOBox(raw)) return messages.noPOBoxes
+
+  if (rule.pattern && !rule.pattern.test(trimmed)) return messages.invalidPostalCode
+
+  if (rule.enum && !rule.enum.includes(trimmed)) return messages.invalidRegion
+
   return undefined
 }
 
-export const validatePostalCode = ({
-  value,
-  countryCode,
-  errorMessage,
-}: {
-  value: string
-  countryCode: string
-  errorMessage: string
-}): string | undefined => {
-  const isoAlpha2 = getIsoAlpha2(countryCode)
-  if (!isoAlpha2 || value.length === 0) return undefined
-  if (!postcodeValidator(value, isoAlpha2)) return errorMessage
-  return undefined
+export type ValidationMessages = {
+  required: string
+  minChars: (params: { min: number }) => string
+  noPOBoxes: string
+  invalidPostalCode: string
+  invalidRegion: string
 }
+
+export type AddressErrors = Partial<Record<keyof ShippingAddress, string>>
+
+export type AddressValidation = {
+  errors: AddressErrors
+  isValid: boolean
+  isPostalCodeRequired: boolean
+}
+
+export const validateAddress = (
+  address: ShippingAddress,
+  messages: ValidationMessages,
+  { checkFullName = true }: { checkFullName?: boolean } = {},
+): AddressValidation => {
+  const schema = buildAddressSchema(address.countryCode)
+  const errors: AddressErrors = {}
+
+  const fieldsToCheck: (keyof ShippingAddress)[] = checkFullName
+    ? [
+        "firstName",
+        "lastName",
+        "line1",
+        "line2",
+        "city",
+        "region",
+        "postalCode",
+        "countryCode",
+      ]
+    : ["line1", "line2", "city", "region", "postalCode", "countryCode"]
+
+  for (const field of fieldsToCheck) {
+    const rule = schema.fields[field]
+    const raw = address[field]
+    const trimmed = raw.trim()
+    const error = validateField({ trimmed, raw, rule }, messages)
+    if (error !== undefined) errors[field] = error
+  }
+
+  return {
+    errors,
+    isValid: Object.keys(errors).length === 0,
+    isPostalCodeRequired: schema.fields.postalCode.required,
+  }
+}
+
+const EMPTY_MESSAGES: ValidationMessages = {
+  required: "",
+  minChars: () => "",
+  noPOBoxes: "",
+  invalidPostalCode: "",
+  invalidRegion: "",
+}
+
+export const isAddressValid = (
+  address: ShippingAddress,
+  { checkFullName = true }: { checkFullName?: boolean } = {},
+): boolean => validateAddress(address, EMPTY_MESSAGES, { checkFullName }).isValid
 
 export type AddressFields = Pick<
   GqlShippingAddress,
@@ -57,6 +128,6 @@ export const addressToLines = (
       : null,
     address.line1,
     address.line2 || null,
-    `${address.city}, ${address.region} ${address.postalCode}`,
-    address.country ?? address.countryCode,
+    [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
+    address.country ?? getCountryLabel(address.countryCode),
   ].filter((line): line is string => line !== null)
