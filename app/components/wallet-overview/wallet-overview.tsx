@@ -9,7 +9,8 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config/appinfo"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -59,6 +60,9 @@ type Props = {
   wallets?: readonly WalletBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
+  showCardRow?: boolean
+  cardBalancePrimary?: string
+  cardBalanceSecondary?: string
 }
 
 const WalletOverview: React.FC<Props> = ({
@@ -67,6 +71,9 @@ const WalletOverview: React.FC<Props> = ({
   wallets,
   showBtcNotification = false,
   showUsdNotification = false,
+  showCardRow = false,
+  cardBalancePrimary,
+  cardBalanceSecondary,
 }) => {
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
@@ -125,6 +132,7 @@ const WalletOverview: React.FC<Props> = ({
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
+  const [pressedCard, setPressedCard] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   return (
@@ -164,7 +172,7 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : hideAmount ? (
-            <Text>****</Text>
+            <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
               <Text type="p1" bold {...testProps("bitcoin-balance")}>
@@ -222,11 +230,49 @@ const WalletOverview: React.FC<Props> = ({
                   </Text>
                 </>
               )}
-              {hideAmount && <Text>****</Text>}
+              {hideAmount && <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>}
             </View>
           )}
         </View>
       </Pressable>
+
+      {showCardRow && (
+        <>
+          <View style={styles.separator} />
+          <Pressable
+            onPressIn={() => setPressedCard(true)}
+            onPressOut={() => setPressedCard(false)}
+            onPress={() => navigation.navigate("cardDashboardScreen")}
+          >
+            <View style={styles.displayTextView}>
+              <View style={styles.currency}>
+                <View style={styles.bubbleWrapper} pointerEvents="box-none">
+                  <View style={pressedCard && styles.pressedOpacity}>
+                    <CurrencyPill
+                      currency={CARD}
+                      containerSize="medium"
+                      containerStyle={pillWidthStyle}
+                      onLayout={onPillLayout(CARD)}
+                    />
+                  </View>
+                </View>
+              </View>
+              {loading ? (
+                <Loader />
+              ) : hideAmount ? (
+                <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>
+              ) : (
+                <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
+                  <Text type="p1" bold>
+                    {cardBalanceSecondary}
+                  </Text>
+                  <Text type="p3">{cardBalancePrimary}</Text>
+                </View>
+              )}
+            </View>
+          </Pressable>
+        </>
+      )}
     </View>
   )
 }
