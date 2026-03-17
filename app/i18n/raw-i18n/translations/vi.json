@@ -3167,7 +3167,8 @@
       "CardApproved": {
         "title": "Chúc mừng!",
         "subtitle": "Thẻ Blink Visa của bạn đã được kích hoạt.",
-        "buttonLabel": "Đặt thẻ vật lý"
+        "buttonLabel": "Đặt thẻ vật lý",
+        "buttonLabelDashboard": "Bảng điều khiển"
       },
       "PhysicalCardOrdered": {
         "title": "Thẻ vật lý của bạn đang trên đường!",

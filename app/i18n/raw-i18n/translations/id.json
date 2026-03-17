@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Selamat!",
         "subtitle": "Kartu Blink Visa Anda telah diaktifkan.",
-        "buttonLabel": "Pesan kartu fisik"
+        "buttonLabel": "Pesan kartu fisik",
+        "buttonLabelDashboard": "Dasbor"
       },
       "PhysicalCardOrdered": {
         "title": "Kartu fisik Anda sedang dalam perjalanan!",

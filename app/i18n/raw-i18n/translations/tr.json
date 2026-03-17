@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Tebrikler!",
         "subtitle": "Blink Visa kartınız etkinleştirildi.",
-        "buttonLabel": "Fiziksel kart sipariş et"
+        "buttonLabel": "Fiziksel kart sipariş et",
+        "buttonLabelDashboard": "Gösterge Paneli"
       },
       "PhysicalCardOrdered": {
         "title": "Fiziksel kartınız yolda!",

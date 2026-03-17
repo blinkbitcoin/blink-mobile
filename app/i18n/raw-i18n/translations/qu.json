@@ -3167,7 +3167,8 @@
       "CardApproved": {
         "title": "¡Kusikuyki!",
         "subtitle": "Blink Visa tarjetayki qallarisqa.",
-        "buttonLabel": "Tarjeta físicata mañakuy"
+        "buttonLabel": "Tarjeta físicata mañakuy",
+        "buttonLabelDashboard": "Ñawpaq panqa"
       },
       "PhysicalCardOrdered": {
         "title": "¡Tarjeta físicayki ñanpi kachkan!",

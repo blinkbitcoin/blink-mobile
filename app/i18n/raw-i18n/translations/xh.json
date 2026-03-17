@@ -3176,7 +3176,8 @@
       "CardApproved": {
         "title": "Sivuyisana nawe!",
         "subtitle": "Ikhadi lakho le-Blink Visa livuselelwe.",
-        "buttonLabel": "Odola ikhadi lokwenyani"
+        "buttonLabel": "Odola ikhadi lokwenyani",
+        "buttonLabelDashboard": "Ideshibhodi"
       },
       "PhysicalCardOrdered": {
         "title": "Ikhadi lakho lokwenyani lisendleleni!",

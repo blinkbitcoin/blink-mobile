@@ -3242,6 +3242,7 @@ const en: BaseTranslation = {
         title: "Congratulations!",
         subtitle: "Your Blink Visa Card has been activated.",
         buttonLabel: "Order physical card",
+        buttonLabelDashboard: "Dashboard",
       },
       PhysicalCardOrdered: {
         title: "Your physical card is on the way!",

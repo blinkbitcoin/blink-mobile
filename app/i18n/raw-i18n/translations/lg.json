@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Weebale!",
         "subtitle": "Kaadi yo eya Blink Visa etandise okukola.",
-        "buttonLabel": "Tegeka kaadi ey'ekikula"
+        "buttonLabel": "Tegeka kaadi ey'ekikula",
+        "buttonLabelDashboard": "Dashiboodi"
       },
       "PhysicalCardOrdered": {
         "title": "Kaadi yo ey'ekikula eri mu kkubo!",

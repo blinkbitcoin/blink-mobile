@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Hongera!",
         "subtitle": "Kadi yako ya Blink Visa imeamilishwa.",
-        "buttonLabel": "Agiza kadi halisi"
+        "buttonLabel": "Agiza kadi halisi",
+        "buttonLabelDashboard": "Dashibodi"
       },
       "PhysicalCardOrdered": {
         "title": "Kadi yako halisi iko njiani!",

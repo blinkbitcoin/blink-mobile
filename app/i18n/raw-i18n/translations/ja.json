@@ -3170,7 +3170,8 @@
             "CardApproved": {
                 "title": "おめでとうございます！",
                 "subtitle": "Blink Visaカードが有効化されました。",
-                "buttonLabel": "物理カードを注文"
+                "buttonLabel": "物理カードを注文",
+                "buttonLabelDashboard": "ダッシュボード"
             },
             "PhysicalCardOrdered": {
                 "title": "物理カードは配送中です！",

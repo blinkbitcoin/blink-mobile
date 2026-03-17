@@ -3147,7 +3147,8 @@
       "CardApproved": {
         "title": "Tillykke!",
         "subtitle": "Dit Blink Visa-kort er blevet aktiveret.",
-        "buttonLabel": "Bestil fysisk kort"
+        "buttonLabel": "Bestil fysisk kort",
+        "buttonLabelDashboard": "Oversigt"
       },
       "PhysicalCardOrdered": {
         "title": "Dit fysiske kort er på vej!",

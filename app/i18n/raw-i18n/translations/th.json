@@ -3167,7 +3167,8 @@
       "CardApproved": {
         "title": "ยินดีด้วย!",
         "subtitle": "บัตร Blink Visa ของคุณได้รับการเปิดใช้งานแล้ว",
-        "buttonLabel": "สั่งบัตรจริง"
+        "buttonLabel": "สั่งบัตรจริง",
+        "buttonLabelDashboard": "แดชบอร์ด"
       },
       "PhysicalCardOrdered": {
         "title": "บัตรจริงของคุณกำลังจัดส่ง!",
