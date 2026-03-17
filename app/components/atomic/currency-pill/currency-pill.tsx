@@ -3,6 +3,7 @@ import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { CARD, CardCurrency } from "@app/types/amounts"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 export const CURRENCY_PILL_PADDING_HORIZONTAL = 8
@@ -22,7 +23,7 @@ export const CurrencyPill = ({
   containerStyle,
   onLayout,
 }: {
-  currency?: WalletCurrency | "ALL"
+  currency?: WalletCurrency | "ALL" | CardCurrency
   label?: string
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
@@ -57,6 +58,12 @@ export const CurrencyPill = ({
           defaultText: LL.common.dollar(),
           color: highlighted ? colors._white : colors._white,
           backgroundColor: highlighted ? colors._green : colors.grey3,
+        }
+      case CARD:
+        return {
+          defaultText: LL.common.card(),
+          color: colors._white,
+          backgroundColor: colors.grey4,
         }
       default:
         return {
