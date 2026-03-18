@@ -22,6 +22,8 @@ import {
   PaymentType,
 } from "@blinkbitcoin/blink-client"
 
+import Clipboard from "@react-native-clipboard/clipboard"
+
 import { ContextForScreen } from "./helper"
 
 type MockedContact = {
@@ -115,6 +117,17 @@ const sendBitcoinDestination = {
   },
 } as const
 
+const getResponderByLabel = (label: string) => {
+  const responders = screen
+    .UNSAFE_getAllByType(View)
+    .filter((node) => typeof node.props.onResponderRelease === "function")
+  const match = responders.find((node) => within(node).queryByLabelText(label))
+  if (!match) {
+    throw new Error(`Responder not found for label: ${label}`)
+  }
+  return match
+}
+
 describe("SendBitcoinDestinationScreen", () => {
   let LL: ReturnType<typeof i18nObject>
   const parseDestinationMock = parseDestination as jest.MockedFunction<
@@ -155,17 +168,6 @@ describe("SendBitcoinDestinationScreen", () => {
     commentAllowed: 140,
     rawData: {},
   })
-
-  const getResponderByLabel = (label: string) => {
-    const responders = screen
-      .UNSAFE_getAllByType(View)
-      .filter((node) => typeof node.props.onResponderRelease === "function")
-    const match = responders.find((node) => within(node).queryByLabelText(label))
-    if (!match) {
-      throw new Error(`Responder not found for label: ${label}`)
-    }
-    return match
-  }
 
   const createUsernameDoesNotExistResult = (handle: string): ParseDestinationResult => {
     const invalidPaymentDestination: ParsedPaymentDestination = {
@@ -860,5 +862,69 @@ describe("SendBitcoinDestinationScreen", () => {
       )
       expect(parseDestinationMock).toHaveBeenCalledTimes(1)
     })
+  })
+})
+describe("SendBitcoinDestinationScreen paste buttons", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const parseDestinationMock = parseDestination as jest.MockedFunction<
+    typeof parseDestination
+  >
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+  })
+
+  it("search paste button works when phone input is active", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "clipboard",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "70000000")
+    await flushAsync()
+
+    const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+    const pasteButton = within(searchResponder).getByText(LL.common.paste())
+    fireEvent.press(pasteButton)
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "clipboard" }),
+    )
+  })
+
+  it("phone paste button works when search input is active", async () => {
+    jest.mocked(Clipboard.getString).mockResolvedValueOnce("+50370000000")
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    const pasteButtons = screen.getAllByText(LL.common.paste())
+    const phonePasteButton = pasteButtons[1]
+
+    fireEvent.press(phonePasteButton)
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByLabelText("telephoneNumber").props.value).toBeTruthy()
   })
 })

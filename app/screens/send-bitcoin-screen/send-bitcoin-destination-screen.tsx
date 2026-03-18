@@ -727,10 +727,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
               <GaloyIcon name="close" size={24} color={styles.icon.color} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              onPress={handlePaste}
-              disabled={activeInputRef.current === InputType.Phone}
-            >
+            <TouchableOpacity onPress={handlePaste}>
               <View style={styles.iconContainer}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
@@ -997,10 +994,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
                 <GaloyIcon name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                onPress={handlePastePhone}
-                disabled={activeInputRef.current === InputType.Search}
-              >
+              <TouchableOpacity onPress={handlePastePhone}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
                 </Text>
