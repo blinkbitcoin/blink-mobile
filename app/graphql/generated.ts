@@ -595,11 +595,19 @@ export const CardStatus = {
 export type CardStatus = typeof CardStatus[keyof typeof CardStatus];
 export type CardTransaction = {
   readonly __typename: 'CardTransaction';
-  readonly amount: Scalars['Float']['output'];
+  readonly amount: Scalars['Int']['output'];
   readonly cardId: Scalars['String']['output'];
   readonly createdAt: Scalars['DateTime']['output'];
   readonly currency: Scalars['String']['output'];
+  readonly enrichedMerchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly enrichedMerchantName?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
+  readonly localAmount?: Maybe<Scalars['Int']['output']>;
+  readonly localCurrency?: Maybe<Scalars['String']['output']>;
+  readonly merchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly merchantCategoryCode?: Maybe<Scalars['String']['output']>;
+  readonly merchantCity?: Maybe<Scalars['String']['output']>;
+  readonly merchantCountry?: Maybe<Scalars['String']['output']>;
   readonly merchantName: Scalars['String']['output'];
   readonly status: TransactionStatus;
 };
@@ -651,7 +659,6 @@ export type ConsumerAccount = Account & {
   readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>;
   readonly callbackPortalUrl: Scalars['String']['output'];
   readonly cardConsumerApplications: ReadonlyArray<ConsumerApplication>;
-  readonly cardTransactions: ReadonlyArray<CardTransaction>;
   readonly cards: ReadonlyArray<Card>;
   /** return CSV stream, base64 encoded, of the list of transactions in the wallet */
   readonly csvTransactions: Scalars['String']['output'];
@@ -678,11 +685,6 @@ export type ConsumerAccount = Account & {
   readonly walletById: Wallet;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly welcomeProfile?: Maybe<WelcomeProfile>;
-};
-
-
-export type ConsumerAccountCardTransactionsArgs = {
-  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2517,7 +2519,9 @@ export const TransactionStatus = {
   Completed: 'COMPLETED',
   Declined: 'DECLINED',
   Pending: 'PENDING',
-  Reversed: 'REVERSED'
+  Refunded: 'REFUNDED',
+  Reversed: 'REVERSED',
+  Unknown: 'UNKNOWN'
 } as const;
 
 export type TransactionStatus = typeof TransactionStatus[keyof typeof TransactionStatus];
@@ -9286,7 +9290,6 @@ export type ResolversTypes = {
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardTransactionConnection: ResolverTypeWrapper<CardTransactionConnection>;
   CardTransactionEdge: ResolverTypeWrapper<CardTransactionEdge>;
   CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
@@ -9305,6 +9308,7 @@ export type ResolversTypes = {
   ContactPayload: ResolverTypeWrapper<ContactPayload>;
   ContactType: ContactType;
   Coordinates: ResolverTypeWrapper<Coordinates>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']['output']>;
   Currency: ResolverTypeWrapper<Currency>;
@@ -9567,7 +9571,6 @@ export type ResolversParentTypes = {
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
   CardTransaction: CardTransaction;
-  Float: Scalars['Float']['output'];
   CardTransactionConnection: CardTransactionConnection;
   CardTransactionEdge: CardTransactionEdge;
   CardTransactionPageInfo: CardTransactionPageInfo;
@@ -9584,6 +9587,7 @@ export type ResolversParentTypes = {
   ContactId: Scalars['ContactId']['output'];
   ContactPayload: ContactPayload;
   Coordinates: Coordinates;
+  Float: Scalars['Float']['output'];
   Country: Country;
   CountryCode: Scalars['CountryCode']['output'];
   Currency: Currency;
@@ -9992,11 +9996,19 @@ export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends 
 };
 
 export type CardTransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransaction'] = ResolversParentTypes['CardTransaction']> = {
-  amount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  amount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   cardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  enrichedMerchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  enrichedMerchantName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  localAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  localCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCategoryCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -10037,7 +10049,6 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
   callbackEndpoints?: Resolver<ReadonlyArray<ResolversTypes['CallbackEndpoint']>, ParentType, ContextType>;
   callbackPortalUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardConsumerApplications?: Resolver<ReadonlyArray<ResolversTypes['ConsumerApplication']>, ParentType, ContextType>;
-  cardTransactions?: Resolver<ReadonlyArray<ResolversTypes['CardTransaction']>, ParentType, ContextType, Partial<ConsumerAccountCardTransactionsArgs>>;
   cards?: Resolver<ReadonlyArray<ResolversTypes['Card']>, ParentType, ContextType>;
   csvTransactions?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<ConsumerAccountCsvTransactionsArgs, 'walletIds'>>;
   defaultWallet?: Resolver<ResolversTypes['PublicWallet'], ParentType, ContextType>;
