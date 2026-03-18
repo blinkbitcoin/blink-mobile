@@ -4,8 +4,6 @@ import { render, fireEvent } from "@testing-library/react-native"
 
 import { CardBalanceSection } from "@app/components/card-screen/card-balance-section"
 
-jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
-
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -20,6 +18,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
+  useTheme: () => ({ theme: { colors: { black: "#000000" } } }),
   makeStyles: () => () => ({
     container: {},
     balanceColumn: {},

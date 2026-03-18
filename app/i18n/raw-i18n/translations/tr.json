@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Bu alan zorunludur",
       "minChars": "En az {min} karakter olmalıdır",
-      "invalidPostalCode": "Geçersiz posta kodu"
+      "invalidPostalCode": "Geçersiz posta kodu, muhtemelen yazım hatası",
+      "invalidRegion": "Geçersiz bölge seçimi"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Adres satırı 1",
       "addressLine2": "Adres satırı 2",
       "city": "Şehir",
-      "state": "İl",
-      "postalCode": "Posta kodu",
       "country": "Ülke",
+      "labels": {
+        "state": "İl",
+        "province": "Eyalet",
+        "prefecture": "Vilayet",
+        "oblast": "Oblast",
+        "department": "İlçe",
+        "county": "İlçe",
+        "district": "İlçe",
+        "doSi": "Do/Si",
+        "island": "Ada",
+        "emirate": "Emirlik",
+        "parish": "Bucak",
+        "region": "Bölge",
+        "zip": "Posta kodu",
+        "postalCode": "Posta kodu",
+        "eircode": "Eircode",
+        "pin": "PIN kodu"
+      },
       "important": "Önemli",
       "importantDescription": "Lütfen adresinizin doğru ve eksiksiz olduğundan emin olun.",
       "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
@@ -3238,16 +3255,28 @@
         "issueType": "Neden",
         "deliveryTime": "Teslimat süresi",
         "shippingCost": "Teslimat ücreti",
-        "bullet1": "Mevcut kartınız yeni kart gelene kadar aktif kalacak",
-        "bullet2": "Yeni kartınız mevcut kartınızla aynı numaralara sahip olacak",
-        "bullet3": "Yeni kart geldiğinde hasarlı kartınızı imha edin"
+        "DamagedInfo": {
+          "bullet1": "Mevcut kartınız yenisi gelene kadar aktif kalacak",
+          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
+          "bullet3": "Yenisi geldiğinde hasarlı kartınızı imha edin"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kartınız korumanız için kilitlendi",
+          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
+          "bullet3": "Eski kartınız kalıcı olarak iptal edilecek"
+        }
       },
       "Status": {
         "title": "Yeni kartınız yolda!",
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
         "buttonLabel": "Gösterge Paneli"
       },
-      "title": "Kartı değiştir"
+      "title": "Kartı değiştir",
+      "errors": {
+        "lockFailed": "Kartınız kilitlenemedi. Lütfen tekrar deneyin.",
+        "replaceFailed": "Kartınız değiştirilemedi. Lütfen tekrar deneyin.",
+        "replaceFailedCardLocked": "Kartınız kilitlendi ancak değiştirme başarısız oldu. Lütfen yardım için destek ile iletişime geçin."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fiziksel kart sipariş et",
@@ -3293,7 +3322,107 @@
         "important": "Önemli",
         "bullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
         "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak",
+        "bullet4": "Kargo adresi sipariş verildikten sonra değiştirilemez"
+      },
+      "errors": {
+        "createFailed": "Fiziksel kartınız sipariş edilemedi. Lütfen tekrar deneyin."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Doğrulama",
+      "CardSubscription": {
+        "subscribeTitle": "Abone Ol",
+        "paymentTitle": "Ödeme",
+        "acceptButton": "Kabul Et",
+        "payButton": "Devam Et ve Öde",
+        "cardTitle": "Blink Özel",
+        "perYear": "yıllık",
+        "status": {
+          "label": "Durum",
+          "paymentPending": "Ödeme Bekliyor",
+          "firstYearFree": "İlk yıl ücretsiz"
+        },
+        "renewalDate": {
+          "label": "Yenileme tarihi"
+        },
+        "agreement": {
+          "text": "Kabul ediyorum",
+          "termsOfService": "Hizmet Şartları",
+          "privacyPolicy": "Gizlilik Politikası",
+          "cardholderAgreement": "Kart Sahibi Sözleşmesi",
+          "and": "ve"
+        },
+        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+      },
+      "CardIntroducing": {
+        "title": "Tanıtım",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa kartı",
+          "for": "için",
+          "maximalist": "Bitcoin Maksimalistleri"
+        },
+        "buttonText": "Devam Et"
+      },
+      "CardDetails": {
+        "title": "Ek avantajlar",
+        "features": {
+          "accountManager": "Özel hesap yöneticisi",
+          "support": "Öncelikli destek",
+          "onchainDeposits": "İşlem ücretlerinden %50 geri ödeme",
+          "circularEconomies": "Döngüsel ekonomilere 100 $"
+        },
+        "andMore": "... ve 2026'da daha fazlası geliyor",
+        "buttonText": "Devam Et"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Hoş geldiniz",
+          "subtitle": "Blink Özel'e",
+          "paragraphs": {
+            "body1": "Biri sizi düşündü ve sizi Blink Özel'e davet etmemizi önerdi. Muhtemelen harika bir Bitcoiner olduğunuz için.",
+            "body2": "2026 hedefimiz programı o kadar çok avantajla doldurmak ki gelecek yıl yenilemenin mantıklı olacağı açık olsun."
+          }
+        },
+        "buttonText": "Hadi başlayalım"
+      },
+      "LoadingCard": {
+        "title": "Kartınız üzerinde çalışıyoruz",
+        "subtitle": "Hazır olduğunda size bildireceğiz",
+        "codingBackend": "...backend kodlanıyor",
+        "buttonText": "Güzel"
+      },
+      "PersonalInformation": {
+        "title": "Son adım",
+        "fields": {
+          "occupation": {
+            "label": "Meslek",
+            "placeholder": "Mesleğinizi seçin"
+          },
+          "annualSalaryRange": {
+            "label": "Yıllık maaş",
+            "placeholder": "Maaş aralığınızı seçin"
+          },
+          "accountPurpose": {
+            "label": "Hesap amacı",
+            "placeholder": "Amacı seçin"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Beklenen aylık harcama",
+            "placeholder": "Harcama aralığınızı seçin"
+          }
+        },
+        "buttonText": "Başvuruyu gönder",
+        "select": "seç"
+      },
+      "CardPreapproved": {
+        "title": "Blink Visa kartı için ön onay aldınız!",
+        "buttonText": "Kapat"
+      },
+      "CardProcessing": {
+        "title": "Başvurunuz işleniyor",
+        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "buttonText": "Kapat"
       }
     }
   }

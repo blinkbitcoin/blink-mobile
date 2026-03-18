@@ -55,6 +55,14 @@ let mockCloseCardAccountReturn = {
   hasPositiveBalance: false,
   balanceDisplay: "",
 }
+jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+  useCardData: () => ({
+    card: { id: "card-123", cardType: "PHYSICAL" },
+    hasPhysicalCard: false,
+    loading: false,
+  }),
+}))
+
 jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
   NotificationCategory: {
     Payments: "Payments",
@@ -407,7 +415,9 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("replaceCardScreen")
+      expect(mockNavigate).toHaveBeenCalledWith("replaceCardScreen", {
+        cardId: "card-123",
+      })
     })
 
     it("allows pressing contact support row and opens mailto", async () => {

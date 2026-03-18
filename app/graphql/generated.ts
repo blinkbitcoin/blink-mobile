@@ -251,6 +251,7 @@ export type ApiKey = {
   readonly expiresAt?: Maybe<Scalars['Timestamp']['output']>;
   readonly id: Scalars['ID']['output'];
   readonly lastUsedAt?: Maybe<Scalars['Timestamp']['output']>;
+  readonly limits: ApiKeyLimits;
   readonly name: Scalars['String']['output'];
   readonly readOnly: Scalars['Boolean']['output'];
   readonly revoked: Scalars['Boolean']['output'];
@@ -269,12 +270,40 @@ export type ApiKeyCreatePayload = {
   readonly apiKeySecret: Scalars['String']['output'];
 };
 
+export type ApiKeyLimits = {
+  readonly __typename: 'ApiKeyLimits';
+  readonly annualLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly annualSpentSats: Scalars['Int']['output'];
+  readonly dailyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly dailySpentSats: Scalars['Int']['output'];
+  readonly monthlyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly monthlySpentSats: Scalars['Int']['output'];
+  readonly weeklyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly weeklySpentSats: Scalars['Int']['output'];
+};
+
+export type ApiKeyRemoveLimitInput = {
+  readonly id: Scalars['ID']['input'];
+  readonly limitTimeWindow: LimitTimeWindow;
+};
+
 export type ApiKeyRevokeInput = {
   readonly id: Scalars['ID']['input'];
 };
 
 export type ApiKeyRevokePayload = {
   readonly __typename: 'ApiKeyRevokePayload';
+  readonly apiKey: ApiKey;
+};
+
+export type ApiKeySetLimitInput = {
+  readonly id: Scalars['ID']['input'];
+  readonly limitSats: Scalars['Int']['input'];
+  readonly limitTimeWindow: LimitTimeWindow;
+};
+
+export type ApiKeySetLimitPayload = {
+  readonly __typename: 'ApiKeySetLimitPayload';
   readonly apiKey: ApiKey;
 };
 
@@ -459,6 +488,25 @@ export type CardBalance = {
   readonly posted: Scalars['Int']['output'];
 };
 
+export type CardCollateralBalance = {
+  readonly __typename: 'CardCollateralBalance';
+  readonly availableSats: Scalars['Int']['output'];
+  readonly pendingSats: Scalars['Int']['output'];
+  readonly settledSats: Scalars['Int']['output'];
+};
+
+export type CardCollateralDeposit = {
+  readonly __typename: 'CardCollateralDeposit';
+  readonly newAvailableBalance: Scalars['Int']['output'];
+  readonly satAmount: Scalars['Int']['output'];
+  readonly transferId: Scalars['ID']['output'];
+};
+
+export type CardCollateralDepositInput = {
+  readonly amountSats: Scalars['Int']['input'];
+  readonly blinkTxId: Scalars['String']['input'];
+};
+
 export type CardConsumerApplicationCreateInput = {
   readonly accountPurpose: Scalars['String']['input'];
   readonly annualSalary: Scalars['String']['input'];
@@ -547,11 +595,19 @@ export const CardStatus = {
 export type CardStatus = typeof CardStatus[keyof typeof CardStatus];
 export type CardTransaction = {
   readonly __typename: 'CardTransaction';
-  readonly amount: Scalars['Float']['output'];
+  readonly amount: Scalars['Int']['output'];
   readonly cardId: Scalars['String']['output'];
   readonly createdAt: Scalars['DateTime']['output'];
   readonly currency: Scalars['String']['output'];
+  readonly enrichedMerchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly enrichedMerchantName?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
+  readonly localAmount?: Maybe<Scalars['Int']['output']>;
+  readonly localCurrency?: Maybe<Scalars['String']['output']>;
+  readonly merchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly merchantCategoryCode?: Maybe<Scalars['String']['output']>;
+  readonly merchantCity?: Maybe<Scalars['String']['output']>;
+  readonly merchantCountry?: Maybe<Scalars['String']['output']>;
   readonly merchantName: Scalars['String']['output'];
   readonly status: TransactionStatus;
 };
@@ -603,7 +659,6 @@ export type ConsumerAccount = Account & {
   readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>;
   readonly callbackPortalUrl: Scalars['String']['output'];
   readonly cardConsumerApplications: ReadonlyArray<ConsumerApplication>;
-  readonly cardTransactions: ReadonlyArray<CardTransaction>;
   readonly cards: ReadonlyArray<Card>;
   /** return CSV stream, base64 encoded, of the list of transactions in the wallet */
   readonly csvTransactions: Scalars['String']['output'];
@@ -630,11 +685,6 @@ export type ConsumerAccount = Account & {
   readonly walletById: Wallet;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly welcomeProfile?: Maybe<WelcomeProfile>;
-};
-
-
-export type ConsumerAccountCardTransactionsArgs = {
-  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -995,6 +1045,14 @@ export type Leaderboard = {
   readonly range: WelcomeRange;
 };
 
+export const LimitTimeWindow = {
+  Annual: 'ANNUAL',
+  Daily: 'DAILY',
+  Monthly: 'MONTHLY',
+  Weekly: 'WEEKLY'
+} as const;
+
+export type LimitTimeWindow = typeof LimitTimeWindow[keyof typeof LimitTimeWindow];
 export type LnAddressPaymentSendInput = {
   /** Amount in satoshis. */
   readonly amount: Scalars['SatAmount']['input'];
@@ -1282,11 +1340,14 @@ export type Mutation = {
   readonly accountUpdateDefaultWalletId: AccountUpdateDefaultWalletIdPayload;
   readonly accountUpdateDisplayCurrency: AccountUpdateDisplayCurrencyPayload;
   readonly apiKeyCreate: ApiKeyCreatePayload;
+  readonly apiKeyRemoveLimit: ApiKeySetLimitPayload;
   readonly apiKeyRevoke: ApiKeyRevokePayload;
+  readonly apiKeySetLimit: ApiKeySetLimitPayload;
   readonly callbackEndpointAdd: CallbackEndpointAddPayload;
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly cardCollateralDeposit: CardCollateralDeposit;
   readonly cardConsumerApplicationCreate: ConsumerApplication;
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
   readonly cardConsumerApplicationUpdate: ConsumerApplication;
@@ -1451,8 +1512,18 @@ export type MutationApiKeyCreateArgs = {
 };
 
 
+export type MutationApiKeyRemoveLimitArgs = {
+  input: ApiKeyRemoveLimitInput;
+};
+
+
 export type MutationApiKeyRevokeArgs = {
   input: ApiKeyRevokeInput;
+};
+
+
+export type MutationApiKeySetLimitArgs = {
+  input: ApiKeySetLimitInput;
 };
 
 
@@ -1468,6 +1539,11 @@ export type MutationCallbackEndpointDeleteArgs = {
 
 export type MutationCaptchaRequestAuthCodeArgs = {
   input: CaptchaRequestAuthCodeInput;
+};
+
+
+export type MutationCardCollateralDepositArgs = {
+  input: CardCollateralDepositInput;
 };
 
 
@@ -2028,6 +2104,7 @@ export type Query = {
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
   readonly cardBalance: CardBalance;
+  readonly cardCollateralBalance: CardCollateralBalance;
   readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
@@ -2442,7 +2519,9 @@ export const TransactionStatus = {
   Completed: 'COMPLETED',
   Declined: 'DECLINED',
   Pending: 'PENDING',
-  Reversed: 'REVERSED'
+  Refunded: 'REFUNDED',
+  Reversed: 'REVERSED',
+  Unknown: 'UNKNOWN'
 } as const;
 
 export type TransactionStatus = typeof TransactionStatus[keyof typeof TransactionStatus];
@@ -3058,6 +3137,13 @@ export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: nev
 
 export type CaptchaCreateChallengeMutation = { readonly __typename: 'Mutation', readonly captchaCreateChallenge: { readonly __typename: 'CaptchaCreateChallengePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly result?: { readonly __typename: 'CaptchaCreateChallengeResult', readonly id: string, readonly challengeCode: string, readonly newCaptcha: boolean, readonly failbackMode: boolean } | null } };
 
+export type KycFlowStartMutationVariables = Exact<{
+  input: KycFlowStartInput;
+}>;
+
+
+export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
+
 export type UserLogoutMutationVariables = Exact<{
   input: UserLogoutInput;
 }>;
@@ -3110,12 +3196,19 @@ export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransac
 export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }> } } | null };
+export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }>, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
 
 export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CardEncryptionPublicKeyQuery = { readonly __typename: 'Query', readonly cardEncryptionPublicKey: string };
+
+export type CardCreateMutationVariables = Exact<{
+  input: CardCreateInput;
+}>;
+
+
+export type CardCreateMutation = { readonly __typename: 'Mutation', readonly cardCreate: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
 
 export type CardPinUpdateMutationVariables = Exact<{
   input: CardPinUpdateInput;
@@ -3123,6 +3216,13 @@ export type CardPinUpdateMutationVariables = Exact<{
 
 
 export type CardPinUpdateMutation = { readonly __typename: 'Mutation', readonly cardPinUpdate: boolean };
+
+export type CardReplaceMutationVariables = Exact<{
+  input: CardReplaceInput;
+}>;
+
+
+export type CardReplaceMutation = { readonly __typename: 'Mutation', readonly cardReplace: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
 
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3159,13 +3259,6 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
-
-export type KycFlowStartMutationVariables = Exact<{
-  input: KycFlowStartInput;
-}>;
-
-
-export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
 
 export type FullOnboardingScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4865,6 +4958,40 @@ export function useCaptchaCreateChallengeMutation(baseOptions?: Apollo.MutationH
 export type CaptchaCreateChallengeMutationHookResult = ReturnType<typeof useCaptchaCreateChallengeMutation>;
 export type CaptchaCreateChallengeMutationResult = Apollo.MutationResult<CaptchaCreateChallengeMutation>;
 export type CaptchaCreateChallengeMutationOptions = Apollo.BaseMutationOptions<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>;
+export const KycFlowStartDocument = gql`
+    mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
+    workflowRunId
+    tokenWeb
+  }
+}
+    `;
+export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
+
+/**
+ * __useKycFlowStartMutation__
+ *
+ * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
+      }
+export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
+export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
+export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const UserLogoutDocument = gql`
     mutation userLogout($input: UserLogoutInput!) {
   userLogout(input: $input) {
@@ -5196,6 +5323,10 @@ export const CardDocument = gql`
           dailyLimitCents
           monthlyLimitCents
         }
+        cardConsumerApplications {
+          id
+          applicationStatus
+        }
       }
     }
   }
@@ -5270,6 +5401,42 @@ export type CardEncryptionPublicKeyQueryHookResult = ReturnType<typeof useCardEn
 export type CardEncryptionPublicKeyLazyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyLazyQuery>;
 export type CardEncryptionPublicKeySuspenseQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeySuspenseQuery>;
 export type CardEncryptionPublicKeyQueryResult = Apollo.QueryResult<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>;
+export const CardCreateDocument = gql`
+    mutation cardCreate($input: CardCreateInput!) {
+  cardCreate(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardCreateMutationFn = Apollo.MutationFunction<CardCreateMutation, CardCreateMutationVariables>;
+
+/**
+ * __useCardCreateMutation__
+ *
+ * To run a mutation, you first call `useCardCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCreateMutation, { data, loading, error }] = useCardCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardCreateMutation, CardCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCreateMutation, CardCreateMutationVariables>(CardCreateDocument, options);
+      }
+export type CardCreateMutationHookResult = ReturnType<typeof useCardCreateMutation>;
+export type CardCreateMutationResult = Apollo.MutationResult<CardCreateMutation>;
+export type CardCreateMutationOptions = Apollo.BaseMutationOptions<CardCreateMutation, CardCreateMutationVariables>;
 export const CardPinUpdateDocument = gql`
     mutation cardPinUpdate($input: CardPinUpdateInput!) {
   cardPinUpdate(input: $input)
@@ -5301,6 +5468,42 @@ export function useCardPinUpdateMutation(baseOptions?: Apollo.MutationHookOption
 export type CardPinUpdateMutationHookResult = ReturnType<typeof useCardPinUpdateMutation>;
 export type CardPinUpdateMutationResult = Apollo.MutationResult<CardPinUpdateMutation>;
 export type CardPinUpdateMutationOptions = Apollo.BaseMutationOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
+export const CardReplaceDocument = gql`
+    mutation cardReplace($input: CardReplaceInput!) {
+  cardReplace(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardReplaceMutationFn = Apollo.MutationFunction<CardReplaceMutation, CardReplaceMutationVariables>;
+
+/**
+ * __useCardReplaceMutation__
+ *
+ * To run a mutation, you first call `useCardReplaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardReplaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardReplaceMutation, { data, loading, error }] = useCardReplaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardReplaceMutation(baseOptions?: Apollo.MutationHookOptions<CardReplaceMutation, CardReplaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardReplaceMutation, CardReplaceMutationVariables>(CardReplaceDocument, options);
+      }
+export type CardReplaceMutationHookResult = ReturnType<typeof useCardReplaceMutation>;
+export type CardReplaceMutationResult = Apollo.MutationResult<CardReplaceMutation>;
+export type CardReplaceMutationOptions = Apollo.BaseMutationOptions<CardReplaceMutation, CardReplaceMutationVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {
@@ -5567,40 +5770,6 @@ export function useUserEmailRegistrationValidateMutation(baseOptions?: Apollo.Mu
 export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof useUserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
-export const KycFlowStartDocument = gql`
-    mutation kycFlowStart($input: KycFlowStartInput!) {
-  kycFlowStart(input: $input) {
-    workflowRunId
-    tokenWeb
-  }
-}
-    `;
-export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
-
-/**
- * __useKycFlowStartMutation__
- *
- * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
-      }
-export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
-export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
-export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const FullOnboardingScreenDocument = gql`
     query fullOnboardingScreen {
   me {
@@ -9087,8 +9256,12 @@ export type ResolversTypes = {
   ApiKey: ResolverTypeWrapper<ApiKey>;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ResolverTypeWrapper<ApiKeyCreatePayload>;
+  ApiKeyLimits: ResolverTypeWrapper<ApiKeyLimits>;
+  ApiKeyRemoveLimitInput: ApiKeyRemoveLimitInput;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ResolverTypeWrapper<ApiKeyRevokePayload>;
+  ApiKeySetLimitInput: ApiKeySetLimitInput;
+  ApiKeySetLimitPayload: ResolverTypeWrapper<ApiKeySetLimitPayload>;
   ApplicationStatus: ApplicationStatus;
   AuthToken: ResolverTypeWrapper<Scalars['AuthToken']['output']>;
   AuthTokenPayload: ResolverTypeWrapper<AuthTokenPayload>;
@@ -9105,6 +9278,9 @@ export type ResolversTypes = {
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
   CardBalance: ResolverTypeWrapper<CardBalance>;
+  CardCollateralBalance: ResolverTypeWrapper<CardCollateralBalance>;
+  CardCollateralDeposit: ResolverTypeWrapper<CardCollateralDeposit>;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -9114,7 +9290,6 @@ export type ResolversTypes = {
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardTransactionConnection: ResolverTypeWrapper<CardTransactionConnection>;
   CardTransactionEdge: ResolverTypeWrapper<CardTransactionEdge>;
   CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
@@ -9133,6 +9308,7 @@ export type ResolversTypes = {
   ContactPayload: ResolverTypeWrapper<ContactPayload>;
   ContactType: ContactType;
   Coordinates: ResolverTypeWrapper<Coordinates>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']['output']>;
   Currency: ResolverTypeWrapper<Currency>;
@@ -9173,6 +9349,7 @@ export type ResolversTypes = {
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
   LeaderboardName: ResolverTypeWrapper<Scalars['LeaderboardName']['output']>;
+  LimitTimeWindow: LimitTimeWindow;
   LnAddressPaymentSendInput: LnAddressPaymentSendInput;
   LnInvoice: ResolverTypeWrapper<LnInvoice>;
   LnInvoiceCancelInput: LnInvoiceCancelInput;
@@ -9362,8 +9539,12 @@ export type ResolversParentTypes = {
   ApiKey: ApiKey;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ApiKeyCreatePayload;
+  ApiKeyLimits: ApiKeyLimits;
+  ApiKeyRemoveLimitInput: ApiKeyRemoveLimitInput;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ApiKeyRevokePayload;
+  ApiKeySetLimitInput: ApiKeySetLimitInput;
+  ApiKeySetLimitPayload: ApiKeySetLimitPayload;
   AuthToken: Scalars['AuthToken']['output'];
   AuthTokenPayload: AuthTokenPayload;
   Authorization: Authorization;
@@ -9379,6 +9560,9 @@ export type ResolversParentTypes = {
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
   CardBalance: CardBalance;
+  CardCollateralBalance: CardCollateralBalance;
+  CardCollateralDeposit: CardCollateralDeposit;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -9387,7 +9571,6 @@ export type ResolversParentTypes = {
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
   CardTransaction: CardTransaction;
-  Float: Scalars['Float']['output'];
   CardTransactionConnection: CardTransactionConnection;
   CardTransactionEdge: CardTransactionEdge;
   CardTransactionPageInfo: CardTransactionPageInfo;
@@ -9404,6 +9587,7 @@ export type ResolversParentTypes = {
   ContactId: Scalars['ContactId']['output'];
   ContactPayload: ContactPayload;
   Coordinates: Coordinates;
+  Float: Scalars['Float']['output'];
   Country: Country;
   CountryCode: Scalars['CountryCode']['output'];
   Currency: Currency;
@@ -9664,6 +9848,7 @@ export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParen
   expiresAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastUsedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
+  limits?: Resolver<ResolversTypes['ApiKeyLimits'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   readOnly?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   revoked?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -9677,7 +9862,24 @@ export type ApiKeyCreatePayloadResolvers<ContextType = any, ParentType extends R
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ApiKeyLimitsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyLimits'] = ResolversParentTypes['ApiKeyLimits']> = {
+  annualLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  annualSpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  dailyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  dailySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  monthlyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  monthlySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  weeklyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  weeklySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type ApiKeyRevokePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyRevokePayload'] = ResolversParentTypes['ApiKeyRevokePayload']> = {
+  apiKey?: Resolver<ResolversTypes['ApiKey'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ApiKeySetLimitPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeySetLimitPayload'] = ResolversParentTypes['ApiKeySetLimitPayload']> = {
   apiKey?: Resolver<ResolversTypes['ApiKey'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9773,6 +9975,20 @@ export type CardBalanceResolvers<ContextType = any, ParentType extends Resolvers
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CardCollateralBalanceResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralBalance'] = ResolversParentTypes['CardCollateralBalance']> = {
+  availableSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pendingSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  settledSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralDepositResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralDeposit'] = ResolversParentTypes['CardCollateralDeposit']> = {
+  newAvailableBalance?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  satAmount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  transferId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
   encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
   encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
@@ -9780,11 +9996,19 @@ export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends 
 };
 
 export type CardTransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransaction'] = ResolversParentTypes['CardTransaction']> = {
-  amount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  amount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   cardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  enrichedMerchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  enrichedMerchantName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  localAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  localCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCategoryCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -9825,7 +10049,6 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
   callbackEndpoints?: Resolver<ReadonlyArray<ResolversTypes['CallbackEndpoint']>, ParentType, ContextType>;
   callbackPortalUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardConsumerApplications?: Resolver<ReadonlyArray<ResolversTypes['ConsumerApplication']>, ParentType, ContextType>;
-  cardTransactions?: Resolver<ReadonlyArray<ResolversTypes['CardTransaction']>, ParentType, ContextType, Partial<ConsumerAccountCardTransactionsArgs>>;
   cards?: Resolver<ReadonlyArray<ResolversTypes['Card']>, ParentType, ContextType>;
   csvTransactions?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<ConsumerAccountCsvTransactionsArgs, 'walletIds'>>;
   defaultWallet?: Resolver<ResolversTypes['PublicWallet'], ParentType, ContextType>;
@@ -10205,11 +10428,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   accountUpdateDefaultWalletId?: Resolver<ResolversTypes['AccountUpdateDefaultWalletIdPayload'], ParentType, ContextType, RequireFields<MutationAccountUpdateDefaultWalletIdArgs, 'input'>>;
   accountUpdateDisplayCurrency?: Resolver<ResolversTypes['AccountUpdateDisplayCurrencyPayload'], ParentType, ContextType, RequireFields<MutationAccountUpdateDisplayCurrencyArgs, 'input'>>;
   apiKeyCreate?: Resolver<ResolversTypes['ApiKeyCreatePayload'], ParentType, ContextType, RequireFields<MutationApiKeyCreateArgs, 'input'>>;
+  apiKeyRemoveLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeyRemoveLimitArgs, 'input'>>;
   apiKeyRevoke?: Resolver<ResolversTypes['ApiKeyRevokePayload'], ParentType, ContextType, RequireFields<MutationApiKeyRevokeArgs, 'input'>>;
+  apiKeySetLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeySetLimitArgs, 'input'>>;
   callbackEndpointAdd?: Resolver<ResolversTypes['CallbackEndpointAddPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointAddArgs, 'input'>>;
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  cardCollateralDeposit?: Resolver<ResolversTypes['CardCollateralDeposit'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositArgs, 'input'>>;
   cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
   cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
@@ -10455,6 +10681,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
   cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
@@ -10890,7 +11117,9 @@ export type Resolvers<ContextType = any> = {
   AccountUpdateNotificationSettingsPayload?: AccountUpdateNotificationSettingsPayloadResolvers<ContextType>;
   ApiKey?: ApiKeyResolvers<ContextType>;
   ApiKeyCreatePayload?: ApiKeyCreatePayloadResolvers<ContextType>;
+  ApiKeyLimits?: ApiKeyLimitsResolvers<ContextType>;
   ApiKeyRevokePayload?: ApiKeyRevokePayloadResolvers<ContextType>;
+  ApiKeySetLimitPayload?: ApiKeySetLimitPayloadResolvers<ContextType>;
   AuthToken?: GraphQLScalarType;
   AuthTokenPayload?: AuthTokenPayloadResolvers<ContextType>;
   Authorization?: AuthorizationResolvers<ContextType>;
@@ -10903,6 +11132,8 @@ export type Resolvers<ContextType = any> = {
   CaptchaCreateChallengeResult?: CaptchaCreateChallengeResultResolvers<ContextType>;
   Card?: CardResolvers<ContextType>;
   CardBalance?: CardBalanceResolvers<ContextType>;
+  CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
+  CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
   CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;

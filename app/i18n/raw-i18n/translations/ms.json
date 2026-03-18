@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Medan ini diperlukan",
       "minChars": "Mesti sekurang-kurangnya {min} aksara",
-      "invalidPostalCode": "Poskod tidak sah"
+      "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
+      "invalidRegion": "Pilihan wilayah tidak sah"
     }
   },
   "errors": {
@@ -3181,9 +3182,25 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Bandar",
-      "state": "Negeri",
-      "postalCode": "Poskod",
       "country": "Negara",
+      "labels": {
+        "state": "Negeri",
+        "province": "Wilayah",
+        "prefecture": "Prefektur",
+        "oblast": "Oblast",
+        "department": "Jabatan",
+        "county": "Daerah",
+        "district": "Daerah",
+        "doSi": "Do/Si",
+        "island": "Pulau",
+        "emirate": "Emirat",
+        "parish": "Parish",
+        "region": "Wilayah",
+        "zip": "Kod ZIP",
+        "postalCode": "Kod pos",
+        "eircode": "Eircode",
+        "pin": "Kod PIN"
+      },
       "important": "Penting",
       "importantDescription": "Sila pastikan alamat anda tepat dan lengkap.",
       "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",
@@ -3279,16 +3296,28 @@
         "issueType": "Sebab",
         "deliveryTime": "Masa penghantaran",
         "shippingCost": "Kos penghantaran",
-        "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baharu tiba",
-        "bullet2": "Kad baharu anda akan mempunyai nombor yang sama dengan kad semasa",
-        "bullet3": "Musnahkan kad rosak anda apabila kad baharu tiba"
+        "DamagedInfo": {
+          "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baru tiba",
+          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
+          "bullet3": "Musnahkan kad rosak anda apabila kad baru tiba"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kad anda telah dikunci untuk perlindungan anda",
+          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
+          "bullet3": "Kad lama anda akan dibatalkan secara kekal"
+        }
       },
       "Status": {
         "title": "Kad baharu anda sedang dalam perjalanan!",
         "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
         "buttonLabel": "Papan Pemuka"
       },
-      "title": "Ganti kad"
+      "title": "Ganti kad",
+      "errors": {
+        "lockFailed": "Gagal mengunci kad anda. Sila cuba lagi.",
+        "replaceFailed": "Gagal menggantikan kad anda. Sila cuba lagi.",
+        "replaceFailedCardLocked": "Kad anda telah dikunci tetapi penggantian gagal. Sila hubungi sokongan untuk bantuan."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Pesan kad fizikal",
@@ -3334,7 +3363,107 @@
         "important": "Penting",
         "bullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
         "bullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
-        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+        "bullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama",
+        "bullet4": "Alamat penghantaran tidak boleh ditukar selepas pesanan dibuat"
+      },
+      "errors": {
+        "createFailed": "Gagal membuat pesanan kad fizikal anda. Sila cuba lagi."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Pengesahan",
+      "CardSubscription": {
+        "subscribeTitle": "Langgan",
+        "paymentTitle": "Pembayaran",
+        "acceptButton": "Terima",
+        "payButton": "Teruskan dan Bayar",
+        "cardTitle": "Blink Peribadi",
+        "perYear": "setahun",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Pembayaran Tertangguh",
+          "firstYearFree": "Tahun pertama percuma"
+        },
+        "renewalDate": {
+          "label": "Tarikh pembaharuan"
+        },
+        "agreement": {
+          "text": "Saya bersetuju dengan",
+          "termsOfService": "Terma Perkhidmatan",
+          "privacyPolicy": "Dasar Privasi",
+          "cardholderAgreement": "Perjanjian Pemegang Kad",
+          "and": "dan"
+        },
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam 1 tahun"
+      },
+      "CardIntroducing": {
+        "title": "Memperkenalkan",
+        "cardInfo": {
+          "bitcoinCard": "Kad Visa Blink",
+          "for": "untuk",
+          "maximalist": "Maximalis Bitcoin"
+        },
+        "buttonText": "Teruskan"
+      },
+      "CardDetails": {
+        "title": "Faedah tambahan",
+        "features": {
+          "accountManager": "Pengurus akaun khusus",
+          "support": "Sokongan keutamaan",
+          "onchainDeposits": "50% pulangan yuran transaksi",
+          "circularEconomies": "$100 untuk ekonomi pekeliling"
+        },
+        "andMore": "... dan lagi akan datang pada 2026",
+        "buttonText": "Teruskan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Selamat datang",
+          "subtitle": "Di Blink Peribadi",
+          "paragraphs": {
+            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Peribadi. Mungkin kerana anda seorang Bitcoiner yang hebat.",
+            "body2": "Matlamat kami untuk 2026 adalah mengisi program dengan begitu banyak kebaikan sehingga jelas untuk memperbaharui tahun depan."
+          }
+        },
+        "buttonText": "Jom mulakan"
+      },
+      "LoadingCard": {
+        "title": "Kami sedang mengusahakan kad anda",
+        "subtitle": "Kami akan memberitahu anda apabila sudah siap",
+        "codingBackend": "...mengekod bahagian belakang",
+        "buttonText": "Bagus"
+      },
+      "PersonalInformation": {
+        "title": "Langkah terakhir",
+        "fields": {
+          "occupation": {
+            "label": "Pekerjaan",
+            "placeholder": "Pilih pekerjaan anda"
+          },
+          "annualSalaryRange": {
+            "label": "Gaji tahunan",
+            "placeholder": "Pilih julat gaji anda"
+          },
+          "accountPurpose": {
+            "label": "Tujuan akaun",
+            "placeholder": "Pilih tujuan"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Perbelanjaan bulanan yang dijangka",
+            "placeholder": "Pilih julat perbelanjaan anda"
+          }
+        },
+        "buttonText": "Hantar permohonan",
+        "select": "pilih"
+      },
+      "CardPreapproved": {
+        "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
+        "buttonText": "Tutup"
+      },
+      "CardProcessing": {
+        "title": "Memproses permohonan anda",
+        "subtitle": "Anggaran masa menunggu: {waitTime: string}",
+        "buttonText": "Tutup"
       }
     }
   }

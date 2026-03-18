@@ -2,9 +2,9 @@ import * as React from "react"
 import { View, TouchableOpacity } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
-import Icon from "react-native-vector-icons/Ionicons"
 import { LocalizedString } from "typesafe-i18n"
 
+import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -36,21 +36,15 @@ export const ModalTooltip: React.FC<ModalTooltipProps> = ({
   const toggleModal = () => setIsVisible(!isVisible)
   const styles = useStyles()
 
-  let iconParams: { name: string; type: string }
+  let iconName: IconNamesType
   let defaultTitle: LocalizedString
   switch (type) {
     case "info":
-      iconParams = {
-        name: "information-circle-outline",
-        type: "ionicons",
-      }
+      iconName = "info"
       defaultTitle = LL.common.bankInfo({ bankName })
       break
     case "advice":
-      iconParams = {
-        name: "bulb-outline",
-        type: "ionicon",
-      }
+      iconName = "lightbulb"
       defaultTitle = LL.common.bankAdvice({ bankName })
       break
   }
@@ -58,12 +52,13 @@ export const ModalTooltip: React.FC<ModalTooltipProps> = ({
 
   return (
     <>
-      <Icon
-        color={type === "info" ? colors.black : colors.error}
-        size={size}
-        {...iconParams}
-        onPress={toggleModal}
-      />
+      <TouchableOpacity onPress={toggleModal}>
+        <GaloyIcon
+          name={iconName}
+          size={size ?? 24}
+          color={type === "info" ? colors.black : colors.error}
+        />
+      </TouchableOpacity>
       <Modal
         isVisible={isVisible}
         onBackdropPress={toggleModal}
@@ -75,7 +70,7 @@ export const ModalTooltip: React.FC<ModalTooltipProps> = ({
         <TouchableOpacity style={styles.fillerOpacity} onPress={toggleModal} />
         <View style={styles.modalCard}>
           <View style={styles.modalTitleContainer}>
-            <Icon size={24} {...iconParams} style={styles.iconContainer} />
+            <GaloyIcon name={iconName} size={24} style={styles.iconContainer} />
             <Text type={"h1"}>{modalTitle}</Text>
           </View>
           <ScrollView>

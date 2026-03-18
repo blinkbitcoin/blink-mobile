@@ -26,7 +26,7 @@ export const CardSettingsScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl } = useRemoteConfig()
-  const { hasPhysicalCard } = useCardData()
+  const { card, hasPhysicalCard } = useCardData()
   const { isCategoryEnabled, toggleCategory } = useNotificationToggle()
   const {
     closeCard,
@@ -81,7 +81,8 @@ export const CardSettingsScreen: React.FC = () => {
   }
 
   const handleReplaceCard = () => {
-    navigation.navigate("replaceCardScreen")
+    if (!card) return
+    navigation.navigate("replaceCardScreen", { cardId: card.id })
   }
 
   const handleTermsAndConditions = () => {
@@ -108,7 +109,7 @@ export const CardSettingsScreen: React.FC = () => {
             ? LL.CardFlow.CardSettings.addToAppleWallet()
             : LL.CardFlow.CardSettings.addToGooglePay()
         }
-        leftIonicon="wallet-outline"
+        leftIcon="wallet"
         onPress={handleAddToMobileWallet}
       />
     ),

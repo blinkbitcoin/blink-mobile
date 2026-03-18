@@ -2778,7 +2778,8 @@
         "validation": {
             "required": "Este campo es obligatorio",
             "minChars": "Debe tener al menos {min} caracteres",
-            "invalidPostalCode": "Código postal no válido"
+            "invalidPostalCode": "Código postal no válido, probablemente un error tipográfico",
+            "invalidRegion": "Selección de región no válida"
         }
     },
     "errors": {
@@ -3140,11 +3141,27 @@
             "addressLine1": "Dirección línea 1",
             "addressLine2": "Dirección línea 2",
             "city": "Ciudad",
-            "state": "Estado",
-            "postalCode": "Código postal",
             "country": "País",
             "important": "Importante",
             "importantDescription": "Asegúrate de que tu dirección sea precisa y completa.",
+            "labels": {
+                "state": "Estado",
+                "province": "Provincia",
+                "prefecture": "Prefectura",
+                "oblast": "Óblast",
+                "department": "Departamento",
+                "county": "Condado",
+                "district": "Distrito",
+                "doSi": "Do/Si",
+                "island": "Isla",
+                "emirate": "Emirato",
+                "parish": "Parroquia",
+                "region": "Región",
+                "zip": "Código postal",
+                "postalCode": "Código postal",
+                "eircode": "Eircode",
+                "pin": "Código PIN"
+            },
             "noPOBoxes": "No se puede entregar tarjetas a apartados postales",
             "signatureRequired": "Puede requerirse firma al momento de la entrega",
             "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas"
@@ -3229,15 +3246,27 @@
                 "deliveryTime": "Tiempo de entrega",
                 "shippingCost": "Costo de entrega",
                 "importantInformation": "Información importante",
-                "bullet1": "Tu tarjeta actual permanecerá activa hasta que llegue la nueva",
-                "bullet2": "Tu nueva tarjeta tendrá los mismos números que tu tarjeta actual",
-                "bullet3": "Destruye tu tarjeta dañada cuando llegue la nueva",
+                "DamagedInfo": {
+                    "bullet1": "Tu tarjeta actual permanecerá activa hasta que llegue la nueva",
+                    "bullet2": "Tu nueva tarjeta tendrá un nuevo número de tarjeta",
+                    "bullet3": "Destruye tu tarjeta dañada cuando llegue la nueva"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "Tu tarjeta ha sido bloqueada para tu protección",
+                    "bullet2": "Tu nueva tarjeta tendrá un nuevo número de tarjeta",
+                    "bullet3": "Tu tarjeta anterior será cancelada permanentemente"
+                },
                 "submitRequest": "Enviar solicitud"
             },
             "Status": {
                 "title": "¡Tu nueva tarjeta está en camino!",
                 "subtitle": "El pedido de entrega de tu tarjeta Blink ha sido enviado.",
                 "buttonLabel": "Panel"
+            },
+            "errors": {
+                "lockFailed": "No se pudo bloquear tu tarjeta. Por favor, inténtalo de nuevo.",
+                "replaceFailed": "No se pudo reemplazar tu tarjeta. Por favor, inténtalo de nuevo.",
+                "replaceFailedCardLocked": "Tu tarjeta fue bloqueada pero el reemplazo falló. Por favor contacta a soporte para asistencia."
             }
         },
         "OrderPhysicalCard": {
@@ -3281,7 +3310,107 @@
                 "important": "Importante",
                 "bullet1": "Tu tarjeta virtual permanecerá activa mientras esperas la tarjeta física",
                 "bullet2": "Necesitarás activar tu tarjeta física cuando llegue",
-                "bullet3": "Ambas tarjetas tendrán el mismo número y detalles"
+                "bullet3": "Ambas tarjetas tendrán el mismo número y detalles",
+                "bullet4": "La dirección de envío no se puede cambiar después de realizar el pedido"
+            },
+            "errors": {
+                "createFailed": "No se pudo ordenar tu tarjeta física. Por favor, inténtalo de nuevo."
+            }
+        },
+        "Onboarding": {
+            "kycHeaderTitle": "Verificación",
+            "CardIntroducing": {
+                "title": "Presentando",
+                "cardInfo": {
+                    "bitcoinCard": "La tarjeta Visa de Blink",
+                    "for": "para",
+                    "maximalist": "Bitcoin Maximalistas"
+                },
+                "buttonText": "Continuar"
+            },
+            "CardDetails": {
+                "title": "Beneficios adicionales",
+                "features": {
+                    "accountManager": "Gestor de cuentas dedicado",
+                    "support": "Apoyo prioritario",
+                    "onchainDeposits": "Reembolso del 50% en las comisiones de transacción",
+                    "circularEconomies": "$100 para economías circulares"
+                },
+                "andMore": "... y más próximamente en 2026",
+                "buttonText": "Continuar"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "Bienvenido a bordo",
+                    "subtitle": "A Blink Private",
+                    "paragraphs": {
+                        "body1": "Alguien pensó en ti y sugirió que deberíamos invitarte a Blink Private. Probablemente porque eres un increíble Bitcoiner.",
+                        "body2": "Nuestra meta para 2026 es llenar el programa con tantas cosas buenas que será obvio renovar el próximo año."
+                    }
+                },
+                "buttonText": "Vamos"
+            },
+            "CardSubscription": {
+                "subscribeTitle": "Suscribir",
+                "paymentTitle": "Pago",
+                "acceptButton": "Aceptar",
+                "payButton": "Continuar y Pagar",
+                "cardTitle": "Blink Privado",
+                "perYear": "por año",
+                "status": {
+                    "label": "Estado",
+                    "paymentPending": "Pago Pendiente",
+                    "firstYearFree": "Primer año gratis"
+                },
+                "renewalDate": {
+                    "label": "Fecha de renovación"
+                },
+                "agreement": {
+                    "text": "Acepto los",
+                    "termsOfService": "Términos de Servicio",
+                    "privacyPolicy": "Política de Privacidad",
+                    "cardholderAgreement": "Acuerdo del Titular de la Tarjeta",
+                    "and": "y"
+                },
+                "renew": "Entiendo que mi suscripción se renovará automáticamente en 1 año"
+            },
+            "LoadingCard": {
+                "title": "Estamos trabajando en tu tarjeta",
+                "subtitle": "Te notificaremos cuando esté lista",
+                "codingBackend": "...programando el backend",
+                "buttonText": "Genial"
+            },
+            "PersonalInformation": {
+                "title": "Paso final",
+                "fields": {
+                    "occupation": {
+                        "label": "Ocupación",
+                        "placeholder": "Selecciona tu ocupación"
+                    },
+                    "annualSalaryRange": {
+                        "label": "Salario anual",
+                        "placeholder": "Selecciona tu rango salarial"
+                    },
+                    "accountPurpose": {
+                        "label": "Propósito de la cuenta",
+                        "placeholder": "Selecciona el propósito"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "Gasto mensual esperado",
+                        "placeholder": "Selecciona tu rango de gastos"
+                    }
+                },
+                "buttonText": "Enviar solicitud",
+                "select": "seleccionar"
+            },
+            "CardPreapproved": {
+                "title": "¡Has sido preaprobado para la tarjeta Blink Visa!",
+                "buttonText": "Cerrar"
+            },
+            "CardProcessing": {
+                "title": "Procesando tu solicitud",
+                "subtitle": "Tiempo estimado de espera: {waitTime: string}",
+                "buttonText": "Cerrar"
             }
         }
     }

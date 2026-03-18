@@ -8,6 +8,10 @@ import { InAppBrowser } from "react-native-inappbrowser-reborn"
 import { gql, useApolloClient } from "@apollo/client"
 import { GaloyInput } from "@app/components/atomic/galoy-input"
 import { GALOY_INSTANCES, possibleGaloyInstanceNames } from "@app/config"
+import {
+  testBulletinsStore,
+  useTestBulletins,
+} from "@app/components/notifications/test-bulletins-store"
 import { activateBeta } from "@app/graphql/client-only-query"
 import { useBetaQuery, useDebugScreenQuery, useLevelQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -47,6 +51,7 @@ export const DeveloperScreen: React.FC = () => {
   const { saveProfile } = useSaveSessionProfile()
 
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const testBulletins = useTestBulletins()
 
   const { appConfig, saveTokenAndInstance } = useAppConfig()
   const token = appConfig.token
@@ -300,6 +305,28 @@ export const DeveloperScreen: React.FC = () => {
               InAppReview.RequestInAppReview().then(setHasFlowFinishedSuccessfully)
             }
           />
+          <Text style={styles.textHeader}>Trigger Bulletins</Text>
+          <Button
+            title="Onboarding Phase 1: KYC"
+            containerStyle={styles.button}
+            onPress={() =>
+              testBulletinsStore.add({
+                id: `test-deeplink-${Date.now()}`,
+                title: "Blink Private is here!",
+                body: "Sign up to get your Visa card and more.",
+                type: "deep-link",
+                deepLink: "card/onboarding",
+              })
+            }
+          />
+          {testBulletins.length > 0 && (
+            <Button
+              title="Clear All Test Notifications"
+              color="red"
+              containerStyle={styles.button}
+              onPress={() => testBulletinsStore.clear()}
+            />
+          )}
           <View>
             <Text style={styles.textHeader}>{DeviceInfo.getReadableVersion()}</Text>
             <Text style={styles.textHeader}>Account info</Text>

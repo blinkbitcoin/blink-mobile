@@ -3,10 +3,11 @@ import React, { useEffect } from "react"
 import { TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
-import { Icon, makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
@@ -107,7 +108,7 @@ export const SettingsScreen: React.FC = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
-          <Icon style={styles.headerRight} name="notifications-outline" type="ionicon" />
+          <GaloyIcon name="bell" size={24} style={styles.headerRight} />
           {count !== 0 && (
             <Text
               type="p4"

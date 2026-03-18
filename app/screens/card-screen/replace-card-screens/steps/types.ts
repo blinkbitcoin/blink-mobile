@@ -5,10 +5,3 @@ export const Issue = {
 } as const
 
 export type IssueType = (typeof Issue)[keyof typeof Issue]
-
-export const Delivery = {
-  Standard: "standard",
-  Express: "express",
-} as const
-
-export type DeliveryType = (typeof Delivery)[keyof typeof Delivery]

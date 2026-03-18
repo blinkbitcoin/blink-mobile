@@ -2781,7 +2781,8 @@
     "validation": {
       "required": "Dette felt er påkrævet",
       "minChars": "Skal være mindst {min} tegn",
-      "invalidPostalCode": "Ugyldigt postnummer"
+      "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl",
+      "invalidRegion": "Ugyldigt regionsvalg"
     }
   },
   "errors": {
@@ -3158,9 +3159,25 @@
       "addressLine1": "Adresselinje 1",
       "addressLine2": "Adresselinje 2",
       "city": "By",
-      "state": "Stat",
-      "postalCode": "Postnummer",
       "country": "Land",
+      "labels": {
+        "state": "Stat",
+        "province": "Provins",
+        "prefecture": "Præfektur",
+        "oblast": "Oblast",
+        "department": "Afdeling",
+        "county": "Amt",
+        "district": "Distrikt",
+        "doSi": "Do/Si",
+        "island": "Ø",
+        "emirate": "Emirat",
+        "parish": "Sogn",
+        "region": "Region",
+        "zip": "Postnummer",
+        "postalCode": "Postnummer",
+        "eircode": "Eircode",
+        "pin": "PIN-kode"
+      },
       "important": "Vigtigt",
       "importantDescription": "Sørg for at din adresse er nøjagtig og komplet.",
       "noPOBoxes": "Kort kan ikke leveres til postbokse",
@@ -3256,16 +3273,28 @@
         "issueType": "Årsag",
         "deliveryTime": "Leveringstid",
         "shippingCost": "Leveringsomkostninger",
-        "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
-        "bullet2": "Dit nye kort vil have de samme numre som dit nuværende kort",
-        "bullet3": "Destruer dit beskadigede kort, når det nye ankommer"
+        "DamagedInfo": {
+          "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
+          "bullet2": "Dit nye kort vil have et nyt kortnummer",
+          "bullet3": "Destruér dit beskadigede kort, når det nye ankommer"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Dit kort er blevet låst for din beskyttelse",
+          "bullet2": "Dit nye kort vil have et nyt kortnummer",
+          "bullet3": "Dit gamle kort vil blive permanent annulleret"
+        }
       },
       "Status": {
         "title": "Dit nye kort er på vej!",
         "subtitle": "Ordre til levering af dit Blink-kort er blevet indsendt.",
         "buttonLabel": "Oversigt"
       },
-      "title": "Erstat kort"
+      "title": "Erstat kort",
+      "errors": {
+        "lockFailed": "Kunne ikke låse dit kort. Prøv venligst igen.",
+        "replaceFailed": "Kunne ikke erstatte dit kort. Prøv venligst igen.",
+        "replaceFailedCardLocked": "Dit kort blev låst, men udskiftningen mislykkedes. Kontakt venligst support for hjælp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Bestil fysisk kort",
@@ -3311,7 +3340,107 @@
         "important": "Vigtigt",
         "bullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
         "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
-        "bullet3": "Begge kort vil have samme kortnummer og oplysninger"
+        "bullet3": "Begge kort vil have samme kortnummer og oplysninger",
+        "bullet4": "Leveringsadressen kan ikke ændres, efter ordren er afgivet"
+      },
+      "errors": {
+        "createFailed": "Det lykkedes ikke at bestille dit fysiske kort. Prøv venligst igen."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verifikation",
+      "CardSubscription": {
+        "subscribeTitle": "Abonner",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Acceptér",
+        "payButton": "Fortsæt og Betal",
+        "cardTitle": "Blink Privat",
+        "perYear": "per år",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling Afventer",
+          "firstYearFree": "Første år gratis"
+        },
+        "renewalDate": {
+          "label": "Fornyelsesdato"
+        },
+        "agreement": {
+          "text": "Jeg accepterer",
+          "termsOfService": "Servicevilkårene",
+          "privacyPolicy": "Privatlivspolitikken",
+          "cardholderAgreement": "Kortholderaftalen",
+          "and": "og"
+        },
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om 1 år"
+      },
+      "CardIntroducing": {
+        "title": "Introduktion",
+        "cardInfo": {
+          "bitcoinCard": "Blink Visa-kortet",
+          "for": "til",
+          "maximalist": "Bitcoin Maksimalister"
+        },
+        "buttonText": "Fortsæt"
+      },
+      "CardDetails": {
+        "title": "Yderligere fordele",
+        "features": {
+          "accountManager": "Dedikeret kontoadministrator",
+          "support": "Prioriteret support",
+          "onchainDeposits": "50% tilbage på transaktionsgebyrer",
+          "circularEconomies": "$100 til cirkulære økonomier"
+        },
+        "andMore": "... og mere kommer i 2026",
+        "buttonText": "Fortsæt"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Velkommen ombord",
+          "subtitle": "Til Blink Privat",
+          "paragraphs": {
+            "body1": "Nogen tænkte på dig og foreslog, at vi skulle invitere dig til Blink Privat. Sandsynligvis fordi du er en fantastisk Bitcoiner.",
+            "body2": "Vores mål for 2026 er at fylde programmet med så mange goder, at det vil være oplagt at forny næste år."
+          }
+        },
+        "buttonText": "Lad os gå"
+      },
+      "LoadingCard": {
+        "title": "Vi arbejder på dit kort",
+        "subtitle": "Vi giver dig besked, når det er her",
+        "codingBackend": "...koder backend",
+        "buttonText": "Fedt"
+      },
+      "PersonalInformation": {
+        "title": "Sidste trin",
+        "fields": {
+          "occupation": {
+            "label": "Beskæftigelse",
+            "placeholder": "Vælg din beskæftigelse"
+          },
+          "annualSalaryRange": {
+            "label": "Årlig løn",
+            "placeholder": "Vælg dit løninterval"
+          },
+          "accountPurpose": {
+            "label": "Kontoformål",
+            "placeholder": "Vælg formålet"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Forventet månedligt forbrug",
+            "placeholder": "Vælg dit forbrugsinterval"
+          }
+        },
+        "buttonText": "Indsend ansøgning",
+        "select": "vælg"
+      },
+      "CardPreapproved": {
+        "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
+        "buttonText": "Luk"
+      },
+      "CardProcessing": {
+        "title": "Behandler din ansøgning",
+        "subtitle": "Estimeret ventetid: {waitTime: string}",
+        "buttonText": "Luk"
       }
     }
   }

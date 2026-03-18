@@ -40,5 +40,7 @@ export const useShippingAddressData = () => {
     }
   }, [shippingAddress])
 
-  return { initialAddress, loading }
+  const phone = data?.me?.phone ?? ""
+
+  return { initialAddress, phone, loading }
 }

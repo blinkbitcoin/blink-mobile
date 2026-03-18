@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Trường này là bắt buộc",
       "minChars": "Phải có ít nhất {min} ký tự",
-      "invalidPostalCode": "Mã bưu chính không hợp lệ"
+      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
+      "invalidRegion": "Lựa chọn vùng không hợp lệ"
     }
   },
   "errors": {
@@ -3178,9 +3179,25 @@
       "addressLine1": "Địa chỉ dòng 1",
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",
-      "state": "Tỉnh/Bang",
-      "postalCode": "Mã bưu điện",
       "country": "Quốc gia",
+      "labels": {
+        "state": "Bang",
+        "province": "Tỉnh",
+        "prefecture": "Quận",
+        "oblast": "Vùng",
+        "department": "Sở",
+        "county": "Huyện",
+        "district": "Quận",
+        "doSi": "Do/Si",
+        "island": "Đảo",
+        "emirate": "Tiểu vương quốc",
+        "parish": "Xứ đạo",
+        "region": "Vùng",
+        "zip": "Mã ZIP",
+        "postalCode": "Mã bưu điện",
+        "eircode": "Eircode",
+        "pin": "Mã PIN"
+      },
       "important": "Quan trọng",
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
@@ -3276,16 +3293,28 @@
         "issueType": "Lý do",
         "deliveryTime": "Thời gian giao hàng",
         "shippingCost": "Phí giao hàng",
-        "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
-        "bullet2": "Thẻ mới của bạn sẽ có cùng số với thẻ hiện tại",
-        "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
+        "DamagedInfo": {
+          "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
+          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
+          "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Thẻ của bạn đã được khóa để bảo vệ bạn",
+          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
+          "bullet3": "Thẻ cũ của bạn sẽ bị hủy vĩnh viễn"
+        }
       },
       "Status": {
         "title": "Thẻ mới của bạn đang trên đường đến!",
         "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
         "buttonLabel": "Bảng điều khiển"
       },
-      "title": "Thay thẻ"
+      "title": "Thay thẻ",
+      "errors": {
+        "lockFailed": "Không thể khóa thẻ của bạn. Vui lòng thử lại.",
+        "replaceFailed": "Không thể thay thế thẻ của bạn. Vui lòng thử lại.",
+        "replaceFailedCardLocked": "Thẻ của bạn đã bị khóa nhưng việc thay thế không thành công. Vui lòng liên hệ hỗ trợ để được trợ giúp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Đặt thẻ vật lý",
@@ -3331,7 +3360,107 @@
         "important": "Quan trọng",
         "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
         "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin",
+        "bullet4": "Không thể thay đổi địa chỉ giao hàng sau khi đặt hàng"
+      },
+      "errors": {
+        "createFailed": "Không thể đặt thẻ vật lý của bạn. Vui lòng thử lại."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Xác minh",
+      "CardSubscription": {
+        "subscribeTitle": "Đăng ký",
+        "paymentTitle": "Thanh toán",
+        "acceptButton": "Chấp nhận",
+        "payButton": "Tiếp tục và Thanh toán",
+        "cardTitle": "Blink Riêng tư",
+        "perYear": "mỗi năm",
+        "status": {
+          "label": "Trạng thái",
+          "paymentPending": "Đang Chờ Thanh toán",
+          "firstYearFree": "Năm đầu tiên miễn phí"
+        },
+        "renewalDate": {
+          "label": "Ngày gia hạn"
+        },
+        "agreement": {
+          "text": "Tôi đồng ý với",
+          "termsOfService": "Điều khoản Dịch vụ",
+          "privacyPolicy": "Chính sách Quyền riêng tư",
+          "cardholderAgreement": "Thỏa thuận Chủ thẻ",
+          "and": "và"
+        },
+        "renew": "Tôi hiểu rằng đăng ký của tôi sẽ tự động gia hạn sau 1 năm"
+      },
+      "CardIntroducing": {
+        "title": "Giới thiệu",
+        "cardInfo": {
+          "bitcoinCard": "Thẻ Visa Blink",
+          "for": "dành cho",
+          "maximalist": "Người theo chủ nghĩa Bitcoin tối đa"
+        },
+        "buttonText": "Tiếp tục"
+      },
+      "CardDetails": {
+        "title": "Đặc quyền bổ sung",
+        "features": {
+          "accountManager": "Quản lý tài khoản chuyên trách",
+          "support": "Hỗ trợ ưu tiên",
+          "onchainDeposits": "Hoàn 50% phí giao dịch",
+          "circularEconomies": "100 $ cho kinh tế tuần hoàn"
+        },
+        "andMore": "... và nhiều hơn nữa vào năm 2026",
+        "buttonText": "Tiếp tục"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Chào mừng bạn",
+          "subtitle": "Đến Blink Riêng tư",
+          "paragraphs": {
+            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Riêng tư. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
+            "body2": "Mục tiêu của chúng tôi cho năm 2026 là lấp đầy chương trình với nhiều ưu đãi đến mức việc gia hạn năm sau là điều hiển nhiên."
+          }
+        },
+        "buttonText": "Bắt đầu nào"
+      },
+      "LoadingCard": {
+        "title": "Chúng tôi đang xử lý thẻ của bạn",
+        "subtitle": "Chúng tôi sẽ thông báo khi thẻ sẵn sàng",
+        "codingBackend": "...đang viết mã backend",
+        "buttonText": "Tuyệt"
+      },
+      "PersonalInformation": {
+        "title": "Bước cuối cùng",
+        "fields": {
+          "occupation": {
+            "label": "Nghề nghiệp",
+            "placeholder": "Chọn nghề nghiệp của bạn"
+          },
+          "annualSalaryRange": {
+            "label": "Thu nhập hàng năm",
+            "placeholder": "Chọn mức thu nhập của bạn"
+          },
+          "accountPurpose": {
+            "label": "Mục đích tài khoản",
+            "placeholder": "Chọn mục đích"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Chi tiêu hàng tháng dự kiến",
+            "placeholder": "Chọn mức chi tiêu của bạn"
+          }
+        },
+        "buttonText": "Gửi đơn đăng ký",
+        "select": "chọn"
+      },
+      "CardPreapproved": {
+        "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
+        "buttonText": "Đóng"
+      },
+      "CardProcessing": {
+        "title": "Đang xử lý đơn đăng ký của bạn",
+        "subtitle": "Thời gian chờ ước tính: {waitTime: string}",
+        "buttonText": "Đóng"
       }
     }
   }

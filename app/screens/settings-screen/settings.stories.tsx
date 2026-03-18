@@ -16,13 +16,13 @@ const S1: React.FC = () => (
   <SettingsRow
     title="Non Tappable"
     action={null}
-    leftIcon={"calculator"}
+    leftGaloyIcon={"calculator"}
     rightIcon={null}
   />
 )
 
 const S2: React.FC = () => (
-  <SettingsRow title="Right Arrowed" action={() => {}} leftIcon={"information"} />
+  <SettingsRow title="Right Arrowed" action={() => {}} leftGaloyIcon={"info"} />
 )
 
 export const Default = () => {

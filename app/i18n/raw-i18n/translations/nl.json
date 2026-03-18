@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Dit veld is verplicht",
       "minChars": "Moet minimaal {min} tekens bevatten",
-      "invalidPostalCode": "Ongeldige postcode"
+      "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout",
+      "invalidRegion": "Ongeldige regioselectie"
     }
   },
   "errors": {
@@ -3181,9 +3182,25 @@
       "addressLine1": "Adresregel 1",
       "addressLine2": "Adresregel 2",
       "city": "Stad",
-      "state": "Provincie",
-      "postalCode": "Postcode",
       "country": "Land",
+      "labels": {
+        "state": "Staat",
+        "province": "Provincie",
+        "prefecture": "Prefectuur",
+        "oblast": "Oblast",
+        "department": "Departement",
+        "county": "Provincie",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Eiland",
+        "emirate": "Emiraat",
+        "parish": "Parochie",
+        "region": "Regio",
+        "zip": "Postcode",
+        "postalCode": "Postcode",
+        "eircode": "Eircode",
+        "pin": "PIN-code"
+      },
       "important": "Belangrijk",
       "importantDescription": "Zorg ervoor dat uw adres nauwkeurig en volledig is.",
       "noPOBoxes": "Kaarten kunnen niet worden bezorgd bij postbussen",
@@ -3279,16 +3296,28 @@
         "issueType": "Reden",
         "deliveryTime": "Levertijd",
         "shippingCost": "Bezorgkosten",
-        "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
-        "bullet2": "Je nieuwe kaart heeft dezelfde nummers als je huidige kaart",
-        "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
+        "DamagedInfo": {
+          "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
+          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
+          "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Je kaart is vergrendeld voor je bescherming",
+          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
+          "bullet3": "Je oude kaart wordt permanent geannuleerd"
+        }
       },
       "Status": {
         "title": "Je nieuwe kaart is onderweg!",
         "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
         "buttonLabel": "Dashboard"
       },
-      "title": "Kaart vervangen"
+      "title": "Kaart vervangen",
+      "errors": {
+        "lockFailed": "Kan je kaart niet vergrendelen. Probeer het opnieuw.",
+        "replaceFailed": "Kan je kaart niet vervangen. Probeer het opnieuw.",
+        "replaceFailedCardLocked": "Je kaart is vergrendeld maar de vervanging is mislukt. Neem contact op met de klantenservice voor hulp."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Fysieke kaart bestellen",
@@ -3334,7 +3363,107 @@
         "important": "Belangrijk",
         "bullet1": "Je virtuele kaart blijft actief terwijl je op de fysieke kaart wacht",
         "bullet2": "Je moet je fysieke kaart activeren zodra deze aankomt",
-        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens"
+        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens",
+        "bullet4": "Het verzendadres kan niet worden gewijzigd nadat de bestelling is geplaatst"
+      },
+      "errors": {
+        "createFailed": "Het bestellen van je fysieke kaart is mislukt. Probeer het opnieuw."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Verificatie",
+      "CardSubscription": {
+        "subscribeTitle": "Abonneren",
+        "paymentTitle": "Betaling",
+        "acceptButton": "Accepteren",
+        "payButton": "Doorgaan en Betalen",
+        "cardTitle": "Blink Privé",
+        "perYear": "per jaar",
+        "status": {
+          "label": "Status",
+          "paymentPending": "Betaling in Afwachting",
+          "firstYearFree": "Eerste jaar gratis"
+        },
+        "renewalDate": {
+          "label": "Verlengingsdatum"
+        },
+        "agreement": {
+          "text": "Ik ga akkoord met de",
+          "termsOfService": "Servicevoorwaarden",
+          "privacyPolicy": "Privacybeleid",
+          "cardholderAgreement": "Kaarthouderovereenkomst",
+          "and": "en"
+        },
+        "renew": "Ik begrijp dat mijn abonnement automatisch wordt verlengd over 1 jaar"
+      },
+      "CardIntroducing": {
+        "title": "Introductie",
+        "cardInfo": {
+          "bitcoinCard": "De Blink Visa-kaart",
+          "for": "voor",
+          "maximalist": "Bitcoin Maximalisten"
+        },
+        "buttonText": "Doorgaan"
+      },
+      "CardDetails": {
+        "title": "Extra voordelen",
+        "features": {
+          "accountManager": "Toegewezen accountmanager",
+          "support": "Prioriteitsondersteuning",
+          "onchainDeposits": "50% terug op transactiekosten",
+          "circularEconomies": "$100 voor circulaire economieën"
+        },
+        "andMore": "... en meer komt in 2026",
+        "buttonText": "Doorgaan"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Welkom aan boord",
+          "subtitle": "Bij Blink Privé",
+          "paragraphs": {
+            "body1": "Iemand dacht aan jou en stelde voor dat we je moesten uitnodigen voor Blink Privé. Waarschijnlijk omdat je een geweldige Bitcoiner bent.",
+            "body2": "Ons doel voor 2026 is het programma te vullen met zoveel voordelen dat het vanzelfsprekend is om volgend jaar te verlengen."
+          }
+        },
+        "buttonText": "Laten we gaan"
+      },
+      "LoadingCard": {
+        "title": "We werken aan je kaart",
+        "subtitle": "We laten je weten zodra het klaar is",
+        "codingBackend": "...backend coderen",
+        "buttonText": "Mooi"
+      },
+      "PersonalInformation": {
+        "title": "Laatste stap",
+        "fields": {
+          "occupation": {
+            "label": "Beroep",
+            "placeholder": "Selecteer je beroep"
+          },
+          "annualSalaryRange": {
+            "label": "Jaarsalaris",
+            "placeholder": "Selecteer je salarisniveau"
+          },
+          "accountPurpose": {
+            "label": "Accountdoel",
+            "placeholder": "Selecteer het doel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Verwachte maandelijkse uitgaven",
+            "placeholder": "Selecteer je uitgavenniveau"
+          }
+        },
+        "buttonText": "Aanvraag indienen",
+        "select": "selecteer"
+      },
+      "CardPreapproved": {
+        "title": "U bent vooraf goedgekeurd voor de Blink Visa-kaart!",
+        "buttonText": "Sluiten"
+      },
+      "CardProcessing": {
+        "title": "Je aanvraag wordt verwerkt",
+        "subtitle": "Geschatte wachttijd: {waitTime: string}",
+        "buttonText": "Sluiten"
       }
     }
   }

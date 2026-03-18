@@ -2,7 +2,6 @@ import * as React from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { ListItem, makeStyles, Overlay, useTheme, Text } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -11,6 +10,7 @@ import { useState } from "react"
 import { useAppConfig } from "@app/hooks"
 import { testProps } from "@app/utils/testProps"
 import useLogout from "@app/hooks/use-logout"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import Modal from "react-native-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -140,7 +140,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {selected ? (
-            <Icon name="checkmark-circle-outline" size={20} color={colors._green} />
+            <GaloyIcon name="check-circle" size={20} color={colors._green} />
           ) : (
             <View style={styles.spacerStyle} />
           )}

@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Ekisenge kino kyetaagibwa",
       "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo",
-      "invalidPostalCode": "Koodi y'eposta si nnungi"
+      "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika",
+      "invalidRegion": "Okulonda ekitundu tekikkaanya"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",
-      "state": "State",
-      "postalCode": "Postal code",
       "country": "Country",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Important",
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
@@ -3238,16 +3255,28 @@
         "issueType": "Ensonga",
         "deliveryTime": "Obudde bw'okutuusa",
         "shippingCost": "Bbeeyi y'okutwala",
-        "bullet1": "Kaadi yo ey'omu kaakati ejja kusigala nga ekola okutuusa empya lw'ejja",
-        "bullet2": "Kaadi yo empya ejja kuba n'ennamba ze zimu ng'eza kaadi ey'omu kaakati",
-        "bullet3": "Zikiriza kaadi yo eyonoonese kaadi empya bw'etuuka"
+        "DamagedInfo": {
+          "bullet1": "Kaadi yo ey'obukakafu ejja kusigala nga ekola okutuusa empya lw'ejja",
+          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
+          "bullet3": "Zikiriza kaadi yo eyonoonese empya bw'ejja"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kaadi yo ekkomeddwa okukulabirira",
+          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
+          "bullet3": "Kaadi yo enkadde ejja kusazibwamu ddala"
+        }
       },
       "Status": {
         "title": "Kaadi yo empya eri mu kkubo!",
         "subtitle": "Oda y'okutuma kaadi yo eya Blink eweereddwa.",
         "buttonLabel": "Dashiboodi"
       },
-      "title": "Kyusa kaadi"
+      "title": "Kyusa kaadi",
+      "errors": {
+        "lockFailed": "Tebisobeddwa kusiba kaadi yo. Gezaako oddemu.",
+        "replaceFailed": "Tebisobeddwa kukyusa kaadi yo. Gezaako oddemu.",
+        "replaceFailedCardLocked": "Kaadi yo yakkomeddwa naye okukyusa kwagaanye. Tuukirira bambi okusobola okuyambibwa."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Saba kaadi ey'omubiri",
@@ -3293,7 +3322,107 @@
         "important": "Kikulu",
         "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
         "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
-        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
+        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu",
+        "bullet4": "Endereesi y'okutumira tesobola kukyusibwa oluvannyuma lw'okuteeka ekiragiro"
+      },
+      "errors": {
+        "createFailed": "Tekulemezeka kuteekawo kaadi yo eyiriimu. Gezaako nate."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Okukakasa",
+      "CardSubscription": {
+        "subscribeTitle": "Wewandise",
+        "paymentTitle": "Okusasula",
+        "acceptButton": "Kkiriza",
+        "payButton": "Weyongere era Osasula",
+        "cardTitle": "Blink Ekyama",
+        "perYear": "buli mwaka",
+        "status": {
+          "label": "Embeera",
+          "paymentPending": "Okusasula Kulindirira",
+          "firstYearFree": "Omwaka ogusooka ogw'obwereere"
+        },
+        "renewalDate": {
+          "label": "Ennaku ey'okuddamu okuwandiisa"
+        },
+        "agreement": {
+          "text": "Nzikiriza",
+          "termsOfService": "Amateeka g'Obuweereza",
+          "privacyPolicy": "Enkola y'Ekyama",
+          "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
+          "and": "ne"
+        },
+        "renew": "Ntegeera nti obuwandiisi bwange bujja kuddamu okuwandiisibwa mu mwaka 1"
+      },
+      "CardIntroducing": {
+        "title": "Okwanjula",
+        "cardInfo": {
+          "bitcoinCard": "Kaadi ya Blink Visa",
+          "for": "ya",
+          "maximalist": "Abantu ba Bitcoin"
+        },
+        "buttonText": "Weyongere"
+      },
+      "CardDetails": {
+        "title": "Ebirala ebirungi",
+        "features": {
+          "accountManager": "Omukozi w'akawunti ow'enjawulo",
+          "support": "Obuyambi obw'okusooka",
+          "onchainDeposits": "50% okuddizibwa ku ssente z'okutambula",
+          "circularEconomies": "$100 eri ekonomiya ezeetooloola"
+        },
+        "andMore": "... n'ebirala bijja mu 2026",
+        "buttonText": "Weyongere"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Tukusanyukidde",
+          "subtitle": "Mu Blink Ekyama",
+          "paragraphs": {
+            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Ekyama. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
+            "body2": "Ekigendererwa kyaffe mu 2026 kwe kutekamu pulogulamu ebirungi ebingi nti kiriba kirabika okuddamu okuwandiisa omwaka ogujja."
+          }
+        },
+        "buttonText": "Ka tugende"
+      },
+      "LoadingCard": {
+        "title": "Tukola ku kaadi yo",
+        "subtitle": "Tujja kukumanya nga efunze",
+        "codingBackend": "...kukola backend",
+        "buttonText": "Kirungi"
+      },
+      "PersonalInformation": {
+        "title": "Olugendo olw'enkomerero",
+        "fields": {
+          "occupation": {
+            "label": "Omulimu",
+            "placeholder": "Londa omulimu gwo"
+          },
+          "annualSalaryRange": {
+            "label": "Omusaala gw'omwaka",
+            "placeholder": "Londa ebbanga ly'omusaala gwo"
+          },
+          "accountPurpose": {
+            "label": "Ekigendererwa ky'akawunti",
+            "placeholder": "Londa ekigendererwa"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Enfuna ey'omwezi esuubirwa",
+            "placeholder": "Londa ebbanga ly'enfuna yo"
+          }
+        },
+        "buttonText": "Sindika esabibu",
+        "select": "londa"
+      },
+      "CardPreapproved": {
+        "title": "Okakasiddwa okusookera ku kaadi ya Blink Visa!",
+        "buttonText": "Ggalawo"
+      },
+      "CardProcessing": {
+        "title": "Tukola ku sabiibu yo",
+        "subtitle": "Obudde obw'okulinda obusuubirwa: {waitTime: string}",
+        "buttonText": "Ggala"
       }
     }
   }

@@ -1,8 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { gql } from "@apollo/client"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { UserContact, useUserContactUpdateAliasMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -17,7 +16,6 @@ import type {
   PeopleStackParamList,
   RootStackParamList,
 } from "../../../navigation/stack-param-lists"
-import { testProps } from "../../../utils/testProps"
 import { ContactTransactions } from "./contact-transactions"
 
 type ContactDetailProps = {
@@ -77,12 +75,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   return (
     <Screen headerShown={false}>
       <View style={styles.aliasView}>
-        <Icon
-          {...testProps("contact-detail-icon")}
-          name="person-outline"
-          size={86}
-          color={colors.black}
-        />
+        <GaloyIcon name="user" size={86} color={colors.black} />
         <View style={styles.inputContainer}>
           <Input
             style={styles.alias}

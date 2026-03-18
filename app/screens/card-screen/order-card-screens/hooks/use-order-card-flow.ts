@@ -2,52 +2,88 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MOCK_USER } from "../card-mock-data"
-import { ShippingAddress } from "../types"
+import { getRegionsByCountry } from "@app/utils/address-metadata"
+import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
-import { IssueType, DeliveryType } from "./steps/types"
+const FALLBACK_COUNTRY = "US"
+
+const buildDefaultAddress = (countryCode: string): ShippingAddress => ({
+  firstName: "",
+  lastName: "",
+  line1: "",
+  line2: "",
+  city: "",
+  region: getRegionsByCountry(countryCode)[0]?.value ?? "",
+  postalCode: "",
+  countryCode,
+})
 
 export const Step = {
-  ReportIssue: 1,
-  Delivery: 2,
-  Confirm: 3,
+  Shipping: 1,
+  Confirm: 2,
 } as const
 
 export type StepType = (typeof Step)[keyof typeof Step]
 
 type FlowState = {
-  selectedIssue: IssueType | null
-  selectedDelivery: DeliveryType | null
+  selectedDelivery: DeliveryType
   useRegisteredAddress: boolean
   customAddress: ShippingAddress
 }
 
-type UseReplaceCardFlowReturn = {
+type UseOrderCardFlowParams = {
+  initialAddress: ShippingAddress | null
+}
+
+type UseOrderCardFlowReturn = {
   step: StepType
   state: FlowState
-  setSelectedIssue: (issue: IssueType) => void
-  setSelectedDelivery: (delivery: DeliveryType) => void
   toggleUseRegisteredAddress: () => void
   setCustomAddress: (address: ShippingAddress) => void
   goToNextStep: () => void
   completeFlow: () => void
 }
 
-const FIRST_STEP = Step.ReportIssue
+const FIRST_STEP = Step.Shipping
 const LAST_STEP = Step.Confirm
 
-export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
+export const useOrderCardFlow = ({
+  initialAddress,
+}: UseOrderCardFlowParams): UseOrderCardFlowReturn => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { countryCode: detectedCountry } = useDeviceLocation()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)
-  const [selectedIssue, setSelectedIssue] = useState<IssueType | null>(null)
-  const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType | null>(null)
-  const [useRegisteredAddress, setUseRegisteredAddress] = useState(true)
+  const [selectedDelivery] = useState<DeliveryType>(Delivery.Standard)
+  const [useRegisteredAddress, setUseRegisteredAddress] = useState(
+    initialAddress !== null,
+  )
   const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    MOCK_USER.registeredAddress,
+    initialAddress ?? buildDefaultAddress(FALLBACK_COUNTRY),
   )
   const isCompleteRef = useRef(false)
+  const hasInitializedRef = useRef(initialAddress !== null)
+  const hasAppliedLocationRef = useRef(false)
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return
+    if (!initialAddress) return
+
+    hasInitializedRef.current = true
+    setUseRegisteredAddress(true)
+    setCustomAddress(initialAddress)
+  }, [initialAddress])
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return
+    if (hasAppliedLocationRef.current) return
+    if (!detectedCountry || detectedCountry === FALLBACK_COUNTRY) return
+
+    hasAppliedLocationRef.current = true
+    setCustomAddress(buildDefaultAddress(detectedCountry))
+  }, [detectedCountry])
 
   const goToNextStep = useCallback(() => {
     setStep((prev) => (prev >= LAST_STEP ? prev : ((prev + 1) as StepType)))
@@ -80,13 +116,10 @@ export const useReplaceCardFlow = (): UseReplaceCardFlowReturn => {
   return {
     step,
     state: {
-      selectedIssue,
       selectedDelivery,
       useRegisteredAddress,
       customAddress,
     },
-    setSelectedIssue,
-    setSelectedDelivery,
     toggleUseRegisteredAddress,
     setCustomAddress,
     goToNextStep,

@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "هذا الحقل مطلوب",
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
-      "invalidPostalCode": "رمز بريدي غير صالح"
+      "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي",
+      "invalidRegion": "اختيار منطقة غير صالح"
     }
   },
   "errors": {
@@ -3178,9 +3179,25 @@
       "addressLine1": "سطر العنوان 1",
       "addressLine2": "سطر العنوان 2",
       "city": "المدينة",
-      "state": "الولاية",
-      "postalCode": "الرمز البريدي",
       "country": "البلد",
+      "labels": {
+        "state": "الولاية",
+        "province": "المقاطعة",
+        "prefecture": "المحافظة",
+        "oblast": "المنطقة",
+        "department": "القسم",
+        "county": "المقاطعة",
+        "district": "الحي",
+        "doSi": "دو/سي",
+        "island": "الجزيرة",
+        "emirate": "الإمارة",
+        "parish": "الأبرشية",
+        "region": "المنطقة",
+        "zip": "الرمز البريدي",
+        "postalCode": "الرمز البريدي",
+        "eircode": "Eircode",
+        "pin": "رمز PIN"
+      },
       "important": "مهم",
       "importantDescription": "يرجى التأكد من أن عنوانك دقيق وكامل.",
       "noPOBoxes": "لا يمكن توصيل البطاقات إلى صناديق البريد",
@@ -3276,16 +3293,28 @@
         "issueType": "السبب",
         "deliveryTime": "وقت التسليم",
         "shippingCost": "تكلفة التوصيل",
-        "bullet1": "ستبقى بطاقتك الحالية نشطة حتى وصول البطاقة الجديدة",
-        "bullet2": "ستحمل بطاقتك الجديدة نفس أرقام بطاقتك الحالية",
-        "bullet3": "أتلف بطاقتك التالفة عند وصول البطاقة الجديدة"
+        "DamagedInfo": {
+          "bullet1": "ستبقى بطاقتك الحالية نشطة حتى وصول البطاقة الجديدة",
+          "bullet2": "ستحصل بطاقتك الجديدة على رقم بطاقة جديد",
+          "bullet3": "أتلف بطاقتك التالفة عند وصول البطاقة الجديدة"
+        },
+        "LostStolenInfo": {
+          "bullet1": "تم قفل بطاقتك لحمايتك",
+          "bullet2": "ستحصل بطاقتك الجديدة على رقم بطاقة جديد",
+          "bullet3": "سيتم إلغاء بطاقتك القديمة نهائياً"
+        }
       },
       "Status": {
         "title": "بطاقتك الجديدة في الطريق!",
         "subtitle": "تم تقديم طلب توصيل بطاقة Blink الخاصة بك.",
         "buttonLabel": "لوحة التحكم"
       },
-      "title": "استبدال البطاقة"
+      "title": "استبدال البطاقة",
+      "errors": {
+        "lockFailed": "فشل في قفل بطاقتك. يرجى المحاولة مرة أخرى.",
+        "replaceFailed": "فشل في استبدال بطاقتك. يرجى المحاولة مرة أخرى.",
+        "replaceFailedCardLocked": "تم قفل بطاقتك لكن الاستبدال فشل. يرجى الاتصال بالدعم للمساعدة."
+      }
     },
     "OrderPhysicalCard": {
       "title": "اطلب بطاقة فعلية",
@@ -3331,7 +3360,107 @@
         "important": "مهم",
         "bullet1": "ستظل بطاقتك الافتراضية نشطة أثناء انتظار البطاقة الفعلية",
         "bullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
-        "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
+        "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل",
+        "bullet4": "لا يمكن تغيير عنوان الشحن بعد تقديم الطلب"
+      },
+      "errors": {
+        "createFailed": "فشل طلب بطاقتك الفعلية. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "التحقق",
+      "CardSubscription": {
+        "subscribeTitle": "اشتراك",
+        "paymentTitle": "الدفع",
+        "acceptButton": "قبول",
+        "payButton": "متابعة والدفع",
+        "cardTitle": "بلينك الخاصة",
+        "perYear": "سنوياً",
+        "status": {
+          "label": "الحالة",
+          "paymentPending": "الدفع معلق",
+          "firstYearFree": "السنة الأولى مجانية"
+        },
+        "renewalDate": {
+          "label": "تاريخ التجديد"
+        },
+        "agreement": {
+          "text": "أوافق على",
+          "termsOfService": "شروط الخدمة",
+          "privacyPolicy": "سياسة الخصوصية",
+          "cardholderAgreement": "اتفاقية حامل البطاقة",
+          "and": "و"
+        },
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائياً خلال سنة واحدة"
+      },
+      "CardIntroducing": {
+        "title": "تقديم",
+        "cardInfo": {
+          "bitcoinCard": "بطاقة Blink Visa",
+          "for": "لـ",
+          "maximalist": "أنصار البيتكوين"
+        },
+        "buttonText": "متابعة"
+      },
+      "CardDetails": {
+        "title": "مزايا إضافية",
+        "features": {
+          "accountManager": "مدير حساب مخصص",
+          "support": "دعم ذو أولوية",
+          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
+          "circularEconomies": "100$ للاقتصادات الدائرية"
+        },
+        "andMore": "... والمزيد قادم في 2026",
+        "buttonText": "متابعة"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "مرحباً بك على متن",
+          "subtitle": "إلى Blink الخاصة",
+          "paragraphs": {
+            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink الخاصة. ربما لأنك بيتكويني رائع.",
+            "body2": "هدفنا لعام 2026 هو ملء البرنامج بالكثير من المزايا بحيث سيكون من الواضح التجديد في العام القادم."
+          }
+        },
+        "buttonText": "هيا بنا"
+      },
+      "LoadingCard": {
+        "title": "نعمل على بطاقتك",
+        "subtitle": "سنبلغك عندما تكون جاهزة",
+        "codingBackend": "...نبرمج الخلفية",
+        "buttonText": "رائع"
+      },
+      "PersonalInformation": {
+        "title": "الخطوة الأخيرة",
+        "fields": {
+          "occupation": {
+            "label": "المهنة",
+            "placeholder": "اختر مهنتك"
+          },
+          "annualSalaryRange": {
+            "label": "الراتب السنوي",
+            "placeholder": "اختر نطاق راتبك"
+          },
+          "accountPurpose": {
+            "label": "غرض الحساب",
+            "placeholder": "اختر الغرض"
+          },
+          "expectedMonthlyVolume": {
+            "label": "الإنفاق الشهري المتوقع",
+            "placeholder": "اختر نطاق إنفاقك"
+          }
+        },
+        "buttonText": "تقديم الطلب",
+        "select": "اختر"
+      },
+      "CardPreapproved": {
+        "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
+        "buttonText": "إغلاق"
+      },
+      "CardProcessing": {
+        "title": "جارٍ معالجة طلبك",
+        "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
+        "buttonText": "إغلاق"
       }
     }
   }

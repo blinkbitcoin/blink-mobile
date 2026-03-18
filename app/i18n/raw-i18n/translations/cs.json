@@ -2795,7 +2795,8 @@
     "validation": {
       "required": "Toto pole je povinné",
       "minChars": "Musí obsahovat alespoň {min} znaků",
-      "invalidPostalCode": "Neplatné PSČ"
+      "invalidPostalCode": "Neplatné PSČ, pravděpodobně překlep",
+      "invalidRegion": "Neplatný výběr regionu"
     }
   },
   "errors": {
@@ -3181,9 +3182,25 @@
       "addressLine1": "Adresa řádek 1",
       "addressLine2": "Adresa řádek 2",
       "city": "Město",
-      "state": "Stát",
-      "postalCode": "PSČ",
       "country": "Země",
+      "labels": {
+        "state": "Stát",
+        "province": "Provincie",
+        "prefecture": "Prefektura",
+        "oblast": "Oblast",
+        "department": "Departement",
+        "county": "Okres",
+        "district": "Okres",
+        "doSi": "Do/Si",
+        "island": "Ostrov",
+        "emirate": "Emirát",
+        "parish": "Farnost",
+        "region": "Region",
+        "zip": "PSČ",
+        "postalCode": "Poštovní směrovací číslo",
+        "eircode": "Eircode",
+        "pin": "PIN kód"
+      },
       "important": "Důležité",
       "importantDescription": "Ujistěte se, že vaše adresa je přesná a úplná.",
       "noPOBoxes": "Karty nelze doručit na poštovní schránky",
@@ -3279,16 +3296,28 @@
         "issueType": "Důvod",
         "deliveryTime": "Doba doručení",
         "shippingCost": "Cena doručení",
-        "bullet1": "Vaše aktuální karta zůstane aktivní, dokud nedorazí nová",
-        "bullet2": "Vaše nová karta bude mít stejná čísla jako současná",
-        "bullet3": "Po doručení nové karty zničte poškozenou kartu"
+        "DamagedInfo": {
+          "bullet1": "Vaše současná karta zůstane aktivní, dokud nedorazí nová",
+          "bullet2": "Vaše nová karta bude mít nové číslo karty",
+          "bullet3": "Zničte svou poškozenou kartu, když dorazí nová"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Vaše karta byla uzamčena pro vaši ochranu",
+          "bullet2": "Vaše nová karta bude mít nové číslo karty",
+          "bullet3": "Vaše stará karta bude trvale zrušena"
+        }
       },
       "Status": {
         "title": "Vaše nová karta je na cestě!",
         "subtitle": "Objednávka doručení vaší karty Blink byla odeslána.",
         "buttonLabel": "Přehled"
       },
-      "title": "Vyměnit kartu"
+      "title": "Vyměnit kartu",
+      "errors": {
+        "lockFailed": "Nepodařilo se zamknout vaši kartu. Zkuste to prosím znovu.",
+        "replaceFailed": "Nepodařilo se vyměnit vaši kartu. Zkuste to prosím znovu.",
+        "replaceFailedCardLocked": "Vaše karta byla uzamčena, ale výměna selhala. Kontaktujte prosím podporu pro pomoc."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Objednat fyzickou kartu",
@@ -3334,7 +3363,107 @@
         "important": "Důležité",
         "bullet1": "Virtuální karta zůstane aktivní, zatímco budete čekat na fyzickou kartu",
         "bullet2": "Po doručení budete muset fyzickou kartu aktivovat",
-        "bullet3": "Obě karty budou mít stejné číslo a údaje"
+        "bullet3": "Obě karty budou mít stejné číslo a údaje",
+        "bullet4": "Doručovací adresu nelze po zadání objednávky změnit"
+      },
+      "errors": {
+        "createFailed": "Nepodařilo se objednat vaši fyzickou kartu. Zkuste to prosím znovu."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Ověření",
+      "CardSubscription": {
+        "subscribeTitle": "Předplatit",
+        "paymentTitle": "Platba",
+        "acceptButton": "Přijmout",
+        "payButton": "Pokračovat a Zaplatit",
+        "cardTitle": "Blink Privátní",
+        "perYear": "za rok",
+        "status": {
+          "label": "Stav",
+          "paymentPending": "Platba Čeká",
+          "firstYearFree": "První rok zdarma"
+        },
+        "renewalDate": {
+          "label": "Datum obnovení"
+        },
+        "agreement": {
+          "text": "Souhlasím s",
+          "termsOfService": "Podmínkami služby",
+          "privacyPolicy": "Zásadami ochrany osobních údajů",
+          "cardholderAgreement": "Smlouvou držitele karty",
+          "and": "a"
+        },
+        "renew": "Rozumím, že mé předplatné se automaticky obnoví za 1 rok"
+      },
+      "CardIntroducing": {
+        "title": "Představujeme",
+        "cardInfo": {
+          "bitcoinCard": "Karta Blink Visa",
+          "for": "pro",
+          "maximalist": "Bitcoin maximalisty"
+        },
+        "buttonText": "Pokračovat"
+      },
+      "CardDetails": {
+        "title": "Další výhody",
+        "features": {
+          "accountManager": "Vyhrazený správce účtu",
+          "support": "Prioritní podpora",
+          "onchainDeposits": "50% zpět z transakčních poplatků",
+          "circularEconomies": "100 $ pro cirkulární ekonomiky"
+        },
+        "andMore": "... a další přijdou v roce 2026",
+        "buttonText": "Pokračovat"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Vítejte na palubě",
+          "subtitle": "V Blink Privátní",
+          "paragraphs": {
+            "body1": "Někdo na vás myslel a navrhl, že bychom vás měli pozvat do Blink Privátní. Pravděpodobně proto, že jste skvělý Bitcoiner.",
+            "body2": "Naším cílem pro rok 2026 je naplnit program tolika výhodami, že bude zřejmé, že se vyplatí příští rok obnovit."
+          }
+        },
+        "buttonText": "Pojďme na to"
+      },
+      "LoadingCard": {
+        "title": "Pracujeme na vaší kartě",
+        "subtitle": "Upozorníme vás, jakmile bude připravena",
+        "codingBackend": "...kódujeme backend",
+        "buttonText": "Skvěle"
+      },
+      "PersonalInformation": {
+        "title": "Poslední krok",
+        "fields": {
+          "occupation": {
+            "label": "Povolání",
+            "placeholder": "Vyberte své povolání"
+          },
+          "annualSalaryRange": {
+            "label": "Roční plat",
+            "placeholder": "Vyberte svůj platový rozsah"
+          },
+          "accountPurpose": {
+            "label": "Účel účtu",
+            "placeholder": "Vyberte účel"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Očekávané měsíční výdaje",
+            "placeholder": "Vyberte svůj rozsah výdajů"
+          }
+        },
+        "buttonText": "Odeslat žádost",
+        "select": "vybrat"
+      },
+      "CardPreapproved": {
+        "title": "Byli jste předschváleni pro kartu Blink Visa!",
+        "buttonText": "Zavřít"
+      },
+      "CardProcessing": {
+        "title": "Zpracováváme vaši žádost",
+        "subtitle": "Odhadovaná doba čekání: {waitTime: string}",
+        "buttonText": "Zavřít"
       }
     }
   }

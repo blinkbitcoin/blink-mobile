@@ -10,8 +10,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated"
-import Icon from "react-native-vector-icons/Ionicons"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 const TOUCH_AREA_HEIGHT = 82
 const MAX_SWIPE_DISTANCE = 80
@@ -125,7 +125,7 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
                 {isLoading ? (
                   <ActivityIndicator size="small" color={colors.grey2} />
                 ) : (
-                  <Icon name="chevron-up-outline" size={18} color={colors.grey2} />
+                  <GaloyIcon name="caret-up" size={18} color={colors.grey2} />
                 )}
               </Animated.View>
             )}

@@ -45,14 +45,17 @@ jest.mock("@app/components/atomic/galoy-primary-button", () => ({
     title,
     onPress,
     disabled,
+    loading,
   }: {
     title: string
     onPress: () => void
     disabled: boolean
+    loading?: boolean
   }) => (
     <View
       testID="primary-button"
       accessibilityState={{ disabled }}
+      accessibilityValue={{ text: loading ? "loading" : "idle" }}
       onTouchEnd={disabled ? undefined : onPress}
     >
       <RNText>{title}</RNText>
@@ -179,6 +182,33 @@ describe("SteppedCardLayout", () => {
 
       const icon = getByTestId("galoy-icon-report-flag")
       expect(icon.props.accessibilityHint).toBe("#3B82F6")
+    })
+  })
+
+  describe("loading", () => {
+    it("disables button when loading is true", () => {
+      const { getByTestId } = render(
+        <SteppedCardLayout {...defaultProps} loading={true} />,
+      )
+
+      const button = getByTestId("primary-button")
+      expect(button.props.accessibilityState).toEqual({ disabled: true })
+    })
+
+    it("passes loading to button", () => {
+      const { getByTestId } = render(
+        <SteppedCardLayout {...defaultProps} loading={true} />,
+      )
+
+      const button = getByTestId("primary-button")
+      expect(button.props.accessibilityValue).toEqual({ text: "loading" })
+    })
+
+    it("button is idle when not loading", () => {
+      const { getByTestId } = render(<SteppedCardLayout {...defaultProps} />)
+
+      const button = getByTestId("primary-button")
+      expect(button.props.accessibilityValue).toEqual({ text: "idle" })
     })
   })
 })

@@ -2795,7 +2795,8 @@
         "validation": {
             "required": "この項目は必須です",
             "minChars": "{min}文字以上で入力してください",
-            "invalidPostalCode": "無効な郵便番号"
+            "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります",
+            "invalidRegion": "地域の選択が無効です"
         }
     },
     "errors": {
@@ -3181,11 +3182,27 @@
             "addressLine1": "住所1",
             "addressLine2": "住所2",
             "city": "市区町村",
-            "state": "都道府県",
-            "postalCode": "郵便番号",
             "country": "国",
             "important": "重要",
             "importantDescription": "住所が正確で完全であることを確認してください。",
+            "labels": {
+                "state": "州",
+                "province": "州",
+                "prefecture": "都道府県",
+                "oblast": "州",
+                "department": "県",
+                "county": "郡",
+                "district": "区",
+                "doSi": "道/市",
+                "island": "島",
+                "emirate": "首長国",
+                "parish": "教区",
+                "region": "地域",
+                "zip": "郵便番号",
+                "postalCode": "郵便番号",
+                "eircode": "Eircode",
+                "pin": "PINコード"
+            },
             "noPOBoxes": "私書箱には配達できません",
             "signatureRequired": "配達時に署名が必要な場合があります",
             "supportedRegions": "配送対応地域内の住所である必要があります"
@@ -3270,15 +3287,27 @@
                 "deliveryTime": "配達時間",
                 "shippingCost": "配送料",
                 "importantInformation": "重要な情報",
-                "bullet1": "新しいカードが届くまで現在のカードは有効のままです",
-                "bullet2": "新しいカードは現在のカードと同じ番号になります",
-                "bullet3": "新しいカードが届いたら破損したカードを処分してください",
+                "DamagedInfo": {
+                    "bullet1": "現在のカードは新しいカードが届くまでアクティブなままです",
+                    "bullet2": "新しいカードには新しいカード番号が付きます",
+                    "bullet3": "新しいカードが届いたら破損したカードを破棄してください"
+                },
+                "LostStolenInfo": {
+                    "bullet1": "お客様の保護のためカードがロックされました",
+                    "bullet2": "新しいカードには新しいカード番号が付きます",
+                    "bullet3": "古いカードは永久にキャンセルされます"
+                },
                 "submitRequest": "リクエストを送信"
             },
             "Status": {
                 "title": "新しいカードが届きます！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
                 "buttonLabel": "ダッシュボード"
+            },
+            "errors": {
+                "lockFailed": "カードのロックに失敗しました。もう一度お試しください。",
+                "replaceFailed": "カードの交換に失敗しました。もう一度お試しください。",
+                "replaceFailedCardLocked": "カードはロックされましたが、交換に失敗しました。サポートにお問い合わせください。"
             }
         },
         "OrderPhysicalCard": {
@@ -3322,7 +3351,107 @@
                 "important": "重要",
                 "bullet1": "物理カードを待っている間もバーチャルカードは有効です",
                 "bullet2": "物理カードが届いたら有効化が必要です",
-                "bullet3": "両方のカードは同じカード番号と詳細になります"
+                "bullet3": "両方のカードは同じカード番号と詳細になります",
+                "bullet4": "注文後に配送先住所を変更することはできません"
+            },
+            "errors": {
+                "createFailed": "物理カードの注文に失敗しました。もう一度お試しください。"
+            }
+        },
+        "Onboarding": {
+            "kycHeaderTitle": "本人確認",
+            "CardSubscription": {
+                "subscribeTitle": "購読",
+                "paymentTitle": "お支払い",
+                "acceptButton": "承諾",
+                "payButton": "続行して支払う",
+                "cardTitle": "Blink プライベート",
+                "perYear": "年額",
+                "status": {
+                    "label": "ステータス",
+                    "paymentPending": "支払い保留中",
+                    "firstYearFree": "初年度無料"
+                },
+                "renewalDate": {
+                    "label": "更新日"
+                },
+                "agreement": {
+                    "text": "以下に同意します",
+                    "termsOfService": "利用規約",
+                    "privacyPolicy": "プライバシーポリシー",
+                    "cardholderAgreement": "カード会員契約",
+                    "and": "および"
+                },
+                "renew": "サブスクリプションが1年後に自動更新されることを理解しています"
+            },
+            "CardIntroducing": {
+                "title": "ご紹介",
+                "cardInfo": {
+                    "bitcoinCard": "Blink Visaカード",
+                    "for": "",
+                    "maximalist": "ビットコインマキシマリスト向け"
+                },
+                "buttonText": "続ける"
+            },
+            "CardDetails": {
+                "title": "追加特典",
+                "features": {
+                    "accountManager": "専任アカウントマネージャー",
+                    "support": "優先サポート",
+                    "onchainDeposits": "取引手数料の50%キャッシュバック",
+                    "circularEconomies": "循環型経済に100ドル"
+                },
+                "andMore": "... さらに2026年に追加予定",
+                "buttonText": "続ける"
+            },
+            "WelcomeOnboard": {
+                "welcomeMessage": {
+                    "title": "ようこそ",
+                    "subtitle": "Blink プライベートへ",
+                    "paragraphs": {
+                        "body1": "あなたのことを考えた方が、Blink プライベートにお招きすることを提案しました。おそらくあなたが素晴らしいビットコイナーだからです。",
+                        "body2": "2026年の私たちの目標は、来年の更新が当然と思えるほど多くの特典でプログラムを充実させることです。"
+                    }
+                },
+                "buttonText": "始めましょう"
+            },
+            "LoadingCard": {
+                "title": "カードを準備中です",
+                "subtitle": "準備ができましたらお知らせします",
+                "codingBackend": "...バックエンドをコーディング中",
+                "buttonText": "了解"
+            },
+            "PersonalInformation": {
+                "title": "最終ステップ",
+                "fields": {
+                    "occupation": {
+                        "label": "職業",
+                        "placeholder": "職業を選択してください"
+                    },
+                    "annualSalaryRange": {
+                        "label": "年収",
+                        "placeholder": "年収の範囲を選択してください"
+                    },
+                    "accountPurpose": {
+                        "label": "アカウントの目的",
+                        "placeholder": "目的を選択してください"
+                    },
+                    "expectedMonthlyVolume": {
+                        "label": "予想月間支出",
+                        "placeholder": "支出の範囲を選択してください"
+                    }
+                },
+                "buttonText": "申請を提出",
+                "select": "選択"
+            },
+            "CardPreapproved": {
+                "title": "Blink Visaカードの事前承認が完了しました！",
+                "buttonText": "閉じる"
+            },
+            "CardProcessing": {
+                "title": "申請を処理中",
+                "subtitle": "推定待ち時間: {waitTime: string}",
+                "buttonText": "閉じる"
             }
         }
     }

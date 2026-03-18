@@ -1,15 +1,20 @@
-import React from "react"
-import { useTheme } from "@rn-vui/themed"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { ActivityIndicator, View } from "react-native"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
+import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toastShow } from "@app/utils/toast"
 
-import { MOCK_USER } from "../card-mock-data"
+import { useCardData } from "../hooks"
+import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
+import { EMPTY_ADDRESS, ShippingAddress } from "../types"
 import { ShippingStep, ConfirmStep } from "./steps"
-import { useOrderCardFlow, Step } from "./use-order-card-flow"
+import { useCreateCard, useOrderCardFlow, Step } from "./hooks"
 
 type StepConfig = {
   icon: "delivery"
@@ -21,30 +26,83 @@ type StepConfig = {
   isButtonDisabled: boolean
 }
 
+const mapToShippingInput = (address: ShippingAddress, phoneNumber: string) => ({
+  firstName: address.firstName,
+  lastName: address.lastName,
+  line1: address.line1,
+  line2: address.line2,
+  city: address.city,
+  region: address.region,
+  postalCode: address.postalCode,
+  countryCode: address.countryCode,
+  // TODO: UI has no phone number input field — using account phone as fallback
+  phoneNumber,
+})
+
 export const OrderCardScreen: React.FC = () => {
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
+  const { applicationId, loading: cardLoading, error: cardError } = useCardData()
+  const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()
+  const { createCard, loading: createLoading } = useCreateCard()
+  const [isFormValid, setIsFormValid] = useState(false)
+  const hasHandledErrorRef = useRef(false)
+
+  useEffect(() => {
+    if (cardLoading || hasHandledErrorRef.current) return
+
+    if (cardError) {
+      hasHandledErrorRef.current = true
+      toastShow({ message: cardError.message, type: "warning", LL })
+      navigation.goBack()
+      return
+    }
+
+    if (!applicationId) {
+      hasHandledErrorRef.current = true
+      toastShow({
+        message: LL.CardFlow.OrderPhysicalCard.errors.createFailed(),
+        type: "warning",
+        LL,
+      })
+      navigation.goBack()
+    }
+  }, [cardLoading, cardError, applicationId, LL, navigation])
+
   const {
     step,
     state,
-    isComplete,
     toggleUseRegisteredAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,
-  } = useOrderCardFlow()
+  } = useOrderCardFlow({ initialAddress })
 
   const steps = [
     LL.CardFlow.OrderPhysicalCard.steps.shipping(),
     LL.CardFlow.OrderPhysicalCard.steps.confirm(),
   ]
 
-  const handleSubmit = () => {
-    if (isComplete) return
+  const registeredAddress = useMemo(
+    () => initialAddress ?? EMPTY_ADDRESS,
+    [initialAddress],
+  )
+
+  const handleSubmit = useCallback(async () => {
+    if (!applicationId) return
+
+    const address = state.useRegisteredAddress ? registeredAddress : state.customAddress
+    const result = await createCard({
+      applicationId,
+      shippingAddress: mapToShippingInput(address, phone),
+    })
+    if (!result) return
+
     completeFlow()
     navigation.replace("cardStatusScreen", {
       title: LL.CardFlow.CardStatus.PhysicalCardOrdered.title(),
@@ -53,8 +111,20 @@ export const OrderCardScreen: React.FC = () => {
       navigateTo: "cardCreatePinScreen",
       iconName: "delivery",
       iconColor: colors._green,
+      lastFour: result.lastFour,
     })
-  }
+  }, [
+    applicationId,
+    state.useRegisteredAddress,
+    state.customAddress,
+    registeredAddress,
+    phone,
+    createCard,
+    completeFlow,
+    navigation,
+    LL,
+    colors._green,
+  ])
 
   const getStepConfig = (): StepConfig => {
     switch (step) {
@@ -66,7 +136,7 @@ export const OrderCardScreen: React.FC = () => {
           subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
           buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
-          isButtonDisabled: false,
+          isButtonDisabled: !state.useRegisteredAddress && !isFormValid,
         }
       case Step.Confirm:
         return {
@@ -76,24 +146,27 @@ export const OrderCardScreen: React.FC = () => {
           subtitle: LL.CardFlow.OrderPhysicalCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.OrderPhysicalCard.Confirm.placeOrder(),
           onButtonPress: handleSubmit,
-          isButtonDisabled: false,
+          isButtonDisabled: !applicationId || createLoading,
         }
       default: {
         const _exhaustive: never = step
-        throw new Error(`Unhandled step: ${_exhaustive}`)
+        throw new Error(`Unknown step: ${_exhaustive}`)
       }
     }
   }
 
-  const renderStepContent = () => {
+  const renderStepContent = (): React.ReactNode => {
     switch (step) {
       case Step.Shipping:
         return (
           <ShippingStep
+            hasRegisteredAddress={initialAddress !== null}
+            registeredAddress={registeredAddress}
             useRegisteredAddress={state.useRegisteredAddress}
             onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
             customAddress={state.customAddress}
             onCustomAddressChange={setCustomAddress}
+            onFormValidityChange={setIsFormValid}
           />
         )
       case Step.Confirm:
@@ -101,17 +174,29 @@ export const OrderCardScreen: React.FC = () => {
           <ConfirmStep
             deliveryType={state.selectedDelivery}
             shippingAddress={
-              state.useRegisteredAddress
-                ? MOCK_USER.registeredAddress
-                : state.customAddress
+              state.useRegisteredAddress ? registeredAddress : state.customAddress
             }
           />
         )
       default: {
         const _exhaustive: never = step
-        throw new Error(`Unhandled step: ${_exhaustive}`)
+        throw new Error(`Unknown step: ${_exhaustive}`)
       }
     }
+  }
+
+  if (cardLoading || addressLoading) {
+    return (
+      <Screen>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            testID="activity-indicator"
+            size="large"
+            color={colors.primary}
+          />
+        </View>
+      </Screen>
+    )
   }
 
   const stepConfig = getStepConfig()
@@ -127,8 +212,17 @@ export const OrderCardScreen: React.FC = () => {
       buttonLabel={stepConfig.buttonLabel}
       onButtonPress={stepConfig.onButtonPress}
       isButtonDisabled={stepConfig.isButtonDisabled}
+      loading={createLoading}
     >
       {renderStepContent()}
     </SteppedCardLayout>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+}))

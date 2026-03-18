@@ -15,15 +15,16 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { MOCK_USER } from "../../card-mock-data"
-import { ShippingAddress } from "../../types"
-import { addressToLines } from "../../utils"
+import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
+import { addressToLines } from "@app/screens/card-screen/utils"
+
 import { useSharedStepStyles } from "./shared-styles"
-import { Delivery, DeliveryType } from "./types"
 
 type DeliveryStepProps = {
   selectedDelivery: DeliveryType | null
   onSelectDelivery: (delivery: DeliveryType) => void
+  hasRegisteredAddress: boolean
+  registeredAddress: ShippingAddress
   useRegisteredAddress: boolean
   onToggleUseRegisteredAddress: () => void
   customAddress: ShippingAddress
@@ -33,6 +34,8 @@ type DeliveryStepProps = {
 export const DeliveryStep: React.FC<DeliveryStepProps> = ({
   selectedDelivery,
   onSelectDelivery,
+  hasRegisteredAddress,
+  registeredAddress,
   useRegisteredAddress,
   onToggleUseRegisteredAddress,
   customAddress,
@@ -48,10 +51,6 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
   const { formatCurrency } = useDisplayCurrency()
 
   const { Delivery: deliveryLL } = LL.CardFlow.ReplaceCard
-
-  const currentAddress = useRegisteredAddress
-    ? MOCK_USER.registeredAddress
-    : customAddress
 
   const getDays = (type: DeliveryType) => {
     const config = replaceCardDeliveryConfig[type]
@@ -101,20 +100,24 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
         ]}
       />
 
-      <View style={sharedStyles.section}>
-        <Text style={sharedStyles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
-        <MultiLineField
-          lines={addressToLines(currentAddress, false)}
-          leftIcon="map-pin"
-        />
-      </View>
+      {hasRegisteredAddress && useRegisteredAddress && (
+        <View style={sharedStyles.section}>
+          <Text style={sharedStyles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
+          <MultiLineField
+            lines={addressToLines(registeredAddress, false)}
+            leftIcon="map-pin"
+          />
+        </View>
+      )}
 
       <View style={localStyles.checkboxFormGroup}>
-        <CheckboxRow
-          label={deliveryLL.useRegisteredAddress()}
-          isChecked={useRegisteredAddress}
-          onPress={onToggleUseRegisteredAddress}
-        />
+        {hasRegisteredAddress && (
+          <CheckboxRow
+            label={deliveryLL.useRegisteredAddress()}
+            isChecked={useRegisteredAddress}
+            onPress={onToggleUseRegisteredAddress}
+          />
+        )}
 
         {!useRegisteredAddress && (
           <ShippingAddressForm

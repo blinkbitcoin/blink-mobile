@@ -2778,7 +2778,8 @@
     "validation": {
       "required": "Sehemu hii inahitajika",
       "minChars": "Lazima iwe na angalau herufi {min}",
-      "invalidPostalCode": "Nambari ya posta si sahihi"
+      "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika",
+      "invalidRegion": "Uchaguzi wa eneo si sahihi"
     }
   },
   "errors": {
@@ -3140,9 +3141,25 @@
       "addressLine1": "Mstari wa anwani 1",
       "addressLine2": "Mstari wa anwani 2",
       "city": "Jiji",
-      "state": "Jimbo",
-      "postalCode": "Msimbo wa posta",
       "country": "Nchi",
+      "labels": {
+        "state": "Jimbo",
+        "province": "Mkoa",
+        "prefecture": "Wilaya",
+        "oblast": "Oblast",
+        "department": "Idara",
+        "county": "Kaunti",
+        "district": "Wilaya",
+        "doSi": "Do/Si",
+        "island": "Kisiwa",
+        "emirate": "Emirate",
+        "parish": "Parokia",
+        "region": "Eneo",
+        "zip": "Msimbo wa ZIP",
+        "postalCode": "Msimbo wa posta",
+        "eircode": "Eircode",
+        "pin": "Msimbo wa PIN"
+      },
       "important": "Muhimu",
       "importantDescription": "Tafadhali hakikisha anwani yako ni sahihi na kamili.",
       "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
@@ -3238,16 +3255,28 @@
         "issueType": "Sababu",
         "deliveryTime": "Muda wa uwasilishaji",
         "shippingCost": "Gharama ya utoaji",
-        "bullet1": "Kadi yako ya sasa itabaki hai hadi mpya itakapofika",
-        "bullet2": "Kadi yako mpya itakuwa na nambari sawa na kadi ya sasa",
-        "bullet3": "Haribu kadi yako iliyoharibiwa kadi mpya itakapofika"
+        "DamagedInfo": {
+          "bullet1": "Kadi yako ya sasa itaendelea kutumika hadi mpya ifike",
+          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
+          "bullet3": "Haribu kadi yako iliyoharibika wakati mpya inafika"
+        },
+        "LostStolenInfo": {
+          "bullet1": "Kadi yako imefungwa kwa ulinzi wako",
+          "bullet2": "Kadi yako mpya itakuwa na nambari mpya ya kadi",
+          "bullet3": "Kadi yako ya zamani itafutwa kabisa"
+        }
       },
       "Status": {
         "title": "Kadi yako mpya iko njiani!",
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limewasilishwa.",
         "buttonLabel": "Dashibodi"
       },
-      "title": "Badilisha kadi"
+      "title": "Badilisha kadi",
+      "errors": {
+        "lockFailed": "Imeshindikana kufunga kadi yako. Tafadhali jaribu tena.",
+        "replaceFailed": "Imeshindikana kubadilisha kadi yako. Tafadhali jaribu tena.",
+        "replaceFailedCardLocked": "Kadi yako ilifungwa lakini ubadilishaji umeshindwa. Tafadhali wasiliana na msaada kwa usaidizi."
+      }
     },
     "OrderPhysicalCard": {
       "title": "Agiza kadi ya kimwili",
@@ -3293,7 +3322,107 @@
         "important": "Muhimu",
         "bullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
         "bullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
-        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale"
+        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale",
+        "bullet4": "Anwani ya usafirishaji haiwezi kubadilishwa baada ya agizo kutolewa"
+      },
+      "errors": {
+        "createFailed": "Imeshindikana kuagiza kadi yako halisi. Tafadhali jaribu tena."
+      }
+    },
+    "Onboarding": {
+      "kycHeaderTitle": "Uthibitishaji",
+      "CardSubscription": {
+        "subscribeTitle": "Jiandikishe",
+        "paymentTitle": "Malipo",
+        "acceptButton": "Kubali",
+        "payButton": "Endelea na Kulipa",
+        "cardTitle": "Blink Binafsi",
+        "perYear": "kwa mwaka",
+        "status": {
+          "label": "Hali",
+          "paymentPending": "Malipo Yanasubiri",
+          "firstYearFree": "Mwaka wa kwanza bure"
+        },
+        "renewalDate": {
+          "label": "Tarehe ya kuhuisha"
+        },
+        "agreement": {
+          "text": "Ninakubali",
+          "termsOfService": "Masharti ya Huduma",
+          "privacyPolicy": "Sera ya Faragha",
+          "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
+          "and": "na"
+        },
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa moja kwa moja baada ya mwaka 1"
+      },
+      "CardIntroducing": {
+        "title": "Kuanzisha",
+        "cardInfo": {
+          "bitcoinCard": "Kadi ya Blink Visa",
+          "for": "kwa",
+          "maximalist": "Wapenzi wa Bitcoin"
+        },
+        "buttonText": "Endelea"
+      },
+      "CardDetails": {
+        "title": "Faida za ziada",
+        "features": {
+          "accountManager": "Meneja akaunti maalum",
+          "support": "Msaada wa kipaumbele",
+          "onchainDeposits": "Urejeshaji wa 50% kwa ada za muamala",
+          "circularEconomies": "$100 kwa uchumi wa mzunguko"
+        },
+        "andMore": "... na zaidi zinakuja 2026",
+        "buttonText": "Endelea"
+      },
+      "WelcomeOnboard": {
+        "welcomeMessage": {
+          "title": "Karibu kwenye bodi",
+          "subtitle": "Kwa Blink Binafsi",
+          "paragraphs": {
+            "body1": "Mtu fulani alikufikiria na kupendekeza kwamba tukualike kwa Blink Binafsi. Labda kwa sababu wewe ni Bitcoiner mzuri sana.",
+            "body2": "Lengo letu kwa 2026 ni kujaza programu na vitu vingi vizuri hivi kwamba itakuwa dhahiri kuhuisha mwaka ujao."
+          }
+        },
+        "buttonText": "Twende"
+      },
+      "LoadingCard": {
+        "title": "Tunafanya kazi kwenye kadi yako",
+        "subtitle": "Tutakuarifu inapokuwa tayari",
+        "codingBackend": "...kuandika msimbo wa nyuma",
+        "buttonText": "Vizuri"
+      },
+      "PersonalInformation": {
+        "title": "Hatua ya mwisho",
+        "fields": {
+          "occupation": {
+            "label": "Kazi",
+            "placeholder": "Chagua kazi yako"
+          },
+          "annualSalaryRange": {
+            "label": "Mshahara wa kila mwaka",
+            "placeholder": "Chagua kiwango cha mshahara wako"
+          },
+          "accountPurpose": {
+            "label": "Madhumuni ya akaunti",
+            "placeholder": "Chagua madhumuni"
+          },
+          "expectedMonthlyVolume": {
+            "label": "Matumizi ya kila mwezi yanayotarajiwa",
+            "placeholder": "Chagua kiwango cha matumizi yako"
+          }
+        },
+        "buttonText": "Wasilisha maombi",
+        "select": "chagua"
+      },
+      "CardPreapproved": {
+        "title": "Umeidhinishwa mapema kwa kadi ya Blink Visa!",
+        "buttonText": "Funga"
+      },
+      "CardProcessing": {
+        "title": "Tunashughulikia maombi yako",
+        "subtitle": "Muda wa kusubiri unaokadiriwa: {waitTime: string}",
+        "buttonText": "Funga"
       }
     }
   }

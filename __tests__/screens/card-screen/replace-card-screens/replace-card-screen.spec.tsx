@@ -40,9 +40,34 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  MOCK_USER: {
-    registeredAddress: {
+jest.mock(
+  "@app/utils/address-metadata",
+  () =>
+    jest.requireActual<typeof import("../helpers/mock-address-metadata")>(
+      "../helpers/mock-address-metadata",
+    ).mockAddressMetadata,
+)
+
+jest.mock("@app/screens/card-screen/utils", () => ({
+  addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(
+    "../helpers/mock-address-utils",
+  ).mockAddressToLines,
+}))
+
+jest.mock("@app/utils/helper", () => ({
+  isIos: false,
+}))
+
+const mockCardReplace = jest.fn()
+const mockLockCard = jest.fn()
+
+jest.mock("@app/screens/card-screen/hooks", () => ({
+  useCardData: () => ({ card: { id: "card-123", cardType: "PHYSICAL" } }),
+}))
+
+jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => ({
+  useShippingAddressData: () => ({
+    initialAddress: {
       firstName: "Satoshi",
       lastName: "Nakamoto",
       line1: "123 Main Street",
@@ -50,45 +75,21 @@ jest.mock("@app/screens/card-screen/card-mock-data", () => ({
       city: "New York",
       region: "NY",
       postalCode: "10001",
-      countryCode: "USA",
+      countryCode: "US",
     },
-  },
+    loading: false,
+  }),
 }))
 
-jest.mock("@app/screens/card-screen/country-region-data", () => ({
-  COUNTRIES: [{ value: "USA", label: "United States" }],
-  getRegionsByCountry: () => [{ value: "NY", label: "New York" }],
+jest.mock("@app/screens/card-screen/replace-card-screens/hooks", () => ({
+  ...jest.requireActual("@app/screens/card-screen/replace-card-screens/hooks"),
+  useReplaceCard: () => ({ replaceCard: mockCardReplace, loading: false }),
+  useLockCard: () => ({ lockCard: mockLockCard, loading: false }),
 }))
 
-jest.mock("@app/screens/card-screen/utils", () => ({
-  addressToLines: (
-    address: {
-      firstName: string
-      lastName: string
-      line1: string
-      line2: string
-      city: string
-      region: string
-      postalCode: string
-      countryCode: string
-    },
-    includeFullName = true,
-  ) => {
-    const lines: string[] = []
-    if (includeFullName) {
-      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
-      if (name) lines.push(name)
-    }
-    lines.push(address.line1)
-    if (address.line2) lines.push(address.line2)
-    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
-    lines.push(address.countryCode)
-    return lines
-  },
-}))
-
-jest.mock("@app/utils/helper", () => ({
-  isIos: false,
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  CardType: { Virtual: "VIRTUAL", Physical: "PHYSICAL" },
 }))
 
 const mockNavigate = jest.fn()
@@ -104,6 +105,7 @@ jest.mock("@react-navigation/native", () => {
       replace: mockReplace,
       addListener: mockAddListener,
     }),
+    useRoute: () => ({ params: { cardId: "card-123" } }),
   }
 })
 
@@ -112,6 +114,8 @@ describe("ReplaceCardScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
+    mockCardReplace.mockResolvedValue({ lastFour: "4321", cardType: "VIRTUAL" })
+    mockLockCard.mockResolvedValue(true)
   })
 
   describe("rendering", () => {
@@ -167,7 +171,29 @@ describe("ReplaceCardScreen", () => {
       expect(getByText("Damaged card")).toBeTruthy()
     })
 
-    it("selects an issue and advances to step 2", async () => {
+    it("selects Damaged and advances to step 2 (delivery for physical)", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Damaged card"))
+      })
+
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(getByText("Delivery options")).toBeTruthy()
+    })
+  })
+
+  describe("lock on lost/stolen", () => {
+    it("calls lockCard when Lost selected and Continue pressed", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <ReplaceCardScreen />
@@ -184,12 +210,64 @@ describe("ReplaceCardScreen", () => {
         fireEvent.press(getByText("Continue"))
       })
 
+      expect(mockLockCard).toHaveBeenCalledWith("card-123")
+
       expect(getByText("Delivery options")).toBeTruthy()
     })
-  })
 
-  describe("step 2 - delivery", () => {
-    const advanceToStep2 = async (getByText: ReturnType<typeof render>["getByText"]) => {
+    it("calls lockCard when Stolen selected", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Stolen card"))
+      })
+
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(mockLockCard).toHaveBeenCalledWith("card-123")
+
+      expect(getByText("Delivery options")).toBeTruthy()
+    })
+
+    it("does NOT call lockCard when Damaged selected", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Damaged card"))
+      })
+
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(mockLockCard).not.toHaveBeenCalled()
+    })
+
+    it("stays on step 1 when lock fails", async () => {
+      mockLockCard.mockResolvedValueOnce(false)
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
       await act(async () => {
         fireEvent.press(getByText("Lost card"))
       })
@@ -197,9 +275,25 @@ describe("ReplaceCardScreen", () => {
       await act(async () => {
         fireEvent.press(getByText("Continue"))
       })
+
+      expect(mockLockCard).toHaveBeenCalledWith("card-123")
+      expect(queryByText("Delivery options")).toBeNull()
+      expect(getByText("Report card Issue")).toBeTruthy()
+    })
+  })
+
+  describe("step 2 - delivery (physical)", () => {
+    const advanceToStep2 = async (getByText: ReturnType<typeof render>["getByText"]) => {
+      await act(async () => {
+        fireEvent.press(getByText("Damaged card"))
+      })
+
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
     }
 
-    it("displays delivery options", async () => {
+    it("displays delivery options after advancing from step 1", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <ReplaceCardScreen />
@@ -213,34 +307,12 @@ describe("ReplaceCardScreen", () => {
       expect(getByText("Standard delivery")).toBeTruthy()
       expect(getByText("Express delivery")).toBeTruthy()
     })
-
-    it("selects delivery and advances to step 3", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <ReplaceCardScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      await advanceToStep2(getByText)
-
-      await act(async () => {
-        fireEvent.press(getByText("Standard delivery"))
-      })
-
-      await act(async () => {
-        fireEvent.press(getByText("Continue"))
-      })
-
-      expect(getByText("Confirm replacement")).toBeTruthy()
-    })
   })
 
   describe("step 3 - confirm", () => {
     const advanceToStep3 = async (getByText: ReturnType<typeof render>["getByText"]) => {
       await act(async () => {
-        fireEvent.press(getByText("Lost card"))
+        fireEvent.press(getByText("Damaged card"))
       })
 
       await act(async () => {
@@ -256,7 +328,7 @@ describe("ReplaceCardScreen", () => {
       })
     }
 
-    it("displays confirm content", async () => {
+    it("displays confirm content after completing flow", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <ReplaceCardScreen />
@@ -272,6 +344,8 @@ describe("ReplaceCardScreen", () => {
     })
 
     it("submits and navigates to status screen", async () => {
+      mockCardReplace.mockResolvedValueOnce({ lastFour: "4321", cardType: "VIRTUAL" })
+
       const { getByText } = render(
         <ContextForScreen>
           <ReplaceCardScreen />
@@ -286,6 +360,7 @@ describe("ReplaceCardScreen", () => {
         fireEvent.press(getByText("Submit request"))
       })
 
+      expect(mockCardReplace).toHaveBeenCalledWith("card-123")
       expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
         title: "Your new card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
@@ -293,13 +368,50 @@ describe("ReplaceCardScreen", () => {
         navigateTo: "cardDashboardScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        lastFour: "4321",
       })
+    })
+
+    it("stays on screen when replace fails", async () => {
+      mockCardReplace.mockResolvedValueOnce(null)
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await advanceToStep3(getByText)
+
+      await act(async () => {
+        fireEvent.press(getByText("Submit request"))
+      })
+
+      expect(mockCardReplace).toHaveBeenCalledWith("card-123")
+      expect(mockReplace).not.toHaveBeenCalled()
     })
   })
 
-  describe("complete flow", () => {
-    it("navigates through all steps and submits", async () => {
-      const { getByText } = render(
+  describe("virtual card flow", () => {
+    beforeEach(() => {
+      jest
+        .spyOn(
+          jest.requireMock("@app/screens/card-screen/hooks") as {
+            useCardData: () => { card: { id: string; cardType: string } }
+          },
+          "useCardData",
+        )
+        .mockReturnValue({ card: { id: "card-123", cardType: "VIRTUAL" } })
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it("skips delivery step: ReportIssue then Confirm directly", async () => {
+      const { getByText, queryByText } = render(
         <ContextForScreen>
           <ReplaceCardScreen />
         </ContextForScreen>,
@@ -317,23 +429,8 @@ describe("ReplaceCardScreen", () => {
         fireEvent.press(getByText("Continue"))
       })
 
-      expect(getByText("Delivery options")).toBeTruthy()
-
-      await act(async () => {
-        fireEvent.press(getByText("Express delivery"))
-      })
-
-      await act(async () => {
-        fireEvent.press(getByText("Continue"))
-      })
-
+      expect(queryByText("Delivery options")).toBeNull()
       expect(getByText("Confirm replacement")).toBeTruthy()
-
-      await act(async () => {
-        fireEvent.press(getByText("Submit request"))
-      })
-
-      expect(mockReplace).toHaveBeenCalledTimes(1)
     })
   })
 })

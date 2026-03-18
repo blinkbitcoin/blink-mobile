@@ -24,7 +24,7 @@ export const LanguageSetting: React.FC = () => {
     <SettingsRow
       loading={loading}
       title={`${LL.common.language()}: ${languageValue}`}
-      leftIcon="language"
+      leftGaloyIcon="translate"
       action={() => navigate("language")}
     />
   )

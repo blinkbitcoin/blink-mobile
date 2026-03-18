@@ -185,7 +185,7 @@ export const EmailSetting: React.FC = () => {
       loading={loading}
       spinner={emDelLoading || emRegLoading}
       title={title(email, emailVerified, LL)}
-      leftIcon="mail-outline"
+      leftGaloyIcon="email-add"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
       rightIconAction={rightIconAction}

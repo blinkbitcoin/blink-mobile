@@ -21425,6 +21425,11 @@ phin@^2.9.1:
   resolved "https://registry.npmjs.org/phin/-/phin-2.9.3.tgz#f9b6ac10a035636fb65dfc576aaaa17b8743125c"
   integrity sha512-CzFr90qM24ju5f88quFC/6qohjC144rehe5n6DH900lgXmUe86+xCKc10ev56gRKC4/BkHUoG4uSiQgBiIXwDA==
 
+phosphor-react-native@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/phosphor-react-native/-/phosphor-react-native-3.0.3.tgz#e59c8d3e2c231db2a339322565abdaed78ae2186"
+  integrity sha512-h8UIIG/V4pgm20uvkt7L8G/GsOWKaU7rnyu2jnGt1vKmaigE0GZWXOHoEw9wZcfATHwvUpr/mkubEG/nbKeJkg==
+
 picocolors@^0.2.1:
   version "0.2.1"
   resolved "https://registry.npmjs.org/picocolors/-/picocolors-0.2.1.tgz#570670f793646851d1ba135996962abad587859f"
@@ -21600,11 +21605,6 @@ possible-typed-array-names@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/possible-typed-array-names/-/possible-typed-array-names-1.0.0.tgz#89bb63c6fada2c3e90adc4a647beeeb39cc7bf8f"
   integrity sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==
-
-postcode-validator@^3.10.9:
-  version "3.10.9"
-  resolved "https://registry.yarnpkg.com/postcode-validator/-/postcode-validator-3.10.9.tgz#26a63308a94c404776d535139b24983053ba6e91"
-  integrity sha512-1gDRLSV/ChHRRjgqlM9Mz7chR02wkgoyX+7d1S1OCnskTG8WpGdFasKLmtZYhQVW6Ykq+eASrP+Ph8hG7CtwQA==
 
 postcss-flexbugs-fixes@^4.2.1:
   version "4.2.1"

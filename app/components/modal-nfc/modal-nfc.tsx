@@ -3,7 +3,7 @@ import { Alert, Pressable, View } from "react-native"
 import Modal from "react-native-modal"
 import NfcManager, { Ndef, NdefRecord, NfcTech } from "react-native-nfc-manager"
 import { SafeAreaView } from "react-native-safe-area-context"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { LNURL_DOMAINS } from "@app/config"
 import {
@@ -204,13 +204,13 @@ export const ModalNfc: React.FC<{
       <Pressable style={styles.flex} onPress={dismiss}></Pressable>
       <SafeAreaView style={styles.modalForeground}>
         <View style={styles.iconContainer}>
-          <Icon name="remove" size={72} color={colors.grey3} style={styles.icon} />
+          <GaloyIcon name="minus" size={72} color={colors.grey3} style={styles.icon} />
         </View>
         <Text type="h1" bold style={styles.message}>
           {LL.SettingsScreen.nfcScanNow()}
         </Text>
         <View style={styles.scanIconContainer}>
-          <Icon name="scan" size={140} color={colors.grey1} />
+          <GaloyIcon name="scan" size={140} color={colors.grey1} />
         </View>
         <View style={styles.buttonContainer}>
           <GaloySecondaryButton title={LL.common.cancel()} onPress={dismiss} />
