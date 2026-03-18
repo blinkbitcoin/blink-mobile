@@ -51,7 +51,11 @@ import {
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { normalizeString } from "@app/utils/helper"
-import { isPhoneNumber, parseValidPhoneNumber } from "@app/utils/phone"
+import {
+  isPhoneNumber,
+  parseValidPhoneNumber,
+  sanitizePhoneNumber,
+} from "@app/utils/phone"
 import { isInt } from "validator"
 
 gql`
@@ -883,7 +887,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     setKeepCountryCode(false)
 
     try {
-      const clipboard = await Clipboard.getString()
+      const clipboard = sanitizePhoneNumber(await Clipboard.getString())
 
       let parsed = null
       parsed = parseValidPhone(clipboard)
@@ -1005,7 +1009,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           }
           onChangeText={(text) => {
             onFocusedInput(InputType.Phone)
-            setRawPhoneNumber(text)
+            setRawPhoneNumber(sanitizePhoneNumber(text))
           }}
           onChangeInfo={(e) => {
             setDefaultPhoneInputInfo(e)
