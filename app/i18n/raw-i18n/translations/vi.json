@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notification Settings",
     "pushNotifications": "Push Notifications",
+    "statusAll": "Tất cả",
+    "statusNone": "Không có",
+    "statusSome": "Một số",
     "notificationCategories": {
       "Circles": {
         "title": "Circles",

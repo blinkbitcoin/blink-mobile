@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notification Settings",
     "pushNotifications": "Push Notifications",
+    "statusAll": "الكل",
+    "statusNone": "لا شيء",
+    "statusSome": "بعض",
     "notificationCategories": {
       "Circles": {
         "title": "Circles",

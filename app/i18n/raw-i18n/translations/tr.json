@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Bildirim Ayarları",
     "pushNotifications": "Anlık Bildirimler",
+    "statusAll": "Tümü",
+    "statusNone": "Hiçbiri",
+    "statusSome": "Bazıları",
     "notificationCategories": {
       "Circles": {
         "title": "Çevreler",

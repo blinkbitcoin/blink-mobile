@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Pengaturan Notifikasi",
     "pushNotifications": "Notifikasi Push",
+    "statusAll": "Semua",
+    "statusNone": "Tidak ada",
+    "statusSome": "Beberapa",
     "notificationCategories": {
       "Circles": {
         "title": "Lingkaran",

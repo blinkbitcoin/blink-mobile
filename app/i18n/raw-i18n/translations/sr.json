@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notification Settings",
     "pushNotifications": "Push Notifications",
+    "statusAll": "Све",
+    "statusNone": "Ниједна",
+    "statusSome": "Неке",
     "notificationCategories": {
       "Circles": {
         "title": "Circles",

@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notification Settings",
     "pushNotifications": "Push Notifications",
+    "statusAll": "ทั้งหมด",
+    "statusNone": "ไม่มี",
+    "statusSome": "บางส่วน",
     "notificationCategories": {
       "Circles": {
         "title": "Circles",

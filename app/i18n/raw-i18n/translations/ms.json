@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Tetapan Notifikasi",
     "pushNotifications": "Paparan notifikasi",
+    "statusAll": "Semua",
+    "statusNone": "Tiada",
+    "statusSome": "Sebahagian",
     "notificationCategories": {
       "Circles": {
         "title": "Kumpulan kecil",

@@ -2360,6 +2360,9 @@
     "NotificationSettingsScreen": {
         "title": "通知設定",
         "pushNotifications": "プッシュ通知",
+        "statusAll": "すべて",
+        "statusNone": "なし",
+        "statusSome": "一部",
         "notificationCategories": {
             "Circles": {
                 "title": "サークル",

@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Setări pentru notificări",
     "pushNotifications": "Notificări Push",
+    "statusAll": "Toate",
+    "statusNone": "Niciuna",
+    "statusSome": "Unele",
     "notificationCategories": {
       "Circles": {
         "title": "Cercuri",

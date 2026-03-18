@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Értesítési beállítások",
     "pushNotifications": "Push értesítések",
+    "statusAll": "Összes",
+    "statusNone": "Egyik sem",
+    "statusSome": "Néhány",
     "notificationCategories": {
       "Circles": {
         "title": "Körök",

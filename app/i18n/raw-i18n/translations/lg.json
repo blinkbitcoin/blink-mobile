@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Enteekateeka Ezitegeeza",
     "pushNotifications": "Okumanyinyisibwa okusika",
+    "statusAll": "Zonna",
+    "statusNone": "Tewali",
+    "statusSome": "Ezimu",
     "notificationCategories": {
       "Circles": {
         "title": "Enkulungo",
