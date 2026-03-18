@@ -2113,7 +2113,7 @@
     "activateNotifications": "Szeretnéd aktiválni az értesítéseket, hogy értesülj, amikor megérkezik a fizetés?",
     "copyClipboard": "Számla a vágólapra másolva",
     "copyClipboardBitcoin": "Bitcoin cím a vágólapra másolva",
-    "copyClipboardPaycode": "Paycode/LNURL a vágólapra  másolva",
+    "copyClipboardPaycode": "Lightning cím a vágólapra másolva",
     "invoicePaid": "Ez a számla kifizetésre került",
     "setNote": "jegyzet beállítása",
     "tapQrCodeCopy": "QR kód másolása érintéssel",

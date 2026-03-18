@@ -2113,7 +2113,7 @@
     "activateNotifications": "Je, unataka kuamsha taarifa ili uweze kuarifiwa wakati malipo yatakapowasili?",
     "copyClipboard": "Bili imekopishwa kwenye ubao wa kunakili",
     "copyClipboardBitcoin": "Anwani ya Bitcoin imekopishwa kwenye ubao wa kunakili",
-    "copyClipboardPaycode": "Paycode/LNURL imekopishwa kwenye ubao wa kunakili",
+    "copyClipboardPaycode": "Anwani ya Lightning imekopishwa kwenye ubao wa kunakili",
     "invoicePaid": "Hii bili imefutwa",
     "setNote": "weka ujumbe",
     "tapQrCodeCopy": "Gusa Msimbo wa QR kuunakili",

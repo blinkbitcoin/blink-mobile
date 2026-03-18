@@ -2120,7 +2120,7 @@
     "activateNotifications": "Anda nak aktifkan notifikasi jika terima bayaran?",
     "copyClipboard": "Invois telah disalin pada clipboard",
     "copyClipboardBitcoin": "Alamat bitcoin telah disalin ke dalam clipboard",
-    "copyClipboardPaycode": "Kod bayaran/LNURL telah disalin pada papan klip",
+    "copyClipboardPaycode": "Alamat Lightning telah disalin pada papan klip",
     "invoicePaid": "Invois ini telah dibayar",
     "setNote": "Beri pesanan",
     "tapQrCodeCopy": "Tekan untuk salin kod QR",

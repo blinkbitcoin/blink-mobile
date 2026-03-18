@@ -2120,7 +2120,7 @@
     "activateNotifications": "Chcete aktivovat oznámení, abyste byli informováni o příchozích platbách?",
     "copyClipboard": "Faktura byla zkopírována do schránky",
     "copyClipboardBitcoin": "Bitcoinová adresa byla zkopírována do schránky",
-    "copyClipboardPaycode": "Paycode/LNURL byl zkopírován do schránky",
+    "copyClipboardPaycode": "Lightning adresa byla zkopírována do schránky",
     "invoicePaid": "Tato faktura byla uhrazena",
     "setNote": "nastavit poznámku",
     "tapQrCodeCopy": "Klepnutím na QR kód ho zkopírujete",

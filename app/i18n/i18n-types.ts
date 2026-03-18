@@ -6660,7 +6660,7 @@ type RootTranslation = {
 		 */
 		copyClipboardBitcoin: string
 		/**
-		 * P​a​y​c​o​d​e​/​L​N​U​R​L​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copyClipboardPaycode: string
 		/**
@@ -17881,7 +17881,7 @@ export type TranslationFunctions = {
 		 */
 		copyClipboardBitcoin: () => LocalizedString
 		/**
-		 * Paycode/LNURL has been copied in the clipboard
+		 * Lightning address has been copied in the clipboard
 		 */
 		copyClipboardPaycode: () => LocalizedString
 		/**

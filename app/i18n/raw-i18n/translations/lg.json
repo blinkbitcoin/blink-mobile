@@ -2113,7 +2113,7 @@
     "activateNotifications": "Oyagala okutandika okumanyisibwa okutegeezebwa ng’okusasula kutuuse?",
     "copyClipboard": "Yinivoyisi ewanduukuluddwa ku lutimbe",
     "copyClipboardBitcoin": "Endagiriro ya Bitcoin ewanduukuluddwa ku lutimbe",
-    "copyClipboardPaycode": "Paycode/LNURL ekoppoloddwa ku lutimbe",
+    "copyClipboardPaycode": "Endereço ya Lightning ekoppoloddwa ku lutimbe",
     "invoicePaid": "Yinivoyisi esasuddwa",
     "setNote": "Teekawo akawandiiko",
     "tapQrCodeCopy": "Kona ku QR Code okugiwanduukulula",

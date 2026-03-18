@@ -2113,7 +2113,7 @@
     "activateNotifications": "Doriți să activați notificările pentru a fi notificat când plata a sosit?",
     "copyClipboard": "Factura a fost copiată în clipboard",
     "copyClipboardBitcoin": "Adresa Bitcoin a fost copiată în clipboard",
-    "copyClipboardPaycode": "Codul de plată/LNURL a fost copiat în clipboard",
+    "copyClipboardPaycode": "Adresa Lightning a fost copiată în clipboard",
     "invoicePaid": "Această factură a fost plătită",
     "setNote": "Setați o notă",
     "tapQrCodeCopy": "Atingeți Codul QR pentru a copia",

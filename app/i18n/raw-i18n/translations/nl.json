@@ -2120,7 +2120,7 @@
     "activateNotifications": "Wil je notificaties activeren om op de hoogte te worden gehouden wanneer de betaling is binnengekomen?",
     "copyClipboard": "Factuur is gekopieerd naar het klembord",
     "copyClipboardBitcoin": "Bitcoin-adres is gekopieerd naar het klembord",
-    "copyClipboardPaycode": "Betaalcode/LNURL is naar het klembord gekopieerd",
+    "copyClipboardPaycode": "Lightning-adres is naar het klembord gekopieerd",
     "invoicePaid": "Deze factuur is betaald",
     "setNote": "zet een noot",
     "tapQrCodeCopy": "Tik op QR-code om te kopiëren",

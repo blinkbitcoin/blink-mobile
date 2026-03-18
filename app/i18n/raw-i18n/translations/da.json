@@ -2116,7 +2116,7 @@
     "activateNotifications": "Ønsker du at aktivere notifikationer for at blive underrettet, når betalingen er modtaget?",
     "copyClipboard": "Fakturaen er blevet kopieret i udklipsholderen",
     "copyClipboardBitcoin": "Bitcoin-adressen er blevet kopieret i udklipsholderen",
-    "copyClipboardPaycode": "Paycode/LNURL er blevet kopieret i udklipsholderen",
+    "copyClipboardPaycode": "Lightning-adressen er blevet kopieret til udklipsholderen",
     "invoicePaid": "Denne faktura er blevet betalt",
     "setNote": "tilføj en note",
     "tapQrCodeCopy": "Tryk på QR-koden for at kopiere.",

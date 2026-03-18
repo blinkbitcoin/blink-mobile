@@ -2113,7 +2113,7 @@
         "activateNotifications": "¿Quieres activar notificaciones para que te avisen cuando haya llegado el pago?",
         "copyClipboard": "La factura se ha copiado al portapapeles",
         "copyClipboardBitcoin": "La dirección de Bitcoin se ha copiado al portapapeles",
-        "copyClipboardPaycode": "El código de pago/LNURL se ha copiado en el portapapeles",
+        "copyClipboardPaycode": "La dirección Lightning se ha copiado en el portapapeles",
         "invoicePaid": "Esta factura ha sido pagada",
         "setNote": "ingrese una nota",
         "tapQrCodeCopy": "Toque el código QR para copiar",

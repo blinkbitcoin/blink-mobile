@@ -2113,7 +2113,7 @@
     "activateNotifications": "Apakah Anda ingin mengaktifkan notifikasi untuk diberi tahu saat pembayaran tiba?",
     "copyClipboard": "Faktur telah disalin ke papan klip",
     "copyClipboardBitcoin": "Alamat Bitcoin telah disalin ke papan klip",
-    "copyClipboardPaycode": "Kode bayar/LNURL telah disalin ke papan klip",
+    "copyClipboardPaycode": "Alamat Lightning telah disalin ke papan klip",
     "invoicePaid": "Faktur ini telah dibayar",
     "setNote": "atur catatan",
     "tapQrCodeCopy": "Ketuk Kode QR untuk Menyalin",

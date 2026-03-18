@@ -2137,7 +2137,7 @@
     "activateNotifications": "Ngaba uyafuna ukwenza izaziso zisebenze xa intlawulo ifikile?",
     "copyClipboard": "I-invoyisi ikhutshelwe kwibhodi eqhotyoshwayo",
     "copyClipboardBitcoin": "Idilesi yeBitcoin ikhutshelwe kwibhodi eqhotyoshwayo",
-    "copyClipboardPaycode": "IPaycode/LNURL ikopishwe kwibhodi eqhotyoshwayo",
+    "copyClipboardPaycode": "Idilesi ye-Lightning ikopishwe kwibhodi eqhotyoshwayo",
     "invoicePaid": "Le invoyisi ihlawulwe",
     "setNote": "seta inqaku",
     "tapQrCodeCopy": "Cofa iKhowudi yeQR ukukopa",
