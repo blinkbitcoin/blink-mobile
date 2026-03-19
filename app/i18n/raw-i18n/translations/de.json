@@ -3130,7 +3130,7 @@
                 "title": "Herzlichen Glückwunsch!",
                 "subtitle": "Deine Blink Visa-Karte wurde aktiviert.",
                 "buttonLabel": "Physische Karte bestellen",
-                "buttonLabelDashboard": "Dashboard"
+                "buttonLabelDashboard": "Übersicht"
             },
             "PhysicalCardOrdered": {
                 "title": "Deine physische Karte ist unterwegs!",
