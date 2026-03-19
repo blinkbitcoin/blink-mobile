@@ -23,7 +23,7 @@ export const CurrencyPill = ({
   containerStyle,
   onLayout,
 }: {
-  currency?: WalletCurrency | "ALL" | CardCurrency
+  currency?: CardCurrency | WalletCurrency | "ALL"
   label?: string
   containerSize?: "small" | "medium" | "large"
   highlighted?: boolean
