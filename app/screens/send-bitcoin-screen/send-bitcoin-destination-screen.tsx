@@ -884,11 +884,12 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     setKeepCountryCode(false)
 
     try {
-      const clipboard = sanitizePhoneNumber(await Clipboard.getString())
+      const clipboardValue = await Clipboard.getString()
+      const clipboardPhoneNumber = sanitizePhoneNumber(clipboardValue)
 
-      let parsed = null
-      parsed = parseValidPhone(clipboard)
-      const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
+      const parsed = parseValidPhone(clipboardPhoneNumber)
+      const parseNumber =
+        parsed && parsed?.isValid() ? parsed.number : clipboardPhoneNumber
 
       updateMatchingContacts(parseNumber)
       dispatchDestinationStateAction({
