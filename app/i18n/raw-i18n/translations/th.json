@@ -2358,16 +2358,19 @@
     "displayCurrency": "สกุลเงินแสดงผล"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "ตั้งค่าการแจ้งเตือน",
+    "pushNotifications": "การแจ้งเตือนแบบพุช",
+    "statusAll": "ทั้งหมด",
+    "statusNone": "ไม่มี",
+    "statusSome": "บางส่วน",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "วงจร",
+        "description": "การแจ้งเตือนเกี่ยวกับวงจรของคุณ"
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "การชำระเงิน",
+        "description": "การแจ้งเตือนเกี่ยวกับการส่งและรับการชำระเงิน"
       },
       "Marketing": {
         "title": "ฟีเจอร์และอัปเดต",

@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notificatie instellingen",
     "pushNotifications": "Pushmeldingen",
+    "statusAll": "Alle",
+    "statusNone": "Geen",
+    "statusSome": "Sommige",
     "notificationCategories": {
       "Circles": {
         "title": "Cirkels",

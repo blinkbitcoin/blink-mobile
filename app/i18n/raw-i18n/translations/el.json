@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Ρυθμίσεις ειδοποιήσεων",
     "pushNotifications": "Προώθηση ειδοποιήσεων",
+    "statusAll": "Όλες",
+    "statusNone": "Καμία",
+    "statusSome": "Μερικές",
     "notificationCategories": {
       "Circles": {
         "title": "Κύκλοι επαφών",

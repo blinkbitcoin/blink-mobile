@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Postavke obavijesti",
     "pushNotifications": "Push obavijesti",
+    "statusAll": "Sve",
+    "statusNone": "Nijedna",
+    "statusSome": "Neke",
     "notificationCategories": {
       "Circles": {
         "title": "Krugovi",

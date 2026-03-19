@@ -2379,6 +2379,9 @@
   "NotificationSettingsScreen": {
     "title": "Iisetingi zezaziso",
     "pushNotifications": "Vumela zonke",
+    "statusAll": "Zonke",
+    "statusNone": "Akukho",
+    "statusSome": "Ezinye",
     "notificationCategories": {
       "Circles": {
         "title": "Izangqa",

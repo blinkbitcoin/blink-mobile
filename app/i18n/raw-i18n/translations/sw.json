@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Mipangilio ya Arifa",
     "pushNotifications": "Arifa za Kusukuma",
+    "statusAll": "Zote",
+    "statusNone": "Hakuna",
+    "statusSome": "Baadhi",
     "notificationCategories": {
       "Circles": {
         "title": "Vikundi",

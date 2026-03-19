@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Nastavenia upozornení",
     "pushNotifications": "Push upozornenia",
+    "statusAll": "Všetky",
+    "statusNone": "Žiadne",
+    "statusSome": "Niektoré",
     "notificationCategories": {
       "Circles": {
         "title": "Kruhy",

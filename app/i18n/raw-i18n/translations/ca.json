@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Configuració de notificacions",
     "pushNotifications": "Notificacions automatiques",
+    "statusAll": "Totes",
+    "statusNone": "Cap",
+    "statusSome": "Algunes",
     "notificationCategories": {
       "Circles": {
         "title": "Cercles",

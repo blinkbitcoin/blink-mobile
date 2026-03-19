@@ -2343,10 +2343,13 @@
     "NotificationSettingsScreen": {
         "title": "Benachrichtigungseinstellungen",
         "pushNotifications": "Push-Benachrichtigungen",
+        "statusAll": "Alle",
+        "statusNone": "Keine",
+        "statusSome": "Einige",
         "notificationCategories": {
             "Circles": {
-                "title": "Circles",
-                "description": "Benachrichtigungen über Ihre Circles."
+                "title": "Kreise",
+                "description": "Benachrichtigungen über Ihre Kreise."
             },
             "Payments": {
                 "title": "Zahlungen",

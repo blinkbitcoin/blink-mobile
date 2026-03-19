@@ -7575,6 +7575,18 @@ type RootTranslation = {
 		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
+		/**
+		 * A​l​l
+		 */
+		statusAll: string
+		/**
+		 * N​o​n​e
+		 */
+		statusNone: string
+		/**
+		 * S​o​m​e
+		 */
+		statusSome: string
 		notificationCategories: {
 			Circles: {
 				/**
@@ -18759,6 +18771,18 @@ export type TranslationFunctions = {
 		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
+		/**
+		 * All
+		 */
+		statusAll: () => LocalizedString
+		/**
+		 * None
+		 */
+		statusNone: () => LocalizedString
+		/**
+		 * Some
+		 */
+		statusSome: () => LocalizedString
 		notificationCategories: {
 			Circles: {
 				/**

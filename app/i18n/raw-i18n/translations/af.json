@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notaverstellings",
     "pushNotifications": "Belangrike notas",
+    "statusAll": "Almal",
+    "statusNone": "Geen",
+    "statusSome": "Sommige",
     "notificationCategories": {
       "Circles": {
         "title": "Sirkels",

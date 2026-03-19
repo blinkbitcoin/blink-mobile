@@ -2414,6 +2414,9 @@ const en: BaseTranslation = {
   NotificationSettingsScreen: {
     title: "Notification settings",
     pushNotifications: "Enable all",
+    statusAll: "All",
+    statusNone: "None",
+    statusSome: "Some",
     notificationCategories: {
       Circles: {
         title: "Circles",

@@ -2358,16 +2358,19 @@
     "displayCurrency": "Rikuchiy qullqi laya"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Willakuy churanakuna",
+    "pushNotifications": "Willakuykunata tanqay",
+    "statusAll": "Lliw",
+    "statusNone": "Mana ima",
+    "statusSome": "Wakin",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Muyu",
+        "description": "Muyuykikunamanta willakuykuna."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Pagokuna",
+        "description": "Qullqi apachiykunamanta chaskiykunamantapas willakuykuna."
       },
       "Marketing": {
         "title": "Musuq ruwanakuna willakuykuna",

@@ -112,7 +112,7 @@ gql`
   }
 `
 
-const NotificationCategories = {
+export const NotificationCategories = {
   Payments: "Payments",
   Circles: "Circles",
   Price: "Price",
