@@ -3,7 +3,7 @@ import { LayoutChangeEvent } from "react-native"
 import rnTextSize from "react-native-text-size-latest"
 
 import type { WalletCurrency } from "@app/graphql/generated"
-import { CARD } from "@app/types/amounts"
+import type { CardCurrency } from "@app/types/amounts"
 import {
   CURRENCY_PILL_BORDER_WIDTH,
   CURRENCY_PILL_PADDING_HORIZONTAL,
@@ -17,6 +17,7 @@ type UseEqualPillWidthOptions = {
 
 const BTC: WalletCurrency = "BTC"
 const USD: WalletCurrency = "USD"
+const CARD: CardCurrency = "CARD"
 
 export const useEqualPillWidth = (options?: UseEqualPillWidthOptions) => {
   const labels = options?.labels
