@@ -1,6 +1,6 @@
 import "@formatjs/intl-getcanonicallocales/polyfill"
 import "@formatjs/intl-locale/polyfill"
-import "@formatjs/intl-numberformat/polyfill-force"
+import "@formatjs/intl-numberformat/polyfill-force.js"
 import "@formatjs/intl-relativetimeformat/polyfill"
 
 import "@formatjs/intl-numberformat/locale-data/af"
