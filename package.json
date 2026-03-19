@@ -68,6 +68,7 @@
     "@expo/react-native-action-sheet": "^4.0.1",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
     "@formatjs/intl-locale": "^3.4.5",
+    "@formatjs/intl-numberformat": "^9.2.4",
     "@formatjs/intl-relativetimeformat": "^11.2.12",
     "@galoymoney/react-native-geetest-module": "^0.1.3",
     "@gorhom/bottom-sheet": "^5.2.8",
