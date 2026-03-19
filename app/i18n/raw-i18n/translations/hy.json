@@ -2358,19 +2358,19 @@
     "displayCurrency": "Ցուցադրման արժույթ"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Ծանուցումների կարգավորումներ",
+    "pushNotifications": "Հրումային ծանուցումներ",
     "statusAll": "Բոլորը",
     "statusNone": "Ոչ մի",
     "statusSome": "Որոշ",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Շրջանակներ",
+        "description": "Ծանուցումներ ձեր շրջանակների մասին։"
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Վճարումներ",
+        "description": "Ծանուցումներ՝ կապված վճարումներ ուղարկելու և ստանալու հետ։"
       },
       "Marketing": {
         "title": "Հնարավորություններ և թարմացումներ",

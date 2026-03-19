@@ -2358,19 +2358,19 @@
     "displayCurrency": "Валута за приказ"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Подешавања обавештења",
+    "pushNotifications": "Push обавештења",
     "statusAll": "Све",
     "statusNone": "Ниједна",
     "statusSome": "Неке",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Кругови",
+        "description": "Обавештења о вашим круговима."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Плаћања",
+        "description": "Обавештења везана за слање и примање плаћања."
       },
       "Marketing": {
         "title": "Функције и ажурирања",

@@ -2358,19 +2358,19 @@
     "displayCurrency": "Měna zobrazení"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Nastavení oznámení",
+    "pushNotifications": "Push oznámení",
     "statusAll": "Všechny",
     "statusNone": "Žádné",
     "statusSome": "Některé",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Kruhy",
+        "description": "Oznámení o vašich kruzích."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Platby",
+        "description": "Oznámení související s odesíláním a přijímáním plateb."
       },
       "Marketing": {
         "title": "Funkce a aktualizace",

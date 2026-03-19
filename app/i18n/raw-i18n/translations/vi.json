@@ -2358,19 +2358,19 @@
     "displayCurrency": "Tiền tệ hiển thị"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Cài đặt thông báo",
+    "pushNotifications": "Thông báo đẩy",
     "statusAll": "Tất cả",
     "statusNone": "Không có",
     "statusSome": "Một số",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Vòng kết nối",
+        "description": "Thông báo về các vòng kết nối của bạn."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Thanh toán",
+        "description": "Thông báo liên quan đến việc gửi và nhận thanh toán."
       },
       "Marketing": {
         "title": "Tính năng và cập nhật",

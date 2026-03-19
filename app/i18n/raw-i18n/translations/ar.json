@@ -2358,19 +2358,19 @@
     "displayCurrency": "عملة العرض"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "إعدادات الإشعارات",
+    "pushNotifications": "إشعارات الدفع",
     "statusAll": "الكل",
     "statusNone": "لا شيء",
     "statusSome": "بعض",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "الدوائر",
+        "description": "إشعارات حول دوائرك."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "المدفوعات",
+        "description": "إشعارات متعلقة بإرسال واستقبال المدفوعات."
       },
       "Marketing": {
         "title": "الميزات والتحديثات",
