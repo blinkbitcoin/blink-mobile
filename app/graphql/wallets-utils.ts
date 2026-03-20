@@ -1,6 +1,15 @@
 import { Wallet, WalletCurrency } from "@app/graphql/generated"
+import type { CardCurrency } from "@app/types/amounts"
 
 export type WalletBalance = Pick<Wallet, "id" | "walletCurrency" | "balance">
+
+type CardBalance = {
+  id: string
+  walletCurrency: CardCurrency
+  balance: number
+}
+
+export type AccountBalance = WalletBalance | CardBalance
 
 export const getBtcWallet = (wallets: readonly WalletBalance[] | undefined) => {
   if (wallets === undefined || wallets.length === 0) {
