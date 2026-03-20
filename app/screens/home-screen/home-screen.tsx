@@ -27,7 +27,7 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
@@ -75,7 +75,7 @@ import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { AccountBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
@@ -343,11 +343,18 @@ export const HomeScreen: React.FC = () => {
   const isCardBackendAvailable = galoyInstanceId === "Staging"
   const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
   const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
-  const {
-    availableSats: cardBalanceSats,
-    balancePrimary: cardBalancePrimary,
-    balanceSecondary: cardBalanceSecondary,
-  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
+  const { availableSats: cardBalanceSats } = useCardBalance(
+    showCardRow ? homeCard?.id : undefined,
+  )
+
+  const accountBalances: AccountBalance[] = [...(wallets ?? [])]
+  if (showCardRow && homeCard) {
+    accountBalances.push({
+      id: homeCard.id,
+      walletCurrency: CARD,
+      balance: cardBalanceSats ?? 0,
+    })
+  }
 
   const {
     formattedBalance: defaultFormattedBalance,
@@ -951,12 +958,9 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onGatedTap={onGatedDollarTap}
-          wallets={wallets}
+          accounts={accountBalances}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
-          showCardRow={showCardRow}
-          cardBalancePrimary={cardBalancePrimary}
-          cardBalanceSecondary={cardBalanceSecondary}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>

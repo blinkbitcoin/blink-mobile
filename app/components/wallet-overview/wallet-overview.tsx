@@ -8,7 +8,12 @@ import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getUsdWallet,
+  WalletBalance,
+} from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -86,24 +91,18 @@ type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
   onGatedTap?: () => void
-  wallets?: readonly WalletBalance[]
+  accounts?: readonly AccountBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
-  showCardRow?: boolean
-  cardBalancePrimary?: string
-  cardBalanceSecondary?: string
 }
 
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
   onGatedTap,
-  wallets,
+  accounts,
   showBtcNotification = false,
   showUsdNotification = false,
-  showCardRow = false,
-  cardBalancePrimary,
-  cardBalanceSecondary,
 }) => {
   const {
     isGated: isDollarBalanceGated,
@@ -133,19 +132,26 @@ const WalletOverview: React.FC<Props> = ({
   let usdInDisplayCurrencyFormatted: string | undefined = "$0.00"
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
+  let cardBalanceFormatted: string | undefined = undefined
+  let cardInDisplayCurrency: string | undefined = undefined
 
-  const hasWallets = wallets && wallets.length > 0
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
-  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+  const hasAccounts = accounts && accounts.length > 0
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasAccounts })
+  const resolvedAccounts = hasAccounts ? accounts : data?.me?.defaultAccount?.wallets
 
-  const hasUsdBalance = (getUsdWallet(resolvedWallets)?.balance ?? 0) > 0
+  const wallets = resolvedAccounts?.filter(
+    (a): a is WalletBalance => a.walletCurrency !== CARD,
+  )
+  const cardAccount = resolvedAccounts?.find((a) => a.walletCurrency === CARD)
+
+  const hasUsdBalance = (getUsdWallet(wallets)?.balance ?? 0) > 0
   /** A gated balance still shows its amount (the row stays disabled); the label only
    *  stands in when there is nothing to show. */
   const showsUnavailableLabel = isDollarRowUnavailable && !hasUsdBalance
 
-  if (isAuthed || hasWallets) {
-    const btcWallet = getBtcWallet(resolvedWallets)
-    const usdWallet = getUsdWallet(resolvedWallets)
+  if (isAuthed || hasAccounts) {
+    const btcWallet = getBtcWallet(wallets)
+    const usdWallet = getUsdWallet(wallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -166,12 +172,21 @@ const WalletOverview: React.FC<Props> = ({
     if (displayCurrency !== WalletCurrency.Usd) {
       usdInUnderlyingCurrency = formatMoneyAmount({ moneyAmount: usdWalletBalance })
     }
+
+    if (cardAccount) {
+      const cardBalance = toBtcMoneyAmount(cardAccount.balance)
+      cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardBalance })
+      cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
+        moneyAmount: cardBalance,
+        isApproximate: true,
+      })
+    }
   }
 
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {
-    if (!resolvedWallets || resolvedWallets.length === 0) return
+    if (!wallets || wallets.length === 0) return
     navigation.navigate("transactionHistory", {
-      wallets: resolvedWallets,
+      wallets,
       currencyFilter,
     })
   }
@@ -312,7 +327,7 @@ const WalletOverview: React.FC<Props> = ({
         </Pressable>
       </DisabledFeature>
 
-      {showCardRow && (
+      {cardAccount && (
         <>
           <View style={styles.separator} />
           <Pressable
@@ -340,9 +355,9 @@ const WalletOverview: React.FC<Props> = ({
               ) : (
                 <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
                   <Text type="p1" bold style={styles.boldBalance}>
-                    {cardBalanceSecondary}
+                    {cardBalanceFormatted}
                   </Text>
-                  <Text type="p3">{cardBalancePrimary}</Text>
+                  <Text type="p3">{cardInDisplayCurrency}</Text>
                 </View>
               )}
             </View>
