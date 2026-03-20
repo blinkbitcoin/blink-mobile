@@ -6,7 +6,12 @@ import { gql } from "@apollo/client"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getUsdWallet,
+  WalletBalance,
+} from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config/appinfo"
@@ -57,23 +62,17 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
-  wallets?: readonly WalletBalance[]
+  accounts?: readonly AccountBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
-  showCardRow?: boolean
-  cardBalancePrimary?: string
-  cardBalanceSecondary?: string
 }
 
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
-  wallets,
+  accounts,
   showBtcNotification = false,
   showUsdNotification = false,
-  showCardRow = false,
-  cardBalancePrimary,
-  cardBalanceSecondary,
 }) => {
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
@@ -92,14 +91,21 @@ const WalletOverview: React.FC<Props> = ({
   let usdInDisplayCurrencyFormatted: string | undefined = "$0.00"
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
+  let cardBalanceFormatted: string | undefined = undefined
+  let cardInDisplayCurrency: string | undefined = undefined
 
-  const hasWallets = wallets && wallets.length > 0
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
-  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+  const hasAccounts = accounts && accounts.length > 0
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasAccounts })
+  const resolvedAccounts = hasAccounts ? accounts : data?.me?.defaultAccount?.wallets
+
+  const wallets = resolvedAccounts?.filter(
+    (a): a is WalletBalance => a.walletCurrency !== CARD,
+  )
+  const cardAccount = resolvedAccounts?.find((a) => a.walletCurrency === CARD)
 
   if (isAuthed) {
-    const btcWallet = getBtcWallet(resolvedWallets)
-    const usdWallet = getUsdWallet(resolvedWallets)
+    const btcWallet = getBtcWallet(wallets)
+    const usdWallet = getUsdWallet(wallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -120,12 +126,21 @@ const WalletOverview: React.FC<Props> = ({
     if (displayCurrency !== WalletCurrency.Usd) {
       usdInUnderlyingCurrency = formatMoneyAmount({ moneyAmount: usdWalletBalance })
     }
+
+    if (cardAccount) {
+      const cardBalance = toBtcMoneyAmount(cardAccount.balance)
+      cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardBalance })
+      cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
+        moneyAmount: cardBalance,
+        isApproximate: true,
+      })
+    }
   }
 
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {
-    if (!resolvedWallets || resolvedWallets.length === 0) return
+    if (!wallets || wallets.length === 0) return
     navigation.navigate("transactionHistory", {
-      wallets: resolvedWallets,
+      wallets,
       currencyFilter,
     })
   }
@@ -236,7 +251,7 @@ const WalletOverview: React.FC<Props> = ({
         </View>
       </Pressable>
 
-      {showCardRow && (
+      {cardAccount && (
         <>
           <View style={styles.separator} />
           <Pressable
@@ -264,9 +279,9 @@ const WalletOverview: React.FC<Props> = ({
               ) : (
                 <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
                   <Text type="p1" bold>
-                    {cardBalanceSecondary}
+                    {cardBalanceFormatted}
                   </Text>
-                  <Text type="p3">{cardBalancePrimary}</Text>
+                  <Text type="p3">{cardInDisplayCurrency}</Text>
                 </View>
               )}
             </View>

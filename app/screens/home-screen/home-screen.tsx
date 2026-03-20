@@ -31,10 +31,12 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { AccountBalance } from "@app/graphql/wallets-utils"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
+import { CARD } from "@app/types/amounts"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
@@ -237,11 +239,14 @@ export const HomeScreen: React.FC = () => {
   const { card } = useCardData()
   const showCardRow =
     card?.status === CardStatus.Active || card?.status === CardStatus.Locked
-  const {
-    availableSats: cardBalanceSats,
-    balancePrimary: cardBalancePrimary,
-    balanceSecondary: cardBalanceSecondary,
-  } = useCardBalance(showCardRow ? card?.id : undefined)
+  const { availableSats: cardBalanceSats } = useCardBalance(
+    showCardRow ? card?.id : undefined,
+  )
+
+  const accounts: AccountBalance[] = [...(wallets ?? [])]
+  if (showCardRow && card) {
+    accounts.push({ id: card.id, walletCurrency: CARD, balance: cardBalanceSats ?? 0 })
+  }
 
   const { formattedBalance, satsBalance } = useTotalBalance(
     wallets,
@@ -543,12 +548,9 @@ export const HomeScreen: React.FC = () => {
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
-          wallets={wallets}
+          accounts={accounts}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
-          showCardRow={showCardRow}
-          cardBalancePrimary={cardBalancePrimary}
-          cardBalanceSecondary={cardBalanceSecondary}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
         <View style={styles.listItemsContainer}>
