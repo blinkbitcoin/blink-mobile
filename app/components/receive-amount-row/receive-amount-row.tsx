@@ -86,7 +86,9 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
     useDisplayCurrency()
   const [isPressed, setIsPressed] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
+  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
+    labels: { BTC: LL.common.bitcoin(), USD: LL.common.dollar() },
+  })
   const { triggerSpin, spinStyle } = useAlternatingSpin()
 
   const { formattedPrimary, formattedSecondary } = formatAmounts({

@@ -2113,7 +2113,7 @@
         "activateNotifications": "Deseja ativar as notificações para ser avisado quando o pagamento chegar?",
         "copyClipboard": "A fatura foi copiada para a área de transferência",
         "copyClipboardBitcoin": "O endereço Bitcoin foi copiado na área de transferência",
-        "copyClipboardPaycode": "Código de pagamento/LNURL foi copiado para a área de transferência",
+        "copyClipboardPaycode": "Endereço Lightning foi copiado para a área de transferência",
         "invoicePaid": "Esta fatura foi paga",
         "setNote": "Escreva uma nota",
         "tapQrCodeCopy": "Toque no Código QR para copiar",

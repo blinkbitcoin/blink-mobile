@@ -2113,7 +2113,7 @@
         "activateNotifications": "Möchtest Du die Benachrichtigungen aktivieren, um zu sehen, wenn die Zahlung eingegangen ist?",
         "copyClipboard": "Invoice wurde in die Zwischenablage kopiert",
         "copyClipboardBitcoin": "Bitcoin Adresse wurde in die Zwischenablage kopiert",
-        "copyClipboardPaycode": "Zahlungscode/LNURL wurde in die Zwischenablage kopiert",
+        "copyClipboardPaycode": "Lightning-Adresse wurde in die Zwischenablage kopiert",
         "invoicePaid": "Diese Invoice wurde bezahlt",
         "setNote": "Notiz erstellen",
         "tapQrCodeCopy": "Tippe den QR Code um zu kopieren",

@@ -2120,7 +2120,7 @@
     "activateNotifications": "Да ли желите да активирате нотификације да бисте били обавештени када уплата пристигне?",
     "copyClipboard": "Рачун је копиран у клипборд",
     "copyClipboardBitcoin": "Биткоин адреса је копирана у клипборд",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Ова рачун је плаћен",
     "setNote": "поставите белешку",
     "tapQrCodeCopy": "Додирните QR код да бисте копирали",

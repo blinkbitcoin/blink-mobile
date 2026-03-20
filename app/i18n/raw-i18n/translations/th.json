@@ -2120,7 +2120,7 @@
     "activateNotifications": "คุณต้องการเปิดการแจ้งเตือนเมื่อธุรกรรมเข้ามาหรือไม่?",
     "copyClipboard": "Invoice ได้ทำการคัดลอกไว้ในคลิปบอร์ดแล้ว",
     "copyClipboardBitcoin": "คัดลอก Bitcoin address ไว้ในคลิปบอร์ดแล้ว",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Invoiceนี้ ได้รับการชำระแล้ว",
     "setNote": "เขียนโน้ต",
     "tapQrCodeCopy": "กดที่ QR Code เพื่อคัดลอก",

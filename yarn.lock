@@ -3303,6 +3303,20 @@
     "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
+"@formatjs/ecma402-abstract@3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-3.1.2.tgz#03d26548b40071120cf616bb6e8a59dfce2050fe"
+  integrity sha512-ApPcse35dtr+snmBbDtnBkc9bvAZCxr9DDzgUR3nXiHZgpwU+85g1Mz0KRqjh7kIgJ6rgIQLQVqYx56rf58XZg==
+  dependencies:
+    "@formatjs/fast-memoize" "3.1.1"
+    "@formatjs/intl-localematcher" "0.8.2"
+    decimal.js "^10.6.0"
+
+"@formatjs/fast-memoize@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/fast-memoize/-/fast-memoize-3.1.1.tgz#3fa0cf158869d9fa8a1af618b66a066ebcaf6051"
+  integrity sha512-CbNbf+tlJn1baRnPkNePnBqTLxGliG6DDgNa/UtV66abwIjwsliPMOt0172tzxABYzSuxZBZfcp//qI8AvBWPg==
+
 "@formatjs/intl-enumerator@1.4.5":
   version "1.4.5"
   resolved "https://registry.npmjs.org/@formatjs/intl-enumerator/-/intl-enumerator-1.4.5.tgz#bcb196b502a957acff9a6f2b4e23a1a5aff5bdcf"
@@ -3333,6 +3347,22 @@
   integrity sha512-zTwEpWOzZ2CiKcB93BLngUX59hQkuZjT2+SAQEscSm52peDW/getsawMcWF1rGRpMCX6D7nSJA3CzJ8gn13N/g==
   dependencies:
     tslib "^2.4.0"
+
+"@formatjs/intl-localematcher@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.8.2.tgz#062aa99dbccc89afde95b812e9f029721b4c6fef"
+  integrity sha512-q05KMYGJLyqFNFtIb8NhWLF5X3aK/k0wYt7dnRFuy6aLQL+vUwQ1cg5cO4qawEiINybeCPXAWlprY2mSBjSXAQ==
+  dependencies:
+    "@formatjs/fast-memoize" "3.1.1"
+
+"@formatjs/intl-numberformat@^9.2.4":
+  version "9.2.4"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-9.2.4.tgz#aa856fe23444a970a16149f6a334fd7918d5eecc"
+  integrity sha512-ezoO/4gTS3Sz6vSZ/UgWgwD7RIYFNwL9RQ17nguWJN12wLeZ8TcWeCrMXlCenxh8TDaftDKwsREIJ5YTEMGi8g==
+  dependencies:
+    "@formatjs/ecma402-abstract" "3.1.2"
+    "@formatjs/intl-localematcher" "0.8.2"
+    decimal.js "^10.6.0"
 
 "@formatjs/intl-relativetimeformat@^11.2.12":
   version "11.2.12"
@@ -12510,6 +12540,11 @@ decamelize@^6.0.0:
   version "6.0.0"
   resolved "https://registry.npmjs.org/decamelize/-/decamelize-6.0.0.tgz#8cad4d916fde5c41a264a43d0ecc56fe3d31749e"
   integrity sha512-Fv96DCsdOgB6mdGl67MT5JaTNKRzrzill5OH5s8bjYJXVlcXyPYGyPsUkWyGV5p1TXI5esYIYMMeDJL0hEIwaA==
+
+decimal.js@^10.6.0:
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.6.0.tgz#e649a43e3ab953a72192ff5983865e509f37ed9a"
+  integrity sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==
 
 decode-uri-component@^0.2.0, decode-uri-component@^0.2.2:
   version "0.2.2"

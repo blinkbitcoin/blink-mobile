@@ -2113,7 +2113,7 @@
     "activateNotifications": "Ödeme geldiğinde haberdar olmak için bildirimleri açmak istiyor musunuz?",
     "copyClipboard": "Fatura panoya kopyalandı",
     "copyClipboardBitcoin": "Bitcoin adresi panoya kopyalandı",
-    "copyClipboardPaycode": "Ödeme Kodu/LNURL panoya kopyalandı",
+    "copyClipboardPaycode": "Lightning adresi panoya kopyalandı",
     "invoicePaid": "Bu fatura ödendi",
     "setNote": "Not yazın",
     "tapQrCodeCopy": "QR koda tıklayarak kopyalayın",

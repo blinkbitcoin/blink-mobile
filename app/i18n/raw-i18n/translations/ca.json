@@ -2113,7 +2113,7 @@
     "activateNotifications": "Vols activar les notificacions per ser avisat quan arribi el pagament?",
     "copyClipboard": "La factura ha estat copiada al porta-retalls",
     "copyClipboardBitcoin": "L'adreça bitcoin ha estat copiada al porta-retalls",
-    "copyClipboardPaycode": "El Codi de pagament/LNURL s'ha copiat al porta-retalls",
+    "copyClipboardPaycode": "L'adreça Lightning s'ha copiat al porta-retalls",
     "invoicePaid": "Aquesta factura s'ha pagat",
     "setNote": "posa una nota",
     "tapQrCodeCopy": "Toca el codi QR per copiar",

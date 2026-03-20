@@ -2120,7 +2120,7 @@
     "activateNotifications": "Želite li aktivirati obavijesti kako biste bili obaviješteni kada uplata stigne?",
     "copyClipboard": "Faktura je kopirana u međuspremnik",
     "copyClipboardBitcoin": "Bitcoin adresa je kopirana u međuspremnik",
-    "copyClipboardPaycode": "Paycode/LNURL je kopiran u međuspremnik",
+    "copyClipboardPaycode": "Lightning adresa je kopirana u međuspremnik",
     "invoicePaid": "Ova faktura je plaćena",
     "setNote": "postavi bilješku",
     "tapQrCodeCopy": "Dodirnite QR kod za kopiranje",

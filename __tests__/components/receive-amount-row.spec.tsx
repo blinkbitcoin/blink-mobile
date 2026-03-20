@@ -53,6 +53,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
       AmountInputButton: {
         tapToSetAmount: () => "Tap to set amount",
       },
+      common: {
+        bitcoin: () => "Bitcoin",
+        dollar: () => "Dollar",
+      },
     },
   }),
 }))

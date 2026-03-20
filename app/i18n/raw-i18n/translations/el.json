@@ -2113,7 +2113,7 @@
     "activateNotifications": "Θέλετε να ενεργοποιήσετε τις ειδοποιήσεις για να ενημερώνεστε όταν ολοκληρωθεί η πληρωμή;",
     "copyClipboard": "Το τιμολόγιο έχει αντιγραφεί στο πρόχειρο",
     "copyClipboardBitcoin": "Η διεύθυνση Bitcoin έχει αντιγραφεί στο πρόχειρο",
-    "copyClipboardPaycode": "Paycode/LNURL έχει αντιγράφει στο πρόχειρο",
+    "copyClipboardPaycode": "Η διεύθυνση Lightning αντιγράφηκε στο πρόχειρο",
     "invoicePaid": "Αυτό το τιμολόγιο έχει πληρωθεί",
     "setNote": "γράψτε μια σημείωση",
     "tapQrCodeCopy": "Πατήστε τον κωδικό QR για αντιγραφή",

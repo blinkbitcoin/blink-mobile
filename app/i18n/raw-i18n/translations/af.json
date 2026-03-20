@@ -2120,7 +2120,7 @@
     "activateNotifications": "Wil jy kennisgewings aktiveer en kennisgewings ontvang wanneer die betaling arriveer het? ",
     "copyClipboard": "Faktuur is na die knipbord oorgedra",
     "copyClipboardBitcoin": "Bitcoin-adres is na die knipbord oorgedra",
-    "copyClipboardPaycode": "Betaalkode/LNURL is oorgedra na knipbord",
+    "copyClipboardPaycode": "Lightning-adres is na die knipbord gekopieer",
     "invoicePaid": "Hierdie faktuur is betaal",
     "setNote": "maak 'n nota",
     "tapQrCodeCopy": "Tik op die QR kode om oor te dra",

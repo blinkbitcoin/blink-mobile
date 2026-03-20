@@ -2120,7 +2120,7 @@
     "activateNotifications": "هل تريد تفعيل الإشعارات لتُشعَر عندما يصلك الدفع؟",
     "copyClipboard": "نُسخت الفاتورة إلى الحافظة",
     "copyClipboardBitcoin": "نُسخ عنوان البيتكوين إلى المحفظة",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "تم دفع الفاتورة",
     "setNote": "قم بكتابة ملاحظة",
     "tapQrCodeCopy": "إضغط على كود QR للنسخ",

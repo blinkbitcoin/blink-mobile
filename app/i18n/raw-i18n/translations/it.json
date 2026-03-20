@@ -2113,7 +2113,7 @@
         "activateNotifications": "Vuoi attivare le notifiche per essere avvisato quando ricevi un pagamento?",
         "copyClipboard": "L'invoice è stata copiata negli appunti",
         "copyClipboardBitcoin": "L'indirizzo Bitcoin è stato copiato negli appunti",
-        "copyClipboardPaycode": "Il Paycode/LNURL è stato copiato negli appunti",
+        "copyClipboardPaycode": "L'indirizzo Lightning è stato copiato negli appunti",
         "invoicePaid": "L'invoice è stata pagata",
         "setNote": "Imposta una nota",
         "tapQrCodeCopy": "Clicca il QR code per copiare",

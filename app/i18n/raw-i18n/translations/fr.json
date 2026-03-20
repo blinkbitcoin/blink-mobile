@@ -2120,7 +2120,7 @@
         "activateNotifications": "Souhaitez-vous activer les notifications pour être prévenu lorsque le paiement est bien parvenu ?",
         "copyClipboard": "La facture a été copiée dans le presse-papier",
         "copyClipboardBitcoin": "L’adresse Bitcoin a été copiée dans le presse-papier",
-        "copyClipboardPaycode": "Le code de paiement/LNURL a été copié dans le presse-papier",
+        "copyClipboardPaycode": "L'adresse Lightning a été copiée dans le presse-papier",
         "invoicePaid": "La facture a été payée",
         "setNote": "Ajouter un message",
         "tapQrCodeCopy": "Touchez le code QR pour le copier",

@@ -19,6 +19,13 @@ export const parseValidPhoneNumber = (
   return null
 }
 
+export const sanitizePhoneNumber = (input: string): string => {
+  const trimmed = input.trim()
+  const digits = trimmed.replace(/\D/g, "")
+
+  return trimmed.startsWith("+") ? `+${digits}` : digits
+}
+
 export const isPhoneNumber = (phoneNumber: string): boolean => {
   try {
     if (isValidPhoneNumber(phoneNumber)) return true

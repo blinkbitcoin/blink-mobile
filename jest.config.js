@@ -53,6 +53,7 @@ module.exports = {
       "|react-native-auto-height-image" +
       "|react-native-nfc-manager" +
       "|uuid" +
+      "|@formatjs" +
       ")/)",
   ],
 }

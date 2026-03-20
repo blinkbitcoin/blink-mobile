@@ -2120,7 +2120,7 @@
     "activateNotifications": "¿Imaynataqmi notificaciones tukuyta kani, qhipa rurasqan kani kashanmi?",
     "copyClipboard": "Kawsayniyta qillqa churayta rikusqa",
     "copyClipboardBitcoin": "Bitcoin kaniyta churayta rikusqa",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Kawsayniyta qillqa kaniyta rikusqa",
     "setNote": "Rikuchiyta sutichaq",
     "tapQrCodeCopy": "QR code churayta sutichaq",
