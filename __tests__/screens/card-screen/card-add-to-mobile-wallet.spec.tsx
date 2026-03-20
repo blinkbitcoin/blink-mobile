@@ -18,24 +18,18 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  CardStatus: {
-    Active: "active",
-    Frozen: "frozen",
-    Inactive: "inactive",
-  },
-  MOCK_CARD: {
-    cardNumber: "4111 1111 1111 1111",
-    holderName: "TEST USER",
-    validThruDate: "2029-06-01",
-    cvv: "123",
-    expiryDate: "06/29",
-    cardType: "Virtual Visa debit",
-    status: "active",
-    issuedDate: "Jan 15, 2024",
-    network: "Visa",
-  },
-}))
+jest.mock("@react-navigation/native", () => {
+  const actualNav = jest.requireActual("@react-navigation/native")
+  return {
+    ...actualNav,
+    useRoute: () => ({
+      params: {
+        lastFour: "1111",
+        holderName: "TEST USER",
+      },
+    }),
+  }
+})
 
 describe("CardAddToMobileWalletScreen", () => {
   beforeEach(() => {

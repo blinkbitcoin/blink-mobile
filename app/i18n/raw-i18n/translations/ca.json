@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Felicitats!",
         "subtitle": "La teva targeta Blink Visa ha estat activada.",
-        "buttonLabel": "Demanar targeta física"
+        "buttonLabel": "Demanar targeta física",
+        "buttonLabelDashboard": "Tauler"
       },
       "PhysicalCardOrdered": {
         "title": "La teva targeta física està en camí!",

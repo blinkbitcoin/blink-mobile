@@ -10295,6 +10295,10 @@ type RootTranslation = {
 				 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
 				 */
 				buttonLabel: string
+				/**
+				 * D​a​s​h​b​o​a​r​d
+				 */
+				buttonLabelDashboard: string
 			}
 			PhysicalCardOrdered: {
 				/**
@@ -21437,6 +21441,10 @@ export type TranslationFunctions = {
 				 * Order physical card
 				 */
 				buttonLabel: () => LocalizedString
+				/**
+				 * Dashboard
+				 */
+				buttonLabelDashboard: () => LocalizedString
 			}
 			PhysicalCardOrdered: {
 				/**

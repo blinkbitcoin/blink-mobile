@@ -3129,7 +3129,8 @@
             "CardApproved": {
                 "title": "Parabéns!",
                 "subtitle": "Seu cartão Blink Visa foi ativado.",
-                "buttonLabel": "Solicitar cartão físico"
+                "buttonLabel": "Solicitar cartão físico",
+                "buttonLabelDashboard": "Painel"
             },
             "PhysicalCardOrdered": {
                 "title": "Seu cartão físico está a caminho!",

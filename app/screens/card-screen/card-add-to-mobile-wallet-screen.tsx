@@ -1,14 +1,19 @@
 import React, { useState } from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { RouteProp, useRoute } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { AddToWalletButton, InfoCard } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardStatus, MOCK_CARD } from "./card-mock-data"
+type AddToMobileWalletRouteProp = RouteProp<
+  RootStackParamList,
+  "cardAddToMobileWalletScreen"
+>
 
 export const CardAddToMobileWalletScreen: React.FC = () => {
   const styles = useStyles()
@@ -16,6 +21,8 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const route = useRoute<AddToMobileWalletRouteProp>()
+  const { lastFour, holderName } = route.params
   const [isLoading, setIsLoading] = useState(false)
 
   const handleAddToWallet = async () => {
@@ -42,10 +49,10 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
         </View>
 
         <BlinkCard
-          cardNumber={MOCK_CARD.cardNumber}
-          holderName={MOCK_CARD.holderName}
-          validThruDate={MOCK_CARD.validThruDate}
-          isFrozen={MOCK_CARD.status === CardStatus.Frozen}
+          cardNumber={lastFour}
+          holderName={holderName}
+          validThruDate=""
+          isFrozen={false}
         />
 
         <AddToWalletButton onPress={handleAddToWallet} disabled={isLoading} />

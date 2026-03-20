@@ -12,26 +12,29 @@ import { isCardFrozen } from "../utils/card-display"
 export const CardApprovedScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
-  const { card } = useCardData()
+  const { card, hasPhysicalCard } = useCardData()
 
   const handlePrimaryButtonPress = () => {
+    if (hasPhysicalCard) {
+      navigation.dispatch(CommonActions.navigate("cardDashboardScreen"))
+      return
+    }
     navigation.dispatch(CommonActions.navigate("orderCardScreen"))
-  }
-
-  const handleAddToWallet = () => {
-    navigation.dispatch(CommonActions.navigate("cardAddToMobileWalletScreen"))
   }
 
   return (
     <CardStatusLayout
       title={LL.CardFlow.CardStatus.CardApproved.title()}
       subtitle={LL.CardFlow.CardStatus.CardApproved.subtitle()}
-      buttonLabel={LL.CardFlow.CardStatus.CardApproved.buttonLabel()}
+      buttonLabel={
+        hasPhysicalCard
+          ? LL.CardFlow.CardStatus.CardApproved.buttonLabelDashboard()
+          : LL.CardFlow.CardStatus.CardApproved.buttonLabel()
+      }
       onPrimaryButtonPress={handlePrimaryButtonPress}
       iconName="check-badge"
       cardNumber={card?.lastFour}
       isFrozen={card ? isCardFrozen(card.status) : false}
-      onAddToWallet={handleAddToWallet}
     />
   )
 }

@@ -3170,7 +3170,8 @@
       "CardApproved": {
         "title": "Tahniah!",
         "subtitle": "Kad Blink Visa anda telah diaktifkan.",
-        "buttonLabel": "Pesan kad fizikal"
+        "buttonLabel": "Pesan kad fizikal",
+        "buttonLabelDashboard": "Papan Pemuka"
       },
       "PhysicalCardOrdered": {
         "title": "Kad fizikal anda sedang dalam perjalanan!",

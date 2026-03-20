@@ -3167,7 +3167,8 @@
       "CardApproved": {
         "title": "¡Kusikuyki!",
         "subtitle": "Blink Visa tarjetayki qallarisqa.",
-        "buttonLabel": "Tarjeta físicata mañakuy"
+        "buttonLabel": "Tarjeta físicata mañakuy",
+        "buttonLabelDashboard": "Ñawpaq panqa"
       },
       "PhysicalCardOrdered": {
         "title": "¡Tarjeta físicayki ñanpi kachkan!",
@@ -3176,7 +3177,7 @@
       }
     },
     "ShippingAddress": {
-      "title": "Shipping address",
+      "title": "Apachina tiyay",
       "firstName": "Ñawpaq suti",
       "lastName": "Ayllu suti",
       "addressLine1": "Address line 1",

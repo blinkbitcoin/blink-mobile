@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Συγχαρητήρια!",
         "subtitle": "Η κάρτα Blink Visa σας έχει ενεργοποιηθεί.",
-        "buttonLabel": "Παραγγελία φυσικής κάρτας"
+        "buttonLabel": "Παραγγελία φυσικής κάρτας",
+        "buttonLabelDashboard": "Πίνακας"
       },
       "PhysicalCardOrdered": {
         "title": "Η φυσική σας κάρτα είναι καθ' οδόν!",

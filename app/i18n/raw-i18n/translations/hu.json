@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Gratulálunk!",
         "subtitle": "A Blink Visa kártyád aktiválva lett.",
-        "buttonLabel": "Fizikai kártya rendelése"
+        "buttonLabel": "Fizikai kártya rendelése",
+        "buttonLabelDashboard": "Irányítópult"
       },
       "PhysicalCardOrdered": {
         "title": "A fizikai kártyád úton van!",

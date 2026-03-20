@@ -3170,7 +3170,8 @@
       "CardApproved": {
         "title": "Շնորհավորում ենք!",
         "subtitle": "Ձեր Blink Visa քարտն ակտիվացվել է։",
-        "buttonLabel": "Պատվիրել ֆիզիկական քարտ"
+        "buttonLabel": "Պատվիրել ֆիզիկական քարտ",
+        "buttonLabelDashboard": "Վահանակ"
       },
       "PhysicalCardOrdered": {
         "title": "Ձեր ֆիզիկական քարտը ճանապարհին է!",

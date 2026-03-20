@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Felicitări!",
         "subtitle": "Cardul tău Blink Visa a fost activat.",
-        "buttonLabel": "Comandă card fizic"
+        "buttonLabel": "Comandă card fizic",
+        "buttonLabelDashboard": "Panou"
       },
       "PhysicalCardOrdered": {
         "title": "Cardul tău fizic este pe drum!",

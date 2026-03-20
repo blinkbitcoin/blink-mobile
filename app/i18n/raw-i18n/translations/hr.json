@@ -3170,7 +3170,8 @@
       "CardApproved": {
         "title": "Čestitamo!",
         "subtitle": "Vaša Blink Visa kartica je aktivirana.",
-        "buttonLabel": "Naruči fizičku karticu"
+        "buttonLabel": "Naruči fizičku karticu",
+        "buttonLabelDashboard": "Nadzorna ploča"
       },
       "PhysicalCardOrdered": {
         "title": "Vaša fizička kartica je na putu!",

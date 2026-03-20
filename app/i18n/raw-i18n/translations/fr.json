@@ -3170,7 +3170,8 @@
             "CardApproved": {
                 "title": "Félicitations !",
                 "subtitle": "Votre carte Blink Visa a été activée.",
-                "buttonLabel": "Commander une carte physique"
+                "buttonLabel": "Commander une carte physique",
+                "buttonLabelDashboard": "Tableau de bord"
             },
             "PhysicalCardOrdered": {
                 "title": "Votre carte physique est en route !",

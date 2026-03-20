@@ -3170,7 +3170,8 @@
       "CardApproved": {
         "title": "Gefeliciteerd!",
         "subtitle": "Je Blink Visa-kaart is geactiveerd.",
-        "buttonLabel": "Fysieke kaart bestellen"
+        "buttonLabel": "Fysieke kaart bestellen",
+        "buttonLabelDashboard": "Overzicht"
       },
       "PhysicalCardOrdered": {
         "title": "Je fysieke kaart is onderweg!",

@@ -112,6 +112,7 @@ export const OrderCardScreen: React.FC = () => {
       iconName: "delivery",
       iconColor: colors._green,
       lastFour: result.lastFour,
+      holderName: "",
     })
   }, [
     applicationId,

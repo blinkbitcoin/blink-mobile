@@ -10,8 +10,6 @@ import { useTheme } from "@rn-vui/themed"
 import { CardStatusLayout } from "@app/components/card-screen"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardStatus, MOCK_CARD } from "./card-mock-data"
-
 type CardStatusScreenRouteProp = RouteProp<RootStackParamList, "cardStatusScreen">
 
 export const CardStatusScreen: React.FC = () => {
@@ -31,14 +29,11 @@ export const CardStatusScreen: React.FC = () => {
     showCard = true,
     showAddToWallet = true,
     lastFour,
+    holderName,
   } = route.params
 
   const handlePrimaryButtonPress = () => {
     navigation.dispatch(CommonActions.navigate(navigateTo))
-  }
-
-  const handleAddToWallet = () => {
-    navigation.dispatch(CommonActions.navigate("cardAddToMobileWalletScreen"))
   }
 
   return (
@@ -50,12 +45,11 @@ export const CardStatusScreen: React.FC = () => {
       iconName={iconName}
       iconColor={iconColor}
       showCard={showCard}
-      cardNumber={lastFour ?? MOCK_CARD.cardNumber}
-      holderName={MOCK_CARD.holderName}
-      validThruDate={MOCK_CARD.validThruDate}
-      isFrozen={MOCK_CARD.status === CardStatus.Frozen}
+      cardNumber={lastFour ?? ""}
+      holderName={holderName ?? ""}
+      validThruDate=""
+      isFrozen={false}
       showAddToWallet={showAddToWallet}
-      onAddToWallet={handleAddToWallet}
     />
   )
 }

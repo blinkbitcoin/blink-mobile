@@ -3129,7 +3129,8 @@
       "CardApproved": {
         "title": "Gratulujeme!",
         "subtitle": "Vaša karta Blink Visa bola aktivovaná.",
-        "buttonLabel": "Objednať fyzickú kartu"
+        "buttonLabel": "Objednať fyzickú kartu",
+        "buttonLabelDashboard": "Prehľad"
       },
       "PhysicalCardOrdered": {
         "title": "Vaša fyzická karta je na ceste!",
