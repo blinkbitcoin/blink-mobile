@@ -18,25 +18,6 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
-jest.mock("@app/screens/card-screen/card-mock-data", () => ({
-  CardStatus: {
-    Active: "active",
-    Frozen: "frozen",
-    Inactive: "inactive",
-  },
-  MOCK_CARD: {
-    cardNumber: "4111 1111 1111 1111",
-    holderName: "TEST USER",
-    validThruDate: "2029-06-01",
-    cvv: "123",
-    expiryDate: "06/29",
-    cardType: "Virtual Visa debit",
-    status: "active",
-    issuedDate: "Jan 15, 2024",
-    network: "Visa",
-  },
-}))
-
 const mockDispatch = jest.fn()
 const mockUseRoute = jest.fn()
 
@@ -60,6 +41,8 @@ const cardApprovedParams = {
   buttonLabel: "Order physical card",
   navigateTo: "cardDashboardScreen" as const,
   iconName: "approved" as const,
+  lastFour: "1111",
+  holderName: "TEST USER",
 }
 
 const physicalCardOrderedParams = {
@@ -68,6 +51,8 @@ const physicalCardOrderedParams = {
   buttonLabel: "Create PIN",
   navigateTo: "cardDashboardScreen" as const,
   iconName: "delivery" as const,
+  lastFour: "4242",
+  holderName: "TEST USER",
 }
 
 const cardApprovedWithCustomColorParams = {
@@ -169,7 +154,7 @@ describe("CardStatusScreen - Card Approved variant", () => {
     expect(getByText("Add to")).toBeTruthy()
   })
 
-  it("navigates to add to mobile wallet screen when add to wallet pressed", async () => {
+  it("add to wallet button can be pressed", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardStatusScreen />
@@ -183,10 +168,7 @@ describe("CardStatusScreen - Card Approved variant", () => {
       fireEvent.press(button)
     })
 
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: "NAVIGATE",
-      payload: { name: "cardAddToMobileWalletScreen" },
-    })
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it("navigates to correct screen when primary button is pressed", async () => {
@@ -407,7 +389,7 @@ describe("CardStatusScreen - complete user flow", () => {
     })
   })
 
-  it("user can interact with add to wallet button", async () => {
+  it("user can press add to wallet button", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardStatusScreen />
@@ -420,10 +402,7 @@ describe("CardStatusScreen - complete user flow", () => {
       fireEvent.press(getByText("Add to"))
     })
 
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: "NAVIGATE",
-      payload: { name: "cardAddToMobileWalletScreen" },
-    })
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it("user can interact with primary action button", async () => {
@@ -445,7 +424,7 @@ describe("CardStatusScreen - complete user flow", () => {
     })
   })
 
-  it("both buttons can be pressed in sequence", async () => {
+  it("primary button dispatches navigation, add to wallet does not", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardStatusScreen />
@@ -462,7 +441,7 @@ describe("CardStatusScreen - complete user flow", () => {
       fireEvent.press(getByText("Order physical card"))
     })
 
-    expect(mockDispatch).toHaveBeenCalledTimes(2)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 })
 

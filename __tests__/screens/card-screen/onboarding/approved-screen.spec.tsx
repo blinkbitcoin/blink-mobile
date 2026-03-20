@@ -43,15 +43,31 @@ jest.mock("@react-navigation/native", () => {
       dispatch: mockDispatch,
     }),
     CommonActions: {
-      navigate: (screen: string) => ({ type: "NAVIGATE", payload: { name: screen } }),
+      navigate: (screen: string, params?: object) => ({
+        type: "NAVIGATE",
+        payload: { name: screen, params },
+      }),
     },
   }
 })
+
+let mockHasPhysicalCard = false
+let mockCardLastFour: string | undefined = "1234"
+
+jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+  useCardData: () => ({
+    card: mockCardLastFour ? { id: "card-123", lastFour: mockCardLastFour } : null,
+    hasPhysicalCard: mockHasPhysicalCard,
+    loading: false,
+  }),
+}))
 
 describe("CardApprovedScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockHasPhysicalCard = false
+    mockCardLastFour = "1234"
   })
 
   it("renders without crashing", async () => {
@@ -90,35 +106,73 @@ describe("CardApprovedScreen", () => {
     expect(getByText("Your Blink Visa Card has been activated.")).toBeTruthy()
   })
 
-  it("passes correct button label to layout", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardApprovedScreen />
-      </ContextForScreen>,
-    )
+  describe("without physical card", () => {
+    it("shows Order physical card button label", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
 
-    await act(async () => {})
+      await act(async () => {})
 
-    expect(getByText("Order physical card")).toBeTruthy()
-  })
-
-  it("navigates to card order screen on button press", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardApprovedScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    const button = getByText("Order physical card")
-    await act(async () => {
-      fireEvent.press(button)
+      expect(getByText("Order physical card")).toBeTruthy()
     })
 
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: "NAVIGATE",
-      payload: { name: "cardOrderScreen" },
+    it("navigates to orderCardScreen on button press", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Order physical card"))
+      })
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: "NAVIGATE",
+        payload: { name: "orderCardScreen", params: undefined },
+      })
+    })
+  })
+
+  describe("with physical card", () => {
+    beforeEach(() => {
+      mockHasPhysicalCard = true
+    })
+
+    it("shows Dashboard button label", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Dashboard")).toBeTruthy()
+    })
+
+    it("navigates to cardDashboardScreen on button press", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Dashboard"))
+      })
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: "NAVIGATE",
+        payload: { name: "cardDashboardScreen", params: undefined },
+      })
     })
   })
 })

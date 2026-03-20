@@ -2120,7 +2120,7 @@
     "activateNotifications": "Wil je notificaties activeren om op de hoogte te worden gehouden wanneer de betaling is binnengekomen?",
     "copyClipboard": "Factuur is gekopieerd naar het klembord",
     "copyClipboardBitcoin": "Bitcoin-adres is gekopieerd naar het klembord",
-    "copyClipboardPaycode": "Betaalcode/LNURL is naar het klembord gekopieerd",
+    "copyClipboardPaycode": "Lightning-adres is naar het klembord gekopieerd",
     "invoicePaid": "Deze factuur is betaald",
     "setNote": "zet een noot",
     "tapQrCodeCopy": "Tik op QR-code om te kopiëren",
@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Notificatie instellingen",
     "pushNotifications": "Pushmeldingen",
+    "statusAll": "Alle",
+    "statusNone": "Geen",
+    "statusSome": "Sommige",
     "notificationCategories": {
       "Circles": {
         "title": "Cirkels",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "Dit veld is verplicht",
       "minChars": "Moet minimaal {min} tekens bevatten",
-      "invalidPostalCode": "Ongeldige postcode"
+      "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout",
+      "invalidRegion": "Ongeldige regioselectie"
     }
   },
   "errors": {
@@ -3166,7 +3170,8 @@
       "CardApproved": {
         "title": "Gefeliciteerd!",
         "subtitle": "Je Blink Visa-kaart is geactiveerd.",
-        "buttonLabel": "Fysieke kaart bestellen"
+        "buttonLabel": "Fysieke kaart bestellen",
+        "buttonLabelDashboard": "Overzicht"
       },
       "PhysicalCardOrdered": {
         "title": "Je fysieke kaart is onderweg!",
@@ -3181,9 +3186,25 @@
       "addressLine1": "Adresregel 1",
       "addressLine2": "Adresregel 2",
       "city": "Stad",
-      "state": "Provincie",
-      "postalCode": "Postcode",
       "country": "Land",
+      "labels": {
+        "state": "Staat",
+        "province": "Provincie",
+        "prefecture": "Prefectuur",
+        "oblast": "Oblast",
+        "department": "Departement",
+        "county": "Provincie",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Eiland",
+        "emirate": "Emiraat",
+        "parish": "Parochie",
+        "region": "Regio",
+        "zip": "Postcode",
+        "postalCode": "Postcode",
+        "eircode": "Eircode",
+        "pin": "PIN-code"
+      },
       "important": "Belangrijk",
       "importantDescription": "Zorg ervoor dat uw adres nauwkeurig en volledig is.",
       "noPOBoxes": "Kaarten kunnen niet worden bezorgd bij postbussen",
@@ -3346,7 +3367,11 @@
         "important": "Belangrijk",
         "bullet1": "Je virtuele kaart blijft actief terwijl je op de fysieke kaart wacht",
         "bullet2": "Je moet je fysieke kaart activeren zodra deze aankomt",
-        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens"
+        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens",
+        "bullet4": "Het verzendadres kan niet worden gewijzigd nadat de bestelling is geplaatst"
+      },
+      "errors": {
+        "createFailed": "Het bestellen van je fysieke kaart is mislukt. Probeer het opnieuw."
       }
     },
     "Onboarding": {

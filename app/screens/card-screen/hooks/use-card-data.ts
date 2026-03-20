@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { CardType, useCardQuery } from "@app/graphql/generated"
+import { ApplicationStatus, CardType, useCardQuery } from "@app/graphql/generated"
 
 gql`
   query card {
@@ -19,6 +19,10 @@ gql`
             dailyLimitCents
             monthlyLimitCents
           }
+          cardConsumerApplications {
+            id
+            applicationStatus
+          }
         }
       }
     }
@@ -34,9 +38,16 @@ export const useCardData = () => {
     nextFetchPolicy: "cache-first",
   })
 
-  const cards = data?.me?.defaultAccount?.cards
+  const account = data?.me?.defaultAccount
+
+  const cards = account?.cards
   const card = cards?.[0]
   const hasPhysicalCard = cards?.some((c) => c.cardType === CardType.Physical) ?? false
 
-  return { card, hasPhysicalCard, loading, error, refetch }
+  const applicationId =
+    account?.cardConsumerApplications?.find(
+      (a) => a.applicationStatus === ApplicationStatus.Approved,
+    )?.id ?? null
+
+  return { card, hasPhysicalCard, applicationId, loading, error, refetch }
 }

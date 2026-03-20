@@ -2120,7 +2120,7 @@
         "activateNotifications": "Souhaitez-vous activer les notifications pour être prévenu lorsque le paiement est bien parvenu ?",
         "copyClipboard": "La facture a été copiée dans le presse-papier",
         "copyClipboardBitcoin": "L’adresse Bitcoin a été copiée dans le presse-papier",
-        "copyClipboardPaycode": "Le code de paiement/LNURL a été copié dans le presse-papier",
+        "copyClipboardPaycode": "L'adresse Lightning a été copiée dans le presse-papier",
         "invoicePaid": "La facture a été payée",
         "setNote": "Ajouter un message",
         "tapQrCodeCopy": "Touchez le code QR pour le copier",
@@ -2360,6 +2360,9 @@
     "NotificationSettingsScreen": {
         "title": "Réglages des notifications",
         "pushNotifications": "Notifications push",
+        "statusAll": "Toutes",
+        "statusNone": "Aucune",
+        "statusSome": "Certaines",
         "notificationCategories": {
             "Circles": {
                 "title": "Cercles",
@@ -2795,7 +2798,8 @@
         "validation": {
             "required": "Ce champ est obligatoire",
             "minChars": "Doit contenir au moins {min} caractères",
-            "invalidPostalCode": "Code postal invalide"
+            "invalidPostalCode": "Code postal invalide, probablement une faute de frappe",
+            "invalidRegion": "Sélection de région non valide"
         }
     },
     "errors": {
@@ -3166,7 +3170,8 @@
             "CardApproved": {
                 "title": "Félicitations !",
                 "subtitle": "Votre carte Blink Visa a été activée.",
-                "buttonLabel": "Commander une carte physique"
+                "buttonLabel": "Commander une carte physique",
+                "buttonLabelDashboard": "Tableau de bord"
             },
             "PhysicalCardOrdered": {
                 "title": "Votre carte physique est en route !",
@@ -3181,11 +3186,27 @@
             "addressLine1": "Adresse ligne 1",
             "addressLine2": "Adresse ligne 2",
             "city": "Ville",
-            "state": "État",
-            "postalCode": "Code postal",
             "country": "Pays",
             "important": "Important",
             "importantDescription": "Veuillez vous assurer que votre adresse est exacte et complète.",
+            "labels": {
+                "state": "État",
+                "province": "Province",
+                "prefecture": "Préfecture",
+                "oblast": "Oblast",
+                "department": "Département",
+                "county": "Comté",
+                "district": "District",
+                "doSi": "Do/Si",
+                "island": "Île",
+                "emirate": "Émirat",
+                "parish": "Paroisse",
+                "region": "Région",
+                "zip": "Code postal",
+                "postalCode": "Code postal",
+                "eircode": "Eircode",
+                "pin": "Code PIN"
+            },
             "noPOBoxes": "Les cartes ne peuvent pas être livrées aux boîtes postales",
             "signatureRequired": "Une signature peut être requise à la livraison",
             "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge"
@@ -3334,7 +3355,11 @@
                 "important": "Important",
                 "bullet1": "Votre carte virtuelle restera active pendant l'attente de la carte physique",
                 "bullet2": "Vous devrez activer votre carte physique à son arrivée",
-                "bullet3": "Les deux cartes auront le même numéro et les mêmes détails"
+                "bullet3": "Les deux cartes auront le même numéro et les mêmes détails",
+                "bullet4": "L'adresse de livraison ne peut pas être modifiée après la commande"
+            },
+            "errors": {
+                "createFailed": "Échec de la commande de votre carte physique. Veuillez réessayer."
             }
         },
         "Onboarding": {

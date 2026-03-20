@@ -2120,7 +2120,7 @@
     "activateNotifications": "هل تريد تفعيل الإشعارات لتُشعَر عندما يصلك الدفع؟",
     "copyClipboard": "نُسخت الفاتورة إلى الحافظة",
     "copyClipboardBitcoin": "نُسخ عنوان البيتكوين إلى المحفظة",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "تم دفع الفاتورة",
     "setNote": "قم بكتابة ملاحظة",
     "tapQrCodeCopy": "إضغط على كود QR للنسخ",
@@ -2358,16 +2358,19 @@
     "displayCurrency": "عملة العرض"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "إعدادات الإشعارات",
+    "pushNotifications": "إشعارات الدفع",
+    "statusAll": "الكل",
+    "statusNone": "لا شيء",
+    "statusSome": "بعض",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "الدوائر",
+        "description": "إشعارات حول دوائرك."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "المدفوعات",
+        "description": "إشعارات متعلقة بإرسال واستقبال المدفوعات."
       },
       "Marketing": {
         "title": "الميزات والتحديثات",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "هذا الحقل مطلوب",
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
-      "invalidPostalCode": "رمز بريدي غير صالح"
+      "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي",
+      "invalidRegion": "اختيار منطقة غير صالح"
     }
   },
   "errors": {
@@ -3163,7 +3167,8 @@
       "CardApproved": {
         "title": "تهانينا!",
         "subtitle": "تم تفعيل بطاقة Blink Visa الخاصة بك.",
-        "buttonLabel": "اطلب البطاقة الفعلية"
+        "buttonLabel": "اطلب البطاقة الفعلية",
+        "buttonLabelDashboard": "لوحة التحكم"
       },
       "PhysicalCardOrdered": {
         "title": "بطاقتك الفعلية في الطريق!",
@@ -3178,9 +3183,25 @@
       "addressLine1": "سطر العنوان 1",
       "addressLine2": "سطر العنوان 2",
       "city": "المدينة",
-      "state": "الولاية",
-      "postalCode": "الرمز البريدي",
       "country": "البلد",
+      "labels": {
+        "state": "الولاية",
+        "province": "المقاطعة",
+        "prefecture": "المحافظة",
+        "oblast": "المنطقة",
+        "department": "القسم",
+        "county": "المقاطعة",
+        "district": "الحي",
+        "doSi": "دو/سي",
+        "island": "الجزيرة",
+        "emirate": "الإمارة",
+        "parish": "الأبرشية",
+        "region": "المنطقة",
+        "zip": "الرمز البريدي",
+        "postalCode": "الرمز البريدي",
+        "eircode": "Eircode",
+        "pin": "رمز PIN"
+      },
       "important": "مهم",
       "importantDescription": "يرجى التأكد من أن عنوانك دقيق وكامل.",
       "noPOBoxes": "لا يمكن توصيل البطاقات إلى صناديق البريد",
@@ -3343,7 +3364,11 @@
         "important": "مهم",
         "bullet1": "ستظل بطاقتك الافتراضية نشطة أثناء انتظار البطاقة الفعلية",
         "bullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
-        "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
+        "bullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل",
+        "bullet4": "لا يمكن تغيير عنوان الشحن بعد تقديم الطلب"
+      },
+      "errors": {
+        "createFailed": "فشل طلب بطاقتك الفعلية. يرجى المحاولة مرة أخرى."
       }
     },
     "Onboarding": {

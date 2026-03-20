@@ -20,6 +20,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     [TransactionStatus.Completed]: colors.success,
     [TransactionStatus.Declined]: colors.error,
     [TransactionStatus.Reversed]: colors.warning,
+    [TransactionStatus.Refunded]: colors.warning,
+    [TransactionStatus.Unknown]: colors.grey3,
   }
 
   const statusTextMap: Record<TransactionStatus, string> = {
@@ -27,6 +29,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     [TransactionStatus.Completed]: LL.CardFlow.TransactionStatus.completed(),
     [TransactionStatus.Declined]: LL.CardFlow.TransactionStatus.declined(),
     [TransactionStatus.Reversed]: LL.CardFlow.TransactionStatus.reversed(),
+    [TransactionStatus.Refunded]: LL.CardFlow.TransactionStatus.reversed(),
+    [TransactionStatus.Unknown]: status,
   }
 
   const backgroundColor = backgroundColorMap[status] ?? colors.grey3

@@ -65,7 +65,6 @@ jest.mock("@app/components/card-screen/add-to-wallet-button", () => ({
 
 describe("CardStatusLayout", () => {
   const mockOnPrimaryButtonPress = jest.fn()
-  const mockOnAddToWallet = jest.fn()
 
   const defaultProps = {
     title: "Card is on the way",
@@ -133,13 +132,9 @@ describe("CardStatusLayout", () => {
   })
 
   describe("AddToWalletButton visibility", () => {
-    it("shows AddToWalletButton when showAddToWallet is true and onAddToWallet provided", () => {
+    it("shows AddToWalletButton when showAddToWallet is true", () => {
       const { getByTestId } = render(
-        <CardStatusLayout
-          {...defaultProps}
-          showAddToWallet={true}
-          onAddToWallet={mockOnAddToWallet}
-        />,
+        <CardStatusLayout {...defaultProps} showAddToWallet={true} />,
       )
 
       expect(getByTestId("add-to-wallet-button")).toBeTruthy()
@@ -147,36 +142,22 @@ describe("CardStatusLayout", () => {
 
     it("hides AddToWalletButton when showAddToWallet is false", () => {
       const { queryByTestId } = render(
-        <CardStatusLayout
-          {...defaultProps}
-          showAddToWallet={false}
-          onAddToWallet={mockOnAddToWallet}
-        />,
+        <CardStatusLayout {...defaultProps} showAddToWallet={false} />,
       )
 
       expect(queryByTestId("add-to-wallet-button")).toBeNull()
     })
 
-    it("hides AddToWalletButton when onAddToWallet is not provided", () => {
-      const { queryByTestId } = render(
-        <CardStatusLayout {...defaultProps} showAddToWallet={true} />,
-      )
-
-      expect(queryByTestId("add-to-wallet-button")).toBeNull()
-    })
-
-    it("calls onAddToWallet when AddToWallet button pressed", () => {
+    it("calls internal handler when AddToWalletButton is pressed", () => {
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {})
       const { getByTestId } = render(
-        <CardStatusLayout
-          {...defaultProps}
-          showAddToWallet={true}
-          onAddToWallet={mockOnAddToWallet}
-        />,
+        <CardStatusLayout {...defaultProps} showAddToWallet={true} />,
       )
 
       fireEvent(getByTestId("add-to-wallet-button"), "touchEnd")
 
-      expect(mockOnAddToWallet).toHaveBeenCalledTimes(1)
+      expect(consoleSpy).toHaveBeenCalledWith("Add to wallet pressed")
+      consoleSpy.mockRestore()
     })
   })
 })

@@ -3,10 +3,13 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  DeliveryType,
+  EMPTY_ADDRESS,
+  ShippingAddress,
+} from "@app/screens/card-screen/types"
 
-import { EMPTY_ADDRESS, ShippingAddress } from "../../types"
-
-import { IssueType, DeliveryType } from "../steps/types"
+import { IssueType } from "../steps/types"
 
 export const Step = {
   ReportIssue: "ReportIssue",

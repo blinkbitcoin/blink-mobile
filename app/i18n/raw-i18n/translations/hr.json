@@ -2120,7 +2120,7 @@
     "activateNotifications": "Želite li aktivirati obavijesti kako biste bili obaviješteni kada uplata stigne?",
     "copyClipboard": "Faktura je kopirana u međuspremnik",
     "copyClipboardBitcoin": "Bitcoin adresa je kopirana u međuspremnik",
-    "copyClipboardPaycode": "Paycode/LNURL je kopiran u međuspremnik",
+    "copyClipboardPaycode": "Lightning adresa je kopirana u međuspremnik",
     "invoicePaid": "Ova faktura je plaćena",
     "setNote": "postavi bilješku",
     "tapQrCodeCopy": "Dodirnite QR kod za kopiranje",
@@ -2360,6 +2360,9 @@
   "NotificationSettingsScreen": {
     "title": "Postavke obavijesti",
     "pushNotifications": "Push obavijesti",
+    "statusAll": "Sve",
+    "statusNone": "Nijedna",
+    "statusSome": "Neke",
     "notificationCategories": {
       "Circles": {
         "title": "Krugovi",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "Ovo polje je obavezno",
       "minChars": "Mora imati najmanje {min} znakova",
-      "invalidPostalCode": "Nevažeći poštanski broj"
+      "invalidPostalCode": "Nevažeći poštanski broj, vjerojatno tipfeler",
+      "invalidRegion": "Nevažeći odabir regije"
     }
   },
   "errors": {
@@ -3166,7 +3170,8 @@
       "CardApproved": {
         "title": "Čestitamo!",
         "subtitle": "Vaša Blink Visa kartica je aktivirana.",
-        "buttonLabel": "Naruči fizičku karticu"
+        "buttonLabel": "Naruči fizičku karticu",
+        "buttonLabelDashboard": "Nadzorna ploča"
       },
       "PhysicalCardOrdered": {
         "title": "Vaša fizička kartica je na putu!",
@@ -3181,9 +3186,25 @@
       "addressLine1": "Adresa redak 1",
       "addressLine2": "Adresa redak 2",
       "city": "Grad",
-      "state": "Država",
-      "postalCode": "Poštanski broj",
       "country": "Zemlja",
+      "labels": {
+        "state": "Država",
+        "province": "Pokrajina",
+        "prefecture": "Prefektura",
+        "oblast": "Oblast",
+        "department": "Odjel",
+        "county": "Županija",
+        "district": "Okrug",
+        "doSi": "Do/Si",
+        "island": "Otok",
+        "emirate": "Emirat",
+        "parish": "Župa",
+        "region": "Regija",
+        "zip": "Poštanski broj",
+        "postalCode": "Poštanski broj",
+        "eircode": "Eircode",
+        "pin": "PIN kod"
+      },
       "important": "Važno",
       "importantDescription": "Molimo provjerite da je vaša adresa točna i potpuna.",
       "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",
@@ -3346,7 +3367,11 @@
         "important": "Važno",
         "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
         "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
-        "bullet3": "Obje kartice imat će isti broj i podatke"
+        "bullet3": "Obje kartice imat će isti broj i podatke",
+        "bullet4": "Adresa za dostavu ne može se promijeniti nakon što je narudžba poslana"
+      },
+      "errors": {
+        "createFailed": "Naručivanje vaše fizičke kartice nije uspjelo. Pokušajte ponovo."
       }
     },
     "Onboarding": {

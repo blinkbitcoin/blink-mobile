@@ -51,7 +51,11 @@ import {
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { normalizeString } from "@app/utils/helper"
-import { isPhoneNumber, parseValidPhoneNumber } from "@app/utils/phone"
+import {
+  isPhoneNumber,
+  parseValidPhoneNumber,
+  sanitizePhoneNumber,
+} from "@app/utils/phone"
 import { isInt } from "validator"
 
 gql`
@@ -723,10 +727,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
               <GaloyIcon name="close" size={24} color={styles.icon.color} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              onPress={handlePaste}
-              disabled={activeInputRef.current === InputType.Phone}
-            >
+            <TouchableOpacity onPress={handlePaste}>
               <View style={styles.iconContainer}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
@@ -883,11 +884,12 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     setKeepCountryCode(false)
 
     try {
-      const clipboard = await Clipboard.getString()
+      const clipboardValue = await Clipboard.getString()
+      const clipboardPhoneNumber = sanitizePhoneNumber(clipboardValue)
 
-      let parsed = null
-      parsed = parseValidPhone(clipboard)
-      const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
+      const parsed = parseValidPhone(clipboardPhoneNumber)
+      const parseNumber =
+        parsed && parsed?.isValid() ? parsed.number : clipboardPhoneNumber
 
       updateMatchingContacts(parseNumber)
       dispatchDestinationStateAction({
@@ -993,10 +995,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
                 <GaloyIcon name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                onPress={handlePastePhone}
-                disabled={activeInputRef.current === InputType.Search}
-              >
+              <TouchableOpacity onPress={handlePastePhone}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
                 </Text>
@@ -1005,7 +1004,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           }
           onChangeText={(text) => {
             onFocusedInput(InputType.Phone)
-            setRawPhoneNumber(text)
+            setRawPhoneNumber(sanitizePhoneNumber(text))
           }}
           onChangeInfo={(e) => {
             setDefaultPhoneInputInfo(e)

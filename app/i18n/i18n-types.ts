@@ -6660,7 +6660,7 @@ type RootTranslation = {
 		 */
 		copyClipboardBitcoin: string
 		/**
-		 * P​a​y​c​o​d​e​/​L​N​U​R​L​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copyClipboardPaycode: string
 		/**
@@ -7575,6 +7575,18 @@ type RootTranslation = {
 		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
+		/**
+		 * A​l​l
+		 */
+		statusAll: string
+		/**
+		 * N​o​n​e
+		 */
+		statusNone: string
+		/**
+		 * S​o​m​e
+		 */
+		statusSome: string
 		notificationCategories: {
 			Circles: {
 				/**
@@ -9109,9 +9121,13 @@ type RootTranslation = {
 			 */
 			minChars: RequiredParams<'min'>
 			/**
-			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e
+			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e​,​ ​p​r​o​b​a​b​l​y​ ​a​ ​t​y​p​o
 			 */
 			invalidPostalCode: string
+			/**
+			 * I​n​v​a​l​i​d​ ​r​e​g​i​o​n​ ​s​e​l​e​c​t​i​o​n
+			 */
+			invalidRegion: string
 		}
 	}
 	errors: {
@@ -10279,6 +10295,10 @@ type RootTranslation = {
 				 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
 				 */
 				buttonLabel: string
+				/**
+				 * D​a​s​h​b​o​a​r​d
+				 */
+				buttonLabelDashboard: string
 			}
 			PhysicalCardOrdered: {
 				/**
@@ -10321,17 +10341,75 @@ type RootTranslation = {
 			 */
 			city: string
 			/**
-			 * S​t​a​t​e
-			 */
-			state: string
-			/**
-			 * P​o​s​t​a​l​ ​c​o​d​e
-			 */
-			postalCode: string
-			/**
 			 * C​o​u​n​t​r​y
 			 */
 			country: string
+			labels: {
+				/**
+				 * S​t​a​t​e
+				 */
+				state: string
+				/**
+				 * P​r​o​v​i​n​c​e
+				 */
+				province: string
+				/**
+				 * P​r​e​f​e​c​t​u​r​e
+				 */
+				prefecture: string
+				/**
+				 * O​b​l​a​s​t
+				 */
+				oblast: string
+				/**
+				 * D​e​p​a​r​t​m​e​n​t
+				 */
+				department: string
+				/**
+				 * C​o​u​n​t​y
+				 */
+				county: string
+				/**
+				 * D​i​s​t​r​i​c​t
+				 */
+				district: string
+				/**
+				 * D​o​/​S​i
+				 */
+				doSi: string
+				/**
+				 * I​s​l​a​n​d
+				 */
+				island: string
+				/**
+				 * E​m​i​r​a​t​e
+				 */
+				emirate: string
+				/**
+				 * P​a​r​i​s​h
+				 */
+				parish: string
+				/**
+				 * R​e​g​i​o​n
+				 */
+				region: string
+				/**
+				 * Z​I​P​ ​c​o​d​e
+				 */
+				zip: string
+				/**
+				 * P​o​s​t​a​l​ ​c​o​d​e
+				 */
+				postalCode: string
+				/**
+				 * E​i​r​c​o​d​e
+				 */
+				eircode: string
+				/**
+				 * P​I​N​ ​c​o​d​e
+				 */
+				pin: string
+			}
 			/**
 			 * I​m​p​o​r​t​a​n​t
 			 */
@@ -10924,6 +11002,16 @@ type RootTranslation = {
 				 * B​o​t​h​ ​c​a​r​d​s​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​c​a​r​d​ ​n​u​m​b​e​r​ ​a​n​d​ ​d​e​t​a​i​l​s
 				 */
 				bullet3: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s​ ​c​a​n​n​o​t​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​f​t​e​r​ ​o​r​d​e​r​ ​i​s​ ​p​l​a​c​e​d
+				 */
+				bullet4: string
+			}
+			errors: {
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​o​r​d​e​r​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				createFailed: string
 			}
 		}
 		Onboarding: {
@@ -17809,7 +17897,7 @@ export type TranslationFunctions = {
 		 */
 		copyClipboardBitcoin: () => LocalizedString
 		/**
-		 * Paycode/LNURL has been copied in the clipboard
+		 * Lightning address has been copied in the clipboard
 		 */
 		copyClipboardPaycode: () => LocalizedString
 		/**
@@ -18687,6 +18775,18 @@ export type TranslationFunctions = {
 		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
+		/**
+		 * All
+		 */
+		statusAll: () => LocalizedString
+		/**
+		 * None
+		 */
+		statusNone: () => LocalizedString
+		/**
+		 * Some
+		 */
+		statusSome: () => LocalizedString
 		notificationCategories: {
 			Circles: {
 				/**
@@ -20194,9 +20294,13 @@ export type TranslationFunctions = {
 			 */
 			minChars: (arg: { min: number }) => LocalizedString
 			/**
-			 * Invalid postal code
+			 * Invalid postal code, probably a typo
 			 */
 			invalidPostalCode: () => LocalizedString
+			/**
+			 * Invalid region selection
+			 */
+			invalidRegion: () => LocalizedString
 		}
 	}
 	errors: {
@@ -21337,6 +21441,10 @@ export type TranslationFunctions = {
 				 * Order physical card
 				 */
 				buttonLabel: () => LocalizedString
+				/**
+				 * Dashboard
+				 */
+				buttonLabelDashboard: () => LocalizedString
 			}
 			PhysicalCardOrdered: {
 				/**
@@ -21379,17 +21487,75 @@ export type TranslationFunctions = {
 			 */
 			city: () => LocalizedString
 			/**
-			 * State
-			 */
-			state: () => LocalizedString
-			/**
-			 * Postal code
-			 */
-			postalCode: () => LocalizedString
-			/**
 			 * Country
 			 */
 			country: () => LocalizedString
+			labels: {
+				/**
+				 * State
+				 */
+				state: () => LocalizedString
+				/**
+				 * Province
+				 */
+				province: () => LocalizedString
+				/**
+				 * Prefecture
+				 */
+				prefecture: () => LocalizedString
+				/**
+				 * Oblast
+				 */
+				oblast: () => LocalizedString
+				/**
+				 * Department
+				 */
+				department: () => LocalizedString
+				/**
+				 * County
+				 */
+				county: () => LocalizedString
+				/**
+				 * District
+				 */
+				district: () => LocalizedString
+				/**
+				 * Do/Si
+				 */
+				doSi: () => LocalizedString
+				/**
+				 * Island
+				 */
+				island: () => LocalizedString
+				/**
+				 * Emirate
+				 */
+				emirate: () => LocalizedString
+				/**
+				 * Parish
+				 */
+				parish: () => LocalizedString
+				/**
+				 * Region
+				 */
+				region: () => LocalizedString
+				/**
+				 * ZIP code
+				 */
+				zip: () => LocalizedString
+				/**
+				 * Postal code
+				 */
+				postalCode: () => LocalizedString
+				/**
+				 * Eircode
+				 */
+				eircode: () => LocalizedString
+				/**
+				 * PIN code
+				 */
+				pin: () => LocalizedString
+			}
 			/**
 			 * Important
 			 */
@@ -21977,6 +22143,16 @@ export type TranslationFunctions = {
 				 * Both cards will have the same card number and details
 				 */
 				bullet3: () => LocalizedString
+				/**
+				 * Shipping address cannot be changed after order is placed
+				 */
+				bullet4: () => LocalizedString
+			}
+			errors: {
+				/**
+				 * Failed to order your physical card. Please try again.
+				 */
+				createFailed: () => LocalizedString
 			}
 		}
 		Onboarding: {

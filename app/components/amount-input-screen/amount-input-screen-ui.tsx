@@ -99,6 +99,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
                 onPress={onToggleCurrency}
+                hitSlop={8}
                 accessibilityLabel="Switch currencies"
                 accessibilityRole="button"
                 style={({ pressed }) => [

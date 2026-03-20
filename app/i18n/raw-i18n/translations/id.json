@@ -2113,7 +2113,7 @@
     "activateNotifications": "Apakah Anda ingin mengaktifkan notifikasi untuk diberi tahu saat pembayaran tiba?",
     "copyClipboard": "Faktur telah disalin ke papan klip",
     "copyClipboardBitcoin": "Alamat Bitcoin telah disalin ke papan klip",
-    "copyClipboardPaycode": "Kode bayar/LNURL telah disalin ke papan klip",
+    "copyClipboardPaycode": "Alamat Lightning telah disalin ke papan klip",
     "invoicePaid": "Faktur ini telah dibayar",
     "setNote": "atur catatan",
     "tapQrCodeCopy": "Ketuk Kode QR untuk Menyalin",
@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Pengaturan Notifikasi",
     "pushNotifications": "Notifikasi Push",
+    "statusAll": "Semua",
+    "statusNone": "Tidak ada",
+    "statusSome": "Beberapa",
     "notificationCategories": {
       "Circles": {
         "title": "Lingkaran",
@@ -2778,7 +2781,8 @@
     "validation": {
       "required": "Bidang ini wajib diisi",
       "minChars": "Harus minimal {min} karakter",
-      "invalidPostalCode": "Kode pos tidak valid"
+      "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik",
+      "invalidRegion": "Pilihan wilayah tidak valid"
     }
   },
   "errors": {
@@ -3125,7 +3129,8 @@
       "CardApproved": {
         "title": "Selamat!",
         "subtitle": "Kartu Blink Visa Anda telah diaktifkan.",
-        "buttonLabel": "Pesan kartu fisik"
+        "buttonLabel": "Pesan kartu fisik",
+        "buttonLabelDashboard": "Dasbor"
       },
       "PhysicalCardOrdered": {
         "title": "Kartu fisik Anda sedang dalam perjalanan!",
@@ -3140,9 +3145,25 @@
       "addressLine1": "Alamat baris 1",
       "addressLine2": "Alamat baris 2",
       "city": "Kota",
-      "state": "Provinsi",
-      "postalCode": "Kode pos",
       "country": "Negara",
+      "labels": {
+        "state": "Negara Bagian",
+        "province": "Provinsi",
+        "prefecture": "Prefektur",
+        "oblast": "Oblast",
+        "department": "Departemen",
+        "county": "Kabupaten",
+        "district": "Kecamatan",
+        "doSi": "Do/Si",
+        "island": "Pulau",
+        "emirate": "Emirat",
+        "parish": "Paroki",
+        "region": "Wilayah",
+        "zip": "Kode ZIP",
+        "postalCode": "Kode pos",
+        "eircode": "Eircode",
+        "pin": "Kode PIN"
+      },
       "important": "Penting",
       "importantDescription": "Pastikan alamat Anda akurat dan lengkap.",
       "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",
@@ -3305,7 +3326,11 @@
         "important": "Penting",
         "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
         "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama",
+        "bullet4": "Alamat pengiriman tidak dapat diubah setelah pesanan dibuat"
+      },
+      "errors": {
+        "createFailed": "Gagal memesan kartu fisik Anda. Silakan coba lagi."
       }
     },
     "Onboarding": {

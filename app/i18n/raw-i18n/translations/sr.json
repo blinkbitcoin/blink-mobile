@@ -2120,7 +2120,7 @@
     "activateNotifications": "Да ли желите да активирате нотификације да бисте били обавештени када уплата пристигне?",
     "copyClipboard": "Рачун је копиран у клипборд",
     "copyClipboardBitcoin": "Биткоин адреса је копирана у клипборд",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Ова рачун је плаћен",
     "setNote": "поставите белешку",
     "tapQrCodeCopy": "Додирните QR код да бисте копирали",
@@ -2358,16 +2358,19 @@
     "displayCurrency": "Валута за приказ"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Подешавања обавештења",
+    "pushNotifications": "Push обавештења",
+    "statusAll": "Све",
+    "statusNone": "Ниједна",
+    "statusSome": "Неке",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Кругови",
+        "description": "Обавештења о вашим круговима."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Плаћања",
+        "description": "Обавештења везана за слање и примање плаћања."
       },
       "Marketing": {
         "title": "Функције и ажурирања",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "Ово поље је обавезно",
       "minChars": "Мора имати најмање {min} знакова",
-      "invalidPostalCode": "Неважећи поштански број"
+      "invalidPostalCode": "Неважећи поштански број, вероватно грешка у куцању",
+      "invalidRegion": "Неважећи избор региона"
     }
   },
   "errors": {
@@ -3163,7 +3167,8 @@
       "CardApproved": {
         "title": "Честитамо!",
         "subtitle": "Ваша Blink Visa картица је активирана.",
-        "buttonLabel": "Наручи физичку картицу"
+        "buttonLabel": "Наручи физичку картицу",
+        "buttonLabelDashboard": "Контролна табла"
       },
       "PhysicalCardOrdered": {
         "title": "Ваша физичка картица је на путу!",
@@ -3178,9 +3183,25 @@
       "addressLine1": "Адреса ред 1",
       "addressLine2": "Адреса ред 2",
       "city": "Град",
-      "state": "Држава",
-      "postalCode": "Поштански број",
       "country": "Земља",
+      "labels": {
+        "state": "Држава",
+        "province": "Покрајина",
+        "prefecture": "Префектура",
+        "oblast": "Област",
+        "department": "Одељenje",
+        "county": "Округ",
+        "district": "Округ",
+        "doSi": "До/Си",
+        "island": "Острво",
+        "emirate": "Емират",
+        "parish": "Парохија",
+        "region": "Регион",
+        "zip": "Поштански број",
+        "postalCode": "Поштански број",
+        "eircode": "Eircode",
+        "pin": "ПИН код"
+      },
       "important": "Важно",
       "importantDescription": "Молимо проверите да је ваша адреса тачна и потпуна.",
       "noPOBoxes": "Картице се не могу доставити на поштанске сандучиће",
@@ -3343,7 +3364,11 @@
         "important": "Важно",
         "bullet1": "Ваша виртуелна картица остаје активна док чекате физичку картицу",
         "bullet2": "Физичку картицу треба да активирате када стигне",
-        "bullet3": "Обе картице ће имати исти број и податке"
+        "bullet3": "Обе картице ће имати исти број и податке",
+        "bullet4": "Адреса за испоруку не може се променити након што је наруџбина послата"
+      },
+      "errors": {
+        "createFailed": "Наруџбина ваше физичке картице није успела. Молимо покушајте поново."
       }
     },
     "Onboarding": {

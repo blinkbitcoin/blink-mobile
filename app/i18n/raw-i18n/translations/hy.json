@@ -2120,7 +2120,7 @@
     "activateNotifications": "Դուք ցանկանու՞մ եք ուտել ակտիվացնել ծանուցումները, որպեսզի տեղեկացվեք վճարման կատարման մասին։ ",
     "copyClipboard": "Վճարման հարցումը պատճենվել է ժամանակավոր շտեմարանում",
     "copyClipboardBitcoin": "Բիթքոյնի հասցեն պատճենվել է ժամանակավոր շտեմարանում",
-    "copyClipboardPaycode": "Վճարման կոդը/LNURL-ը պատճենվել են ժամանակավոր շտեմարանում",
+    "copyClipboardPaycode": "Lightning հասցեն պատճենվել է ժամանակավոր շտեմարանում",
     "invoicePaid": "Այս վճարման հարցումը կատարվել է",
     "setNote": "Սահմանել նշում",
     "tapQrCodeCopy": "Սեղմել QR ծածկագիրը պատճենելու համար",
@@ -2358,16 +2358,19 @@
     "displayCurrency": "Ցուցադրման արժույթ"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Ծանուցումների կարգավորումներ",
+    "pushNotifications": "Հրումային ծանուցումներ",
+    "statusAll": "Բոլորը",
+    "statusNone": "Ոչ մի",
+    "statusSome": "Որոշ",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Շրջանակներ",
+        "description": "Ծանուցումներ ձեր շրջանակների մասին։"
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Վճարումներ",
+        "description": "Ծանուցումներ՝ կապված վճարումներ ուղարկելու և ստանալու հետ։"
       },
       "Marketing": {
         "title": "Հնարավորություններ և թարմացումներ",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "Այս դաշտը պարտադիր է",
       "minChars": "Պետք է լինի առնվազն {min} նիշ",
-      "invalidPostalCode": "Անվավեր փոստային կոդ"
+      "invalidPostalCode": "Անվավեր փոստային կոդ, հավանաբար տպագրական սխալ",
+      "invalidRegion": "Անվավեր տարածաշրջանի ընտրություն"
     }
   },
   "errors": {
@@ -3166,7 +3170,8 @@
       "CardApproved": {
         "title": "Շնորհավորում ենք!",
         "subtitle": "Ձեր Blink Visa քարտն ակտիվացվել է։",
-        "buttonLabel": "Պատվիրել ֆիզիկական քարտ"
+        "buttonLabel": "Պատվիրել ֆիզիկական քարտ",
+        "buttonLabelDashboard": "Վահանակ"
       },
       "PhysicalCardOrdered": {
         "title": "Ձեր ֆիզիկական քարտը ճանապարհին է!",
@@ -3181,9 +3186,25 @@
       "addressLine1": "Հասցեի տող 1",
       "addressLine2": "Հասցեի տող 2",
       "city": "Քաղաք",
-      "state": "Նահանգ",
-      "postalCode": "Փոստային կոդ",
       "country": "Երկիր",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Կարևոր",
       "importantDescription": "Խնդրում ենք համոզվել, որ ձեր հասցեն ճշգրիտ և ամբողջական է։",
       "noPOBoxes": "Քարտերը չեն կարող առաքվել փոստային արկղերին",
@@ -3346,7 +3367,11 @@
         "important": "Կարևոր",
         "bullet1": "Ձեր վիրտուալ քարտը կմնա ակտիվ, մինչև սպասեք ֆիզիկական քարտին",
         "bullet2": "Ֆիզիկական քարտը ստանալուց հետո պետք է այն ակտիվացնեք",
-        "bullet3": "Երկու քարտերն էլ կունենան նույն քարտի համարը և տվյալները"
+        "bullet3": "Երկու քարտերն էլ կունենան նույն քարտի համարը և տվյալները",
+        "bullet4": "Պատվերը ներկայացնելուց հետո առաքման հասցեն չի կարող փոփոխվել"
+      },
+      "errors": {
+        "createFailed": "Չհաջողվեց պատվիրել ձեր ֆիզիկական քարտը։ Խնդրում ենք նորից փորձել։"
       }
     },
     "Onboarding": {

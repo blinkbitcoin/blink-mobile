@@ -1,4 +1,8 @@
-import { isPhoneNumber, parseValidPhoneNumber } from "../../app/utils/phone"
+import {
+  isPhoneNumber,
+  parseValidPhoneNumber,
+  sanitizePhoneNumber,
+} from "../../app/utils/phone"
 
 describe("parseValidPhoneNumber", () => {
   it("returns parsed phone for valid international number", () => {
@@ -46,5 +50,55 @@ describe("isPhoneNumber", () => {
 
   it("returns false for valid phone numbers without plus sign even when format is recognized", () => {
     expect(isPhoneNumber("14155552671")).toBe(false)
+  })
+})
+
+describe("sanitizePhoneNumber", () => {
+  it("removes spaces from phone number", () => {
+    expect(sanitizePhoneNumber("911 40745533")).toBe("91140745533")
+  })
+
+  it("removes dashes from phone number", () => {
+    expect(sanitizePhoneNumber("911-40745533")).toBe("91140745533")
+  })
+
+  it("removes parentheses from phone number", () => {
+    expect(sanitizePhoneNumber("(911) 40745533")).toBe("91140745533")
+  })
+
+  it("preserves + prefix for international numbers", () => {
+    expect(sanitizePhoneNumber("+54 911 40745533")).toBe("+5491140745533")
+  })
+
+  it("preserves + prefix with dashes and parentheses", () => {
+    expect(sanitizePhoneNumber("+54 (911) 40745533")).toBe("+5491140745533")
+    expect(sanitizePhoneNumber("+54-911-40745533")).toBe("+5491140745533")
+    expect(sanitizePhoneNumber("+54(911)40745533")).toBe("+5491140745533")
+  })
+
+  it("handles already clean numbers", () => {
+    expect(sanitizePhoneNumber("+5491140745533")).toBe("+5491140745533")
+    expect(sanitizePhoneNumber("91140745533")).toBe("91140745533")
+  })
+
+  it("trims leading and trailing spaces", () => {
+    expect(sanitizePhoneNumber("  +54 911 40745533  ")).toBe("+5491140745533")
+    expect(sanitizePhoneNumber("  91140745533  ")).toBe("91140745533")
+  })
+
+  it("removes duplicate + signs", () => {
+    expect(sanitizePhoneNumber("++503 78662557")).toBe("+50378662557")
+    expect(sanitizePhoneNumber("+503 +78662557")).toBe("+50378662557")
+  })
+
+  it("removes letters and special characters", () => {
+    expect(sanitizePhoneNumber("abc123def456")).toBe("123456")
+    expect(sanitizePhoneNumber("+1.555.123.4567")).toBe("+15551234567")
+  })
+
+  it("handles empty and edge cases", () => {
+    expect(sanitizePhoneNumber("")).toBe("")
+    expect(sanitizePhoneNumber("   ")).toBe("")
+    expect(sanitizePhoneNumber("+")).toBe("+")
   })
 })

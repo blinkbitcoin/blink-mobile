@@ -73,18 +73,9 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
-  addressToLines: (address: ShippingAddress, includeFullName = true) => {
-    const lines: string[] = []
-    if (includeFullName) {
-      const name = [address.firstName, address.lastName].filter(Boolean).join(" ")
-      if (name) lines.push(name)
-    }
-    lines.push(address.line1)
-    if (address.line2) lines.push(address.line2)
-    lines.push(`${address.city}, ${address.region} ${address.postalCode}`)
-    lines.push(address.countryCode)
-    return lines
-  },
+  addressToLines: jest.requireActual<typeof import("../../helpers/mock-address-utils")>(
+    "../../helpers/mock-address-utils",
+  ).mockAddressToLines,
 }))
 
 jest.mock("@app/components/card-screen", () => ({
@@ -163,7 +154,7 @@ describe("DeliveryStep", () => {
     city: "New York",
     region: "NY",
     postalCode: "10001",
-    countryCode: "USA",
+    countryCode: "US",
   }
 
   const defaultProps = {
@@ -266,8 +257,8 @@ describe("DeliveryStep", () => {
       )
 
       expect(getByText("123 Main Street")).toBeTruthy()
-      expect(getByText("New York, NY 10001")).toBeTruthy()
-      expect(getByText("USA")).toBeTruthy()
+      expect(getByText("New York, NY, 10001")).toBeTruthy()
+      expect(getByText("United States")).toBeTruthy()
     })
 
     it("hides address preview and shows form when checkbox unchecked", () => {

@@ -57,7 +57,7 @@ let mockCloseCardAccountReturn = {
 }
 jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
   useCardData: () => ({
-    card: { id: "card-123", cardType: "PHYSICAL" },
+    card: { id: "card-123", lastFour: "1234", cardType: "PHYSICAL" },
     hasPhysicalCard: false,
     loading: false,
   }),
@@ -398,7 +398,10 @@ describe("CardSettingsScreen", () => {
         fireEvent.press(row)
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("cardAddToMobileWalletScreen")
+      expect(mockNavigate).toHaveBeenCalledWith("cardAddToMobileWalletScreen", {
+        lastFour: "1234",
+        holderName: "",
+      })
     })
 
     it("allows pressing replace card row", async () => {

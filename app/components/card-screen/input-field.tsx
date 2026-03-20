@@ -41,6 +41,7 @@ type InputFieldProps = {
   size?: InputSizeType
   helperText?: string
   error?: boolean
+  errorMessage?: string
   required?: boolean
   minLength?: number
   validate?: (value: string) => string | undefined
@@ -69,6 +70,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   size = InputSize.Default,
   helperText,
   error = false,
+  errorMessage,
   required = false,
   minLength,
   validate,
@@ -103,13 +105,25 @@ export const InputField: React.FC<InputFieldProps> = ({
   const validationError = useMemo(() => {
     if (!hasBlurred && !hasTyped) return undefined
 
+    if (errorMessage !== undefined) return errorMessage
+
     const trimmed = (isEditable ? internalValue : value).trim()
     if (required && trimmed.length === 0) return LL.common.validation.required()
     if (minLength && trimmed.length > 0 && trimmed.length < minLength)
       return LL.common.validation.minChars({ min: minLength })
     if (validateRef.current) return validateRef.current(trimmed)
     return undefined
-  }, [hasBlurred, hasTyped, isEditable, internalValue, value, required, minLength, LL])
+  }, [
+    hasBlurred,
+    hasTyped,
+    errorMessage,
+    isEditable,
+    internalValue,
+    value,
+    required,
+    minLength,
+    LL,
+  ])
 
   const displayHelperText = validationError ?? helperText
   const isError = Boolean(validationError) || error
@@ -155,9 +169,14 @@ export const InputField: React.FC<InputFieldProps> = ({
         </View>
         <View style={styles.helperTextContainer}>
           {displayHelperText ? (
-            <Text style={[styles.helperText, isError && styles.helperTextError]}>
-              {displayHelperText}
-            </Text>
+            <View style={styles.helperTextRow}>
+              {isError && (
+                <GaloyIcon name="warning-circle" size={12} color={colors.error} />
+              )}
+              <Text style={[styles.helperText, isError && styles.helperTextError]}>
+                {displayHelperText}
+              </Text>
+            </View>
           ) : null}
         </View>
       </View>
@@ -248,6 +267,11 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     helperTextContainer: {
       minHeight: 13,
+    },
+    helperTextRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
     },
   }
 })

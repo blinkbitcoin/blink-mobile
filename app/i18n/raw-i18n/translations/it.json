@@ -2113,7 +2113,7 @@
         "activateNotifications": "Vuoi attivare le notifiche per essere avvisato quando ricevi un pagamento?",
         "copyClipboard": "L'invoice è stata copiata negli appunti",
         "copyClipboardBitcoin": "L'indirizzo Bitcoin è stato copiato negli appunti",
-        "copyClipboardPaycode": "Il Paycode/LNURL è stato copiato negli appunti",
+        "copyClipboardPaycode": "L'indirizzo Lightning è stato copiato negli appunti",
         "invoicePaid": "L'invoice è stata pagata",
         "setNote": "Imposta una nota",
         "tapQrCodeCopy": "Clicca il QR code per copiare",
@@ -2343,6 +2343,9 @@
     "NotificationSettingsScreen": {
         "title": "Impostazioni di notifica",
         "pushNotifications": "Notifiche push",
+        "statusAll": "Tutte",
+        "statusNone": "Nessuna",
+        "statusSome": "Alcune",
         "notificationCategories": {
             "Circles": {
                 "title": "Cerchi",
@@ -2778,7 +2781,8 @@
         "validation": {
             "required": "Questo campo è obbligatorio",
             "minChars": "Deve contenere almeno {min} caratteri",
-            "invalidPostalCode": "Codice postale non valido"
+            "invalidPostalCode": "Codice postale non valido, probabilmente un errore di battitura",
+            "invalidRegion": "Selezione regione non valida"
         }
     },
     "errors": {
@@ -3125,7 +3129,8 @@
             "CardApproved": {
                 "title": "Congratulazioni!",
                 "subtitle": "La tua carta Blink Visa è stata attivata.",
-                "buttonLabel": "Ordina carta fisica"
+                "buttonLabel": "Ordina carta fisica",
+                "buttonLabelDashboard": "Pannello"
             },
             "PhysicalCardOrdered": {
                 "title": "La tua carta fisica è in arrivo!",
@@ -3140,11 +3145,27 @@
             "addressLine1": "Indirizzo riga 1",
             "addressLine2": "Indirizzo riga 2",
             "city": "Città",
-            "state": "Stato",
-            "postalCode": "Codice postale",
             "country": "Paese",
             "important": "Importante",
             "importantDescription": "Assicurati che il tuo indirizzo sia accurato e completo.",
+            "labels": {
+                "state": "Stato",
+                "province": "Provincia",
+                "prefecture": "Prefettura",
+                "oblast": "Oblast",
+                "department": "Dipartimento",
+                "county": "Contea",
+                "district": "Distretto",
+                "doSi": "Do/Si",
+                "island": "Isola",
+                "emirate": "Emirato",
+                "parish": "Parrocchia",
+                "region": "Regione",
+                "zip": "CAP",
+                "postalCode": "Codice postale",
+                "eircode": "Eircode",
+                "pin": "Codice PIN"
+            },
             "noPOBoxes": "Le carte non possono essere consegnate alle caselle postali",
             "signatureRequired": "Potrebbe essere richiesta la firma alla consegna",
             "supportedRegions": "L'indirizzo deve essere all'interno delle regioni di spedizione supportate"
@@ -3293,7 +3314,11 @@
                 "important": "Importante",
                 "bullet1": "La tua carta virtuale rimarrà attiva mentre aspetti la carta fisica",
                 "bullet2": "Dovrai attivare la tua carta fisica quando arriva",
-                "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli"
+                "bullet3": "Entrambe le carte avranno lo stesso numero e gli stessi dettagli",
+                "bullet4": "L'indirizzo di spedizione non può essere modificato dopo l'ordine"
+            },
+            "errors": {
+                "createFailed": "Impossibile ordinare la tua carta fisica. Per favore riprova."
             }
         },
         "Onboarding": {

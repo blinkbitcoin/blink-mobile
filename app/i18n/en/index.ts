@@ -2151,7 +2151,7 @@ const en: BaseTranslation = {
       "Do you want to activate notifications to be notified when the payment has arrived?",
     copyClipboard: "Invoice has been copied in the clipboard",
     copyClipboardBitcoin: "Bitcoin address has been copied in the clipboard",
-    copyClipboardPaycode: "Paycode/LNURL has been copied in the clipboard",
+    copyClipboardPaycode: "Lightning address has been copied in the clipboard",
     invoicePaid: "This invoice has been paid",
     setNote: "set a note",
     tapQrCodeCopy: "Tap QR Code to Copy",
@@ -2414,6 +2414,9 @@ const en: BaseTranslation = {
   NotificationSettingsScreen: {
     title: "Notification settings",
     pushNotifications: "Enable all",
+    statusAll: "All",
+    statusNone: "None",
+    statusSome: "Some",
     notificationCategories: {
       Circles: {
         title: "Circles",
@@ -2880,7 +2883,8 @@ const en: BaseTranslation = {
     validation: {
       required: "This field is required",
       minChars: "Must be at least {min:number} characters",
-      invalidPostalCode: "Invalid postal code",
+      invalidPostalCode: "Invalid postal code, probably a typo",
+      invalidRegion: "Invalid region selection",
     },
   },
   errors: {
@@ -3238,6 +3242,7 @@ const en: BaseTranslation = {
         title: "Congratulations!",
         subtitle: "Your Blink Visa Card has been activated.",
         buttonLabel: "Order physical card",
+        buttonLabelDashboard: "Dashboard",
       },
       PhysicalCardOrdered: {
         title: "Your physical card is on the way!",
@@ -3252,9 +3257,25 @@ const en: BaseTranslation = {
       addressLine1: "Address line 1",
       addressLine2: "Address line 2",
       city: "City",
-      state: "State",
-      postalCode: "Postal code",
       country: "Country",
+      labels: {
+        state: "State",
+        province: "Province",
+        prefecture: "Prefecture",
+        oblast: "Oblast",
+        department: "Department",
+        county: "County",
+        district: "District",
+        doSi: "Do/Si",
+        island: "Island",
+        emirate: "Emirate",
+        parish: "Parish",
+        region: "Region",
+        zip: "ZIP code",
+        postalCode: "Postal code",
+        eircode: "Eircode",
+        pin: "PIN code",
+      },
       important: "Important",
       importantDescription: "Please ensure your address is accurate and complete.",
       noPOBoxes: "Cards cannot be delivered to P.O. boxes",
@@ -3434,6 +3455,10 @@ const en: BaseTranslation = {
         bullet1: "Your virtual card will remain active while you wait for the physical card",
         bullet2: "You'll need to activate your physical card when it arrives",
         bullet3: "Both cards will have the same card number and details",
+        bullet4: "Shipping address cannot be changed after order is placed",
+      },
+      errors: {
+        createFailed: "Failed to order your physical card. Please try again.",
       },
     },
     Onboarding: {

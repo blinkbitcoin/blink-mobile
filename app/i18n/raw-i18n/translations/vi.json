@@ -2120,7 +2120,7 @@
     "activateNotifications": "Bạn có muốn kích hoạt thông báo để được thông báo khi nhận được thanh toán không?",
     "copyClipboard": "Hóa đơn đã được sao chép vào bộ nhớ tạm",
     "copyClipboardBitcoin": "Địa chỉ bitcoin đã được sao chép vào bộ nhớ tạm",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Hóa đơn này đã được thanh toán",
     "setNote": "Viết ghi chú",
     "tapQrCodeCopy": "Nhấn Mã QR để sao chép",
@@ -2358,16 +2358,19 @@
     "displayCurrency": "Tiền tệ hiển thị"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "Cài đặt thông báo",
+    "pushNotifications": "Thông báo đẩy",
+    "statusAll": "Tất cả",
+    "statusNone": "Không có",
+    "statusSome": "Một số",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "Vòng kết nối",
+        "description": "Thông báo về các vòng kết nối của bạn."
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "Thanh toán",
+        "description": "Thông báo liên quan đến việc gửi và nhận thanh toán."
       },
       "Marketing": {
         "title": "Tính năng và cập nhật",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "Trường này là bắt buộc",
       "minChars": "Phải có ít nhất {min} ký tự",
-      "invalidPostalCode": "Mã bưu chính không hợp lệ"
+      "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
+      "invalidRegion": "Lựa chọn vùng không hợp lệ"
     }
   },
   "errors": {
@@ -3163,7 +3167,8 @@
       "CardApproved": {
         "title": "Chúc mừng!",
         "subtitle": "Thẻ Blink Visa của bạn đã được kích hoạt.",
-        "buttonLabel": "Đặt thẻ vật lý"
+        "buttonLabel": "Đặt thẻ vật lý",
+        "buttonLabelDashboard": "Bảng điều khiển"
       },
       "PhysicalCardOrdered": {
         "title": "Thẻ vật lý của bạn đang trên đường!",
@@ -3178,9 +3183,25 @@
       "addressLine1": "Địa chỉ dòng 1",
       "addressLine2": "Địa chỉ dòng 2",
       "city": "Thành phố",
-      "state": "Tỉnh/Bang",
-      "postalCode": "Mã bưu điện",
       "country": "Quốc gia",
+      "labels": {
+        "state": "Bang",
+        "province": "Tỉnh",
+        "prefecture": "Quận",
+        "oblast": "Vùng",
+        "department": "Sở",
+        "county": "Huyện",
+        "district": "Quận",
+        "doSi": "Do/Si",
+        "island": "Đảo",
+        "emirate": "Tiểu vương quốc",
+        "parish": "Xứ đạo",
+        "region": "Vùng",
+        "zip": "Mã ZIP",
+        "postalCode": "Mã bưu điện",
+        "eircode": "Eircode",
+        "pin": "Mã PIN"
+      },
       "important": "Quan trọng",
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
@@ -3343,7 +3364,11 @@
         "important": "Quan trọng",
         "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
         "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin",
+        "bullet4": "Không thể thay đổi địa chỉ giao hàng sau khi đặt hàng"
+      },
+      "errors": {
+        "createFailed": "Không thể đặt thẻ vật lý của bạn. Vui lòng thử lại."
       }
     },
     "Onboarding": {

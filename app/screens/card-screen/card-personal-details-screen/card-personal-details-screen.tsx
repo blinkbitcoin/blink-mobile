@@ -14,11 +14,6 @@ import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { OnboardingStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-/*
- * TODO: uncomment and replace mock data with real API data
- * when dateOfBirth and registeredAddress are available via the API
- */
-// import { MOCK_USER } from "../card-mock-data"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
 
@@ -109,11 +104,10 @@ export const CardPersonalDetailsScreen: React.FC = () => {
         <InputField label={LLPersonalDetails.lastName()} value={lastName} />
 
         {/*
-         * TODO: uncomment and replace mock data with real API data
-         * when dateOfBirth is available via the API
+         * TODO: uncomment when dateOfBirth is available via the API
          * <InputField
          *   label={LLPersonalDetails.dateOfBirth()}
-         *   value={MOCK_USER.dateOfBirth}
+         *   value={...}
          * />
          */}
 
@@ -128,12 +122,11 @@ export const CardPersonalDetailsScreen: React.FC = () => {
         />
 
         {/*
-         * TODO: uncomment and replace mock data with real API data
-         * when registeredAddress is available via the API
+         * TODO: uncomment when registeredAddress is available via the API
          * <View style={styles.section}>
          *   <Text style={styles.sectionTitle}>{LLPersonalDetails.registeredAddress()}</Text>
          *   <MultiLineField
-         *     lines={addressToLines(MOCK_USER.registeredAddress)}
+         *     lines={addressToLines(...)}
          *     leftIcon="map-pin"
          *   />
          * </View>

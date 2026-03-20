@@ -2137,7 +2137,7 @@
     "activateNotifications": "Ngaba uyafuna ukwenza izaziso zisebenze xa intlawulo ifikile?",
     "copyClipboard": "I-invoyisi ikhutshelwe kwibhodi eqhotyoshwayo",
     "copyClipboardBitcoin": "Idilesi yeBitcoin ikhutshelwe kwibhodi eqhotyoshwayo",
-    "copyClipboardPaycode": "IPaycode/LNURL ikopishwe kwibhodi eqhotyoshwayo",
+    "copyClipboardPaycode": "Idilesi ye-Lightning ikopishwe kwibhodi eqhotyoshwayo",
     "invoicePaid": "Le invoyisi ihlawulwe",
     "setNote": "seta inqaku",
     "tapQrCodeCopy": "Cofa iKhowudi yeQR ukukopa",
@@ -2379,6 +2379,9 @@
   "NotificationSettingsScreen": {
     "title": "Iisetingi zezaziso",
     "pushNotifications": "Vumela zonke",
+    "statusAll": "Zonke",
+    "statusNone": "Akukho",
+    "statusSome": "Ezinye",
     "notificationCategories": {
       "Circles": {
         "title": "Izangqa",
@@ -2819,7 +2822,8 @@
     "validation": {
       "required": "Le ndawo iyafuneka",
       "minChars": "Kufuneka ibe nobuncinane {min} oonobumba",
-      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni"
+      "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni, mhlawumbi yimpazamo yokutayipha",
+      "invalidRegion": "Ukukhetha kwengingqi okungekho semthethweni"
     }
   },
   "errors": {
@@ -3172,7 +3176,8 @@
       "CardApproved": {
         "title": "Sivuyisana nawe!",
         "subtitle": "Ikhadi lakho le-Blink Visa livuselelwe.",
-        "buttonLabel": "Odola ikhadi lokwenyani"
+        "buttonLabel": "Odola ikhadi lokwenyani",
+        "buttonLabelDashboard": "Ideshibhodi"
       },
       "PhysicalCardOrdered": {
         "title": "Ikhadi lakho lokwenyani lisendleleni!",
@@ -3181,15 +3186,31 @@
       }
     },
     "ShippingAddress": {
-      "title": "Shipping address",
+      "title": "Idilesi yokuthumela",
       "firstName": "Igama lokuqala",
       "lastName": "Ifani",
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",
-      "state": "State",
-      "postalCode": "Postal code",
       "country": "Country",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Important",
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
@@ -3352,7 +3373,11 @@
         "important": "Kubalulekile",
         "bullet1": "Ikhadi lakho le-virtual liza kuhlala lisebenza ngexesha olinde ikhadi elibonakalayo",
         "bullet2": "Kufuneka uvule ikhadi lakho elibonakalayo xa lifika",
-        "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha"
+        "bullet3": "Omabini amakhadi aya kuba nenombolo efanayo kunye neenkcukacha",
+        "bullet4": "Idilesi yokuhanjiswa ayinakutshintshwa emva kokuba iodolo ithunyelwe"
+      },
+      "errors": {
+        "createFailed": "Ayiphumelelanga ukuodola ikhadi lakho lokwenyani. Nceda uzame kwakhona."
       }
     },
     "Onboarding": {

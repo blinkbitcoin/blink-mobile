@@ -2113,7 +2113,7 @@
     "activateNotifications": "Oyagala okutandika okumanyisibwa okutegeezebwa ng’okusasula kutuuse?",
     "copyClipboard": "Yinivoyisi ewanduukuluddwa ku lutimbe",
     "copyClipboardBitcoin": "Endagiriro ya Bitcoin ewanduukuluddwa ku lutimbe",
-    "copyClipboardPaycode": "Paycode/LNURL ekoppoloddwa ku lutimbe",
+    "copyClipboardPaycode": "Endereço ya Lightning ekoppoloddwa ku lutimbe",
     "invoicePaid": "Yinivoyisi esasuddwa",
     "setNote": "Teekawo akawandiiko",
     "tapQrCodeCopy": "Kona ku QR Code okugiwanduukulula",
@@ -2343,6 +2343,9 @@
   "NotificationSettingsScreen": {
     "title": "Enteekateeka Ezitegeeza",
     "pushNotifications": "Okumanyinyisibwa okusika",
+    "statusAll": "Zonna",
+    "statusNone": "Tewali",
+    "statusSome": "Ezimu",
     "notificationCategories": {
       "Circles": {
         "title": "Enkulungo",
@@ -2778,7 +2781,8 @@
     "validation": {
       "required": "Ekisenge kino kyetaagibwa",
       "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo",
-      "invalidPostalCode": "Koodi y'eposta si nnungi"
+      "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika",
+      "invalidRegion": "Okulonda ekitundu tekikkaanya"
     }
   },
   "errors": {
@@ -3125,7 +3129,8 @@
       "CardApproved": {
         "title": "Weebale!",
         "subtitle": "Kaadi yo eya Blink Visa etandise okukola.",
-        "buttonLabel": "Tegeka kaadi ey'ekikula"
+        "buttonLabel": "Tegeka kaadi ey'ekikula",
+        "buttonLabelDashboard": "Dashiboodi"
       },
       "PhysicalCardOrdered": {
         "title": "Kaadi yo ey'ekikula eri mu kkubo!",
@@ -3134,15 +3139,31 @@
       }
     },
     "ShippingAddress": {
-      "title": "Shipping address",
+      "title": "Endagiriro y'okutumira",
       "firstName": "Erinnya ery'omu maaso",
       "lastName": "Erinnya ery'oku nkomerero",
       "addressLine1": "Address line 1",
       "addressLine2": "Address line 2",
       "city": "City",
-      "state": "State",
-      "postalCode": "Postal code",
       "country": "Country",
+      "labels": {
+        "state": "State",
+        "province": "Province",
+        "prefecture": "Prefecture",
+        "oblast": "Oblast",
+        "department": "Department",
+        "county": "County",
+        "district": "District",
+        "doSi": "Do/Si",
+        "island": "Island",
+        "emirate": "Emirate",
+        "parish": "Parish",
+        "region": "Region",
+        "zip": "ZIP code",
+        "postalCode": "Postal code",
+        "eircode": "Eircode",
+        "pin": "PIN code"
+      },
       "important": "Important",
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
@@ -3305,7 +3326,11 @@
         "important": "Kikulu",
         "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
         "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
-        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
+        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu",
+        "bullet4": "Endereesi y'okutumira tesobola kukyusibwa oluvannyuma lw'okuteeka ekiragiro"
+      },
+      "errors": {
+        "createFailed": "Tekulemezeka kuteekawo kaadi yo eyiriimu. Gezaako nate."
       }
     },
     "Onboarding": {

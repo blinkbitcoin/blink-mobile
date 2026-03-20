@@ -2120,7 +2120,7 @@
     "activateNotifications": "คุณต้องการเปิดการแจ้งเตือนเมื่อธุรกรรมเข้ามาหรือไม่?",
     "copyClipboard": "Invoice ได้ทำการคัดลอกไว้ในคลิปบอร์ดแล้ว",
     "copyClipboardBitcoin": "คัดลอก Bitcoin address ไว้ในคลิปบอร์ดแล้ว",
-    "copyClipboardPaycode": "Paycode/LNURL has been copied in the clipboard",
+    "copyClipboardPaycode": "Lightning address has been copied in the clipboard",
     "invoicePaid": "Invoiceนี้ ได้รับการชำระแล้ว",
     "setNote": "เขียนโน้ต",
     "tapQrCodeCopy": "กดที่ QR Code เพื่อคัดลอก",
@@ -2358,16 +2358,19 @@
     "displayCurrency": "สกุลเงินแสดงผล"
   },
   "NotificationSettingsScreen": {
-    "title": "Notification Settings",
-    "pushNotifications": "Push Notifications",
+    "title": "ตั้งค่าการแจ้งเตือน",
+    "pushNotifications": "การแจ้งเตือนแบบพุช",
+    "statusAll": "ทั้งหมด",
+    "statusNone": "ไม่มี",
+    "statusSome": "บางส่วน",
     "notificationCategories": {
       "Circles": {
-        "title": "Circles",
-        "description": "Notifications about your circles."
+        "title": "วงจร",
+        "description": "การแจ้งเตือนเกี่ยวกับวงจรของคุณ"
       },
       "Payments": {
-        "title": "Payments",
-        "description": "Notifications related to sending and receiving payments."
+        "title": "การชำระเงิน",
+        "description": "การแจ้งเตือนเกี่ยวกับการส่งและรับการชำระเงิน"
       },
       "Marketing": {
         "title": "ฟีเจอร์และอัปเดต",
@@ -2795,7 +2798,8 @@
     "validation": {
       "required": "จำเป็นต้องกรอกข้อมูลนี้",
       "minChars": "ต้องมีอย่างน้อย {min} ตัวอักษร",
-      "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง"
+      "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด",
+      "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
     }
   },
   "errors": {
@@ -3163,7 +3167,8 @@
       "CardApproved": {
         "title": "ยินดีด้วย!",
         "subtitle": "บัตร Blink Visa ของคุณได้รับการเปิดใช้งานแล้ว",
-        "buttonLabel": "สั่งบัตรจริง"
+        "buttonLabel": "สั่งบัตรจริง",
+        "buttonLabelDashboard": "แดชบอร์ด"
       },
       "PhysicalCardOrdered": {
         "title": "บัตรจริงของคุณกำลังจัดส่ง!",
@@ -3178,9 +3183,25 @@
       "addressLine1": "ที่อยู่บรรทัดที่ 1",
       "addressLine2": "ที่อยู่บรรทัดที่ 2",
       "city": "เมือง",
-      "state": "รัฐ/จังหวัด",
-      "postalCode": "รหัสไปรษณีย์",
       "country": "ประเทศ",
+      "labels": {
+        "state": "รัฐ",
+        "province": "จังหวัด",
+        "prefecture": "จังหวัด",
+        "oblast": "แคว้น",
+        "department": "แผนก",
+        "county": "เทศมณฑล",
+        "district": "เขต",
+        "doSi": "โด/ซี",
+        "island": "เกาะ",
+        "emirate": "เอมิเรต",
+        "parish": "ตำบล",
+        "region": "ภูมิภาค",
+        "zip": "รหัสไปรษณีย์",
+        "postalCode": "รหัสไปรษณีย์",
+        "eircode": "Eircode",
+        "pin": "รหัส PIN"
+      },
       "important": "สำคัญ",
       "importantDescription": "กรุณาตรวจสอบให้แน่ใจว่าที่อยู่ของคุณถูกต้องและครบถ้วน",
       "noPOBoxes": "ไม่สามารถจัดส่งบัตรไปยังตู้ไปรษณีย์ได้",
@@ -3343,7 +3364,11 @@
         "important": "สำคัญ",
         "bullet1": "บัตรเสมือนของคุณจะยังใช้งานได้ระหว่างรอบัตรจริง",
         "bullet2": "คุณต้องเปิดใช้งานบัตรจริงเมื่อมาถึง",
-        "bullet3": "บัตรทั้งสองใบจะมีหมายเลขและรายละเอียดเดียวกัน"
+        "bullet3": "บัตรทั้งสองใบจะมีหมายเลขและรายละเอียดเดียวกัน",
+        "bullet4": "ไม่สามารถเปลี่ยนที่อยู่จัดส่งได้หลังจากสั่งซื้อแล้ว"
+      },
+      "errors": {
+        "createFailed": "ไม่สามารถสั่งบัตรจริงของคุณได้ กรุณาลองใหม่อีกครั้ง"
       }
     },
     "Onboarding": {
