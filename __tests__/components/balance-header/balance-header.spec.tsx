@@ -108,6 +108,15 @@ describe("BalanceHeader", () => {
     )
   })
 
+  it("keeps the balance on one line, shrunk to fit, rather than wrapping (#3570)", () => {
+    const { getByTestId } = renderHeader({ formattedBalance: "KSh5,120" })
+
+    const balance = getByTestId("balance-value")
+    expect(balance.props.numberOfLines).toBe(1)
+    expect(balance.props.adjustsFontSizeToFit).toBe(true)
+    expect(balance.props.children).toBe("KSh5,120")
+  })
+
   it("renders the hidden placeholder instead of the balance when the amount is hidden", () => {
     mockHideAmount = true
 
