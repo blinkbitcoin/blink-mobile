@@ -18,6 +18,15 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({
+    firstName: "TEST",
+    lastName: "USER",
+    fullName: "TEST USER",
+    loading: false,
+  }),
+}))
+
 const mockDispatch = jest.fn()
 const mockUseRoute = jest.fn()
 
@@ -42,7 +51,7 @@ const cardApprovedParams = {
   navigateTo: "cardDashboardScreen" as const,
   iconName: "approved" as const,
   lastFour: "1111",
-  holderName: "TEST USER",
+  cardId: "card-123",
 }
 
 const physicalCardOrderedParams = {
@@ -52,7 +61,7 @@ const physicalCardOrderedParams = {
   navigateTo: "cardDashboardScreen" as const,
   iconName: "delivery" as const,
   lastFour: "4242",
-  holderName: "TEST USER",
+  cardId: "card-456",
 }
 
 const cardApprovedWithCustomColorParams = {
