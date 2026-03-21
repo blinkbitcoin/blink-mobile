@@ -1358,6 +1358,30 @@ query cardEncryptionPublicKey {
   cardEncryptionPublicKey
 }
 
+query cardHolder($cardId: ID!) {
+  cardHolder(cardId: $cardId) {
+    firstName
+    lastName
+    __typename
+  }
+}
+
+query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
+  cardSecretsEncrypted(cardId: $cardId, sessionId: $sessionId) {
+    encryptedPan {
+      iv
+      data
+      __typename
+    }
+    encryptedCvc {
+      iv
+      data
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardSpendingControls {
   me {
     id
