@@ -79,6 +79,20 @@ jest.mock("@app/utils/toast", () => ({
 
 import { toastShow } from "@app/utils/toast"
 
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({ firstName: "", lastName: "", fullName: "", loading: false }),
+}))
+
+const mockFetchSecrets = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
+  useCardSecrets: () => ({
+    secrets: undefined,
+    loading: false,
+    error: undefined,
+    fetchSecrets: mockFetchSecrets,
+  }),
+}))
+
 const mockUseCardData = jest.fn()
 jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
