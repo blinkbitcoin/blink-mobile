@@ -10,12 +10,13 @@ import { BlinkCard } from "@app/components/blink-card"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
-import { useCardData, useClipboard } from "@app/hooks"
+import { useCardData, useCardHolder, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
 
 import { useBiometricGate } from "./hooks/use-biometric-gate"
+import { useCardSecrets } from "./hooks/use-card-secrets"
 import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
 
 const CLIPBOARD_CLEAR_MS = 60_000
@@ -37,6 +38,8 @@ export const CardDetailsScreen: React.FC = () => {
   })
 
   const { card, loading: cardLoading } = useCardData()
+  const { fullName } = useCardHolder(card?.id)
+  const { secrets, fetchSecrets } = useCardSecrets()
 
   useEffect(() => {
     if (authenticated && !cardLoading && !card) {
@@ -44,12 +47,20 @@ export const CardDetailsScreen: React.FC = () => {
     }
   }, [authenticated, cardLoading, card, handleDismiss])
 
-  const handleCopy = useCallback(
-    (content: string, label: string) => {
-      copyToClipboard({
-        content,
-        message: LL.common.hasBeenCopiedToClipboard({ type: label }),
-      })
+  useEffect(() => {
+    if (authenticated && card?.id && !secrets) {
+      fetchSecrets(card.id)
+    }
+  }, [authenticated, card?.id, secrets, fetchSecrets])
+
+  const copyAction = useCallback(
+    (value: string | undefined, label: string): (() => void) | undefined => {
+      if (!value) return undefined
+      return () =>
+        copyToClipboard({
+          content: value,
+          message: LL.common.hasBeenCopiedToClipboard({ type: label }),
+        })
     },
     [copyToClipboard, LL],
   )
@@ -110,13 +121,15 @@ export const CardDetailsScreen: React.FC = () => {
 
   const isFrozen = isCardFrozen(card.status)
   const statusConfig = cardStatusConfig[card.status]
+  const cardNumber = secrets?.pan ?? card.lastFour
+  const cardNumberFormatted = formatCardDisplayNumber(cardNumber, true)
 
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
         <BlinkCard
-          cardNumber={card.lastFour}
-          holderName=""
+          cardId={card.id}
+          cardNumber={cardNumber}
           validThruDate=""
           isFrozen={isFrozen}
           showCardDetails
@@ -125,12 +138,10 @@ export const CardDetailsScreen: React.FC = () => {
         <View style={styles.fieldsContainer}>
           <ActionField
             label={LL.CardFlow.CardDetails.cardNumber()}
-            value={formatCardDisplayNumber(card.lastFour, true)}
+            value={cardNumberFormatted}
             icon="copy-paste"
             testID="card-number-field"
-            onAction={() =>
-              handleCopy(card.lastFour, LL.CardFlow.CardDetails.cardNumber())
-            }
+            onAction={copyAction(cardNumber, LL.CardFlow.CardDetails.cardNumber())}
           />
 
           <View style={styles.rowFields}>
@@ -139,24 +150,23 @@ export const CardDetailsScreen: React.FC = () => {
                 label={LL.CardFlow.CardDetails.expiryDate()}
                 value={null}
                 icon="copy-paste"
-                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.expiryDate())}
               />
             </View>
             <View style={styles.halfField}>
               <ActionField
                 label={LL.CardFlow.CardDetails.cvv()}
-                value={null}
+                value={secrets?.cvc ?? null}
                 icon="copy-paste"
-                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cvv())}
+                onAction={copyAction(secrets?.cvc, LL.CardFlow.CardDetails.cvv())}
               />
             </View>
           </View>
 
           <ActionField
             label={LL.CardFlow.CardDetails.cardholderName()}
-            value={null}
+            value={fullName || null}
             icon="copy-paste"
-            // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cardholderName())}
+            onAction={copyAction(fullName, LL.CardFlow.CardDetails.cardholderName())}
           />
 
           <InfoSection
