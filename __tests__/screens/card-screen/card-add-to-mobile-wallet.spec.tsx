@@ -18,6 +18,15 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({
+    firstName: "TEST",
+    lastName: "USER",
+    fullName: "TEST USER",
+    loading: false,
+  }),
+}))
+
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -25,7 +34,7 @@ jest.mock("@react-navigation/native", () => {
     useRoute: () => ({
       params: {
         lastFour: "1111",
-        holderName: "TEST USER",
+        cardId: "card-123",
       },
     }),
   }
