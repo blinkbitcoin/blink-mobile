@@ -137,8 +137,8 @@ export const CardDashboardScreen: React.FC = () => {
         }
       >
         <BlinkCard
+          cardId={card?.id}
           cardNumber={cardNumber}
-          holderName=""
           validThruDate=""
           isFrozen={isFrozen}
         />

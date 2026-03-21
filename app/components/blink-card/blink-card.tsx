@@ -5,15 +5,17 @@ import { LinearGradient } from "react-native-linear-gradient"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
-import { formatCardDisplayNumber } from "@app/utils/helper"
-import { formatCardValidThruDisplay } from "@app/utils/date"
+import { useCardHolder } from "@app/hooks/use-card-holder"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { formatCardValidThruDisplay } from "@app/utils/date"
+import { formatCardDisplayNumber } from "@app/utils/helper"
 
 const CARD_ASPECT_RATIO = 1.584
 const CARD_MAX_WIDTH = 400
 const CARD_HORIZONTAL_MARGIN = 40
 
 type BlinkCardProps = {
+  cardId?: string
   cardNumber: string
   holderName?: string
   validThruDate: string | Date
@@ -22,6 +24,7 @@ type BlinkCardProps = {
 }
 
 export const BlinkCard: React.FC<BlinkCardProps> = ({
+  cardId,
   cardNumber,
   holderName,
   validThruDate,
@@ -38,8 +41,10 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const maskedCardNumber = formatCardDisplayNumber(cardNumber, showCardDetails)
+  const { fullName: resolvedName } = useCardHolder(holderName ? undefined : cardId)
+  const displayHolderName = holderName ?? resolvedName
 
+  const maskedCardNumber = formatCardDisplayNumber(cardNumber, showCardDetails)
   const maskedValidThru = formatCardValidThruDisplay(validThruDate, showCardDetails)
 
   return (
@@ -59,7 +64,7 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
         <Text style={styles.cardNumber}>{maskedCardNumber}</Text>
 
         <View style={styles.bottomRow}>
-          <Text style={styles.holderName}>{holderName}</Text>
+          <Text style={styles.holderName}>{displayHolderName?.toUpperCase()}</Text>
           <View style={styles.validThruContainer}>
             <Text style={styles.validThruLabel}>{LL.CardFlow.validThruLabel()}</Text>
             {maskedValidThru ? (

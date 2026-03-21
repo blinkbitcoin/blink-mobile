@@ -14,6 +14,15 @@ jest.mock("react-native-linear-gradient", () => ({
   ),
 }))
 
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({
+    firstName: "",
+    lastName: "",
+    fullName: "",
+    loading: false,
+  }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -340,6 +349,32 @@ describe("BlinkCard", () => {
       )
 
       expect(getByText("•••• 1234 5678 9012")).toBeTruthy()
+    })
+  })
+
+  describe("toUpperCase on holderName", () => {
+    it("converts lowercase holder name to uppercase", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} holderName="john doe" />,
+      )
+
+      expect(getByText("JOHN DOE")).toBeTruthy()
+    })
+
+    it("converts mixed case holder name to uppercase", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} holderName="Satoshi Nakamoto" />,
+      )
+
+      expect(getByText("SATOSHI NAKAMOTO")).toBeTruthy()
+    })
+
+    it("keeps already uppercase holder name unchanged", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} holderName="JOHN DOE" />,
+      )
+
+      expect(getByText("JOHN DOE")).toBeTruthy()
     })
   })
 
