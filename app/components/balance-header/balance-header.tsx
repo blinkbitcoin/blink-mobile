@@ -1,9 +1,10 @@
 import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { TouchableOpacity, View, Text } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
 
@@ -37,27 +38,17 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
   // so there is no need to pass loading from parent?
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
-      {hideAmount ? (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <Text style={styles.balanceHiddenText}>****</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <View>
-            {loading ? (
-              <Loader />
-            ) : (
-              <Text
-                style={styles.primaryBalanceText}
-                allowFontScaling
-                adjustsFontSizeToFit
-              >
-                {formattedBalance}
-              </Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
+        {hideAmount ? (
+          <HiddenBalancePlaceholder size="large" />
+        ) : loading ? (
+          <Loader />
+        ) : (
+          <Text style={styles.primaryBalanceText} allowFontScaling adjustsFontSizeToFit>
+            {formattedBalance}
+          </Text>
+        )}
+      </TouchableOpacity>
     </View>
   )
 }
@@ -65,7 +56,11 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
 const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
-    textAlign: "center",
+  },
+  balanceWrapper: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
@@ -76,10 +71,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loaderForefound: {
     color: colors.loaderForeground,
-  },
-  balanceHiddenText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.black,
   },
 }))

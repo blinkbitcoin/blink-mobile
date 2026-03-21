@@ -13,6 +13,7 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -164,7 +165,7 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : hideAmount ? (
-            <Text>****</Text>
+            <HiddenBalancePlaceholder size="small" />
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
               <Text type="p1" bold {...testProps("bitcoin-balance")}>
@@ -206,7 +207,9 @@ const WalletOverview: React.FC<Props> = ({
             <Loader />
           ) : (
             <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
-              {!hideAmount && (
+              {hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
                 <>
                   {usdInUnderlyingCurrency ? (
                     <Text type="p1" bold>
@@ -222,7 +225,6 @@ const WalletOverview: React.FC<Props> = ({
                   </Text>
                 </>
               )}
-              {hideAmount && <Text>****</Text>}
             </View>
           )}
         </View>
