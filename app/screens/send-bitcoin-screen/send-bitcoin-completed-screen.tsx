@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, Alert, ScrollView } from "react-native"
+import { AppState, View, Alert, ScrollView } from "react-native"
 import InAppReview from "react-native-in-app-review"
 import ViewShot from "react-native-view-shot"
 
@@ -353,7 +353,21 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     }
   }, [feedbackShownData?.data?.feedbackModalShown, requestFeedback])
 
-  const handleNavigateHome = () => navigation.navigate("Primary")
+  const handleNavigateHome = useCallback(
+    () => navigation.navigate("Primary"),
+    [navigation],
+  )
+
+  const appState = useRef(AppState.currentState)
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (appState.current === "active" && nextAppState === "background") {
+        handleNavigateHome()
+      }
+      appState.current = nextAppState
+    })
+    return () => subscription.remove()
+  }, [handleNavigateHome])
 
   if (showSuccessIcon) {
     return (
