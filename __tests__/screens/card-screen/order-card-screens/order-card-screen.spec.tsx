@@ -292,7 +292,7 @@ describe("OrderCardScreen", () => {
         iconName: "delivery",
         iconColor: expect.any(String),
         lastFour: "1234",
-        holderName: "",
+        cardId: "card-1",
       })
     })
 
