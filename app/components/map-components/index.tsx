@@ -317,9 +317,7 @@ export default function MapComponent({ data, userLocation, hasLocation }: Props)
         rotateEnabled={false}
         pitchEnabled={false}
         mapType="standard"
-        loadingEnabled={true}
-        loadingIndicatorColor={colors.grey2}
-        loadingBackgroundColor={colors.grey4}
+        loadingEnabled={false}
       >
         {renderedMarkers}
         {communityGeoJson && (
