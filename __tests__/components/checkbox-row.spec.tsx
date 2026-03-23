@@ -2,7 +2,7 @@ import React from "react"
 import { Text as RNText } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
-import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
+import { CheckboxRow } from "@app/components/checkbox-row"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
