@@ -11284,6 +11284,50 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
+	SparkOnboarding: {
+		BackupMethod: {
+			/**
+			 * C​h​o​o​s​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d
+			 */
+			title: string
+			/**
+			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​G​o​o​g​l​e​ ​D​r​i​v​e​/​A​p​p​l​e​ ​i​C​l​o​u​d​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 */
+			subtitle: string
+			/**
+			 * G​o​o​g​l​e​ ​D​r​i​v​e
+			 */
+			googleDrive: string
+			/**
+			 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManager: string
+			/**
+			 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+			 */
+			manualBackup: string
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * K​e​e​p​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​e​c​r​e​t​!
+				 */
+				title: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​n​o​b​o​d​y​ ​c​a​n​ ​r​e​c​o​v​e​r​ ​m​y​ ​w​a​l​l​e​t​ ​i​f​ ​I​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​r​a​s​e
+				 */
+				check1: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​i​f​ ​s​o​m​e​b​o​d​y​ ​g​e​t​s​ ​t​h​i​s​ ​p​h​r​a​s​e​,​ ​t​h​e​y​ ​c​a​n​ ​s​t​e​a​l​ ​a​l​l​ ​m​y​ ​f​u​n​d​s​.
+				 */
+				check2: string
+				/**
+				 * N​o​b​o​d​y​ ​i​s​ ​a​s​k​i​n​g​ ​m​e​ ​f​o​r​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​m​e​s​s​a​g​e​ ​o​r​ ​a​ ​c​a​l​l
+				 */
+				check3: string
+			}
+		}
+	}
 }
 
 export type TranslationFunctions = {
@@ -22423,6 +22467,50 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	SparkOnboarding: {
+		BackupMethod: {
+			/**
+			 * Choose your backup method
+			 */
+			title: () => LocalizedString
+			/**
+			 * We recommend Google Drive/Apple iCloud for new users.
+			 */
+			subtitle: () => LocalizedString
+			/**
+			 * Google Drive
+			 */
+			googleDrive: () => LocalizedString
+			/**
+			 * Password manager
+			 */
+			passwordManager: () => LocalizedString
+			/**
+			 * Manual backup
+			 */
+			manualBackup: () => LocalizedString
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * Keep your backup phrase secret!
+				 */
+				title: () => LocalizedString
+				/**
+				 * I understand nobody can recover my wallet if I lose this phrase
+				 */
+				check1: () => LocalizedString
+				/**
+				 * I understand if somebody gets this phrase, they can steal all my funds.
+				 */
+				check2: () => LocalizedString
+				/**
+				 * Nobody is asking me for this information via message or a call
+				 */
+				check3: () => LocalizedString
+			}
+		}
 	}
 }
 

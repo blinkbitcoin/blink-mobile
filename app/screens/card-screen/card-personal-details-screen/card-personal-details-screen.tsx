@@ -5,11 +5,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import {
   AvatarInitial,
   ContactSupportRow,
-  IconTextButton,
   InfoCard,
   InputField,
   SettingItemRow,
 } from "@app/components/card-screen"
+import { IconTextButton } from "@app/components/icon-text-button"
 import { Screen } from "@app/components/screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { OnboardingStatus } from "@app/graphql/generated"
