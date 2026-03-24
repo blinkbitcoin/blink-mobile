@@ -11306,6 +11306,14 @@ type RootTranslation = {
 			 * M​a​n​u​a​l​ ​b​a​c​k​u​p
 			 */
 			manualBackup: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			keychainSaved: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
+			 */
+			keychainFailed: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -22549,6 +22557,14 @@ export type TranslationFunctions = {
 			 * Manual backup
 			 */
 			manualBackup: () => LocalizedString
+			/**
+			 * Backup saved to password manager
+			 */
+			keychainSaved: () => LocalizedString
+			/**
+			 * Failed to save backup
+			 */
+			keychainFailed: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {

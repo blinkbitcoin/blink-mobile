@@ -3569,6 +3569,8 @@ const en: BaseTranslation = {
       googleDrive: "Google Drive",
       passwordManager: "Password manager",
       manualBackup: "Manual backup",
+      keychainSaved: "Backup saved to password manager",
+      keychainFailed: "Failed to save backup",
     },
     ManualBackup: {
       Alerts: {

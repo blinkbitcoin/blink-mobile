@@ -3436,7 +3436,9 @@
       "subtitle": "Yeni kullanıcılar için Google Drive/Apple iCloud öneriyoruz.",
       "googleDrive": "Google Drive",
       "passwordManager": "Şifre yöneticisi",
-      "manualBackup": "Manuel yedekleme"
+      "manualBackup": "Manuel yedekleme",
+      "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
+      "keychainFailed": "Yedekleme kaydedilemedi"
     },
     "ManualBackup": {
       "Alerts": {

@@ -3474,7 +3474,9 @@
       "subtitle": "Google Drive/Apple iCloud nisqata kunanchayku musuq rurakkunapaq.",
       "googleDrive": "Google Drive",
       "passwordManager": "Yaykuna rimay kamachiq",
-      "manualBackup": "Makiwan waqaychay"
+      "manualBackup": "Makiwan waqaychay",
+      "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
+      "keychainFailed": "Mana atikurqachu waqaychayta"
     },
     "ManualBackup": {
       "Alerts": {
