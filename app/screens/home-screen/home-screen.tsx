@@ -634,8 +634,8 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 7,
     flexDirection: "column",
     flex: 1,
-    height: 40,
-    maxHeight: 40,
+    height: 48,
+    maxHeight: 48,
   },
   header: {
     flexDirection: "row",
