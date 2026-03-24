@@ -3436,7 +3436,9 @@
       "subtitle": "Tunapendekeza Google Drive/Apple iCloud kwa watumiaji wapya.",
       "googleDrive": "Google Drive",
       "passwordManager": "Kidhibiti cha nywila",
-      "manualBackup": "Nakala ya mkono"
+      "manualBackup": "Nakala ya mkono",
+      "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
+      "keychainFailed": "Imeshindwa kuhifadhi nakala"
     },
     "ManualBackup": {
       "Alerts": {

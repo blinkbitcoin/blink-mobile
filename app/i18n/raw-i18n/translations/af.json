@@ -3477,7 +3477,9 @@
       "subtitle": "Ons beveel Google Drive/Apple iCloud aan vir nuwe gebruikers.",
       "googleDrive": "Google Drive",
       "passwordManager": "Wagwoordbestuurder",
-      "manualBackup": "Handmatige rugsteun"
+      "manualBackup": "Handmatige rugsteun",
+      "keychainSaved": "Rugsteun gestoor in wagwoordbestuurder",
+      "keychainFailed": "Kon nie rugsteun stoor nie"
     },
     "ManualBackup": {
       "Alerts": {

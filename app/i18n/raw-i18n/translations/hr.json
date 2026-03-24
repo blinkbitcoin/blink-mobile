@@ -3477,7 +3477,9 @@
       "subtitle": "Preporučujemo Google Drive/Apple iCloud za nove korisnike.",
       "googleDrive": "Google Drive",
       "passwordManager": "Upravitelj lozinki",
-      "manualBackup": "Ručna sigurnosna kopija"
+      "manualBackup": "Ručna sigurnosna kopija",
+      "keychainSaved": "Sigurnosna kopija spremljena u upravitelj lozinki",
+      "keychainFailed": "Spremanje sigurnosne kopije nije uspjelo"
     },
     "ManualBackup": {
       "Alerts": {

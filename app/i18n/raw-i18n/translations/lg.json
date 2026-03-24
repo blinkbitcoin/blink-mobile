@@ -3436,7 +3436,9 @@
       "subtitle": "Tukutegeeza Google Drive/Apple iCloud gy'abakozesa abapya.",
       "googleDrive": "Google Drive",
       "passwordManager": "Omuteegezzi w'ebigambo by'okuyingira",
-      "manualBackup": "Okukoppa mu ngalo"
+      "manualBackup": "Okukoppa mu ngalo",
+      "keychainSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
+      "keychainFailed": "Okukoppa tekusobodde kutereka"
     },
     "ManualBackup": {
       "Alerts": {

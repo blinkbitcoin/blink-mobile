@@ -3436,7 +3436,9 @@
       "subtitle": "Új felhasználóknak a Google Drive/Apple iCloud ajánlott.",
       "googleDrive": "Google Drive",
       "passwordManager": "Jelszókezelő",
-      "manualBackup": "Kézi biztonsági mentés"
+      "manualBackup": "Kézi biztonsági mentés",
+      "keychainSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
+      "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést"
     },
     "ManualBackup": {
       "Alerts": {

@@ -3483,7 +3483,9 @@
       "subtitle": "Sicebisa Google Drive/Apple iCloud kubasebenzisi abatsha.",
       "googleDrive": "Google Drive",
       "passwordManager": "Umlawuli wezigxina",
-      "manualBackup": "Ukugcina ngesandla"
+      "manualBackup": "Ukugcina ngesandla",
+      "keychainSaved": "Ukugcinwa kugcinwe kumlawuli wezigxina",
+      "keychainFailed": "Ukugcinwa akuphumelelanga"
     },
     "ManualBackup": {
       "Alerts": {
