@@ -3102,6 +3102,7 @@ const en: BaseTranslation = {
       cardTypeVirtual: "Virtual Visa debit",
       cardTypePhysical: "Physical Visa debit",
       authDescription: "Authenticate to view card details",
+      biometricRequired: "Biometric authentication is required to view card details",
       issued: "Issued",
       network: "Network",
       keepDetailsSafe: "Keep your details safe",

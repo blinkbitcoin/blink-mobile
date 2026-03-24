@@ -3051,7 +3051,8 @@
       "statusFailed": "Misluk",
       "cardTypeVirtual": "Virtuele Visa-debiet",
       "cardTypePhysical": "Fisiese Visa-debiet",
-      "authDescription": "Verifieer om kaartbesonderhede te sien"
+      "authDescription": "Verifieer om kaartbesonderhede te sien",
+      "biometricRequired": "Biometriese verifikasie is nodig om kaartbesonderhede te sien"
     },
     "CardStatements": {
       "title": "Statements",

@@ -3010,7 +3010,8 @@
       "statusFailed": "Başarısız",
       "cardTypeVirtual": "Sanal Visa banka kartı",
       "cardTypePhysical": "Fiziksel Visa banka kartı",
-      "authDescription": "Kart ayrıntılarını görmek için kimlik doğrulayın"
+      "authDescription": "Kart ayrıntılarını görmek için kimlik doğrulayın",
+      "biometricRequired": "Kart ayrıntılarını görüntülemek için biyometrik kimlik doğrulama gereklidir"
     },
     "CardStatements": {
       "title": "Statements",

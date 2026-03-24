@@ -3010,7 +3010,8 @@
       "statusFailed": "Sikertelen",
       "cardTypeVirtual": "Virtuális Visa betéti",
       "cardTypePhysical": "Fizikai Visa betéti",
-      "authDescription": "Hitelesítés a kártyaadatok megtekintéséhez"
+      "authDescription": "Hitelesítés a kártyaadatok megtekintéséhez",
+      "biometricRequired": "Biometrikus hitelesítés szükséges a kártya adatainak megtekintéséhez"
     },
     "CardStatements": {
       "title": "Statements",

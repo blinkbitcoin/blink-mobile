@@ -3022,7 +3022,8 @@
             "statusFailed": "失敗",
             "cardTypeVirtual": "バーチャルVisaデビット",
             "cardTypePhysical": "フィジカルVisaデビット",
-            "authDescription": "カード詳細を表示するには認証してください"
+            "authDescription": "カード詳細を表示するには認証してください",
+            "biometricRequired": "カードの詳細を表示するには生体認証が必要です"
         },
         "CardLimits": {
             "currentLimitsTitle": "現在の限度額",

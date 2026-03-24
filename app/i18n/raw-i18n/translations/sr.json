@@ -3048,7 +3048,8 @@
       "statusFailed": "Неуспела",
       "cardTypeVirtual": "Виртуелна Visa дебитна",
       "cardTypePhysical": "Физичка Visa дебитна",
-      "authDescription": "Аутентификујте се да видите податке картице"
+      "authDescription": "Аутентификујте се да видите податке картице",
+      "biometricRequired": "Биометријска аутентификација је потребна за приказ детаља картице"
     },
     "CardStatements": {
       "title": "Statements",

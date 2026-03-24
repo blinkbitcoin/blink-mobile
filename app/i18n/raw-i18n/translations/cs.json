@@ -3051,7 +3051,8 @@
       "statusFailed": "Selhala",
       "cardTypeVirtual": "Virtuální Visa debetní",
       "cardTypePhysical": "Fyzická Visa debetní",
-      "authDescription": "Ověřte se pro zobrazení údajů karty"
+      "authDescription": "Ověřte se pro zobrazení údajů karty",
+      "biometricRequired": "K zobrazení údajů karty je vyžadováno biometrické ověření"
     },
     "CardStatements": {
       "title": "Statements",

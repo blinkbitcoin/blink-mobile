@@ -17,6 +17,8 @@ jest.mock("react-native-linear-gradient", () => ({
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
+const mockDispatch = jest.fn()
+const mockCanGoBack = jest.fn().mockReturnValue(true)
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -25,6 +27,8 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
       setOptions: mockSetOptions,
       navigate: mockNavigate,
+      dispatch: mockDispatch,
+      canGoBack: mockCanGoBack,
     }),
   }
 })
@@ -82,7 +86,11 @@ const defaultCardData = {
 
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
-  mockIsSensorAvailable.mockResolvedValue(false)
+  mockIsSensorAvailable.mockResolvedValue(true)
+  mockCanGoBack.mockReturnValue(true)
+  mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) =>
+    onSuccess(),
+  )
 }
 
 describe("CardDetailsScreen", () => {
@@ -98,10 +106,10 @@ describe("CardDetailsScreen", () => {
   })
 
   describe("biometric authentication", () => {
-    it("skips biometric when sensor is not available", async () => {
+    it("navigates back when sensor is not available", async () => {
       mockIsSensorAvailable.mockResolvedValue(false)
 
-      const { getByText } = render(
+      render(
         <ContextForScreen>
           <CardDetailsScreen />
         </ContextForScreen>,
@@ -109,8 +117,8 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("Card number")).toBeTruthy()
       expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalled()
     })
 
     it("triggers biometric when sensor is available", async () => {
@@ -154,6 +162,26 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(mockGoBack).toHaveBeenCalled()
+    })
+
+    it("resets to home on biometric failure when no navigation history", async () => {
+      mockCanGoBack.mockReturnValue(false)
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+        }),
+      )
     })
   })
 

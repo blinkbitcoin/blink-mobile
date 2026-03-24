@@ -3048,7 +3048,8 @@
       "statusFailed": "Mana atikunchu",
       "cardTypeVirtual": "Virtual Visa débito",
       "cardTypePhysical": "Físico Visa débito",
-      "authDescription": "Kikillaykita tarichiy tarjeta willakunata qhawanaykipaq"
+      "authDescription": "Kikillaykita tarichiy tarjeta willakunata qhawanaykipaq",
+      "biometricRequired": "Biometric authentication is required to view card details"
     },
     "CardStatements": {
       "title": "Statements",

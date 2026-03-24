@@ -2981,7 +2981,8 @@
             "statusFailed": "Falhou",
             "cardTypeVirtual": "Débito Visa virtual",
             "cardTypePhysical": "Débito Visa físico",
-            "authDescription": "Autentique-se para ver os detalhes do cartão"
+            "authDescription": "Autentique-se para ver os detalhes do cartão",
+            "biometricRequired": "Autenticação biométrica é necessária para visualizar os detalhes do cartão"
         },
         "CardLimits": {
             "currentLimitsTitle": "Limites atuais",

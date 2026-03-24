@@ -3010,7 +3010,8 @@
       "statusFailed": "Gagal",
       "cardTypeVirtual": "Debit Visa virtual",
       "cardTypePhysical": "Debit Visa fisik",
-      "authDescription": "Autentikasi untuk melihat detail kartu"
+      "authDescription": "Autentikasi untuk melihat detail kartu",
+      "biometricRequired": "Autentikasi biometrik diperlukan untuk melihat detail kartu"
     },
     "CardStatements": {
       "title": "Statements",

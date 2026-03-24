@@ -3010,7 +3010,8 @@
       "statusFailed": "Fallida",
       "cardTypeVirtual": "Dèbit Visa virtual",
       "cardTypePhysical": "Dèbit Visa física",
-      "authDescription": "Autentiqueu-vos per veure els detalls de la targeta"
+      "authDescription": "Autentiqueu-vos per veure els detalls de la targeta",
+      "biometricRequired": "L'autenticació biomètrica és necessària per veure els detalls de la targeta"
     },
     "CardStatements": {
       "title": "Statements",

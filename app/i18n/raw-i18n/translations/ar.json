@@ -3048,7 +3048,8 @@
       "statusFailed": "فشلت",
       "cardTypeVirtual": "بطاقة فيزا افتراضية مدينة",
       "cardTypePhysical": "بطاقة فيزا فعلية مدينة",
-      "authDescription": "قم بالمصادقة لعرض تفاصيل البطاقة"
+      "authDescription": "قم بالمصادقة لعرض تفاصيل البطاقة",
+      "biometricRequired": "المصادقة البيومترية مطلوبة لعرض تفاصيل البطاقة"
     },
     "CardStatements": {
       "title": "Statements",

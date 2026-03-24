@@ -9833,6 +9833,10 @@ type RootTranslation = {
 			 */
 			authDescription: string
 			/**
+			 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​v​i​e​w​ ​c​a​r​d​ ​d​e​t​a​i​l​s
+			 */
+			biometricRequired: string
+			/**
 			 * I​s​s​u​e​d
 			 */
 			issued: string
@@ -20988,6 +20992,10 @@ export type TranslationFunctions = {
 			 * Authenticate to view card details
 			 */
 			authDescription: () => LocalizedString
+			/**
+			 * Biometric authentication is required to view card details
+			 */
+			biometricRequired: () => LocalizedString
 			/**
 			 * Issued
 			 */

@@ -3048,7 +3048,8 @@
       "statusFailed": "ล้มเหลว",
       "cardTypeVirtual": "บัตรเดบิต Visa เสมือน",
       "cardTypePhysical": "บัตรเดบิต Visa จริง",
-      "authDescription": "ยืนยันตัวตนเพื่อดูรายละเอียดบัตร"
+      "authDescription": "ยืนยันตัวตนเพื่อดูรายละเอียดบัตร",
+      "biometricRequired": "จำเป็นต้องยืนยันตัวตนด้วยไบโอเมตริกเพื่อดูรายละเอียดบัตร"
     },
     "CardStatements": {
       "title": "Statements",

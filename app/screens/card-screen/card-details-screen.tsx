@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { ActionField } from "@app/components/action-field"
@@ -14,6 +14,7 @@ import { useCardData, useCardHolder, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
+import { toastShow } from "@app/utils/toast"
 
 import { useBiometricGate } from "./hooks/use-biometric-gate"
 import { useCardSecrets } from "./hooks/use-card-secrets"
@@ -30,11 +31,22 @@ export const CardDetailsScreen: React.FC = () => {
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
+  const handleBiometricFailure = useCallback(() => {
+    toastShow({
+      message: LL.CardFlow.CardDetails.biometricRequired(),
+      LL,
+    })
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+      return
+    }
+    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+  }, [navigation, LL])
 
   const authenticated = useBiometricGate({
     description: LL.CardFlow.CardDetails.authDescription(),
-    onFailure: handleDismiss,
+    onFailure: handleBiometricFailure,
+    required: true,
   })
 
   const { card, loading: cardLoading } = useCardData()
@@ -43,9 +55,9 @@ export const CardDetailsScreen: React.FC = () => {
 
   useEffect(() => {
     if (authenticated && !cardLoading && !card) {
-      handleDismiss()
+      handleBiometricFailure()
     }
-  }, [authenticated, cardLoading, card, handleDismiss])
+  }, [authenticated, cardLoading, card, handleBiometricFailure])
 
   useEffect(() => {
     if (authenticated && card?.id && !secrets) {
