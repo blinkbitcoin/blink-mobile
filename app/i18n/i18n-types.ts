@@ -11326,6 +11326,65 @@ type RootTranslation = {
 				 */
 				check3: string
 			}
+			Phrase: {
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * T​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​w​o​r​k​s​ ​i​n​ ​a​n​y​ ​{​s​p​a​r​k​C​o​m​p​a​t​i​b​l​e​L​i​n​k​}
+				 * @param {string} sparkCompatibleLink
+				 */
+				sparkCompatible: RequiredParams<'sparkCompatibleLink'>
+				/**
+				 * S​p​a​r​k​-​c​o​m​p​a​t​i​b​l​e​ ​w​a​l​l​e​t
+				 */
+				sparkCompatibleLink: string
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+				 */
+				copiedToast: string
+				/**
+				 * S​a​v​e​ ​i​t​ ​n​o​w
+				 */
+				saveItNow: string
+				/**
+				 * I​ ​h​a​v​e​ ​s​a​v​e​d​ ​i​t
+				 */
+				savedConfirm: string
+				/**
+				 * C​o​p​y
+				 */
+				copy: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * A​ ​q​u​i​c​k​ ​c​h​e​c​k​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​w​r​i​t​t​e​n​ ​i​t​ ​d​o​w​n​ ​c​o​r​r​e​c​t​l​y
+				 */
+				subtitle: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d
+				 */
+				enterWord: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d​s
+				 */
+				enterWords: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+			}
+			Success: {
+				/**
+				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
+				 */
+				title: string
+			}
 		}
 	}
 }
@@ -22509,6 +22568,64 @@ export type TranslationFunctions = {
 				 * Nobody is asking me for this information via message or a call
 				 */
 				check3: () => LocalizedString
+			}
+			Phrase: {
+				/**
+				 * Your backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * This backup phrase works in any {sparkCompatibleLink}
+				 */
+				sparkCompatible: (arg: { sparkCompatibleLink: string }) => LocalizedString
+				/**
+				 * Spark-compatible wallet
+				 */
+				sparkCompatibleLink: () => LocalizedString
+				/**
+				 * Backup phrase copied into clipboard
+				 */
+				copiedToast: () => LocalizedString
+				/**
+				 * Save it now
+				 */
+				saveItNow: () => LocalizedString
+				/**
+				 * I have saved it
+				 */
+				savedConfirm: () => LocalizedString
+				/**
+				 * Copy
+				 */
+				copy: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * A quick check if you have written it down correctly
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Enter word
+				 */
+				enterWord: () => LocalizedString
+				/**
+				 * Enter words
+				 */
+				enterWords: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+			}
+			Success: {
+				/**
+				 * Welcome to non-custodial Blink
+				 */
+				title: () => LocalizedString
 			}
 		}
 	}

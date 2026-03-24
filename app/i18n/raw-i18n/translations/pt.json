@@ -3417,5 +3417,41 @@
                 "buttonText": "Fechar"
             }
         }
+    },
+    "SparkOnboarding": {
+        "BackupMethod": {
+            "title": "Escolha seu método de backup",
+            "subtitle": "Recomendamos Google Drive/Apple iCloud para novos usuários.",
+            "googleDrive": "Google Drive",
+            "passwordManager": "Gerenciador de senhas",
+            "manualBackup": "Backup manual"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "Mantenha sua frase de backup em segredo!",
+                "check1": "Entendo que ninguém pode recuperar minha carteira se eu perder esta frase",
+                "check2": "Entendo que se alguém obtiver esta frase, pode roubar todos os meus fundos.",
+                "check3": "Ninguém está me pedindo estas informações por mensagem ou ligação"
+            },
+            "Phrase": {
+                "headerTitle": "Sua frase de backup",
+                "sparkCompatible": "Esta frase de backup funciona em qualquer {sparkCompatibleLink}",
+                "sparkCompatibleLink": "carteira compatível com Spark",
+                "copiedToast": "Frase de backup copiada para a área de transferência",
+                "saveItNow": "Salve agora",
+                "savedConfirm": "Já salvei",
+                "copy": "Copiar"
+            },
+            "Confirm": {
+                "headerTitle": "Confirmar frase de backup",
+                "subtitle": "Uma verificação rápida se você a escreveu corretamente",
+                "enterWord": "Digite a palavra",
+                "enterWords": "Digite as palavras",
+                "confirm": "Confirmar"
+            },
+            "Success": {
+                "title": "Bem-vindo ao Blink não-custodial"
+            }
+        }
     }
 }

@@ -3470,5 +3470,41 @@
         "buttonText": "Zavřít"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Vyberte metodu zálohování",
+      "subtitle": "Pro nové uživatele doporučujeme Google Drive/Apple iCloud.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Správce hesel",
+      "manualBackup": "Ruční zálohování"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Udržujte záložní frázi v tajnosti!",
+        "check1": "Chápu, že nikdo nemůže obnovit mou peněženku, pokud ztratím tuto frázi",
+        "check2": "Chápu, že pokud někdo získá tuto frázi, může ukrást všechny mé prostředky.",
+        "check3": "Nikdo mě nežádá o tyto informace prostřednictvím zprávy nebo hovoru"
+      },
+      "Phrase": {
+        "headerTitle": "Vaše záložní fráze",
+        "sparkCompatible": "Tato záložní fráze funguje v jakékoli {sparkCompatibleLink}",
+        "sparkCompatibleLink": "peněžence kompatibilní se Spark",
+        "copiedToast": "Záložní fráze zkopírována do schránky",
+        "saveItNow": "Uložte ji nyní",
+        "savedConfirm": "Už jsem ji uložil",
+        "copy": "Kopírovat"
+      },
+      "Confirm": {
+        "headerTitle": "Potvrďte záložní frázi",
+        "subtitle": "Rychlá kontrola, zda jste ji správně zapsali",
+        "enterWord": "Zadejte slovo",
+        "enterWords": "Zadejte slova",
+        "confirm": "Potvrdit"
+      },
+      "Success": {
+        "title": "Vítejte v necustodial Blink"
+      }
+    }
   }
 }

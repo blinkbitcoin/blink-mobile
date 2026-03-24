@@ -3429,5 +3429,41 @@
         "buttonText": "Închide"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Alege metoda de backup",
+      "subtitle": "Recomandăm Google Drive/Apple iCloud pentru utilizatorii noi.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Manager de parole",
+      "manualBackup": "Backup manual"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Păstrează-ți fraza de backup secretă!",
+        "check1": "Înțeleg că nimeni nu poate recupera portofelul meu dacă pierd această frază",
+        "check2": "Înțeleg că dacă cineva obține această frază, poate fura toate fondurile mele.",
+        "check3": "Nimeni nu îmi cere aceste informații prin mesaj sau apel"
+      },
+      "Phrase": {
+        "headerTitle": "Fraza ta de backup",
+        "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
+        "sparkCompatibleLink": "portofel compatibil Spark",
+        "copiedToast": "Fraza de backup copiată în clipboard",
+        "saveItNow": "Salvează acum",
+        "savedConfirm": "Am salvat-o",
+        "copy": "Copiază"
+      },
+      "Confirm": {
+        "headerTitle": "Confirmă fraza de backup",
+        "subtitle": "O verificare rapidă dacă ai scris-o corect",
+        "enterWord": "Introdu cuvântul",
+        "enterWords": "Introdu cuvintele",
+        "confirm": "Confirmă"
+      },
+      "Success": {
+        "title": "Bun venit la Blink non-custodial"
+      }
+    }
   }
 }

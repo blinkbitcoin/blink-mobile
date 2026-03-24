@@ -3429,5 +3429,41 @@
         "buttonText": "Funga"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Chagua njia yako ya nakala",
+      "subtitle": "Tunapendekeza Google Drive/Apple iCloud kwa watumiaji wapya.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Kidhibiti cha nywila",
+      "manualBackup": "Nakala ya mkono"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Weka maneno yako ya nakala siri!",
+        "check1": "Naelewa hakuna mtu anayeweza kurejesha pochi yangu nikipoteza maneno haya",
+        "check2": "Naelewa ikiwa mtu atapata maneno haya, anaweza kuiba fedha zangu zote.",
+        "check3": "Hakuna mtu anayeniomba taarifa hizi kupitia ujumbe au simu"
+      },
+      "Phrase": {
+        "headerTitle": "Maneno yako ya nakala",
+        "sparkCompatible": "Maneno haya ya nakala yanafanya kazi katika {sparkCompatibleLink} yoyote",
+        "sparkCompatibleLink": "pochi inayoendana na Spark",
+        "copiedToast": "Maneno ya nakala yamenakiliwa kwenye ubao",
+        "saveItNow": "Hifadhi sasa",
+        "savedConfirm": "Nimehifadhi",
+        "copy": "Nakili"
+      },
+      "Confirm": {
+        "headerTitle": "Thibitisha maneno ya nakala",
+        "subtitle": "Ukaguzi wa haraka kama umeyaandika kwa usahihi",
+        "enterWord": "Ingiza neno",
+        "enterWords": "Ingiza maneno",
+        "confirm": "Thibitisha"
+      },
+      "Success": {
+        "title": "Karibu kwa Blink isiyo na uhifadhi"
+      }
+    }
   }
 }

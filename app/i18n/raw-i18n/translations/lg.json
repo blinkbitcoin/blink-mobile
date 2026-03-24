@@ -3429,5 +3429,41 @@
         "buttonText": "Ggala"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Londa enkola yo ey'okukoppa",
+      "subtitle": "Tukutegeeza Google Drive/Apple iCloud gy'abakozesa abapya.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Omuteegezzi w'ebigambo by'okuyingira",
+      "manualBackup": "Okukoppa mu ngalo"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Kuma ekigambo kyo eky'okukoppa mu kyama!",
+        "check1": "Ntegeeza nti tewali muntu ayinza kuddamu ensawo yange bwe nfiirwa ekigambo kino",
+        "check2": "Ntegeeza nti omuntu bw'afuna ekigambo kino, ayinza okubba ssente zange zonna.",
+        "check3": "Tewali muntu ansaba ebikwata ku bino ku bubaka oba ku ssimu"
+      },
+      "Phrase": {
+        "headerTitle": "Ekigambo kyo eky'okukoppa",
+        "sparkCompatible": "Ekigambo kino eky'okukoppa kikola mu {sparkCompatibleLink} yonna",
+        "sparkCompatibleLink": "nsawo eyekuvaanyizibwa ne Spark",
+        "copiedToast": "Ekigambo eky'okukoppa kiwanduukuliddwa ku lutimbe",
+        "saveItNow": "Kitereke kati",
+        "savedConfirm": "Nkitereka",
+        "copy": "Koppa"
+      },
+      "Confirm": {
+        "headerTitle": "Kakasa ekigambo eky'okukoppa",
+        "subtitle": "Okukebera mangu oba wakiwandiika bulungi",
+        "enterWord": "Yingiza ekigambo",
+        "enterWords": "Yingiza ebigambo",
+        "confirm": "Kakasa"
+      },
+      "Success": {
+        "title": "Tukulabiriza ku Blink etali ya kuzibika"
+      }
+    }
   }
 }
