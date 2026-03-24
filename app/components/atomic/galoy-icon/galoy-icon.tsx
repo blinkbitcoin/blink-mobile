@@ -101,6 +101,7 @@ import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
+import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -225,6 +226,7 @@ const customSvgMap = {
   "qr-code": QrCode,
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
+  "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,
 } as const
 
