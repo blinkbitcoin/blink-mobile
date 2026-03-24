@@ -3,7 +3,7 @@ import { it } from "@jest/globals"
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
-  formatDurationHours,
+  formatDuration,
   formatMonth,
   formatShortDate,
   getLastDayOfMonth,
@@ -316,21 +316,33 @@ describe("date utils", () => {
     })
   })
 
-  describe("formatDurationHours", () => {
+  describe("formatDuration", () => {
     it("formats hours with narrow display", () => {
-      expect(formatDurationHours(24, "en-US")).toBe("24h")
+      expect(formatDuration(24, { locale: "en-US" })).toBe("24h")
     })
 
     it("formats single hour", () => {
-      expect(formatDurationHours(1, "en-US")).toBe("1h")
+      expect(formatDuration(1, { locale: "en-US" })).toBe("1h")
     })
 
     it("formats large values", () => {
-      expect(formatDurationHours(72, "en-US")).toBe("72h")
+      expect(formatDuration(72, { locale: "en-US" })).toBe("72h")
     })
 
-    it("defaults to en-US when no locale provided", () => {
-      expect(formatDurationHours(48)).toBe("48h")
+    it("defaults to hour and en-US when no options provided", () => {
+      expect(formatDuration(48)).toBe("48h")
+    })
+
+    it("formats seconds with narrow display", () => {
+      expect(formatDuration(10, { unit: "second", locale: "en-US" })).toBe("10s")
+    })
+
+    it("formats minutes with narrow display", () => {
+      expect(formatDuration(5, { unit: "minute", locale: "en-US" })).toBe("5m")
+    })
+
+    it("formats days with narrow display", () => {
+      expect(formatDuration(3, { unit: "day", locale: "en-US" })).toBe("3d")
     })
   })
 })
