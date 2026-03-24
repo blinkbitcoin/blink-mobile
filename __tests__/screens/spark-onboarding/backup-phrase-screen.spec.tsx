@@ -26,7 +26,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
-  open: jest.fn(),
+  open: jest.fn().mockResolvedValue(undefined),
 }))
 
 jest.mock("@app/screens/settings-screen/group", () => {
