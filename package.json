@@ -94,6 +94,7 @@
     "apollo3-cache-persist": "^0.15.0",
     "axios": "^1.11.0",
     "bech32": "^2.0.0",
+    "bip39": "^3.1.0",
     "bitcoinjs-lib": "^6.1.5",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.16.0",
