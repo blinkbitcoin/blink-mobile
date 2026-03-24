@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from "react"
-import { ScrollView, View } from "react-native"
+import { Linking, ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -57,6 +57,11 @@ export const SparkBackupPhraseScreen: React.FC = () => {
     })
   }, [copyToClipboard, LL])
 
+  const handleOpenLink = () =>
+    InAppBrowser.open(sparkCompatibleWalletsUrl).catch(() =>
+      Linking.openURL(sparkCompatibleWalletsUrl),
+    )
+
   const handleContinue = () => {
     const indices = pickRandomIndices(MOCK_WORDS.length, 3)
     const challenges = indices.map((i) => ({ index: i, word: MOCK_WORDS[i] }))
@@ -104,7 +109,7 @@ export const SparkBackupPhraseScreen: React.FC = () => {
             <Text
               style={styles.linkText}
               accessibilityRole="link"
-              onPress={() => InAppBrowser.open(sparkCompatibleWalletsUrl)}
+              onPress={handleOpenLink}
             >
               {sparkLink}
             </Text>
