@@ -65,6 +65,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                       style={styles.input}
                       placeholder={`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
                       placeholderTextColor={colors.grey2}
+                      accessibilityLabel={`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
                       value={inputs[i]}
                       onChangeText={(text) => {
                         updateInput(i, text)
@@ -90,6 +91,8 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                       renderItem={({ item }) => (
                         <Pressable
                           style={styles.suggestionItem}
+                          accessibilityRole="button"
+                          accessibilityLabel={item}
                           onPress={() => selectSuggestion(i, item)}
                         >
                           <Text style={styles.suggestionText}>{item}</Text>

@@ -103,6 +103,7 @@ export const SparkBackupPhraseScreen: React.FC = () => {
             {infoBefore}
             <Text
               style={styles.linkText}
+              accessibilityRole="link"
               onPress={() => InAppBrowser.open(sparkCompatibleWalletsUrl)}
             >
               {sparkLink}
