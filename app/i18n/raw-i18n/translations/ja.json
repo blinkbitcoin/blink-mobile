@@ -3465,7 +3465,9 @@
             "subtitle": "新規ユーザーにはGoogle Drive/Apple iCloudをお勧めします。",
             "googleDrive": "Google Drive",
             "passwordManager": "パスワードマネージャー",
-            "manualBackup": "手動バックアップ"
+            "manualBackup": "手動バックアップ",
+            "keychainSaved": "バックアップがパスワードマネージャーに保存されました",
+            "keychainFailed": "バックアップの保存に失敗しました"
         },
         "ManualBackup": {
             "Alerts": {

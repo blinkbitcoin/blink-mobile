@@ -3436,7 +3436,9 @@
       "subtitle": "Kami merekomendasikan Google Drive/Apple iCloud untuk pengguna baru.",
       "googleDrive": "Google Drive",
       "passwordManager": "Pengelola kata sandi",
-      "manualBackup": "Cadangan manual"
+      "manualBackup": "Cadangan manual",
+      "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
+      "keychainFailed": "Gagal menyimpan cadangan"
     },
     "ManualBackup": {
       "Alerts": {

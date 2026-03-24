@@ -3424,7 +3424,9 @@
             "subtitle": "Wir empfehlen Google Drive/Apple iCloud für neue Benutzer.",
             "googleDrive": "Google Drive",
             "passwordManager": "Passwort-Manager",
-            "manualBackup": "Manuelle Sicherung"
+            "manualBackup": "Manuelle Sicherung",
+            "keychainSaved": "Sicherung im Passwort-Manager gespeichert",
+            "keychainFailed": "Sicherung konnte nicht gespeichert werden"
         },
         "ManualBackup": {
             "Alerts": {

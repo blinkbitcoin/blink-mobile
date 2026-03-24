@@ -3436,7 +3436,9 @@
       "subtitle": "Recomanem Google Drive/Apple iCloud per a nous usuaris.",
       "googleDrive": "Google Drive",
       "passwordManager": "Gestor de contrasenyes",
-      "manualBackup": "Còpia de seguretat manual"
+      "manualBackup": "Còpia de seguretat manual",
+      "keychainSaved": "Còpia de seguretat desada al gestor de contrasenyes",
+      "keychainFailed": "No s’ha pogut desar la còpia de seguretat"
     },
     "ManualBackup": {
       "Alerts": {

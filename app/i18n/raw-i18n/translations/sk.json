@@ -3436,7 +3436,9 @@
       "subtitle": "Pre nových používateľov odporúčame Google Drive/Apple iCloud.",
       "googleDrive": "Google Drive",
       "passwordManager": "Správca hesiel",
-      "manualBackup": "Ručné zálohovanie"
+      "manualBackup": "Ručné zálohovanie",
+      "keychainSaved": "Záloha uložená do správcu hesiel",
+      "keychainFailed": "Nepodarilo sa uložiť zálohu"
     },
     "ManualBackup": {
       "Alerts": {

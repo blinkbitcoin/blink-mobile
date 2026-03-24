@@ -3477,7 +3477,9 @@
       "subtitle": "We raden Google Drive/Apple iCloud aan voor nieuwe gebruikers.",
       "googleDrive": "Google Drive",
       "passwordManager": "Wachtwoordbeheerder",
-      "manualBackup": "Handmatige back-up"
+      "manualBackup": "Handmatige back-up",
+      "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
+      "keychainFailed": "Back-up opslaan mislukt"
     },
     "ManualBackup": {
       "Alerts": {

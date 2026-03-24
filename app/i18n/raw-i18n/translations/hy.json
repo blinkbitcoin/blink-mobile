@@ -3477,7 +3477,9 @@
       "subtitle": "Նոր օգտատերերի համար խորհուրդ ենք տալիս Google Drive/Apple iCloud-ը։",
       "googleDrive": "Google Drive",
       "passwordManager": "Գաղտնաբառերի կառավարիչ",
-      "manualBackup": "Ձեռքով պահուստավորում"
+      "manualBackup": "Ձեռքով պահուստավորում",
+      "keychainSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
+      "keychainFailed": "Չհաջողվել պահուստավորումը"
     },
     "ManualBackup": {
       "Alerts": {

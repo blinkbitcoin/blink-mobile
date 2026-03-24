@@ -3436,7 +3436,9 @@
       "subtitle": "Recomandăm Google Drive/Apple iCloud pentru utilizatorii noi.",
       "googleDrive": "Google Drive",
       "passwordManager": "Manager de parole",
-      "manualBackup": "Backup manual"
+      "manualBackup": "Backup manual",
+      "keychainSaved": "Backup salvat în managerul de parole",
+      "keychainFailed": "Nu s-a putut salva backup-ul"
     },
     "ManualBackup": {
       "Alerts": {

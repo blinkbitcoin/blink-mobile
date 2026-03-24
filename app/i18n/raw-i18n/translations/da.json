@@ -3454,7 +3454,9 @@
       "subtitle": "Vi anbefaler Google Drive/Apple iCloud til nye brugere.",
       "googleDrive": "Google Drive",
       "passwordManager": "Adgangskodeadministrator",
-      "manualBackup": "Manuel backup"
+      "manualBackup": "Manuel backup",
+      "keychainSaved": "Backup gemt i adgangskodeadministrator",
+      "keychainFailed": "Kunne ikke gemme backup"
     },
     "ManualBackup": {
       "Alerts": {

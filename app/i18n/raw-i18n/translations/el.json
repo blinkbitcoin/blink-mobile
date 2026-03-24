@@ -3436,7 +3436,9 @@
       "subtitle": "Προτείνουμε Google Drive/Apple iCloud για νέους χρήστες.",
       "googleDrive": "Google Drive",
       "passwordManager": "Διαχειριστής κωδικών",
-      "manualBackup": "Χειροκίνητο αντίγραφο ασφαλείας"
+      "manualBackup": "Χειροκίνητο αντίγραφο ασφαλείας",
+      "keychainSaved": "Αντίγραφο ασφαλείας αποθηκεύτηκε στον διαχειριστή κωδικών",
+      "keychainFailed": "Αποτυχία αποθήκευσης αντιγράφου ασφαλείας"
     },
     "ManualBackup": {
       "Alerts": {
