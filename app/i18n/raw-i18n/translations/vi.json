@@ -3467,5 +3467,41 @@
         "buttonText": "Đóng"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Chọn phương thức sao lưu",
+      "subtitle": "Chúng tôi khuyên dùng Google Drive/Apple iCloud cho người dùng mới.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Trình quản lý mật khẩu",
+      "manualBackup": "Sao lưu thủ công"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Giữ bí mật cụm từ sao lưu của bạn!",
+        "check1": "Tôi hiểu rằng không ai có thể khôi phục ví của tôi nếu tôi mất cụm từ này",
+        "check2": "Tôi hiểu rằng nếu ai đó có được cụm từ này, họ có thể đánh cắp tất cả tiền của tôi.",
+        "check3": "Không ai yêu cầu tôi cung cấp thông tin này qua tin nhắn hoặc cuộc gọi"
+      },
+      "Phrase": {
+        "headerTitle": "Cụm từ sao lưu của bạn",
+        "sparkCompatible": "Cụm từ sao lưu này hoạt động trong bất kỳ {sparkCompatibleLink} nào",
+        "sparkCompatibleLink": "ví tương thích Spark",
+        "copiedToast": "Đã sao chép cụm từ sao lưu vào bộ nhớ tạm",
+        "saveItNow": "Lưu ngay",
+        "savedConfirm": "Tôi đã lưu",
+        "copy": "Sao chép"
+      },
+      "Confirm": {
+        "headerTitle": "Xác nhận cụm từ sao lưu",
+        "subtitle": "Kiểm tra nhanh xem bạn đã ghi đúng chưa",
+        "enterWord": "Nhập từ",
+        "enterWords": "Nhập các từ",
+        "confirm": "Xác nhận"
+      },
+      "Success": {
+        "title": "Chào mừng đến với Blink tự quản lý"
+      }
+    }
   }
 }

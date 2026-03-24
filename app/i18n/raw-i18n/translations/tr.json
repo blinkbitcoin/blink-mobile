@@ -3429,5 +3429,41 @@
         "buttonText": "Kapat"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Yedekleme yönteminizi seçin",
+      "subtitle": "Yeni kullanıcılar için Google Drive/Apple iCloud öneriyoruz.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Şifre yöneticisi",
+      "manualBackup": "Manuel yedekleme"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Yedekleme ifadenizi gizli tutun!",
+        "check1": "Bu ifadeyi kaybedersem kimsenin cüzdanımı kurtaramayacağını anlıyorum",
+        "check2": "Birisi bu ifadeyi ele geçirirse tüm fonlarımı çalabileceğini anlıyorum.",
+        "check3": "Kimse benden bu bilgileri mesaj veya arama yoluyla istemiyor"
+      },
+      "Phrase": {
+        "headerTitle": "Yedekleme ifadeniz",
+        "sparkCompatible": "Bu yedekleme ifadesi herhangi bir {sparkCompatibleLink} çalışır",
+        "sparkCompatibleLink": "Spark uyumlu cüzdanda",
+        "copiedToast": "Yedekleme ifadesi panoya kopyalandı",
+        "saveItNow": "Şimdi kaydet",
+        "savedConfirm": "Kaydettim",
+        "copy": "Kopyala"
+      },
+      "Confirm": {
+        "headerTitle": "Yedekleme ifadesini onayla",
+        "subtitle": "Doğru yazıp yazmadığınızın hızlı bir kontrolü",
+        "enterWord": "Kelimeyi girin",
+        "enterWords": "Kelimeleri girin",
+        "confirm": "Onayla"
+      },
+      "Success": {
+        "title": "Gözetimsiz Blink'e hoş geldiniz"
+      }
+    }
   }
 }

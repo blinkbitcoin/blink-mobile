@@ -3467,5 +3467,41 @@
         "buttonText": "Затвори"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Изаберите метод резервне копије",
+      "subtitle": "Препоручујемо Google Drive/Apple iCloud за нове кoriснике.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Менаџер лозинки",
+      "manualBackup": "Ручна резервна копија"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Чувајте своју резервну фразу у тајности!",
+        "check1": "Разумем да нико не може повратити мој новчаник ако изгубим ову фразу",
+        "check2": "Разумем да ако неко добије ову фразу, може украсти сва моја средства.",
+        "check3": "Нико ме не тражи ове информације путем поруке или позива"
+      },
+      "Phrase": {
+        "headerTitle": "Ваша резервна фраза",
+        "sparkCompatible": "Ова резервна фраза ради у сваком {sparkCompatibleLink}",
+        "sparkCompatibleLink": "новчанику компатибилном са Spark",
+        "copiedToast": "Резервна фраза копирана у међуспремник",
+        "saveItNow": "Сачувајте сада",
+        "savedConfirm": "Сачувао сам је",
+        "copy": "Копирај"
+      },
+      "Confirm": {
+        "headerTitle": "Потврдите резервну фразу",
+        "subtitle": "Брза провера да ли сте је исправно записали",
+        "enterWord": "Унесите реч",
+        "enterWords": "Унесите речи",
+        "confirm": "Потврди"
+      },
+      "Success": {
+        "title": "Добродошли у Blink без скрбништва"
+      }
+    }
   }
 }

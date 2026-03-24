@@ -3470,5 +3470,41 @@
         "buttonText": "Zatvori"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Odaberite metodu sigurnosne kopije",
+      "subtitle": "Preporučujemo Google Drive/Apple iCloud za nove korisnike.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Upravitelj lozinki",
+      "manualBackup": "Ručna sigurnosna kopija"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Čuvajte svoju sigurnosnu frazu tajnom!",
+        "check1": "Razumijem da nitko ne može oporaviti moj novčanik ako izgubim ovu frazu",
+        "check2": "Razumijem da ako netko dobije ovu frazu, može ukrasti sva moja sredstva.",
+        "check3": "Nitko me ne traži ove informacije putem poruke ili poziva"
+      },
+      "Phrase": {
+        "headerTitle": "Vaša sigurnosna fraza",
+        "sparkCompatible": "Ova sigurnosna fraza radi u svakom {sparkCompatibleLink}",
+        "sparkCompatibleLink": "novčaniku kompatibilnom sa Spark",
+        "copiedToast": "Sigurnosna fraza kopirana u međuspremnik",
+        "saveItNow": "Spremite sada",
+        "savedConfirm": "Spremio sam je",
+        "copy": "Kopiraj"
+      },
+      "Confirm": {
+        "headerTitle": "Potvrdite sigurnosnu frazu",
+        "subtitle": "Brza provjera jeste li je ispravno zapisali",
+        "enterWord": "Unesite riječ",
+        "enterWords": "Unesite riječi",
+        "confirm": "Potvrdi"
+      },
+      "Success": {
+        "title": "Dobrodošli u Blink bez skrbništva"
+      }
+    }
   }
 }

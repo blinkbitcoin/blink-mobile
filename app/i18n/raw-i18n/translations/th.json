@@ -3467,5 +3467,41 @@
         "buttonText": "ปิด"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "เลือกวิธีการสำรองข้อมูล",
+      "subtitle": "เราแนะนำ Google Drive/Apple iCloud สำหรับผู้ใช้ใหม่",
+      "googleDrive": "Google Drive",
+      "passwordManager": "ตัวจัดการรหัสผ่าน",
+      "manualBackup": "สำรองข้อมูลด้วยตนเอง"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "เก็บวลีสำรองของคุณเป็นความลับ!",
+        "check1": "ฉันเข้าใจว่าไม่มีใครสามารถกู้คืนกระเป๋าเงินของฉันได้หากฉันสูญเสียวลีนี้",
+        "check2": "ฉันเข้าใจว่าหากใครบางคนได้รับวลีนี้ พวกเขาสามารถขโมยเงินทั้งหมดของฉันได้",
+        "check3": "ไม่มีใครขอข้อมูลนี้จากฉันผ่านข้อความหรือโทรศัพท์"
+      },
+      "Phrase": {
+        "headerTitle": "วลีสำรองของคุณ",
+        "sparkCompatible": "วลีสำรองนี้ใช้ได้ใน{sparkCompatibleLink}",
+        "sparkCompatibleLink": "กระเป๋าเงินที่รองรับ Spark",
+        "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",
+        "saveItNow": "บันทึกตอนนี้",
+        "savedConfirm": "ฉันบันทึกแล้ว",
+        "copy": "คัดลอก"
+      },
+      "Confirm": {
+        "headerTitle": "ยืนยันวลีสำรอง",
+        "subtitle": "ตรวจสอบอย่างรวดเร็วว่าคุณเขียนถูกต้อง",
+        "enterWord": "ป้อนคำ",
+        "enterWords": "ป้อนคำ",
+        "confirm": "ยืนยัน"
+      },
+      "Success": {
+        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล"
+      }
+    }
   }
 }
