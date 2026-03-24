@@ -18,6 +18,7 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { formatDuration } from "@app/utils/date"
 import { pickRandomIndices } from "@app/utils/helper"
 
+const BIP39_MNEMONIC_WORD_COUNT = 12
 const COUNTDOWN_SECONDS = 10
 const CLIPBOARD_CLEAR_MS = 60_000
 
@@ -47,8 +48,9 @@ export const SparkBackupPhraseScreen: React.FC = () => {
   const expiresAt = useRef(new Date(Date.now() + COUNTDOWN_SECONDS * 1000)).current
   const { remainingSeconds, isExpired } = useCountdown(expiresAt)
 
-  const firstHalf = MOCK_WORDS.slice(0, 6)
-  const secondHalf = MOCK_WORDS.slice(6, 12)
+  const half = BIP39_MNEMONIC_WORD_COUNT / 2
+  const firstHalf = MOCK_WORDS.slice(0, half)
+  const secondHalf = MOCK_WORDS.slice(half)
 
   const handleCopy = useCallback(() => {
     copyToClipboard({
