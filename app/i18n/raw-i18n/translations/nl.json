@@ -3470,5 +3470,41 @@
         "buttonText": "Sluiten"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Kies je back-upmethode",
+      "subtitle": "We raden Google Drive/Apple iCloud aan voor nieuwe gebruikers.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Wachtwoordbeheerder",
+      "manualBackup": "Handmatige back-up"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Houd je back-upzin geheim!",
+        "check1": "Ik begrijp dat niemand mijn portemonnee kan herstellen als ik deze zin verlies",
+        "check2": "Ik begrijp dat als iemand deze zin krijgt, ze al mijn geld kunnen stelen.",
+        "check3": "Niemand vraagt mij om deze informatie via bericht of telefoontje"
+      },
+      "Phrase": {
+        "headerTitle": "Je back-upzin",
+        "sparkCompatible": "Deze back-upzin werkt in elke {sparkCompatibleLink}",
+        "sparkCompatibleLink": "Spark-compatibele portemonnee",
+        "copiedToast": "Back-upzin naar klembord gekopieerd",
+        "saveItNow": "Sla het nu op",
+        "savedConfirm": "Ik heb het opgeslagen",
+        "copy": "Kopiëren"
+      },
+      "Confirm": {
+        "headerTitle": "Bevestig back-upzin",
+        "subtitle": "Een snelle controle of je het correct hebt opgeschreven",
+        "enterWord": "Voer woord in",
+        "enterWords": "Voer woorden in",
+        "confirm": "Bevestigen"
+      },
+      "Success": {
+        "title": "Welkom bij non-custodial Blink"
+      }
+    }
   }
 }

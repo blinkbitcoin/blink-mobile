@@ -3429,5 +3429,41 @@
         "buttonText": "Tutup"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Pilih metode cadangan Anda",
+      "subtitle": "Kami merekomendasikan Google Drive/Apple iCloud untuk pengguna baru.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Pengelola kata sandi",
+      "manualBackup": "Cadangan manual"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Rahasiakan frasa cadangan Anda!",
+        "check1": "Saya memahami tidak ada yang bisa memulihkan dompet saya jika saya kehilangan frasa ini",
+        "check2": "Saya memahami jika seseorang mendapatkan frasa ini, mereka bisa mencuri semua dana saya.",
+        "check3": "Tidak ada yang meminta informasi ini melalui pesan atau panggilan"
+      },
+      "Phrase": {
+        "headerTitle": "Frasa cadangan Anda",
+        "sparkCompatible": "Frasa cadangan ini berfungsi di {sparkCompatibleLink} mana pun",
+        "sparkCompatibleLink": "dompet yang kompatibel dengan Spark",
+        "copiedToast": "Frasa cadangan disalin ke papan klip",
+        "saveItNow": "Simpan sekarang",
+        "savedConfirm": "Saya sudah menyimpannya",
+        "copy": "Salin"
+      },
+      "Confirm": {
+        "headerTitle": "Konfirmasi frasa cadangan",
+        "subtitle": "Pemeriksaan cepat apakah Anda menulisnya dengan benar",
+        "enterWord": "Masukkan kata",
+        "enterWords": "Masukkan kata-kata",
+        "confirm": "Konfirmasi"
+      },
+      "Success": {
+        "title": "Selamat datang di Blink non-kustodial"
+      }
+    }
   }
 }

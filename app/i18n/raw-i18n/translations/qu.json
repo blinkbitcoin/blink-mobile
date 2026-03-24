@@ -3467,5 +3467,41 @@
         "buttonText": "Wisq'ay"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Akllay imayna waqaychanaykita",
+      "subtitle": "Google Drive/Apple iCloud nisqata kunanchayku musuq rurakkunapaq.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Yaykuna rimay kamachiq",
+      "manualBackup": "Makiwan waqaychay"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Waqaychay backup rimayniykita pakasqata!",
+        "check1": "Riqsini pipas mana atinchu wallitayta kutichiy kay rimayta chinkachiptiy",
+        "check2": "Riqsini pipas kay rimayta tariptinqa, llapan qullqiyta suwanman.",
+        "check3": "Pipas mana kay willakuykunata mañawanchu willaypi utaq waqyaypi"
+      },
+      "Phrase": {
+        "headerTitle": "Waqaychay rimaykikunata",
+        "sparkCompatible": "Kay waqaychay rimaykunaqa {sparkCompatibleLink} llamkan",
+        "sparkCompatibleLink": "Spark wallitakunapi",
+        "copiedToast": "Waqaychay rimay kopiyasqa",
+        "saveItNow": "Waqaychay kunan",
+        "savedConfirm": "Ñam waqaychani",
+        "copy": "Kopiyay"
+      },
+      "Confirm": {
+        "headerTitle": "Waqaychay rimayta takyachiy",
+        "subtitle": "Usqhay qhaway allinta qillqasqaykita",
+        "enterWord": "Rimayta yaykuchiy",
+        "enterWords": "Rimaykunata yaykuchiy",
+        "confirm": "Takyachiy"
+      },
+      "Success": {
+        "title": "Blink mana waqaychisqaman haykuy"
+      }
+    }
   }
 }
