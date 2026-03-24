@@ -176,6 +176,13 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
+  sparkBackupMethodScreen: undefined
+  sparkBackupAlertsScreen: undefined
+  sparkBackupPhraseScreen: undefined
+  sparkBackupConfirmScreen: {
+    challenges: Array<{ index: number; word: string }>
+  }
+  sparkBackupSuccessScreen: undefined
 }
 
 export type OnboardingStackParamList = {
