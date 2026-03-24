@@ -18,25 +18,11 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { formatDuration } from "@app/utils/date"
 import { pickRandomIndices } from "@app/utils/helper"
 
+import { MOCK_WORDS } from "../spark-mock-data"
+
 const BIP39_MNEMONIC_WORD_COUNT = 12
 const COUNTDOWN_SECONDS = 10
 const CLIPBOARD_CLEAR_MS = 60_000
-
-// TODO: replace with real seed phrase from Spark SDK
-const MOCK_WORDS = [
-  "youth",
-  "indicate",
-  "void",
-  "nation",
-  "bundle",
-  "execute",
-  "ritual",
-  "artwork",
-  "harvest",
-  "genuine",
-  "plunge",
-  "captain",
-]
 
 export const SparkBackupPhraseScreen: React.FC = () => {
   const { LL, locale } = useI18nContext()
