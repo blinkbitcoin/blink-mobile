@@ -3010,7 +3010,8 @@
       "statusFailed": "Imeshindwa",
       "cardTypeVirtual": "Kadi ya Visa pepe ya malipo",
       "cardTypePhysical": "Kadi ya Visa halisi ya malipo",
-      "authDescription": "Thibitisha ili kuona maelezo ya kadi"
+      "authDescription": "Thibitisha ili kuona maelezo ya kadi",
+      "biometricRequired": "Uthibitishaji wa kibayometriki unahitajika kuona maelezo ya kadi"
     },
     "CardStatements": {
       "title": "Statements",

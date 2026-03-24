@@ -3010,7 +3010,8 @@
       "statusFailed": "Yelemeddwa",
       "cardTypeVirtual": "Kaadi ya Visa eya ku kompyuta",
       "cardTypePhysical": "Kaadi ya Visa ey'engalo",
-      "authDescription": "Kakasa okwekennyezza okulaba ebikwata ku kaadi"
+      "authDescription": "Kakasa okwekennyezza okulaba ebikwata ku kaadi",
+      "biometricRequired": "Okukakasa kw'ebyobulamu kwetaagisa okulaba ebikwata ku kaadi"
     },
     "CardStatements": {
       "title": "Statements",

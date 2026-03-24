@@ -3010,7 +3010,8 @@
       "statusFailed": "Απέτυχε",
       "cardTypeVirtual": "Εικονική χρεωστική Visa",
       "cardTypePhysical": "Φυσική χρεωστική Visa",
-      "authDescription": "Επαληθεύστε για να δείτε τα στοιχεία της κάρτας"
+      "authDescription": "Επαληθεύστε για να δείτε τα στοιχεία της κάρτας",
+      "biometricRequired": "Απαιτείται βιομετρική επαλήθευση για την προβολή στοιχείων κάρτας"
     },
     "CardStatements": {
       "title": "Statements",

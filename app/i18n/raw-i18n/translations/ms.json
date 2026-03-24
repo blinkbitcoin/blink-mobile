@@ -3051,7 +3051,8 @@
       "statusFailed": "Gagal",
       "cardTypeVirtual": "Debit Visa maya",
       "cardTypePhysical": "Debit Visa fizikal",
-      "authDescription": "Sahkan untuk melihat butiran kad"
+      "authDescription": "Sahkan untuk melihat butiran kad",
+      "biometricRequired": "Pengesahan biometrik diperlukan untuk melihat butiran kad"
     },
     "CardStatements": {
       "title": "Statements",

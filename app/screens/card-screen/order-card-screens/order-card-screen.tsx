@@ -47,7 +47,7 @@ export const OrderCardScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const { applicationId, loading: cardLoading, error: cardError } = useCardData()
+  const { card, applicationId, loading: cardLoading, error: cardError } = useCardData()
   const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
   const [isFormValid, setIsFormValid] = useState(false)
@@ -112,7 +112,7 @@ export const OrderCardScreen: React.FC = () => {
       iconName: "delivery",
       iconColor: colors._green,
       lastFour: result.lastFour,
-      holderName: "",
+      cardId: card?.id,
     })
   }, [
     applicationId,
@@ -125,6 +125,7 @@ export const OrderCardScreen: React.FC = () => {
     navigation,
     LL,
     colors._green,
+    card?.id,
   ])
 
   const getStepConfig = (): StepConfig => {

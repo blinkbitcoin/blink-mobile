@@ -3048,7 +3048,8 @@
       "statusFailed": "Thất bại",
       "cardTypeVirtual": "Thẻ ghi nợ Visa ảo",
       "cardTypePhysical": "Thẻ ghi nợ Visa vật lý",
-      "authDescription": "Xác thực để xem chi tiết thẻ"
+      "authDescription": "Xác thực để xem chi tiết thẻ",
+      "biometricRequired": "Cần xác thực sinh trắc học để xem chi tiết thẻ"
     },
     "CardStatements": {
       "title": "Statements",

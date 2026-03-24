@@ -3010,7 +3010,8 @@
       "statusFailed": "Eșuat",
       "cardTypeVirtual": "Debit Visa virtual",
       "cardTypePhysical": "Debit Visa fizic",
-      "authDescription": "Autentifică-te pentru a vedea detaliile cardului"
+      "authDescription": "Autentifică-te pentru a vedea detaliile cardului",
+      "biometricRequired": "Autentificarea biometrică este necesară pentru a vizualiza detaliile cardului"
     },
     "CardStatements": {
       "title": "Statements",

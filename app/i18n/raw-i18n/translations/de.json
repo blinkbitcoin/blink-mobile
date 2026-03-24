@@ -2981,7 +2981,8 @@
             "statusFailed": "Fehlgeschlagen",
             "cardTypeVirtual": "Virtuelle Visa-Debitkarte",
             "cardTypePhysical": "Physische Visa-Debitkarte",
-            "authDescription": "Authentifizieren, um Kartendetails anzuzeigen"
+            "authDescription": "Authentifizieren, um Kartendetails anzuzeigen",
+            "biometricRequired": "Biometrische Authentifizierung ist erforderlich, um Kartendetails anzuzeigen"
         },
         "CardLimits": {
             "currentLimitsTitle": "Aktuelle Limits",

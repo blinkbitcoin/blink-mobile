@@ -3051,7 +3051,8 @@
       "statusFailed": "Ձախողվել",
       "cardTypeVirtual": "Վիրտուալ Visa դեբիտ",
       "cardTypePhysical": "Ֆիզիկական Visa դեբիտ",
-      "authDescription": "Նույնականացեք քարտի տվյալները տեսնելու համար"
+      "authDescription": "Նույնականացեք քարտի տվյալները տեսնելու համար",
+      "biometricRequired": "Քարտի տվյալները տեսնելու համար պահանջվում է կենսաչափական նույնականացում"
     },
     "CardStatements": {
       "title": "Statements",

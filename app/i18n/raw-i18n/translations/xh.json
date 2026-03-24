@@ -3057,7 +3057,8 @@
       "statusFailed": "Ayiphumelelanga",
       "cardTypeVirtual": "Ikhadi le-Visa lokukhupha imali engazange libonwe",
       "cardTypePhysical": "Ikhadi le-Visa lokukhupha imali elingokoqobo",
-      "authDescription": "Qinisekisa ukubona iinkcukacha zekhadi"
+      "authDescription": "Qinisekisa ukubona iinkcukacha zekhadi",
+      "biometricRequired": "Ukuqinisekiswa nge-biometric kuyafuneka ukujonga iinkcukacha zekhadi"
     },
     "CardStatements": {
       "title": "Statements",

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { ActionField } from "@app/components/action-field"
@@ -10,12 +10,14 @@ import { BlinkCard } from "@app/components/blink-card"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
-import { useCardData, useClipboard } from "@app/hooks"
+import { useCardData, useCardHolder, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
+import { toastShow } from "@app/utils/toast"
 
 import { useBiometricGate } from "./hooks/use-biometric-gate"
+import { useCardSecrets } from "./hooks/use-card-secrets"
 import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
 
 const CLIPBOARD_CLEAR_MS = 60_000
@@ -29,30 +31,45 @@ export const CardDetailsScreen: React.FC = () => {
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
+  const handleBiometricFailure = useCallback(() => {
+    toastShow({
+      message: LL.CardFlow.CardDetails.biometricRequired(),
+      LL,
+    })
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+      return
+    }
+    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+  }, [navigation, LL])
 
   const authenticated = useBiometricGate({
     description: LL.CardFlow.CardDetails.authDescription(),
-    onFailure: handleDismiss,
+    onFailure: handleBiometricFailure,
+    required: true,
   })
 
   const { card, loading: cardLoading } = useCardData()
+  const { fullName } = useCardHolder(card?.id)
+  const { secrets, fetchSecrets } = useCardSecrets()
 
   useEffect(() => {
     if (authenticated && !cardLoading && !card) {
-      handleDismiss()
+      handleBiometricFailure()
     }
-  }, [authenticated, cardLoading, card, handleDismiss])
+  }, [authenticated, cardLoading, card, handleBiometricFailure])
 
-  const handleCopy = useCallback(
-    (content: string, label: string) => {
-      copyToClipboard({
-        content,
-        message: LL.common.hasBeenCopiedToClipboard({ type: label }),
-      })
-    },
-    [copyToClipboard, LL],
-  )
+  useEffect(() => {
+    if (authenticated && card?.id && !secrets) {
+      fetchSecrets(card.id)
+    }
+  }, [authenticated, card?.id, secrets, fetchSecrets])
+
+  const handleCopy = (content: string, label: string) =>
+    copyToClipboard({
+      content,
+      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
+    })
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
@@ -110,13 +127,15 @@ export const CardDetailsScreen: React.FC = () => {
 
   const isFrozen = isCardFrozen(card.status)
   const statusConfig = cardStatusConfig[card.status]
+  const cardNumber = secrets?.pan ?? card.lastFour
+  const cardNumberFormatted = formatCardDisplayNumber(cardNumber, true)
 
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
         <BlinkCard
-          cardNumber={card.lastFour}
-          holderName=""
+          cardId={card.id}
+          cardNumber={cardNumber}
           validThruDate=""
           isFrozen={isFrozen}
           showCardDetails
@@ -125,12 +144,10 @@ export const CardDetailsScreen: React.FC = () => {
         <View style={styles.fieldsContainer}>
           <ActionField
             label={LL.CardFlow.CardDetails.cardNumber()}
-            value={formatCardDisplayNumber(card.lastFour, true)}
+            value={cardNumberFormatted}
             icon="copy-paste"
             testID="card-number-field"
-            onAction={() =>
-              handleCopy(card.lastFour, LL.CardFlow.CardDetails.cardNumber())
-            }
+            onAction={() => handleCopy(cardNumber, LL.CardFlow.CardDetails.cardNumber())}
           />
 
           <View style={styles.rowFields}>
@@ -139,24 +156,27 @@ export const CardDetailsScreen: React.FC = () => {
                 label={LL.CardFlow.CardDetails.expiryDate()}
                 value={null}
                 icon="copy-paste"
-                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.expiryDate())}
               />
             </View>
             <View style={styles.halfField}>
               <ActionField
                 label={LL.CardFlow.CardDetails.cvv()}
-                value={null}
+                value={secrets?.cvc ?? null}
                 icon="copy-paste"
-                // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cvv())}
+                onAction={() =>
+                  handleCopy(secrets?.cvc ?? "", LL.CardFlow.CardDetails.cvv())
+                }
               />
             </View>
           </View>
 
           <ActionField
             label={LL.CardFlow.CardDetails.cardholderName()}
-            value={null}
+            value={fullName || null}
             icon="copy-paste"
-            // onAction={() => handleCopy("", LL.CardFlow.CardDetails.cardholderName())}
+            onAction={() =>
+              handleCopy(fullName, LL.CardFlow.CardDetails.cardholderName())
+            }
           />
 
           <InfoSection

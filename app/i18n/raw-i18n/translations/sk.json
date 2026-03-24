@@ -3010,7 +3010,8 @@
       "statusFailed": "Zlyhala",
       "cardTypeVirtual": "Virtuálna Visa debetná",
       "cardTypePhysical": "Fyzická Visa debetná",
-      "authDescription": "Overte sa pre zobrazenie údajov karty"
+      "authDescription": "Overte sa pre zobrazenie údajov karty",
+      "biometricRequired": "Na zobrazenie údajov karty je potrebné biometrické overenie"
     },
     "CardStatements": {
       "title": "Statements",

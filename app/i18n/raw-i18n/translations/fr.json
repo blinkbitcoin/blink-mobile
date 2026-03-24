@@ -3022,7 +3022,8 @@
             "statusFailed": "Échouée",
             "cardTypeVirtual": "Débit Visa virtuelle",
             "cardTypePhysical": "Débit Visa physique",
-            "authDescription": "Authentifiez-vous pour voir les détails de la carte"
+            "authDescription": "Authentifiez-vous pour voir les détails de la carte",
+            "biometricRequired": "L'authentification biométrique est requise pour afficher les détails de la carte"
         },
         "CardLimits": {
             "currentLimitsTitle": "Limites actuelles",
