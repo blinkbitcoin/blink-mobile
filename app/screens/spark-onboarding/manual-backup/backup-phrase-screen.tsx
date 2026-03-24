@@ -21,6 +21,7 @@ import { pickRandomIndices } from "@app/utils/helper"
 const COUNTDOWN_SECONDS = 10
 const CLIPBOARD_CLEAR_MS = 60_000
 
+// TODO: replace with real seed phrase from Spark SDK
 const MOCK_WORDS = [
   "youth",
   "indicate",
