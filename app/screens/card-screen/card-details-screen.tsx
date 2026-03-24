@@ -65,17 +65,11 @@ export const CardDetailsScreen: React.FC = () => {
     }
   }, [authenticated, card?.id, secrets, fetchSecrets])
 
-  const copyAction = useCallback(
-    (value: string | undefined, label: string): (() => void) | undefined => {
-      if (!value) return undefined
-      return () =>
-        copyToClipboard({
-          content: value,
-          message: LL.common.hasBeenCopiedToClipboard({ type: label }),
-        })
-    },
-    [copyToClipboard, LL],
-  )
+  const handleCopy = (content: string, label: string) =>
+    copyToClipboard({
+      content,
+      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
+    })
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
@@ -153,7 +147,7 @@ export const CardDetailsScreen: React.FC = () => {
             value={cardNumberFormatted}
             icon="copy-paste"
             testID="card-number-field"
-            onAction={copyAction(cardNumber, LL.CardFlow.CardDetails.cardNumber())}
+            onAction={() => handleCopy(cardNumber, LL.CardFlow.CardDetails.cardNumber())}
           />
 
           <View style={styles.rowFields}>
@@ -169,7 +163,9 @@ export const CardDetailsScreen: React.FC = () => {
                 label={LL.CardFlow.CardDetails.cvv()}
                 value={secrets?.cvc ?? null}
                 icon="copy-paste"
-                onAction={copyAction(secrets?.cvc, LL.CardFlow.CardDetails.cvv())}
+                onAction={() =>
+                  handleCopy(secrets?.cvc ?? "", LL.CardFlow.CardDetails.cvv())
+                }
               />
             </View>
           </View>
@@ -178,7 +174,9 @@ export const CardDetailsScreen: React.FC = () => {
             label={LL.CardFlow.CardDetails.cardholderName()}
             value={fullName || null}
             icon="copy-paste"
-            onAction={copyAction(fullName, LL.CardFlow.CardDetails.cardholderName())}
+            onAction={() =>
+              handleCopy(fullName, LL.CardFlow.CardDetails.cardholderName())
+            }
           />
 
           <InfoSection
