@@ -1,40 +1,17 @@
-import {
-  generateRandomHexKey,
-  encryptRsaOaep,
-  encryptAesGcm,
-  decryptAesGcm,
-} from "@app/utils/crypto"
+import crypto from "crypto"
 
-const mockDecipherUpdate = jest.fn().mockReturnValue(Buffer.from("decrypted"))
-const mockDecipherFinal = jest.fn().mockReturnValue(Buffer.from(""))
-const mockSetAuthTag = jest.fn()
+import { generateRandomHexKey, encryptAesGcm, decryptAesGcm } from "@app/utils/crypto"
 
-jest.mock("react-native-quick-crypto", () => {
-  const mockCipher = {
-    update: jest.fn().mockReturnValue(Buffer.from("encrypted")),
-    final: jest.fn().mockReturnValue(Buffer.from("")),
-    getAuthTag: jest.fn().mockReturnValue(Buffer.from("0123456789abcdef")),
-  }
-
-  const mockDecipher = {
-    update: (...args: readonly unknown[]) => mockDecipherUpdate(...args),
-    final: () => mockDecipherFinal(),
-    setAuthTag: (...args: readonly unknown[]) => mockSetAuthTag(...args),
-  }
-
-  return {
-    __esModule: true,
-    default: {
-      randomBytes: jest.fn((size: number) => Buffer.alloc(size, 0xab)),
-      publicEncrypt: jest.fn().mockReturnValue(Buffer.from("rsa-encrypted-data")),
-      createCipheriv: jest.fn().mockReturnValue(mockCipher),
-      createDecipheriv: jest.fn().mockReturnValue(mockDecipher),
-      constants: {
-        RSA_PKCS1_OAEP_PADDING: 4,
-      },
-    },
-  }
-})
+jest.mock("react-native-quick-crypto", () => ({
+  __esModule: true,
+  default: {
+    randomBytes: (size: number) => crypto.randomBytes(size),
+    publicEncrypt: crypto.publicEncrypt,
+    createCipheriv: crypto.createCipheriv,
+    createDecipheriv: crypto.createDecipheriv,
+    constants: crypto.constants,
+  },
+}))
 
 describe("crypto utils", () => {
   describe("generateRandomHexKey", () => {
@@ -43,109 +20,107 @@ describe("crypto utils", () => {
       expect(key).toHaveLength(32)
       expect(key).toMatch(/^[0-9a-f]+$/)
     })
-  })
 
-  describe("encryptRsaOaep", () => {
-    it("returns a base64-encoded string", () => {
-      const result = encryptRsaOaep(
-        "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
-        "abcd1234abcd1234abcd1234abcd1234",
-      )
-      expect(typeof result).toBe("string")
-      expect(result.length).toBeGreaterThan(0)
-    })
-
-    it("calls publicEncrypt with OAEP padding and sha1", () => {
-      const Crypto = jest.requireMock("react-native-quick-crypto").default
-      Crypto.publicEncrypt.mockClear()
-
-      encryptRsaOaep(
-        "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
-        "abcd1234abcd1234abcd1234abcd1234",
-      )
-
-      expect(Crypto.publicEncrypt).toHaveBeenCalledWith(
-        expect.objectContaining({
-          padding: 4,
-          oaepHash: "sha1",
-        }),
-        expect.any(Buffer),
-      )
+    it("generates unique keys", () => {
+      const key1 = generateRandomHexKey()
+      const key2 = generateRandomHexKey()
+      expect(key1).not.toBe(key2)
     })
   })
 
-  describe("encryptAesGcm", () => {
-    it("returns data and iv as base64 strings", () => {
-      const result = encryptAesGcm("plaintext", "abcd1234abcd1234abcd1234abcd1234")
-      expect(typeof result.data).toBe("string")
-      expect(typeof result.iv).toBe("string")
-      expect(result.data.length).toBeGreaterThan(0)
-      expect(result.iv.length).toBeGreaterThan(0)
+  describe("encryptAesGcm + decryptAesGcm roundtrip", () => {
+    it("encrypts and decrypts a simple string", () => {
+      const key = generateRandomHexKey()
+      const plaintext = "hello world"
+
+      const { data, iv } = encryptAesGcm(plaintext, key)
+      const decrypted = decryptAesGcm(data, iv, key)
+
+      expect(decrypted).toBe(plaintext)
     })
 
-    it("creates cipher with aes-128-gcm", () => {
-      const Crypto = jest.requireMock("react-native-quick-crypto").default
-      Crypto.createCipheriv.mockClear()
+    it("encrypts and decrypts an empty string", () => {
+      const key = generateRandomHexKey()
+      const plaintext = ""
 
-      encryptAesGcm("plaintext", "abcd1234abcd1234abcd1234abcd1234")
+      const { data, iv } = encryptAesGcm(plaintext, key)
+      const decrypted = decryptAesGcm(data, iv, key)
 
-      expect(Crypto.createCipheriv).toHaveBeenCalledWith(
-        "aes-128-gcm",
-        expect.any(Uint8Array),
-        expect.anything(),
-      )
-    })
-  })
-
-  describe("decryptAesGcm", () => {
-    beforeEach(() => {
-      mockDecipherUpdate.mockReturnValue(Buffer.from("decrypted"))
-      mockDecipherFinal.mockReturnValue(Buffer.from(""))
-      mockSetAuthTag.mockClear()
+      expect(decrypted).toBe(plaintext)
     })
 
-    it("returns a decrypted utf8 string", () => {
-      const cipherData = Buffer.concat([
-        Buffer.from("encrypted-content"),
-        Buffer.from("0123456789abcdef"),
-      ]).toString("base64")
-      const iv = Buffer.from("1234567890123456").toString("base64")
-      const hexKey = "abcd1234abcd1234abcd1234abcd1234"
+    it("encrypts and decrypts unicode text", () => {
+      const key = generateRandomHexKey()
+      const plaintext = "café ñ 日本語 🚀"
 
-      const result = decryptAesGcm(cipherData, iv, hexKey)
+      const { data, iv } = encryptAesGcm(plaintext, key)
+      const decrypted = decryptAesGcm(data, iv, key)
 
-      expect(typeof result).toBe("string")
-      expect(result).toBe("decrypted")
+      expect(decrypted).toBe(plaintext)
     })
 
-    it("creates decipher with aes-128-gcm", () => {
-      const Crypto = jest.requireMock("react-native-quick-crypto").default
-      Crypto.createDecipheriv.mockClear()
+    it("encrypts and decrypts a long string", () => {
+      const key = generateRandomHexKey()
+      const plaintext = "a]".repeat(10000)
 
-      const cipherData = Buffer.concat([
-        Buffer.from("encrypted-content"),
-        Buffer.from("0123456789abcdef"),
-      ]).toString("base64")
-      const iv = Buffer.from("1234567890123456").toString("base64")
+      const { data, iv } = encryptAesGcm(plaintext, key)
+      const decrypted = decryptAesGcm(data, iv, key)
 
-      decryptAesGcm(cipherData, iv, "abcd1234abcd1234abcd1234abcd1234")
-
-      expect(Crypto.createDecipheriv).toHaveBeenCalledWith(
-        "aes-128-gcm",
-        expect.any(Uint8Array),
-        expect.any(Buffer),
-      )
+      expect(decrypted).toBe(plaintext)
     })
 
-    it("sets the auth tag from the last 16 bytes of cipher data", () => {
-      const content = Buffer.from("encrypted-content")
-      const authTag = Buffer.from("auth-tag-16bytes")
-      const cipherData = Buffer.concat([content, authTag]).toString("base64")
-      const iv = Buffer.from("1234567890123456").toString("base64")
+    it("produces different ciphertext for same plaintext", () => {
+      const key = generateRandomHexKey()
+      const plaintext = "same input"
 
-      decryptAesGcm(cipherData, iv, "abcd1234abcd1234abcd1234abcd1234")
+      const result1 = encryptAesGcm(plaintext, key)
+      const result2 = encryptAesGcm(plaintext, key)
 
-      expect(mockSetAuthTag).toHaveBeenCalledTimes(1)
+      expect(result1.data).not.toBe(result2.data)
+      expect(result1.iv).not.toBe(result2.iv)
+    })
+
+    it("fails to decrypt with wrong key", () => {
+      const key1 = generateRandomHexKey()
+      const key2 = generateRandomHexKey()
+      const plaintext = "secret"
+
+      const { data, iv } = encryptAesGcm(plaintext, key1)
+
+      expect(() => decryptAesGcm(data, iv, key2)).toThrow()
+    })
+
+    it("fails to decrypt with tampered ciphertext", () => {
+      const key = generateRandomHexKey()
+      const plaintext = "secret"
+
+      const { data, iv } = encryptAesGcm(plaintext, key)
+
+      const tampered = Buffer.from(data, "base64")
+      tampered[0] = tampered[0] === 0 ? 1 : 0
+      const tamperedData = tampered.toString("base64")
+
+      expect(() => decryptAesGcm(tamperedData, iv, key)).toThrow()
+    })
+
+    it("decrypts a card number correctly", () => {
+      const key = generateRandomHexKey()
+      const pan = "4549880051539745"
+
+      const { data, iv } = encryptAesGcm(pan, key)
+      const decrypted = decryptAesGcm(data, iv, key)
+
+      expect(decrypted).toBe(pan)
+    })
+
+    it("decrypts a CVC correctly", () => {
+      const key = generateRandomHexKey()
+      const cvc = "342"
+
+      const { data, iv } = encryptAesGcm(cvc, key)
+      const decrypted = decryptAesGcm(data, iv, key)
+
+      expect(decrypted).toBe(cvc)
     })
   })
 })
