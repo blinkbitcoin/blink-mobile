@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { SparkBackupSuccessScreen } from "@app/screens/spark-onboarding/manual-backup/backup-success-screen"
+import { SparkBackupSuccessScreen } from "@app/screens/spark-onboarding/backup-success-screen"
 import { ContextForScreen } from "../helper"
 
 jest.mock("@app/components/success-animation/success-icon-animation", () => {
