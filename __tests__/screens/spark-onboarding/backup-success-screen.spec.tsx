@@ -1,0 +1,92 @@
+import React from "react"
+import { render } from "@testing-library/react-native"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { i18nObject } from "@app/i18n/i18n-util"
+
+import { SparkBackupSuccessScreen } from "@app/screens/spark-onboarding/manual-backup/backup-success-screen"
+import { ContextForScreen } from "../helper"
+
+jest.mock("@app/components/success-animation/success-icon-animation", () => {
+  const { View } = jest.requireActual("react-native")
+  return {
+    SuccessIconAnimation: ({ children }: { children: React.ReactNode }) => (
+      <View>{children}</View>
+    ),
+  }
+})
+
+jest.mock("@app/components/success-animation/success-text-animation", () => {
+  const { View } = jest.requireActual("react-native")
+  return {
+    CompletedTextAnimation: ({
+      children,
+      onComplete,
+    }: {
+      children: React.ReactNode
+      onComplete?: () => void
+    }) => {
+      if (onComplete) setTimeout(onComplete, 0)
+      return <View>{children}</View>
+    },
+  }
+})
+
+const mockDispatch = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ dispatch: mockDispatch }),
+  CommonActions: {
+    reset: (config: { index: number; routes: Array<{ name: string }> }) => ({
+      type: "RESET",
+      payload: config,
+    }),
+  },
+}))
+
+loadLocale("en")
+const LL = i18nObject("en")
+
+describe("SparkBackupSuccessScreen", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("renders success message", () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByText(LL.SparkOnboarding.ManualBackup.Success.title())).toBeTruthy()
+  })
+
+  it("renders without crashing", () => {
+    const { toJSON } = render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    expect(toJSON()).toBeTruthy()
+  })
+
+  it("navigates to home after animation completes", async () => {
+    render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50)
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: { index: 0, routes: [{ name: "Primary" }] },
+      }),
+    )
+  })
+})
