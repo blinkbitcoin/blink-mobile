@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Alege metoda de backup",
-      "subtitle": "Recomandăm Google Drive/Apple iCloud pentru utilizatorii noi.",
+      "subtitle": "Recomandăm {provider} pentru utilizatorii noi.",
       "googleDrive": "Google Drive",
       "passwordManager": "Manager de parole",
       "manualBackup": "Backup manual",
       "keychainSaved": "Backup salvat în managerul de parole",
-      "keychainFailed": "Nu s-a putut salva backup-ul"
+      "keychainFailed": "Nu s-a putut salva backup-ul",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Fraza de backup copiată în clipboard",
         "saveItNow": "Salvează acum",
         "savedConfirm": "Am salvat-o",
-        "copy": "Copiază"
+        "copy": "Copiază",
+        "continueButton": "Continuă"
       },
       "Confirm": {
         "headerTitle": "Confirmă fraza de backup",

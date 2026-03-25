@@ -86,7 +86,7 @@ describe("SparkBackupAlertsScreen", () => {
     fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check3()))
 
     fireEvent.press(getByText(LL.common.continue()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", { step: 1 })
   })
 
   it("keeps revealed checkboxes visible after unchecking", () => {

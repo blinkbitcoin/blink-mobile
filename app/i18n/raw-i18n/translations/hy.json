@@ -3474,12 +3474,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Ընտրեք ձեր պահուստավորման եղանակը",
-      "subtitle": "Նոր օգտատերերի համար խորհուրդ ենք տալիս Google Drive/Apple iCloud-ը։",
+      "subtitle": "Նոր օգտատերերի համար խորհուրդ ենք տալիս {provider}-ը։",
       "googleDrive": "Google Drive",
       "passwordManager": "Գաղտնաբառերի կառավարիչ",
       "manualBackup": "Ձեռքով պահուստավորում",
       "keychainSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
-      "keychainFailed": "Չհաջողվել պահուստավորումը"
+      "keychainFailed": "Չհաջողվել պահուստավորումը",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3495,7 +3496,8 @@
         "copiedToast": "Պահուստային արտահայտությունը պատճենվեց ժամանակավոր շտեմարանում",
         "saveItNow": "Պահպանեք հիմա",
         "savedConfirm": "Ես պահպանել եմ",
-        "copy": "Պատճենել"
+        "copy": "Պատճենել",
+        "continueButton": "Շարունակել"
       },
       "Confirm": {
         "headerTitle": "Հաստատեք պահուստային արտահայտությունը",

@@ -1,60 +1,38 @@
-import React, { useCallback, useRef } from "react"
-import { Linking, ScrollView, View } from "react-native"
+import React from "react"
+import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import InAppBrowser from "react-native-inappbrowser-reborn"
+import { useRoute, RouteProp } from "@react-navigation/native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconTextButton } from "@app/components/icon-text-button"
 import { InfoBanner } from "@app/components/info-banner"
 import { Screen } from "@app/components/screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { useClipboard, useCountdown } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
-import { formatDuration } from "@app/utils/date"
-import { pickRandomIndices } from "@app/utils/helper"
 
-import { MOCK_WORDS } from "../spark-mock-data"
+import { useBackupPhrase } from "../hooks"
 
-const BIP39_MNEMONIC_WORD_COUNT = 12
-const COUNTDOWN_SECONDS = 10
-const CLIPBOARD_CLEAR_MS = 60_000
+const WORDS_PER_CARD = 3
+
+type PhraseRouteProp = RouteProp<RootStackParamList, "sparkBackupPhraseScreen">
 
 export const SparkBackupPhraseScreen: React.FC = () => {
-  const { LL, locale } = useI18nContext()
+  const { LL } = useI18nContext()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
-  const { sparkCompatibleWalletsUrl } = useRemoteConfig()
+  const { step } = useRoute<PhraseRouteProp>().params
 
-  const expiresAt = useRef(new Date(Date.now() + COUNTDOWN_SECONDS * 1000)).current
-  const { remainingSeconds, isExpired } = useCountdown(expiresAt)
-
-  const half = BIP39_MNEMONIC_WORD_COUNT / 2
-  const firstHalf = MOCK_WORDS.slice(0, half)
-  const secondHalf = MOCK_WORDS.slice(half)
-
-  const handleCopy = useCallback(() => {
-    copyToClipboard({
-      content: MOCK_WORDS.join(" "),
-      message: LL.SparkOnboarding.ManualBackup.Phrase.copiedToast(),
-    })
-  }, [copyToClipboard, LL])
-
-  const handleOpenLink = () =>
-    InAppBrowser.open(sparkCompatibleWalletsUrl).catch(() =>
-      Linking.openURL(sparkCompatibleWalletsUrl),
-    )
-
-  const handleContinue = () => {
-    const indices = pickRandomIndices(MOCK_WORDS.length, 3)
-    const challenges = indices.map((i) => ({ index: i, word: MOCK_WORDS[i] }))
-    navigation.navigate("sparkBackupConfirmScreen", { challenges })
-  }
+  const {
+    firstCard,
+    secondCard,
+    offset,
+    handleCopy,
+    handleOpenLink,
+    handleContinue,
+    buttonTitle,
+    isButtonDisabled,
+  } = useBackupPhrase(step)
 
   const sparkLink = LL.SparkOnboarding.ManualBackup.Phrase.sparkCompatibleLink()
   const infoText = LL.SparkOnboarding.ManualBackup.Phrase.sparkCompatible({
@@ -62,15 +40,9 @@ export const SparkBackupPhraseScreen: React.FC = () => {
   })
   const [infoBefore, infoAfter] = infoText.split(sparkLink)
 
-  const getButtonTitle = () => {
-    if (!remainingSeconds) return LL.SparkOnboarding.ManualBackup.Phrase.savedConfirm()
-
-    return `${LL.SparkOnboarding.ManualBackup.Phrase.saveItNow()} ${formatDuration(remainingSeconds, { unit: "second", locale })}`
-  }
-
   const renderWord = (word: string, index: number) => (
     <View key={index} style={styles.wordRow}>
-      <Text style={styles.wordNumber}>{`${index + 1}.  `}</Text>
+      <Text style={styles.wordNumber}>{`${offset + index + 1}.  `}</Text>
       <Text style={styles.wordText}>{word}</Text>
     </View>
   )
@@ -80,12 +52,14 @@ export const SparkBackupPhraseScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.seedWords}>
           <SettingsGroup
-            items={firstHalf.map((word, i) => () => renderWord(word, i))}
+            items={firstCard.map((word, i) => () => renderWord(word, i))}
             containerStyle={styles.card}
             dividerStyle={styles.divider}
           />
           <SettingsGroup
-            items={secondHalf.map((word, i) => () => renderWord(word, i + 6))}
+            items={secondCard.map(
+              (word, i) => () => renderWord(word, i + WORDS_PER_CARD),
+            )}
             containerStyle={styles.card}
             dividerStyle={styles.divider}
           />
@@ -114,8 +88,8 @@ export const SparkBackupPhraseScreen: React.FC = () => {
 
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
-          title={getButtonTitle()}
-          disabled={!isExpired}
+          title={buttonTitle}
+          disabled={isButtonDisabled}
           onPress={handleContinue}
         />
       </View>

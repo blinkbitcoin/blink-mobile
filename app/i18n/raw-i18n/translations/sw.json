@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Chagua njia yako ya nakala",
-      "subtitle": "Tunapendekeza Google Drive/Apple iCloud kwa watumiaji wapya.",
+      "subtitle": "Tunapendekeza {provider} kwa watumiaji wapya.",
       "googleDrive": "Google Drive",
       "passwordManager": "Kidhibiti cha nywila",
       "manualBackup": "Nakala ya mkono",
       "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
-      "keychainFailed": "Imeshindwa kuhifadhi nakala"
+      "keychainFailed": "Imeshindwa kuhifadhi nakala",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Maneno ya nakala yamenakiliwa kwenye ubao",
         "saveItNow": "Hifadhi sasa",
         "savedConfirm": "Nimehifadhi",
-        "copy": "Nakili"
+        "copy": "Nakili",
+        "continueButton": "Endelea"
       },
       "Confirm": {
         "headerTitle": "Thibitisha maneno ya nakala",

@@ -3451,12 +3451,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Vælg din backup-metode",
-      "subtitle": "Vi anbefaler Google Drive/Apple iCloud til nye brugere.",
+      "subtitle": "Vi anbefaler {provider} til nye brugere.",
       "googleDrive": "Google Drive",
       "passwordManager": "Adgangskodeadministrator",
       "manualBackup": "Manuel backup",
       "keychainSaved": "Backup gemt i adgangskodeadministrator",
-      "keychainFailed": "Kunne ikke gemme backup"
+      "keychainFailed": "Kunne ikke gemme backup",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3472,7 +3473,8 @@
         "copiedToast": "Backup-sætning kopieret til udklipsholder",
         "saveItNow": "Gem den nu",
         "savedConfirm": "Jeg har gemt den",
-        "copy": "Kopiér"
+        "copy": "Kopiér",
+        "continueButton": "Fortsæt"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",

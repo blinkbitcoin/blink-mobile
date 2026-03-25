@@ -10,7 +10,7 @@ import { CheckboxRow } from "@app/components/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 
 const ANIM_DURATION = 300
 
@@ -107,7 +107,9 @@ export const SparkBackupAlertsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.common.continue()}
             disabled={!allChecked}
-            onPress={() => navigation.navigate("sparkBackupPhraseScreen")}
+            onPress={() =>
+              navigation.navigate("sparkBackupPhraseScreen", { step: PhraseStep.First })
+            }
           />
         </View>
       </View>
