@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",
-      "subtitle": "Kami merekomendasikan Google Drive/Apple iCloud untuk pengguna baru.",
+      "subtitle": "Kami merekomendasikan {provider} untuk pengguna baru.",
       "googleDrive": "Google Drive",
       "passwordManager": "Pengelola kata sandi",
       "manualBackup": "Cadangan manual",
       "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
-      "keychainFailed": "Gagal menyimpan cadangan"
+      "keychainFailed": "Gagal menyimpan cadangan",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Frasa cadangan disalin ke papan klip",
         "saveItNow": "Simpan sekarang",
         "savedConfirm": "Saya sudah menyimpannya",
-        "copy": "Salin"
+        "copy": "Salin",
+        "continueButton": "Lanjutkan"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",

@@ -3471,12 +3471,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
-      "subtitle": "เราแนะนำ Google Drive/Apple iCloud สำหรับผู้ใช้ใหม่",
+      "subtitle": "เราแนะนำ {provider} สำหรับผู้ใช้ใหม่",
       "googleDrive": "Google Drive",
       "passwordManager": "ตัวจัดการรหัสผ่าน",
       "manualBackup": "สำรองข้อมูลด้วยตนเอง",
       "keychainSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
-      "keychainFailed": "ไม่สามารถบันทึกสำรองได้"
+      "keychainFailed": "ไม่สามารถบันทึกสำรองได้",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3492,7 +3493,8 @@
         "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",
         "saveItNow": "บันทึกตอนนี้",
         "savedConfirm": "ฉันบันทึกแล้ว",
-        "copy": "คัดลอก"
+        "copy": "คัดลอก",
+        "continueButton": "ดำเนินการต่อ"
       },
       "Confirm": {
         "headerTitle": "ยืนยันวลีสำรอง",

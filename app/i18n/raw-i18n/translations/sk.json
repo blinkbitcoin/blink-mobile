@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Vyberte metódu zálohovania",
-      "subtitle": "Pre nových používateľov odporúčame Google Drive/Apple iCloud.",
+      "subtitle": "Pre nových používateľov odporúčame {provider}.",
       "googleDrive": "Google Drive",
       "passwordManager": "Správca hesiel",
       "manualBackup": "Ručné zálohovanie",
       "keychainSaved": "Záloha uložená do správcu hesiel",
-      "keychainFailed": "Nepodarilo sa uložiť zálohu"
+      "keychainFailed": "Nepodarilo sa uložiť zálohu",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Záložná fráza skopírovaná do schránky",
         "saveItNow": "Uložte teraz",
         "savedConfirm": "Už som ju uložil",
-        "copy": "Kopírovať"
+        "copy": "Kopírovať",
+        "continueButton": "Pokračovať"
       },
       "Confirm": {
         "headerTitle": "Potvrďte záložnú frázu",

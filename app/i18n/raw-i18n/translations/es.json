@@ -3421,12 +3421,13 @@
     "SparkOnboarding": {
         "BackupMethod": {
             "title": "Elige tu método de respaldo",
-            "subtitle": "Recomendamos Google Drive/Apple iCloud para nuevos usuarios.",
+            "subtitle": "Recomendamos {provider} para nuevos usuarios.",
             "googleDrive": "Google Drive",
             "passwordManager": "Gestor de contraseñas",
             "manualBackup": "Respaldo manual",
             "keychainSaved": "Respaldo guardado en el gestor de contraseñas",
-            "keychainFailed": "Error al guardar el respaldo"
+            "keychainFailed": "Error al guardar el respaldo",
+            "appleICloud": "Apple iCloud"
         },
         "ManualBackup": {
             "Alerts": {
@@ -3442,7 +3443,8 @@
                 "copiedToast": "Frase de respaldo copiada al portapapeles",
                 "saveItNow": "Guárdala ahora",
                 "savedConfirm": "Ya la guardé",
-                "copy": "Copiar"
+                "copy": "Copiar",
+                "continueButton": "Continuar"
             },
             "Confirm": {
                 "headerTitle": "Confirmar frase de respaldo",

@@ -11291,13 +11291,18 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​G​o​o​g​l​e​ ​D​r​i​v​e​/​A​p​p​l​e​ ​i​C​l​o​u​d​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​{​p​r​o​v​i​d​e​r​}​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 * @param {string} provider
 			 */
-			subtitle: string
+			subtitle: RequiredParams<'provider'>
 			/**
 			 * G​o​o​g​l​e​ ​D​r​i​v​e
 			 */
 			googleDrive: string
+			/**
+			 * A​p​p​l​e​ ​i​C​l​o​u​d
+			 */
+			appleICloud: string
 			/**
 			 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
 			 */
@@ -11356,6 +11361,10 @@ type RootTranslation = {
 				 * S​a​v​e​ ​i​t​ ​n​o​w
 				 */
 				saveItNow: string
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				continueButton: string
 				/**
 				 * I​ ​h​a​v​e​ ​s​a​v​e​d​ ​i​t
 				 */
@@ -22542,13 +22551,17 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * We recommend Google Drive/Apple iCloud for new users.
+			 * We recommend {provider} for new users.
 			 */
-			subtitle: () => LocalizedString
+			subtitle: (arg: { provider: string }) => LocalizedString
 			/**
 			 * Google Drive
 			 */
 			googleDrive: () => LocalizedString
+			/**
+			 * Apple iCloud
+			 */
+			appleICloud: () => LocalizedString
 			/**
 			 * Password manager
 			 */
@@ -22606,6 +22619,10 @@ export type TranslationFunctions = {
 				 * Save it now
 				 */
 				saveItNow: () => LocalizedString
+				/**
+				 * Continue
+				 */
+				continueButton: () => LocalizedString
 				/**
 				 * I have saved it
 				 */

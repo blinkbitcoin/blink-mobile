@@ -3471,12 +3471,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
-      "subtitle": "Chúng tôi khuyên dùng Google Drive/Apple iCloud cho người dùng mới.",
+      "subtitle": "Chúng tôi khuyên dùng {provider} cho người dùng mới.",
       "googleDrive": "Google Drive",
       "passwordManager": "Trình quản lý mật khẩu",
       "manualBackup": "Sao lưu thủ công",
       "keychainSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
-      "keychainFailed": "Không thể lưu bản sao lưu"
+      "keychainFailed": "Không thể lưu bản sao lưu",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3492,7 +3493,8 @@
         "copiedToast": "Đã sao chép cụm từ sao lưu vào bộ nhớ tạm",
         "saveItNow": "Lưu ngay",
         "savedConfirm": "Tôi đã lưu",
-        "copy": "Sao chép"
+        "copy": "Sao chép",
+        "continueButton": "Tiếp tục"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
