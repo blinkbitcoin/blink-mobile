@@ -79,7 +79,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                       onFocus={() => setActiveIndex(i)}
                       autoCapitalize="none"
                       autoCorrect={false}
-                      contextMenuHidden
+                      keyboardType="visible-password"
                     />
                     <GaloyIcon name="pencil" size={16} color={colors.primary} />
                   </View>
