@@ -3471,12 +3471,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "اختر طريقة النسخ الاحتياطي",
-      "subtitle": "نوصي بـ Google Drive/Apple iCloud للمستخدمين الجدد.",
+      "subtitle": "نوصي بـ {provider} للمستخدمين الجدد.",
       "googleDrive": "Google Drive",
       "passwordManager": "مدير كلمات المرور",
       "manualBackup": "نسخ احتياطي يدوي",
       "keychainSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
-      "keychainFailed": "فشل حفظ النسخة الاحتياطية"
+      "keychainFailed": "فشل حفظ النسخة الاحتياطية",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3492,7 +3493,8 @@
         "copiedToast": "تم نسخ عبارة النسخ الاحتياطي إلى الحافظة",
         "saveItNow": "احفظها الآن",
         "savedConfirm": "لقد حفظتها",
-        "copy": "نسخ"
+        "copy": "نسخ",
+        "continueButton": "متابعة"
       },
       "Confirm": {
         "headerTitle": "تأكيد عبارة النسخ الاحتياطي",

@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Επιλέξτε τη μέθοδο αντιγράφου ασφαλείας",
-      "subtitle": "Προτείνουμε Google Drive/Apple iCloud για νέους χρήστες.",
+      "subtitle": "Προτείνουμε {provider} για νέους χρήστες.",
       "googleDrive": "Google Drive",
       "passwordManager": "Διαχειριστής κωδικών",
       "manualBackup": "Χειροκίνητο αντίγραφο ασφαλείας",
       "keychainSaved": "Αντίγραφο ασφαλείας αποθηκεύτηκε στον διαχειριστή κωδικών",
-      "keychainFailed": "Αποτυχία αποθήκευσης αντιγράφου ασφαλείας"
+      "keychainFailed": "Αποτυχία αποθήκευσης αντιγράφου ασφαλείας",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Η φράση αντιγράφηκε στο πρόχειρο",
         "saveItNow": "Αποθηκεύστε τώρα",
         "savedConfirm": "Την αποθήκευσα",
-        "copy": "Αντιγραφή"
+        "copy": "Αντιγραφή",
+        "continueButton": "Συνέχεια"
       },
       "Confirm": {
         "headerTitle": "Επιβεβαίωση φράσης",

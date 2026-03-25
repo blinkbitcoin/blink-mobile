@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Válassz biztonsági mentési módszert",
-      "subtitle": "Új felhasználóknak a Google Drive/Apple iCloud ajánlott.",
+      "subtitle": "Új felhasználóknak a {provider} ajánlott.",
       "googleDrive": "Google Drive",
       "passwordManager": "Jelszókezelő",
       "manualBackup": "Kézi biztonsági mentés",
       "keychainSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
-      "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést"
+      "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Biztonsági mentési kifejezés vágólapra másolva",
         "saveItNow": "Mentsd el most",
         "savedConfirm": "Elmentettem",
-        "copy": "Másolás"
+        "copy": "Másolás",
+        "continueButton": "Tovább"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",

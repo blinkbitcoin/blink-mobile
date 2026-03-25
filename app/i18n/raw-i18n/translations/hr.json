@@ -3474,12 +3474,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Odaberite metodu sigurnosne kopije",
-      "subtitle": "Preporučujemo Google Drive/Apple iCloud za nove korisnike.",
+      "subtitle": "Preporučujemo {provider} za nove korisnike.",
       "googleDrive": "Google Drive",
       "passwordManager": "Upravitelj lozinki",
       "manualBackup": "Ručna sigurnosna kopija",
       "keychainSaved": "Sigurnosna kopija spremljena u upravitelj lozinki",
-      "keychainFailed": "Spremanje sigurnosne kopije nije uspjelo"
+      "keychainFailed": "Spremanje sigurnosne kopije nije uspjelo",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3495,7 +3496,8 @@
         "copiedToast": "Sigurnosna fraza kopirana u međuspremnik",
         "saveItNow": "Spremite sada",
         "savedConfirm": "Spremio sam je",
-        "copy": "Kopiraj"
+        "copy": "Kopiraj",
+        "continueButton": "Nastavi"
       },
       "Confirm": {
         "headerTitle": "Potvrdite sigurnosnu frazu",

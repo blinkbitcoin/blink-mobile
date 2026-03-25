@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Londa enkola yo ey'okukoppa",
-      "subtitle": "Tukutegeeza Google Drive/Apple iCloud gy'abakozesa abapya.",
+      "subtitle": "Tukutegeeza {provider} gy'abakozesa abapya.",
       "googleDrive": "Google Drive",
       "passwordManager": "Omuteegezzi w'ebigambo by'okuyingira",
       "manualBackup": "Okukoppa mu ngalo",
       "keychainSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
-      "keychainFailed": "Okukoppa tekusobodde kutereka"
+      "keychainFailed": "Okukoppa tekusobodde kutereka",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Ekigambo eky'okukoppa kiwanduukuliddwa ku lutimbe",
         "saveItNow": "Kitereke kati",
         "savedConfirm": "Nkitereka",
-        "copy": "Koppa"
+        "copy": "Koppa",
+        "continueButton": "Weyongerawo"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",

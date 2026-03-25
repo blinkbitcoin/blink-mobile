@@ -3474,12 +3474,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Kies je back-upmethode",
-      "subtitle": "We raden Google Drive/Apple iCloud aan voor nieuwe gebruikers.",
+      "subtitle": "We raden {provider} aan voor nieuwe gebruikers.",
       "googleDrive": "Google Drive",
       "passwordManager": "Wachtwoordbeheerder",
       "manualBackup": "Handmatige back-up",
       "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
-      "keychainFailed": "Back-up opslaan mislukt"
+      "keychainFailed": "Back-up opslaan mislukt",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3495,7 +3496,8 @@
         "copiedToast": "Back-upzin naar klembord gekopieerd",
         "saveItNow": "Sla het nu op",
         "savedConfirm": "Ik heb het opgeslagen",
-        "copy": "Kopiëren"
+        "copy": "Kopiëren",
+        "continueButton": "Doorgaan"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",

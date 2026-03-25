@@ -3462,12 +3462,13 @@
     "SparkOnboarding": {
         "BackupMethod": {
             "title": "バックアップ方法を選択",
-            "subtitle": "新規ユーザーにはGoogle Drive/Apple iCloudをお勧めします。",
+            "subtitle": "新規ユーザーには{provider}をお勧めします。",
             "googleDrive": "Google Drive",
             "passwordManager": "パスワードマネージャー",
             "manualBackup": "手動バックアップ",
             "keychainSaved": "バックアップがパスワードマネージャーに保存されました",
-            "keychainFailed": "バックアップの保存に失敗しました"
+            "keychainFailed": "バックアップの保存に失敗しました",
+            "appleICloud": "Apple iCloud"
         },
         "ManualBackup": {
             "Alerts": {
@@ -3483,7 +3484,8 @@
                 "copiedToast": "バックアップフレーズをクリップボードにコピーしました",
                 "saveItNow": "今すぐ保存",
                 "savedConfirm": "保存しました",
-                "copy": "コピー"
+                "copy": "コピー",
+                "continueButton": "続行"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",

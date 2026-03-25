@@ -3471,12 +3471,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Akllay imayna waqaychanaykita",
-      "subtitle": "Google Drive/Apple iCloud nisqata kunanchayku musuq rurakkunapaq.",
+      "subtitle": "{provider} nisqata kunanchayku musuq rurakkunapaq.",
       "googleDrive": "Google Drive",
       "passwordManager": "Yaykuna rimay kamachiq",
       "manualBackup": "Makiwan waqaychay",
       "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
-      "keychainFailed": "Mana atikurqachu waqaychayta"
+      "keychainFailed": "Mana atikurqachu waqaychayta",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3492,7 +3493,8 @@
         "copiedToast": "Waqaychay rimay kopiyasqa",
         "saveItNow": "Waqaychay kunan",
         "savedConfirm": "Ñam waqaychani",
-        "copy": "Kopiyay"
+        "copy": "Kopiyay",
+        "continueButton": "Hinaspa"
       },
       "Confirm": {
         "headerTitle": "Waqaychay rimayta takyachiy",

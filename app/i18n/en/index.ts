@@ -3565,8 +3565,9 @@ const en: BaseTranslation = {
   SparkOnboarding: {
     BackupMethod: {
       title: "Choose your backup method",
-      subtitle: "We recommend Google Drive/Apple iCloud for new users.",
+      subtitle: "We recommend {provider: string} for new users.",
       googleDrive: "Google Drive",
+      appleICloud: "Apple iCloud",
       passwordManager: "Password manager",
       manualBackup: "Manual backup",
       keychainSaved: "Backup saved to password manager",
@@ -3587,6 +3588,7 @@ const en: BaseTranslation = {
         sparkCompatibleLink: "Spark-compatible wallet",
         copiedToast: "Backup phrase copied into clipboard",
         saveItNow: "Save it now",
+        continueButton: "Continue",
         savedConfirm: "I have saved it",
         copy: "Copy",
       },

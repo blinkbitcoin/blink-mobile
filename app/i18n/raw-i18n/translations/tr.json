@@ -3433,12 +3433,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Yedekleme yönteminizi seçin",
-      "subtitle": "Yeni kullanıcılar için Google Drive/Apple iCloud öneriyoruz.",
+      "subtitle": "Yeni kullanıcılar için {provider} öneriyoruz.",
       "googleDrive": "Google Drive",
       "passwordManager": "Şifre yöneticisi",
       "manualBackup": "Manuel yedekleme",
       "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
-      "keychainFailed": "Yedekleme kaydedilemedi"
+      "keychainFailed": "Yedekleme kaydedilemedi",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3454,7 +3455,8 @@
         "copiedToast": "Yedekleme ifadesi panoya kopyalandı",
         "saveItNow": "Şimdi kaydet",
         "savedConfirm": "Kaydettim",
-        "copy": "Kopyala"
+        "copy": "Kopyala",
+        "continueButton": "Devam et"
       },
       "Confirm": {
         "headerTitle": "Yedekleme ifadesini onayla",

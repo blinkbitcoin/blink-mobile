@@ -3471,12 +3471,13 @@
   "SparkOnboarding": {
     "BackupMethod": {
       "title": "Изаберите метод резервне копије",
-      "subtitle": "Препоручујемо Google Drive/Apple iCloud за нове кoriснике.",
+      "subtitle": "Препоручујемо {provider} за нове кoriснике.",
       "googleDrive": "Google Drive",
       "passwordManager": "Менаџер лозинки",
       "manualBackup": "Ручна резервна копија",
       "keychainSaved": "Резервна копија сачувана у менаџеру лозинки",
-      "keychainFailed": "Чување резервне копије није успело"
+      "keychainFailed": "Чување резервне копије није успело",
+      "appleICloud": "Apple iCloud"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3492,7 +3493,8 @@
         "copiedToast": "Резервна фраза копирана у међуспремник",
         "saveItNow": "Сачувајте сада",
         "savedConfirm": "Сачувао сам је",
-        "copy": "Копирај"
+        "copy": "Копирај",
+        "continueButton": "Настави"
       },
       "Confirm": {
         "headerTitle": "Потврдите резервну фразу",
