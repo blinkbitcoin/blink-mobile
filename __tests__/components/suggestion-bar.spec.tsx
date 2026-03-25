@@ -1,4 +1,5 @@
 import React from "react"
+import { Keyboard } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { SuggestionBar } from "@app/components/suggestion-bar"
@@ -45,5 +46,20 @@ describe("SuggestionBar", () => {
 
     fireEvent.press(getByText("help"))
     expect(mockOnSelect).toHaveBeenCalledWith("help")
+  })
+
+  it("listens to keyboard events", () => {
+    const addListenerSpy = jest.spyOn(Keyboard, "addListener")
+
+    render(
+      <ContextForScreen>
+        <SuggestionBar suggestions={["hello"]} onSelect={mockOnSelect} />
+      </ContextForScreen>,
+    )
+
+    expect(addListenerSpy).toHaveBeenCalledWith("keyboardDidShow", expect.any(Function))
+    expect(addListenerSpy).toHaveBeenCalledWith("keyboardDidHide", expect.any(Function))
+
+    addListenerSpy.mockRestore()
   })
 })
