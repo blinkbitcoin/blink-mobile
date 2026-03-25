@@ -1,5 +1,5 @@
-import React from "react"
-import { Pressable, View } from "react-native"
+import React, { useEffect, useState } from "react"
+import { Keyboard, Pressable, View } from "react-native"
 
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -13,11 +13,23 @@ export const SuggestionBar: React.FC<SuggestionBarProps> = ({
   onSelect,
 }) => {
   const styles = useStyles()
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) =>
+      setKeyboardHeight(e.endCoordinates.height),
+    )
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardHeight(0))
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
+  }, [])
 
   if (suggestions.length === 0) return null
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { bottom: keyboardHeight }]}>
       {suggestions.map((item) => (
         <Pressable
           key={item}
@@ -35,18 +47,21 @@ export const SuggestionBar: React.FC<SuggestionBarProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
+    position: "absolute",
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "center",
     gap: 10,
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   chip: {
     flex: 1,
     alignItems: "center",
     backgroundColor: colors.grey5,
     borderRadius: 8,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   text: {
     fontSize: 14,
