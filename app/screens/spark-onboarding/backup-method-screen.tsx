@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { Platform, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -20,6 +20,11 @@ export const SparkBackupMethodScreen: React.FC = () => {
 
   const { keychainLoading, handleKeychainBackup, handleManualBackup } = useBackupMethods()
 
+  const cloudProvider =
+    Platform.OS === "ios"
+      ? LL.SparkOnboarding.BackupMethod.appleICloud()
+      : LL.SparkOnboarding.BackupMethod.googleDrive()
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
@@ -27,7 +32,9 @@ export const SparkBackupMethodScreen: React.FC = () => {
           icon="cloud-arrow-up"
           iconColor={colors._green}
           title={LL.SparkOnboarding.BackupMethod.title()}
-          subtitle={LL.SparkOnboarding.BackupMethod.subtitle()}
+          subtitle={LL.SparkOnboarding.BackupMethod.subtitle({
+            provider: cloudProvider,
+          })}
         />
 
         <View style={styles.buttonsContainer}>

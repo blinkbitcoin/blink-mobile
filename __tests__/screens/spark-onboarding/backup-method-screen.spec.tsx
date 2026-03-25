@@ -47,7 +47,13 @@ describe("SparkBackupMethodScreen", () => {
     )
 
     expect(getByText(LL.SparkOnboarding.BackupMethod.title())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.BackupMethod.subtitle())).toBeTruthy()
+    expect(
+      getByText(
+        LL.SparkOnboarding.BackupMethod.subtitle({
+          provider: LL.SparkOnboarding.BackupMethod.appleICloud(),
+        }),
+      ),
+    ).toBeTruthy()
   })
 
   it("renders all buttons", () => {
