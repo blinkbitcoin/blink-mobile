@@ -14,9 +14,11 @@ import { MOCK_WORDS } from "../spark-mock-data"
 export const useBackupMethods = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { appConfig } = useAppConfig()
 
-  const { save: saveToKeychain, loading: keychainLoading } =
-    useKeychainBackup(SPARK_KEYCHAIN_SERVICE)
+  const { save: saveToKeychain, loading: keychainLoading } = useKeychainBackup(
+    getSparkKeychainService(appConfig.galoyInstance.name),
+  )
 
   const handleKeychainBackup = useCallback(async () => {
     const success = await saveToKeychain(MOCK_WORDS.join(" "))
