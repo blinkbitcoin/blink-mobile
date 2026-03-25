@@ -137,7 +137,6 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.transparent,
     minHeight: 50,
     paddingHorizontal: 14,
-    paddingVertical: 5,
     gap: 12,
   },
   wordNumber: {
