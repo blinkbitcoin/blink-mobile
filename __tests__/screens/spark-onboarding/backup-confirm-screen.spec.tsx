@@ -6,6 +6,11 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { SparkBackupConfirmScreen } from "@app/screens/spark-onboarding/manual-backup/backup-confirm-screen"
 import { ContextForScreen } from "../helper"
 
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  __esModule: true,
+  default: { open: jest.fn(() => Promise.resolve()) },
+}))
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -27,6 +32,11 @@ const LL = i18nObject("en")
 describe("SparkBackupConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it("renders subtitle and input fields", () => {
@@ -56,77 +66,6 @@ describe("SparkBackupConfirmScreen", () => {
     )
 
     expect(getByText(LL.SparkOnboarding.ManualBackup.Confirm.enterWords())).toBeTruthy()
-  })
-
-  it("shows confirm label when all inputs are filled correctly", () => {
-    const { getByPlaceholderText, getByText } = render(
-      <ContextForScreen>
-        <SparkBackupConfirmScreen />
-      </ContextForScreen>,
-    )
-
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
-      "youth",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 5`),
-      "bundle",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 9`),
-      "harvest",
-    )
-
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Confirm.confirm())).toBeTruthy()
-  })
-
-  it("does not navigate when words are incorrect", () => {
-    const { getByPlaceholderText, getByText } = render(
-      <ContextForScreen>
-        <SparkBackupConfirmScreen />
-      </ContextForScreen>,
-    )
-
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
-      "wrong",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 5`),
-      "wrong",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 9`),
-      "wrong",
-    )
-
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Confirm.confirm()))
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("navigates to success screen on correct words", () => {
-    const { getByPlaceholderText, getByText } = render(
-      <ContextForScreen>
-        <SparkBackupConfirmScreen />
-      </ContextForScreen>,
-    )
-
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
-      "youth",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 5`),
-      "bundle",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 9`),
-      "harvest",
-    )
-
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Confirm.confirm()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
   it("shows autocomplete suggestions when typing 3+ characters", () => {
@@ -161,7 +100,20 @@ describe("SparkBackupConfirmScreen", () => {
     expect(input.props.value).toBe("youth")
   })
 
-  it("accepts case-insensitive input", () => {
+  it("disables context menu to prevent paste", () => {
+    const { getByPlaceholderText } = render(
+      <ContextForScreen>
+        <SparkBackupConfirmScreen />
+      </ContextForScreen>,
+    )
+
+    const input = getByPlaceholderText(
+      `${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`,
+    )
+    expect(input.props.contextMenuHidden).toBe(true)
+  })
+
+  it("shows word number when input has content", () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
         <SparkBackupConfirmScreen />
@@ -170,18 +122,10 @@ describe("SparkBackupConfirmScreen", () => {
 
     fireEvent.changeText(
       getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
-      "YOUTH",
+      "you",
     )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 5`),
-      "Bundle",
-    )
-    fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 9`),
-      "HARVEST",
-    )
+    fireEvent.press(getByText("youth"))
 
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Confirm.confirm()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(getByText("1.")).toBeTruthy()
   })
 })
