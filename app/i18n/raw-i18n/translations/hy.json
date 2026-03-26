@@ -3509,6 +3509,27 @@
       "Success": {
         "title": "Բարի գալուստ ոչ պահառու Blink"
       }
+    },
+    "CloudBackup": {
+      "title": "Եկեք պահուստարորենք ձեր դրամապանակը",
+      "description": "Մենք կպահեստենք ձեր պահուստային արտահայտության պատճենը ձեր {provider}-ում.",
+      "encryptCheckbox": "Գաղտնագրել լրացուցիչ գաղտնաբառով",
+      "password": "Գաղտնաբառ",
+      "passwordPlaceholder": "(նվազագույնը 12 նիշ)",
+      "confirmPassword": "Հաստատել գաղտնաբառը",
+      "confirmPasswordPlaceholder": "Կրկին մտցրեք գաղտնաբառը",
+      "continueButton": "Շարունակել",
+      "importantTitle": "Կարեւոր",
+      "importantMessage": "Blink-ը չի պահում այս գաղտնաբառը: Եթե կորցնեք այն, {bold} վերականգնել ձեր դրամապանակը:",
+      "importantMessageBold": "մենք չենք կարողանա",
+      "passwordTooShort": "Նվազագույնը 12 նիշ",
+      "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
+      "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
+      "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
+      "signInFailed": "Google-ի մուտքը ձախողվեց",
+      "existingBackupTitle": "Պահուստային պատճեն գտնվել է",
+      "existingBackupMessage": "Ձեր {provider}-ում արդեն պահուստային պատճեն կա: Ուզում եք վերագրե՞լ:",
+      "overwrite": "Վերագրել"
     }
   }
 }

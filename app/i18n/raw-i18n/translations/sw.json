@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Karibu kwa Blink isiyo na uhifadhi"
       }
+    },
+    "CloudBackup": {
+      "title": "Tuhifadhi nakala ya mkoba wako",
+      "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
+      "encryptCheckbox": "Ficha kwa nywila ya ziada",
+      "password": "Nywila",
+      "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
+      "confirmPassword": "Thibitisha nywila",
+      "confirmPasswordPlaceholder": "Ingiza nywila tena",
+      "continueButton": "Endelea",
+      "importantTitle": "Muhimu",
+      "importantMessage": "Blink haihifadhi nywila hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
+      "importantMessageBold": "hatutaweza",
+      "passwordTooShort": "Herufi 12 ndogo zaidi",
+      "passwordMismatch": "Nywila hazifanani",
+      "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
+      "uploadFailed": "Imeshindwa kupakia nakala",
+      "signInFailed": "Imeshindwa kuingia kwenye Google",
+      "existingBackupTitle": "Nakala imepatikana",
+      "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
+      "overwrite": "Badilisha"
     }
   }
 }

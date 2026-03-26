@@ -3456,6 +3456,27 @@
             "Success": {
                 "title": "Bienvenido a Blink sin custodia"
             }
+        },
+        "CloudBackup": {
+            "title": "Respaldemos tu billetera",
+            "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
+            "encryptCheckbox": "Encriptar con contraseña adicional",
+            "password": "Contraseña",
+            "passwordPlaceholder": "(mínimo 12 caracteres)",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Ingresa la contraseña de nuevo",
+            "continueButton": "Continuar",
+            "importantTitle": "Importante",
+            "importantMessage": "Blink no almacena esta contraseña. Si la pierdes, {bold} recuperar tu billetera.",
+            "importantMessageBold": "no podremos",
+            "passwordTooShort": "Mínimo 12 caracteres",
+            "passwordMismatch": "Las contraseñas no coinciden",
+            "uploadSuccess": "Respaldo guardado en {provider}",
+            "uploadFailed": "Error al subir el respaldo",
+            "signInFailed": "Error al iniciar sesión en Google",
+            "existingBackupTitle": "Respaldo encontrado",
+            "existingBackupMessage": "Ya existe un respaldo en tu {provider}. ¿Deseas sobrescribirlo?",
+            "overwrite": "Sobrescribir"
         }
     }
 }

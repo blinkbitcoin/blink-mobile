@@ -3506,6 +3506,27 @@
       "Success": {
         "title": "Chào mừng đến với Blink tự quản lý"
       }
+    },
+    "CloudBackup": {
+      "title": "Hãy sao lưu ví của bạn",
+      "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
+      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "(tối thiểu 12 ký tự)",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+      "continueButton": "Tiếp tục",
+      "importantTitle": "Quan trọng",
+      "importantMessage": "Blink không lưu trữ mật khẩu này. Nếu bạn mất nó, {bold} khôi phục ví của bạn.",
+      "importantMessageBold": "chúng tôi sẽ không thể",
+      "passwordTooShort": "Tối thiểu 12 ký tự",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
+      "uploadFailed": "Không thể tải lên bản sao lưu",
+      "signInFailed": "Không thể đăng nhập vào Google",
+      "existingBackupTitle": "Đã tìm thấy bản sao lưu",
+      "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
+      "overwrite": "Ghi đè"
     }
   }
 }

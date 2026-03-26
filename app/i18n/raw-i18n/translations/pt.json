@@ -3456,6 +3456,27 @@
             "Success": {
                 "title": "Bem-vindo ao Blink não-custodial"
             }
+        },
+        "CloudBackup": {
+            "title": "Vamos fazer backup da sua carteira",
+            "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
+            "encryptCheckbox": "Criptografar com senha adicional",
+            "password": "Senha",
+            "passwordPlaceholder": "(mínimo 12 caracteres)",
+            "confirmPassword": "Confirmar senha",
+            "confirmPasswordPlaceholder": "Digite a senha novamente",
+            "continueButton": "Continuar",
+            "importantTitle": "Importante",
+            "importantMessage": "O Blink não armazena esta senha. Se você perdê-la, {bold} recuperar sua carteira.",
+            "importantMessageBold": "não poderemos",
+            "passwordTooShort": "Mínimo 12 caracteres",
+            "passwordMismatch": "As senhas não coincidem",
+            "uploadSuccess": "Backup salvo no {provider}",
+            "uploadFailed": "Falha ao enviar o backup",
+            "signInFailed": "Falha ao entrar no Google",
+            "existingBackupTitle": "Backup encontrado",
+            "existingBackupMessage": "Já existe um backup no seu {provider}. Deseja sobrescrevê-lo?",
+            "overwrite": "Sobrescrever"
         }
     }
 }

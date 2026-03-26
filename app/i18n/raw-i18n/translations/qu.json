@@ -3506,6 +3506,27 @@
       "Success": {
         "title": "Blink mana waqaychisqaman haykuy"
       }
+    },
+    "CloudBackup": {
+      "title": "Qullqikuqniykita waqaychasun",
+      "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
+      "encryptCheckbox": "Yapay contraseñawan pakay",
+      "password": "Contraseña",
+      "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
+      "confirmPassword": "Contraseñata takyachiy",
+      "confirmPasswordPlaceholder": "Contraseñata hukmanta qillqay",
+      "continueButton": "Hinalla",
+      "importantTitle": "Allin yachanapaq",
+      "importantMessage": "Blink mana kay contraseñata waqaychanchu. Chinkachiptiykeqa, {bold} qullqikuqniykita kutichiyku.",
+      "importantMessageBold": "mana atiykumanchu",
+      "passwordTooShort": "Pisi kaptinpas 12 sanampakuna",
+      "passwordMismatch": "Contraseñakuna mana tupanchu",
+      "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
+      "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
+      "signInFailed": "Google nisqaman yaykuy mana atikurqanchu",
+      "existingBackupTitle": "Waqaychay tarikusqa",
+      "existingBackupMessage": "{provider} nisqaykipi huknin waqaychay kachkanña. Qawariyta munankichu?",
+      "overwrite": "Hawamanta qillqay"
     }
   }
 }
