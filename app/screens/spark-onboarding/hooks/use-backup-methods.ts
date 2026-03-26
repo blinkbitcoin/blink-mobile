@@ -1,10 +1,11 @@
 import { useCallback } from "react"
+import { Platform } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { SPARK_KEYCHAIN_SERVICE } from "@app/config/appinfo"
-import { useKeychainBackup } from "@app/hooks"
+import { getSparkKeychainService } from "@app/config/appinfo"
+import { useAppConfig, useKeychainBackup } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
@@ -38,6 +39,11 @@ export const useBackupMethods = () => {
     navigation.navigate("sparkBackupSuccessScreen")
   }, [saveToKeychain, navigation, LL])
 
+  const handleCloudBackup = useCallback(() => {
+    if (Platform.OS === "ios") return
+    navigation.navigate("sparkCloudBackupScreen")
+  }, [navigation])
+
   const handleManualBackup = useCallback(() => {
     navigation.navigate("sparkBackupAlertsScreen")
   }, [navigation])
@@ -45,6 +51,7 @@ export const useBackupMethods = () => {
   return {
     keychainLoading,
     handleKeychainBackup,
+    handleCloudBackup,
     handleManualBackup,
   }
 }
