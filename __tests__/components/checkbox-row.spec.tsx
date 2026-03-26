@@ -21,6 +21,8 @@ jest.mock("@rn-vui/themed", () => ({
     checkbox: {},
     checkboxChecked: {},
     label: {},
+    centered: { alignSelf: "center" },
+    labelCentered: { flex: 0 },
   }),
 }))
 
@@ -83,6 +85,28 @@ describe("CheckboxRow", () => {
       fireEvent.press(getByRole("checkbox"))
 
       expect(defaultProps.onPress).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe("centered prop", () => {
+    it("applies centered styles when centered is true", () => {
+      const { getByRole } = render(<CheckboxRow {...defaultProps} centered />)
+
+      const checkbox = getByRole("checkbox")
+      const containerStyles = checkbox.props.style
+      expect(containerStyles).toEqual(
+        expect.arrayContaining([expect.objectContaining({ alignSelf: "center" })]),
+      )
+    })
+
+    it("does not apply centered styles by default", () => {
+      const { getByRole } = render(<CheckboxRow {...defaultProps} />)
+
+      const checkbox = getByRole("checkbox")
+      const containerStyles = checkbox.props.style
+      expect(containerStyles).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ alignSelf: "center" })]),
+      )
     })
   })
 
