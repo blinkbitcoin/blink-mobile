@@ -57,6 +57,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
               label={LL.SparkOnboarding.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
+              centered
             />
 
             {isEncrypted && (
@@ -128,9 +129,11 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingTop: 20,
     gap: 14,
+    alignItems: "center",
   },
   encryptionFields: {
     gap: 0,
+    alignSelf: "stretch",
   },
   warningCard: {
     backgroundColor: colors.grey5,
