@@ -11,6 +11,7 @@ import {
 
 export const useTotalBalance = (
   wallets?: readonly WalletBalance[],
+  cardBalanceSats?: number,
 ): {
   formattedBalance: string
   numericBalance: number
@@ -33,6 +34,10 @@ export const useTotalBalance = (
     toUsdMoneyAmount(usdWallet?.balance),
     DisplayCurrency,
   )
+  const cardAmount =
+    cardBalanceSats === undefined
+      ? undefined
+      : convertMoneyAmount?.(toBtcMoneyAmount(cardBalanceSats), DisplayCurrency)
 
   if (!btcAmount || !usdAmount) {
     return {
@@ -42,7 +47,10 @@ export const useTotalBalance = (
     }
   }
 
-  const totalDisplay = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const walletTotal = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const totalDisplay = cardAmount
+    ? addMoneyAmounts({ a: walletTotal, b: cardAmount })
+    : walletTotal
 
   const integerBalanceString = formatMoneyAmount({
     moneyAmount: totalDisplay,

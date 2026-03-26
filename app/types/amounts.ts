@@ -3,6 +3,9 @@ import { WalletCurrency } from "@app/graphql/generated"
 export const DisplayCurrency = "DisplayCurrency" as const
 export type DisplayCurrency = typeof DisplayCurrency
 
+export const CARD = "CARD" as const
+export type CardCurrency = typeof CARD
+
 export type DisplayAmount = MoneyAmount<DisplayCurrency>
 
 export type WalletOrDisplayCurrency = WalletCurrency | DisplayCurrency

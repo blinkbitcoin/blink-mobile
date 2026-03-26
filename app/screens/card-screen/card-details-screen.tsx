@@ -10,13 +10,12 @@ import { BlinkCard } from "@app/components/blink-card"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
-import { useClipboard } from "@app/hooks"
+import { useCardData, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
 
 import { useBiometricGate } from "./hooks/use-biometric-gate"
-import { useCardData } from "./hooks/use-card-data"
 import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
 
 const CLIPBOARD_CLEAR_MS = 60_000

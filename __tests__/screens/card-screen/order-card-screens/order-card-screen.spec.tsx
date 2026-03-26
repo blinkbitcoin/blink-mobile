@@ -73,7 +73,7 @@ const mockAddress = {
 }
 
 const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 

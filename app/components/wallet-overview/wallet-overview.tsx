@@ -6,10 +6,16 @@ import { gql } from "@apollo/client"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getUsdWallet,
+  WalletBalance,
+} from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config/appinfo"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -56,7 +62,7 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
-  wallets?: readonly WalletBalance[]
+  accounts?: readonly AccountBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
 }
@@ -64,7 +70,7 @@ type Props = {
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
-  wallets,
+  accounts,
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
@@ -85,14 +91,21 @@ const WalletOverview: React.FC<Props> = ({
   let usdInDisplayCurrencyFormatted: string | undefined = "$0.00"
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
+  let cardBalanceFormatted: string | undefined = undefined
+  let cardInDisplayCurrency: string | undefined = undefined
 
-  const hasWallets = wallets && wallets.length > 0
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
-  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+  const hasAccounts = accounts && accounts.length > 0
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasAccounts })
+  const resolvedAccounts = hasAccounts ? accounts : data?.me?.defaultAccount?.wallets
+
+  const wallets = resolvedAccounts?.filter(
+    (a): a is WalletBalance => a.walletCurrency !== CARD,
+  )
+  const cardAccount = resolvedAccounts?.find((a) => a.walletCurrency === CARD)
 
   if (isAuthed) {
-    const btcWallet = getBtcWallet(resolvedWallets)
-    const usdWallet = getUsdWallet(resolvedWallets)
+    const btcWallet = getBtcWallet(wallets)
+    const usdWallet = getUsdWallet(wallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -113,18 +126,28 @@ const WalletOverview: React.FC<Props> = ({
     if (displayCurrency !== WalletCurrency.Usd) {
       usdInUnderlyingCurrency = formatMoneyAmount({ moneyAmount: usdWalletBalance })
     }
+
+    if (cardAccount) {
+      const cardBalance = toBtcMoneyAmount(cardAccount.balance)
+      cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardBalance })
+      cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
+        moneyAmount: cardBalance,
+        isApproximate: true,
+      })
+    }
   }
 
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {
-    if (!resolvedWallets || resolvedWallets.length === 0) return
+    if (!wallets || wallets.length === 0) return
     navigation.navigate("transactionHistory", {
-      wallets: resolvedWallets,
+      wallets,
       currencyFilter,
     })
   }
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
+  const [pressedCard, setPressedCard] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   return (
@@ -164,7 +187,7 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : hideAmount ? (
-            <Text>****</Text>
+            <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
               <Text type="p1" bold {...testProps("bitcoin-balance")}>
@@ -222,11 +245,49 @@ const WalletOverview: React.FC<Props> = ({
                   </Text>
                 </>
               )}
-              {hideAmount && <Text>****</Text>}
+              {hideAmount && <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>}
             </View>
           )}
         </View>
       </Pressable>
+
+      {cardAccount && (
+        <>
+          <View style={styles.separator} />
+          <Pressable
+            onPressIn={() => setPressedCard(true)}
+            onPressOut={() => setPressedCard(false)}
+            onPress={() => navigation.navigate("cardDashboardScreen")}
+          >
+            <View style={styles.displayTextView}>
+              <View style={styles.currency}>
+                <View style={styles.bubbleWrapper} pointerEvents="box-none">
+                  <View style={pressedCard && styles.pressedOpacity}>
+                    <CurrencyPill
+                      currency={CARD}
+                      containerSize="medium"
+                      containerStyle={pillWidthStyle}
+                      onLayout={onPillLayout(CARD)}
+                    />
+                  </View>
+                </View>
+              </View>
+              {loading ? (
+                <Loader />
+              ) : hideAmount ? (
+                <Text>{HIDDEN_AMOUNT_PLACEHOLDER}</Text>
+              ) : (
+                <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
+                  <Text type="p1" bold>
+                    {cardBalanceFormatted}
+                  </Text>
+                  <Text type="p3">{cardInDisplayCurrency}</Text>
+                </View>
+              )}
+            </View>
+          </Pressable>
+        </>
+      )}
     </View>
   )
 }
