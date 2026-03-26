@@ -7,6 +7,7 @@ import { SparkBackupMethodScreen } from "@app/screens/spark-onboarding/backup-me
 import { ContextForScreen } from "../helper"
 
 const mockHandleKeychainBackup = jest.fn()
+const mockHandleCloudBackup = jest.fn()
 const mockHandleManualBackup = jest.fn()
 let mockKeychainLoading = false
 
@@ -14,6 +15,7 @@ jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   useBackupMethods: () => ({
     keychainLoading: mockKeychainLoading,
     handleKeychainBackup: mockHandleKeychainBackup,
+    handleCloudBackup: mockHandleCloudBackup,
     handleManualBackup: mockHandleManualBackup,
   }),
 }))
@@ -63,9 +65,20 @@ describe("SparkBackupMethodScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.BackupMethod.googleDrive())).toBeTruthy()
+    expect(getByText(LL.SparkOnboarding.BackupMethod.appleICloud())).toBeTruthy()
     expect(getByText(LL.SparkOnboarding.BackupMethod.passwordManager())).toBeTruthy()
     expect(getByText(LL.SparkOnboarding.BackupMethod.manualBackup())).toBeTruthy()
+  })
+
+  it("calls handleCloudBackup on cloud provider press", () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(getByText(LL.SparkOnboarding.BackupMethod.appleICloud()))
+    expect(mockHandleCloudBackup).toHaveBeenCalled()
   })
 
   it("calls handleManualBackup on manual backup press", () => {

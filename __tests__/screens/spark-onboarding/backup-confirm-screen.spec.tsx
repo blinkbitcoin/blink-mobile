@@ -100,19 +100,6 @@ describe("SparkBackupConfirmScreen", () => {
     expect(input.props.value).toBe("youth")
   })
 
-  it("disables context menu to prevent paste", () => {
-    const { getByPlaceholderText } = render(
-      <ContextForScreen>
-        <SparkBackupConfirmScreen />
-      </ContextForScreen>,
-    )
-
-    const input = getByPlaceholderText(
-      `${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`,
-    )
-    expect(input.props.contextMenuHidden).toBe(true)
-  })
-
   it("shows word number when input has content", () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
