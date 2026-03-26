@@ -11320,6 +11320,88 @@ type RootTranslation = {
 			 */
 			keychainFailed: string
 		}
+		CloudBackup: {
+			/**
+			 * L​e​t​'​s​ ​b​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
+			 * @param {string} provider
+			 */
+			description: RequiredParams<'provider'>
+			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
+			 * P​a​s​s​w​o​r​d
+			 */
+			password: string
+			/**
+			 * (​1​2​ ​c​h​a​r​a​c​t​e​r​s​ ​m​i​n​i​m​u​m​)
+			 */
+			passwordPlaceholder: string
+			/**
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
+			 */
+			confirmPassword: string
+			/**
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
+			 */
+			confirmPasswordPlaceholder: string
+			/**
+			 * C​o​n​t​i​n​u​e
+			 */
+			continueButton: string
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			importantTitle: string
+			/**
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * @param {string} bold
+			 */
+			importantMessage: RequiredParams<'bold'>
+			/**
+			 * w​e​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e
+			 */
+			importantMessageBold: string
+			/**
+			 * M​i​n​i​m​u​m​ ​1​2​ ​c​h​a​r​a​c​t​e​r​s
+			 */
+			passwordTooShort: string
+			/**
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 */
+			passwordMismatch: string
+			/**
+			 * B​a​c​k​u​p​ ​f​o​u​n​d
+			 */
+			existingBackupTitle: string
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} provider
+			 */
+			existingBackupMessage: RequiredParams<'provider'>
+			/**
+			 * O​v​e​r​w​r​i​t​e
+			 */
+			overwrite: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			uploadSuccess: RequiredParams<'provider'>
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​l​o​a​d​ ​b​a​c​k​u​p
+			 */
+			uploadFailed: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​G​o​o​g​l​e
+			 */
+			signInFailed: string
+		}
 		ManualBackup: {
 			Alerts: {
 				/**
@@ -22578,6 +22660,84 @@ export type TranslationFunctions = {
 			 * Failed to save backup
 			 */
 			keychainFailed: () => LocalizedString
+		}
+		CloudBackup: {
+			/**
+			 * Let's back up your wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * We will save a backup of your backup phrase to your {provider}.
+			 */
+			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
+			 * Password
+			 */
+			password: () => LocalizedString
+			/**
+			 * (12 characters minimum)
+			 */
+			passwordPlaceholder: () => LocalizedString
+			/**
+			 * Confirm password
+			 */
+			confirmPassword: () => LocalizedString
+			/**
+			 * Enter password again
+			 */
+			confirmPasswordPlaceholder: () => LocalizedString
+			/**
+			 * Continue
+			 */
+			continueButton: () => LocalizedString
+			/**
+			 * Important
+			 */
+			importantTitle: () => LocalizedString
+			/**
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
+			 */
+			importantMessage: (arg: { bold: string }) => LocalizedString
+			/**
+			 * we will not be able
+			 */
+			importantMessageBold: () => LocalizedString
+			/**
+			 * Minimum 12 characters
+			 */
+			passwordTooShort: () => LocalizedString
+			/**
+			 * Passwords do not match
+			 */
+			passwordMismatch: () => LocalizedString
+			/**
+			 * Backup found
+			 */
+			existingBackupTitle: () => LocalizedString
+			/**
+			 * A backup already exists in your {provider}. Do you want to overwrite it?
+			 */
+			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Overwrite
+			 */
+			overwrite: () => LocalizedString
+			/**
+			 * Backup saved to {provider}
+			 */
+			uploadSuccess: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Failed to upload backup
+			 */
+			uploadFailed: () => LocalizedString
+			/**
+			 * Failed to sign in to Google
+			 */
+			signInFailed: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {

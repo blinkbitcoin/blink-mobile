@@ -3506,6 +3506,27 @@
       "Success": {
         "title": "Добродошли у Blink без скрбништва"
       }
+    },
+    "CloudBackup": {
+      "title": "Направимо резервну копију вашег новчаника",
+      "description": "Сачуваћемо копију ваше фразе за опоравак у вашем {provider}.",
+      "encryptCheckbox": "Шифрујте додатном лозинком",
+      "password": "Лозинка",
+      "passwordPlaceholder": "(најмање 12 знакова)",
+      "confirmPassword": "Потврдите лозинку",
+      "confirmPasswordPlaceholder": "Унесите лозинку поново",
+      "continueButton": "Настави",
+      "importantTitle": "Важно",
+      "importantMessage": "Blink не чува ову лозинку. Ако је изгубите, {bold} да повратимо ваш новчаник.",
+      "importantMessageBold": "нећемо моћи",
+      "passwordTooShort": "Најмање 12 знакова",
+      "passwordMismatch": "Лозинке се не подударају",
+      "uploadSuccess": "Резервна копија сачувана у {provider}",
+      "uploadFailed": "Отпремање резервне копије није успело",
+      "signInFailed": "Пријава на Google није успела",
+      "existingBackupTitle": "Резервна копија пронађена",
+      "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
+      "overwrite": "Препиши"
     }
   }
 }

@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Καλώς ήρθατε στο μη φυλασσόμενο Blink"
       }
+    },
+    "CloudBackup": {
+      "title": "Ας δημιουργήσουμε αντίγραφο ασφαλείας του πορτοφολιού σας",
+      "description": "Θα αποθηκεύσουμε ένα αντίγραφο της φράσης ανάκτησης στο {provider} σας.",
+      "encryptCheckbox": "Κρυπτογράφηση με πρόσθετο κωδικό",
+      "password": "Κωδικός",
+      "passwordPlaceholder": "(τουλάχιστον 12 χαρακτήρες)",
+      "confirmPassword": "Επιβεβαίωση κωδικού",
+      "confirmPasswordPlaceholder": "Εισαγάγετε τον κωδικό ξανά",
+      "continueButton": "Συνέχεια",
+      "importantTitle": "Σημαντικό",
+      "importantMessage": "Το Blink δεν αποθηκεύει αυτόν τον κωδικό. Αν τον χάσετε, {bold} να ανακτήσουμε το πορτοφόλι σας.",
+      "importantMessageBold": "δεν θα μπορέσουμε",
+      "passwordTooShort": "Τουλάχιστον 12 χαρακτήρες",
+      "passwordMismatch": "Οι κωδικοί δεν ταιριάζουν",
+      "uploadSuccess": "Το αντίγραφο ασφαλείας αποθηκεύτηκε στο {provider}",
+      "uploadFailed": "Αποτυχία μεταφόρτωσης αντιγράφου ασφαλείας",
+      "signInFailed": "Αποτυχία σύνδεσης στο Google",
+      "existingBackupTitle": "Βρέθηκε αντίγραφο ασφαλείας",
+      "existingBackupMessage": "Υπάρχει ήδη αντίγραφο ασφαλείας στο {provider} σας. Θέλετε να το αντικαταστήσετε;",
+      "overwrite": "Αντικατάσταση"
     }
   }
 }

@@ -3486,6 +3486,27 @@
       "Success": {
         "title": "Velkommen til non-custodial Blink"
       }
+    },
+    "CloudBackup": {
+      "title": "Lad os sikkerhedskopiere din tegnebog",
+      "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
+      "encryptCheckbox": "Kryptér med ekstra adgangskode",
+      "password": "Adgangskode",
+      "passwordPlaceholder": "(minimum 12 tegn)",
+      "confirmPassword": "Bekræft adgangskode",
+      "confirmPasswordPlaceholder": "Indtast adgangskode igen",
+      "continueButton": "Fortsæt",
+      "importantTitle": "Vigtigt",
+      "importantMessage": "Blink gemmer ikke denne adgangskode. Hvis du mister den, {bold} gendanne din tegnebog.",
+      "importantMessageBold": "vil vi ikke kunne",
+      "passwordTooShort": "Minimum 12 tegn",
+      "passwordMismatch": "Adgangskoderne stemmer ikke overens",
+      "uploadSuccess": "Sikkerhedskopi gemt i {provider}",
+      "uploadFailed": "Kunne ikke uploade sikkerhedskopi",
+      "signInFailed": "Kunne ikke logge ind på Google",
+      "existingBackupTitle": "Sikkerhedskopi fundet",
+      "existingBackupMessage": "Der findes allerede en sikkerhedskopi i din {provider}. Vil du overskrive den?",
+      "overwrite": "Overskriv"
     }
   }
 }

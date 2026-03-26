@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Benvingut a Blink sense custòdia"
       }
+    },
+    "CloudBackup": {
+      "title": "Fem una còpia de seguretat de la teva cartera",
+      "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
+      "encryptCheckbox": "Xifrar amb contrasenya addicional",
+      "password": "Contrasenya",
+      "passwordPlaceholder": "(mínim 12 caràcters)",
+      "confirmPassword": "Confirmar contrasenya",
+      "confirmPasswordPlaceholder": "Introdueix la contrasenya de nou",
+      "continueButton": "Continuar",
+      "importantTitle": "Important",
+      "importantMessage": "Blink no emmagatzema aquesta contrasenya. Si la perds, {bold} recuperar la teva cartera.",
+      "importantMessageBold": "no podrem",
+      "passwordTooShort": "Mínim 12 caràcters",
+      "passwordMismatch": "Les contrasenyes no coincideixen",
+      "uploadSuccess": "Còpia de seguretat desada a {provider}",
+      "uploadFailed": "Error en pujar la còpia de seguretat",
+      "signInFailed": "Error en iniciar sessió a Google",
+      "existingBackupTitle": "Còpia de seguretat trobada",
+      "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
+      "overwrite": "Sobreescriure"
     }
   }
 }

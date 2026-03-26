@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Vitajte v necustodial Blink"
       }
+    },
+    "CloudBackup": {
+      "title": "Zálohujme vašu peňaženku",
+      "description": "Uložíme zálohu vašej záložnej frázy do vášho {provider}.",
+      "encryptCheckbox": "Šifrovať dodatočným heslom",
+      "password": "Heslo",
+      "passwordPlaceholder": "(minimálne 12 znakov)",
+      "confirmPassword": "Potvrdiť heslo",
+      "confirmPasswordPlaceholder": "Zadajte heslo znova",
+      "continueButton": "Pokračovať",
+      "importantTitle": "Dôležité",
+      "importantMessage": "Blink toto heslo neukladá. Ak ho stratíte, {bold} obnoviť vašu peňaženku.",
+      "importantMessageBold": "nebudeme schopní",
+      "passwordTooShort": "Minimálne 12 znakov",
+      "passwordMismatch": "Heslá sa nezhodujú",
+      "uploadSuccess": "Záloha uložená do {provider}",
+      "uploadFailed": "Nahranie zálohy zlyhalo",
+      "signInFailed": "Prihlásenie do Google zlyhalo",
+      "existingBackupTitle": "Záloha nájdená",
+      "existingBackupMessage": "Vo vašom {provider} už existuje záloha. Chcete ju prepísať?",
+      "overwrite": "Prepísať"
     }
   }
 }

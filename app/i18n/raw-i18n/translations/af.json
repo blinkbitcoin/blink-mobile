@@ -3509,6 +3509,27 @@
       "Success": {
         "title": "Welkom by nie-bewaarder Blink"
       }
+    },
+    "CloudBackup": {
+      "title": "Kom ons rugsteun jou beursie",
+      "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
+      "encryptCheckbox": "Enkripteer met bykomende wagwoord",
+      "password": "Wagwoord",
+      "passwordPlaceholder": "(minimum 12 karakters)",
+      "confirmPassword": "Bevestig wagwoord",
+      "confirmPasswordPlaceholder": "Voer wagwoord weer in",
+      "continueButton": "Gaan voort",
+      "importantTitle": "Belangrik",
+      "importantMessage": "Blink stoor nie hierdie wagwoord nie. As jy dit verloor, sal ons {bold} jou beursie herstel nie.",
+      "importantMessageBold": "nie in staat wees om",
+      "passwordTooShort": "Minimum 12 karakters",
+      "passwordMismatch": "Wagwoorde stem nie ooreen nie",
+      "uploadSuccess": "Rugsteun gestoor in {provider}",
+      "uploadFailed": "Kon nie rugsteun oplaai nie",
+      "signInFailed": "Kon nie by Google aanmeld nie",
+      "existingBackupTitle": "Rugsteun gevind",
+      "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
+      "overwrite": "Oorskryf"
     }
   }
 }

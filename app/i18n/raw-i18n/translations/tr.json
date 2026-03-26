@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Gözetimsiz Blink'e hoş geldiniz"
       }
+    },
+    "CloudBackup": {
+      "title": "Cüzdanınızı yedekleyelim",
+      "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
+      "encryptCheckbox": "Ek şifre ile şifrele",
+      "password": "Şifre",
+      "passwordPlaceholder": "(en az 12 karakter)",
+      "confirmPassword": "Şifreyi onayla",
+      "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
+      "continueButton": "Devam et",
+      "importantTitle": "Önemli",
+      "importantMessage": "Blink bu şifreyi saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
+      "importantMessageBold": "cüzdanınızı kurtaramayız",
+      "passwordTooShort": "En az 12 karakter",
+      "passwordMismatch": "Şifreler uyuşmuyor",
+      "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
+      "uploadFailed": "Yedek yüklenemedi",
+      "signInFailed": "Google'a giriş yapılamadı",
+      "existingBackupTitle": "Yedek bulundu",
+      "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
+      "overwrite": "Üzerine yaz"
     }
   }
 }

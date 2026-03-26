@@ -3506,6 +3506,27 @@
       "Success": {
         "title": "مرحبًا بك في Blink غير الحافظة"
       }
+    },
+    "CloudBackup": {
+      "title": "لنقم بنسخ محفظتك احتياطيًا",
+      "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
+      "encryptCheckbox": "تشفير بكلمة مرور إضافية",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أدخل كلمة المرور مرة أخرى",
+      "continueButton": "متابعة",
+      "importantTitle": "مهم",
+      "importantMessage": "لا يخزن Blink كلمة المرور هذه. إذا فقدتها، {bold} استعادة محفظتك.",
+      "importantMessageBold": "لن نتمكن من",
+      "passwordTooShort": "12 حرفًا كحد أدنى",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
+      "uploadFailed": "فشل رفع النسخة الاحتياطية",
+      "signInFailed": "فشل تسجيل الدخول إلى Google",
+      "existingBackupTitle": "تم العثور على نسخة احتياطية",
+      "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
+      "overwrite": "استبدال"
     }
   }
 }

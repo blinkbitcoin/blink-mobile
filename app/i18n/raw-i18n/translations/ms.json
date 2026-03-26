@@ -3509,6 +3509,27 @@
       "Success": {
         "title": "Selamat datang ke Blink bukan jagaan"
       }
+    },
+    "CloudBackup": {
+      "title": "Mari sandarkan dompet anda",
+      "description": "Kami akan menyimpan sandaran frasa pemulihan anda ke {provider} anda.",
+      "encryptCheckbox": "Sulitkan dengan kata laluan tambahan",
+      "password": "Kata laluan",
+      "passwordPlaceholder": "(minimum 12 aksara)",
+      "confirmPassword": "Sahkan kata laluan",
+      "confirmPasswordPlaceholder": "Masukkan kata laluan sekali lagi",
+      "continueButton": "Teruskan",
+      "importantTitle": "Penting",
+      "importantMessage": "Blink tidak menyimpan kata laluan ini. Jika anda kehilangannya, {bold} memulihkan dompet anda.",
+      "importantMessageBold": "kami tidak akan dapat",
+      "passwordTooShort": "Minimum 12 aksara",
+      "passwordMismatch": "Kata laluan tidak sepadan",
+      "uploadSuccess": "Sandaran disimpan ke {provider}",
+      "uploadFailed": "Gagal memuat naik sandaran",
+      "signInFailed": "Gagal log masuk ke Google",
+      "existingBackupTitle": "Sandaran ditemui",
+      "existingBackupMessage": "Sandaran sudah wujud di {provider} anda. Adakah anda mahu menimpanya?",
+      "overwrite": "Tulis ganti"
     }
   }
 }

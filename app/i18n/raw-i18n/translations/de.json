@@ -3456,6 +3456,27 @@
             "Success": {
                 "title": "Willkommen bei nicht-verwaltetem Blink"
             }
+        },
+        "CloudBackup": {
+            "title": "Sichern wir Ihre Brieftasche",
+            "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
+            "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
+            "password": "Passwort",
+            "passwordPlaceholder": "(mindestens 12 Zeichen)",
+            "confirmPassword": "Passwort bestätigen",
+            "confirmPasswordPlaceholder": "Passwort erneut eingeben",
+            "continueButton": "Weiter",
+            "importantTitle": "Wichtig",
+            "importantMessage": "Blink speichert dieses Passwort nicht. Wenn Sie es verlieren, {bold} Ihre Brieftasche wiederherstellen.",
+            "importantMessageBold": "können wir nicht",
+            "passwordTooShort": "Mindestens 12 Zeichen",
+            "passwordMismatch": "Passwörter stimmen nicht überein",
+            "uploadSuccess": "Sicherung in {provider} gespeichert",
+            "uploadFailed": "Fehler beim Hochladen der Sicherung",
+            "signInFailed": "Anmeldung bei Google fehlgeschlagen",
+            "existingBackupTitle": "Sicherung gefunden",
+            "existingBackupMessage": "Es existiert bereits eine Sicherung in Ihrem {provider}. Möchten Sie sie überschreiben?",
+            "overwrite": "Überschreiben"
         }
     }
 }

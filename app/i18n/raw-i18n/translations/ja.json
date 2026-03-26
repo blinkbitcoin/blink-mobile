@@ -3497,6 +3497,27 @@
             "Success": {
                 "title": "ノンカストディアルBlinkへようこそ"
             }
+        },
+        "CloudBackup": {
+            "title": "ウォレットをバックアップしましょう",
+            "description": "{provider}にバックアップフレーズのコピーを保存します。",
+            "encryptCheckbox": "追加パスワードで暗号化",
+            "password": "パスワード",
+            "passwordPlaceholder": "（12文字以上）",
+            "confirmPassword": "パスワード確認",
+            "confirmPasswordPlaceholder": "パスワードを再入力",
+            "continueButton": "続行",
+            "importantTitle": "重要",
+            "importantMessage": "Blinkはこのパスワードを保存しません。紛失した場合、{bold}。",
+            "importantMessageBold": "ウォレットを復元できません",
+            "passwordTooShort": "12文字以上必要です",
+            "passwordMismatch": "パスワードが一致しません",
+            "uploadSuccess": "{provider}にバックアップを保存しました",
+            "uploadFailed": "バックアップのアップロードに失敗しました",
+            "signInFailed": "Googleへのログインに失敗しました",
+            "existingBackupTitle": "バックアップが見つかりました",
+            "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
+            "overwrite": "上書き"
         }
     }
 }
