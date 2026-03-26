@@ -1,6 +1,30 @@
 import Crypto from "react-native-quick-crypto"
 
+const PBKDF2_ITERATIONS = 600_000
+const PBKDF2_KEY_LENGTH = 16
+const PBKDF2_DIGEST = "SHA-256"
+
 export const generateRandomHexKey = (): string => Crypto.randomBytes(16).toString("hex")
+
+export const deriveKeyFromPassword = (
+  password: string,
+  existingSalt?: string,
+): { key: string; salt: string } => {
+  const salt = existingSalt ? Buffer.from(existingSalt, "base64") : Crypto.randomBytes(16)
+
+  const key = Crypto.pbkdf2Sync(
+    password,
+    salt,
+    PBKDF2_ITERATIONS,
+    PBKDF2_KEY_LENGTH,
+    PBKDF2_DIGEST,
+  )
+
+  return {
+    key: key.toString("hex"),
+    salt: salt.toString("base64"),
+  }
+}
 
 export const encryptRsaOaep = (publicKeyPem: string, hexData: string): string => {
   const dataBase64 = Buffer.from(hexData, "hex").toString("base64")
