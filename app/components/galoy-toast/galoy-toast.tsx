@@ -16,6 +16,10 @@ const styles = {
     fontSize: 16,
     color: light.red,
   },
+  text1StyleWarning: {
+    fontSize: 16,
+    color: light.warning,
+  },
   text2Style: {
     fontSize: 14,
     color: light._black,
@@ -42,6 +46,15 @@ const toastConfig = {
       text2NumberOfLines={2}
       style={[{ borderLeftColor: light.red }, styles.container]}
       text1Style={styles.text1StyleError}
+      text2Style={styles.text2Style}
+    />
+  ),
+  warning: (props: BaseToastProps) => (
+    <ErrorToast
+      {...props}
+      text2NumberOfLines={2}
+      style={[{ borderLeftColor: light.warning }, styles.container]}
+      text1Style={styles.text1StyleWarning}
       text2Style={styles.text2Style}
     />
   ),
