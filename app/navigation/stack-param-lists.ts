@@ -180,6 +180,7 @@ export type RootStackParamList = {
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
   sparkBackupMethodScreen: undefined
+  sparkCloudBackupScreen: undefined
   sparkBackupAlertsScreen: undefined
   sparkBackupPhraseScreen: { step: PhraseStep }
   sparkBackupConfirmScreen: {

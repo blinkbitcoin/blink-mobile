@@ -21,7 +21,6 @@ export const useBackupConfirm = ({ challenges, onComplete }: UseBackupConfirmPar
 
   const selectSuggestion = (index: number, word: string) => {
     updateInput(index, word)
-    setActiveIndex(undefined)
   }
 
   const isWordCorrect = (index: number): boolean =>
