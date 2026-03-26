@@ -102,6 +102,7 @@ import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+import NostrWalletConnect from "@app/assets/icons/nostr-wallet-connect.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -226,6 +227,7 @@ const customSvgMap = {
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
   "heart-outline": HeartOutline,
+  "nostr-wallet-connect": NostrWalletConnect,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
