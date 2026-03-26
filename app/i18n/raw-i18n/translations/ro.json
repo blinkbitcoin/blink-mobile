@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Bun venit la Blink non-custodial"
       }
+    },
+    "CloudBackup": {
+      "title": "Să facem o copie de siguranță a portofelului tău",
+      "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
+      "encryptCheckbox": "Criptează cu o parolă suplimentară",
+      "password": "Parolă",
+      "passwordPlaceholder": "(minim 12 caractere)",
+      "confirmPassword": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Introdu parola din nou",
+      "continueButton": "Continuă",
+      "importantTitle": "Important",
+      "importantMessage": "Blink nu stochează această parolă. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
+      "importantMessageBold": "nu vom putea",
+      "passwordTooShort": "Minim 12 caractere",
+      "passwordMismatch": "Parolele nu se potrivesc",
+      "uploadSuccess": "Copie de siguranță salvată în {provider}",
+      "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
+      "signInFailed": "Conectarea la Google a eșuat",
+      "existingBackupTitle": "Copie de siguranță găsită",
+      "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
+      "overwrite": "Suprascrie"
     }
   }
 }

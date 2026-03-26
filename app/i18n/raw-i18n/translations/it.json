@@ -3456,6 +3456,27 @@
             "Success": {
                 "title": "Benvenuto su Blink non-custodial"
             }
+        },
+        "CloudBackup": {
+            "title": "Eseguiamo il backup del portafoglio",
+            "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
+            "encryptCheckbox": "Crittografa con password aggiuntiva",
+            "password": "Password",
+            "passwordPlaceholder": "(minimo 12 caratteri)",
+            "confirmPassword": "Conferma password",
+            "confirmPasswordPlaceholder": "Inserisci nuovamente la password",
+            "continueButton": "Continua",
+            "importantTitle": "Importante",
+            "importantMessage": "Blink non memorizza questa password. Se la perdi, {bold} recuperare il tuo portafoglio.",
+            "importantMessageBold": "non saremo in grado di",
+            "passwordTooShort": "Minimo 12 caratteri",
+            "passwordMismatch": "Le password non corrispondono",
+            "uploadSuccess": "Backup salvato su {provider}",
+            "uploadFailed": "Impossibile caricare il backup",
+            "signInFailed": "Accesso a Google non riuscito",
+            "existingBackupTitle": "Backup trovato",
+            "existingBackupMessage": "Esiste già un backup nel tuo {provider}. Vuoi sovrascriverlo?",
+            "overwrite": "Sovrascrivi"
         }
     }
 }

@@ -3573,6 +3573,30 @@ const en: BaseTranslation = {
       keychainSaved: "Backup saved to password manager",
       keychainFailed: "Failed to save backup",
     },
+    CloudBackup: {
+      title: "Let's back up your wallet",
+      description:
+        "We will save a backup of your backup phrase to your {provider: string}.",
+      encryptCheckbox: "Encrypt with additional password",
+      password: "Password",
+      passwordPlaceholder: "(12 characters minimum)",
+      confirmPassword: "Confirm password",
+      confirmPasswordPlaceholder: "Enter password again",
+      continueButton: "Continue",
+      importantTitle: "Important",
+      importantMessage:
+        "Blink does not store this password. If you lose it, {bold: string} to recover your wallet.",
+      importantMessageBold: "we will not be able",
+      passwordTooShort: "Minimum 12 characters",
+      passwordMismatch: "Passwords do not match",
+      existingBackupTitle: "Backup found",
+      existingBackupMessage:
+        "A backup already exists in your {provider: string}. Do you want to overwrite it?",
+      overwrite: "Overwrite",
+      uploadSuccess: "Backup saved to {provider: string}",
+      uploadFailed: "Failed to upload backup",
+      signInFailed: "Failed to sign in to Google",
+    },
     ManualBackup: {
       Alerts: {
         title: "Keep your backup phrase secret!",

@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Üdvözöljük a nem letétkezelő Blinkben"
       }
+    },
+    "CloudBackup": {
+      "title": "Készítsünk biztonsági mentést a tárcádról",
+      "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
+      "encryptCheckbox": "Titkosítás további jelszóval",
+      "password": "Jelszó",
+      "passwordPlaceholder": "(legalább 12 karakter)",
+      "confirmPassword": "Jelszó megerősítése",
+      "confirmPasswordPlaceholder": "Add meg újra a jelszót",
+      "continueButton": "Tovább",
+      "importantTitle": "Fontos",
+      "importantMessage": "A Blink nem tárolja ezt a jelszót. Ha elveszíted, {bold} visszaállítani a tárcádat.",
+      "importantMessageBold": "nem fogjuk tudni",
+      "passwordTooShort": "Legalább 12 karakter",
+      "passwordMismatch": "A jelszavak nem egyeznek",
+      "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
+      "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
+      "signInFailed": "Bejelentkezés a Google-be sikertelen",
+      "existingBackupTitle": "Biztonsági mentés találva",
+      "existingBackupMessage": "Már létezik biztonsági mentés a {provider} tárhelyeden. Felül szeretnéd írni?",
+      "overwrite": "Felülírás"
     }
   }
 }

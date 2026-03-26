@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Tukulabiriza ku Blink etali ya kuzibika"
       }
+    },
+    "CloudBackup": {
+      "title": "Ka tukoppe akawunti yo",
+      "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
+      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
+      "password": "Ekigambo eky'okuyingira",
+      "passwordPlaceholder": "(obunene 12 ennukuta)",
+      "confirmPassword": "Kakasa ekigambo eky'okuyingira",
+      "confirmPasswordPlaceholder": "Yingiza ekigambo eky'okuyingira nate",
+      "continueButton": "Weyongere",
+      "importantTitle": "Kya mugaso",
+      "importantMessage": "Blink tekutereka kigambo kino eky'okuyingira. Bw'okifiirwa, {bold} okuzuula akawunti yo.",
+      "importantMessageBold": "tetujja kusobola",
+      "passwordTooShort": "Obunene ennukuta 12",
+      "passwordMismatch": "Ebigambo eby'okuyingira tebituukagana",
+      "uploadSuccess": "Kopi eterekedwa mu {provider}",
+      "uploadFailed": "Enteeka y'ekopi teeyasoboka",
+      "signInFailed": "Okuyingira mu Google tekwagenda bulungi",
+      "existingBackupTitle": "Kopi efuniddwa",
+      "existingBackupMessage": "Waliwo kopi mu {provider} yo. Oyagala okugisimbulira?",
+      "overwrite": "Simbulira"
     }
   }
 }

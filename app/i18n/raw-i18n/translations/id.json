@@ -3468,6 +3468,27 @@
       "Success": {
         "title": "Selamat datang di Blink non-kustodial"
       }
+    },
+    "CloudBackup": {
+      "title": "Mari cadangkan dompet Anda",
+      "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
+      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
+      "password": "Kata sandi",
+      "passwordPlaceholder": "(minimal 12 karakter)",
+      "confirmPassword": "Konfirmasi kata sandi",
+      "confirmPasswordPlaceholder": "Masukkan kata sandi lagi",
+      "continueButton": "Lanjutkan",
+      "importantTitle": "Penting",
+      "importantMessage": "Blink tidak menyimpan kata sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
+      "importantMessageBold": "kami tidak akan bisa",
+      "passwordTooShort": "Minimal 12 karakter",
+      "passwordMismatch": "Kata sandi tidak cocok",
+      "uploadSuccess": "Cadangan disimpan ke {provider}",
+      "uploadFailed": "Gagal mengunggah cadangan",
+      "signInFailed": "Gagal masuk ke Google",
+      "existingBackupTitle": "Cadangan ditemukan",
+      "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
+      "overwrite": "Timpa"
     }
   }
 }

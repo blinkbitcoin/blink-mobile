@@ -3515,6 +3515,27 @@
       "Success": {
         "title": "Wamkelekile ku-Blink engagcinwayo"
       }
+    },
+    "CloudBackup": {
+      "title": "Masigcine isipaji sakho",
+      "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
+      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
+      "password": "Igama lokugqitha",
+      "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
+      "confirmPassword": "Qinisekisa igama lokugqitha",
+      "confirmPasswordPlaceholder": "Faka igama lokugqitha kwakhona",
+      "continueButton": "Qhubeka",
+      "importantTitle": "Okubalulekileyo",
+      "importantMessage": "I-Blink ayigcini eli gama lokugqitha. Ukuba ulilahla, {bold} ukubuyisela isipaji sakho.",
+      "importantMessageBold": "asiyi kukwazi",
+      "passwordTooShort": "Ubuncinane oonobumba abayi-12",
+      "passwordMismatch": "Amagama okugqitha awafani",
+      "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
+      "uploadFailed": "Ukufaka ikopi akuphumelelanga",
+      "signInFailed": "Ukungena kwi-Google akuphumelelanga",
+      "existingBackupTitle": "Ikopi ifunyenwe",
+      "existingBackupMessage": "Sele kukho ikopi kwi-{provider} yakho. Ungathanda ukuyibhala phezu kwayo?",
+      "overwrite": "Bhala phezu kwayo"
     }
   }
 }
