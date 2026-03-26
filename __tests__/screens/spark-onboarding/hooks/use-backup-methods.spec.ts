@@ -16,6 +16,9 @@ jest.mock("@app/hooks", () => ({
     save: mockSave,
     loading: mockLoading,
   }),
+  useAppConfig: () => ({
+    appConfig: { galoyInstance: { name: "Blink" } },
+  }),
 }))
 
 const mockToastShow = jest.fn()
@@ -76,6 +79,16 @@ describe("useBackupMethods", () => {
       expect.objectContaining({ message: "Failed to save backup" }),
     )
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
+  })
+
+  it("does not navigate on handleCloudBackup on iOS", () => {
+    const { result } = renderHook(() => useBackupMethods())
+
+    act(() => {
+      result.current.handleCloudBackup()
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("sparkCloudBackupScreen")
   })
 
   it("navigates to alerts screen on handleManualBackup", () => {
