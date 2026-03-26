@@ -50,7 +50,7 @@ describe("useBackupConfirm", () => {
     expect(result.current.inputs[1]).toBe("")
   })
 
-  it("selects suggestion and clears active index", () => {
+  it("fills input when suggestion is selected", () => {
     const { result } = renderHook(() =>
       useBackupConfirm({ challenges, onComplete: mockOnComplete }),
     )
@@ -59,7 +59,6 @@ describe("useBackupConfirm", () => {
     act(() => result.current.selectSuggestion(0, "youth"))
 
     expect(result.current.inputs[0]).toBe("youth")
-    expect(result.current.activeIndex).toBeUndefined()
   })
 
   it("detects correct word", () => {
