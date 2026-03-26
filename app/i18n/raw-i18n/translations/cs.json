@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Budete odhlášeni z relace propojené s {identifier: string}.\nUjistěte se, že máte přístup k opětovnému přihlášení v budoucnu.",
     "logoutOneAccountConfirm": "Rozumím. Prosím odhlaste mě.",
     "receiveCurrency": "Měna příjmu",
-    "displayCurrency": "Měna zobrazení"
+    "displayCurrency": "Měna zobrazení",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Nastavení oznámení",

@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Ojja kufulumizibwa ku kizindaalo ekikwatagana ne {identifier: string}.\nKakasa nti olina engeri ey'okuyingira nate mu biseera eby'omu maaso.",
     "logoutOneAccountConfirm": "Ntegedde. Nsaba onfulumye.",
     "receiveCurrency": "Ssente z'okufuna",
-    "displayCurrency": "Ssente ez'okulaga"
+    "displayCurrency": "Ssente ez'okulaga",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Enteekateeka Ezitegeeza",

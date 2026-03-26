@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Vei fi deconectat din sesiunea legată de {identifier: string}.\n Asigură-te că ai acces pentru a te conecta din nou în viitor.",
     "logoutOneAccountConfirm": "Înțeleg. Te rog să mă deconectezi.",
     "receiveCurrency": "Monedă de primire",
-    "displayCurrency": "Monedă de afișare"
+    "displayCurrency": "Monedă de afișare",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Setări pentru notificări",

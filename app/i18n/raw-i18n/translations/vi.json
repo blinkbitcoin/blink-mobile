@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Bạn sẽ bị đăng xuất khỏi phiên liên kết với {identifier: string}.\nHãy đảm bảo bạn có quyền truy cập để đăng nhập lại trong tương lai.",
     "logoutOneAccountConfirm": "Tôi hiểu. Vui lòng đăng xuất.",
     "receiveCurrency": "Tiền tệ nhận",
-    "displayCurrency": "Tiền tệ hiển thị"
+    "displayCurrency": "Tiền tệ hiển thị",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Cài đặt thông báo",

@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Դուք դուրս կգաք {identifier: string}-ին կապված նիստից։\nՀամոզվեք՝ որ հետագայում կրկին մուտք գործելու հնարավորություն ունեք։",
     "logoutOneAccountConfirm": "Հասկանում եմ։ Խնդրում եմ՝ դուրս գալ։",
     "receiveCurrency": "Ստացման արժույթ",
-    "displayCurrency": "Ցուցադրման արժույթ"
+    "displayCurrency": "Ցուցադրման արժույթ",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Ծանուցումների կարգավորումներ",

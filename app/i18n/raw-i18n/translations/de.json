@@ -2338,7 +2338,8 @@
         "logoutOneAccountAlertContent": "Du wirst von der Sitzung abgemeldet, die mit {identifier: string} verknüpft ist.\nStelle sicher, dass du dich in Zukunft wieder anmelden kannst.",
         "logoutOneAccountConfirm": "Ich verstehe. Bitte abmelden.",
         "receiveCurrency": "Empfangswährung",
-        "displayCurrency": "Anzeigewährung"
+        "displayCurrency": "Anzeigewährung",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "Benachrichtigungseinstellungen",

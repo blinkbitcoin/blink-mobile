@@ -7427,6 +7427,10 @@ type RootTranslation = {
 		 */
 		apiAcess: string
 		/**
+		 * N​o​s​t​r​ ​W​a​l​l​e​t​ ​C​o​n​n​e​c​t
+		 */
+		nostrWalletConnect: string
+		/**
 		 * A​P​I​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
 		 */
 		apiDocumentation: string
@@ -18628,6 +18632,10 @@ export type TranslationFunctions = {
 		 * API integration
 		 */
 		apiAcess: () => LocalizedString
+		/**
+		 * Nostr Wallet Connect
+		 */
+		nostrWalletConnect: () => LocalizedString
 		/**
 		 * API documentation
 		 */

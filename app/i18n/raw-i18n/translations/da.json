@@ -2341,7 +2341,8 @@
     "logoutOneAccountAlertContent": "Du vil blive logget ud af sessionen knyttet til {identifier: string}.\nSørg for, at du har adgang til at logge ind igen i fremtiden.",
     "logoutOneAccountConfirm": "Jeg forstår. Log venligst ud.",
     "receiveCurrency": "Modtagevaluta",
-    "displayCurrency": "Visningsvaluta"
+    "displayCurrency": "Visningsvaluta",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Notifikationsindstillinger",

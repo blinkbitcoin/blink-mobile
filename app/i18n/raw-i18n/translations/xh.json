@@ -2374,7 +2374,8 @@
     "logoutOneAccountConfirm": "Ndiyaqonda. Nceda undikhuphele ngaphandle.",
     "receiveCurrency": "Imali yokufumana",
     "displayCurrency": "Imali yokubonisa",
-    "tapLogIn": "Cofa ukwazi ukungena"
+    "tapLogIn": "Cofa ukwazi ukungena",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Iisetingi zezaziso",

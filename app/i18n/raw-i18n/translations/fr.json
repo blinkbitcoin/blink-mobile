@@ -2355,7 +2355,8 @@
         "logoutOneAccountAlertContent": "Vous serez déconnecté de la session liée à {identifier: string}.\nAssurez-vous d'avoir accès pour vous reconnecter à l'avenir.",
         "logoutOneAccountConfirm": "Je comprends. Veuillez me déconnecter.",
         "receiveCurrency": "Devise de réception",
-        "displayCurrency": "Devise d'affichage"
+        "displayCurrency": "Devise d'affichage",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "Réglages des notifications",

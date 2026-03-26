@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "{identifier: string} nisqawan tinkisqa sesiónmanta lluqsinki.\nQhipaman watiqmanta yaykunaykipaq yaykuyta atisqaykita chiqapchay.",
     "logoutOneAccountConfirm": "Riqsinim. Ama hina kaspa lluqsichiy.",
     "receiveCurrency": "Chaskiy qullqi laya",
-    "displayCurrency": "Rikuchiy qullqi laya"
+    "displayCurrency": "Rikuchiy qullqi laya",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Willakuy churanakuna",

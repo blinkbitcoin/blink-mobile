@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Bit ćete odjavljeni sa sesije povezane s {identifier: string}.\nProvjerite imate li pristup za ponovnu prijavu u budućnosti.",
     "logoutOneAccountConfirm": "Razumijem. Molimo odjavite me.",
     "receiveCurrency": "Valuta za primanje",
-    "displayCurrency": "Valuta za prikaz"
+    "displayCurrency": "Valuta za prikaz",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Postavke obavijesti",

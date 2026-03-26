@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "سيتم تسجيل خروجك من الجلسة المرتبطة بـ {identifier: string}.\nتأكد من أن لديك وسيلة لتسجيل الدخول مرة أخرى في المستقبل.",
     "logoutOneAccountConfirm": "أنا أفهم. يرجى تسجيل الخروج.",
     "receiveCurrency": "عملة الاستلام",
-    "displayCurrency": "عملة العرض"
+    "displayCurrency": "عملة العرض",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "إعدادات الإشعارات",

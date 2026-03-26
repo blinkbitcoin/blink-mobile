@@ -2373,6 +2373,7 @@ const en: BaseTranslation = {
     staticQrCopied: "Your static QR code link has been copied",
     setByOs: "Set by OS",
     apiAcess: "API integration",
+    nostrWalletConnect: "Nostr Wallet Connect",
     apiDocumentation: "API documentation",
     apiDashboard: "API access and dashboard",
     pos: "Point of Sale",

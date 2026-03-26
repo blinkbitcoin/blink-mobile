@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Je wordt uitgelogd van de sessie gekoppeld aan {identifier: string}.\nZorg ervoor dat je in de toekomst weer kunt inloggen.",
     "logoutOneAccountConfirm": "Ik begrijp het. Log me uit.",
     "receiveCurrency": "Ontvangstvaluta",
-    "displayCurrency": "Weergavevaluta"
+    "displayCurrency": "Weergavevaluta",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Notificatie instellingen",

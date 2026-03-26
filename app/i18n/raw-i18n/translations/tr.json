@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "{identifier: string} ile bağlantılı oturumdan çıkış yapılacak.\nGelecekte tekrar giriş yapabilmek için erişiminizin olduğundan emin olun.",
     "logoutOneAccountConfirm": "Anlıyorum. Lütfen çıkış yap.",
     "receiveCurrency": "Alış para birimi",
-    "displayCurrency": "Görüntülenen para birimi"
+    "displayCurrency": "Görüntülenen para birimi",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Bildirim Ayarları",

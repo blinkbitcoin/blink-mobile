@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Utatoka kwenye kipindi kinachohusiana na {identifier: string}.\nHakikisha una uwezo wa kuingia tena katika siku zijazo.",
     "logoutOneAccountConfirm": "Ninaelewa. Tafadhali niondoe.",
     "receiveCurrency": "Sarafu ya kupokea",
-    "displayCurrency": "Sarafu ya kuonyesha"
+    "displayCurrency": "Sarafu ya kuonyesha",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Mipangilio ya Arifa",

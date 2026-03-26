@@ -2337,7 +2337,8 @@
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
         "receiveCurrency": "Cuenta a recibir",
-        "displayCurrency": "Moneda"
+        "displayCurrency": "Moneda",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de notificaciones",

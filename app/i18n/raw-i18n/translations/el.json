@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Θα αποσυνδεθείτε από τη συνεδρία που σχετίζεται με {identifier: string}.\nΒεβαιωθείτε ότι έχετε πρόσβαση για να συνδεθείτε ξανά στο μέλλον.",
     "logoutOneAccountConfirm": "Κατανοώ. Παρακαλώ αποσυνδέστε με.",
     "receiveCurrency": "Νόμισμα λήψης",
-    "displayCurrency": "Νόμισμα εμφάνισης"
+    "displayCurrency": "Νόμισμα εμφάνισης",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Ρυθμίσεις ειδοποιήσεων",

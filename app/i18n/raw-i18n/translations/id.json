@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Anda akan keluar dari sesi yang terhubung dengan {identifier: string}.\nPastikan Anda memiliki akses untuk masuk kembali di masa mendatang.",
     "logoutOneAccountConfirm": "Saya mengerti. Silakan keluar.",
     "receiveCurrency": "Mata uang penerimaan",
-    "displayCurrency": "Mata uang tampilan"
+    "displayCurrency": "Mata uang tampilan",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Pengaturan Notifikasi",

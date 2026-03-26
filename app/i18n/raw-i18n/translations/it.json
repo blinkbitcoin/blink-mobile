@@ -2338,7 +2338,8 @@
         "logoutOneAccountAlertContent": "Verrai disconnesso dalla sessione collegata a {identifier: string}.\nAssicurati di avere accesso per effettuare nuovamente l'accesso in futuro.",
         "logoutOneAccountConfirm": "Ho capito. Procedi con la disconnessione.",
         "receiveCurrency": "Valuta di ricezione",
-        "displayCurrency": "Valuta di visualizzazione"
+        "displayCurrency": "Valuta di visualizzazione",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "Impostazioni di notifica",

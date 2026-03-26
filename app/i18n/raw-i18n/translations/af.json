@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Jy sal afgemeld word van die sessie wat aan {identifier: string} gekoppel is.\nMaak seker jy het toegang om in die toekoms weer aan te meld.",
     "logoutOneAccountConfirm": "Ek verstaan. Meld asseblief af.",
     "receiveCurrency": "Ontvanggeldeenheid",
-    "displayCurrency": "Vertoongeldeenheid"
+    "displayCurrency": "Vertoongeldeenheid",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Notaverstellings",

@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "คุณจะถูกออกจากระบบจากเซสชันที่เชื่อมโยงกับ {identifier: string}\nกรุณาตรวจสอบว่าคุณสามารถเข้าสู่ระบบได้อีกในอนาคต",
     "logoutOneAccountConfirm": "ฉันเข้าใจแล้ว กรุณาออกจากระบบ",
     "receiveCurrency": "สกุลเงินรับ",
-    "displayCurrency": "สกุลเงินแสดงผล"
+    "displayCurrency": "สกุลเงินแสดงผล",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "ตั้งค่าการแจ้งเตือน",
