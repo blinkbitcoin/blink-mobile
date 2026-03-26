@@ -1,4 +1,5 @@
 export { SparkBackupMethodScreen } from "./backup-method-screen"
+export { SparkCloudBackupScreen } from "./cloud-backup-screen"
 export { SparkBackupAlertsScreen } from "./manual-backup/backup-alerts-screen"
 export { SparkBackupPhraseScreen } from "./manual-backup/backup-phrase-screen"
 export { SparkBackupConfirmScreen } from "./manual-backup/backup-confirm-screen"

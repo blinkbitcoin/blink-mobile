@@ -21,7 +21,10 @@ export const getInviteLink = (_username: string | null | undefined) => {
 }
 
 export const getSparkKeychainService = (network: string) =>
-  `blink-spark-seed-backup-${network.toLowerCase()}`
+  `blink-spark-backup-${network.toLowerCase()}`
+
+export const getSparkDriveBackupFilename = (network: string) =>
+  `blink-spark-backup-${network.toLowerCase()}.json`
 
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
