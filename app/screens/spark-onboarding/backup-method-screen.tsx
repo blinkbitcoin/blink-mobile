@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform, View } from "react-native"
+import { View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -10,6 +10,7 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { useBackupMethods } from "./hooks"
+import { getCloudProviderName } from "./utils"
 
 export const SparkBackupMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -18,12 +19,10 @@ export const SparkBackupMethodScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const { keychainLoading, handleKeychainBackup, handleManualBackup } = useBackupMethods()
+  const { keychainLoading, handleKeychainBackup, handleCloudBackup, handleManualBackup } =
+    useBackupMethods()
 
-  const cloudProvider =
-    Platform.OS === "ios"
-      ? LL.SparkOnboarding.BackupMethod.appleICloud()
-      : LL.SparkOnboarding.BackupMethod.googleDrive()
+  const cloudProvider = getCloudProviderName(LL)
 
   return (
     <Screen preset="fixed">
@@ -38,7 +37,7 @@ export const SparkBackupMethodScreen: React.FC = () => {
         />
 
         <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton title={LL.SparkOnboarding.BackupMethod.googleDrive()} />
+          <GaloyPrimaryButton title={cloudProvider} onPress={handleCloudBackup} />
           <GaloySecondaryButton
             title={LL.SparkOnboarding.BackupMethod.passwordManager()}
             onPress={handleKeychainBackup}

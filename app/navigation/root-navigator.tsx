@@ -124,6 +124,7 @@ import {
 } from "@app/screens/onboarding-screen"
 import {
   SparkBackupMethodScreen,
+  SparkCloudBackupScreen,
   SparkBackupAlertsScreen,
   SparkBackupPhraseScreen,
   SparkBackupConfirmScreen,
@@ -700,6 +701,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sparkBackupMethodScreen"
         component={SparkBackupMethodScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkCloudBackupScreen"
+        component={SparkCloudBackupScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
