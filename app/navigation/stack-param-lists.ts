@@ -176,6 +176,10 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
+  nwcEmptyState: undefined
+  nwcNewConnection: undefined
+  nwcConnectionCreated: { connectionString: string; appName: string }
+  nwcConnectedApps: undefined
 }
 
 export type OnboardingStackParamList = {

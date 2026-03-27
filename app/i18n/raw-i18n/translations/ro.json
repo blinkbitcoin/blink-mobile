@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Vei fi deconectat din sesiunea legată de {identifier: string}.\n Asigură-te că ai acces pentru a te conecta din nou în viitor.",
     "logoutOneAccountConfirm": "Înțeleg. Te rog să mă deconectezi.",
     "receiveCurrency": "Monedă de primire",
-    "displayCurrency": "Monedă de afișare"
+    "displayCurrency": "Monedă de afișare",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Setări pentru notificări",
@@ -3429,5 +3430,24 @@
         "buttonText": "Închide"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Conectează Blink la alte aplicații prin NWC",
+    "newConnection": "Conexiune nouă",
+    "connectWallet": "Conectează portofelul",
+    "appNameLabel": "Numele aplicației pe care doriți să o conectați",
+    "appNamePlaceholder": "Numele aplicației",
+    "dailyBudget": "Buget zilnic",
+    "connectionCreated": "Conexiune creată",
+    "nwcConnectionString": "Șir de conexiune NWC",
+    "copyInstruction": "Copiați acest șir și lipiți-l în aplicația pe care doriți să o conectați.",
+    "nwcStringCopied": "Șirul de conexiune NWC a fost copiat în clipboard",
+    "done": "Gata",
+    "connectedApps": "Aplicații conectate",
+    "budget": "Buget: {amount}",
+    "doNotNotifyBelow": "Nu notifica pentru tranzacții sub",
+    "deleteConfirmTitle": "Sunteți sigur?",
+    "deleteConfirmBody": "Doriți cu adevărat să revocați conexiunea la {appName}?",
+    "dismiss": "Renunță"
   }
 }

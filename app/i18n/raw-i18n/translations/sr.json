@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Бићете одјављени из сесије повезане са {identifier: string}.\nУверите се да имате приступ за поновну пријаву у будућности.",
     "logoutOneAccountConfirm": "Разумем. Молимо одјавите ме.",
     "receiveCurrency": "Валута за пријем",
-    "displayCurrency": "Валута за приказ"
+    "displayCurrency": "Валута за приказ",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Подешавања обавештења",
@@ -3467,5 +3468,24 @@
         "buttonText": "Затвори"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Повежите Blink са другим апликацијама преко NWC-а",
+    "newConnection": "Нова веза",
+    "connectWallet": "Повежи новчаник",
+    "appNameLabel": "Назив апликације коју желите да повежете",
+    "appNamePlaceholder": "Назив апликације",
+    "dailyBudget": "Дневни буџет",
+    "connectionCreated": "Веза креирана",
+    "nwcConnectionString": "NWC стринг за повезивање",
+    "copyInstruction": "Копирајте овај стринг и налепите га у апликацију коју желите да повежете.",
+    "nwcStringCopied": "NWC стринг за повезивање копиран у оставу",
+    "done": "Готово",
+    "connectedApps": "Повезане апликације",
+    "budget": "Буџет: {amount}",
+    "doNotNotifyBelow": "Не обавештавај за трансакције испод",
+    "deleteConfirmTitle": "Да ли сте сигурни?",
+    "deleteConfirmBody": "Да ли заиста желите да опозовете везу са {appName}?",
+    "dismiss": "Одбаци"
   }
 }

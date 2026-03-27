@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Θα αποσυνδεθείτε από τη συνεδρία που σχετίζεται με {identifier: string}.\nΒεβαιωθείτε ότι έχετε πρόσβαση για να συνδεθείτε ξανά στο μέλλον.",
     "logoutOneAccountConfirm": "Κατανοώ. Παρακαλώ αποσυνδέστε με.",
     "receiveCurrency": "Νόμισμα λήψης",
-    "displayCurrency": "Νόμισμα εμφάνισης"
+    "displayCurrency": "Νόμισμα εμφάνισης",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Ρυθμίσεις ειδοποιήσεων",
@@ -3429,5 +3430,24 @@
         "buttonText": "Κλείσιμο"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Συνδέστε το Blink με άλλες εφαρμογές μέσω NWC",
+    "newConnection": "Νέα σύνδεση",
+    "connectWallet": "Σύνδεση πορτοφολιού",
+    "appNameLabel": "Όνομα της εφαρμογής που θέλετε να συνδέσετε",
+    "appNamePlaceholder": "Όνομα εφαρμογής",
+    "dailyBudget": "Ημερήσιος προϋπολογισμός",
+    "connectionCreated": "Η σύνδεση δημιουργήθηκε",
+    "nwcConnectionString": "Συμβολοσειρά σύνδεσης NWC",
+    "copyInstruction": "Αντιγράψτε αυτή τη συμβολοσειρά και επικολλήστε την στην εφαρμογή που θέλετε να συνδέσετε.",
+    "nwcStringCopied": "Η συμβολοσειρά σύνδεσης NWC αντιγράφηκε στο πρόχειρο",
+    "done": "Ολοκληρώθηκε",
+    "connectedApps": "Συνδεδεμένες εφαρμογές",
+    "budget": "Προϋπολογισμός: {amount}",
+    "doNotNotifyBelow": "Να μην ειδοποιούνται συναλλαγές κάτω από",
+    "deleteConfirmTitle": "Είστε σίγουροι;",
+    "deleteConfirmBody": "Θέλετε πραγματικά να ανακαλέσετε τη σύνδεση με {appName};",
+    "dismiss": "Απόρριψη"
   }
 }
