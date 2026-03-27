@@ -65,7 +65,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
         <View>
           <View style={[styles.fieldBackground, isDisabled && styles.disabled]}>
             <View style={styles.contentContainer}>
-              <Text type="p2" style={currentOption?.label ? {} : styles.placeholderText}>
+              <Text type="p2" style={!currentOption?.label && styles.placeholderText}>
                 {displayText}
               </Text>
               {currentOption?.description && (
