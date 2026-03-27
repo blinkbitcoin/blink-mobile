@@ -3418,5 +3418,24 @@
                 "buttonText": "Fechar"
             }
         }
+    },
+    "NostrWalletConnect": {
+        "emptyStateHeadline": "Conecte o Blink a outros aplicativos via NWC",
+        "newConnection": "Nova conexão",
+        "connectWallet": "Conectar carteira",
+        "appNameLabel": "Nome do aplicativo que deseja conectar",
+        "appNamePlaceholder": "Nome do aplicativo",
+        "dailyBudget": "Orçamento diário",
+        "connectionCreated": "Conexão criada",
+        "nwcConnectionString": "String de conexão NWC",
+        "copyInstruction": "Copie esta string e cole no aplicativo que deseja conectar.",
+        "nwcStringCopied": "String de conexão NWC copiada para a área de transferência",
+        "done": "Concluído",
+        "connectedApps": "Aplicativos conectados",
+        "budget": "Orçamento: {amount}",
+        "doNotNotifyBelow": "Não notificar transações abaixo de",
+        "deleteConfirmTitle": "Tem certeza?",
+        "deleteConfirmBody": "Deseja realmente revogar a conexão com {appName}?",
+        "dismiss": "Descartar"
     }
 }

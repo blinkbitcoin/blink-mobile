@@ -3430,5 +3430,24 @@
         "buttonText": "Kapat"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Blink'i NWC üzerinden diğer uygulamalara bağlayın",
+    "newConnection": "Yeni bağlantı",
+    "connectWallet": "Cüzdanı bağla",
+    "appNameLabel": "Bağlamak istediğiniz uygulamanın adı",
+    "appNamePlaceholder": "Uygulama adı",
+    "dailyBudget": "Günlük bütçe",
+    "connectionCreated": "Bağlantı oluşturuldu",
+    "nwcConnectionString": "NWC bağlantı dizesi",
+    "copyInstruction": "Bu dizeyi kopyalayın ve bağlamak istediğiniz uygulamaya yapıştırın.",
+    "nwcStringCopied": "NWC bağlantı dizesi panoya kopyalandı",
+    "done": "Bitti",
+    "connectedApps": "Bağlı uygulamalar",
+    "budget": "Bütçe: {amount}",
+    "doNotNotifyBelow": "Altındaki işlemler için bildirim gönderme",
+    "deleteConfirmTitle": "Emin misiniz?",
+    "deleteConfirmBody": "{appName} ile bağlantıyı gerçekten iptal etmek istiyor musunuz?",
+    "dismiss": "Kapat"
   }
 }

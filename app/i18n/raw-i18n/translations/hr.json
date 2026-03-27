@@ -3471,5 +3471,24 @@
         "buttonText": "Zatvori"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Povežite Blink s drugim aplikacijama putem NWC-a",
+    "newConnection": "Nova veza",
+    "connectWallet": "Poveži novčanik",
+    "appNameLabel": "Naziv aplikacije koju želite povezati",
+    "appNamePlaceholder": "Naziv aplikacije",
+    "dailyBudget": "Dnevni proračun",
+    "connectionCreated": "Veza stvorena",
+    "nwcConnectionString": "NWC niz za povezivanje",
+    "copyInstruction": "Kopirajte ovaj niz i zalijepite ga u aplikaciju koju želite povezati.",
+    "nwcStringCopied": "NWC niz za povezivanje kopiran u međuspremnik",
+    "done": "Gotovo",
+    "connectedApps": "Povezane aplikacije",
+    "budget": "Proračun: {amount}",
+    "doNotNotifyBelow": "Ne obavještavaj za transakcije ispod",
+    "deleteConfirmTitle": "Jeste li sigurni?",
+    "deleteConfirmBody": "Želite li zaista opozvati vezu s {appName}?",
+    "dismiss": "Odbaci"
   }
 }

@@ -3430,5 +3430,24 @@
         "buttonText": "Tutup"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Hubungkan Blink ke aplikasi lain melalui NWC",
+    "newConnection": "Koneksi baru",
+    "connectWallet": "Hubungkan dompet",
+    "appNameLabel": "Nama aplikasi yang ingin Anda hubungkan",
+    "appNamePlaceholder": "Nama aplikasi",
+    "dailyBudget": "Anggaran harian",
+    "connectionCreated": "Koneksi dibuat",
+    "nwcConnectionString": "String koneksi NWC",
+    "copyInstruction": "Salin string ini dan tempelkan ke aplikasi yang ingin Anda hubungkan.",
+    "nwcStringCopied": "String koneksi NWC disalin ke papan klip",
+    "done": "Selesai",
+    "connectedApps": "Aplikasi terhubung",
+    "budget": "Anggaran: {amount}",
+    "doNotNotifyBelow": "Jangan beri notifikasi untuk transaksi di bawah",
+    "deleteConfirmTitle": "Apakah Anda yakin?",
+    "deleteConfirmBody": "Apakah Anda benar-benar ingin mencabut koneksi ke {appName}?",
+    "dismiss": "Tutup"
   }
 }

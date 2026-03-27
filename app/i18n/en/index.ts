@@ -3563,6 +3563,27 @@ const en: BaseTranslation = {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
   },
+  NostrWalletConnect: {
+    emptyStateHeadline: "Connect Blink to other apps via NWC",
+    newConnection: "New connection",
+    connectWallet: "Connect wallet",
+    appNameLabel: "Name of app you wish to connect",
+    appNamePlaceholder: "App name",
+    dailyBudget: "Daily budget",
+    connectionCreated: "Connection created",
+    nwcConnectionString: "NWC connection string",
+    copyInstruction:
+      "Copy this string and paste it into the app you wish to connect to.",
+    nwcStringCopied: "NWC connection string copied into clipboard",
+    done: "Done",
+    connectedApps: "Connected apps",
+    budget: "Budget: {amount: string}",
+    doNotNotifyBelow: "Do not notify for transactions below",
+    deleteConfirmTitle: "Are you sure?",
+    deleteConfirmBody:
+      "Do you really want to revoke connection to {appName: string}?",
+    dismiss: "Dismiss",
+  },
 }
 
 export default en

@@ -11288,6 +11288,78 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
+	NostrWalletConnect: {
+		/**
+		 * C​o​n​n​e​c​t​ ​B​l​i​n​k​ ​t​o​ ​o​t​h​e​r​ ​a​p​p​s​ ​v​i​a​ ​N​W​C
+		 */
+		emptyStateHeadline: string
+		/**
+		 * N​e​w​ ​c​o​n​n​e​c​t​i​o​n
+		 */
+		newConnection: string
+		/**
+		 * C​o​n​n​e​c​t​ ​w​a​l​l​e​t
+		 */
+		connectWallet: string
+		/**
+		 * N​a​m​e​ ​o​f​ ​a​p​p​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​c​o​n​n​e​c​t
+		 */
+		appNameLabel: string
+		/**
+		 * A​p​p​ ​n​a​m​e
+		 */
+		appNamePlaceholder: string
+		/**
+		 * D​a​i​l​y​ ​b​u​d​g​e​t
+		 */
+		dailyBudget: string
+		/**
+		 * C​o​n​n​e​c​t​i​o​n​ ​c​r​e​a​t​e​d
+		 */
+		connectionCreated: string
+		/**
+		 * N​W​C​ ​c​o​n​n​e​c​t​i​o​n​ ​s​t​r​i​n​g
+		 */
+		nwcConnectionString: string
+		/**
+		 * C​o​p​y​ ​t​h​i​s​ ​s​t​r​i​n​g​ ​a​n​d​ ​p​a​s​t​e​ ​i​t​ ​i​n​t​o​ ​t​h​e​ ​a​p​p​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​c​o​n​n​e​c​t​ ​t​o​.
+		 */
+		copyInstruction: string
+		/**
+		 * N​W​C​ ​c​o​n​n​e​c​t​i​o​n​ ​s​t​r​i​n​g​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		nwcStringCopied: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
+		/**
+		 * C​o​n​n​e​c​t​e​d​ ​a​p​p​s
+		 */
+		connectedApps: string
+		/**
+		 * B​u​d​g​e​t​:​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		budget: RequiredParams<'amount'>
+		/**
+		 * D​o​ ​n​o​t​ ​n​o​t​i​f​y​ ​f​o​r​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​b​e​l​o​w
+		 */
+		doNotNotifyBelow: string
+		/**
+		 * A​r​e​ ​y​o​u​ ​s​u​r​e​?
+		 */
+		deleteConfirmTitle: string
+		/**
+		 * D​o​ ​y​o​u​ ​r​e​a​l​l​y​ ​w​a​n​t​ ​t​o​ ​r​e​v​o​k​e​ ​c​o​n​n​e​c​t​i​o​n​ ​t​o​ ​{​a​p​p​N​a​m​e​}​?
+		 * @param {string} appName
+		 */
+		deleteConfirmBody: RequiredParams<'appName'>
+		/**
+		 * D​i​s​m​i​s​s
+		 */
+		dismiss: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -22431,6 +22503,76 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	NostrWalletConnect: {
+		/**
+		 * Connect Blink to other apps via NWC
+		 */
+		emptyStateHeadline: () => LocalizedString
+		/**
+		 * New connection
+		 */
+		newConnection: () => LocalizedString
+		/**
+		 * Connect wallet
+		 */
+		connectWallet: () => LocalizedString
+		/**
+		 * Name of app you wish to connect
+		 */
+		appNameLabel: () => LocalizedString
+		/**
+		 * App name
+		 */
+		appNamePlaceholder: () => LocalizedString
+		/**
+		 * Daily budget
+		 */
+		dailyBudget: () => LocalizedString
+		/**
+		 * Connection created
+		 */
+		connectionCreated: () => LocalizedString
+		/**
+		 * NWC connection string
+		 */
+		nwcConnectionString: () => LocalizedString
+		/**
+		 * Copy this string and paste it into the app you wish to connect to.
+		 */
+		copyInstruction: () => LocalizedString
+		/**
+		 * NWC connection string copied into clipboard
+		 */
+		nwcStringCopied: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
+		/**
+		 * Connected apps
+		 */
+		connectedApps: () => LocalizedString
+		/**
+		 * Budget: {amount}
+		 */
+		budget: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Do not notify for transactions below
+		 */
+		doNotNotifyBelow: () => LocalizedString
+		/**
+		 * Are you sure?
+		 */
+		deleteConfirmTitle: () => LocalizedString
+		/**
+		 * Do you really want to revoke connection to {appName}?
+		 */
+		deleteConfirmBody: (arg: { appName: string }) => LocalizedString
+		/**
+		 * Dismiss
+		 */
+		dismiss: () => LocalizedString
 	}
 }
 

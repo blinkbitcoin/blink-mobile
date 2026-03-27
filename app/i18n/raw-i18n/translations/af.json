@@ -3471,5 +3471,24 @@
         "buttonText": "Sluit"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Verbind Blink met ander programme via NWC",
+    "newConnection": "Nuwe verbinding",
+    "connectWallet": "Verbind beursie",
+    "appNameLabel": "Naam van die program wat jy wil verbind",
+    "appNamePlaceholder": "Programnaam",
+    "dailyBudget": "Daaglikse begroting",
+    "connectionCreated": "Verbinding geskep",
+    "nwcConnectionString": "NWC-verbindingstring",
+    "copyInstruction": "Kopieer hierdie string en plak dit in die program wat jy wil verbind.",
+    "nwcStringCopied": "NWC-verbindingstring na knipbord gekopieer",
+    "done": "Klaar",
+    "connectedApps": "Verbinde programme",
+    "budget": "Begroting: {amount}",
+    "doNotNotifyBelow": "Moenie in kennis stel vir transaksies onder nie",
+    "deleteConfirmTitle": "Is jy seker?",
+    "deleteConfirmBody": "Wil jy regtig die verbinding met {appName} herroep?",
+    "dismiss": "Verwerp"
   }
 }

@@ -3468,5 +3468,24 @@
         "buttonText": "Wisq'ay"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Blink nisqata huk ruraykunaman tinki NWC nisqawan",
+    "newConnection": "Musuq tinki",
+    "connectWallet": "Waletata tinki",
+    "appNameLabel": "Tinkiyta munanki chay ruraypa sutin",
+    "appNamePlaceholder": "Ruraypa sutin",
+    "dailyBudget": "Sapa punchaw qullqi",
+    "connectionCreated": "Tinki kamarisqa",
+    "nwcConnectionString": "NWC tinki qillqa",
+    "copyInstruction": "Kay qillqata kichay hinaspa tinkiyta munanki chay rurayman churay.",
+    "nwcStringCopied": "NWC tinki qillqa kichasqa",
+    "done": "Tukusqa",
+    "connectedApps": "Tinkisqa ruraykuna",
+    "budget": "Qullqi: {amount}",
+    "doNotNotifyBelow": "Ama willaychu ura ruraykuna",
+    "deleteConfirmTitle": "Chiqaqchu?",
+    "deleteConfirmBody": "Chiqaqtachu {appName} nisqapa tinkinta puchukachisunki?",
+    "dismiss": "Wikchuy"
   }
 }

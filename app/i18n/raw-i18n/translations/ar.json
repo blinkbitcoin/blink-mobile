@@ -3468,5 +3468,24 @@
         "buttonText": "إغلاق"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "اربط Blink بتطبيقات أخرى عبر NWC",
+    "newConnection": "اتصال جديد",
+    "connectWallet": "ربط المحفظة",
+    "appNameLabel": "اسم التطبيق الذي تريد ربطه",
+    "appNamePlaceholder": "اسم التطبيق",
+    "dailyBudget": "الميزانية اليومية",
+    "connectionCreated": "تم إنشاء الاتصال",
+    "nwcConnectionString": "سلسلة اتصال NWC",
+    "copyInstruction": "انسخ هذه السلسلة والصقها في التطبيق الذي تريد ربطه.",
+    "nwcStringCopied": "تم نسخ سلسلة اتصال NWC إلى الحافظة",
+    "done": "تم",
+    "connectedApps": "التطبيقات المتصلة",
+    "budget": "الميزانية: {amount}",
+    "doNotNotifyBelow": "عدم الإشعار للمعاملات أقل من",
+    "deleteConfirmTitle": "هل أنت متأكد؟",
+    "deleteConfirmBody": "هل تريد حقًا إلغاء الاتصال بـ {appName}؟",
+    "dismiss": "إغلاق"
   }
 }

@@ -3471,5 +3471,24 @@
         "buttonText": "Փակել"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Միացրեք Blink-ը այլ հավելվածներին NWC-ի միջոցով",
+    "newConnection": "Նոր կապակցություն",
+    "connectWallet": "Միացրեք դրամապանակը",
+    "appNameLabel": "Հավելվածի անունը, որը ցանկանում եք կապակցել",
+    "appNamePlaceholder": "Հավելվածի անունը",
+    "dailyBudget": "Օրական բյուջե",
+    "connectionCreated": "Կապակցությունը ստեղծվել է",
+    "nwcConnectionString": "NWC կապակցման տող",
+    "copyInstruction": "Պատճենեք այս տողը և տեղադրեք այն հավելվածում, որը ցանկանում եք կապակցել։",
+    "nwcStringCopied": "NWC կապակցման տողը պատճենվել է",
+    "done": "Պատրաստ",
+    "connectedApps": "Կապակցված հավելվածներ",
+    "budget": "Բյուջե։ {amount}",
+    "doNotNotifyBelow": "Չծանուցել գործարքների համար ցածր քան",
+    "deleteConfirmTitle": "Վստահծ եք։",
+    "deleteConfirmBody": "Իսկապես ցանկանում եք հետ կանչել {appName}-ի կապակցությունը։",
+    "dismiss": "Փակել"
   }
 }

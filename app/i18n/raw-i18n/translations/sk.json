@@ -3430,5 +3430,24 @@
         "buttonText": "Zavrieť"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Pripojte Blink k ďalším aplikáciám cez NWC",
+    "newConnection": "Nové pripojenie",
+    "connectWallet": "Pripojiť peňaženku",
+    "appNameLabel": "Názov aplikácie, ktorú chcete pripojiť",
+    "appNamePlaceholder": "Názov aplikácie",
+    "dailyBudget": "Denný rozpočet",
+    "connectionCreated": "Pripojenie vytvorené",
+    "nwcConnectionString": "Reťazec pripojenia NWC",
+    "copyInstruction": "Skopírujte tento reťazec a vložte ho do aplikácie, ktorú chcete pripojiť.",
+    "nwcStringCopied": "Reťazec pripojenia NWC skopírovaný do schránky",
+    "done": "Hotovo",
+    "connectedApps": "Pripojené aplikácie",
+    "budget": "Rozpočet: {amount}",
+    "doNotNotifyBelow": "Neupozorňovať na transakcie nižšie ako",
+    "deleteConfirmTitle": "Ste si istí?",
+    "deleteConfirmBody": "Naozaj chcete zrušiť pripojenie k {appName}?",
+    "dismiss": "Zavrieť"
   }
 }

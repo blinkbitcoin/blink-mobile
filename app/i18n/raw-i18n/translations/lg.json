@@ -3430,5 +3430,24 @@
         "buttonText": "Ggala"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Yungiza Blink ku pulogulamu endala okuyita mu NWC",
+    "newConnection": "Okuyunga okupya",
+    "connectWallet": "Yunga ssente",
+    "appNameLabel": "Erinnya ly'epulogulamu gy'oyagala okuyunga",
+    "appNamePlaceholder": "Erinnya ly'epulogulamu",
+    "dailyBudget": "Bajeti ya buli lunaku",
+    "connectionCreated": "Okuyunga kutondeddwa",
+    "nwcConnectionString": "Ennyiriri y'okuyunga NWC",
+    "copyInstruction": "Koppa ennyiriri eno ogitiike mu pulogulamu gy'oyagala okuyunga.",
+    "nwcStringCopied": "Ennyiriri y'okuyunga NWC ekoppiddwa",
+    "done": "Biwedde",
+    "connectedApps": "Pulogulamu eziyungiddwa",
+    "budget": "Bajeti: {amount}",
+    "doNotNotifyBelow": "Tobuulira ku bikolwa ebiri wansi wa",
+    "deleteConfirmTitle": "Oli mukakafu?",
+    "deleteConfirmBody": "Ddala oyagala okusazaamu okuyunga eri {appName}?",
+    "dismiss": "Ggalawo"
   }
 }
