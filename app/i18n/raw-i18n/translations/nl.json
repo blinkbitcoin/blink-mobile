@@ -3470,5 +3470,66 @@
         "buttonText": "Sluiten"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Kies je back-upmethode",
+      "subtitle": "We raden {provider} aan voor nieuwe gebruikers.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Wachtwoordbeheerder",
+      "manualBackup": "Handmatige back-up",
+      "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
+      "keychainFailed": "Back-up opslaan mislukt",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Houd je back-upzin geheim!",
+        "check1": "Ik begrijp dat niemand mijn portemonnee kan herstellen als ik deze zin verlies",
+        "check2": "Ik begrijp dat als iemand deze zin krijgt, ze al mijn geld kunnen stelen.",
+        "check3": "Niemand vraagt mij om deze informatie via bericht of telefoontje"
+      },
+      "Phrase": {
+        "headerTitle": "Je back-upzin",
+        "sparkCompatible": "Deze back-upzin werkt in elke {sparkCompatibleLink}",
+        "sparkCompatibleLink": "Spark-compatibele portemonnee",
+        "copiedToast": "Back-upzin naar klembord gekopieerd",
+        "saveItNow": "Sla het nu op",
+        "savedConfirm": "Ik heb het opgeslagen",
+        "copy": "Kopiëren",
+        "continueButton": "Doorgaan"
+      },
+      "Confirm": {
+        "headerTitle": "Bevestig back-upzin",
+        "subtitle": "Een snelle controle of je het correct hebt opgeschreven",
+        "enterWord": "Voer woord in",
+        "enterWords": "Voer woorden in",
+        "confirm": "Bevestigen"
+      },
+      "Success": {
+        "title": "Welkom bij non-custodial Blink"
+      }
+    },
+    "CloudBackup": {
+      "title": "Laten we een back-up maken van je portemonnee",
+      "description": "We slaan een back-up van je herstelzin op in je {provider}.",
+      "encryptCheckbox": "Versleutelen met extra wachtwoord",
+      "password": "Wachtwoord",
+      "passwordPlaceholder": "(minimaal 12 tekens)",
+      "confirmPassword": "Bevestig wachtwoord",
+      "confirmPasswordPlaceholder": "Voer wachtwoord opnieuw in",
+      "continueButton": "Doorgaan",
+      "importantTitle": "Belangrijk",
+      "importantMessage": "Blink slaat dit wachtwoord niet op. Als je het verliest, {bold} je portemonnee te herstellen.",
+      "importantMessageBold": "kunnen we niet",
+      "passwordTooShort": "Minimaal 12 tekens",
+      "passwordMismatch": "Wachtwoorden komen niet overeen",
+      "uploadSuccess": "Back-up opgeslagen in {provider}",
+      "uploadFailed": "Uploaden van back-up mislukt",
+      "signInFailed": "Inloggen bij Google mislukt",
+      "existingBackupTitle": "Back-up gevonden",
+      "existingBackupMessage": "Er bestaat al een back-up in je {provider}. Wil je deze overschrijven?",
+      "overwrite": "Overschrijven"
+    }
   }
 }

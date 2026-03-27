@@ -3458,5 +3458,66 @@
                 "buttonText": "閉じる"
             }
         }
+    },
+    "SparkOnboarding": {
+        "BackupMethod": {
+            "title": "バックアップ方法を選択",
+            "subtitle": "新規ユーザーには{provider}をお勧めします。",
+            "googleDrive": "Google Drive",
+            "passwordManager": "パスワードマネージャー",
+            "manualBackup": "手動バックアップ",
+            "keychainSaved": "バックアップがパスワードマネージャーに保存されました",
+            "keychainFailed": "バックアップの保存に失敗しました",
+            "appleICloud": "Apple iCloud"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "バックアップフレーズを秘密にしてください！",
+                "check1": "このフレーズを紛失した場合、誰もウォレットを復元できないことを理解しています",
+                "check2": "誰かがこのフレーズを入手した場合、すべての資金を盗むことができることを理解しています。",
+                "check3": "メッセージや電話でこの情報を求めている人はいません"
+            },
+            "Phrase": {
+                "headerTitle": "バックアップフレーズ",
+                "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
+                "sparkCompatibleLink": "Spark対応ウォレット",
+                "copiedToast": "バックアップフレーズをクリップボードにコピーしました",
+                "saveItNow": "今すぐ保存",
+                "savedConfirm": "保存しました",
+                "copy": "コピー",
+                "continueButton": "続行"
+            },
+            "Confirm": {
+                "headerTitle": "バックアップフレーズの確認",
+                "subtitle": "正しく書き留めたか簡単に確認します",
+                "enterWord": "単語を入力",
+                "enterWords": "単語を入力",
+                "confirm": "確認"
+            },
+            "Success": {
+                "title": "ノンカストディアルBlinkへようこそ"
+            }
+        },
+        "CloudBackup": {
+            "title": "ウォレットをバックアップしましょう",
+            "description": "{provider}にバックアップフレーズのコピーを保存します。",
+            "encryptCheckbox": "追加パスワードで暗号化",
+            "password": "パスワード",
+            "passwordPlaceholder": "（12文字以上）",
+            "confirmPassword": "パスワード確認",
+            "confirmPasswordPlaceholder": "パスワードを再入力",
+            "continueButton": "続行",
+            "importantTitle": "重要",
+            "importantMessage": "Blinkはこのパスワードを保存しません。紛失した場合、{bold}。",
+            "importantMessageBold": "ウォレットを復元できません",
+            "passwordTooShort": "12文字以上必要です",
+            "passwordMismatch": "パスワードが一致しません",
+            "uploadSuccess": "{provider}にバックアップを保存しました",
+            "uploadFailed": "バックアップのアップロードに失敗しました",
+            "signInFailed": "Googleへのログインに失敗しました",
+            "existingBackupTitle": "バックアップが見つかりました",
+            "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
+            "overwrite": "上書き"
+        }
     }
 }

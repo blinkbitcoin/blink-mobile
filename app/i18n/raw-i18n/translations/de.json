@@ -3417,5 +3417,66 @@
                 "buttonText": "Schließen"
             }
         }
+    },
+    "SparkOnboarding": {
+        "BackupMethod": {
+            "title": "Wähle deine Sicherungsmethode",
+            "subtitle": "Wir empfehlen {provider} für neue Benutzer.",
+            "googleDrive": "Google Drive",
+            "passwordManager": "Passwort-Manager",
+            "manualBackup": "Manuelle Sicherung",
+            "keychainSaved": "Sicherung im Passwort-Manager gespeichert",
+            "keychainFailed": "Sicherung konnte nicht gespeichert werden",
+            "appleICloud": "Apple iCloud"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "Halte deine Sicherungswörter geheim!",
+                "check1": "Ich verstehe, dass niemand meine Wallet wiederherstellen kann, wenn ich diese Wörter verliere",
+                "check2": "Ich verstehe, dass jemand alle meine Gelder stehlen kann, wenn er diese Wörter erhält.",
+                "check3": "Niemand fragt mich nach diesen Informationen per Nachricht oder Anruf"
+            },
+            "Phrase": {
+                "headerTitle": "Deine Sicherungswörter",
+                "sparkCompatible": "Diese Sicherungswörter funktionieren in jeder {sparkCompatibleLink}",
+                "sparkCompatibleLink": "Spark-kompatiblen Wallet",
+                "copiedToast": "Sicherungswörter in die Zwischenablage kopiert",
+                "saveItNow": "Jetzt speichern",
+                "savedConfirm": "Ich habe sie gespeichert",
+                "copy": "Kopieren",
+                "continueButton": "Weiter"
+            },
+            "Confirm": {
+                "headerTitle": "Sicherungswörter bestätigen",
+                "subtitle": "Eine kurze Überprüfung, ob du sie richtig aufgeschrieben hast",
+                "enterWord": "Wort eingeben",
+                "enterWords": "Wörter eingeben",
+                "confirm": "Bestätigen"
+            },
+            "Success": {
+                "title": "Willkommen bei nicht-verwaltetem Blink"
+            }
+        },
+        "CloudBackup": {
+            "title": "Sichern wir Ihre Brieftasche",
+            "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
+            "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
+            "password": "Passwort",
+            "passwordPlaceholder": "(mindestens 12 Zeichen)",
+            "confirmPassword": "Passwort bestätigen",
+            "confirmPasswordPlaceholder": "Passwort erneut eingeben",
+            "continueButton": "Weiter",
+            "importantTitle": "Wichtig",
+            "importantMessage": "Blink speichert dieses Passwort nicht. Wenn Sie es verlieren, {bold} Ihre Brieftasche wiederherstellen.",
+            "importantMessageBold": "können wir nicht",
+            "passwordTooShort": "Mindestens 12 Zeichen",
+            "passwordMismatch": "Passwörter stimmen nicht überein",
+            "uploadSuccess": "Sicherung in {provider} gespeichert",
+            "uploadFailed": "Fehler beim Hochladen der Sicherung",
+            "signInFailed": "Anmeldung bei Google fehlgeschlagen",
+            "existingBackupTitle": "Sicherung gefunden",
+            "existingBackupMessage": "Es existiert bereits eine Sicherung in Ihrem {provider}. Möchten Sie sie überschreiben?",
+            "overwrite": "Überschreiben"
+        }
     }
 }

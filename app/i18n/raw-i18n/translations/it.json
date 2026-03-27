@@ -3417,5 +3417,66 @@
                 "buttonText": "Chiudi"
             }
         }
+    },
+    "SparkOnboarding": {
+        "BackupMethod": {
+            "title": "Scegli il metodo di backup",
+            "subtitle": "Consigliamo {provider} per i nuovi utenti.",
+            "googleDrive": "Google Drive",
+            "passwordManager": "Gestore password",
+            "manualBackup": "Backup manuale",
+            "keychainSaved": "Backup salvato nel gestore password",
+            "keychainFailed": "Impossibile salvare il backup",
+            "appleICloud": "Apple iCloud"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "Mantieni segreta la tua frase di backup!",
+                "check1": "Capisco che nessuno può recuperare il mio portafoglio se perdo questa frase",
+                "check2": "Capisco che se qualcuno ottiene questa frase, può rubare tutti i miei fondi.",
+                "check3": "Nessuno mi sta chiedendo queste informazioni tramite messaggio o chiamata"
+            },
+            "Phrase": {
+                "headerTitle": "La tua frase di backup",
+                "sparkCompatible": "Questa frase di backup funziona in qualsiasi {sparkCompatibleLink}",
+                "sparkCompatibleLink": "portafoglio compatibile con Spark",
+                "copiedToast": "Frase di backup copiata negli appunti",
+                "saveItNow": "Salvala ora",
+                "savedConfirm": "L'ho salvata",
+                "copy": "Copia",
+                "continueButton": "Continua"
+            },
+            "Confirm": {
+                "headerTitle": "Conferma frase di backup",
+                "subtitle": "Un controllo rapido per verificare di averla scritta correttamente",
+                "enterWord": "Inserisci la parola",
+                "enterWords": "Inserisci le parole",
+                "confirm": "Conferma"
+            },
+            "Success": {
+                "title": "Benvenuto su Blink non-custodial"
+            }
+        },
+        "CloudBackup": {
+            "title": "Eseguiamo il backup del portafoglio",
+            "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
+            "encryptCheckbox": "Crittografa con password aggiuntiva",
+            "password": "Password",
+            "passwordPlaceholder": "(minimo 12 caratteri)",
+            "confirmPassword": "Conferma password",
+            "confirmPasswordPlaceholder": "Inserisci nuovamente la password",
+            "continueButton": "Continua",
+            "importantTitle": "Importante",
+            "importantMessage": "Blink non memorizza questa password. Se la perdi, {bold} recuperare il tuo portafoglio.",
+            "importantMessageBold": "non saremo in grado di",
+            "passwordTooShort": "Minimo 12 caratteri",
+            "passwordMismatch": "Le password non corrispondono",
+            "uploadSuccess": "Backup salvato su {provider}",
+            "uploadFailed": "Impossibile caricare il backup",
+            "signInFailed": "Accesso a Google non riuscito",
+            "existingBackupTitle": "Backup trovato",
+            "existingBackupMessage": "Esiste già un backup nel tuo {provider}. Vuoi sovrascriverlo?",
+            "overwrite": "Sovrascrivi"
+        }
     }
 }

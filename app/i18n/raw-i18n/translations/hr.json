@@ -3470,5 +3470,66 @@
         "buttonText": "Zatvori"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Odaberite metodu sigurnosne kopije",
+      "subtitle": "Preporučujemo {provider} za nove korisnike.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Upravitelj lozinki",
+      "manualBackup": "Ručna sigurnosna kopija",
+      "keychainSaved": "Sigurnosna kopija spremljena u upravitelj lozinki",
+      "keychainFailed": "Spremanje sigurnosne kopije nije uspjelo",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Čuvajte svoju sigurnosnu frazu tajnom!",
+        "check1": "Razumijem da nitko ne može oporaviti moj novčanik ako izgubim ovu frazu",
+        "check2": "Razumijem da ako netko dobije ovu frazu, može ukrasti sva moja sredstva.",
+        "check3": "Nitko me ne traži ove informacije putem poruke ili poziva"
+      },
+      "Phrase": {
+        "headerTitle": "Vaša sigurnosna fraza",
+        "sparkCompatible": "Ova sigurnosna fraza radi u svakom {sparkCompatibleLink}",
+        "sparkCompatibleLink": "novčaniku kompatibilnom sa Spark",
+        "copiedToast": "Sigurnosna fraza kopirana u međuspremnik",
+        "saveItNow": "Spremite sada",
+        "savedConfirm": "Spremio sam je",
+        "copy": "Kopiraj",
+        "continueButton": "Nastavi"
+      },
+      "Confirm": {
+        "headerTitle": "Potvrdite sigurnosnu frazu",
+        "subtitle": "Brza provjera jeste li je ispravno zapisali",
+        "enterWord": "Unesite riječ",
+        "enterWords": "Unesite riječi",
+        "confirm": "Potvrdi"
+      },
+      "Success": {
+        "title": "Dobrodošli u Blink bez skrbništva"
+      }
+    },
+    "CloudBackup": {
+      "title": "Napravimo sigurnosnu kopiju vašeg novčanika",
+      "description": "Spremit ćemo kopiju vaše sigurnosne fraze u vaš {provider}.",
+      "encryptCheckbox": "Šifriraj dodatnom lozinkom",
+      "password": "Lozinka",
+      "passwordPlaceholder": "(najmanje 12 znakova)",
+      "confirmPassword": "Potvrdi lozinku",
+      "confirmPasswordPlaceholder": "Unesite lozinku ponovo",
+      "continueButton": "Nastavi",
+      "importantTitle": "Važno",
+      "importantMessage": "Blink ne pohranjuje ovu lozinku. Ako je izgubite, {bold} oporaviti vaš novčanik.",
+      "importantMessageBold": "nećemo moći",
+      "passwordTooShort": "Najmanje 12 znakova",
+      "passwordMismatch": "Lozinke se ne podudaraju",
+      "uploadSuccess": "Sigurnosna kopija spremljena u {provider}",
+      "uploadFailed": "Učitavanje sigurnosne kopije nije uspjelo",
+      "signInFailed": "Prijava na Google nije uspjela",
+      "existingBackupTitle": "Sigurnosna kopija pronađena",
+      "existingBackupMessage": "Sigurnosna kopija već postoji u vašem {provider}. Želite li je prebrisati?",
+      "overwrite": "Prebriši"
+    }
   }
 }

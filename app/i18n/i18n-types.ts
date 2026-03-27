@@ -11284,6 +11284,208 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
+	SparkOnboarding: {
+		BackupMethod: {
+			/**
+			 * C​h​o​o​s​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d
+			 */
+			title: string
+			/**
+			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​{​p​r​o​v​i​d​e​r​}​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 * @param {string} provider
+			 */
+			subtitle: RequiredParams<'provider'>
+			/**
+			 * G​o​o​g​l​e​ ​D​r​i​v​e
+			 */
+			googleDrive: string
+			/**
+			 * A​p​p​l​e​ ​i​C​l​o​u​d
+			 */
+			appleICloud: string
+			/**
+			 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManager: string
+			/**
+			 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+			 */
+			manualBackup: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			keychainSaved: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
+			 */
+			keychainFailed: string
+		}
+		CloudBackup: {
+			/**
+			 * L​e​t​'​s​ ​b​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
+			 * @param {string} provider
+			 */
+			description: RequiredParams<'provider'>
+			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
+			 * P​a​s​s​w​o​r​d
+			 */
+			password: string
+			/**
+			 * (​1​2​ ​c​h​a​r​a​c​t​e​r​s​ ​m​i​n​i​m​u​m​)
+			 */
+			passwordPlaceholder: string
+			/**
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
+			 */
+			confirmPassword: string
+			/**
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
+			 */
+			confirmPasswordPlaceholder: string
+			/**
+			 * C​o​n​t​i​n​u​e
+			 */
+			continueButton: string
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			importantTitle: string
+			/**
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * @param {string} bold
+			 */
+			importantMessage: RequiredParams<'bold'>
+			/**
+			 * w​e​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e
+			 */
+			importantMessageBold: string
+			/**
+			 * M​i​n​i​m​u​m​ ​1​2​ ​c​h​a​r​a​c​t​e​r​s
+			 */
+			passwordTooShort: string
+			/**
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 */
+			passwordMismatch: string
+			/**
+			 * B​a​c​k​u​p​ ​f​o​u​n​d
+			 */
+			existingBackupTitle: string
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} provider
+			 */
+			existingBackupMessage: RequiredParams<'provider'>
+			/**
+			 * O​v​e​r​w​r​i​t​e
+			 */
+			overwrite: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			uploadSuccess: RequiredParams<'provider'>
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​l​o​a​d​ ​b​a​c​k​u​p
+			 */
+			uploadFailed: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​G​o​o​g​l​e
+			 */
+			signInFailed: string
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * K​e​e​p​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​e​c​r​e​t​!
+				 */
+				title: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​n​o​b​o​d​y​ ​c​a​n​ ​r​e​c​o​v​e​r​ ​m​y​ ​w​a​l​l​e​t​ ​i​f​ ​I​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​r​a​s​e
+				 */
+				check1: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​i​f​ ​s​o​m​e​b​o​d​y​ ​g​e​t​s​ ​t​h​i​s​ ​p​h​r​a​s​e​,​ ​t​h​e​y​ ​c​a​n​ ​s​t​e​a​l​ ​a​l​l​ ​m​y​ ​f​u​n​d​s​.
+				 */
+				check2: string
+				/**
+				 * N​o​b​o​d​y​ ​i​s​ ​a​s​k​i​n​g​ ​m​e​ ​f​o​r​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​m​e​s​s​a​g​e​ ​o​r​ ​a​ ​c​a​l​l
+				 */
+				check3: string
+			}
+			Phrase: {
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * T​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​w​o​r​k​s​ ​i​n​ ​a​n​y​ ​{​s​p​a​r​k​C​o​m​p​a​t​i​b​l​e​L​i​n​k​}
+				 * @param {string} sparkCompatibleLink
+				 */
+				sparkCompatible: RequiredParams<'sparkCompatibleLink'>
+				/**
+				 * S​p​a​r​k​-​c​o​m​p​a​t​i​b​l​e​ ​w​a​l​l​e​t
+				 */
+				sparkCompatibleLink: string
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+				 */
+				copiedToast: string
+				/**
+				 * S​a​v​e​ ​i​t​ ​n​o​w
+				 */
+				saveItNow: string
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				continueButton: string
+				/**
+				 * I​ ​h​a​v​e​ ​s​a​v​e​d​ ​i​t
+				 */
+				savedConfirm: string
+				/**
+				 * C​o​p​y
+				 */
+				copy: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * A​ ​q​u​i​c​k​ ​c​h​e​c​k​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​w​r​i​t​t​e​n​ ​i​t​ ​d​o​w​n​ ​c​o​r​r​e​c​t​l​y
+				 */
+				subtitle: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d
+				 */
+				enterWord: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d​s
+				 */
+				enterWords: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+			}
+			Success: {
+				/**
+				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
+				 */
+				title: string
+			}
+		}
+	}
 }
 
 export type TranslationFunctions = {
@@ -22423,6 +22625,202 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	SparkOnboarding: {
+		BackupMethod: {
+			/**
+			 * Choose your backup method
+			 */
+			title: () => LocalizedString
+			/**
+			 * We recommend {provider} for new users.
+			 */
+			subtitle: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Google Drive
+			 */
+			googleDrive: () => LocalizedString
+			/**
+			 * Apple iCloud
+			 */
+			appleICloud: () => LocalizedString
+			/**
+			 * Password manager
+			 */
+			passwordManager: () => LocalizedString
+			/**
+			 * Manual backup
+			 */
+			manualBackup: () => LocalizedString
+			/**
+			 * Backup saved to password manager
+			 */
+			keychainSaved: () => LocalizedString
+			/**
+			 * Failed to save backup
+			 */
+			keychainFailed: () => LocalizedString
+		}
+		CloudBackup: {
+			/**
+			 * Let's back up your wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * We will save a backup of your backup phrase to your {provider}.
+			 */
+			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
+			 * Password
+			 */
+			password: () => LocalizedString
+			/**
+			 * (12 characters minimum)
+			 */
+			passwordPlaceholder: () => LocalizedString
+			/**
+			 * Confirm password
+			 */
+			confirmPassword: () => LocalizedString
+			/**
+			 * Enter password again
+			 */
+			confirmPasswordPlaceholder: () => LocalizedString
+			/**
+			 * Continue
+			 */
+			continueButton: () => LocalizedString
+			/**
+			 * Important
+			 */
+			importantTitle: () => LocalizedString
+			/**
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
+			 */
+			importantMessage: (arg: { bold: string }) => LocalizedString
+			/**
+			 * we will not be able
+			 */
+			importantMessageBold: () => LocalizedString
+			/**
+			 * Minimum 12 characters
+			 */
+			passwordTooShort: () => LocalizedString
+			/**
+			 * Passwords do not match
+			 */
+			passwordMismatch: () => LocalizedString
+			/**
+			 * Backup found
+			 */
+			existingBackupTitle: () => LocalizedString
+			/**
+			 * A backup already exists in your {provider}. Do you want to overwrite it?
+			 */
+			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Overwrite
+			 */
+			overwrite: () => LocalizedString
+			/**
+			 * Backup saved to {provider}
+			 */
+			uploadSuccess: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Failed to upload backup
+			 */
+			uploadFailed: () => LocalizedString
+			/**
+			 * Failed to sign in to Google
+			 */
+			signInFailed: () => LocalizedString
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * Keep your backup phrase secret!
+				 */
+				title: () => LocalizedString
+				/**
+				 * I understand nobody can recover my wallet if I lose this phrase
+				 */
+				check1: () => LocalizedString
+				/**
+				 * I understand if somebody gets this phrase, they can steal all my funds.
+				 */
+				check2: () => LocalizedString
+				/**
+				 * Nobody is asking me for this information via message or a call
+				 */
+				check3: () => LocalizedString
+			}
+			Phrase: {
+				/**
+				 * Your backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * This backup phrase works in any {sparkCompatibleLink}
+				 */
+				sparkCompatible: (arg: { sparkCompatibleLink: string }) => LocalizedString
+				/**
+				 * Spark-compatible wallet
+				 */
+				sparkCompatibleLink: () => LocalizedString
+				/**
+				 * Backup phrase copied into clipboard
+				 */
+				copiedToast: () => LocalizedString
+				/**
+				 * Save it now
+				 */
+				saveItNow: () => LocalizedString
+				/**
+				 * Continue
+				 */
+				continueButton: () => LocalizedString
+				/**
+				 * I have saved it
+				 */
+				savedConfirm: () => LocalizedString
+				/**
+				 * Copy
+				 */
+				copy: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * A quick check if you have written it down correctly
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Enter word
+				 */
+				enterWord: () => LocalizedString
+				/**
+				 * Enter words
+				 */
+				enterWords: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+			}
+			Success: {
+				/**
+				 * Welcome to non-custodial Blink
+				 */
+				title: () => LocalizedString
+			}
+		}
 	}
 }
 

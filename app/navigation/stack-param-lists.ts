@@ -1,4 +1,7 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
+
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -176,6 +179,14 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
+  sparkBackupMethodScreen: undefined
+  sparkCloudBackupScreen: undefined
+  sparkBackupAlertsScreen: undefined
+  sparkBackupPhraseScreen: { step: PhraseStep }
+  sparkBackupConfirmScreen: {
+    challenges: Array<{ index: number; word: string }>
+  }
+  sparkBackupSuccessScreen: undefined
 }
 
 export type OnboardingStackParamList = {

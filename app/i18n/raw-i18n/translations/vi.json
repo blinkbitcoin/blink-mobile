@@ -3467,5 +3467,66 @@
         "buttonText": "Đóng"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Chọn phương thức sao lưu",
+      "subtitle": "Chúng tôi khuyên dùng {provider} cho người dùng mới.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Trình quản lý mật khẩu",
+      "manualBackup": "Sao lưu thủ công",
+      "keychainSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
+      "keychainFailed": "Không thể lưu bản sao lưu",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Giữ bí mật cụm từ sao lưu của bạn!",
+        "check1": "Tôi hiểu rằng không ai có thể khôi phục ví của tôi nếu tôi mất cụm từ này",
+        "check2": "Tôi hiểu rằng nếu ai đó có được cụm từ này, họ có thể đánh cắp tất cả tiền của tôi.",
+        "check3": "Không ai yêu cầu tôi cung cấp thông tin này qua tin nhắn hoặc cuộc gọi"
+      },
+      "Phrase": {
+        "headerTitle": "Cụm từ sao lưu của bạn",
+        "sparkCompatible": "Cụm từ sao lưu này hoạt động trong bất kỳ {sparkCompatibleLink} nào",
+        "sparkCompatibleLink": "ví tương thích Spark",
+        "copiedToast": "Đã sao chép cụm từ sao lưu vào bộ nhớ tạm",
+        "saveItNow": "Lưu ngay",
+        "savedConfirm": "Tôi đã lưu",
+        "copy": "Sao chép",
+        "continueButton": "Tiếp tục"
+      },
+      "Confirm": {
+        "headerTitle": "Xác nhận cụm từ sao lưu",
+        "subtitle": "Kiểm tra nhanh xem bạn đã ghi đúng chưa",
+        "enterWord": "Nhập từ",
+        "enterWords": "Nhập các từ",
+        "confirm": "Xác nhận"
+      },
+      "Success": {
+        "title": "Chào mừng đến với Blink tự quản lý"
+      }
+    },
+    "CloudBackup": {
+      "title": "Hãy sao lưu ví của bạn",
+      "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
+      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "(tối thiểu 12 ký tự)",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+      "continueButton": "Tiếp tục",
+      "importantTitle": "Quan trọng",
+      "importantMessage": "Blink không lưu trữ mật khẩu này. Nếu bạn mất nó, {bold} khôi phục ví của bạn.",
+      "importantMessageBold": "chúng tôi sẽ không thể",
+      "passwordTooShort": "Tối thiểu 12 ký tự",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
+      "uploadFailed": "Không thể tải lên bản sao lưu",
+      "signInFailed": "Không thể đăng nhập vào Google",
+      "existingBackupTitle": "Đã tìm thấy bản sao lưu",
+      "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
+      "overwrite": "Ghi đè"
+    }
   }
 }

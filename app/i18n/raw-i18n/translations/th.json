@@ -3467,5 +3467,66 @@
         "buttonText": "ปิด"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "เลือกวิธีการสำรองข้อมูล",
+      "subtitle": "เราแนะนำ {provider} สำหรับผู้ใช้ใหม่",
+      "googleDrive": "Google Drive",
+      "passwordManager": "ตัวจัดการรหัสผ่าน",
+      "manualBackup": "สำรองข้อมูลด้วยตนเอง",
+      "keychainSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
+      "keychainFailed": "ไม่สามารถบันทึกสำรองได้",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "เก็บวลีสำรองของคุณเป็นความลับ!",
+        "check1": "ฉันเข้าใจว่าไม่มีใครสามารถกู้คืนกระเป๋าเงินของฉันได้หากฉันสูญเสียวลีนี้",
+        "check2": "ฉันเข้าใจว่าหากใครบางคนได้รับวลีนี้ พวกเขาสามารถขโมยเงินทั้งหมดของฉันได้",
+        "check3": "ไม่มีใครขอข้อมูลนี้จากฉันผ่านข้อความหรือโทรศัพท์"
+      },
+      "Phrase": {
+        "headerTitle": "วลีสำรองของคุณ",
+        "sparkCompatible": "วลีสำรองนี้ใช้ได้ใน{sparkCompatibleLink}",
+        "sparkCompatibleLink": "กระเป๋าเงินที่รองรับ Spark",
+        "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",
+        "saveItNow": "บันทึกตอนนี้",
+        "savedConfirm": "ฉันบันทึกแล้ว",
+        "copy": "คัดลอก",
+        "continueButton": "ดำเนินการต่อ"
+      },
+      "Confirm": {
+        "headerTitle": "ยืนยันวลีสำรอง",
+        "subtitle": "ตรวจสอบอย่างรวดเร็วว่าคุณเขียนถูกต้อง",
+        "enterWord": "ป้อนคำ",
+        "enterWords": "ป้อนคำ",
+        "confirm": "ยืนยัน"
+      },
+      "Success": {
+        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล"
+      }
+    },
+    "CloudBackup": {
+      "title": "มาสำรองข้อมูลกระเป๋าเงินของคุณกัน",
+      "description": "เราจะบันทึกสำเนาวลีสำรองของคุณไปยัง {provider} ของคุณ",
+      "encryptCheckbox": "เข้ารหัสด้วยรหัสผ่านเพิ่มเติม",
+      "password": "รหัสผ่าน",
+      "passwordPlaceholder": "(อย่างน้อย 12 ตัวอักษร)",
+      "confirmPassword": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "กรอกรหัสผ่านอีกครั้ง",
+      "continueButton": "ดำเนินการต่อ",
+      "importantTitle": "สำคัญ",
+      "importantMessage": "Blink ไม่ได้เก็บรหัสผ่านนี้ หากคุณทำหาย {bold} กู้คืนกระเป๋าเงินของคุณได้",
+      "importantMessageBold": "เราจะไม่สามารถ",
+      "passwordTooShort": "อย่างน้อย 12 ตัวอักษร",
+      "passwordMismatch": "รหัสผ่านไม่ตรงกัน",
+      "uploadSuccess": "สำรองข้อมูลไปยัง {provider} แล้ว",
+      "uploadFailed": "อัปโหลดข้อมูลสำรองไม่สำเร็จ",
+      "signInFailed": "ลงชื่อเข้าใช้ Google ไม่สำเร็จ",
+      "existingBackupTitle": "พบข้อมูลสำรอง",
+      "existingBackupMessage": "มีข้อมูลสำรองอยู่แล้วใน {provider} ของคุณ คุณต้องการเขียนทับหรือไม่?",
+      "overwrite": "เขียนทับ"
+    }
   }
 }

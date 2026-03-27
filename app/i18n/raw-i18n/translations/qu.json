@@ -3467,5 +3467,66 @@
         "buttonText": "Wisq'ay"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Akllay imayna waqaychanaykita",
+      "subtitle": "{provider} nisqata kunanchayku musuq rurakkunapaq.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Yaykuna rimay kamachiq",
+      "manualBackup": "Makiwan waqaychay",
+      "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
+      "keychainFailed": "Mana atikurqachu waqaychayta",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Waqaychay backup rimayniykita pakasqata!",
+        "check1": "Riqsini pipas mana atinchu wallitayta kutichiy kay rimayta chinkachiptiy",
+        "check2": "Riqsini pipas kay rimayta tariptinqa, llapan qullqiyta suwanman.",
+        "check3": "Pipas mana kay willakuykunata mañawanchu willaypi utaq waqyaypi"
+      },
+      "Phrase": {
+        "headerTitle": "Waqaychay rimaykikunata",
+        "sparkCompatible": "Kay waqaychay rimaykunaqa {sparkCompatibleLink} llamkan",
+        "sparkCompatibleLink": "Spark wallitakunapi",
+        "copiedToast": "Waqaychay rimay kopiyasqa",
+        "saveItNow": "Waqaychay kunan",
+        "savedConfirm": "Ñam waqaychani",
+        "copy": "Kopiyay",
+        "continueButton": "Hinaspa"
+      },
+      "Confirm": {
+        "headerTitle": "Waqaychay rimayta takyachiy",
+        "subtitle": "Usqhay qhaway allinta qillqasqaykita",
+        "enterWord": "Rimayta yaykuchiy",
+        "enterWords": "Rimaykunata yaykuchiy",
+        "confirm": "Takyachiy"
+      },
+      "Success": {
+        "title": "Blink mana waqaychisqaman haykuy"
+      }
+    },
+    "CloudBackup": {
+      "title": "Qullqikuqniykita waqaychasun",
+      "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
+      "encryptCheckbox": "Yapay contraseñawan pakay",
+      "password": "Contraseña",
+      "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
+      "confirmPassword": "Contraseñata takyachiy",
+      "confirmPasswordPlaceholder": "Contraseñata hukmanta qillqay",
+      "continueButton": "Hinalla",
+      "importantTitle": "Allin yachanapaq",
+      "importantMessage": "Blink mana kay contraseñata waqaychanchu. Chinkachiptiykeqa, {bold} qullqikuqniykita kutichiyku.",
+      "importantMessageBold": "mana atiykumanchu",
+      "passwordTooShort": "Pisi kaptinpas 12 sanampakuna",
+      "passwordMismatch": "Contraseñakuna mana tupanchu",
+      "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
+      "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
+      "signInFailed": "Google nisqaman yaykuy mana atikurqanchu",
+      "existingBackupTitle": "Waqaychay tarikusqa",
+      "existingBackupMessage": "{provider} nisqaykipi huknin waqaychay kachkanña. Qawariyta munankichu?",
+      "overwrite": "Hawamanta qillqay"
+    }
   }
 }

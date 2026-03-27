@@ -3429,5 +3429,66 @@
         "buttonText": "Kapat"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Yedekleme yönteminizi seçin",
+      "subtitle": "Yeni kullanıcılar için {provider} öneriyoruz.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Şifre yöneticisi",
+      "manualBackup": "Manuel yedekleme",
+      "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
+      "keychainFailed": "Yedekleme kaydedilemedi",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Yedekleme ifadenizi gizli tutun!",
+        "check1": "Bu ifadeyi kaybedersem kimsenin cüzdanımı kurtaramayacağını anlıyorum",
+        "check2": "Birisi bu ifadeyi ele geçirirse tüm fonlarımı çalabileceğini anlıyorum.",
+        "check3": "Kimse benden bu bilgileri mesaj veya arama yoluyla istemiyor"
+      },
+      "Phrase": {
+        "headerTitle": "Yedekleme ifadeniz",
+        "sparkCompatible": "Bu yedekleme ifadesi herhangi bir {sparkCompatibleLink} çalışır",
+        "sparkCompatibleLink": "Spark uyumlu cüzdanda",
+        "copiedToast": "Yedekleme ifadesi panoya kopyalandı",
+        "saveItNow": "Şimdi kaydet",
+        "savedConfirm": "Kaydettim",
+        "copy": "Kopyala",
+        "continueButton": "Devam et"
+      },
+      "Confirm": {
+        "headerTitle": "Yedekleme ifadesini onayla",
+        "subtitle": "Doğru yazıp yazmadığınızın hızlı bir kontrolü",
+        "enterWord": "Kelimeyi girin",
+        "enterWords": "Kelimeleri girin",
+        "confirm": "Onayla"
+      },
+      "Success": {
+        "title": "Gözetimsiz Blink'e hoş geldiniz"
+      }
+    },
+    "CloudBackup": {
+      "title": "Cüzdanınızı yedekleyelim",
+      "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
+      "encryptCheckbox": "Ek şifre ile şifrele",
+      "password": "Şifre",
+      "passwordPlaceholder": "(en az 12 karakter)",
+      "confirmPassword": "Şifreyi onayla",
+      "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
+      "continueButton": "Devam et",
+      "importantTitle": "Önemli",
+      "importantMessage": "Blink bu şifreyi saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
+      "importantMessageBold": "cüzdanınızı kurtaramayız",
+      "passwordTooShort": "En az 12 karakter",
+      "passwordMismatch": "Şifreler uyuşmuyor",
+      "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
+      "uploadFailed": "Yedek yüklenemedi",
+      "signInFailed": "Google'a giriş yapılamadı",
+      "existingBackupTitle": "Yedek bulundu",
+      "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
+      "overwrite": "Üzerine yaz"
+    }
   }
 }

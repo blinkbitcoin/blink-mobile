@@ -3429,5 +3429,66 @@
         "buttonText": "Bezárás"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Válassz biztonsági mentési módszert",
+      "subtitle": "Új felhasználóknak a {provider} ajánlott.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Jelszókezelő",
+      "manualBackup": "Kézi biztonsági mentés",
+      "keychainSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
+      "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Tartsd titokban a biztonsági mentési kifejezésed!",
+        "check1": "Megértem, hogy senki sem tudja visszaállítani a pénztárcámat, ha elveszítem ezt a kifejezést",
+        "check2": "Megértem, hogy ha valaki megszerzi ezt a kifejezést, ellophatja az összes pénzemet.",
+        "check3": "Senki nem kéri tőlem ezeket az információkat üzenetben vagy hívásban"
+      },
+      "Phrase": {
+        "headerTitle": "A biztonsági mentési kifejezésed",
+        "sparkCompatible": "Ez a kifejezés bármely {sparkCompatibleLink} működik",
+        "sparkCompatibleLink": "Spark-kompatibilis pénztárcában",
+        "copiedToast": "Biztonsági mentési kifejezés vágólapra másolva",
+        "saveItNow": "Mentsd el most",
+        "savedConfirm": "Elmentettem",
+        "copy": "Másolás",
+        "continueButton": "Tovább"
+      },
+      "Confirm": {
+        "headerTitle": "Biztonsági mentés megerősítése",
+        "subtitle": "Gyors ellenőrzés, hogy helyesen írtad-e le",
+        "enterWord": "Írd be a szót",
+        "enterWords": "Írd be a szavakat",
+        "confirm": "Megerősítés"
+      },
+      "Success": {
+        "title": "Üdvözöljük a nem letétkezelő Blinkben"
+      }
+    },
+    "CloudBackup": {
+      "title": "Készítsünk biztonsági mentést a tárcádról",
+      "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
+      "encryptCheckbox": "Titkosítás további jelszóval",
+      "password": "Jelszó",
+      "passwordPlaceholder": "(legalább 12 karakter)",
+      "confirmPassword": "Jelszó megerősítése",
+      "confirmPasswordPlaceholder": "Add meg újra a jelszót",
+      "continueButton": "Tovább",
+      "importantTitle": "Fontos",
+      "importantMessage": "A Blink nem tárolja ezt a jelszót. Ha elveszíted, {bold} visszaállítani a tárcádat.",
+      "importantMessageBold": "nem fogjuk tudni",
+      "passwordTooShort": "Legalább 12 karakter",
+      "passwordMismatch": "A jelszavak nem egyeznek",
+      "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
+      "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
+      "signInFailed": "Bejelentkezés a Google-be sikertelen",
+      "existingBackupTitle": "Biztonsági mentés találva",
+      "existingBackupMessage": "Már létezik biztonsági mentés a {provider} tárhelyeden. Felül szeretnéd írni?",
+      "overwrite": "Felülírás"
+    }
   }
 }

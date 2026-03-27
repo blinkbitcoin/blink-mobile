@@ -3562,6 +3562,72 @@ const en: BaseTranslation = {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
   },
+  SparkOnboarding: {
+    BackupMethod: {
+      title: "Choose your backup method",
+      subtitle: "We recommend {provider: string} for new users.",
+      googleDrive: "Google Drive",
+      appleICloud: "Apple iCloud",
+      passwordManager: "Password manager",
+      manualBackup: "Manual backup",
+      keychainSaved: "Backup saved to password manager",
+      keychainFailed: "Failed to save backup",
+    },
+    CloudBackup: {
+      title: "Let's back up your wallet",
+      description:
+        "We will save a backup of your backup phrase to your {provider: string}.",
+      encryptCheckbox: "Encrypt with additional password",
+      password: "Password",
+      passwordPlaceholder: "(12 characters minimum)",
+      confirmPassword: "Confirm password",
+      confirmPasswordPlaceholder: "Enter password again",
+      continueButton: "Continue",
+      importantTitle: "Important",
+      importantMessage:
+        "Blink does not store this password. If you lose it, {bold: string} to recover your wallet.",
+      importantMessageBold: "we will not be able",
+      passwordTooShort: "Minimum 12 characters",
+      passwordMismatch: "Passwords do not match",
+      existingBackupTitle: "Backup found",
+      existingBackupMessage:
+        "A backup already exists in your {provider: string}. Do you want to overwrite it?",
+      overwrite: "Overwrite",
+      uploadSuccess: "Backup saved to {provider: string}",
+      uploadFailed: "Failed to upload backup",
+      signInFailed: "Failed to sign in to Google",
+    },
+    ManualBackup: {
+      Alerts: {
+        title: "Keep your backup phrase secret!",
+        check1: "I understand nobody can recover my wallet if I lose this phrase",
+        check2:
+          "I understand if somebody gets this phrase, they can steal all my funds.",
+        check3: "Nobody is asking me for this information via message or a call",
+      },
+      Phrase: {
+        headerTitle: "Your backup phrase",
+        sparkCompatible:
+          "This backup phrase works in any {sparkCompatibleLink: string}",
+        sparkCompatibleLink: "Spark-compatible wallet",
+        copiedToast: "Backup phrase copied into clipboard",
+        saveItNow: "Save it now",
+        continueButton: "Continue",
+        savedConfirm: "I have saved it",
+        copy: "Copy",
+      },
+      Confirm: {
+        headerTitle: "Confirm backup phrase",
+        subtitle: "A quick check if you have written it down correctly",
+        enterWord: "Enter word",
+        enterWords: "Enter words",
+        confirm: "Confirm",
+      },
+      Success: {
+        title: "Welcome to non-custodial Blink",
+      },
+    },
+  },
 }
 
 export default en

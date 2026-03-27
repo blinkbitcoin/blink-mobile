@@ -3429,5 +3429,66 @@
         "buttonText": "Tancar"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Tria el teu mètode de còpia de seguretat",
+      "subtitle": "Recomanem {provider} per a nous usuaris.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Gestor de contrasenyes",
+      "manualBackup": "Còpia de seguretat manual",
+      "keychainSaved": "Còpia de seguretat desada al gestor de contrasenyes",
+      "keychainFailed": "No s’ha pogut desar la còpia de seguretat",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Mantén la teva frase de còpia de seguretat en secret!",
+        "check1": "Entenc que ningú pot recuperar la meva cartera si perdo aquesta frase",
+        "check2": "Entenc que si algú obté aquesta frase, pot robar tots els meus fons.",
+        "check3": "Ningú em demana aquesta informació per missatge o trucada"
+      },
+      "Phrase": {
+        "headerTitle": "La teva frase de còpia de seguretat",
+        "sparkCompatible": "Aquesta frase de còpia de seguretat funciona en qualsevol {sparkCompatibleLink}",
+        "sparkCompatibleLink": "cartera compatible amb Spark",
+        "copiedToast": "Frase de còpia de seguretat copiada al porta-retalls",
+        "saveItNow": "Desa-la ara",
+        "savedConfirm": "Ja l'he desat",
+        "copy": "Copiar",
+        "continueButton": "Continua"
+      },
+      "Confirm": {
+        "headerTitle": "Confirma la frase de còpia de seguretat",
+        "subtitle": "Una comprovació ràpida per veure si l'has escrita correctament",
+        "enterWord": "Introdueix la paraula",
+        "enterWords": "Introdueix les paraules",
+        "confirm": "Confirmar"
+      },
+      "Success": {
+        "title": "Benvingut a Blink sense custòdia"
+      }
+    },
+    "CloudBackup": {
+      "title": "Fem una còpia de seguretat de la teva cartera",
+      "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
+      "encryptCheckbox": "Xifrar amb contrasenya addicional",
+      "password": "Contrasenya",
+      "passwordPlaceholder": "(mínim 12 caràcters)",
+      "confirmPassword": "Confirmar contrasenya",
+      "confirmPasswordPlaceholder": "Introdueix la contrasenya de nou",
+      "continueButton": "Continuar",
+      "importantTitle": "Important",
+      "importantMessage": "Blink no emmagatzema aquesta contrasenya. Si la perds, {bold} recuperar la teva cartera.",
+      "importantMessageBold": "no podrem",
+      "passwordTooShort": "Mínim 12 caràcters",
+      "passwordMismatch": "Les contrasenyes no coincideixen",
+      "uploadSuccess": "Còpia de seguretat desada a {provider}",
+      "uploadFailed": "Error en pujar la còpia de seguretat",
+      "signInFailed": "Error en iniciar sessió a Google",
+      "existingBackupTitle": "Còpia de seguretat trobada",
+      "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
+      "overwrite": "Sobreescriure"
+    }
   }
 }

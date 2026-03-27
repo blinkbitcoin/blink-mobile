@@ -3429,5 +3429,66 @@
         "buttonText": "Închide"
       }
     }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Alege metoda de backup",
+      "subtitle": "Recomandăm {provider} pentru utilizatorii noi.",
+      "googleDrive": "Google Drive",
+      "passwordManager": "Manager de parole",
+      "manualBackup": "Backup manual",
+      "keychainSaved": "Backup salvat în managerul de parole",
+      "keychainFailed": "Nu s-a putut salva backup-ul",
+      "appleICloud": "Apple iCloud"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Păstrează-ți fraza de backup secretă!",
+        "check1": "Înțeleg că nimeni nu poate recupera portofelul meu dacă pierd această frază",
+        "check2": "Înțeleg că dacă cineva obține această frază, poate fura toate fondurile mele.",
+        "check3": "Nimeni nu îmi cere aceste informații prin mesaj sau apel"
+      },
+      "Phrase": {
+        "headerTitle": "Fraza ta de backup",
+        "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
+        "sparkCompatibleLink": "portofel compatibil Spark",
+        "copiedToast": "Fraza de backup copiată în clipboard",
+        "saveItNow": "Salvează acum",
+        "savedConfirm": "Am salvat-o",
+        "copy": "Copiază",
+        "continueButton": "Continuă"
+      },
+      "Confirm": {
+        "headerTitle": "Confirmă fraza de backup",
+        "subtitle": "O verificare rapidă dacă ai scris-o corect",
+        "enterWord": "Introdu cuvântul",
+        "enterWords": "Introdu cuvintele",
+        "confirm": "Confirmă"
+      },
+      "Success": {
+        "title": "Bun venit la Blink non-custodial"
+      }
+    },
+    "CloudBackup": {
+      "title": "Să facem o copie de siguranță a portofelului tău",
+      "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
+      "encryptCheckbox": "Criptează cu o parolă suplimentară",
+      "password": "Parolă",
+      "passwordPlaceholder": "(minim 12 caractere)",
+      "confirmPassword": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Introdu parola din nou",
+      "continueButton": "Continuă",
+      "importantTitle": "Important",
+      "importantMessage": "Blink nu stochează această parolă. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
+      "importantMessageBold": "nu vom putea",
+      "passwordTooShort": "Minim 12 caractere",
+      "passwordMismatch": "Parolele nu se potrivesc",
+      "uploadSuccess": "Copie de siguranță salvată în {provider}",
+      "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
+      "signInFailed": "Conectarea la Google a eșuat",
+      "existingBackupTitle": "Copie de siguranță găsită",
+      "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
+      "overwrite": "Suprascrie"
+    }
   }
 }
