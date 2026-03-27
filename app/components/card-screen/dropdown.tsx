@@ -130,9 +130,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     backgroundColor: colors.grey5,
     alignItems: "center",
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
     paddingVertical: 14,
-    minHeight: 60,
+    minHeight: 48,
     borderRadius: 8,
   },
   contentContainer: {
@@ -158,12 +159,13 @@ const useStyles = makeStyles(({ colors }) => ({
   optionContainer: {
     flexDirection: "row",
     backgroundColor: colors.grey5,
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
     paddingVertical: 16,
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
-    minHeight: 60,
+    minHeight: 48,
   },
   selectedOption: {
     backgroundColor: colors.grey4,
