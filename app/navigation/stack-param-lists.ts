@@ -187,6 +187,8 @@ export type RootStackParamList = {
     challenges: Array<{ index: number; word: string }>
   }
   sparkBackupSuccessScreen: undefined
+  sparkMigrationExplainer: undefined
+  sparkMigrationTransferringFunds: undefined
 }
 
 export type OnboardingStackParamList = {
