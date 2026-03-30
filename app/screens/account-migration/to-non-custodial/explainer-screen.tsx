@@ -19,7 +19,6 @@ export const SparkMigrationExplainerScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-
   const handleLearnMore = () => {
     Linking.openURL(SPARK_LEARN_MORE_URL)
   }

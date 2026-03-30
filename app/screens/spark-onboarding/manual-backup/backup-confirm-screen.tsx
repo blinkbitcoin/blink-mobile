@@ -12,7 +12,6 @@ import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useHomeAuthedQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-
 import { useBackupConfirm } from "../hooks"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "sparkBackupConfirmScreen">
