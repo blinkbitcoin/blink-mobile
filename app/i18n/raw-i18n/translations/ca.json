@@ -3493,5 +3493,15 @@
       "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
       "overwrite": "Sobreescriure"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Passa a no custodial",
+    "explainerTitle": "Què significa passar a no custodial?",
+    "explainerStep1": "Crearàs un compte no custodial al protocol Spark, ",
+    "explainerStep1Link": "més informació aquí",
+    "explainerStep2": "Transferirem els teus fons al teu nou compte no custodial i el teu compte actual serà eliminat",
+    "explainerStep3": "Continua fent servir Blink com sempre",
+    "letsMove": "Anem-hi",
+    "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   }
 }

@@ -3493,5 +3493,15 @@
       "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
       "overwrite": "Badilisha"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Hamia kwa non-custodial",
+    "explainerTitle": "Inamaanisha nini kuhamia kwa non-custodial?",
+    "explainerStep1": "Utaunda akaunti ya non-custodial kwenye itifaki ya Spark, ",
+    "explainerStep1Link": "jifunze zaidi hapa",
+    "explainerStep2": "Tunahamisha fedha zako kwenye akaunti yako mpya ya non-custodial na akaunti yako ya sasa itafutwa",
+    "explainerStep3": "Endelea kutumia Blink kama kawaida",
+    "letsMove": "Twende",
+    "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   }
 }
