@@ -13,6 +13,7 @@ const light = {
   _green: "#00A700",
   _primary1: "#FFBE0B",
   _primary2: "#FB5607",
+  _warningLight: "#FFF9E5",
 
   // adjusted
   white: "#FFFFFF",
@@ -64,6 +65,7 @@ const dark = {
   _green: "#00A700",
   _primary1: "#FFBE0B",
   _primary2: "#FB5607",
+  _warningLight: "#FFF9E5",
 
   // adjusted
   white: "#000000",
