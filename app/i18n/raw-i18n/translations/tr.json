@@ -3493,5 +3493,15 @@
       "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
       "overwrite": "Üzerine yaz"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Non-custodial'a geç",
+    "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
+    "explainerStep1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız, ",
+    "explainerStep1Link": "buradan daha fazla bilgi edinin",
+    "explainerStep2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz ve mevcut hesabınız silinecek",
+    "explainerStep3": "Blink'i her zamanki gibi kullanmaya devam edin",
+    "letsMove": "Hadi başlayalım",
+    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   }
 }

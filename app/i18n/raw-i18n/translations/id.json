@@ -3493,5 +3493,15 @@
       "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
       "overwrite": "Timpa"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Pindah ke non-custodial",
+    "explainerTitle": "Apa artinya pindah ke non-custodial?",
+    "explainerStep1": "Anda akan membuat akun non-custodial di protokol Spark, ",
+    "explainerStep1Link": "pelajari lebih lanjut di sini",
+    "explainerStep2": "Kami mentransfer dana Anda ke akun non-custodial baru dan akun Anda saat ini akan dihapus",
+    "explainerStep3": "Terus gunakan Blink seperti biasa",
+    "letsMove": "Ayo mulai",
+    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   }
 }

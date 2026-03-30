@@ -3481,5 +3481,15 @@
             "existingBackupMessage": "Já existe um backup no seu {provider}. Deseja sobrescrevê-lo?",
             "overwrite": "Sobrescrever"
         }
+    },
+    "AccountMigration": {
+        "moveToNonCustodial": "Migrar para não custodial",
+        "explainerTitle": "O que significa migrar para não custodial?",
+        "explainerStep1": "Você criará uma conta não custodial no protocolo Spark, ",
+        "explainerStep1Link": "saiba mais aqui",
+        "explainerStep2": "Transferiremos seus fundos para sua nova conta não custodial e sua conta atual será excluída",
+        "explainerStep3": "Continue usando o Blink como de costume",
+        "letsMove": "Vamos lá",
+        "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos."
     }
 }

@@ -3531,5 +3531,15 @@
       "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
       "overwrite": "استبدال"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "الانتقال إلى غير حفظي",
+    "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
+    "explainerStep1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark، ",
+    "explainerStep1Link": "اعرف المزيد هنا",
+    "explainerStep2": "سننقل أموالك إلى حسابك الجديد غير الحفظي وسيتم حذف حسابك الحالي",
+    "explainerStep3": "استمر في استخدام Blink كالمعتاد",
+    "letsMove": "هيا بنا",
+    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
   }
 }

@@ -3481,5 +3481,15 @@
             "existingBackupMessage": "Ya existe un respaldo en tu {provider}. ¿Deseas sobrescribirlo?",
             "overwrite": "Sobrescribir"
         }
+    },
+    "AccountMigration": {
+        "moveToNonCustodial": "Migrar a no custodia",
+        "explainerTitle": "¿Qué significa migrar a no custodia?",
+        "explainerStep1": "Crearás una cuenta no custodial en el protocolo Spark, ",
+        "explainerStep1Link": "aprende más aquí",
+        "explainerStep2": "Transferiremos tus fondos a tu nueva cuenta no custodial y tu cuenta actual será eliminada",
+        "explainerStep3": "Continúa usando Blink como siempre",
+        "letsMove": "¡Vamos!",
+        "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
     }
 }

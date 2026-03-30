@@ -3632,6 +3632,19 @@ const en: BaseTranslation = {
       },
     },
   },
+  AccountMigration: {
+    moveToNonCustodial: "Move to non-custodial",
+    explainerTitle: "What does it mean to move to non-custodial?",
+    explainerStep1:
+      "You will create a non-custodial account on the Spark protocol, ",
+    explainerStep1Link: "learn more here",
+    explainerStep2:
+      "We transfer your funds into your new non-custodial account, and your current account will be deleted",
+    explainerStep3: "Continue using Blink as usual",
+    letsMove: "Let's move",
+    transferringFunds:
+      "Transferring your funds. It should be done in a few seconds.",
+  },
 }
 
 export default en
