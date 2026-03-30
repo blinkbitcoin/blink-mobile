@@ -511,4 +511,21 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.numberOfLines).toBe(1)
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
+
+  it("renders Move to non-custodial option in Account section", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText("Move to non-custodial")).toBeTruthy()
+  })
 })
