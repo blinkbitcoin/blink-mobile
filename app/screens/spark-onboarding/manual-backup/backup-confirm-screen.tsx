@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
+import { useHomeAuthedQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -25,9 +26,17 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { challenges } = useRoute<ConfirmRouteProp>().params
 
+  const { data: { me } = {} } = useHomeAuthedQuery({ fetchPolicy: "cache-first" })
+  const hasFunds =
+    me?.defaultAccount?.wallets?.some((wallet) => wallet.balance > 0) ?? false
+
   const onComplete = useCallback(() => {
+    if (hasFunds) {
+      navigation.navigate("sparkMigrationTransferringFunds")
+      return
+    }
     navigation.navigate("sparkBackupSuccessScreen")
-  }, [navigation])
+  }, [navigation, hasFunds])
 
   const {
     inputs,
