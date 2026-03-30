@@ -3531,5 +3531,15 @@
       "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
       "overwrite": "Ghi đè"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Chuyển sang non-custodial",
+    "explainerTitle": "Chuyển sang non-custodial nghĩa là gì?",
+    "explainerStep1": "Bạn sẽ tạo một tài khoản non-custodial trên giao thức Spark, ",
+    "explainerStep1Link": "tìm hiểu thêm tại đây",
+    "explainerStep2": "Chúng tôi chuyển tiền của bạn vào tài khoản non-custodial mới và tài khoản hiện tại của bạn sẽ bị xóa",
+    "explainerStep3": "Tiếp tục sử dụng Blink như bình thường",
+    "letsMove": "Bắt đầu nào",
+    "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
   }
 }

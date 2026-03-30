@@ -3534,5 +3534,15 @@
       "existingBackupMessage": "Sigurnosna kopija već postoji u vašem {provider}. Želite li je prebrisati?",
       "overwrite": "Prebriši"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Prebaci na ne-skrbnički",
+    "explainerTitle": "Što znači prebaciti na ne-skrbnički?",
+    "explainerStep1": "Stvorit ćete ne-skrbnički račun na Spark protokolu, ",
+    "explainerStep1Link": "saznajte više ovdje",
+    "explainerStep2": "Prebacujemo vaša sredstva na vaš novi ne-skrbnički račun, a vaš trenutni račun bit će izbrisan",
+    "explainerStep3": "Nastavite koristiti Blink kao i obično",
+    "letsMove": "Idemo",
+    "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
   }
 }
