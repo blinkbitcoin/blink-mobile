@@ -106,7 +106,7 @@ describe("useMigrationCheckpoint", () => {
   })
 
   it("ignores expired checkpoint and removes from storage", async () => {
-    const expiredTimestamp = Date.now() - 25 * 60 * 60 * 1000 // 25 hours ago
+    const expiredTimestamp = Date.now() - 49 * 60 * 60 * 1000
     mockLoadJson.mockResolvedValue({
       step: MigrationCheckpoint.BackupAlerts,
       savedAt: expiredTimestamp,
@@ -120,23 +120,8 @@ describe("useMigrationCheckpoint", () => {
     expect(mockRemove).toHaveBeenCalledWith("migrationCheckpoint")
   })
 
-  it("ignores expired backup method checkpoint after 1 hour", async () => {
-    const expiredTimestamp = Date.now() - 2 * 60 * 60 * 1000 // 2 hours ago
-    mockLoadJson.mockResolvedValue({
-      step: MigrationCheckpoint.BackupMethod,
-      savedAt: expiredTimestamp,
-    })
-
-    const { result } = renderHook(() => useMigrationCheckpoint())
-
-    await act(async () => {})
-
-    expect(result.current.checkpoint).toBeNull()
-    expect(mockRemove).toHaveBeenCalledWith("migrationCheckpoint")
-  })
-
-  it("keeps valid backup method checkpoint within 1 hour", async () => {
-    const recentTimestamp = Date.now() - 30 * 60 * 1000 // 30 minutes ago
+  it("keeps valid checkpoint within 48 hours", async () => {
+    const recentTimestamp = Date.now() - 47 * 60 * 60 * 1000
     mockLoadJson.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: recentTimestamp,
