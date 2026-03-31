@@ -3,8 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 const STORAGE_KEY = "migrationCheckpoint"
-const SHORT_EXPIRATION_MS = 60 * 60 * 1000 // 1 hour
-const DEFAULT_EXPIRATION_MS = 24 * SHORT_EXPIRATION_MS // 24 hours
+const EXPIRATION_MS = 48 * 60 * 60 * 1000
 
 export const MigrationCheckpoint = {
   BackupMethod: "backupMethod",
@@ -14,12 +13,6 @@ export const MigrationCheckpoint = {
 
 export type MigrationCheckpointType =
   (typeof MigrationCheckpoint)[keyof typeof MigrationCheckpoint]
-
-const checkpointExpirationMap: Record<MigrationCheckpointType, number> = {
-  [MigrationCheckpoint.BackupMethod]: SHORT_EXPIRATION_MS,
-  [MigrationCheckpoint.CloudBackup]: DEFAULT_EXPIRATION_MS,
-  [MigrationCheckpoint.BackupAlerts]: DEFAULT_EXPIRATION_MS,
-}
 
 const checkpointRouteMap = {
   [MigrationCheckpoint.BackupMethod]: "sparkBackupMethodScreen",
@@ -50,7 +43,7 @@ export const useMigrationCheckpoint = () => {
       }
 
       const typedStep = step as MigrationCheckpointType
-      if (Date.now() - savedAt > checkpointExpirationMap[typedStep]) {
+      if (Date.now() - savedAt > EXPIRATION_MS) {
         remove(STORAGE_KEY)
         setLoading(false)
         return
