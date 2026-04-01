@@ -22,6 +22,17 @@ export const getBreezClient = async (): Promise<BreezSdkInterface> => {
     const seed = new Seed.Mnemonic({ mnemonic: MNEMONIC, passphrase: undefined })
     const config = defaultConfig(Network.Mainnet)
     config.apiKey = Config.BREEZ_API_KEY ?? ""
+    config.stableBalanceConfig = {
+      tokens: [
+        {
+          label: "USDB",
+          tokenIdentifier: Config.SPARK_TOKEN_IDENTIFIER ?? "",
+        },
+      ],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: undefined,
+    }
 
     const sdk = await connect({ config, seed, storageDir: STORAGE_DIR })
     sdkInstance = sdk

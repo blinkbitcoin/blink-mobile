@@ -18,6 +18,18 @@ import { prepareSparkPayment } from "./methods/send/prepare-spark-payment"
 import { sendLightningPayment } from "./methods/send/send-lightning-payment"
 import { sendOnchainPayment } from "./methods/send/send-onchain-payment"
 import { sendSparkPayment } from "./methods/send/send-spark-payment"
+import { subscribeEvents } from "./methods/events/subscribe-events"
+import { listUnclaimedDeposits } from "./methods/deposits/list-unclaimed-deposits"
+import { claimDeposit } from "./methods/deposits/claim-deposit"
+import { activateStableBalance } from "./methods/stable-balance/activate-stable-balance"
+import { deactivateStableBalance } from "./methods/stable-balance/deactivate-stable-balance"
+import { convertBtcToUsdb } from "./methods/stable-balance/convert-btc-to-usdb"
+import { convertUsdbToBtc } from "./methods/stable-balance/convert-usdb-to-btc"
+import {
+  fetchConversionLimitsBtcToToken,
+  fetchConversionLimitsTokenToBtc,
+} from "./methods/stable-balance/fetch-conversion-limits"
+import { getDefaultConfig } from "./methods/stable-balance/get-token-identifier"
 import { formatError, stringifyWithBigInt } from "./utils"
 
 type DemoMethod = () => Promise<object>
@@ -46,8 +58,8 @@ const SECTIONS: ReadonlyArray<SectionConfig> = [
     title: "Receive",
     buttons: [
       {
-        label: "Create Invoice (1000 sats)",
-        method: () => createLightningInvoice(1000),
+        label: "Create Invoice (700 sats)",
+        method: () => createLightningInvoice(700),
       },
     ],
   },
@@ -97,13 +109,35 @@ const SECTIONS: ReadonlyArray<SectionConfig> = [
           ),
       },
       {
-        label: "Send (10 sats)",
+        label: "Send (78 sats)",
         method: () =>
           sendSparkPayment(
-            "spark1pgss8g96acg7rwljvv33m57rs7wd9zxj4fd8xyetuhhqy7m2cyjqq0rxazfu3f",
-            10,
+            "spark1pgss9hdhea48v558ennltqv34zx52arly8ngkvf2cl6uj0la9m505ww4y77f4x",
+            78,
           ),
       },
+    ],
+  },
+  {
+    title: "Deposits",
+    buttons: [
+      { label: "List Unclaimed", method: listUnclaimedDeposits },
+      {
+        label: "Claim Deposit",
+        method: () => claimDeposit("PASTE_TXID_HERE", 0),
+      },
+    ],
+  },
+  {
+    title: "Stable Balance",
+    buttons: [
+      { label: "Default Config", method: getDefaultConfig },
+      { label: "Activate USDB", method: activateStableBalance },
+      { label: "Deactivate", method: deactivateStableBalance },
+      { label: "Limits BTC → USDB", method: fetchConversionLimitsBtcToToken },
+      { label: "Limits USDB → BTC", method: fetchConversionLimitsTokenToBtc },
+      { label: "Convert 800 sats → USDB", method: () => convertBtcToUsdb(800) },
+      { label: "Convert 800 USDB → BTC", method: () => convertUsdbToBtc(800) },
     ],
   },
 ]
@@ -112,6 +146,16 @@ export const BreezSdkDemoScreen: React.FC = () => {
   const styles = useStyles()
   const [result, setResult] = useState("")
   const [loading, setLoading] = useState(false)
+  const [eventLogs, setEventLogs] = useState<string[]>([])
+  const [listening, setListening] = useState(false)
+
+  const startListening = useCallback(async () => {
+    if (listening) return
+    setListening(true)
+    await subscribeEvents((log: string) => {
+      setEventLogs((prev) => [log, ...prev].slice(0, 50))
+    })
+  }, [listening])
 
   const runMethod = useCallback(async (method: DemoMethod) => {
     setLoading(true)
@@ -153,11 +197,36 @@ export const BreezSdkDemoScreen: React.FC = () => {
           </View>
         ))}
 
+        <View style={styles.section}>
+          <Text type="h2" style={styles.sectionTitle}>
+            Events
+          </Text>
+          <GaloyPrimaryButton
+            title={listening ? "Listening..." : "Start Listener"}
+            onPress={startListening}
+            disabled={listening || loading}
+          />
+          {eventLogs.length > 0 && (
+            <ScrollView style={styles.eventLogContainer} nestedScrollEnabled>
+              {eventLogs.map((log, i) => (
+                <Text key={`${log}-${i}`} selectable style={styles.eventLogText}>
+                  {log}
+                </Text>
+              ))}
+            </ScrollView>
+          )}
+          {listening && eventLogs.length === 0 && (
+            <Text style={styles.eventLogWaiting}>Waiting for events...</Text>
+          )}
+        </View>
+
         {loading && <ActivityIndicator size="large" style={styles.loader} />}
 
         {result !== "" && (
           <ScrollView style={styles.resultContainer} nestedScrollEnabled>
-            <Text style={styles.resultText}>{result}</Text>
+            <Text selectable style={styles.resultText}>
+              {result}
+            </Text>
           </ScrollView>
         )}
       </View>
@@ -194,5 +263,23 @@ const useStyles = makeStyles(({ colors }) => ({
   resultText: {
     fontSize: 12,
     fontFamily: "monospace",
+  },
+  eventLogContainer: {
+    marginTop: 10,
+    maxHeight: 200,
+    backgroundColor: colors.grey5,
+    borderRadius: 8,
+    padding: 12,
+  },
+  eventLogText: {
+    fontSize: 11,
+    fontFamily: "monospace",
+    marginBottom: 4,
+  },
+  eventLogWaiting: {
+    marginTop: 10,
+    fontSize: 12,
+    fontStyle: "italic",
+    color: colors.grey3,
   },
 }))
