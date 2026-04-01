@@ -22625,15 +22625,16 @@ react-native-quick-base64@^2.0.5, react-native-quick-base64@^2.2.2:
   resolved "https://registry.yarnpkg.com/react-native-quick-base64/-/react-native-quick-base64-2.2.2.tgz#52005a0b455b04acc1c6ff3eb8fa220401656aae"
   integrity sha512-WLHSifHLoamr2kF00Gov0W9ud6CfPshe1rmqWTquVIi9c62qxOaJCFVDrXFZhEBU8B8PvGLVuOlVKH78yhY0Fg==
 
-react-native-quick-crypto@1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/react-native-quick-crypto/-/react-native-quick-crypto-1.0.10.tgz#faa1fc5b67b17401c2c730e23dedc6ecf1db8bd5"
-  integrity sha512-dTRnCN2GZoZTKDrO/Bh9rV4txR5RtESHzZLjlTsW91ZoAkyLNhcpDT5f/PFQhU+wu5892DScByRqEPXn8AteJA==
+react-native-quick-crypto@1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/react-native-quick-crypto/-/react-native-quick-crypto-1.0.18.tgz#6030d6ddf2223570f324324d8a62581ca988c033"
+  integrity sha512-VjBLW2PasOUSxAqy2IDNvLqBez9NwTDBecwCpuz0F5WkzPDGZ4CuZEFGyL1qfkjwok11F0x3IyMrmCyFBAtOCQ==
   dependencies:
     "@craftzdog/react-native-buffer" "6.1.0"
     events "3.3.0"
     readable-stream "4.5.2"
     safe-buffer "^5.2.1"
+    string_decoder "^1.3.0"
     util "0.12.5"
 
 react-native-randombytes@^3.5.1:
