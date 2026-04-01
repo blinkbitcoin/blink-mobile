@@ -176,6 +176,7 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
+  breezSdkDemoScreen: undefined
 }
 
 export type OnboardingStackParamList = {

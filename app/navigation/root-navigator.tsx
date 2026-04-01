@@ -69,6 +69,7 @@ import {
   LoginMethodScreen,
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
+import { BreezSdkDemoScreen } from "../screens/breez-sdk-demo/breez-sdk-demo-screen"
 import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
@@ -359,6 +360,11 @@ export const RootStack = () => {
         options={{
           gestureEnabled: false,
         }}
+      />
+      <RootNavigator.Screen
+        name="breezSdkDemoScreen"
+        component={BreezSdkDemoScreen}
+        options={{ title: "Breez SDK Demo" }}
       />
       <RootNavigator.Screen
         name="sectionCompleted"
