@@ -58,8 +58,8 @@ const SECTIONS: ReadonlyArray<SectionConfig> = [
     title: "Receive",
     buttons: [
       {
-        label: "Create Invoice (700 sats)",
-        method: () => createLightningInvoice(700),
+        label: "Create Invoice (125 sats)",
+        method: () => createLightningInvoice(125),
       },
     ],
   },
@@ -157,16 +157,29 @@ export const BreezSdkDemoScreen: React.FC = () => {
     })
   }, [listening])
 
-  const runMethod = useCallback(async (method: DemoMethod) => {
+  const runMethod = useCallback(async (method: DemoMethod, label: string) => {
     setLoading(true)
     setResult("")
+    const separator = "=".repeat(50)
+    console.log(`\n${separator}`)
+    console.log(`[SPIKE] START: ${label}`)
+    console.log(separator)
     try {
       const response = await method()
-      setResult(
-        stringifyWithBigInt(response as Parameters<typeof stringifyWithBigInt>[0]),
+      const output = stringifyWithBigInt(
+        response as Parameters<typeof stringifyWithBigInt>[0],
       )
+      console.log(`[SPIKE] RESULT: ${label}`)
+      console.log(output)
+      console.log(`[SPIKE] END: ${label} — SUCCESS`)
+      console.log(separator)
+      setResult(output)
     } catch (error) {
-      setResult(formatError(error as Error))
+      const msg = formatError(error as Error)
+      console.log(`[SPIKE] RESULT: ${label}`)
+      console.log(msg)
+      console.log(`[SPIKE] END: ${label} — FAILED`)
+      console.log(separator)
     } finally {
       setLoading(false)
     }
@@ -189,7 +202,7 @@ export const BreezSdkDemoScreen: React.FC = () => {
                 <GaloyPrimaryButton
                   key={btn.label}
                   title={btn.label}
-                  onPress={() => runMethod(btn.method)}
+                  onPress={() => runMethod(btn.method, `${section.title} > ${btn.label}`)}
                   disabled={loading}
                 />
               ))}
