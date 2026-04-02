@@ -22,6 +22,7 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
+import { CustodialWalletProvider } from "./custodial/providers/wallet-provider"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
 import TypesafeI18n from "./i18n/i18n-react"
@@ -54,24 +55,26 @@ export const App = () => (
         <GaloyClient>
           <GaloyThemeProvider>
             <FeatureFlagContextProvider>
-              <ActionsProvider>
-                <NavigationContainerWrapper>
-                  <ErrorBoundary FallbackComponent={ErrorScreen}>
-                    <RootSiblingParent>
-                      <BottomSheetModalProvider>
-                        <NotificationsProvider>
-                          <AppStateWrapper />
-                          <PushNotificationComponent />
-                          <RootStack />
-                          <NetworkErrorComponent />
-                          <ActionModals />
-                        </NotificationsProvider>
-                        <GaloyToast />
-                      </BottomSheetModalProvider>
-                    </RootSiblingParent>
-                  </ErrorBoundary>
-                </NavigationContainerWrapper>
-              </ActionsProvider>
+              <CustodialWalletProvider>
+                <ActionsProvider>
+                  <NavigationContainerWrapper>
+                    <ErrorBoundary FallbackComponent={ErrorScreen}>
+                      <RootSiblingParent>
+                        <BottomSheetModalProvider>
+                          <NotificationsProvider>
+                            <AppStateWrapper />
+                            <PushNotificationComponent />
+                            <RootStack />
+                            <NetworkErrorComponent />
+                            <ActionModals />
+                          </NotificationsProvider>
+                          <GaloyToast />
+                        </BottomSheetModalProvider>
+                      </RootSiblingParent>
+                    </ErrorBoundary>
+                  </NavigationContainerWrapper>
+                </ActionsProvider>
+              </CustodialWalletProvider>
             </FeatureFlagContextProvider>
           </GaloyThemeProvider>
         </GaloyClient>
