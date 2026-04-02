@@ -3502,5 +3502,31 @@
     "explainerStep3": "Terus gunakan Blink seperti biasa",
     "letsMove": "Ayo mulai",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Pilih jenis akun",
+    "description": "Pilih bagaimana Anda ingin mengelola dana Anda",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Cadangkan dompet",
+    "description": "Pilih metode pencadangan untuk mengamankan dana Anda"
+  },
+  "RestoreScreen": {
+    "title": "Pulihkan dompet",
+    "description": "Pulihkan dompet Anda dari cadangan"
+  },
+  "BackupNudge": {
+    "title": "Amankan dompet Anda",
+    "description": "Dana Anda dalam bahaya. Amankan dompet Anda sekarang."
+  },
+  "StableBalance": {
+    "title": "Saldo stabil",
+    "description": "Simpan saldo dalam USD didukung USDB di Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Fitur tidak tersedia",
+    "description": "Fitur ini memerlukan akun kustodial."
   }
 }

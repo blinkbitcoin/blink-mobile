@@ -3502,5 +3502,31 @@
     "explainerStep3": "Continuă să folosești Blink ca de obicei",
     "letsMove": "Hai să mergem",
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Alegeți tipul de cont",
+    "description": "Selectați cum doriți să vă gestionați fondurile",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Copie de siguranță portofel",
+    "description": "Alegeți o metodă de backup pentru a vă proteja fondurile"
+  },
+  "RestoreScreen": {
+    "title": "Restaurare portofel",
+    "description": "Recuperați portofelul dintr-o copie de siguranță"
+  },
+  "BackupNudge": {
+    "title": "Securizați-vă portofelul",
+    "description": "Fondurile dvs. sunt în pericol. Securizați-vă portofelul acum."
+  },
+  "StableBalance": {
+    "title": "Sold stabil",
+    "description": "Păstrați un sold în USD alimentat de USDB pe Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funcție indisponibilă",
+    "description": "Această funcție necesită un cont custodial."
   }
 }

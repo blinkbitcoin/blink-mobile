@@ -3543,5 +3543,31 @@
     "explainerStep3": "Blijf Blink gebruiken zoals gewoonlijk",
     "letsMove": "Laten we gaan",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Kies accounttype",
+    "description": "Kies hoe je je fondsen wilt beheren",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Portemonnee back-uppen",
+    "description": "Kies een back-upmethode om je fondsen te beschermen"
+  },
+  "RestoreScreen": {
+    "title": "Portemonnee herstellen",
+    "description": "Herstel je portemonnee vanuit een back-up"
+  },
+  "BackupNudge": {
+    "title": "Beveilig je portemonnee",
+    "description": "Je fondsen lopen gevaar. Beveilig je portemonnee nu."
+  },
+  "StableBalance": {
+    "title": "Stabiel saldo",
+    "description": "Houd een USD-saldo aangedreven door USDB op Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Functie niet beschikbaar",
+    "description": "Deze functie vereist een bewaarrekening."
   }
 }

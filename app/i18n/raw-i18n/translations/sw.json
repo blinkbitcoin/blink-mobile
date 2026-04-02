@@ -3502,5 +3502,31 @@
     "explainerStep3": "Endelea kutumia Blink kama kawaida",
     "letsMove": "Twende",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Chagua aina ya akaunti",
+    "description": "Chagua jinsi unavyotaka kusimamia fedha zako",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Hifadhi nakala ya mkoba",
+    "description": "Chagua njia ya kuhifadhi nakala ili kulinda fedha zako"
+  },
+  "RestoreScreen": {
+    "title": "Rejesha mkoba",
+    "description": "Rejesha mkoba wako kutoka kwa nakala"
+  },
+  "BackupNudge": {
+    "title": "Linda mkoba wako",
+    "description": "Fedha zako ziko hatarini. Linda mkoba wako sasa."
+  },
+  "StableBalance": {
+    "title": "Salio thabiti",
+    "description": "Hifadhi salio la USD linaloendeleshwa na USDB kwenye Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Kipengele hakipatikani",
+    "description": "Kipengele hiki kinahitaji akaunti ya ulezi."
   }
 }
