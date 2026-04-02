@@ -3540,5 +3540,31 @@
     "explainerStep3": "Наставите да користите Blink као и обично",
     "letsMove": "Идемо",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Изаберите тип налога",
+    "description": "Изаберите како желите да управљате средствима",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Резервна копија новчаника",
+    "description": "Изаберите метод резервне копије за заштиту средстава"
+  },
+  "RestoreScreen": {
+    "title": "Враћање новчаника",
+    "description": "Вратите новчаник из резервне копије"
+  },
+  "BackupNudge": {
+    "title": "Заштитите новчаник",
+    "description": "Ваша средства су угрожена. Заштитите новчаник сада."
+  },
+  "StableBalance": {
+    "title": "Стабилан салдо",
+    "description": "Држите салдо у USD покретан USDB на Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Функција недоступна",
+    "description": "Ова функција захтева кустодијални налог."
   }
 }

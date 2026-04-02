@@ -3490,5 +3490,31 @@
         "explainerStep3": "Continúa usando Blink como siempre",
         "letsMove": "¡Vamos!",
         "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
+    },
+    "AccountTypeSelectionScreen": {
+        "title": "Elige tipo de cuenta",
+        "description": "Selecciona cómo quieres administrar tus fondos",
+        "custodialLabel": "Blink",
+        "selfCustodialLabel": "Spark"
+    },
+    "BackupScreen": {
+        "title": "Respaldar billetera",
+        "description": "Elige un método de respaldo para proteger tus fondos"
+    },
+    "RestoreScreen": {
+        "title": "Restaurar billetera",
+        "description": "Recupera tu billetera desde un respaldo"
+    },
+    "BackupNudge": {
+        "title": "Asegura tu billetera",
+        "description": "Tus fondos están en riesgo. Asegura tu billetera ahora."
+    },
+    "StableBalance": {
+        "title": "Balance estable",
+        "description": "Mantén un balance en USD impulsado por USDB en Spark."
+    },
+    "BackendFeatureGate": {
+        "title": "Función no disponible",
+        "description": "Esta función requiere una cuenta custodia."
     }
 }

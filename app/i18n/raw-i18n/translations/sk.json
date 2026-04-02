@@ -3502,5 +3502,31 @@
     "explainerStep3": "Pokračujte v používaní Blink ako zvyčajne",
     "letsMove": "Poďme na to",
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Vyberte typ účtu",
+    "description": "Vyberte, ako chcete spravovať svoje prostriedky",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Zálohovať peňaženku",
+    "description": "Vyberte metódu zálohovania na ochranu prostriedkov"
+  },
+  "RestoreScreen": {
+    "title": "Obnoviť peňaženku",
+    "description": "Obnovte peňaženku zo zálohy"
+  },
+  "BackupNudge": {
+    "title": "Zabezpečte peňaženku",
+    "description": "Vaše prostriedky sú ohrozené. Zabezpečte peňaženku teraz."
+  },
+  "StableBalance": {
+    "title": "Stabilný zostatok",
+    "description": "Udržiavajte zostatok v USD poháňaný USDB na Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funkcia nedostupná",
+    "description": "Táto funkcia vyžaduje úschovný účet."
   }
 }

@@ -3540,5 +3540,31 @@
     "explainerStep3": "Blink nisqata llamkachiy imaynallapas",
     "letsMove": "Haku",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Aklliy cuenta laya",
+    "description": "Aklliy imaynata qullqi kamachiy munasqayki",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Walleta waqaychay",
+    "description": "Aklliy waqaychay ñanta qullqiykita jark'anapaq"
+  },
+  "RestoreScreen": {
+    "title": "Walleta kutichiy",
+    "description": "Walletaykita waqaychaymanta kutichiy"
+  },
+  "BackupNudge": {
+    "title": "Walletaykita jark'ay",
+    "description": "Qullqiyki ñak'ariypi kachkan. Walletaykita jark'ay kunan."
+  },
+  "StableBalance": {
+    "title": "Saldo sinchi",
+    "description": "USD saldota USDB Spark nisqawan jap'iy."
+  },
+  "BackendFeatureGate": {
+    "title": "Kay mana kanchu",
+    "description": "Kay ruwayqa custodial cuentata munan."
   }
 }
