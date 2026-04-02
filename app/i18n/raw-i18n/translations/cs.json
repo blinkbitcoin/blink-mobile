@@ -3543,5 +3543,31 @@
     "explainerStep3": "Pokračujte v používání Blink jako obvykle",
     "letsMove": "Pojďme na to",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Vyberte typ účtu",
+    "description": "Vyberte, jak chcete spravovat své prostředky",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Zálohovat peněženku",
+    "description": "Vyberte metodu zálohy pro zabezpečení prostředků"
+  },
+  "RestoreScreen": {
+    "title": "Obnovit peněženku",
+    "description": "Obnovte peněženku ze zálohy"
+  },
+  "BackupNudge": {
+    "title": "Zabezpečte peněženku",
+    "description": "Vaše prostředky jsou ohroženy. Zabezpečte peněženku nyní."
+  },
+  "StableBalance": {
+    "title": "Stabilní zůstatek",
+    "description": "Držte zůstatek v USD poháněný USDB na Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funkce nedostupná",
+    "description": "Tato funkce vyžaduje úschovný účet."
   }
 }

@@ -3520,5 +3520,31 @@
     "explainerStep3": "Fortsæt med at bruge Blink som normalt",
     "letsMove": "Lad os gå",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Vælg kontotype",
+    "description": "Vælg hvordan du vil administrere dine midler",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Sikkerhedskopier tegnebog",
+    "description": "Vælg en sikkerhedskopieringsmetode for at beskytte dine midler"
+  },
+  "RestoreScreen": {
+    "title": "Gendan tegnebog",
+    "description": "Gendan din tegnebog fra en sikkerhedskopi"
+  },
+  "BackupNudge": {
+    "title": "Sikr din tegnebog",
+    "description": "Dine midler er i fare. Sikr din tegnebog nu."
+  },
+  "StableBalance": {
+    "title": "Stabil saldo",
+    "description": "Hold en USD-saldo drevet af USDB på Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funktion ikke tilgængelig",
+    "description": "Denne funktion kræver en forvaringskonto."
   }
 }

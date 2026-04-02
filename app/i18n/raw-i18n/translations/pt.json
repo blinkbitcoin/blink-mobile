@@ -3490,5 +3490,31 @@
         "explainerStep3": "Continue usando o Blink como de costume",
         "letsMove": "Vamos lá",
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos."
+    },
+    "AccountTypeSelectionScreen": {
+        "title": "Escolha o tipo de conta",
+        "description": "Selecione como deseja gerenciar seus fundos",
+        "custodialLabel": "Blink",
+        "selfCustodialLabel": "Spark"
+    },
+    "BackupScreen": {
+        "title": "Fazer backup da carteira",
+        "description": "Escolha um método de backup para proteger seus fundos"
+    },
+    "RestoreScreen": {
+        "title": "Restaurar carteira",
+        "description": "Recupere sua carteira a partir de um backup"
+    },
+    "BackupNudge": {
+        "title": "Proteja sua carteira",
+        "description": "Seus fundos estão em risco. Proteja sua carteira agora."
+    },
+    "StableBalance": {
+        "title": "Saldo estável",
+        "description": "Mantenha um saldo em USD alimentado por USDB no Spark."
+    },
+    "BackendFeatureGate": {
+        "title": "Recurso indisponível",
+        "description": "Este recurso requer uma conta custodial."
     }
 }
