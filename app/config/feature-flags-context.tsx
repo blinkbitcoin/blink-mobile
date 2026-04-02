@@ -18,6 +18,8 @@ const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
+const NonCustodialEnabledKey = "nonCustodialEnabled"
+const StableBalanceEnabledKey = "stableBalanceEnabled"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -29,6 +31,8 @@ type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
+  nonCustodialEnabled: boolean
+  stableBalanceEnabled: boolean
 }
 
 type RemoteConfig = {
@@ -46,6 +50,8 @@ type RemoteConfig = {
   [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
+  [NonCustodialEnabledKey]: boolean
+  [StableBalanceEnabledKey]: boolean
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -68,10 +74,14 @@ const defaultRemoteConfig: RemoteConfig = {
   cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  nonCustodialEnabled: false,
+  stableBalanceEnabled: false,
 }
 
-const defaultFeatureFlags = {
+const defaultFeatureFlags: FeatureFlags = {
   deviceAccountEnabled: false,
+  nonCustodialEnabled: false,
+  stableBalanceEnabled: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -154,6 +164,14 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
 
+        const nonCustodialEnabled = remoteConfigInstance()
+          .getValue(NonCustodialEnabledKey)
+          .asBoolean()
+
+        const stableBalanceEnabled = remoteConfigInstance()
+          .getValue(StableBalanceEnabledKey)
+          .asBoolean()
+
         const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
@@ -177,6 +195,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
+          nonCustodialEnabled,
+          stableBalanceEnabled,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
@@ -186,9 +206,12 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     })()
   }, [])
 
-  const featureFlags = {
+  const featureFlags: FeatureFlags = {
     deviceAccountEnabled:
       remoteConfig.deviceAccountEnabledRestAuth || galoyInstance.id === "Local",
+    nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
+    stableBalanceEnabled:
+      remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
   }
 
   if (!remoteConfigReady && currentLevel === "NonAuth") {
