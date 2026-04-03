@@ -99,3 +99,10 @@ export const toMinorUnit = (dollars: string): number =>
   Math.round(parseFloat(dollars) * 100)
 
 export const toMajorUnit = (cents: number): number => cents / 100
+
+export const toNumber = (value: bigint | string | number): number => {
+  if (typeof value === "number") return value
+  const parsed = Number(value)
+  if (Number.isNaN(parsed)) return 0
+  return parsed
+}
