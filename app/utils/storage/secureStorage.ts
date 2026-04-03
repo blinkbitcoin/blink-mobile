@@ -5,6 +5,7 @@ export default class KeyStoreWrapper {
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
+  private static readonly MNEMONIC = "mnemonic"
 
   public static async getIsBiometricsEnabled(): Promise<boolean> {
     try {
@@ -131,6 +132,43 @@ export default class KeyStoreWrapper {
       await RNSecureKeyStore.remove(KeyStoreWrapper.SESSION_PROFILES)
       return true
     } catch (err) {
+      return false
+    }
+  }
+
+  public static async hasMnemonic(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.get(KeyStoreWrapper.MNEMONIC)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async getMnemonic(): Promise<string> {
+    try {
+      return await RNSecureKeyStore.get(KeyStoreWrapper.MNEMONIC)
+    } catch {
+      return ""
+    }
+  }
+
+  public static async setMnemonic(mnemonic: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.MNEMONIC, mnemonic, {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async deleteMnemonic(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.MNEMONIC)
+      return true
+    } catch {
       return false
     }
   }
