@@ -1,4 +1,5 @@
 import { useCustodialWallet } from "@app/custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -17,10 +18,11 @@ const createPlaceholder = (accountType: AccountType): ActiveWalletState => ({
 export const useActiveWallet = (): ActiveWalletState => {
   const { activeAccount, accounts, setActiveAccountId } = useAccountRegistry()
   const custodialState = useCustodialWallet()
+  const selfCustodialState = useSelfCustodialWallet()
 
   useSelfCustodialRollback({ activeAccount, accounts, setActiveAccountId })
 
   if (!activeAccount) return createPlaceholder(AccountType.Custodial)
   if (activeAccount.type === AccountType.Custodial) return custodialState
-  return createPlaceholder(AccountType.SelfCustodial)
+  return selfCustodialState
 }
