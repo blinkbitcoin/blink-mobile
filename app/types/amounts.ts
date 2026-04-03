@@ -67,6 +67,14 @@ export const toUsdMoneyAmount = (amount: number | undefined): UsdMoneyAmount => 
   }
 }
 
+export const toWalletMoneyAmount = (
+  amount: number,
+  currency: WalletCurrency,
+): MoneyAmount<WalletCurrency> => {
+  if (currency === WalletCurrency.Btc) return toBtcMoneyAmount(Math.abs(amount))
+  return toUsdMoneyAmount(Math.abs(amount))
+}
+
 export const toWalletAmount = <T extends WalletCurrency>({
   amount,
   currency,
