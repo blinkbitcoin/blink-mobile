@@ -199,6 +199,73 @@ describe("resolve lnurl destination", () => {
     })
   })
 
+  describe("with lnurl auth string", () => {
+    const lnurlPaymentDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlauthstring",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: ["ourdomain.com"],
+      accountDefaultWalletQuery: jest.fn(),
+      myWalletIds: ["testwalletid"],
+    }
+
+    it("creates lnurl auth destination with login action", async () => {
+      mockRequestPayServiceParams.mockImplementation(throwError)
+      const mockLnurlAuthParams = {
+        tag: "login" as const,
+        k1: "e2af6254a8df433264fa23f67eb8188635d15ce883e8fc020989d5f82ae6f11e",
+        callback: "https://example.com/auth",
+        domain: "example.com",
+      }
+      mockGetParams.mockResolvedValue(mockLnurlAuthParams)
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Receive,
+          validDestination: {
+            paymentType: PaymentType.Lnurl,
+            callback: mockLnurlAuthParams.callback,
+            domain: mockLnurlAuthParams.domain,
+            k1: mockLnurlAuthParams.k1,
+            action: "login",
+            valid: true,
+            lnurl: lnurlPaymentDestinationParams.parsedLnurlDestination.lnurl,
+          },
+        }),
+      )
+    })
+
+    it("creates lnurl auth destination with register action", async () => {
+      mockRequestPayServiceParams.mockImplementation(throwError)
+      const mockLnurlAuthParams = {
+        tag: "login" as const,
+        k1: "e2af6254a8df433264fa23f67eb8188635d15ce883e8fc020989d5f82ae6f11e",
+        callback: "https://example.com/auth",
+        domain: "example.com",
+        action: "register" as const,
+      }
+      mockGetParams.mockResolvedValue(mockLnurlAuthParams)
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Receive,
+          validDestination: expect.objectContaining({
+            action: "register",
+          }),
+        }),
+      )
+    })
+  })
+
   describe("with phone number on our domain", () => {
     const lnurlPaymentDestinationParams = {
       parsedLnurlDestination: {
