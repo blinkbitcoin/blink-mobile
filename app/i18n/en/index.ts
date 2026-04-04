@@ -2650,15 +2650,6 @@ const en: BaseTranslation = {
     whatsapp: "Send via WhatsApp",
     telegram: "Send via Telegram",
   },
-  LnurlAuthScreen: {
-    title: "Login Request",
-    actionRegister: "register",
-    actionLogin: "login",
-    actionLink: "link account",
-    actionAuth: "authorize",
-    actionDescription: "{action} to {domain}",
-    success: "Successfully authenticated!",
-  },
   LoginMethodScreen: {
     title: "Select preferred login method.",
     useTelegram: "Use Telegram",
