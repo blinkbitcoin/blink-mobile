@@ -163,8 +163,10 @@ export const ModalNfc: React.FC<{
             ).amount
           }
 
-          destination.validDestination.minWithdrawable = amount * 1000 // coz msats
-          destination.validDestination.maxWithdrawable = amount * 1000 // coz msats
+          if ("minWithdrawable" in destination.validDestination) {
+            destination.validDestination.minWithdrawable = amount * 1000 // coz msats
+            destination.validDestination.maxWithdrawable = amount * 1000 // coz msats
+          }
 
           receiveViaNFC(destination)
         }

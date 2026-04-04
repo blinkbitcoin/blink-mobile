@@ -17,6 +17,10 @@ import {
   toBtcMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import {
+  LnurlWithdrawDestination,
+  ValidParsedReceiveDestination,
+} from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -35,7 +39,7 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
   const { formatMoneyAmount } = useDisplayCurrency()
 
   const { callback, domain, defaultDescription, k1, minWithdrawable, maxWithdrawable } =
-    route.params.receiveDestination.validDestination
+    route.params.receiveDestination.validDestination as LnurlWithdrawDestination
 
   // minWithdrawable and maxWithdrawable are in msats
   const minWithdrawableSatoshis = toBtcMoneyAmount(Math.round(minWithdrawable / 1000))
