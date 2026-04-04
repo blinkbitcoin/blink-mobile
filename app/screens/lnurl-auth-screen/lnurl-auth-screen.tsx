@@ -9,6 +9,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { deriveLinkingKey, signLnurlChallenge } from "../../utils/lnurl-auth"
 import { testProps } from "../../utils/testProps"
 
 type Prop = {
@@ -51,11 +52,27 @@ const LnurlAuthScreen: React.FC<Prop> = ({ route }) => {
   }, [navigation, LL])
 
   const handleAuth = useCallback(async () => {
-    // TODO: Implement linkingKey derivation and signing in Task 7-8
-    // For now, just show a placeholder that auth is in progress
     try {
-      // Placeholder - will be implemented in Task 8
-      setErr("LNURL Auth not yet implemented - coming soon")
+      const { privateKey, publicKey } = await deriveLinkingKey(domain)
+      const sig = signLnurlChallenge(privateKey, k1)
+
+      const urlObject = new URL(callback)
+      urlObject.searchParams.set("k1", k1)
+      urlObject.searchParams.set("sig", sig)
+      urlObject.searchParams.set("key", publicKey)
+
+      const result = await fetch(urlObject.toString())
+
+      if (result.ok) {
+        const response = await result.json()
+        if (response?.status?.toLowerCase() === "ok") {
+          setSuccess(true)
+        } else {
+          setErr(response?.reason || "Authentication failed")
+        }
+      } else {
+        setErr("Failed to connect to service")
+      }
     } catch (error) {
       setErr(`${error}`)
     }
