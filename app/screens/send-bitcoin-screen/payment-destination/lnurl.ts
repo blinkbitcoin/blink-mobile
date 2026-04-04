@@ -190,3 +190,25 @@ export const createLnurlWithdrawDestination = (
     },
   } as const
 }
+
+export type CreateLnurlAuthDestinationParams = {
+  lnurl: string
+  callback: string
+  domain: string
+  k1: string
+  action: "register" | "login" | "link" | "auth"
+}
+
+export const createLnurlAuthDestination = (
+  params: CreateLnurlAuthDestinationParams,
+): ReceiveDestination => {
+  return {
+    valid: true,
+    destinationDirection: DestinationDirection.Receive,
+    validDestination: {
+      ...params,
+      paymentType: PaymentType.Lnurl,
+      valid: true,
+    },
+  } as const
+}
