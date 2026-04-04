@@ -52,6 +52,19 @@ export const resolveLnurlDestination = async ({
       })
     }
 
+    // Check for lnurl auth request (LUD-04)
+    if ("tag" in lnurlParams && lnurlParams.tag === "login") {
+      const authParams = lnurlParams as { callback: string; domain: string; k1: string; action?: string }
+      const action = (authParams.action || "login") as "register" | "login" | "link" | "auth"
+      return createLnurlAuthDestination({
+        lnurl: parsedLnurlDestination.lnurl,
+        callback: authParams.callback,
+        domain: authParams.domain,
+        k1: authParams.k1,
+        action,
+      })
+    }
+
     // Check for lnurl pay request
     try {
       const lnurlPayParams = await requestPayServiceParams({
