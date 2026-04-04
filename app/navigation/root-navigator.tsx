@@ -35,6 +35,7 @@ import { PhoneRegistrationValidateScreen } from "@app/screens/phone-auth-screen/
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 import RedeemBitcoinDetailScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-detail-screen"
 import RedeemBitcoinResultScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen"
+import LnurlAuthScreen from "@app/screens/lnurl-auth-screen"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
@@ -264,6 +265,13 @@ export const RootStack = () => {
         component={RedeemBitcoinResultScreen}
         options={{
           title: LL.RedeemBitcoinScreen.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="lnurlAuth"
+        component={LnurlAuthScreen}
+        options={{
+          title: "",
         }}
       />
       <RootNavigator.Screen
