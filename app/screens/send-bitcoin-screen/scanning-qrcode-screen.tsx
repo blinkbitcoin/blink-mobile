@@ -159,6 +159,24 @@ export const ScanningQRCodeScreen: React.FC = () => {
             return
           }
 
+          const validDest = destination.validDestination as {
+            action?: "register" | "login" | "link" | "auth"
+            callback: string
+            domain: string
+            k1: string
+            lnurl: string
+          }
+          if (validDest && "action" in validDest && validDest.action) {
+            navigation.navigate("lnurlAuth", {
+              callback: validDest.callback,
+              domain: validDest.domain,
+              k1: validDest.k1,
+              action: validDest.action,
+              lnurl: validDest.lnurl,
+            })
+            return
+          }
+
           navigation.reset({
             routes: [
               {
