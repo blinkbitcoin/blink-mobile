@@ -1,12 +1,14 @@
 import * as keychain from "react-native-keychain"
 import * as bip39 from "bip39"
 import * as bip32 from "bip32"
-import * as tinySecp256k1 from "tiny-secp256k1"
+import * as secp256k1 from "@bitcoinerlab/secp256k1"
 import Crypto from "react-native-quick-crypto"
+import { generateSecureRandom } from "react-native-securerandom"
 import { script as bitcoinScript } from "bitcoinjs-lib"
 import { sign } from "@bitcoinerlab/secp256k1"
 
 const LNURL_AUTH_PURPOSE = 138
+const LNURL_AUTH_SEED_SERVICE = "lnurl-auth-seed"
 
 export const normalizeLnurlAuthDomain = (domain: string): string => {
   const normalizedInput = domain.trim().toLowerCase()
@@ -50,7 +52,11 @@ export const assertLnurlAuthCallbackDomainMatch = ({
 
   const normalizedDomain = normalizeLnurlAuthDomain(domain)
 
-  if (callbackDomain === "" || normalizedDomain === "" || callbackDomain !== normalizedDomain) {
+  const isDomainMatch =
+    callbackDomain === normalizedDomain ||
+    callbackDomain.endsWith(`.${normalizedDomain}`)
+
+  if (callbackDomain === "" || normalizedDomain === "" || !isDomainMatch) {
     throw new Error("LNURL-auth callback domain mismatch")
   }
 }
@@ -117,16 +123,9 @@ export const deriveLinkingKey = async (
     throw new Error("Invalid LNURL-auth domain")
   }
 
-  const credentials = await keychain.getGenericPassword({ service: "mnemonic" })
-  if (!credentials) {
-    throw new Error("No mnemonic found in keychain")
-  }
+  const seed = await getLnurlAuthSeed()
 
-  const mnemonic = credentials.password
-
-  const seed = bip39.mnemonicToSeedSync(mnemonic)
-
-  const root = bip32.BIP32Factory(tinySecp256k1).fromSeed(seed)
+  const root = bip32.BIP32Factory(secp256k1).fromSeed(seed)
 
   const hashingKey = root.deriveHardened(LNURL_AUTH_PURPOSE).derive(0)
   if (!hashingKey.privateKey) {
@@ -154,15 +153,53 @@ export const deriveLinkingKey = async (
   }
 }
 
+const getLnurlAuthSeed = async (): Promise<Buffer> => {
+  const mnemonicCredentials = await keychain.getGenericPassword({ service: "mnemonic" })
+  if (mnemonicCredentials && mnemonicCredentials.password) {
+    return bip39.mnemonicToSeedSync(mnemonicCredentials.password)
+  }
+
+  const seedCredentials = await keychain.getGenericPassword({
+    service: LNURL_AUTH_SEED_SERVICE,
+  })
+  if (seedCredentials && seedCredentials.password && /^[0-9a-fA-F]{64}$/.test(seedCredentials.password)) {
+    return Buffer.from(seedCredentials.password, "hex")
+  }
+
+  const randomSeedBytes = await generateSecureRandom(32)
+  const seedHex = Buffer.from(randomSeedBytes).toString("hex")
+
+  const saved = await keychain.setGenericPassword(
+    LNURL_AUTH_SEED_SERVICE,
+    seedHex,
+    { service: LNURL_AUTH_SEED_SERVICE },
+  )
+
+  if (!saved) {
+    throw new Error("Failed to store LNURL-auth seed")
+  }
+
+  return Buffer.from(seedHex, "hex")
+}
+
 export const signLnurlChallenge = (
   privateKey: Buffer,
   k1: string,
+  publicKeyHex?: string,
 ): string => {
   const k1Bytes = Buffer.from(assertValidK1(k1), "hex")
 
   const signature = sign(k1Bytes, privateKey)
+
+  if (publicKeyHex) {
+    const isValid = secp256k1.verify(k1Bytes, Buffer.from(publicKeyHex, "hex"), signature)
+    if (!isValid) {
+      throw new Error("Invalid LNURL-auth signature (self-check failed)")
+    }
+  }
+
   const derWithHashType = bitcoinScript.signature.encode(Buffer.from(signature), 0x01)
   const derSignature = derWithHashType.subarray(0, -1)
 
-  return derSignature.toString("hex")
+  return Buffer.from(derSignature).toString("hex")
 }

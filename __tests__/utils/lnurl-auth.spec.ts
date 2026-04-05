@@ -1,6 +1,7 @@
 jest.mock("react-native-keychain", () => ({
   __esModule: true,
   getGenericPassword: jest.fn(),
+  setGenericPassword: jest.fn(),
 }))
 
 jest.mock("bip32", () => ({
@@ -11,6 +12,11 @@ jest.mock("bip32", () => ({
 jest.mock("bip39", () => ({
   __esModule: true,
   mnemonicToSeedSync: jest.fn(),
+}))
+
+jest.mock("react-native-securerandom", () => ({
+  __esModule: true,
+  generateSecureRandom: jest.fn(),
 }))
 
 jest.mock("tiny-secp256k1", () => ({
@@ -39,6 +45,7 @@ const {
 
 const keychain = require("react-native-keychain") as {
   getGenericPassword: jest.Mock
+  setGenericPassword: jest.Mock
 }
 
 const bip39 = require("bip39") as {
@@ -47,6 +54,10 @@ const bip39 = require("bip39") as {
 
 const bip32 = require("bip32") as {
   BIP32Factory: jest.Mock
+}
+
+const secureRandom = require("react-native-securerandom") as {
+  generateSecureRandom: jest.Mock
 }
 
 const parseDerSignature = (signatureHex: string): Buffer => {
@@ -123,6 +134,24 @@ describe("lnurl auth utils", () => {
         assertLnurlAuthCallbackDomainMatch({
           callback: "https://evil.com/login?tag=login",
           domain: "example.com",
+        }),
+      ).toThrow("LNURL-auth callback domain mismatch")
+    })
+
+    it("accepts callback subdomain for the same root domain", () => {
+      expect(() =>
+        assertLnurlAuthCallbackDomainMatch({
+          callback: "https://auth.satsai.tools/login?tag=login",
+          domain: "satsai.tools",
+        }),
+      ).not.toThrow()
+    })
+
+    it("rejects callback domains that only contain the domain as a suffix", () => {
+      expect(() =>
+        assertLnurlAuthCallbackDomainMatch({
+          callback: "https://satsai.tools.evil.com/login?tag=login",
+          domain: "satsai.tools",
         }),
       ).toThrow("LNURL-auth callback domain mismatch")
     })
@@ -224,7 +253,9 @@ describe("lnurl auth utils", () => {
 
     beforeEach(() => {
       keychain.getGenericPassword.mockResolvedValue({ username: "", password: mnemonic })
+      keychain.setGenericPassword.mockResolvedValue(true)
       bip39.mnemonicToSeedSync.mockReturnValue(Buffer.from("test-seed", "utf8"))
+      secureRandom.generateSecureRandom.mockResolvedValue(new Uint8Array(32).fill(7))
       bip32.BIP32Factory.mockReturnValue({
         fromSeed: jest.fn(() => createDeterministicNode(["m"])),
       })
@@ -252,6 +283,21 @@ describe("lnurl auth utils", () => {
 
     it("throws for empty normalized domain", async () => {
       await expect(deriveLinkingKey(" ... ")).rejects.toThrow("Invalid LNURL-auth domain")
+    })
+
+    it("creates and stores fallback LNURL-auth seed when mnemonic is missing", async () => {
+      keychain.getGenericPassword
+        .mockResolvedValueOnce(false)
+        .mockResolvedValueOnce(false)
+
+      const result = await deriveLinkingKey("example.com")
+
+      expect(keychain.setGenericPassword).toHaveBeenCalledWith(
+        "lnurl-auth-seed",
+        "0707070707070707070707070707070707070707070707070707070707070707",
+        { service: "lnurl-auth-seed" },
+      )
+      expect(result.publicKey).toHaveLength(66)
     })
   })
 })

@@ -56,11 +56,7 @@ const LnurlAuthScreen: React.FC<Prop> = ({ route }) => {
   }, [action, LL])
 
   const consentText = useMemo(() => {
-    const actionDescription =
-      LL.LnurlAuthScreen?.actionDescription?.({ action: actionText, domain }) ??
-      `${actionText} to ${domain}`
-
-    return `${LL.common.confirm()}: ${actionDescription}`
+    return `${LL.common.confirm()}: ${actionText} ${domain}`
   }, [LL, actionText, domain])
 
   useEffect(() => {
@@ -101,7 +97,7 @@ const LnurlAuthScreen: React.FC<Prop> = ({ route }) => {
 
     try {
       const { privateKey, publicKey } = await deriveLinkingKey(domain)
-      const sig = signLnurlChallenge(privateKey, k1)
+      const sig = signLnurlChallenge(privateKey, k1, publicKey)
 
       const callbackUrl = buildLnurlAuthSignedCallbackUrl({
         callback,
