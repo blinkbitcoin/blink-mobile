@@ -19,7 +19,6 @@ import {
 } from "@app/types/amounts"
 import {
   LnurlWithdrawDestination,
-  ValidParsedReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"

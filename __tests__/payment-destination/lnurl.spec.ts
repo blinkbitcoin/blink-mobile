@@ -148,6 +148,28 @@ describe("resolve lnurl destination", () => {
         }),
       )
     })
+
+    it("still resolves lnurl pay when getParams throws", async () => {
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse(
+        lnurlPaymentDestinationParams.parsedLnurlDestination.lnurl,
+      )
+      mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+      mockGetParams.mockImplementation(throwError)
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+          validDestination: {
+            ...lnurlPaymentDestinationParams.parsedLnurlDestination,
+            lnurlParams: lnurlPayParams,
+            valid: true,
+          },
+        }),
+      )
+    })
   })
 
   describe("with lnurl withdraw string", () => {
@@ -260,6 +282,30 @@ describe("resolve lnurl destination", () => {
           destinationDirection: DestinationDirection.Receive,
           validDestination: expect.objectContaining({
             action: "register",
+          }),
+        }),
+      )
+    })
+
+    it("defaults to login action when lnurl auth action is unsupported", async () => {
+      mockRequestPayServiceParams.mockImplementation(throwError)
+      const mockLnurlAuthParams = {
+        tag: "login" as const,
+        k1: "e2af6254a8df433264fa23f67eb8188635d15ce883e8fc020989d5f82ae6f11e",
+        callback: "https://example.com/auth",
+        domain: "example.com",
+        action: "unsupported-action",
+      }
+      mockGetParams.mockResolvedValue(mockLnurlAuthParams)
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Receive,
+          validDestination: expect.objectContaining({
+            action: "login",
           }),
         }),
       )

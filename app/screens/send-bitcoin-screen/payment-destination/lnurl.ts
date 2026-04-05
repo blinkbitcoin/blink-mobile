@@ -37,10 +37,15 @@ export const resolveLnurlDestination = async ({
   // but lnurl withdraw is handled here
 
   if (parsedLnurlDestination.valid) {
-    const lnurlParams = await getParams(parsedLnurlDestination.lnurl)
+    let lnurlParams: Awaited<ReturnType<typeof getParams>> | undefined
+    try {
+      lnurlParams = await getParams(parsedLnurlDestination.lnurl)
+    } catch {
+      lnurlParams = undefined
+    }
 
     // Check for lnurl withdraw request
-    if ("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
+    if (lnurlParams && "tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
       return createLnurlWithdrawDestination({
         lnurl: parsedLnurlDestination.lnurl,
         callback: lnurlParams.callback,
@@ -53,14 +58,16 @@ export const resolveLnurlDestination = async ({
     }
 
     // Check for lnurl auth request (LUD-04)
-    if ("tag" in lnurlParams && lnurlParams.tag === "login") {
-      const authParams = lnurlParams as { callback: string; domain: string; k1: string; action?: string }
-      const action = (authParams.action || "login") as "register" | "login" | "link" | "auth"
+    if (lnurlParams && "tag" in lnurlParams && lnurlParams.tag === "login") {
+      const action =
+        "action" in lnurlParams && isLnurlAuthAction(lnurlParams.action)
+          ? lnurlParams.action
+          : "login"
       return createLnurlAuthDestination({
         lnurl: parsedLnurlDestination.lnurl,
-        callback: authParams.callback,
-        domain: authParams.domain,
-        k1: authParams.k1,
+        callback: lnurlParams.callback,
+        domain: lnurlParams.domain,
+        k1: lnurlParams.k1,
         action,
       })
     }
@@ -210,6 +217,14 @@ export type CreateLnurlAuthDestinationParams = {
   domain: string
   k1: string
   action: "register" | "login" | "link" | "auth"
+}
+
+export const isLnurlAuthAction = (
+  action: unknown,
+): action is CreateLnurlAuthDestinationParams["action"] => {
+  return (
+    action === "register" || action === "login" || action === "link" || action === "auth"
+  )
 }
 
 export const createLnurlAuthDestination = (

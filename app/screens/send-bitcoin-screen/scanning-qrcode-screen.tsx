@@ -36,8 +36,12 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { parseDestination } from "./payment-destination"
-import { DestinationDirection } from "./payment-destination/index.types"
+import { isLnurlAuthAction, parseDestination } from "./payment-destination"
+import {
+  DestinationDirection,
+  LnurlAuthDestination,
+  ValidParsedReceiveDestination,
+} from "./payment-destination/index.types"
 
 const { width: screenWidth } = Dimensions.get("window")
 const { height: screenHeight } = Dimensions.get("window")
@@ -132,6 +136,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
     return url.protocol === "http:" || url.protocol === "https:"
   }
 
+  const isLnurlAuthDestination = (
+    destination: ValidParsedReceiveDestination,
+  ): destination is LnurlAuthDestination => {
+    return "action" in destination && isLnurlAuthAction(destination.action)
+  }
+
   const processInvoice = React.useMemo(() => {
     return async (data: string | undefined) => {
       if (pending || !wallets || !bitcoinNetwork || !data) {
@@ -159,14 +169,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
             return
           }
 
-          const validDest = destination.validDestination as {
-            action?: "register" | "login" | "link" | "auth"
-            callback: string
-            domain: string
-            k1: string
-            lnurl: string
-          }
-          if (validDest && "action" in validDest && validDest.action) {
+          const validDest = destination.validDestination
+          if (isLnurlAuthDestination(validDest)) {
             navigation.navigate("lnurlAuth", {
               callback: validDest.callback,
               domain: validDest.domain,

@@ -1,1 +1,9 @@
-export { deriveLinkingKey, signLnurlChallenge } from "./lnurl-auth"
+export {
+  assertLnurlAuthCallbackDomainMatch,
+  assertValidK1,
+  buildLnurlAuthSignedCallbackUrl,
+  composeLnurlAuthCallbackUrl,
+  deriveLinkingKey,
+  normalizeLnurlAuthDomain,
+  signLnurlChallenge,
+} from "./lnurl-auth"
