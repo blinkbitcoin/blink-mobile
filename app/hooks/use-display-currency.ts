@@ -64,12 +64,14 @@ const formatCurrencyHelper = ({
   fractionDigits,
   withSign = true,
   currencyCode,
+  currencyId,
 }: {
   amountInMajorUnits: number | string
   isApproximate?: boolean
   symbol?: string
   fractionDigits: number
   currencyCode?: string
+  currencyId?: string
   withSign?: boolean
 }) => {
   const isNegative = Number(amountInMajorUnits) < 0
@@ -80,9 +82,13 @@ const formatCurrencyHelper = ({
     // FIXME this workaround of using .format and not .formatNumber is
     // because hermes haven't fully implemented Intl.NumberFormat yet
   }).format(Math.abs(Number(amountInMajorUnits)))
-  return `${isApproximate ? `${APPROXIMATE_PREFIX} ` : ""}${
-    isNegative && withSign ? "-" : ""
-  }${symbol}${amountStr}${currencyCode ? ` ${currencyCode}` : ""}`
+  const approxStr = isApproximate ? `${APPROXIMATE_PREFIX} ` : ""
+  const signStr = isNegative && withSign ? "-" : ""
+  const codeSuffix = currencyCode ? ` ${currencyCode}` : ""
+  if (currencyId === "HUF") {
+    return `${approxStr}${signStr}${amountStr} ${symbol}${codeSuffix}`
+  }
+  return `${approxStr}${signStr}${symbol}${amountStr}${codeSuffix}`
 }
 
 const displayCurrencyHasSignificantMinorUnits = ({
@@ -219,6 +225,7 @@ export const useDisplayCurrency = () => {
         fractionDigits: currencyInfo.fractionDigits,
         withSign,
         currencyCode,
+        currencyId: currency,
       })
     },
     [displayCurrencyDictionary],
@@ -261,6 +268,7 @@ export const useDisplayCurrency = () => {
           moneyAmount.currency === WalletCurrency.Btc && !noSuffix
             ? currencyCode
             : undefined,
+        currencyId: currencyCode,
       })
     },
     [currencyInfo, moneyAmountToMajorUnitOrSats, LL],
