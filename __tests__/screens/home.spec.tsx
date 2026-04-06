@@ -336,4 +336,35 @@ describe("HomeScreen", () => {
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
   })
+
+  it("skips GraphQL queries when self-custodial is active", async () => {
+    jest.doMock("@app/hooks/use-active-wallet", () => ({
+      useActiveWallet: () => ({
+        wallets: [
+          {
+            id: "btc-1",
+            walletCurrency: "BTC",
+            balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+            transactions: [],
+          },
+          {
+            id: "usd-1",
+            walletCurrency: "USD",
+            balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+            transactions: [],
+          },
+        ],
+        status: "ready",
+        accountType: "self-custodial",
+      }),
+    }))
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+  })
 })

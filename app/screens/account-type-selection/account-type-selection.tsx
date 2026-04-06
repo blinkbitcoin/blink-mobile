@@ -45,8 +45,6 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       }
       navigation.navigate("login", {
         type: PhoneLoginInitiateType.Login,
-        title: undefined,
-        onboarding: undefined,
       })
       return
     }
