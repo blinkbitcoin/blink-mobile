@@ -8,13 +8,21 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 import { generateMnemonic } from "bip39"
+import Crypto from "react-native-quick-crypto"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import { SparkConfig, SparkToken } from "./config"
 import { createSdkLogListener } from "./logging"
 
-initLogging(undefined, createSdkLogListener(), undefined)
+const initializeLogging = (() => {
+  let done = false
+  return () => {
+    if (done) return
+    done = true
+    initLogging(undefined, createSdkLogListener(), undefined)
+  }
+})()
 
 const createSdkConfig = () => {
   const config = defaultConfig(Network.Mainnet)
@@ -33,11 +41,10 @@ const createSdkConfig = () => {
 }
 
 export const initSdk = async (mnemonic: string): Promise<BreezSdkInterface> => {
+  initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
   const config = createSdkConfig()
-  const sdk = await connect({ config, seed, storageDir: SparkConfig.storageDir })
-
-  return sdk
+  return connect({ config, seed, storageDir: SparkConfig.storageDir })
 }
 
 export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
@@ -45,20 +52,15 @@ export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
 }
 
 export const selfCustodialCreateWallet = async (): Promise<string> => {
-  const mnemonic = generateMnemonic()
+  const mnemonic = generateMnemonic(128, (size: number) =>
+    Buffer.from(Crypto.randomBytes(size)),
+  )
   if (!mnemonic) throw new Error("Failed to generate mnemonic")
 
   const stored = await KeyStoreWrapper.setMnemonic(mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig()
-  const sdk = await connect({
-    config,
-    seed,
-    storageDir: SparkConfig.storageDir,
-  })
-
+  const sdk = await initSdk(mnemonic)
   try {
     await sdk.updateUserSettings({
       sparkPrivateModeEnabled: undefined,
@@ -67,7 +69,7 @@ export const selfCustodialCreateWallet = async (): Promise<string> => {
       }),
     })
   } finally {
-    await sdk.disconnect()
+    await disconnectSdk(sdk)
   }
 
   return mnemonic
