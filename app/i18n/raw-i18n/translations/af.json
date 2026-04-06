@@ -3545,10 +3545,16 @@
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Kies rekeningtipe",
-    "description": "Kies hoe jy jou fondse wil bestuur",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Ons hou die fondse namens jou",
+    "selfCustodialDescription": "Net jy kan toegang tot fondse kry",
+    "continueButton": "Gaan voort",
+    "descriptionDefault": "Kies asseblief jou voorkeur tipe Blink.",
+    "descriptionSelected": "Kies asseblief rekeningtipe.",
+    "chooseMethod": "Kies metode",
+    "restoreComingSoonTitle": "Binnekort beskikbaar",
+    "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees."
   },
   "BackupScreen": {
     "title": "Rugsteun jou beursie",
@@ -3569,5 +3575,11 @@
   "BackendFeatureGate": {
     "title": "Funksie nie beskikbaar nie",
     "description": "Hierdie funksie vereis 'n bewaarderrekening."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Skep jou beursie...",
+    "errorTitle": "Beursie skepping het misluk",
+    "errorDescription": "Iets het verkeerd gegaan. Probeer asseblief weer.",
+    "retry": "Probeer weer"
   }
 }

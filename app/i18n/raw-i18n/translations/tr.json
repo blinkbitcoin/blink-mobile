@@ -3504,10 +3504,16 @@
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Hesap türünü seçin",
-    "description": "Fonlarınızı nasıl yönetmek istediğinizi seçin",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Fonlarınızı sizin adınıza saklıyoruz",
+    "selfCustodialDescription": "Fonlarınıza yalnızca siz erişebilirsiniz",
+    "continueButton": "Devam et",
+    "descriptionDefault": "Lütfen tercih ettiğiniz Blink türünü seçin.",
+    "descriptionSelected": "Lütfen hesap türünü seçin.",
+    "chooseMethod": "Yöntem seçin",
+    "restoreComingSoonTitle": "Yakında",
+    "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır."
   },
   "BackupScreen": {
     "title": "Cüzdanı yedekle",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",
     "description": "Bu özellik bir saklama hesabı gerektiriyor."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Cüzdanınız oluşturuluyor...",
+    "errorTitle": "Cüzdan oluşturma başarısız",
+    "errorDescription": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+    "retry": "Tekrar dene"
   }
 }

@@ -3542,10 +3542,16 @@
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
   },
   "AccountTypeSelectionScreen": {
-    "title": "เลือกประเภทบัญชี",
-    "description": "เลือกวิธีที่คุณต้องการจัดการเงินของคุณ",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "เราดูแลเงินทุนในนามของคุณ",
+    "selfCustodialDescription": "คุณเท่านั้นที่สามารถเข้าถึงเงินทุน",
+    "continueButton": "ดำเนินการต่อ",
+    "descriptionDefault": "กรุณาเลือกประเภท Blink ที่คุณต้องการ",
+    "descriptionSelected": "กรุณาเลือกประเภทบัญชี",
+    "chooseMethod": "เลือกวิธี",
+    "restoreComingSoonTitle": "เร็วๆ นี้",
+    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต"
   },
   "BackupScreen": {
     "title": "สำรองข้อมูลกระเป๋าเงิน",
@@ -3566,5 +3572,11 @@
   "BackendFeatureGate": {
     "title": "ฟีเจอร์ไม่พร้อมใช้งาน",
     "description": "ฟีเจอร์นี้ต้องการบัญชีแบบรับฝาก"
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "กำลังสร้างกระเป๋าเงิน...",
+    "errorTitle": "สร้างกระเป๋าเงินล้มเหลว",
+    "errorDescription": "มีบางอย่างผิดพลาด กรุณาลองอีกครั้ง",
+    "retry": "ลองอีกครั้ง"
   }
 }

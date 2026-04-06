@@ -3492,10 +3492,16 @@
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
     },
     "AccountTypeSelectionScreen": {
-        "title": "Scegli il tipo di conto",
-        "description": "Seleziona come vuoi gestire i tuoi fondi",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "Noi custodiamo i fondi per tuo conto",
+        "selfCustodialDescription": "Solo tu puoi accedere ai fondi",
+        "continueButton": "Continua",
+        "descriptionDefault": "Scegli il tuo tipo preferito di Blink.",
+        "descriptionSelected": "Scegli il tipo di conto.",
+        "chooseMethod": "Scegli metodo",
+        "restoreComingSoonTitle": "In arrivo",
+        "restoreComingSoonDescription": "La funzione di ripristino sarà disponibile in un aggiornamento futuro."
     },
     "BackupScreen": {
         "title": "Backup del portafoglio",
@@ -3516,5 +3522,11 @@
     "BackendFeatureGate": {
         "title": "Funzione non disponibile",
         "description": "Questa funzione richiede un conto di custodia."
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "Creazione del portafoglio...",
+        "errorTitle": "Creazione portafoglio fallita",
+        "errorDescription": "Qualcosa è andato storto. Riprova.",
+        "retry": "Riprova"
     }
 }

@@ -3504,10 +3504,16 @@
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Tria el tipus de compte",
-    "description": "Selecciona com vols gestionar els teus fons",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Nosaltres custodiem els fons per tu",
+    "selfCustodialDescription": "Només tu pots accedir als fons",
+    "continueButton": "Continuar",
+    "descriptionDefault": "Si us plau, trieu el vostre tipus preferit de Blink.",
+    "descriptionSelected": "Si us plau, trieu el tipus de compte.",
+    "chooseMethod": "Trieu mètode",
+    "restoreComingSoonTitle": "Properament",
+    "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura."
   },
   "BackupScreen": {
     "title": "Còpia de seguretat",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Funció no disponible",
     "description": "Aquesta funció requereix un compte custodial."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Creant la teva cartera...",
+    "errorTitle": "Error en crear la cartera",
+    "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a intentar.",
+    "retry": "Tornar a intentar"
   }
 }

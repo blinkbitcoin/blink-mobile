@@ -3504,10 +3504,16 @@
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Válasszon fióktípust",
-    "description": "Válassza ki, hogyan szeretné kezelni pénzeszközeit",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Mi kezeljük a pénzeszközöket az Ön nevében",
+    "selfCustodialDescription": "Csak Ön férhet hozzá a pénzeszközökhöz",
+    "continueButton": "Folytatás",
+    "descriptionDefault": "Kérjük, válassza ki a kívánt Blink típust.",
+    "descriptionSelected": "Kérjük, válassza ki a fiók típusát.",
+    "chooseMethod": "Válasszon módszert",
+    "restoreComingSoonTitle": "Hamarosan elérhető",
+    "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető."
   },
   "BackupScreen": {
     "title": "Tárca biztonsági mentése",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Funkció nem elérhető",
     "description": "Ez a funkció letéti fiókot igényel."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Tárca létrehozása...",
+    "errorTitle": "Tárca létrehozása sikertelen",
+    "errorDescription": "Valami hiba történt. Kérjük, próbálja újra.",
+    "retry": "Újra próbálkozás"
   }
 }

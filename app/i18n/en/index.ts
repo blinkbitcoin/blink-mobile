@@ -3645,10 +3645,17 @@ const en: BaseTranslation = {
       "Transferring your funds. It should be done in a few seconds.",
   },
   AccountTypeSelectionScreen: {
-    title: "Choose account type",
-    description: "Select how you want to manage your funds",
-    custodialLabel: "Blink",
-    selfCustodialLabel: "Spark",
+    descriptionDefault: "Please choose your preferred type of Blink.",
+    descriptionSelected: "Please choose account type.",
+    custodialLabel: "Custodial",
+    selfCustodialLabel: "Non-custodial",
+    custodialDescription: "We hold the funds on your behalf",
+    selfCustodialDescription: "Only you can access funds",
+    chooseMethod: "Choose method",
+    continueButton: "Continue",
+    restoreComingSoonTitle: "Coming soon",
+    restoreComingSoonDescription:
+      "Restore flow will be available in a future update.",
   },
   BackupScreen: {
     title: "Back up your wallet",
@@ -3665,6 +3672,12 @@ const en: BaseTranslation = {
   StableBalance: {
     title: "Stable Balance",
     description: "Hold a USD-denominated balance powered by USDB on Spark.",
+  },
+  SparkWalletCreationScreen: {
+    creating: "Creating your wallet...",
+    errorTitle: "Wallet creation failed",
+    errorDescription: "Something went wrong. Please try again.",
+    retry: "Try again",
   },
   BackendFeatureGate: {
     title: "Feature unavailable",

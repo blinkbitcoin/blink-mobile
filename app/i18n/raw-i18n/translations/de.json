@@ -3492,10 +3492,16 @@
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
     },
     "AccountTypeSelectionScreen": {
-        "title": "Kontotyp wählen",
-        "description": "Wähle, wie du deine Mittel verwalten möchtest",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "Wir verwahren die Mittel in deinem Namen",
+        "selfCustodialDescription": "Nur du hast Zugang zu den Mitteln",
+        "continueButton": "Weiter",
+        "descriptionDefault": "Bitte wähle deinen bevorzugten Blink-Typ.",
+        "descriptionSelected": "Bitte Kontotyp wählen.",
+        "chooseMethod": "Methode wählen",
+        "restoreComingSoonTitle": "Demnächst verfügbar",
+        "restoreComingSoonDescription": "Die Wiederherstellungsfunktion wird in einem zukünftigen Update verfügbar sein."
     },
     "BackupScreen": {
         "title": "Wallet sichern",
@@ -3516,5 +3522,11 @@
     "BackendFeatureGate": {
         "title": "Funktion nicht verfügbar",
         "description": "Diese Funktion erfordert ein Verwahrungskonto."
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "Erstelle dein Wallet...",
+        "errorTitle": "Wallet-Erstellung fehlgeschlagen",
+        "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "retry": "Erneut versuchen"
     }
 }

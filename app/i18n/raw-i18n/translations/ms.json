@@ -3545,10 +3545,16 @@
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Pilih jenis akaun",
-    "description": "Pilih bagaimana anda mahu menguruskan dana anda",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Kami menyimpan dana bagi pihak anda",
+    "selfCustodialDescription": "Hanya anda boleh mengakses dana",
+    "continueButton": "Teruskan",
+    "descriptionDefault": "Sila pilih jenis Blink pilihan anda.",
+    "descriptionSelected": "Sila pilih jenis akaun.",
+    "chooseMethod": "Pilih kaedah",
+    "restoreComingSoonTitle": "Akan datang",
+    "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang."
   },
   "BackupScreen": {
     "title": "Sandaran dompet",
@@ -3569,5 +3575,11 @@
   "BackendFeatureGate": {
     "title": "Ciri tidak tersedia",
     "description": "Ciri ini memerlukan akaun jagaan."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Mencipta dompet anda...",
+    "errorTitle": "Penciptaan dompet gagal",
+    "errorDescription": "Sesuatu telah berlaku. Sila cuba lagi.",
+    "retry": "Cuba lagi"
   }
 }
