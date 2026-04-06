@@ -3504,10 +3504,16 @@
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Alegeți tipul de cont",
-    "description": "Selectați cum doriți să vă gestionați fondurile",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Noi păstrăm fondurile în numele dumneavoastră",
+    "selfCustodialDescription": "Doar dumneavoastră puteți accesa fondurile",
+    "continueButton": "Continuă",
+    "descriptionDefault": "Vă rugăm alegeți tipul preferat de Blink.",
+    "descriptionSelected": "Vă rugăm alegeți tipul de cont.",
+    "chooseMethod": "Alegeți metoda",
+    "restoreComingSoonTitle": "În curând",
+    "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare."
   },
   "BackupScreen": {
     "title": "Copie de siguranță portofel",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Funcție indisponibilă",
     "description": "Această funcție necesită un cont custodial."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Se creează portofelul...",
+    "errorTitle": "Crearea portofelului a eșuat",
+    "errorDescription": "Ceva nu a mers bine. Vă rugăm încercați din nou.",
+    "retry": "Încearcă din nou"
   }
 }

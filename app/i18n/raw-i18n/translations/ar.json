@@ -3542,10 +3542,16 @@
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
   },
   "AccountTypeSelectionScreen": {
-    "title": "اختر نوع الحساب",
-    "description": "حدد كيف تريد إدارة أموالك",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "نحن نحتفظ بالأموال نيابة عنك",
+    "selfCustodialDescription": "أنت فقط يمكنك الوصول إلى الأموال",
+    "continueButton": "متابعة",
+    "descriptionDefault": "يرجى اختيار النوع المفضل لديك من Blink.",
+    "descriptionSelected": "يرجى اختيار نوع الحساب.",
+    "chooseMethod": "اختر الطريقة",
+    "restoreComingSoonTitle": "قريباً",
+    "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي."
   },
   "BackupScreen": {
     "title": "نسخ احتياطي للمحفظة",
@@ -3566,5 +3572,11 @@
   "BackendFeatureGate": {
     "title": "الميزة غير متاحة",
     "description": "تتطلب هذه الميزة حساباً وصائياً."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "جارٍ إنشاء محفظتك...",
+    "errorTitle": "فشل إنشاء المحفظة",
+    "errorDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "retry": "حاول مرة أخرى"
   }
 }

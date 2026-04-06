@@ -3545,10 +3545,16 @@
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Odaberite vrstu računa",
-    "description": "Odaberite kako želite upravljati sredstvima",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Mi čuvamo sredstva u vaše ime",
+    "selfCustodialDescription": "Samo vi možete pristupiti sredstvima",
+    "continueButton": "Nastavi",
+    "descriptionDefault": "Molimo odaberite željenu vrstu Blinka.",
+    "descriptionSelected": "Molimo odaberite vrstu računa.",
+    "chooseMethod": "Odaberite metodu",
+    "restoreComingSoonTitle": "Uskoro dostupno",
+    "restoreComingSoonDescription": "Funkcija vraćanja bit će dostupna u budućem ažuriranju."
   },
   "BackupScreen": {
     "title": "Sigurnosna kopija novčanika",
@@ -3569,5 +3575,11 @@
   "BackendFeatureGate": {
     "title": "Značajka nedostupna",
     "description": "Ova značajka zahtijeva skrbnički račun."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Stvaranje novčanika...",
+    "errorTitle": "Stvaranje novčanika nije uspjelo",
+    "errorDescription": "Nešto je pošlo po krivu. Molimo pokušajte ponovo.",
+    "retry": "Pokušaj ponovo"
   }
 }
