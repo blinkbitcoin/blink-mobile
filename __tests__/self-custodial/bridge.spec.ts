@@ -10,7 +10,11 @@ const mockDisconnect = jest.fn()
 const mockUpdateUserSettings = jest.fn()
 
 jest.mock("bip39", () => ({
-  generateMnemonic: () => mockGenerateMnemonic(),
+  generateMnemonic: (...args: unknown[]) => mockGenerateMnemonic(...args),
+}))
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomBytes: (size: number) => Buffer.alloc(size),
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
