@@ -31,6 +31,8 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -162,6 +164,10 @@ export const HomeScreen: React.FC = () => {
   const { isAtLeastLevelOne } = useLevel()
 
   const isAuthed = useIsAuthed()
+  const activeWallet = useActiveWallet()
+  const isSelfCustodial =
+    activeWallet.accountType === AccountType.SelfCustodial &&
+    activeWallet.status !== ActiveWalletStatus.Unavailable
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -177,7 +183,7 @@ export const HomeScreen: React.FC = () => {
     error,
     refetch: refetchAuthed,
   } = useHomeAuthedQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
     errorPolicy: "all",
 
@@ -186,7 +192,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const { loading: loadingPrice, refetch: refetchRealtimePrice } = useRealtimePriceQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
 
     // this enables offline mode use-case
@@ -224,12 +230,20 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
-  const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
+  const loading = isSelfCustodial
+    ? activeWallet.status === ActiveWalletStatus.Loading
+    : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
   const usernameTitle = username || phone || LL.common.blinkUser()
 
-  const wallets = dataAuthed?.me?.defaultAccount?.wallets
+  const wallets = isSelfCustodial
+    ? activeWallet.wallets.map((w) => ({
+        id: w.id,
+        balance: w.balance.amount,
+        walletCurrency: w.walletCurrency,
+      }))
+    : dataAuthed?.me?.defaultAccount?.wallets
   const { formattedBalance, satsBalance } = useTotalBalance(wallets)
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
@@ -337,8 +351,9 @@ export const HomeScreen: React.FC = () => {
   const numberOfTxs = transactions.length
 
   const onMenuClick = (target: Target) => {
-    if (isAuthed) {
+    if (isSelfCustodial || isAuthed) {
       if (
+        !isSelfCustodial &&
         target === "receiveBitcoin" &&
         !hasPromptedSetDefaultAccount &&
         numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
@@ -352,9 +367,9 @@ export const HomeScreen: React.FC = () => {
       // but there is no need for a params and the types should not necessitate it
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       navigation.navigate(target as any)
-    } else {
-      setModalVisible(true)
+      return
     }
+    setModalVisible(true)
   }
 
   const activateWallet = () => {
@@ -411,6 +426,7 @@ export const HomeScreen: React.FC = () => {
   const isIosWithBalance = isIos && satsBalance > 0
 
   if (
+    isSelfCustodial ||
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
     levelAccount === AccountLevel.Two ||
