@@ -42,7 +42,7 @@ export const GetStartedScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
 
-  const { deviceAccountEnabled } = useFeatureFlags()
+  const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
 
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
 
@@ -52,6 +52,11 @@ export const GetStartedScreen: React.FC = () => {
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
 
+    if (nonCustodialEnabled) {
+      navigation.navigate("accountTypeSelection", { mode: "create" })
+      return
+    }
+
     navigation.navigate("acceptTermsAndConditions", { flow: "trial" })
   }
 
@@ -60,6 +65,12 @@ export const GetStartedScreen: React.FC = () => {
       action: "log_in",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
+
+    if (nonCustodialEnabled) {
+      navigation.navigate("accountTypeSelection", { mode: "restore" })
+      return
+    }
+
     navigation.navigate("login", {
       type: PhoneLoginInitiateType.Login,
     })
