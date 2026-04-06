@@ -21,6 +21,8 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
 export type RootStackParamList = {
   getStarted: undefined
+  accountTypeSelection: { mode: "create" | "restore" }
+  sparkWalletCreation: undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -239,4 +241,4 @@ export type PrimaryStackParamList = {
   Web: undefined
 }
 
-export type NewAccountFlowParamsList = { flow: "phone" | "trial" }
+export type NewAccountFlowParamsList = { flow: "phone" | "trial" | "selfCustodial" }
