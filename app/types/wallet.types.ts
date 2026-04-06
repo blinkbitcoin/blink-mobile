@@ -17,6 +17,11 @@ export const AccountType = {
 
 export type AccountType = (typeof AccountType)[keyof typeof AccountType]
 
+export const DefaultAccountId = {
+  Custodial: `${AccountType.Custodial}-default`,
+  SelfCustodial: `${AccountType.SelfCustodial}-default`,
+} as const
+
 export const AccountStatus = {
   Available: "available",
   RequiresRestore: "requires_restore",
