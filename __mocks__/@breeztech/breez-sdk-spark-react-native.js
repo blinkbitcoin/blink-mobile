@@ -1,0 +1,43 @@
+/* eslint-disable camelcase */
+const SdkEvent_Tags = {
+  Synced: "Synced",
+  PaymentSucceeded: "PaymentSucceeded",
+  PaymentPending: "PaymentPending",
+  PaymentFailed: "PaymentFailed",
+  ClaimedDeposits: "ClaimedDeposits",
+  UnclaimedDeposits: "UnclaimedDeposits",
+  Optimization: "Optimization",
+  LightningAddressChanged: "LightningAddressChanged",
+}
+
+const PaymentDetails_Tags = {
+  Spark: "Spark",
+  Token: "Token",
+  Lightning: "Lightning",
+  Withdraw: "Withdraw",
+  Deposit: "Deposit",
+}
+
+module.exports = {
+  connect: jest.fn(),
+  defaultConfig: jest.fn().mockReturnValue({}),
+  initLogging: jest.fn(),
+  Network: { Mainnet: "mainnet" },
+  Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
+  StableBalanceActiveLabel: {
+    Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
+    Unset: jest.fn().mockReturnValue({ tag: "Unset" }),
+  },
+  SdkEvent_Tags,
+  PaymentMethod: {
+    Lightning: 0,
+    Spark: 1,
+    Token: 2,
+    Deposit: 3,
+    Withdraw: 4,
+    Unknown: 5,
+  },
+  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+  PaymentType: { Send: 0, Receive: 1 },
+  PaymentDetails_Tags,
+}
