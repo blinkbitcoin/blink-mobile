@@ -3522,10 +3522,16 @@
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Vælg kontotype",
-    "description": "Vælg hvordan du vil administrere dine midler",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Vi opbevarer midlerne på dine vegne",
+    "selfCustodialDescription": "Kun du har adgang til midlerne",
+    "continueButton": "Fortsæt",
+    "descriptionDefault": "Vælg venligst din foretrukne type Blink.",
+    "descriptionSelected": "Vælg venligst kontotype.",
+    "chooseMethod": "Vælg metode",
+    "restoreComingSoonTitle": "Kommer snart",
+    "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering."
   },
   "BackupScreen": {
     "title": "Sikkerhedskopier tegnebog",
@@ -3546,5 +3552,11 @@
   "BackendFeatureGate": {
     "title": "Funktion ikke tilgængelig",
     "description": "Denne funktion kræver en forvaringskonto."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Opretter din tegnebog...",
+    "errorTitle": "Oprettelse af tegnebog mislykkedes",
+    "errorDescription": "Noget gik galt. Prøv venligst igen.",
+    "retry": "Prøv igen"
   }
 }

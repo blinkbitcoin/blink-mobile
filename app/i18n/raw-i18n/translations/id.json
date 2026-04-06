@@ -3504,10 +3504,16 @@
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Pilih jenis akun",
-    "description": "Pilih bagaimana Anda ingin mengelola dana Anda",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Kami menyimpan dana atas nama Anda",
+    "selfCustodialDescription": "Hanya Anda yang dapat mengakses dana",
+    "continueButton": "Lanjutkan",
+    "descriptionDefault": "Silakan pilih jenis Blink yang Anda inginkan.",
+    "descriptionSelected": "Silakan pilih jenis akun.",
+    "chooseMethod": "Pilih metode",
+    "restoreComingSoonTitle": "Segera hadir",
+    "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang."
   },
   "BackupScreen": {
     "title": "Cadangkan dompet",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Fitur tidak tersedia",
     "description": "Fitur ini memerlukan akun kustodial."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Membuat dompet Anda...",
+    "errorTitle": "Gagal membuat dompet",
+    "errorDescription": "Terjadi kesalahan. Silakan coba lagi.",
+    "retry": "Coba lagi"
   }
 }

@@ -3504,10 +3504,16 @@
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Vyberte typ účtu",
-    "description": "Vyberte, ako chcete spravovať svoje prostriedky",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Prostriedky držíme za vás",
+    "selfCustodialDescription": "Len vy máte prístup k prostriedkom",
+    "continueButton": "Pokračovať",
+    "descriptionDefault": "Vyberte prosím váš preferovaný typ Blink.",
+    "descriptionSelected": "Vyberte prosím typ účtu.",
+    "chooseMethod": "Vyberte metódu",
+    "restoreComingSoonTitle": "Čoskoro dostupné",
+    "restoreComingSoonDescription": "Funkcia obnovenia bude dostupná v budúcej aktualizácii."
   },
   "BackupScreen": {
     "title": "Zálohovať peňaženku",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Funkcia nedostupná",
     "description": "Táto funkcia vyžaduje úschovný účet."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Vytváranie peňaženky...",
+    "errorTitle": "Vytvorenie peňaženky zlyhalo",
+    "errorDescription": "Niečo sa pokazilo. Skúste to prosím znova.",
+    "retry": "Skúsiť znova"
   }
 }

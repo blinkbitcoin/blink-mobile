@@ -3504,10 +3504,16 @@
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Chagua aina ya akaunti",
-    "description": "Chagua jinsi unavyotaka kusimamia fedha zako",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Tunashikilia fedha kwa niaba yako",
+    "selfCustodialDescription": "Wewe peke yako unaweza kufikia fedha",
+    "continueButton": "Endelea",
+    "descriptionDefault": "Tafadhali chagua aina yako unayoipendelea ya Blink.",
+    "descriptionSelected": "Tafadhali chagua aina ya akaunti.",
+    "chooseMethod": "Chagua njia",
+    "restoreComingSoonTitle": "Inakuja hivi karibuni",
+    "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye."
   },
   "BackupScreen": {
     "title": "Hifadhi nakala ya mkoba",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Kipengele hakipatikani",
     "description": "Kipengele hiki kinahitaji akaunti ya ulezi."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Kuunda mkoba wako...",
+    "errorTitle": "Kuunda mkoba kumeshindikana",
+    "errorDescription": "Kuna kitu kimekwenda vibaya. Tafadhali jaribu tena.",
+    "retry": "Jaribu tena"
   }
 }

@@ -3551,10 +3551,16 @@
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Khetha uhlobo lwe-akhawunti",
-    "description": "Khetha indlela ofuna ukulawula ngayo imali yakho",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Sigcina imali egameni lakho",
+    "selfCustodialDescription": "Nguwe wedwa onokufikelela kwimali",
+    "continueButton": "Qhubeka",
+    "descriptionDefault": "Nceda ukhethe uhlobo lwakho olukhethwayo lwe-Blink.",
+    "descriptionSelected": "Nceda ukhethe uhlobo lwe-akhawunti.",
+    "chooseMethod": "Khetha indlela",
+    "restoreComingSoonTitle": "Iyeza kungekudala",
+    "restoreComingSoonDescription": "Isici sokubuyisela siya kufumaneka kwisashintsho elizayo."
   },
   "BackupScreen": {
     "title": "Gcina isipele sesikhwama",
@@ -3575,5 +3581,11 @@
   "BackendFeatureGate": {
     "title": "Isici asifumaneki",
     "description": "Esi sici sidinga i-akhawunti ye-custodial."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Ukwenza isikhwama sakho...",
+    "errorTitle": "Ukwenza isikhwama akuphumelelanga",
+    "errorDescription": "Kukho into engahambanga kakuhle. Nceda uzame kwakhona.",
+    "retry": "Zama kwakhona"
   }
 }

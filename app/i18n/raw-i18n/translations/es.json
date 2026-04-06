@@ -3492,10 +3492,16 @@
         "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
     },
     "AccountTypeSelectionScreen": {
-        "title": "Elige tipo de cuenta",
-        "description": "Selecciona cómo quieres administrar tus fondos",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "Nosotros custodiamos los fondos por ti",
+        "selfCustodialDescription": "Solo tú puedes acceder a los fondos",
+        "continueButton": "Continuar",
+        "descriptionDefault": "Por favor elige tu tipo preferido de Blink.",
+        "descriptionSelected": "Por favor elige tipo de cuenta.",
+        "chooseMethod": "Elegir método",
+        "restoreComingSoonTitle": "Próximamente",
+        "restoreComingSoonDescription": "La función de restauración estará disponible en una actualización futura."
     },
     "BackupScreen": {
         "title": "Respaldar billetera",
@@ -3516,5 +3522,11 @@
     "BackendFeatureGate": {
         "title": "Función no disponible",
         "description": "Esta función requiere una cuenta custodia."
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "Creando tu billetera...",
+        "errorTitle": "Error al crear la billetera",
+        "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo.",
+        "retry": "Intentar de nuevo"
     }
 }

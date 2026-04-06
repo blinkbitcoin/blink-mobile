@@ -3533,10 +3533,16 @@
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     },
     "AccountTypeSelectionScreen": {
-        "title": "アカウントタイプを選択",
-        "description": "資金の管理方法を選択してください",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "お客様に代わって資金を保管します",
+        "selfCustodialDescription": "あなただけが資金にアクセスできます",
+        "continueButton": "続行",
+        "descriptionDefault": "ご希望のBlinkタイプを選択してください。",
+        "descriptionSelected": "アカウントタイプを選択してください。",
+        "chooseMethod": "方法を選択",
+        "restoreComingSoonTitle": "近日公開",
+        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。"
     },
     "BackupScreen": {
         "title": "ウォレットをバックアップ",
@@ -3557,5 +3563,11 @@
     "BackendFeatureGate": {
         "title": "機能が利用できません",
         "description": "この機能にはカストディアルアカウントが必要です。"
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "ウォレットを作成中...",
+        "errorTitle": "ウォレットの作成に失敗しました",
+        "errorDescription": "エラーが発生しました。もう一度お試しください。",
+        "retry": "再試行"
     }
 }

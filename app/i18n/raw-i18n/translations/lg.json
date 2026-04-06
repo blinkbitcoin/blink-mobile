@@ -3504,10 +3504,16 @@
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Londa ekika ky'akawunti",
-    "description": "Londa engeri gy'oyagala okuddukanya ssente zo",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Tukuuma ssente zo ku lw'ekitiibwa kyo",
+    "selfCustodialDescription": "Ggwe wekka oyinza okufuna ssente",
+    "continueButton": "Weyongerayo",
+    "descriptionDefault": "Londa ekika kya Blink ky'oyagala.",
+    "descriptionSelected": "Londa ekika ky'akawunti.",
+    "chooseMethod": "Londa enkola",
+    "restoreComingSoonTitle": "Kijja mangu",
+    "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja."
   },
   "BackupScreen": {
     "title": "Koppa wallet yo",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Ekikola tekiriwo",
     "description": "Ekikola kino kyetaagisa akawunti ya custodial."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Okukola wallet yo...",
+    "errorTitle": "Okukola wallet kugaanye",
+    "errorDescription": "Waliwo ekikyamu. Gezaako nate.",
+    "retry": "Gezaako nate"
   }
 }
