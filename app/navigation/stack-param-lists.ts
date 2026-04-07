@@ -97,6 +97,13 @@ export type RootStackParamList = {
     settlementAmount: MoneyAmount<typeof WalletCurrency.Btc>
     displayAmount: MoneyAmount<DisplayCurrency>
   }
+  lnurlAuth: {
+    callback: string
+    domain: string
+    k1: string
+    action: "register" | "login" | "link" | "auth"
+    lnurl: string
+  }
   phoneFlow: NavigatorScreenParams<PhoneValidationStackParamList>
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }

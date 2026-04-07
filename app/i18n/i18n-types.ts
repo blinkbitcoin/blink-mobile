@@ -8269,6 +8269,38 @@ type RootTranslation = {
 		 */
 		telegram: string
 	}
+	LnurlAuthScreen: {
+		/**
+		 * L​o​g​i​n​ ​R​e​q​u​e​s​t
+		 */
+		title: string
+		/**
+		 * r​e​g​i​s​t​e​r
+		 */
+		actionRegister: string
+		/**
+		 * l​o​g​i​n
+		 */
+		actionLogin: string
+		/**
+		 * l​i​n​k​ ​a​c​c​o​u​n​t
+		 */
+		actionLink: string
+		/**
+		 * a​u​t​h​o​r​i​z​e
+		 */
+		actionAuth: string
+		/**
+		 * {​a​c​t​i​o​n​}​ ​t​o​ ​{​d​o​m​a​i​n​}
+		 * @param {unknown} action
+		 * @param {unknown} domain
+		 */
+		actionDescription: RequiredParams<'action' | 'domain'>
+		/**
+		 * S​u​c​c​e​s​s​f​u​l​l​y​ ​a​u​t​h​e​n​t​i​c​a​t​e​d​!
+		 */
+		success: string
+	}
 	LoginMethodScreen: {
 		/**
 		 * S​e​l​e​c​t​ ​p​r​e​f​e​r​r​e​d​ ​l​o​g​i​n​ ​m​e​t​h​o​d​.
@@ -19454,6 +19486,36 @@ export type TranslationFunctions = {
 		 * Send via Telegram
 		 */
 		telegram: () => LocalizedString
+	}
+	LnurlAuthScreen: {
+		/**
+		 * Login Request
+		 */
+		title: () => LocalizedString
+		/**
+		 * register
+		 */
+		actionRegister: () => LocalizedString
+		/**
+		 * login
+		 */
+		actionLogin: () => LocalizedString
+		/**
+		 * link account
+		 */
+		actionLink: () => LocalizedString
+		/**
+		 * authorize
+		 */
+		actionAuth: () => LocalizedString
+		/**
+		 * {action} to {domain}
+		 */
+		actionDescription: (arg: { action: unknown, domain: unknown }) => LocalizedString
+		/**
+		 * Successfully authenticated!
+		 */
+		success: () => LocalizedString
 	}
 	LoginMethodScreen: {
 		/**

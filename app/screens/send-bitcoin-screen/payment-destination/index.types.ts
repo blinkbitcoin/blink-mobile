@@ -98,7 +98,7 @@ export type ResolvedLnurlPaymentDestination = LnurlPaymentDestination & {
   lnurlParams: LnUrlPayServiceResponse
 }
 
-export type ValidParsedReceiveDestination = LnurlWithdrawDestination
+export type ValidParsedReceiveDestination = LnurlWithdrawDestination | LnurlAuthDestination
 
 export type LnurlWithdrawDestination = {
   paymentType: typeof PaymentType.Lnurl
@@ -110,4 +110,14 @@ export type LnurlWithdrawDestination = {
   defaultDescription: string
   minWithdrawable: number
   maxWithdrawable: number
+}
+
+export type LnurlAuthDestination = {
+  paymentType: typeof PaymentType.Lnurl
+  valid: true
+  lnurl: string
+  callback: string
+  domain: string
+  k1: string
+  action: "register" | "login" | "link" | "auth"
 }

@@ -2215,6 +2215,15 @@ const en: BaseTranslation = {
     amountToRedeemFrom: "Amount to redeem from {domain: string}",
     redeemAmountFrom: "Redeem {amountToRedeem: string} from {domain: string}",
   },
+  LnurlAuthScreen: {
+    title: "Login Request",
+    actionLogin: "login",
+    actionRegister: "register",
+    actionLink: "link account",
+    actionAuth: "authorize",
+    actionDescription: "{{action}} to {{domain}}",
+    success: "Successfully authenticated!",
+  },
   ScanningQRCodeScreen: {
     invalidContent:
       "We found:\n\n{found: string}\n\nThis is not a valid Bitcoin address or Lightning invoice",

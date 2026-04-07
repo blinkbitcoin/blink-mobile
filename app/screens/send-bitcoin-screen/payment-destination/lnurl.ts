@@ -37,10 +37,15 @@ export const resolveLnurlDestination = async ({
   // but lnurl withdraw is handled here
 
   if (parsedLnurlDestination.valid) {
-    const lnurlParams = await getParams(parsedLnurlDestination.lnurl)
+    let lnurlParams: Awaited<ReturnType<typeof getParams>> | undefined
+    try {
+      lnurlParams = await getParams(parsedLnurlDestination.lnurl)
+    } catch {
+      lnurlParams = undefined
+    }
 
     // Check for lnurl withdraw request
-    if ("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
+    if (lnurlParams && "tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
       return createLnurlWithdrawDestination({
         lnurl: parsedLnurlDestination.lnurl,
         callback: lnurlParams.callback,
@@ -49,6 +54,21 @@ export const resolveLnurlDestination = async ({
         defaultDescription: lnurlParams.defaultDescription,
         minWithdrawable: lnurlParams.minWithdrawable,
         maxWithdrawable: lnurlParams.maxWithdrawable,
+      })
+    }
+
+    // Check for lnurl auth request (LUD-04)
+    if (lnurlParams && "tag" in lnurlParams && lnurlParams.tag === "login") {
+      const action =
+        "action" in lnurlParams && isLnurlAuthAction(lnurlParams.action)
+          ? lnurlParams.action
+          : "login"
+      return createLnurlAuthDestination({
+        lnurl: parsedLnurlDestination.lnurl,
+        callback: lnurlParams.callback,
+        domain: lnurlParams.domain,
+        k1: lnurlParams.k1,
+        action,
       })
     }
 
@@ -179,6 +199,36 @@ export type CreateLnurlWithdrawDestinationParams = {
 
 export const createLnurlWithdrawDestination = (
   params: CreateLnurlWithdrawDestinationParams,
+): ReceiveDestination => {
+  return {
+    valid: true,
+    destinationDirection: DestinationDirection.Receive,
+    validDestination: {
+      ...params,
+      paymentType: PaymentType.Lnurl,
+      valid: true,
+    },
+  } as const
+}
+
+export type CreateLnurlAuthDestinationParams = {
+  lnurl: string
+  callback: string
+  domain: string
+  k1: string
+  action: "register" | "login" | "link" | "auth"
+}
+
+export const isLnurlAuthAction = (
+  action: unknown,
+): action is CreateLnurlAuthDestinationParams["action"] => {
+  return (
+    action === "register" || action === "login" || action === "link" || action === "auth"
+  )
+}
+
+export const createLnurlAuthDestination = (
+  params: CreateLnurlAuthDestinationParams,
 ): ReceiveDestination => {
   return {
     valid: true,
