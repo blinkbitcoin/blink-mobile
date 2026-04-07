@@ -490,6 +490,13 @@ export const HomeScreen: React.FC = () => {
             )}
           </View>
           <GaloyIconButton
+            onPress={() => navigation.navigate("breezSdkDemoScreen")}
+            size={"medium"}
+            name="lightning"
+            iconOnly={true}
+            weight="bold"
+          />
+          <GaloyIconButton
             onPress={() => navigation.navigate("settings")}
             size={"medium"}
             name="menu"
