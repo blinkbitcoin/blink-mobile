@@ -3535,8 +3535,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",
     "explainerTitle": "Imataq niyta munan non-custodial nisqaman kutiy?",
-    "explainerStep1": "Spark protocol nisqapi non-custodial akawuntita ruwanki, ",
-    "explainerStep1Link": "astawanta yachay kaypi",
+    "explainerStep1": "Spark protocol nisqapi non-custodial akawuntita ruwanki, <link>astawanta yachay kaypi</link>",
     "explainerStep2": "Qullqiykita musuq non-custodial akawuntiykiman apasun, kunan akawuntiykitaq puchukanqa",
     "explainerStep3": "Blink nisqata llamkachiy imaynallapas",
     "letsMove": "Haku",

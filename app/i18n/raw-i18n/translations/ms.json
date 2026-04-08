@@ -3538,8 +3538,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Beralih ke non-custodial",
     "explainerTitle": "Apakah maksud beralih ke non-custodial?",
-    "explainerStep1": "Anda akan membuat akaun non-custodial di protokol Spark, ",
-    "explainerStep1Link": "ketahui lebih lanjut di sini",
+    "explainerStep1": "Anda akan membuat akaun non-custodial di protokol Spark, <link>ketahui lebih lanjut di sini</link>",
     "explainerStep2": "Kami memindahkan dana anda ke akaun non-custodial baharu dan akaun semasa anda akan dipadamkan",
     "explainerStep3": "Teruskan menggunakan Blink seperti biasa",
     "letsMove": "Jom",
