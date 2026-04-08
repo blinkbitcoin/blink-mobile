@@ -12,6 +12,15 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
+const mockSaveCheckpoint = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationCheckpoint: () => ({
+    saveCheckpoint: mockSaveCheckpoint,
+  }),
+  MigrationCheckpoint: { BackupAlerts: "backupAlerts" },
+}))
+
 jest.mock("@app/components/icon-hero", () => {
   const { Text } = jest.requireActual("react-native")
   return {
@@ -104,5 +113,15 @@ describe("SparkBackupAlertsScreen", () => {
 
     expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2())).toBeTruthy()
     expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check3())).toBeTruthy()
+  })
+
+  it("saves BackupAlerts checkpoint on mount", () => {
+    render(
+      <ContextForScreen>
+        <SparkBackupAlertsScreen />
+      </ContextForScreen>,
+    )
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupAlerts")
   })
 })

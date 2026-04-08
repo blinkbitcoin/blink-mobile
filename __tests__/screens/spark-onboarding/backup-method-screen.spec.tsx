@@ -23,6 +23,15 @@ jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   }),
 }))
 
+const mockSaveCheckpoint = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationCheckpoint: () => ({
+    saveCheckpoint: mockSaveCheckpoint,
+  }),
+  MigrationCheckpoint: { BackupMethod: "backupMethod" },
+}))
+
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   GaloyPrimaryButton: ({
     title,
@@ -151,5 +160,15 @@ describe("SparkBackupMethodScreen", () => {
         .accessibilityState,
     ).toEqual({ disabled: true })
     expect(getByText(LL.SparkOnboarding.BackupMethod.iOSComingSoon())).toBeTruthy()
+  })
+
+  it("saves BackupMethod checkpoint on mount", () => {
+    render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupMethod")
   })
 })
