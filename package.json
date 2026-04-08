@@ -285,7 +285,7 @@
     }
   },
   "resolutions": {
-    "basic-ftp": ">=5.2.0",
+    "basic-ftp": ">=5.2.1",
     "cipher-base": "^1.0.6",
     "types-ramda": "0.29.4",
     "ejs": "3.1.9",
