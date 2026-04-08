@@ -1,9 +1,7 @@
 import { useCallback, useMemo, useRef } from "react"
-import { Linking } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard, useCountdown } from "@app/hooks"
@@ -11,6 +9,7 @@ import { useWalletMnemonicWords } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDuration } from "@app/utils/date"
+import { openExternalUrl } from "@app/utils/external"
 
 import { buildConfirmChallenges } from "../utils"
 
@@ -49,10 +48,7 @@ export const useBackupPhrase = (step: PhraseStep) => {
   }, [copyToClipboard, LL, words])
 
   const handleOpenLink = useCallback(
-    () =>
-      InAppBrowser.open(sparkCompatibleWalletsUrl).catch(() =>
-        Linking.openURL(sparkCompatibleWalletsUrl),
-      ),
+    () => openExternalUrl(sparkCompatibleWalletsUrl),
     [sparkCompatibleWalletsUrl],
   )
 
