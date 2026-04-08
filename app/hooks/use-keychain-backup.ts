@@ -11,7 +11,10 @@ export const useKeychainBackup = (service: string) => {
       setLoading(true)
       setError(undefined)
       try {
-        const result = await Keychain.setGenericPassword(service, value, { service })
+        const result = await Keychain.setGenericPassword(service, value, {
+          service,
+          accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        })
         return result !== false
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error"
