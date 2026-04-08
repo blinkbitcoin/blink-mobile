@@ -2783,7 +2783,9 @@
             "minChars": "Deve contenere almeno {min} caratteri",
             "invalidPostalCode": "Codice postale non valido, probabilmente un errore di battitura",
             "invalidRegion": "Selezione regione non valida"
-        }
+        },
+        "passwordTooWeak": "La password è troppo debole. Usa una combinazione di lettere maiuscole, minuscole, numeri e caratteri speciali.",
+        "passwordCommon": "Questa password è troppo comune. Scegli una password più sicura."
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",
@@ -3423,11 +3425,12 @@
             "title": "Scegli il metodo di backup",
             "subtitle": "Consigliamo {provider} per i nuovi utenti.",
             "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
             "passwordManager": "Gestore password",
             "manualBackup": "Backup manuale",
             "keychainSaved": "Backup salvato nel gestore password",
             "keychainFailed": "Impossibile salvare il backup",
-            "appleICloud": "Apple iCloud"
+            "iOSComingSoon": "Backup su iCloud in arrivo"
         },
         "ManualBackup": {
             "Alerts": {

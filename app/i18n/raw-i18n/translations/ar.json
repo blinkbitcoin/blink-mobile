@@ -2800,7 +2800,9 @@
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
       "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي",
       "invalidRegion": "اختيار منطقة غير صالح"
-    }
+    },
+    "passwordTooWeak": "كلمة المرور ضعيفة جدًا. استخدم مزيجًا من الأحرف الكبيرة والصغيرة والأرقام والرموز الخاصة.",
+    "passwordCommon": "كلمة المرور هذه شائعة جدًا. يرجى اختيار كلمة مرور أقوى."
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -3473,11 +3475,12 @@
       "title": "اختر طريقة النسخ الاحتياطي",
       "subtitle": "نوصي بـ {provider} للمستخدمين الجدد.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "مدير كلمات المرور",
       "manualBackup": "نسخ احتياطي يدوي",
       "keychainSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
       "keychainFailed": "فشل حفظ النسخة الاحتياطية",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "النسخ الاحتياطي على iCloud قريبًا"
     },
     "ManualBackup": {
       "Alerts": {

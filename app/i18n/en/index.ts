@@ -2886,6 +2886,9 @@ const en: BaseTranslation = {
       invalidPostalCode: "Invalid postal code, probably a typo",
       invalidRegion: "Invalid region selection",
     },
+    passwordTooWeak:
+      "Password is too weak. Use a mix of uppercase, lowercase, numbers, and special characters.",
+    passwordCommon: "This password is too common. Please choose a stronger password.",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",
@@ -3572,6 +3575,7 @@ const en: BaseTranslation = {
       manualBackup: "Manual backup",
       keychainSaved: "Backup saved to password manager",
       keychainFailed: "Failed to save backup",
+      iOSComingSoon: "iCloud backup coming soon",
     },
     CloudBackup: {
       title: "Let's back up your wallet",

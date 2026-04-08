@@ -2824,7 +2824,9 @@
       "minChars": "Kufuneka ibe nobuncinane {min} oonobumba",
       "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni, mhlawumbi yimpazamo yokutayipha",
       "invalidRegion": "Ukukhetha kwengingqi okungekho semthethweni"
-    }
+    },
+    "passwordTooWeak": "Iphasiwedi ibuthathaka kakhulu. Sebenzisa indibaniselwano yoonobumba abakhulu, abancinci, amanani neempawu ezizodwa.",
+    "passwordCommon": "Le phasiwedi ixhaphake kakhulu. Nceda ukhethe iphasiwedi eyomeleleyo ngakumbi."
   },
   "errors": {
     "generic": "There was an error.\nPlease try again later.",
@@ -3482,11 +3484,12 @@
       "title": "Khetha indlela yakho yokugcina",
       "subtitle": "Sicebisa {provider} kubasebenzisi abatsha.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Umlawuli wezigxina",
       "manualBackup": "Ukugcina ngesandla",
       "keychainSaved": "Ukugcinwa kugcinwe kumlawuli wezigxina",
       "keychainFailed": "Ukugcinwa akuphumelelanga",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Ugcino lwe-iCloud luyeza kungekudala"
     },
     "ManualBackup": {
       "Alerts": {

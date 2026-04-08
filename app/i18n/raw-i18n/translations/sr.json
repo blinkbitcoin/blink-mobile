@@ -2800,7 +2800,9 @@
       "minChars": "Мора имати најмање {min} знакова",
       "invalidPostalCode": "Неважећи поштански број, вероватно грешка у куцању",
       "invalidRegion": "Неважећи избор региона"
-    }
+    },
+    "passwordTooWeak": "Лозинка је преслаба. Користите комбинацију великих и малих слова, бројева и специјалних знакова.",
+    "passwordCommon": "Ова лозинка је превише честа. Изаберите јачу лозинку."
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -3473,11 +3475,12 @@
       "title": "Изаберите метод резервне копије",
       "subtitle": "Препоручујемо {provider} за нове кoriснике.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Менаџер лозинки",
       "manualBackup": "Ручна резервна копија",
       "keychainSaved": "Резервна копија сачувана у менаџеру лозинки",
       "keychainFailed": "Чување резервне копије није успело",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloud резервна копија ускоро стиже"
     },
     "ManualBackup": {
       "Alerts": {

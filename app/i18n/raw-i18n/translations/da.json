@@ -2786,7 +2786,9 @@
       "minChars": "Skal være mindst {min} tegn",
       "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl",
       "invalidRegion": "Ugyldigt regionsvalg"
-    }
+    },
+    "passwordTooWeak": "Adgangskoden er for svag. Brug en kombination af store og små bogstaver, tal og specialtegn.",
+    "passwordCommon": "Denne adgangskode er for almindelig. Vælg venligst en stærkere adgangskode."
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",
@@ -3453,11 +3455,12 @@
       "title": "Vælg din backup-metode",
       "subtitle": "Vi anbefaler {provider} til nye brugere.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Adgangskodeadministrator",
       "manualBackup": "Manuel backup",
       "keychainSaved": "Backup gemt i adgangskodeadministrator",
       "keychainFailed": "Kunne ikke gemme backup",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloud-sikkerhedskopi kommer snart"
     },
     "ManualBackup": {
       "Alerts": {

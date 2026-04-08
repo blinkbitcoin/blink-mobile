@@ -2783,7 +2783,9 @@
       "minChars": "Harus minimal {min} karakter",
       "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik",
       "invalidRegion": "Pilihan wilayah tidak valid"
-    }
+    },
+    "passwordTooWeak": "Kata sandi terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, angka, dan karakter khusus.",
+    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat."
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -3435,11 +3437,12 @@
       "title": "Pilih metode cadangan Anda",
       "subtitle": "Kami merekomendasikan {provider} untuk pengguna baru.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Pengelola kata sandi",
       "manualBackup": "Cadangan manual",
       "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
       "keychainFailed": "Gagal menyimpan cadangan",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Pencadangan iCloud segera hadir"
     },
     "ManualBackup": {
       "Alerts": {

@@ -2783,7 +2783,9 @@
             "minChars": "Muss mindestens {min} Zeichen lang sein",
             "invalidPostalCode": "Ungültige Postleitzahl, wahrscheinlich ein Tippfehler",
             "invalidRegion": "Ungültige Regionsauswahl"
-        }
+        },
+        "passwordTooWeak": "Das Passwort ist zu schwach. Verwende eine Kombination aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen.",
+        "passwordCommon": "Dieses Passwort ist zu häufig. Bitte wähle ein stärkeres Passwort."
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",
@@ -3423,11 +3425,12 @@
             "title": "Wähle deine Sicherungsmethode",
             "subtitle": "Wir empfehlen {provider} für neue Benutzer.",
             "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
             "passwordManager": "Passwort-Manager",
             "manualBackup": "Manuelle Sicherung",
             "keychainSaved": "Sicherung im Passwort-Manager gespeichert",
             "keychainFailed": "Sicherung konnte nicht gespeichert werden",
-            "appleICloud": "Apple iCloud"
+            "iOSComingSoon": "iCloud-Backup kommt bald"
         },
         "ManualBackup": {
             "Alerts": {

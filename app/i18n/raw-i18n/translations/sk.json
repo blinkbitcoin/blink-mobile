@@ -2783,7 +2783,9 @@
       "minChars": "Musí obsahovať aspoň {min} znakov",
       "invalidPostalCode": "Neplatné PSČ, pravdepodobne preklep",
       "invalidRegion": "Neplatný výber regiónu"
-    }
+    },
+    "passwordTooWeak": "Heslo je príliš slabé. Použite kombináciu veľkých a malých písmen, číslic a špeciálnych znakov.",
+    "passwordCommon": "Toto heslo je príliš bežné. Vyberte si silnejšie heslo."
   },
   "errors": {
     "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",
@@ -3435,11 +3437,12 @@
       "title": "Vyberte metódu zálohovania",
       "subtitle": "Pre nových používateľov odporúčame {provider}.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Správca hesiel",
       "manualBackup": "Ručné zálohovanie",
       "keychainSaved": "Záloha uložená do správcu hesiel",
       "keychainFailed": "Nepodarilo sa uložiť zálohu",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Zálohovanie do iCloudu bude čoskoro k dispozícii"
     },
     "ManualBackup": {
       "Alerts": {
