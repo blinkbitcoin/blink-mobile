@@ -55,6 +55,7 @@ describe("encryptPin", () => {
     expect(encryptAesGcm).toHaveBeenCalledWith(
       "246784FFFFFFFFFF",
       "abcd1234abcd1234abcd1234abcd1234",
+      { ivLength: 16 },
     )
   })
 })

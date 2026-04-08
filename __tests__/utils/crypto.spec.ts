@@ -87,6 +87,24 @@ describe("crypto utils", () => {
         expect.anything(),
       )
     })
+
+    it("uses a 12-byte IV by default", () => {
+      const Crypto = jest.requireMock("react-native-quick-crypto").default
+      Crypto.randomBytes.mockClear()
+
+      encryptAesGcm("plaintext", "abcd1234abcd1234abcd1234abcd1234")
+
+      expect(Crypto.randomBytes).toHaveBeenCalledWith(12)
+    })
+
+    it("accepts an explicit IV length override", () => {
+      const Crypto = jest.requireMock("react-native-quick-crypto").default
+      Crypto.randomBytes.mockClear()
+
+      encryptAesGcm("plaintext", "abcd1234abcd1234abcd1234abcd1234", { ivLength: 16 })
+
+      expect(Crypto.randomBytes).toHaveBeenCalledWith(16)
+    })
   })
 
   describe("deriveKeyFromPassword", () => {
