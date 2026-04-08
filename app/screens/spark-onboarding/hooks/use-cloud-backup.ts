@@ -1,17 +1,17 @@
 import { useCallback } from "react"
-import { Alert } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
+import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { deriveKeyFromPassword, encryptAesGcm } from "@app/utils/crypto"
+import { confirmDialog } from "@app/utils/confirm-dialog"
+import { buildBackupPayload } from "@app/utils/spark-backup-format"
 import { toastShow } from "@app/utils/toast"
 
-import { MOCK_WORDS } from "../spark-mock-data"
 import { getCloudProviderName } from "../utils"
 
 const DEFAULT_BACKUP_VERSION = 1
@@ -22,24 +22,6 @@ type UseCloudBackupParams = {
   version?: number
 }
 
-type OverwriteAlertParams = {
-  title: string
-  message: string
-  labels: { cancel: string; overwrite: string }
-}
-
-const confirmOverwrite = ({
-  title,
-  message,
-  labels,
-}: OverwriteAlertParams): Promise<boolean> =>
-  new Promise((resolve) => {
-    Alert.alert(title, message, [
-      { text: labels.cancel, style: "cancel", onPress: () => resolve(false) },
-      { text: labels.overwrite, style: "destructive", onPress: () => resolve(true) },
-    ])
-  })
-
 export const useCloudBackup = ({
   isEncrypted,
   password,
@@ -49,6 +31,7 @@ export const useCloudBackup = ({
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { appConfig } = useAppConfig()
   const { startSession, upload, loading } = useGoogleDriveBackup()
+  const mnemonic = useWalletMnemonic()
 
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
@@ -59,38 +42,32 @@ export const useCloudBackup = ({
     try {
       session = await startSession(filename)
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : LL.SparkOnboarding.CloudBackup.signInFailed()
-      toastShow({ message, LL })
+      console.error("[CloudBackup] Sign-in failed:", err)
+      toastShow({ message: LL.SparkOnboarding.CloudBackup.signInFailed(), LL })
       return
     }
 
     if (session.existingFileId) {
-      const confirmed = await confirmOverwrite({
+      const confirmed = await confirmDialog({
         title: LL.SparkOnboarding.CloudBackup.existingBackupTitle(),
         message: LL.SparkOnboarding.CloudBackup.existingBackupMessage({ provider }),
         labels: {
           cancel: LL.common.cancel(),
-          overwrite: LL.SparkOnboarding.CloudBackup.overwrite(),
+          confirm: LL.SparkOnboarding.CloudBackup.overwrite(),
         },
       })
       if (!confirmed) return
     }
 
-    const mnemonic = MOCK_WORDS.join(" ")
-    const base = { version, createdAt: Date.now() }
-
-    const payload = isEncrypted
-      ? (() => {
-          const { key, salt } = deriveKeyFromPassword(password)
-          const { data, iv } = encryptAesGcm(mnemonic, key)
-          return JSON.stringify({ ...base, encrypted: true, data, iv, salt })
-        })()
-      : JSON.stringify({ ...base, encrypted: false, mnemonic })
+    const payload = buildBackupPayload(mnemonic, {
+      password: isEncrypted ? password : undefined,
+      version,
+    })
 
     const result = await upload(payload, filename, session)
     if (!result.success) {
-      toastShow({ message: result.error, LL })
+      console.error("[CloudBackup] Upload failed:", result.error)
+      toastShow({ message: LL.SparkOnboarding.CloudBackup.uploadFailed(), LL })
       return
     }
 
@@ -109,6 +86,7 @@ export const useCloudBackup = ({
     navigation,
     LL,
     appConfig.galoyInstance.name,
+    mnemonic,
   ])
 
   return { handleBackup, loading }

@@ -7,9 +7,36 @@ jest.mock("@react-navigation/native", () => ({
   useFocusEffect: jest.fn(),
 }))
 
+jest.mock("@app/utils/validators/password", () => ({
+  validatePassword: jest.fn((password: string) => {
+    const errors: string[] = []
+    if (password.length < 12) errors.push("too-short")
+    if (
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^a-zA-Z0-9]/.test(password)
+    )
+      errors.push("too-weak")
+    return {
+      valid: errors.length === 0,
+      errors,
+      strength: errors.length === 0 ? "strong" : "weak",
+    }
+  }),
+  PasswordIssue: {
+    TooShort: "too-short",
+    TooWeak: "too-weak",
+    CommonPassword: "common-password",
+  },
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
+      common: {
+        passwordTooWeak: () => "Password too weak",
+        passwordCommon: () => "Password too common",
+      },
       SparkOnboarding: {
         CloudBackup: {
           passwordTooShort: () => "Minimum 12 characters",
@@ -59,7 +86,7 @@ describe("useCloudBackupForm", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
     act(() => result.current.toggleEncryption())
-    act(() => result.current.setPassword("validpassword1"))
+    act(() => result.current.setPassword("ValidPass1234!"))
     act(() => result.current.setConfirmPassword("different"))
 
     expect(result.current.confirmPasswordError).toBe("Passwords do not match")
@@ -70,8 +97,8 @@ describe("useCloudBackupForm", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
     act(() => result.current.toggleEncryption())
-    act(() => result.current.setPassword("validpassword1"))
-    act(() => result.current.setConfirmPassword("validpassword1"))
+    act(() => result.current.setPassword("ValidPass1234!"))
+    act(() => result.current.setConfirmPassword("ValidPass1234!"))
 
     expect(result.current.passwordError).toBeUndefined()
     expect(result.current.confirmPasswordError).toBeUndefined()

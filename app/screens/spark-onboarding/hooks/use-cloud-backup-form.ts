@@ -3,8 +3,7 @@ import { useCallback, useMemo, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-
-const MIN_PASSWORD_LENGTH = 12
+import { validatePassword, PasswordIssue } from "@app/utils/validators/password"
 
 export const useCloudBackupForm = () => {
   const { LL } = useI18nContext()
@@ -27,13 +26,22 @@ export const useCloudBackupForm = () => {
     setConfirmPassword("")
   }, [])
 
+  const passwordValidation = useMemo(() => {
+    if (!isEncrypted || password.length === 0) return null
+    return validatePassword(password)
+  }, [isEncrypted, password])
+
   const passwordError = useMemo(() => {
-    if (!isEncrypted) return undefined
-    if (password.length === 0) return undefined
-    if (password.length < MIN_PASSWORD_LENGTH)
+    if (!passwordValidation) return undefined
+    if (passwordValidation.valid) return undefined
+    if (passwordValidation.errors.includes(PasswordIssue.TooShort))
       return LL.SparkOnboarding.CloudBackup.passwordTooShort()
+    if (passwordValidation.errors.includes(PasswordIssue.CommonPassword))
+      return LL.common.passwordCommon()
+    if (passwordValidation.errors.includes(PasswordIssue.TooWeak))
+      return LL.common.passwordTooWeak()
     return undefined
-  }, [isEncrypted, password, LL])
+  }, [passwordValidation, LL])
 
   const confirmPasswordError = useMemo(() => {
     if (!isEncrypted) return undefined
@@ -45,10 +53,10 @@ export const useCloudBackupForm = () => {
 
   const isValid = useMemo(() => {
     if (!isEncrypted) return true
-    if (password.length < MIN_PASSWORD_LENGTH) return false
+    if (!passwordValidation?.valid) return false
     if (confirmPassword !== password) return false
     return true
-  }, [isEncrypted, password, confirmPassword])
+  }, [isEncrypted, password, confirmPassword, passwordValidation])
 
   return {
     isEncrypted,
