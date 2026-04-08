@@ -15,7 +15,8 @@ const authHeader = (token: string) => ({ Authorization: `Bearer ${token}` })
 
 const randomBoundary = (): string => `blink_${Crypto.randomBytes(16).toString("hex")}`
 
-const escapeFileName = (name: string): string => name.replace(/'/g, "\\'")
+const escapeFileName = (name: string): string =>
+  name.replace(/\\/g, "\\\\").replace(/'/g, "\\'")
 
 export const buildMultipartBody = (
   metadata: string,
