@@ -1,13 +1,14 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 
 import { useBackupMethods } from "./hooks"
 import { getCloudProviderName } from "./utils"
@@ -19,8 +20,13 @@ export const SparkBackupMethodScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const { keychainLoading, handleKeychainBackup, handleCloudBackup, handleManualBackup } =
-    useBackupMethods()
+  const {
+    isCloudBackupAvailable,
+    keychainLoading,
+    handleKeychainBackup,
+    handleCloudBackup,
+    handleManualBackup,
+  } = useBackupMethods()
 
   const cloudProvider = getCloudProviderName(LL)
 
@@ -37,15 +43,27 @@ export const SparkBackupMethodScreen: React.FC = () => {
         />
 
         <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton title={cloudProvider} onPress={handleCloudBackup} />
+          <GaloyPrimaryButton
+            title={cloudProvider}
+            onPress={handleCloudBackup}
+            disabled={!isCloudBackupAvailable}
+            {...testProps("backup-cloud-button")}
+          />
+          {!isCloudBackupAvailable && (
+            <Text style={styles.comingSoonText}>
+              {LL.SparkOnboarding.BackupMethod.iOSComingSoon()}
+            </Text>
+          )}
           <GaloySecondaryButton
             title={LL.SparkOnboarding.BackupMethod.passwordManager()}
             onPress={handleKeychainBackup}
             loading={keychainLoading}
+            {...testProps("backup-keychain-button")}
           />
           <GaloySecondaryButton
             title={LL.SparkOnboarding.BackupMethod.manualBackup()}
             onPress={handleManualBackup}
+            {...testProps("backup-manual-button")}
           />
         </View>
       </View>
@@ -63,5 +81,8 @@ const useStyles = makeStyles(() => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
+  },
+  comingSoonText: {
+    textAlign: "center",
   },
 }))

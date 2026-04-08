@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
+import { Pressable, Text } from "react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -10,9 +11,11 @@ const mockHandleKeychainBackup = jest.fn()
 const mockHandleCloudBackup = jest.fn()
 const mockHandleManualBackup = jest.fn()
 let mockKeychainLoading = false
+let mockIsCloudBackupAvailable = true
 
 jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   useBackupMethods: () => ({
+    isCloudBackupAvailable: mockIsCloudBackupAvailable,
     keychainLoading: mockKeychainLoading,
     handleKeychainBackup: mockHandleKeychainBackup,
     handleCloudBackup: mockHandleCloudBackup,
@@ -20,8 +23,35 @@ jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   }),
 }))
 
+jest.mock("@app/components/atomic/galoy-primary-button", () => ({
+  GaloyPrimaryButton: ({
+    title,
+    onPress,
+    disabled,
+  }: {
+    title: string
+    onPress: () => void
+    disabled?: boolean
+  }) => (
+    <Pressable
+      testID={`primary-${title}`}
+      accessibilityState={{ disabled: Boolean(disabled) }}
+      onPress={disabled ? undefined : onPress}
+    >
+      <Text>{title}</Text>
+    </Pressable>
+  ),
+}))
+
+jest.mock("@app/components/atomic/galoy-secondary-button", () => ({
+  GaloySecondaryButton: ({ title, onPress }: { title: string; onPress: () => void }) => (
+    <Pressable testID={`secondary-${title}`} onPress={onPress}>
+      <Text>{title}</Text>
+    </Pressable>
+  ),
+}))
+
 jest.mock("@app/components/icon-hero", () => {
-  const { Text } = jest.requireActual("react-native")
   return {
     IconHero: ({ title, subtitle }: { title: string; subtitle: string }) => (
       <>
@@ -39,6 +69,7 @@ describe("SparkBackupMethodScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockKeychainLoading = false
+    mockIsCloudBackupAvailable = true
   })
 
   it("renders title and subtitle", () => {
@@ -104,5 +135,21 @@ describe("SparkBackupMethodScreen", () => {
     })
 
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
+  })
+
+  it("disables cloud backup and shows coming soon text when unavailable", () => {
+    mockIsCloudBackupAvailable = false
+
+    const { getByTestId, getByText } = render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    expect(
+      getByTestId(`primary-${LL.SparkOnboarding.BackupMethod.appleICloud()}`).props
+        .accessibilityState,
+    ).toEqual({ disabled: true })
+    expect(getByText(LL.SparkOnboarding.BackupMethod.iOSComingSoon())).toBeTruthy()
   })
 })
