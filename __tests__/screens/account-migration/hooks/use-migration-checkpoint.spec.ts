@@ -35,11 +35,13 @@ describe("useMigrationCheckpoint", () => {
     mockClearCheckpointFromStorage.mockResolvedValue(undefined)
   })
 
-  it("starts with null checkpoint and loading true", () => {
+  it("starts with null checkpoint and loading true", async () => {
     const { result } = renderHook(() => useMigrationCheckpoint())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.checkpoint).toBeNull()
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it("loads existing checkpoint from storage", async () => {
