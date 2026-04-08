@@ -1,28 +1,45 @@
 import React from "react"
+import { StyleProp, TextStyle } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
-type RichTextProps = {
-  text: string
-  bold: string
+type TagHandler = {
+  style?: StyleProp<TextStyle>
+  onPress?: () => void
 }
 
-export const RichText: React.FC<RichTextProps> = ({ text, bold }) => {
+type RichTextProps = {
+  text: string
+  tags?: Record<string, TagHandler>
+  style?: StyleProp<TextStyle>
+}
+
+const SPLIT_PATTERN = /(<\w+>.*?<\/\w+>)/g
+const TAG_PATTERN = /^<(\w+)>(.*)<\/\1>$/
+
+export const RichText: React.FC<RichTextProps> = ({ text, tags, style }) => {
   const styles = useStyles()
 
-  if (!text.includes(bold)) {
-    return <Text style={styles.body}>{text}</Text>
+  const allTags: Record<string, TagHandler> = {
+    bold: { style: styles.bold },
+    link: { style: styles.link },
+    ...tags,
   }
 
-  const [before, after] = text.split(bold)
+  const parts = text.split(SPLIT_PATTERN).map((part, i) => {
+    const match = part.match(TAG_PATTERN)
+    if (!match) return part
 
-  return (
-    <Text style={styles.body}>
-      {before}
-      <Text style={styles.bold}>{bold}</Text>
-      {after}
-    </Text>
-  )
+    const [, tag, inner] = match
+    const handler = allTags[tag]
+    return (
+      <Text key={i} style={handler?.style} onPress={handler?.onPress}>
+        {inner}
+      </Text>
+    )
+  })
+
+  return <Text style={[styles.body, style]}>{parts}</Text>
 }
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -33,6 +50,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   bold: {
     fontWeight: "700",
+    color: colors.black,
+  },
+  link: {
+    textDecorationLine: "underline",
     color: colors.black,
   },
 }))

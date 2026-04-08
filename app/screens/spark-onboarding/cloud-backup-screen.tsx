@@ -89,9 +89,8 @@ export const SparkCloudBackupScreen: React.FC = () => {
                 >
                   <RichText
                     text={LL.SparkOnboarding.CloudBackup.importantMessage({
-                      bold: LL.SparkOnboarding.CloudBackup.importantMessageBold(),
+                      bold: `<bold>${LL.SparkOnboarding.CloudBackup.importantMessageBold()}</bold>`,
                     })}
-                    bold={LL.SparkOnboarding.CloudBackup.importantMessageBold()}
                   />
                 </InfoBanner>
               </View>
