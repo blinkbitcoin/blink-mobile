@@ -18,13 +18,19 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
   },
 }))
 
-const mockFetch = jest.fn()
-global.fetch = mockFetch as typeof fetch
+const mockFindAppDataFile = jest.fn()
+const mockUploadAppDataFile = jest.fn()
+const mockDownloadAppDataFile = jest.fn()
+
+jest.mock("@app/utils/google-drive-client", () => ({
+  findAppDataFile: (...args: readonly unknown[]) => mockFindAppDataFile(...args),
+  uploadAppDataFile: (...args: readonly unknown[]) => mockUploadAppDataFile(...args),
+  downloadAppDataFile: (...args: readonly unknown[]) => mockDownloadAppDataFile(...args),
+}))
 
 describe("useGoogleDriveBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockFetch.mockReset()
   })
 
   it("returns initial state", () => {
@@ -34,10 +40,7 @@ describe("useGoogleDriveBackup", () => {
 
   describe("startSession", () => {
     it("signs in and checks for existing file", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ files: [] }),
-      })
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
@@ -53,10 +56,7 @@ describe("useGoogleDriveBackup", () => {
     })
 
     it("returns existing file id when backup exists", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ files: [{ id: "existing-id" }] }),
-      })
+      mockFindAppDataFile.mockResolvedValueOnce("existing-id")
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
@@ -85,7 +85,7 @@ describe("useGoogleDriveBackup", () => {
     const mockSession = { accessToken: "test-token", existingFileId: undefined }
 
     it("creates new file with POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true })
+      mockUploadAppDataFile.mockResolvedValueOnce(undefined)
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
@@ -99,14 +99,18 @@ describe("useGoogleDriveBackup", () => {
       })
 
       expect(uploadResult.success).toBe(true)
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("uploadType=multipart"),
-        expect.objectContaining({ method: "POST" }),
+      expect(mockUploadAppDataFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: '{"test": true}',
+          fileName: "backup.json",
+          accessToken: "test-token",
+          existingId: undefined,
+        }),
       )
     })
 
     it("updates existing file with PATCH", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true })
+      mockUploadAppDataFile.mockResolvedValueOnce(undefined)
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
@@ -116,18 +120,17 @@ describe("useGoogleDriveBackup", () => {
         await result.current.upload('{"test": true}', "backup.json", sessionWithFile)
       })
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("file-123"),
-        expect.objectContaining({ method: "PATCH" }),
+      expect(mockUploadAppDataFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          existingId: "file-123",
+        }),
       )
     })
 
     it("returns error on upload failure", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        text: () => Promise.resolve("Forbidden"),
-      })
+      mockUploadAppDataFile.mockRejectedValueOnce(
+        new Error("Drive upload failed (403): Forbidden"),
+      )
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
@@ -141,7 +144,7 @@ describe("useGoogleDriveBackup", () => {
       })
 
       expect(uploadResult.success).toBe(false)
-      expect(uploadResult.error).toBe("403: Forbidden")
+      expect(uploadResult.error).toBe("Drive upload failed (403): Forbidden")
     })
   })
 })

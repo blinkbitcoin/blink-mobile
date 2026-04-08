@@ -1,0 +1,134 @@
+import {
+  buildMultipartBody,
+  downloadAppDataFile,
+  findAppDataFile,
+  uploadAppDataFile,
+} from "@app/utils/google-drive-client"
+
+describe("google drive client", () => {
+  const originalFetch = global.fetch
+
+  beforeEach(() => {
+    global.fetch = jest.fn() as unknown as typeof fetch
+  })
+
+  afterAll(() => {
+    global.fetch = originalFetch
+  })
+
+  it("builds multipart body with the provided boundary", () => {
+    const body = buildMultipartBody('{"name":"backup.json"}', "content", "test-boundary")
+
+    expect(body).toContain("--test-boundary")
+    expect(body).toContain("Content-Type: application/json; charset=UTF-8")
+    expect(body).toContain("Content-Type: text/plain; charset=UTF-8")
+    expect(body.endsWith("--test-boundary--")).toBe(true)
+  })
+
+  it("finds files in appDataFolder with trashed filter and escaped filename", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ files: [{ id: "file-123" }] }),
+    })
+
+    const fileId = await findAppDataFile("blink's backup.json", "token")
+
+    expect(fileId).toBe("file-123")
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining(
+        encodeURIComponent(
+          "name='blink\\'s backup.json' and 'appDataFolder' in parents and trashed = false",
+        ),
+      ),
+      expect.objectContaining({
+        headers: { Authorization: "Bearer token" },
+      }),
+    )
+  })
+
+  it("throws when file lookup response is not ok", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: async () => "Unauthorized",
+    })
+
+    await expect(findAppDataFile("backup.json", "token")).rejects.toThrow(
+      "Drive query failed (401): Unauthorized",
+    )
+  })
+
+  it("uploads with POST when there is no existing file", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+    })
+
+    await uploadAppDataFile({
+      content: "content",
+      fileName: "backup.json",
+      accessToken: "token",
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("uploadType=multipart"),
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "Authorization": "Bearer token",
+          "Content-Type": expect.stringContaining("multipart/related; boundary=blink_"),
+        }),
+        body: expect.stringContaining('"parents":["appDataFolder"]'),
+      }),
+    )
+  })
+
+  it("uploads with PATCH when updating an existing file", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+    })
+
+    await uploadAppDataFile({
+      content: "content",
+      fileName: "backup.json",
+      accessToken: "token",
+      existingId: "file-123",
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/file-123?uploadType=multipart"),
+      expect.objectContaining({
+        method: "PATCH",
+        body: expect.stringContaining('"name":"backup.json"'),
+      }),
+    )
+  })
+
+  it("downloadAppDataFile returns file content on success", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve('{"mnemonic":"test words"}'),
+    })
+
+    const content = await downloadAppDataFile("file-456", "token-abc")
+
+    expect(content).toBe('{"mnemonic":"test words"}')
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/file-456?alt=media"),
+      expect.objectContaining({
+        headers: { Authorization: "Bearer token-abc" },
+      }),
+    )
+  })
+
+  it("downloadAppDataFile throws on non-OK response", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      text: () => Promise.resolve("Not found"),
+    })
+
+    await expect(downloadAppDataFile("file-456", "token-abc")).rejects.toThrow(
+      "Drive download failed (404)",
+    )
+  })
+})
