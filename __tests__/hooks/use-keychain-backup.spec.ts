@@ -6,6 +6,9 @@ const mockSetGenericPassword = jest.fn()
 
 jest.mock("react-native-keychain", () => ({
   setGenericPassword: (...args: readonly unknown[]) => mockSetGenericPassword(...args),
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "AccessibleWhenUnlockedThisDeviceOnly",
+  },
 }))
 
 describe("useKeychainBackup", () => {
@@ -28,7 +31,10 @@ describe("useKeychainBackup", () => {
       expect(mockSetGenericPassword).toHaveBeenCalledWith(
         "test-service",
         "youth indicate void",
-        expect.objectContaining({ service: "test-service" }),
+        expect.objectContaining({
+          service: "test-service",
+          accessible: "AccessibleWhenUnlockedThisDeviceOnly",
+        }),
       )
       expect(result.current.loading).toBe(false)
       expect(result.current.error).toBeUndefined()
