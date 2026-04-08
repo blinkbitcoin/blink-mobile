@@ -15670,10 +15670,10 @@ gzip-size@^6.0.0:
   dependencies:
     duplexer "^0.1.2"
 
-handlebars@^4.7.7:
-  version "4.7.8"
-  resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.8.tgz#41c42c18b1be2365439188c77c6afae71c0cd9e9"
-  integrity sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==
+handlebars@>=4.7.9, handlebars@^4.7.7:
+  version "4.7.9"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.9.tgz#6f139082ab58dc4e5a0e51efe7db5ae890d56a0f"
+  integrity sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==
   dependencies:
     minimist "^1.2.5"
     neo-async "^2.6.2"
@@ -22597,10 +22597,10 @@ react-native-nfc-manager@^3.14.14:
   dependencies:
     "@expo/config-plugins" "~7.8.0"
 
-react-native-nitro-modules@0.31.2:
-  version "0.31.2"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.31.2.tgz#2070a4e52abbbcb334d385a90a7154e502e5101e"
-  integrity sha512-UTG1kfLq5XDlR1OkhrNLNMbU6EvxIdLp4RUWT4PY8eBKyykOq8/kjc3fYMYxVEUZG+mrujRSMNXKeqHfiMUhOQ==
+react-native-nitro-modules@0.35.2:
+  version "0.35.2"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.35.2.tgz#75fbcd42a73d93540c0069d42098d9dc6c12ea7e"
+  integrity sha512-97cZcCh3ZAuWAfutel2Q3qLfc45XXh7F9Ei5tEjahP0kV3q8hQelwLIulKXmjN+f0JI5Zf/wCsfwwdVWYU2tKA==
 
 react-native-permissions@^4.1.5:
   version "4.1.5"
@@ -22625,15 +22625,16 @@ react-native-quick-base64@^2.0.5, react-native-quick-base64@^2.2.2:
   resolved "https://registry.yarnpkg.com/react-native-quick-base64/-/react-native-quick-base64-2.2.2.tgz#52005a0b455b04acc1c6ff3eb8fa220401656aae"
   integrity sha512-WLHSifHLoamr2kF00Gov0W9ud6CfPshe1rmqWTquVIi9c62qxOaJCFVDrXFZhEBU8B8PvGLVuOlVKH78yhY0Fg==
 
-react-native-quick-crypto@1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/react-native-quick-crypto/-/react-native-quick-crypto-1.0.9.tgz#275cee857a4bcf8ed97fefd903f2d542b837df1c"
-  integrity sha512-SAugK0DZg8Q0ELkPWZnzFabbRngZQh0BjwXEMpXH3YQgiM1vVHnb83YOdOTcBmUnM/mAKz+PW9lrvccloNwjbA==
+react-native-quick-crypto@1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/react-native-quick-crypto/-/react-native-quick-crypto-1.0.18.tgz#6030d6ddf2223570f324324d8a62581ca988c033"
+  integrity sha512-VjBLW2PasOUSxAqy2IDNvLqBez9NwTDBecwCpuz0F5WkzPDGZ4CuZEFGyL1qfkjwok11F0x3IyMrmCyFBAtOCQ==
   dependencies:
     "@craftzdog/react-native-buffer" "6.1.0"
     events "3.3.0"
     readable-stream "4.5.2"
     safe-buffer "^5.2.1"
+    string_decoder "^1.3.0"
     util "0.12.5"
 
 react-native-randombytes@^3.5.1:

@@ -566,6 +566,12 @@ export type CardCreateInput = {
   readonly status?: InputMaybe<CardStatus>;
 };
 
+export type CardHolder = {
+  readonly __typename: 'CardHolder';
+  readonly firstName: Scalars['String']['output'];
+  readonly lastName: Scalars['String']['output'];
+};
+
 export type CardPinUpdateInput = {
   readonly cardId: Scalars['ID']['input'];
   readonly encryptedPin: Scalars['String']['input'];
@@ -2106,6 +2112,7 @@ export type Query = {
   readonly cardBalance: CardBalance;
   readonly cardCollateralBalance: CardCollateralBalance;
   readonly cardEncryptionPublicKey: Scalars['String']['output'];
+  readonly cardHolder: CardHolder;
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly colorScheme: Scalars['String']['output'];
@@ -2158,6 +2165,11 @@ export type QueryBtcPriceListArgs = {
 
 
 export type QueryCardBalanceArgs = {
+  cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardHolderArgs = {
   cardId: Scalars['ID']['input'];
 };
 
@@ -9285,6 +9297,7 @@ export type ResolversTypes = {
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardHolder: ResolverTypeWrapper<CardHolder>;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
@@ -9567,6 +9580,7 @@ export type ResolversParentTypes = {
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardHolder: CardHolder;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
@@ -9986,6 +10000,12 @@ export type CardCollateralDepositResolvers<ContextType = any, ParentType extends
   newAvailableBalance?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   satAmount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   transferId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardHolderResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardHolder'] = ResolversParentTypes['CardHolder']> = {
+  firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10683,6 +10703,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
   cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
   cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardHolder?: Resolver<ResolversTypes['CardHolder'], ParentType, ContextType, RequireFields<QueryCardHolderArgs, 'cardId'>>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -11134,6 +11155,7 @@ export type Resolvers<ContextType = any> = {
   CardBalance?: CardBalanceResolvers<ContextType>;
   CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
   CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
+  CardHolder?: CardHolderResolvers<ContextType>;
   CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;

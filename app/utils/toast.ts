@@ -23,6 +23,12 @@ export const toastShow = ({
     typeof message === "function" ? message(englishTranslation) : message
   const translatedMessage = typeof message === "function" ? message(LL) : message
 
+  const toastTitle = {
+    error: LL.common.error(),
+    success: LL.common.success(),
+    warning: LL.common.warning(),
+  }
+
   logToastShown({
     message: englishMessage,
     type,
@@ -36,7 +42,7 @@ export const toastShow = ({
   // https://github.com/calintamas/react-native-toast-message/issues/164#issuecomment-803556361
   Toast.show({
     type,
-    text1: type === "error" ? LL.common.error() : LL.common.success(),
+    text1: toastTitle[type],
     text2: translatedMessage,
     position: "bottom",
     bottomOffset: 80,
