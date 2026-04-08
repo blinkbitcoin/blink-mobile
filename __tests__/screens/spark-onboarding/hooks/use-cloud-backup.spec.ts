@@ -1,5 +1,4 @@
 import { renderHook, act } from "@testing-library/react-native"
-import { Alert } from "react-native"
 
 import { useCloudBackup } from "@app/screens/spark-onboarding/hooks/use-cloud-backup"
 
@@ -38,6 +37,26 @@ jest.mock("@app/utils/crypto", () => ({
   encryptAesGcm: () => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }),
 }))
 
+jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+  useWalletMnemonic: () => "youth indicate void",
+}))
+
+jest.mock("@app/utils/spark-backup-format", () => ({
+  buildBackupPayload: jest.fn(
+    (_mnemonic: string, opts: { password?: string; version?: number }) =>
+      JSON.stringify({
+        version: opts.version ?? 1,
+        encrypted: Boolean(opts.password),
+        mnemonic: opts.password ? "ZW5jcnlwdGVk" : "youth indicate void",
+      }),
+  ),
+}))
+
+const mockConfirmDialog = jest.fn()
+jest.mock("@app/utils/confirm-dialog", () => ({
+  confirmDialog: (...args: readonly unknown[]) => mockConfirmDialog(...args),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -50,6 +69,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         CloudBackup: {
           uploadSuccess: ({ provider }: { provider: string }) => `Saved to ${provider}`,
           uploadFailed: () => "Upload failed",
+          signInFailed: () => "Sign in failed",
           existingBackupTitle: () => "Backup found",
           existingBackupMessage: () => "Overwrite?",
           overwrite: () => "Overwrite",
@@ -120,7 +140,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "403: Forbidden" }),
+      expect.objectContaining({ message: "Upload failed" }),
     )
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
@@ -137,7 +157,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "DEVELOPER_ERROR" }),
+      expect.objectContaining({ message: "Sign in failed" }),
     )
     expect(mockUpload).not.toHaveBeenCalled()
   })
@@ -145,11 +165,7 @@ describe("useCloudBackup", () => {
   it("shows overwrite confirmation when backup exists", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
     mockUpload.mockResolvedValue({ success: true })
-
-    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation((_, __, buttons) => {
-      const overwriteBtn = buttons?.find((b) => b.style === "destructive")
-      overwriteBtn?.onPress?.()
-    })
+    mockConfirmDialog.mockResolvedValue(true)
 
     const { result } = renderHook(() =>
       useCloudBackup({ isEncrypted: false, password: "" }),
@@ -159,23 +175,22 @@ describe("useCloudBackup", () => {
       await result.current.handleBackup()
     })
 
-    expect(alertSpy).toHaveBeenCalledWith("Backup found", "Overwrite?", expect.any(Array))
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Backup found",
+        labels: expect.objectContaining({ confirm: "Overwrite" }),
+      }),
+    )
     expect(mockUpload).toHaveBeenCalledWith(
       expect.stringContaining('"encrypted":false'),
       "blink-spark-backup-blink.json",
       withExistingFile,
     )
-
-    alertSpy.mockRestore()
   })
 
   it("does not upload when user cancels overwrite", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
-
-    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation((_, __, buttons) => {
-      const cancelBtn = buttons?.find((b) => b.style === "cancel")
-      cancelBtn?.onPress?.()
-    })
+    mockConfirmDialog.mockResolvedValue(false)
 
     const { result } = renderHook(() =>
       useCloudBackup({ isEncrypted: false, password: "" }),
@@ -187,8 +202,6 @@ describe("useCloudBackup", () => {
 
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
-
-    alertSpy.mockRestore()
   })
 
   it("includes version in backup payload", async () => {

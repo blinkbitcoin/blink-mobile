@@ -7,12 +7,12 @@ import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard, useCountdown } from "@app/hooks"
+import { useWalletMnemonicWords } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDuration } from "@app/utils/date"
-import { pickRandomIndices } from "@app/utils/helper"
 
-import { MOCK_WORDS } from "../spark-mock-data"
+import { buildConfirmChallenges } from "../utils"
 
 const WORDS_PER_STEP = 6
 const WORDS_PER_CARD = 3
@@ -24,6 +24,7 @@ export const useBackupPhrase = (step: PhraseStep) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const { sparkCompatibleWalletsUrl } = useRemoteConfig()
+  const words = useWalletMnemonicWords()
 
   const expiresAt = useRef(new Date(Date.now() + COUNTDOWN_SECONDS * 1000)).current
   const { remainingSeconds, isExpired } = useCountdown(expiresAt)
@@ -32,20 +33,20 @@ export const useBackupPhrase = (step: PhraseStep) => {
 
   const { firstCard, secondCard, offset } = useMemo(() => {
     const wordOffset = isStep1 ? 0 : WORDS_PER_STEP
-    const stepWords = MOCK_WORDS.slice(wordOffset, wordOffset + WORDS_PER_STEP)
+    const stepWords = words.slice(wordOffset, wordOffset + WORDS_PER_STEP)
     return {
       firstCard: stepWords.slice(0, WORDS_PER_CARD),
       secondCard: stepWords.slice(WORDS_PER_CARD),
       offset: wordOffset,
     }
-  }, [isStep1])
+  }, [isStep1, words])
 
   const handleCopy = useCallback(() => {
     copyToClipboard({
-      content: MOCK_WORDS.join(" "),
+      content: words.join(" "),
       message: LL.SparkOnboarding.ManualBackup.Phrase.copiedToast(),
     })
-  }, [copyToClipboard, LL])
+  }, [copyToClipboard, LL, words])
 
   const handleOpenLink = useCallback(
     () =>
@@ -60,10 +61,9 @@ export const useBackupPhrase = (step: PhraseStep) => {
       navigation.navigate("sparkBackupPhraseScreen", { step: PhraseStep.Second })
       return
     }
-    const indices = pickRandomIndices(MOCK_WORDS.length, 3)
-    const challenges = indices.map((i) => ({ index: i, word: MOCK_WORDS[i] }))
+    const challenges = buildConfirmChallenges(words, 3)
     navigation.navigate("sparkBackupConfirmScreen", { challenges })
-  }, [isStep1, navigation])
+  }, [isStep1, navigation, words])
 
   const buttonTitle = (() => {
     if (isStep1) {
