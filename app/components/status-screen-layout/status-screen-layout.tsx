@@ -16,7 +16,7 @@ type StatusScreenLayoutProps = {
 export const StatusScreenLayout: React.FC<StatusScreenLayoutProps> = ({
   icon,
   iconSize = 72,
-  iconBackgroundColor,
+  iconBackgroundColor = "transparent",
   children,
   footer,
 }) => {
@@ -25,13 +25,9 @@ export const StatusScreenLayout: React.FC<StatusScreenLayoutProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {iconBackgroundColor ? (
-          <View style={styles.iconCircle}>
-            <GaloyIcon name={icon} size={iconSize} />
-          </View>
-        ) : (
+        <View style={styles.iconCircle}>
           <GaloyIcon name={icon} size={iconSize} />
-        )}
+        </View>
         {children}
       </View>
       {footer ? <View style={styles.footer}>{footer}</View> : null}
@@ -40,7 +36,7 @@ export const StatusScreenLayout: React.FC<StatusScreenLayoutProps> = ({
 }
 
 type StyleProps = {
-  iconBackgroundColor?: string
+  iconBackgroundColor: string
 }
 
 const useStyles = makeStyles((_theme, { iconBackgroundColor }: StyleProps) => ({
