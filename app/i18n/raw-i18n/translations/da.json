@@ -3515,8 +3515,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Flyt til non-custodial",
     "explainerTitle": "Hvad betyder det at flytte til non-custodial?",
-    "explainerStep1": "Du opretter en non-custodial konto på Spark-protokollen, ",
-    "explainerStep1Link": "lær mere her",
+    "explainerStep1": "Du opretter en non-custodial konto på Spark-protokollen, <link>lær mere her</link>",
     "explainerStep2": "Vi overfører dine midler til din nye non-custodial konto, og din nuværende konto vil blive slettet",
     "explainerStep3": "Fortsæt med at bruge Blink som normalt",
     "letsMove": "Lad os gå",

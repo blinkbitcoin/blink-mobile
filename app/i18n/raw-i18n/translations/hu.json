@@ -3497,8 +3497,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Áttérés non-custodial-ra",
     "explainerTitle": "Mit jelent a non-custodial-ra való áttérés?",
-    "explainerStep1": "Létrehozol egy non-custodial fiókot a Spark protokollon, ",
-    "explainerStep1Link": "tudj meg többet itt",
+    "explainerStep1": "Létrehozol egy non-custodial fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
     "explainerStep2": "Átutaljuk az egyenlegedet az új non-custodial fiókodba, és a jelenlegi fiókod törlésre kerül",
     "explainerStep3": "Használd tovább a Blinket a megszokott módon",
     "letsMove": "Rajta",

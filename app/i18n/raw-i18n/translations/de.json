@@ -3485,8 +3485,7 @@
     "AccountMigration": {
         "moveToNonCustodial": "Zu Non-Custodial wechseln",
         "explainerTitle": "Was bedeutet es, zu Non-Custodial zu wechseln?",
-        "explainerStep1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll, ",
-        "explainerStep1Link": "hier mehr erfahren",
+        "explainerStep1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll, <link>hier mehr erfahren</link>",
         "explainerStep2": "Wir übertragen deine Guthaben auf dein neues Non-Custodial-Konto und dein aktuelles Konto wird gelöscht",
         "explainerStep3": "Nutze Blink weiterhin wie gewohnt",
         "letsMove": "Los geht's",

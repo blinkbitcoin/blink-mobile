@@ -3497,8 +3497,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Tuuka ku non-custodial",
     "explainerTitle": "Kitegeeza ki okutuuka ku non-custodial?",
-    "explainerStep1": "Ojja okukola akawunti ya non-custodial ku Spark protocol, ",
-    "explainerStep1Link": "yiga ebisingawo wano",
+    "explainerStep1": "Ojja okukola akawunti ya non-custodial ku Spark protocol, <link>yiga ebisingawo wano</link>",
     "explainerStep2": "Tutwala ssente zo ku akawunti yo empya eya non-custodial n'akawunti yo eriwo ejja kusazibwamu",
     "explainerStep3": "Weyongere okukozesa Blink nga bulijjo",
     "letsMove": "Ka tugende",

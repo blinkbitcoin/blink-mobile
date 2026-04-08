@@ -3526,8 +3526,7 @@
     "AccountMigration": {
         "moveToNonCustodial": "ノンカストディアルに移行",
         "explainerTitle": "ノンカストディアルへの移行とは？",
-        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、",
-        "explainerStep1Link": "詳細はこちら",
+        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、<link>詳細はこちら</link>",
         "explainerStep2": "お客様の資金を新しいノンカストディアルアカウントに転送し、現在のアカウントは削除されます",
         "explainerStep3": "これまで通りBlinkをご利用ください",
         "letsMove": "移行する",

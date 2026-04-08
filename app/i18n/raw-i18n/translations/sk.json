@@ -3497,8 +3497,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Prejsť na non-custodial",
     "explainerTitle": "Čo znamená prejsť na non-custodial?",
-    "explainerStep1": "Vytvoríte non-custodial účet na protokole Spark, ",
-    "explainerStep1Link": "zistiť viac tu",
+    "explainerStep1": "Vytvoríte non-custodial účet na protokole Spark, <link>zistiť viac tu</link>",
     "explainerStep2": "Prevedieme vaše prostriedky na váš nový non-custodial účet a váš súčasný účet bude vymazaný",
     "explainerStep3": "Pokračujte v používaní Blink ako zvyčajne",
     "letsMove": "Poďme na to",

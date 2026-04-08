@@ -16,6 +16,16 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+jest.mock("@app/utils/external", () => ({
+  openExternalUrl: jest.fn(),
+}))
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  }),
+}))
+
 jest.mock("@app/components/icon-hero", () => ({
   IconHero: ({ title }: { title: string }) => {
     const { Text } = jest.requireActual("react-native")
@@ -59,6 +69,21 @@ describe("SparkMigrationExplainerScreen", () => {
     )
 
     expect(screen.getByText("learn more here")).toBeTruthy()
+  })
+
+  it("opens external URL when learn more is pressed", () => {
+    const { openExternalUrl } = jest.requireMock("@app/utils/external")
+
+    render(
+      <ContextForScreen>
+        <SparkMigrationExplainerScreen />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(screen.getByText("learn more here"))
+    expect(openExternalUrl).toHaveBeenCalledWith(
+      "https://docs.spark.money/wallets/overview",
+    )
   })
 
   it("renders Let's move button", () => {
