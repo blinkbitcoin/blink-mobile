@@ -2800,7 +2800,9 @@
       "minChars": "Phải có ít nhất {min} ký tự",
       "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
       "invalidRegion": "Lựa chọn vùng không hợp lệ"
-    }
+    },
+    "passwordTooWeak": "Mật khẩu quá yếu. Hãy dùng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt.",
+    "passwordCommon": "Mật khẩu này quá phổ biến. Vui lòng chọn mật khẩu mạnh hơn."
   },
   "errors": {
     "generic": "Đã có lỗi.\nVui lòng thử lại sau.",
@@ -3473,11 +3475,12 @@
       "title": "Chọn phương thức sao lưu",
       "subtitle": "Chúng tôi khuyên dùng {provider} cho người dùng mới.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Trình quản lý mật khẩu",
       "manualBackup": "Sao lưu thủ công",
       "keychainSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
       "keychainFailed": "Không thể lưu bản sao lưu",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Sao lưu iCloud sắp ra mắt"
     },
     "ManualBackup": {
       "Alerts": {

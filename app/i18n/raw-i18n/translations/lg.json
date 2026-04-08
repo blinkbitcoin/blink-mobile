@@ -2783,7 +2783,9 @@
       "minChars": "Kiteekwa okuba n'ennukuta {min} oba okusingawo",
       "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika",
       "invalidRegion": "Okulonda ekitundu tekikkaanya"
-    }
+    },
+    "passwordTooWeak": "Ebigambo eby’ekyama binafu nnyo. Kozesa ennukuta ennene n’entono, ennamba n’obubonero obw’enjawulo.",
+    "passwordCommon": "Ebigambo bino eby’ekyama bimanyiddwa nnyo. Nsaba olonde ekigambo eky’ekyama ekisinga obukakafu."
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -3435,11 +3437,12 @@
       "title": "Londa enkola yo ey'okukoppa",
       "subtitle": "Tukutegeeza {provider} gy'abakozesa abapya.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Omuteegezzi w'ebigambo by'okuyingira",
       "manualBackup": "Okukoppa mu ngalo",
       "keychainSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
       "keychainFailed": "Okukoppa tekusobodde kutereka",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Okukoppa ku iCloud kujja mangu"
     },
     "ManualBackup": {
       "Alerts": {

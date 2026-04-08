@@ -2800,7 +2800,9 @@
       "minChars": "Moet ten minste {min} karakters wees",
       "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
       "invalidRegion": "Ongeldige streekkeuse"
-    }
+    },
+    "passwordTooWeak": "Wagwoord is te swak. Gebruik ’n mengsel van hoofletters, kleinletters, syfers en spesiale karakters.",
+    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord."
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -3476,11 +3478,12 @@
       "title": "Kies jou rugsteunmetode",
       "subtitle": "Ons beveel {provider} aan vir nuwe gebruikers.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Wagwoordbestuurder",
       "manualBackup": "Handmatige rugsteun",
       "keychainSaved": "Rugsteun gestoor in wagwoordbestuurder",
       "keychainFailed": "Kon nie rugsteun stoor nie",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloud-rugsteun kom binnekort"
     },
     "ManualBackup": {
       "Alerts": {

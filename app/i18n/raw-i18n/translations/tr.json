@@ -2783,7 +2783,9 @@
       "minChars": "En az {min} karakter olmalıdır",
       "invalidPostalCode": "Geçersiz posta kodu, muhtemelen yazım hatası",
       "invalidRegion": "Geçersiz bölge seçimi"
-    }
+    },
+    "passwordTooWeak": "Şifre çok zayıf. Büyük harf, küçük harf, rakam ve özel karakterlerden oluşan bir kombinasyon kullanın.",
+    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin."
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",
@@ -3435,11 +3437,12 @@
       "title": "Yedekleme yönteminizi seçin",
       "subtitle": "Yeni kullanıcılar için {provider} öneriyoruz.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Şifre yöneticisi",
       "manualBackup": "Manuel yedekleme",
       "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
       "keychainFailed": "Yedekleme kaydedilemedi",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloud yedekleme yakında geliyor"
     },
     "ManualBackup": {
       "Alerts": {

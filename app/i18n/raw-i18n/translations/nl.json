@@ -2800,7 +2800,9 @@
       "minChars": "Moet minimaal {min} tekens bevatten",
       "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout",
       "invalidRegion": "Ongeldige regioselectie"
-    }
+    },
+    "passwordTooWeak": "Het wachtwoord is te zwak. Gebruik een combinatie van hoofdletters, kleine letters, cijfers en speciale tekens.",
+    "passwordCommon": "Dit wachtwoord komt te vaak voor. Kies een sterker wachtwoord."
   },
   "errors": {
     "generic": "Er is een fout opgetreden.\nProbeer het later opnieuw.",
@@ -3476,11 +3478,12 @@
       "title": "Kies je back-upmethode",
       "subtitle": "We raden {provider} aan voor nieuwe gebruikers.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Wachtwoordbeheerder",
       "manualBackup": "Handmatige back-up",
       "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
       "keychainFailed": "Back-up opslaan mislukt",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloud-back-up komt binnenkort"
     },
     "ManualBackup": {
       "Alerts": {

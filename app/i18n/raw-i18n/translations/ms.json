@@ -2800,7 +2800,9 @@
       "minChars": "Mesti sekurang-kurangnya {min} aksara",
       "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
       "invalidRegion": "Pilihan wilayah tidak sah"
-    }
+    },
+    "passwordTooWeak": "Kata laluan terlalu lemah. Gunakan gabungan huruf besar, huruf kecil, nombor dan aksara khas.",
+    "passwordCommon": "Kata laluan ini terlalu biasa. Sila pilih kata laluan yang lebih kukuh."
   },
   "errors": {
     "generic": "Ada masalah timbul\nSila cuba lagi",
@@ -3476,11 +3478,12 @@
       "title": "Pilih kaedah sandaran anda",
       "subtitle": "Kami mengesyorkan {provider} untuk pengguna baharu.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Pengurus kata laluan",
       "manualBackup": "Sandaran manual",
       "keychainSaved": "Sandaran disimpan ke pengurus kata laluan",
       "keychainFailed": "Gagal menyimpan sandaran",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Sandaran iCloud akan datang tidak lama lagi"
     },
     "ManualBackup": {
       "Alerts": {

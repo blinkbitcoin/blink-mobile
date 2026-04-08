@@ -2783,7 +2783,9 @@
       "minChars": "Legalább {min} karakter szükséges",
       "invalidPostalCode": "Érvénytelen irányítószám, valószínűleg elgépelés",
       "invalidRegion": "Érvénytelen régióválasztás"
-    }
+    },
+    "passwordTooWeak": "A jelszó túl gyenge. Használjon kis- és nagybetűket, számokat és speciális karaktereket.",
+    "passwordCommon": "Ez a jelszó túl gyakori. Kérjük, válasszon erősebb jelszót."
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -3435,11 +3437,12 @@
       "title": "Válassz biztonsági mentési módszert",
       "subtitle": "Új felhasználóknak a {provider} ajánlott.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Jelszókezelő",
       "manualBackup": "Kézi biztonsági mentés",
       "keychainSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
       "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Az iCloud biztonsági mentés hamarosan érkezik"
     },
     "ManualBackup": {
       "Alerts": {

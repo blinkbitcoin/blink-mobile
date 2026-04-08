@@ -2783,7 +2783,9 @@
       "minChars": "Trebuie să aibă cel puțin {min} caractere",
       "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare",
       "invalidRegion": "Selectarea regiunii este invalidă"
-    }
+    },
+    "passwordTooWeak": "Parola este prea slabă. Folosește o combinație de litere mari, litere mici, cifre și caractere speciale.",
+    "passwordCommon": "Această parolă este prea comună. Te rugăm să alegi o parolă mai puternică."
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -3435,11 +3437,12 @@
       "title": "Alege metoda de backup",
       "subtitle": "Recomandăm {provider} pentru utilizatorii noi.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Manager de parole",
       "manualBackup": "Backup manual",
       "keychainSaved": "Backup salvat în managerul de parole",
       "keychainFailed": "Nu s-a putut salva backup-ul",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Backup-ul în iCloud va fi disponibil în curând"
     },
     "ManualBackup": {
       "Alerts": {

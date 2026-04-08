@@ -2783,7 +2783,9 @@
       "minChars": "Lazima iwe na angalau herufi {min}",
       "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika",
       "invalidRegion": "Uchaguzi wa eneo si sahihi"
-    }
+    },
+    "passwordTooWeak": "Nenosiri ni dhaifu sana. Tumia mchanganyiko wa herufi kubwa, herufi ndogo, nambari na alama maalum.",
+    "passwordCommon": "Nenosiri hili ni la kawaida sana. Tafadhali chagua nenosiri lenye nguvu zaidi."
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -3435,11 +3437,12 @@
       "title": "Chagua njia yako ya nakala",
       "subtitle": "Tunapendekeza {provider} kwa watumiaji wapya.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Kidhibiti cha nywila",
       "manualBackup": "Nakala ya mkono",
       "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
       "keychainFailed": "Imeshindwa kuhifadhi nakala",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "Hifadhi nakala ya iCloud inakuja hivi karibuni"
     },
     "ManualBackup": {
       "Alerts": {

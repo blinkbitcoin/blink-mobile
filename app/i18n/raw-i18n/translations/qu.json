@@ -2800,7 +2800,9 @@
       "minChars": "{min} sanampakama kanan",
       "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay",
       "invalidRegion": "Mana allin suyu akllay"
-    }
+    },
+    "passwordTooWeak": "Yaykuna rimayqa ancha pisi kallpayoqmi. Hatun qillqakuna, uchuy qillqakuna, yupaykuna hinaspa huk señalakunata chaqrullay.",
+    "passwordCommon": "Kay yaykuna rimayqa ancha riqsisqa kachkan. Aswan kallpasapa yaykuna rimayta akllay."
   },
   "errors": {
     "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",
@@ -3473,11 +3475,12 @@
       "title": "Akllay imayna waqaychanaykita",
       "subtitle": "{provider} nisqata kunanchayku musuq rurakkunapaq.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Yaykuna rimay kamachiq",
       "manualBackup": "Makiwan waqaychay",
       "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
       "keychainFailed": "Mana atikurqachu waqaychayta",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "iCloudpi waqaychayqa utqayman hamunqa"
     },
     "ManualBackup": {
       "Alerts": {

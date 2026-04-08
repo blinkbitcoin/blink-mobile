@@ -2800,7 +2800,9 @@
       "minChars": "ต้องมีอย่างน้อย {min} ตัวอักษร",
       "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด",
       "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
-    }
+    },
+    "passwordTooWeak": "รหัสผ่านนี้คาดเดาง่ายเกินไป ใช้อักษรพิมพ์ใหญ่ อักษรพิมพ์เล็ก ตัวเลข และอักขระพิเศษผสมกัน",
+    "passwordCommon": "รหัสผ่านนี้ใช้กันทั่วไปเกินไป โปรดเลือกรหัสผ่านที่รัดกุมกว่า"
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -3473,11 +3475,12 @@
       "title": "เลือกวิธีการสำรองข้อมูล",
       "subtitle": "เราแนะนำ {provider} สำหรับผู้ใช้ใหม่",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "ตัวจัดการรหัสผ่าน",
       "manualBackup": "สำรองข้อมูลด้วยตนเอง",
       "keychainSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
       "keychainFailed": "ไม่สามารถบันทึกสำรองได้",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "การสำรองข้อมูลไปยัง iCloud จะมาเร็ว ๆ นี้"
     },
     "ManualBackup": {
       "Alerts": {

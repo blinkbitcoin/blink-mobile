@@ -2783,7 +2783,9 @@
       "minChars": "Ha de tenir almenys {min} caràcters",
       "invalidPostalCode": "Codi postal no vàlid, probablement un error tipogràfic",
       "invalidRegion": "Selecció de regió no vàlida"
-    }
+    },
+    "passwordTooWeak": "La contrasenya és massa feble. Fes servir una combinació de majúscules, minúscules, números i caràcters especials.",
+    "passwordCommon": "Aquesta contrasenya és massa comuna. Si us plau, tria una contrasenya més segura."
   },
   "errors": {
     "generic": "Hi ha hagut un error.\nSi us plau intenta-ho més tard.",
@@ -3435,11 +3437,12 @@
       "title": "Tria el teu mètode de còpia de seguretat",
       "subtitle": "Recomanem {provider} per a nous usuaris.",
       "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
       "passwordManager": "Gestor de contrasenyes",
       "manualBackup": "Còpia de seguretat manual",
       "keychainSaved": "Còpia de seguretat desada al gestor de contrasenyes",
       "keychainFailed": "No s’ha pogut desar la còpia de seguretat",
-      "appleICloud": "Apple iCloud"
+      "iOSComingSoon": "La còpia de seguretat a l’iCloud arribarà aviat"
     },
     "ManualBackup": {
       "Alerts": {

@@ -2800,7 +2800,9 @@
             "minChars": "Doit contenir au moins {min} caractères",
             "invalidPostalCode": "Code postal invalide, probablement une faute de frappe",
             "invalidRegion": "Sélection de région non valide"
-        }
+        },
+        "passwordTooWeak": "Le mot de passe est trop faible. Utilisez une combinaison de majuscules, minuscules, chiffres et caractères spéciaux.",
+        "passwordCommon": "Ce mot de passe est trop courant. Veuillez choisir un mot de passe plus robuste."
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
@@ -3464,11 +3466,12 @@
             "title": "Choisissez votre méthode de sauvegarde",
             "subtitle": "Nous recommandons {provider} pour les nouveaux utilisateurs.",
             "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
             "passwordManager": "Gestionnaire de mots de passe",
             "manualBackup": "Sauvegarde manuelle",
             "keychainSaved": "Sauvegarde enregistrée dans le gestionnaire de mots de passe",
             "keychainFailed": "Échec de l’enregistrement de la sauvegarde",
-            "appleICloud": "Apple iCloud"
+            "iOSComingSoon": "La sauvegarde iCloud arrive bientôt"
         },
         "ManualBackup": {
             "Alerts": {
