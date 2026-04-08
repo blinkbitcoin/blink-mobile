@@ -11508,13 +11508,9 @@ type RootTranslation = {
 		 */
 		explainerTitle: string
 		/**
-		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l​,​ 
+		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l​,​ ​<​l​i​n​k​>​l​e​a​r​n​ ​m​o​r​e​ ​h​e​r​e​<​/​l​i​n​k​>
 		 */
 		explainerStep1: string
-		/**
-		 * l​e​a​r​n​ ​m​o​r​e​ ​h​e​r​e
-		 */
-		explainerStep1Link: string
 		/**
 		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​,​ ​a​n​d​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​l​e​t​e​d
 		 */
@@ -22890,13 +22886,9 @@ export type TranslationFunctions = {
 		 */
 		explainerTitle: () => LocalizedString
 		/**
-		 * You will create a non-custodial account on the Spark protocol, 
+		 * You will create a non-custodial account on the Spark protocol, <link>learn more here</link>
 		 */
 		explainerStep1: () => LocalizedString
-		/**
-		 * learn more here
-		 */
-		explainerStep1Link: () => LocalizedString
 		/**
 		 * We transfer your funds into your new non-custodial account, and your current account will be deleted
 		 */

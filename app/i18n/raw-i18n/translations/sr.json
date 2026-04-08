@@ -3535,8 +3535,7 @@
   "AccountMigration": {
     "moveToNonCustodial": "Пребаци на non-custodial",
     "explainerTitle": "Шта значи пребацити на non-custodial?",
-    "explainerStep1": "Креираћете non-custodial налог на Spark протоколу, ",
-    "explainerStep1Link": "сазнајте више овде",
+    "explainerStep1": "Креираћете non-custodial налог на Spark протоколу, <link>сазнајте више овде</link>",
     "explainerStep2": "Пребацујемо ваша средства на ваш нови non-custodial налог, а ваш тренутни налог ће бити обрисан",
     "explainerStep3": "Наставите да користите Blink као и обично",
     "letsMove": "Идемо",
