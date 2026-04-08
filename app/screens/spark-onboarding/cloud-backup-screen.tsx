@@ -1,15 +1,17 @@
 import React from "react"
 import { View } from "react-native"
 
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
+import { InfoBanner } from "@app/components/info-banner"
 import { PasswordInput } from "@app/components/password-input"
+import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 
 import { useCloudBackup, useCloudBackupForm } from "./hooks"
 import { getCloudProviderName } from "./utils"
@@ -58,6 +60,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
               isChecked={isEncrypted}
               onPress={toggleEncryption}
               centered
+              {...testProps("encrypt-checkbox")}
             />
 
             {isEncrypted && (
@@ -68,6 +71,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
                   onChangeText={setPassword}
                   placeholder={LL.SparkOnboarding.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
+                  {...testProps("cloud-password-input")}
                 />
                 <PasswordInput
                   label={LL.SparkOnboarding.CloudBackup.confirmPassword()}
@@ -75,30 +79,21 @@ export const SparkCloudBackupScreen: React.FC = () => {
                   onChangeText={setConfirmPassword}
                   placeholder={LL.SparkOnboarding.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
+                  {...testProps("cloud-confirm-password-input")}
                 />
 
-                <View style={styles.warningCard}>
-                  <View style={styles.warningHeader}>
-                    <GaloyIcon name="info" size={16} color={colors.primary} />
-                    <Text style={styles.warningTitle}>
-                      {LL.SparkOnboarding.CloudBackup.importantTitle()}
-                    </Text>
-                  </View>
-                  {(() => {
-                    const boldText = LL.SparkOnboarding.CloudBackup.importantMessageBold()
-                    const fullText = LL.SparkOnboarding.CloudBackup.importantMessage({
-                      bold: boldText,
-                    })
-                    const [before, after] = fullText.split(boldText)
-                    return (
-                      <Text style={styles.warningBody}>
-                        {before}
-                        <Text style={styles.warningBold}>{boldText}</Text>
-                        {after}
-                      </Text>
-                    )
-                  })()}
-                </View>
+                <InfoBanner
+                  variant="warning"
+                  title={LL.SparkOnboarding.CloudBackup.importantTitle()}
+                  icon="info"
+                >
+                  <RichText
+                    text={LL.SparkOnboarding.CloudBackup.importantMessage({
+                      bold: LL.SparkOnboarding.CloudBackup.importantMessageBold(),
+                    })}
+                    bold={LL.SparkOnboarding.CloudBackup.importantMessageBold()}
+                  />
+                </InfoBanner>
               </View>
             )}
           </View>
@@ -110,6 +105,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
             disabled={!isValid}
             loading={loading}
             onPress={handleBackup}
+            {...testProps("cloud-backup-continue")}
           />
         </View>
       </View>
@@ -117,7 +113,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -134,35 +130,6 @@ const useStyles = makeStyles(({ colors }) => ({
   encryptionFields: {
     gap: 0,
     alignSelf: "stretch",
-  },
-  warningCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    padding: 14,
-    gap: 14,
-  },
-  warningHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 3,
-  },
-  warningTitle: {
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  warningBody: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: colors.grey2,
-  },
-  warningBold: {
-    fontWeight: "700",
-    fontSize: 16,
-    lineHeight: 22,
-    color: colors.grey2,
   },
   buttonsContainer: {
     gap: 10,
