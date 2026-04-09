@@ -19,7 +19,7 @@ const custodialAccount = {
   selected: false,
   status: AccountStatus.Available,
 }
-const scAccount = {
+const selfCustodialAccount = {
   id: "sc-default",
   type: AccountType.SelfCustodial,
   label: "Self-custodial",
@@ -40,8 +40,8 @@ describe("useSelfCustodialRollback", () => {
 
     renderHook(() =>
       useSelfCustodialRollback({
-        activeAccount: scAccount,
-        accounts: [custodialAccount, scAccount],
+        activeAccount: selfCustodialAccount,
+        accounts: [custodialAccount, selfCustodialAccount],
         setActiveAccountId: mockSetActiveAccountId,
       }),
     )
@@ -54,8 +54,8 @@ describe("useSelfCustodialRollback", () => {
 
     renderHook(() =>
       useSelfCustodialRollback({
-        activeAccount: scAccount,
-        accounts: [custodialAccount, scAccount],
+        activeAccount: selfCustodialAccount,
+        accounts: [custodialAccount, selfCustodialAccount],
         setActiveAccountId: mockSetActiveAccountId,
       }),
     )
@@ -82,8 +82,8 @@ describe("useSelfCustodialRollback", () => {
 
     renderHook(() =>
       useSelfCustodialRollback({
-        activeAccount: scAccount,
-        accounts: [scAccount],
+        activeAccount: selfCustodialAccount,
+        accounts: [selfCustodialAccount],
         setActiveAccountId: mockSetActiveAccountId,
       }),
     )
@@ -96,8 +96,8 @@ describe("useSelfCustodialRollback", () => {
 
     const { rerender } = renderHook(() =>
       useSelfCustodialRollback({
-        activeAccount: scAccount,
-        accounts: [custodialAccount, scAccount],
+        activeAccount: selfCustodialAccount,
+        accounts: [custodialAccount, selfCustodialAccount],
         setActiveAccountId: mockSetActiveAccountId,
       }),
     )

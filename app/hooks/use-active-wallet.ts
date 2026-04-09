@@ -23,6 +23,16 @@ const createPlaceholder = (accountType: AccountType): ActiveWalletState => ({
   accountType,
 })
 
+const resolveBaseState = (
+  activeAccount: { type: AccountType } | undefined,
+  custodialState: ActiveWalletState,
+  selfCustodialState: ActiveWalletState,
+): ActiveWalletState => {
+  if (!activeAccount) return createPlaceholder(AccountType.Custodial)
+  if (activeAccount.type === AccountType.Custodial) return custodialState
+  return selfCustodialState
+}
+
 export const useActiveWallet = (): ActiveWalletResult => {
   const { activeAccount, accounts, setActiveAccountId } = useAccountRegistry()
   const custodialState = useCustodialWallet()
@@ -31,11 +41,7 @@ export const useActiveWallet = (): ActiveWalletResult => {
   useSelfCustodialRollback({ activeAccount, accounts, setActiveAccountId })
 
   return useMemo(() => {
-    const base = activeAccount
-      ? activeAccount.type === AccountType.Custodial
-        ? custodialState
-        : selfCustodialState
-      : createPlaceholder(AccountType.Custodial)
+    const base = resolveBaseState(activeAccount, custodialState, selfCustodialState)
 
     return {
       ...base,
