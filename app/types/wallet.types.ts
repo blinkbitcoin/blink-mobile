@@ -7,6 +7,9 @@ import { WalletDescriptor } from "./wallets"
 export type { WalletCurrency }
 export type { WalletDescriptor }
 
+export const CUSTODIAL_DEFAULT_ID = "custodial-default"
+export const SELF_CUSTODIAL_DEFAULT_ID = "self-custodial-default"
+
 export const AccountType = {
   Custodial: "custodial",
   SelfCustodial: "self-custodial",
