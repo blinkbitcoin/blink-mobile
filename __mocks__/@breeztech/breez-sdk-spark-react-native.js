@@ -22,7 +22,7 @@ module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
   initLogging: jest.fn(),
-  Network: { Mainnet: "mainnet" },
+  Network: { Mainnet: 0, Regtest: 1 },
   Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
