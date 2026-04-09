@@ -13,6 +13,7 @@ jest.mock("react-native-secure-key-store", () => ({
   },
   ACCESSIBLE: {
     ALWAYS_THIS_DEVICE_ONLY: "ALWAYS_THIS_DEVICE_ONLY",
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
   },
 }))
 
@@ -53,24 +54,32 @@ describe("KeyStoreWrapper mnemonic methods", () => {
       )
     })
 
-    it("returns empty string when not found", async () => {
+    it("returns null on keychain error", async () => {
+      mockGet.mockRejectedValue(new Error("keychain unavailable"))
+
+      const result = await KeyStoreWrapper.getMnemonic()
+
+      expect(result).toBeNull()
+    })
+
+    it("returns null when key not found", async () => {
       mockGet.mockRejectedValue(new Error("not found"))
 
       const result = await KeyStoreWrapper.getMnemonic()
 
-      expect(result).toBe("")
+      expect(result).toBeNull()
     })
   })
 
   describe("setMnemonic", () => {
-    it("stores mnemonic and returns true on success", async () => {
+    it("stores mnemonic with WHEN_UNLOCKED_THIS_DEVICE_ONLY accessibility", async () => {
       mockSet.mockResolvedValue(undefined)
 
       const result = await KeyStoreWrapper.setMnemonic("test mnemonic")
 
       expect(result).toBe(true)
       expect(mockSet).toHaveBeenCalledWith("mnemonic", "test mnemonic", {
-        accessible: "ALWAYS_THIS_DEVICE_ONLY",
+        accessible: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
       })
     })
 
@@ -84,19 +93,68 @@ describe("KeyStoreWrapper mnemonic methods", () => {
   })
 
   describe("deleteMnemonic", () => {
-    it("removes mnemonic and returns true on success", async () => {
+    it("removes mnemonic and network, returns true", async () => {
       mockRemove.mockResolvedValue(undefined)
 
       const result = await KeyStoreWrapper.deleteMnemonic()
 
       expect(result).toBe(true)
       expect(mockRemove).toHaveBeenCalledWith("mnemonic")
+      expect(mockRemove).toHaveBeenCalledWith("mnemonic_network")
     })
 
     it("returns false on failure", async () => {
       mockRemove.mockRejectedValue(new Error("remove error"))
 
       const result = await KeyStoreWrapper.deleteMnemonic()
+
+      expect(result).toBe(false)
+    })
+
+    it("returns false when key does not exist", async () => {
+      mockRemove.mockRejectedValue(new Error("key not found"))
+
+      const result = await KeyStoreWrapper.deleteMnemonic()
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe("getMnemonicNetwork", () => {
+    it("returns stored network string", async () => {
+      mockGet.mockResolvedValue("regtest")
+
+      const result = await KeyStoreWrapper.getMnemonicNetwork()
+
+      expect(result).toBe("regtest")
+      expect(mockGet).toHaveBeenCalledWith("mnemonic_network")
+    })
+
+    it("returns null when not found", async () => {
+      mockGet.mockRejectedValue(new Error("not found"))
+
+      const result = await KeyStoreWrapper.getMnemonicNetwork()
+
+      expect(result).toBeNull()
+    })
+  })
+
+  describe("setMnemonicNetwork", () => {
+    it("stores network with WHEN_UNLOCKED_THIS_DEVICE_ONLY", async () => {
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.setMnemonicNetwork("regtest")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("mnemonic_network", "regtest", {
+        accessible: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
+      })
+    })
+
+    it("returns false on failure", async () => {
+      mockSet.mockRejectedValue(new Error("storage error"))
+
+      const result = await KeyStoreWrapper.setMnemonicNetwork("mainnet")
 
       expect(result).toBe(false)
     })
