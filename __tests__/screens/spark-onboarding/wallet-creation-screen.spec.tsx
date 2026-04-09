@@ -1,37 +1,17 @@
 import React from "react"
-import { render, waitFor } from "@testing-library/react-native"
+import { render, waitFor, fireEvent } from "@testing-library/react-native"
 
 import { SparkWalletCreationScreen } from "@app/screens/spark-onboarding/wallet-creation-screen"
 
-const mockDispatch = jest.fn()
-const mockCreateWallet = jest.fn()
-const mockUpdateState = jest.fn()
-const mockDeleteMnemonic = jest.fn()
+const mockCreate = jest.fn()
+let mockStatus = "idle"
 
-jest.mock("@react-navigation/native", () => ({
-  CommonActions: {
-    reset: (params: Record<string, unknown>) => ({ type: "RESET", ...params }),
-  },
-  useNavigation: () => ({ dispatch: mockDispatch }),
-}))
-
-jest.mock("@react-navigation/stack", () => ({
-  StackNavigationProp: jest.fn(),
-}))
-
-jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: () => mockCreateWallet(),
-}))
-
-jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({
-    updateState: mockUpdateState,
+jest.mock("@app/screens/spark-onboarding/hooks/use-create-wallet", () => ({
+  CreationStatus: { Idle: "idle", Creating: "creating", Error: "error" },
+  useCreateWallet: () => ({
+    status: mockStatus,
+    create: mockCreate,
   }),
-}))
-
-jest.mock("@app/utils/storage/secureStorage", () => ({
-  __esModule: true,
-  default: { deleteMnemonic: () => mockDeleteMnemonic() },
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -82,62 +62,38 @@ jest.mock("@app/utils/testProps", () => ({
 describe("SparkWalletCreationScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCreateWallet.mockResolvedValue("test-mnemonic")
-    mockDeleteMnemonic.mockResolvedValue(true)
+    mockStatus = "idle"
   })
 
-  it("shows loading state on mount", () => {
+  it("calls create on mount", () => {
+    render(<SparkWalletCreationScreen />)
+
+    expect(mockCreate).toHaveBeenCalledTimes(1)
+  })
+
+  it("shows loading state when creating", () => {
+    mockStatus = "creating"
     const { getByTestId } = render(<SparkWalletCreationScreen />)
 
     expect(getByTestId("creating-text")).toBeTruthy()
   })
 
-  it("calls selfCustodialCreateWallet on mount", async () => {
-    render(<SparkWalletCreationScreen />)
+  it("shows error state with retry button on error", () => {
+    mockStatus = "error"
+    const { getByTestId, getByText } = render(<SparkWalletCreationScreen />)
 
-    await waitFor(() => {
-      expect(mockCreateWallet).toHaveBeenCalledTimes(1)
-    })
+    expect(getByTestId("error-title")).toBeTruthy()
+    expect(getByText("Try again")).toBeTruthy()
   })
 
-  it("updates activeAccountId on success", async () => {
-    render(<SparkWalletCreationScreen />)
+  it("calls create on retry press", async () => {
+    mockStatus = "error"
+    const { getByText } = render(<SparkWalletCreationScreen />)
+
+    fireEvent.press(getByText("Try again"))
 
     await waitFor(() => {
-      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+      expect(mockCreate).toHaveBeenCalledTimes(2)
     })
-  })
-
-  it("navigates to Primary on success", async () => {
-    render(<SparkWalletCreationScreen />)
-
-    await waitFor(() => {
-      expect(mockDispatch).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "RESET",
-          index: 0,
-          routes: [{ name: "Primary" }],
-        }),
-      )
-    })
-  })
-
-  it("shows error state on failure", async () => {
-    mockCreateWallet.mockRejectedValue(new Error("SDK error"))
-
-    const { findByTestId } = render(<SparkWalletCreationScreen />)
-
-    const errorTitle = await findByTestId("error-title")
-    expect(errorTitle).toBeTruthy()
-  })
-
-  it("does not clean up mnemonic on success", async () => {
-    render(<SparkWalletCreationScreen />)
-
-    await waitFor(() => {
-      expect(mockCreateWallet).toHaveBeenCalledTimes(1)
-    })
-
-    expect(mockDeleteMnemonic).not.toHaveBeenCalled()
   })
 })

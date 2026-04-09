@@ -1,53 +1,22 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { ActivityIndicator, View } from "react-native"
-import { CommonActions, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { DefaultAccountId } from "@app/types/wallet.types"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
-import { usePersistentStateContext } from "@app/store/persistent-state"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { testProps } from "@app/utils/testProps"
 
-const CreationStatus = {
-  Creating: "creating",
-  Error: "error",
-} as const
-
-type CreationStatus = (typeof CreationStatus)[keyof typeof CreationStatus]
+import { CreationStatus, useCreateWallet } from "./hooks/use-create-wallet"
 
 export const SparkWalletCreationScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { updateState } = usePersistentStateContext()
-  const [status, setStatus] = useState<CreationStatus>(CreationStatus.Creating)
-
-  const createWallet = useCallback(async () => {
-    setStatus(CreationStatus.Creating)
-    try {
-      await selfCustodialCreateWallet()
-      updateState((prev) => {
-        if (!prev) return prev
-        return { ...prev, activeAccountId: DefaultAccountId.SelfCustodial }
-      })
-      navigation.dispatch(
-        CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-      )
-    } catch {
-      await KeyStoreWrapper.deleteMnemonic()
-      setStatus(CreationStatus.Error)
-    }
-  }, [navigation, updateState])
+  const { status, create } = useCreateWallet()
 
   useEffect(() => {
-    createWallet()
-  }, [createWallet])
+    create()
+  }, [create])
 
   if (status === CreationStatus.Error) {
     return (
@@ -64,7 +33,7 @@ export const SparkWalletCreationScreen: React.FC = () => {
           <View style={styles.ctaContainer}>
             <GaloyPrimaryButton
               title={LL.SparkWalletCreationScreen.retry()}
-              onPress={createWallet}
+              onPress={create}
               {...testProps("retry-button")}
             />
           </View>
