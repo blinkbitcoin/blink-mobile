@@ -8,6 +8,7 @@ const mockActiveAccount = jest.fn()
 const mockAccounts = jest.fn()
 const mockSetActiveAccountId = jest.fn()
 const mockCustodialState = jest.fn()
+const mockSelfCustodialState = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
@@ -25,16 +26,33 @@ jest.mock("@app/custodial/providers/wallet-provider", () => ({
   useCustodialWallet: () => mockCustodialState(),
 }))
 
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => mockSelfCustodialState(),
+}))
+
 const custodialReady = {
   wallets: [],
   status: ActiveWalletStatus.Ready,
   accountType: AccountType.Custodial,
 }
 
+const scReady = {
+  wallets: [],
+  status: ActiveWalletStatus.Ready,
+  accountType: AccountType.SelfCustodial,
+}
+
+const scUnavailable = {
+  wallets: [],
+  status: ActiveWalletStatus.Unavailable,
+  accountType: AccountType.SelfCustodial,
+}
+
 describe("useActiveWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockCustodialState.mockReturnValue(custodialReady)
+    mockSelfCustodialState.mockReturnValue(scUnavailable)
     mockAccounts.mockReturnValue([])
   })
 
@@ -48,19 +66,37 @@ describe("useActiveWallet", () => {
 
     expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     expect(result.current.accountType).toBe(AccountType.Custodial)
+    expect(result.current.isReady).toBe(true)
+    expect(result.current.isSelfCustodial).toBe(false)
+    expect(result.current.needsBackendAuth).toBe(true)
   })
 
-  it("returns unavailable placeholder when active account is self-custodial", () => {
+  it("returns self-custodial state when active account is self-custodial", () => {
     mockActiveAccount.mockReturnValue({
-      id: "self-custodial-default",
+      id: "sc-default",
       type: AccountType.SelfCustodial,
     })
+    mockSelfCustodialState.mockReturnValue(scReady)
 
     const { result } = renderHook(() => useActiveWallet())
 
-    expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     expect(result.current.accountType).toBe(AccountType.SelfCustodial)
-    expect(result.current.wallets).toHaveLength(0)
+    expect(result.current.isReady).toBe(true)
+    expect(result.current.isSelfCustodial).toBe(true)
+    expect(result.current.needsBackendAuth).toBe(false)
+  })
+
+  it("isSelfCustodial is false when self-custodial but unavailable", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialState.mockReturnValue(scUnavailable)
+
+    const { result } = renderHook(() => useActiveWallet())
+
+    expect(result.current.isSelfCustodial).toBe(false)
   })
 
   it("returns unavailable custodial placeholder when no active account", () => {
@@ -70,5 +106,7 @@ describe("useActiveWallet", () => {
 
     expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
     expect(result.current.accountType).toBe(AccountType.Custodial)
+    expect(result.current.isReady).toBe(false)
+    expect(result.current.needsBackendAuth).toBe(true)
   })
 })
