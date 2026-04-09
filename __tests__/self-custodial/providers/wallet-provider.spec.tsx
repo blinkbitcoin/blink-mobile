@@ -197,6 +197,126 @@ describe("SelfCustodialWalletProvider", () => {
     expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3")
   })
 
+  it("handles refresh error gracefully", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockRejectedValueOnce(new Error("refresh failed"))
+    mockSnapshot.mockResolvedValue([])
+
+    const mockSdk = {
+      addEventListener: jest.fn().mockResolvedValue("id"),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockSnapshot).toHaveBeenCalled()
+    })
+
+    expect(result.current.wallets).toEqual([])
+  })
+
+  it("triggers refresh on SDK events", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue([])
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    const mockSdk = {
+      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      }),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    mockSnapshot.mockClear()
+    await capturedListener!({ tag: "Synced" })
+
+    expect(mockSnapshot).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not refresh on non-refresh events", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue([])
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    const mockSdk = {
+      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      }),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    mockSnapshot.mockClear()
+    await capturedListener!({ tag: "PaymentFailed" })
+
+    expect(mockSnapshot).not.toHaveBeenCalled()
+  })
+
+  it("coalesces rapid refresh calls", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+
+    let resolveFirst: () => void
+    mockSnapshot.mockImplementationOnce(
+      () =>
+        new Promise<never[]>((resolve) => {
+          resolveFirst = () => resolve([])
+        }),
+    )
+    mockSnapshot.mockResolvedValue([])
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    const mockSdk = {
+      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      }),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockSdk.addEventListener).toHaveBeenCalled()
+    })
+
+    // Fire event while first refresh is in-flight
+    capturedListener!({ tag: "Synced" })
+
+    // Resolve first refresh
+    resolveFirst!()
+
+    await waitFor(() => {
+      // Initial refresh + event-triggered coalesced refresh
+      expect(mockSnapshot).toHaveBeenCalledTimes(2)
+    })
+  })
+
   it("disconnects SDK on unmount", async () => {
     const mockSdk = {
       addEventListener: jest.fn().mockResolvedValue("listener-id"),
