@@ -37,6 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     alignItems: "center",
     paddingTop: 20,
+    paddingHorizontal: 40,
     gap: 14,
   },
   iconContainer: {
