@@ -43,8 +43,8 @@ export const SparkBackupMethodScreen: React.FC = () => {
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon="cloud-arrow-up"
-          iconColor={colors._green}
+          icon="cloud"
+          iconColor={colors.black}
           title={LL.SparkOnboarding.BackupMethod.title()}
           subtitle={LL.SparkOnboarding.BackupMethod.subtitle({
             provider: cloudProvider,
