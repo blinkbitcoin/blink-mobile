@@ -1,10 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import {
-  AccountStatus,
-  AccountType,
-  DefaultAccountId,
-} from "@app/types/wallet.types"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet.types"
 
 import {
   createCustodialDescriptor,
@@ -168,7 +164,7 @@ describe("createSelfCustodialDescriptor", () => {
   it("creates a self-custodial descriptor with correct defaults", () => {
     const desc = createSelfCustodialDescriptor("Spark")
 
-    expect(desc.id).toBe(SELF_DefaultAccountId.Custodial)
+    expect(desc.id).toBe(DefaultAccountId.SelfCustodial)
     expect(desc.type).toBe(AccountType.SelfCustodial)
     expect(desc.label).toBe("Spark")
     expect(desc.selected).toBe(false)
@@ -183,7 +179,7 @@ describe("markSelected", () => {
   ]
 
   it("marks account matching activeId as selected", () => {
-    const result = markSelected(accounts, SELF_DefaultAccountId.Custodial)
+    const result = markSelected(accounts, DefaultAccountId.SelfCustodial)
 
     expect(result[0].selected).toBe(false)
     expect(result[1].selected).toBe(true)

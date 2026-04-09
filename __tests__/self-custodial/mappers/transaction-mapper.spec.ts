@@ -141,3 +141,37 @@ describe("mapSelfCustodialTransactions", () => {
     expect(result).toHaveLength(0)
   })
 })
+
+describe("edge cases", () => {
+  it("handles zero-amount payment", () => {
+    const payment = createPayment({ amount: BigInt(0) })
+    const result = mapSelfCustodialTransaction(payment)
+
+    expect(result.amount.amount).toBe(0)
+  })
+
+  it("handles zero-fee payment", () => {
+    const payment = createPayment({ fees: BigInt(0) })
+    const result = mapSelfCustodialTransaction(payment)
+
+    expect(result.fee?.amount).toBe(0)
+  })
+
+  it("handles Deposit detail tag as Lightning", () => {
+    const payment = createPayment({
+      details: { tag: "Deposit", inner: {} },
+    })
+    const result = mapSelfCustodialTransaction(payment)
+
+    expect(result.paymentType).toBe(PaymentType.Lightning)
+  })
+
+  it("handles Withdraw detail tag as Lightning", () => {
+    const payment = createPayment({
+      details: { tag: "Withdraw", inner: {} },
+    })
+    const result = mapSelfCustodialTransaction(payment)
+
+    expect(result.paymentType).toBe(PaymentType.Lightning)
+  })
+})
