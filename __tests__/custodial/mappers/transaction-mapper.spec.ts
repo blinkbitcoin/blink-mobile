@@ -7,6 +7,7 @@ import {
 import { AccountType } from "@app/types/wallet.types"
 
 import {
+  filterTransactionsByCurrency,
   mapCustodialTransaction,
   mapCustodialTransactions,
 } from "@app/custodial/mappers/transaction-mapper"
@@ -136,6 +137,13 @@ describe("mapCustodialTransaction", () => {
     expect(result.paymentType).toBe(PaymentType.Lightning)
   })
 
+  it("omits fee when settlementFee is zero", () => {
+    const tx = { ...baseTx, settlementFee: 0 }
+    const result = mapCustodialTransaction(tx, WalletCurrency.Btc)
+
+    expect(result.fee).toBeUndefined()
+  })
+
   it("maps USD wallet currency correctly", () => {
     const tx = { ...baseTx, settlementCurrency: WalletCurrency.Usd }
     const result = mapCustodialTransaction(tx, WalletCurrency.Usd)
@@ -163,6 +171,29 @@ describe("mapCustodialTransactions", () => {
 
   it("returns empty array for empty input", () => {
     const result = mapCustodialTransactions([], WalletCurrency.Btc)
+
+    expect(result).toHaveLength(0)
+  })
+})
+
+describe("filterTransactionsByCurrency", () => {
+  it("filters transactions by currency", () => {
+    const btcTx = { ...baseTx, id: "btc-tx", settlementCurrency: WalletCurrency.Btc }
+    const usdTx = { ...baseTx, id: "usd-tx", settlementCurrency: WalletCurrency.Usd }
+
+    const btcResult = filterTransactionsByCurrency([btcTx, usdTx], WalletCurrency.Btc)
+    const usdResult = filterTransactionsByCurrency([btcTx, usdTx], WalletCurrency.Usd)
+
+    expect(btcResult).toHaveLength(1)
+    expect(btcResult[0].id).toBe("btc-tx")
+    expect(usdResult).toHaveLength(1)
+    expect(usdResult[0].id).toBe("usd-tx")
+  })
+
+  it("returns empty array when no matches", () => {
+    const btcTx = { ...baseTx, settlementCurrency: WalletCurrency.Btc }
+
+    const result = filterTransactionsByCurrency([btcTx], WalletCurrency.Usd)
 
     expect(result).toHaveLength(0)
   })

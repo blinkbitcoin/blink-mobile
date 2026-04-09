@@ -54,7 +54,9 @@ export const mapCustodialTransaction = (
   status: mapStatus(tx.status),
   timestamp: tx.createdAt,
   paymentType: mapPaymentType(tx),
-  fee: toMoneyAmount(tx.settlementFee, walletCurrency),
+  ...(tx.settlementFee !== 0 && {
+    fee: toMoneyAmount(tx.settlementFee, walletCurrency),
+  }),
   sourceAccountType: AccountType.Custodial,
 })
 
@@ -62,3 +64,8 @@ export const mapCustodialTransactions = (
   txs: ReadonlyArray<TransactionFragment>,
   walletCurrency: WalletCurrency,
 ): NormalizedTransaction[] => txs.map((tx) => mapCustodialTransaction(tx, walletCurrency))
+
+export const filterTransactionsByCurrency = (
+  txs: ReadonlyArray<TransactionFragment>,
+  currency: WalletCurrency,
+): TransactionFragment[] => txs.filter((tx) => tx.settlementCurrency === currency)
