@@ -7,6 +7,7 @@ import {
   type ConvertAdapter,
   type GetFeeAdapter,
   type ListPendingDepositsAdapter,
+  type PaymentAdapterResult,
   type PaymentError,
   type ReceiveLightningAdapter,
   type ReceiveOnchainAdapter,
@@ -43,6 +44,15 @@ type GetAddressMutation = () => Promise<{ address: string } | null>
 
 const toPaymentError = (message: string): PaymentError => ({
   message,
+})
+
+const failed = (message: string): PaymentAdapterResult => ({
+  status: PaymentResultStatus.Failed,
+  errors: [toPaymentError(message)],
+})
+
+const receiveError = (message: string) => ({
+  errors: [toPaymentError(message)],
 })
 
 const mapSendStatus = (status: PaymentSendResult): PaymentResultStatus => {
@@ -89,11 +99,7 @@ export const createCustodialReceiveLightning = (
       amount: params.amount?.amount,
       memo: params.memo,
     })
-    if (!result)
-      return {
-        invoice: "",
-        errors: [toPaymentError("Failed to create invoice")],
-      }
+    if (!result) return receiveError("Failed to create invoice")
     return { invoice: result.invoice }
   }
 }
@@ -103,11 +109,7 @@ export const createCustodialReceiveOnchain = (
 ): ReceiveOnchainAdapter => {
   return async () => {
     const result = await mutation()
-    if (!result)
-      return {
-        address: "",
-        errors: [toPaymentError("Failed to get address")],
-      }
+    if (!result) return receiveError("Failed to get address")
     return { address: result.address }
   }
 }
@@ -126,7 +128,5 @@ export const createCustodialClaimDeposit: ClaimDepositAdapter = {
   },
 }
 
-export const createCustodialConvert: ConvertAdapter = async () => ({
-  status: PaymentResultStatus.Failed,
-  errors: [toPaymentError("Conversion not yet supported for custodial accounts")],
-})
+export const createCustodialConvert: ConvertAdapter = async () =>
+  failed("Conversion not yet supported for custodial accounts")

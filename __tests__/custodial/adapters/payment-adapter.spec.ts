@@ -120,7 +120,7 @@ describe("createCustodialReceiveLightning", () => {
 
     const result = await adapter({})
 
-    expect(result.invoice).toBe("")
+    expect(result.invoice).toBeUndefined()
     expect(result.errors).toHaveLength(1)
     expect(result.errors?.[0].message).toBe("Failed to create invoice")
   })
@@ -143,7 +143,7 @@ describe("createCustodialReceiveOnchain", () => {
 
     const result = await adapter()
 
-    expect(result.address).toBe("")
+    expect(result.address).toBeUndefined()
     expect(result.errors).toHaveLength(1)
   })
 })
