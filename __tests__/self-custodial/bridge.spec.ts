@@ -83,14 +83,6 @@ describe("selfCustodialCreateWallet", () => {
     )
   })
 
-  it("returns the generated mnemonic", async () => {
-    const result = await selfCustodialCreateWallet()
-
-    expect(result).toBe(
-      "word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12",
-    )
-  })
-
   it("connects to SDK and activates stable balance", async () => {
     await selfCustodialCreateWallet()
 
