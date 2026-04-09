@@ -45,8 +45,8 @@ export const SparkCloudBackupScreen: React.FC = () => {
         <View>
           <View style={styles.heroContainer}>
             <IconHero
-              icon="cloud-arrow-up"
-              iconColor={colors._green}
+              icon="cloud"
+              iconColor={colors.black}
               title={LL.SparkOnboarding.CloudBackup.title()}
               subtitle={LL.SparkOnboarding.CloudBackup.description({
                 provider: cloudProvider,
@@ -83,9 +83,8 @@ export const SparkCloudBackupScreen: React.FC = () => {
                 />
 
                 <InfoBanner
-                  variant="warning"
                   title={LL.SparkOnboarding.CloudBackup.importantTitle()}
-                  icon="info"
+                  icon="warning"
                 >
                   <RichText
                     text={LL.SparkOnboarding.CloudBackup.importantMessage({
