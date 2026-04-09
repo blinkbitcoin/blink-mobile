@@ -52,7 +52,7 @@ export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
   await sdk.disconnect()
 }
 
-export const selfCustodialCreateWallet = async (): Promise<string> => {
+export const selfCustodialCreateWallet = async (): Promise<void> => {
   if (!__DEV__) {
     throw new Error(
       "Wallet creation is disabled in production builds until backup flow is available",
@@ -95,8 +95,6 @@ export const selfCustodialCreateWallet = async (): Promise<string> => {
     )
     throw err
   }
-
-  return mnemonic
 }
 
 export const selfCustodialRestoreWallet = async (mnemonic: string): Promise<void> => {
