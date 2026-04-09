@@ -8,6 +8,7 @@ import {
 const mockCreateWallet = jest.fn()
 const mockUpdateState = jest.fn()
 const mockDispatch = jest.fn()
+const mockRecordError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialCreateWallet: () => mockCreateWallet(),
@@ -24,6 +25,10 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     dispatch: mockDispatch,
   }),
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: Error[]) => mockRecordError(...args),
 }))
 
 describe("useCreateWallet", () => {
@@ -103,6 +108,21 @@ describe("useCreateWallet", () => {
     })
 
     expect(result.current.status).toBe(CreationStatus.Error)
+  })
+
+  it("wraps non-Error rejection for crashlytics", async () => {
+    mockCreateWallet.mockRejectedValue("string error")
+
+    const { result } = renderHook(() => useCreateWallet())
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(result.current.status).toBe(CreationStatus.Error)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Wallet creation failed: string error" }),
+    )
   })
 
   it("does not update state on failure", async () => {
