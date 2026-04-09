@@ -7,7 +7,6 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 const mockActiveAccount = jest.fn()
 const mockAccounts = jest.fn()
 const mockSetActiveAccountId = jest.fn()
-const mockNonCustodialEnabled = jest.fn()
 const mockCustodialState = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -18,10 +17,8 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
-jest.mock("@app/config/feature-flags-context", () => ({
-  useFeatureFlags: () => ({
-    nonCustodialEnabled: mockNonCustodialEnabled(),
-  }),
+jest.mock("@app/hooks/use-self-custodial-rollback", () => ({
+  useSelfCustodialRollback: jest.fn(),
 }))
 
 jest.mock("@app/custodial/providers/wallet-provider", () => ({
@@ -37,7 +34,6 @@ const custodialReady = {
 describe("useActiveWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockNonCustodialEnabled.mockReturnValue(true)
     mockCustodialState.mockReturnValue(custodialReady)
     mockAccounts.mockReturnValue([])
   })
@@ -74,44 +70,5 @@ describe("useActiveWallet", () => {
 
     expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
     expect(result.current.accountType).toBe(AccountType.Custodial)
-  })
-
-  it("rolls back to custodial when flag disabled and active is self-custodial", () => {
-    mockNonCustodialEnabled.mockReturnValue(false)
-    mockActiveAccount.mockReturnValue({
-      id: "self-custodial-default",
-      type: AccountType.SelfCustodial,
-    })
-    mockAccounts.mockReturnValue([
-      { id: "custodial-default", type: AccountType.Custodial },
-    ])
-
-    renderHook(() => useActiveWallet())
-
-    expect(mockSetActiveAccountId).toHaveBeenCalledWith("custodial-default")
-  })
-
-  it("does not roll back when flag enabled", () => {
-    mockNonCustodialEnabled.mockReturnValue(true)
-    mockActiveAccount.mockReturnValue({
-      id: "self-custodial-default",
-      type: AccountType.SelfCustodial,
-    })
-
-    renderHook(() => useActiveWallet())
-
-    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
-  })
-
-  it("does not roll back when active account is custodial", () => {
-    mockNonCustodialEnabled.mockReturnValue(false)
-    mockActiveAccount.mockReturnValue({
-      id: "custodial-default",
-      type: AccountType.Custodial,
-    })
-
-    renderHook(() => useActiveWallet())
-
-    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
   })
 })
