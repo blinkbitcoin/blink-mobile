@@ -36,8 +36,8 @@ describe("usePayments", () => {
     const { result } = renderHook(() => usePayments())
 
     expect(result.current.claimDeposit).toBeDefined()
-    expect(result.current.claimDeposit.getClaimFee).toBeDefined()
-    expect(result.current.claimDeposit.claimDeposit).toBeDefined()
+    expect(result.current.claimDeposit!.getClaimFee).toBeDefined()
+    expect(result.current.claimDeposit!.claimDeposit).toBeDefined()
   })
 
   it("returns convert adapter", () => {

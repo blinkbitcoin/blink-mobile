@@ -36,13 +36,13 @@ const custodialReady = {
   accountType: AccountType.Custodial,
 }
 
-const scReady = {
+const selfCustodialReady = {
   wallets: [],
   status: ActiveWalletStatus.Ready,
   accountType: AccountType.SelfCustodial,
 }
 
-const scUnavailable = {
+const selfCustodialUnavailable = {
   wallets: [],
   status: ActiveWalletStatus.Unavailable,
   accountType: AccountType.SelfCustodial,
@@ -52,7 +52,7 @@ describe("useActiveWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockCustodialState.mockReturnValue(custodialReady)
-    mockSelfCustodialState.mockReturnValue(scUnavailable)
+    mockSelfCustodialState.mockReturnValue(selfCustodialUnavailable)
     mockAccounts.mockReturnValue([])
   })
 
@@ -76,7 +76,7 @@ describe("useActiveWallet", () => {
       id: "sc-default",
       type: AccountType.SelfCustodial,
     })
-    mockSelfCustodialState.mockReturnValue(scReady)
+    mockSelfCustodialState.mockReturnValue(selfCustodialReady)
 
     const { result } = renderHook(() => useActiveWallet())
 
@@ -92,7 +92,7 @@ describe("useActiveWallet", () => {
       id: "sc-default",
       type: AccountType.SelfCustodial,
     })
-    mockSelfCustodialState.mockReturnValue(scUnavailable)
+    mockSelfCustodialState.mockReturnValue(selfCustodialUnavailable)
 
     const { result } = renderHook(() => useActiveWallet())
 

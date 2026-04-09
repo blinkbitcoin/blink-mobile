@@ -23,9 +23,9 @@ type PaymentsResult = {
   getFee?: GetFeeAdapter
   receiveLightning?: ReceiveLightningAdapter
   receiveOnchain?: ReceiveOnchainAdapter
-  listPendingDeposits: ListPendingDepositsAdapter
-  claimDeposit: ClaimDepositAdapter
-  convert: ConvertAdapter
+  listPendingDeposits?: ListPendingDepositsAdapter
+  claimDeposit?: ClaimDepositAdapter
+  convert?: ConvertAdapter
   accountType: AccountType
 }
 

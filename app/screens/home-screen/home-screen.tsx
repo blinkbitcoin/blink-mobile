@@ -348,25 +348,23 @@ export const HomeScreen: React.FC = () => {
   const numberOfTxs = transactions.length
 
   const onMenuClick = (target: Target) => {
-    if (isSelfCustodial || isAuthed) {
-      if (
-        !isSelfCustodial &&
-        target === "receiveBitcoin" &&
-        !hasPromptedSetDefaultAccount &&
-        numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
-        galoyInstanceId === "Main"
-      ) {
-        toggleSetDefaultAccountModal()
-        return
-      }
-
-      // we are using any because Typescript complain on the fact we are not passing any params
-      // but there is no need for a params and the types should not necessitate it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      navigation.navigate(target as any)
+    if (!isSelfCustodial && !isAuthed) {
+      setModalVisible(true)
       return
     }
-    setModalVisible(true)
+
+    if (
+      !isSelfCustodial &&
+      target === "receiveBitcoin" &&
+      !hasPromptedSetDefaultAccount &&
+      numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
+      galoyInstanceId === "Main"
+    ) {
+      toggleSetDefaultAccountModal()
+      return
+    }
+
+    navigation.navigate(target)
   }
 
   const activateWallet = () => {
@@ -399,7 +397,11 @@ export const HomeScreen: React.FC = () => {
     }, [openUpgradeModal, triggerUpgradeModal]),
   )
 
-  type Target = "scanningQRCode" | "sendBitcoinDestination" | "receiveBitcoin"
+  type Target =
+    | "scanningQRCode"
+    | "sendBitcoinDestination"
+    | "receiveBitcoin"
+    | "conversionDetails"
   type IconNamesType = keyof typeof icons
 
   const buttons = [
@@ -422,14 +424,15 @@ export const HomeScreen: React.FC = () => {
 
   const isIosWithBalance = isIos && satsBalance > 0
 
-  if (
+  const shouldShowTransferButton =
     isSelfCustodial ||
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
     levelAccount === AccountLevel.Two ||
     levelAccount === AccountLevel.Three ||
     isIosWithBalance
-  ) {
+
+  if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails" as Target,
