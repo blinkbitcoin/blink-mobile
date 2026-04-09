@@ -1,8 +1,18 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType } from "@app/types/wallet.types"
+import {
+  AccountStatus,
+  AccountType,
+  CUSTODIAL_DEFAULT_ID,
+  SELF_CUSTODIAL_DEFAULT_ID,
+} from "@app/types/wallet.types"
 
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import {
+  createCustodialDescriptor,
+  createSelfCustodialDescriptor,
+  markSelected,
+  useAccountRegistry,
+} from "@app/hooks/use-account-registry"
 
 const mockUseIsAuthed = jest.fn()
 const mockUpdateState = jest.fn()
@@ -140,5 +150,56 @@ describe("useAccountRegistry", () => {
     })
 
     expect(mockSaveToken).not.toHaveBeenCalled()
+  })
+})
+
+describe("createCustodialDescriptor", () => {
+  it("creates a custodial descriptor with correct defaults", () => {
+    const desc = createCustodialDescriptor("Blink")
+
+    expect(desc.id).toBe(CUSTODIAL_DEFAULT_ID)
+    expect(desc.type).toBe(AccountType.Custodial)
+    expect(desc.label).toBe("Blink")
+    expect(desc.selected).toBe(false)
+    expect(desc.status).toBe(AccountStatus.Available)
+  })
+})
+
+describe("createSelfCustodialDescriptor", () => {
+  it("creates a self-custodial descriptor with correct defaults", () => {
+    const desc = createSelfCustodialDescriptor("Spark")
+
+    expect(desc.id).toBe(SELF_CUSTODIAL_DEFAULT_ID)
+    expect(desc.type).toBe(AccountType.SelfCustodial)
+    expect(desc.label).toBe("Spark")
+    expect(desc.selected).toBe(false)
+    expect(desc.status).toBe(AccountStatus.RequiresRestore)
+  })
+})
+
+describe("markSelected", () => {
+  const accounts = [
+    createCustodialDescriptor("Blink"),
+    createSelfCustodialDescriptor("Spark"),
+  ]
+
+  it("marks account matching activeId as selected", () => {
+    const result = markSelected(accounts, SELF_CUSTODIAL_DEFAULT_ID)
+
+    expect(result[0].selected).toBe(false)
+    expect(result[1].selected).toBe(true)
+  })
+
+  it("selects first account when activeId is undefined", () => {
+    const result = markSelected(accounts, undefined)
+
+    expect(result[0].selected).toBe(true)
+    expect(result[1].selected).toBe(false)
+  })
+
+  it("selects none when list is empty", () => {
+    const result = markSelected([], "some-id")
+
+    expect(result).toHaveLength(0)
   })
 })

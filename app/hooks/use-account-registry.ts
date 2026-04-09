@@ -7,13 +7,39 @@ import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   AccountStatus,
   AccountType,
+  CUSTODIAL_DEFAULT_ID,
+  SELF_CUSTODIAL_DEFAULT_ID,
   type AccountDescriptor,
 } from "@app/types/wallet.types"
 
 import { useAppConfig } from "./use-app-config"
 
-const CUSTODIAL_DEFAULT_ID = "custodial-default"
-const SELF_CUSTODIAL_DEFAULT_ID = "self-custodial-default"
+export const createCustodialDescriptor = (label: string): AccountDescriptor => ({
+  id: CUSTODIAL_DEFAULT_ID,
+  type: AccountType.Custodial,
+  label,
+  selected: false,
+  status: AccountStatus.Available,
+})
+
+export const createSelfCustodialDescriptor = (label: string): AccountDescriptor => ({
+  id: SELF_CUSTODIAL_DEFAULT_ID,
+  type: AccountType.SelfCustodial,
+  label,
+  selected: false,
+  status: AccountStatus.RequiresRestore,
+})
+
+export const markSelected = (
+  accounts: AccountDescriptor[],
+  activeId: string | undefined,
+): AccountDescriptor[] => {
+  const resolvedId = activeId ?? accounts[0]?.id
+  return accounts.map((account) => ({
+    ...account,
+    selected: account.id === resolvedId,
+  }))
+}
 
 type AccountRegistryResult = {
   accounts: AccountDescriptor[]
@@ -32,32 +58,16 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     const list: AccountDescriptor[] = []
 
     if (isAuthed) {
-      list.push({
-        id: CUSTODIAL_DEFAULT_ID,
-        type: AccountType.Custodial,
-        label: LL.AccountTypeSelectionScreen.custodialLabel(),
-        selected: false,
-        status: AccountStatus.Available,
-      })
+      list.push(createCustodialDescriptor(LL.AccountTypeSelectionScreen.custodialLabel()))
     }
 
     if (nonCustodialEnabled) {
-      list.push({
-        id: SELF_CUSTODIAL_DEFAULT_ID,
-        type: AccountType.SelfCustodial,
-        label: LL.AccountTypeSelectionScreen.selfCustodialLabel(),
-        selected: false,
-        status: AccountStatus.RequiresRestore,
-      })
+      list.push(
+        createSelfCustodialDescriptor(LL.AccountTypeSelectionScreen.selfCustodialLabel()),
+      )
     }
 
-    const activeId = persistentState.activeAccountId
-    const resolvedId = activeId ?? list[0]?.id
-
-    return list.map((account) => ({
-      ...account,
-      selected: account.id === resolvedId,
-    }))
+    return markSelected(list, persistentState.activeAccountId)
   }, [
     isAuthed,
     nonCustodialEnabled,
