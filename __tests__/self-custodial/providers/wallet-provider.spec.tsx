@@ -1,6 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
-import { render, renderHook } from "@testing-library/react-native"
+import { render, renderHook, waitFor } from "@testing-library/react-native"
 
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
 
@@ -10,6 +10,7 @@ import {
 } from "@app/self-custodial/providers/wallet-provider"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  Network: { Mainnet: 0, Regtest: 1 },
   // eslint-disable-next-line camelcase
   SdkEvent_Tags: {
     Synced: "Synced",
@@ -17,41 +18,46 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     PaymentPending: "PaymentPending",
     ClaimedDeposits: "ClaimedDeposits",
     UnclaimedDeposits: "UnclaimedDeposits",
+    PaymentFailed: "PaymentFailed",
+    Optimization: "Optimization",
   },
   initLogging: jest.fn(),
 }))
 
-const mockHasMnemonic = jest.fn()
 const mockGetMnemonic = jest.fn()
-const mockNonCustodialEnabled = jest.fn()
+const mockGetMnemonicNetwork = jest.fn()
+const mockInitSdk = jest.fn()
+const mockDisconnectSdk = jest.fn()
 
-jest.mock("@app/utils/storage/secureStorage", () => {
-  const mock = {
-    hasMnemonic: () => mockHasMnemonic(),
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
     getMnemonic: () => mockGetMnemonic(),
-  }
-  return { __esModule: true, default: mock }
-})
-
-jest.mock("@app/config/feature-flags-context", () => ({
-  useFeatureFlags: () => ({
-    nonCustodialEnabled: mockNonCustodialEnabled(),
-  }),
+    getMnemonicNetwork: () => mockGetMnemonicNetwork(),
+  },
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  initSdk: jest.fn().mockRejectedValue(new Error("SDK not available in test")),
-  disconnectSdk: jest.fn().mockResolvedValue(undefined),
+  initSdk: (...args: unknown[]) => mockInitSdk(...args),
+  disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
+}))
+
+jest.mock("@app/self-custodial/logging", () => ({
+  logSdkEvent: jest.fn(),
+  SdkLogLevel: { Error: "error" },
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkToken: { Label: "USDB", Ticker: "USDB" },
-  SparkConfig: {
-    storageDir: "/test",
-    maxSlippageBps: 50,
-    tokenIdentifier: "test-id",
-    apiKey: "test-key",
-  },
+  SparkConfig: { network: 1 },
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
+  getSelfCustodialWalletSnapshot: jest.fn().mockResolvedValue([]),
 }))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -61,9 +67,10 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe("SelfCustodialWalletProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockNonCustodialEnabled.mockReturnValue(false)
-    mockHasMnemonic.mockResolvedValue(false)
-    mockGetMnemonic.mockResolvedValue("")
+    mockGetMnemonic.mockResolvedValue(null)
+    mockGetMnemonicNetwork.mockResolvedValue("regtest")
+    mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
+    mockDisconnectSdk.mockResolvedValue(undefined)
   })
 
   it("renders children", () => {
@@ -76,23 +83,14 @@ describe("SelfCustodialWalletProvider", () => {
     expect(getByText("child")).toBeTruthy()
   })
 
-  it("returns unavailable when flag is disabled", async () => {
-    mockNonCustodialEnabled.mockReturnValue(false)
-
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
-    expect(result.current.accountType).toBe(AccountType.SelfCustodial)
-    expect(result.current.wallets).toHaveLength(0)
-  })
-
   it("returns unavailable when no mnemonic exists", async () => {
-    mockNonCustodialEnabled.mockReturnValue(true)
-    mockHasMnemonic.mockResolvedValue(false)
+    mockGetMnemonic.mockResolvedValue(null)
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
-    expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    })
   })
 
   it("sets accountType to self-custodial", () => {
@@ -104,7 +102,6 @@ describe("SelfCustodialWalletProvider", () => {
   it("provides retry function", () => {
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
-    expect(result.current.retry).toBeDefined()
     expect(typeof result.current.retry).toBe("function")
   })
 
@@ -112,5 +109,110 @@ describe("SelfCustodialWalletProvider", () => {
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     expect(result.current.wallets).toEqual([])
+  })
+
+  it("sets error status on network mismatch", async () => {
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockGetMnemonicNetwork.mockResolvedValue("mainnet")
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+
+    expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  it("allows null stored network (legacy wallets)", async () => {
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockGetMnemonicNetwork.mockResolvedValue(null)
+    mockInitSdk.mockRejectedValue(new Error("SDK not available"))
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).toHaveBeenCalled()
+    })
+  })
+
+  it("sets error status when SDK init fails", async () => {
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockRejectedValue(new Error("init failed"))
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+  })
+
+  it("does not call initSdk when mnemonic is null", async () => {
+    mockGetMnemonic.mockResolvedValue(null)
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).not.toHaveBeenCalled()
+    })
+  })
+
+  it("sets Loading then Ready on successful init", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue([])
+
+    const mockSdk = {
+      addEventListener: jest.fn().mockResolvedValue("id"),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+  })
+
+  it("initializes SDK regardless of feature flag state (rollback-safe)", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue([])
+
+    const mockSdk = {
+      addEventListener: jest.fn().mockResolvedValue("id"),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3")
+  })
+
+  it("disconnects SDK on unmount", async () => {
+    const mockSdk = {
+      addEventListener: jest.fn().mockResolvedValue("listener-id"),
+      disconnect: jest.fn(),
+    }
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).toHaveBeenCalled()
+    })
+
+    unmount()
+
+    expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
   })
 })
