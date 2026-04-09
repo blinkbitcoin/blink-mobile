@@ -119,12 +119,12 @@ export type SendPaymentAdapter = (
 export type GetFeeAdapter = (params: SendPaymentParams) => Promise<FeeQuote | null>
 
 export type ReceiveLightningAdapter = (params: ReceiveLightningParams) => Promise<{
-  invoice: string
+  invoice?: string
   errors?: PaymentError[]
 }>
 
 export type ReceiveOnchainAdapter = () => Promise<{
-  address: string
+  address?: string
   errors?: PaymentError[]
 }>
 
