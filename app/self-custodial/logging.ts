@@ -19,30 +19,26 @@ const sdkLogLevelMap: Record<string, SdkLogLevel> = {
 }
 
 const toSdkLogLevel = (level: string): SdkLogLevel =>
-  sdkLogLevelMap[level.toLowerCase()] ?? SdkLogLevel.Error
+  sdkLogLevelMap[level.toLowerCase()] ?? SdkLogLevel.Info
+
+const logDispatch: Record<SdkLogLevel, (msg: string) => void> = {
+  [SdkLogLevel.Debug]: (msg) => console.debug(msg),
+  [SdkLogLevel.Info]: (msg) => {
+    console.debug(msg)
+    crashlytics().log(msg)
+  },
+  [SdkLogLevel.Warn]: (msg) => {
+    console.warn(msg)
+    crashlytics().log(msg)
+  },
+  [SdkLogLevel.Error]: (msg) => {
+    console.error(msg)
+    crashlytics().recordError(new Error(msg))
+  },
+}
 
 export const logSdkEvent = (level: SdkLogLevel, message: string): void => {
-  const prefixed = `${LOG_PREFIX} ${message}`
-
-  if (level === SdkLogLevel.Debug) {
-    console.debug(prefixed)
-    return
-  }
-
-  if (level === SdkLogLevel.Info) {
-    console.debug(prefixed)
-    crashlytics().log(prefixed)
-    return
-  }
-
-  if (level === SdkLogLevel.Warn) {
-    console.warn(prefixed)
-    crashlytics().log(prefixed)
-    return
-  }
-
-  console.error(prefixed)
-  crashlytics().recordError(new Error(prefixed))
+  logDispatch[level](`${LOG_PREFIX} ${message}`)
 }
 
 type SdkLogListener = {

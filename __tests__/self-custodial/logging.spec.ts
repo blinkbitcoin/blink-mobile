@@ -88,7 +88,7 @@ describe("connectToSdkLogger", () => {
     expect(mockLog).toHaveBeenCalledWith("[SparkSDK] sdk initialized")
   })
 
-  it("maps unknown level to error", async () => {
+  it("maps unknown level to info", async () => {
     let capturedListener: { onEvent: (e: { level: string; line: string }) => void }
 
     const mockSdk = {
@@ -101,6 +101,7 @@ describe("connectToSdkLogger", () => {
     await connectToSdkLogger(mockSdk)
     capturedListener!.onEvent({ level: "UNKNOWN", line: "bad level" })
 
-    expect(console.error).toHaveBeenCalledWith("[SparkSDK] bad level")
+    expect(console.debug).toHaveBeenCalledWith("[SparkSDK] bad level")
+    expect(mockLog).toHaveBeenCalledWith("[SparkSDK] bad level")
   })
 })
