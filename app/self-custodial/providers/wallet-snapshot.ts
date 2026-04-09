@@ -1,7 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toWalletMoneyAmount } from "@app/types/amounts"
 import { toWalletId, type WalletState } from "@app/types/wallet.types"
 
 import { SparkToken } from "../config"
@@ -21,14 +21,14 @@ export const getSelfCustodialWalletSnapshot = async (
   const btcWallet: WalletState = {
     id: toWalletId(`${info.identityPubkey}-btc`),
     walletCurrency: WalletCurrency.Btc,
-    balance: toBtcMoneyAmount(btcBalance),
+    balance: toWalletMoneyAmount(btcBalance, WalletCurrency.Btc),
     transactions: [],
   }
 
   const usdWallet: WalletState = {
     id: toWalletId(`${info.identityPubkey}-usd`),
     walletCurrency: WalletCurrency.Usd,
-    balance: toUsdMoneyAmount(usdBalance),
+    balance: toWalletMoneyAmount(usdBalance, WalletCurrency.Usd),
     transactions: [],
   }
 
