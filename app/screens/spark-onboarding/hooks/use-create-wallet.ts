@@ -2,6 +2,7 @@ import { useCallback, useState } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
@@ -32,7 +33,10 @@ export const useCreateWallet = () => {
       navigation.dispatch(
         CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
       )
-    } catch {
+    } catch (err) {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Wallet creation failed: ${err}`),
+      )
       setStatus(CreationStatus.Error)
     }
   }, [navigation, updateState])
