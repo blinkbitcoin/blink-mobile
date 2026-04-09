@@ -2,6 +2,7 @@ import { useCallback } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
@@ -42,7 +43,9 @@ export const useCloudBackup = ({
     try {
       session = await startSession(filename)
     } catch (err) {
-      console.error("[CloudBackup] Sign-in failed:", err)
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Cloud backup sign-in failed: ${err}`),
+      )
       toastShow({ message: LL.SparkOnboarding.CloudBackup.signInFailed(), LL })
       return
     }
@@ -66,7 +69,7 @@ export const useCloudBackup = ({
 
     const result = await upload(payload, filename, session)
     if (!result.success) {
-      console.error("[CloudBackup] Upload failed:", result.error)
+      crashlytics().recordError(new Error(`Cloud backup upload failed: ${result.error}`))
       toastShow({ message: LL.SparkOnboarding.CloudBackup.uploadFailed(), LL })
       return
     }
