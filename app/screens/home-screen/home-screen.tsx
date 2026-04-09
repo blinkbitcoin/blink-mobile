@@ -32,7 +32,6 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -165,9 +164,7 @@ export const HomeScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
-  const isSelfCustodial =
-    activeWallet.accountType === AccountType.SelfCustodial &&
-    activeWallet.status !== ActiveWalletStatus.Unavailable
+  const { isSelfCustodial } = activeWallet
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -231,7 +228,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const loading = isSelfCustodial
-    ? activeWallet.status === ActiveWalletStatus.Loading
+    ? !activeWallet.isReady
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
