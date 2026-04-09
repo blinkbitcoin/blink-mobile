@@ -7,25 +7,35 @@ import React, {
   useRef,
   useState,
 } from "react"
+import { AppState } from "react-native"
 
-import { SdkEvent_Tags as SdkEventTags } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  Network,
+  SdkEvent_Tags as SdkEventTags,
+} from "@breeztech/breez-sdk-spark-react-native"
+import crashlytics from "@react-native-firebase/crashlytics"
 
-import { useFeatureFlags } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   AccountType,
   ActiveWalletStatus,
-  toWalletId,
   type ActiveWalletState,
   type WalletState,
 } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import { disconnectSdk, initSdk } from "../bridge"
-import { SparkToken } from "../config"
+import { SparkConfig } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
-import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
+
+import { getSelfCustodialWalletSnapshot } from "./wallet-snapshot"
+
+const REFRESH_EVENTS = new Set([
+  SdkEventTags.Synced,
+  SdkEventTags.PaymentSucceeded,
+  SdkEventTags.PaymentPending,
+  SdkEventTags.ClaimedDeposits,
+  SdkEventTags.UnclaimedDeposits,
+])
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
@@ -44,62 +54,35 @@ const SelfCustodialWalletContext =
 export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const { nonCustodialEnabled } = useFeatureFlags()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [retryCount, setRetryCount] = useState(0)
   const sdkRef = useRef<Awaited<ReturnType<typeof initSdk>> | null>(null)
+  const refreshingRef = useRef(false)
+
+  const pendingRefreshRef = useRef(false)
 
   const refreshWallets = useCallback(async () => {
     if (!sdkRef.current) return
+    if (refreshingRef.current) {
+      pendingRefreshRef.current = true
+      return
+    }
+    refreshingRef.current = true
 
     try {
-      const info = await sdkRef.current.getInfo({ ensureSynced: false })
-      const identityPubkey = info.identityPubkey
-
-      const btcBalance = Number(info.balanceSats)
-      const usdbEntry = Object.entries(info.tokenBalances).find(
-        ([, token]) => token.tokenMetadata?.ticker === SparkToken.Ticker,
-      )
-      const usdBalance = usdbEntry ? Number(usdbEntry[1].balance) : 0
-
-      const btcWallet: WalletState = {
-        id: toWalletId(`${identityPubkey}-btc`),
-        walletCurrency: WalletCurrency.Btc,
-        balance: toBtcMoneyAmount(btcBalance),
-        transactions: [],
-      }
-
-      const usdWallet: WalletState = {
-        id: toWalletId(`${identityPubkey}-usd`),
-        walletCurrency: WalletCurrency.Usd,
-        balance: toUsdMoneyAmount(Number(usdBalance)),
-        transactions: [],
-      }
-
-      const payments = await sdkRef.current.listPayments({
-        typeFilter: undefined,
-        statusFilter: undefined,
-        assetFilter: undefined,
-        paymentDetailsFilter: undefined,
-        fromTimestamp: undefined,
-        toTimestamp: undefined,
-        offset: undefined,
-        limit: 50,
-        sortAscending: false,
-      })
-
-      const txs = mapSelfCustodialTransactions(payments.payments)
-      const btcTxs = txs.filter((tx) => tx.amount.currency === WalletCurrency.Btc)
-      const usdTxs = txs.filter((tx) => tx.amount.currency === WalletCurrency.Usd)
-
-      setWallets([
-        { ...btcWallet, transactions: btcTxs },
-        { ...usdWallet, transactions: usdTxs },
-      ])
+      const snapshot = await getSelfCustodialWalletSnapshot(sdkRef.current)
+      setWallets(snapshot)
       setStatus(ActiveWalletStatus.Ready)
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
+      crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
+    } finally {
+      refreshingRef.current = false // eslint-disable-line require-atomic-updates
+      if (pendingRefreshRef.current) {
+        pendingRefreshRef.current = false
+        refreshWallets()
+      }
     }
   }, [])
 
@@ -107,21 +90,32 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     let mounted = true
 
     const initialize = async () => {
-      const hasMnemonic = await KeyStoreWrapper.hasMnemonic()
-      if (!hasMnemonic || !nonCustodialEnabled) {
+      const mnemonic = await KeyStoreWrapper.getMnemonic()
+      if (!mnemonic) {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
+        return
+      }
+
+      const storedNetwork = await KeyStoreWrapper.getMnemonicNetwork()
+      const currentNetwork =
+        SparkConfig.network === Network.Mainnet ? "mainnet" : "regtest"
+      if (storedNetwork && storedNetwork !== currentNetwork) {
+        logSdkEvent(
+          SdkLogLevel.Error,
+          `Network mismatch: wallet=${storedNetwork}, config=${currentNetwork}`,
+        )
+        crashlytics().recordError(
+          new Error(
+            `Network mismatch: wallet=${storedNetwork}, config=${currentNetwork}`,
+          ),
+        )
+        if (mounted) setStatus(ActiveWalletStatus.Error)
         return
       }
 
       if (mounted) setStatus(ActiveWalletStatus.Loading)
 
       try {
-        const mnemonic = await KeyStoreWrapper.getMnemonic()
-        if (!mnemonic) {
-          if (mounted) setStatus(ActiveWalletStatus.Unavailable)
-          return
-        }
-
         const sdk = await initSdk(mnemonic)
         if (!mounted) {
           await disconnectSdk(sdk)
@@ -133,13 +127,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         await sdk.addEventListener({
           onEvent: async (event) => {
             if (!mounted) return
-            if (
-              event.tag === SdkEventTags.Synced ||
-              event.tag === SdkEventTags.PaymentSucceeded ||
-              event.tag === SdkEventTags.PaymentPending ||
-              event.tag === SdkEventTags.ClaimedDeposits ||
-              event.tag === SdkEventTags.UnclaimedDeposits
-            ) {
+            if (REFRESH_EVENTS.has(event.tag)) {
               await refreshWallets()
             }
           },
@@ -148,6 +136,9 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         await refreshWallets()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`SDK init failed: ${err}`),
+        )
         if (mounted) setStatus(ActiveWalletStatus.Error)
       }
     }
@@ -161,7 +152,14 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         sdkRef.current = null
       }
     }
-  }, [nonCustodialEnabled, retryCount, refreshWallets])
+  }, [retryCount, refreshWallets])
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") refreshWallets()
+    })
+    return () => subscription.remove()
+  }, [refreshWallets])
 
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1)
