@@ -43,10 +43,10 @@ describe("SparkBackupAlertsScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.title())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1())).toBeTruthy()
-    expect(queryByText(LL.SparkOnboarding.ManualBackup.Alerts.check2())).toBeNull()
-    expect(queryByText(LL.SparkOnboarding.ManualBackup.Alerts.check3())).toBeNull()
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.title())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check1())).toBeTruthy()
+    expect(queryByText(LL.BackupScreen.ManualBackup.Alerts.check2())).toBeNull()
+    expect(queryByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeNull()
   })
 
   it("reveals second checkbox after checking first", () => {
@@ -56,8 +56,8 @@ describe("SparkBackupAlertsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1()))
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2())).toBeTruthy()
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check2())).toBeTruthy()
   })
 
   it("reveals third checkbox after checking second", () => {
@@ -67,9 +67,9 @@ describe("SparkBackupAlertsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1()))
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2()))
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check3())).toBeTruthy()
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeTruthy()
   })
 
   it("continue button is disabled when not all checkboxes are checked", () => {
@@ -90,9 +90,9 @@ describe("SparkBackupAlertsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1()))
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2()))
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check3()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check3()))
 
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", { step: 1 })
@@ -105,14 +105,14 @@ describe("SparkBackupAlertsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1()))
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
 
     // Uncheck first — second and third should remain visible
-    fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check1()))
+    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
 
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check2())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Alerts.check3())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check2())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeTruthy()
   })
 
   it("saves BackupAlerts checkpoint on mount", () => {
