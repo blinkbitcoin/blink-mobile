@@ -22,9 +22,7 @@ export const SparkBackupSuccessScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <SuccessScreenLayout onAnimationComplete={navigateToHome}>
-        <Text style={styles.message}>
-          {LL.SparkOnboarding.ManualBackup.Success.title()}
-        </Text>
+        <Text style={styles.message}>{LL.BackupScreen.ManualBackup.Success.title()}</Text>
       </SuccessScreenLayout>
     </Screen>
   )
