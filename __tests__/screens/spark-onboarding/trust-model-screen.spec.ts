@@ -10,6 +10,10 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: (...args: unknown[]) => mockSetItem(...args),
 }))
 
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
+}))
+
 describe("useTrustModelSeen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -17,20 +21,22 @@ describe("useTrustModelSeen", () => {
     mockSetItem.mockResolvedValue(undefined)
   })
 
-  it("defaults to seen=true before loading", () => {
+  it("defaults to seen=false and loaded=false before loading", () => {
     const { result } = renderHook(() => useTrustModelSeen())
 
-    expect(result.current.seen).toBe(true)
+    expect(result.current.seen).toBe(false)
+    expect(result.current.loaded).toBe(false)
   })
 
-  it("loads false when not persisted", async () => {
+  it("loads false and sets loaded when not persisted", async () => {
     mockGetItem.mockResolvedValue(null)
 
     const { result } = renderHook(() => useTrustModelSeen())
 
     await waitFor(() => {
-      expect(result.current.seen).toBe(false)
+      expect(result.current.loaded).toBe(true)
     })
+    expect(result.current.seen).toBe(false)
   })
 
   it("loads true when persisted", async () => {
@@ -41,6 +47,7 @@ describe("useTrustModelSeen", () => {
     await waitFor(() => {
       expect(result.current.seen).toBe(true)
     })
+    expect(result.current.loaded).toBe(true)
   })
 
   it("persists seen state on markAsSeen", async () => {
@@ -49,7 +56,7 @@ describe("useTrustModelSeen", () => {
     const { result } = renderHook(() => useTrustModelSeen())
 
     await waitFor(() => {
-      expect(result.current.seen).toBe(false)
+      expect(result.current.loaded).toBe(true)
     })
 
     await act(async () => {
@@ -58,5 +65,16 @@ describe("useTrustModelSeen", () => {
 
     expect(result.current.seen).toBe(true)
     expect(mockSetItem).toHaveBeenCalledWith("trustModelSeen", "true")
+  })
+
+  it("sets loaded=true even when getItem rejects", async () => {
+    mockGetItem.mockRejectedValue(new Error("storage error"))
+
+    const { result } = renderHook(() => useTrustModelSeen())
+
+    await waitFor(() => {
+      expect(result.current.loaded).toBe(true)
+    })
+    expect(result.current.seen).toBe(false)
   })
 })
