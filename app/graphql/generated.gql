@@ -1579,6 +1579,25 @@ query realtimePrice {
   }
 }
 
+query realtimePriceUnauthed($currency: DisplayCurrency) {
+  realtimePrice(currency: $currency) {
+    btcSatPrice {
+      base
+      offset
+      __typename
+    }
+    denominatorCurrency
+    id
+    timestamp
+    usdCentPrice {
+      base
+      offset
+      __typename
+    }
+    __typename
+  }
+}
+
 query scanningQRCodeScreen {
   globals {
     network
