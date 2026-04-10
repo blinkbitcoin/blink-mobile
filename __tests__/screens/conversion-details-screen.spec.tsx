@@ -17,6 +17,7 @@ import {
   WalletCurrency,
   ConversionScreenDocument,
   RealtimePriceDocument,
+  RealtimePriceUnauthedDocument,
   DisplayCurrencyDocument,
   CurrencyListDocument,
 } from "@app/graphql/generated"
@@ -245,17 +246,28 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
     },
   }
 
+  const realtimePriceUnauthedMock = {
+    request: {
+      query: RealtimePriceUnauthedDocument,
+      variables: { currency: "USD" },
+    },
+    result: { data: { __typename: "Query", realtimePrice: null } },
+  }
+
   return [
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
   ]
@@ -270,6 +282,13 @@ const createEmptyMocks = (): MockedResponse[] => {
     {
       request: { query: RealtimePriceDocument },
       result: { data: { __typename: "Query", me: null } },
+    },
+    {
+      request: {
+        query: RealtimePriceUnauthedDocument,
+        variables: { currency: "USD" },
+      },
+      result: { data: { __typename: "Query", realtimePrice: null } },
     },
     {
       request: { query: DisplayCurrencyDocument },
