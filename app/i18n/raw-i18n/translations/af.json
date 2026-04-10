@@ -2047,6 +2047,7 @@
     "createAccount": "Skep 'n nuwe rekening",
     "exploreWallet": "Verken beursie",
     "login": "Meld aan",
+    "loginOrRestore": "Teken in / Herstel",
     "logBackInWith": "Teken weer in met",
     "headline": "Beursie deur Galoy gebou",
     "startTrialAccount": "Begin met 'n proefrekening",
@@ -3473,7 +3474,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies jou rugsteunmetode",
       "subtitle": "Ons beveel {provider} aan vir nuwe gebruikers.",
@@ -3556,17 +3559,37 @@
     "restoreComingSoonTitle": "Binnekort beskikbaar",
     "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees."
   },
-  "BackupScreen": {
-    "title": "Rugsteun jou beursie",
-    "description": "Kies 'n rugsteunmetode om jou fondse te beveilig"
-  },
   "RestoreScreen": {
     "title": "Herstel beursie",
-    "description": "Herstel jou beursie vanaf 'n rugsteun"
+    "description": "Herstel jou beursie vanaf 'n rugsteun",
+    "phraseTitle": "Herstel beursie",
+    "phraseSubtitleStep1": "Voer die eerste 6 woorde van jou rugsteunfrase in",
+    "phraseSubtitleStep2": "Voer die res van jou rugsteunfrase in",
+    "nextWords": "Volgende 6 woorde",
+    "paste": "Plak",
+    "enterWord": "Woord",
+    "invalidMnemonic": "Ongeldige rugsteunfrase. Kontroleer asseblief jou woorde en probeer weer.",
+    "restoring": "Jou beursie word herstel...",
+    "restoreSuccess": "Beursie suksesvol herstel",
+    "restoreFailed": "Kon nie beursie herstel nie. Probeer asseblief weer.",
+    "restore": "Herstel beursie",
+    "noBackupFound": "Geen rugsteun gevind nie",
+    "noBackupDescription": "Ons kon nie 'n rugsteun vind nie. Jy kan jou rugsteunfrase handmatig invoer.",
+    "enterPassword": "Voer jou enkripsierwagwoord in",
+    "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer."
   },
   "BackupNudge": {
     "title": "Beveilig jou beursie",
-    "description": "Jou fondse is in gevaar. Beveilig jou beursie nou."
+    "description": "Jou fondse is in gevaar. Beveilig jou beursie nou. Dit neem net 'n minuut.",
+    "cta": "Beveilig nou",
+    "settingsWarning": "Rugsteun jou beursie. As jy hierdie toestel verloor, verloor jy jou fondse.",
+    "modalTitle": "Jou fondse het beskerming nodig",
+    "modalDescription": "Jy het 'n beduidende balans. Rugsteun jou beursie om verlies te voorkom.",
+    "secureMe": "Beveilig my",
+    "trustModelTitle": "Jy is in beheer",
+    "trustModelDescription": "Jou sleutels beheer jou fondse. Transaksies word verwerk deur Spark-operateurs, nie direk op Bitcoin L1 geverifieer nie.",
+    "trustModelWarning": "Baie klein balanse is dalk nie ekonomies om na die Bitcoin-basisketting te herstel nie.",
+    "trustModelDismiss": "Ek verstaan"
   },
   "StableBalance": {
     "title": "Stabiele balans",

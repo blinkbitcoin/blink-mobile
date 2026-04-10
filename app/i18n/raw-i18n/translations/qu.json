@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "Yaykuy",
+    "loginOrRestore": "Yaykuy / Kutichiy",
     "logBackInWith": "Log back in with",
     "headline": "Galoyta kawsayninkunawan kuskan.",
     "startTrialAccount": "Start with a trial account",
@@ -3470,7 +3471,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Akllay imayna waqaychanaykita",
       "subtitle": "{provider} nisqata kunanchayku musuq rurakkunapaq.",
@@ -3553,17 +3556,37 @@
     "restoreComingSoonTitle": "Qayllamuchkan",
     "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa."
   },
-  "BackupScreen": {
-    "title": "Walleta waqaychay",
-    "description": "Aklliy waqaychay ñanta qullqiykita jark'anapaq"
-  },
   "RestoreScreen": {
     "title": "Walleta kutichiy",
-    "description": "Walletaykita waqaychaymanta kutichiy"
+    "description": "Walletaykita waqaychaymanta kutichiy",
+    "phraseTitle": "Wallet kutichiy",
+    "phraseSubtitleStep1": "6 ñawpaq simikuna qillqay backup frase nisqamanta",
+    "phraseSubtitleStep2": "Puchun simikuna qillqay backup frase nisqamanta",
+    "nextWords": "Hamuq 6 simikuna",
+    "paste": "Taqay",
+    "enterWord": "Simi",
+    "invalidMnemonic": "Mana allin backup frase. Simiykikunata qhaway hinaspa watiqmanta ruway.",
+    "restoring": "Walletniykita kutichichkani...",
+    "restoreSuccess": "Wallet allinmi kutichimusqa",
+    "restoreFailed": "Mana atinichu walletta kutichiy. Watiqmanta ruway.",
+    "restore": "Wallet kutichiy",
+    "noBackupFound": "Mana backup tarikunchu",
+    "noBackupDescription": "Mana backup tarikuyta atinichu. Makiykiwan backup frase qillqayta atinki.",
+    "enterPassword": "Cifrado contraseñaykita qillqay",
+    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway."
   },
   "BackupNudge": {
     "title": "Walletaykita jark'ay",
-    "description": "Qullqiyki ñak'ariypi kachkan. Walletaykita jark'ay kunan."
+    "description": "Qullqiykikuna riskupi kachkan. Walletniykita waqaychay kunan. Huk minutullam.",
+    "cta": "Kunan waqaychay",
+    "settingsWarning": "Walletniykita backup ruray. Kay aparatuta chinkachispaqa, qullqiykita chinkachinki.",
+    "modalTitle": "Qullqiykikuna waqaychana",
+    "modalDescription": "Hatun saldoyki kan. Backup ruray ama chinkanampaq.",
+    "secureMe": "Waqaychaway",
+    "trustModelTitle": "Qammi kamachkanki",
+    "trustModelDescription": "Llaviykikuna qullqiykita kamachin. Transacciones Spark operadorkuna ruranku, mana Bitcoin L1 pi.",
+    "trustModelWarning": "Ancha uchuy saldokuna mana allinchu Bitcoin cadena base man kutichiy.",
+    "trustModelDismiss": "Entiendeni"
   },
   "StableBalance": {
     "title": "Saldo sinchi",

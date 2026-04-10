@@ -2045,6 +2045,7 @@
         "createAccount": "Criar nova conta",
         "exploreWallet": "Explorar carteira",
         "login": "Entrar",
+        "loginOrRestore": "Entrar / Restaurar",
         "logBackInWith": "Faça login novamente com",
         "headline": "Carteira desenvolvida pela Galoy",
         "startTrialAccount": "Comece com uma conta teste",
@@ -3420,7 +3421,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Escolha seu método de backup",
             "subtitle": "Recomendamos {provider} para novos usuários.",
@@ -3503,17 +3506,37 @@
         "restoreComingSoonTitle": "Em breve",
         "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura."
     },
-    "BackupScreen": {
-        "title": "Fazer backup da carteira",
-        "description": "Escolha um método de backup para proteger seus fundos"
-    },
     "RestoreScreen": {
         "title": "Restaurar carteira",
-        "description": "Recupere sua carteira a partir de um backup"
+        "description": "Recupere sua carteira a partir de um backup",
+        "phraseTitle": "Restaurar carteira",
+        "phraseSubtitleStep1": "Digite as primeiras 6 palavras da sua frase de backup",
+        "phraseSubtitleStep2": "Digite o restante da sua frase de backup",
+        "nextWords": "Próximas 6 palavras",
+        "paste": "Colar",
+        "enterWord": "Palavra",
+        "invalidMnemonic": "Frase de backup inválida. Verifique suas palavras e tente novamente.",
+        "restoring": "Restaurando sua carteira...",
+        "restoreSuccess": "Carteira restaurada com sucesso",
+        "restoreFailed": "Falha ao restaurar carteira. Tente novamente.",
+        "restore": "Restaurar carteira",
+        "noBackupFound": "Nenhum backup encontrado",
+        "noBackupDescription": "Não encontramos um backup. Você pode digitar sua frase de backup manualmente.",
+        "enterPassword": "Digite sua senha de criptografia",
+        "wrongPassword": "Senha incorreta. Tente novamente."
     },
     "BackupNudge": {
         "title": "Proteja sua carteira",
-        "description": "Seus fundos estão em risco. Proteja sua carteira agora."
+        "description": "Seus fundos estão em risco. Proteja sua carteira agora. Leva apenas um minuto.",
+        "cta": "Proteger agora",
+        "settingsWarning": "Faça backup da sua carteira. Se perder este dispositivo, perderá seus fundos.",
+        "modalTitle": "Seus fundos precisam de proteção",
+        "modalDescription": "Você tem um saldo significativo. Faça backup da carteira para evitar perdas.",
+        "secureMe": "Proteger",
+        "trustModelTitle": "Você está no controle",
+        "trustModelDescription": "Suas chaves controlam seus fundos. As transações são processadas pelos operadores Spark, não validadas diretamente no Bitcoin L1.",
+        "trustModelWarning": "Saldos muito pequenos podem não ser econômicos para recuperar na cadeia base do Bitcoin.",
+        "trustModelDismiss": "Eu entendo"
     },
     "StableBalance": {
         "title": "Saldo estável",
