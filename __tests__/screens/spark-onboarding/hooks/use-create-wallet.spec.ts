@@ -9,6 +9,7 @@ const mockCreateWallet = jest.fn()
 const mockUpdateState = jest.fn()
 const mockDispatch = jest.fn()
 const mockRecordError = jest.fn()
+const mockReinitSdk = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialCreateWallet: () => mockCreateWallet(),
@@ -25,6 +26,10 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     dispatch: mockDispatch,
   }),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -79,6 +84,16 @@ describe("useCreateWallet", () => {
       galoyAuthToken: "t",
       activeAccountId: "self-custodial-default",
     })
+  })
+
+  it("reinits SDK on success", async () => {
+    const { result } = renderHook(() => useCreateWallet())
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(mockReinitSdk).toHaveBeenCalledTimes(1)
   })
 
   it("navigates to Primary on success", async () => {
@@ -136,5 +151,6 @@ describe("useCreateWallet", () => {
 
     expect(mockUpdateState).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockReinitSdk).not.toHaveBeenCalled()
   })
 })
