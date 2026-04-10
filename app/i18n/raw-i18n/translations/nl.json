@@ -2047,6 +2047,7 @@
     "createAccount": "Creëer een nieuw account",
     "exploreWallet": "Ontdek portemonnee",
     "login": "Inloggen",
+    "loginOrRestore": "Inloggen / Herstellen",
     "logBackInWith": "Log opnieuw in met",
     "headline": "Wallet mogelijk gemaakt door Galoy",
     "startTrialAccount": "Begin met een proefaccount",
@@ -3473,7 +3474,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies je back-upmethode",
       "subtitle": "We raden {provider} aan voor nieuwe gebruikers.",
@@ -3556,17 +3559,37 @@
     "restoreComingSoonTitle": "Binnenkort beschikbaar",
     "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update."
   },
-  "BackupScreen": {
-    "title": "Portemonnee back-uppen",
-    "description": "Kies een back-upmethode om je fondsen te beschermen"
-  },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",
-    "description": "Herstel je portemonnee vanuit een back-up"
+    "description": "Herstel je portemonnee vanuit een back-up",
+    "phraseTitle": "Portemonnee herstellen",
+    "phraseSubtitleStep1": "Voer de eerste 6 woorden van je back-upfrase in",
+    "phraseSubtitleStep2": "Voer de rest van je back-upfrase in",
+    "nextWords": "Volgende 6 woorden",
+    "paste": "Plakken",
+    "enterWord": "Woord",
+    "invalidMnemonic": "Ongeldige back-upfrase. Controleer je woorden en probeer opnieuw.",
+    "restoring": "Je portemonnee wordt hersteld...",
+    "restoreSuccess": "Portemonnee succesvol hersteld",
+    "restoreFailed": "Herstel mislukt. Probeer opnieuw.",
+    "restore": "Portemonnee herstellen",
+    "noBackupFound": "Geen back-up gevonden",
+    "noBackupDescription": "We konden geen back-up vinden. Je kunt je back-upfrase handmatig invoeren.",
+    "enterPassword": "Voer je versleutelingswachtwoord in",
+    "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw."
   },
   "BackupNudge": {
     "title": "Beveilig je portemonnee",
-    "description": "Je fondsen lopen gevaar. Beveilig je portemonnee nu."
+    "description": "Je tegoeden lopen risico. Beveilig je portemonnee nu. Het duurt maar een minuut.",
+    "cta": "Nu beveiligen",
+    "settingsWarning": "Maak een back-up van je portemonnee. Als je dit apparaat verliest, verlies je je tegoeden.",
+    "modalTitle": "Je tegoeden hebben bescherming nodig",
+    "modalDescription": "Je hebt een aanzienlijk saldo. Maak een back-up om verlies te voorkomen.",
+    "secureMe": "Beveilig mij",
+    "trustModelTitle": "Jij hebt de controle",
+    "trustModelDescription": "Jouw sleutels beheren je tegoeden. Transacties worden verwerkt door Spark-operators, niet direct gevalideerd op Bitcoin L1.",
+    "trustModelWarning": "Zeer kleine saldi zijn mogelijk niet economisch om te herstellen naar de Bitcoin-basisketen.",
+    "trustModelDismiss": "Ik begrijp het"
   },
   "StableBalance": {
     "title": "Stabiel saldo",
