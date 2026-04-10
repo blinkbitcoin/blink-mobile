@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "تسجيل الدخول",
+    "loginOrRestore": "تسجيل الدخول / استعادة",
     "logBackInWith": "Log back in with",
     "headline": "المحفظة مشغلة بواسطة Galoy",
     "startTrialAccount": "Start with a trial account",
@@ -3470,7 +3471,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "اختر طريقة النسخ الاحتياطي",
       "subtitle": "نوصي بـ {provider} للمستخدمين الجدد.",
@@ -3553,17 +3556,37 @@
     "restoreComingSoonTitle": "قريباً",
     "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي."
   },
-  "BackupScreen": {
-    "title": "نسخ احتياطي للمحفظة",
-    "description": "اختر طريقة النسخ الاحتياطي لتأمين أموالك"
-  },
   "RestoreScreen": {
     "title": "استعادة المحفظة",
-    "description": "استعد محفظتك من نسخة احتياطية"
+    "description": "استعد محفظتك من نسخة احتياطية",
+    "phraseTitle": "استعادة المحفظة",
+    "phraseSubtitleStep1": "أدخل أول 6 كلمات من عبارة النسخ الاحتياطي",
+    "phraseSubtitleStep2": "أدخل بقية عبارة النسخ الاحتياطي",
+    "nextWords": "الكلمات الـ 6 التالية",
+    "paste": "لصق",
+    "enterWord": "كلمة",
+    "invalidMnemonic": "عبارة نسخ احتياطي غير صالحة. يرجى التحقق من كلماتك والمحاولة مرة أخرى.",
+    "restoring": "جاري استعادة محفظتك...",
+    "restoreSuccess": "تمت استعادة المحفظة بنجاح",
+    "restoreFailed": "فشل في استعادة المحفظة. يرجى المحاولة مرة أخرى.",
+    "restore": "استعادة المحفظة",
+    "noBackupFound": "لم يتم العثور على نسخة احتياطية",
+    "noBackupDescription": "لم نتمكن من العثور على نسخة احتياطية. يمكنك إدخال عبارة النسخ الاحتياطي يدوياً.",
+    "enterPassword": "أدخل كلمة مرور التشفير",
+    "wrongPassword": "كلمة مرور غير صحيحة. يرجى المحاولة مرة أخرى."
   },
   "BackupNudge": {
     "title": "أمّن محفظتك",
-    "description": "أموالك في خطر. أمّن محفظتك الآن."
+    "description": "أموالك في خطر. قم بتأمين محفظتك الآن. يستغرق الأمر دقيقة واحدة فقط.",
+    "cta": "تأمين الآن",
+    "settingsWarning": "قم بنسخ محفظتك احتياطياً. إذا فقدت هذا الجهاز، ستفقد أموالك.",
+    "modalTitle": "أموالك تحتاج حماية",
+    "modalDescription": "لديك رصيد كبير. قم بنسخ محفظتك احتياطياً لمنع الخسارة.",
+    "secureMe": "تأمين",
+    "trustModelTitle": "أنت المتحكم",
+    "trustModelDescription": "مفاتيحك تتحكم في أموالك. تتم معالجة المعاملات بواسطة مشغلي Spark، وليس مباشرة على Bitcoin L1.",
+    "trustModelWarning": "قد لا يكون استرداد الأرصدة الصغيرة جداً إلى سلسلة Bitcoin الأساسية اقتصادياً.",
+    "trustModelDismiss": "أفهم"
   },
   "StableBalance": {
     "title": "الرصيد المستقر",

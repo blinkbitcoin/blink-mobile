@@ -2079,6 +2079,7 @@ const en: BaseTranslation = {
     createAccount: "Create new account",
     exploreWallet: "Explore wallet",
     login: "Login",
+    loginOrRestore: "Log in / Restore",
     logBackInWith: "Log back in with",
     headline: "Wallet powered by Blink",
     startTrialAccount: "Start with a trial account",
@@ -3565,7 +3566,9 @@ const en: BaseTranslation = {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
   },
-  SparkOnboarding: {
+  BackupScreen: {
+    title: "Back up your wallet",
+    description: "Choose a backup method to secure your funds",
     BackupMethod: {
       title: "Choose your backup method",
       subtitle: "We recommend {provider: string} for new users.",
@@ -3657,17 +3660,41 @@ const en: BaseTranslation = {
     restoreComingSoonDescription:
       "Restore flow will be available in a future update.",
   },
-  BackupScreen: {
-    title: "Back up your wallet",
-    description: "Choose a backup method to secure your funds",
-  },
   RestoreScreen: {
     title: "Restore wallet",
     description: "Recover your wallet from a backup",
+    phraseTitle: "Restore wallet",
+    phraseSubtitleStep1: "Enter first 6 words of your backup phrase",
+    phraseSubtitleStep2: "Enter rest of your backup phrase",
+    nextWords: "Next 6 words",
+    paste: "Paste",
+    enterWord: "Word",
+    invalidMnemonic: "Invalid backup phrase. Please check your words and try again.",
+    restoring: "Restoring your wallet...",
+    restoreSuccess: "Wallet restored successfully",
+    restoreFailed: "Failed to restore wallet. Please try again.",
+    restore: "Restore wallet",
+    noBackupFound: "No backup found",
+    noBackupDescription:
+      "We couldn't find a backup. You can enter your backup phrase manually instead.",
+    enterPassword: "Enter your encryption password",
+    wrongPassword: "Incorrect password. Please try again.",
   },
   BackupNudge: {
     title: "Secure your wallet",
-    description: "Your funds are at risk. Secure your wallet now.",
+    description: "Your funds are at risk. Secure your wallet now. It only takes a minute.",
+    cta: "Secure now",
+    settingsWarning: "Backup your wallet. If you lose this device, you will lose your funds.",
+    modalTitle: "Your funds need protection",
+    modalDescription:
+      "You have a significant balance. Back up your wallet to prevent loss.",
+    secureMe: "Secure me",
+    trustModelTitle: "You are in control",
+    trustModelDescription:
+      "Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.",
+    trustModelWarning:
+      "Very small balances may not be economical to recover to the Bitcoin base chain.",
+    trustModelDismiss: "I understand",
   },
   StableBalance: {
     title: "Stable Balance",

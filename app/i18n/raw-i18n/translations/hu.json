@@ -2045,6 +2045,7 @@
     "createAccount": "Új fiók létrehozása",
     "exploreWallet": "Tárca felfedezése",
     "login": "Bejelentkezés",
+    "loginOrRestore": "Bejelentkezés / Visszaállítás",
     "logBackInWith": "Újra bejelentkezés ezzel:",
     "headline": "A Galoy által biztosított tárca",
     "startTrialAccount": "Kezdés próba fiókkal",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Válassz biztonsági mentési módszert",
       "subtitle": "Új felhasználóknak a {provider} ajánlott.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Hamarosan elérhető",
     "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető."
   },
-  "BackupScreen": {
-    "title": "Tárca biztonsági mentése",
-    "description": "Válasszon biztonsági mentési módszert pénzeszközei védelméhez"
-  },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",
-    "description": "Állítsa vissza tárcáját biztonsági mentésből"
+    "description": "Állítsa vissza tárcáját biztonsági mentésből",
+    "phraseTitle": "Tárca visszaállítása",
+    "phraseSubtitleStep1": "Add meg a biztonsági kifejezésed első 6 szavát",
+    "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
+    "nextWords": "Következő 6 szó",
+    "paste": "Beillesztés",
+    "enterWord": "Szó",
+    "invalidMnemonic": "Érvénytelen biztonsági kifejezés. Kérjük, ellenőrizd a szavakat és próbáld újra.",
+    "restoring": "Tárca visszaállítása...",
+    "restoreSuccess": "Tárca sikeresen visszaállítva",
+    "restoreFailed": "Nem sikerült visszaállítani a tárcát. Kérjük, próbáld újra.",
+    "restore": "Tárca visszaállítása",
+    "noBackupFound": "Nem található biztonsági mentés",
+    "noBackupDescription": "Nem találtunk biztonsági mentést. Kézzel is megadhatod a biztonsági kifejezésedet.",
+    "enterPassword": "Add meg a titkosítási jelszavadat",
+    "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra."
   },
   "BackupNudge": {
     "title": "Biztosítsa tárcáját",
-    "description": "Pénzeszközei veszélyben vannak. Biztosítsa tárcáját most."
+    "description": "Pénzeszközeid veszélyben vannak. Biztosítsd a tárcádat most. Csak egy percet vesz igénybe.",
+    "cta": "Biztosítás most",
+    "settingsWarning": "Készíts biztonsági mentést. Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
+    "modalTitle": "Pénzeszközeid védelmet igényelnek",
+    "modalDescription": "Jelentős egyenleged van. Készíts biztonsági mentést a veszteség elkerülése érdekében.",
+    "secureMe": "Biztosíts",
+    "trustModelTitle": "Te irányítasz",
+    "trustModelDescription": "A kulcsaid irányítják a pénzedet. A tranzakciókat Spark operátorok dolgozzák fel, nem közvetlenül a Bitcoin L1-en.",
+    "trustModelWarning": "Nagyon kis egyenlegek visszaállítása a Bitcoin alapláncon nem biztos, hogy gazdaságos.",
+    "trustModelDismiss": "Megértettem"
   },
   "StableBalance": {
     "title": "Stabil egyenleg",

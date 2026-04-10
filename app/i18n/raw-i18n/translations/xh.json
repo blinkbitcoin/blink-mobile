@@ -2062,6 +2062,7 @@
     "createAccount": "Yila iakhawunti entsha",
     "exploreWallet": "Phonononga isipaji",
     "login": "Ngena",
+    "loginOrRestore": "Ngena / Buyisela",
     "logBackInWith": "Ngena kwakhona nge",
     "headline": "Isipaji siqhutywa nguGaloy",
     "startTrialAccount": "Start with a trial account",
@@ -3479,7 +3480,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Khetha indlela yakho yokugcina",
       "subtitle": "Sicebisa {provider} kubasebenzisi abatsha.",
@@ -3562,17 +3565,37 @@
     "restoreComingSoonTitle": "Iyeza kungekudala",
     "restoreComingSoonDescription": "Isici sokubuyisela siya kufumaneka kwisashintsho elizayo."
   },
-  "BackupScreen": {
-    "title": "Gcina isipele sesikhwama",
-    "description": "Khetha indlela yokugcina ukuze ukhusele imali yakho"
-  },
   "RestoreScreen": {
     "title": "Buyisela isikhwama",
-    "description": "Buyisela isikhwama sakho kwikhophi"
+    "description": "Buyisela isikhwama sakho kwikhophi",
+    "phraseTitle": "Buyisela isipaji",
+    "phraseSubtitleStep1": "Faka amagama okuqala a-6 omgca wakho wokugcina",
+    "phraseSubtitleStep2": "Faka amanye amagama omgca wakho wokugcina",
+    "nextWords": "Amagama a-6 alandelayo",
+    "paste": "Ncamathisela",
+    "enterWord": "Igama",
+    "invalidMnemonic": "Umgca wokugcina ongekho semthethweni. Nceda ujonge amagama akho uze uzame kwakhona.",
+    "restoring": "Kubuyiselwa isipaji sakho...",
+    "restoreSuccess": "Isipaji sibuyiselwe ngempumelelo",
+    "restoreFailed": "Akuphumelelanga ukubuyisela isipaji. Nceda uzame kwakhona.",
+    "restore": "Buyisela isipaji",
+    "noBackupFound": "Akukho gcino lifunyenweyo",
+    "noBackupDescription": "Asikwazanga ukufumana igcino. Ungafaka umgca wakho wokugcina ngesandla.",
+    "enterPassword": "Faka iphasiwedi yakho yokufihla",
+    "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona."
   },
   "BackupNudge": {
     "title": "Khusela isikhwama sakho",
-    "description": "Imali yakho isengozini. Khusela isikhwama sakho ngoku."
+    "description": "Imali yakho isengozini. Khusela isipaji sakho ngoku. Kuthatha umzuzu omnye kuphela.",
+    "cta": "Khusela ngoku",
+    "settingsWarning": "Gcina isipaji sakho. Ukuba ulahlekelwa sesi sixhobo, uya kulahlekelwa yimali yakho.",
+    "modalTitle": "Imali yakho ifuna ukukhuselwa",
+    "modalDescription": "Unebhalansi ebalulekileyo. Gcina isipaji sakho ukuthintela ukulahlekelwa.",
+    "secureMe": "Ndikhusele",
+    "trustModelTitle": "Nguwe olawulayo",
+    "trustModelDescription": "Izitshixo zakho zilawula imali yakho. Iintlawulo zenziwa ngabaqhubi beSpark, haziqinisekiswa ngqo kwi-Bitcoin L1.",
+    "trustModelWarning": "Ibhalansi encinane kakhulu inokungabi yoqoqosho ukubuyisela kumxokelelwane wesiseko we-Bitcoin.",
+    "trustModelDismiss": "Ndiyaqonda"
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",
