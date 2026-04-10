@@ -21,7 +21,11 @@ const initializeLogging = (() => {
   return () => {
     if (done) return
     done = true
-    initLogging(undefined, createSdkLogListener(), undefined)
+    try {
+      initLogging(undefined, createSdkLogListener(), undefined)
+    } catch {
+      // initLogging can fail if called after SDK state changes — non-fatal
+    }
   }
 })()
 
