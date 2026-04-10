@@ -69,7 +69,16 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   )
 
   return {
-    ...bip39,
+    words: bip39.words,
+    stepWords: bip39.stepWords,
+    offset: bip39.offset,
+    activeIndex: bip39.activeIndex,
+    setActiveIndex: bip39.setActiveIndex,
+    suggestions: bip39.suggestions,
+    selectSuggestion: bip39.selectSuggestion,
+    handlePaste: bip39.handlePaste,
+    stepFilled: bip39.stepFilled,
+    allFilled: bip39.allFilled,
     updateWord,
     handlePasteFromClipboard,
     isValid,
