@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Alert, Pressable, View } from "react-native"
+import { Pressable, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -56,10 +56,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       return
     }
 
-    Alert.alert(
-      LL.AccountTypeSelectionScreen.restoreComingSoonTitle(),
-      LL.AccountTypeSelectionScreen.restoreComingSoonDescription(),
-    )
+    navigation.navigate("sparkRestoreMethodScreen")
   }
 
   const isSelected = (option: AccountOption) => selected === option
@@ -69,9 +66,9 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       <View style={styles.wrapper}>
         <View style={styles.body}>
           <Text style={styles.description}>
-            {selected
-              ? LL.AccountTypeSelectionScreen.descriptionSelected()
-              : LL.AccountTypeSelectionScreen.descriptionDefault()}
+            {mode === SelectionMode.Create
+              ? LL.AccountTypeSelectionScreen.descriptionDefault()
+              : LL.AccountTypeSelectionScreen.descriptionSelected()}
           </Text>
 
           <View style={styles.grid}>
