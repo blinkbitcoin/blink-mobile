@@ -9,6 +9,7 @@ import { useAppConfig, useKeychainBackup } from "@app/hooks"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
 import { toastShow } from "@app/utils/toast"
 
 export const useBackupMethods = () => {
@@ -16,6 +17,7 @@ export const useBackupMethods = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { appConfig } = useAppConfig()
   const mnemonic = useWalletMnemonic()
+  const { setBackupCompleted } = useBackupState()
   const isCloudBackupAvailable = Platform.OS !== "ios"
 
   const { save: saveToKeychain, loading: keychainLoading } = useKeychainBackup(
@@ -26,24 +28,25 @@ export const useBackupMethods = () => {
     const success = await saveToKeychain(mnemonic)
     if (!success) {
       toastShow({
-        message: LL.SparkOnboarding.BackupMethod.keychainFailed(),
+        message: LL.BackupScreen.BackupMethod.keychainFailed(),
         LL,
       })
       return
     }
 
+    setBackupCompleted("keychain")
     toastShow({
-      message: LL.SparkOnboarding.BackupMethod.keychainSaved(),
+      message: LL.BackupScreen.BackupMethod.keychainSaved(),
       type: "success",
       LL,
     })
     navigation.navigate("sparkBackupSuccessScreen")
-  }, [saveToKeychain, navigation, LL, mnemonic])
+  }, [saveToKeychain, navigation, LL, mnemonic, setBackupCompleted])
 
   const handleCloudBackup = useCallback(() => {
     if (!isCloudBackupAvailable) {
       toastShow({
-        message: LL.SparkOnboarding.BackupMethod.iOSComingSoon(),
+        message: LL.BackupScreen.BackupMethod.iOSComingSoon(),
         LL,
       })
       return
