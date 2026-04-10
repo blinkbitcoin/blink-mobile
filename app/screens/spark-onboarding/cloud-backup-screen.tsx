@@ -47,8 +47,8 @@ export const SparkCloudBackupScreen: React.FC = () => {
             <IconHero
               icon="cloud"
               iconColor={colors.black}
-              title={LL.SparkOnboarding.CloudBackup.title()}
-              subtitle={LL.SparkOnboarding.CloudBackup.description({
+              title={LL.BackupScreen.CloudBackup.title()}
+              subtitle={LL.BackupScreen.CloudBackup.description({
                 provider: cloudProvider,
               })}
             />
@@ -56,7 +56,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
 
           <View style={styles.formContainer}>
             <CheckboxRow
-              label={LL.SparkOnboarding.CloudBackup.encryptCheckbox()}
+              label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
               centered
@@ -66,29 +66,29 @@ export const SparkCloudBackupScreen: React.FC = () => {
             {isEncrypted && (
               <View style={styles.encryptionFields}>
                 <PasswordInput
-                  label={LL.SparkOnboarding.CloudBackup.password()}
+                  label={LL.BackupScreen.CloudBackup.password()}
                   value={password}
                   onChangeText={setPassword}
-                  placeholder={LL.SparkOnboarding.CloudBackup.passwordPlaceholder()}
+                  placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
                   {...testProps("cloud-password-input")}
                 />
                 <PasswordInput
-                  label={LL.SparkOnboarding.CloudBackup.confirmPassword()}
+                  label={LL.BackupScreen.CloudBackup.confirmPassword()}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  placeholder={LL.SparkOnboarding.CloudBackup.confirmPasswordPlaceholder()}
+                  placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
                   {...testProps("cloud-confirm-password-input")}
                 />
 
                 <InfoBanner
-                  title={LL.SparkOnboarding.CloudBackup.importantTitle()}
+                  title={LL.BackupScreen.CloudBackup.importantTitle()}
                   icon="warning"
                 >
                   <RichText
-                    text={LL.SparkOnboarding.CloudBackup.importantMessage({
-                      bold: `<bold>${LL.SparkOnboarding.CloudBackup.importantMessageBold()}</bold>`,
+                    text={LL.BackupScreen.CloudBackup.importantMessage({
+                      bold: `<bold>${LL.BackupScreen.CloudBackup.importantMessageBold()}</bold>`,
                     })}
                   />
                 </InfoBanner>
@@ -99,7 +99,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={LL.SparkOnboarding.CloudBackup.continueButton()}
+            title={LL.BackupScreen.CloudBackup.continueButton()}
             disabled={!isValid}
             loading={loading}
             onPress={handleBackup}

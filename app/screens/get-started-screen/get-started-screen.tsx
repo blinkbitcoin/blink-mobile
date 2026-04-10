@@ -110,7 +110,11 @@ export const GetStartedScreen: React.FC = () => {
             onPress={handleCreateAccount}
           />
           <GaloySecondaryButton
-            title={LL.GetStartedScreen.login()}
+            title={
+              nonCustodialEnabled
+                ? LL.GetStartedScreen.loginOrRestore()
+                : LL.GetStartedScreen.login()
+            }
             onPress={handleLogin}
             containerStyle={styles.secondaryButtonContainer}
           />

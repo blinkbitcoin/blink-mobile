@@ -11,6 +11,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { testProps } from "@app/utils/testProps"
 import {
   MigrationCheckpoint,
   useMigrationCheckpoint,
@@ -66,9 +67,9 @@ export const SparkBackupAlertsScreen: React.FC = () => {
   }
 
   const checkLabels = [
-    LL.SparkOnboarding.ManualBackup.Alerts.check1(),
-    LL.SparkOnboarding.ManualBackup.Alerts.check2(),
-    LL.SparkOnboarding.ManualBackup.Alerts.check3(),
+    LL.BackupScreen.ManualBackup.Alerts.check1(),
+    LL.BackupScreen.ManualBackup.Alerts.check2(),
+    LL.BackupScreen.ManualBackup.Alerts.check3(),
   ]
 
   return (
@@ -78,7 +79,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
           <IconHero
             icon="eye-slash"
             iconColor={colors.primary}
-            title={LL.SparkOnboarding.ManualBackup.Alerts.title()}
+            title={LL.BackupScreen.ManualBackup.Alerts.title()}
           />
 
           <View style={styles.checkboxList}>
@@ -87,6 +88,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
                 label={checkLabels[0]}
                 isChecked={checks[0]}
                 onPress={() => toggle(0)}
+                {...testProps("backup-alert-check-0")}
               />
             </View>
 
@@ -96,6 +98,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
                   label={checkLabels[1]}
                   isChecked={checks[1]}
                   onPress={() => toggle(1)}
+                  {...testProps("backup-alert-check-1")}
                 />
               </Animated.View>
             )}
@@ -106,6 +109,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
                   label={checkLabels[2]}
                   isChecked={checks[2]}
                   onPress={() => toggle(2)}
+                  {...testProps("backup-alert-check-2")}
                 />
               </Animated.View>
             )}
@@ -119,6 +123,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
             onPress={() =>
               navigation.navigate("sparkBackupPhraseScreen", { step: PhraseStep.First })
             }
+            {...testProps("backup-alerts-continue")}
           />
         </View>
       </View>
