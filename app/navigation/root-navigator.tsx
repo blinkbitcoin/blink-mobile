@@ -134,6 +134,11 @@ import {
   SparkWalletCreationScreen,
 } from "@app/screens/spark-onboarding"
 import {
+  SparkRestoreMethodScreen,
+  SparkRestorePhraseScreen,
+  SparkCloudRestoreScreen,
+} from "@app/screens/spark-onboarding/restore"
+import {
   SparkMigrationExplainerScreen,
   TransferringFundsScreen,
 } from "@app/screens/account-migration"
@@ -732,14 +737,14 @@ export const RootStack = () => {
         name="sparkBackupPhraseScreen"
         component={SparkBackupPhraseScreen}
         options={{
-          title: LL.SparkOnboarding.ManualBackup.Phrase.headerTitle(),
+          title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
         }}
       />
       <RootNavigator.Screen
         name="sparkBackupConfirmScreen"
         component={SparkBackupConfirmScreen}
         options={{
-          title: LL.SparkOnboarding.ManualBackup.Confirm.headerTitle(),
+          title: LL.BackupScreen.ManualBackup.Confirm.headerTitle(),
         }}
       />
       <RootNavigator.Screen
@@ -761,6 +766,21 @@ export const RootStack = () => {
         name="sparkMigrationTransferringFunds"
         component={TransferringFundsScreen}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="sparkRestoreMethodScreen"
+        component={SparkRestoreMethodScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkRestorePhraseScreen"
+        component={SparkRestorePhraseScreen}
+        options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
+      />
+      <RootNavigator.Screen
+        name="sparkCloudRestoreScreen"
+        component={SparkCloudRestoreScreen}
+        options={{ title: "" }}
       />
     </RootNavigator.Navigator>
   )
