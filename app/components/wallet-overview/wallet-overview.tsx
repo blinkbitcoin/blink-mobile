@@ -90,7 +90,7 @@ const WalletOverview: React.FC<Props> = ({
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
 
-  if (isAuthed) {
+  if (isAuthed || hasWallets) {
     const btcWallet = getBtcWallet(resolvedWallets)
     const usdWallet = getUsdWallet(resolvedWallets)
 
