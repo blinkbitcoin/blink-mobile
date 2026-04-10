@@ -239,7 +239,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const loading = isSelfCustodial
-    ? !activeWallet.isReady
+    ? activeWallet.status === "loading"
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
