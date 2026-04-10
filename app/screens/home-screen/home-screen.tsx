@@ -375,10 +375,11 @@ export const HomeScreen: React.FC = () => {
   // debug code. verify that we have 2 wallets. mobile doesn't work well with only one wallet
   // TODO: add this code in a better place
   React.useEffect(() => {
+    if (isSelfCustodial) return
     if (wallets?.length !== undefined && wallets?.length !== 2) {
       Alert.alert(LL.HomeScreen.walletCountNotTwo())
     }
-  }, [wallets, LL])
+  }, [wallets, LL, isSelfCustodial])
 
   // Trigger the upgrade trial account modal
   useFocusEffect(
