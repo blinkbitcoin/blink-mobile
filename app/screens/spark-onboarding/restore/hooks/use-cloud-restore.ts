@@ -9,7 +9,7 @@ import {
   isEncryptedBackup,
   parseBackupPayload,
   parseEncryptedBackupPayload,
-} from "@app/utils/spark-backup-format"
+} from "@app/utils/backup-payload"
 
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
 

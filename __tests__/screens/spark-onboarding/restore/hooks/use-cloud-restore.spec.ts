@@ -22,7 +22,7 @@ jest.mock("@app/config/appinfo", () => ({
   getSparkDriveBackupFilename: (name: string) => `spark-backup-${name}.json`,
 }))
 
-jest.mock("@app/utils/spark-backup-format", () => ({
+jest.mock("@app/utils/backup-payload", () => ({
   isEncryptedBackup: (content: string) => {
     try {
       return JSON.parse(content)?.encrypted === true
@@ -157,7 +157,7 @@ describe("useCloudRestore", () => {
 
   it("shows password error on decrypt failure", async () => {
     const mockParseEncrypted = jest.requireMock(
-      "@app/utils/spark-backup-format",
+      "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
     mockParseEncrypted.mockImplementationOnce(() => {
       throw new Error("decrypt failed")

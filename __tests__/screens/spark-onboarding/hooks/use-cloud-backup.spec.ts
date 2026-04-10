@@ -47,7 +47,7 @@ jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
   }),
 }))
 
-jest.mock("@app/utils/spark-backup-format", () => ({
+jest.mock("@app/utils/backup-payload", () => ({
   buildBackupPayload: jest.fn(
     (_mnemonic: string, opts: { password?: string; version?: number }) =>
       JSON.stringify({
