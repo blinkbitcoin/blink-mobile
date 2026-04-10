@@ -1,4 +1,8 @@
-import { getBip39Suggestions, BIP39_WORDLIST_EN } from "@app/utils/bip39-wordlist"
+import {
+  getBip39Suggestions,
+  BIP39_WORDLIST_EN,
+  splitWords,
+} from "@app/utils/bip39-wordlist"
 
 describe("BIP39_WORDLIST_EN", () => {
   it("contains 2048 words", () => {
@@ -53,5 +57,27 @@ describe("getBip39Suggestions", () => {
 
   it("returns empty array for non-matching prefix", () => {
     expect(getBip39Suggestions("zzz")).toEqual([])
+  })
+})
+
+describe("splitWords", () => {
+  it("splits text into lowercase words", () => {
+    expect(splitWords("Hello World")).toEqual(["hello", "world"])
+  })
+
+  it("handles multiple spaces", () => {
+    expect(splitWords("one   two  three")).toEqual(["one", "two", "three"])
+  })
+
+  it("trims whitespace", () => {
+    expect(splitWords("  hello  ")).toEqual(["hello"])
+  })
+
+  it("handles tabs and newlines", () => {
+    expect(splitWords("one\ttwo\nthree")).toEqual(["one", "two", "three"])
+  })
+
+  it("converts to lowercase", () => {
+    expect(splitWords("ABANDON ABILITY")).toEqual(["abandon", "ability"])
   })
 })
