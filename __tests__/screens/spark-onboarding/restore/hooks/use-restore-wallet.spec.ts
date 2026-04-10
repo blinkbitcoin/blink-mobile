@@ -103,6 +103,34 @@ describe("useRestoreWallet", () => {
     )
   })
 
+  it("second restore call while first is in-flight still calls bridge", async () => {
+    let resolveFirst: () => void
+    mockRestore.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveFirst = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    act(() => {
+      result.current.restore("mnemonic1")
+    })
+
+    expect(result.current.status).toBe(RestoreWalletStatus.Restoring)
+
+    await act(async () => {
+      await result.current.restore("mnemonic2")
+    })
+
+    expect(mockRestore).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      resolveFirst!()
+    })
+  })
+
   it("sets restoring status during restore", async () => {
     let resolveRestore: () => void
     mockRestore.mockReturnValue(
