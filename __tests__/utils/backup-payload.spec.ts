@@ -22,7 +22,7 @@ import {
   isEncryptedBackup,
   parseBackupPayload,
   parseEncryptedBackupPayload,
-} from "@app/utils/spark-backup-format"
+} from "@app/utils/backup-payload"
 
 describe("spark backup format", () => {
   const mnemonic =

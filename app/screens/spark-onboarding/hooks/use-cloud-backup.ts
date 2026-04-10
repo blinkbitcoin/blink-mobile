@@ -11,7 +11,7 @@ import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { confirmDialog } from "@app/utils/confirm-dialog"
-import { buildBackupPayload } from "@app/utils/spark-backup-format"
+import { buildBackupPayload } from "@app/utils/backup-payload"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
