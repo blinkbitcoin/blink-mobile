@@ -7,6 +7,9 @@ type Bip39SuggestionsOptions = {
   maxResults?: number
 }
 
+export const splitWords = (text: string): string[] =>
+  text.trim().toLowerCase().split(/\s+/)
+
 export const getBip39Suggestions = (
   prefix: string,
   options?: Bip39SuggestionsOptions,
