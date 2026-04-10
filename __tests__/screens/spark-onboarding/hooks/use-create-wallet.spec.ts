@@ -10,6 +10,7 @@ const mockUpdateState = jest.fn()
 const mockDispatch = jest.fn()
 const mockRecordError = jest.fn()
 const mockReinitSdk = jest.fn()
+const mockResetBackupState = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialCreateWallet: () => mockCreateWallet(),
@@ -30,6 +31,10 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
+}))
+
+jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+  useBackupState: () => ({ resetBackupState: mockResetBackupState }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -86,7 +91,7 @@ describe("useCreateWallet", () => {
     })
   })
 
-  it("reinits SDK on success", async () => {
+  it("reinits SDK and resets backup state on success", async () => {
     const { result } = renderHook(() => useCreateWallet())
 
     await act(async () => {
@@ -94,6 +99,7 @@ describe("useCreateWallet", () => {
     })
 
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+    expect(mockResetBackupState).toHaveBeenCalledTimes(1)
   })
 
   it("navigates to Primary on success", async () => {
@@ -152,5 +158,6 @@ describe("useCreateWallet", () => {
     expect(mockUpdateState).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReinitSdk).not.toHaveBeenCalled()
+    expect(mockResetBackupState).not.toHaveBeenCalled()
   })
 })

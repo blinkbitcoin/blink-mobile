@@ -11,6 +11,8 @@ const mockNavigate = jest.fn()
 const mockDeleteMnemonic = jest.fn()
 const mockRecordError = jest.fn()
 const mockToastShow = jest.fn()
+const mockReinitSdk = jest.fn()
+const mockResetBackupState = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
@@ -32,6 +34,14 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: { deleteMnemonic: () => mockDeleteMnemonic() },
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
+}))
+
+jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+  useBackupState: () => ({ resetBackupState: mockResetBackupState }),
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -71,6 +81,8 @@ describe("useRestoreWallet", () => {
 
     expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+    expect(mockResetBackupState).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
