@@ -23,17 +23,21 @@ jest.mock("@app/config/appinfo", () => ({
 }))
 
 jest.mock("@app/utils/spark-backup-format", () => ({
-  parseBackupPayload: (content: string) => {
-    const parsed = JSON.parse(content) as { mnemonic: string; encrypted?: boolean }
-    if (parsed.encrypted) {
-      throw new Error("Encrypted payload requires password")
+  isEncryptedBackup: (content: string) => {
+    try {
+      return JSON.parse(content)?.encrypted === true
+    } catch {
+      return false
     }
-    return { mnemonic: parsed.mnemonic }
   },
-  parseEncryptedBackupPayload: (content: string, _password: string) => {
+  parseBackupPayload: (content: string) => {
     const parsed = JSON.parse(content) as { mnemonic: string }
     return { mnemonic: parsed.mnemonic }
   },
+  parseEncryptedBackupPayload: jest.fn((content: string, _password: string) => {
+    const parsed = JSON.parse(content) as { mnemonic: string }
+    return { mnemonic: parsed.mnemonic }
+  }),
 }))
 
 jest.mock("@app/screens/spark-onboarding/restore/hooks/use-restore-wallet", () => ({
@@ -110,6 +114,93 @@ describe("useCloudRestore", () => {
     await waitFor(() => {
       expect(result.current.isPassword).toBe(true)
     })
+  })
+
+  it("shows error for corrupted/malformed JSON", async () => {
+    mockDownload.mockResolvedValue({
+      success: true,
+      content: "not valid json {{{",
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("decrypts encrypted backup with correct password", async () => {
+    mockDownload.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        encrypted: true,
+        mnemonic: "decrypted words",
+        data: "enc",
+        iv: "iv",
+        salt: "salt",
+      }),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(mockRestore).toHaveBeenCalledWith("decrypted words")
+  })
+
+  it("shows password error on decrypt failure", async () => {
+    const mockParseEncrypted = jest.requireMock(
+      "@app/utils/spark-backup-format",
+    ).parseEncryptedBackupPayload
+    mockParseEncrypted.mockImplementationOnce(() => {
+      throw new Error("decrypt failed")
+    })
+
+    mockDownload.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        encrypted: true,
+        data: "enc",
+        iv: "iv",
+        salt: "salt",
+      }),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(result.current.passwordError).toBe("Wrong password")
+  })
+
+  it("does not fire attemptDownload twice on rerender", async () => {
+    mockDownload.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({ mnemonic: "word1 word2 word3" }),
+    })
+
+    const { rerender } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(mockRestore).toHaveBeenCalledTimes(1)
+    })
+
+    rerender({})
+
+    expect(mockStartSession).toHaveBeenCalledTimes(1)
   })
 
   it("reports sign-in errors to crashlytics", async () => {
