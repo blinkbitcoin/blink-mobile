@@ -21,8 +21,7 @@ jest.mock("@rn-vui/themed", () => {
   }
   return {
     makeStyles:
-      (fn: (theme: { colors: typeof colors }) => Record<string, object>) =>
-      () =>
+      (fn: (theme: { colors: typeof colors }) => Record<string, object>) => () =>
         fn({ colors }),
     Text: ({ children, ...props }: { children: React.ReactNode }) =>
       React.createElement("Text", props, children),
