@@ -35,7 +35,7 @@ export const useCloudBackupForm = () => {
     if (!passwordValidation) return undefined
     if (passwordValidation.valid) return undefined
     if (passwordValidation.errors.includes(PasswordIssue.TooShort))
-      return LL.SparkOnboarding.CloudBackup.passwordTooShort()
+      return LL.BackupScreen.CloudBackup.passwordTooShort()
     if (passwordValidation.errors.includes(PasswordIssue.CommonPassword))
       return LL.common.passwordCommon()
     if (passwordValidation.errors.includes(PasswordIssue.TooWeak))
@@ -47,7 +47,7 @@ export const useCloudBackupForm = () => {
     if (!isEncrypted) return undefined
     if (confirmPassword.length === 0) return undefined
     if (confirmPassword !== password)
-      return LL.SparkOnboarding.CloudBackup.passwordMismatch()
+      return LL.BackupScreen.CloudBackup.passwordMismatch()
     return undefined
   }, [isEncrypted, confirmPassword, password, LL])
 

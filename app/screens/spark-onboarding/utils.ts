@@ -5,8 +5,8 @@ import { pickRandomIndices } from "@app/utils/helper"
 
 export const getCloudProviderName = (LL: TranslationFunctions): string =>
   Platform.OS === "ios"
-    ? LL.SparkOnboarding.BackupMethod.appleICloud()
-    : LL.SparkOnboarding.BackupMethod.googleDrive()
+    ? LL.BackupScreen.BackupMethod.appleICloud()
+    : LL.BackupScreen.BackupMethod.googleDrive()
 
 export const buildConfirmChallenges = (
   words: readonly string[],
