@@ -171,7 +171,11 @@ export const HomeScreen: React.FC = () => {
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
-  const { seen: trustModelSeen, markAsSeen: markTrustModelSeen } = useTrustModelSeen()
+  const {
+    seen: trustModelSeen,
+    loaded: trustModelLoaded,
+    markAsSeen: markTrustModelSeen,
+  } = useTrustModelSeen()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -480,7 +484,8 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("profileScreen")
   }
 
-  const showTrustModel = isSelfCustodial && !trustModelSeen && satsBalance > 0
+  const showTrustModel =
+    isSelfCustodial && trustModelLoaded && !trustModelSeen && satsBalance > 0
 
   return (
     <Screen headerShown={false}>
