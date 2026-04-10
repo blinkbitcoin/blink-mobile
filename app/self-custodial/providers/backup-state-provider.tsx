@@ -8,6 +8,7 @@ import React, {
 } from "react"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 const BACKUP_STATE_KEY = "backupState"
 
@@ -70,7 +71,11 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
 
   const persist = useCallback((state: BackupState) => {
     setBackupState(state)
-    AsyncStorage.setItem(BACKUP_STATE_KEY, JSON.stringify(state))
+    AsyncStorage.setItem(BACKUP_STATE_KEY, JSON.stringify(state)).catch((err) => {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Backup state persist failed: ${err}`),
+      )
+    })
   }, [])
 
   const setBackupCompleted = useCallback(
