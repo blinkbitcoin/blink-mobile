@@ -88,11 +88,11 @@ describe("SparkBackupMethodScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.BackupMethod.title())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.title())).toBeTruthy()
     expect(
       getByText(
-        LL.SparkOnboarding.BackupMethod.subtitle({
-          provider: LL.SparkOnboarding.BackupMethod.appleICloud(),
+        LL.BackupScreen.BackupMethod.subtitle({
+          provider: LL.BackupScreen.BackupMethod.appleICloud(),
         }),
       ),
     ).toBeTruthy()
@@ -105,9 +105,9 @@ describe("SparkBackupMethodScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.BackupMethod.appleICloud())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.BackupMethod.passwordManager())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.BackupMethod.manualBackup())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.appleICloud())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
   it("calls handleCloudBackup on cloud provider press", () => {
@@ -117,7 +117,7 @@ describe("SparkBackupMethodScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.BackupMethod.appleICloud()))
+    fireEvent.press(getByText(LL.BackupScreen.BackupMethod.appleICloud()))
     expect(mockHandleCloudBackup).toHaveBeenCalled()
   })
 
@@ -128,7 +128,7 @@ describe("SparkBackupMethodScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.BackupMethod.manualBackup()))
+    fireEvent.press(getByText(LL.BackupScreen.BackupMethod.manualBackup()))
     expect(mockHandleManualBackup).toHaveBeenCalled()
   })
 
@@ -140,7 +140,7 @@ describe("SparkBackupMethodScreen", () => {
     )
 
     await act(async () => {
-      fireEvent.press(getByText(LL.SparkOnboarding.BackupMethod.passwordManager()))
+      fireEvent.press(getByText(LL.BackupScreen.BackupMethod.passwordManager()))
     })
 
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
@@ -156,10 +156,10 @@ describe("SparkBackupMethodScreen", () => {
     )
 
     expect(
-      getByTestId(`primary-${LL.SparkOnboarding.BackupMethod.appleICloud()}`).props
+      getByTestId(`primary-${LL.BackupScreen.BackupMethod.appleICloud()}`).props
         .accessibilityState,
     ).toEqual({ disabled: true })
-    expect(getByText(LL.SparkOnboarding.BackupMethod.iOSComingSoon())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.iOSComingSoon())).toBeTruthy()
   })
 
   it("saves BackupMethod checkpoint on mount", () => {
