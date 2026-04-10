@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react"
 
+import crashlytics from "@react-native-firebase/crashlytics"
 import * as Keychain from "react-native-keychain"
 
 export const useKeychainBackup = (service: string) => {
@@ -32,7 +33,10 @@ export const useKeychainBackup = (service: string) => {
       const credentials = await Keychain.getGenericPassword({ service })
       if (!credentials) return null
       return credentials.password
-    } catch {
+    } catch (err) {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Keychain read failed: ${err}`),
+      )
       return null
     }
   }, [service])

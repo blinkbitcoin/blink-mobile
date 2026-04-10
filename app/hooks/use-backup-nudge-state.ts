@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -38,7 +39,11 @@ export const useBackupNudgeState = (): BackupNudgeState => {
   const dismissBanner = useCallback(() => {
     const now = Date.now()
     setDismissedAt(now)
-    AsyncStorage.setItem(DISMISSAL_KEY, String(now))
+    AsyncStorage.setItem(DISMISSAL_KEY, String(now)).catch((err) => {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Nudge dismiss write failed: ${err}`),
+      )
+    })
   }, [])
 
   const isBackedUp = backupState.status === BackupStatus.Completed
@@ -65,7 +70,7 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     !shouldShowModal &&
     !isDismissedRecently
 
-  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial
+  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial && loaded
 
   return {
     shouldShowBanner,
