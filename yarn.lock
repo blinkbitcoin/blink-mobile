@@ -22654,6 +22654,11 @@ react-native-safe-area-context@^5.6.0:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.6.1.tgz#cb4d249ef1a6f7e8fd0cfdfa9764838dffda26b6"
   integrity sha512-/wJE58HLEAkATzhhX1xSr+fostLsK8Q97EfpfMDKo8jlOc1QKESSX/FQrhk7HhQH/2uSaox4Y86sNaI02kteiA==
 
+react-native-screenguard@^2.0.0-beta5:
+  version "2.0.0-beta5"
+  resolved "https://registry.yarnpkg.com/react-native-screenguard/-/react-native-screenguard-2.0.0-beta5.tgz#a2e11e585bd67384d77590950af94a3c2144667b"
+  integrity sha512-v8Lnv2am+COzEGKvj6J4UbpQsjHixkSqSJ+tgJtDvwck2Dil1vwOhEJBbngXYgj63x4iFlV9gE4gAOWG60avAg==
+
 "react-native-screens@>=4.0 <4.5":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.4.0.tgz#3fcbcdf1bbb1be2736b10d43edc3d4e69c37b5aa"
