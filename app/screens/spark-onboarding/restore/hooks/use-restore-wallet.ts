@@ -7,6 +7,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { DefaultAccountId } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -30,6 +31,7 @@ export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
+  const { retry: reinitSdk } = useSelfCustodialWallet()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
 
   const activateAccount = useCallback(() => {
@@ -45,6 +47,7 @@ export const useRestoreWallet = () => {
       try {
         await selfCustodialRestoreWallet(mnemonic)
         activateAccount()
+        reinitSdk()
         navigation.navigate("sparkBackupSuccessScreen")
       } catch (err) {
         await KeyStoreWrapper.deleteMnemonic().catch(() => {})
@@ -54,7 +57,7 @@ export const useRestoreWallet = () => {
         throw err
       }
     },
-    [activateAccount, navigation, LL],
+    [activateAccount, reinitSdk, navigation, LL],
   )
 
   return { restore, status }
