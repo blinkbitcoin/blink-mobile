@@ -18,6 +18,8 @@ const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
+const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
+const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
 
@@ -50,6 +52,8 @@ type RemoteConfig = {
   [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
+  [BackupNudgeBannerThresholdKey]: number
+  [BackupNudgeModalThresholdKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
 }
@@ -74,6 +78,8 @@ const defaultRemoteConfig: RemoteConfig = {
   cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  backupNudgeBannerThreshold: 2100,
+  backupNudgeModalThreshold: 21000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
 }
@@ -164,6 +170,14 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
 
+        const backupNudgeBannerThreshold = remoteConfigInstance()
+          .getValue(BackupNudgeBannerThresholdKey)
+          .asNumber()
+
+        const backupNudgeModalThreshold = remoteConfigInstance()
+          .getValue(BackupNudgeModalThresholdKey)
+          .asNumber()
+
         const nonCustodialEnabled = remoteConfigInstance()
           .getValue(NonCustodialEnabledKey)
           .asBoolean()
@@ -195,6 +209,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
+          backupNudgeBannerThreshold,
+          backupNudgeModalThreshold,
           nonCustodialEnabled,
           stableBalanceEnabled,
         })
