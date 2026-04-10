@@ -88,7 +88,7 @@ export const SparkRestoreMethodScreen: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   errorText: {
     textAlign: "center",
-    color: colors.red,
+    color: colors.error,
     fontSize: 14,
     marginTop: 12,
   },
