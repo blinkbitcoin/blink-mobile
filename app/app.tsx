@@ -23,6 +23,7 @@ import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
 import { CustodialWalletProvider } from "./custodial/providers/wallet-provider"
+import { BackupStateProvider } from "./self-custodial/providers/backup-state-provider"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet-provider"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -58,24 +59,26 @@ export const App = () => (
             <FeatureFlagContextProvider>
               <CustodialWalletProvider>
                 <SelfCustodialWalletProvider>
-                  <ActionsProvider>
-                    <NavigationContainerWrapper>
-                      <ErrorBoundary FallbackComponent={ErrorScreen}>
-                        <RootSiblingParent>
-                          <BottomSheetModalProvider>
-                            <NotificationsProvider>
-                              <AppStateWrapper />
-                              <PushNotificationComponent />
-                              <RootStack />
-                              <NetworkErrorComponent />
-                              <ActionModals />
-                            </NotificationsProvider>
-                            <GaloyToast />
-                          </BottomSheetModalProvider>
-                        </RootSiblingParent>
-                      </ErrorBoundary>
-                    </NavigationContainerWrapper>
-                  </ActionsProvider>
+                  <BackupStateProvider>
+                    <ActionsProvider>
+                      <NavigationContainerWrapper>
+                        <ErrorBoundary FallbackComponent={ErrorScreen}>
+                          <RootSiblingParent>
+                            <BottomSheetModalProvider>
+                              <NotificationsProvider>
+                                <AppStateWrapper />
+                                <PushNotificationComponent />
+                                <RootStack />
+                                <NetworkErrorComponent />
+                                <ActionModals />
+                              </NotificationsProvider>
+                              <GaloyToast />
+                            </BottomSheetModalProvider>
+                          </RootSiblingParent>
+                        </ErrorBoundary>
+                      </NavigationContainerWrapper>
+                    </ActionsProvider>
+                  </BackupStateProvider>
                 </SelfCustodialWalletProvider>
               </CustodialWalletProvider>
             </FeatureFlagContextProvider>
