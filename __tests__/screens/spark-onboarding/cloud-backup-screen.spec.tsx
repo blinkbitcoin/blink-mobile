@@ -62,7 +62,7 @@ describe("SparkCloudBackupScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.CloudBackup.title())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.title())).toBeTruthy()
   })
 
   it("renders checkbox and continue button", () => {
@@ -72,8 +72,8 @@ describe("SparkCloudBackupScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.CloudBackup.encryptCheckbox())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.CloudBackup.continueButton())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.encryptCheckbox())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.continueButton())).toBeTruthy()
   })
 
   it("does not show password fields when encryption is off", () => {
@@ -83,7 +83,7 @@ describe("SparkCloudBackupScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(queryByText(LL.SparkOnboarding.CloudBackup.password())).toBeNull()
+    expect(queryByText(LL.BackupScreen.CloudBackup.password())).toBeNull()
   })
 
   it("shows password fields and warning when encryption is on", () => {
@@ -95,9 +95,9 @@ describe("SparkCloudBackupScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.CloudBackup.password())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.CloudBackup.confirmPassword())).toBeTruthy()
-    expect(getByText(LL.SparkOnboarding.CloudBackup.importantTitle())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.password())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeTruthy()
   })
 
   it("calls handleBackup on continue press", () => {
@@ -107,7 +107,7 @@ describe("SparkCloudBackupScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.SparkOnboarding.CloudBackup.continueButton()))
+    fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
     expect(mockHandleBackup).toHaveBeenCalled()
   })
 })

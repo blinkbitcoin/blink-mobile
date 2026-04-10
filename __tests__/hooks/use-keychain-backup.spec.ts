@@ -3,9 +3,11 @@ import { renderHook, act } from "@testing-library/react-native"
 import { useKeychainBackup } from "@app/hooks/use-keychain-backup"
 
 const mockSetGenericPassword = jest.fn()
+const mockGetGenericPassword = jest.fn()
 
 jest.mock("react-native-keychain", () => ({
   setGenericPassword: (...args: readonly unknown[]) => mockSetGenericPassword(...args),
+  getGenericPassword: (...args: readonly unknown[]) => mockGetGenericPassword(...args),
   ACCESSIBLE: {
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: "AccessibleWhenUnlockedThisDeviceOnly",
   },
@@ -37,7 +39,7 @@ describe("useKeychainBackup", () => {
         }),
       )
       expect(result.current.loading).toBe(false)
-      expect(result.current.error).toBeUndefined()
+      expect(result.current.error).toBeNull()
     })
 
     it("returns false when keychain save fails", async () => {
@@ -80,6 +82,48 @@ describe("useKeychainBackup", () => {
 
       expect(success).toBe(false)
       expect(result.current.error).toBe("Unknown error")
+    })
+  })
+
+  describe("read", () => {
+    it("returns password from keychain", async () => {
+      mockGetGenericPassword.mockResolvedValue({ password: "test mnemonic" })
+
+      const { result } = renderHook(() => useKeychainBackup("test-service"))
+
+      let value: string | null = null
+      await act(async () => {
+        value = await result.current.read()
+      })
+
+      expect(value).toBe("test mnemonic")
+      expect(mockGetGenericPassword).toHaveBeenCalledWith({ service: "test-service" })
+    })
+
+    it("returns null when no credentials found", async () => {
+      mockGetGenericPassword.mockResolvedValue(false)
+
+      const { result } = renderHook(() => useKeychainBackup("test-service"))
+
+      let value: string | null = null
+      await act(async () => {
+        value = await result.current.read()
+      })
+
+      expect(value).toBeNull()
+    })
+
+    it("returns null on error", async () => {
+      mockGetGenericPassword.mockRejectedValue(new Error("keychain error"))
+
+      const { result } = renderHook(() => useKeychainBackup("test-service"))
+
+      let value: string | null = null
+      await act(async () => {
+        value = await result.current.read()
+      })
+
+      expect(value).toBeNull()
     })
   })
 })

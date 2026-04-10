@@ -1,3 +1,12 @@
+jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+  useBackupNudgeState: () => ({
+    shouldShowBanner: false,
+    shouldShowModal: false,
+    shouldShowSettingsBanner: false,
+    dismissBanner: jest.fn(),
+  }),
+}))
+
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"

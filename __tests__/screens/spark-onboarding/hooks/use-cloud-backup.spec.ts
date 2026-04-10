@@ -41,6 +41,12 @@ jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
 }))
 
+jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+  useBackupState: () => ({
+    setBackupCompleted: jest.fn(),
+  }),
+}))
+
 jest.mock("@app/utils/spark-backup-format", () => ({
   buildBackupPayload: jest.fn(
     (_mnemonic: string, opts: { password?: string; version?: number }) =>
@@ -61,7 +67,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: { cancel: () => "Cancel" },
-      SparkOnboarding: {
+      BackupScreen: {
         BackupMethod: {
           googleDrive: () => "Google Drive",
           appleICloud: () => "Apple iCloud",
