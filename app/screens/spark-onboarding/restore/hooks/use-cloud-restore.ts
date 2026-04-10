@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 
@@ -6,6 +6,7 @@ import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
+  isEncryptedBackup,
   parseBackupPayload,
   parseEncryptedBackupPayload,
 } from "@app/utils/spark-backup-format"
@@ -31,6 +32,7 @@ export const useCloudRestore = () => {
   const [backupContent, setBackupContent] = useState<string | null>(null)
   const [password, setPassword] = useState("")
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const hasRunRef = useRef(false)
 
   const attemptDownload = useCallback(async () => {
     setStep(CloudStep.Loading)
@@ -44,16 +46,14 @@ export const useCloudRestore = () => {
         return
       }
 
-      try {
-        const { mnemonic } = parseBackupPayload(result.content)
-        await restore(mnemonic)
+      if (isEncryptedBackup(result.content)) {
+        setBackupContent(result.content)
+        setStep(CloudStep.Password)
         return
-      } catch {
-        // encrypted — needs password
       }
 
-      setBackupContent(result.content)
-      setStep(CloudStep.Password)
+      const { mnemonic } = parseBackupPayload(result.content)
+      await restore(mnemonic)
     } catch (err) {
       crashlytics().recordError(
         err instanceof Error ? err : new Error(`Cloud download failed: ${err}`),
@@ -63,6 +63,8 @@ export const useCloudRestore = () => {
   }, [appConfig.galoyInstance.name, startSession, download, restore])
 
   useEffect(() => {
+    if (hasRunRef.current) return
+    hasRunRef.current = true
     attemptDownload()
   }, [attemptDownload])
 

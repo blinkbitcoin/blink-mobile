@@ -67,6 +67,15 @@ export const buildBackupPayload = (mnemonic: string, opts: BuildOptions = {}): s
   return JSON.stringify(payload)
 }
 
+export const isEncryptedBackup = (raw: string): boolean => {
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed?.encrypted === true
+  } catch {
+    return false
+  }
+}
+
 export const parseBackupPayload = (raw: string): { mnemonic: string } => {
   const parsed = JSON.parse(raw) as BackupPayload
 
