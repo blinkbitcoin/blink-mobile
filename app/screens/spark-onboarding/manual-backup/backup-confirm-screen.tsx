@@ -12,6 +12,8 @@ import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
+import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm } from "../hooks"
 
@@ -27,15 +29,17 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   const { challenges } = useRoute<ConfirmRouteProp>().params
 
   const { wallets } = useActiveWallet()
+  const { setBackupCompleted } = useBackupState()
   const hasFunds = wallets.some((w) => w.balance.amount > 0)
 
   const onComplete = useCallback(() => {
+    setBackupCompleted("manual")
     if (hasFunds) {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
     }
     navigation.navigate("sparkBackupSuccessScreen")
-  }, [navigation, hasFunds])
+  }, [navigation, hasFunds, setBackupCompleted])
 
   const {
     inputs,
@@ -55,7 +59,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
       <View style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.subtitle}>
-            {LL.SparkOnboarding.ManualBackup.Confirm.subtitle()}
+            {LL.BackupScreen.ManualBackup.Confirm.subtitle()}
           </Text>
 
           <View style={styles.inputList}>
@@ -76,9 +80,8 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                     )}
                     <TextInput
                       style={styles.input}
-                      placeholder={`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
+                      placeholder={`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
                       placeholderTextColor={colors.grey2}
-                      accessibilityLabel={`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
                       value={inputs[i]}
                       onChangeText={(text) => {
                         updateInput(i, text)
@@ -88,6 +91,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                       autoCapitalize="none"
                       autoCorrect={false}
                       keyboardType="visible-password"
+                      {...testProps(`confirm-word-${challenge.index}`)}
                     />
                     <GaloyIcon name="pencil" size={16} color={colors.primary} />
                   </View>
@@ -108,10 +112,12 @@ export const SparkBackupConfirmScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={
               allFilled
-                ? LL.SparkOnboarding.ManualBackup.Confirm.confirm()
-                : LL.SparkOnboarding.ManualBackup.Confirm.enterWords()
+                ? LL.BackupScreen.ManualBackup.Confirm.confirm()
+                : LL.BackupScreen.ManualBackup.Confirm.enterWords()
             }
             disabled={!allCorrect}
+            onPress={onComplete}
+            {...testProps("backup-confirm-button")}
           />
         </View>
       </View>
