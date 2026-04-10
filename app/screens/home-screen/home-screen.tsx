@@ -30,8 +30,13 @@ import {
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { TrustModelModal } from "@app/components/trust-model-modal"
+import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -165,6 +170,8 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const { seen: trustModelSeen, markAsSeen: markTrustModelSeen } = useTrustModelSeen()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -473,6 +480,8 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("profileScreen")
   }
 
+  const showTrustModel = isSelfCustodial && !trustModelSeen && satsBalance > 0
+
   return (
     <Screen headerShown={false}>
       {AccountCreationNeededModal}
@@ -565,6 +574,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
+        {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal
@@ -579,6 +589,8 @@ export const HomeScreen: React.FC = () => {
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
       />
+      <BackupNudgeModal isVisible={shouldShowModal} />
+      <TrustModelModal isVisible={showTrustModel} onDismiss={markTrustModelSeen} />
     </Screen>
   )
 }
