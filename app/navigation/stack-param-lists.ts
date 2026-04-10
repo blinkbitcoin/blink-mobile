@@ -191,6 +191,9 @@ export type RootStackParamList = {
   sparkBackupSuccessScreen: undefined
   sparkMigrationExplainer: undefined
   sparkMigrationTransferringFunds: undefined
+  sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }
+  sparkRestoreMethodScreen: undefined
+  sparkCloudRestoreScreen: undefined
 }
 
 export type OnboardingStackParamList = {
