@@ -23,6 +23,22 @@ gql`
       }
     }
   }
+
+  query realtimePriceUnauthed($currency: DisplayCurrency) {
+    realtimePrice(currency: $currency) {
+      btcSatPrice {
+        base
+        offset
+      }
+      denominatorCurrency
+      id
+      timestamp
+      usdCentPrice {
+        base
+        offset
+      }
+    }
+  }
 `
 
 export const createCache = () =>

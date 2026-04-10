@@ -3048,6 +3048,13 @@ export type RealtimePriceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type RealtimePriceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly realtimePrice: { readonly __typename: 'RealtimePrice', readonly denominatorCurrency: string, readonly id: string, readonly timestamp: number, readonly btcSatPrice: { readonly __typename: 'PriceOfOneSatInMinorUnit', readonly base: number, readonly offset: number }, readonly usdCentPrice: { readonly __typename: 'PriceOfOneUsdCentInMinorUnit', readonly base: number, readonly offset: number } } } } | null };
 
+export type RealtimePriceUnauthedQueryVariables = Exact<{
+  currency?: InputMaybe<Scalars['DisplayCurrency']['input']>;
+}>;
+
+
+export type RealtimePriceUnauthedQuery = { readonly __typename: 'Query', readonly realtimePrice: { readonly __typename: 'RealtimePrice', readonly denominatorCurrency: string, readonly id: string, readonly timestamp: number, readonly btcSatPrice: { readonly __typename: 'PriceOfOneSatInMinorUnit', readonly base: number, readonly offset: number }, readonly usdCentPrice: { readonly __typename: 'PriceOfOneUsdCentInMinorUnit', readonly base: number, readonly offset: number } } };
+
 export type HideBalanceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4233,6 +4240,56 @@ export type RealtimePriceQueryHookResult = ReturnType<typeof useRealtimePriceQue
 export type RealtimePriceLazyQueryHookResult = ReturnType<typeof useRealtimePriceLazyQuery>;
 export type RealtimePriceSuspenseQueryHookResult = ReturnType<typeof useRealtimePriceSuspenseQuery>;
 export type RealtimePriceQueryResult = Apollo.QueryResult<RealtimePriceQuery, RealtimePriceQueryVariables>;
+export const RealtimePriceUnauthedDocument = gql`
+    query realtimePriceUnauthed($currency: DisplayCurrency) {
+  realtimePrice(currency: $currency) {
+    btcSatPrice {
+      base
+      offset
+    }
+    denominatorCurrency
+    id
+    timestamp
+    usdCentPrice {
+      base
+      offset
+    }
+  }
+}
+    `;
+
+/**
+ * __useRealtimePriceUnauthedQuery__
+ *
+ * To run a query within a React component, call `useRealtimePriceUnauthedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRealtimePriceUnauthedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRealtimePriceUnauthedQuery({
+ *   variables: {
+ *      currency: // value for 'currency'
+ *   },
+ * });
+ */
+export function useRealtimePriceUnauthedQuery(baseOptions?: Apollo.QueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+      }
+export function useRealtimePriceUnauthedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+        }
+export function useRealtimePriceUnauthedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+        }
+export type RealtimePriceUnauthedQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedQuery>;
+export type RealtimePriceUnauthedLazyQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedLazyQuery>;
+export type RealtimePriceUnauthedSuspenseQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedSuspenseQuery>;
+export type RealtimePriceUnauthedQueryResult = Apollo.QueryResult<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>;
 export const HideBalanceDocument = gql`
     query hideBalance {
   hideBalance @client
