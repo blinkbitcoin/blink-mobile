@@ -4,12 +4,12 @@ import * as Keychain from "react-native-keychain"
 
 export const useKeychainBackup = (service: string) => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | undefined>()
+  const [error, setError] = useState<string | null>(null)
 
   const save = useCallback(
     async (value: string): Promise<boolean> => {
       setLoading(true)
-      setError(undefined)
+      setError(null)
       try {
         const result = await Keychain.setGenericPassword(service, value, {
           service,
@@ -27,5 +27,15 @@ export const useKeychainBackup = (service: string) => {
     [service],
   )
 
-  return { save, loading, error }
+  const read = useCallback(async (): Promise<string | null> => {
+    try {
+      const credentials = await Keychain.getGenericPassword({ service })
+      if (!credentials) return null
+      return credentials.password
+    } catch {
+      return null
+    }
+  }, [service])
+
+  return { save, read, loading, error }
 }
