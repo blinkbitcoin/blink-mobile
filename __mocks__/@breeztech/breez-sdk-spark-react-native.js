@@ -18,6 +18,18 @@ const PaymentDetails_Tags = {
   Deposit: "Deposit",
 }
 
+const createInstanceOf = (targetTag) => ({
+  instanceOf: (obj) => obj?.tag === targetTag,
+})
+
+const PaymentDetails = {
+  Lightning: createInstanceOf("Lightning"),
+  Spark: createInstanceOf("Spark"),
+  Token: createInstanceOf("Token"),
+  Deposit: createInstanceOf("Deposit"),
+  Withdraw: createInstanceOf("Withdraw"),
+}
+
 module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
@@ -40,4 +52,5 @@ module.exports = {
   PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
+  PaymentDetails,
 }
