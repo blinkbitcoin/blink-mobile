@@ -10,6 +10,9 @@ type BuildBitcoinUriParams = {
   prefix?: boolean
 }
 
+export const buildLightningUri = (paymentRequest: string, prefix = true): string =>
+  prefix ? `lightning:${paymentRequest}` : paymentRequest
+
 export const buildBitcoinUri = ({
   address,
   amountSats,
@@ -22,7 +25,7 @@ export const buildBitcoinUri = ({
 
   const params = new URLSearchParams()
   if (amountSats) params.append("amount", `${satsToBtc(amountSats)}`)
-  if (memo) params.append("message", encodeURI(memo))
+  if (memo) params.append("message", memo)
 
   const query = params.toString()
   return query ? `${base}?${query}` : base
