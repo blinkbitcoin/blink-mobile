@@ -10,7 +10,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { disconnectSdk, initSdk } from "../bridge"
+import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
 import { SparkConfig } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
@@ -25,10 +25,17 @@ const REFRESH_EVENTS = new Set([
   SdkEventTags.NewDeposits,
 ])
 
+const PAYMENT_RECEIVED_EVENTS = [
+  SdkEventTags.PaymentSucceeded,
+  SdkEventTags.PaymentPending,
+]
+
 type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
   sdk: Awaited<ReturnType<typeof initSdk>> | null
+  isStableBalanceActive: boolean
+  paymentReceivedCount: number
   hasMoreTransactions: boolean
   loadingMore: boolean
   loadMore: () => Promise<void>
@@ -37,6 +44,8 @@ type SdkLifecycleState = {
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
+  const [isStableBalanceActive, setIsStableBalanceActive] = useState(false)
+  const [paymentReceivedCount, setPaymentReceivedCount] = useState(0)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const sdkRef = useRef<Awaited<ReturnType<typeof initSdk>> | null>(null)
@@ -106,14 +115,20 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
         sdkRef.current = sdk
 
-        await sdk.addEventListener({
-          onEvent: async (event) => {
-            if (!mounted) return
-            if (REFRESH_EVENTS.has(event.tag)) {
-              await refreshWallets()
+        await addSdkEventListener(sdk, async (event) => {
+          if (!mounted) return
+          if (REFRESH_EVENTS.has(event.tag)) {
+            if (PAYMENT_RECEIVED_EVENTS.includes(event.tag)) {
+              setPaymentReceivedCount((prev) => prev + 1)
             }
-          },
+            await refreshWallets()
+          }
         })
+
+        const settings = await getUserSettings(sdk)
+        if (mounted) {
+          setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+        }
 
         await refreshWallets()
       } catch (err) {
@@ -172,6 +187,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     wallets,
     status,
     sdk: sdkRef.current,
+    isStableBalanceActive,
+    paymentReceivedCount,
     hasMoreTransactions,
     loadingMore,
     loadMore,
