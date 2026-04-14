@@ -3551,5 +3551,25 @@
         "errorTitle": "Wallet-Erstellung fehlgeschlagen",
         "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
         "retry": "Erneut versuchen"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Spark-Überweisung",
+        "lightningPayment": "Lightning-Zahlung",
+        "onchainDeposit": "On-chain Einzahlung",
+        "onchainWithdrawal": "On-chain Auszahlung",
+        "conversionFromBitcoin": "Umwandlung von Bitcoin",
+        "conversionToBitcoin": "Umwandlung in Bitcoin",
+        "conversionFromToken": "Umwandlung von {token}",
+        "conversionToToken": "Umwandlung in {token}",
+        "tokenTransfer": "{token}-Überweisung",
+        "payTo": "Zahlen an {address}",
+        "payment": "Zahlung"
+    },
+    "UnclaimedDeposit": {
+        "title": "Du hast {count} nicht beanspruchte Einzahlung(en)",
+        "description": "Gesamt: {sats} Sats zum Beanspruchen verfügbar",
+        "claim": "Jetzt beanspruchen",
+        "claiming": "Wird beansprucht...",
+        "belowMinimum": "{count} Einzahlung(en) unter dem Minimum (~{minimum} Sats). Diese können noch nicht beansprucht werden."
     }
 }

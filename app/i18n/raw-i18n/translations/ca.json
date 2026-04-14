@@ -3563,5 +3563,25 @@
     "errorTitle": "Error en crear la cartera",
     "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a intentar.",
     "retry": "Tornar a intentar"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Transferència Spark",
+    "lightningPayment": "Pagament Lightning",
+    "onchainDeposit": "Dipòsit On-chain",
+    "onchainWithdrawal": "Retirada On-chain",
+    "conversionFromBitcoin": "Conversió des de Bitcoin",
+    "conversionToBitcoin": "Conversió a Bitcoin",
+    "conversionFromToken": "Conversió des de {token}",
+    "conversionToToken": "Conversió a {token}",
+    "tokenTransfer": "Transferència {token}",
+    "payTo": "Pagar a {address}",
+    "payment": "Pagament"
+  },
+  "UnclaimedDeposit": {
+    "title": "Tens {count} dipòsit(s) no reclamat(s)",
+    "description": "Total: {sats} sats disponibles per reclamar",
+    "claim": "Reclama ara",
+    "claiming": "Reclamant...",
+    "belowMinimum": "{count} dipòsit(s) per sota del mínim (~{minimum} sats). Encara no es poden reclamar."
   }
 }

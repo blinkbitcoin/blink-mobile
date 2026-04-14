@@ -3563,5 +3563,25 @@
     "errorTitle": "Cüzdan oluşturma başarısız",
     "errorDescription": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
     "retry": "Tekrar dene"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark Transferi",
+    "lightningPayment": "Lightning Ödemesi",
+    "onchainDeposit": "On-chain Yatırma",
+    "onchainWithdrawal": "On-chain Çekim",
+    "conversionFromBitcoin": "Bitcoin'den dönüşüm",
+    "conversionToBitcoin": "Bitcoin'e dönüşüm",
+    "conversionFromToken": "{token}'den dönüşüm",
+    "conversionToToken": "{token}'e dönüşüm",
+    "tokenTransfer": "{token} Transferi",
+    "payTo": "{address} adresine öde",
+    "payment": "Ödeme"
+  },
+  "UnclaimedDeposit": {
+    "title": "{count} talep edilmemiş yatırmanız var",
+    "description": "Toplam: {sats} sats talep edilebilir",
+    "claim": "Şimdi talep et",
+    "claiming": "Talep ediliyor...",
+    "belowMinimum": "{count} yatırma minimum altında (~{minimum} sats). Henüz talep edilemez."
   }
 }

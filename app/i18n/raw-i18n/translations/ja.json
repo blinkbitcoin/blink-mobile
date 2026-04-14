@@ -3592,5 +3592,25 @@
         "errorTitle": "ウォレットの作成に失敗しました",
         "errorDescription": "エラーが発生しました。もう一度お試しください。",
         "retry": "再試行"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Spark送金",
+        "lightningPayment": "Lightning支払い",
+        "onchainDeposit": "On-chain入金",
+        "onchainWithdrawal": "On-chain出金",
+        "conversionFromBitcoin": "Bitcoinからの変換",
+        "conversionToBitcoin": "Bitcoinへの変換",
+        "conversionFromToken": "{token}からの変換",
+        "conversionToToken": "{token}への変換",
+        "tokenTransfer": "{token}送金",
+        "payTo": "{address}に支払い",
+        "payment": "支払い"
+    },
+    "UnclaimedDeposit": {
+        "title": "{count}件の未請求デポジットがあります",
+        "description": "合計: {sats} sats請求可能",
+        "claim": "今すぐ請求",
+        "claiming": "請求中...",
+        "belowMinimum": "{count}件のデポジットが最小額(~{minimum} sats)未満です。まだ請求できません。"
     }
 }

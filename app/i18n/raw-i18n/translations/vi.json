@@ -3601,5 +3601,25 @@
     "errorTitle": "Tạo ví thất bại",
     "errorDescription": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "retry": "Thử lại"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Chuyển Spark",
+    "lightningPayment": "Thanh toán Lightning",
+    "onchainDeposit": "Nạp On-chain",
+    "onchainWithdrawal": "Rút On-chain",
+    "conversionFromBitcoin": "Chuyển đổi từ Bitcoin",
+    "conversionToBitcoin": "Chuyển đổi sang Bitcoin",
+    "conversionFromToken": "Chuyển đổi từ {token}",
+    "conversionToToken": "Chuyển đổi sang {token}",
+    "tokenTransfer": "Chuyển {token}",
+    "payTo": "Thanh toán cho {address}",
+    "payment": "Thanh toán"
+  },
+  "UnclaimedDeposit": {
+    "title": "Bạn có {count} khoản gửi chưa được yêu cầu",
+    "description": "Tổng: {sats} sats có thể yêu cầu",
+    "claim": "Yêu cầu ngay",
+    "claiming": "Đang yêu cầu...",
+    "belowMinimum": "{count} khoản gửi dưới mức tối thiểu (~{minimum} sats). Chưa thể yêu cầu."
   }
 }

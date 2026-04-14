@@ -3610,5 +3610,25 @@
     "errorTitle": "Ukwenza isikhwama akuphumelelanga",
     "errorDescription": "Kukho into engahambanga kakuhle. Nceda uzame kwakhona.",
     "retry": "Zama kwakhona"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Ukudluliswa kwe-Spark",
+    "lightningPayment": "Intlawulo ye-Lightning",
+    "onchainDeposit": "Idipozithi ye-On-chain",
+    "onchainWithdrawal": "Ukurhoxiswa kwe-On-chain",
+    "conversionFromBitcoin": "Ukuguqulwa kwe-Bitcoin",
+    "conversionToBitcoin": "Ukuguqulwa kuya kwi-Bitcoin",
+    "conversionFromToken": "Ukuguqulwa kwe-{token}",
+    "conversionToToken": "Ukuguqulwa kuya kwi-{token}",
+    "tokenTransfer": "Ukudluliswa kwe-{token}",
+    "payTo": "Hlawula ku-{address}",
+    "payment": "Intlawulo"
+  },
+  "UnclaimedDeposit": {
+    "title": "Unama-{count} edipozithi engabangwayo",
+    "description": "Iyonke: {sats} sats ezifumanekayo ukufuna",
+    "claim": "Funa ngoku",
+    "claiming": "Iyafuna...",
+    "belowMinimum": "{count} idipozithi ngaphantsi komlinganiselo (~{minimum} sats). Azinakufunwa okwangoku."
   }
 }

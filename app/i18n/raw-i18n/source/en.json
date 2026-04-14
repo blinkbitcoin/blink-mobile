@@ -2468,6 +2468,19 @@
     "SplashScreen": {
         "update": "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS"
     },
+    "TransactionDescription": {
+        "sparkTransfer": "Spark Transfer",
+        "lightningPayment": "Lightning Payment",
+        "onchainDeposit": "On-chain Deposit",
+        "onchainWithdrawal": "On-chain Withdrawal",
+        "conversionFromBitcoin": "Conversion from Bitcoin",
+        "conversionToBitcoin": "Conversion to Bitcoin",
+        "conversionFromToken": "Conversion from {token: string}",
+        "conversionToToken": "Conversion to {token: string}",
+        "tokenTransfer": "{token: string} Transfer",
+        "payTo": "Pay to {address: string}",
+        "payment": "Payment"
+    },
     "TransactionDetailScreen": {
         "paid": "Paid to/from",
         "received": "You received",
