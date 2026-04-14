@@ -1,5 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react"
 
+import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   AccountType,
   ActiveWalletStatus,
@@ -10,13 +12,23 @@ import { useSdkLifecycle } from "./use-sdk-lifecycle"
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
+  sdk: BreezSdkInterface | null
+  hasMoreTransactions: boolean
+  loadingMore: boolean
+  loadMore: () => Promise<void>
 }
+
+const noop = async () => {}
 
 const defaultState: SelfCustodialWalletContextValue = {
   wallets: [],
   status: ActiveWalletStatus.Unavailable,
   accountType: AccountType.SelfCustodial,
   retry: () => {},
+  sdk: null,
+  hasMoreTransactions: false,
+  loadingMore: false,
+  loadMore: noop,
 }
 
 const SelfCustodialWalletContext =
@@ -26,7 +38,8 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [retryCount, setRetryCount] = useState(0)
-  const { wallets, status } = useSdkLifecycle(retryCount)
+  const { wallets, status, sdk, hasMoreTransactions, loadingMore, loadMore } =
+    useSdkLifecycle(retryCount)
 
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1)
@@ -38,8 +51,12 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       status,
       accountType: AccountType.SelfCustodial,
       retry,
+      sdk,
+      hasMoreTransactions,
+      loadingMore,
+      loadMore,
     }),
-    [wallets, status, retry],
+    [wallets, status, retry, sdk, hasMoreTransactions, loadingMore, loadMore],
   )
 
   return (
