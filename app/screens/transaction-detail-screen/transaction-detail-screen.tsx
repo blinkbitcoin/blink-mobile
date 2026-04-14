@@ -10,6 +10,7 @@ import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { WalletSummary } from "@app/components/wallet-summary"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import {
   SettlementVia,
   TransactionFragment,
@@ -129,6 +130,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
+  const { isSelfCustodial } = useActiveWallet()
   const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
 
@@ -522,7 +524,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ]}
               />
             )}
-          {id && (
+          {id && !isSelfCustodial && (
             <Row
               entry="Blink Internal Id"
               value={id}
