@@ -8,9 +8,10 @@ import {
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { tokenBaseUnitsToCents, toWalletMoneyAmount } from "@app/types/amounts"
-import { toWalletId, type WalletState } from "@app/types/wallet.types"
 import { type NormalizedTransaction } from "@app/types/transaction.types"
+import { toWalletId, type WalletState } from "@app/types/wallet.types"
 
+import { getWalletInfo, listPayments } from "../bridge"
 import { SparkConfig, SparkToken } from "../config"
 import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
 
@@ -43,17 +44,7 @@ const fetchAndMapPayments = async (
   sdk: BreezSdkInterface,
   offset: number,
 ): Promise<NormalizedTransaction[]> => {
-  const response = await sdk.listPayments({
-    typeFilter: undefined,
-    statusFilter: undefined,
-    assetFilter: undefined,
-    paymentDetailsFilter: undefined,
-    fromTimestamp: undefined,
-    toTimestamp: undefined,
-    offset,
-    limit: TRANSACTIONS_PER_PAGE,
-    sortAscending: false,
-  })
+  const response = await listPayments(sdk, offset, TRANSACTIONS_PER_PAGE)
 
   return mapSelfCustodialTransactions(response.payments.filter(isKnownPayment))
 }
@@ -90,7 +81,7 @@ export type WalletSnapshot = {
 export const getSelfCustodialWalletSnapshot = async (
   sdk: BreezSdkInterface,
 ): Promise<WalletSnapshot> => {
-  const info = await sdk.getInfo({ ensureSynced: false })
+  const info = await getWalletInfo(sdk)
   const transactions = await fetchAndMapPayments(sdk, 0)
 
   return {

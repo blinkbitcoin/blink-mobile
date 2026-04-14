@@ -1,9 +1,9 @@
+import { type TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   PaymentType,
   TransactionDirection,
   type NormalizedTransaction,
 } from "@app/types/transaction.types"
-import { type TranslationFunctions } from "@app/i18n/i18n-types"
 
 const TICKER_DISPLAY: Record<string, string> = {
   USDB: "USD",

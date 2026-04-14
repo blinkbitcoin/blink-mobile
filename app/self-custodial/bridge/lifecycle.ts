@@ -6,6 +6,7 @@ import {
   defaultConfig,
   initLogging,
   type BreezSdkInterface,
+  type SdkEvent,
 } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { generateMnemonic } from "bip39"
@@ -13,8 +14,8 @@ import Crypto from "react-native-quick-crypto"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { SparkConfig, SparkToken } from "./config"
-import { createSdkLogListener } from "./logging"
+import { SparkConfig, SparkToken } from "../config"
+import { createSdkLogListener } from "../logging"
 
 const initializeLogging = (() => {
   let done = false
@@ -55,6 +56,14 @@ export const initSdk = async (mnemonic: string): Promise<BreezSdkInterface> => {
 export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
   await sdk.disconnect()
 }
+
+export const addSdkEventListener = (
+  sdk: BreezSdkInterface,
+  onEvent: (event: SdkEvent) => Promise<void>,
+) => sdk.addEventListener({ onEvent })
+
+export const removeSdkEventListener = (sdk: BreezSdkInterface, listenerId: string) =>
+  sdk.removeEventListener(listenerId)
 
 export const selfCustodialCreateWallet = async (): Promise<void> => {
   if (!__DEV__) {

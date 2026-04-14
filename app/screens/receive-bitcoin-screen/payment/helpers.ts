@@ -1,16 +1,11 @@
 import { Network } from "@app/graphql/generated"
+import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
 } from "@blinkbitcoin/blink-client"
 
 import { Invoice, GetFullUriInput } from "./index.types"
-
-const prefixByType = {
-  [Invoice.OnChain]: "bitcoin:",
-  [Invoice.Lightning]: "lightning:",
-  [Invoice.PayCode]: "",
-}
 
 export const getPaymentRequestFullUri = ({
   input,
@@ -24,21 +19,14 @@ export const getPaymentRequestFullUri = ({
     return uppercase ? input.toUpperCase() : input
   }
 
-  const uriPrefix = prefix ? prefixByType[type] : ""
-  const uri = `${uriPrefix}${input}`
-  const params = new URLSearchParams()
-
-  if (amount) params.append("amount", `${satsToBTC(amount)}`)
-
-  if (memo) {
-    params.append("message", encodeURI(memo))
-    return `${uri}?${params.toString()}`
-  }
-
-  return uri + (params.toString() ? "?" + params.toString() : "")
+  return buildBitcoinUri({
+    address: input,
+    amountSats: amount,
+    memo,
+    uppercase,
+    prefix,
+  })
 }
-
-export const satsToBTC = (satsAmount: number): number => satsAmount / 10 ** 8
 
 export const getDefaultMemo = (bankName: string) => {
   return `Pay to ${bankName} Wallet user`
