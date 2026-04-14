@@ -3563,5 +3563,25 @@
     "errorTitle": "Vytvorenie peňaženky zlyhalo",
     "errorDescription": "Niečo sa pokazilo. Skúste to prosím znova.",
     "retry": "Skúsiť znova"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark prevod",
+    "lightningPayment": "Lightning platba",
+    "onchainDeposit": "On-chain vklad",
+    "onchainWithdrawal": "On-chain výber",
+    "conversionFromBitcoin": "Konverzia z Bitcoinu",
+    "conversionToBitcoin": "Konverzia na Bitcoin",
+    "conversionFromToken": "Konverzia z {token}",
+    "conversionToToken": "Konverzia na {token}",
+    "tokenTransfer": "{token} prevod",
+    "payTo": "Zaplatiť na {address}",
+    "payment": "Platba"
+  },
+  "UnclaimedDeposit": {
+    "title": "Máte {count} nevyzdvihnutý(ch) vklad(ov)",
+    "description": "Celkom: {sats} satov na vyzdvihnutie",
+    "claim": "Vyzdvihnúť teraz",
+    "claiming": "Vyzdvihuje sa...",
+    "belowMinimum": "{count} vklad(ov) pod minimom (~{minimum} satov). Zatiaľ sa nedajú vyzdvihnúť."
   }
 }

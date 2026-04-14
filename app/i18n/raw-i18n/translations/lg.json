@@ -3563,5 +3563,25 @@
     "errorTitle": "Okukola wallet kugaanye",
     "errorDescription": "Waliwo ekikyamu. Gezaako nate.",
     "retry": "Gezaako nate"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Okukyusa Spark",
+    "lightningPayment": "Okusasula Lightning",
+    "onchainDeposit": "Okuteeka On-chain",
+    "onchainWithdrawal": "Okuggya On-chain",
+    "conversionFromBitcoin": "Okukyusa okuva mu Bitcoin",
+    "conversionToBitcoin": "Okukyusa okudda mu Bitcoin",
+    "conversionFromToken": "Okukyusa okuva mu {token}",
+    "conversionToToken": "Okukyusa okudda mu {token}",
+    "tokenTransfer": "Okukyusa {token}",
+    "payTo": "Sasula {address}",
+    "payment": "Okusasula"
+  },
+  "UnclaimedDeposit": {
+    "title": "Olina {count} ebitateekeddwa",
+    "description": "Omutindo: {sats} sats ezikubirwa",
+    "claim": "Teeka kati",
+    "claiming": "Kuteeka...",
+    "belowMinimum": "{count} ebiteekeddwa wansi w'obunene (~{minimum} sats). Bino tebisobola kuteekebwa."
   }
 }

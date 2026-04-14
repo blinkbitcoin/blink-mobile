@@ -3563,5 +3563,25 @@
     "errorTitle": "Gagal membuat dompet",
     "errorDescription": "Terjadi kesalahan. Silakan coba lagi.",
     "retry": "Coba lagi"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Transfer Spark",
+    "lightningPayment": "Pembayaran Lightning",
+    "onchainDeposit": "Deposit On-chain",
+    "onchainWithdrawal": "Penarikan On-chain",
+    "conversionFromBitcoin": "Konversi dari Bitcoin",
+    "conversionToBitcoin": "Konversi ke Bitcoin",
+    "conversionFromToken": "Konversi dari {token}",
+    "conversionToToken": "Konversi ke {token}",
+    "tokenTransfer": "Transfer {token}",
+    "payTo": "Bayar ke {address}",
+    "payment": "Pembayaran"
+  },
+  "UnclaimedDeposit": {
+    "title": "Anda memiliki {count} deposit yang belum diklaim",
+    "description": "Total: {sats} sats tersedia untuk diklaim",
+    "claim": "Klaim sekarang",
+    "claiming": "Mengklaim...",
+    "belowMinimum": "{count} deposit di bawah minimum (~{minimum} sats). Belum bisa diklaim."
   }
 }

@@ -3551,5 +3551,25 @@
         "errorTitle": "Error al crear la billetera",
         "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo.",
         "retry": "Intentar de nuevo"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Transferencia Spark",
+        "lightningPayment": "Pago Lightning",
+        "onchainDeposit": "Depósito On-chain",
+        "onchainWithdrawal": "Retiro On-chain",
+        "conversionFromBitcoin": "Conversión desde Bitcoin",
+        "conversionToBitcoin": "Conversión a Bitcoin",
+        "conversionFromToken": "Conversión desde {token}",
+        "conversionToToken": "Conversión a {token}",
+        "tokenTransfer": "Transferencia {token}",
+        "payTo": "Pagar a {address}",
+        "payment": "Pago"
+    },
+    "UnclaimedDeposit": {
+        "title": "Tienes {count} depósito(s) sin reclamar",
+        "description": "Total: {sats} sats disponibles para reclamar",
+        "claim": "Reclamar ahora",
+        "claiming": "Reclamando...",
+        "belowMinimum": "{count} depósito(s) por debajo del mínimo (~{minimum} sats). Aún no se pueden reclamar."
     }
 }

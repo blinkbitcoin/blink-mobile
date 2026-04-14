@@ -3604,5 +3604,25 @@
     "errorTitle": "Stvaranje novčanika nije uspjelo",
     "errorDescription": "Nešto je pošlo po krivu. Molimo pokušajte ponovo.",
     "retry": "Pokušaj ponovo"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark prijenos",
+    "lightningPayment": "Lightning plaćanje",
+    "onchainDeposit": "On-chain polog",
+    "onchainWithdrawal": "On-chain povlačenje",
+    "conversionFromBitcoin": "Konverzija iz Bitcoina",
+    "conversionToBitcoin": "Konverzija u Bitcoin",
+    "conversionFromToken": "Konverzija iz {token}",
+    "conversionToToken": "Konverzija u {token}",
+    "tokenTransfer": "{token} prijenos",
+    "payTo": "Plati na {address}",
+    "payment": "Plaćanje"
+  },
+  "UnclaimedDeposit": {
+    "title": "Imate {count} nezatraženi(h) polog(a)",
+    "description": "Ukupno: {sats} satova dostupno za potraživanje",
+    "claim": "Zatraži sada",
+    "claiming": "Zahtijevanje...",
+    "belowMinimum": "{count} polog(a) ispod minimuma (~{minimum} satova). Još se ne mogu zatražiti."
   }
 }

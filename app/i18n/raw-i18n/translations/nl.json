@@ -3604,5 +3604,25 @@
     "errorTitle": "Aanmaken portemonnee mislukt",
     "errorDescription": "Er is iets misgegaan. Probeer het opnieuw.",
     "retry": "Opnieuw proberen"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark-overdracht",
+    "lightningPayment": "Lightning-betaling",
+    "onchainDeposit": "On-chain storting",
+    "onchainWithdrawal": "On-chain opname",
+    "conversionFromBitcoin": "Omzetting van Bitcoin",
+    "conversionToBitcoin": "Omzetting naar Bitcoin",
+    "conversionFromToken": "Omzetting van {token}",
+    "conversionToToken": "Omzetting naar {token}",
+    "tokenTransfer": "{token}-overdracht",
+    "payTo": "Betalen aan {address}",
+    "payment": "Betaling"
+  },
+  "UnclaimedDeposit": {
+    "title": "Je hebt {count} niet-opgeëiste storting(en)",
+    "description": "Totaal: {sats} sats beschikbaar om op te eisen",
+    "claim": "Nu opeisen",
+    "claiming": "Opeisen...",
+    "belowMinimum": "{count} storting(en) onder het minimum (~{minimum} sats). Deze kunnen nog niet worden opgeëist."
   }
 }

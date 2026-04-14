@@ -8001,6 +8001,56 @@ type RootTranslation = {
 		 */
 		update: string
 	}
+	TransactionDescription: {
+		/**
+		 * S​p​a​r​k​ ​T​r​a​n​s​f​e​r
+		 */
+		sparkTransfer: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​P​a​y​m​e​n​t
+		 */
+		lightningPayment: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​D​e​p​o​s​i​t
+		 */
+		onchainDeposit: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​W​i​t​h​d​r​a​w​a​l
+		 */
+		onchainWithdrawal: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​B​i​t​c​o​i​n
+		 */
+		conversionFromBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		conversionToBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionFromToken: RequiredParams<'token'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionToToken: RequiredParams<'token'>
+		/**
+		 * {​t​o​k​e​n​}​ ​T​r​a​n​s​f​e​r
+		 * @param {string} token
+		 */
+		tokenTransfer: RequiredParams<'token'>
+		/**
+		 * P​a​y​ ​t​o​ ​{​a​d​d​r​e​s​s​}
+		 * @param {string} address
+		 */
+		payTo: RequiredParams<'address'>
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		payment: string
+	}
 	TransactionDetailScreen: {
 		/**
 		 * P​a​i​d​ ​t​o​/​f​r​o​m
@@ -19644,6 +19694,52 @@ export type TranslationFunctions = {
 	This can be done from the PlayStore for Android and Testflight for iOS
 		 */
 		update: () => LocalizedString
+	}
+	TransactionDescription: {
+		/**
+		 * Spark Transfer
+		 */
+		sparkTransfer: () => LocalizedString
+		/**
+		 * Lightning Payment
+		 */
+		lightningPayment: () => LocalizedString
+		/**
+		 * On-chain Deposit
+		 */
+		onchainDeposit: () => LocalizedString
+		/**
+		 * On-chain Withdrawal
+		 */
+		onchainWithdrawal: () => LocalizedString
+		/**
+		 * Conversion from Bitcoin
+		 */
+		conversionFromBitcoin: () => LocalizedString
+		/**
+		 * Conversion to Bitcoin
+		 */
+		conversionToBitcoin: () => LocalizedString
+		/**
+		 * Conversion from {token}
+		 */
+		conversionFromToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * Conversion to {token}
+		 */
+		conversionToToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * {token} Transfer
+		 */
+		tokenTransfer: (arg: { token: string }) => LocalizedString
+		/**
+		 * Pay to {address}
+		 */
+		payTo: (arg: { address: string }) => LocalizedString
+		/**
+		 * Payment
+		 */
+		payment: () => LocalizedString
 	}
 	TransactionDetailScreen: {
 		/**

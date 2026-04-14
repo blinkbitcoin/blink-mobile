@@ -3601,5 +3601,25 @@
     "errorTitle": "สร้างกระเป๋าเงินล้มเหลว",
     "errorDescription": "มีบางอย่างผิดพลาด กรุณาลองอีกครั้ง",
     "retry": "ลองอีกครั้ง"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "โอน Spark",
+    "lightningPayment": "ชำระเงิน Lightning",
+    "onchainDeposit": "ฝาก On-chain",
+    "onchainWithdrawal": "ถอน On-chain",
+    "conversionFromBitcoin": "แปลงจาก Bitcoin",
+    "conversionToBitcoin": "แปลงเป็น Bitcoin",
+    "conversionFromToken": "แปลงจาก {token}",
+    "conversionToToken": "แปลงเป็น {token}",
+    "tokenTransfer": "โอน {token}",
+    "payTo": "จ่ายไปที่ {address}",
+    "payment": "การชำระเงิน"
+  },
+  "UnclaimedDeposit": {
+    "title": "คุณมี {count} รายการฝากที่ยังไม่ได้เรียกร้อง",
+    "description": "รวม: {sats} sats พร้อมเรียกร้อง",
+    "claim": "เรียกร้องตอนนี้",
+    "claiming": "กำลังเรียกร้อง...",
+    "belowMinimum": "{count} รายการฝากต่ำกว่าขั้นต่ำ (~{minimum} sats) ยังไม่สามารถเรียกร้องได้"
   }
 }

@@ -3592,5 +3592,25 @@
         "errorTitle": "Échec de la création du portefeuille",
         "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer.",
         "retry": "Réessayer"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Transfert Spark",
+        "lightningPayment": "Paiement Lightning",
+        "onchainDeposit": "Dépôt On-chain",
+        "onchainWithdrawal": "Retrait On-chain",
+        "conversionFromBitcoin": "Conversion depuis Bitcoin",
+        "conversionToBitcoin": "Conversion en Bitcoin",
+        "conversionFromToken": "Conversion depuis {token}",
+        "conversionToToken": "Conversion en {token}",
+        "tokenTransfer": "Transfert {token}",
+        "payTo": "Payer à {address}",
+        "payment": "Paiement"
+    },
+    "UnclaimedDeposit": {
+        "title": "Vous avez {count} dépôt(s) non réclamé(s)",
+        "description": "Total : {sats} sats disponibles à réclamer",
+        "claim": "Réclamer maintenant",
+        "claiming": "Réclamation...",
+        "belowMinimum": "{count} dépôt(s) en dessous du minimum (~{minimum} sats). Ils ne peuvent pas encore être réclamés."
     }
 }

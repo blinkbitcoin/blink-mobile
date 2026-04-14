@@ -3604,5 +3604,25 @@
     "errorTitle": "Դրամապանակի ստեղծումը ձախողվեց",
     "errorDescription": "Ինչ-որ բան սխալ գնաց։ Խնդրում ենք կրկին փորձել։",
     "retry": "Փորձել կրկին"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark փոխանցում",
+    "lightningPayment": "Lightning վճարում",
+    "onchainDeposit": "On-chain մուտքագրում",
+    "onchainWithdrawal": "On-chain դուրսբերում",
+    "conversionFromBitcoin": "Փոխարկում Bitcoin-ից",
+    "conversionToBitcoin": "Փոխարկում Bitcoin-ի",
+    "conversionFromToken": "Փոխարկում {token}-ից",
+    "conversionToToken": "Փոխարկում {token}-ի",
+    "tokenTransfer": "{token} փոխանցում",
+    "payTo": "Վճարել՝ {address}",
+    "payment": "Վճարում"
+  },
+  "UnclaimedDeposit": {
+    "title": "Դուք ունեք {count} չպահանջված ավանդ(ներ)",
+    "description": "Ընդամենը՝ {sats} sats, հասանելի պահանջման համար",
+    "claim": "Պահանջել հիմա",
+    "claiming": "Պահանջվում է...",
+    "belowMinimum": "{count} ավանդ(ներ) նվազագույնից ցածր են (~{minimum} sats)։ Դրանք դեռ հնարավոր չէ պահանջել։"
   }
 }

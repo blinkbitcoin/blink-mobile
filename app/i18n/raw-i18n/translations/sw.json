@@ -3563,5 +3563,25 @@
     "errorTitle": "Kuunda mkoba kumeshindikana",
     "errorDescription": "Kuna kitu kimekwenda vibaya. Tafadhali jaribu tena.",
     "retry": "Jaribu tena"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Uhamisho wa Spark",
+    "lightningPayment": "Malipo ya Lightning",
+    "onchainDeposit": "Amana ya On-chain",
+    "onchainWithdrawal": "Uondoaji wa On-chain",
+    "conversionFromBitcoin": "Ubadilishaji kutoka Bitcoin",
+    "conversionToBitcoin": "Ubadilishaji kwenda Bitcoin",
+    "conversionFromToken": "Ubadilishaji kutoka {token}",
+    "conversionToToken": "Ubadilishaji kwenda {token}",
+    "tokenTransfer": "Uhamisho wa {token}",
+    "payTo": "Lipa kwa {address}",
+    "payment": "Malipo"
+  },
+  "UnclaimedDeposit": {
+    "title": "Una amana {count} ambazo hazijaombwa",
+    "description": "Jumla: {sats} sats zinazopatikana kudai",
+    "claim": "Dai sasa",
+    "claiming": "Inadai...",
+    "belowMinimum": "Amana {count} chini ya kiwango cha chini (~{minimum} sats). Bado haziwezi kudaiwa."
   }
 }

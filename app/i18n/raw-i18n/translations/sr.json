@@ -3601,5 +3601,25 @@
     "errorTitle": "Креирање новчаника није успело",
     "errorDescription": "Нешто је пошло по злу. Покушајте поново.",
     "retry": "Покушај поново"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark пренос",
+    "lightningPayment": "Lightning плаћање",
+    "onchainDeposit": "On-chain депозит",
+    "onchainWithdrawal": "On-chain повлачење",
+    "conversionFromBitcoin": "Конверзија из Биткоина",
+    "conversionToBitcoin": "Конверзија у Биткоин",
+    "conversionFromToken": "Конверзија из {token}",
+    "conversionToToken": "Конверзија у {token}",
+    "tokenTransfer": "{token} пренос",
+    "payTo": "Плати на {address}",
+    "payment": "Плаћање"
+  },
+  "UnclaimedDeposit": {
+    "title": "Имате {count} незатражен(их) депозит(а)",
+    "description": "Укупно: {sats} сатова доступно за потраживање",
+    "claim": "Затражи сада",
+    "claiming": "Захтевање...",
+    "belowMinimum": "{count} депозит(а) испод минимума (~{minimum} сатова). Још не могу бити затражени."
   }
 }

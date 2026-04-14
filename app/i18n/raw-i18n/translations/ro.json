@@ -3563,5 +3563,25 @@
     "errorTitle": "Crearea portofelului a eșuat",
     "errorDescription": "Ceva nu a mers bine. Vă rugăm încercați din nou.",
     "retry": "Încearcă din nou"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Transfer Spark",
+    "lightningPayment": "Plată Lightning",
+    "onchainDeposit": "Depozit On-chain",
+    "onchainWithdrawal": "Retragere On-chain",
+    "conversionFromBitcoin": "Conversie din Bitcoin",
+    "conversionToBitcoin": "Conversie în Bitcoin",
+    "conversionFromToken": "Conversie din {token}",
+    "conversionToToken": "Conversie în {token}",
+    "tokenTransfer": "Transfer {token}",
+    "payTo": "Plătește la {address}",
+    "payment": "Plată"
+  },
+  "UnclaimedDeposit": {
+    "title": "Ai {count} depozit(e) nerevendicate",
+    "description": "Total: {sats} sats disponibili pentru revendicare",
+    "claim": "Revendică acum",
+    "claiming": "Se revendică...",
+    "belowMinimum": "{count} depozit(e) sub minimum (~{minimum} sats). Nu pot fi revendicate încă."
   }
 }

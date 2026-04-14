@@ -3604,5 +3604,25 @@
     "errorTitle": "Penciptaan dompet gagal",
     "errorDescription": "Sesuatu telah berlaku. Sila cuba lagi.",
     "retry": "Cuba lagi"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Pemindahan Spark",
+    "lightningPayment": "Pembayaran Lightning",
+    "onchainDeposit": "Deposit On-chain",
+    "onchainWithdrawal": "Pengeluaran On-chain",
+    "conversionFromBitcoin": "Penukaran dari Bitcoin",
+    "conversionToBitcoin": "Penukaran ke Bitcoin",
+    "conversionFromToken": "Penukaran dari {token}",
+    "conversionToToken": "Penukaran ke {token}",
+    "tokenTransfer": "Pemindahan {token}",
+    "payTo": "Bayar kepada {address}",
+    "payment": "Pembayaran"
+  },
+  "UnclaimedDeposit": {
+    "title": "Anda mempunyai {count} deposit yang belum dituntut",
+    "description": "Jumlah: {sats} sats tersedia untuk dituntut",
+    "claim": "Tuntut sekarang",
+    "claiming": "Menuntut...",
+    "belowMinimum": "{count} deposit di bawah minimum (~{minimum} sats). Belum boleh dituntut."
   }
 }
