@@ -8,7 +8,6 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { toNumber } from "@app/utils/helper"
 import { tokenBaseUnitsToCents, toWalletMoneyAmount } from "@app/types/amounts"
 import {
   PaymentType,
@@ -17,6 +16,7 @@ import {
   type NormalizedTransaction,
 } from "@app/types/transaction.types"
 import { AccountType } from "@app/types/wallet.types"
+import { toNumber } from "@app/utils/helper"
 
 const mapPaymentMethod = (
   method: PaymentMethod,
