@@ -75,6 +75,16 @@ export const toWalletMoneyAmount = (
   return toUsdMoneyAmount(Math.abs(amount))
 }
 
+const DISPLAY_DECIMALS = 2
+
+export const tokenBaseUnitsToCents = (
+  rawAmount: number,
+  tokenDecimals: number,
+): number => {
+  const excessDecimals = Math.max(tokenDecimals - DISPLAY_DECIMALS, 0)
+  return Math.round(rawAmount / 10 ** excessDecimals)
+}
+
 export const toWalletAmount = <T extends WalletCurrency>({
   amount,
   currency,
