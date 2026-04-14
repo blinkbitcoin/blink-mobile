@@ -13,11 +13,12 @@ import {
 } from "@react-navigation/native"
 import { useTheme } from "@rn-vui/themed"
 
-import { useIsAuthed } from "../graphql/is-authed-context"
-import { RootStackParamList } from "./stack-param-lists"
-
-import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { Action, useActionsContext } from "@app/components/actions"
+import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+
+import { RootStackParamList } from "./stack-param-lists"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -54,6 +55,8 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const isAuthed = useIsAuthed()
+  const { isSelfCustodial } = useActiveWallet()
+  const canHandlePayments = isAuthed || isSelfCustodial
   const [isAppLocked, setIsAppLocked] = React.useState(true)
   const [urlAfterUnlockAndAuth, setUrlAfterUnlockAndAuth] = React.useState<string | null>(
     null,
@@ -61,11 +64,11 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   const { setActiveAction } = useActionsContext()
 
   useEffect(() => {
-    if (isAuthed && !isAppLocked && urlAfterUnlockAndAuth) {
+    if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
       Linking.openURL(urlAfterUnlockAndAuth)
       setUrlAfterUnlockAndAuth(null)
     }
-  }, [isAuthed, isAppLocked, urlAfterUnlockAndAuth])
+  }, [canHandlePayments, isAppLocked, urlAfterUnlockAndAuth])
 
   const setAppUnlocked = React.useMemo(
     () => async () => {
@@ -169,7 +172,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       const onReceiveURL = ({ url }: { url: string }) => {
         if (url.includes(TELEGRAM_CALLBACK_PATH)) return
 
-        if (!isAppLocked && isAuthed) {
+        if (!isAppLocked && canHandlePayments) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {
             setActiveAction(maybeAction)
