@@ -28,6 +28,7 @@ const mockGetMnemonic = jest.fn()
 const mockGetMnemonicNetwork = jest.fn()
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
+const mockAddSdkEventListener = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -40,6 +41,11 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (...args: unknown[]) => mockInitSdk(...args),
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
+  addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
+  getUserSettings: jest.fn().mockResolvedValue({
+    stableBalanceActiveLabel: undefined,
+    sparkPrivateModeEnabled: false,
+  }),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -71,6 +77,7 @@ describe("SelfCustodialWalletProvider", () => {
     mockGetMnemonicNetwork.mockResolvedValue("regtest")
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
+    mockAddSdkEventListener.mockResolvedValue("listener-id")
   })
 
   it("renders children", () => {
@@ -226,12 +233,14 @@ describe("SelfCustodialWalletProvider", () => {
     mockSnapshot.mockResolvedValue([])
 
     let capturedListener: (event: { tag: string }) => Promise<void>
-    const mockSdk = {
-      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
         capturedListener = onEvent
         return Promise.resolve("id")
-      }),
-    }
+      },
+    )
+
+    const mockSdk = {}
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue(mockSdk)
 
@@ -254,12 +263,14 @@ describe("SelfCustodialWalletProvider", () => {
     mockSnapshot.mockResolvedValue([])
 
     let capturedListener: (event: { tag: string }) => Promise<void>
-    const mockSdk = {
-      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
         capturedListener = onEvent
         return Promise.resolve("id")
-      }),
-    }
+      },
+    )
+
+    const mockSdk = {}
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue(mockSdk)
 
@@ -290,19 +301,21 @@ describe("SelfCustodialWalletProvider", () => {
     mockSnapshot.mockResolvedValue([])
 
     let capturedListener: (event: { tag: string }) => Promise<void>
-    const mockSdk = {
-      addEventListener: jest.fn().mockImplementation(({ onEvent }) => {
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
         capturedListener = onEvent
         return Promise.resolve("id")
-      }),
-    }
+      },
+    )
+
+    const mockSdk = {}
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue(mockSdk)
 
     renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     await waitFor(() => {
-      expect(mockSdk.addEventListener).toHaveBeenCalled()
+      expect(mockAddSdkEventListener).toHaveBeenCalled()
     })
 
     // Fire event while first refresh is in-flight

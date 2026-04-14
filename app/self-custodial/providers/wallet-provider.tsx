@@ -13,6 +13,8 @@ import { useSdkLifecycle } from "./use-sdk-lifecycle"
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
   sdk: BreezSdkInterface | null
+  isStableBalanceActive: boolean
+  paymentReceivedCount: number
   hasMoreTransactions: boolean
   loadingMore: boolean
   loadMore: () => Promise<void>
@@ -26,6 +28,8 @@ const defaultState: SelfCustodialWalletContextValue = {
   accountType: AccountType.SelfCustodial,
   retry: () => {},
   sdk: null,
+  isStableBalanceActive: false,
+  paymentReceivedCount: 0,
   hasMoreTransactions: false,
   loadingMore: false,
   loadMore: noop,
@@ -38,8 +42,16 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [retryCount, setRetryCount] = useState(0)
-  const { wallets, status, sdk, hasMoreTransactions, loadingMore, loadMore } =
-    useSdkLifecycle(retryCount)
+  const {
+    wallets,
+    status,
+    sdk,
+    isStableBalanceActive,
+    paymentReceivedCount,
+    hasMoreTransactions,
+    loadingMore,
+    loadMore,
+  } = useSdkLifecycle(retryCount)
 
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1)
@@ -52,11 +64,23 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
+      isStableBalanceActive,
+      paymentReceivedCount,
       hasMoreTransactions,
       loadingMore,
       loadMore,
     }),
-    [wallets, status, retry, sdk, hasMoreTransactions, loadingMore, loadMore],
+    [
+      wallets,
+      status,
+      retry,
+      sdk,
+      isStableBalanceActive,
+      paymentReceivedCount,
+      hasMoreTransactions,
+      loadingMore,
+      loadMore,
+    ],
   )
 
   return (
