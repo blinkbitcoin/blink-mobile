@@ -2,9 +2,9 @@ import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types
 
 import {
   getPaymentRequestFullUri,
-  satsToBTC,
   truncateMiddle,
 } from "../../app/screens/receive-bitcoin-screen/payment/helpers"
+import { satsToBtc as satsToBTC } from "@app/utils/bitcoin-uri"
 
 describe("getInvoiceFullUri", () => {
   it("returns a prefixed bitcoin uri", () => {
@@ -43,7 +43,7 @@ describe("getInvoiceFullUri", () => {
       memo: "will not forget",
     })
 
-    expect(uri).toBe(`bitcoin:btc1234567890address?message=will%2520not%2520forget`)
+    expect(uri).toBe(`bitcoin:btc1234567890address?message=will+not+forget`)
   })
 
   it("contains memo and amount in the uri", () => {
@@ -55,9 +55,7 @@ describe("getInvoiceFullUri", () => {
     })
 
     expect(uri).toBe(
-      `bitcoin:btc1234567890address?amount=${
-        100 / 10 ** 8
-      }&message=will%2520not%2520forget`,
+      `bitcoin:btc1234567890address?amount=${100 / 10 ** 8}&message=will+not+forget`,
     )
   })
 

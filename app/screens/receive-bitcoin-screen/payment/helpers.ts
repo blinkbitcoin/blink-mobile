@@ -15,7 +15,7 @@ export const getPaymentRequestFullUri = ({
   prefix = true,
   type = Invoice.OnChain,
 }: GetFullUriInput): string => {
-  if (type === Invoice.Lightning) {
+  if (type === Invoice.Lightning || type === Invoice.PayCode) {
     return uppercase ? input.toUpperCase() : input
   }
 
