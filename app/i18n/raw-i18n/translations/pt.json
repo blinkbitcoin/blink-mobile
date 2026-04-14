@@ -3551,5 +3551,25 @@
         "errorTitle": "Falha ao criar carteira",
         "errorDescription": "Algo deu errado. Por favor, tente novamente.",
         "retry": "Tentar novamente"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Transferência Spark",
+        "lightningPayment": "Pagamento Lightning",
+        "onchainDeposit": "Depósito On-chain",
+        "onchainWithdrawal": "Saque On-chain",
+        "conversionFromBitcoin": "Conversão de Bitcoin",
+        "conversionToBitcoin": "Conversão para Bitcoin",
+        "conversionFromToken": "Conversão de {token}",
+        "conversionToToken": "Conversão para {token}",
+        "tokenTransfer": "Transferência {token}",
+        "payTo": "Pagar a {address}",
+        "payment": "Pagamento"
+    },
+    "UnclaimedDeposit": {
+        "title": "Você tem {count} depósito(s) não reclamado(s)",
+        "description": "Total: {sats} sats disponíveis para reivindicar",
+        "claim": "Reivindicar agora",
+        "claiming": "Reivindicando...",
+        "belowMinimum": "{count} depósito(s) abaixo do mínimo (~{minimum} sats). Ainda não podem ser reivindicados."
     }
 }

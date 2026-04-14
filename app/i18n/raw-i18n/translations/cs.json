@@ -3604,5 +3604,25 @@
     "errorTitle": "Vytvoření peněženky selhalo",
     "errorDescription": "Něco se pokazilo. Zkuste to prosím znovu.",
     "retry": "Zkusit znovu"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark převod",
+    "lightningPayment": "Lightning platba",
+    "onchainDeposit": "On-chain vklad",
+    "onchainWithdrawal": "On-chain výběr",
+    "conversionFromBitcoin": "Konverze z Bitcoinu",
+    "conversionToBitcoin": "Konverze na Bitcoin",
+    "conversionFromToken": "Konverze z {token}",
+    "conversionToToken": "Konverze na {token}",
+    "tokenTransfer": "{token} převod",
+    "payTo": "Zaplatit na {address}",
+    "payment": "Platba"
+  },
+  "UnclaimedDeposit": {
+    "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
+    "description": "Celkem: {sats} satů k vyzvednutí",
+    "claim": "Vyzvednout nyní",
+    "claiming": "Vyzvedávání...",
+    "belowMinimum": "{count} vklad(ů) pod minimem (~{minimum} satů). Zatím je nelze vyzvednout."
   }
 }

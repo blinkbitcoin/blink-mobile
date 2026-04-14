@@ -3601,5 +3601,25 @@
     "errorTitle": "Wallet ruway mana allinchu",
     "errorDescription": "Imapas mana allinchu. Watiqmanta ruway.",
     "retry": "Watiqmanta ruway"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark apachiynin",
+    "lightningPayment": "Lightning pagaynin",
+    "onchainDeposit": "On-chain churana",
+    "onchainWithdrawal": "On-chain hurquna",
+    "conversionFromBitcoin": "Bitcoinmanta tikray",
+    "conversionToBitcoin": "Bitcoinman tikray",
+    "conversionFromToken": "{token}manta tikray",
+    "conversionToToken": "{token}man tikray",
+    "tokenTransfer": "{token} apachiynin",
+    "payTo": "{address}man pagay",
+    "payment": "Pagay"
+  },
+  "UnclaimedDeposit": {
+    "title": "{count} mana mañakusqa churana(kuna) kapusunki",
+    "description": "Tukuy: {sats} sats mañakunapaq",
+    "claim": "Kunan mañakuy",
+    "claiming": "Mañakuchkan...",
+    "belowMinimum": "{count} churana(kuna) pisi (~{minimum} sats). Manaraj mañakuyta atinkichu."
   }
 }

@@ -3581,5 +3581,25 @@
     "errorTitle": "Oprettelse af tegnebog mislykkedes",
     "errorDescription": "Noget gik galt. Prøv venligst igen.",
     "retry": "Prøv igen"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark-overførsel",
+    "lightningPayment": "Lightning-betaling",
+    "onchainDeposit": "On-chain indbetaling",
+    "onchainWithdrawal": "On-chain udbetaling",
+    "conversionFromBitcoin": "Konvertering fra Bitcoin",
+    "conversionToBitcoin": "Konvertering til Bitcoin",
+    "conversionFromToken": "Konvertering fra {token}",
+    "conversionToToken": "Konvertering til {token}",
+    "tokenTransfer": "{token}-overførsel",
+    "payTo": "Betal til {address}",
+    "payment": "Betaling"
+  },
+  "UnclaimedDeposit": {
+    "title": "Du har {count} uafhentede indbetalinger",
+    "description": "Total: {sats} sats tilgængelige at gøre krav på",
+    "claim": "Gør krav nu",
+    "claiming": "Gør krav...",
+    "belowMinimum": "{count} indbetaling(er) under minimum (~{minimum} sats). Disse kan ikke gøres krav på endnu."
   }
 }

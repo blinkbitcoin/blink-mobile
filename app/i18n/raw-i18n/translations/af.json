@@ -3604,5 +3604,25 @@
     "errorTitle": "Beursie skepping het misluk",
     "errorDescription": "Iets het verkeerd gegaan. Probeer asseblief weer.",
     "retry": "Probeer weer"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark-oordrag",
+    "lightningPayment": "Lightning-betaling",
+    "onchainDeposit": "On-chain Deposito",
+    "onchainWithdrawal": "On-chain Onttrekking",
+    "conversionFromBitcoin": "Omskakeling van Bitcoin",
+    "conversionToBitcoin": "Omskakeling na Bitcoin",
+    "conversionFromToken": "Omskakeling van {token}",
+    "conversionToToken": "Omskakeling na {token}",
+    "tokenTransfer": "{token}-oordrag",
+    "payTo": "Betaal aan {address}",
+    "payment": "Betaling"
+  },
+  "UnclaimedDeposit": {
+    "title": "Jy het {count} onopgeëiste deposito('s)",
+    "description": "Totaal: {sats} sats beskikbaar om te eis",
+    "claim": "Eis nou",
+    "claiming": "Besig om te eis...",
+    "belowMinimum": "{count} deposito('s) onder minimum (~{minimum} sats). Hierdie kan nog nie geëis word nie."
   }
 }

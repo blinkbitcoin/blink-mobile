@@ -3563,5 +3563,25 @@
     "errorTitle": "Αποτυχία δημιουργίας πορτοφολιού",
     "errorDescription": "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά.",
     "retry": "Δοκιμάστε ξανά"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Μεταφορά Spark",
+    "lightningPayment": "Πληρωμή Lightning",
+    "onchainDeposit": "Κατάθεση On-chain",
+    "onchainWithdrawal": "Ανάληψη On-chain",
+    "conversionFromBitcoin": "Μετατροπή από Bitcoin",
+    "conversionToBitcoin": "Μετατροπή σε Bitcoin",
+    "conversionFromToken": "Μετατροπή από {token}",
+    "conversionToToken": "Μετατροπή σε {token}",
+    "tokenTransfer": "Μεταφορά {token}",
+    "payTo": "Πληρωμή σε {address}",
+    "payment": "Πληρωμή"
+  },
+  "UnclaimedDeposit": {
+    "title": "Έχετε {count} μη διεκδικημένη(-ες) κατάθεση(-εις)",
+    "description": "Σύνολο: {sats} sats διαθέσιμα για διεκδίκηση",
+    "claim": "Διεκδίκηση τώρα",
+    "claiming": "Διεκδίκηση...",
+    "belowMinimum": "{count} κατάθεση(-εις) κάτω από το ελάχιστο (~{minimum} sats). Δεν μπορούν να διεκδικηθούν ακόμα."
   }
 }

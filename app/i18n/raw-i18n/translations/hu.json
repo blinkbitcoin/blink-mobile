@@ -3563,5 +3563,25 @@
     "errorTitle": "Tárca létrehozása sikertelen",
     "errorDescription": "Valami hiba történt. Kérjük, próbálja újra.",
     "retry": "Újra próbálkozás"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark átutalás",
+    "lightningPayment": "Lightning fizetés",
+    "onchainDeposit": "On-chain befizetés",
+    "onchainWithdrawal": "On-chain kivétel",
+    "conversionFromBitcoin": "Átváltás Bitcoinból",
+    "conversionToBitcoin": "Átváltás Bitcoinra",
+    "conversionFromToken": "Átváltás {token}-ból",
+    "conversionToToken": "Átváltás {token}-ra",
+    "tokenTransfer": "{token} átutalás",
+    "payTo": "Fizetés: {address}",
+    "payment": "Fizetés"
+  },
+  "UnclaimedDeposit": {
+    "title": "{count} nem igényelt befizetésed van",
+    "description": "Összesen: {sats} sat elérhető igénylésre",
+    "claim": "Igénylés most",
+    "claiming": "Igénylés...",
+    "belowMinimum": "{count} befizetés a minimum alatt (~{minimum} sat). Ezek még nem igényelhetők."
   }
 }

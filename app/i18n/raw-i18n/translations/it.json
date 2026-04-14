@@ -3551,5 +3551,25 @@
         "errorTitle": "Creazione portafoglio fallita",
         "errorDescription": "Qualcosa è andato storto. Riprova.",
         "retry": "Riprova"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Trasferimento Spark",
+        "lightningPayment": "Pagamento Lightning",
+        "onchainDeposit": "Deposito On-chain",
+        "onchainWithdrawal": "Prelievo On-chain",
+        "conversionFromBitcoin": "Conversione da Bitcoin",
+        "conversionToBitcoin": "Conversione in Bitcoin",
+        "conversionFromToken": "Conversione da {token}",
+        "conversionToToken": "Conversione in {token}",
+        "tokenTransfer": "Trasferimento {token}",
+        "payTo": "Pagare a {address}",
+        "payment": "Pagamento"
+    },
+    "UnclaimedDeposit": {
+        "title": "Hai {count} deposito/i non reclamato/i",
+        "description": "Totale: {sats} sats disponibili da reclamare",
+        "claim": "Reclama ora",
+        "claiming": "Reclamando...",
+        "belowMinimum": "{count} deposito/i sotto il minimo (~{minimum} sats). Non possono ancora essere reclamati."
     }
 }

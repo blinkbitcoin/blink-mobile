@@ -3601,5 +3601,25 @@
     "errorTitle": "فشل إنشاء المحفظة",
     "errorDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "retry": "حاول مرة أخرى"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "تحويل Spark",
+    "lightningPayment": "دفعة Lightning",
+    "onchainDeposit": "إيداع On-chain",
+    "onchainWithdrawal": "سحب On-chain",
+    "conversionFromBitcoin": "تحويل من Bitcoin",
+    "conversionToBitcoin": "تحويل إلى Bitcoin",
+    "conversionFromToken": "تحويل من {token}",
+    "conversionToToken": "تحويل إلى {token}",
+    "tokenTransfer": "تحويل {token}",
+    "payTo": "دفع إلى {address}",
+    "payment": "دفعة"
+  },
+  "UnclaimedDeposit": {
+    "title": "لديك {count} إيداع(ات) غير مطالب بها",
+    "description": "الإجمالي: {sats} سات متاحة للمطالبة",
+    "claim": "طالب الآن",
+    "claiming": "جارٍ المطالبة...",
+    "belowMinimum": "{count} إيداع(ات) أقل من الحد الأدنى (~{minimum} سات). لا يمكن المطالبة بها بعد."
   }
 }
