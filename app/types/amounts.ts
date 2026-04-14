@@ -75,6 +75,14 @@ export const toWalletMoneyAmount = (
   return toUsdMoneyAmount(Math.abs(amount))
 }
 
+export const toSatsAmount = (
+  amount: MoneyAmount<WalletOrDisplayCurrency>,
+  convert: (
+    amount: MoneyAmount<WalletOrDisplayCurrency>,
+    currency: WalletCurrency,
+  ) => MoneyAmount<WalletCurrency>,
+): number => convert(amount, WalletCurrency.Btc).amount
+
 const DISPLAY_DECIMALS = 2
 
 export const tokenBaseUnitsToCents = (

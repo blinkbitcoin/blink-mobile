@@ -1,0 +1,184 @@
+import { useCallback, useEffect, useMemo, useState } from "react"
+
+import { WalletCurrency } from "@app/graphql/generated"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import {
+  Invoice,
+  InvoiceType,
+  PaymentRequestState,
+} from "@app/screens/receive-bitcoin-screen/payment/index.types"
+import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import {
+  MoneyAmount,
+  WalletOrDisplayCurrency,
+  toBtcMoneyAmount,
+  toSatsAmount,
+} from "@app/types/amounts"
+import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
+
+import type { InvoiceData, SCPaymentRequestState } from "./types"
+
+export const usePaymentRequest = (): SCPaymentRequestState | null => {
+  const { sdk, paymentReceivedCount } = useSelfCustodialWallet()
+  const { wallets } = useActiveWallet()
+  const { convertMoneyAmount } = usePriceConversion()
+
+  const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
+  const usdWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+
+  const [type, setType] = useState<InvoiceType>(Invoice.Lightning)
+  const [memo, setMemoState] = useState("")
+  const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
+  const [amount, setAmountState] = useState<MoneyAmount<WalletOrDisplayCurrency>>()
+  const [receivingCurrency, setReceivingCurrency] = useState<WalletCurrency>(
+    WalletCurrency.Btc,
+  )
+  const [paymentRequest, setPaymentRequest] = useState<string>()
+  const [onchainAddress, setOnchainAddress] = useState<string>()
+  const [requestState, setRequestState] = useState<string>(PaymentRequestState.Idle)
+
+  const receivingWalletDescriptor = useMemo(
+    () => ({
+      id:
+        (receivingCurrency === WalletCurrency.Btc ? btcWallet?.id : usdWallet?.id) ?? "",
+      currency: receivingCurrency,
+    }),
+    [receivingCurrency, btcWallet?.id, usdWallet?.id],
+  )
+
+  const amountInSats = useMemo(
+    () =>
+      amount && convertMoneyAmount ? toSatsAmount(amount, convertMoneyAmount) : undefined,
+    [amount, convertMoneyAmount],
+  )
+
+  const generateRequest = useCallback(async () => {
+    if (!sdk || type === Invoice.OnChain) return
+    setRequestState(PaymentRequestState.Loading)
+
+    const sats =
+      amount && convertMoneyAmount ? toSatsAmount(amount, convertMoneyAmount) : undefined
+    const adapter = createReceiveLightning(sdk)
+    const result = await adapter({
+      amount: sats ? toBtcMoneyAmount(sats) : undefined,
+      memo: memo || undefined,
+    })
+
+    if (!("invoice" in result) || !result.invoice) {
+      setRequestState(PaymentRequestState.Error)
+      return
+    }
+
+    setPaymentRequest(result.invoice)
+    setRequestState(PaymentRequestState.Created)
+  }, [sdk, type, memo, amount, convertMoneyAmount])
+
+  const setMemo = useCallback(() => {
+    setMemoState(memoChangeText || "")
+  }, [memoChangeText])
+
+  const setAmount = useCallback((newAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
+    setAmountState(newAmount)
+  }, [])
+
+  const switchReceivingWallet = useCallback(
+    (newType: InvoiceType, currency: WalletCurrency) => {
+      setType(newType)
+      setReceivingCurrency(currency)
+    },
+    [],
+  )
+
+  useEffect(() => {
+    generateRequest()
+  }, [generateRequest])
+
+  useEffect(() => {
+    if (!sdk || onchainAddress) return
+    const adapter = createReceiveOnchain(sdk)
+    adapter().then((result: { address?: string }) => {
+      if (result.address) setOnchainAddress(result.address)
+    })
+  }, [sdk, onchainAddress])
+
+  useEffect(() => {
+    if (requestState !== PaymentRequestState.Created) return
+    if (paymentReceivedCount > 0) setRequestState(PaymentRequestState.Paid)
+  }, [paymentReceivedCount, requestState])
+
+  const getFullUriFn = useCallback(
+    (params: { uppercase?: boolean; prefix?: boolean }) => {
+      if (!paymentRequest) return ""
+      return buildLightningUri(paymentRequest, params.prefix)
+    },
+    [paymentRequest],
+  )
+
+  const getCopyableInvoiceFn = useCallback(() => paymentRequest ?? "", [paymentRequest])
+
+  const getOnchainFullUriFn = useCallback(
+    (params: { uppercase?: boolean; prefix?: boolean }) => {
+      if (!onchainAddress) return ""
+      return buildBitcoinUri({
+        address: onchainAddress,
+        amountSats: amountInSats,
+        memo: memo || undefined,
+        uppercase: params.uppercase,
+        prefix: params.prefix,
+      })
+    },
+    [onchainAddress, amountInSats, memo],
+  )
+
+  if (!sdk || !btcWallet) return null
+
+  const invoiceData: InvoiceData | undefined = paymentRequest
+    ? {
+        invoiceType: type,
+        paymentRequest,
+        address: undefined,
+        getFullUriFn,
+        getCopyableInvoiceFn,
+      }
+    : undefined
+
+  return {
+    type,
+    state: requestState,
+    setType,
+    setMemo,
+    setAmount,
+    switchReceivingWallet,
+    setExpirationTime: () => {},
+    regenerateInvoice: generateRequest,
+    expiresInSeconds: undefined,
+    expirationTime: 0,
+    canSetExpirationTime: false,
+    memo,
+    memoChangeText,
+    setMemoChangeText,
+    convertMoneyAmount,
+    settlementAmount:
+      amount && convertMoneyAmount
+        ? convertMoneyAmount(amount, receivingCurrency)
+        : undefined,
+    unitOfAccountAmount: amount,
+    receivingWalletDescriptor,
+    canSetAmount: true,
+    canSetMemo: true,
+    canUsePaycode: false,
+    btcWalletId: btcWallet?.id,
+    usdWalletId: usdWallet?.id,
+    lnAddressHostname: "",
+    feesInformation: undefined,
+    info: invoiceData ? { data: invoiceData } : undefined,
+    onchainAddress,
+    getOnchainFullUriFn,
+    pr: {
+      state: requestState,
+      info: { data: invoiceData },
+    },
+  }
+}
