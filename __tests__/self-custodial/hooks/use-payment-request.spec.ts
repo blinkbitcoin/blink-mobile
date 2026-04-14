@@ -1,0 +1,244 @@
+import { renderHook, act, waitFor } from "@testing-library/react-native"
+import { WalletCurrency } from "@app/graphql/generated"
+
+import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
+
+const mockReceiveLightning = jest.fn()
+const mockReceiveOnchain = jest.fn()
+const mockSelfCustodialWallet = jest.fn()
+const mockActiveWallet = jest.fn()
+const mockConvertMoneyAmount = jest.fn()
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  createReceiveLightning: () => mockReceiveLightning,
+  createReceiveOnchain: () => mockReceiveOnchain,
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => mockSelfCustodialWallet(),
+}))
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockActiveWallet(),
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
+}))
+
+const btcWallet = {
+  id: "btc-w1",
+  walletCurrency: WalletCurrency.Btc,
+  balance: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+  transactions: [],
+}
+
+const usdWallet = {
+  id: "usd-w1",
+  walletCurrency: WalletCurrency.Usd,
+  balance: { amount: 500, currency: WalletCurrency.Usd, currencyCode: "USD" },
+  transactions: [],
+}
+
+const mockSdk = { id: "mock-sdk" }
+
+describe("usePaymentRequest", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      paymentReceivedCount: 0,
+    })
+    mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet] })
+    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
+    mockReceiveOnchain.mockResolvedValue({ address: "bc1qtest..." })
+    mockConvertMoneyAmount.mockImplementation(
+      (amount: { amount: number }, currency: string) => ({
+        amount: amount.amount,
+        currency,
+        currencyCode: currency,
+      }),
+    )
+  })
+
+  it("returns null when sdk is unavailable", () => {
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: undefined,
+      paymentReceivedCount: 0,
+    })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    expect(result.current).toBeNull()
+  })
+
+  it("returns null when btcWallet is missing", () => {
+    mockActiveWallet.mockReturnValue({ wallets: [] })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    expect(result.current).toBeNull()
+  })
+
+  it("generates Lightning invoice on mount", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns wallet IDs", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    expect(result.current?.btcWalletId).toBe("btc-w1")
+    expect(result.current?.usdWalletId).toBe("usd-w1")
+  })
+
+  it("sets error state when receive fails", async () => {
+    mockReceiveLightning.mockResolvedValue({ errors: [{ message: "fail" }] })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+  })
+
+  it("generates on-chain address on mount", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qtest...")
+    })
+  })
+
+  it("getFullUriFn returns prefixed lightning URI", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    const uri = result.current?.pr.info?.data?.getFullUriFn({
+      prefix: true,
+      uppercase: false,
+    })
+    expect(uri).toBe("lightning:lnbc1test...")
+  })
+
+  it("getFullUriFn returns raw invoice without prefix", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    const uri = result.current?.pr.info?.data?.getFullUriFn({
+      prefix: false,
+      uppercase: false,
+    })
+    expect(uri).toBe("lnbc1test...")
+  })
+
+  it("getCopyableInvoiceFn returns payment request", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    const invoice = result.current?.pr.info?.data?.getCopyableInvoiceFn()
+    expect(invoice).toBe("lnbc1test...")
+  })
+
+  it("setMemo updates memo from memoChangeText", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    act(() => {
+      result.current?.setMemoChangeText("test memo")
+    })
+
+    act(() => {
+      result.current?.setMemo()
+    })
+
+    expect(result.current?.memo).toBe("test memo")
+  })
+
+  it("setAmount updates unitOfAccountAmount", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    act(() => {
+      result.current?.setAmount({
+        amount: 5000,
+        currency: WalletCurrency.Btc,
+        currencyCode: "BTC",
+      })
+    })
+
+    expect(result.current?.unitOfAccountAmount?.amount).toBe(5000)
+  })
+
+  it("detects payment via paymentReceivedCount", async () => {
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      paymentReceivedCount: 1,
+    })
+
+    rerender({})
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Paid")
+    })
+  })
+
+  it("has correct SC-specific defaults", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    expect(result.current?.canSetAmount).toBe(true)
+    expect(result.current?.canSetMemo).toBe(true)
+    expect(result.current?.canUsePaycode).toBe(false)
+    expect(result.current?.canSetExpirationTime).toBe(false)
+    expect(result.current?.feesInformation).toBeUndefined()
+    expect(result.current?.lnAddressHostname).toBe("")
+  })
+
+  it("getOnchainFullUriFn returns bitcoin URI with address", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qtest...")
+    })
+
+    const uri = result.current?.getOnchainFullUriFn?.({
+      prefix: true,
+      uppercase: false,
+    })
+    expect(uri).toBe("bitcoin:bc1qtest...")
+  })
+})
