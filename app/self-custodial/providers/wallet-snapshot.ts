@@ -1,55 +1,118 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  PaymentDetails,
+  PaymentMethod,
+  type BreezSdkInterface,
+  type Payment,
+  type TokenBalance,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { toWalletMoneyAmount } from "@app/types/amounts"
+import { tokenBaseUnitsToCents, toWalletMoneyAmount } from "@app/types/amounts"
 import { toWalletId, type WalletState } from "@app/types/wallet.types"
+import { type NormalizedTransaction } from "@app/types/transaction.types"
 
-import { SparkToken } from "../config"
+import { SparkConfig, SparkToken } from "../config"
 import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
 
-export const getSelfCustodialWalletSnapshot = async (
-  sdk: BreezSdkInterface,
-): Promise<WalletState[]> => {
-  const info = await sdk.getInfo({ ensureSynced: false })
+const TRANSACTIONS_PER_PAGE = 20
 
-  const btcBalance = Number(info.balanceSats)
-  const usdbEntry = Object.entries(info.tokenBalances).find(
+const getStableBalance = (
+  tokenBalances: Map<string, TokenBalance> | Record<string, TokenBalance>,
+): number => {
+  const entries: [string, TokenBalance][] =
+    tokenBalances instanceof Map
+      ? [...tokenBalances.entries()]
+      : Object.entries(tokenBalances)
+
+  const match = entries.find(
     ([, token]) => token.tokenMetadata?.ticker === SparkToken.Ticker,
   )
-  const usdBalance = usdbEntry ? Number(usdbEntry[1].balance) : 0
+  if (!match) return 0
 
-  const btcWallet: WalletState = {
-    id: toWalletId(`${info.identityPubkey}-btc`),
-    walletCurrency: WalletCurrency.Btc,
-    balance: toWalletMoneyAmount(btcBalance, WalletCurrency.Btc),
-    transactions: [],
-  }
+  const decimals = match[1].tokenMetadata?.decimals ?? 0
+  return tokenBaseUnitsToCents(Number(match[1].balance), decimals)
+}
 
-  const usdWallet: WalletState = {
-    id: toWalletId(`${info.identityPubkey}-usd`),
-    walletCurrency: WalletCurrency.Usd,
-    balance: toWalletMoneyAmount(usdBalance, WalletCurrency.Usd),
-    transactions: [],
-  }
+const isKnownPayment = (payment: Payment): boolean => {
+  if (payment.method !== PaymentMethod.Token) return true
+  if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
+  return payment.details.inner.metadata.identifier === SparkConfig.tokenIdentifier
+}
 
-  const payments = await sdk.listPayments({
+const fetchAndMapPayments = async (
+  sdk: BreezSdkInterface,
+  offset: number,
+): Promise<NormalizedTransaction[]> => {
+  const response = await sdk.listPayments({
     typeFilter: undefined,
     statusFilter: undefined,
     assetFilter: undefined,
     paymentDetailsFilter: undefined,
     fromTimestamp: undefined,
     toTimestamp: undefined,
-    offset: undefined,
-    limit: 50,
+    offset,
+    limit: TRANSACTIONS_PER_PAGE,
     sortAscending: false,
   })
 
-  const txs = mapSelfCustodialTransactions(payments.payments)
-  const btcTxs = txs.filter((tx) => tx.amount.currency === WalletCurrency.Btc)
-  const usdTxs = txs.filter((tx) => tx.amount.currency === WalletCurrency.Usd)
+  return mapSelfCustodialTransactions(response.payments.filter(isKnownPayment))
+}
 
-  return [
-    { ...btcWallet, transactions: btcTxs },
-    { ...usdWallet, transactions: usdTxs },
-  ]
+type WalletBalances = {
+  identityPubkey: string
+  btcBalance: number
+  stableBalance: number
+}
+
+const buildWallets = (
+  balances: WalletBalances,
+  transactions: NormalizedTransaction[],
+): WalletState[] => [
+  {
+    id: toWalletId(`${balances.identityPubkey}-btc`),
+    walletCurrency: WalletCurrency.Btc,
+    balance: toWalletMoneyAmount(balances.btcBalance, WalletCurrency.Btc),
+    transactions: transactions.filter((tx) => tx.amount.currency === WalletCurrency.Btc),
+  },
+  {
+    id: toWalletId(`${balances.identityPubkey}-usd`),
+    walletCurrency: WalletCurrency.Usd,
+    balance: toWalletMoneyAmount(balances.stableBalance, WalletCurrency.Usd),
+    transactions: transactions.filter((tx) => tx.amount.currency === WalletCurrency.Usd),
+  },
+]
+
+export type WalletSnapshot = {
+  wallets: WalletState[]
+  hasMore: boolean
+}
+
+export const getSelfCustodialWalletSnapshot = async (
+  sdk: BreezSdkInterface,
+): Promise<WalletSnapshot> => {
+  const info = await sdk.getInfo({ ensureSynced: false })
+  const transactions = await fetchAndMapPayments(sdk, 0)
+
+  return {
+    wallets: buildWallets(
+      {
+        identityPubkey: info.identityPubkey,
+        btcBalance: Number(info.balanceSats),
+        stableBalance: getStableBalance(info.tokenBalances),
+      },
+      transactions,
+    ),
+    hasMore: transactions.length >= TRANSACTIONS_PER_PAGE,
+  }
+}
+
+export const loadMoreTransactions = async (
+  sdk: BreezSdkInterface,
+  currentCount: number,
+): Promise<{ transactions: NormalizedTransaction[]; hasMore: boolean }> => {
+  const transactions = await fetchAndMapPayments(sdk, currentCount)
+  return {
+    transactions,
+    hasMore: transactions.length >= TRANSACTIONS_PER_PAGE,
+  }
 }
