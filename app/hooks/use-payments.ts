@@ -6,6 +6,11 @@ import {
   createCustodialListPendingDeposits,
 } from "@app/custodial/adapters/payment-adapter"
 import {
+  createReceiveLightning,
+  createReceiveOnchain,
+} from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import {
   type ClaimDepositAdapter,
   type ConvertAdapter,
   type GetFeeAdapter,
@@ -31,15 +36,23 @@ type PaymentsResult = {
 
 export const usePayments = (): PaymentsResult => {
   const { activeAccount } = useAccountRegistry()
+  const { sdk } = useSelfCustodialWallet()
   const accountType = activeAccount?.type ?? AccountType.Custodial
 
-  return useMemo(
-    (): PaymentsResult => ({
+  return useMemo((): PaymentsResult => {
+    if (accountType === AccountType.SelfCustodial && sdk) {
+      return {
+        receiveLightning: createReceiveLightning(sdk),
+        receiveOnchain: createReceiveOnchain(sdk),
+        accountType,
+      }
+    }
+
+    return {
       listPendingDeposits: createCustodialListPendingDeposits,
       claimDeposit: createCustodialClaimDeposit,
       convert: createCustodialConvert,
       accountType,
-    }),
-    [accountType],
-  )
+    }
+  }, [accountType, sdk])
 }
