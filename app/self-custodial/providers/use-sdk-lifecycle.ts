@@ -14,7 +14,7 @@ import { disconnectSdk, initSdk } from "../bridge"
 import { SparkConfig } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
-import { getSelfCustodialWalletSnapshot } from "./wallet-snapshot"
+import { getSelfCustodialWalletSnapshot, loadMoreTransactions } from "./wallet-snapshot"
 
 const REFRESH_EVENTS = new Set([
   SdkEventTags.Synced,
@@ -22,16 +22,23 @@ const REFRESH_EVENTS = new Set([
   SdkEventTags.PaymentPending,
   SdkEventTags.ClaimedDeposits,
   SdkEventTags.UnclaimedDeposits,
+  SdkEventTags.NewDeposits,
 ])
 
 type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
+  sdk: Awaited<ReturnType<typeof initSdk>> | null
+  hasMoreTransactions: boolean
+  loadingMore: boolean
+  loadMore: () => Promise<void>
 }
 
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
+  const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const sdkRef = useRef<Awaited<ReturnType<typeof initSdk>> | null>(null)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
@@ -46,7 +53,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
     try {
       const snapshot = await getSelfCustodialWalletSnapshot(sdkRef.current)
-      setWallets(snapshot)
+      setWallets(snapshot.wallets)
+      setHasMoreTransactions(snapshot.hasMore)
       setStatus(ActiveWalletStatus.Ready)
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
@@ -135,5 +143,37 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     return () => subscription.remove()
   }, [refreshWallets])
 
-  return { wallets, status }
+  const loadMore = useCallback(async () => {
+    if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
+    setLoadingMore(true)
+    try {
+      const currentCount = wallets.reduce((sum, w) => sum + w.transactions.length, 0)
+      const result = await loadMoreTransactions(sdkRef.current, currentCount)
+      setHasMoreTransactions(result.hasMore)
+      setWallets((prev) =>
+        prev.map((w) => ({
+          ...w,
+          transactions: [
+            ...w.transactions,
+            ...result.transactions.filter(
+              (tx) => tx.amount.currency === w.walletCurrency,
+            ),
+          ],
+        })),
+      )
+    } catch (err) {
+      logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMoreTransactions, wallets])
+
+  return {
+    wallets,
+    status,
+    sdk: sdkRef.current,
+    hasMoreTransactions,
+    loadingMore,
+    loadMore,
+  }
 }

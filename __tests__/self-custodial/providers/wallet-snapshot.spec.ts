@@ -4,6 +4,7 @@ import { getSelfCustodialWalletSnapshot } from "@app/self-custodial/providers/wa
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
+  SparkConfig: { tokenIdentifier: "test-token-id" },
 }))
 
 const createMockSdk = (overrides = {}) => ({
@@ -12,8 +13,8 @@ const createMockSdk = (overrides = {}) => ({
     balanceSats: 50000,
     tokenBalances: {
       token1: {
-        balance: 1500,
-        tokenMetadata: { ticker: "USDB" },
+        balance: 150000,
+        tokenMetadata: { ticker: "USDB", decimals: 6 },
       },
     },
     ...overrides,
@@ -25,13 +26,13 @@ describe("getSelfCustodialWalletSnapshot", () => {
   it("returns BTC and USD wallets with correct balances", async () => {
     const sdk = createMockSdk()
 
-    const wallets = await getSelfCustodialWalletSnapshot(sdk as never)
+    const { wallets } = await getSelfCustodialWalletSnapshot(sdk as never)
 
     expect(wallets).toHaveLength(2)
     expect(wallets[0].walletCurrency).toBe(WalletCurrency.Btc)
     expect(wallets[0].balance.amount).toBe(50000)
     expect(wallets[1].walletCurrency).toBe(WalletCurrency.Usd)
-    expect(wallets[1].balance.amount).toBe(1500)
+    expect(wallets[1].balance.amount).toBe(15)
   })
 
   it("returns zero USD balance when no token found", async () => {
@@ -42,7 +43,7 @@ describe("getSelfCustodialWalletSnapshot", () => {
       tokenBalances: {},
     })
 
-    const wallets = await getSelfCustodialWalletSnapshot(sdk as never)
+    const { wallets } = await getSelfCustodialWalletSnapshot(sdk as never)
 
     expect(wallets[1].balance.amount).toBe(0)
   })
@@ -50,7 +51,7 @@ describe("getSelfCustodialWalletSnapshot", () => {
   it("uses identityPubkey for wallet IDs", async () => {
     const sdk = createMockSdk()
 
-    const wallets = await getSelfCustodialWalletSnapshot(sdk as never)
+    const { wallets } = await getSelfCustodialWalletSnapshot(sdk as never)
 
     expect(wallets[0].id).toContain("pubkey123")
     expect(wallets[1].id).toContain("pubkey123")
@@ -62,20 +63,21 @@ describe("getSelfCustodialWalletSnapshot", () => {
       payments: [
         {
           id: "pay1",
-          paymentType: "send",
-          amountSats: 1000,
-          feesSats: 10,
-          paymentTime: 1700000000,
-          status: "complete",
+          paymentType: 0,
+          amount: BigInt(1000),
+          fees: BigInt(10),
+          timestamp: BigInt(1700000000),
+          status: 0,
+          method: 0,
           details: {
             tag: "Lightning",
-            data: { paymentHash: "hash1" },
+            inner: { description: "test" },
           },
         },
       ],
     })
 
-    const wallets = await getSelfCustodialWalletSnapshot(sdk as never)
+    const { wallets } = await getSelfCustodialWalletSnapshot(sdk as never)
 
     expect(wallets[0].transactions.length).toBeGreaterThanOrEqual(0)
   })
