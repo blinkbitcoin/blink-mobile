@@ -11,26 +11,38 @@ import {
   mapSelfCustodialTransactions,
 } from "@app/self-custodial/mappers/transaction-mapper"
 
-jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
-  PaymentMethod: {
-    Lightning: 0,
-    Spark: 1,
-    Token: 2,
-    Deposit: 3,
-    Withdraw: 4,
-    Unknown: 5,
-  },
-  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
-  PaymentType: { Send: 0, Receive: 1 },
-  // eslint-disable-next-line camelcase
-  PaymentDetails_Tags: {
-    Spark: "Spark",
-    Token: "Token",
-    Lightning: "Lightning",
-    Withdraw: "Withdraw",
-    Deposit: "Deposit",
-  },
-}))
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
+  const instanceOf = (tag: string) => ({
+    instanceOf: (obj: { tag?: string }) => obj?.tag === tag,
+  })
+  return {
+    PaymentMethod: {
+      Lightning: 0,
+      Spark: 1,
+      Token: 2,
+      Deposit: 3,
+      Withdraw: 4,
+      Unknown: 5,
+    },
+    PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+    PaymentType: { Send: 0, Receive: 1 },
+    // eslint-disable-next-line camelcase
+    PaymentDetails_Tags: {
+      Spark: "Spark",
+      Token: "Token",
+      Lightning: "Lightning",
+      Withdraw: "Withdraw",
+      Deposit: "Deposit",
+    },
+    PaymentDetails: {
+      Lightning: instanceOf("Lightning"),
+      Spark: instanceOf("Spark"),
+      Token: instanceOf("Token"),
+      Deposit: instanceOf("Deposit"),
+      Withdraw: instanceOf("Withdraw"),
+    },
+  }
+})
 
 type TestPayment = Parameters<typeof mapSelfCustodialTransaction>[0]
 
@@ -118,7 +130,13 @@ describe("mapSelfCustodialTransaction", () => {
 
   it("fees always use BTC currency", () => {
     const result = mapSelfCustodialTransaction(
-      createPayment({ method: 2, details: { tag: "Token", inner: {} } }),
+      createPayment({
+        method: 2,
+        details: {
+          tag: "Token",
+          inner: { metadata: { ticker: "USDB", decimals: 6, identifier: "test" } },
+        },
+      }),
     )
 
     expect(result.fee?.currency).toBe(WalletCurrency.Btc)
@@ -157,21 +175,23 @@ describe("edge cases", () => {
     expect(result.fee?.amount).toBe(0)
   })
 
-  it("handles Deposit detail tag as Lightning", () => {
+  it("handles Deposit method as Onchain", () => {
     const payment = createPayment({
+      method: 3,
       details: { tag: "Deposit", inner: {} },
     })
     const result = mapSelfCustodialTransaction(payment)
 
-    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(result.paymentType).toBe(PaymentType.Onchain)
   })
 
-  it("handles Withdraw detail tag as Lightning", () => {
+  it("handles Withdraw method as Onchain", () => {
     const payment = createPayment({
+      method: 4,
       details: { tag: "Withdraw", inner: {} },
     })
     const result = mapSelfCustodialTransaction(payment)
 
-    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(result.paymentType).toBe(PaymentType.Onchain)
   })
 })
