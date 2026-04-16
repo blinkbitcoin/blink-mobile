@@ -39,6 +39,7 @@ import { TrustModelModal } from "@app/components/trust-model-modal"
 import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import {
@@ -579,6 +580,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
+        {isSelfCustodial && <UnclaimedDepositBanner />}
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />

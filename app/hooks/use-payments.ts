@@ -6,6 +6,15 @@ import {
   createCustodialListPendingDeposits,
 } from "@app/custodial/adapters/payment-adapter"
 import {
+  createGetFee,
+  createSendPayment,
+} from "@app/self-custodial/adapters/payment-adapter"
+import {
+  createClaimDeposit,
+  createListPendingDeposits,
+} from "@app/self-custodial/adapters/deposit-adapter"
+import {
+  createConvert,
   createReceiveLightning,
   createReceiveOnchain,
 } from "@app/self-custodial/bridge"
@@ -42,8 +51,13 @@ export const usePayments = (): PaymentsResult => {
   return useMemo((): PaymentsResult => {
     if (accountType === AccountType.SelfCustodial && sdk) {
       return {
+        sendPayment: createSendPayment(sdk),
+        getFee: createGetFee(sdk),
         receiveLightning: createReceiveLightning(sdk),
         receiveOnchain: createReceiveOnchain(sdk),
+        listPendingDeposits: createListPendingDeposits(sdk),
+        claimDeposit: createClaimDeposit(sdk),
+        convert: createConvert(sdk),
         accountType,
       }
     }
