@@ -2322,7 +2322,11 @@
     "recommended": "Đề xuất",
     "walletOffline": "Ví của bạn đang ngoại tuyến. Vui lòng kiểm tra kết nối và thử lại.",
     "destinationIsRequired": "Điểm đến là bắt buộc",
-    "lnurlInvoiceIncorrectDescription": "Máy chủ LNURL đã phản hồi với một hóa đơn có phần mô tả không chính xác."
+    "lnurlInvoiceIncorrectDescription": "Máy chủ LNURL đã phản hồi với một hóa đơn có phần mô tả không chính xác.",
+    "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
+    "sdkAmountTooLow": "Số tiền quá thấp cho giao dịch on-chain.",
+    "sdkNetworkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
+    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
     "staticQr": "QR tĩnh có thể in",

@@ -2305,7 +2305,11 @@
     "slow": "Lassú",
     "recommended": "Ajánlott",
     "walletOffline": "A tárcád offline. Kérjük, ellenőrizd a kapcsolatot és próbáld újra.",
-    "destinationIsRequired": "A cél kötelező"
+    "destinationIsRequired": "A cél kötelező",
+    "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
+    "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
+    "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
+    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
     "staticQr": "Nyomtatható statikus QR-kód",

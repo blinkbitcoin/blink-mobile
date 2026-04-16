@@ -2322,7 +2322,11 @@
     "recommended": "Doporučeno",
     "walletOffline": "Vaše peněženka je offline. Zkontrolujte prosím připojení a zkuste to znovu.",
     "destinationIsRequired": "Je vyžadován příjemce",
-    "lnurlInvoiceIncorrectDescription": "Server lnurl odpověděl fakturou s nesprávným hashem popisu."
+    "lnurlInvoiceIncorrectDescription": "Server lnurl odpověděl fakturou s nesprávným hashem popisu.",
+    "sdkInsufficientFunds": "Nedostatek prostředků pro tuto transakci.",
+    "sdkAmountTooLow": "Částka je příliš nízká pro on-chain transakci.",
+    "sdkNetworkError": "Chyba sítě. Zkontrolujte připojení a zkuste to znovu.",
+    "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku."
   },
   "SettingsScreen": {
     "staticQr": "Tisknutelný statický QR",

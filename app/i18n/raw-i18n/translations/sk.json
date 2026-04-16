@@ -2305,7 +2305,11 @@
     "slow": "Pomalý",
     "recommended": "Odporúčané",
     "walletOffline": "Vaša peňaženka je offline. Skontrolujte pripojenie a skúste to znova.",
-    "destinationIsRequired": "Príjemca je povinný"
+    "destinationIsRequired": "Príjemca je povinný",
+    "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
+    "sdkAmountTooLow": "Suma je príliš nízka pre on-chain transakciu.",
+    "sdkNetworkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
+    "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
     "staticQr": "Vytlačiteľný statický QR kód",

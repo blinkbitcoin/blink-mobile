@@ -2322,7 +2322,11 @@
     "recommended": "Disyorkan",
     "walletOffline": "Dompet anda di luar talian. Sila semak sambungan anda dan cuba lagi.",
     "destinationIsRequired": "Destinasi penghantaran adalah wajib",
-    "lnurlInvoiceIncorrectDescription": "Server lnurl telah respon terhadap invois tersebut dengan kesalahan pada perincian hash"
+    "lnurlInvoiceIncorrectDescription": "Server lnurl telah respon terhadap invois tersebut dengan kesalahan pada perincian hash",
+    "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",
+    "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
+    "sdkNetworkError": "Ralat rangkaian. Sila semak sambungan anda dan cuba lagi.",
+    "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
   },
   "SettingsScreen": {
     "staticQr": "QR statik boleh cetak",

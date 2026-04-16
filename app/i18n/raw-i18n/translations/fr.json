@@ -2322,7 +2322,11 @@
         "recommended": "Recommandé",
         "walletOffline": "Votre portefeuille est hors ligne. Veuillez vérifier votre connexion et réessayer.",
         "destinationIsRequired": "Adresse de destination requise",
-        "lnurlInvoiceIncorrectDescription": "Le serveur lnurl a répondu avec une facture contenant un hachage de description incorrect."
+        "lnurlInvoiceIncorrectDescription": "Le serveur lnurl a répondu avec une facture contenant un hachage de description incorrect.",
+        "sdkInsufficientFunds": "Fonds insuffisants pour cette transaction.",
+        "sdkAmountTooLow": "Le montant est trop faible pour une transaction on-chain.",
+        "sdkNetworkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+        "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
         "staticQr": "QR statique imprimable",

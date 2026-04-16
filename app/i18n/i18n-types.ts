@@ -7436,6 +7436,22 @@ type RootTranslation = {
 		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		walletOffline: string
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkInsufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​t​o​o​ ​l​o​w​ ​f​o​r​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkAmountTooLow: string
+		/**
+		 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		sdkNetworkError: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
+		 */
+		sdkGenericError: string
 	}
 	SettingsScreen: {
 		/**
@@ -19286,6 +19302,22 @@ export type TranslationFunctions = {
 		 * Your wallet is offline. Please check your connection and try again.
 		 */
 		walletOffline: () => LocalizedString
+		/**
+		 * Not enough funds for this transaction.
+		 */
+		sdkInsufficientFunds: () => LocalizedString
+		/**
+		 * Amount is too low for an on-chain transaction.
+		 */
+		sdkAmountTooLow: () => LocalizedString
+		/**
+		 * Network error. Please check your connection and try again.
+		 */
+		sdkNetworkError: () => LocalizedString
+		/**
+		 * Unable to estimate fees. Please try a different amount.
+		 */
+		sdkGenericError: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**

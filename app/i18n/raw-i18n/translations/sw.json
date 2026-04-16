@@ -2305,7 +2305,11 @@
     "slow": "Polepole",
     "recommended": "Inapendekezwa",
     "walletOffline": "Pochi yako haiko mtandaoni. Tafadhali angalia muunganisho wako na ujaribu tena.",
-    "destinationIsRequired": "Mpokeaji anahitajika"
+    "destinationIsRequired": "Mpokeaji anahitajika",
+    "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
+    "sdkAmountTooLow": "Kiasi ni kidogo sana kwa muamala wa on-chain.",
+    "sdkNetworkError": "Hitilafu ya mtandao. Angalia muunganisho wako na ujaribu tena.",
+    "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
   },
   "SettingsScreen": {
     "staticQr": "Msimbo Tuli wa QR unaoweza kuchapishwa",

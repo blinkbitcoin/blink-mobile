@@ -2305,7 +2305,11 @@
     "slow": "Lambat",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
-    "destinationIsRequired": "Tujuan diperlukan"
+    "destinationIsRequired": "Tujuan diperlukan",
+    "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
+    "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
+    "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
+    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
     "staticQr": "Kode QR Statis yang Dapat Dicetak",

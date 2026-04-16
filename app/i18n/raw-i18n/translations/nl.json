@@ -2322,7 +2322,11 @@
     "recommended": "Aanbevolen",
     "walletOffline": "Je portemonnee is offline. Controleer je verbinding en probeer het opnieuw.",
     "destinationIsRequired": "Bestemming is vereist",
-    "lnurlInvoiceIncorrectDescription": "De ln-url server reageerde met een factuur met een onjuiste hash-beschrijving."
+    "lnurlInvoiceIncorrectDescription": "De ln-url server reageerde met een factuur met een onjuiste hash-beschrijving.",
+    "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",
+    "sdkAmountTooLow": "Het bedrag is te laag voor een on-chain transactie.",
+    "sdkNetworkError": "Netwerkfout. Controleer uw verbinding en probeer het opnieuw.",
+    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
   },
   "SettingsScreen": {
     "staticQr": "Afdrukbare statische QR",

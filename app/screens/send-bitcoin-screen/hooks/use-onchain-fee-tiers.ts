@@ -29,15 +29,42 @@ const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
   [FeeTierOption.Slow]: { feeSats: 0, etaMinutes: ETA_MINUTES[FeeTierOption.Slow] },
 }
 
+export const SdkFeeError = {
+  InsufficientFunds: "insufficient_funds",
+  InvalidInput: "invalid_input",
+  NetworkError: "network_error",
+  Generic: "generic",
+} as const
+
+export type SdkFeeError = (typeof SdkFeeError)[keyof typeof SdkFeeError]
+
+type OnchainFeeTiersResult = {
+  tiers: Record<FeeTierOption, FeeTierInfo>
+  error: SdkFeeError | null
+}
+
+const classifyError = (err: unknown): SdkFeeError => {
+  const message = err instanceof Error ? err.message : String(err)
+  if (message.includes("InsufficientFunds")) return SdkFeeError.InsufficientFunds
+  if (message.includes("InvalidInput")) return SdkFeeError.InvalidInput
+  if (message.includes("NetworkError")) return SdkFeeError.NetworkError
+
+  return SdkFeeError.Generic
+}
+
 export const useOnchainFeeTiers = (
   sdk: BreezSdkInterface | null,
   address: string | undefined,
   amountSats: number | undefined,
-): Record<FeeTierOption, FeeTierInfo> => {
+): OnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
+  const [error, setError] = useState<SdkFeeError | null>(null)
 
   const fetchFees = useCallback(async () => {
-    if (!sdk || !address || !amountSats) return
+    if (!sdk || !address || !amountSats) {
+      setError(null)
+      return
+    }
 
     try {
       const prepared = await prepareSend(sdk, address, BigInt(amountSats))
@@ -58,8 +85,9 @@ export const useOnchainFeeTiers = (
           etaMinutes: ETA_MINUTES[FeeTierOption.Slow],
         },
       })
-    } catch {
-      // keep defaults
+      setError(null)
+    } catch (err) {
+      setError(classifyError(err))
     }
   }, [sdk, address, amountSats])
 
@@ -67,5 +95,5 @@ export const useOnchainFeeTiers = (
     fetchFees()
   }, [fetchFees])
 
-  return tiers
+  return { tiers, error }
 }

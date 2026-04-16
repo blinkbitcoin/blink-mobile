@@ -2322,7 +2322,11 @@
     "recommended": "แนะนำ",
     "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "destinationIsRequired": "กรุณาระบุปลายทาง",
-    "lnurlInvoiceIncorrectDescription": "เซิร์ฟเวอร์ lnurl ตอบสนองกับ invoice ที่มี Description hash ไม่ถูกต้อง"
+    "lnurlInvoiceIncorrectDescription": "เซิร์ฟเวอร์ lnurl ตอบสนองกับ invoice ที่มี Description hash ไม่ถูกต้อง",
+    "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
+    "sdkAmountTooLow": "จำนวนเงินต่ำเกินไปสำหรับธุรกรรม on-chain",
+    "sdkNetworkError": "ข้อผิดพลาดของเครือข่าย กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
     "staticQr": "QR แบบคงที่สำหรับพิมพ์",

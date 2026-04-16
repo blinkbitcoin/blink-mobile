@@ -2374,6 +2374,10 @@ const en: BaseTranslation = {
     slow: "Slow",
     recommended: "Recommended",
     walletOffline: "Your wallet is offline. Please check your connection and try again.",
+    sdkInsufficientFunds: "Not enough funds for this transaction.",
+    sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
+    sdkNetworkError: "Network error. Please check your connection and try again.",
+    sdkGenericError: "Unable to estimate fees. Please try a different amount.",
   },
   SettingsScreen: {
     staticQr: "Printable static QR",

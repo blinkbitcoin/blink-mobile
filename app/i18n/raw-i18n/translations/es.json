@@ -2304,7 +2304,11 @@
         "medium": "Medio",
         "slow": "Lento",
         "recommended": "Recomendado",
-        "walletOffline": "Tu billetera está sin conexión. Por favor verifica tu conexión e intenta de nuevo."
+        "walletOffline": "Tu billetera está sin conexión. Por favor verifica tu conexión e intenta de nuevo.",
+        "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
+        "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
+        "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
     },
     "SettingsScreen": {
         "staticQr": "QR estático imprimible",

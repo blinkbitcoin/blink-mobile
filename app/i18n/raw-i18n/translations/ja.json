@@ -2322,7 +2322,11 @@
         "recommended": "推奨",
         "walletOffline": "ウォレットがオフラインです。接続を確認してもう一度お試しください。",
         "destinationIsRequired": "送金先の入力は必須です",
-        "lnurlInvoiceIncorrectDescription": "lnurlサーバーが不正な説明ハッシュを持つインボイスで応答しました。"
+        "lnurlInvoiceIncorrectDescription": "lnurlサーバーが不正な説明ハッシュを持つインボイスで応答しました。",
+        "sdkInsufficientFunds": "この取引に十分な残高がありません。",
+        "sdkAmountTooLow": "オンチェーン取引には金額が低すぎます。",
+        "sdkNetworkError": "ネットワークエラー。接続を確認して再試行してください。",
+        "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
         "staticQr": "印刷用静的QR",

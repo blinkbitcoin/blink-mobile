@@ -2340,7 +2340,11 @@
     "walletOffline": "Isipaji sakho asikho kwi-intanethi. Nceda ujonge unxibelelwano lwakho uze uzame kwakhona.",
     "destinationIsRequired": "Indawo yokufikela iyafuneka",
     "input": "Igama lomsebenzisi, i-invoyisi, okanye idilesi",
-    "lnurlInvoiceIncorrectDescription": "Iseva ye-lnurl iphendule nge-invoyisi enenkcazo engachanekanga i-hash."
+    "lnurlInvoiceIncorrectDescription": "Iseva ye-lnurl iphendule nge-invoyisi enenkcazo engachanekanga i-hash.",
+    "sdkInsufficientFunds": "Imali ayonelanga kulo msebenzi.",
+    "sdkAmountTooLow": "Imali iphantsi kakhulu kumsebenzi we-on-chain.",
+    "sdkNetworkError": "Impazamo yenethiwekhi. Khawujonge unxibelelwano lwakho uze uzame kwakhona.",
+    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
     "staticQr": "I-QR esisigxina enokuprintwa",

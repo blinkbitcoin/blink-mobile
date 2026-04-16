@@ -2305,7 +2305,11 @@
     "slow": "Lent",
     "recommended": "Recomandat",
     "walletOffline": "Portofelul tău este offline. Te rugăm să verifici conexiunea și să încerci din nou.",
-    "destinationIsRequired": "Destinația este necesară"
+    "destinationIsRequired": "Destinația este necesară",
+    "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
+    "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
+    "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
+    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
     "staticQr": "Cod QR static imprimabil",

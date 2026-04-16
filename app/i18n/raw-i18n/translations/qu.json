@@ -2322,7 +2322,11 @@
     "recommended": "Allin",
     "walletOffline": "Qullqi wasi offline kachkan. Ama hina t'inkisqaykita qhaway hinaspa wakmanta ñit'iy.",
     "destinationIsRequired": "Qillqata sutichinaqinmi kaniyta rikuyta munanpi kaniyta rikuchiy",
-    "lnurlInvoiceIncorrectDescription": "Lnurl serverpi kawsayniyta qillqata sutichinaqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta hashpi mana kaniyta rikuchiy."
+    "lnurlInvoiceIncorrectDescription": "Lnurl serverpi kawsayniyta qillqata sutichinaqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta hashpi mana kaniyta rikuchiy.",
+    "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
+    "sdkAmountTooLow": "Yupayqa pisillam on-chain ruwaykunapaq.",
+    "sdkNetworkError": "Llika pantay. Tinkisqaykita qhaway hinaspa watiqmanta ruway.",
+    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
     "staticQr": "Ñit'iy atikuq QR nisqa",

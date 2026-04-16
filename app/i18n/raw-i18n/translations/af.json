@@ -2322,7 +2322,11 @@
     "recommended": "Aanbeveel",
     "walletOffline": "Jou beursie is vanlyn. Kontroleer asseblief jou verbinding en probeer weer.",
     "destinationIsRequired": "Bestemming word benodig",
-    "lnurlInvoiceIncorrectDescription": "Die LNURL-bediener het reageer met 'n faktuur met 'n verkeerde transaksie-hash"
+    "lnurlInvoiceIncorrectDescription": "Die LNURL-bediener het reageer met 'n faktuur met 'n verkeerde transaksie-hash",
+    "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
+    "sdkAmountTooLow": "Bedrag is te laag vir 'n on-chain transaksie.",
+    "sdkNetworkError": "Netwerkfout. Kontroleer asseblief jou verbinding en probeer weer.",
+    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
     "staticQr": "Drukbare statiese QR",
