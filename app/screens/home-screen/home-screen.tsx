@@ -594,7 +594,7 @@ export const HomeScreen: React.FC = () => {
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
       />
-      <BackupNudgeModal isVisible={shouldShowModal} />
+      <BackupNudgeModal isVisible={shouldShowModal} onClose={dismissBanner} />
       <TrustModelModal isVisible={showTrustModel} onDismiss={markTrustModelSeen} />
     </Screen>
   )

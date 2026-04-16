@@ -11670,15 +11670,15 @@ type RootTranslation = {
 		 */
 		settingsWarning: string
 		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​n​e​e​d​ ​p​r​o​t​e​c​t​i​o​n
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
 		 */
 		modalTitle: string
 		/**
-		 * Y​o​u​ ​h​a​v​e​ ​a​ ​s​i​g​n​i​f​i​c​a​n​t​ ​b​a​l​a​n​c​e​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​p​r​e​v​e​n​t​ ​l​o​s​s​.
+		 * W​e​ ​h​i​g​h​l​y​ ​r​e​c​o​m​m​e​n​d​ ​y​o​u​ ​b​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​p​r​e​v​e​n​t​ ​a​ ​c​o​m​p​l​e​t​e​ ​l​o​s​s​ ​o​f​ ​f​u​n​d​s​ ​i​n​ ​c​a​s​e​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​.
 		 */
 		modalDescription: string
 		/**
-		 * S​e​c​u​r​e​ ​m​e
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
 		 */
 		secureMe: string
 		/**
@@ -23256,15 +23256,15 @@ export type TranslationFunctions = {
 		 */
 		settingsWarning: () => LocalizedString
 		/**
-		 * Your funds need protection
+		 * Secure your funds
 		 */
 		modalTitle: () => LocalizedString
 		/**
-		 * You have a significant balance. Back up your wallet to prevent loss.
+		 * We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.
 		 */
 		modalDescription: () => LocalizedString
 		/**
-		 * Secure me
+		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
 		/**

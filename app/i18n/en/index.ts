@@ -3685,10 +3685,10 @@ const en: BaseTranslation = {
     description: "Secure your wallet now. It only takes a minute.",
     cta: "Secure wallet",
     settingsWarning: "Backup your wallet. If you lose this device, you will lose your funds.",
-    modalTitle: "Your funds need protection",
+    modalTitle: "Secure your funds",
     modalDescription:
-      "You have a significant balance. Back up your wallet to prevent loss.",
-    secureMe: "Secure me",
+      "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
+    secureMe: "Secure wallet",
     trustModelTitle: "You are in control",
     trustModelDescription:
       "Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.",
