@@ -2305,7 +2305,11 @@
     "slow": "Yavaş",
     "recommended": "Önerilen",
     "walletOffline": "Cüzdanınız çevrimdışı. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
-    "destinationIsRequired": "Gönderilecek adres gerekli."
+    "destinationIsRequired": "Gönderilecek adres gerekli.",
+    "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
+    "sdkAmountTooLow": "Tutar, bir on-chain işlemi için çok düşük.",
+    "sdkNetworkError": "Ağ hatası. Bağlantınızı kontrol edin ve tekrar deneyin.",
+    "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
     "staticQr": "Basılabilir Statik QR Kodu",

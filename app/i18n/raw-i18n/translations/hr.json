@@ -2322,7 +2322,11 @@
     "recommended": "Preporučeno",
     "walletOffline": "Vaš novčanik je offline. Provjerite vezu i pokušajte ponovo.",
     "destinationIsRequired": "Odredište je obavezno",
-    "lnurlInvoiceIncorrectDescription": "lnurl poslužitelj je odgovorio fakturom s netočnim hashom opisa."
+    "lnurlInvoiceIncorrectDescription": "lnurl poslužitelj je odgovorio fakturom s netočnim hashom opisa.",
+    "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
+    "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
+    "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
+    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
   },
   "SettingsScreen": {
     "staticQr": "Statični QR za ispis",

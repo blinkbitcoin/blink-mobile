@@ -2305,7 +2305,11 @@
         "slow": "Langsam",
         "recommended": "Empfohlen",
         "walletOffline": "Deine Wallet ist offline. Bitte überprüfe deine Verbindung und versuche es erneut.",
-        "destinationIsRequired": "Empfänger ist erforderlich"
+        "destinationIsRequired": "Empfänger ist erforderlich",
+        "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
+        "sdkAmountTooLow": "Der Betrag ist zu niedrig für eine On-Chain-Transaktion.",
+        "sdkNetworkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+        "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
     },
     "SettingsScreen": {
         "staticQr": "Druckbarer statischer QR-Code",

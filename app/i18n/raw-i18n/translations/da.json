@@ -2308,7 +2308,11 @@
     "slow": "Langsom",
     "recommended": "Anbefalet",
     "walletOffline": "Din tegnebog er offline. Tjek venligst din forbindelse og prøv igen.",
-    "destinationIsRequired": "Destination er påkrævet"
+    "destinationIsRequired": "Destination er påkrævet",
+    "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
+    "sdkAmountTooLow": "Beløbet er for lavt til en on-chain transaktion.",
+    "sdkNetworkError": "Netværksfejl. Tjek din forbindelse og prøv igen.",
+    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
     "staticQr": "Printbar statisk QR",

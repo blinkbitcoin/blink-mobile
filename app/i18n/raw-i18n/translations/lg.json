@@ -2305,7 +2305,11 @@
     "slow": "Mpola",
     "recommended": "Kirungi",
     "walletOffline": "Wallet yo eri offline. Kebera ennyukuta yo oddemu ogezeko.",
-    "destinationIsRequired": "Enkomerero y'etagisa"
+    "destinationIsRequired": "Enkomerero y'etagisa",
+    "sdkInsufficientFunds": "Ssente tezimala ku mulimu guno.",
+    "sdkAmountTooLow": "Omuwendo guli wansi ennyo olw'okukola on-chain.",
+    "sdkNetworkError": "Ensobi y'ennyonnyola. Kebera ennyonnyola yo oddemu okugezaako.",
+    "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
     "staticQr": "Koodi ya QR etali ya kukyukakyuka eyinza okwokyebwaamu",
