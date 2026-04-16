@@ -35,7 +35,7 @@ type SdkLifecycleState = {
   status: ActiveWalletStatus
   sdk: Awaited<ReturnType<typeof initSdk>> | null
   isStableBalanceActive: boolean
-  paymentReceivedCount: number
+  lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
   loadMore: () => Promise<void>
@@ -45,9 +45,10 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [isStableBalanceActive, setIsStableBalanceActive] = useState(false)
-  const [paymentReceivedCount, setPaymentReceivedCount] = useState(0)
+  const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [sdk, setSdk] = useState<Awaited<ReturnType<typeof initSdk>> | null>(null)
   const sdkRef = useRef<Awaited<ReturnType<typeof initSdk>> | null>(null)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
@@ -114,12 +115,18 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         }
 
         sdkRef.current = sdk
+        setSdk(sdk)
 
         await addSdkEventListener(sdk, async (event) => {
           if (!mounted) return
           if (REFRESH_EVENTS.has(event.tag)) {
             if (PAYMENT_RECEIVED_EVENTS.includes(event.tag)) {
-              setPaymentReceivedCount((prev) => prev + 1)
+              const inner = "inner" in event ? event.inner : null
+              const paymentId =
+                inner && typeof inner === "object" && "payment" in inner
+                  ? (inner as { payment: { id: string } }).payment.id
+                  : null
+              if (paymentId) setLastReceivedPaymentId(paymentId)
             }
             await refreshWallets()
           }
@@ -147,6 +154,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       if (sdkRef.current) {
         disconnectSdk(sdkRef.current)
         sdkRef.current = null
+        setSdk(null)
       }
     }
   }, [retryCount, refreshWallets])
@@ -186,9 +194,9 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   return {
     wallets,
     status,
-    sdk: sdkRef.current,
+    sdk,
     isStableBalanceActive,
-    paymentReceivedCount,
+    lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,
     loadMore,
