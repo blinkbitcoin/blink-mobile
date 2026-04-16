@@ -34,6 +34,7 @@ import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { TrustModelModal } from "@app/components/trust-model-modal"
 import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
@@ -171,6 +172,7 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  const { refreshWallets: refreshSCWallets } = useSelfCustodialWallet()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const {
     seen: trustModelSeen,
@@ -337,6 +339,11 @@ export const HomeScreen: React.FC = () => {
   ])
 
   const refetch = React.useCallback(() => {
+    if (isSelfCustodial) {
+      refreshSCWallets()
+      return
+    }
+
     if (!isAuthed) return
 
     Promise.all([
@@ -350,6 +357,8 @@ export const HomeScreen: React.FC = () => {
     })
   }, [
     isAuthed,
+    isSelfCustodial,
+    refreshSCWallets,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,
