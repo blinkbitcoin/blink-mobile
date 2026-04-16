@@ -15,7 +15,6 @@ import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
   Network,
   useOnChainTxFeeLazyQuery,
-  useSendBitcoinDetailsScreenQuery,
   useSendBitcoinInternalLimitsQuery,
   useSendBitcoinWithdrawalLimitsQuery,
   Wallet,
@@ -24,7 +23,16 @@ import {
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
-import { getBtcWallet, getDefaultWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+
+import {
+  decodeInvoiceString,
+  Network as NetworkLibGaloy,
+  PaymentType,
+} from "@blinkbitcoin/blink-client"
+import crashlytics from "@react-native-firebase/crashlytics"
+import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
 import { useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -36,13 +44,10 @@ import {
   toUsdMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import {
-  decodeInvoiceString,
-  Network as NetworkLibGaloy,
-} from "@blinkbitcoin/blink-client"
-import crashlytics from "@react-native-firebase/crashlytics"
-import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { FeeTierSelector } from "./fee-tier-selector"
+import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
+import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
@@ -119,11 +124,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { hideAmount } = useHideAmount()
 
-  const { data } = useSendBitcoinDetailsScreenQuery({
-    fetchPolicy: "cache-first",
-    returnPartialData: true,
-    skip: !useIsAuthed(),
-  })
+  const { wallets, defaultWallet, btcWallet, usdWallet, network, isSelfCustodial } =
+    useSendWallets()
 
   const { formatMoneyAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
@@ -133,22 +135,21 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-
-  const defaultWallet = getDefaultWallet(
-    data?.me?.defaultAccount?.wallets,
-    data?.me?.defaultAccount?.defaultWalletId,
-  )
-
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
-
-  const network = data?.globals?.network
-
-  const wallets = data?.me?.defaultAccount?.wallets
   const { paymentDestination } = route.params
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
+  const { feeTier, setFeeTier, feeTierOptions } = useOnchainFeeTierOptions({
+    paymentDetail,
+    isSelfCustodial,
+    paymentDestination,
+    convertMoneyAmount: _convertMoneyAmount,
+  })
+
+  const handleFeeTierChange = (tier: typeof feeTier) => {
+    const rebuilt = setFeeTier(tier, paymentDetail)
+    if (rebuilt) setPaymentDetail(rebuilt)
+  }
 
   const { data: withdrawalLimitsData } = useSendBitcoinWithdrawalLimitsQuery({
     fetchPolicy: "no-cache",
@@ -293,6 +294,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (paymentDetail?.paymentType === "onchain") return LL.common.onchain()
     if (paymentDetail?.paymentType === "lightning") return LL.common.lightning()
     if (paymentDetail?.paymentType === "lnurl") return LL.common.lightning()
+    if (paymentDetail?.paymentType === "spark") return LL.common.spark()
   }
 
   const ChooseWalletModal = wallets && (
@@ -576,6 +578,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             />
           </View>
         </View>
+        {isSelfCustodial && paymentDetail.paymentType === PaymentType.Onchain && (
+          <View style={styles.fieldContainer}>
+            <FeeTierSelector
+              title={LL.SendBitcoinScreen.feeTier()}
+              options={feeTierOptions}
+              selected={feeTier}
+              onSelect={handleFeeTierChange}
+            />
+          </View>
+        )}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
           <NoteInput
