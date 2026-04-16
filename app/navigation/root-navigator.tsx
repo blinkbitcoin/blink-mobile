@@ -87,6 +87,7 @@ import { SelectionScreen } from "../screens/settings-screen/selection-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
+import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed-deposits-screen"
 
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
@@ -422,6 +423,11 @@ export const RootStack = () => {
           headerShown: false,
           // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
         }}
+      />
+      <RootNavigator.Screen
+        name="unclaimedDepositsScreen"
+        component={UnclaimedDepositsScreen}
+        options={{ title: LL.UnclaimedDeposit.screenTitle() }}
       />
       <RootNavigator.Screen
         name="transactionHistory"
