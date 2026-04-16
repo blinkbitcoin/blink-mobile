@@ -15,7 +15,24 @@ import {
 import { type ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 
 import { formatFeeTierOptions } from "./format-fee-tier-options"
-import { FeeTierOption, useOnchainFeeTiers } from "./use-onchain-fee-tiers"
+import {
+  FeeTierOption,
+  type SdkFeeError,
+  SdkFeeError as FeeError,
+  useOnchainFeeTiers,
+} from "./use-onchain-fee-tiers"
+
+type LL = ReturnType<typeof useI18nContext>["LL"]
+
+const resolveFeeErrorMessage = (error: SdkFeeError, LL: LL): string => {
+  if (error === FeeError.InsufficientFunds) {
+    return LL.SendBitcoinScreen.sdkInsufficientFunds()
+  }
+  if (error === FeeError.InvalidInput) return LL.SendBitcoinScreen.sdkAmountTooLow()
+  if (error === FeeError.NetworkError) return LL.SendBitcoinScreen.sdkNetworkError()
+
+  return LL.SendBitcoinScreen.sdkGenericError()
+}
 
 type FeeTierOptionsParams = {
   paymentDetail: PaymentDetail<WalletCurrency> | null
@@ -43,7 +60,13 @@ export const useOnchainFeeTierOptions = ({
       ? paymentDetail.settlementAmount.amount
       : undefined
 
-  const feeTiers = useOnchainFeeTiers(sdk ?? null, onchainAddress, onchainAmountSats)
+  const { tiers: feeTiers, error: feeError } = useOnchainFeeTiers(
+    sdk ?? null,
+    onchainAddress,
+    onchainAmountSats,
+  )
+
+  const feeTierErrorMessage = feeError ? resolveFeeErrorMessage(feeError, LL) : undefined
 
   const feeTierOptions = formatFeeTierOptions({
     tiers: feeTiers,
@@ -92,5 +115,5 @@ export const useOnchainFeeTierOptions = ({
     [isOnchain, rebuildForTier],
   )
 
-  return { feeTier, setFeeTier, feeTierOptions, isOnchain }
+  return { feeTier, setFeeTier, feeTierOptions, isOnchain, feeTierErrorMessage }
 }

@@ -2305,7 +2305,11 @@
     "slow": "Lent",
     "recommended": "Recomanat",
     "walletOffline": "La teva cartera està fora de línia. Si us plau, comprova la connexió i torna-ho a provar.",
-    "destinationIsRequired": "La destinació és necessaria"
+    "destinationIsRequired": "La destinació és necessaria",
+    "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
+    "sdkAmountTooLow": "L'import és massa baix per a una transacció on-chain.",
+    "sdkNetworkError": "Error de xarxa. Comproveu la connexió i torneu-ho a provar.",
+    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
     "staticQr": "Codi QR estàtic imprimible",

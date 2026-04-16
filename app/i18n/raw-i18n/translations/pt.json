@@ -2305,7 +2305,11 @@
         "slow": "Lento",
         "recommended": "Recomendado",
         "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
-        "destinationIsRequired": "Destino é obrigatório"
+        "destinationIsRequired": "Destino é obrigatório",
+        "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
+        "sdkAmountTooLow": "O valor é muito baixo para uma transação on-chain.",
+        "sdkNetworkError": "Erro de rede. Verifique sua conexão e tente novamente.",
+        "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
         "staticQr": "QR Code estático imprimível",

@@ -139,12 +139,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
-  const { feeTier, setFeeTier, feeTierOptions } = useOnchainFeeTierOptions({
-    paymentDetail,
-    isSelfCustodial,
-    paymentDestination,
-    convertMoneyAmount: _convertMoneyAmount,
-  })
+  const { feeTier, setFeeTier, feeTierOptions, feeTierErrorMessage } =
+    useOnchainFeeTierOptions({
+      paymentDetail,
+      isSelfCustodial,
+      paymentDestination,
+      convertMoneyAmount: _convertMoneyAmount,
+    })
 
   const handleFeeTierChange = (tier: typeof feeTier) => {
     const rebuilt = setFeeTier(tier, paymentDetail)
@@ -599,7 +600,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           />
         </View>
         <SendBitcoinDetailsExtraInfo
-          errorMessage={asyncErrorMessage}
+          errorMessage={asyncErrorMessage || feeTierErrorMessage}
           amountStatus={amountStatus}
           currentLevel={currentLevel}
         />
@@ -607,7 +608,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           <GaloyPrimaryButton
             onPress={goToNextScreen || undefined}
             loading={isLoadingLnurl}
-            disabled={!goToNextScreen || !amountStatus.validAmount}
+            disabled={
+              !goToNextScreen || !amountStatus.validAmount || Boolean(feeTierErrorMessage)
+            }
             title={LL.common.next()}
           />
         </View>

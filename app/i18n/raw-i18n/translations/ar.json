@@ -2322,7 +2322,11 @@
     "recommended": "موصى به",
     "walletOffline": "محفظتك غير متصلة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
     "destinationIsRequired": "الوجهة مطلوبة",
-    "lnurlInvoiceIncorrectDescription": "استجاب الخادم بفاتورة فيها هاش وصف غير صالح."
+    "lnurlInvoiceIncorrectDescription": "استجاب الخادم بفاتورة فيها هاش وصف غير صالح.",
+    "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
+    "sdkAmountTooLow": "المبلغ منخفض جدًا لمعاملة على السلسلة.",
+    "sdkNetworkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
     "staticQr": "رمز QR ثابت قابل للطباعة",
