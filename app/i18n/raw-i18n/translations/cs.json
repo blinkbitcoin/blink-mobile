@@ -3579,9 +3579,9 @@
     "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu."
   },
   "BackupNudge": {
-    "title": "Zabezpečte peněženku",
-    "description": "Vaše prostředky jsou ohroženy. Zabezpečte svou peněženku nyní. Trvá to jen minutu.",
-    "cta": "Zabezpečit nyní",
+    "title": "Vaše prostředky jsou v ohrožení",
+    "description": "Zabezpečte svou peněženku nyní. Zabere to jen minutu.",
+    "cta": "Zabezpečit peněženku",
     "settingsWarning": "Zálohujte svou peněženku. Pokud ztratíte toto zařízení, přijdete o své prostředky.",
     "modalTitle": "Vaše prostředky potřebují ochranu",
     "modalDescription": "Máte významný zůstatek. Zálohujte svou peněženku, abyste předešli ztrátě.",

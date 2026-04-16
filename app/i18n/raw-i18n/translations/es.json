@@ -3526,9 +3526,9 @@
         "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo."
     },
     "BackupNudge": {
-        "title": "Asegura tu billetera",
-        "description": "Tus fondos están en riesgo. Asegura tu billetera ahora. Solo toma un minuto.",
-        "cta": "Asegurar ahora",
+        "title": "Tus fondos están en riesgo",
+        "description": "Asegura tu billetera ahora. Solo toma un minuto.",
+        "cta": "Asegurar billetera",
         "settingsWarning": "Respalda tu billetera. Si pierdes este dispositivo, perderás tus fondos.",
         "modalTitle": "Tus fondos necesitan protección",
         "modalDescription": "Tienes un saldo significativo. Respalda tu billetera para evitar pérdidas.",

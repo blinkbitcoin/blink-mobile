@@ -3579,9 +3579,9 @@
     "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer."
   },
   "BackupNudge": {
-    "title": "Beveilig jou beursie",
-    "description": "Jou fondse is in gevaar. Beveilig jou beursie nou. Dit neem net 'n minuut.",
-    "cta": "Beveilig nou",
+    "title": "Jou fondse is in gevaar",
+    "description": "Beveilig jou beursie nou. Dit neem net 'n minuut.",
+    "cta": "Beveilig beursie",
     "settingsWarning": "Rugsteun jou beursie. As jy hierdie toestel verloor, verloor jy jou fondse.",
     "modalTitle": "Jou fondse het beskerming nodig",
     "modalDescription": "Jy het 'n beduidende balans. Rugsteun jou beursie om verlies te voorkom.",

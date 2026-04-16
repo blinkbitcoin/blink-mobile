@@ -3585,9 +3585,9 @@
     "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona."
   },
   "BackupNudge": {
-    "title": "Khusela isikhwama sakho",
-    "description": "Imali yakho isengozini. Khusela isipaji sakho ngoku. Kuthatha umzuzu omnye kuphela.",
-    "cta": "Khusela ngoku",
+    "title": "Imali yakho isengozini",
+    "description": "Khuseleka ingxowa yakho ngoku. Kuthatha umzuzu nje kuphela.",
+    "cta": "Khuseleka ingxowa",
     "settingsWarning": "Gcina isipaji sakho. Ukuba ulahlekelwa sesi sixhobo, uya kulahlekelwa yimali yakho.",
     "modalTitle": "Imali yakho ifuna ukukhuselwa",
     "modalDescription": "Unebhalansi ebalulekileyo. Gcina isipaji sakho ukuthintela ukulahlekelwa.",

@@ -3538,9 +3538,9 @@
     "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar."
   },
   "BackupNudge": {
-    "title": "Protegeix la teva cartera",
-    "description": "Els teus fons estan en risc. Assegura la teva cartera ara. Només triga un minut.",
-    "cta": "Assegurar ara",
+    "title": "Els teus fons estan en risc",
+    "description": "Assegura la teva cartera ara. Només triga un minut.",
+    "cta": "Assegurar cartera",
     "settingsWarning": "Fes una còpia de seguretat de la teva cartera. Si perds aquest dispositiu, perdràs els teus fons.",
     "modalTitle": "Els teus fons necessiten protecció",
     "modalDescription": "Tens un balanç significatiu. Fes una còpia de seguretat per evitar pèrdues.",

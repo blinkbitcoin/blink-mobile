@@ -3538,9 +3538,9 @@
     "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena."
   },
   "BackupNudge": {
-    "title": "Linda mkoba wako",
-    "description": "Fedha zako ziko hatarini. Linda mkoba wako sasa. Inachukua dakika moja tu.",
-    "cta": "Linda sasa",
+    "title": "Fedha zako ziko hatarini",
+    "description": "Linda pochi yako sasa. Inachukua dakika moja tu.",
+    "cta": "Linda pochi",
     "settingsWarning": "Hifadhi mkoba wako. Ukipoteza kifaa hiki, utapoteza fedha zako.",
     "modalTitle": "Fedha zako zinahitaji ulinzi",
     "modalDescription": "Una salio kubwa. Hifadhi mkoba wako ili kuzuia hasara.",

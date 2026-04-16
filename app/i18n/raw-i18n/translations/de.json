@@ -3526,9 +3526,9 @@
         "wrongPassword": "Falsches Passwort. Bitte versuche es erneut."
     },
     "BackupNudge": {
-        "title": "Sichere dein Wallet",
-        "description": "Deine Guthaben sind gefährdet. Sichere deine Wallet jetzt. Es dauert nur eine Minute.",
-        "cta": "Jetzt sichern",
+        "title": "Ihre Mittel sind gefährdet",
+        "description": "Sichern Sie Ihre Wallet jetzt. Es dauert nur eine Minute.",
+        "cta": "Wallet sichern",
         "settingsWarning": "Sichere deine Wallet. Wenn du dieses Gerät verlierst, verlierst du deine Guthaben.",
         "modalTitle": "Deine Guthaben brauchen Schutz",
         "modalDescription": "Du hast ein erhebliches Guthaben. Sichere deine Wallet, um Verluste zu vermeiden.",

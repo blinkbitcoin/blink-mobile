@@ -3538,9 +3538,9 @@
     "wrongPassword": "Kata sandi salah. Silakan coba lagi."
   },
   "BackupNudge": {
-    "title": "Amankan dompet Anda",
-    "description": "Dana Anda berisiko. Amankan dompet Anda sekarang. Hanya butuh satu menit.",
-    "cta": "Amankan sekarang",
+    "title": "Dana Anda dalam bahaya",
+    "description": "Amankan dompet Anda sekarang. Hanya butuh satu menit.",
+    "cta": "Amankan dompet",
     "settingsWarning": "Cadangkan dompet Anda. Jika Anda kehilangan perangkat ini, Anda akan kehilangan dana.",
     "modalTitle": "Dana Anda membutuhkan perlindungan",
     "modalDescription": "Anda memiliki saldo yang signifikan. Cadangkan dompet untuk mencegah kehilangan.",

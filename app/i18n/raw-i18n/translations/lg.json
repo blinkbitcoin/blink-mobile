@@ -3538,9 +3538,9 @@
     "wrongPassword": "Password si ntuufu. Gezaako nate."
   },
   "BackupNudge": {
-    "title": "Kuuma wallet yo",
-    "description": "Ssente zo ziri mu kabi. Kuba wallet yo kati. Kitwala eddakiika emu yokka.",
-    "cta": "Kuba kati",
+    "title": "Ssente zo ziri mu bulabe",
+    "description": "Kuuma wallet yo kati. Kimala ddakiika emu yokka.",
+    "cta": "Kuuma wallet",
     "settingsWarning": "Koppa wallet yo. Bw'ofiirwa ekikozesebwa kino, onofiirwa ssente zo.",
     "modalTitle": "Ssente zo zeetaaga okukuumibwa",
     "modalDescription": "Olina balance ennene. Koppa wallet yo okusobola okwewala okufiirwa.",
