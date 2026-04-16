@@ -1,6 +1,6 @@
 import React from "react"
 
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
@@ -13,23 +13,38 @@ import CustomModal from "../custom-modal/custom-modal"
 
 type BackupNudgeModalProps = {
   isVisible: boolean
+  onClose: () => void
 }
 
-export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({ isVisible }) => {
+export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({
+  isVisible,
+  onClose,
+}) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const handleSecure = () => {
+    onClose()
     navigation.navigate("sparkBackupMethodScreen")
   }
 
   return (
     <CustomModal
       isVisible={isVisible}
-      toggleModal={() => {}}
-      showCloseIconButton={false}
-      image={<GaloyIcon name="warning" size={40} {...testProps("nudge-warning-icon")} />}
+      toggleModal={onClose}
+      showCloseIconButton={true}
+      image={
+        <GaloyIcon
+          name="warning"
+          size={52}
+          color={colors.primary}
+          {...testProps("nudge-warning-icon")}
+        />
+      }
       title={LL.BackupNudge.modalTitle()}
       body={<Text style={styles.description}>{LL.BackupNudge.modalDescription()}</Text>}
       primaryButtonTitle={LL.BackupNudge.secureMe()}
@@ -42,8 +57,8 @@ export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({ isVisible })
 const useStyles = makeStyles(({ colors }) => ({
   description: {
     textAlign: "center",
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.grey2,
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.black,
   },
 }))
