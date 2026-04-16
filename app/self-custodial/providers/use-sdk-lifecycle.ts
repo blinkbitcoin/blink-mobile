@@ -39,6 +39,7 @@ type SdkLifecycleState = {
   hasMoreTransactions: boolean
   loadingMore: boolean
   loadMore: () => Promise<void>
+  refreshWallets: () => Promise<void>
 }
 
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
@@ -69,6 +70,9 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
       crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
+      setStatus((prev) =>
+        prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Ready : prev,
+      )
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
       if (pendingRefreshRef.current) {
@@ -132,12 +136,15 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
           }
         })
 
-        const settings = await getUserSettings(sdk)
-        if (mounted) {
-          setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
-        }
-
         await refreshWallets()
+
+        getUserSettings(sdk)
+          .then((settings) => {
+            if (mounted) {
+              setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+            }
+          })
+          .catch(() => {})
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
         crashlytics().recordError(
@@ -200,5 +207,6 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     hasMoreTransactions,
     loadingMore,
     loadMore,
+    refreshWallets,
   }
 }
