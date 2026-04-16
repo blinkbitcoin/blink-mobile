@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -21,7 +21,7 @@ import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
 import type { InvoiceData, SCPaymentRequestState } from "./types"
 
 export const usePaymentRequest = (): SCPaymentRequestState | null => {
-  const { sdk, paymentReceivedCount } = useSelfCustodialWallet()
+  const { sdk, lastReceivedPaymentId } = useSelfCustodialWallet()
   const { wallets } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
 
@@ -38,6 +38,9 @@ export const usePaymentRequest = (): SCPaymentRequestState | null => {
   const [paymentRequest, setPaymentRequest] = useState<string>()
   const [onchainAddress, setOnchainAddress] = useState<string>()
   const [requestState, setRequestState] = useState<string>(PaymentRequestState.Idle)
+  const baselinePaymentIdRef = useRef<string | null>(lastReceivedPaymentId)
+  const lastPaymentIdRef = useRef(lastReceivedPaymentId)
+  lastPaymentIdRef.current = lastReceivedPaymentId
 
   const receivingWalletDescriptor = useMemo(
     () => ({
@@ -71,6 +74,7 @@ export const usePaymentRequest = (): SCPaymentRequestState | null => {
       return
     }
 
+    baselinePaymentIdRef.current = lastPaymentIdRef.current
     setPaymentRequest(result.invoice)
     setRequestState(PaymentRequestState.Created)
   }, [sdk, type, memo, amount, convertMoneyAmount])
@@ -105,8 +109,10 @@ export const usePaymentRequest = (): SCPaymentRequestState | null => {
 
   useEffect(() => {
     if (requestState !== PaymentRequestState.Created) return
-    if (paymentReceivedCount > 0) setRequestState(PaymentRequestState.Paid)
-  }, [paymentReceivedCount, requestState])
+    if (!lastReceivedPaymentId) return
+    if (lastReceivedPaymentId === baselinePaymentIdRef.current) return
+    setRequestState(PaymentRequestState.Paid)
+  }, [lastReceivedPaymentId, requestState])
 
   const getFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {

@@ -47,7 +47,7 @@ describe("usePaymentRequest", () => {
     jest.clearAllMocks()
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
-      paymentReceivedCount: 0,
+      lastReceivedPaymentId: null,
     })
     mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet] })
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
@@ -64,7 +64,7 @@ describe("usePaymentRequest", () => {
   it("returns null when sdk is unavailable", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: undefined,
-      paymentReceivedCount: 0,
+      lastReceivedPaymentId: null,
     })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -194,8 +194,42 @@ describe("usePaymentRequest", () => {
     expect(result.current?.unitOfAccountAmount?.amount).toBe(5000)
   })
 
-  it("detects payment via paymentReceivedCount", async () => {
+  it("transitions to Paid when a new payment arrives after invoice creation", async () => {
     const { result, rerender } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: "payment-abc-123",
+    })
+    rerender({})
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Paid")
+    })
+  })
+
+  it("does not trigger Paid on re-entry when payment ID matches baseline", async () => {
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: "payment-already-seen",
+    })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    expect(result.current?.state).toBe("Created")
+  })
+
+  it("full cycle: create → paid → re-enter → new invoice without re-triggering", async () => {
+    const { result, rerender, unmount } = renderHook(() => usePaymentRequest())
 
     await waitFor(() => {
       expect(result.current?.state).toBe("Created")
@@ -203,14 +237,29 @@ describe("usePaymentRequest", () => {
 
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
-      paymentReceivedCount: 1,
+      lastReceivedPaymentId: "payment-first",
     })
-
     rerender({})
 
     await waitFor(() => {
       expect(result.current?.state).toBe("Paid")
     })
+
+    unmount()
+
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: "payment-first",
+    })
+    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1second..." })
+
+    const { result: result2 } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result2.current?.state).toBe("Created")
+    })
+
+    expect(result2.current?.state).toBe("Created")
   })
 
   it("has correct SC-specific defaults", async () => {
