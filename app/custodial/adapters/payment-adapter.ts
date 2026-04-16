@@ -126,6 +126,9 @@ export const createCustodialClaimDeposit: ClaimDepositAdapter = {
   claimDeposit: async () => {
     throw new UnsupportedOperationError("claimDeposit")
   },
+  refundDeposit: async () => {
+    throw new UnsupportedOperationError("refundDeposit")
+  },
 }
 
 export const createCustodialConvert: ConvertAdapter = async () =>

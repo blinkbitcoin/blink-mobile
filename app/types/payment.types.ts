@@ -82,22 +82,45 @@ export type FeeQuote =
     }
 
 export const DepositStatus = {
-  Pending: "pending",
-  ClaimRequired: "claim_required",
+  Immature: "immature",
+  Claimable: "claimable",
+  FeeExceeded: "fee_exceeded",
+  Error: "error",
+  Refunded: "refunded",
 } as const
 
 export type DepositStatus = (typeof DepositStatus)[keyof typeof DepositStatus]
 
+export const DepositErrorReason = {
+  FeeExceeded: "fee_exceeded",
+  MissingUtxo: "missing_utxo",
+  BelowDust: "below_dust",
+  Generic: "generic",
+} as const
+
+export type DepositErrorReason =
+  (typeof DepositErrorReason)[keyof typeof DepositErrorReason]
+
 export type PendingDeposit = {
   id: string
-  address: string
+  txid: string
+  vout: number
   amount: MoneyAmount<WalletCurrency>
   status: DepositStatus
-  claimFee?: MoneyAmount<WalletCurrency>
+  errorReason: DepositErrorReason | null
+  requiredFeeSats?: number
+  errorMessage?: string
 }
 
 export type ClaimDepositParams = {
   depositId: string
+  maxFeeSats?: number
+}
+
+export type RefundDepositParams = {
+  depositId: string
+  destinationAddress: string
+  feeRateSatPerVb: number
 }
 
 export const ConvertDirection = {
@@ -136,6 +159,7 @@ export type ListPendingDepositsAdapter = () => Promise<{
 export type ClaimDepositAdapter = {
   getClaimFee: (params: ClaimDepositParams) => Promise<FeeQuote | null>
   claimDeposit: (params: ClaimDepositParams) => Promise<PaymentAdapterResult>
+  refundDeposit: (params: RefundDepositParams) => Promise<PaymentAdapterResult>
 }
 
 export type ConvertAdapter = (params: ConvertParams) => Promise<PaymentAdapterResult>
