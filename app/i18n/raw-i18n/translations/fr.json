@@ -3567,9 +3567,9 @@
         "wrongPassword": "Mot de passe incorrect. Veuillez réessayer."
     },
     "BackupNudge": {
-        "title": "Sécurisez votre portefeuille",
-        "description": "Vos fonds sont en danger. Sécurisez votre portefeuille maintenant. Cela ne prend qu'une minute.",
-        "cta": "Sécuriser maintenant",
+        "title": "Vos fonds sont en danger",
+        "description": "Sécurisez votre portefeuille maintenant. Cela ne prend qu'une minute.",
+        "cta": "Sécuriser le portefeuille",
         "settingsWarning": "Sauvegardez votre portefeuille. Si vous perdez cet appareil, vous perdrez vos fonds.",
         "modalTitle": "Vos fonds ont besoin de protection",
         "modalDescription": "Vous avez un solde important. Sauvegardez votre portefeuille pour éviter les pertes.",

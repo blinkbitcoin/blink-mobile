@@ -3579,9 +3579,9 @@
     "wrongPassword": "Netočna lozinka. Pokušajte ponovo."
   },
   "BackupNudge": {
-    "title": "Zaštitite novčanik",
-    "description": "Vaša sredstva su ugrožena. Osigurajte svoj novčanik sada. Traje samo minutu.",
-    "cta": "Osiguraj sada",
+    "title": "Vaša sredstva su u opasnosti",
+    "description": "Osigurajte svoj novčanik sada. Traje samo minutu.",
+    "cta": "Osiguraj novčanik",
     "settingsWarning": "Napravite sigurnosnu kopiju. Ako izgubite ovaj uređaj, izgubit ćete svoja sredstva.",
     "modalTitle": "Vaša sredstva trebaju zaštitu",
     "modalDescription": "Imate značajan saldo. Napravite sigurnosnu kopiju kako biste spriječili gubitak.",

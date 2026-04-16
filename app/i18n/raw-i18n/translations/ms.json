@@ -3579,9 +3579,9 @@
     "wrongPassword": "Kata laluan salah. Sila cuba lagi."
   },
   "BackupNudge": {
-    "title": "Lindungi dompet anda",
-    "description": "Dana anda berisiko. Lindungi dompet anda sekarang. Hanya mengambil masa seminit.",
-    "cta": "Lindungi sekarang",
+    "title": "Dana anda dalam bahaya",
+    "description": "Lindungi dompet anda sekarang. Ia hanya mengambil masa seminit.",
+    "cta": "Lindungi dompet",
     "settingsWarning": "Sandarkan dompet anda. Jika anda kehilangan peranti ini, anda akan kehilangan dana anda.",
     "modalTitle": "Dana anda memerlukan perlindungan",
     "modalDescription": "Anda mempunyai baki yang besar. Sandarkan dompet anda untuk mengelakkan kerugian.",

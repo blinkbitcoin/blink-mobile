@@ -3538,9 +3538,9 @@
     "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra."
   },
   "BackupNudge": {
-    "title": "Biztosítsa tárcáját",
-    "description": "Pénzeszközeid veszélyben vannak. Biztosítsd a tárcádat most. Csak egy percet vesz igénybe.",
-    "cta": "Biztosítás most",
+    "title": "Az Ön pénzeszközei veszélyben vannak",
+    "description": "Biztosítsa tárcáját most. Csak egy percet vesz igénybe.",
+    "cta": "Tárca biztosítása",
     "settingsWarning": "Készíts biztonsági mentést. Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
     "modalTitle": "Pénzeszközeid védelmet igényelnek",
     "modalDescription": "Jelentős egyenleged van. Készíts biztonsági mentést a veszteség elkerülése érdekében.",

@@ -3556,9 +3556,9 @@
     "wrongPassword": "Forkert adgangskode. Prøv venligst igen."
   },
   "BackupNudge": {
-    "title": "Sikr din tegnebog",
-    "description": "Dine midler er i fare. Sikr din tegnebog nu. Det tager kun et minut.",
-    "cta": "Sikr nu",
+    "title": "Dine midler er i fare",
+    "description": "Sikr din tegnebog nu. Det tager kun et minut.",
+    "cta": "Sikr tegnebog",
     "settingsWarning": "Sikkerhedskopiér din tegnebog. Hvis du mister denne enhed, mister du dine midler.",
     "modalTitle": "Dine midler har brug for beskyttelse",
     "modalDescription": "Du har en betydelig saldo. Sikkerhedskopiér din tegnebog for at undgå tab.",
