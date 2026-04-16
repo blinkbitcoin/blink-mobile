@@ -34,7 +34,16 @@ module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
   initLogging: jest.fn(),
+  BitcoinNetwork: { Bitcoin: 0, Testnet3: 1, Testnet4: 2, Signet: 3, Regtest: 4 },
+  InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  SendPaymentOptions: {
+    BitcoinAddress: jest.fn().mockImplementation((args) => ({
+      tag: "BitcoinAddress",
+      ...args,
+    })),
+  },
   Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
