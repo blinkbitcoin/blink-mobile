@@ -3579,9 +3579,9 @@
     "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw."
   },
   "BackupNudge": {
-    "title": "Beveilig je portemonnee",
-    "description": "Je tegoeden lopen risico. Beveilig je portemonnee nu. Het duurt maar een minuut.",
-    "cta": "Nu beveiligen",
+    "title": "Uw fondsen lopen gevaar",
+    "description": "Beveilig nu uw portemonnee. Het duurt maar een minuut.",
+    "cta": "Portemonnee beveiligen",
     "settingsWarning": "Maak een back-up van je portemonnee. Als je dit apparaat verliest, verlies je je tegoeden.",
     "modalTitle": "Je tegoeden hebben bescherming nodig",
     "modalDescription": "Je hebt een aanzienlijk saldo. Maak een back-up om verlies te voorkomen.",

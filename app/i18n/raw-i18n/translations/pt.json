@@ -3526,9 +3526,9 @@
         "wrongPassword": "Senha incorreta. Tente novamente."
     },
     "BackupNudge": {
-        "title": "Proteja sua carteira",
-        "description": "Seus fundos estão em risco. Proteja sua carteira agora. Leva apenas um minuto.",
-        "cta": "Proteger agora",
+        "title": "Seus fundos estão em risco",
+        "description": "Proteja sua carteira agora. Leva apenas um minuto.",
+        "cta": "Proteger carteira",
         "settingsWarning": "Faça backup da sua carteira. Se perder este dispositivo, perderá seus fundos.",
         "modalTitle": "Seus fundos precisam de proteção",
         "modalDescription": "Você tem um saldo significativo. Faça backup da carteira para evitar perdas.",

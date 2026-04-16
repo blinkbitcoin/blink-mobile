@@ -3538,9 +3538,9 @@
     "wrongPassword": "Parolă incorectă. Încercați din nou."
   },
   "BackupNudge": {
-    "title": "Securizați-vă portofelul",
-    "description": "Fondurile tale sunt în pericol. Securizează-ți portofelul acum. Durează doar un minut.",
-    "cta": "Securizează acum",
+    "title": "Fondurile dumneavoastră sunt în pericol",
+    "description": "Securizați-vă portofelul acum. Durează doar un minut.",
+    "cta": "Securizare portofel",
     "settingsWarning": "Fă backup la portofel. Dacă pierzi acest dispozitiv, vei pierde fondurile.",
     "modalTitle": "Fondurile tale au nevoie de protecție",
     "modalDescription": "Ai un sold semnificativ. Fă backup pentru a preveni pierderea.",

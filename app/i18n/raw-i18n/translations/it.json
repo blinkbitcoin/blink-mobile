@@ -3526,9 +3526,9 @@
         "wrongPassword": "Password errata. Riprova."
     },
     "BackupNudge": {
-        "title": "Proteggi il portafoglio",
-        "description": "I tuoi fondi sono a rischio. Proteggi il tuo portafoglio ora. Ci vuole solo un minuto.",
-        "cta": "Proteggi ora",
+        "title": "I tuoi fondi sono a rischio",
+        "description": "Metti al sicuro il tuo portafoglio ora. Ci vuole solo un minuto.",
+        "cta": "Proteggi portafoglio",
         "settingsWarning": "Esegui il backup del portafoglio. Se perdi questo dispositivo, perderai i tuoi fondi.",
         "modalTitle": "I tuoi fondi hanno bisogno di protezione",
         "modalDescription": "Hai un saldo significativo. Esegui il backup per evitare perdite.",

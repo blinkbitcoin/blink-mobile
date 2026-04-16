@@ -17,7 +17,6 @@ jest.mock("@rn-vui/themed", () => {
     primary: "#007",
     black: "#000",
     white: "#fff",
-    _orange: "#f90",
   }
   return {
     makeStyles:
@@ -33,6 +32,20 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
 }))
 
+jest.mock("@app/components/atomic/galoy-icon-button", () => ({
+  GaloyIconButton: ({ onPress }: { onPress: () => void }) =>
+    React.createElement("Pressable", { onPress, testID: "dismiss-button" }),
+}))
+
+jest.mock("@app/components/atomic/galoy-primary-button", () => ({
+  GaloyPrimaryButton: ({ onPress, title }: { onPress: () => void; title: string }) =>
+    React.createElement(
+      "Pressable",
+      { onPress, testID: "cta-button" },
+      React.createElement("Text", {}, title),
+    ),
+}))
+
 jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
@@ -41,9 +54,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       BackupNudge: {
-        title: () => "Back up your wallet",
-        description: () => "Secure your funds",
-        cta: () => "Secure now",
+        title: () => "Your funds are at risk",
+        description: () => "Secure your wallet now. It only takes a minute.",
+        cta: () => "Secure wallet",
       },
     },
   }),
@@ -57,15 +70,21 @@ describe("BackupNudgeBanner", () => {
   it("renders title and description", () => {
     const { getByText } = render(<BackupNudgeBanner onDismiss={jest.fn()} />)
 
-    expect(getByText("Back up your wallet")).toBeTruthy()
-    expect(getByText("Secure your funds")).toBeTruthy()
+    expect(getByText("Your funds are at risk")).toBeTruthy()
+    expect(getByText("Secure your wallet now. It only takes a minute.")).toBeTruthy()
   })
 
-  it("calls onDismiss when close button pressed", () => {
+  it("renders CTA button with correct label", () => {
+    const { getByText } = render(<BackupNudgeBanner onDismiss={jest.fn()} />)
+
+    expect(getByText("Secure wallet")).toBeTruthy()
+  })
+
+  it("calls onDismiss when dismiss button pressed", () => {
     const onDismiss = jest.fn()
     const { getByTestId } = render(<BackupNudgeBanner onDismiss={onDismiss} />)
 
-    fireEvent.press(getByTestId("backup-nudge-dismiss"))
+    fireEvent.press(getByTestId("dismiss-button"))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
@@ -73,7 +92,7 @@ describe("BackupNudgeBanner", () => {
   it("navigates to backup method screen on CTA press", () => {
     const { getByTestId } = render(<BackupNudgeBanner onDismiss={jest.fn()} />)
 
-    fireEvent.press(getByTestId("backup-nudge-cta"))
+    fireEvent.press(getByTestId("cta-button"))
 
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupMethodScreen")
   })

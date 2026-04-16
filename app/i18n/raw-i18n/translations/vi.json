@@ -3576,9 +3576,9 @@
     "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại."
   },
   "BackupNudge": {
-    "title": "Bảo mật ví của bạn",
-    "description": "Tiền của bạn đang gặp rủi ro. Bảo mật ví của bạn ngay. Chỉ mất một phút.",
-    "cta": "Bảo mật ngay",
+    "title": "Tiền của bạn đang gặp rủi ro",
+    "description": "Bảo mật ví của bạn ngay bây giờ. Chỉ mất một phút.",
+    "cta": "Bảo mật ví",
     "settingsWarning": "Sao lưu ví của bạn. Nếu bạn mất thiết bị này, bạn sẽ mất tiền.",
     "modalTitle": "Tiền của bạn cần được bảo vệ",
     "modalDescription": "Bạn có số dư đáng kể. Sao lưu ví để tránh mất mát.",

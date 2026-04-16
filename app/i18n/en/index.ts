@@ -3681,9 +3681,9 @@ const en: BaseTranslation = {
     wrongPassword: "Incorrect password. Please try again.",
   },
   BackupNudge: {
-    title: "Secure your wallet",
-    description: "Your funds are at risk. Secure your wallet now. It only takes a minute.",
-    cta: "Secure now",
+    title: "Your funds are at risk",
+    description: "Secure your wallet now. It only takes a minute.",
+    cta: "Secure wallet",
     settingsWarning: "Backup your wallet. If you lose this device, you will lose your funds.",
     modalTitle: "Your funds need protection",
     modalDescription:

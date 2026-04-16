@@ -3576,9 +3576,9 @@
     "wrongPassword": "Mana allin contraseña. Watiqmanta ruway."
   },
   "BackupNudge": {
-    "title": "Walletaykita jark'ay",
-    "description": "Qullqiykikuna riskupi kachkan. Walletniykita waqaychay kunan. Huk minutullam.",
-    "cta": "Kunan waqaychay",
+    "title": "Qullqiykikuna sasachakuypi kachkan",
+    "description": "Waqaychay wallitaykita kunan. Huk minutullam.",
+    "cta": "Waqaychay wallita",
     "settingsWarning": "Walletniykita backup ruray. Kay aparatuta chinkachispaqa, qullqiykita chinkachinki.",
     "modalTitle": "Qullqiykikuna waqaychana",
     "modalDescription": "Hatun saldoyki kan. Backup ruray ama chinkanampaq.",

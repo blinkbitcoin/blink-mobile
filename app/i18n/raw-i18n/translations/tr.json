@@ -3538,9 +3538,9 @@
     "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin."
   },
   "BackupNudge": {
-    "title": "Cüzdanınızı güvence altına alın",
-    "description": "Fonlarınız risk altında. Cüzdanınızı şimdi güvence altına alın. Sadece bir dakika sürer.",
-    "cta": "Şimdi güvence altına al",
+    "title": "Fonlarınız risk altında",
+    "description": "Cüzdanınızı şimdi güvenceye alın. Sadece bir dakika sürer.",
+    "cta": "Cüzdanı güvenceye al",
     "settingsWarning": "Cüzdanınızı yedekleyin. Bu cihazı kaybederseniz, fonlarınızı kaybedersiniz.",
     "modalTitle": "Fonlarınızın korumaya ihtiyacı var",
     "modalDescription": "Önemli bir bakiyeniz var. Kaybı önlemek için cüzdanınızı yedekleyin.",

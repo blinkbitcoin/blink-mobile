@@ -11654,15 +11654,15 @@ type RootTranslation = {
 	}
 	BackupNudge: {
 		/**
-		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
 		 */
 		title: string
 		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k​.​ ​S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​i​n​u​t​e​.
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​i​n​u​t​e​.
 		 */
 		description: string
 		/**
-		 * S​e​c​u​r​e​ ​n​o​w
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
 		 */
 		cta: string
 		/**
@@ -23240,15 +23240,15 @@ export type TranslationFunctions = {
 	}
 	BackupNudge: {
 		/**
-		 * Secure your wallet
+		 * Your funds are at risk
 		 */
 		title: () => LocalizedString
 		/**
-		 * Your funds are at risk. Secure your wallet now. It only takes a minute.
+		 * Secure your wallet now. It only takes a minute.
 		 */
 		description: () => LocalizedString
 		/**
-		 * Secure now
+		 * Secure wallet
 		 */
 		cta: () => LocalizedString
 		/**
