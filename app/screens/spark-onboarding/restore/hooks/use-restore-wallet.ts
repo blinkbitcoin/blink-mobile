@@ -60,7 +60,7 @@ export const useRestoreWallet = () => {
         throw err
       }
     },
-    [activateAccount, reinitSdk, navigation, LL],
+    [activateAccount, reinitSdk, resetBackupState, navigation, LL],
   )
 
   return { restore, status }
