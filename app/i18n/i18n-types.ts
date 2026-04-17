@@ -11792,6 +11792,20 @@ type RootTranslation = {
 		 */
 		trustModelDismiss: string
 	}
+	SelfCustodialOffline: {
+		/**
+		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​c​a​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​n​e​t​w​o​r​k​ ​r​i​g​h​t​ ​n​o​w​.​ ​T​r​y​ ​a​g​a​i​n​ ​w​h​e​n​ ​y​o​u​'​r​e​ ​b​a​c​k​ ​o​n​l​i​n​e​.
+		 */
+		description: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
 	UnclaimedDeposit: {
 		/**
 		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
@@ -23585,6 +23599,20 @@ export type TranslationFunctions = {
 		 * I understand
 		 */
 		trustModelDismiss: () => LocalizedString
+	}
+	SelfCustodialOffline: {
+		/**
+		 * Wallet is offline
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your non-custodial wallet can't reach the network right now. Try again when you're back online.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**

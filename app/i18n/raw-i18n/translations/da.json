@@ -3606,6 +3606,11 @@
     "payTo": "Betal til {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialOffline": {
+    "title": "Pungen er offline",
+    "description": "Din ikke-deponerede pung kan ikke nå netværket lige nu. Prøv igen, når du er online.",
+    "retry": "Prøv igen"
+  },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",
     "description": "Total: {sats} sats tilgængelige at gøre krav på",

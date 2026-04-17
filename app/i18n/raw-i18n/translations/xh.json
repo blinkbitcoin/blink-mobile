@@ -3635,6 +3635,11 @@
     "payTo": "Hlawula ku-{address}",
     "payment": "Intlawulo"
   },
+  "SelfCustodialOffline": {
+    "title": "Ingxowa-mali ayikho kwi-intanethi",
+    "description": "Ingxowa-mali yakho engekho kugcino ayinakufikelela kwinethiwekhi ngoku. Zama kwakhona xa ubuyela kwi-intanethi.",
+    "retry": "Zama kwakhona"
+  },
   "UnclaimedDeposit": {
     "title": "Unama-{count} edipozithi engabangwayo",
     "description": "Iyonke: {sats} sats ezifumanekayo ukufuna",

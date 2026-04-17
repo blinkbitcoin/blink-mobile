@@ -3626,6 +3626,11 @@
     "payTo": "{address}man pagay",
     "payment": "Pagay"
   },
+  "SelfCustodialOffline": {
+    "title": "Wallet manan conexionniyuqchu",
+    "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",
+    "retry": "Yapamanta rurana"
+  },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",
     "description": "Tukuy: {sats} sats mañakunapaq",

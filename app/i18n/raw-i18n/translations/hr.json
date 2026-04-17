@@ -3629,6 +3629,11 @@
     "payTo": "Plati na {address}",
     "payment": "Plaćanje"
   },
+  "SelfCustodialOffline": {
+    "title": "Novčanik je izvan mreže",
+    "description": "Vaš ne-skrbnički novčanik trenutno ne može pristupiti mreži. Pokušajte ponovno kada se vratite na mrežu.",
+    "retry": "Pokušaj ponovno"
+  },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",
     "description": "Ukupno: {sats} satova dostupno za potraživanje",

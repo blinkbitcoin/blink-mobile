@@ -3588,6 +3588,11 @@
     "payTo": "Lipa kwa {address}",
     "payment": "Malipo"
   },
+  "SelfCustodialOffline": {
+    "title": "Pochi iko nje ya mtandao",
+    "description": "Pochi yako isiyo ya ulinzi haiwezi kufikia mtandao kwa sasa. Jaribu tena utakaporudi mtandaoni.",
+    "retry": "Jaribu tena"
+  },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",
     "description": "Jumla: {sats} sats zinazopatikana kudai",

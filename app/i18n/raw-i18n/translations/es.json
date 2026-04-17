@@ -3576,6 +3576,11 @@
         "payTo": "Pagar a {address}",
         "payment": "Pago"
     },
+    "SelfCustodialOffline": {
+        "title": "La billetera está sin conexión",
+        "description": "Tu billetera no custodial no puede alcanzar la red en este momento. Inténtalo de nuevo cuando vuelvas a estar en línea.",
+        "retry": "Intentar de nuevo"
+    },
     "UnclaimedDeposit": {
         "title": "Tienes {count} depósito(s) sin reclamar",
         "description": "Total: {sats} sats disponibles para reclamar",

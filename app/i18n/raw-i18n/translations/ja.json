@@ -3617,6 +3617,11 @@
         "payTo": "{address}に支払い",
         "payment": "支払い"
     },
+    "SelfCustodialOffline": {
+        "title": "ウォレットはオフラインです",
+        "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",
+        "retry": "再試行"
+    },
     "UnclaimedDeposit": {
         "title": "{count}件の未請求デポジットがあります",
         "description": "合計: {sats} sats請求可能",

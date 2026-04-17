@@ -3629,6 +3629,11 @@
     "payTo": "Betalen aan {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialOffline": {
+    "title": "Wallet is offline",
+    "description": "Je niet-bewaarde wallet kan het netwerk momenteel niet bereiken. Probeer het opnieuw wanneer je weer online bent.",
+    "retry": "Opnieuw proberen"
+  },
   "UnclaimedDeposit": {
     "title": "Je hebt {count} niet-opgeëiste storting(en)",
     "description": "Totaal: {sats} sats beschikbaar om op te eisen",

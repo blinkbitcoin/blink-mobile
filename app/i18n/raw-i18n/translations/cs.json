@@ -3629,6 +3629,11 @@
     "payTo": "Zaplatit na {address}",
     "payment": "Platba"
   },
+  "SelfCustodialOffline": {
+    "title": "Peněženka je offline",
+    "description": "Vaše nesvěřenská peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
+    "retry": "Zkusit znovu"
+  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
     "description": "Celkem: {sats} satů k vyzvednutí",
