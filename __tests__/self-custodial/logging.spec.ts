@@ -88,4 +88,24 @@ describe("createSdkLogListener", () => {
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] bad level")
     expect(mockLog).toHaveBeenCalledWith("[SparkSDK] bad level")
   })
+
+  it("suppresses 'Received empty event' log lines", () => {
+    const listener = createSdkLogListener()
+
+    listener.log({ level: "WARN", line: "Received empty event from relay" })
+
+    expect(console.debug).not.toHaveBeenCalled()
+    expect(console.warn).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("forwards other warnings normally", () => {
+    const listener = createSdkLogListener()
+
+    listener.log({ level: "WARN", line: "something happened" })
+
+    expect(console.warn).toHaveBeenCalledWith("[SparkSDK] something happened")
+    expect(mockLog).toHaveBeenCalledWith("[SparkSDK] something happened")
+  })
 })
