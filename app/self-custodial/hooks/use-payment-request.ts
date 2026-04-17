@@ -22,7 +22,7 @@ import type { InvoiceData, SCPaymentRequestState } from "./types"
 
 export const usePaymentRequest = (): SCPaymentRequestState | null => {
   const { sdk, lastReceivedPaymentId } = useSelfCustodialWallet()
-  const { wallets } = useActiveWallet()
+  const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
 
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
@@ -58,26 +58,31 @@ export const usePaymentRequest = (): SCPaymentRequestState | null => {
   )
 
   const generateRequest = useCallback(async () => {
-    if (!sdk || type === Invoice.OnChain) return
+    if (!sdk || !isReady || type === Invoice.OnChain) return
     setRequestState(PaymentRequestState.Loading)
 
-    const sats =
-      amount && convertMoneyAmount ? toSatsAmount(amount, convertMoneyAmount) : undefined
-    const adapter = createReceiveLightning(sdk)
-    const result = await adapter({
-      amount: sats ? toBtcMoneyAmount(sats) : undefined,
-      memo: memo || undefined,
-    })
+    try {
+      const sats =
+        amount && convertMoneyAmount
+          ? toSatsAmount(amount, convertMoneyAmount)
+          : undefined
+      const adapter = createReceiveLightning(sdk)
+      const result = await adapter({
+        amount: sats ? toBtcMoneyAmount(sats) : undefined,
+        memo: memo || undefined,
+      })
+      if (!("invoice" in result) || !result.invoice) {
+        setRequestState(PaymentRequestState.Error)
+        return
+      }
 
-    if (!("invoice" in result) || !result.invoice) {
+      baselinePaymentIdRef.current = lastPaymentIdRef.current
+      setPaymentRequest(result.invoice)
+      setRequestState(PaymentRequestState.Created)
+    } catch {
       setRequestState(PaymentRequestState.Error)
-      return
     }
-
-    baselinePaymentIdRef.current = lastPaymentIdRef.current
-    setPaymentRequest(result.invoice)
-    setRequestState(PaymentRequestState.Created)
-  }, [sdk, type, memo, amount, convertMoneyAmount])
+  }, [sdk, isReady, type, memo, amount, convertMoneyAmount])
 
   const setMemo = useCallback(() => {
     setMemoState(memoChangeText || "")

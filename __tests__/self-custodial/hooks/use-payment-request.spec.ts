@@ -49,7 +49,7 @@ describe("usePaymentRequest", () => {
       sdk: mockSdk,
       lastReceivedPaymentId: null,
     })
-    mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet] })
+    mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet], isReady: true })
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
     mockReceiveOnchain.mockResolvedValue({ address: "bc1qtest..." })
     mockConvertMoneyAmount.mockImplementation(
@@ -109,6 +109,27 @@ describe("usePaymentRequest", () => {
     await waitFor(() => {
       expect(result.current?.state).toBe("Error")
     })
+  })
+
+  it("sets error state when the receive adapter throws", async () => {
+    mockReceiveLightning.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+  })
+
+  it("does not call the receive adapter while active wallet is not ready", () => {
+    mockActiveWallet.mockReturnValue({
+      wallets: [btcWallet, usdWallet],
+      isReady: false,
+    })
+
+    renderHook(() => usePaymentRequest())
+
+    expect(mockReceiveLightning).not.toHaveBeenCalled()
   })
 
   it("generates on-chain address on mount", async () => {

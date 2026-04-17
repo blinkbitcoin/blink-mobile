@@ -46,8 +46,11 @@ type LogEntry = {
   line: string
 }
 
+const SUPPRESSED_MESSAGES = ["Received empty event"]
+
 export const createSdkLogListener = () => ({
   log: (entry: LogEntry) => {
+    if (SUPPRESSED_MESSAGES.some((m) => entry.line.includes(m))) return
     logSdkEvent(toSdkLogLevel(entry.level), entry.line)
   },
 })
