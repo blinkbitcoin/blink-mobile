@@ -7,6 +7,7 @@ import {
 import { AccountType } from "@app/types/wallet.types"
 
 import {
+  mapCurrency,
   mapSelfCustodialTransaction,
   mapSelfCustodialTransactions,
 } from "@app/self-custodial/mappers/transaction-mapper"
@@ -157,6 +158,20 @@ describe("mapSelfCustodialTransactions", () => {
     const result = mapSelfCustodialTransactions([])
 
     expect(result).toHaveLength(0)
+  })
+})
+
+describe("mapCurrency", () => {
+  it("maps Token payment details to USD", () => {
+    expect(mapCurrency({ tag: "Token", inner: {} } as never)).toBe(WalletCurrency.Usd)
+  })
+
+  it("maps Lightning payment details to BTC", () => {
+    expect(mapCurrency({ tag: "Lightning", inner: {} } as never)).toBe(WalletCurrency.Btc)
+  })
+
+  it("defaults to BTC when details are undefined", () => {
+    expect(mapCurrency(undefined)).toBe(WalletCurrency.Btc)
   })
 })
 
