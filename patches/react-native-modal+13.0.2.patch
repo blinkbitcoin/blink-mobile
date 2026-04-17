@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-modal/dist/modal.js b/node_modules/react-native-modal/dist/modal.js
+index 6d01fcc..56a287e 100644
+--- a/node_modules/react-native-modal/dist/modal.js
++++ b/node_modules/react-native-modal/dist/modal.js
+@@ -537,9 +537,14 @@ export class ReactNativeModal extends React.Component {
+                 this.makeBackdrop(),
+                 containerView));
+         }
+-        return (React.createElement(Modal, { transparent: true, animationType: 'none', visible: this.state.isVisible, onRequestClose: onBackButtonPress, ...otherProps },
+-            this.makeBackdrop(),
+-            avoidKeyboard ? (React.createElement(KeyboardAvoidingView, { behavior: Platform.OS === 'ios' ? 'padding' : undefined, pointerEvents: "box-none", style: computedStyle.concat([{ margin: 0 }]) }, containerView)) : (containerView)));
++        // Workaround for react-native-modal + New Architecture (Fabric):
++        // wrapping the Modal in a View stabilises Fabric's layout measurement and
++        // prevents the modal from rendering incorrectly (black / misaligned / blank).
++        // See https://github.com/react-native-modal/react-native-modal/issues/* (newArch).
++        return (React.createElement(View, { pointerEvents: "box-none" },
++            React.createElement(Modal, { transparent: true, animationType: 'none', visible: this.state.isVisible, onRequestClose: onBackButtonPress, ...otherProps },
++                this.makeBackdrop(),
++                avoidKeyboard ? (React.createElement(KeyboardAvoidingView, { behavior: Platform.OS === 'ios' ? 'padding' : undefined, pointerEvents: "box-none", style: computedStyle.concat([{ margin: 0 }]) }, containerView)) : (containerView))));
+     }
+ }
+ export default ReactNativeModal;
