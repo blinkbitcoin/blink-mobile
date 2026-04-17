@@ -3629,6 +3629,11 @@
     "payTo": "Betaal aan {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialOffline": {
+    "title": "Beursie is vanlyn",
+    "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
+    "retry": "Probeer weer"
+  },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",
     "description": "Totaal: {sats} sats beskikbaar om te eis",

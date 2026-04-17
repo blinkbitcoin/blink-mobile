@@ -3626,6 +3626,11 @@
     "payTo": "Thanh toán cho {address}",
     "payment": "Thanh toán"
   },
+  "SelfCustodialOffline": {
+    "title": "Ví đang ngoại tuyến",
+    "description": "Ví không lưu ký của bạn hiện không thể kết nối với mạng. Vui lòng thử lại khi bạn kết nối trở lại.",
+    "retry": "Thử lại"
+  },
   "UnclaimedDeposit": {
     "title": "Bạn có {count} khoản gửi chưa được yêu cầu",
     "description": "Tổng: {sats} sats có thể yêu cầu",

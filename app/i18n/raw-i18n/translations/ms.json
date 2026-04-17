@@ -3629,6 +3629,11 @@
     "payTo": "Bayar kepada {address}",
     "payment": "Pembayaran"
   },
+  "SelfCustodialOffline": {
+    "title": "Dompet luar talian",
+    "description": "Dompet bukan kustodian anda tidak dapat mencapai rangkaian sekarang. Cuba lagi apabila anda dalam talian semula.",
+    "retry": "Cuba lagi"
+  },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",
     "description": "Jumlah: {sats} sats tersedia untuk dituntut",

@@ -3588,6 +3588,11 @@
     "payTo": "Sasula {address}",
     "payment": "Okusasula"
   },
+  "SelfCustodialOffline": {
+    "title": "Envalopu si ku yintaneeti",
+    "description": "Envalopu yo etesigibwamu tesobola kutuuka ku yintaneeti kati. Gezaako nate ng'oddayo ku yintaneeti.",
+    "retry": "Gezaako nate"
+  },
   "UnclaimedDeposit": {
     "title": "Olina {count} ebitateekeddwa",
     "description": "Omutindo: {sats} sats ezikubirwa",

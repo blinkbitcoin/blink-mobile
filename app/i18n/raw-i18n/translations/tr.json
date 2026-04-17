@@ -3588,6 +3588,11 @@
     "payTo": "{address} adresine öde",
     "payment": "Ödeme"
   },
+  "SelfCustodialOffline": {
+    "title": "Cüzdan çevrimdışı",
+    "description": "Gözetimsiz cüzdanınız şu anda ağa ulaşamıyor. Tekrar çevrimiçi olduğunuzda tekrar deneyin.",
+    "retry": "Tekrar dene"
+  },
   "UnclaimedDeposit": {
     "title": "{count} talep edilmemiş yatırmanız var",
     "description": "Toplam: {sats} sats talep edilebilir",

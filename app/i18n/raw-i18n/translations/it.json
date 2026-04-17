@@ -3576,6 +3576,11 @@
         "payTo": "Pagare a {address}",
         "payment": "Pagamento"
     },
+    "SelfCustodialOffline": {
+        "title": "Il portafoglio è offline",
+        "description": "Il tuo portafoglio non custodito non può raggiungere la rete in questo momento. Riprova quando sarai di nuovo online.",
+        "retry": "Riprova"
+    },
     "UnclaimedDeposit": {
         "title": "Hai {count} deposito/i non reclamato/i",
         "description": "Totale: {sats} sats disponibili da reclamare",

@@ -3588,6 +3588,11 @@
     "payTo": "Pagar a {address}",
     "payment": "Pagament"
   },
+  "SelfCustodialOffline": {
+    "title": "La cartera està fora de línia",
+    "description": "La teva cartera no custodial no pot arribar a la xarxa ara mateix. Torna-ho a provar quan estiguis connectat.",
+    "retry": "Torna-ho a provar"
+  },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",
     "description": "Total: {sats} sats disponibles per reclamar",

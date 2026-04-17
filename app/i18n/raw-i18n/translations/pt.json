@@ -3576,6 +3576,11 @@
         "payTo": "Pagar a {address}",
         "payment": "Pagamento"
     },
+    "SelfCustodialOffline": {
+        "title": "A carteira está offline",
+        "description": "A sua carteira não custodial não consegue alcançar a rede neste momento. Tente novamente quando voltar a estar online.",
+        "retry": "Tentar novamente"
+    },
     "UnclaimedDeposit": {
         "title": "Você tem {count} depósito(s) não reclamado(s)",
         "description": "Total: {sats} sats disponíveis para reivindicar",

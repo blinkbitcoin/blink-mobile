@@ -3588,6 +3588,11 @@
     "payTo": "Fizetés: {address}",
     "payment": "Fizetés"
   },
+  "SelfCustodialOffline": {
+    "title": "A pénztárca offline",
+    "description": "A nem letétbe helyezett pénztárcája jelenleg nem tudja elérni a hálózatot. Próbálja újra, amikor ismét online lesz.",
+    "retry": "Próbáld újra"
+  },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",
     "description": "Összesen: {sats} sat elérhető igénylésre",
