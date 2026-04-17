@@ -12,6 +12,7 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
+import { isOnline } from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -29,6 +30,11 @@ type SdkLifecycleState = {
   loadMore: () => Promise<void>
   refreshWallets: () => Promise<void>
 }
+
+const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
+  ActiveWalletStatus.Error,
+  ActiveWalletStatus.Unavailable,
+]
 
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
@@ -51,6 +57,14 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     refreshingRef.current = true
 
     try {
+      const online = await isOnline()
+      if (!online) {
+        setStatus((prev) =>
+          OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
+        )
+        return
+      }
+
       const snapshot = await getSelfCustodialWalletSnapshot(sdkRef.current)
       setWallets(snapshot.wallets)
       setHasMoreTransactions(snapshot.hasMore)
@@ -58,9 +72,12 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
       crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
-      setStatus((prev) =>
-        prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Ready : prev,
-      )
+      setStatus((prev) => {
+        if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {
+          return ActiveWalletStatus.Offline
+        }
+        return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Ready : prev
+      })
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
       if (pendingRefreshRef.current) {
@@ -145,6 +162,15 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       if (state === "active") refreshWallets()
     })
     return () => subscription.remove()
+  }, [refreshWallets])
+
+  useEffect(() => {
+    const CONNECTIVITY_POLL_MS = 10000
+    const interval = setInterval(() => {
+      if (!sdkRef.current) return
+      refreshWallets()
+    }, CONNECTIVITY_POLL_MS)
+    return () => clearInterval(interval)
   }, [refreshWallets])
 
   const loadMore = useCallback(async () => {
