@@ -3588,6 +3588,11 @@
     "payTo": "Plătește la {address}",
     "payment": "Plată"
   },
+  "SelfCustodialOffline": {
+    "title": "Portofelul este offline",
+    "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
+    "retry": "Încearcă din nou"
+  },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",
     "description": "Total: {sats} sats disponibili pentru revendicare",
