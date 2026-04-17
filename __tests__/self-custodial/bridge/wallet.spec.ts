@@ -5,12 +5,12 @@ import {
 } from "@app/self-custodial/bridge/wallet"
 
 describe("getWalletInfo", () => {
-  it("calls sdk.getInfo with ensureSynced:true so the reported balance is fresh", () => {
+  it("calls sdk.getInfo with ensureSynced:false so startup does not block on SDK sync", () => {
     const getInfo = jest.fn().mockResolvedValue({ balanceSats: 0 })
 
     getWalletInfo({ getInfo } as never)
 
-    expect(getInfo).toHaveBeenCalledWith({ ensureSynced: true })
+    expect(getInfo).toHaveBeenCalledWith({ ensureSynced: false })
   })
 })
 
