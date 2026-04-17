@@ -41,7 +41,6 @@ const AUTO_DISMISS_DELAY = 5000
 
 const SC_BLOCKED_STATUSES: ActiveWalletStatus[] = [
   ActiveWalletStatus.Error,
-  ActiveWalletStatus.Offline,
   ActiveWalletStatus.Unavailable,
 ]
 

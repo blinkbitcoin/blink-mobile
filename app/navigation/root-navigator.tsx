@@ -40,6 +40,7 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import { withOfflineGate } from "@app/self-custodial/hocs"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -230,7 +231,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="scanningQRCode"
-        component={ScanningQRCodeScreen}
+        component={withOfflineGate(ScanningQRCodeScreen)}
         options={{
           title: LL.ScanningQRCodeScreen.title(),
           headerShown: false,
@@ -239,7 +240,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="sendBitcoinDestination"
-        component={SendBitcoinDestinationScreen}
+        component={withOfflineGate(SendBitcoinDestinationScreen)}
         options={{
           title: LL.SendBitcoinScreen.destinationScreenTitle(),
           headerRight: () => (
@@ -254,12 +255,12 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="sendBitcoinDetails"
-        component={SendBitcoinDetailsScreen}
+        component={withOfflineGate(SendBitcoinDetailsScreen)}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
-        component={SendBitcoinConfirmationScreen}
+        component={withOfflineGate(SendBitcoinConfirmationScreen)}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
@@ -269,7 +270,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
-        component={ReceiveScreen}
+        component={withOfflineGate(ReceiveScreen)}
         options={{
           title: LL.ReceiveScreen.title(),
         }}
@@ -283,7 +284,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="redeemBitcoinDetail"
-        component={RedeemBitcoinDetailScreen}
+        component={withOfflineGate(RedeemBitcoinDetailScreen)}
         options={{
           title: LL.RedeemBitcoinScreen.title(),
         }}
@@ -297,14 +298,14 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="conversionDetails"
-        component={ConversionDetailsScreen}
+        component={withOfflineGate(ConversionDetailsScreen)}
         options={{
           title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
         name="conversionConfirmation"
-        component={ConversionConfirmationScreen}
+        component={withOfflineGate(ConversionConfirmationScreen)}
         options={{
           title: LL.ConversionConfirmationScreen.title(),
         }}
@@ -426,7 +427,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="unclaimedDepositsScreen"
-        component={UnclaimedDepositsScreen}
+        component={withOfflineGate(UnclaimedDepositsScreen)}
         options={{ title: LL.UnclaimedDeposit.screenTitle() }}
       />
       <RootNavigator.Screen
