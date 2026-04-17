@@ -45,7 +45,7 @@ export const useCreateWallet = () => {
       )
       setStatus(CreationStatus.Error)
     }
-  }, [navigation, updateState])
+  }, [navigation, updateState, reinitSdk, resetBackupState])
 
   return { status, create }
 }
