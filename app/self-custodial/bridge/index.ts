@@ -7,6 +7,7 @@ export {
   selfCustodialRestoreWallet,
 } from "./lifecycle"
 export { getWalletInfo, listPayments, getUserSettings } from "./wallet"
+export { getSparkStatus } from "./status"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
 export { prepareSend, executeSend, extractOnchainFees, extractLightningFee } from "./send"
 export type { OnchainFeeTiers } from "./send"

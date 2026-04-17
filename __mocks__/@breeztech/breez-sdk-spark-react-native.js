@@ -62,4 +62,12 @@ module.exports = {
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
   PaymentDetails,
+  ServiceStatus: {
+    Operational: 0,
+    Degraded: 1,
+    Partial: 2,
+    Unknown: 3,
+    Major: 4,
+  },
+  getSparkStatus: jest.fn().mockResolvedValue({ status: 0, lastUpdated: BigInt(0) }),
 }
