@@ -1,7 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
-  sdk.getInfo({ ensureSynced: true })
+  sdk.getInfo({ ensureSynced: false })
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
