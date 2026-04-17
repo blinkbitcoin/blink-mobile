@@ -41,7 +41,7 @@ const mapStatus = (status: PaymentStatus): TransactionStatus => {
   return TransactionStatus.Failed
 }
 
-const mapCurrency = (details?: Payment["details"]): WalletCurrency => {
+export const mapCurrency = (details?: Payment["details"]): WalletCurrency => {
   if (details?.tag === PaymentDetailsTags.Token) return WalletCurrency.Usd
   return WalletCurrency.Btc
 }
