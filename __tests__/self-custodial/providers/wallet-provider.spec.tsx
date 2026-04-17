@@ -1,6 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
-import { render, renderHook, waitFor } from "@testing-library/react-native"
+import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
 
@@ -60,10 +60,17 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { network: 1 },
+  SparkNetworkLabel: "regtest",
+}))
+
+jest.mock("@app/self-custodial/providers/validate-network", () => ({
+  validateStoredNetwork: jest.fn().mockResolvedValue(true),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: jest.fn().mockResolvedValue([]),
+  loadMoreTransactions: jest.fn().mockResolvedValue({ transactions: [], hasMore: false }),
+  appendTransactions: jest.fn().mockImplementation((wallets: unknown) => wallets),
 }))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -119,8 +126,11 @@ describe("SelfCustodialWalletProvider", () => {
   })
 
   it("sets error status on network mismatch", async () => {
+    const mockValidate = jest.requireMock(
+      "@app/self-custodial/providers/validate-network",
+    ).validateStoredNetwork
+    mockValidate.mockResolvedValueOnce(false)
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockGetMnemonicNetwork.mockResolvedValue("mainnet")
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -131,9 +141,8 @@ describe("SelfCustodialWalletProvider", () => {
     expect(mockInitSdk).not.toHaveBeenCalled()
   })
 
-  it("allows null stored network (legacy wallets)", async () => {
+  it("initializes SDK when network validation passes", async () => {
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockGetMnemonicNetwork.mockResolvedValue(null)
     mockInitSdk.mockRejectedValue(new Error("SDK not available"))
 
     renderHook(() => useSelfCustodialWallet(), { wrapper })
@@ -347,5 +356,100 @@ describe("SelfCustodialWalletProvider", () => {
     unmount()
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+  })
+
+  it("updates lastReceivedPaymentId when a PaymentSucceeded event carries a payment id", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue({ wallets: [], hasMore: false })
+
+    let capturedListener: (event: { tag: string; inner?: unknown }) => Promise<void>
+    mockAddSdkEventListener.mockImplementation(
+      (
+        _sdk: unknown,
+        onEvent: (event: { tag: string; inner?: unknown }) => Promise<void>,
+      ) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      },
+    )
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockAddSdkEventListener).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      await capturedListener!({
+        tag: "PaymentSucceeded",
+        inner: { payment: { id: "pay-new-42" } },
+      })
+    })
+
+    expect(result.current.lastReceivedPaymentId).toBe("pay-new-42")
+  })
+
+  it("does not update lastReceivedPaymentId for non-payment refresh events", async () => {
+    const mockSnapshot = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    ).getSelfCustodialWalletSnapshot
+    mockSnapshot.mockResolvedValue({ wallets: [], hasMore: false })
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      },
+    )
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockAddSdkEventListener).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      await capturedListener!({ tag: "Synced" })
+    })
+
+    expect(result.current.lastReceivedPaymentId).toBeNull()
+  })
+
+  it("loadMore calls loadMoreTransactions and appends via appendTransactions", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue({
+      wallets: [],
+      hasMore: true,
+    })
+    snapshot.loadMoreTransactions.mockResolvedValue({
+      transactions: [{ id: "tx-new" }],
+      hasMore: false,
+    })
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.hasMoreTransactions).toBe(true)
+    })
+
+    await act(async () => {
+      await result.current.loadMore()
+    })
+
+    expect(snapshot.loadMoreTransactions).toHaveBeenCalled()
+    expect(snapshot.appendTransactions).toHaveBeenCalled()
+    expect(result.current.hasMoreTransactions).toBe(false)
   })
 })

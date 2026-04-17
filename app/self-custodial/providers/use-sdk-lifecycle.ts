@@ -1,39 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import {
-  Network,
-  SdkEvent_Tags as SdkEventTags,
-} from "@breeztech/breez-sdk-spark-react-native"
+import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
-import { SparkConfig } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
-import { getSelfCustodialWalletSnapshot, loadMoreTransactions } from "./wallet-snapshot"
-
-const REFRESH_EVENTS = new Set([
-  SdkEventTags.Synced,
-  SdkEventTags.PaymentSucceeded,
-  SdkEventTags.PaymentPending,
-  SdkEventTags.ClaimedDeposits,
-  SdkEventTags.UnclaimedDeposits,
-  SdkEventTags.NewDeposits,
-])
-
-const PAYMENT_RECEIVED_EVENTS = [
-  SdkEventTags.PaymentSucceeded,
-  SdkEventTags.PaymentPending,
-]
+import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
+import { validateStoredNetwork } from "./validate-network"
+import {
+  appendTransactions,
+  getSelfCustodialWalletSnapshot,
+  loadMoreTransactions,
+} from "./wallet-snapshot"
 
 type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
-  sdk: Awaited<ReturnType<typeof initSdk>> | null
+  sdk: BreezSdkInterface | null
   isStableBalanceActive: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
@@ -49,8 +37,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [sdk, setSdk] = useState<Awaited<ReturnType<typeof initSdk>> | null>(null)
-  const sdkRef = useRef<Awaited<ReturnType<typeof initSdk>> | null>(null)
+  const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
+  const sdkRef = useRef<BreezSdkInterface | null>(null)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
 
@@ -85,6 +73,38 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   useEffect(() => {
     let mounted = true
 
+    const connectAndListen = async (mnemonic: string) => {
+      const connectedSdk = await initSdk(mnemonic)
+      if (!mounted) {
+        await disconnectSdk(connectedSdk)
+        return
+      }
+
+      sdkRef.current = connectedSdk
+      setSdk(connectedSdk)
+
+      await addSdkEventListener(connectedSdk, async (event) => {
+        if (!mounted) return
+        if (!REFRESH_EVENTS.has(event.tag)) return
+
+        if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
+          const paymentId = extractPaymentId(event)
+          if (paymentId) setLastReceivedPaymentId(paymentId)
+        }
+        await refreshWallets()
+      })
+
+      refreshWallets().catch(() => {})
+
+      getUserSettings(connectedSdk)
+        .then((settings) => {
+          if (mounted) {
+            setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+          }
+        })
+        .catch(() => {})
+    }
+
     const initialize = async () => {
       const mnemonic = await KeyStoreWrapper.getMnemonic()
       if (!mnemonic) {
@@ -92,69 +112,23 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         return
       }
 
-      const storedNetwork = await KeyStoreWrapper.getMnemonicNetwork()
-      const currentNetwork =
-        SparkConfig.network === Network.Mainnet ? "mainnet" : "regtest"
-      if (storedNetwork && storedNetwork !== currentNetwork) {
-        logSdkEvent(
-          SdkLogLevel.Error,
-          `Network mismatch: wallet=${storedNetwork}, config=${currentNetwork}`,
-        )
-        crashlytics().recordError(
-          new Error(
-            `Network mismatch: wallet=${storedNetwork}, config=${currentNetwork}`,
-          ),
-        )
+      const networkValid = await validateStoredNetwork()
+      if (!networkValid) {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
       }
 
       if (mounted) setStatus(ActiveWalletStatus.Loading)
-
-      try {
-        const sdk = await initSdk(mnemonic)
-        if (!mounted) {
-          await disconnectSdk(sdk)
-          return
-        }
-
-        sdkRef.current = sdk
-        setSdk(sdk)
-
-        await addSdkEventListener(sdk, async (event) => {
-          if (!mounted) return
-          if (REFRESH_EVENTS.has(event.tag)) {
-            if (PAYMENT_RECEIVED_EVENTS.includes(event.tag)) {
-              const inner = "inner" in event ? event.inner : null
-              const paymentId =
-                inner && typeof inner === "object" && "payment" in inner
-                  ? (inner as { payment: { id: string } }).payment.id
-                  : null
-              if (paymentId) setLastReceivedPaymentId(paymentId)
-            }
-            await refreshWallets()
-          }
-        })
-
-        await refreshWallets()
-
-        getUserSettings(sdk)
-          .then((settings) => {
-            if (mounted) {
-              setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
-            }
-          })
-          .catch(() => {})
-      } catch (err) {
-        logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`SDK init failed: ${err}`),
-        )
-        if (mounted) setStatus(ActiveWalletStatus.Error)
-      }
+      await connectAndListen(mnemonic)
     }
 
-    initialize()
+    initialize().catch((err) => {
+      logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`SDK init failed: ${err}`),
+      )
+      if (mounted) setStatus(ActiveWalletStatus.Error)
+    })
 
     return () => {
       mounted = false
@@ -180,17 +154,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       const currentCount = wallets.reduce((sum, w) => sum + w.transactions.length, 0)
       const result = await loadMoreTransactions(sdkRef.current, currentCount)
       setHasMoreTransactions(result.hasMore)
-      setWallets((prev) =>
-        prev.map((w) => ({
-          ...w,
-          transactions: [
-            ...w.transactions,
-            ...result.transactions.filter(
-              (tx) => tx.amount.currency === w.walletCurrency,
-            ),
-          ],
-        })),
-      )
+      setWallets((prev) => appendTransactions(prev, result.transactions))
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
     } finally {

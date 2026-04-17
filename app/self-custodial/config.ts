@@ -26,11 +26,11 @@ const parseNetwork = (): Network => {
 
 export const SparkNetwork = parseNetwork()
 
-const networkSuffix = SparkNetwork === Network.Mainnet ? "mainnet" : "regtest"
+export const SparkNetworkLabel = SparkNetwork === Network.Mainnet ? "mainnet" : "regtest"
 
 export const SparkConfig = {
   network: SparkNetwork,
-  storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${networkSuffix}`,
+  storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
   maxSlippageBps: 50,
   tokenIdentifier: Config.SPARK_TOKEN_IDENTIFIER ?? "",
   apiKey: Config.BREEZ_API_KEY ?? "",

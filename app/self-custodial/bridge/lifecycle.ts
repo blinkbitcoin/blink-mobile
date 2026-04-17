@@ -14,7 +14,7 @@ import Crypto from "react-native-quick-crypto"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { SparkConfig, SparkToken } from "../config"
+import { SparkConfig, SparkNetworkLabel, SparkToken } from "../config"
 import { createSdkLogListener } from "../logging"
 
 const initializeLogging = (() => {
@@ -86,8 +86,7 @@ export const selfCustodialCreateWallet = async (): Promise<void> => {
   const stored = await KeyStoreWrapper.setMnemonic(mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  const networkLabel = SparkConfig.network === Network.Mainnet ? "mainnet" : "regtest"
-  await KeyStoreWrapper.setMnemonicNetwork(networkLabel)
+  await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
 
   try {
     const sdk = await initSdk(mnemonic)
@@ -114,6 +113,5 @@ export const selfCustodialRestoreWallet = async (mnemonic: string): Promise<void
   const stored = await KeyStoreWrapper.setMnemonic(mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  const networkLabel = SparkConfig.network === Network.Mainnet ? "mainnet" : "regtest"
-  await KeyStoreWrapper.setMnemonicNetwork(networkLabel)
+  await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
 }

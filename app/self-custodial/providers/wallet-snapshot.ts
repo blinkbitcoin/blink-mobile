@@ -97,6 +97,18 @@ export const getSelfCustodialWalletSnapshot = async (
   }
 }
 
+export const appendTransactions = (
+  wallets: WalletState[],
+  newTxs: NormalizedTransaction[],
+): WalletState[] =>
+  wallets.map((w) => ({
+    ...w,
+    transactions: [
+      ...w.transactions,
+      ...newTxs.filter((tx) => tx.amount.currency === w.walletCurrency),
+    ],
+  }))
+
 export const loadMoreTransactions = async (
   sdk: BreezSdkInterface,
   currentCount: number,

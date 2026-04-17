@@ -65,4 +65,16 @@ describe("SparkConfig", () => {
     expect(SparkConfig.apiKey).toBe("my-key")
     expect(SparkConfig.tokenIdentifier).toBe("my-token")
   })
+
+  it("exports SparkNetworkLabel as 'mainnet' for mainnet", () => {
+    const { SparkNetworkLabel } = loadConfig()
+
+    expect(SparkNetworkLabel).toBe("mainnet")
+  })
+
+  it("exports SparkNetworkLabel as 'regtest' for regtest", () => {
+    const { SparkNetworkLabel } = loadConfig({ BREEZ_NETWORK: "regtest" })
+
+    expect(SparkNetworkLabel).toBe("regtest")
+  })
 })
