@@ -1,6 +1,11 @@
 import { ServiceStatus } from "@breeztech/breez-sdk-spark-react-native"
 
-import { getOnlineState, isOnline } from "@app/self-custodial/providers/is-online"
+import {
+  getOnlineState,
+  getServiceStatus,
+  isOnline,
+  isOnlineStatus,
+} from "@app/self-custodial/providers/is-online"
 
 const mockGetSparkStatus = jest.fn()
 
@@ -8,12 +13,62 @@ jest.mock("@app/self-custodial/bridge", () => ({
   getSparkStatus: () => mockGetSparkStatus(),
 }))
 
-describe("isOnline (boolean wrapper, backward-compat)", () => {
+describe("getServiceStatus", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it("returns true when Spark status is Operational", async () => {
+  const ALL_STATUSES: ReadonlyArray<{ label: string; status: ServiceStatus }> = [
+    { label: "Operational", status: ServiceStatus.Operational },
+    { label: "Degraded", status: ServiceStatus.Degraded },
+    { label: "Partial", status: ServiceStatus.Partial },
+    { label: "Unknown", status: ServiceStatus.Unknown },
+    { label: "Major", status: ServiceStatus.Major },
+  ]
+
+  ALL_STATUSES.forEach(({ label, status }) => {
+    it(`returns ${label} when the SDK reports it`, async () => {
+      mockGetSparkStatus.mockResolvedValue({ status, lastUpdated: BigInt(0) })
+
+      expect(await getServiceStatus()).toBe(status)
+    })
+  })
+
+  it("falls back to Major when getSparkStatus throws (device offline / API down)", async () => {
+    mockGetSparkStatus.mockRejectedValue(new Error("network down"))
+
+    expect(await getServiceStatus()).toBe(ServiceStatus.Major)
+  })
+})
+
+describe("isOnlineStatus", () => {
+  it("returns true for Operational", () => {
+    expect(isOnlineStatus(ServiceStatus.Operational)).toBe(true)
+  })
+
+  it("returns true for Degraded (payments still possible)", () => {
+    expect(isOnlineStatus(ServiceStatus.Degraded)).toBe(true)
+  })
+
+  const OFFLINE_STATUSES: ReadonlyArray<{ label: string; status: ServiceStatus }> = [
+    { label: "Partial", status: ServiceStatus.Partial },
+    { label: "Unknown", status: ServiceStatus.Unknown },
+    { label: "Major", status: ServiceStatus.Major },
+  ]
+
+  OFFLINE_STATUSES.forEach(({ label, status }) => {
+    it(`returns false for ${label}`, () => {
+      expect(isOnlineStatus(status)).toBe(false)
+    })
+  })
+})
+
+describe("isOnline", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("returns true when status is Operational", async () => {
     mockGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Operational,
       lastUpdated: BigInt(0),
@@ -22,7 +77,7 @@ describe("isOnline (boolean wrapper, backward-compat)", () => {
     expect(await isOnline()).toBe(true)
   })
 
-  it("returns true when Spark status is Degraded (payments still possible)", async () => {
+  it("returns true when status is Degraded", async () => {
     mockGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Degraded,
       lastUpdated: BigInt(0),
@@ -31,25 +86,7 @@ describe("isOnline (boolean wrapper, backward-compat)", () => {
     expect(await isOnline()).toBe(true)
   })
 
-  it("returns false when Spark status is Partial", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Partial,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(false)
-  })
-
-  it("returns false when Spark status is Unknown", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Unknown,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(false)
-  })
-
-  it("returns false when Spark status is Major outage", async () => {
+  it("returns false when status is Major", async () => {
     mockGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Major,
       lastUpdated: BigInt(0),
@@ -58,8 +95,8 @@ describe("isOnline (boolean wrapper, backward-compat)", () => {
     expect(await isOnline()).toBe(false)
   })
 
-  it("returns false when getSparkStatus throws (device offline / status API unreachable)", async () => {
-    mockGetSparkStatus.mockRejectedValue(new Error("Network request failed"))
+  it("returns false when getSparkStatus throws", async () => {
+    mockGetSparkStatus.mockRejectedValue(new Error("net down"))
 
     expect(await isOnline()).toBe(false)
   })
