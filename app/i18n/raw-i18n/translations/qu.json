@@ -3631,6 +3631,10 @@
     "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",
     "retry": "Yapamanta rurana"
   },
+  "SelfCustodialBalance": {
+    "staleLabel": "MACHURAYASQA",
+    "syncFailedToast": "Qullqi kaqllachiy mana atikurqachu. Qullqiyki mana hunt'aqchu kanman."
+  },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",
     "description": "Tukuy: {sats} sats mañakunapaq",

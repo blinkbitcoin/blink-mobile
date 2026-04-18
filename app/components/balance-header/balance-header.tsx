@@ -4,6 +4,7 @@ import { TouchableOpacity, View, Text } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { StatusPill, type StatusPillVariant } from "@app/components/status-pill"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { testProps } from "@app/utils/testProps"
 
@@ -23,15 +24,27 @@ const Loader = () => {
   )
 }
 
+export type StatusBadge = {
+  label: string
+  status: StatusPillVariant
+}
+
 type Props = {
   loading: boolean
   formattedBalance?: string
+  statusBadge?: StatusBadge
 }
 
-export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) => {
+export const BalanceHeader: React.FC<Props> = ({
+  loading,
+  formattedBalance,
+  statusBadge,
+}) => {
   const styles = useStyles()
 
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+
+  const showBadge = Boolean(statusBadge) && !loading && !hideAmount
 
   // TODO: use suspense for this component with the apollo suspense hook (in beta)
   // so there is no need to pass loading from parent?
@@ -43,7 +56,15 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <View>
+          <View style={styles.amountWrapper}>
+            {showBadge && statusBadge ? (
+              <StatusPill
+                label={statusBadge.label}
+                status={statusBadge.status}
+                ghost
+                style={styles.statusPillGhost}
+              />
+            ) : null}
             {loading ? (
               <Loader />
             ) : (
@@ -55,6 +76,14 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
                 {formattedBalance}
               </Text>
             )}
+            {showBadge && statusBadge ? (
+              <StatusPill
+                label={statusBadge.label}
+                status={statusBadge.status}
+                testID="balance-status-badge"
+                style={styles.statusPill}
+              />
+            ) : null}
           </View>
         </TouchableOpacity>
       )}
@@ -66,6 +95,11 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
     textAlign: "center",
+  },
+  amountWrapper: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    alignSelf: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
@@ -81,5 +115,13 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 32,
     fontWeight: "bold",
     color: colors.black,
+  },
+  statusPill: {
+    marginLeft: 6,
+    marginTop: 2,
+  },
+  statusPillGhost: {
+    marginRight: 6,
+    marginTop: 2,
   },
 }))

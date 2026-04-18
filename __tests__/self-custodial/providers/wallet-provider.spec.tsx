@@ -23,6 +23,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     PaymentFailed: "PaymentFailed",
     Optimization: "Optimization",
   },
+  ServiceStatus: {
+    Operational: 0,
+    Degraded: 1,
+    Partial: 2,
+    Unknown: 3,
+    Major: 4,
+  },
   initLogging: jest.fn(),
 }))
 
@@ -31,6 +38,7 @@ const mockGetMnemonicNetwork = jest.fn()
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
+const mockToastShow = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -48,6 +56,10 @@ jest.mock("@app/self-custodial/bridge", () => ({
     stableBalanceActiveLabel: undefined,
     sparkPrivateModeEnabled: false,
   }),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -69,9 +81,16 @@ jest.mock("@app/self-custodial/providers/validate-network", () => ({
   validateStoredNetwork: jest.fn().mockResolvedValue(true),
 }))
 
-jest.mock("@app/self-custodial/providers/is-online", () => ({
-  isOnline: jest.fn().mockResolvedValue(true),
-}))
+jest.mock("@app/self-custodial/providers/is-online", () => {
+  // Mirror ServiceStatus enum ordinals from the SDK mock.
+  const Operational = 0
+  const Degraded = 1
+  return {
+    getServiceStatus: jest.fn().mockResolvedValue(Operational),
+    isOnlineStatus: (s: number) => s === Operational || s === Degraded,
+    isOnline: jest.fn().mockResolvedValue(true),
+  }
+})
 
 jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: jest.fn().mockResolvedValue([]),
@@ -373,10 +392,14 @@ describe("SelfCustodialWalletProvider", () => {
       initSdk: mockInitSdk,
       addSdkEventListener: mockAddSdkEventListener,
     })
-    const isOnlineMock = jest.requireMock(
+
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+    ).getServiceStatus
+    getServiceStatusMock
+      .mockResolvedValueOnce(ServiceStatus.Operational)
+      .mockResolvedValueOnce(ServiceStatus.Major)
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -399,13 +422,15 @@ describe("SelfCustodialWalletProvider", () => {
       initSdk: mockInitSdk,
       addSdkEventListener: mockAddSdkEventListener,
     })
-    const isOnlineMock = jest.requireMock(
+
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock
-      .mockResolvedValueOnce(true) // initial refresh → Ready
-      .mockResolvedValueOnce(false) // Synced event → Offline
-      .mockResolvedValueOnce(true) // manual refresh → Ready
+    ).getServiceStatus
+    getServiceStatusMock
+      .mockResolvedValueOnce(ServiceStatus.Operational) // initial refresh → Ready
+      .mockResolvedValueOnce(ServiceStatus.Major) // Synced event → Offline
+      .mockResolvedValueOnce(ServiceStatus.Operational) // manual refresh → Ready
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -428,6 +453,17 @@ describe("SelfCustodialWalletProvider", () => {
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
+  })
+})
+
+describe("SelfCustodialWalletProvider — async ops, connectivity & polling", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetMnemonic.mockResolvedValue(null)
+    mockGetMnemonicNetwork.mockResolvedValue("regtest")
+    mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
+    mockDisconnectSdk.mockResolvedValue(undefined)
+    mockAddSdkEventListener.mockResolvedValue("listener-id")
   })
 
   it("loadMore calls loadMoreTransactions and appends via appendTransactions", async () => {
@@ -460,6 +496,174 @@ describe("SelfCustodialWalletProvider", () => {
     expect(result.current.hasMoreTransactions).toBe(false)
   })
 
+  const buildStaleSnapshot = () => ({
+    wallets: [
+      {
+        id: "btc",
+        walletCurrency: "BTC",
+        balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+        transactions: [
+          {
+            id: "tx1",
+            amount: { amount: 100, currency: "BTC", currencyCode: "BTC" },
+            direction: "receive",
+            status: "completed",
+            timestamp: 0,
+            paymentType: "lightning",
+          },
+        ],
+      },
+    ],
+    hasMore: false,
+  })
+
+  const buildFreshSnapshot = () => ({
+    wallets: [
+      {
+        id: "btc",
+        walletCurrency: "BTC",
+        balance: { amount: 100, currency: "BTC", currencyCode: "BTC" },
+        transactions: [],
+      },
+    ],
+    hasMore: false,
+  })
+
+  it("exposes isBalanceStale=true when balance=0 but history has completed incoming txs", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildStaleSnapshot())
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+    await waitFor(() => {
+      expect(result.current.isBalanceStale).toBe(true)
+    })
+  })
+
+  it("exposes isBalanceStale=false when balance is non-zero", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildFreshSnapshot())
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    expect(result.current.isBalanceStale).toBe(false)
+  })
+
+  it("shows the balance-stale toast only on the false→true transition (not on every poll)", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildStaleSnapshot())
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      },
+    )
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+
+    await act(async () => {
+      await capturedListener!({ tag: "Synced" })
+    })
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps isBalanceStale=true when status transitions to Offline (sticky, only a fresh snapshot clears it)", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildStaleSnapshot())
+
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
+      "@app/self-custodial/providers/is-online",
+    ).getServiceStatus
+    getServiceStatusMock
+      .mockResolvedValueOnce(ServiceStatus.Operational)
+      .mockResolvedValueOnce(ServiceStatus.Major)
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      },
+    )
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.isBalanceStale).toBe(true)
+    })
+
+    await act(async () => {
+      await capturedListener!({ tag: "Synced" })
+    })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Offline)
+    })
+    expect(result.current.isBalanceStale).toBe(true)
+  })
+
+  it("clears isBalanceStale when a subsequent snapshot reports a non-zero balance", async () => {
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot
+      .mockResolvedValueOnce(buildStaleSnapshot())
+      .mockResolvedValue(buildFreshSnapshot())
+
+    let capturedListener: (event: { tag: string }) => Promise<void>
+    mockAddSdkEventListener.mockImplementation(
+      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
+        capturedListener = onEvent
+        return Promise.resolve("id")
+      },
+    )
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.isBalanceStale).toBe(true)
+    })
+
+    await act(async () => {
+      await capturedListener!({ tag: "Synced" })
+    })
+
+    await waitFor(() => {
+      expect(result.current.isBalanceStale).toBe(false)
+    })
+  })
+
   it("preserves Error status when isOnline=false (does not downgrade to Offline)", async () => {
     const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
     snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue({
@@ -467,14 +671,11 @@ describe("SelfCustodialWalletProvider", () => {
       hasMore: false,
     })
 
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    // Initial refresh online so we reach Ready, then we simulate an Error
-    // status from elsewhere (e.g. init failure scenario) and check offline
-    // ticks do not overwrite it. Since the direct path from Ready cannot
-    // become Error, we validate through the network validation branch.
-    isOnlineMock.mockResolvedValue(false)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Major)
 
     const mockValidate = jest.requireMock(
       "@app/self-custodial/providers/validate-network",
@@ -497,10 +698,11 @@ describe("SelfCustodialWalletProvider", () => {
   })
 
   it("preserves Unavailable status when isOnline=false (no mnemonic case)", async () => {
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(false)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Major)
 
     mockGetMnemonic.mockResolvedValue(null)
 
@@ -527,10 +729,11 @@ describe("SelfCustodialWalletProvider", () => {
       hasMore: false,
     })
 
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(false)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Major)
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -553,10 +756,11 @@ describe("SelfCustodialWalletProvider", () => {
       hasMore: false,
     })
 
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Operational)
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -570,22 +774,22 @@ describe("SelfCustodialWalletProvider", () => {
       await Promise.resolve()
     })
 
-    const initialIsOnlineCalls = isOnlineMock.mock.calls.length
+    const initialCalls = getServiceStatusMock.mock.calls.length
 
     // Advance 10 seconds: one more poll tick
     await act(async () => {
       jest.advanceTimersByTime(10000)
       await Promise.resolve()
     })
-    expect(isOnlineMock.mock.calls.length).toBeGreaterThan(initialIsOnlineCalls)
+    expect(getServiceStatusMock.mock.calls.length).toBeGreaterThan(initialCalls)
 
     // Advance another 10 seconds: another tick
-    const afterFirstTick = isOnlineMock.mock.calls.length
+    const afterFirstTick = getServiceStatusMock.mock.calls.length
     await act(async () => {
       jest.advanceTimersByTime(10000)
       await Promise.resolve()
     })
-    expect(isOnlineMock.mock.calls.length).toBeGreaterThan(afterFirstTick)
+    expect(getServiceStatusMock.mock.calls.length).toBeGreaterThan(afterFirstTick)
 
     jest.useRealTimers()
   })
@@ -598,10 +802,11 @@ describe("SelfCustodialWalletProvider", () => {
       hasMore: false,
     })
 
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Operational)
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -615,7 +820,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
 
     unmount()
-    const afterUnmount = isOnlineMock.mock.calls.length
+    const afterUnmount = getServiceStatusMock.mock.calls.length
 
     // Advance several intervals after unmount — should not trigger more calls
     await act(async () => {
@@ -623,7 +828,7 @@ describe("SelfCustodialWalletProvider", () => {
       await Promise.resolve()
     })
 
-    expect(isOnlineMock.mock.calls).toHaveLength(afterUnmount)
+    expect(getServiceStatusMock.mock.calls).toHaveLength(afterUnmount)
 
     jest.useRealTimers()
   })
@@ -636,10 +841,11 @@ describe("SelfCustodialWalletProvider", () => {
       hasMore: false,
     })
 
-    const isOnlineMock = jest.requireMock(
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Operational)
 
     const listeners: Array<(state: string) => void> = []
     const addEventListenerSpy = jest
@@ -658,23 +864,23 @@ describe("SelfCustodialWalletProvider", () => {
       expect(addEventListenerSpy).toHaveBeenCalled()
     })
 
-    const callsBefore = isOnlineMock.mock.calls.length
+    const callsBefore = getServiceStatusMock.mock.calls.length
 
     await act(async () => {
       listeners.forEach((fn) => fn("active"))
       await Promise.resolve()
     })
 
-    expect(isOnlineMock.mock.calls.length).toBeGreaterThan(callsBefore)
+    expect(getServiceStatusMock.mock.calls.length).toBeGreaterThan(callsBefore)
 
-    const callsAfterActive = isOnlineMock.mock.calls.length
+    const callsAfterActive = getServiceStatusMock.mock.calls.length
     await act(async () => {
       listeners.forEach((fn) => fn("background"))
       await Promise.resolve()
     })
 
     // Background transition should NOT trigger a refresh
-    expect(isOnlineMock.mock.calls).toHaveLength(callsAfterActive)
+    expect(getServiceStatusMock.mock.calls).toHaveLength(callsAfterActive)
 
     addEventListenerSpy.mockRestore()
   })

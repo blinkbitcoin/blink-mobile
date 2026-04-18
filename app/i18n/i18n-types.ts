@@ -11806,6 +11806,16 @@ type RootTranslation = {
 		 */
 		retry: string
 	}
+	SelfCustodialBalance: {
+		/**
+		 * S​T​A​L​E
+		 */
+		staleLabel: string
+		/**
+		 * B​a​l​a​n​c​e​ ​s​y​n​c​ ​f​a​i​l​e​d​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e​.
+		 */
+		syncFailedToast: string
+	}
 	UnclaimedDeposit: {
 		/**
 		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
@@ -23613,6 +23623,16 @@ export type TranslationFunctions = {
 		 * Try again
 		 */
 		retry: () => LocalizedString
+	}
+	SelfCustodialBalance: {
+		/**
+		 * STALE
+		 */
+		staleLabel: () => LocalizedString
+		/**
+		 * Balance sync failed. Your balance may be out of date.
+		 */
+		syncFailedToast: () => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**
