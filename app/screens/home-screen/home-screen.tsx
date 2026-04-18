@@ -17,7 +17,11 @@ import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
-import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
+import {
+  BalanceHeader,
+  useTotalBalance,
+  type StatusBadge,
+} from "@app/components/balance-header"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -172,7 +176,10 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
-  const { refreshWallets: refreshSelfCustodialWallets } = useSelfCustodialWallet()
+  const {
+    refreshWallets: refreshSelfCustodialWallets,
+    isBalanceStale: selfCustodialIsBalanceStale,
+  } = useSelfCustodialWallet()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const {
     seen: trustModelSeen,
@@ -256,6 +263,11 @@ export const HomeScreen: React.FC = () => {
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
   const { formattedBalance, satsBalance } = useTotalBalance(wallets)
+
+  const balanceStatusBadge = useMemo<StatusBadge | undefined>(() => {
+    if (!isSelfCustodial || !selfCustodialIsBalanceStale) return undefined
+    return { label: LL.SelfCustodialBalance.staleLabel(), status: "warning" }
+  }, [isSelfCustodial, selfCustodialIsBalanceStale, LL])
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount.level
@@ -539,7 +551,11 @@ export const HomeScreen: React.FC = () => {
           />
         </View>
       </View>
-      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
+      <BalanceHeader
+        loading={loading}
+        formattedBalance={formattedBalance}
+        statusBadge={balanceStatusBadge}
+      />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}

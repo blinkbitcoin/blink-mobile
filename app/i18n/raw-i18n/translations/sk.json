@@ -3593,6 +3593,10 @@
     "description": "Vaša nekustodiálna peňaženka momentálne nemôže dosiahnuť sieť. Skúste to znova, keď budete online.",
     "retry": "Skúsiť znova"
   },
+  "SelfCustodialBalance": {
+    "staleLabel": "ZASTARALÝ",
+    "syncFailedToast": "Synchronizácia zostatku zlyhala. Váš zostatok môže byť neaktuálny."
+  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzdvihnutý(ch) vklad(ov)",
     "description": "Celkom: {sats} satov na vyzdvihnutie",

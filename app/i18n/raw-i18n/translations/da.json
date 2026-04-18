@@ -3611,6 +3611,10 @@
     "description": "Din ikke-deponerede pung kan ikke nå netværket lige nu. Prøv igen, når du er online.",
     "retry": "Prøv igen"
   },
+  "SelfCustodialBalance": {
+    "staleLabel": "FORÆLDET",
+    "syncFailedToast": "Synkronisering af saldo mislykkedes. Din saldo kan være forældet."
+  },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",
     "description": "Total: {sats} sats tilgængelige at gøre krav på",

@@ -2,14 +2,25 @@ import { ServiceStatus } from "@breeztech/breez-sdk-spark-react-native"
 
 import { getSparkStatus } from "../bridge"
 
-export const isOnline = async (): Promise<boolean> => {
+const ONLINE_STATUSES: readonly ServiceStatus[] = [
+  ServiceStatus.Operational,
+  ServiceStatus.Degraded,
+]
+
+export const getServiceStatus = async (): Promise<ServiceStatus> => {
   try {
     const { status } = await getSparkStatus()
-    return status === ServiceStatus.Operational || status === ServiceStatus.Degraded
+    return status
   } catch {
-    return false
+    return ServiceStatus.Major
   }
 }
+
+export const isOnlineStatus = (status: ServiceStatus): boolean =>
+  ONLINE_STATUSES.includes(status)
+
+export const isOnline = async (): Promise<boolean> =>
+  isOnlineStatus(await getServiceStatus())
 
 export const OnlineState = {
   Online: "online",
@@ -22,10 +33,7 @@ export type OnlineState = (typeof OnlineState)[keyof typeof OnlineState]
 export const getOnlineState = async (): Promise<OnlineState> => {
   try {
     const { status } = await getSparkStatus()
-    if (status === ServiceStatus.Operational || status === ServiceStatus.Degraded) {
-      return OnlineState.Online
-    }
-    return OnlineState.Offline
+    return isOnlineStatus(status) ? OnlineState.Online : OnlineState.Offline
   } catch {
     return OnlineState.Unknown
   }

@@ -4,12 +4,15 @@ import { AppState } from "react-native"
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { toastShow } from "@app/utils/toast"
 
 import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
+import { detectBalanceStale } from "./detect-balance-stale"
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
 import { getOnlineState, OnlineState } from "./is-online"
@@ -24,6 +27,7 @@ type SdkLifecycleState = {
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
   isStableBalanceActive: boolean
+  isBalanceStale: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -37,9 +41,12 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 ]
 
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
+  const { LL } = useI18nContext()
+
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [isStableBalanceActive, setIsStableBalanceActive] = useState(false)
+  const [isBalanceStale, setIsBalanceStale] = useState(false)
   const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -47,6 +54,22 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const sdkRef = useRef<BreezSdkInterface | null>(null)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
+  const isBalanceStaleRef = useRef(false)
+  const llRef = useRef(LL)
+  llRef.current = LL
+
+  const updateBalanceStale = useCallback((nextStale: boolean) => {
+    const prevStale = isBalanceStaleRef.current
+    isBalanceStaleRef.current = nextStale
+    setIsBalanceStale(nextStale)
+    if (nextStale && !prevStale) {
+      toastShow({
+        message: (tr) => tr.SelfCustodialBalance.syncFailedToast(),
+        LL: llRef.current,
+        type: "warning",
+      })
+    }
+  }, [])
 
   const refreshWallets = useCallback(async () => {
     const sdk = sdkRef.current
@@ -77,6 +100,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         setStatus(ActiveWalletStatus.Ready)
+
+        updateBalanceStale(detectBalanceStale(snapshot.wallets))
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
         crashlytics().recordError(
@@ -99,7 +124,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
     }
-  }, [])
+  }, [updateBalanceStale])
 
   useEffect(() => {
     let mounted = true
@@ -210,6 +235,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     status,
     sdk,
     isStableBalanceActive,
+    isBalanceStale,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,

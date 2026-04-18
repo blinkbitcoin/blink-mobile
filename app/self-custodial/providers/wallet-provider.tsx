@@ -14,6 +14,7 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
   sdk: BreezSdkInterface | null
   isStableBalanceActive: boolean
+  isBalanceStale: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -30,6 +31,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   retry: () => {},
   sdk: null,
   isStableBalanceActive: false,
+  isBalanceStale: false,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
   loadingMore: false,
@@ -49,6 +51,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     status,
     sdk,
     isStableBalanceActive,
+    isBalanceStale,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,
@@ -68,6 +71,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       retry,
       sdk,
       isStableBalanceActive,
+      isBalanceStale,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,
@@ -80,6 +84,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       retry,
       sdk,
       isStableBalanceActive,
+      isBalanceStale,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,

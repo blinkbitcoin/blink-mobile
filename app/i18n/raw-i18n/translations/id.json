@@ -3593,6 +3593,10 @@
     "description": "Dompet non-kustodian Anda tidak dapat mencapai jaringan saat ini. Coba lagi ketika Anda kembali online.",
     "retry": "Coba lagi"
   },
+  "SelfCustodialBalance": {
+    "staleLabel": "USANG",
+    "syncFailedToast": "Sinkronisasi saldo gagal. Saldo Anda mungkin sudah tidak terbaru."
+  },
   "UnclaimedDeposit": {
     "title": "Anda memiliki {count} deposit yang belum diklaim",
     "description": "Total: {sats} sats tersedia untuk diklaim",

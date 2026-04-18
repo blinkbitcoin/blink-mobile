@@ -3593,6 +3593,10 @@
     "description": "Envalopu yo etesigibwamu tesobola kutuuka ku yintaneeti kati. Gezaako nate ng'oddayo ku yintaneeti.",
     "retry": "Gezaako nate"
   },
+  "SelfCustodialBalance": {
+    "staleLabel": "KIKADDE",
+    "syncFailedToast": "Okugoberera akawungeezi tekusobose. Akawungeezi ko ka yinza okuba nga kakadde."
+  },
   "UnclaimedDeposit": {
     "title": "Olina {count} ebitateekeddwa",
     "description": "Omutindo: {sats} sats ezikubirwa",
