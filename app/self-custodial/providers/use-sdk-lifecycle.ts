@@ -33,6 +33,7 @@ type SdkLifecycleState = {
   loadingMore: boolean
   loadMore: () => Promise<void>
   refreshWallets: () => Promise<void>
+  refreshStableBalanceActive: () => Promise<void>
 }
 
 const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
@@ -55,6 +56,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const isBalanceStaleRef = useRef(false)
+  const rawTxOffsetRef = useRef(0)
   const llRef = useRef(LL)
   llRef.current = LL
 
@@ -99,6 +101,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         const snapshot = await getSelfCustodialWalletSnapshot(sdk)
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
+        rawTxOffsetRef.current = snapshot.rawTransactionCount
         setStatus(ActiveWalletStatus.Ready)
 
         updateBalanceStale(detectBalanceStale(snapshot.wallets))
@@ -210,6 +213,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     const CONNECTIVITY_POLL_MS = 10000
     const interval = setInterval(() => {
       if (!sdkRef.current) return
+      if (AppState.currentState !== "active") return
       refreshWallets()
     }, CONNECTIVITY_POLL_MS)
     return () => clearInterval(interval)
@@ -219,8 +223,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
     setLoadingMore(true)
     try {
-      const currentCount = wallets.reduce((sum, w) => sum + w.transactions.length, 0)
-      const result = await loadMoreTransactions(sdkRef.current, currentCount)
+      const result = await loadMoreTransactions(sdkRef.current, rawTxOffsetRef.current)
+      rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
     } catch (err) {
@@ -228,7 +232,17 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     } finally {
       setLoadingMore(false)
     }
-  }, [loadingMore, hasMoreTransactions, wallets])
+  }, [loadingMore, hasMoreTransactions])
+
+  const refreshStableBalanceActive = useCallback(async () => {
+    if (!sdkRef.current) return
+    try {
+      const settings = await getUserSettings(sdkRef.current)
+      setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+    } catch (err) {
+      logSdkEvent(SdkLogLevel.Error, `Failed to refresh user settings: ${err}`)
+    }
+  }, [])
 
   return {
     wallets,
@@ -241,5 +255,6 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     loadingMore,
     loadMore,
     refreshWallets,
+    refreshStableBalanceActive,
   }
 }
