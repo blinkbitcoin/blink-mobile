@@ -72,7 +72,11 @@
         "receivingAccount": "Compte destinataire",
         "infoBitcoin": "Le montant en Bitcoin est approximatif. Il peut varier légèrement.",
         "infoDollar": "Le montant en dollars est approximatif. Il peut varier légèrement.",
-        "transferButtonText": "Transférer de {fromWallet} vers {toWallet}"
+        "transferButtonText": "Transférer de {fromWallet} vers {toWallet}",
+        "feeLabel": "Frais de conversion",
+        "feeError": "Impossible de récupérer les frais de conversion",
+        "amountFloored": "Montant augmenté pour atteindre le minimum de conversion.",
+        "amountDustBumped": "Montant augmenté pour convertir la totalité de votre solde."
     },
     "ConversionSuccessScreen": {
         "message": "Conversion réussie",
@@ -3592,7 +3596,32 @@
     },
     "StableBalance": {
         "title": "Solde stable",
-        "description": "Conservez un solde en USD propulsé par USDB sur Spark."
+        "description": "Conservez un solde en USD propulsé par USDB sur Spark.",
+        "balanceLabelBtc": "Solde · SATS",
+        "balanceLabelUsd": "Solde · USD",
+        "settingsRowTitle": "Solde Stable",
+        "settingsTitle": "Solde Stable",
+        "settingsDescription": "Gardez une partie de votre portefeuille en USD. Convertissez entre BTC et USD manuellement à tout moment avec l'action Convertir.",
+        "activationLabel": "Actif",
+        "activeHint": "Votre portefeuille détient des USD via USDB.",
+        "inactiveHint": "Votre portefeuille ne détient que des BTC.",
+        "deactivateWarningBody": "Il vous reste {amount:string} USD. Convertissez-les d'abord en BTC, sinon votre solde USD sera masqué jusqu'à la réactivation du Solde Stable.",
+        "toggleModal": {
+            "activateTitle": "Activer le solde stable",
+            "activateBody": "Votre solde en BTC sera converti en USDB. Voici les frais de conversion estimés.",
+            "activateConfirm": "Activer",
+            "deactivateTitle": "Désactiver le solde stable",
+            "deactivateBody": "Votre solde en USDB sera reconverti en BTC. Voici les frais de conversion estimés.",
+            "deactivateConfirm": "Désactiver",
+            "cancel": "Annuler"
+        },
+        "firstTimeModal": {
+            "title": "À propos de la Conversion",
+            "dualBalance": "BTC et USD sont deux soldes indépendants dans votre portefeuille. Utilisez Convert à tout moment pour déplacer des fonds entre eux.",
+            "trustDisclosure": "Le mode USD utilise des jetons USDB sur Spark. Les hypothèses de confiance diffèrent de la détention directe de BTC. USDB repose sur l'émetteur de jetons de Spark.",
+            "acknowledge": "Je comprends"
+        },
+        "minimumConversion": "Conversion minimale : {amount:string}"
     },
     "BackendFeatureGate": {
         "title": "Fonctionnalité indisponible",

@@ -72,7 +72,11 @@
     "receivingAccount": "Akaun penerimaan",
     "infoBitcoin": "Jumlah Bitcoin hanyalah anggaran. Ia mungkin berbeza sedikit.",
     "infoDollar": "Jumlah Dolar hanyalah anggaran. Ia mungkin berbeza sedikit.",
-    "transferButtonText": "Pindahkan {fromWallet} ke {toWallet}"
+    "transferButtonText": "Pindahkan {fromWallet} ke {toWallet}",
+    "feeLabel": "Yuran pertukaran",
+    "feeError": "Tidak dapat mendapatkan yuran pertukaran",
+    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum pertukaran.",
+    "amountDustBumped": "Jumlah dinaikkan untuk menukar keseluruhan baki anda."
   },
   "ConversionSuccessScreen": {
     "message": "Penukaran telah berjaya",
@@ -3604,7 +3608,32 @@
   },
   "StableBalance": {
     "title": "Baki stabil",
-    "description": "Simpan baki dalam USD dikuasakan USDB di Spark."
+    "description": "Simpan baki dalam USD dikuasakan USDB di Spark.",
+    "balanceLabelBtc": "Baki · SATS",
+    "balanceLabelUsd": "Baki · USD",
+    "settingsRowTitle": "Baki Stabil",
+    "settingsTitle": "Baki Stabil",
+    "settingsDescription": "Simpan sebahagian dompet anda dalam USD. Tukar antara BTC dan USD secara manual pada bila-bila masa menggunakan tindakan Tukar.",
+    "activationLabel": "Aktif",
+    "activeHint": "Dompet anda menyimpan USD melalui USDB.",
+    "inactiveHint": "Dompet anda hanya menyimpan BTC.",
+    "deactivateWarningBody": "Anda masih mempunyai {amount:string} USD. Tukarkan ke BTC terlebih dahulu, atau baki USD anda akan disembunyikan sehingga anda mengaktifkan semula Baki Stabil.",
+    "toggleModal": {
+      "activateTitle": "Aktifkan Baki Stabil",
+      "activateBody": "Baki BTC anda akan ditukar kepada USDB. Ini adalah anggaran yuran penukaran.",
+      "activateConfirm": "Aktifkan",
+      "deactivateTitle": "Nyahaktifkan Baki Stabil",
+      "deactivateBody": "Baki USDB anda akan ditukar semula kepada BTC. Ini adalah anggaran yuran penukaran.",
+      "deactivateConfirm": "Nyahaktifkan",
+      "cancel": "Batal"
+    },
+    "firstTimeModal": {
+      "title": "Mengenai Penukaran",
+      "dualBalance": "BTC dan USD ialah dua baki bebas dalam dompet anda. Gunakan Convert pada bila-bila masa untuk memindahkan dana antara keduanya.",
+      "trustDisclosure": "Mod USD menggunakan token USDB di Spark. Andaian kepercayaan berbeza daripada memegang BTC secara langsung. USDB bergantung pada penerbit token Spark.",
+      "acknowledge": "Saya faham"
+    },
+    "minimumConversion": "Penukaran minimum: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Ciri tidak tersedia",

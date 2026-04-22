@@ -72,7 +72,11 @@
     "receivingAccount": "Račun za primanje",
     "infoBitcoin": "Bitcoin iznos je samo približan. Može varirati za mali iznos.",
     "infoDollar": "Dolarski iznos je samo približan. Može varirati za mali iznos.",
-    "transferButtonText": "Prenesi {fromWallet} u {toWallet}"
+    "transferButtonText": "Prenesi {fromWallet} u {toWallet}",
+    "feeLabel": "Naknada za konverziju",
+    "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju",
+    "amountFloored": "Iznos povećan kako bi se zadovoljio minimum konverzije.",
+    "amountDustBumped": "Iznos povećan radi konverzije cijelog salda."
   },
   "ConversionSuccessScreen": {
     "message": "Konverzija uspješna",
@@ -3604,7 +3608,32 @@
   },
   "StableBalance": {
     "title": "Stabilan saldo",
-    "description": "Držite saldo u USD pokretan USDB na Sparku."
+    "description": "Držite saldo u USD pokretan USDB na Sparku.",
+    "balanceLabelBtc": "Stanje · SATS",
+    "balanceLabelUsd": "Stanje · USD",
+    "settingsRowTitle": "Stabilno stanje",
+    "settingsTitle": "Stabilno stanje",
+    "settingsDescription": "Dio novčanika držite u USD. BTC i USD pretvarajte ručno u bilo kojem trenutku pomoću radnje Pretvori.",
+    "activationLabel": "Aktivno",
+    "activeHint": "Tvoj novčanik drži USD putem USDB.",
+    "inactiveHint": "Tvoj novčanik drži samo BTC.",
+    "deactivateWarningBody": "Još imaš {amount:string} USD. Pretvori u BTC prvo, inače će tvoje USD stanje biti skriveno dok ponovno ne aktiviraš Stabilno stanje.",
+    "toggleModal": {
+      "activateTitle": "Aktiviraj stabilni saldo",
+      "activateBody": "Vaš BTC saldo bit će pretvoren u USDB. Ovo je procijenjena naknada za konverziju.",
+      "activateConfirm": "Aktiviraj",
+      "deactivateTitle": "Deaktiviraj stabilni saldo",
+      "deactivateBody": "Vaš USDB saldo bit će pretvoren natrag u BTC. Ovo je procijenjena naknada za konverziju.",
+      "deactivateConfirm": "Deaktiviraj",
+      "cancel": "Odustani"
+    },
+    "firstTimeModal": {
+      "title": "O pretvorbi",
+      "dualBalance": "BTC i USD su dva neovisna salda u vašem novčaniku. Koristite Convert u bilo kojem trenutku za premještanje sredstava između njih.",
+      "trustDisclosure": "USD način koristi USDB tokene na Sparku. Pretpostavke povjerenja razlikuju se od izravnog držanja BTC-a. USDB se oslanja na Sparkovog izdavatelja tokena.",
+      "acknowledge": "Razumijem"
+    },
+    "minimumConversion": "Minimalna pretvorba: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Značajka nedostupna",
