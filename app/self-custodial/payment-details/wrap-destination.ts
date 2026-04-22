@@ -19,6 +19,78 @@ type WrapOptions = {
   feeTier?: FeeTierOption
 }
 
+type ValidDestination = Extract<
+  ParseDestinationResult,
+  { valid: true }
+>["validDestination"]
+
+type LightningDestination = Extract<
+  ValidDestination,
+  { paymentType: typeof PaymentType.Lightning | typeof PaymentType.Lnurl }
+>
+type OnchainDestination = Extract<
+  ValidDestination,
+  { paymentType: typeof PaymentType.Onchain }
+>
+type SparkDestination = Extract<
+  ValidDestination,
+  { paymentType: typeof SelfCustodialPaymentType.Spark }
+>
+
+type BuildArgs<T extends WalletCurrency, D extends ValidDestination> = {
+  sdk: BreezSdkInterface
+  destination: D
+  params: CreatePaymentDetailParams<T>
+  options: WrapOptions
+}
+
+const buildLightningDetail = <T extends WalletCurrency>({
+  sdk,
+  destination,
+  params,
+}: BuildArgs<T, LightningDestination>) => {
+  const invoiceAmount =
+    "amount" in destination && destination.amount ? destination.amount : 0
+  const paymentRequest =
+    "paymentRequest" in destination ? destination.paymentRequest : destination.lnurl
+  const invoiceMemo = "memo" in destination ? destination.memo : undefined
+
+  return createSelfCustodialLightningPaymentDetails({
+    sdk,
+    paymentRequest,
+    unitOfAccountAmount: toBtcMoneyAmount(invoiceAmount),
+    hasAmount: invoiceAmount > 0,
+    ...params,
+    destinationSpecifiedMemo: invoiceMemo,
+  })
+}
+
+const buildSparkDetail = <T extends WalletCurrency>({
+  sdk,
+  destination,
+  params,
+}: BuildArgs<T, SparkDestination>) =>
+  createSelfCustodialSparkPaymentDetails({
+    sdk,
+    address: destination.address,
+    unitOfAccountAmount: toBtcMoneyAmount(0),
+    ...params,
+  })
+
+const buildOnchainDetail = <T extends WalletCurrency>({
+  sdk,
+  destination,
+  params,
+  options,
+}: BuildArgs<T, OnchainDestination>) =>
+  createSelfCustodialOnchainPaymentDetails({
+    sdk,
+    address: destination.address,
+    unitOfAccountAmount: toBtcMoneyAmount(0),
+    feeTier: options.feeTier,
+    ...params,
+  })
+
 export const wrapDestinationForSC = (
   result: ParseDestinationResult,
   sdk: BreezSdkInterface,
@@ -34,46 +106,32 @@ export const wrapDestinationForSC = (
     createPaymentDetail: <T extends WalletCurrency>(
       params: CreatePaymentDetailParams<T>,
     ) => {
-      if (
-        original.paymentType === PaymentType.Lightning ||
-        original.paymentType === PaymentType.Lnurl
-      ) {
-        const invoiceAmount =
-          "amount" in original && original.amount ? original.amount : 0
-        const hasAmount = invoiceAmount > 0
-        const invoiceMemo = "memo" in original ? original.memo : undefined
-
-        return createSelfCustodialLightningPaymentDetails({
-          sdk,
-          paymentRequest:
-            "paymentRequest" in original ? original.paymentRequest : original.lnurl,
-          unitOfAccountAmount: toBtcMoneyAmount(invoiceAmount),
-          hasAmount,
-          ...params,
-          destinationSpecifiedMemo: invoiceMemo,
-        })
+      switch (original.paymentType) {
+        case PaymentType.Lightning:
+        case PaymentType.Lnurl:
+          return buildLightningDetail({
+            sdk,
+            destination: original as LightningDestination,
+            params,
+            options,
+          })
+        case SelfCustodialPaymentType.Spark:
+          return buildSparkDetail({
+            sdk,
+            destination: original as SparkDestination,
+            params,
+            options,
+          })
+        case PaymentType.Onchain:
+          return buildOnchainDetail({
+            sdk,
+            destination: original as OnchainDestination,
+            params,
+            options,
+          })
+        default:
+          return result.createPaymentDetail(params)
       }
-
-      if (original.paymentType === SelfCustodialPaymentType.Spark) {
-        return createSelfCustodialSparkPaymentDetails({
-          sdk,
-          address: original.address,
-          unitOfAccountAmount: toBtcMoneyAmount(0),
-          ...params,
-        })
-      }
-
-      if (original.paymentType === PaymentType.Onchain) {
-        return createSelfCustodialOnchainPaymentDetails({
-          sdk,
-          address: original.address,
-          unitOfAccountAmount: toBtcMoneyAmount(0),
-          feeTier: options.feeTier,
-          ...params,
-        })
-      }
-
-      return result.createPaymentDetail(params)
     },
   }
 }
