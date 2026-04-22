@@ -30,6 +30,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
     claimDeposit: jest.fn(),
   }),
   createConvert: jest.fn().mockReturnValue(jest.fn()),
+  createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
 }))
 
 jest.mock("@app/custodial/adapters/payment-adapter", () => ({
@@ -124,5 +125,38 @@ describe("usePayments", () => {
 
     expect(result.current.accountType).toBe(AccountType.SelfCustodial)
     expect(result.current.sendPayment).toBeUndefined()
+  })
+
+  it("exposes getConversionQuote only on the SC path with an SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeDefined()
+  })
+
+  it("does not expose getConversionQuote on the custodial path", () => {
+    mockActiveAccount.mockReturnValue({ id: "custodial-default", type: "custodial" })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeUndefined()
+  })
+
+  it("does not expose getConversionQuote for a SC account missing its SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeUndefined()
   })
 })
