@@ -40,6 +40,7 @@ import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
+import { StableBalanceSetting } from "./settings/stable-balance"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -103,6 +104,7 @@ export const SettingsScreen: React.FC = () => {
       CurrencySetting,
       LanguageSetting,
       ThemeSetting,
+      StableBalanceSetting,
     ],
     securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
     advanced: [ExportCsvSetting, ApiAccessSetting],
