@@ -30,6 +30,29 @@ const PaymentDetails = {
   Withdraw: createInstanceOf("Withdraw"),
 }
 
+const SdkError_Tags = {
+  SparkError: "SparkError",
+  InsufficientFunds: "InsufficientFunds",
+  InvalidUuid: "InvalidUuid",
+  InvalidInput: "InvalidInput",
+  NetworkError: "NetworkError",
+  StorageError: "StorageError",
+  ChainServiceError: "ChainServiceError",
+  MaxDepositClaimFeeExceeded: "MaxDepositClaimFeeExceeded",
+  MissingUtxo: "MissingUtxo",
+  LnurlError: "LnurlError",
+  Signer: "Signer",
+  Generic: "Generic",
+}
+
+const SdkError = {
+  instanceOf: (obj) =>
+    Boolean(obj) &&
+    typeof obj === "object" &&
+    typeof obj.tag === "string" &&
+    Object.values(SdkError_Tags).includes(obj.tag),
+}
+
 module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
@@ -62,6 +85,8 @@ module.exports = {
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
   PaymentDetails,
+  SdkError,
+  SdkError_Tags,
   ServiceStatus: {
     Operational: 0,
     Degraded: 1,
