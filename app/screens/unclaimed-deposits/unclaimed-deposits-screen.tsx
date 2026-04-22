@@ -12,7 +12,7 @@ import {
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { formatFeeTierOptions } from "@app/screens/send-bitcoin-screen/hooks/format-fee-tier-options"
+import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { DepositStatus } from "@app/types/payment.types"
