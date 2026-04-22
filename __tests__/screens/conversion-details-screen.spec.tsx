@@ -39,6 +39,42 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => ({
+    isSelfCustodial: false,
+    isReady: false,
+    needsBackendAuth: true,
+    wallets: [],
+    status: "Unavailable",
+    accountType: "Custodial",
+  }),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({
+    wallets: [],
+    status: "Unavailable",
+    accountType: "SelfCustodial",
+    retry: () => {},
+    sdk: null,
+    isStableBalanceActive: false,
+    isBalanceStale: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: async () => {},
+    refreshWallets: async () => {},
+  }),
+}))
+
+jest.mock("@app/hooks/use-stable-balance-first-time", () => ({
+  useStableBalanceFirstTime: () => ({
+    shouldShow: false,
+    markAsShown: jest.fn(),
+    loaded: true,
+  }),
+}))
+
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
   label?: string
