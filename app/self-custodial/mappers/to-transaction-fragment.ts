@@ -23,13 +23,77 @@ type DisplayInfo = {
   fractionDigits: number
 }
 
+type DescriptionResolver = (tx: NormalizedTransaction) => string
+
+type DisplayValues = {
+  displayAmount: string
+  displayCurrency: string
+  displayFee: string
+}
+
+type ComputeDisplayInput = {
+  signedAmount: number
+  currency: WalletCurrency
+  feeAmount: number
+  feeCurrency: WalletCurrency
+  display?: DisplayInfo
+}
+
+const STATUS_MAP: Record<TransactionStatus, TxStatus> = {
+  [TransactionStatus.Completed]: TxStatus.Success,
+  [TransactionStatus.Pending]: TxStatus.Pending,
+  [TransactionStatus.Failed]: TxStatus.Failure,
+}
+
 const mapDirection = (direction: TransactionDirection): TxDirection =>
   direction === TransactionDirection.Send ? TxDirection.Send : TxDirection.Receive
 
-const mapStatus = (status: TransactionStatus): TxStatus => {
-  if (status === TransactionStatus.Completed) return TxStatus.Success
-  if (status === TransactionStatus.Pending) return TxStatus.Pending
-  return TxStatus.Failure
+const mapStatus = (status: TransactionStatus): TxStatus =>
+  STATUS_MAP[status] ?? TxStatus.Failure
+
+const wrapMoneyAmount = (
+  amount: number,
+  currency: WalletCurrency,
+): MoneyAmount<WalletOrDisplayCurrency> => ({
+  amount,
+  currency,
+  currencyCode: currency,
+})
+
+const formatInDisplayCurrency = (
+  amount: MoneyAmount<WalletOrDisplayCurrency>,
+  display: DisplayInfo,
+): string => {
+  const converted = display.convertMoneyAmount(
+    amount,
+    display.displayCurrency as WalletOrDisplayCurrency,
+  )
+  const majorUnits = converted.amount / 10 ** display.fractionDigits
+  return majorUnits.toFixed(display.fractionDigits)
+}
+
+const computeDisplay = ({
+  signedAmount,
+  currency,
+  feeAmount,
+  feeCurrency,
+  display,
+}: ComputeDisplayInput): DisplayValues => {
+  if (!display) {
+    return {
+      displayAmount: `${Math.abs(signedAmount)}`,
+      displayCurrency: currency,
+      displayFee: `${feeAmount}`,
+    }
+  }
+  return {
+    displayAmount: formatInDisplayCurrency(
+      wrapMoneyAmount(Math.abs(signedAmount), currency),
+      display,
+    ),
+    displayCurrency: display.displayCurrency,
+    displayFee: formatInDisplayCurrency(wrapMoneyAmount(feeAmount, feeCurrency), display),
+  }
 }
 
 const createInitiationVia = (
@@ -38,11 +102,7 @@ const createInitiationVia = (
   if (tx.paymentType === PaymentType.Onchain) {
     return { __typename: "InitiationViaOnChain", address: "" }
   }
-  return {
-    __typename: "InitiationViaLn",
-    paymentHash: tx.id,
-    paymentRequest: "",
-  }
+  return { __typename: "InitiationViaLn", paymentHash: tx.id, paymentRequest: "" }
 }
 
 const createSettlementVia = (
@@ -58,60 +118,26 @@ const createSettlementVia = (
   return { __typename: "SettlementViaLn", preImage: null }
 }
 
-type ComputeDisplayInput = {
-  signedAmount: number
-  currency: WalletCurrency
-  feeAmount: number
-  display?: DisplayInfo
+type FeeConversionInput = {
+  rawAmount: number
+  rawCurrency: WalletCurrency
+  settlementCurrency: WalletCurrency
+  display: DisplayInfo | undefined
 }
 
-const computeDisplay = ({
-  signedAmount,
-  currency,
-  feeAmount,
+const feeInSettlementCurrency = ({
+  rawAmount,
+  rawCurrency,
+  settlementCurrency,
   display,
-}: ComputeDisplayInput): {
-  displayAmount: string
-  displayCurrency: string
-  displayFee: string
-} => {
-  if (!display) {
-    return {
-      displayAmount: `${Math.abs(signedAmount)}`,
-      displayCurrency: currency,
-      displayFee: `${feeAmount}`,
-    }
-  }
-
-  const settlementInWalletCurrency: MoneyAmount<WalletOrDisplayCurrency> = {
-    amount: Math.abs(signedAmount),
-    currency,
-    currencyCode: currency,
-  }
-
-  const converted = display.convertMoneyAmount(
-    settlementInWalletCurrency,
-    display.displayCurrency as WalletOrDisplayCurrency,
-  )
-  const majorUnits = converted.amount / 10 ** display.fractionDigits
-  const displayAmount = majorUnits.toFixed(display.fractionDigits)
-
-  const feeInWalletCurrency: MoneyAmount<WalletOrDisplayCurrency> = {
-    amount: feeAmount,
-    currency: WalletCurrency.Btc,
-    currencyCode: WalletCurrency.Btc,
-  }
-  const convertedFee = display.convertMoneyAmount(
-    feeInWalletCurrency,
-    display.displayCurrency as WalletOrDisplayCurrency,
-  )
-  const feeMajor = convertedFee.amount / 10 ** display.fractionDigits
-  const displayFee = feeMajor.toFixed(display.fractionDigits)
-
-  return { displayAmount, displayCurrency: display.displayCurrency, displayFee }
+}: FeeConversionInput): number => {
+  if (rawCurrency === settlementCurrency) return rawAmount
+  if (!display) return 0
+  return display.convertMoneyAmount(
+    wrapMoneyAmount(rawAmount, rawCurrency),
+    settlementCurrency,
+  ).amount
 }
-
-type DescriptionResolver = (tx: NormalizedTransaction) => string
 
 export const toTransactionFragment = (
   tx: NormalizedTransaction,
@@ -119,16 +145,26 @@ export const toTransactionFragment = (
   resolveDescription?: DescriptionResolver,
 ): TransactionFragment => {
   const direction = mapDirection(tx.direction)
-  const feeAmount = tx.fee?.amount ?? 0
-  const totalAmount =
-    direction === TxDirection.Send ? tx.amount.amount + feeAmount : tx.amount.amount
-  const signedAmount = direction === TxDirection.Send ? -totalAmount : totalAmount
+  const rawFeeAmount = tx.fee?.amount ?? 0
+  const rawFeeCurrency = (tx.fee?.currency ?? WalletCurrency.Btc) as WalletCurrency
   const currency = tx.amount.currency as WalletCurrency
+
+  const settlementFee = feeInSettlementCurrency({
+    rawAmount: rawFeeAmount,
+    rawCurrency: rawFeeCurrency,
+    settlementCurrency: currency,
+    display,
+  })
+
+  const totalAmount =
+    direction === TxDirection.Send ? tx.amount.amount + settlementFee : tx.amount.amount
+  const signedAmount = direction === TxDirection.Send ? -totalAmount : totalAmount
 
   const { displayAmount, displayCurrency, displayFee } = computeDisplay({
     signedAmount,
     currency,
-    feeAmount,
+    feeAmount: rawFeeAmount,
+    feeCurrency: rawFeeCurrency,
     display,
   })
 
@@ -140,7 +176,7 @@ export const toTransactionFragment = (
     memo: resolveDescription ? resolveDescription(tx) : tx.memo ?? null,
     createdAt: tx.timestamp,
     settlementAmount: signedAmount,
-    settlementFee: feeAmount,
+    settlementFee,
     settlementDisplayFee: displayFee,
     settlementCurrency: currency,
     settlementDisplayAmount: displayAmount,
