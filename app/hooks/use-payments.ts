@@ -15,6 +15,7 @@ import {
 } from "@app/self-custodial/adapters/deposit-adapter"
 import {
   createConvert,
+  createGetConversionQuote,
   createReceiveLightning,
   createReceiveOnchain,
 } from "@app/self-custodial/bridge"
@@ -22,6 +23,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-pro
 import {
   type ClaimDepositAdapter,
   type ConvertAdapter,
+  type GetConversionQuoteAdapter,
   type GetFeeAdapter,
   type ListPendingDepositsAdapter,
   type ReceiveLightningAdapter,
@@ -40,6 +42,7 @@ type PaymentsResult = {
   listPendingDeposits?: ListPendingDepositsAdapter
   claimDeposit?: ClaimDepositAdapter
   convert?: ConvertAdapter
+  getConversionQuote?: GetConversionQuoteAdapter
   accountType: AccountType
 }
 
@@ -58,6 +61,7 @@ export const usePayments = (): PaymentsResult => {
         listPendingDeposits: createListPendingDeposits(sdk),
         claimDeposit: createClaimDeposit(sdk),
         convert: createConvert(sdk),
+        getConversionQuote: createGetConversionQuote(sdk),
         accountType,
       }
     }
