@@ -39,6 +39,7 @@ const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
 const mockToastShow = jest.fn()
+const mockGetUserSettings = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -52,10 +53,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (...args: unknown[]) => mockInitSdk(...args),
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
-  getUserSettings: jest.fn().mockResolvedValue({
-    stableBalanceActiveLabel: undefined,
-    sparkPrivateModeEnabled: false,
-  }),
+  getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -117,6 +115,10 @@ describe("SelfCustodialWalletProvider", () => {
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockGetUserSettings.mockResolvedValue({
+      stableBalanceActiveLabel: undefined,
+      sparkPrivateModeEnabled: false,
+    })
     jest
       .requireMock("@app/self-custodial/providers/is-online")
       .getOnlineState.mockResolvedValue("online")
@@ -482,8 +484,7 @@ describe("SelfCustodialWalletProvider", () => {
       initSdk: mockInitSdk,
       addSdkEventListener: mockAddSdkEventListener,
     })
-    const bridge = jest.requireMock("@app/self-custodial/bridge")
-    bridge.getUserSettings.mockRejectedValue(new Error("settings boom"))
+    mockGetUserSettings.mockRejectedValue(new Error("settings boom"))
 
     renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -566,6 +567,10 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockGetUserSettings.mockResolvedValue({
+      stableBalanceActiveLabel: undefined,
+      sparkPrivateModeEnabled: false,
+    })
     jest
       .requireMock("@app/self-custodial/providers/is-online")
       .getOnlineState.mockResolvedValue("online")
@@ -863,6 +868,9 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     ).getOnlineState
     getOnlineStateMock.mockResolvedValue("online")
 
+    const prevAppState = AppState.currentState
+    AppState.currentState = "active"
+
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
 
@@ -889,6 +897,48 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     })
     expect(getOnlineStateMock.mock.calls.length).toBeGreaterThan(afterFirstTick)
 
+    AppState.currentState = prevAppState
+    jest.useRealTimers()
+  })
+
+  it("skips the 10s poll tick when AppState is not 'active'", async () => {
+    jest.useFakeTimers()
+    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue({
+      wallets: [],
+      hasMore: false,
+    })
+    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
+    const getServiceStatusMock = jest.requireMock(
+      "@app/self-custodial/providers/is-online",
+    ).getServiceStatus
+    getServiceStatusMock.mockResolvedValue(ServiceStatus.Operational)
+
+    const { AppState } = jest.requireActual("react-native")
+    const prevAppState = AppState.currentState
+    AppState.currentState = "background"
+
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({})
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+
+    const initialCalls = getServiceStatusMock.mock.calls.length
+
+    await act(async () => {
+      jest.advanceTimersByTime(10000)
+      await Promise.resolve()
+    })
+
+    expect(getServiceStatusMock.mock.calls).toHaveLength(initialCalls)
+
+    AppState.currentState = prevAppState
     jest.useRealTimers()
   })
 
@@ -977,5 +1027,101 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(getOnlineStateMock.mock.calls).toHaveLength(callsAfterActive)
 
     addEventListenerSpy.mockRestore()
+  })
+
+  describe("isStableBalanceActive state and refreshStableBalanceActive()", () => {
+    it("defaults to false when getUserSettings returns no active label", async () => {
+      mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: undefined,
+        sparkPrivateModeEnabled: false,
+      })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.sdk).toBeTruthy())
+      await waitFor(() => expect(mockGetUserSettings).toHaveBeenCalled())
+      expect(result.current.isStableBalanceActive).toBe(false)
+    })
+
+    it("reports true when getUserSettings returns an active label", async () => {
+      mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: { label: "USDB" },
+        sparkPrivateModeEnabled: false,
+      })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.sdk).toBeTruthy())
+      await waitFor(() => expect(result.current.isStableBalanceActive).toBe(true))
+    })
+
+    it("refreshStableBalanceActive() re-reads the SDK and flips the flag on change", async () => {
+      mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: undefined,
+        sparkPrivateModeEnabled: false,
+      })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.sdk).toBeTruthy())
+      await waitFor(() => expect(result.current.isStableBalanceActive).toBe(false))
+
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: { label: "USDB" },
+        sparkPrivateModeEnabled: false,
+      })
+
+      await act(async () => {
+        await result.current.refreshStableBalanceActive()
+      })
+
+      expect(result.current.isStableBalanceActive).toBe(true)
+    })
+
+    it("refreshStableBalanceActive() is a no-op when the SDK is not connected", async () => {
+      mockGetMnemonic.mockResolvedValue(null)
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() =>
+        expect(result.current.status).toBe(ActiveWalletStatus.Unavailable),
+      )
+
+      const callsBefore = mockGetUserSettings.mock.calls.length
+
+      await act(async () => {
+        await result.current.refreshStableBalanceActive()
+      })
+
+      expect(mockGetUserSettings.mock.calls).toHaveLength(callsBefore)
+    })
+
+    it("refreshStableBalanceActive() swallows errors and keeps the flag stable", async () => {
+      mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: { label: "USDB" },
+        sparkPrivateModeEnabled: false,
+      })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.sdk).toBeTruthy())
+      await waitFor(() => expect(result.current.isStableBalanceActive).toBe(true))
+
+      mockGetUserSettings.mockRejectedValueOnce(new Error("boom"))
+
+      await act(async () => {
+        await result.current.refreshStableBalanceActive()
+      })
+
+      expect(result.current.isStableBalanceActive).toBe(true)
+    })
   })
 })
