@@ -10,6 +10,7 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -31,8 +32,12 @@ export const AccountBanner: React.FC = () => {
 
   const { currentLevel } = useLevel()
   const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
+  const isAuthed = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
+  const { data, loading } = useSettingsScreenQuery({
+    skip: !isAuthed,
+    fetchPolicy: "cache-first",
+  })
 
   const hasUsername = Boolean(data?.me?.username)
   const lnAddress = `${data?.me?.username}@${lnAddressHostname}`
