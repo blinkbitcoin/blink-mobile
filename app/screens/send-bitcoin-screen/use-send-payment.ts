@@ -211,8 +211,12 @@ export const useSendPayment = (
   ] = useOnChainUsdPaymentSendAsBtcDenominatedMutation(options)
 
   const [hasAttemptedSend, setHasAttemptedSend] = useState(false)
+  // Tracks loading for mutations that bypass Apollo (e.g. self-custodial SDK calls)
+  // so the UI still gets a loading signal while the mutation is in-flight.
+  const [localLoading, setLocalLoading] = useState(false)
 
   const loading =
+    localLoading ||
     intraLedgerPaymentSendLoading ||
     intraLedgerUsdPaymentSendLoading ||
     lnInvoicePaymentSendLoading ||
@@ -227,25 +231,30 @@ export const useSendPayment = (
     return sendPaymentMutation && !hasAttemptedSend
       ? async () => {
           setHasAttemptedSend(true)
-          const { status, errors, extraInfo, transaction } = await sendPaymentMutation({
-            intraLedgerPaymentSend,
-            intraLedgerUsdPaymentSend,
-            lnInvoicePaymentSend,
-            lnNoAmountInvoicePaymentSend,
-            lnNoAmountUsdInvoicePaymentSend,
-            onChainPaymentSend,
-            onChainPaymentSendAll,
-            onChainUsdPaymentSend,
-            onChainUsdPaymentSendAsBtcDenominated,
-          })
-          let errorsMessage = undefined
-          if (errors) {
-            errorsMessage = getErrorMessages(errors)
+          setLocalLoading(true)
+          try {
+            const { status, errors, extraInfo, transaction } = await sendPaymentMutation({
+              intraLedgerPaymentSend,
+              intraLedgerUsdPaymentSend,
+              lnInvoicePaymentSend,
+              lnNoAmountInvoicePaymentSend,
+              lnNoAmountUsdInvoicePaymentSend,
+              onChainPaymentSend,
+              onChainPaymentSendAll,
+              onChainUsdPaymentSend,
+              onChainUsdPaymentSendAsBtcDenominated,
+            })
+            let errorsMessage = undefined
+            if (errors) {
+              errorsMessage = getErrorMessages(errors)
+            }
+            if (status === PaymentSendResult.Failure) {
+              setHasAttemptedSend(false)
+            }
+            return { status, errorsMessage, extraInfo, transaction }
+          } finally {
+            setLocalLoading(false)
           }
-          if (status === PaymentSendResult.Failure) {
-            setHasAttemptedSend(false)
-          }
-          return { status, errorsMessage, extraInfo, transaction }
         }
       : undefined
   }, [
