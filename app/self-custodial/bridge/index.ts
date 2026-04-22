@@ -8,6 +8,7 @@ export {
 } from "./lifecycle"
 export { getWalletInfo, listPayments, getUserSettings } from "./wallet"
 export { getSparkStatus } from "./status"
+export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
 export {
   prepareSend,
@@ -20,6 +21,8 @@ export {
 export type { OnchainFeeTiers, PrepareSendOptions } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
-export { createConvert } from "./convert"
+export { createConvert, createGetConversionQuote } from "./convert"
+export { fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"
 export type { ParsedSparkAddress } from "./parse"
+export { findUsdbToken, fetchUsdbDecimals } from "./token-balance"
