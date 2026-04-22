@@ -195,6 +195,7 @@ export type RootStackParamList = {
   sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }
   sparkRestoreMethodScreen: undefined
   sparkCloudRestoreScreen: undefined
+  stableBalanceSettings: undefined
 }
 
 export type OnboardingStackParamList = {
