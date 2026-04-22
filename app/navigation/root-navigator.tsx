@@ -41,6 +41,7 @@ import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import { OfflineGate } from "@app/self-custodial/components"
+import { StableBalanceSettingsScreen } from "@app/screens/stable-balance-settings-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -783,6 +784,11 @@ export const RootStack = () => {
         name="sparkWalletCreation"
         component={SparkWalletCreationScreen}
         options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="stableBalanceSettings"
+        component={StableBalanceSettingsScreen}
+        options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
         name="sparkMigrationExplainer"
