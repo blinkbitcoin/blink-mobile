@@ -70,7 +70,11 @@
     "receivingAccount": "Λογαριασμός λήψης",
     "infoBitcoin": "Το ποσό σε Bitcoin είναι κατά προσέγγιση. Μπορεί να διαφέρει ελαφρώς.",
     "infoDollar": "Το ποσό σε δολάρια είναι κατά προσέγγιση. Μπορεί να διαφέρει ελαφρώς.",
-    "transferButtonText": "Μεταφορά {fromWallet} σε {toWallet}"
+    "transferButtonText": "Μεταφορά {fromWallet} σε {toWallet}",
+    "feeLabel": "Χρέωση μετατροπής",
+    "feeError": "Δεν ήταν δυνατή η ανάκτηση της χρέωσης μετατροπής",
+    "amountFloored": "Το ποσό αυξήθηκε για να ικανοποιήσει το ελάχιστο μετατροπής.",
+    "amountDustBumped": "Το ποσό αυξήθηκε για να μετατραπεί όλο το υπόλοιπό σου."
   },
   "ConversionSuccessScreen": {
     "message": "Επιτυχής μετατροπή",
@@ -3563,7 +3567,32 @@
   },
   "StableBalance": {
     "title": "Σταθερό υπόλοιπο",
-    "description": "Διατηρήστε υπόλοιπο σε USD με USDB στο Spark."
+    "description": "Διατηρήστε υπόλοιπο σε USD με USDB στο Spark.",
+    "balanceLabelBtc": "Υπόλοιπο · SATS",
+    "balanceLabelUsd": "Υπόλοιπο · USD",
+    "settingsRowTitle": "Σταθερό Υπόλοιπο",
+    "settingsTitle": "Σταθερό Υπόλοιπο",
+    "settingsDescription": "Διατηρήστε μέρος του πορτοφολιού σας σε USD. Μετατρέψτε χειροκίνητα μεταξύ BTC και USD ανά πάσα στιγμή χρησιμοποιώντας την ενέργεια Μετατροπή.",
+    "activationLabel": "Ενεργό",
+    "activeHint": "Το πορτοφόλι διατηρεί USD μέσω USDB.",
+    "inactiveHint": "Το πορτοφόλι διατηρεί μόνο BTC.",
+    "deactivateWarningBody": "Έχεις ακόμη {amount:string} USD. Μετατρέψτε πρώτα σε BTC, αλλιώς το υπόλοιπο USD θα είναι κρυφό μέχρι να ενεργοποιήσετε ξανά το Σταθερό Υπόλοιπο.",
+    "toggleModal": {
+      "activateTitle": "Ενεργοποίηση σταθερού υπολοίπου",
+      "activateBody": "Το υπόλοιπό σας σε BTC θα μετατραπεί σε USDB. Αυτή είναι η εκτιμώμενη χρέωση μετατροπής.",
+      "activateConfirm": "Ενεργοποίηση",
+      "deactivateTitle": "Απενεργοποίηση σταθερού υπολοίπου",
+      "deactivateBody": "Το υπόλοιπό σας σε USDB θα μετατραπεί ξανά σε BTC. Αυτή είναι η εκτιμώμενη χρέωση μετατροπής.",
+      "deactivateConfirm": "Απενεργοποίηση",
+      "cancel": "Ακύρωση"
+    },
+    "firstTimeModal": {
+      "title": "Σχετικά με τη Μετατροπή",
+      "dualBalance": "Το BTC και το USD είναι δύο ανεξάρτητα υπόλοιπα στο πορτοφόλι σας. Χρησιμοποιήστε το Convert οποιαδήποτε στιγμή για να μεταφέρετε χρήματα μεταξύ τους.",
+      "trustDisclosure": "Η λειτουργία USD χρησιμοποιεί tokens USDB στο Spark. Οι παραδοχές εμπιστοσύνης είναι διαφορετικές από το να κρατάτε BTC απευθείας. το USDB βασίζεται στον εκδότη tokens του Spark.",
+      "acknowledge": "Καταλαβαίνω"
+    },
+    "minimumConversion": "Ελάχιστη μετατροπή: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Λειτουργία μη διαθέσιμη",

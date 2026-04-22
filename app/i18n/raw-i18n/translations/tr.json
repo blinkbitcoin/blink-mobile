@@ -70,7 +70,11 @@
     "receivingAccount": "Alınacak miktar",
     "infoBitcoin": "Bitcoin miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "infoDollar": "Dolar miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
-    "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et"
+    "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et",
+    "feeLabel": "Dönüştürme ücreti",
+    "feeError": "Dönüştürme ücreti alınamadı",
+    "amountFloored": "Tutar, dönüştürme minimumunu karşılamak için artırıldı.",
+    "amountDustBumped": "Tutar, tüm bakiyenizi dönüştürmek için artırıldı."
   },
   "ConversionSuccessScreen": {
     "message": "Çevirme başarılı",
@@ -3563,7 +3567,32 @@
   },
   "StableBalance": {
     "title": "Sabit bakiye",
-    "description": "Spark üzerinde USDB tarafından desteklenen USD bakiyesi tutun."
+    "description": "Spark üzerinde USDB tarafından desteklenen USD bakiyesi tutun.",
+    "balanceLabelBtc": "Bakiye · SATS",
+    "balanceLabelUsd": "Bakiye · USD",
+    "settingsRowTitle": "Stabil Bakiye",
+    "settingsTitle": "Stabil Bakiye",
+    "settingsDescription": "Cüzdanınızın bir kısmını USD olarak tutun. Dönüştür eylemini kullanarak BTC ile USD arasında istediğiniz zaman manuel olarak dönüşüm yapın.",
+    "activationLabel": "Aktif",
+    "activeHint": "Cüzdanınız USDB üzerinden USD tutuyor.",
+    "inactiveHint": "Cüzdanınız sadece BTC tutuyor.",
+    "deactivateWarningBody": "Hâlâ {amount:string} USD'niz var. Önce BTC'ye dönüştürün; aksi halde Stabil Bakiye'yi tekrar etkinleştirene kadar USD bakiyeniz gizlenir.",
+    "toggleModal": {
+      "activateTitle": "Sabit Bakiyeyi Etkinleştir",
+      "activateBody": "BTC bakiyeniz USDB'ye dönüştürülecek. Bu, tahmini dönüşüm ücretidir.",
+      "activateConfirm": "Etkinleştir",
+      "deactivateTitle": "Sabit Bakiyeyi Devre Dışı Bırak",
+      "deactivateBody": "USDB bakiyeniz tekrar BTC'ye dönüştürülecek. Bu, tahmini dönüşüm ücretidir.",
+      "deactivateConfirm": "Devre dışı bırak",
+      "cancel": "İptal"
+    },
+    "firstTimeModal": {
+      "title": "Dönüşüm Hakkında",
+      "dualBalance": "BTC ve USD, cüzdanınızdaki iki bağımsız bakiyedir. Aralarında fon taşımak için istediğiniz zaman Convert'i kullanın.",
+      "trustDisclosure": "USD modu Spark üzerindeki USDB tokenlarını kullanır. Güven varsayımları doğrudan BTC tutmaktan farklıdır. USDB Spark'ın token çıkaranına dayanır.",
+      "acknowledge": "Anlıyorum"
+    },
+    "minimumConversion": "Minimum dönüşüm: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",

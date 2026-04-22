@@ -70,7 +70,11 @@
     "receivingAccount": "Akawunti eweebwa",
     "infoBitcoin": "Omuwendo gwa Bitcoin gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
     "infoDollar": "Omuwendo gwa Doola gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
-    "transferButtonText": "Weereza {fromWallet} eri {toWallet}"
+    "transferButtonText": "Weereza {fromWallet} eri {toWallet}",
+    "feeLabel": "Ssente z'okukyusa",
+    "feeError": "Tekisoboka kuggya ssente z'okukyusa",
+    "amountFloored": "Omuwendo gulinnyisiddwa okutuuka ku minimum y'okukyusa.",
+    "amountDustBumped": "Omuwendo gulinnyisiddwa okukyusa akasente ko kwonna."
   },
   "ConversionSuccessScreen": {
     "message": "Okukyusa kutuuse kubuwanguzi",
@@ -3563,7 +3567,32 @@
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",
-    "description": "Kuuma bbaalansi mu USD n'obuyambi bwa USDB ku Spark."
+    "description": "Kuuma bbaalansi mu USD n'obuyambi bwa USDB ku Spark.",
+    "balanceLabelBtc": "Balansi · SATS",
+    "balanceLabelUsd": "Balansi · USD",
+    "settingsRowTitle": "Balansi Enywevu",
+    "settingsTitle": "Balansi Enywevu",
+    "settingsDescription": "Kuuma ku n'yamu ku yalopu yo mu doola za America. Enkyusa wakati wonna gy'oyagala nga okozesa akatuli ka Kyusa.",
+    "activationLabel": "Kisaliddwa",
+    "activeHint": "Valet yo ekwata USD nga eyita mu USDB.",
+    "inactiveHint": "Valet yo ekwata BTC kyokka.",
+    "deactivateWarningBody": "Okyasigalawo {amount:string} USD. Sooka ofuule BTC, oba balansi yo eya USD eyiinzira nga tokyalongedde Balansi Enywevu.",
+    "toggleModal": {
+      "activateTitle": "Kola Ssente Ezinywedde",
+      "activateBody": "BTC yo ejja kukyusibwa mu USDB. Lino lye sente ez'okukyusa ezisuubiddwa.",
+      "activateConfirm": "Kola",
+      "deactivateTitle": "Zikiriza Ssente Ezinywedde Kusalako",
+      "deactivateBody": "USDB yo ejja kuddizibwa mu BTC. Lino lye sente ez'okukyusa ezisuubiddwa.",
+      "deactivateConfirm": "Kusalako",
+      "cancel": "Sazaamu"
+    },
+    "firstTimeModal": {
+      "title": "Ebikwata ku Kukyusa",
+      "dualBalance": "BTC ne USD bye ssente ebbiri ezeewaddeko mu wolede yo. Kozesa Convert buli kiseera okusengula ssente wakati waabyo.",
+      "trustDisclosure": "Endowooza ya USD ekozesa tokens za USDB ku Spark. Ebiteebereezebwa eby'obwesige bya njawulo okukuuma BTC butereevu. USDB yeesigamye ku muwa tokens wa Spark.",
+      "acknowledge": "Ntegedde"
+    },
+    "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Ekikola tekiriwo",

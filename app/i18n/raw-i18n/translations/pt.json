@@ -70,7 +70,11 @@
         "receivingAccount": "Conta de Recebimento",
         "infoBitcoin": "O valor em Bitcoin é apenas aproximado. Ele pode variar uma pequena quantia.",
         "infoDollar": "O valor em Dólar é apenas aproximado. Ele pode variar uma pequena quantia.",
-        "transferButtonText": "Transferir {fromWallet} para {toWallet}"
+        "transferButtonText": "Transferir {fromWallet} para {toWallet}",
+        "feeLabel": "Taxa de conversão",
+        "feeError": "Não foi possível obter a taxa de conversão",
+        "amountFloored": "Valor aumentado para cumprir o mínimo de conversão.",
+        "amountDustBumped": "Valor aumentado para converter todo o seu saldo."
     },
     "ConversionSuccessScreen": {
         "message": "Conversão bem sucedida",
@@ -3551,7 +3555,32 @@
     },
     "StableBalance": {
         "title": "Saldo estável",
-        "description": "Mantenha um saldo em USD alimentado por USDB no Spark."
+        "description": "Mantenha um saldo em USD alimentado por USDB no Spark.",
+        "balanceLabelBtc": "Saldo · SATS",
+        "balanceLabelUsd": "Saldo · USD",
+        "settingsRowTitle": "Saldo Estável",
+        "settingsTitle": "Saldo Estável",
+        "settingsDescription": "Mantenha parte da sua carteira em USD. Converta entre BTC e USD manualmente a qualquer momento com a ação Converter.",
+        "activationLabel": "Ativo",
+        "activeHint": "A tua carteira mantém USD via USDB.",
+        "inactiveHint": "A tua carteira só mantém BTC.",
+        "deactivateWarningBody": "Ainda tens {amount:string} USD. Converte primeiro para BTC, ou o teu saldo em USD ficará oculto até reativares o Saldo Estável.",
+        "toggleModal": {
+            "activateTitle": "Ativar saldo estável",
+            "activateBody": "Seu saldo em BTC será convertido em USDB. Esta é a taxa de conversão estimada.",
+            "activateConfirm": "Ativar",
+            "deactivateTitle": "Desativar saldo estável",
+            "deactivateBody": "Seu saldo em USDB será convertido de volta em BTC. Esta é a taxa de conversão estimada.",
+            "deactivateConfirm": "Desativar",
+            "cancel": "Cancelar"
+        },
+        "firstTimeModal": {
+            "title": "Sobre Converter",
+            "dualBalance": "BTC e USD são dois saldos independentes em sua carteira. Use Convert a qualquer momento para mover fundos entre eles.",
+            "trustDisclosure": "O modo USD usa tokens USDB no Spark. As suposições de confiança são diferentes de deter BTC diretamente. O USDB depende do emissor de tokens do Spark.",
+            "acknowledge": "Compreendo"
+        },
+        "minimumConversion": "Conversão mínima: {amount:string}"
     },
     "BackendFeatureGate": {
         "title": "Recurso indisponível",

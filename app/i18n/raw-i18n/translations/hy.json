@@ -72,7 +72,11 @@
     "receivingAccount": "Ստացող հաշիվ ",
     "infoBitcoin": "Բիթքոյն-ի գումարը մոտավորապես է։ Այն կարող է փոքր-ինչ տարբերվել։",
     "infoDollar": "Դոլարի գումարը մոտավորապես է։ Այն կարող է փոքր-ինչ տարբերվել։",
-    "transferButtonText": "Փոխանցել {fromWallet}-ից {toWallet}"
+    "transferButtonText": "Փոխանցել {fromWallet}-ից {toWallet}",
+    "feeLabel": "Փոխարկման վճար",
+    "feeError": "Չհաջողվեց ստանալ փոխարկման վճարը",
+    "amountFloored": "Գումարն ավելացվեց փոխարկման նվազագույնին հասնելու համար։",
+    "amountDustBumped": "Գումարն ավելացվեց ամբողջ մնացորդդ փոխարկելու համար։"
   },
   "ConversionSuccessScreen": {
     "message": "Փոխակերպումը հաջողությամբ է կատարվել",
@@ -3604,7 +3608,32 @@
   },
   "StableBalance": {
     "title": "Կայուն մնացորդ",
-    "description": "Պահեք ԱՄՆ դոլարով արտահայտված մնացորդ, որը աշխատում է Spark-ում USDB-ի միջոցով։"
+    "description": "Պահեք ԱՄՆ դոլարով արտահայտված մնացորդ, որը աշխատում է Spark-ում USDB-ի միջոցով։",
+    "balanceLabelBtc": "Մնացորդ · SATS",
+    "balanceLabelUsd": "Մնացորդ · USD",
+    "settingsRowTitle": "Կայուն մնացորդ",
+    "settingsTitle": "Կայուն մնացորդ",
+    "settingsDescription": "Ձեր դրամապանակի մի մասը պահեք USD-ով: Փոխարկեք BTC-ի և USD-ի միջև ձեռքով ցանկացած պահի՝ օգտագործելով Փոխարկել գործողությունը:",
+    "activationLabel": "Ակտիվ",
+    "activeHint": "Ձեր դրամապանակը USD է պահում USDB-ի միջոցով։",
+    "inactiveHint": "Ձեր դրամապանակը պահում է միայն BTC։",
+    "deactivateWarningBody": "Դուք դեռ ունեք {amount:string} USD։ Նախ փոխարկեք BTC, այլապես ձեր USD մնացորդը թաքցվելու է, մինչև նորից չակտիվացնեք Կայուն մնացորդը։",
+    "toggleModal": {
+      "activateTitle": "Ակտիվացնել կայուն մնացորդը",
+      "activateBody": "Ձեր BTC մնացորդը կփոխարկվի USDB-ի։ Սա փոխարկման գնահատված վճարն է։",
+      "activateConfirm": "Ակտիվացնել",
+      "deactivateTitle": "Ապաակտիվացնել կայուն մնացորդը",
+      "deactivateBody": "Ձեր USDB մնացորդը նորից կփոխարկվի BTC-ի։ Սա փոխարկման գնահատված վճարն է։",
+      "deactivateConfirm": "Ապաակտիվացնել",
+      "cancel": "Չեղարկել"
+    },
+    "firstTimeModal": {
+      "title": "Փոխարկման մասին",
+      "dualBalance": "BTC-ն և USD-ն ձեր դրամապանակում երկու անկախ մնացորդներ են։ Ցանկացած պահի օգտագործեք Convert-ը՝ դրանց միջև միջոցներ տեղափոխելու համար։",
+      "trustDisclosure": "USD ռեժիմը օգտագործում է USDB թոքեններ Spark-ում։ Վստահության ենթադրությունները տարբերվում են BTC-ի ուղղակի պահելուց. USDB-ն հիմնված է Spark-ի թոքեն թողարկողի վրա։",
+      "acknowledge": "Ես հասկանում եմ"
+    },
+    "minimumConversion": "Նվազագույն փոխարկում. {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Հնարավորությունը հասանելի չէ",
