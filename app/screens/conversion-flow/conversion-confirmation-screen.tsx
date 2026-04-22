@@ -24,13 +24,18 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
+import { PaymentResultStatus } from "@app/types/payment.types"
 import { WalletDescriptor } from "@app/types/wallets"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
+
+import { ConversionFeeRow } from "./conversion-fee-row"
+import { useNonCustodialConversion } from "./hooks"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -55,23 +60,40 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const { fromWalletCurrency, moneyAmount } = route.params
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
+  const [scConverting, setScConverting] = useState(false)
   const isAuthed = useIsAuthed()
+  const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
   const [intraLedgerPaymentSend, { loading: intraLedgerPaymentSendLoading }] =
     useIntraLedgerPaymentSendMutation()
   const [intraLedgerUsdPaymentSend, { loading: intraLedgerUsdPaymentSendLoading }] =
     useIntraLedgerUsdPaymentSendMutation()
-  const isLoading = intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading
+  const isLoading =
+    intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading || scConverting
   const { LL } = useI18nContext()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-first",
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
   })
 
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const scBtcWallet = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
+  const scUsdWallet = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+  const btcWallet = isSelfCustodial
+    ? scBtcWallet && {
+        id: scBtcWallet.id,
+        balance: scBtcWallet.balance.amount,
+        walletCurrency: scBtcWallet.walletCurrency,
+      }
+    : getBtcWallet(data?.me?.defaultAccount?.wallets)
+  const usdWallet = isSelfCustodial
+    ? scUsdWallet && {
+        id: scUsdWallet.id,
+        balance: scUsdWallet.balance.amount,
+        walletCurrency: scUsdWallet.walletCurrency,
+      }
+    : getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const btcToUsdRate = useMemo(() => {
     if (!convertMoneyAmount) return null
@@ -85,7 +107,18 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }, [convertMoneyAmount, formatMoneyAmount])
 
-  if (!data?.me || !usdWallet || !btcWallet || !convertMoneyAmount) {
+  const nonCustodialConversion = useNonCustodialConversion({
+    fromCurrency: fromWalletCurrency,
+    moneyAmount,
+    enabled: isSelfCustodial,
+  })
+
+  if (
+    (!isSelfCustodial && !data?.me) ||
+    !usdWallet ||
+    !btcWallet ||
+    !convertMoneyAmount
+  ) {
     // TODO: handle errors and or provide some loading state
     return null
   }
@@ -165,7 +198,54 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     toastShow({ message: error.message, LL })
   }
 
+  const paySelfCustodial = async () => {
+    setScConverting(true)
+    try {
+      const outcome = await nonCustodialConversion.execute()
+      logConversionResult({
+        sendingWallet: fromWalletCurrency,
+        receivingWallet:
+          fromWalletCurrency === WalletCurrency.Btc
+            ? WalletCurrency.Usd
+            : WalletCurrency.Btc,
+        paymentStatus:
+          outcome.status === PaymentResultStatus.Success
+            ? PaymentSendResult.Success
+            : PaymentSendResult.Failure,
+      })
+      if (outcome.status === PaymentResultStatus.Success) {
+        navigation.dispatch((state) => {
+          const routes = [{ name: "Primary" }, { name: "conversionSuccess" }]
+          return CommonActions.reset({
+            ...state,
+            routes,
+            index: routes.length - 1,
+          })
+        })
+        ReactNativeHapticFeedback.trigger("notificationSuccess", {
+          ignoreAndroidSystemSettings: true,
+        })
+        return
+      }
+      setErrorMessage(outcome.message)
+      ReactNativeHapticFeedback.trigger("notificationError", {
+        ignoreAndroidSystemSettings: true,
+      })
+    } catch (err) {
+      if (err instanceof Error) {
+        crashlytics().recordError(err)
+        handlePaymentError(err)
+      }
+    } finally {
+      setScConverting(false)
+    }
+  }
+
   const payWallet = async () => {
+    if (isSelfCustodial) {
+      await paySelfCustodial()
+      return
+    }
     if (fromWallet.currency === WalletCurrency.Btc) {
       try {
         logConversionAttempt({
@@ -295,6 +375,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
           </View>
         </View>
+        {isSelfCustodial && (
+          <ConversionFeeRow
+            feeText={nonCustodialConversion.feeText}
+            adjustmentText={nonCustodialConversion.adjustmentText}
+            isLoading={nonCustodialConversion.isQuoting}
+            hasError={nonCustodialConversion.hasQuoteError}
+          />
+        )}
         <View style={styles.infoContainer}>
           <Text style={styles.conversionInfoFieldTitle}>
             {toWallet.currency === WalletCurrency.Btc
@@ -318,7 +406,9 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             })}
             loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
             onSwipe={payWallet}
-            disabled={isLoading}
+            disabled={
+              isLoading || (isSelfCustodial && !nonCustodialConversion.canExecute)
+            }
           />
         </View>
       </PanGestureHandler>
@@ -345,9 +435,6 @@ const useStyles = makeStyles(({ colors }) => ({
   conversionRateText: {
     color: colors.grey0,
   },
-  conversionInfoField: {
-    marginBottom: 20,
-  },
   conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
   conversionInfoFieldValue: {
     color: colors.grey1,
@@ -359,20 +446,12 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     fontWeight: "normal",
   },
-  buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
   errorContainer: {
     marginBottom: 10,
   },
   errorText: {
     color: colors.error,
     textAlign: "center",
-  },
-  walletSelectorContainer: {
-    flexDirection: "column",
-    backgroundColor: colors.grey5,
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
   },
   fromFieldContainer: {
     flexDirection: "row",
