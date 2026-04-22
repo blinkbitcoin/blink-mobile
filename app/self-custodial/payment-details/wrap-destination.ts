@@ -9,11 +9,11 @@ import {
   type ParseDestinationResult,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { PaymentType as SCPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 
-import { createSCLightningPaymentDetails } from "./lightning"
-import { createSCOnchainPaymentDetails } from "./onchain"
-import { createSCSparkPaymentDetails } from "./spark"
+import { createSelfCustodialLightningPaymentDetails } from "./lightning"
+import { createSelfCustodialOnchainPaymentDetails } from "./onchain"
+import { createSelfCustodialSparkPaymentDetails } from "./spark"
 
 type WrapOptions = {
   feeTier?: FeeTierOption
@@ -43,7 +43,7 @@ export const wrapDestinationForSC = (
         const hasAmount = invoiceAmount > 0
         const invoiceMemo = "memo" in original ? original.memo : undefined
 
-        return createSCLightningPaymentDetails({
+        return createSelfCustodialLightningPaymentDetails({
           sdk,
           paymentRequest:
             "paymentRequest" in original ? original.paymentRequest : original.lnurl,
@@ -54,8 +54,8 @@ export const wrapDestinationForSC = (
         })
       }
 
-      if (original.paymentType === SCPaymentType.Spark) {
-        return createSCSparkPaymentDetails({
+      if (original.paymentType === SelfCustodialPaymentType.Spark) {
+        return createSelfCustodialSparkPaymentDetails({
           sdk,
           address: original.address,
           unitOfAccountAmount: toBtcMoneyAmount(0),
@@ -64,7 +64,7 @@ export const wrapDestinationForSC = (
       }
 
       if (original.paymentType === PaymentType.Onchain) {
-        return createSCOnchainPaymentDetails({
+        return createSelfCustodialOnchainPaymentDetails({
           sdk,
           address: original.address,
           unitOfAccountAmount: toBtcMoneyAmount(0),

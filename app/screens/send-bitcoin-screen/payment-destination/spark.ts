@@ -1,5 +1,5 @@
 import { type ParsedSparkAddress } from "@app/self-custodial/bridge"
-import { PaymentType as SCPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 
 import {
   DestinationDirection,
@@ -8,7 +8,7 @@ import {
 } from "./index.types"
 
 export type SparkPaymentDestination = {
-  paymentType: typeof SCPaymentType.Spark
+  paymentType: typeof SelfCustodialPaymentType.Spark
   valid: true
   address: string
   identityPublicKey: string
@@ -26,7 +26,7 @@ export const resolveSparkDestination = (
   }
 
   const destination: SparkPaymentDestination = {
-    paymentType: SCPaymentType.Spark,
+    paymentType: SelfCustodialPaymentType.Spark,
     valid: true,
     address: parsed.address,
     identityPublicKey: parsed.identityPublicKey,

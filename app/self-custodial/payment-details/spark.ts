@@ -1,7 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { PaymentType as SCPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 import {
   ConvertMoneyAmount,
   PaymentDetail,
@@ -23,7 +23,7 @@ type CreateSCSparkParams<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
 } & BaseCreatePaymentDetailsParams<T>
 
-export const createSCSparkPaymentDetails = <T extends WalletCurrency>(
+export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>(
   params: CreateSCSparkParams<T>,
 ): PaymentDetail<T> => {
   const {
@@ -61,28 +61,37 @@ export const createSCSparkPaymentDetails = <T extends WalletCurrency>(
     : { canSendPayment: false, canGetFee: false }
 
   const setAmount: SetAmount<T> = (newAmount) =>
-    createSCSparkPaymentDetails({ ...params, unitOfAccountAmount: newAmount })
+    createSelfCustodialSparkPaymentDetails({
+      ...params,
+      unitOfAccountAmount: newAmount,
+    })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
     ? { canSetMemo: false }
     : {
         canSetMemo: true,
         setMemo: (newMemo) =>
-          createSCSparkPaymentDetails({ ...params, senderSpecifiedMemo: newMemo }),
+          createSelfCustodialSparkPaymentDetails({
+            ...params,
+            senderSpecifiedMemo: newMemo,
+          }),
       }
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
-    createSCSparkPaymentDetails({ ...params, sendingWalletDescriptor: desc })
+    createSelfCustodialSparkPaymentDetails({
+      ...params,
+      sendingWalletDescriptor: desc,
+    })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSCSparkPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialSparkPaymentDetails({ ...params, convertMoneyAmount: fn })
 
   return {
     destination: address,
     memo,
     convertMoneyAmount,
     setConvertMoneyAmount,
-    paymentType: SCPaymentType.Spark,
+    paymentType: SelfCustodialPaymentType.Spark,
     settlementAmount,
     settlementAmountIsEstimated: false,
     unitOfAccountAmount,
