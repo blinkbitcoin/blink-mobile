@@ -13,8 +13,8 @@ import {
   type PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { type ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
 
-import { formatFeeTierOptions } from "./format-fee-tier-options"
 import {
   FeeTierOption,
   type SdkFeeError,

@@ -1,10 +1,10 @@
-import { formatDuration } from "@app/utils/date"
-
 import {
   type FeeTierInfo,
   type FeeTierOption,
   FeeTierOption as Tier,
-} from "./use-onchain-fee-tiers"
+} from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+
+import { formatDuration } from "./date"
 
 type FormatFeeTierParams = {
   tiers: Record<FeeTierOption, FeeTierInfo>

@@ -1,4 +1,4 @@
-import { formatFeeTierOptions } from "@app/screens/send-bitcoin-screen/hooks/format-fee-tier-options"
+import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
 
 jest.mock("react-native-config", () => ({
   BREEZ_NETWORK: "regtest",
