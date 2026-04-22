@@ -40,7 +40,7 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
-import { withOfflineGate } from "@app/self-custodial/hocs"
+import { OfflineGate } from "@app/self-custodial/components"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -158,6 +158,26 @@ import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
 const RootNavigator = createStackNavigator<RootStackParamList>()
 
+const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
+  const Gated: React.FC<P> = (props) => (
+    <OfflineGate>
+      <Screen {...props} />
+    </OfflineGate>
+  )
+  Gated.displayName = `OfflineGated(${Screen.displayName ?? Screen.name ?? "Screen"})`
+  return Gated
+}
+
+const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
+const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
+const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
+const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
+const ReceiveGated = withOfflineGate(ReceiveScreen)
+const RedeemBitcoinDetailGated = withOfflineGate(RedeemBitcoinDetailScreen)
+const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
+const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
+const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
+
 export const RootStack = () => {
   const styles = useStyles()
   const {
@@ -231,7 +251,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="scanningQRCode"
-        component={withOfflineGate(ScanningQRCodeScreen)}
+        component={ScanningQRCodeGated}
         options={{
           title: LL.ScanningQRCodeScreen.title(),
           headerShown: false,
@@ -240,7 +260,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="sendBitcoinDestination"
-        component={withOfflineGate(SendBitcoinDestinationScreen)}
+        component={SendBitcoinDestinationGated}
         options={{
           title: LL.SendBitcoinScreen.destinationScreenTitle(),
           headerRight: () => (
@@ -255,12 +275,12 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="sendBitcoinDetails"
-        component={withOfflineGate(SendBitcoinDetailsScreen)}
+        component={SendBitcoinDetailsGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
-        component={withOfflineGate(SendBitcoinConfirmationScreen)}
+        component={SendBitcoinConfirmationGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
@@ -270,7 +290,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
-        component={withOfflineGate(ReceiveScreen)}
+        component={ReceiveGated}
         options={{
           title: LL.ReceiveScreen.title(),
         }}
@@ -284,7 +304,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="redeemBitcoinDetail"
-        component={withOfflineGate(RedeemBitcoinDetailScreen)}
+        component={RedeemBitcoinDetailGated}
         options={{
           title: LL.RedeemBitcoinScreen.title(),
         }}
@@ -298,14 +318,14 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="conversionDetails"
-        component={withOfflineGate(ConversionDetailsScreen)}
+        component={ConversionDetailsGated}
         options={{
           title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
         name="conversionConfirmation"
-        component={withOfflineGate(ConversionConfirmationScreen)}
+        component={ConversionConfirmationGated}
         options={{
           title: LL.ConversionConfirmationScreen.title(),
         }}
@@ -427,7 +447,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="unclaimedDepositsScreen"
-        component={withOfflineGate(UnclaimedDepositsScreen)}
+        component={UnclaimedDepositsGated}
         options={{ title: LL.UnclaimedDeposit.screenTitle() }}
       />
       <RootNavigator.Screen
