@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
-import { createSCOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
+import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
 
 jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
   createGetFee: jest.fn().mockReturnValue(jest.fn()),
@@ -31,30 +31,30 @@ const createParams = (overrides = {}) => ({
   ...overrides,
 })
 
-describe("createSCOnchainPaymentDetails", () => {
+describe("createSelfCustodialOnchainPaymentDetails", () => {
   it("returns Onchain payment type", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Onchain)
   })
 
   it("sets destination to address", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.destination).toBe("bc1q...")
   })
 
   it("always allows setting amount", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.canSetAmount).toBe(true)
   })
 
   it("can send and get fee when amount > 0", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.canSendPayment).toBe(true)
     expect(detail.canGetFee).toBe(true)
   })
 
   it("cannot send or get fee when amount is 0", () => {
-    const detail = createSCOnchainPaymentDetails(
+    const detail = createSelfCustodialOnchainPaymentDetails(
       createParams({
         convertMoneyAmount: jest.fn().mockReturnValue({
           amount: 0,
@@ -68,19 +68,19 @@ describe("createSCOnchainPaymentDetails", () => {
   })
 
   it("cannot set memo when destinationSpecifiedMemo exists", () => {
-    const detail = createSCOnchainPaymentDetails(
+    const detail = createSelfCustodialOnchainPaymentDetails(
       createParams({ destinationSpecifiedMemo: "locked" }),
     )
     expect(detail.canSetMemo).toBe(false)
   })
 
   it("can set memo when no destinationSpecifiedMemo", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.canSetMemo).toBe(true)
   })
 
   it("setMemo returns new detail with updated memo", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     if (detail.canSetMemo && detail.setMemo) {
       const updated = detail.setMemo("new memo")
       expect(updated.memo).toBe("new memo")
@@ -88,7 +88,7 @@ describe("createSCOnchainPaymentDetails", () => {
   })
 
   it("setAmount returns new detail", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     const newAmount = {
       amount: 2000,
       currency: WalletCurrency.Btc,
@@ -101,7 +101,7 @@ describe("createSCOnchainPaymentDetails", () => {
   })
 
   it("setSendingWalletDescriptor returns new detail", () => {
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     const newDesc = { id: "w2", currency: WalletCurrency.Btc }
     const updated = detail.setSendingWalletDescriptor(newDesc)
     expect(updated.sendingWalletDescriptor).toEqual(newDesc)
@@ -113,7 +113,7 @@ describe("createSCOnchainPaymentDetails", () => {
       currency: WalletCurrency.Btc,
       currencyCode: WalletCurrency.Btc,
     })
-    const detail = createSCOnchainPaymentDetails(createParams())
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     const updated = detail.setConvertMoneyAmount(newConvert)
     expect(updated.convertMoneyAmount).toBe(newConvert)
   })

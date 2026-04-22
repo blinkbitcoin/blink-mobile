@@ -10,7 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { testProps } from "@app/utils/testProps"
 
-export const ScPaymentOfflineNotice: React.FC = () => {
+export const SelfCustodialPaymentOfflineNotice: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -24,7 +24,10 @@ export const ScPaymentOfflineNotice: React.FC = () => {
 
   return (
     <Screen>
-      <View style={styles.container} {...testProps("sc-payment-offline-notice")}>
+      <View
+        style={styles.container}
+        {...testProps("self-custodial-payment-offline-notice")}
+      >
         <View style={styles.iconWrapper}>
           <GaloyIcon name="warning" size={48} color={colors.warning} />
         </View>
@@ -38,7 +41,7 @@ export const ScPaymentOfflineNotice: React.FC = () => {
           title={LL.SelfCustodialOffline.retry()}
           onPress={handleRetry}
           containerStyle={styles.retryButton}
-          {...testProps("sc-payment-offline-retry")}
+          {...testProps("self-custodial-payment-offline-retry")}
         />
       </View>
     </Screen>

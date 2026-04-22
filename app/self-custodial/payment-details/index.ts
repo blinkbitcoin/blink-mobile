@@ -1,2 +1,2 @@
-export { createSCLightningPaymentDetails } from "./lightning"
-export { createSCOnchainPaymentDetails } from "./onchain"
+export { createSelfCustodialLightningPaymentDetails } from "./lightning"
+export { createSelfCustodialOnchainPaymentDetails } from "./onchain"

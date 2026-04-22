@@ -23,7 +23,7 @@ type CreateSCOnchainParams<T extends WalletCurrency> = {
   feeTier?: FeeTierOption
 } & BaseCreatePaymentDetailsParams<T>
 
-export const createSCOnchainPaymentDetails = <T extends WalletCurrency>(
+export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
   params: CreateSCOnchainParams<T>,
 ): PaymentDetail<T> => {
   const {
@@ -63,21 +63,30 @@ export const createSCOnchainPaymentDetails = <T extends WalletCurrency>(
     : { canSendPayment: false, canGetFee: false }
 
   const setAmount: SetAmount<T> = (newAmount) =>
-    createSCOnchainPaymentDetails({ ...params, unitOfAccountAmount: newAmount })
+    createSelfCustodialOnchainPaymentDetails({
+      ...params,
+      unitOfAccountAmount: newAmount,
+    })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
     ? { canSetMemo: false }
     : {
         canSetMemo: true,
         setMemo: (newMemo) =>
-          createSCOnchainPaymentDetails({ ...params, senderSpecifiedMemo: newMemo }),
+          createSelfCustodialOnchainPaymentDetails({
+            ...params,
+            senderSpecifiedMemo: newMemo,
+          }),
       }
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
-    createSCOnchainPaymentDetails({ ...params, sendingWalletDescriptor: desc })
+    createSelfCustodialOnchainPaymentDetails({
+      ...params,
+      sendingWalletDescriptor: desc,
+    })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSCOnchainPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialOnchainPaymentDetails({ ...params, convertMoneyAmount: fn })
 
   return {
     destination: address,

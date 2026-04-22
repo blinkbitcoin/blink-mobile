@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
-import { createSCLightningPaymentDetails } from "@app/self-custodial/payment-details/lightning"
+import { createSelfCustodialLightningPaymentDetails } from "@app/self-custodial/payment-details/lightning"
 
 const mockCreateGetFee = jest.fn().mockReturnValue(jest.fn())
 const mockCreateSendMutation = jest.fn().mockReturnValue(jest.fn())
@@ -38,45 +38,51 @@ const createParams = (overrides = {}) => ({
   ...overrides,
 })
 
-describe("createSCLightningPaymentDetails", () => {
+describe("createSelfCustodialLightningPaymentDetails", () => {
   beforeEach(() => {
     mockCreateGetFee.mockClear()
     mockCreateSendMutation.mockClear()
   })
 
   it("returns Lightning payment type", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Lightning)
   })
 
   it("sets destination to paymentRequest", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     expect(detail.destination).toBe("lnbc1...")
   })
 
   it("cannot set amount when hasAmount=true", () => {
-    const detail = createSCLightningPaymentDetails(createParams({ hasAmount: true }))
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: true }),
+    )
     expect(detail.canSetAmount).toBe(false)
   })
 
   it("can set amount when hasAmount=false", () => {
-    const detail = createSCLightningPaymentDetails(createParams({ hasAmount: false }))
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: false }),
+    )
     expect(detail.canSetAmount).toBe(true)
   })
 
   it("has destinationSpecifiedAmount when hasAmount=true", () => {
-    const detail = createSCLightningPaymentDetails(createParams({ hasAmount: true }))
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: true }),
+    )
     expect(detail.destinationSpecifiedAmount).toBeDefined()
   })
 
   it("can send and get fee when amount > 0", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     expect(detail.canSendPayment).toBe(true)
     expect(detail.canGetFee).toBe(true)
   })
 
   it("cannot send or get fee when amount is 0", () => {
-    const detail = createSCLightningPaymentDetails(
+    const detail = createSelfCustodialLightningPaymentDetails(
       createParams({
         convertMoneyAmount: jest.fn().mockReturnValue({
           amount: 0,
@@ -90,7 +96,7 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("uses destinationSpecifiedMemo over senderSpecifiedMemo", () => {
-    const detail = createSCLightningPaymentDetails(
+    const detail = createSelfCustodialLightningPaymentDetails(
       createParams({
         destinationSpecifiedMemo: "invoice memo",
         senderSpecifiedMemo: "sender memo",
@@ -100,26 +106,26 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("uses senderSpecifiedMemo when no destinationSpecifiedMemo", () => {
-    const detail = createSCLightningPaymentDetails(
+    const detail = createSelfCustodialLightningPaymentDetails(
       createParams({ senderSpecifiedMemo: "sender memo" }),
     )
     expect(detail.memo).toBe("sender memo")
   })
 
   it("cannot set memo when destinationSpecifiedMemo exists", () => {
-    const detail = createSCLightningPaymentDetails(
+    const detail = createSelfCustodialLightningPaymentDetails(
       createParams({ destinationSpecifiedMemo: "locked" }),
     )
     expect(detail.canSetMemo).toBe(false)
   })
 
   it("can set memo when no destinationSpecifiedMemo", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     expect(detail.canSetMemo).toBe(true)
   })
 
   it("setMemo returns new detail with updated memo", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     if (detail.canSetMemo && detail.setMemo) {
       const updated = detail.setMemo("new memo")
       expect(updated.memo).toBe("new memo")
@@ -127,7 +133,9 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("setAmount returns new detail", () => {
-    const detail = createSCLightningPaymentDetails(createParams({ hasAmount: false }))
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: false }),
+    )
     if (detail.canSetAmount && detail.setAmount) {
       const newAmount = {
         amount: 2000,
@@ -140,7 +148,7 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("setSendingWalletDescriptor returns new detail", () => {
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     const newDesc = { id: "w2", currency: WalletCurrency.Btc }
     const updated = detail.setSendingWalletDescriptor(newDesc)
     expect(updated.sendingWalletDescriptor).toEqual(newDesc)
@@ -152,13 +160,13 @@ describe("createSCLightningPaymentDetails", () => {
       currency: WalletCurrency.Btc,
       currencyCode: WalletCurrency.Btc,
     })
-    const detail = createSCLightningPaymentDetails(createParams())
+    const detail = createSelfCustodialLightningPaymentDetails(createParams())
     const updated = detail.setConvertMoneyAmount(newConvert)
     expect(updated.convertMoneyAmount).toBe(newConvert)
   })
 
   it("passes USDB tokenIdentifier when sending wallet is USD", () => {
-    createSCLightningPaymentDetails(
+    createSelfCustodialLightningPaymentDetails(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
         convertMoneyAmount: jest.fn().mockReturnValue({
@@ -179,7 +187,7 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("passes tokenIdentifier=undefined when sending wallet is BTC", () => {
-    createSCLightningPaymentDetails(createParams())
+    createSelfCustodialLightningPaymentDetails(createParams())
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
@@ -191,7 +199,7 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("scales USD settlement cents into USDB base units for hasAmount=false", () => {
-    createSCLightningPaymentDetails(
+    createSelfCustodialLightningPaymentDetails(
       createParams({
         hasAmount: false,
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
@@ -210,7 +218,7 @@ describe("createSCLightningPaymentDetails", () => {
   })
 
   it("keeps BTC settlement amount in sats for hasAmount=false", () => {
-    createSCLightningPaymentDetails(
+    createSelfCustodialLightningPaymentDetails(
       createParams({
         hasAmount: false,
         convertMoneyAmount: jest.fn().mockReturnValue({

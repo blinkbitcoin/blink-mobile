@@ -20,7 +20,7 @@ import { useNotificationPermission } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { usePaymentRequest as useSCPaymentRequest } from "@app/self-custodial/hooks"
+import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 
@@ -47,7 +47,7 @@ const SC_BLOCKED_STATUSES: ActiveWalletStatus[] = [
 const ReceiveScreen = () => {
   const { isSelfCustodial, status } = useActiveWallet()
   const custodialRequest = usePaymentRequest()
-  const scRequest = useSCPaymentRequest()
+  const scRequest = useSelfCustodialPaymentRequest()
 
   if (isSelfCustodial && SC_BLOCKED_STATUSES.includes(status)) {
     return null

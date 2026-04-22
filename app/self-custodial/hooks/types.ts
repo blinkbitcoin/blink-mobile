@@ -13,7 +13,7 @@ export type InvoiceData = {
   getCopyableInvoiceFn: () => string
 }
 
-export type SCPaymentRequestState = {
+export type SelfCustodialPaymentRequestState = {
   type: InvoiceType
   state: string
   setType: (type: InvoiceType) => void

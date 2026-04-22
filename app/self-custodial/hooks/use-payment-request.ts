@@ -18,9 +18,9 @@ import {
 } from "@app/types/amounts"
 import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
 
-import type { InvoiceData, SCPaymentRequestState } from "./types"
+import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
-export const usePaymentRequest = (): SCPaymentRequestState | null => {
+export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
   const { sdk, lastReceivedPaymentId } = useSelfCustodialWallet()
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()

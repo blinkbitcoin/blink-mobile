@@ -7,11 +7,13 @@ const mockCreateSCLightning = jest.fn().mockReturnValue({ paymentType: "lightnin
 const mockCreateSCOnchain = jest.fn().mockReturnValue({ paymentType: "onchain" })
 
 jest.mock("@app/self-custodial/payment-details/lightning", () => ({
-  createSCLightningPaymentDetails: (...args: unknown[]) => mockCreateSCLightning(...args),
+  createSelfCustodialLightningPaymentDetails: (...args: unknown[]) =>
+    mockCreateSCLightning(...args),
 }))
 
 jest.mock("@app/self-custodial/payment-details/onchain", () => ({
-  createSCOnchainPaymentDetails: (...args: unknown[]) => mockCreateSCOnchain(...args),
+  createSelfCustodialOnchainPaymentDetails: (...args: unknown[]) =>
+    mockCreateSCOnchain(...args),
 }))
 
 const mockSdk = {} as never
