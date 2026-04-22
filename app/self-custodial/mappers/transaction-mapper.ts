@@ -102,10 +102,10 @@ const toDisplayAmount = (
   rawAmount: number,
   currency: WalletCurrency,
   tokenDecimals: number,
-): number => {
-  if (currency === WalletCurrency.Btc) return rawAmount
-  return tokenBaseUnitsToCents(rawAmount, tokenDecimals)
-}
+): number =>
+  currency === WalletCurrency.Btc
+    ? rawAmount
+    : tokenBaseUnitsToCents(rawAmount, tokenDecimals)
 
 const extractMemo = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
@@ -139,19 +139,19 @@ const extractTokenTicker = (payment: Payment): string | undefined => {
   return payment.details.inner.metadata.ticker
 }
 
-const hasConversion = (payment: Payment): boolean => {
-  if (payment.conversionDetails) return true
-  if (!payment.details) return false
-
+const conversionInfoOf = (payment: Payment) => {
+  if (!payment.details) return undefined
   if (PaymentDetails.Spark.instanceOf(payment.details)) {
-    return Boolean(payment.details.inner.conversionInfo)
+    return payment.details.inner.conversionInfo
   }
   if (PaymentDetails.Token.instanceOf(payment.details)) {
-    return Boolean(payment.details.inner.conversionInfo)
+    return payment.details.inner.conversionInfo
   }
-
-  return false
+  return undefined
 }
+
+const hasConversion = (payment: Payment): boolean =>
+  Boolean(payment.conversionDetails) || Boolean(conversionInfoOf(payment))
 
 export const mapSelfCustodialTransaction = (payment: Payment): NormalizedTransaction => {
   const currency = mapCurrency(payment.details)
