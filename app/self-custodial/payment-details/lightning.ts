@@ -24,7 +24,7 @@ type CreateSCLightningParams<T extends WalletCurrency> = {
   hasAmount: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
-export const createSCLightningPaymentDetails = <T extends WalletCurrency>(
+export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurrency>(
   params: CreateSCLightningParams<T>,
 ): PaymentDetail<T> => {
   const {
@@ -67,17 +67,26 @@ export const createSCLightningPaymentDetails = <T extends WalletCurrency>(
     : {
         canSetMemo: true,
         setMemo: (newMemo) =>
-          createSCLightningPaymentDetails({ ...params, senderSpecifiedMemo: newMemo }),
+          createSelfCustodialLightningPaymentDetails({
+            ...params,
+            senderSpecifiedMemo: newMemo,
+          }),
       }
 
   const setAmount: SetAmount<T> = (newAmount) =>
-    createSCLightningPaymentDetails({ ...params, unitOfAccountAmount: newAmount })
+    createSelfCustodialLightningPaymentDetails({
+      ...params,
+      unitOfAccountAmount: newAmount,
+    })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
-    createSCLightningPaymentDetails({ ...params, sendingWalletDescriptor: desc })
+    createSelfCustodialLightningPaymentDetails({
+      ...params,
+      sendingWalletDescriptor: desc,
+    })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSCLightningPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialLightningPaymentDetails({ ...params, convertMoneyAmount: fn })
 
   return {
     destination: paymentRequest,

@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import { PaymentType as SCPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 
-import { createSCSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
+import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
 
 const mockCreateGetFee = jest.fn().mockReturnValue(jest.fn())
 const mockCreateSendMutation = jest.fn().mockReturnValue(jest.fn())
@@ -37,33 +37,33 @@ const createParams = (overrides = {}) => ({
   ...overrides,
 })
 
-describe("createSCSparkPaymentDetails", () => {
+describe("createSelfCustodialSparkPaymentDetails", () => {
   beforeEach(() => {
     mockCreateGetFee.mockClear()
     mockCreateSendMutation.mockClear()
   })
 
   it("returns Spark payment type", () => {
-    const detail = createSCSparkPaymentDetails(createParams())
+    const detail = createSelfCustodialSparkPaymentDetails(createParams())
 
-    expect(detail.paymentType).toBe(SCPaymentType.Spark)
+    expect(detail.paymentType).toBe(SelfCustodialPaymentType.Spark)
   })
 
   it("sets destination to the Spark address", () => {
-    const detail = createSCSparkPaymentDetails(createParams())
+    const detail = createSelfCustodialSparkPaymentDetails(createParams())
 
     expect(detail.destination).toBe("sp1abc")
   })
 
   it("exposes send + fee when amount > 0", () => {
-    const detail = createSCSparkPaymentDetails(createParams())
+    const detail = createSelfCustodialSparkPaymentDetails(createParams())
 
     expect(detail.canSendPayment).toBe(true)
     expect(detail.canGetFee).toBe(true)
   })
 
   it("disables send + fee when amount is 0", () => {
-    const detail = createSCSparkPaymentDetails(
+    const detail = createSelfCustodialSparkPaymentDetails(
       createParams({
         convertMoneyAmount: jest.fn().mockReturnValue({
           amount: 0,
@@ -78,7 +78,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("passes USDB tokenIdentifier when sending wallet is USD", () => {
-    createSCSparkPaymentDetails(
+    createSelfCustodialSparkPaymentDetails(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
         convertMoneyAmount: jest.fn().mockReturnValue({
@@ -99,7 +99,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("passes tokenIdentifier=undefined when sending wallet is BTC", () => {
-    createSCSparkPaymentDetails(createParams())
+    createSelfCustodialSparkPaymentDetails(createParams())
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
@@ -111,7 +111,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("scales USD settlement cents into USDB base units", () => {
-    createSCSparkPaymentDetails(
+    createSelfCustodialSparkPaymentDetails(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
         convertMoneyAmount: jest.fn().mockReturnValue({
@@ -129,7 +129,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("keeps BTC settlement amount in sats", () => {
-    createSCSparkPaymentDetails(
+    createSelfCustodialSparkPaymentDetails(
       createParams({
         convertMoneyAmount: jest.fn().mockReturnValue({
           amount: 12345,
@@ -145,7 +145,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("setAmount returns a new detail with the updated amount", () => {
-    const detail = createSCSparkPaymentDetails(createParams())
+    const detail = createSelfCustodialSparkPaymentDetails(createParams())
     const newAmount = {
       amount: 2000,
       currency: WalletCurrency.Btc,
@@ -159,7 +159,7 @@ describe("createSCSparkPaymentDetails", () => {
   })
 
   it("setSendingWalletDescriptor returns a new detail with the updated descriptor", () => {
-    const detail = createSCSparkPaymentDetails(createParams())
+    const detail = createSelfCustodialSparkPaymentDetails(createParams())
     const newDescriptor = { id: "w-btc-2", currency: WalletCurrency.Btc }
 
     const updated = detail.setSendingWalletDescriptor(newDescriptor)
