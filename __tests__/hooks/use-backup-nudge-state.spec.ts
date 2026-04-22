@@ -51,14 +51,21 @@ describe("useBackupNudgeState", () => {
     mockSetItem.mockResolvedValue(undefined)
   })
 
-  it("returns false for all flags before loaded resolves", () => {
+  it("hides banner and modal while dismissal-load is pending", () => {
     mockGetItem.mockReturnValue(new Promise(() => {}))
 
     const { result } = renderHook(() => useBackupNudgeState())
 
     expect(result.current.shouldShowBanner).toBe(false)
     expect(result.current.shouldShowModal).toBe(false)
-    expect(result.current.shouldShowSettingsBanner).toBe(false)
+  })
+
+  it("shows settings banner without waiting for dismissal-load", () => {
+    mockGetItem.mockReturnValue(new Promise(() => {}))
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    expect(result.current.shouldShowSettingsBanner).toBe(true)
   })
 
   it("shows banner when balance >= banner threshold and not backed up", async () => {

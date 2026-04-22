@@ -70,7 +70,7 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     !shouldShowModal &&
     !isDismissedRecently
 
-  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial && loaded
+  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial
 
   return {
     shouldShowBanner,
