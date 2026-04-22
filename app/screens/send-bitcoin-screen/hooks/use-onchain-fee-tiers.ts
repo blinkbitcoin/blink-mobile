@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  SdkError,
+  SdkError_Tags as SdkErrorTags,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
 
@@ -43,12 +47,26 @@ type OnchainFeeTiersResult = {
   error: SdkFeeError | null
 }
 
-const classifyError = (err: unknown): SdkFeeError => {
-  const message = err instanceof Error ? err.message : String(err)
-  if (message.includes("InsufficientFunds")) return SdkFeeError.InsufficientFunds
-  if (message.includes("InvalidInput")) return SdkFeeError.InvalidInput
-  if (message.includes("NetworkError")) return SdkFeeError.NetworkError
+const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
+  [SdkErrorTags.InsufficientFunds]: SdkFeeError.InsufficientFunds,
+  [SdkErrorTags.InvalidInput]: SdkFeeError.InvalidInput,
+  [SdkErrorTags.NetworkError]: SdkFeeError.NetworkError,
+}
 
+const MESSAGE_TAG_MATCHERS: Array<[SdkErrorTags, SdkFeeError]> = [
+  [SdkErrorTags.InsufficientFunds, SdkFeeError.InsufficientFunds],
+  [SdkErrorTags.InvalidInput, SdkFeeError.InvalidInput],
+  [SdkErrorTags.NetworkError, SdkFeeError.NetworkError],
+]
+
+const classifyError = (err: unknown): SdkFeeError => {
+  if (SdkError.instanceOf(err)) {
+    return SDK_ERROR_TAG_MAP[err.tag] ?? SdkFeeError.Generic
+  }
+  const message = err instanceof Error ? err.message : String(err)
+  for (const [tag, code] of MESSAGE_TAG_MATCHERS) {
+    if (message.includes(tag)) return code
+  }
   return SdkFeeError.Generic
 }
 

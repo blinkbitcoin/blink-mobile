@@ -37,6 +37,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentRequest: {
     create: jest.fn((args: Record<string, unknown>) => args),
   },
+  SdkError: { instanceOf: () => false },
+  SdkError_Tags: {
+    InsufficientFunds: "InsufficientFunds",
+    InvalidInput: "InvalidInput",
+    NetworkError: "NetworkError",
+    Generic: "Generic",
+  },
 }))
 
 jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({

@@ -113,6 +113,29 @@ describe("useOnchainFeeTiers", () => {
     })
   })
 
+  it("classifies typed SdkError instances by tag (prefers tag over message)", async () => {
+    mockPrepareSend.mockRejectedValue({
+      tag: "InsufficientFunds",
+      message: "irrelevant message",
+    })
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 1000))
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(SdkFeeError.InsufficientFunds)
+    })
+  })
+
+  it("maps an unknown typed SdkError tag to Generic", async () => {
+    mockPrepareSend.mockRejectedValue({ tag: "StorageError" })
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 1000))
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(SdkFeeError.Generic)
+    })
+  })
+
   it("classifies unknown errors as Generic", async () => {
     mockPrepareSend.mockRejectedValue(new Error("Something unexpected"))
 
