@@ -20,6 +20,7 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   loadingMore: boolean
   loadMore: () => Promise<void>
   refreshWallets: () => Promise<void>
+  refreshStableBalanceActive: () => Promise<void>
 }
 
 const noop = async () => {}
@@ -37,6 +38,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   loadingMore: false,
   loadMore: noop,
   refreshWallets: noop,
+  refreshStableBalanceActive: noop,
 }
 
 const SelfCustodialWalletContext =
@@ -57,6 +59,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     loadingMore,
     loadMore,
     refreshWallets,
+    refreshStableBalanceActive,
   } = useSdkLifecycle(retryCount)
 
   const retry = useCallback(() => {
@@ -77,6 +80,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       loadingMore,
       loadMore,
       refreshWallets,
+      refreshStableBalanceActive,
     }),
     [
       wallets,
@@ -90,6 +94,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       loadingMore,
       loadMore,
       refreshWallets,
+      refreshStableBalanceActive,
     ],
   )
 
