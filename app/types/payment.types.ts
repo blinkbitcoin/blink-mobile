@@ -136,10 +136,33 @@ export const ConvertDirection = {
 
 export type ConvertDirection = (typeof ConvertDirection)[keyof typeof ConvertDirection]
 
+export const convertDirectionFromCurrency = (
+  fromCurrency: WalletCurrency,
+): ConvertDirection =>
+  fromCurrency === WalletCurrency.Btc
+    ? ConvertDirection.BtcToUsd
+    : ConvertDirection.UsdToBtc
+
+export const oppositeWalletCurrency = (currency: WalletCurrency): WalletCurrency =>
+  currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
+
 export type ConvertParams = {
-  amount: MoneyAmount<WalletCurrency>
+  fromAmount: MoneyAmount<WalletCurrency>
+  toAmount: MoneyAmount<WalletCurrency>
   direction: ConvertDirection
 }
+
+export type ConversionLimits = {
+  minFromAmount: number | null
+  minToAmount: number | null
+}
+
+export const ConvertErrorCode = {
+  BelowMinimum: "below_minimum",
+  LimitsUnavailable: "limits_unavailable",
+} as const
+
+export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
 
 export type SendPaymentAdapter = (
   params: SendPaymentParams,
@@ -169,3 +192,21 @@ export type ClaimDepositAdapter = {
 }
 
 export type ConvertAdapter = (params: ConvertParams) => Promise<PaymentAdapterResult>
+
+export const ConvertAmountAdjustment = {
+  FlooredToMin: "floored_to_min",
+  IncreasedToAvoidDust: "increased_to_avoid_dust",
+} as const
+
+export type ConvertAmountAdjustment =
+  (typeof ConvertAmountAdjustment)[keyof typeof ConvertAmountAdjustment]
+
+export type ConvertQuote = {
+  formattedFee: string
+  amountAdjustment?: ConvertAmountAdjustment
+  execute: () => Promise<PaymentAdapterResult>
+}
+
+export type GetConversionQuoteAdapter = (
+  params: ConvertParams,
+) => Promise<ConvertQuote | null>
