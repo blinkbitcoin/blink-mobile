@@ -22,6 +22,9 @@ import {
   useTotalBalance,
   type StatusBadge,
 } from "@app/components/balance-header"
+import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { toBtcMoneyAmount } from "@app/types/amounts"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -33,7 +36,7 @@ import {
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -178,8 +181,11 @@ export const HomeScreen: React.FC = () => {
   const { isSelfCustodial } = activeWallet
   const {
     refreshWallets: refreshSelfCustodialWallets,
+    isStableBalanceActive,
     isBalanceStale: selfCustodialIsBalanceStale,
   } = useSelfCustodialWallet()
+  const { stableBalanceEnabled } = useFeatureFlags()
+  const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const {
     seen: trustModelSeen,
@@ -262,7 +268,18 @@ export const HomeScreen: React.FC = () => {
         walletCurrency: w.walletCurrency,
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
-  const { formattedBalance, satsBalance } = useTotalBalance(wallets)
+  const { formattedBalance: defaultFormattedBalance, satsBalance } =
+    useTotalBalance(wallets)
+
+  const showStableBalanceToggle =
+    stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
+
+  const { formatMoneyAmount } = useDisplayCurrency()
+
+  const formattedBalance =
+    showStableBalanceToggle && balanceMode === BalanceMode.Btc
+      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+      : defaultFormattedBalance
 
   const balanceStatusBadge = useMemo<StatusBadge | undefined>(() => {
     if (!isSelfCustodial || !selfCustodialIsBalanceStale) return undefined
@@ -554,6 +571,9 @@ export const HomeScreen: React.FC = () => {
       <BalanceHeader
         loading={loading}
         formattedBalance={formattedBalance}
+        showStableBalanceToggle={showStableBalanceToggle}
+        mode={balanceMode}
+        onModeChange={toggleBalanceMode}
         statusBadge={balanceStatusBadge}
       />
       <View style={styles.badgeSlot}>

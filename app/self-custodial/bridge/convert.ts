@@ -8,7 +8,6 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { centsToTokenBaseUnits } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -20,6 +19,7 @@ import {
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
 } from "@app/types/payment.types"
+import { centsToTokenBaseUnits } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
 import { SparkConfig } from "../config"
