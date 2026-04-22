@@ -9,14 +9,21 @@ export const toSatsAmount = (
   ) => MoneyAmount<WalletCurrency>,
 ): number => convert(amount, WalletCurrency.Btc).amount
 
-export const tokenBaseUnitsToCents = (
+export const tokenBaseUnitsToCentsExact = (
   rawAmount: number,
   tokenDecimals: number,
   displayDecimals = 2,
 ): number => {
   const excessDecimals = Math.max(tokenDecimals - displayDecimals, 0)
-  return Math.round(rawAmount / 10 ** excessDecimals)
+  return rawAmount / 10 ** excessDecimals
 }
+
+export const tokenBaseUnitsToCents = (
+  rawAmount: number,
+  tokenDecimals: number,
+  displayDecimals = 2,
+): number =>
+  Math.round(tokenBaseUnitsToCentsExact(rawAmount, tokenDecimals, displayDecimals))
 
 export const centsToTokenBaseUnits = (
   cents: number,
