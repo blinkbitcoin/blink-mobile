@@ -2373,10 +2373,10 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.5.3.tgz#7ef372f264e1fb94f7638c35e1eb5ec8dd3601f5"
   integrity sha512-jdd9qJEnMvceZzzI2iLVf4ArHqNC2RcusL9qYP1F2O4AK5XEkh7HMW1KB3t0MXS4DqjYmMeIFW169o1WEIahCA==
 
-"@breeztech/breez-sdk-spark-react-native@^0.12.2-dev3":
-  version "0.12.2-dev3"
-  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.12.2-dev3.tgz#319dc7c749e16984746163471510e67fd650173f"
-  integrity sha512-ZEaSdghXdGlRk2775Mghjgb0md+M8iqsnOjlM8rz0aoEu6xBY/Cx68rjgsx0hnHWSXtBpQdmNq27oNmXxLpazQ==
+"@breeztech/breez-sdk-spark-react-native@0.13.2-dev3":
+  version "0.13.2-dev3"
+  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.13.2-dev3.tgz#1f5237a0dfa4ff2090bbc159417896c202d0ef39"
+  integrity sha512-ahlvq/qr0E7K0M52dt8V5jjLTzA4hvVGEmdrO80jcE+9c29rnSscfRXZvvo7vNcnZZ5rj547ePGEyvml0rslwQ==
   dependencies:
     uniffi-bindgen-react-native "^0.29.3-1"
 
