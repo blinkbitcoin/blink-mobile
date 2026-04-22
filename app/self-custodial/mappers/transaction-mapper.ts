@@ -31,10 +31,10 @@ const mapPaymentMethod = (
   return PaymentType.Lightning
 }
 
-const mapDirection = (paymentType: SdkPaymentType): TransactionDirection => {
-  if (paymentType === SdkPaymentType.Send) return TransactionDirection.Send
-  return TransactionDirection.Receive
-}
+const mapDirection = (paymentType: SdkPaymentType): TransactionDirection =>
+  paymentType === SdkPaymentType.Send
+    ? TransactionDirection.Send
+    : TransactionDirection.Receive
 
 const mapStatus = (status: PaymentStatus): TransactionStatus => {
   if (status === PaymentStatus.Completed) return TransactionStatus.Completed
@@ -42,10 +42,8 @@ const mapStatus = (status: PaymentStatus): TransactionStatus => {
   return TransactionStatus.Failed
 }
 
-export const mapCurrency = (details?: Payment["details"]): WalletCurrency => {
-  if (details?.tag === PaymentDetailsTags.Token) return WalletCurrency.Usd
-  return WalletCurrency.Btc
-}
+export const mapCurrency = (details?: Payment["details"]): WalletCurrency =>
+  details?.tag === PaymentDetailsTags.Token ? WalletCurrency.Usd : WalletCurrency.Btc
 
 const getTokenDecimals = (details?: Payment["details"]): number => {
   if (!details || !PaymentDetails.Token.instanceOf(details)) return 0
@@ -56,10 +54,10 @@ const toDisplayAmount = (
   rawAmount: number,
   currency: WalletCurrency,
   tokenDecimals: number,
-): number => {
-  if (currency === WalletCurrency.Btc) return rawAmount
-  return tokenBaseUnitsToCents(rawAmount, tokenDecimals)
-}
+): number =>
+  currency === WalletCurrency.Btc
+    ? rawAmount
+    : tokenBaseUnitsToCents(rawAmount, tokenDecimals)
 
 const extractMemo = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
@@ -93,19 +91,19 @@ const extractTokenTicker = (payment: Payment): string | undefined => {
   return payment.details.inner.metadata.ticker
 }
 
-const hasConversion = (payment: Payment): boolean => {
-  if (payment.conversionDetails) return true
-  if (!payment.details) return false
-
+const conversionInfoOf = (payment: Payment) => {
+  if (!payment.details) return undefined
   if (PaymentDetails.Spark.instanceOf(payment.details)) {
-    return Boolean(payment.details.inner.conversionInfo)
+    return payment.details.inner.conversionInfo
   }
   if (PaymentDetails.Token.instanceOf(payment.details)) {
-    return Boolean(payment.details.inner.conversionInfo)
+    return payment.details.inner.conversionInfo
   }
-
-  return false
+  return undefined
 }
+
+const hasConversion = (payment: Payment): boolean =>
+  Boolean(payment.conversionDetails) || Boolean(conversionInfoOf(payment))
 
 export const mapSelfCustodialTransaction = (payment: Payment): NormalizedTransaction => {
   const currency = mapCurrency(payment.details)
