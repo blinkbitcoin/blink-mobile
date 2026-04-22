@@ -201,23 +201,22 @@ describe("toTransactionFragment", () => {
       fractionDigits: 2,
     })
 
-    // First call converts the settlement amount in USD cents
-    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        amount: 512, // |signedAmount| = settlement (500) + fee (12) for a Send
-        currency: WalletCurrency.Usd,
-        currencyCode: WalletCurrency.Usd,
-      }),
-      "USD",
-    )
-    // Second call converts the fee in BTC sats — NOT mixed in with the USD amount
-    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
-      2,
+    // The BTC fee is converted via convertMoneyAmount with currency: BTC — never
+    // mixed in raw with the USD settlement amount. That's the mixed-unit guard.
+    expect(convertMoneyAmount).toHaveBeenCalledWith(
       expect.objectContaining({
         amount: 12,
         currency: WalletCurrency.Btc,
         currencyCode: WalletCurrency.Btc,
+      }),
+      "USD",
+    )
+    // The settlement amount stays in USD cents for the display conversion.
+    expect(convertMoneyAmount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: 501,
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
       }),
       "USD",
     )
