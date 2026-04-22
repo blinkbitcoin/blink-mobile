@@ -13,6 +13,8 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
+import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
+
 import { createGetFee, createSendMutation } from "./send-helpers"
 
 type CreateSCLightningParams<T extends WalletCurrency> = {
@@ -45,7 +47,10 @@ export const createSCLightningPaymentDetails = <T extends WalletCurrency>(
   const prepareParams = {
     sdk,
     paymentRequest,
-    amount: hasAmount ? undefined : BigInt(settlementAmount.amount),
+    amount: hasAmount
+      ? undefined
+      : toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency),
+    tokenIdentifier: resolveSendTokenIdentifier(sendingWalletDescriptor.currency),
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount

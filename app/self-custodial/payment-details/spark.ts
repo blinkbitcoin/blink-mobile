@@ -13,6 +13,8 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
+import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
+
 import { createGetFee, createSendMutation } from "./send-helpers"
 
 type CreateSCSparkParams<T extends WalletCurrency> = {
@@ -43,7 +45,10 @@ export const createSCSparkPaymentDetails = <T extends WalletCurrency>(
   const prepareParams = {
     sdk,
     paymentRequest: address,
-    amount: settlementAmount.amount ? BigInt(settlementAmount.amount) : undefined,
+    amount: settlementAmount.amount
+      ? toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency)
+      : undefined,
+    tokenIdentifier: resolveSendTokenIdentifier(sendingWalletDescriptor.currency),
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount

@@ -67,7 +67,10 @@ export const useOnchainFeeTiers = (
     }
 
     try {
-      const prepared = await prepareSend(sdk, address, BigInt(amountSats))
+      const prepared = await prepareSend(sdk, {
+        paymentRequest: address,
+        amount: BigInt(amountSats),
+      })
       const fees = extractOnchainFees(prepared)
       if (!fees) return
 

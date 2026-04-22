@@ -9,7 +9,11 @@ import {
   type SendOnchainSpeedFeeQuote,
 } from "@breeztech/breez-sdk-spark-react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
+import { centsToTokenBaseUnits } from "@app/types/amounts"
 import { toNumber } from "@app/utils/helper"
+
+import { SparkConfig, SparkToken } from "../config"
 
 const speedFeeTotal = (quote: SendOnchainSpeedFeeQuote): number =>
   toNumber(quote.userFeeSat) + toNumber(quote.l1BroadcastFeeSat)
@@ -45,18 +49,43 @@ export const extractLightningFee = (
   )
 }
 
-export const prepareSend = (
-  sdk: BreezSdkInterface,
-  paymentRequest: string,
-  amount: bigint | undefined,
-) =>
+export type PrepareSendOptions = {
+  paymentRequest: string
+  amount: bigint | undefined
+  tokenIdentifier?: string
+}
+
+export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions) =>
   sdk.prepareSendPayment(
     PrepareSendPaymentRequest.create({
-      paymentRequest,
-      amount,
-      tokenIdentifier: undefined,
+      paymentRequest: options.paymentRequest,
+      amount: options.amount,
+      tokenIdentifier: options.tokenIdentifier,
     }),
   )
+
+/**
+ * Convert a wallet-native amount into the unit the Spark SDK expects for send
+ * operations: sats for BTC, USDB base units for USD.
+ */
+export const toSdkSendAmount = (
+  amount: number,
+  currency: WalletCurrency,
+  tokenDecimals: number = SparkToken.DefaultDecimals,
+): bigint =>
+  currency === WalletCurrency.Usd
+    ? BigInt(centsToTokenBaseUnits(amount, tokenDecimals))
+    : BigInt(amount)
+
+/**
+ * Resolve the token identifier to pass on send based on the sending wallet
+ * currency. Returns the configured USDB token identifier for USD wallets and
+ * `undefined` (i.e. native BTC) otherwise.
+ */
+export const resolveSendTokenIdentifier = (
+  currency: WalletCurrency,
+): string | undefined =>
+  currency === WalletCurrency.Usd ? SparkConfig.tokenIdentifier || undefined : undefined
 
 export const executeSend = (
   sdk: BreezSdkInterface,

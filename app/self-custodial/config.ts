@@ -5,6 +5,7 @@ import { DocumentDirectoryPath } from "react-native-fs"
 export const SparkToken = {
   Label: "USDB",
   Ticker: "USDB",
+  DefaultDecimals: 6,
 } as const
 
 export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
