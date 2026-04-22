@@ -3,11 +3,7 @@ import {
   createSendPayment,
   createGetFee,
 } from "@app/self-custodial/adapters/payment-adapter"
-import {
-  createReceiveLightning,
-  createReceiveOnchain,
-  createConvert,
-} from "@app/self-custodial/bridge"
+import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
@@ -359,38 +355,6 @@ describe("self-custodial payment adapters", () => {
       const result = await receive()
 
       expect(result.errors?.[0].message).toBe("no address")
-    })
-  })
-
-  describe("createConvert", () => {
-    it("prepares and sends conversion", async () => {
-      const sdk = createMockSdk()
-      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
-      sdk.sendPayment.mockResolvedValue({})
-
-      const convert = createConvert(sdk as never)
-      const result = await convert({
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: "btc_to_usd",
-      })
-
-      expect(result.status).toBe("success")
-      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
-        expect.objectContaining({ tokenIdentifier: "test-token-id" }),
-      )
-    })
-
-    it("returns failed on error", async () => {
-      const sdk = createMockSdk()
-      sdk.prepareSendPayment.mockRejectedValue(new Error("slippage"))
-
-      const convert = createConvert(sdk as never)
-      const result = await convert({
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: "btc_to_usd",
-      })
-
-      expect(result.status).toBe("failed")
     })
   })
 })

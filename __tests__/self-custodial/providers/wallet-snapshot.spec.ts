@@ -21,7 +21,7 @@ const createMockSdk = (overrides = {}) => ({
     tokenBalances: {
       token1: {
         balance: 150000,
-        tokenMetadata: { ticker: "USDB", decimals: 6 },
+        tokenMetadata: { identifier: "test-token-id", ticker: "USDB", decimals: 6 },
       },
     },
     ...overrides,
