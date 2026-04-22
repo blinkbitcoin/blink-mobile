@@ -4,6 +4,7 @@ import { useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -19,7 +20,8 @@ export const AccountLNAddress: React.FC = () => {
   const [isModalShown, setModalShown] = useState(false)
   const toggleModalVisibility = () => setModalShown((x) => !x)
 
-  const { data, loading } = useSettingsScreenQuery()
+  const isAuthed = useIsAuthed()
+  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
 
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
