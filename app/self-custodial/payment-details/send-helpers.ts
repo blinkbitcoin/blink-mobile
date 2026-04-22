@@ -19,6 +19,7 @@ type PrepareParams = {
   sdk: BreezSdkInterface
   paymentRequest: string
   amount: bigint | undefined
+  tokenIdentifier?: string
 }
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
@@ -33,13 +34,19 @@ const TIER_TO_FEE_KEY = {
   [FeeTierOption.Slow]: "slow",
 } as const
 
+const toPrepareOptions = (params: PrepareParams) => ({
+  paymentRequest: params.paymentRequest,
+  amount: params.amount,
+  tokenIdentifier: params.tokenIdentifier,
+})
+
 export const createGetFee = <T extends WalletCurrency>(
   params: PrepareParams,
   currency: T,
 ): GetFee<T> => {
   return async () => {
     try {
-      await prepareSend(params.sdk, params.paymentRequest, params.amount)
+      await prepareSend(params.sdk, toPrepareOptions(params))
       return {
         amount: toWalletAmount({ amount: LIGHTNING_FEE_SATS, currency }),
       }
@@ -56,7 +63,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
 ): GetFee<T> => {
   return async () => {
     try {
-      const prepared = await prepareSend(params.sdk, params.paymentRequest, params.amount)
+      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const fees = extractOnchainFees(prepared)
       const feeKey = TIER_TO_FEE_KEY[feeTier]
       const feeSats = fees ? fees[feeKey] : 0
@@ -73,7 +80,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
 export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {
   return async () => {
     try {
-      const prepared = await prepareSend(params.sdk, params.paymentRequest, params.amount)
+      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       await executeSend(params.sdk, prepared)
       return { status: PaymentSendResult.Success }
     } catch (err) {
@@ -96,7 +103,7 @@ export const createSendMutationOnchain = (
 ): SendPaymentMutation => {
   return async () => {
     try {
-      const prepared = await prepareSend(params.sdk, params.paymentRequest, params.amount)
+      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
       return { status: PaymentSendResult.Success }
     } catch (err) {

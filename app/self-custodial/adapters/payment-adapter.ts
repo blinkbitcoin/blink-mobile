@@ -1,6 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
   FeeMode,
@@ -18,6 +19,8 @@ import {
   extractLightningFee,
   extractOnchainFees,
   prepareSend,
+  resolveSendTokenIdentifier,
+  toSdkSendAmount,
 } from "../bridge"
 
 const failed = (message: string): PaymentAdapterResult => ({
@@ -28,11 +31,12 @@ const failed = (message: string): PaymentAdapterResult => ({
 export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter => {
   return async ({ destination, amount }) => {
     try {
-      const prepared = await prepareSend(
-        sdk,
-        destination,
-        amount ? BigInt(amount.amount) : undefined,
-      )
+      const currency = amount?.currency ?? WalletCurrency.Btc
+      const prepared = await prepareSend(sdk, {
+        paymentRequest: destination,
+        amount: amount ? toSdkSendAmount(amount.amount, currency) : undefined,
+        tokenIdentifier: resolveSendTokenIdentifier(currency),
+      })
       await executeSend(sdk, prepared)
 
       return { status: PaymentResultStatus.Success }
@@ -45,11 +49,12 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
 export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
   return async ({ destination, amount }) => {
     try {
-      const prepared = await prepareSend(
-        sdk,
-        destination,
-        amount ? BigInt(amount.amount) : undefined,
-      )
+      const currency = amount?.currency ?? WalletCurrency.Btc
+      const prepared = await prepareSend(sdk, {
+        paymentRequest: destination,
+        amount: amount ? toSdkSendAmount(amount.amount, currency) : undefined,
+        tokenIdentifier: resolveSendTokenIdentifier(currency),
+      })
 
       const onchainFees = extractOnchainFees(prepared)
       if (onchainFees) {

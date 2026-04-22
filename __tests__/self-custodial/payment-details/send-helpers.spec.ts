@@ -194,4 +194,37 @@ describe("createSendMutation", () => {
     expect(result.status).toBe(PaymentSendResult.Failure)
     expect(result.errors?.[0].message).toBe("Send failed: string error")
   })
+
+  it("forwards tokenIdentifier from prepare params to the SDK prepare call", async () => {
+    mockPrepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
+    mockSendPayment.mockResolvedValue(undefined)
+
+    const send = createSendMutation({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: BigInt(1500),
+      tokenIdentifier: "usdb-token-id",
+    })
+    await send()
+
+    expect(mockPrepareSendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
+    )
+  })
+
+  it("passes tokenIdentifier=undefined when omitted so the SDK treats it as a BTC send", async () => {
+    mockPrepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
+    mockSendPayment.mockResolvedValue(undefined)
+
+    const send = createSendMutation({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: BigInt(1500),
+    })
+    await send()
+
+    expect(mockPrepareSendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: undefined }),
+    )
+  })
 })

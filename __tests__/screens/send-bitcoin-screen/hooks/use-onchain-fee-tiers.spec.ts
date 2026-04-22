@@ -60,7 +60,10 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers.medium.feeSats).toBe(300)
     expect(result.current.tiers.slow.feeSats).toBe(150)
     expect(result.current.error).toBeNull()
-    expect(mockPrepareSend).toHaveBeenCalledWith(mockSdk, "bc1qtest", BigInt(5000))
+    expect(mockPrepareSend).toHaveBeenCalledWith(mockSdk, {
+      paymentRequest: "bc1qtest",
+      amount: BigInt(5000),
+    })
   })
 
   it("sets ETA minutes for each tier", async () => {

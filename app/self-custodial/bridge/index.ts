@@ -9,8 +9,15 @@ export {
 export { getWalletInfo, listPayments, getUserSettings } from "./wallet"
 export { getSparkStatus } from "./status"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
-export { prepareSend, executeSend, extractOnchainFees, extractLightningFee } from "./send"
-export type { OnchainFeeTiers } from "./send"
+export {
+  prepareSend,
+  executeSend,
+  extractOnchainFees,
+  extractLightningFee,
+  toSdkSendAmount,
+  resolveSendTokenIdentifier,
+} from "./send"
+export type { OnchainFeeTiers, PrepareSendOptions } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
 export { createConvert } from "./convert"

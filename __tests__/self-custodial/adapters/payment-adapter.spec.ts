@@ -13,12 +13,16 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
   InputType_Tags: { SparkAddress: "SparkAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
   PrepareSendPaymentRequest: {
     create: (args: unknown) => args,
   },
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+  },
+  SendPaymentOptions: {
+    BitcoinAddress: jest.fn((args: unknown) => args),
   },
   SendPaymentRequest: {
     create: (args: unknown) => args,
@@ -40,6 +44,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { tokenIdentifier: "test-token-id" },
+  SparkToken: { Label: "USDB", Ticker: "USDB", DefaultDecimals: 6 },
 }))
 
 const createMockSdk = () => ({
@@ -76,6 +81,58 @@ describe("self-custodial payment adapters", () => {
       expect(result.status).toBe("failed")
       expect(result.errors?.[0].message).toBe("network error")
     })
+
+    it("sends with tokenIdentifier + USDB-scaled amount when currency is USD", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
+      sdk.sendPayment.mockResolvedValue({})
+
+      const send = createSendPayment(sdk as never)
+      await send({
+        destination: "lnbc1...",
+        amount: { amount: 70, currency: "USD", currencyCode: "USD" },
+      })
+
+      // $0.70 = 70 cents → 70 * 10^4 = 700_000 USDB base units
+      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tokenIdentifier: "test-token-id",
+          amount: BigInt(700000),
+        }),
+      )
+    })
+
+    it("sends without tokenIdentifier and amount in sats when currency is BTC", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
+      sdk.sendPayment.mockResolvedValue({})
+
+      const send = createSendPayment(sdk as never)
+      await send({
+        destination: "lnbc1...",
+        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+      })
+
+      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tokenIdentifier: undefined,
+          amount: BigInt(1000),
+        }),
+      )
+    })
+
+    it("sends without tokenIdentifier when amount is omitted", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(0) })
+      sdk.sendPayment.mockResolvedValue({})
+
+      const send = createSendPayment(sdk as never)
+      await send({ destination: "lnbc1..." })
+
+      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
+        expect.objectContaining({ tokenIdentifier: undefined }),
+      )
+    })
   })
 
   describe("createGetFee", () => {
@@ -98,6 +155,40 @@ describe("self-custodial payment adapters", () => {
       const result = await getFee({ destination: "lnbc1..." })
 
       expect(result).toBeNull()
+    })
+
+    it("prepares with tokenIdentifier + USDB-scaled amount when currency is USD", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
+
+      const getFee = createGetFee(sdk as never)
+      await getFee({
+        destination: "lnbc1...",
+        amount: { amount: 500, currency: "USD", currencyCode: "USD" },
+      })
+
+      // $5.00 = 500 cents → 500 * 10^4 = 5_000_000 USDB base units
+      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tokenIdentifier: "test-token-id",
+          amount: BigInt(5000000),
+        }),
+      )
+    })
+
+    it("prepares without tokenIdentifier when amount currency is BTC", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
+
+      const getFee = createGetFee(sdk as never)
+      await getFee({
+        destination: "lnbc1...",
+        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+      })
+
+      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
+        expect.objectContaining({ tokenIdentifier: undefined }),
+      )
     })
   })
 
