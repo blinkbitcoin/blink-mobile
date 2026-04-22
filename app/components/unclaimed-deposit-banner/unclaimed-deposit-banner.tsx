@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Pressable, View } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { DepositStatus } from "@app/types/payment.types"
 import { testProps } from "@app/utils/testProps"
 
@@ -20,17 +21,29 @@ export const UnclaimedDepositBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { listPendingDeposits } = usePayments()
+  // Re-fetch whenever wallets refresh (e.g. ClaimedDeposits / NewDeposits SDK events).
+  const { wallets } = useSelfCustodialWallet()
   const [count, setCount] = useState(0)
   const [totalSats, setTotalSats] = useState(0)
 
-  useEffect(() => {
+  const fetchDeposits = useCallback(() => {
     if (!listPendingDeposits) return
+    let cancelled = false
     listPendingDeposits().then(({ deposits }) => {
+      if (cancelled) return
       const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)
       setCount(active.length)
       setTotalSats(active.reduce((sum, { amount }) => sum + amount.amount, 0))
     })
+    return () => {
+      cancelled = true
+    }
   }, [listPendingDeposits])
+
+  // Re-fetch on SDK wallet refresh + every time the banner comes back into focus
+  // (covers the user returning from the unclaimed-deposits screen after claiming).
+  useFocusEffect(fetchDeposits)
+  useEffect(fetchDeposits, [fetchDeposits, wallets])
 
   if (count === 0) return null
 
