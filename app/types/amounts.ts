@@ -93,6 +93,11 @@ export const tokenBaseUnitsToCents = (
   return Math.round(rawAmount / 10 ** excessDecimals)
 }
 
+export const centsToTokenBaseUnits = (cents: number, tokenDecimals: number): number => {
+  const excessDecimals = Math.max(tokenDecimals - DISPLAY_DECIMALS, 0)
+  return Math.round(cents * 10 ** excessDecimals)
+}
+
 export const toWalletAmount = <T extends WalletCurrency>({
   amount,
   currency,

@@ -3,9 +3,21 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createSCLightningPaymentDetails } from "@app/self-custodial/payment-details/lightning"
 
-jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
-  createGetFee: jest.fn().mockReturnValue(jest.fn()),
-  createSendMutation: jest.fn().mockReturnValue(jest.fn()),
+const mockCreateGetFee = jest.fn().mockReturnValue(jest.fn())
+const mockCreateSendMutation = jest.fn().mockReturnValue(jest.fn())
+
+jest.mock("@app/self-custodial/payment-details/send-helpers", () => {
+  const actual = jest.requireActual("@app/self-custodial/payment-details/send-helpers")
+  return {
+    ...actual,
+    createGetFee: (...args: unknown[]) => mockCreateGetFee(...args),
+    createSendMutation: (...args: unknown[]) => mockCreateSendMutation(...args),
+  }
+})
+
+jest.mock("@app/self-custodial/config", () => ({
+  SparkConfig: { tokenIdentifier: "usdb-token-id" },
+  SparkToken: { Label: "USDB", Ticker: "USDB", DefaultDecimals: 6 },
 }))
 
 const createParams = (overrides = {}) => ({
@@ -27,6 +39,11 @@ const createParams = (overrides = {}) => ({
 })
 
 describe("createSCLightningPaymentDetails", () => {
+  beforeEach(() => {
+    mockCreateGetFee.mockClear()
+    mockCreateSendMutation.mockClear()
+  })
+
   it("returns Lightning payment type", () => {
     const detail = createSCLightningPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Lightning)
@@ -138,5 +155,74 @@ describe("createSCLightningPaymentDetails", () => {
     const detail = createSCLightningPaymentDetails(createParams())
     const updated = detail.setConvertMoneyAmount(newConvert)
     expect(updated.convertMoneyAmount).toBe(newConvert)
+  })
+
+  it("passes USDB tokenIdentifier when sending wallet is USD", () => {
+    createSCLightningPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        convertMoneyAmount: jest.fn().mockReturnValue({
+          amount: 500,
+          currency: WalletCurrency.Usd,
+          currencyCode: WalletCurrency.Usd,
+        }),
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
+    )
+    expect(mockCreateGetFee).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
+      WalletCurrency.Usd,
+    )
+  })
+
+  it("passes tokenIdentifier=undefined when sending wallet is BTC", () => {
+    createSCLightningPaymentDetails(createParams())
+
+    expect(mockCreateSendMutation).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: undefined }),
+    )
+    expect(mockCreateGetFee).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenIdentifier: undefined }),
+      WalletCurrency.Btc,
+    )
+  })
+
+  it("scales USD settlement cents into USDB base units for hasAmount=false", () => {
+    createSCLightningPaymentDetails(
+      createParams({
+        hasAmount: false,
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        convertMoneyAmount: jest.fn().mockReturnValue({
+          amount: 70,
+          currency: WalletCurrency.Usd,
+          currencyCode: WalletCurrency.Usd,
+        }),
+      }),
+    )
+
+    // 70 cents ($0.70) × 10^4 (USDB 6-decimal scaling vs 2-decimal display) = 700_000 base units
+    expect(mockCreateSendMutation).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: BigInt(700000) }),
+    )
+  })
+
+  it("keeps BTC settlement amount in sats for hasAmount=false", () => {
+    createSCLightningPaymentDetails(
+      createParams({
+        hasAmount: false,
+        convertMoneyAmount: jest.fn().mockReturnValue({
+          amount: 12345,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        }),
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: BigInt(12345) }),
+    )
   })
 })
