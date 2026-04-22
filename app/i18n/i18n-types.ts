@@ -286,6 +286,22 @@ type RootTranslation = {
 		 * @param {unknown} toWallet
 		 */
 		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeLabel: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeError: string
+		/**
+		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​m​e​e​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​m​i​n​i​m​u​m​.
+		 */
+		amountFloored: string
+		/**
+		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​c​o​n​v​e​r​t​ ​y​o​u​r​ ​f​u​l​l​ ​b​a​l​a​n​c​e​.
+		 */
+		amountDustBumped: string
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -11947,6 +11963,96 @@ type RootTranslation = {
 		 * H​o​l​d​ ​a​ ​U​S​D​-​d​e​n​o​m​i​n​a​t​e​d​ ​b​a​l​a​n​c​e​ ​p​o​w​e​r​e​d​ ​b​y​ ​U​S​D​B​ ​o​n​ ​S​p​a​r​k​.
 		 */
 		description: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​S​A​T​S
+		 */
+		balanceLabelBtc: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​U​S​D
+		 */
+		balanceLabelUsd: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsRowTitle: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsTitle: string
+		/**
+		 * K​e​e​p​ ​p​a​r​t​ ​o​f​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​i​n​ ​U​S​D​.​ ​C​o​n​v​e​r​t​ ​b​e​t​w​e​e​n​ ​B​T​C​ ​a​n​d​ ​U​S​D​ ​m​a​n​u​a​l​l​y​ ​a​n​y​t​i​m​e​ ​u​s​i​n​g​ ​t​h​e​ ​C​o​n​v​e​r​t​ ​a​c​t​i​o​n​.
+		 */
+		settingsDescription: string
+		/**
+		 * A​c​t​i​v​e
+		 */
+		activationLabel: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​U​S​D​ ​v​i​a​ ​U​S​D​B​.
+		 */
+		activeHint: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​o​n​l​y​.
+		 */
+		inactiveHint: string
+		/**
+		 * Y​o​u​ ​s​t​i​l​l​ ​h​a​v​e​ ​{​a​m​o​u​n​t​}​ ​U​S​D​.​ ​C​o​n​v​e​r​t​ ​t​o​ ​B​T​C​ ​f​i​r​s​t​,​ ​o​r​ ​y​o​u​r​ ​U​S​D​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​h​i​d​d​e​n​ ​u​n​t​i​l​ ​y​o​u​ ​r​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.
+		 * @param {string} amount
+		 */
+		deactivateWarningBody: RequiredParams<'amount'>
+		toggleModal: {
+			/**
+			 * A​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			activateTitle: string
+			/**
+			 * Y​o​u​r​ ​B​T​C​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​U​S​D​B​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			activateBody: string
+			/**
+			 * A​c​t​i​v​a​t​e
+			 */
+			activateConfirm: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			deactivateTitle: string
+			/**
+			 * Y​o​u​r​ ​U​S​D​B​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​b​a​c​k​ ​t​o​ ​B​T​C​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			deactivateBody: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e
+			 */
+			deactivateConfirm: string
+			/**
+			 * C​a​n​c​e​l
+			 */
+			cancel: string
+		}
+		firstTimeModal: {
+			/**
+			 * A​b​o​u​t​ ​C​o​n​v​e​r​t
+			 */
+			title: string
+			/**
+			 * B​T​C​ ​a​n​d​ ​U​S​D​ ​a​r​e​ ​t​w​o​ ​i​n​d​e​p​e​n​d​e​n​t​ ​b​a​l​a​n​c​e​s​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​U​s​e​ ​C​o​n​v​e​r​t​ ​a​n​y​ ​t​i​m​e​ ​t​o​ ​m​o​v​e​ ​f​u​n​d​s​ ​b​e​t​w​e​e​n​ ​t​h​e​m​.
+			 */
+			dualBalance: string
+			/**
+			 * U​S​D​ ​m​o​d​e​ ​u​s​e​s​ ​U​S​D​B​ ​t​o​k​e​n​s​ ​o​n​ ​S​p​a​r​k​.​ ​T​h​e​ ​t​r​u​s​t​ ​a​s​s​u​m​p​t​i​o​n​s​ ​a​r​e​ ​d​i​f​f​e​r​e​n​t​ ​f​r​o​m​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​d​i​r​e​c​t​l​y​.​ ​U​S​D​B​ ​r​e​l​i​e​s​ ​o​n​ ​S​p​a​r​k​'​s​ ​t​o​k​e​n​ ​i​s​s​u​e​r​.
+			 */
+			trustDisclosure: string
+			/**
+			 * I​ ​u​n​d​e​r​s​t​a​n​d
+			 */
+			acknowledge: string
+		}
+		/**
+		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		minimumConversion: RequiredParams<'amount'>
 	}
 	SparkWalletCreationScreen: {
 		/**
@@ -12220,6 +12326,22 @@ export type TranslationFunctions = {
 		 * Transfer {fromWallet} to {toWallet}
 		 */
 		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
+		/**
+		 * Conversion fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Couldn't fetch the conversion fee
+		 */
+		feeError: () => LocalizedString
+		/**
+		 * Amount increased to meet the conversion minimum.
+		 */
+		amountFloored: () => LocalizedString
+		/**
+		 * Amount increased to convert your full balance.
+		 */
+		amountDustBumped: () => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -23757,6 +23879,94 @@ export type TranslationFunctions = {
 		 * Hold a USD-denominated balance powered by USDB on Spark.
 		 */
 		description: () => LocalizedString
+		/**
+		 * Balance · SATS
+		 */
+		balanceLabelBtc: () => LocalizedString
+		/**
+		 * Balance · USD
+		 */
+		balanceLabelUsd: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsRowTitle: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsTitle: () => LocalizedString
+		/**
+		 * Keep part of your wallet in USD. Convert between BTC and USD manually anytime using the Convert action.
+		 */
+		settingsDescription: () => LocalizedString
+		/**
+		 * Active
+		 */
+		activationLabel: () => LocalizedString
+		/**
+		 * Your wallet is holding USD via USDB.
+		 */
+		activeHint: () => LocalizedString
+		/**
+		 * Your wallet is holding BTC only.
+		 */
+		inactiveHint: () => LocalizedString
+		/**
+		 * You still have {amount} USD. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
+		 */
+		deactivateWarningBody: (arg: { amount: string }) => LocalizedString
+		toggleModal: {
+			/**
+			 * Activate Stable Balance
+			 */
+			activateTitle: () => LocalizedString
+			/**
+			 * Your BTC balance will be converted to USDB. This is the estimated conversion fee.
+			 */
+			activateBody: () => LocalizedString
+			/**
+			 * Activate
+			 */
+			activateConfirm: () => LocalizedString
+			/**
+			 * Deactivate Stable Balance
+			 */
+			deactivateTitle: () => LocalizedString
+			/**
+			 * Your USDB balance will be converted back to BTC. This is the estimated conversion fee.
+			 */
+			deactivateBody: () => LocalizedString
+			/**
+			 * Deactivate
+			 */
+			deactivateConfirm: () => LocalizedString
+			/**
+			 * Cancel
+			 */
+			cancel: () => LocalizedString
+		}
+		firstTimeModal: {
+			/**
+			 * About Convert
+			 */
+			title: () => LocalizedString
+			/**
+			 * BTC and USD are two independent balances in your wallet. Use Convert any time to move funds between them.
+			 */
+			dualBalance: () => LocalizedString
+			/**
+			 * USD mode uses USDB tokens on Spark. The trust assumptions are different from holding BTC directly. USDB relies on Spark's token issuer.
+			 */
+			trustDisclosure: () => LocalizedString
+			/**
+			 * I understand
+			 */
+			acknowledge: () => LocalizedString
+		}
+		/**
+		 * Minimum conversion: {amount}
+		 */
+		minimumConversion: (arg: { amount: string }) => LocalizedString
 	}
 	SparkWalletCreationScreen: {
 		/**

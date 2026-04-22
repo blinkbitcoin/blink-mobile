@@ -70,7 +70,11 @@
     "receivingAccount": "Compte receptor",
     "infoBitcoin": "La quantitat de Bitcoin és només aproximada. Pot variar lleugerament.",
     "infoDollar": "La quantitat en dòlars és només aproximada. Pot variar lleugerament.",
-    "transferButtonText": "Transferir {fromWallet} a {toWallet}"
+    "transferButtonText": "Transferir {fromWallet} a {toWallet}",
+    "feeLabel": "Comissió de conversió",
+    "feeError": "No s'ha pogut obtenir la comissió de conversió",
+    "amountFloored": "Import augmentat per complir el mínim de conversió.",
+    "amountDustBumped": "Import augmentat per convertir tot el teu saldo."
   },
   "ConversionSuccessScreen": {
     "message": "Conversió efectuada amb èxit",
@@ -3563,7 +3567,32 @@
   },
   "StableBalance": {
     "title": "Balanç estable",
-    "description": "Mantén un balanç denominat en USD amb USDB a Spark."
+    "description": "Mantén un balanç denominat en USD amb USDB a Spark.",
+    "balanceLabelBtc": "Saldo · SATS",
+    "balanceLabelUsd": "Saldo · USD",
+    "settingsRowTitle": "Saldo Estable",
+    "settingsTitle": "Saldo Estable",
+    "settingsDescription": "Mantén part de la teva cartera en USD. Converteix entre BTC i USD manualment en qualsevol moment amb l'acció Converteix.",
+    "activationLabel": "Actiu",
+    "activeHint": "La teva cartera manté USD via USDB.",
+    "inactiveHint": "La teva cartera manté només BTC.",
+    "deactivateWarningBody": "Encara tens {amount:string} USD. Converteix a BTC primer, o el teu saldo en USD quedarà ocult fins que reactivis Saldo Estable.",
+    "toggleModal": {
+      "activateTitle": "Activa el saldo estable",
+      "activateBody": "El teu saldo en BTC es convertirà a USDB. Aquesta és la comissió de conversió estimada.",
+      "activateConfirm": "Activar",
+      "deactivateTitle": "Desactiva el saldo estable",
+      "deactivateBody": "El teu saldo en USDB es tornarà a convertir a BTC. Aquesta és la comissió de conversió estimada.",
+      "deactivateConfirm": "Desactivar",
+      "cancel": "Cancel·la"
+    },
+    "firstTimeModal": {
+      "title": "Sobre Convertir",
+      "dualBalance": "BTC i USD són dos saldos independents a la teva cartera. Utilitza Convert en qualsevol moment per moure fons entre ells.",
+      "trustDisclosure": "El mode USD utilitza tokens USDB a Spark. Les suposicions de confiança són diferents a guardar BTC directament. USDB depèn de l'emissor de tokens de Spark.",
+      "acknowledge": "Ho entenc"
+    },
+    "minimumConversion": "Conversió mínima: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Funció no disponible",

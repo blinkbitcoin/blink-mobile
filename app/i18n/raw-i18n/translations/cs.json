@@ -72,7 +72,11 @@
     "receivingAccount": "Přijímací účet",
     "infoBitcoin": "Částka v Bitcoinu je pouze přibližná. Může se mírně lišit.",
     "infoDollar": "Částka v dolarech je pouze přibližná. Může se mírně lišit.",
-    "transferButtonText": "Převést {fromWallet} na {toWallet}"
+    "transferButtonText": "Převést {fromWallet} na {toWallet}",
+    "feeLabel": "Poplatek za konverzi",
+    "feeError": "Nepodařilo se načíst poplatek za konverzi",
+    "amountFloored": "Částka zvýšena na minimum konverze.",
+    "amountDustBumped": "Částka zvýšena pro konverzi celého zůstatku."
   },
   "ConversionSuccessScreen": {
     "message": "Úspěšný převod",
@@ -3604,7 +3608,32 @@
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",
-    "description": "Držte zůstatek v USD poháněný USDB na Spark."
+    "description": "Držte zůstatek v USD poháněný USDB na Spark.",
+    "balanceLabelBtc": "Zůstatek · SATS",
+    "balanceLabelUsd": "Zůstatek · USD",
+    "settingsRowTitle": "Stabilní zůstatek",
+    "settingsTitle": "Stabilní zůstatek",
+    "settingsDescription": "Část své peněženky uchovávejte v USD. BTC a USD převádějte kdykoli ručně pomocí akce Převést.",
+    "activationLabel": "Aktivní",
+    "activeHint": "Peněženka drží USD přes USDB.",
+    "inactiveHint": "Peněženka drží pouze BTC.",
+    "deactivateWarningBody": "Máš ještě {amount:string} USD. Nejdřív převeď na BTC, jinak bude zůstatek v USD skrytý, dokud Stabilní zůstatek znovu neaktivuješ.",
+    "toggleModal": {
+      "activateTitle": "Aktivovat stabilní zůstatek",
+      "activateBody": "Váš zůstatek v BTC bude převeden na USDB. Toto je odhadovaný poplatek za převod.",
+      "activateConfirm": "Aktivovat",
+      "deactivateTitle": "Deaktivovat stabilní zůstatek",
+      "deactivateBody": "Váš zůstatek v USDB bude převeden zpět na BTC. Toto je odhadovaný poplatek za převod.",
+      "deactivateConfirm": "Deaktivovat",
+      "cancel": "Zrušit"
+    },
+    "firstTimeModal": {
+      "title": "O převodu",
+      "dualBalance": "BTC a USD jsou dva nezávislé zůstatky ve vaší peněžence. Kdykoli použijte Convert k přesunu prostředků mezi nimi.",
+      "trustDisclosure": "Režim USD používá tokeny USDB na Sparku. Předpoklady důvěry jsou jiné než držení BTC přímo. USDB spoléhá na emitenta tokenů Sparku.",
+      "acknowledge": "Rozumím"
+    },
+    "minimumConversion": "Minimální převod: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Funkce nedostupná",

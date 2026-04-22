@@ -72,7 +72,11 @@
     "receivingAccount": "บัญชีรับเงิน",
     "infoBitcoin": "จำนวน Bitcoin เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "infoDollar": "จำนวนดอลลาร์เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
-    "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}"
+    "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}",
+    "feeLabel": "ค่าธรรมเนียมการแปลง",
+    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้",
+    "amountFloored": "จำนวนเงินเพิ่มขึ้นเพื่อให้ถึงขั้นต่ำในการแปลง",
+    "amountDustBumped": "จำนวนเงินเพิ่มขึ้นเพื่อแปลงยอดคงเหลือทั้งหมดของคุณ"
   },
   "ConversionSuccessScreen": {
     "message": "การแลกเปลี่ยนสำเร็จแล้ว",
@@ -3601,7 +3605,32 @@
   },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",
-    "description": "ถือยอดคงเหลือเป็น USD ขับเคลื่อนโดย USDB บน Spark"
+    "description": "ถือยอดคงเหลือเป็น USD ขับเคลื่อนโดย USDB บน Spark",
+    "balanceLabelBtc": "ยอดเงิน · SATS",
+    "balanceLabelUsd": "ยอดเงิน · USD",
+    "settingsRowTitle": "ยอดเงินคงที่",
+    "settingsTitle": "ยอดเงินคงที่",
+    "settingsDescription": "เก็บส่วนหนึ่งของกระเป๋าของคุณเป็น USD แปลงระหว่าง BTC และ USD ด้วยตนเองได้ตลอดเวลาโดยใช้การกระทำ แปลง",
+    "activationLabel": "เปิดใช้งาน",
+    "activeHint": "กระเป๋าเงินของคุณถือ USD ผ่าน USDB",
+    "inactiveHint": "กระเป๋าเงินของคุณถือ BTC เท่านั้น",
+    "deactivateWarningBody": "คุณยังมี {amount:string} USD โปรดแปลงเป็น BTC ก่อน มิฉะนั้นยอด USD จะถูกซ่อนไว้จนกว่าคุณจะเปิดยอดเงินคงที่อีกครั้ง",
+    "toggleModal": {
+      "activateTitle": "เปิดใช้ยอดคงเหลือแบบเสถียร",
+      "activateBody": "ยอดคงเหลือ BTC ของคุณจะถูกแปลงเป็น USDB นี่คือค่าธรรมเนียมการแปลงโดยประมาณ",
+      "activateConfirm": "เปิดใช้",
+      "deactivateTitle": "ปิดใช้ยอดคงเหลือแบบเสถียร",
+      "deactivateBody": "ยอดคงเหลือ USDB ของคุณจะถูกแปลงกลับเป็น BTC นี่คือค่าธรรมเนียมการแปลงโดยประมาณ",
+      "deactivateConfirm": "ปิดใช้",
+      "cancel": "ยกเลิก"
+    },
+    "firstTimeModal": {
+      "title": "เกี่ยวกับการแปลง",
+      "dualBalance": "BTC และ USD เป็นยอดคงเหลือที่เป็นอิสระสองรายการในกระเป๋าของคุณ ใช้ Convert เมื่อใดก็ได้เพื่อย้ายเงินระหว่างกัน",
+      "trustDisclosure": "โหมด USD ใช้โทเค็น USDB บน Spark ข้อสันนิษฐานด้านความเชื่อถือต่างจากการถือ BTC โดยตรง. USDB พึ่งพาผู้ออกโทเค็นของ Spark",
+      "acknowledge": "เข้าใจแล้ว"
+    },
+    "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "ฟีเจอร์ไม่พร้อมใช้งาน",

@@ -72,7 +72,11 @@
     "receivingAccount": "Tài khoản nhận",
     "infoBitcoin": "Số lượng Bitcoin chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
-    "transferButtonText": "Chuyển {fromWallet} sang {toWallet}"
+    "transferButtonText": "Chuyển {fromWallet} sang {toWallet}",
+    "feeLabel": "Phí chuyển đổi",
+    "feeError": "Không thể lấy phí chuyển đổi",
+    "amountFloored": "Số tiền đã được tăng để đạt mức tối thiểu chuyển đổi.",
+    "amountDustBumped": "Số tiền đã được tăng để chuyển đổi toàn bộ số dư của bạn."
   },
   "ConversionSuccessScreen": {
     "message": "Chuyễn đổi đã thành công",
@@ -3601,7 +3605,32 @@
   },
   "StableBalance": {
     "title": "Số dư ổn định",
-    "description": "Giữ số dư tính bằng USD được hỗ trợ bởi USDB trên Spark."
+    "description": "Giữ số dư tính bằng USD được hỗ trợ bởi USDB trên Spark.",
+    "balanceLabelBtc": "Số dư · SATS",
+    "balanceLabelUsd": "Số dư · USD",
+    "settingsRowTitle": "Số Dư Ổn Định",
+    "settingsTitle": "Số Dư Ổn Định",
+    "settingsDescription": "Giữ một phần ví của bạn bằng USD. Chuyển đổi giữa BTC và USD thủ công bất cứ lúc nào bằng hành động Chuyển đổi.",
+    "activationLabel": "Hoạt động",
+    "activeHint": "Ví của bạn đang giữ USD qua USDB.",
+    "inactiveHint": "Ví của bạn chỉ giữ BTC.",
+    "deactivateWarningBody": "Bạn vẫn còn {amount:string} USD. Hãy chuyển sang BTC trước, nếu không số dư USD của bạn sẽ bị ẩn cho đến khi bạn kích hoạt lại Số Dư Ổn Định.",
+    "toggleModal": {
+      "activateTitle": "Bật số dư ổn định",
+      "activateBody": "Số dư BTC của bạn sẽ được chuyển đổi sang USDB. Đây là phí chuyển đổi ước tính.",
+      "activateConfirm": "Bật",
+      "deactivateTitle": "Tắt số dư ổn định",
+      "deactivateBody": "Số dư USDB của bạn sẽ được chuyển đổi lại thành BTC. Đây là phí chuyển đổi ước tính.",
+      "deactivateConfirm": "Tắt",
+      "cancel": "Hủy"
+    },
+    "firstTimeModal": {
+      "title": "Về Chuyển đổi",
+      "dualBalance": "BTC và USD là hai số dư độc lập trong ví của bạn. Sử dụng Convert bất cứ lúc nào để chuyển tiền giữa chúng.",
+      "trustDisclosure": "Chế độ USD sử dụng token USDB trên Spark. Các giả định tin cậy khác với việc giữ BTC trực tiếp. USDB phụ thuộc vào nhà phát hành token của Spark.",
+      "acknowledge": "Tôi hiểu"
+    },
+    "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "Tính năng không khả dụng",

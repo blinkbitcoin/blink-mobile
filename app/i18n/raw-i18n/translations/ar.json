@@ -72,7 +72,11 @@
     "receivingAccount": "حساب الاستلام",
     "infoBitcoin": "مبلغ Bitcoin تقريبي فقط. قد يختلف بمقدار صغير.",
     "infoDollar": "مبلغ الدولار تقريبي فقط. قد يختلف بمقدار صغير.",
-    "transferButtonText": "تحويل من {fromWallet} إلى {toWallet}"
+    "transferButtonText": "تحويل من {fromWallet} إلى {toWallet}",
+    "feeLabel": "رسوم التحويل",
+    "feeError": "تعذر جلب رسوم التحويل",
+    "amountFloored": "تم زيادة المبلغ للوصول إلى الحد الأدنى للتحويل.",
+    "amountDustBumped": "تم زيادة المبلغ لتحويل رصيدك بالكامل."
   },
   "ConversionSuccessScreen": {
     "message": "تم التحويل بنجاح",
@@ -3601,7 +3605,32 @@
   },
   "StableBalance": {
     "title": "الرصيد المستقر",
-    "description": "احتفظ برصيد مقوّم بالدولار مدعوم بـ USDB على Spark."
+    "description": "احتفظ برصيد مقوّم بالدولار مدعوم بـ USDB على Spark.",
+    "balanceLabelBtc": "الرصيد · ساتس",
+    "balanceLabelUsd": "الرصيد · دولار",
+    "settingsRowTitle": "الرصيد المستقر",
+    "settingsTitle": "الرصيد المستقر",
+    "settingsDescription": "احتفظ بجزء من محفظتك بالدولار الأمريكي. قم بالتحويل بين BTC والدولار الأمريكي يدويًا في أي وقت باستخدام إجراء التحويل.",
+    "activationLabel": "مفعل",
+    "activeHint": "محفظتك تحتفظ بالدولار عبر USDB.",
+    "inactiveHint": "محفظتك تحتفظ بالبيتكوين فقط.",
+    "deactivateWarningBody": "لا يزال لديك {amount:string} دولار. قم بالتحويل إلى بيتكوين أولاً، وإلا سيتم إخفاء رصيد الدولار حتى تُعيد تفعيل الرصيد المستقر.",
+    "toggleModal": {
+      "activateTitle": "تفعيل الرصيد الثابت",
+      "activateBody": "سيتم تحويل رصيد البيتكوين الخاص بك إلى USDB. هذه هي رسوم التحويل التقديرية.",
+      "activateConfirm": "تفعيل",
+      "deactivateTitle": "إلغاء تفعيل الرصيد الثابت",
+      "deactivateBody": "سيتم تحويل رصيد USDB الخاص بك إلى البيتكوين. هذه هي رسوم التحويل التقديرية.",
+      "deactivateConfirm": "إلغاء التفعيل",
+      "cancel": "إلغاء"
+    },
+    "firstTimeModal": {
+      "title": "عن التحويل",
+      "dualBalance": "BTC و USD رصيدان مستقلان في محفظتك. استخدم Convert في أي وقت لنقل الأموال بينهما.",
+      "trustDisclosure": "يستخدم وضع USD رموز USDB على Spark. افتراضات الثقة تختلف عن الاحتفاظ بالبيتكوين مباشرة. USDB يعتمد على مُصدر الرموز في Spark.",
+      "acknowledge": "فهمت"
+    },
+    "minimumConversion": "الحد الأدنى للتحويل: {amount:string}"
   },
   "BackendFeatureGate": {
     "title": "الميزة غير متاحة",
