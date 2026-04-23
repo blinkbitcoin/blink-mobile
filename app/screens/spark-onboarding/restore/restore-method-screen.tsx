@@ -74,7 +74,7 @@ export const SparkRestoreMethodScreen: React.FC = () => {
     >
       <IconHero
         icon="cloud"
-        iconColor={colors.black}
+        iconColor={colors.success}
         title={LL.RestoreScreen.title()}
         subtitle={LL.RestoreScreen.description()}
       />
