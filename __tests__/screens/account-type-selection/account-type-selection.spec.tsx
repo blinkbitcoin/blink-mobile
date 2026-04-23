@@ -36,21 +36,28 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const mockCardDefaultBg = "#1d1d1d"
+const mockCardSelectedBg = "#2B2B2B"
+const mockPrimary = "#fc5805"
+
 jest.mock("@rn-vui/themed", () => ({
   makeStyles:
     (fn: (args: { colors: Record<string, string> }) => Record<string, object>) => () =>
       fn({
         colors: {
-          primary: "#000",
+          primary: "#fc5805",
           grey2: "#949494",
           grey3: "#999",
-          grey5: "#eee",
+          grey5: "#1d1d1d",
+          grey6: "#2B2B2B",
           black: "#000",
         },
       }),
   Text: ({ children, ...props }: { children: React.ReactNode }) =>
     React.createElement("Text", props, children),
-  useTheme: () => ({ theme: { colors: { primary: "#000", grey5: "#eee" } } }),
+  useTheme: () => ({
+    theme: { colors: { primary: "#fc5805", grey5: "#1d1d1d", grey6: "#2B2B2B" } },
+  }),
 }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
@@ -165,5 +172,34 @@ describe("AccountTypeSelectionScreen", () => {
     fireEvent.press(getByTestId("continue-button"))
 
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("uses grey5 as default card background and grey6 when selected", () => {
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    const custodialCard = getByTestId("custodial-option")
+    const selfCustodialCard = getByTestId("self-custodial-option")
+
+    expect(custodialCard.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: mockCardDefaultBg }),
+      ]),
+    )
+    expect(selfCustodialCard.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: mockCardDefaultBg }),
+      ]),
+    )
+
+    fireEvent.press(custodialCard)
+
+    expect(custodialCard.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          backgroundColor: mockCardSelectedBg,
+          borderColor: mockPrimary,
+        }),
+      ]),
+    )
   })
 })
