@@ -77,6 +77,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 styles.card,
                 isSelected(AccountOption.Custodial) && {
                   borderColor: colors.primary,
+                  backgroundColor: colors.grey6,
                 },
               ]}
               onPress={() => setSelected(AccountOption.Custodial)}
@@ -98,6 +99,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 styles.card,
                 isSelected(AccountOption.SelfCustodial) && {
                   borderColor: colors.primary,
+                  backgroundColor: colors.grey6,
                 },
               ]}
               onPress={() => setSelected(AccountOption.SelfCustodial)}
