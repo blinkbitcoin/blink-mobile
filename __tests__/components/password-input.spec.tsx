@@ -58,4 +58,16 @@ describe("PasswordInput", () => {
 
     expect(queryByText("Too short")).toBeNull()
   })
+
+  it("calls onBlur when the input loses focus", () => {
+    const onBlur = jest.fn()
+    const { getByPlaceholderText } = render(
+      <ContextForScreen>
+        <PasswordInput {...defaultProps} onBlur={onBlur} />
+      </ContextForScreen>,
+    )
+
+    fireEvent(getByPlaceholderText("Enter password"), "blur")
+    expect(onBlur).toHaveBeenCalledTimes(1)
+  })
 })
