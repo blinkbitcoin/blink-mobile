@@ -3,6 +3,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
+import { InfoBanner } from "@app/components/info-banner"
 import { SparkCloudBackupScreen } from "@app/screens/spark-onboarding/cloud-backup-screen"
 import { ContextForScreen } from "../helper"
 
@@ -40,6 +41,20 @@ jest.mock("@app/components/icon-hero", () => {
         <Text>{title}</Text>
         <Text>{subtitle}</Text>
       </>
+    ),
+  }
+})
+
+jest.mock("@app/components/info-banner", () => {
+  const { Text } = jest.requireActual("react-native")
+  return {
+    InfoBanner: jest.fn(
+      ({ title, children }: { title?: string; children: React.ReactNode }) => (
+        <>
+          {title ? <Text>{title}</Text> : null}
+          {children}
+        </>
+      ),
     ),
   }
 })
@@ -109,5 +124,22 @@ describe("SparkCloudBackupScreen", () => {
 
     fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
     expect(mockHandleBackup).toHaveBeenCalled()
+  })
+
+  it("renders the Important InfoBanner with warning icon color", () => {
+    mockIsEncrypted = true
+
+    render(
+      <ContextForScreen>
+        <SparkCloudBackupScreen />
+      </ContextForScreen>,
+    )
+
+    const infoBannerMock = InfoBanner as unknown as jest.Mock
+    const props = infoBannerMock.mock.calls[0][0]
+
+    expect(props.icon).toBe("warning")
+    expect(props.iconColor).toBe("warning")
+    expect(props.title).toBe(LL.BackupScreen.CloudBackup.importantTitle())
   })
 })

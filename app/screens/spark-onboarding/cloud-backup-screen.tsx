@@ -85,6 +85,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
                 <InfoBanner
                   title={LL.BackupScreen.CloudBackup.importantTitle()}
                   icon="warning"
+                  iconColor="warning"
                 >
                   <RichText
                     text={LL.BackupScreen.CloudBackup.importantMessage({
