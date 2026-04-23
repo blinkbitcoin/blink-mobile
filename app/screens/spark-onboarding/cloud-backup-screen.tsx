@@ -46,7 +46,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
           <View style={styles.heroContainer}>
             <IconHero
               icon="cloud"
-              iconColor={colors.black}
+              iconColor={colors.success}
               title={LL.BackupScreen.CloudBackup.title()}
               subtitle={LL.BackupScreen.CloudBackup.description({
                 provider: cloudProvider,
