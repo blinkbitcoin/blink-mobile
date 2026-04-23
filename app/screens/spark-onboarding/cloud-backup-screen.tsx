@@ -32,6 +32,8 @@ export const SparkCloudBackupScreen: React.FC = () => {
     toggleEncryption,
     setPassword,
     setConfirmPassword,
+    markPasswordTouched,
+    markConfirmPasswordTouched,
     passwordError,
     confirmPasswordError,
     isValid,
@@ -69,6 +71,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
                   label={LL.BackupScreen.CloudBackup.password()}
                   value={password}
                   onChangeText={setPassword}
+                  onBlur={markPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
                   {...testProps("cloud-password-input")}
@@ -77,6 +80,7 @@ export const SparkCloudBackupScreen: React.FC = () => {
                   label={LL.BackupScreen.CloudBackup.confirmPassword()}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
+                  onBlur={markConfirmPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
                   {...testProps("cloud-confirm-password-input")}
