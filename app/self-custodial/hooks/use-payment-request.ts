@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { getPaymentRequestFullUri } from "@app/screens/receive-bitcoin-screen/payment/helpers"
 import {
   Invoice,
   InvoiceType,
@@ -16,7 +17,7 @@ import {
   toBtcMoneyAmount,
 } from "@app/types/amounts"
 import { toSatsAmount } from "@app/utils/amounts"
-import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
+import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
@@ -122,7 +123,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const getFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {
       if (!paymentRequest) return ""
-      return buildLightningUri(paymentRequest, params.prefix)
+      return getPaymentRequestFullUri({
+        type: Invoice.Lightning,
+        input: paymentRequest,
+        uppercase: params.uppercase,
+        prefix: params.prefix,
+      })
     },
     [paymentRequest],
   )
