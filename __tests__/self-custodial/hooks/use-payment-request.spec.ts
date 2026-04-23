@@ -140,7 +140,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  it("getFullUriFn returns prefixed lightning URI", async () => {
+  it("getFullUriFn returns raw lightning invoice without `lightning:` prefix even when prefix is requested", async () => {
     const { result } = renderHook(() => usePaymentRequest())
 
     await waitFor(() => {
@@ -151,7 +151,7 @@ describe("usePaymentRequest", () => {
       prefix: true,
       uppercase: false,
     })
-    expect(uri).toBe("lightning:lnbc1test...")
+    expect(uri).toBe("lnbc1test...")
   })
 
   it("getFullUriFn returns raw invoice without prefix", async () => {
@@ -166,6 +166,17 @@ describe("usePaymentRequest", () => {
       uppercase: false,
     })
     expect(uri).toBe("lnbc1test...")
+  })
+
+  it("getFullUriFn returns uppercased invoice when requested", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    const uri = result.current?.pr.info?.data?.getFullUriFn({ uppercase: true })
+    expect(uri).toBe("LNBC1TEST...")
   })
 
   it("getCopyableInvoiceFn returns payment request", async () => {

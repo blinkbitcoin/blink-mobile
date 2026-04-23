@@ -927,11 +927,6 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
 
   it("polls refreshWallets every 10s while mounted", async () => {
     jest.useFakeTimers()
-    const { AppState } = jest.requireActual("react-native")
-    Object.defineProperty(AppState, "currentState", {
-      value: "active",
-      configurable: true,
-    })
     const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
     snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue({
       wallets: [],
