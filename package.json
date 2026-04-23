@@ -157,7 +157,7 @@
     "rn-qr-generator": "^1.4.5",
     "typesafe-i18n": "^5.26.2",
     "use-count-up": "^3.0.1",
-    "uuid": "^9.0.0",
+    "uuid": "^14.0.0",
     "validator": "^13.9.0",
     "victory-native": "^40.1.1",
     "webln": "^0.3.2"
