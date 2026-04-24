@@ -2164,7 +2164,10 @@
     "lightningAddress": "Lightning adresi",
     "lightningInvoice": "Lightning faturası",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT"
+    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
+    "autoConvertMinAmount": "{minSats: number} sats altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
+    "autoConvertSuccess": "{amount: number} sats alındı, Dolara çevrildi.",
+    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu."
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",

@@ -2171,7 +2171,10 @@
     "lightningAddress": "Alamat lightning",
     "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT"
+    "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
+    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
+    "autoConvertSuccess": "Menerima {amount: number} sats, ditukar kepada Dolar.",
+    "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal."
   },
   "RedeemBitcoinScreen": {
     "title": "Tebus bitcoin",

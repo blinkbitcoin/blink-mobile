@@ -2164,7 +2164,10 @@
         "lightningAddress": "Lightning-Adresse",
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT"
+        "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
+        "autoConvertMinAmount": "Beträge unter {minSats: number} Sats können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
+        "autoConvertSuccess": "{amount: number} Sats empfangen, in Dollar umgewandelt.",
+        "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen."
     },
     "RedeemBitcoinScreen": {
         "title": "Bitcoin einlösen",

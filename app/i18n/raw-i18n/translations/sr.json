@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT"
+    "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT",
+    "autoConvertMinAmount": "Износи мањи од {minSats: number} сатошија не могу се аутоматски конвертовати у Доларе. Добићете Биткоин уместо тога.",
+    "autoConvertSuccess": "Примљено {amount: number} сатошија, конвертовано у Доларе.",
+    "autoConvertFailed": "Уплата примљена, али конверзија није успела."
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",
