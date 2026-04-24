@@ -22,6 +22,10 @@ const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
+const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
+const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
+const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
+const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -56,6 +60,10 @@ type RemoteConfig = {
   [BackupNudgeModalThresholdKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
+  [AutoConvertMaxAttemptsKey]: number
+  [AutoConvertPollMaxAttemptsKey]: number
+  [AutoConvertPollIntervalMsKey]: number
+  [AutoConvertAmountMatchToleranceBpsKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -82,6 +90,10 @@ const defaultRemoteConfig: RemoteConfig = {
   backupNudgeModalThreshold: 21000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  autoConvertMaxAttempts: 3,
+  autoConvertPollMaxAttempts: 7,
+  autoConvertPollIntervalMs: 2000,
+  autoConvertAmountMatchToleranceBps: 500,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -186,6 +198,22 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(StableBalanceEnabledKey)
           .asBoolean()
 
+        const autoConvertMaxAttempts = remoteConfigInstance()
+          .getValue(AutoConvertMaxAttemptsKey)
+          .asNumber()
+
+        const autoConvertPollMaxAttempts = remoteConfigInstance()
+          .getValue(AutoConvertPollMaxAttemptsKey)
+          .asNumber()
+
+        const autoConvertPollIntervalMs = remoteConfigInstance()
+          .getValue(AutoConvertPollIntervalMsKey)
+          .asNumber()
+
+        const autoConvertAmountMatchToleranceBps = remoteConfigInstance()
+          .getValue(AutoConvertAmountMatchToleranceBpsKey)
+          .asNumber()
+
         const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
@@ -213,6 +241,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           backupNudgeModalThreshold,
           nonCustodialEnabled,
           stableBalanceEnabled,
+          autoConvertMaxAttempts,
+          autoConvertPollMaxAttempts,
+          autoConvertPollIntervalMs,
+          autoConvertAmountMatchToleranceBps,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
