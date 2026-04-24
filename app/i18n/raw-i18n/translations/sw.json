@@ -3629,10 +3629,6 @@
     "description": "Pochi yako isiyo ya ulinzi haiwezi kufikia mtandao kwa sasa. Jaribu tena utakaporudi mtandaoni.",
     "retry": "Jaribu tena"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "CHAKALA",
-    "syncFailedToast": "Kusawazisha salio kumeshindwa. Salio lako linaweza kuwa la zamani."
-  },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",
     "description": "Jumla: {sats} sats zinazopatikana kudai",

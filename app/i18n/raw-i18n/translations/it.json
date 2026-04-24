@@ -3617,10 +3617,6 @@
         "description": "Il tuo portafoglio non custodito non può raggiungere la rete in questo momento. Riprova quando sarai di nuovo online.",
         "retry": "Riprova"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "OBSOLETO",
-        "syncFailedToast": "Sincronizzazione del saldo non riuscita. Il tuo saldo potrebbe essere obsoleto."
-    },
     "UnclaimedDeposit": {
         "title": "Hai {count} deposito/i non reclamato/i",
         "description": "Totale: {sats} sats disponibili da reclamare",

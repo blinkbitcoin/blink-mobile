@@ -61,7 +61,6 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
     retry: () => {},
     sdk: null,
     isStableBalanceActive: false,
-    isBalanceStale: false,
     lastReceivedPaymentId: null,
     hasMoreTransactions: false,
     loadingMore: false,

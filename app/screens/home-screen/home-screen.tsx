@@ -17,11 +17,7 @@ import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
-import {
-  BalanceHeader,
-  useTotalBalance,
-  type StatusBadge,
-} from "@app/components/balance-header"
+import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -179,11 +175,8 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
-  const {
-    refreshWallets: refreshSelfCustodialWallets,
-    isStableBalanceActive,
-    isBalanceStale: selfCustodialIsBalanceStale,
-  } = useSelfCustodialWallet()
+  const { refreshWallets: refreshSelfCustodialWallets, isStableBalanceActive } =
+    useSelfCustodialWallet()
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
@@ -280,11 +273,6 @@ export const HomeScreen: React.FC = () => {
     showStableBalanceToggle && balanceMode === BalanceMode.Btc
       ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
       : defaultFormattedBalance
-
-  const balanceStatusBadge = useMemo<StatusBadge | undefined>(() => {
-    if (!isSelfCustodial || !selfCustodialIsBalanceStale) return undefined
-    return { label: LL.SelfCustodialBalance.staleLabel(), status: "warning" }
-  }, [isSelfCustodial, selfCustodialIsBalanceStale, LL])
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount.level
@@ -574,7 +562,6 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
-        statusBadge={balanceStatusBadge}
       />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge

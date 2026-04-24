@@ -3629,10 +3629,6 @@
     "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
     "retry": "Încearcă din nou"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ÎNVECHIT",
-    "syncFailedToast": "Sincronizarea soldului a eșuat. Soldul tău poate fi învechit."
-  },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",
     "description": "Total: {sats} sats disponibili pentru revendicare",

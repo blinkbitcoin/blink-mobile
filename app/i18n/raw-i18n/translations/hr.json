@@ -3670,10 +3670,6 @@
     "description": "Vaš ne-skrbnički novčanik trenutno ne može pristupiti mreži. Pokušajte ponovno kada se vratite na mrežu.",
     "retry": "Pokušaj ponovno"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ZASTARJELO",
-    "syncFailedToast": "Sinkronizacija stanja nije uspjela. Vaše stanje možda nije ažurno."
-  },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",
     "description": "Ukupno: {sats} satova dostupno za potraživanje",
