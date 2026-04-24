@@ -54,4 +54,7 @@ export type SelfCustodialPaymentRequestState = {
     state: string
     info?: { data?: InvoiceData }
   }
+  isAssetToggleDisabled: boolean
+  shouldShowAutoConvertMinWarning: boolean
+  autoConvertMinSats: number | undefined
 }

@@ -9,8 +9,6 @@ import {
   InvoiceType,
   PaymentRequestState,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
-import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import {
   MoneyAmount,
   WalletOrDisplayCurrency,
@@ -19,12 +17,26 @@ import {
 import { toSatsAmount } from "@app/utils/amounts"
 import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
+import {
+  addPendingAutoConvert,
+  fetchAutoConvertMinSats,
+  ReceiveAssetMode,
+} from "../auto-convert"
+import { createReceiveLightning, createReceiveOnchain } from "../bridge"
+import { useSelfCustodialWallet } from "../providers/wallet-provider"
+
+import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
 export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
   const { sdk, lastReceivedPaymentId } = useSelfCustodialWallet()
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
+  const {
+    assetMode,
+    setAssetMode,
+    isToggleDisabled: isAssetToggleDisabled,
+  } = useReceiveAssetMode()
 
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
   const usdWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
@@ -33,15 +45,18 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const [memo, setMemoState] = useState("")
   const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
   const [amount, setAmountState] = useState<MoneyAmount<WalletOrDisplayCurrency>>()
-  const [receivingCurrency, setReceivingCurrency] = useState<WalletCurrency>(
-    WalletCurrency.Btc,
-  )
   const [paymentRequest, setPaymentRequest] = useState<string>()
   const [onchainAddress, setOnchainAddress] = useState<string>()
   const [requestState, setRequestState] = useState<string>(PaymentRequestState.Idle)
+  const [autoConvertMinSats, setAutoConvertMinSats] = useState<number | undefined>(
+    undefined,
+  )
   const baselinePaymentIdRef = useRef<string | null>(lastReceivedPaymentId)
   const lastPaymentIdRef = useRef(lastReceivedPaymentId)
   lastPaymentIdRef.current = lastReceivedPaymentId
+
+  const receivingCurrency =
+    assetMode === ReceiveAssetMode.Dollar ? WalletCurrency.Usd : WalletCurrency.Btc
 
   const receivingWalletDescriptor = useMemo(
     () => ({
@@ -63,18 +78,29 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     setRequestState(PaymentRequestState.Loading)
 
     try {
-      const sats =
+      const invoiceSats =
         amount && convertMoneyAmount
           ? toSatsAmount(amount, convertMoneyAmount)
           : undefined
+
       const adapter = createReceiveLightning(sdk)
       const result = await adapter({
-        amount: sats ? toBtcMoneyAmount(sats) : undefined,
+        amount: invoiceSats ? toBtcMoneyAmount(invoiceSats) : undefined,
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
         setRequestState(PaymentRequestState.Error)
         return
+      }
+
+      if (assetMode === ReceiveAssetMode.Dollar) {
+        await addPendingAutoConvert({
+          paymentRequest: result.invoice,
+          amountSats: invoiceSats,
+          createdAtMs: Date.now(),
+          attempts: 0,
+          lastAttemptAtMs: undefined,
+        })
       }
 
       baselinePaymentIdRef.current = lastPaymentIdRef.current
@@ -83,7 +109,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     } catch {
       setRequestState(PaymentRequestState.Error)
     }
-  }, [sdk, isReady, type, memo, amount, convertMoneyAmount])
+  }, [sdk, isReady, type, memo, amount, convertMoneyAmount, assetMode])
 
   const setMemo = useCallback(() => {
     setMemoState(memoChangeText || "")
@@ -96,9 +122,13 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const switchReceivingWallet = useCallback(
     (newType: InvoiceType, currency: WalletCurrency) => {
       setType(newType)
-      setReceivingCurrency(currency)
+      setAssetMode(
+        currency === WalletCurrency.Usd
+          ? ReceiveAssetMode.Dollar
+          : ReceiveAssetMode.Bitcoin,
+      )
     },
-    [],
+    [setAssetMode],
   )
 
   useEffect(() => {
@@ -112,6 +142,26 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       if (result.address) setOnchainAddress(result.address)
     })
   }, [sdk, onchainAddress])
+
+  useEffect(() => {
+    if (!sdk) return
+    let cancelled = false
+    fetchAutoConvertMinSats(sdk).then((minSats) => {
+      if (!cancelled) setAutoConvertMinSats(minSats)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [sdk])
+
+  // Page-agnostic flags; the screen composes them with the carousel state.
+  const shouldShowAutoConvertMinWarning = useMemo(() => {
+    if (assetMode !== ReceiveAssetMode.Dollar) return false
+    if (autoConvertMinSats === undefined) return false
+    const pendingSats = amountInSats
+    if (pendingSats === undefined) return true
+    return pendingSats < autoConvertMinSats
+  }, [assetMode, autoConvertMinSats, amountInSats])
 
   useEffect(() => {
     if (requestState !== PaymentRequestState.Created) return
@@ -197,5 +247,8 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       state: requestState,
       info: { data: invoiceData },
     },
+    isAssetToggleDisabled,
+    shouldShowAutoConvertMinWarning,
+    autoConvertMinSats,
   }
 }

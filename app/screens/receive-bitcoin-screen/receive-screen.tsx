@@ -21,6 +21,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 
@@ -60,6 +61,7 @@ const ReceiveScreen = () => {
     <ReceiveScreenContent
       requestState={requestState as ReceiveScreenContentProps["requestState"]}
       isSelfCustodial={isSelfCustodial}
+      scRequest={isSelfCustodial ? scRequest : undefined}
     />
   )
 }
@@ -70,11 +72,13 @@ type ReceiveScreenContentProps = {
     getOnchainFullUriFn?: (params: { uppercase?: boolean; prefix?: boolean }) => string
   }
   isSelfCustodial: boolean
+  scRequest: SelfCustodialPaymentRequestState | null | undefined
 }
 
 const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   requestState,
   isSelfCustodial,
+  scRequest,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -169,6 +173,14 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     return () => clearTimeout(id)
   }, [requestState.state, navigation])
 
+  const onchainAmountRowCurrency = isSelfCustodial
+    ? WalletCurrency.Btc
+    : carousel.onchainWalletCurrency
+
+  const amountRowCurrency = carousel.isOnChainPage
+    ? onchainAmountRowCurrency
+    : requestState.receivingWalletDescriptor.currency
+
   return (
     <Screen
       preset="scroll"
@@ -248,17 +260,18 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
       <View style={styles.inputsContainer}>
         <ReceiveAmountRow
           unitOfAccountAmount={requestState.unitOfAccountAmount}
-          walletCurrency={
-            carousel.isOnChainPage
-              ? carousel.onchainWalletCurrency
-              : requestState.receivingWalletDescriptor.currency
-          }
+          walletCurrency={amountRowCurrency}
           convertMoneyAmount={requestState.convertMoneyAmount}
           setAmount={handleSetAmount}
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
-          canToggleWallet={!isSelfCustodial}
+          canToggleWallet={
+            isSelfCustodial
+              ? !carousel.isOnChainPage && !scRequest?.isAssetToggleDisabled
+              : true
+          }
           disabled={
+            !isSelfCustodial &&
             carousel.isOnChainPage &&
             carousel.onchainWalletCurrency === WalletCurrency.Usd
           }
@@ -306,6 +319,10 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           walletCurrency={requestState.receivingWalletDescriptor.currency}
           canSetExpirationTime={requestState.canSetExpirationTime}
           feesInformation={requestState.feesInformation}
+          shouldShowAutoConvertMinWarning={
+            !carousel.isOnChainPage && scRequest?.shouldShowAutoConvertMinWarning
+          }
+          autoConvertMinSats={scRequest?.autoConvertMinSats}
         />
       </View>
 
