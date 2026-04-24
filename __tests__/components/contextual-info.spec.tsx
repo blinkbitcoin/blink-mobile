@@ -67,6 +67,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
           overFee: string
         }) =>
           `Deposit fee: ${fee} SAT for amounts under ${threshold} SAT or ${overFee} SAT for deposits over ${threshold} SAT`,
+        autoConvertMinAmount: ({ minSats }: { minSats: number }) =>
+          `Amounts below ${minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.`,
       },
     },
   }),
@@ -218,6 +220,63 @@ describe("ContextualInfo", () => {
       )
 
       expect(toJSON()).toBeNull()
+    })
+  })
+
+  describe("auto-convert minimum warning", () => {
+    it("renders the warning when shouldShowAutoConvertMinWarning is true and autoConvertMinSats is defined", () => {
+      const { getByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          canSetExpirationTime={false}
+          shouldShowAutoConvertMinWarning
+          autoConvertMinSats={800}
+        />,
+      )
+
+      expect(
+        getByText(
+          "Amounts below 800 sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+        ),
+      ).toBeTruthy()
+    })
+
+    it("renders the warning icon for the auto-convert minimum warning", () => {
+      const { getByTestId } = render(
+        <ContextualInfo
+          {...defaultProps}
+          canSetExpirationTime={false}
+          shouldShowAutoConvertMinWarning
+          autoConvertMinSats={800}
+        />,
+      )
+
+      expect(getByTestId("galoy-icon-warning")).toBeTruthy()
+    })
+
+    it("does NOT render the warning when the flag is false", () => {
+      const { queryByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          canSetExpirationTime={false}
+          shouldShowAutoConvertMinWarning={false}
+          autoConvertMinSats={800}
+        />,
+      )
+
+      expect(queryByText(/Amounts below/)).toBeNull()
+    })
+
+    it("does NOT render the warning when autoConvertMinSats is undefined", () => {
+      const { queryByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          canSetExpirationTime={false}
+          shouldShowAutoConvertMinWarning
+        />,
+      )
+
+      expect(queryByText(/Amounts below/)).toBeNull()
     })
   })
 })
