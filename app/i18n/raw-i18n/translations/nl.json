@@ -3668,10 +3668,6 @@
     "description": "Je niet-bewaarde wallet kan het netwerk momenteel niet bereiken. Probeer het opnieuw wanneer je weer online bent.",
     "retry": "Opnieuw proberen"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "VEROUDERD",
-    "syncFailedToast": "Synchroniseren van saldo mislukt. Je saldo is mogelijk verouderd."
-  },
   "UnclaimedDeposit": {
     "title": "Je hebt {count} niet-opgeëiste storting(en)",
     "description": "Totaal: {sats} sats beschikbaar om op te eisen",

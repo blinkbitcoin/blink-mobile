@@ -3656,10 +3656,6 @@
         "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",
         "retry": "再試行"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "古い",
-        "syncFailedToast": "残高の同期に失敗しました。残高が最新でない可能性があります。"
-    },
     "UnclaimedDeposit": {
         "title": "{count}件の未請求デポジットがあります",
         "description": "合計: {sats} sats請求可能",

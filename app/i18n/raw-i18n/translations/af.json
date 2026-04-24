@@ -3668,10 +3668,6 @@
     "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
     "retry": "Probeer weer"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "VEROUDERD",
-    "syncFailedToast": "Balans sinkronisasie het misluk. Jou balans is dalk verouderd."
-  },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",
     "description": "Totaal: {sats} sats beskikbaar om te eis",

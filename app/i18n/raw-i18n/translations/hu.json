@@ -3627,10 +3627,6 @@
     "description": "A nem letétbe helyezett pénztárcája jelenleg nem tudja elérni a hálózatot. Próbálja újra, amikor ismét online lesz.",
     "retry": "Próbáld újra"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ELAVULT",
-    "syncFailedToast": "Az egyenleg szinkronizálása sikertelen. Az egyenleged elavult lehet."
-  },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",
     "description": "Összesen: {sats} sat elérhető igénylésre",

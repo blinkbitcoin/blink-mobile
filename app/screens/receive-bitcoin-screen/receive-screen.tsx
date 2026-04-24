@@ -61,7 +61,7 @@ const ReceiveScreen = () => {
     <ReceiveScreenContent
       requestState={requestState as ReceiveScreenContentProps["requestState"]}
       isSelfCustodial={isSelfCustodial}
-      scRequest={isSelfCustodial ? scRequest : undefined}
+      selfCustodialRequest={isSelfCustodial ? selfCustodialRequest : undefined}
     />
   )
 }
@@ -72,13 +72,13 @@ type ReceiveScreenContentProps = {
     getOnchainFullUriFn?: (params: { uppercase?: boolean; prefix?: boolean }) => string
   }
   isSelfCustodial: boolean
-  scRequest: SelfCustodialPaymentRequestState | null | undefined
+  selfCustodialRequest: SelfCustodialPaymentRequestState | null | undefined
 }
 
 const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   requestState,
   isSelfCustodial,
-  scRequest,
+  selfCustodialRequest,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -267,7 +267,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           onToggleWallet={handleToggleWallet}
           canToggleWallet={
             isSelfCustodial
-              ? !carousel.isOnChainPage && !scRequest?.isAssetToggleDisabled
+              ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
               : true
           }
           disabled={
@@ -320,9 +320,10 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           canSetExpirationTime={requestState.canSetExpirationTime}
           feesInformation={requestState.feesInformation}
           shouldShowAutoConvertMinWarning={
-            !carousel.isOnChainPage && scRequest?.shouldShowAutoConvertMinWarning
+            !carousel.isOnChainPage &&
+            selfCustodialRequest?.shouldShowAutoConvertMinWarning
           }
-          autoConvertMinSats={scRequest?.autoConvertMinSats}
+          autoConvertMinSats={selfCustodialRequest?.autoConvertMinSats}
         />
       </View>
 

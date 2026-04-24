@@ -3668,10 +3668,6 @@
     "description": "Dompet bukan kustodian anda tidak dapat mencapai rangkaian sekarang. Cuba lagi apabila anda dalam talian semula.",
     "retry": "Cuba lagi"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "LAPUK",
-    "syncFailedToast": "Penyegerakan baki gagal. Baki anda mungkin sudah lapuk."
-  },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",
     "description": "Jumlah: {sats} sats tersedia untuk dituntut",

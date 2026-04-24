@@ -3627,10 +3627,6 @@
     "description": "Gözetimsiz cüzdanınız şu anda ağa ulaşamıyor. Tekrar çevrimiçi olduğunuzda tekrar deneyin.",
     "retry": "Tekrar dene"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ESKİMİŞ",
-    "syncFailedToast": "Bakiye senkronizasyonu başarısız. Bakiyeniz güncel olmayabilir."
-  },
   "UnclaimedDeposit": {
     "title": "{count} talep edilmemiş yatırmanız var",
     "description": "Toplam: {sats} sats talep edilebilir",

@@ -3656,10 +3656,6 @@
         "description": "Votre portefeuille non-custodial ne peut pas atteindre le réseau pour le moment. Réessayez lorsque vous serez de nouveau en ligne.",
         "retry": "Réessayer"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "OBSOLÈTE",
-        "syncFailedToast": "Échec de la synchronisation du solde. Votre solde peut être obsolète."
-    },
     "UnclaimedDeposit": {
         "title": "Vous avez {count} dépôt(s) non réclamé(s)",
         "description": "Total : {sats} sats disponibles à réclamer",

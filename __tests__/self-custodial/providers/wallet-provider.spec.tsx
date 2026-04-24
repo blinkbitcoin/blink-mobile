@@ -38,7 +38,6 @@ const mockGetMnemonicNetwork = jest.fn()
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
-const mockToastShow = jest.fn()
 const mockGetUserSettings = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -54,10 +53,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
-}))
-
-jest.mock("@app/utils/toast", () => ({
-  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -506,174 +501,6 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(snapshot.loadMoreTransactions).toHaveBeenCalled()
     expect(snapshot.appendTransactions).toHaveBeenCalled()
     expect(result.current.hasMoreTransactions).toBe(false)
-  })
-
-  const buildStaleSnapshot = () => ({
-    wallets: [
-      {
-        id: "btc",
-        walletCurrency: "BTC",
-        balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
-        transactions: [
-          {
-            id: "tx1",
-            amount: { amount: 100, currency: "BTC", currencyCode: "BTC" },
-            direction: "receive",
-            status: "completed",
-            timestamp: 0,
-            paymentType: "lightning",
-          },
-        ],
-      },
-    ],
-    hasMore: false,
-  })
-
-  const buildFreshSnapshot = () => ({
-    wallets: [
-      {
-        id: "btc",
-        walletCurrency: "BTC",
-        balance: { amount: 100, currency: "BTC", currencyCode: "BTC" },
-        transactions: [],
-      },
-    ],
-    hasMore: false,
-  })
-
-  it("exposes isBalanceStale=true when balance=0 but history has completed incoming txs", async () => {
-    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
-    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildStaleSnapshot())
-
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockInitSdk.mockResolvedValue({})
-
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    await waitFor(() => {
-      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
-    })
-    await waitFor(() => {
-      expect(result.current.isBalanceStale).toBe(true)
-    })
-  })
-
-  it("exposes isBalanceStale=false when balance is non-zero", async () => {
-    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
-    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildFreshSnapshot())
-
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockInitSdk.mockResolvedValue({})
-
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    await waitFor(() => {
-      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
-    })
-
-    expect(result.current.isBalanceStale).toBe(false)
-  })
-
-  it("shows the balance-stale toast only on the false→true transition (not on every poll)", async () => {
-    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
-    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue(buildStaleSnapshot())
-
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockInitSdk.mockResolvedValue({})
-
-    let capturedListener: (event: { tag: string }) => Promise<void>
-    mockAddSdkEventListener.mockImplementation(
-      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
-        capturedListener = onEvent
-        return Promise.resolve("id")
-      },
-    )
-
-    renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    await waitFor(() => {
-      expect(mockToastShow).toHaveBeenCalledTimes(1)
-    })
-
-    await act(async () => {
-      await capturedListener!({ tag: "Synced" })
-    })
-
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 0)
-    })
-    expect(mockToastShow).toHaveBeenCalledTimes(1)
-  })
-
-  it("keeps isBalanceStale=true when status transitions to Offline (sticky, only a fresh snapshot clears it)", async () => {
-    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
-    snapshot.getSelfCustodialWalletSnapshot.mockReset()
-    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValueOnce(buildStaleSnapshot())
-    snapshot.getSelfCustodialWalletSnapshot.mockRejectedValue(new Error("offline"))
-
-    const { ServiceStatus } = jest.requireMock("@breeztech/breez-sdk-spark-react-native")
-    const getServiceStatusMock = jest.requireMock(
-      "@app/self-custodial/providers/is-online",
-    ).getServiceStatus
-    getServiceStatusMock.mockResolvedValue(ServiceStatus.Major)
-
-    let capturedListener: (event: { tag: string }) => Promise<void>
-    mockAddSdkEventListener.mockImplementation(
-      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
-        capturedListener = onEvent
-        return Promise.resolve("id")
-      },
-    )
-
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockInitSdk.mockResolvedValue({})
-
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    await waitFor(() => {
-      expect(result.current.isBalanceStale).toBe(true)
-    })
-
-    await act(async () => {
-      await capturedListener!({ tag: "Synced" })
-    })
-
-    await waitFor(() => {
-      expect(result.current.status).toBe(ActiveWalletStatus.Offline)
-    })
-    expect(result.current.isBalanceStale).toBe(true)
-  })
-
-  it("clears isBalanceStale when a subsequent snapshot reports a non-zero balance", async () => {
-    const snapshot = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
-    snapshot.getSelfCustodialWalletSnapshot
-      .mockResolvedValueOnce(buildStaleSnapshot())
-      .mockResolvedValue(buildFreshSnapshot())
-
-    let capturedListener: (event: { tag: string }) => Promise<void>
-    mockAddSdkEventListener.mockImplementation(
-      (_sdk: unknown, onEvent: (event: { tag: string }) => Promise<void>) => {
-        capturedListener = onEvent
-        return Promise.resolve("id")
-      },
-    )
-
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
-    mockInitSdk.mockResolvedValue({})
-
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
-
-    await waitFor(() => {
-      expect(result.current.isBalanceStale).toBe(true)
-    })
-
-    await act(async () => {
-      await capturedListener!({ tag: "Synced" })
-    })
-
-    await waitFor(() => {
-      expect(result.current.isBalanceStale).toBe(false)
-    })
   })
 
   it("preserves Error status when isOnline=false (does not downgrade to Offline)", async () => {

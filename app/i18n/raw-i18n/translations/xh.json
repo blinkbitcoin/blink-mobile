@@ -3674,10 +3674,6 @@
     "description": "Ingxowa-mali yakho engekho kugcino ayinakufikelela kwinethiwekhi ngoku. Zama kwakhona xa ubuyela kwi-intanethi.",
     "retry": "Zama kwakhona"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ENDALA",
-    "syncFailedToast": "Ukuhambelanisa ibhalansi kuhlulekile. Ibhalansi yakho inokuba ayihambi nexesha."
-  },
   "UnclaimedDeposit": {
     "title": "Unama-{count} edipozithi engabangwayo",
     "description": "Iyonke: {sats} sats ezifumanekayo ukufuna",
