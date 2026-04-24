@@ -9,12 +9,17 @@ import {
   type ConvertParams,
   type ConvertQuote,
 } from "@app/types/payment.types"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toDisplayAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
 const mockGetQuote = jest.fn()
+const mockFormatMoneyAmount = jest.fn(() => "$0.05")
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => {
@@ -37,7 +42,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
-  formattedFee: "$0.05",
+  feeAmount: toDisplayAmount({ amount: 5, currencyCode: "USD" }),
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })

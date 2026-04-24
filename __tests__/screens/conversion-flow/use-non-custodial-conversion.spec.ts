@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNonCustodialConversion } from "@app/screens/conversion-flow/hooks/use-non-custodial-conversion"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toDisplayAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -11,9 +11,14 @@ import {
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
+const mockFormatMoneyAmount = jest.fn(() => "$0.05")
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
@@ -55,11 +60,10 @@ const defaultParams = {
 const makeQuote = (
   overrides: Partial<{
     amountAdjustment?: ConvertAmountAdjustment
-    formattedFee: string
     execute: jest.Mock
   }> = {},
 ) => ({
-  formattedFee: overrides.formattedFee ?? "$0.05",
+  feeAmount: toDisplayAmount({ amount: 5, currencyCode: "USD" }),
   amountAdjustment: overrides.amountAdjustment,
   execute:
     overrides.execute ??

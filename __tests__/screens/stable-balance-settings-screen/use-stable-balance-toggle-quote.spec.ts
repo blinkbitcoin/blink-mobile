@@ -2,7 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useStableBalanceToggleQuote } from "@app/screens/stable-balance-settings-screen/hooks/use-stable-balance-toggle-quote"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toDisplayAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -11,9 +11,14 @@ import {
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
+const mockFormatMoneyAmount = jest.fn(() => "$0.05")
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
@@ -40,7 +45,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const makeQuote = (amountAdjustment?: ConvertAmountAdjustment) => ({
-  formattedFee: "$0.05",
+  feeAmount: toDisplayAmount({ amount: 5, currencyCode: "USD" }),
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })

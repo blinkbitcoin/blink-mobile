@@ -8,6 +8,8 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
+import { toDisplayAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -19,28 +21,13 @@ import {
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
 } from "@app/types/payment.types"
-import { centsToTokenBaseUnits } from "@app/utils/amounts"
+import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
 import { SparkConfig } from "../config"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
-import { fetchUsdbDecimals } from "./token-balance"
-
-const MIN_USD_FRACTION_DIGITS = 2
-
-const formatUsdFromBaseUnits = (rawAmount: number, decimals: number): string => {
-  const divisor = 10 ** decimals
-  const whole = Math.floor(rawAmount / divisor)
-  const fractional = rawAmount % divisor
-  const padded = String(fractional).padStart(decimals, "0")
-  const trimmed = padded.replace(/0+$/, "")
-  const fractionalStr =
-    trimmed.length < MIN_USD_FRACTION_DIGITS
-      ? trimmed.padEnd(MIN_USD_FRACTION_DIGITS, "0")
-      : trimmed
-  return `$${whole}.${fractionalStr}`
-}
+import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
 
 const failed = (message: string, code?: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
@@ -98,11 +85,34 @@ type PreparedConversion = {
   tokenDecimals: number
 }
 
-const prepareConversion = async (
+const prepareConversionWithDestination = async (
   sdk: BreezSdkInterface,
-  { fromAmount, toAmount, direction }: ConvertParams,
-): Promise<PreparedConversion> => {
-  const tokenDecimals = await fetchUsdbDecimals(sdk)
+  {
+    direction,
+    destinationAmount,
+  }: { direction: ConvertDirection; destinationAmount: bigint },
+): Promise<PrepareSendPaymentResponse> => {
+  const isBtcToUsd = direction === ConvertDirection.BtcToUsd
+  const paymentRequest = await createOwnSparkInvoice(
+    sdk,
+    destinationAmount,
+    isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+  )
+  return sdk.prepareSendPayment(
+    PrepareSendPaymentRequest.create({
+      paymentRequest,
+      amount: destinationAmount,
+      tokenIdentifier: isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+      conversionOptions: buildConversionOptions(direction),
+    }),
+  )
+}
+
+const fetchLimitsOrThrow = async (
+  sdk: BreezSdkInterface,
+  direction: ConvertDirection,
+  tokenDecimals: number,
+): Promise<{ minFromAmount: number | null; minToAmount: number | null }> => {
   const limits = await fetchConversionLimits(sdk, direction, tokenDecimals).catch(
     () => null,
   )
@@ -112,6 +122,13 @@ const prepareConversion = async (
       "Conversion limits unavailable",
     )
   }
+  return limits
+}
+
+const enforceMinimums = (
+  { fromAmount, toAmount }: ConvertParams,
+  limits: { minFromAmount: number | null; minToAmount: number | null },
+): void => {
   if (limits.minFromAmount !== null && fromAmount.amount < limits.minFromAmount) {
     throw new ConvertError(
       ConvertErrorCode.BelowMinimum,
@@ -124,28 +141,122 @@ const prepareConversion = async (
       "Destination amount is below the conversion minimum",
     )
   }
+}
 
-  const isBtcToUsd = direction === ConvertDirection.BtcToUsd
-  const destinationAmount = isBtcToUsd
-    ? BigInt(centsToTokenBaseUnits(toAmount.amount, tokenDecimals))
-    : BigInt(toAmount.amount)
+const inputBaseUnits = (params: ConvertParams, tokenDecimals: number): bigint =>
+  params.direction === ConvertDirection.BtcToUsd
+    ? BigInt(params.fromAmount.amount)
+    : BigInt(centsToTokenBaseUnits(params.fromAmount.amount, tokenDecimals))
 
-  const paymentRequest = await createOwnSparkInvoice(
-    sdk,
-    destinationAmount,
-    isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+const destinationBaseUnits = (
+  params: ConvertParams,
+  destAmount: number,
+  tokenDecimals: number,
+): bigint =>
+  params.direction === ConvertDirection.BtcToUsd
+    ? BigInt(centsToTokenBaseUnits(destAmount, tokenDecimals))
+    : BigInt(destAmount)
+
+const fetchFromBalanceBaseUnits = async (
+  sdk: BreezSdkInterface,
+  direction: ConvertDirection,
+): Promise<bigint> => {
+  const info = await sdk.getInfo({ ensureSynced: false })
+  if (direction === ConvertDirection.BtcToUsd) {
+    return info.balanceSats
+  }
+  const usdb = findUsdbToken(info)
+  return usdb ? BigInt(toNumber(usdb.balance)) : 0n
+}
+
+/** Safety margin over `minFromAmount` for the discovery quote. */
+const DISCOVERY_MIN_INPUT_MARGIN_BPS = 1000 // 10%
+
+/**
+ * Exact-input algorithm: discovery -> final -> optional correction.
+ * Breez only accepts a destination amount and rejects `FeesIncluded`
+ * on `FromBitcoin`, so we solve for the destination whose `amountIn`
+ * lands on `inputAmount`.
+ */
+const prepareConversion = async (
+  sdk: BreezSdkInterface,
+  params: ConvertParams,
+): Promise<PreparedConversion> => {
+  const tokenDecimals = await fetchUsdbDecimals(sdk)
+  const limits = await fetchLimitsOrThrow(sdk, params.direction, tokenDecimals)
+  enforceMinimums(params, limits)
+
+  // Cents round down to base units inflated above the real balance, so
+  // cap against the SDK's authoritative value.
+  const requestedInput = inputBaseUnits(params, tokenDecimals)
+  const actualBalance = await fetchFromBalanceBaseUnits(sdk, params.direction)
+  const inputAmount =
+    actualBalance > 0n && actualBalance < requestedInput ? actualBalance : requestedInput
+
+  const halfDestination = Math.max(1, Math.floor(params.toAmount.amount / 2))
+  // `minFromAmount` (input side) translated into destination units via
+  // the UI rate, with a margin so the discovery stays above the pool's
+  // input floor.
+  const fromMinInDestUnits =
+    limits.minFromAmount !== null && params.fromAmount.amount > 0
+      ? Math.ceil(
+          (limits.minFromAmount *
+            params.toAmount.amount *
+            (10_000 + DISCOVERY_MIN_INPUT_MARGIN_BPS)) /
+            (params.fromAmount.amount * 10_000),
+        )
+      : 0
+  const toMinInDestUnits = limits.minToAmount ?? 0
+  const safeDiscoveryDestination = Math.max(
+    halfDestination,
+    fromMinInDestUnits,
+    toMinInDestUnits,
+  )
+  const discoveryDestination = destinationBaseUnits(
+    params,
+    safeDiscoveryDestination,
+    tokenDecimals,
   )
 
-  const prepared = await sdk.prepareSendPayment(
-    PrepareSendPaymentRequest.create({
-      paymentRequest,
-      amount: destinationAmount,
-      tokenIdentifier: isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
-      conversionOptions: buildConversionOptions(direction),
-    }),
-  )
+  const discovery = await prepareConversionWithDestination(sdk, {
+    direction: params.direction,
+    destinationAmount: discoveryDestination,
+  })
+  const discoveryEstimate = discovery.conversionEstimate
+  if (!discoveryEstimate) return { prepared: discovery, tokenDecimals }
 
-  return { prepared, tokenDecimals }
+  const discoveryAmountIn = BigInt(toNumber(discoveryEstimate.amountIn))
+  const discoveryAmountOut = BigInt(toNumber(discoveryEstimate.amountOut))
+  if (discoveryAmountIn === 0n) return { prepared: discovery, tokenDecimals }
+
+  const initialTarget = (discoveryAmountOut * inputAmount) / discoveryAmountIn
+  if (initialTarget <= 0n) return { prepared: discovery, tokenDecimals }
+
+  let prepared: PrepareSendPaymentResponse
+  try {
+    prepared = await prepareConversionWithDestination(sdk, {
+      direction: params.direction,
+      destinationAmount: initialTarget,
+    })
+  } catch {
+    return { prepared: discovery, tokenDecimals }
+  }
+
+  const finalAmountIn = BigInt(toNumber(prepared.conversionEstimate?.amountIn ?? 0n))
+  if (finalAmountIn <= inputAmount) return { prepared, tokenDecimals }
+
+  // Final overshoots: shrink by the observed ratio and re-quote once.
+  const correctedTarget = (initialTarget * inputAmount) / finalAmountIn
+  if (correctedTarget <= 0n) return { prepared: discovery, tokenDecimals }
+  try {
+    const corrected = await prepareConversionWithDestination(sdk, {
+      direction: params.direction,
+      destinationAmount: correctedTarget,
+    })
+    return { prepared: corrected, tokenDecimals }
+  } catch {
+    return { prepared: discovery, tokenDecimals }
+  }
 }
 
 const executePrepared = async (
@@ -166,8 +277,12 @@ const toConvertQuote = (
 ): ConvertQuote | null => {
   const estimate = prepared.conversionEstimate
   if (!estimate) return null
+  const feeCents = tokenBaseUnitsToCents(toNumber(estimate.fee), tokenDecimals)
   return {
-    formattedFee: formatUsdFromBaseUnits(toNumber(estimate.fee), tokenDecimals),
+    feeAmount: toDisplayAmount({
+      amount: feeCents,
+      currencyCode: WalletCurrency.Usd,
+    }),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
     execute: () => executePrepared(sdk, prepared),
   }
