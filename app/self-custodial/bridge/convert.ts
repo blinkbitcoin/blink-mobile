@@ -5,8 +5,10 @@ import {
   ReceivePaymentMethod,
   ReceivePaymentRequest,
   SendPaymentRequest,
+  SyncWalletRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { toDisplayAmount } from "@app/types/amounts"
@@ -265,6 +267,16 @@ const executePrepared = async (
 ): Promise<PaymentAdapterResult> => {
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
+    // TODO: remove once @breeztech/breez-sdk-spark-react-native materializes
+    // token balances on payment insert. Today it only happens on sync, so we
+    // force one here to keep getInfo aligned with the convert result.
+    try {
+      await sdk.syncWallet(SyncWalletRequest.create({}))
+    } catch (err) {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`convert: post-send syncWallet: ${err}`),
+      )
+    }
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
