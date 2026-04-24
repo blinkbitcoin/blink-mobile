@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning-adres",
     "lightningInvoice": "Lightning-factuur",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT"
+    "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT",
+    "autoConvertMinAmount": "Bedragen onder {minSats: number} sats kunnen niet automatisch worden omgezet naar Dollar. Je ontvangt Bitcoin in plaats daarvan.",
+    "autoConvertSuccess": "{amount: number} sats ontvangen, omgezet naar Dollar.",
+    "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt."
   },
   "RedeemBitcoinScreen": {
     "title": "Wissel Bitcoin",

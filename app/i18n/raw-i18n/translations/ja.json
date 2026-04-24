@@ -2171,7 +2171,10 @@
         "lightningAddress": "Lightningアドレス",
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT"
+        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "autoConvertMinAmount": "{minSats: number} sats未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
+        "autoConvertSuccess": "{amount: number} satsを受け取り、ドルに変換しました。",
+        "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。"
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",

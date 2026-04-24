@@ -6869,6 +6869,20 @@ type RootTranslation = {
 		 * @param {string} threshold
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
+		/**
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​s​a​t​s​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {number} minSats
+		 */
+		autoConvertMinAmount: RequiredParams<'minSats'>
+		/**
+		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}​ ​s​a​t​s​,​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​.
+		 * @param {number} amount
+		 */
+		autoConvertSuccess: RequiredParams<'amount'>
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
+		 */
+		autoConvertFailed: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -18900,6 +18914,18 @@ export type TranslationFunctions = {
 		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
+		/**
+		 * Amounts below {minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 */
+		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
+		/**
+		 * Received {amount} sats, converted to Dollar.
+		 */
+		autoConvertSuccess: (arg: { amount: number }) => LocalizedString
+		/**
+		 * Payment received but the conversion failed.
+		 */
+		autoConvertFailed: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**
