@@ -3629,10 +3629,6 @@
     "description": "La teva cartera no custodial no pot arribar a la xarxa ara mateix. Torna-ho a provar quan estiguis connectat.",
     "retry": "Torna-ho a provar"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "OBSOLET",
-    "syncFailedToast": "No s'ha pogut sincronitzar el saldo. El teu saldo pot estar desactualitzat."
-  },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",
     "description": "Total: {sats} sats disponibles per reclamar",

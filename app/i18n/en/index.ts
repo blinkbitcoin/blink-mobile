@@ -3737,10 +3737,6 @@ const en: BaseTranslation = {
       "Your non-custodial wallet can't reach the network right now. Try again when you're back online.",
     retry: "Try again",
   },
-  SelfCustodialBalance: {
-    staleLabel: "STALE",
-    syncFailedToast: "Balance sync failed. Your balance may be out of date.",
-  },
   UnclaimedDeposit: {
     screenTitle: "Unclaimed Deposits",
     cardTitle: "Claim {sats} sats",

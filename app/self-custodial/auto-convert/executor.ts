@@ -141,8 +141,10 @@ const hasAlreadyConverted = async (
   }
 }
 
-const isBelowMinimumError = (errors: { code?: string }[] | undefined): boolean =>
-  Boolean(errors?.some((err) => err.code === ConvertErrorCode.BelowMinimum))
+const isBelowMinimumError = (err: unknown): boolean =>
+  typeof err === "object" &&
+  err !== null &&
+  (err as { code?: string }).code === ConvertErrorCode.BelowMinimum
 
 export const executeAutoConvert = async (
   sdk: BreezSdkInterface,
@@ -177,23 +179,20 @@ export const executeAutoConvert = async (
     direction: ConvertDirection.BtcToUsd,
   }
 
-  const getQuote = createGetConversionQuote(sdk)
   let quote
   try {
-    quote = await getQuote(convertParams)
+    quote = await createGetConversionQuote(sdk)(convertParams)
   } catch (err) {
-    if ((err as { code?: string }).code === ConvertErrorCode.BelowMinimum) {
+    if (isBelowMinimumError(err)) {
       return { status: AutoConvertStatus.SkippedBelowMin }
     }
     return { status: AutoConvertStatus.Failed }
   }
   if (!quote) return { status: AutoConvertStatus.Failed }
+
   const result = await quote.execute()
   if (result.status === PaymentResultStatus.Success) {
     return { status: AutoConvertStatus.Converted }
-  }
-  if (isBelowMinimumError(result.errors)) {
-    return { status: AutoConvertStatus.SkippedBelowMin }
   }
   return { status: AutoConvertStatus.Failed }
 }

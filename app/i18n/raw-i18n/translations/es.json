@@ -3617,10 +3617,6 @@
         "description": "Tu billetera no custodial no puede alcanzar la red en este momento. Inténtalo de nuevo cuando vuelvas a estar en línea.",
         "retry": "Intentar de nuevo"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "DESACTUALIZADO",
-        "syncFailedToast": "Error al sincronizar el balance. Tu balance puede estar desactualizado."
-    },
     "UnclaimedDeposit": {
         "title": "Tienes {count} depósito(s) sin reclamar",
         "description": "Total: {sats} sats disponibles para reclamar",

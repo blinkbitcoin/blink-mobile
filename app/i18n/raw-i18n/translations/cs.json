@@ -3670,10 +3670,6 @@
     "description": "Vaše nesvěřenská peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
     "retry": "Zkusit znovu"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ZASTARALÝ",
-    "syncFailedToast": "Synchronizace zůstatku se nezdařila. Váš zůstatek může být neaktuální."
-  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
     "description": "Celkem: {sats} satů k vyzvednutí",

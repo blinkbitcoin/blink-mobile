@@ -6,8 +6,7 @@ import {
   waitForPaymentCompleted,
 } from "@app/self-custodial/auto-convert/executor"
 
-const mockGetQuote = jest.fn()
-const mockExecuteQuote = jest.fn()
+const mockGetConversionQuote = jest.fn()
 const mockFetchLimits = jest.fn()
 const mockFetchDecimals = jest.fn()
 
@@ -15,7 +14,7 @@ jest.mock("@app/self-custodial/bridge/convert", () => ({
   createGetConversionQuote:
     () =>
     (...args: unknown[]) =>
-      mockGetQuote(...args),
+      mockGetConversionQuote(...args),
 }))
 
 jest.mock("@app/self-custodial/bridge/limits", () => ({
@@ -139,21 +138,12 @@ describe("executeAutoConvert", () => {
       listPayments: jest.fn().mockResolvedValue({ payments }),
     }) as never
 
-  const stubQuoteSuccess = () => {
-    mockGetQuote.mockResolvedValue({ execute: mockExecuteQuote })
-    mockExecuteQuote.mockResolvedValue({ status: PaymentResultStatus.Success })
-  }
-
-  const stubQuoteFailed = (errors: { message: string; code?: string }[]) => {
-    mockGetQuote.mockResolvedValue({ execute: mockExecuteQuote })
-    mockExecuteQuote.mockResolvedValue({
-      status: PaymentResultStatus.Failed,
-      errors,
-    })
-  }
-
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  const successQuote = () => ({
+    execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
   })
 
   it("short-circuits with SkippedStableBalanceActive when the sweep owns the conversion", async () => {
@@ -163,7 +153,7 @@ describe("executeAutoConvert", () => {
     })
 
     expect(outcome).toEqual({ status: "skipped-stable-balance-active" })
-    expect(mockGetQuote).not.toHaveBeenCalled()
+    expect(mockGetConversionQuote).not.toHaveBeenCalled()
   })
 
   it("detects a prior matching conversion and returns AlreadyConverted", async () => {
@@ -181,11 +171,11 @@ describe("executeAutoConvert", () => {
     )
 
     expect(outcome).toEqual({ status: "already-converted" })
-    expect(mockGetQuote).not.toHaveBeenCalled()
+    expect(mockGetConversionQuote).not.toHaveBeenCalled()
   })
 
   it("ignores conversions recorded before the pending record was created", async () => {
-    stubQuoteSuccess()
+    mockGetConversionQuote.mockResolvedValue(successQuote())
 
     const outcome = await executeAutoConvert(
       sdkWith([
@@ -201,7 +191,7 @@ describe("executeAutoConvert", () => {
     )
 
     expect(outcome).toEqual({ status: "converted" })
-    expect(mockGetQuote).toHaveBeenCalled()
+    expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
   it("tolerates ±5% amount drift when matching prior conversions", async () => {
@@ -222,7 +212,7 @@ describe("executeAutoConvert", () => {
   })
 
   it("does NOT match a conversion whose amount drift exceeds the tolerance", async () => {
-    stubQuoteSuccess()
+    mockGetConversionQuote.mockResolvedValue(successQuote())
 
     await executeAutoConvert(
       sdkWith([
@@ -237,51 +227,50 @@ describe("executeAutoConvert", () => {
       baseParams,
     )
 
-    expect(mockGetQuote).toHaveBeenCalled()
+    expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
-  it("executes the conversion quote and returns Converted on success", async () => {
-    stubQuoteSuccess()
+  it("requests a quote and returns Converted on success", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
 
     const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
     expect(outcome).toEqual({ status: "converted" })
   })
 
-  it("returns SkippedBelowMin when getQuote rejects with BelowMinimum (prepare-time)", async () => {
-    mockGetQuote.mockRejectedValue({ code: ConvertErrorCode.BelowMinimum })
+  it("returns SkippedBelowMin when getConversionQuote throws BelowMinimum", async () => {
+    mockGetConversionQuote.mockRejectedValue(
+      Object.assign(new Error("below"), { code: ConvertErrorCode.BelowMinimum }),
+    )
 
     const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
     expect(outcome).toEqual({ status: "skipped-below-min" })
   })
 
-  it("returns SkippedBelowMin when quote.execute() fails with BelowMinimum (execute-time)", async () => {
-    stubQuoteFailed([{ message: "below", code: ConvertErrorCode.BelowMinimum }])
-
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
-
-    expect(outcome).toEqual({ status: "skipped-below-min" })
-  })
-
-  it("returns Failed when getQuote rejects with any other error", async () => {
-    mockGetQuote.mockRejectedValue(new Error("limits unavailable"))
+  it("returns Failed when getConversionQuote throws any other error", async () => {
+    mockGetConversionQuote.mockRejectedValue(new Error("network"))
 
     const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
     expect(outcome).toEqual({ status: "failed" })
   })
 
-  it("returns Failed when quote.execute() reports any other error", async () => {
-    stubQuoteFailed([{ message: "network" }])
+  it("returns Failed when getConversionQuote returns null (no estimate)", async () => {
+    mockGetConversionQuote.mockResolvedValue(null)
 
     const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
     expect(outcome).toEqual({ status: "failed" })
   })
 
-  it("returns Failed when getQuote returns null (no quote available)", async () => {
-    mockGetQuote.mockResolvedValue(null)
+  it("returns Failed when execute() reports failure", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "send failed" }],
+      }),
+    })
 
     const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
@@ -289,7 +278,7 @@ describe("executeAutoConvert", () => {
   })
 
   it("treats a listPayments failure as 'no prior conversion' (fail-open)", async () => {
-    stubQuoteSuccess()
+    mockGetConversionQuote.mockResolvedValue(successQuote())
     const sdk = {
       listPayments: jest.fn().mockRejectedValue(new Error("network")),
     }
