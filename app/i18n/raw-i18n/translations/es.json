@@ -2164,7 +2164,10 @@
         "lightningAddress": "Dirección lightning",
         "lightningInvoice": "Factura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT"
+        "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT",
+        "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
+        "autoConvertSuccess": "Se recibieron {amount: number} sats, convertidos a Dólar.",
+        "autoConvertFailed": "Pago recibido pero la conversión falló."
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",

@@ -2171,7 +2171,10 @@
     "lightningAddress": "عنوان lightning",
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT"
+    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
+    "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
+    "autoConvertSuccess": "تم استلام {amount: number} ساتوشي وتحويلها إلى دولار.",
+    "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل."
   },
   "RedeemBitcoinScreen": {
     "title": "حرر البيتكوين",
