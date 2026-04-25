@@ -150,6 +150,18 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   useSendBalances: () => mockUseSendBalances(),
 }))
 
+const useActiveWalletMock = jest.fn(() => ({
+  isSelfCustodial: false,
+  isReady: true,
+  needsBackendAuth: false,
+  wallets: [],
+  status: "ready",
+  accountType: "Custodial",
+}))
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => useActiveWalletMock(),
+}))
+
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
     onSwipe: () => void
@@ -177,6 +189,14 @@ describe("SendBitcoinConfirmationScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "Custodial",
+    })
     loadLocale("en")
     LL = i18nObject("en")
 
@@ -320,6 +340,43 @@ describe("SendBitcoinConfirmationScreen", () => {
       destination: defaultLightningParams.lnurl,
       isMerchant: false,
     })
+  })
+
+  it("Skips saveLnAddressContact entirely when the active wallet is self-custodial", async () => {
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "SelfCustodial",
+    })
+
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    const paymentDetailLightning = createLnurlPaymentDetails(defaultLightningParams)
+    const routeLnurl = {
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: { paymentDetail: paymentDetailLightning },
+    } as const
+
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "SUCCESS",
+      extraInfo: { preimage: "preimagetest" },
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={routeLnurl} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).not.toHaveBeenCalled()
   })
 
   it("Does not call saveLnAddressContact when LNURL payment is to a merchant", async () => {
