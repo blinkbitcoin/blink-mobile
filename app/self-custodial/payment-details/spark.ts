@@ -55,7 +55,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     ? {
         canSendPayment: true,
         canGetFee: true,
-        getFee: createGetFee(prepareParams, sendingWalletDescriptor.currency),
+        getFee: createGetFee(prepareParams),
         sendPaymentMutation: createSendMutation(prepareParams),
       }
     : { canSendPayment: false, canGetFee: false }
