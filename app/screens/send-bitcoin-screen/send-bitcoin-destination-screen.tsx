@@ -373,7 +373,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         rawInput,
         myWalletIds: wallets.map(({ id }) => id),
         bitcoinNetwork,
-        lnurlDomains: [lnAddressHostname, ...LNURL_DOMAINS],
+        lnurlDomains: isSelfCustodial ? [] : [lnAddressHostname, ...LNURL_DOMAINS],
         accountDefaultWalletQuery,
       })
       logParseDestinationResult(destination)
