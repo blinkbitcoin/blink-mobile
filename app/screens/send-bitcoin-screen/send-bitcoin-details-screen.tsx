@@ -365,7 +365,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     (async () => {
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
-      if (paymentDetail.paymentType === "lnurl") {
+      if (paymentDetail.paymentType === "lnurl" && !paymentDetail.sendPaymentMutation) {
         try {
           setIsLoadingLnurl(true)
 
