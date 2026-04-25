@@ -165,72 +165,78 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
     expect(updated.convertMoneyAmount).toBe(newConvert)
   })
 
-  it("passes USDB tokenIdentifier when sending wallet is USD", () => {
+  it("never passes a tokenIdentifier (Lightning is always paid in sats)", () => {
     createSelfCustodialLightningPaymentDetails(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
-        convertMoneyAmount: jest.fn().mockReturnValue({
-          amount: 500,
-          currency: WalletCurrency.Usd,
-          currencyCode: WalletCurrency.Usd,
-        }),
       }),
     )
 
-    expect(mockCreateSendMutation).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
-    )
-    expect(mockCreateGetFee).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
-      WalletCurrency.Usd,
-    )
+    const prepareParams = mockCreateSendMutation.mock.calls[0][0]
+    expect(prepareParams).not.toHaveProperty("tokenIdentifier")
+    const feeParams = mockCreateGetFee.mock.calls[0][0]
+    expect(feeParams).not.toHaveProperty("tokenIdentifier")
   })
 
-  it("passes tokenIdentifier=undefined when sending wallet is BTC", () => {
-    createSelfCustodialLightningPaymentDetails(createParams())
+  it("converts unitOfAccountAmount to sats for the SDK when sending from a USD wallet", () => {
+    const convertMoneyAmount = jest.fn((_amount, target) => ({
+      amount: target === WalletCurrency.Btc ? 3065 : 238,
+      currency: target,
+      currencyCode: target,
+    }))
 
-    expect(mockCreateSendMutation).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: undefined }),
-    )
-    expect(mockCreateGetFee).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: undefined }),
-      WalletCurrency.Btc,
-    )
-  })
-
-  it("scales USD settlement cents into USDB base units for hasAmount=false", () => {
     createSelfCustodialLightningPaymentDetails(
       createParams({
         hasAmount: false,
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
-        convertMoneyAmount: jest.fn().mockReturnValue({
-          amount: 70,
-          currency: WalletCurrency.Usd,
-          currencyCode: WalletCurrency.Usd,
-        }),
+        convertMoneyAmount,
       }),
     )
 
-    // 70 cents ($0.70) × 10^4 (USDB 6-decimal scaling vs 2-decimal display) = 700_000 base units
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: BigInt(700000) }),
+      expect.objectContaining({ amount: BigInt(3065) }),
     )
   })
 
-  it("keeps BTC settlement amount in sats for hasAmount=false", () => {
+  it("passes sats directly when sending wallet is BTC", () => {
+    const convertMoneyAmount = jest.fn().mockReturnValue({
+      amount: 12345,
+      currency: WalletCurrency.Btc,
+      currencyCode: WalletCurrency.Btc,
+    })
+
     createSelfCustodialLightningPaymentDetails(
-      createParams({
-        hasAmount: false,
-        convertMoneyAmount: jest.fn().mockReturnValue({
-          amount: 12345,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        }),
-      }),
+      createParams({ hasAmount: false, convertMoneyAmount }),
     )
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
     )
+  })
+
+  it("passes a USDB→BTC conversionOptions when sending from a USD wallet", () => {
+    createSelfCustodialLightningPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      }),
+    )
+
+    const prepareParams = mockCreateSendMutation.mock.calls[0][0]
+    expect(prepareParams.conversionOptions).toEqual(
+      expect.objectContaining({
+        conversionType: expect.objectContaining({ tag: "ToBitcoin" }),
+      }),
+    )
+  })
+
+  it("omits conversionOptions when sending from a BTC wallet", () => {
+    createSelfCustodialLightningPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-btc", currency: WalletCurrency.Btc },
+      }),
+    )
+
+    const prepareParams = mockCreateSendMutation.mock.calls[0][0]
+    expect(prepareParams.conversionOptions).toBeUndefined()
   })
 })

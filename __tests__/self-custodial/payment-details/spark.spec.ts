@@ -94,7 +94,6 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
-      WalletCurrency.Usd,
     )
   })
 
@@ -106,7 +105,6 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
-      WalletCurrency.Btc,
     )
   })
 
