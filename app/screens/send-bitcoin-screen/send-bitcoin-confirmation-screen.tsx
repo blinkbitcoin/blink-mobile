@@ -349,6 +349,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     if (paymentType === "onchain") return LL.common.onchain()
     if (paymentType === "lightning") return LL.common.lightning()
     if (paymentType === "lnurl") return LL.common.lightning()
+    if (paymentType === "spark") return LL.common.spark()
   }
 
   const isLightningRecommended = () => {
