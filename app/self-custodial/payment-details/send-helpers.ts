@@ -2,6 +2,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import {
   OnchainConfirmationSpeed,
   type BreezSdkInterface,
+  type ConversionOptions,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
@@ -10,17 +11,22 @@ import {
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
-import { toWalletAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
 
-import { executeSend, extractOnchainFees, prepareSend } from "../bridge"
-
-const LIGHTNING_FEE_SATS = 0
+import {
+  executeSend,
+  extractLightningFee,
+  extractOnchainFees,
+  prepareSend,
+} from "../bridge"
+import { classifySdkError } from "../sdk-error"
 
 type PrepareParams = {
   sdk: BreezSdkInterface
   paymentRequest: string
   amount: bigint | undefined
   tokenIdentifier?: string
+  conversionOptions?: ConversionOptions
 }
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
@@ -33,18 +39,20 @@ const toPrepareOptions = (params: PrepareParams) => ({
   paymentRequest: params.paymentRequest,
   amount: params.amount,
   tokenIdentifier: params.tokenIdentifier,
+  conversionOptions: params.conversionOptions,
 })
+
+const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
+  toBtcMoneyAmount(feeSats) as unknown as WalletAmount<T>
 
 export const createGetFee = <T extends WalletCurrency>(
   params: PrepareParams,
-  currency: T,
 ): GetFee<T> => {
   return async () => {
     try {
-      await prepareSend(params.sdk, toPrepareOptions(params))
-      return {
-        amount: toWalletAmount({ amount: LIGHTNING_FEE_SATS, currency }),
-      }
+      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      const feeSats = extractLightningFee(prepared) ?? 0
+      return { amount: asGetFeeAmount<T>(feeSats) }
     } catch {
       return { amount: undefined }
     }
@@ -53,7 +61,6 @@ export const createGetFee = <T extends WalletCurrency>(
 
 export const createGetFeeOnchain = <T extends WalletCurrency>(
   params: PrepareParams,
-  currency: T,
   feeTier: FeeTierOption,
 ): GetFee<T> => {
   return async () => {
@@ -62,9 +69,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
       const fees = extractOnchainFees(prepared)
       if (!fees) return { amount: undefined }
 
-      return {
-        amount: toWalletAmount({ amount: fees[feeTier], currency }),
-      }
+      return { amount: asGetFeeAmount<T>(fees[feeTier]) }
     } catch {
       return { amount: undefined }
     }
@@ -75,9 +80,8 @@ const reportSendFailure = (
   scope: string,
   err: unknown,
 ): { __typename: "GraphQLApplicationError"; message: string } => {
-  const message = err instanceof Error ? err.message : `${scope}: ${err}`
   crashlytics().recordError(err instanceof Error ? err : new Error(`${scope}: ${err}`))
-  return { __typename: "GraphQLApplicationError", message }
+  return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
 export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {

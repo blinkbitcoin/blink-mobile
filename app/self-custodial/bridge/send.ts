@@ -5,6 +5,7 @@ import {
   SendPaymentOptions,
   SendPaymentRequest,
   type BreezSdkInterface,
+  type ConversionOptions,
   type PrepareSendPaymentResponse,
   type SendOnchainSpeedFeeQuote,
 } from "@breeztech/breez-sdk-spark-react-native"
@@ -41,18 +42,17 @@ export const extractLightningFee = (
   prepared: PrepareSendPaymentResponse,
 ): number | null => {
   if (prepared.paymentMethod?.tag !== MethodTag.Bolt11Invoice) return null
-
-  const inner = prepared.paymentMethod.inner
-  return (
-    toNumber(inner.lightningFeeSats) +
-    (inner.sparkTransferFeeSats ? toNumber(inner.sparkTransferFeeSats) : 0)
-  )
+  const { sparkTransferFeeSats, lightningFeeSats } = prepared.paymentMethod.inner
+  if (sparkTransferFeeSats !== undefined) return toNumber(sparkTransferFeeSats)
+  if (lightningFeeSats !== undefined) return toNumber(lightningFeeSats)
+  return null
 }
 
 export type PrepareSendOptions = {
   paymentRequest: string
   amount: bigint | undefined
   tokenIdentifier?: string
+  conversionOptions?: ConversionOptions
 }
 
 export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions) =>
@@ -61,6 +61,7 @@ export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions)
       paymentRequest: options.paymentRequest,
       amount: options.amount,
       tokenIdentifier: options.tokenIdentifier,
+      conversionOptions: options.conversionOptions,
     }),
   )
 
@@ -95,8 +96,24 @@ export const executeSend = (
   sdk.sendPayment(
     SendPaymentRequest.create({
       prepareResponse,
-      options: confirmationSpeed
-        ? new SendPaymentOptions.BitcoinAddress({ confirmationSpeed })
-        : undefined,
+      options: buildSendOptions(prepareResponse, confirmationSpeed),
     }),
   )
+
+const buildSendOptions = (
+  prepared: PrepareSendPaymentResponse,
+  confirmationSpeed: OnchainConfirmationSpeed | undefined,
+): SendPaymentOptions | undefined => {
+  const method = prepared.paymentMethod
+  if (!method) return undefined
+  if (method.tag === MethodTag.BitcoinAddress && confirmationSpeed !== undefined) {
+    return new SendPaymentOptions.BitcoinAddress({ confirmationSpeed })
+  }
+  if (method.tag === MethodTag.Bolt11Invoice) {
+    return new SendPaymentOptions.Bolt11Invoice({
+      preferSpark: method.inner.sparkTransferFeeSats !== undefined,
+      completionTimeoutSecs: undefined,
+    })
+  }
+  return undefined
+}
