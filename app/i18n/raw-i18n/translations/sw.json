@@ -3629,6 +3629,13 @@
     "description": "Pochi yako isiyo ya ulinzi haiwezi kufikia mtandao kwa sasa. Jaribu tena utakaporudi mtandaoni.",
     "retry": "Jaribu tena"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Hakuna fedha za kutosha kufunika kiasi na ada za mtandao. Jaribu kiasi kidogo.",
+    "belowMinimum": "Kiasi kiko chini ya kiwango cha chini kinachohitajika kwa malipo haya. Jaribu kiasi kikubwa zaidi.",
+    "networkError": "Tatizo la muunganisho wa mtandao. Angalia muunganisho wako na ujaribu tena.",
+    "invalidInput": "Maelezo ya malipo yanaonekana batili. Tafadhali kagua na ujaribu tena.",
+    "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo."
+  },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",
     "description": "Jumla: {sats} sats zinazopatikana kudai",

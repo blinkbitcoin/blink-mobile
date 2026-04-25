@@ -3629,6 +3629,13 @@
     "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
     "retry": "Încearcă din nou"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Fonduri insuficiente pentru a acoperi suma și taxele de rețea. Încearcă o sumă mai mică.",
+    "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
+    "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
+    "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+  },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",
     "description": "Total: {sats} sats disponibili pentru revendicare",
