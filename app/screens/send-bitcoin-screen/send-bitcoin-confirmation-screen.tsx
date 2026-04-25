@@ -24,8 +24,10 @@ import {
   multiplyMoneyAmounts,
   toBtcMoneyAmount,
   toUsdMoneyAmount,
+  ZeroBtcMoneyAmount,
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
+import { useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -111,6 +113,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const { LL } = useI18nContext()
+  const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
 
   const fee = useFee(getFee)
@@ -243,7 +246,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       }
 
       setPaymentError(
-        errorsMessage || LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
+        translateSdkError(errorsMessage) ||
+          LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
       )
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -275,20 +279,34 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     satAmount,
     currencyFeeAmount,
     satFeeAmount,
+    translateSdkError,
   ])
 
   let validAmount = true
   let invalidAmountErrorMessage = ""
 
+  const zeroSettlementAmount = moneyAmountIsCurrencyType(
+    settlementAmount,
+    WalletCurrency.Btc,
+  )
+    ? ZeroBtcMoneyAmount
+    : ZeroUsdMoneyAmount
+
+  const feeInSettlementCurrency = fee.amount
+    ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
+    : zeroSettlementAmount
+
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: fee.amount || ZeroUsdMoneyAmount,
+    b: feeInSettlementCurrency,
   })
+
+  const skipBalanceCheck = isSendingMax || hasAttemptedSend
 
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Btc) &&
     btcBalanceMoneyAmount &&
-    !isSendingMax
+    !skipBalanceCheck
   ) {
     validAmount = lessThanOrEqualTo({
       value: totalAmount,
@@ -304,7 +322,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Usd) &&
     usdBalanceMoneyAmount &&
-    !isSendingMax
+    !skipBalanceCheck
   ) {
     validAmount = lessThanOrEqualTo({
       value: totalAmount,
@@ -561,8 +579,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "flex-end",
   },
   errorContainer: {
-    marginVertical: 20,
-    flex: 1,
+    padding: 20,
   },
   errorText: {
     color: colors.error,
