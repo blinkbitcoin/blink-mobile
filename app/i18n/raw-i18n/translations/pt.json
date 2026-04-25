@@ -3617,6 +3617,13 @@
         "description": "A sua carteira não custodial não consegue alcançar a rede neste momento. Tente novamente quando voltar a estar online.",
         "retry": "Tentar novamente"
     },
+    "SelfCustodialError": {
+        "insufficientFunds": "Fundos insuficientes para cobrir o valor e as taxas de rede. Tente um valor menor.",
+        "belowMinimum": "O valor está abaixo do mínimo exigido para este pagamento. Tente um valor maior.",
+        "networkError": "Problema de conexão de rede. Verifique sua conexão e tente novamente.",
+        "invalidInput": "Os detalhes do pagamento parecem inválidos. Por favor, revise e tente novamente.",
+        "generic": "Não foi possível concluir o pagamento. Tente novamente em um momento, ou use um valor menor."
+    },
     "UnclaimedDeposit": {
         "title": "Você tem {count} depósito(s) não reclamado(s)",
         "description": "Total: {sats} sats disponíveis para reivindicar",

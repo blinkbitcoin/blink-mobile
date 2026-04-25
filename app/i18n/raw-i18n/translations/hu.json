@@ -3629,6 +3629,13 @@
     "description": "A nem letétbe helyezett pénztárcája jelenleg nem tudja elérni a hálózatot. Próbálja újra, amikor ismét online lesz.",
     "retry": "Próbáld újra"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nincs elég pénz az összeg és a hálózati díjak fedezésére. Próbálj kisebb összeget.",
+    "belowMinimum": "Az összeg az ehhez a fizetéshez szükséges minimum alatt van. Próbálj nagyobb összeget.",
+    "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
+    "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
+    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
+  },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",
     "description": "Összesen: {sats} sat elérhető igénylésre",

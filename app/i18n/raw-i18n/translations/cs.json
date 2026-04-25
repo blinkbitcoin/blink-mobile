@@ -3670,6 +3670,13 @@
     "description": "Vaše nesvěřenská peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
     "retry": "Zkusit znovu"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nedostatek prostředků na pokrytí částky a síťových poplatků. Zkuste menší částku.",
+    "belowMinimum": "Částka je pod minimem požadovaným pro tuto platbu. Zkuste větší částku.",
+    "networkError": "Problém se síťovým připojením. Zkontrolujte připojení a zkuste to znovu.",
+    "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
+    "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku."
+  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
     "description": "Celkem: {sats} satů k vyzvednutí",
