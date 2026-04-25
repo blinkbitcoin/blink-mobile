@@ -5,6 +5,7 @@ import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destin
 
 const mockCreateLightning = jest.fn().mockReturnValue({ paymentType: "lightning" })
 const mockCreateOnchain = jest.fn().mockReturnValue({ paymentType: "onchain" })
+const mockCreateLnurl = jest.fn().mockReturnValue({ paymentType: "lnurl" })
 
 jest.mock("@app/self-custodial/payment-details/lightning", () => ({
   createSelfCustodialLightningPaymentDetails: (...args: unknown[]) =>
@@ -14,6 +15,11 @@ jest.mock("@app/self-custodial/payment-details/lightning", () => ({
 jest.mock("@app/self-custodial/payment-details/onchain", () => ({
   createSelfCustodialOnchainPaymentDetails: (...args: unknown[]) =>
     mockCreateOnchain(...args),
+}))
+
+jest.mock("@app/self-custodial/payment-details/lnurl", () => ({
+  createSelfCustodialLnurlPaymentDetails: (...args: unknown[]) =>
+    mockCreateLnurl(...args),
 }))
 
 const mockSdk = {} as never
@@ -87,16 +93,51 @@ describe("wrapDestination", () => {
     )
   })
 
-  it("wraps Lnurl destination", () => {
+  it("wraps Lnurl destination through the SC lnurl detail (not the lightning detail)", () => {
     const result = createValidResult(PaymentType.Lnurl, {
       lnurl: "lnurl1...",
+      isMerchant: false,
+      lnurlParams: {
+        callback: "https://example.com/cb",
+        min: 1,
+        max: 1000,
+        commentAllowed: 200,
+        description: "Pay user",
+      },
     })
 
     const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
-    expect(mockCreateLightning).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentRequest: "lnurl1..." }),
+    expect(mockCreateLnurl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sdk: mockSdk,
+        lnurl: "lnurl1...",
+        isMerchant: false,
+        destinationSpecifiedMemo: "Pay user",
+        lnurlParams: expect.objectContaining({ min: 1, max: 1000 }),
+      }),
+    )
+    expect(mockCreateLightning).not.toHaveBeenCalled()
+  })
+
+  it("propagates isMerchant=true for merchant Lnurl destinations", () => {
+    const result = createValidResult(PaymentType.Lnurl, {
+      lnurl: "lnurl1merchant",
+      isMerchant: true,
+      lnurlParams: {
+        callback: "https://m.example/cb",
+        min: 1,
+        max: 100,
+        commentAllowed: 0,
+      },
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLnurl).toHaveBeenCalledWith(
+      expect.objectContaining({ isMerchant: true }),
     )
   })
 

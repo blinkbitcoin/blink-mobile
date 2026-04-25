@@ -1,5 +1,6 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import { PaymentType } from "@blinkbitcoin/blink-client"
+import { LnUrlPayServiceResponse } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
@@ -12,6 +13,7 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 
 import { createSelfCustodialLightningPaymentDetails } from "./lightning"
+import { createSelfCustodialLnurlPaymentDetails } from "./lnurl"
 import { createSelfCustodialOnchainPaymentDetails } from "./onchain"
 import { createSelfCustodialSparkPaymentDetails } from "./spark"
 
@@ -26,7 +28,11 @@ type ValidDestination = Extract<
 
 type LightningDestination = Extract<
   ValidDestination,
-  { paymentType: typeof PaymentType.Lightning | typeof PaymentType.Lnurl }
+  { paymentType: typeof PaymentType.Lightning }
+>
+type LnurlDestination = Extract<
+  ValidDestination,
+  { paymentType: typeof PaymentType.Lnurl; lnurlParams: LnUrlPayServiceResponse }
 >
 type OnchainDestination = Extract<
   ValidDestination,
@@ -51,19 +57,32 @@ const buildLightningDetail = <T extends WalletCurrency>({
 }: BuildArgs<T, LightningDestination>) => {
   const invoiceAmount =
     "amount" in destination && destination.amount ? destination.amount : 0
-  const paymentRequest =
-    "paymentRequest" in destination ? destination.paymentRequest : destination.lnurl
   const invoiceMemo = "memo" in destination ? destination.memo : undefined
 
   return createSelfCustodialLightningPaymentDetails({
     sdk,
-    paymentRequest,
+    paymentRequest: destination.paymentRequest,
     unitOfAccountAmount: toBtcMoneyAmount(invoiceAmount),
     hasAmount: invoiceAmount > 0,
     ...params,
     destinationSpecifiedMemo: invoiceMemo,
   })
 }
+
+const buildLnurlDetail = <T extends WalletCurrency>({
+  sdk,
+  destination,
+  params,
+}: BuildArgs<T, LnurlDestination>) =>
+  createSelfCustodialLnurlPaymentDetails({
+    sdk,
+    lnurl: destination.lnurl,
+    lnurlParams: destination.lnurlParams,
+    unitOfAccountAmount: toBtcMoneyAmount(destination.lnurlParams.min || 0),
+    isMerchant: destination.isMerchant,
+    destinationSpecifiedMemo: destination.lnurlParams.description,
+    ...params,
+  })
 
 const buildSparkDetail = <T extends WalletCurrency>({
   sdk,
@@ -108,10 +127,16 @@ export const wrapDestination = (
     ) => {
       switch (original.paymentType) {
         case PaymentType.Lightning:
-        case PaymentType.Lnurl:
           return buildLightningDetail({
             sdk,
             destination: original as LightningDestination,
+            params,
+            options,
+          })
+        case PaymentType.Lnurl:
+          return buildLnurlDetail({
+            sdk,
+            destination: original as LnurlDestination,
             params,
             options,
           })
