@@ -3668,6 +3668,13 @@
     "description": "Je niet-bewaarde wallet kan het netwerk momenteel niet bereiken. Probeer het opnieuw wanneer je weer online bent.",
     "retry": "Opnieuw proberen"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Onvoldoende saldo voor het bedrag en de netwerkkosten. Probeer een kleiner bedrag.",
+    "belowMinimum": "Het bedrag is lager dan het vereiste minimum voor deze betaling. Probeer een groter bedrag.",
+    "networkError": "Probleem met netwerkverbinding. Controleer je verbinding en probeer opnieuw.",
+    "invalidInput": "De betalingsgegevens lijken ongeldig. Controleer ze en probeer opnieuw.",
+    "generic": "De betaling kon niet worden voltooid. Probeer het zo opnieuw, of gebruik een kleiner bedrag."
+  },
   "UnclaimedDeposit": {
     "title": "Je hebt {count} niet-opgeëiste storting(en)",
     "description": "Totaal: {sats} sats beschikbaar om op te eisen",

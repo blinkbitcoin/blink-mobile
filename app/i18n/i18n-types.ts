@@ -11844,6 +11844,28 @@ type RootTranslation = {
 		 */
 		retry: string
 	}
+	SelfCustodialError: {
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​t​o​ ​c​o​v​e​r​ ​t​h​e​ ​a​m​o​u​n​t​ ​a​n​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​T​r​y​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		insufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​b​e​l​o​w​ ​t​h​e​ ​m​i​n​i​m​u​m​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​ ​T​r​y​ ​a​ ​l​a​r​g​e​r​ ​a​m​o​u​n​t​.
+		 */
+		belowMinimum: string
+		/**
+		 * N​e​t​w​o​r​k​ ​c​o​n​n​e​c​t​i​o​n​ ​p​r​o​b​l​e​m​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		networkError: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​ ​l​o​o​k​ ​i​n​v​a​l​i​d​.​ ​P​l​e​a​s​e​ ​r​e​v​i​e​w​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		invalidInput: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		generic: string
+	}
 	UnclaimedDeposit: {
 		/**
 		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
@@ -23777,6 +23799,28 @@ export type TranslationFunctions = {
 		 * Try again
 		 */
 		retry: () => LocalizedString
+	}
+	SelfCustodialError: {
+		/**
+		 * Not enough funds to cover the amount and network fees. Try a smaller amount.
+		 */
+		insufficientFunds: () => LocalizedString
+		/**
+		 * Amount is below the minimum required for this payment. Try a larger amount.
+		 */
+		belowMinimum: () => LocalizedString
+		/**
+		 * Network connection problem. Check your connection and try again.
+		 */
+		networkError: () => LocalizedString
+		/**
+		 * The payment details look invalid. Please review and try again.
+		 */
+		invalidInput: () => LocalizedString
+		/**
+		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
+		 */
+		generic: () => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**

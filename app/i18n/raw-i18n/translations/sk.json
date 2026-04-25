@@ -3627,6 +3627,13 @@
     "description": "Vaša nekustodiálna peňaženka momentálne nemôže dosiahnuť sieť. Skúste to znova, keď budete online.",
     "retry": "Skúsiť znova"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nedostatok prostriedkov na pokrytie sumy a sieťových poplatkov. Skúste menšiu sumu.",
+    "belowMinimum": "Suma je pod minimom požadovaným pre túto platbu. Skúste väčšiu sumu.",
+    "networkError": "Problém so sieťovým pripojením. Skontrolujte pripojenie a skúste znova.",
+    "invalidInput": "Detaily platby vyzerajú neplatné. Skontrolujte ich a skúste znova.",
+    "generic": "Platbu sa nepodarilo dokončiť. Skúste znova o chvíľu alebo použite menšiu sumu."
+  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzdvihnutý(ch) vklad(ov)",
     "description": "Celkom: {sats} satov na vyzdvihnutie",

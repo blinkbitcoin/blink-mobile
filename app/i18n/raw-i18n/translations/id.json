@@ -3627,6 +3627,13 @@
     "description": "Dompet non-kustodian Anda tidak dapat mencapai jaringan saat ini. Coba lagi ketika Anda kembali online.",
     "retry": "Coba lagi"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Dana tidak cukup untuk menutupi jumlah dan biaya jaringan. Coba jumlah yang lebih kecil.",
+    "belowMinimum": "Jumlahnya di bawah minimum yang diperlukan untuk pembayaran ini. Coba jumlah yang lebih besar.",
+    "networkError": "Masalah koneksi jaringan. Periksa koneksi Anda dan coba lagi.",
+    "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
+    "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil."
+  },
   "UnclaimedDeposit": {
     "title": "Anda memiliki {count} deposit yang belum diklaim",
     "description": "Total: {sats} sats tersedia untuk diklaim",

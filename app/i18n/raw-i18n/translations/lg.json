@@ -3627,6 +3627,13 @@
     "description": "Envalopu yo etesigibwamu tesobola kutuuka ku yintaneeti kati. Gezaako nate ng'oddayo ku yintaneeti.",
     "retry": "Gezaako nate"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Sente teziikira kubikka muwendo n'ebisale by'omukutu. Gezaako omuwendo omutono.",
+    "belowMinimum": "Omuwendo guli wansi w'omuwendo omutono ogwetagisa eby'okusasula kuno. Gezaako omuwendo omunene.",
+    "networkError": "Ekizibu ky'okuyungibwa ku mukutu. Kebera enkolagana yo oddemu ogezeeko.",
+    "invalidInput": "Ebikwata ku kusasula bifaanana nga si bituufu. Wonna obyebibebule oddemu ogezeeko.",
+    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono."
+  },
   "UnclaimedDeposit": {
     "title": "Olina {count} ebitateekeddwa",
     "description": "Omutindo: {sats} sats ezikubirwa",

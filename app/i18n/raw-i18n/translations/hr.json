@@ -3668,6 +3668,13 @@
     "description": "Vaš ne-skrbnički novčanik trenutno ne može pristupiti mreži. Pokušajte ponovno kada se vratite na mrežu.",
     "retry": "Pokušaj ponovno"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nedovoljno sredstava za pokrivanje iznosa i mrežnih naknada. Pokušajte s manjim iznosom.",
+    "belowMinimum": "Iznos je ispod minimuma potrebnog za ovo plaćanje. Pokušajte s većim iznosom.",
+    "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
+    "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
+    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
+  },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",
     "description": "Ukupno: {sats} satova dostupno za potraživanje",

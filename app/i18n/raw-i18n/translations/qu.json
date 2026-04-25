@@ -3665,6 +3665,13 @@
     "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",
     "retry": "Yapamanta rurana"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Mana suficiente qullqi kanchu chay qullqimanta nisqa kanapaq mink'a quykunatawan. Aswan huch'uy qullqitayqa rikuychis.",
+    "belowMinimum": "Qullqiqa kay quypaq mañasqa ñut'u qullqi sayanmantaqa pisinmanmi. Aswan hatun qullqitaqa rikuychis.",
+    "networkError": "Conexión sasachakuy. Conexión qhawariy hinaspa kaqmanta rurariy.",
+    "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
+    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
+  },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",
     "description": "Tukuy: {sats} sats mañakunapaq",

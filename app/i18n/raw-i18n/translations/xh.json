@@ -3674,6 +3674,13 @@
     "description": "Ingxowa-mali yakho engekho kugcino ayinakufikelela kwinethiwekhi ngoku. Zama kwakhona xa ubuyela kwi-intanethi.",
     "retry": "Zama kwakhona"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Akukho mali yaneleyo ukugubungela isixa kunye neentlawulo zothungelwano. Zama isixa esincinci.",
+    "belowMinimum": "Isixa singaphantsi kweminimum efunekayo kule ntlawulo. Zama isixa esikhulu.",
+    "networkError": "Ingxaki yoqhagamshelwano kwithungelwano. Khangela uqhagamshelwano lwakho uphinde uzame.",
+    "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
+    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci."
+  },
   "UnclaimedDeposit": {
     "title": "Unama-{count} edipozithi engabangwayo",
     "description": "Iyonke: {sats} sats ezifumanekayo ukufuna",

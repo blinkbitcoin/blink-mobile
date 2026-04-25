@@ -3656,6 +3656,13 @@
         "description": "Votre portefeuille non-custodial ne peut pas atteindre le réseau pour le moment. Réessayez lorsque vous serez de nouveau en ligne.",
         "retry": "Réessayer"
     },
+    "SelfCustodialError": {
+        "insufficientFunds": "Fonds insuffisants pour couvrir le montant et les frais de réseau. Essayez un montant plus petit.",
+        "belowMinimum": "Le montant est inférieur au minimum requis pour ce paiement. Essayez un montant plus grand.",
+        "networkError": "Problème de connexion réseau. Vérifiez votre connexion et réessayez.",
+        "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
+        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit."
+    },
     "UnclaimedDeposit": {
         "title": "Vous avez {count} dépôt(s) non réclamé(s)",
         "description": "Total : {sats} sats disponibles à réclamer",

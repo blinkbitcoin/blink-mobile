@@ -3615,6 +3615,13 @@
         "description": "Deine nicht-verwahrte Wallet kann das Netzwerk gerade nicht erreichen. Versuche es erneut, wenn du wieder online bist.",
         "retry": "Erneut versuchen"
     },
+    "SelfCustodialError": {
+        "insufficientFunds": "Nicht genügend Guthaben, um den Betrag und die Netzwerkgebühren zu decken. Versuche einen kleineren Betrag.",
+        "belowMinimum": "Der Betrag liegt unter dem für diese Zahlung erforderlichen Minimum. Versuche einen größeren Betrag.",
+        "networkError": "Netzwerkverbindungsproblem. Überprüfe deine Verbindung und versuche es erneut.",
+        "invalidInput": "Die Zahlungsdetails scheinen ungültig zu sein. Bitte überprüfen und erneut versuchen.",
+        "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag."
+    },
     "UnclaimedDeposit": {
         "title": "Du hast {count} nicht beanspruchte Einzahlung(en)",
         "description": "Gesamt: {sats} Sats zum Beanspruchen verfügbar",

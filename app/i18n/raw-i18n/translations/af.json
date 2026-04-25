@@ -3668,6 +3668,13 @@
     "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
     "retry": "Probeer weer"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nie genoeg fondse om die bedrag en netwerkkostes te dek nie. Probeer 'n kleiner bedrag.",
+    "belowMinimum": "Bedrag is onder die minimum vereis vir hierdie betaling. Probeer 'n groter bedrag.",
+    "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
+    "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
+    "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
+  },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",
     "description": "Totaal: {sats} sats beskikbaar om te eis",

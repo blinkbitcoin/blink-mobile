@@ -3668,6 +3668,13 @@
     "description": "Dompet bukan kustodian anda tidak dapat mencapai rangkaian sekarang. Cuba lagi apabila anda dalam talian semula.",
     "retry": "Cuba lagi"
   },
+  "SelfCustodialError": {
+    "insufficientFunds": "Tidak cukup dana untuk menampung jumlah dan yuran rangkaian. Cuba jumlah yang lebih kecil.",
+    "belowMinimum": "Jumlah berada di bawah minimum yang diperlukan untuk pembayaran ini. Cuba jumlah yang lebih besar.",
+    "networkError": "Masalah sambungan rangkaian. Semak sambungan anda dan cuba lagi.",
+    "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
+    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
+  },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",
     "description": "Jumlah: {sats} sats tersedia untuk dituntut",
