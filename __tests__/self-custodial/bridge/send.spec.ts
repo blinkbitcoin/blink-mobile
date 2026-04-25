@@ -2,16 +2,22 @@
 import { WalletCurrency } from "@app/graphql/generated"
 
 import {
+  executeLnurl,
   executeSend,
   extractLightningFee,
+  extractLnurlFee,
   extractOnchainFees,
+  prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "@app/self-custodial/bridge/send"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
+  LnurlPayRequest: { create: (p: Record<string, unknown>) => p },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  PrepareLnurlPayRequest: { create: (p: Record<string, unknown>) => p },
   PrepareSendPaymentRequest: { create: (p: Record<string, unknown>) => p },
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
@@ -293,5 +299,117 @@ describe("resolveSendTokenIdentifier", () => {
 
   it("returns undefined for BTC wallets so the SDK treats it as a BTC send", () => {
     expect(resolveSendTokenIdentifier(WalletCurrency.Btc)).toBeUndefined()
+  })
+})
+
+describe("prepareLnurl", () => {
+  const payRequest = {
+    callback: "https://example.com/cb",
+    minSendable: BigInt(1000),
+    maxSendable: BigInt(100000000),
+    metadataStr: '[["text/plain","hi"]]',
+    commentAllowed: 0,
+    domain: "example.com",
+    url: "https://example.com",
+    address: undefined,
+    allowsNostr: undefined,
+    nostrPubkey: undefined,
+  } as never
+
+  it("forwards amount, payRequest, comment to the SDK call", async () => {
+    const prepareLnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { prepareLnurlPay } as never
+
+    await prepareLnurl(sdk, {
+      amount: BigInt(1500),
+      payRequest,
+      comment: "hello",
+    })
+
+    expect(prepareLnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: BigInt(1500),
+        payRequest,
+        comment: "hello",
+      }),
+    )
+  })
+
+  it("passes tokenIdentifier + conversionOptions + feePolicy for USD wallet sends", async () => {
+    const prepareLnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { prepareLnurlPay } as never
+    const conversionOptions = {
+      conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
+    } as never
+
+    await prepareLnurl(sdk, {
+      amount: BigInt(1000000),
+      payRequest,
+      tokenIdentifier: "usdb-token-id",
+      conversionOptions,
+      feePolicy: 1,
+    })
+
+    expect(prepareLnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tokenIdentifier: "usdb-token-id",
+        conversionOptions,
+        feePolicy: 1,
+      }),
+    )
+  })
+
+  it("omits tokenIdentifier and conversionOptions for BTC wallet sends", async () => {
+    const prepareLnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { prepareLnurlPay } as never
+
+    await prepareLnurl(sdk, { amount: BigInt(1500), payRequest })
+
+    expect(prepareLnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tokenIdentifier: undefined,
+        conversionOptions: undefined,
+        feePolicy: undefined,
+      }),
+    )
+  })
+})
+
+describe("extractLnurlFee", () => {
+  it("returns the prepared response feeSats coerced to a number", () => {
+    expect(extractLnurlFee({ feeSats: BigInt(7) } as never)).toBe(7)
+  })
+
+  it("returns 0 when feeSats is zero", () => {
+    expect(extractLnurlFee({ feeSats: BigInt(0) } as never)).toBe(0)
+  })
+})
+
+describe("executeLnurl", () => {
+  it("forwards prepareResponse and idempotencyKey to the SDK call", async () => {
+    const lnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { lnurlPay } as never
+    const prepareResponse = { amountSats: BigInt(100), feeSats: BigInt(1) } as never
+
+    await executeLnurl(sdk, prepareResponse, "idemp-key-1")
+
+    expect(lnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prepareResponse,
+        idempotencyKey: "idemp-key-1",
+      }),
+    )
+  })
+
+  it("passes idempotencyKey as undefined when not provided", async () => {
+    const lnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { lnurlPay } as never
+    const prepareResponse = { amountSats: BigInt(100), feeSats: BigInt(1) } as never
+
+    await executeLnurl(sdk, prepareResponse)
+
+    expect(lnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: undefined }),
+    )
   })
 })

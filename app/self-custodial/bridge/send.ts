@@ -1,11 +1,17 @@
 import {
+  FeePolicy,
+  LnurlPayRequest,
   OnchainConfirmationSpeed,
+  PrepareLnurlPayRequest,
   PrepareSendPaymentRequest,
   SendPaymentMethod_Tags as MethodTag,
   SendPaymentOptions,
   SendPaymentRequest,
   type BreezSdkInterface,
   type ConversionOptions,
+  type LnurlPayRequestDetails,
+  type LnurlPayResponse,
+  type PrepareLnurlPayResponse,
   type PrepareSendPaymentResponse,
   type SendOnchainSpeedFeeQuote,
 } from "@breeztech/breez-sdk-spark-react-native"
@@ -117,3 +123,39 @@ const buildSendOptions = (
   }
   return undefined
 }
+
+export type PrepareLnurlOptions = {
+  amount: bigint
+  payRequest: LnurlPayRequestDetails
+  comment?: string
+  tokenIdentifier?: string
+  conversionOptions?: ConversionOptions
+  feePolicy?: FeePolicy
+}
+
+export const prepareLnurl = (sdk: BreezSdkInterface, options: PrepareLnurlOptions) =>
+  sdk.prepareLnurlPay(
+    PrepareLnurlPayRequest.create({
+      amount: options.amount,
+      payRequest: options.payRequest,
+      comment: options.comment,
+      tokenIdentifier: options.tokenIdentifier,
+      conversionOptions: options.conversionOptions,
+      feePolicy: options.feePolicy,
+    }),
+  )
+
+export const extractLnurlFee = (prepared: PrepareLnurlPayResponse): number =>
+  toNumber(prepared.feeSats)
+
+export const executeLnurl = (
+  sdk: BreezSdkInterface,
+  prepareResponse: PrepareLnurlPayResponse,
+  idempotencyKey?: string,
+): Promise<LnurlPayResponse> =>
+  sdk.lnurlPay(
+    LnurlPayRequest.create({
+      prepareResponse,
+      idempotencyKey,
+    }),
+  )
