@@ -2329,6 +2329,7 @@
     "addressScreen": "Ödeme alma yolları",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
+    "recoveryMethod": "Kurtarma yöntemi",
     "title": "Ayarlar",
     "darkMode": "Karanlık Mod",
     "setToDark": "Mod: karanlık.",
@@ -3470,7 +3471,7 @@
         "check3": "Kimse benden bu bilgileri mesaj veya arama yoluyla istemiyor"
       },
       "Phrase": {
-        "headerTitle": "Yedekleme ifadeniz",
+        "headerTitle": "Yedekleme ifadesi",
         "sparkCompatible": "Bu yedekleme ifadesi herhangi bir {sparkCompatibleLink} çalışır",
         "sparkCompatibleLink": "Spark uyumlu cüzdanda",
         "copiedToast": "Yedekleme ifadesi panoya kopyalandı",
@@ -3484,7 +3485,8 @@
         "subtitle": "Doğru yazıp yazmadığınızın hızlı bir kontrolü",
         "enterWord": "Kelimeyi girin",
         "enterWords": "Kelimeleri girin",
-        "confirm": "Onayla"
+        "confirm": "Onayla",
+        "incorrectWord": "Yanlış kelime, lütfen sırayı kontrol edin"
       },
       "Success": {
         "title": "Gözetimsiz Blink'e hoş geldiniz"
@@ -3542,7 +3544,7 @@
     "nextWords": "Sonraki 6 kelime",
     "paste": "Yapıştır",
     "enterWord": "Kelime",
-    "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelimelerinizi kontrol edin ve tekrar deneyin.",
+    "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin.",
     "restoring": "Cüzdanınız geri yükleniyor...",
     "restoreSuccess": "Cüzdan başarıyla geri yüklendi",
     "restoreFailed": "Cüzdan geri yüklenemedi. Lütfen tekrar deneyin.",

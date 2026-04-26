@@ -2346,6 +2346,7 @@
         "addressScreen": "Moyens de se faire payer",
         "tapUserName": "Appuyez pour définir l’identifiant",
         "notifications": "Notifications",
+        "recoveryMethod": "Méthode de récupération",
         "title": "Réglages",
         "darkMode": "Mode sombre",
         "setToDark": "Mode : sombre.",
@@ -3499,7 +3500,7 @@
                 "check3": "Personne ne me demande ces informations par message ou appel"
             },
             "Phrase": {
-                "headerTitle": "Votre phrase de sauvegarde",
+                "headerTitle": "Phrase de sauvegarde",
                 "sparkCompatible": "Cette phrase de sauvegarde fonctionne dans tout {sparkCompatibleLink}",
                 "sparkCompatibleLink": "portefeuille compatible Spark",
                 "copiedToast": "Phrase de sauvegarde copiée dans le presse-papier",
@@ -3513,7 +3514,8 @@
                 "subtitle": "Vérification rapide que vous l'avez bien notée",
                 "enterWord": "Entrez le mot",
                 "enterWords": "Entrez les mots",
-                "confirm": "Confirmer"
+                "confirm": "Confirmer",
+                "incorrectWord": "Mot incorrect, veuillez vérifier l'ordre"
             },
             "Success": {
                 "title": "Bienvenue sur Blink non-custodial"
@@ -3571,7 +3573,7 @@
         "nextWords": "6 mots suivants",
         "paste": "Coller",
         "enterWord": "Mot",
-        "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier vos mots et réessayer.",
+        "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
         "restoring": "Restauration de votre portefeuille...",
         "restoreSuccess": "Portefeuille restauré avec succès",
         "restoreFailed": "Échec de la restauration. Veuillez réessayer.",

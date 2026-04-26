@@ -2332,6 +2332,7 @@
     "addressScreen": "Måder at modtage betaling",
     "tapUserName": "Tryk for at indstille brugernavn",
     "notifications": "Notifikationer",
+    "recoveryMethod": "Gendannelsesmetode",
     "title": "Indstillinger",
     "darkMode": "Mørk tilstand",
     "setToDark": "Tilstand: mørk.",
@@ -3488,7 +3489,7 @@
         "check3": "Ingen beder mig om disse oplysninger via besked eller opkald"
       },
       "Phrase": {
-        "headerTitle": "Din backup-sætning",
+        "headerTitle": "Backup-frase",
         "sparkCompatible": "Denne backup-sætning fungerer i enhver {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-kompatibel tegnebog",
         "copiedToast": "Backup-sætning kopieret til udklipsholder",
@@ -3502,7 +3503,8 @@
         "subtitle": "En hurtig kontrol om du har skrevet den korrekt ned",
         "enterWord": "Indtast ord",
         "enterWords": "Indtast ord",
-        "confirm": "Bekræft"
+        "confirm": "Bekræft",
+        "incorrectWord": "Forkert ord, kontroller venligst rækkefølgen"
       },
       "Success": {
         "title": "Velkommen til non-custodial Blink"
@@ -3560,7 +3562,7 @@
     "nextWords": "Næste 6 ord",
     "paste": "Indsæt",
     "enterWord": "Ord",
-    "invalidMnemonic": "Ugyldig sikkerhedsfrase. Kontrollér venligst dine ord og prøv igen.",
+    "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
     "restoring": "Gendanner din tegnebog...",
     "restoreSuccess": "Tegnebog genoprettet",
     "restoreFailed": "Kunne ikke gendanne tegnebogen. Prøv venligst igen.",

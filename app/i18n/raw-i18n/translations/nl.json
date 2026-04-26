@@ -2346,6 +2346,7 @@
     "addressScreen": "Manieren om betaald te krijgen",
     "tapUserName": "Click om gebruikersnaam in te stellen",
     "notifications": "Meldingen",
+    "recoveryMethod": "Herstelmethode",
     "title": "Instellingen",
     "darkMode": "Donkere modus",
     "setToDark": "Modus: donker.",
@@ -3511,7 +3512,7 @@
         "check3": "Niemand vraagt mij om deze informatie via bericht of telefoontje"
       },
       "Phrase": {
-        "headerTitle": "Je back-upzin",
+        "headerTitle": "Back-upzin",
         "sparkCompatible": "Deze back-upzin werkt in elke {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-compatibele portemonnee",
         "copiedToast": "Back-upzin naar klembord gekopieerd",
@@ -3525,7 +3526,8 @@
         "subtitle": "Een snelle controle of je het correct hebt opgeschreven",
         "enterWord": "Voer woord in",
         "enterWords": "Voer woorden in",
-        "confirm": "Bevestigen"
+        "confirm": "Bevestigen",
+        "incorrectWord": "Onjuist woord, controleer de volgorde"
       },
       "Success": {
         "title": "Welkom bij non-custodial Blink"
@@ -3583,7 +3585,7 @@
     "nextWords": "Volgende 6 woorden",
     "paste": "Plakken",
     "enterWord": "Woord",
-    "invalidMnemonic": "Ongeldige back-upfrase. Controleer je woorden en probeer opnieuw.",
+    "invalidMnemonic": "Ongeldige back-upzin. Controleer of de woordvolgorde correct is.",
     "restoring": "Je portemonnee wordt hersteld...",
     "restoreSuccess": "Portemonnee succesvol hersteld",
     "restoreFailed": "Herstel mislukt. Probeer opnieuw.",

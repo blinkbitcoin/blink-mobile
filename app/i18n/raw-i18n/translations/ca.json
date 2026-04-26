@@ -2329,6 +2329,7 @@
     "addressScreen": "Maneres de cobrar",
     "tapUserName": "Toca per definir el nom d'usuari",
     "notifications": "Notificacions",
+    "recoveryMethod": "Mètode de recuperació",
     "title": "Configuració",
     "darkMode": "Mode fosc",
     "setToDark": "Mode: fosc",
@@ -3470,7 +3471,7 @@
         "check3": "Ningú em demana aquesta informació per missatge o trucada"
       },
       "Phrase": {
-        "headerTitle": "La teva frase de còpia de seguretat",
+        "headerTitle": "Frase de còpia de seguretat",
         "sparkCompatible": "Aquesta frase de còpia de seguretat funciona en qualsevol {sparkCompatibleLink}",
         "sparkCompatibleLink": "cartera compatible amb Spark",
         "copiedToast": "Frase de còpia de seguretat copiada al porta-retalls",
@@ -3484,7 +3485,8 @@
         "subtitle": "Una comprovació ràpida per veure si l'has escrita correctament",
         "enterWord": "Introdueix la paraula",
         "enterWords": "Introdueix les paraules",
-        "confirm": "Confirmar"
+        "confirm": "Confirmar",
+        "incorrectWord": "Paraula incorrecta, comprova l'ordre"
       },
       "Success": {
         "title": "Benvingut a Blink sense custòdia"
@@ -3542,7 +3544,7 @@
     "nextWords": "Següents 6 paraules",
     "paste": "Enganxar",
     "enterWord": "Paraula",
-    "invalidMnemonic": "Frase de recuperació no vàlida. Si us plau, revisa les paraules i torna-ho a provar.",
+    "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
     "restoring": "Restaurant la teva cartera...",
     "restoreSuccess": "Cartera restaurada amb èxit",
     "restoreFailed": "No s'ha pogut restaurar la cartera. Si us plau, torna-ho a provar.",

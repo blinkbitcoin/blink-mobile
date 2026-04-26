@@ -2329,6 +2329,7 @@
     "addressScreen": "Njia za kupokea malipo",
     "tapUserName": "Guza ili kuandikisha jina la mtumiaji",
     "notifications": "Arifa",
+    "recoveryMethod": "Mbinu ya kurejesha",
     "title": "Mipangilio",
     "darkMode": "Njia ya Giza",
     "setToDark": "Njia: giza.",
@@ -3470,7 +3471,7 @@
         "check3": "Hakuna mtu anayeniomba taarifa hizi kupitia ujumbe au simu"
       },
       "Phrase": {
-        "headerTitle": "Maneno yako ya nakala",
+        "headerTitle": "Kifungu cha akiba",
         "sparkCompatible": "Maneno haya ya nakala yanafanya kazi katika {sparkCompatibleLink} yoyote",
         "sparkCompatibleLink": "pochi inayoendana na Spark",
         "copiedToast": "Maneno ya nakala yamenakiliwa kwenye ubao",
@@ -3484,7 +3485,8 @@
         "subtitle": "Ukaguzi wa haraka kama umeyaandika kwa usahihi",
         "enterWord": "Ingiza neno",
         "enterWords": "Ingiza maneno",
-        "confirm": "Thibitisha"
+        "confirm": "Thibitisha",
+        "incorrectWord": "Neno si sahihi, tafadhali kagua mpangilio"
       },
       "Success": {
         "title": "Karibu kwa Blink isiyo na uhifadhi"
@@ -3542,7 +3544,7 @@
     "nextWords": "Maneno 6 yanayofuata",
     "paste": "Bandika",
     "enterWord": "Neno",
-    "invalidMnemonic": "Msemo wa hifadhi si sahihi. Tafadhali angalia maneno yako na jaribu tena.",
+    "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
     "restoring": "Kurudisha mkoba wako...",
     "restoreSuccess": "Mkoba umerejeshwa kwa mafanikio",
     "restoreFailed": "Imeshindikana kurejesha mkoba. Tafadhali jaribu tena.",
