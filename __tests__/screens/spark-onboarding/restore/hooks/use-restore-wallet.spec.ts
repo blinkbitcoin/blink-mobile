@@ -12,7 +12,7 @@ const mockDeleteMnemonic = jest.fn()
 const mockRecordError = jest.fn()
 const mockToastShow = jest.fn()
 const mockReinitSdk = jest.fn()
-const mockResetBackupState = jest.fn()
+const mockSetBackupCompleted = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
@@ -41,7 +41,8 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
-  useBackupState: () => ({ resetBackupState: mockResetBackupState }),
+  useBackupState: () => ({ setBackupCompleted: mockSetBackupCompleted }),
+  BackupMethod: { Manual: "manual", Recovery: "recovery" },
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -82,7 +83,7 @@ describe("useRestoreWallet", () => {
     expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
-    expect(mockResetBackupState).toHaveBeenCalledTimes(1)
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
