@@ -2328,6 +2328,7 @@
         "addressScreen": "Formas de recibir pagos",
         "tapUserName": "Ingrese aquí para configurarlo",
         "notifications": "Notificaciones",
+        "recoveryMethod": "Método de recuperación",
         "title": "Configuración",
         "darkMode": "Modo oscuro.",
         "setToDark": "Modo: oscuro.",
@@ -3458,7 +3459,7 @@
                 "check3": "Nadie me está pidiendo esta información por mensaje o llamada"
             },
             "Phrase": {
-                "headerTitle": "Tu frase de respaldo",
+                "headerTitle": "Frase de respaldo",
                 "sparkCompatible": "Esta frase de respaldo funciona en cualquier {sparkCompatibleLink}",
                 "sparkCompatibleLink": "billetera compatible con Spark",
                 "copiedToast": "Frase de respaldo copiada al portapapeles",
@@ -3472,7 +3473,8 @@
                 "subtitle": "Una verificación rápida de que la escribiste correctamente",
                 "enterWord": "Ingresa la palabra",
                 "enterWords": "Ingresa las palabras",
-                "confirm": "Confirmar"
+                "confirm": "Confirmar",
+                "incorrectWord": "Palabra incorrecta, revisa el orden"
             },
             "Success": {
                 "title": "Bienvenido a Blink sin custodia"
@@ -3530,7 +3532,7 @@
         "nextWords": "Siguientes 6 palabras",
         "paste": "Pegar",
         "enterWord": "Palabra",
-        "invalidMnemonic": "Frase de respaldo inválida. Por favor revisa tus palabras e intenta de nuevo.",
+        "invalidMnemonic": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto.",
         "restoring": "Restaurando tu billetera...",
         "restoreSuccess": "Billetera restaurada exitosamente",
         "restoreFailed": "Error al restaurar la billetera. Por favor intenta de nuevo.",

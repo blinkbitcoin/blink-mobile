@@ -2329,6 +2329,7 @@
     "addressScreen": "Cara menerima pembayaran",
     "tapUserName": "Ketuk untuk mengatur nama pengguna",
     "notifications": "Notifikasi",
+    "recoveryMethod": "Metode pemulihan",
     "title": "Pengaturan",
     "darkMode": "Mode Gelap",
     "setToDark": "Mode: gelap.",
@@ -3470,7 +3471,7 @@
         "check3": "Tidak ada yang meminta informasi ini melalui pesan atau panggilan"
       },
       "Phrase": {
-        "headerTitle": "Frasa cadangan Anda",
+        "headerTitle": "Frasa cadangan",
         "sparkCompatible": "Frasa cadangan ini berfungsi di {sparkCompatibleLink} mana pun",
         "sparkCompatibleLink": "dompet yang kompatibel dengan Spark",
         "copiedToast": "Frasa cadangan disalin ke papan klip",
@@ -3484,7 +3485,8 @@
         "subtitle": "Pemeriksaan cepat apakah Anda menulisnya dengan benar",
         "enterWord": "Masukkan kata",
         "enterWords": "Masukkan kata-kata",
-        "confirm": "Konfirmasi"
+        "confirm": "Konfirmasi",
+        "incorrectWord": "Kata salah, harap periksa urutannya"
       },
       "Success": {
         "title": "Selamat datang di Blink non-kustodial"
@@ -3542,7 +3544,7 @@
     "nextWords": "6 kata berikutnya",
     "paste": "Tempel",
     "enterWord": "Kata",
-    "invalidMnemonic": "Frasa cadangan tidak valid. Periksa kata-kata Anda dan coba lagi.",
+    "invalidMnemonic": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar.",
     "restoring": "Memulihkan dompet Anda...",
     "restoreSuccess": "Dompet berhasil dipulihkan",
     "restoreFailed": "Gagal memulihkan dompet. Silakan coba lagi.",

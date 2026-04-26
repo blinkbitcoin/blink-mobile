@@ -2346,6 +2346,7 @@
     "addressScreen": "Ways to get paid",
     "tapUserName": "إضغط لتعيين اسم المستخدم",
     "notifications": "Notifications",
+    "recoveryMethod": "طريقة الاسترداد",
     "title": "تطبيق الإعدادات",
     "darkMode": "Dark Mode",
     "setToDark": "Mode: dark.",
@@ -3522,7 +3523,8 @@
         "subtitle": "فحص سريع إذا كنت قد كتبتها بشكل صحيح",
         "enterWord": "أدخل الكلمة",
         "enterWords": "أدخل الكلمات",
-        "confirm": "تأكيد"
+        "confirm": "تأكيد",
+        "incorrectWord": "كلمة غير صحيحة، يرجى التحقق من الترتيب"
       },
       "Success": {
         "title": "مرحبًا بك في Blink غير الحافظة"
@@ -3580,7 +3582,7 @@
     "nextWords": "الكلمات الـ 6 التالية",
     "paste": "لصق",
     "enterWord": "كلمة",
-    "invalidMnemonic": "عبارة نسخ احتياطي غير صالحة. يرجى التحقق من كلماتك والمحاولة مرة أخرى.",
+    "invalidMnemonic": "عبارة نسخ احتياطي غير صحيحة. يرجى التحقق من صحة ترتيب الكلمات.",
     "restoring": "جاري استعادة محفظتك...",
     "restoreSuccess": "تمت استعادة المحفظة بنجاح",
     "restoreFailed": "فشل في استعادة المحفظة. يرجى المحاولة مرة أخرى.",

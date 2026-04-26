@@ -2364,6 +2364,7 @@
     "addressScreen": "Iindlela zokuhlawulwa",
     "tapUserName": "Cofa ukuseta igama lomsebenzisi",
     "notifications": "Izaziso",
+    "recoveryMethod": "Indlela yokubuyisela",
     "title": "Iisetingi",
     "darkMode": "Isimo Esimnyama",
     "setToDark": "Isimo: Esimnyama.",
@@ -3517,7 +3518,7 @@
         "check3": "Akukho mntu undicela olu lwazi ngomlayezo okanye umnxeba"
       },
       "Phrase": {
-        "headerTitle": "Ibinzana lakho lokugcina",
+        "headerTitle": "Ibinzana lokugcina",
         "sparkCompatible": "Eli binzana lokugcina lisebenza kuyo nayiphi na {sparkCompatibleLink}",
         "sparkCompatibleLink": "isikhwama esihambisanayo ne-Spark",
         "copiedToast": "Ibinzana lokugcina likopishwe kwibhodi",
@@ -3531,7 +3532,8 @@
         "subtitle": "Ukuhlola ngokukhawuleza ukuba ulibhale ngokuchanekileyo",
         "enterWord": "Faka igama",
         "enterWords": "Faka amagama",
-        "confirm": "Qinisekisa"
+        "confirm": "Qinisekisa",
+        "incorrectWord": "Igama elingachananga, nceda ujonge ulandelelwano"
       },
       "Success": {
         "title": "Wamkelekile ku-Blink engagcinwayo"
@@ -3589,7 +3591,7 @@
     "nextWords": "Amagama a-6 alandelayo",
     "paste": "Ncamathisela",
     "enterWord": "Igama",
-    "invalidMnemonic": "Umgca wokugcina ongekho semthethweni. Nceda ujonge amagama akho uze uzame kwakhona.",
+    "invalidMnemonic": "Ibinzana lokugcina elingachananga. Nceda ujonge ukuba ulandelelwano lwamagama lulungile.",
     "restoring": "Kubuyiselwa isipaji sakho...",
     "restoreSuccess": "Isipaji sibuyiselwe ngempumelelo",
     "restoreFailed": "Akuphumelelanga ukubuyisela isipaji. Nceda uzame kwakhona.",

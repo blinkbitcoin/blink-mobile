@@ -2346,6 +2346,7 @@
     "addressScreen": "Způsoby platby",
     "tapUserName": "Klepnutím na nastavíte uživatelské jméno",
     "notifications": "Notifications",
+    "recoveryMethod": "Metoda obnovy",
     "title": "Nastavení",
     "darkMode": "Tmavý režim",
     "setToDark": "Režim: tmavý",
@@ -3511,7 +3512,7 @@
         "check3": "Nikdo mě nežádá o tyto informace prostřednictvím zprávy nebo hovoru"
       },
       "Phrase": {
-        "headerTitle": "Vaše záložní fráze",
+        "headerTitle": "Záložní fráze",
         "sparkCompatible": "Tato záložní fráze funguje v jakékoli {sparkCompatibleLink}",
         "sparkCompatibleLink": "peněžence kompatibilní se Spark",
         "copiedToast": "Záložní fráze zkopírována do schránky",
@@ -3525,7 +3526,8 @@
         "subtitle": "Rychlá kontrola, zda jste ji správně zapsali",
         "enterWord": "Zadejte slovo",
         "enterWords": "Zadejte slova",
-        "confirm": "Potvrdit"
+        "confirm": "Potvrdit",
+        "incorrectWord": "Nesprávné slovo, zkontroluj prosím pořadí"
       },
       "Success": {
         "title": "Vítejte v necustodial Blink"
@@ -3583,7 +3585,7 @@
     "nextWords": "Dalších 6 slov",
     "paste": "Vložit",
     "enterWord": "Slovo",
-    "invalidMnemonic": "Neplatná zálohovací fráze. Zkontrolujte svá slova a zkuste to znovu.",
+    "invalidMnemonic": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné.",
     "restoring": "Obnovování vaší peněženky...",
     "restoreSuccess": "Peněženka úspěšně obnovena",
     "restoreFailed": "Obnova peněženky selhala. Zkuste to prosím znovu.",
