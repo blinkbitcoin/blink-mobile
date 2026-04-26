@@ -8,6 +8,8 @@ const ONLINE_STATUSES: readonly ServiceStatus[] = [
   ServiceStatus.Degraded,
 ]
 
+const STATUS_TIMEOUT_MS = 5000
+
 const reportSparkStatusFailure = (err: unknown): void => {
   recordErrorOnce(
     "spark-status-fetch-failed",
@@ -16,12 +18,16 @@ const reportSparkStatusFailure = (err: unknown): void => {
 }
 
 export const getServiceStatus = async (): Promise<ServiceStatus> => {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), STATUS_TIMEOUT_MS)
   try {
-    const { status } = await getSparkStatus()
+    const { status } = await getSparkStatus(controller.signal)
     return status
   } catch (err) {
     reportSparkStatusFailure(err)
     return ServiceStatus.Major
+  } finally {
+    clearTimeout(timer)
   }
 }
 
