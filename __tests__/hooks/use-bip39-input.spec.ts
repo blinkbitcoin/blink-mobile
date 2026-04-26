@@ -3,11 +3,29 @@ import { renderHook, act } from "@testing-library/react-native"
 import { useBip39Input } from "@app/hooks/use-bip39-input"
 
 jest.mock("@app/utils/bip39-wordlist", () => ({
-  BIP39_WORDLIST_EN: ["abandon", "ability", "able", "about", "above", "absent"],
-  getBip39Suggestions: (prefix: string) =>
-    ["abandon", "ability", "able", "about", "above", "absent"].filter((w) =>
-      w.startsWith(prefix),
-    ),
+  BIP39_WORDLIST_EN: [
+    "abandon",
+    "ability",
+    "able",
+    "about",
+    "above",
+    "absent",
+    "run",
+    "runway",
+  ],
+  getBip39Suggestions: (prefix: string, options?: { maxResults?: number }) => {
+    const all = [
+      "abandon",
+      "ability",
+      "able",
+      "about",
+      "above",
+      "absent",
+      "run",
+      "runway",
+    ].filter((w) => w.startsWith(prefix))
+    return options?.maxResults ? all.slice(0, options.maxResults) : all
+  },
   splitWords: (text: string) => text.trim().toLowerCase().split(/\s+/),
 }))
 
@@ -176,5 +194,63 @@ describe("useBip39Input", () => {
 
     expect(result.current.words[5]).toBe("absent")
     expect(result.current.activeIndex).toBe(5)
+  })
+
+  it("requests focus on next index when input is a prefix-unique BIP39 word", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "abandon")
+    })
+
+    expect(result.current.focusRequest).toBe(1)
+  })
+
+  it("does not advance when input is BIP39 word but prefix has multiple matches", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "run")
+    })
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("does not advance when input is not a BIP39 word", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "ru")
+    })
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("does not advance past last index in step", () => {
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 1 }),
+    )
+
+    act(() => {
+      result.current.updateWord(5, "abandon")
+    })
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("clearFocusRequest resets focusRequest", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "abandon")
+    })
+
+    expect(result.current.focusRequest).toBe(1)
+
+    act(() => {
+      result.current.clearFocusRequest()
+    })
+
+    expect(result.current.focusRequest).toBeNull()
   })
 })

@@ -30,6 +30,7 @@ export const useBip39Input = ({
   const [words, setWords] = useState<string[]>(initialWords ?? Array(wordCount).fill(""))
   const [activeIndex, setActiveIndex] = useState(offset)
   const [keyboardVisible, setKeyboardVisible] = useState(false)
+  const [focusRequest, setFocusRequest] = useState<number | null>(null)
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () =>
@@ -45,13 +46,25 @@ export const useBip39Input = ({
     }
   }, [])
 
-  const updateWord = useCallback((index: number, value: string) => {
-    setWords((prev) => {
-      const next = [...prev]
-      next[index] = value.toLowerCase().trim()
-      return next
-    })
-  }, [])
+  const updateWord = useCallback(
+    (index: number, value: string) => {
+      const normalized = value.toLowerCase().trim()
+      setWords((prev) => {
+        const next = [...prev]
+        next[index] = normalized
+        return next
+      })
+      const lastIndexInStep = offset + wordsPerStep - 1
+      if (!BIP39_WORD_SET.has(normalized)) return
+      if (index >= lastIndexInStep) return
+      const matches = BIP39_WORDLIST_EN.filter((w) => w.startsWith(normalized))
+      if (matches.length !== 1) return
+      setFocusRequest(index + 1)
+    },
+    [offset, wordsPerStep],
+  )
+
+  const clearFocusRequest = useCallback(() => setFocusRequest(null), [])
 
   const handlePaste = useCallback(
     (text: string) => {
@@ -68,8 +81,9 @@ export const useBip39Input = ({
     if (!keyboardVisible) return []
     const current = words[activeIndex]
     if (!current || current.length < MIN_CHARS) return []
-    if (BIP39_WORD_SET.has(current)) return []
-    return getBip39Suggestions(current, { maxResults: MAX_SUGGESTIONS })
+    const matches = getBip39Suggestions(current, { maxResults: MAX_SUGGESTIONS })
+    if (matches.length === 1 && matches[0] === current) return []
+    return matches
   }, [words, activeIndex, keyboardVisible])
 
   const selectSuggestion = useCallback(
@@ -99,5 +113,7 @@ export const useBip39Input = ({
     selectSuggestion,
     stepFilled,
     allFilled,
+    focusRequest,
+    clearFocusRequest,
   }
 }
