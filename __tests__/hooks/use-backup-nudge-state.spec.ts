@@ -21,6 +21,15 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockRemoteConfig(),
 }))
 
+jest.mock("@app/components/balance-header/use-total-balance", () => ({
+  useTotalBalance: (wallets: Array<{ walletCurrency: string; balance: number }>) => ({
+    satsBalance: wallets.reduce(
+      (sum, w) => (w.walletCurrency === "BTC" ? sum + w.balance : sum),
+      0,
+    ),
+  }),
+}))
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: (...args: string[]) => mockGetItem(...args),
   setItem: (...args: string[]) => mockSetItem(...args),
@@ -30,11 +39,11 @@ const defaultBackupState = { backupState: { status: "none", method: null } }
 const completedBackupState = { backupState: { status: "completed", method: "manual" } }
 const selfCustodialWallet = {
   accountType: "self-custodial",
-  wallets: [{ walletCurrency: "BTC", balance: { amount: 3000 } }],
+  wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 3000 } }],
 }
 const custodialWallet = {
   accountType: "custodial",
-  wallets: [{ walletCurrency: "BTC", balance: { amount: 50000 } }],
+  wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 50000 } }],
 }
 const defaultConfig = {
   backupNudgeBannerThreshold: 2100,
@@ -80,7 +89,7 @@ describe("useBackupNudgeState", () => {
   it("shows modal when balance >= modal threshold", async () => {
     mockActiveWallet.mockReturnValue({
       accountType: "self-custodial",
-      wallets: [{ walletCurrency: "BTC", balance: { amount: 22000 } }],
+      wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
     })
 
     const { result } = renderHook(() => useBackupNudgeState())
