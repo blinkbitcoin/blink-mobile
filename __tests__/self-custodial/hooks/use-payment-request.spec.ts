@@ -175,7 +175,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr.info?.data?.getFullUriFn({ uppercase: true })
+    const uri = result.current?.pr?.info?.data?.getFullUriFn({ uppercase: true })
     expect(uri).toBe("LNBC1TEST...")
   })
 
