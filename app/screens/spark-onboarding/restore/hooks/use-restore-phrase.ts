@@ -8,6 +8,7 @@ import { validateMnemonic } from "bip39"
 import { useBip39Input } from "@app/hooks/use-bip39-input"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { splitWords } from "@app/utils/bip39-wordlist"
 
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
 
@@ -34,10 +35,27 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     initialWords,
   })
 
+  const handlePaste = useCallback(
+    (text: string) => {
+      const accepted = bip39.handlePaste(text)
+      if (!accepted || !isStep1) return accepted
+
+      const parsed = splitWords(text)
+      if (parsed.length === WORD_COUNT && validateMnemonic(parsed.join(" "))) {
+        navigation.navigate("sparkRestorePhraseScreen", {
+          step: PhraseStep.Second,
+          words: parsed,
+        })
+      }
+      return accepted
+    },
+    [bip39, isStep1, navigation],
+  )
+
   const handlePasteFromClipboard = useCallback(async () => {
     const text = await Clipboard.getString()
-    if (text) bip39.handlePaste(text)
-  }, [bip39])
+    if (text) handlePaste(text)
+  }, [handlePaste])
 
   const isValid = useMemo(() => {
     if (!bip39.allFilled) return false
@@ -76,9 +94,11 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     setActiveIndex: bip39.setActiveIndex,
     suggestions: bip39.suggestions,
     selectSuggestion: bip39.selectSuggestion,
-    handlePaste: bip39.handlePaste,
+    handlePaste,
     stepFilled: bip39.stepFilled,
     allFilled: bip39.allFilled,
+    focusRequest: bip39.focusRequest,
+    clearFocusRequest: bip39.clearFocusRequest,
     updateWord,
     handlePasteFromClipboard,
     isValid,
