@@ -189,7 +189,7 @@ export type RootStackParamList = {
   sparkBackupConfirmScreen: {
     challenges: Array<{ index: number; word: string }>
   }
-  sparkBackupSuccessScreen: undefined
+  sparkBackupSuccessScreen: { reBackup?: boolean } | undefined
   sparkMigrationExplainer: undefined
   sparkMigrationTransferringFunds: undefined
   sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }
