@@ -9,7 +9,7 @@ import {
 const mockGetSparkStatus = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  getSparkStatus: () => mockGetSparkStatus(),
+  getSparkStatus: (signal?: AbortSignal) => mockGetSparkStatus(signal),
 }))
 
 describe("getServiceStatus", () => {
@@ -37,6 +37,36 @@ describe("getServiceStatus", () => {
     mockGetSparkStatus.mockRejectedValue(new Error("network down"))
 
     expect(await getServiceStatus()).toBe(ServiceStatus.Major)
+  })
+
+  it("forwards an AbortSignal to getSparkStatus", async () => {
+    mockGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await getServiceStatus()
+
+    const signal = mockGetSparkStatus.mock.calls[0][0]
+    expect(signal).toBeInstanceOf(AbortSignal)
+    expect(signal.aborted).toBe(false)
+  })
+
+  it("aborts and returns Major when the SDK call hangs past the timeout", async () => {
+    jest.useFakeTimers()
+    mockGetSparkStatus.mockImplementation(
+      (signal: AbortSignal) =>
+        new Promise((_, reject) => {
+          signal.addEventListener("abort", () => reject(new Error("aborted")))
+        }),
+    )
+
+    const promise = getServiceStatus()
+    jest.runAllTimers()
+    const result = await promise
+
+    expect(result).toBe(ServiceStatus.Major)
+    jest.useRealTimers()
   })
 })
 

@@ -82,29 +82,20 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     refreshingRef.current = true
 
     try {
-      const serviceStatus = await getServiceStatus()
-      if (!isOnlineStatus(serviceStatus)) {
-        setStatus((prev) =>
-          OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
-        )
-        return
-      }
-
       const snapshot = await getSelfCustodialWalletSnapshot(sdkRef.current)
       setWallets(snapshot.wallets)
       setHasMoreTransactions(snapshot.hasMore)
       rawTxOffsetRef.current = snapshot.rawTransactionCount
       setStatus(ActiveWalletStatus.Ready)
-
       updateBalanceStale(detectBalanceStale(snapshot.wallets))
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
       crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
+      const serviceStatus = await getServiceStatus()
+      const online = isOnlineStatus(serviceStatus)
       setStatus((prev) => {
-        if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {
-          return ActiveWalletStatus.Offline
-        }
-        return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Ready : prev
+        if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
+        return online ? ActiveWalletStatus.Error : ActiveWalletStatus.Offline
       })
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
