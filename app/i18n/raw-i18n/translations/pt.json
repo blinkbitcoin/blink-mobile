@@ -2329,6 +2329,7 @@
         "addressScreen": "Formas de receber pagamentos",
         "tapUserName": "Toque para definir o nome de usuário",
         "notifications": "Notificações",
+        "recoveryMethod": "Método de recuperação",
         "title": "Configurações",
         "darkMode": "Modo Escuro",
         "setToDark": "Modo: escuro.",
@@ -3458,7 +3459,7 @@
                 "check3": "Ninguém está me pedindo estas informações por mensagem ou ligação"
             },
             "Phrase": {
-                "headerTitle": "Sua frase de backup",
+                "headerTitle": "Frase de backup",
                 "sparkCompatible": "Esta frase de backup funciona em qualquer {sparkCompatibleLink}",
                 "sparkCompatibleLink": "carteira compatível com Spark",
                 "copiedToast": "Frase de backup copiada para a área de transferência",
@@ -3472,7 +3473,8 @@
                 "subtitle": "Uma verificação rápida se você a escreveu corretamente",
                 "enterWord": "Digite a palavra",
                 "enterWords": "Digite as palavras",
-                "confirm": "Confirmar"
+                "confirm": "Confirmar",
+                "incorrectWord": "Palavra incorreta, verifique a ordem"
             },
             "Success": {
                 "title": "Bem-vindo ao Blink não-custodial"
@@ -3530,7 +3532,7 @@
         "nextWords": "Próximas 6 palavras",
         "paste": "Colar",
         "enterWord": "Palavra",
-        "invalidMnemonic": "Frase de backup inválida. Verifique suas palavras e tente novamente.",
+        "invalidMnemonic": "Frase de backup inválida. Verifique se a ordem das palavras está correta.",
         "restoring": "Restaurando sua carteira...",
         "restoreSuccess": "Carteira restaurada com sucesso",
         "restoreFailed": "Falha ao restaurar carteira. Tente novamente.",
