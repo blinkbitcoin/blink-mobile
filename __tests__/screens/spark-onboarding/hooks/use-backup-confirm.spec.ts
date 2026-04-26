@@ -124,4 +124,47 @@ describe("useBackupConfirm", () => {
 
     expect(mockOnComplete).not.toHaveBeenCalled()
   })
+
+  it("requests focus on next index when correct word is typed", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "youth"))
+
+    expect(result.current.focusRequest).toBe(1)
+  })
+
+  it("does not request focus past the last challenge", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(2, "harvest"))
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("does not request focus when typed word is wrong", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "young"))
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("clearFocusRequest resets focusRequest", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "youth"))
+    expect(result.current.focusRequest).toBe(1)
+
+    act(() => result.current.clearFocusRequest())
+
+    expect(result.current.focusRequest).toBeNull()
+  })
 })
