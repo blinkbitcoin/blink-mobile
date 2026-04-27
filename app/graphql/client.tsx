@@ -63,7 +63,7 @@ const noRetryOperations = [
   "deviceNotificationTokenCreate",
 
   // Self-custodial payments go through Breez SDK directly, not Apollo.
-  // Add any future SC-related GraphQL operations here if needed.
+  // Add any future self-custodial GraphQL operations here if needed.
 ]
 
 const getAuthorizationHeader = (token: string): string => {

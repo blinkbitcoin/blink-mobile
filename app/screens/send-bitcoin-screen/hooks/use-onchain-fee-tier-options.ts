@@ -6,7 +6,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { wrapDestinationForSC } from "@app/self-custodial/payment-details/wrap-destination"
+import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
   ConvertMoneyAmount,
@@ -88,7 +88,7 @@ export const useOnchainFeeTierOptions = ({
       if (!sdk || !paymentDestination || !convertMoneyAmount) return null
       if (currentDetail.paymentType !== PaymentType.Onchain) return null
 
-      const wrapped = wrapDestinationForSC(paymentDestination, sdk, { feeTier: tier })
+      const wrapped = wrapDestination(paymentDestination, sdk, { feeTier: tier })
       if (!wrapped.valid || !("createPaymentDetail" in wrapped)) return null
 
       const rebuilt = wrapped.createPaymentDetail({

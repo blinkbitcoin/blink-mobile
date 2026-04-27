@@ -37,7 +37,7 @@ export const resolveSparkDestination = (
     validDestination: destination,
     destinationDirection: DestinationDirection.Send,
     createPaymentDetail: () => {
-      throw new Error("Spark destinations must be wrapped via wrapDestinationForSC")
+      throw new Error("Spark destinations must be wrapped via wrapDestination")
     },
   }
 }

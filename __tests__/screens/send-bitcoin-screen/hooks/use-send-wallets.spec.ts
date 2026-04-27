@@ -49,7 +49,7 @@ describe("useSendWallets", () => {
     })
   })
 
-  it("returns SC wallets when self-custodial", () => {
+  it("returns wallets when self-custodial", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       isReady: true,
@@ -98,7 +98,7 @@ describe("useSendWallets", () => {
     expect(result.current.network).toBe("mainnet")
   })
 
-  it("returns loading true when SC wallet not ready", () => {
+  it("returns loading true when self-custodial wallet not ready", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       isReady: false,
@@ -112,7 +112,7 @@ describe("useSendWallets", () => {
     expect(result.current.loading).toBe(true)
   })
 
-  it("defaults SC wallet to BTC", () => {
+  it("defaults self-custodial wallet to BTC", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       isReady: true,
@@ -132,7 +132,7 @@ describe("useSendBalances", () => {
     jest.clearAllMocks()
   })
 
-  it("returns SC wallet balances when self-custodial", () => {
+  it("returns wallet balances when self-custodial", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       wallets: [btcWallet, usdWallet],

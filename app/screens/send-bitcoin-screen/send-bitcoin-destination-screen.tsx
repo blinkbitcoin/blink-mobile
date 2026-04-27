@@ -37,7 +37,7 @@ import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { parseSparkAddress } from "@app/self-custodial/bridge"
-import { wrapDestinationForSC } from "@app/self-custodial/payment-details/wrap-destination"
+import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 
 import { toWalletBalances } from "./hooks/use-send-wallets"
@@ -359,7 +359,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             return
           }
 
-          const wrapped = wrapDestinationForSC(sparkDest, sdk)
+          const wrapped = wrapDestination(sparkDest, sdk)
           if (!wrapped.valid) return
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetValid,
@@ -379,7 +379,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       logParseDestinationResult(destination)
 
       const wrappedDestination =
-        isSelfCustodial && sdk ? wrapDestinationForSC(destination, sdk) : destination
+        isSelfCustodial && sdk ? wrapDestination(destination, sdk) : destination
 
       if (wrappedDestination.valid === false) {
         if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {

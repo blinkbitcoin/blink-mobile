@@ -1,19 +1,19 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
-import { wrapDestinationForSC } from "@app/self-custodial/payment-details/wrap-destination"
+import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 
-const mockCreateSCLightning = jest.fn().mockReturnValue({ paymentType: "lightning" })
-const mockCreateSCOnchain = jest.fn().mockReturnValue({ paymentType: "onchain" })
+const mockCreateLightning = jest.fn().mockReturnValue({ paymentType: "lightning" })
+const mockCreateOnchain = jest.fn().mockReturnValue({ paymentType: "onchain" })
 
 jest.mock("@app/self-custodial/payment-details/lightning", () => ({
   createSelfCustodialLightningPaymentDetails: (...args: unknown[]) =>
-    mockCreateSCLightning(...args),
+    mockCreateLightning(...args),
 }))
 
 jest.mock("@app/self-custodial/payment-details/onchain", () => ({
   createSelfCustodialOnchainPaymentDetails: (...args: unknown[]) =>
-    mockCreateSCOnchain(...args),
+    mockCreateOnchain(...args),
 }))
 
 const mockSdk = {} as never
@@ -35,14 +35,14 @@ const createParams = () => ({
 const callCreatePaymentDetail = (wrapped: any) =>
   wrapped.createPaymentDetail(createParams())
 
-describe("wrapDestinationForSC", () => {
+describe("wrapDestination", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it("returns result as-is when invalid", () => {
     const result = { valid: false as const } as never
-    expect(wrapDestinationForSC(result, mockSdk)).toBe(result)
+    expect(wrapDestination(result, mockSdk)).toBe(result)
   })
 
   it("returns result as-is when direction is Receive", () => {
@@ -52,7 +52,7 @@ describe("wrapDestinationForSC", () => {
       validDestination: { paymentType: PaymentType.Lightning },
       createPaymentDetail: jest.fn(),
     } as never
-    expect(wrapDestinationForSC(result, mockSdk)).toBe(result)
+    expect(wrapDestination(result, mockSdk)).toBe(result)
   })
 
   it("wraps Lightning destination", () => {
@@ -61,10 +61,10 @@ describe("wrapDestinationForSC", () => {
       amount: 1000,
     })
 
-    const wrapped = wrapDestinationForSC(result, mockSdk)
+    const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
-    expect(mockCreateSCLightning).toHaveBeenCalledWith(
+    expect(mockCreateLightning).toHaveBeenCalledWith(
       expect.objectContaining({
         sdk: mockSdk,
         paymentRequest: "lnbc1...",
@@ -79,10 +79,10 @@ describe("wrapDestinationForSC", () => {
       amount: 0,
     })
 
-    const wrapped = wrapDestinationForSC(result, mockSdk)
+    const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
-    expect(mockCreateSCLightning).toHaveBeenCalledWith(
+    expect(mockCreateLightning).toHaveBeenCalledWith(
       expect.objectContaining({ hasAmount: false }),
     )
   })
@@ -92,10 +92,10 @@ describe("wrapDestinationForSC", () => {
       lnurl: "lnurl1...",
     })
 
-    const wrapped = wrapDestinationForSC(result, mockSdk)
+    const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
-    expect(mockCreateSCLightning).toHaveBeenCalledWith(
+    expect(mockCreateLightning).toHaveBeenCalledWith(
       expect.objectContaining({ paymentRequest: "lnurl1..." }),
     )
   })
@@ -105,10 +105,10 @@ describe("wrapDestinationForSC", () => {
       address: "bc1q...",
     })
 
-    const wrapped = wrapDestinationForSC(result, mockSdk)
+    const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
-    expect(mockCreateSCOnchain).toHaveBeenCalledWith(
+    expect(mockCreateOnchain).toHaveBeenCalledWith(
       expect.objectContaining({
         sdk: mockSdk,
         address: "bc1q...",
@@ -127,11 +127,11 @@ describe("wrapDestinationForSC", () => {
       createPaymentDetail: originalCreatePaymentDetail,
     } as never
 
-    const wrapped = wrapDestinationForSC(result, mockSdk)
+    const wrapped = wrapDestination(result, mockSdk)
     callCreatePaymentDetail(wrapped)
 
     expect(originalCreatePaymentDetail).toHaveBeenCalled()
-    expect(mockCreateSCLightning).not.toHaveBeenCalled()
-    expect(mockCreateSCOnchain).not.toHaveBeenCalled()
+    expect(mockCreateLightning).not.toHaveBeenCalled()
+    expect(mockCreateOnchain).not.toHaveBeenCalled()
   })
 })

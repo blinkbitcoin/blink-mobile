@@ -91,7 +91,7 @@ const buildOnchainDetail = <T extends WalletCurrency>({
     ...params,
   })
 
-export const wrapDestinationForSC = (
+export const wrapDestination = (
   result: ParseDestinationResult,
   sdk: BreezSdkInterface,
   options: WrapOptions = {},

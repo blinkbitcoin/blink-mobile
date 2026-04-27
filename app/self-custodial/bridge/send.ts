@@ -10,7 +10,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { centsToTokenBaseUnits } from "@app/types/amounts"
+import { centsToTokenBaseUnits } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
 import { SparkConfig, SparkToken } from "../config"

@@ -17,14 +17,14 @@ import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
 
 import { createGetFee, createSendMutation } from "./send-helpers"
 
-type CreateSCSparkParams<T extends WalletCurrency> = {
+type CreateSparkParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>(
-  params: CreateSCSparkParams<T>,
+  params: CreateSparkParams<T>,
 ): PaymentDetail<T> => {
   const {
     sdk,

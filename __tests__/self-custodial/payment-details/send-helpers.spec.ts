@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck — GetFee<T> type expects GQL fee probe params that SC doesn't use
+// @ts-nocheck — GetFee<T> type expects GQL fee probe params that self-custodial doesn't use
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
