@@ -11,7 +11,7 @@ import {
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"

@@ -1,24 +1,24 @@
+import { formatDuration } from "@app/utils/date"
+
 import {
   type FeeTierInfo,
   type FeeTierOption,
   FeeTierOption as Tier,
-} from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+} from "./hooks/fee-tiers.types"
 
-import { formatDuration } from "./date"
-
-type FormatFeeTierParams = {
+type BuildFeeTierOptionsParams = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   labels: Record<FeeTierOption, string>
   formatSats: (sats: number) => string
   locale: string
 }
 
-export const formatFeeTierOptions = ({
+export const buildFeeTierOptions = ({
   tiers,
   labels,
   formatSats,
   locale,
-}: FormatFeeTierParams) =>
+}: BuildFeeTierOptionsParams) =>
   [Tier.Fast, Tier.Medium, Tier.Slow].map((tier) => {
     const info = tiers[tier]
     const feePart = formatSats(info.feeSats)

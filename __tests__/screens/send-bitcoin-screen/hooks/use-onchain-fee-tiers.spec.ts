@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   useOnchainFeeTiers,
-  FeeTierOption,
   SdkFeeError,
 } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 
