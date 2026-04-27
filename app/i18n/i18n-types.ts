@@ -9258,7 +9258,7 @@ type RootTranslation = {
 		 * @param {string} os
 		 * @param {string} version
 		 */
-		defaultSupportMessage: RequiredParams<'bankName' | 'os' | 'version'>
+		defaultSupportMessage: RequiredParams<'accountId' | 'bankName' | 'os' | 'version'>
 		/**
 		 * e​m​a​i​l​ ​{​e​m​a​i​l​}​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 * @param {string} email
@@ -20426,7 +20426,7 @@ export type TranslationFunctions = {
 		/**
 		 * Hey there! I need some help with {bankName}, I'm using the version {version} on {os}.
 		 */
-		defaultSupportMessage: (arg: { bankName: string, os: string, version: string }) => LocalizedString
+		defaultSupportMessage: (arg: { accountId: string, bankName: string, os: string, version: string }) => LocalizedString
 		/**
 		 * email {email} copied to clipboard
 		 */

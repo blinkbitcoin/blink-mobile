@@ -4,6 +4,7 @@ import { getReadableVersion } from "react-native-device-info"
 
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { isIos } from "@app/utils/helper"
 
 import { GaloyTertiaryButton } from "../atomic/galoy-tertiary-button"
@@ -16,10 +17,14 @@ export const ContactSupportButton = ({
 }) => {
   const [showContactSupport, setShowContactSupport] = useState(false)
   const { LL } = useI18nContext()
+  const { data } = useSettingsScreenQuery()
   const { appConfig } = useAppConfig()
   const { name: bankName } = appConfig.galoyInstance
 
+  const accountId = data?.me?.defaultAccount?.id || "Unknown"
+
   const messageBody = LL.support.defaultSupportMessage({
+    accountId,
     os: isIos ? "iOS" : "Android",
     version: getReadableVersion(),
     bankName,
