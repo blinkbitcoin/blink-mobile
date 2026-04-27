@@ -17,7 +17,7 @@ import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
 
 import { createGetFee, createSendMutation } from "./send-helpers"
 
-type CreateSCLightningParams<T extends WalletCurrency> = {
+type CreateLightningParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   paymentRequest: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
@@ -25,7 +25,7 @@ type CreateSCLightningParams<T extends WalletCurrency> = {
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurrency>(
-  params: CreateSCLightningParams<T>,
+  params: CreateLightningParams<T>,
 ): PaymentDetail<T> => {
   const {
     sdk,

@@ -14,8 +14,8 @@ import {
   MoneyAmount,
   WalletOrDisplayCurrency,
   toBtcMoneyAmount,
-  toSatsAmount,
 } from "@app/types/amounts"
+import { toSatsAmount } from "@app/utils/amounts"
 import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
 
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"

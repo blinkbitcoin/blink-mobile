@@ -283,7 +283,7 @@ describe("usePaymentRequest", () => {
     expect(result2.current?.state).toBe("Created")
   })
 
-  it("has correct SC-specific defaults", async () => {
+  it("has correct self-custodial-specific defaults", async () => {
     const { result } = renderHook(() => usePaymentRequest())
 
     await waitFor(() => {

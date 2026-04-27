@@ -16,7 +16,7 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
 
-type CreateSCOnchainParams<T extends WalletCurrency> = {
+type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
@@ -24,7 +24,7 @@ type CreateSCOnchainParams<T extends WalletCurrency> = {
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
-  params: CreateSCOnchainParams<T>,
+  params: CreateOnchainParams<T>,
 ): PaymentDetail<T> => {
   const {
     sdk,

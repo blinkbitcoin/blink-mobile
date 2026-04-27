@@ -1,5 +1,5 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import { toSatsAmount } from "@app/types/amounts"
+import { toSatsAmount } from "@app/utils/amounts"
 
 const mockConvert = jest.fn()
 
