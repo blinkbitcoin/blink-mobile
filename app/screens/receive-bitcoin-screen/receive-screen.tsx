@@ -39,7 +39,7 @@ import {
 
 const AUTO_DISMISS_DELAY = 5000
 
-const SC_BLOCKED_STATUSES: ActiveWalletStatus[] = [
+const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
   ActiveWalletStatus.Error,
   ActiveWalletStatus.Unavailable,
 ]
@@ -47,13 +47,13 @@ const SC_BLOCKED_STATUSES: ActiveWalletStatus[] = [
 const ReceiveScreen = () => {
   const { isSelfCustodial, status } = useActiveWallet()
   const custodialRequest = usePaymentRequest()
-  const scRequest = useSelfCustodialPaymentRequest()
+  const selfCustodialRequest = useSelfCustodialPaymentRequest()
 
-  if (isSelfCustodial && SC_BLOCKED_STATUSES.includes(status)) {
+  if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
     return null
   }
 
-  const requestState = isSelfCustodial ? scRequest : custodialRequest
+  const requestState = isSelfCustodial ? selfCustodialRequest : custodialRequest
   if (!requestState) return null
 
   return (

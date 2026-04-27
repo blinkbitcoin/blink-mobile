@@ -80,7 +80,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const isAuthed = useIsAuthed()
   const client = useApolloClient()
   const activeWallet = useActiveWallet()
-  const { loadMore: scLoadMore } = useSelfCustodialWallet()
+  const { loadMore: selfCustodialLoadMore } = useSelfCustodialWallet()
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
@@ -149,7 +149,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     dataToRender?.me?.defaultAccount?.pendingIncomingTransactions
   const transactions = dataToRender?.me?.defaultAccount?.transactions
 
-  const scDisplayInfo = React.useMemo(
+  const selfCustodialDisplayInfo = React.useMemo(
     () =>
       convertMoneyAmount
         ? { displayCurrency, convertMoneyAmount, fractionDigits }
@@ -157,12 +157,12 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     [convertMoneyAmount, displayCurrency, fractionDigits],
   )
 
-  const scAllFragments = React.useMemo(() => {
+  const selfCustodialFragments = React.useMemo(() => {
     if (!activeWallet.isSelfCustodial) return []
     const allTxs = activeWallet.wallets.flatMap((w) => w.transactions)
     const describe = (tx: Parameters<typeof getTransactionDescription>[0]) =>
       getTransactionDescription(tx, LL)
-    const fragments = toTransactionFragments(allTxs, scDisplayInfo, describe)
+    const fragments = toTransactionFragments(allTxs, selfCustodialDisplayInfo, describe)
     const withoutFailed = fragments.filter((tx) => tx.status !== TxStatus.Failure)
     if (walletFilter === "ALL") return withoutFailed
     return withoutFailed.filter((tx) => tx.settlementCurrency === walletFilter)
@@ -170,22 +170,22 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     activeWallet.isSelfCustodial,
     activeWallet.wallets,
     walletFilter,
-    scDisplayInfo,
+    selfCustodialDisplayInfo,
     LL,
   ])
 
-  const scSettled = React.useMemo(
-    () => scAllFragments.filter((tx) => tx.status !== TxStatus.Pending),
-    [scAllFragments],
+  const selfCustodialSettled = React.useMemo(
+    () => selfCustodialFragments.filter((tx) => tx.status !== TxStatus.Pending),
+    [selfCustodialFragments],
   )
 
-  const scPending = React.useMemo(
-    () => scAllFragments.filter((tx) => tx.status === TxStatus.Pending),
-    [scAllFragments],
+  const selfCustodialPending = React.useMemo(
+    () => selfCustodialFragments.filter((tx) => tx.status === TxStatus.Pending),
+    [selfCustodialFragments],
   )
 
   React.useEffect(() => {
-    scAllFragments.forEach((tx) => {
+    selfCustodialFragments.forEach((tx) => {
       client.writeFragment({
         id: client.cache.identify({ __typename: "Transaction", id: tx.id }),
         fragment: TransactionFragmentDoc,
@@ -193,17 +193,17 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         data: tx,
       })
     })
-  }, [client, scAllFragments])
+  }, [client, selfCustodialFragments])
 
   const settledTxs = React.useMemo(() => {
-    if (activeWallet.isSelfCustodial) return scSettled
+    if (activeWallet.isSelfCustodial) return selfCustodialSettled
     return transactions?.edges?.map((e) => e.node) ?? []
-  }, [activeWallet.isSelfCustodial, scSettled, transactions])
+  }, [activeWallet.isSelfCustodial, selfCustodialSettled, transactions])
 
   const pendingTxs = React.useMemo<TransactionFragment[]>(() => {
-    if (activeWallet.isSelfCustodial) return scPending
+    if (activeWallet.isSelfCustodial) return selfCustodialPending
     return pendingIncomingTransactions ? [...pendingIncomingTransactions] : []
-  }, [activeWallet.isSelfCustodial, scPending, pendingIncomingTransactions])
+  }, [activeWallet.isSelfCustodial, selfCustodialPending, pendingIncomingTransactions])
 
   const sections = React.useMemo(
     () =>
@@ -379,7 +379,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const fetchNextTransactionsPage = () => {
     if (activeWallet.isSelfCustodial) {
-      scLoadMore()
+      selfCustodialLoadMore()
       return
     }
 
