@@ -12,8 +12,8 @@ import {
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { DepositStatus } from "@app/types/payment.types"
 import { testProps } from "@app/utils/testProps"
@@ -38,7 +38,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const [feeTier, setFeeTier] = useState<FeeTierOption>(FeeTierOption.Medium)
 
   const feeTiers = useRecommendedFeeTiers(sdk ?? null, refundDepositId !== null)
-  const feeTierOptions = formatFeeTierOptions({
+  const feeTierOptions = buildFeeTierOptions({
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),

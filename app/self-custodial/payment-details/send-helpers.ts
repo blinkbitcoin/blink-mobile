@@ -8,7 +8,7 @@ import {
   GetFee,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { toWalletAmount } from "@app/types/amounts"
 
 import { executeSend, extractOnchainFees, prepareSend } from "../bridge"

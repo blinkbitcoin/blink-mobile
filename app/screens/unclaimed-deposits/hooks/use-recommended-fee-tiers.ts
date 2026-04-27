@@ -4,12 +4,12 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { getRecommendedFees } from "@app/self-custodial/bridge"
 
+import { ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import {
-  ETA_MINUTES,
   type FeeTierInfo,
-  type FeeTierOption,
+  FeeTierOption,
   FeeTierOption as Tier,
-} from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 
 const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
   [Tier.Fast]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Fast] },
