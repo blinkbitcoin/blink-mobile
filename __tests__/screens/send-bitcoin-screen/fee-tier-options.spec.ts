@@ -1,4 +1,4 @@
-import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
+import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
 
 jest.mock("react-native-config", () => ({
   BREEZ_NETWORK: "regtest",
@@ -13,7 +13,7 @@ jest.mock("@app/utils/date", () => ({
     `${value}${opts.unit === "minute" ? "m" : "h"}`,
 }))
 
-describe("formatFeeTierOptions", () => {
+describe("buildFeeTierOptions", () => {
   const tiers = {
     fast: { feeSats: 500, etaMinutes: 10 },
     medium: { feeSats: 300, etaMinutes: 30 },
@@ -27,7 +27,7 @@ describe("formatFeeTierOptions", () => {
   }
 
   it("formats options with label, detail, and id", () => {
-    const result = formatFeeTierOptions({
+    const result = buildFeeTierOptions({
       tiers,
       labels,
       formatSats: (sats) => `${sats} sats`,
@@ -53,7 +53,7 @@ describe("formatFeeTierOptions", () => {
   })
 
   it("uses custom formatSats function", () => {
-    const result = formatFeeTierOptions({
+    const result = buildFeeTierOptions({
       tiers,
       labels,
       formatSats: (sats) => `${sats} sat/vB`,

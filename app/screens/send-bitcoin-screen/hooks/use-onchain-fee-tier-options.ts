@@ -13,10 +13,11 @@ import {
   type PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { type ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { formatFeeTierOptions } from "@app/utils/format-fee-tier-options"
 
+import { buildFeeTierOptions } from "../fee-tier-options"
+
+import { FeeTierOption } from "./fee-tiers.types"
 import {
-  FeeTierOption,
   type SdkFeeError,
   SdkFeeError as FeeError,
   useOnchainFeeTiers,
@@ -68,7 +69,7 @@ export const useOnchainFeeTierOptions = ({
 
   const feeTierErrorMessage = feeError ? resolveFeeErrorMessage(feeError, LL) : undefined
 
-  const feeTierOptions = formatFeeTierOptions({
+  const feeTierOptions = buildFeeTierOptions({
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),

@@ -2,7 +2,7 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   type CreatePaymentDetailParams,
   DestinationDirection,

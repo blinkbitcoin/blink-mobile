@@ -1,5 +1,4 @@
 import { Platform } from "react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { MASK_CHAR } from "@app/config/appinfo"
 
@@ -106,12 +105,5 @@ export const toNumber = (value: bigint | string | number): number => {
   if (typeof value === "number") return value
   const parsed = Number(value)
   if (Number.isNaN(parsed)) return 0
-  if (!Number.isSafeInteger(parsed) && typeof value === "bigint") {
-    crashlytics().recordError(
-      new Error(
-        `toNumber: bigint value ${value.toString()} exceeds Number.MAX_SAFE_INTEGER; precision lost`,
-      ),
-    )
-  }
   return parsed
 }
