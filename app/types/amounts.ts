@@ -75,29 +75,6 @@ export const toWalletMoneyAmount = (
   return toUsdMoneyAmount(Math.abs(amount))
 }
 
-export const toSatsAmount = (
-  amount: MoneyAmount<WalletOrDisplayCurrency>,
-  convert: (
-    amount: MoneyAmount<WalletOrDisplayCurrency>,
-    currency: WalletCurrency,
-  ) => MoneyAmount<WalletCurrency>,
-): number => convert(amount, WalletCurrency.Btc).amount
-
-const DISPLAY_DECIMALS = 2
-
-export const tokenBaseUnitsToCents = (
-  rawAmount: number,
-  tokenDecimals: number,
-): number => {
-  const excessDecimals = Math.max(tokenDecimals - DISPLAY_DECIMALS, 0)
-  return Math.round(rawAmount / 10 ** excessDecimals)
-}
-
-export const centsToTokenBaseUnits = (cents: number, tokenDecimals: number): number => {
-  const excessDecimals = Math.max(tokenDecimals - DISPLAY_DECIMALS, 0)
-  return Math.round(cents * 10 ** excessDecimals)
-}
-
 export const toWalletAmount = <T extends WalletCurrency>({
   amount,
   currency,

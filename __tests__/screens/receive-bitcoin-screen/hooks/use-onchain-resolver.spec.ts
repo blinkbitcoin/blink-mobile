@@ -93,7 +93,7 @@ describe("useOnchainResolver", () => {
     expect(mockUseOnChainAddress).toHaveBeenCalledWith(undefined, expect.any(Object))
   })
 
-  it("returns the SC onchain address + loading=false once available", () => {
+  it("returns the self-custodial onchain address + loading=false once available", () => {
     const state = buildState({
       onchainAddress: "bc1qself",
       getOnchainFullUriFn: () => "bitcoin:bc1qself",
@@ -108,7 +108,7 @@ describe("useOnchainResolver", () => {
     expect(result.current.getFullUriFn?.({ prefix: true })).toBe("bitcoin:bc1qself")
   })
 
-  it("reports loading=true while the SC onchain address is still null", () => {
+  it("reports loading=true while the self-custodial onchain address is still null", () => {
     const state = buildState({ onchainAddress: undefined })
 
     const { result } = renderHook(() =>

@@ -172,7 +172,7 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
-  const { refreshWallets: refreshSCWallets } = useSelfCustodialWallet()
+  const { refreshWallets: refreshSelfCustodialWallets } = useSelfCustodialWallet()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const {
     seen: trustModelSeen,
@@ -340,7 +340,7 @@ export const HomeScreen: React.FC = () => {
 
   const refetch = React.useCallback(() => {
     if (isSelfCustodial) {
-      refreshSCWallets()
+      refreshSelfCustodialWallets()
       return
     }
 
@@ -358,7 +358,7 @@ export const HomeScreen: React.FC = () => {
   }, [
     isAuthed,
     isSelfCustodial,
-    refreshSCWallets,
+    refreshSelfCustodialWallets,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,

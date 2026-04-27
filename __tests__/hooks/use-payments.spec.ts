@@ -97,9 +97,9 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeUndefined()
   })
 
-  it("returns self-custodial adapters when SC account with SDK", () => {
+  it("returns self-custodial adapters when self-custodial account with SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
@@ -113,9 +113,9 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeDefined()
   })
 
-  it("falls back to custodial adapters when SC account without SDK", () => {
+  it("falls back to custodial adapters when self-custodial account without SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
