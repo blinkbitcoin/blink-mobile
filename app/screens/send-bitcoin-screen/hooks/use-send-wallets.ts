@@ -15,6 +15,7 @@ import {
   type WalletBalance,
 } from "@app/graphql/wallets-utils"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { usePersistentStateContext } from "@app/store/persistent-state"
 import { type WalletState } from "@app/types/wallet.types"
 
 export const toWalletBalances = (wallets: WalletState[]): WalletBalance[] =>
@@ -38,6 +39,7 @@ export const useSendWallets = (): SendWallets => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  const { persistentState } = usePersistentStateContext()
 
   const { data, loading: custodialLoading } = useSendBitcoinDetailsScreenQuery({
     fetchPolicy: "cache-first",
@@ -56,13 +58,17 @@ export const useSendWallets = (): SendWallets => {
     const btc = selfCustodialWallets.find(
       ({ walletCurrency }) => walletCurrency === WalletCurrency.Btc,
     )
+    const usd = selfCustodialWallets.find(
+      ({ walletCurrency }) => walletCurrency === WalletCurrency.Usd,
+    )
+    const preferred =
+      persistentState.selfCustodialDefaultWalletCurrency ?? WalletCurrency.Btc
+    const defaultWallet = preferred === WalletCurrency.Usd ? usd ?? btc : btc
     return {
       wallets: selfCustodialWallets,
-      defaultWallet: btc,
+      defaultWallet,
       btcWallet: btc,
-      usdWallet: selfCustodialWallets.find(
-        ({ walletCurrency }) => walletCurrency === WalletCurrency.Usd,
-      ),
+      usdWallet: usd,
       network: unauthedData?.globals?.network,
       loading: !activeWallet.isReady,
       isSelfCustodial: true,
