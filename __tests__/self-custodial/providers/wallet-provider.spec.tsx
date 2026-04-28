@@ -53,6 +53,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
+  getLightningAddress: jest.fn().mockResolvedValue(null),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -89,6 +90,7 @@ jest.mock("@app/self-custodial/providers/is-online", () => {
     getOnlineState: jest.fn().mockResolvedValue("online"),
     getServiceStatus: jest.fn().mockResolvedValue(Operational),
     isOnlineStatus: (s: number) => s === Operational || s === Degraded,
+    isDegradedStatus: (s: number) => s === Degraded,
     isOnline: jest.fn().mockResolvedValue(true),
   }
 })
