@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3651,12 +3644,6 @@
       "deactivateBody": "USDB qullqiyki BTC-man kutichikunqa. Kaymi tikrachiypa chaninchasqa chaninchayninmi.",
       "deactivateConfirm": "Wañuchiy",
       "cancel": "T'akuy"
-    },
-    "firstTimeModal": {
-      "title": "Tikrana hawalla",
-      "dualBalance": "BTC-wan USD-wan qillqasapaykipi iskay saqisqa qullqikunam. Haykaqpas Convert-ta ruray paykunapura qullqita astanapaq.",
-      "trustDisclosure": "USD modoqa Sparkpi USDB tokenkunata apaykachan. Iñiy suposikuykunaqa wakjina kan BTC-ta direkto hapishaptikimanta. USDB Sparkpa token tuqyachisqanman tiyan.",
-      "acknowledge": "Entiendechkani"
     },
     "minimumConversion": "Aswan aslla tikray: {amount:string}"
   },

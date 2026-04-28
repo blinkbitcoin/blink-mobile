@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3651,12 +3644,6 @@
       "deactivateBody": "سيتم تحويل رصيد USDB الخاص بك إلى البيتكوين. هذه هي رسوم التحويل التقديرية.",
       "deactivateConfirm": "إلغاء التفعيل",
       "cancel": "إلغاء"
-    },
-    "firstTimeModal": {
-      "title": "عن التحويل",
-      "dualBalance": "BTC و USD رصيدان مستقلان في محفظتك. استخدم Convert في أي وقت لنقل الأموال بينهما.",
-      "trustDisclosure": "يستخدم وضع USD رموز USDB على Spark. افتراضات الثقة تختلف عن الاحتفاظ بالبيتكوين مباشرة. USDB يعتمد على مُصدر الرموز في Spark.",
-      "acknowledge": "فهمت"
     },
     "minimumConversion": "الحد الأدنى للتحويل: {amount:string}"
   },

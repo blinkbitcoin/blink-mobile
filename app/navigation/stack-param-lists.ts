@@ -198,7 +198,6 @@ export type RootStackParamList = {
   stableBalanceSettings: undefined
   selfCustodialAccountInformationScreen: undefined
   selfCustodialTransactionLimitsScreen: undefined
-  selfCustodialBitcoinDepositScreen: undefined
 }
 
 export type OnboardingStackParamList = {

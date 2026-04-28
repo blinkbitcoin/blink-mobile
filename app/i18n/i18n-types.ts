@@ -7699,28 +7699,6 @@ type RootTranslation = {
 			 */
 			loadError: string
 		}
-		WaysToGetPaid: {
-			/**
-			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
-			 */
-			lightningAddressTitle: string
-			/**
-			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​i​n​s​t​a​n​t​l​y​.
-			 */
-			lightningAddressDescription: string
-			/**
-			 * B​i​t​c​o​i​n​ ​d​e​p​o​s​i​t​ ​a​d​d​r​e​s​s
-			 */
-			onchainTitle: string
-			/**
-			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​o​n​-​c​h​a​i​n​.
-			 */
-			onchainDescription: string
-			/**
-			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​.
-			 */
-			loadError: string
-		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -12137,24 +12115,6 @@ type RootTranslation = {
 			 * C​a​n​c​e​l
 			 */
 			cancel: string
-		}
-		firstTimeModal: {
-			/**
-			 * A​b​o​u​t​ ​C​o​n​v​e​r​t
-			 */
-			title: string
-			/**
-			 * B​T​C​ ​a​n​d​ ​U​S​D​ ​a​r​e​ ​t​w​o​ ​i​n​d​e​p​e​n​d​e​n​t​ ​b​a​l​a​n​c​e​s​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​U​s​e​ ​C​o​n​v​e​r​t​ ​a​n​y​ ​t​i​m​e​ ​t​o​ ​m​o​v​e​ ​f​u​n​d​s​ ​b​e​t​w​e​e​n​ ​t​h​e​m​.
-			 */
-			dualBalance: string
-			/**
-			 * U​S​D​ ​m​o​d​e​ ​u​s​e​s​ ​U​S​D​B​ ​t​o​k​e​n​s​ ​o​n​ ​S​p​a​r​k​.​ ​T​h​e​ ​t​r​u​s​t​ ​a​s​s​u​m​p​t​i​o​n​s​ ​a​r​e​ ​d​i​f​f​e​r​e​n​t​ ​f​r​o​m​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​d​i​r​e​c​t​l​y​.​ ​U​S​D​B​ ​r​e​l​i​e​s​ ​o​n​ ​S​p​a​r​k​'​s​ ​t​o​k​e​n​ ​i​s​s​u​e​r​.
-			 */
-			trustDisclosure: string
-			/**
-			 * I​ ​u​n​d​e​r​s​t​a​n​d
-			 */
-			acknowledge: string
 		}
 		/**
 		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
@@ -19873,28 +19833,6 @@ export type TranslationFunctions = {
 			 */
 			loadError: () => LocalizedString
 		}
-		WaysToGetPaid: {
-			/**
-			 * Lightning address
-			 */
-			lightningAddressTitle: () => LocalizedString
-			/**
-			 * Share this address to receive Lightning payments instantly.
-			 */
-			lightningAddressDescription: () => LocalizedString
-			/**
-			 * Bitcoin deposit address
-			 */
-			onchainTitle: () => LocalizedString
-			/**
-			 * Share this address to receive Bitcoin on-chain.
-			 */
-			onchainDescription: () => LocalizedString
-			/**
-			 * Could not load your payment details.
-			 */
-			loadError: () => LocalizedString
-		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -24228,24 +24166,6 @@ export type TranslationFunctions = {
 			 * Cancel
 			 */
 			cancel: () => LocalizedString
-		}
-		firstTimeModal: {
-			/**
-			 * About Convert
-			 */
-			title: () => LocalizedString
-			/**
-			 * BTC and USD are two independent balances in your wallet. Use Convert any time to move funds between them.
-			 */
-			dualBalance: () => LocalizedString
-			/**
-			 * USD mode uses USDB tokens on Spark. The trust assumptions are different from holding BTC directly. USDB relies on Spark's token issuer.
-			 */
-			trustDisclosure: () => LocalizedString
-			/**
-			 * I understand
-			 */
-			acknowledge: () => LocalizedString
 		}
 		/**
 		 * Minimum conversion: {amount}

@@ -2390,13 +2390,6 @@
             "minFromLabel": "Minimum sent",
             "minToLabel": "Minimum received",
             "loadError": "Could not load conversion limits."
-        },
-        "WaysToGetPaid": {
-            "lightningAddressTitle": "Lightning address",
-            "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-            "onchainTitle": "Bitcoin deposit address",
-            "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-            "loadError": "Could not load your payment details."
         }
     },
     "NotificationSettingsScreen": {
@@ -3642,12 +3635,6 @@
             "deactivateBody": "USDB残高はBTCに戻されます。これは推定される変換手数料です。",
             "deactivateConfirm": "無効化",
             "cancel": "キャンセル"
-        },
-        "firstTimeModal": {
-            "title": "変換について",
-            "dualBalance": "BTCとUSDは、ウォレット内の独立した2つの残高です。いつでもConvertを使って、それらの間で資金を移動できます。",
-            "trustDisclosure": "USDモードはSpark上のUSDBトークンを使用します。信頼の前提はBTCを直接保有することとは異なります. USDBはSparkのトークン発行者に依存しています。",
-            "acknowledge": "理解しました"
         },
         "minimumConversion": "最小変換額: {amount:string}"
     },

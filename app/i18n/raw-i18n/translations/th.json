@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3651,12 +3644,6 @@
       "deactivateBody": "ยอดคงเหลือ USDB ของคุณจะถูกแปลงกลับเป็น BTC นี่คือค่าธรรมเนียมการแปลงโดยประมาณ",
       "deactivateConfirm": "ปิดใช้",
       "cancel": "ยกเลิก"
-    },
-    "firstTimeModal": {
-      "title": "เกี่ยวกับการแปลง",
-      "dualBalance": "BTC และ USD เป็นยอดคงเหลือที่เป็นอิสระสองรายการในกระเป๋าของคุณ ใช้ Convert เมื่อใดก็ได้เพื่อย้ายเงินระหว่างกัน",
-      "trustDisclosure": "โหมด USD ใช้โทเค็น USDB บน Spark ข้อสันนิษฐานด้านความเชื่อถือต่างจากการถือ BTC โดยตรง. USDB พึ่งพาผู้ออกโทเค็นของ Spark",
-      "acknowledge": "เข้าใจแล้ว"
     },
     "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}"
   },

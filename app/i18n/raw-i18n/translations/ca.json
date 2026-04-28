@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3613,12 +3606,6 @@
       "deactivateBody": "El teu saldo en USDB es tornarà a convertir a BTC. Aquesta és la comissió de conversió estimada.",
       "deactivateConfirm": "Desactivar",
       "cancel": "Cancel·la"
-    },
-    "firstTimeModal": {
-      "title": "Sobre Convertir",
-      "dualBalance": "BTC i USD són dos saldos independents a la teva cartera. Utilitza Convert en qualsevol moment per moure fons entre ells.",
-      "trustDisclosure": "El mode USD utilitza tokens USDB a Spark. Les suposicions de confiança són diferents a guardar BTC directament. USDB depèn de l'emissor de tokens de Spark.",
-      "acknowledge": "Ho entenc"
     },
     "minimumConversion": "Conversió mínima: {amount:string}"
   },
