@@ -3743,8 +3743,6 @@
     "title": "Delete self-custodial wallet",
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete",
     "dangerZoneImportantTitle": "Quan trọng",
     "dangerZoneBulletReinstated": "Điều này chỉ xóa ví khỏi thiết bị này",
     "dangerZoneBulletPermanent": "Tiền của bạn vẫn có thể truy cập được nếu bạn có cụm từ sao lưu",

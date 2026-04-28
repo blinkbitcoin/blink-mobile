@@ -3723,8 +3723,6 @@
     "title": "Delete self-custodial wallet",
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete",
     "dangerZoneImportantTitle": "Vigtigt",
     "dangerZoneBulletReinstated": "Dette fjerner kun pungen fra denne enhed",
     "dangerZoneBulletPermanent": "Dine midler forbliver tilgængelige, hvis du har din backup-frase",

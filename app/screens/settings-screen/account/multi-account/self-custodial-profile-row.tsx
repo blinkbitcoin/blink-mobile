@@ -13,6 +13,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
 import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
@@ -29,7 +30,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   entry,
   isFirstItem,
 }) => {
-  const { id: accountId, lightningAddress } = entry
+  const { id: accountId, lightningAddress: persistedLightningAddress } = entry
   const styles = useStyles()
   const {
     theme: { colors },
@@ -38,6 +39,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
+  const { lightningAddress: liveLightningAddress } = useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmText, setConfirmText] = useState("")
@@ -45,7 +47,10 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
 
   const isActive =
     activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
-  const rowTitle = lightningAddress ?? LL.common.anonymous()
+  const lightningAddress = isActive
+    ? liveLightningAddress ?? persistedLightningAddress
+    : persistedLightningAddress
+  const rowTitle = lightningAddress ?? LL.common.anonymousUser()
 
   const closeModal = () => {
     setModalVisible(false)
@@ -134,9 +139,6 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
             <ListItem.Title numberOfLines={1} ellipsizeMode="middle">
               {rowTitle}
             </ListItem.Title>
-            <Text type="p3" style={styles.subtleText}>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
-            </Text>
           </ListItem.Content>
           <GaloyIconButton
             name="close"

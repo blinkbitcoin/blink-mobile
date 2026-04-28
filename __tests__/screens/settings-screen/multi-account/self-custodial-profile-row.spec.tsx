@@ -37,8 +37,8 @@ jest.mock("@rn-vui/themed", () => {
       {
         Content: ({ children }: { children: React.ReactNode }) =>
           React.createElement("ListItemContent", null, children),
-        Title: ({ children }: { children: React.ReactNode }) =>
-          React.createElement("Text", null, children),
+        Title: ({ children, ...props }: { children: React.ReactNode }) =>
+          React.createElement("Text", props, children),
       },
     ),
     Overlay: ({
@@ -131,6 +131,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
+const mockUseSelfCustodialWallet = jest.fn()
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
+}))
+
 const mockDeleteWallet = jest.fn()
 const mockUseDeleteSelfCustodial = jest.fn()
 jest.mock(
@@ -164,7 +169,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: {
         confirm: () => "Confirm",
         cancel: () => "Cancel",
-        anonymous: () => "Anonymous",
+        anonymousUser: () => "Anonymous user",
       },
     },
   }),
@@ -175,6 +180,7 @@ const setActiveAccountId = jest.fn()
 describe("SelfCustodialProfileRow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
     mockUseDeleteSelfCustodial.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
@@ -201,12 +207,12 @@ describe("SelfCustodialProfileRow", () => {
     expect(getByText("alice@example.com")).toBeTruthy()
   })
 
-  it("falls back to anonymous label when no lightning address is set", () => {
+  it("falls back to anonymous user label when no lightning address is set", () => {
     const { getByText } = render(
       <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
-    expect(getByText("Anonymous")).toBeTruthy()
+    expect(getByText("Anonymous user")).toBeTruthy()
   })
 
   it("switches to the entry's account id when the row is pressed", () => {
@@ -276,5 +282,43 @@ describe("SelfCustodialProfileRow", () => {
     )
 
     expect(getByTestId("delete-overlay")).toBeTruthy()
+  })
+
+  it("prefers the live lightning address from the SDK when the row is active", () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "magentamouse1845@breez.tips",
+    })
+
+    const { getByText } = render(
+      <SelfCustodialProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }}
+      />,
+    )
+
+    expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
+  })
+
+  it("ignores the live lightning address for inactive rows and uses the persisted entry value", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "magentamouse1845@breez.tips",
+    })
+
+    const { getByText } = render(
+      <SelfCustodialProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@example.com" }}
+      />,
+    )
+
+    expect(getByText("stored@example.com")).toBeTruthy()
   })
 })

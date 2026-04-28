@@ -3693,8 +3693,6 @@
         "title": "Excluir carteira autocustodial",
         "warning": "Isso removerá esta carteira deste dispositivo.",
         "recoveryNote": "Se você tem sua frase de backup salva pode restaurar esta carteira em qualquer dispositivo. Se não tem, perderá o acesso aos seus fundos.",
-        "backupBadgeCompleted": "Backup completo",
-        "backupBadgeMissing": "Backup incompleto",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "Isto remove a carteira apenas deste dispositivo",
         "dangerZoneBulletPermanent": "Os teus fundos continuam acessíveis se tiveres a tua frase de recuperação",
