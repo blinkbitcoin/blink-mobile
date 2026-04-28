@@ -35,6 +35,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
+import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
@@ -613,6 +614,7 @@ export const HomeScreen: React.FC = () => {
           ))}
         </View>
         {isSelfCustodial && <UnclaimedDepositBanner />}
+        <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
