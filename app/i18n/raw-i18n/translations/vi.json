@@ -3744,6 +3744,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Quan trọng",
+    "dangerZoneBulletReinstated": "Điều này chỉ xóa ví khỏi thiết bị này",
+    "dangerZoneBulletPermanent": "Tiền của bạn vẫn có thể truy cập được nếu bạn có cụm từ sao lưu",
+    "dangerZoneBulletEmpty": "Nếu không có cụm từ sao lưu, bạn có thể mất quyền truy cập vĩnh viễn",
+    "dangerZoneDeleteButton": "Xóa ví khỏi thiết bị này",
+    "confirmModalTitle": "Xác nhận xóa ví",
+    "confirmModalTypeToConfirm": "Nhập \"{delete: string}\" để xác nhận"
   }
 }

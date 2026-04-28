@@ -3706,6 +3706,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Σημαντικό",
+    "dangerZoneBulletReinstated": "Αυτό αφαιρεί το πορτοφόλι μόνο από αυτή τη συσκευή",
+    "dangerZoneBulletPermanent": "Τα κεφάλαιά σας παραμένουν προσβάσιμα αν έχετε τη φράση αντιγράφου ασφαλείας",
+    "dangerZoneBulletEmpty": "Χωρίς τη φράση αντιγράφου ασφαλείας μπορεί να χάσετε οριστικά την πρόσβαση",
+    "dangerZoneDeleteButton": "Αφαίρεση πορτοφολιού από αυτή τη συσκευή",
+    "confirmModalTitle": "Επιβεβαίωση αφαίρεσης πορτοφολιού",
+    "confirmModalTypeToConfirm": "Πληκτρολογήστε \"{delete: string}\" για επιβεβαίωση"
   }
 }
