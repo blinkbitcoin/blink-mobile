@@ -3,17 +3,11 @@ import QRCode from "react-native-qrcode-svg"
 
 import { makeStyles } from "@rn-vui/themed"
 
-export const QrCodeComponent = ({ otpauth }: { otpauth: string }) => {
+export const QrCodeComponent = ({ value }: { value: string }) => {
   const styles = useStyles()
   return (
     <View style={styles.spacingAround}>
-      <QRCode
-        value={otpauth}
-        size={200}
-        //   logo={require("./path/to/your/logo.png")} // Optional: If you want to include a logo within the QR code.
-        //   logoSize={30}
-        //   logoBackgroundColor="transparent"
-      />
+      <QRCode value={value} size={200} />
     </View>
   )
 }
