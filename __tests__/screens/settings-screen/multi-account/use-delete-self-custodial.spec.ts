@@ -9,10 +9,12 @@ const mockDisconnectSdk = jest.fn()
 const mockDeleteMnemonic = jest.fn()
 const mockResetBackupState = jest.fn()
 const mockSetActiveAccountId = jest.fn()
+const mockUpdatePersistentState = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseHasCustodialAccount = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 const mockCrashlyticsRecordError = jest.fn()
+const mockRnfsUnlink = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ dispatch: mockNavigationDispatch }),
@@ -44,6 +46,20 @@ jest.mock("@app/hooks/use-has-custodial-account", () => ({
   useHasCustodialAccount: () => mockUseHasCustodialAccount(),
 }))
 
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({ updateState: mockUpdatePersistentState }),
+}))
+
+jest.mock("@app/self-custodial/config", () => ({
+  SparkConfig: { storageDir: "/test/breez-sdk-spark-regtest" },
+}))
+
+jest.mock("react-native-fs", () => ({
+  __esModule: true,
+  default: { unlink: (...args: unknown[]) => mockRnfsUnlink(...args) },
+  unlink: (...args: unknown[]) => mockRnfsUnlink(...args),
+}))
+
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: { deleteMnemonic: (...args: unknown[]) => mockDeleteMnemonic(...args) },
@@ -58,6 +74,7 @@ describe("useDeleteSelfCustodial", () => {
     mockUseHasCustodialAccount.mockReturnValue(false)
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockDeleteMnemonic.mockResolvedValue(undefined)
+    mockRnfsUnlink.mockResolvedValue(undefined)
   })
 
   it("starts in idle state with no error", () => {
@@ -67,7 +84,7 @@ describe("useDeleteSelfCustodial", () => {
     expect(result.current.error).toBeNull()
   })
 
-  it("disconnects SDK, deletes mnemonic, resets backup state, and navigates to getStarted when no custodial account exists", async () => {
+  it("disconnects SDK, deletes mnemonic, wipes storage, clears activeAccountId, and navigates to getStarted when no custodial account exists", async () => {
     const { result } = renderHook(() => useDeleteSelfCustodial())
 
     await act(async () => {
@@ -76,8 +93,16 @@ describe("useDeleteSelfCustodial", () => {
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
     expect(mockDeleteMnemonic).toHaveBeenCalled()
+    expect(mockRnfsUnlink).toHaveBeenCalledWith("/test/breez-sdk-spark-regtest")
     expect(mockResetBackupState).toHaveBeenCalled()
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+
+    const updaterFn = mockUpdatePersistentState.mock.calls[0][0]
+    expect(updaterFn({ activeAccountId: "self-custodial-default", other: 1 })).toEqual({
+      activeAccountId: undefined,
+      other: 1,
+    })
+
     expect(mockNavigationDispatch).toHaveBeenCalledWith({
       type: "reset",
       payload: { index: 0, routes: [{ name: "getStarted" }] },
