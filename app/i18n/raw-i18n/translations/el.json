@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Το υπόλοιπό σας σε USDB θα μετατραπεί ξανά σε BTC. Αυτή είναι η εκτιμώμενη χρέωση μετατροπής.",
       "deactivateConfirm": "Απενεργοποίηση",
       "cancel": "Ακύρωση"
-    },
-    "firstTimeModal": {
-      "title": "Σχετικά με τη Μετατροπή",
-      "dualBalance": "Το BTC και το USD είναι δύο ανεξάρτητα υπόλοιπα στο πορτοφόλι σας. Χρησιμοποιήστε το Convert οποιαδήποτε στιγμή για να μεταφέρετε χρήματα μεταξύ τους.",
-      "trustDisclosure": "Η λειτουργία USD χρησιμοποιεί tokens USDB στο Spark. Οι παραδοχές εμπιστοσύνης είναι διαφορετικές από το να κρατάτε BTC απευθείας. το USDB βασίζεται στον εκδότη tokens του Spark.",
-      "acknowledge": "Καταλαβαίνω"
     },
     "minimumConversion": "Ελάχιστη μετατροπή: {amount:string}",
     "conversionUnavailable": "Η μετατροπή δεν είναι διαθέσιμη προσωρινά. Δοκιμάστε ξανά."

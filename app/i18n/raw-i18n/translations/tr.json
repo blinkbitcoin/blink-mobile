@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "USDB bakiyeniz tekrar BTC'ye dönüştürülecek. Bu, tahmini dönüşüm ücretidir.",
       "deactivateConfirm": "Devre dışı bırak",
       "cancel": "İptal"
-    },
-    "firstTimeModal": {
-      "title": "Dönüşüm Hakkında",
-      "dualBalance": "BTC ve USD, cüzdanınızdaki iki bağımsız bakiyedir. Aralarında fon taşımak için istediğiniz zaman Convert'i kullanın.",
-      "trustDisclosure": "USD modu Spark üzerindeki USDB tokenlarını kullanır. Güven varsayımları doğrudan BTC tutmaktan farklıdır. USDB Spark'ın token çıkaranına dayanır.",
-      "acknowledge": "Anlıyorum"
     },
     "minimumConversion": "Minimum dönüşüm: {amount:string}",
     "conversionUnavailable": "Dönüşüm geçici olarak kullanılamıyor. Lütfen tekrar deneyin."

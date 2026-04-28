@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "USDB yo ejja kuddizibwa mu BTC. Lino lye sente ez'okukyusa ezisuubiddwa.",
       "deactivateConfirm": "Kusalako",
       "cancel": "Sazaamu"
-    },
-    "firstTimeModal": {
-      "title": "Ebikwata ku Kukyusa",
-      "dualBalance": "BTC ne USD bye ssente ebbiri ezeewaddeko mu wolede yo. Kozesa Convert buli kiseera okusengula ssente wakati waabyo.",
-      "trustDisclosure": "Endowooza ya USD ekozesa tokens za USDB ku Spark. Ebiteebereezebwa eby'obwesige bya njawulo okukuuma BTC butereevu. USDB yeesigamye ku muwa tokens wa Spark.",
-      "acknowledge": "Ntegedde"
     },
     "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}",
     "conversionUnavailable": "Okukyusa tekikolaako kati. Gezaako nate."

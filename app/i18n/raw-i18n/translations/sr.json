@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3654,12 +3647,6 @@
       "deactivateBody": "Ваш USDB салдо ће бити враћен у BTC. Ово је процењена накнада за конверзију.",
       "deactivateConfirm": "Деактивирај",
       "cancel": "Откажи"
-    },
-    "firstTimeModal": {
-      "title": "О конверзији",
-      "dualBalance": "BTC и USD су два независна салда у вашем новчанику. Користите Convert било кад за премештање средстава између њих.",
-      "trustDisclosure": "USD режим користи USDB токене на Sparku. Претпоставке поверења разликују се од директног држања BTC-а. USDB се ослања на Sparkovog издаваоца токена.",
-      "acknowledge": "Разумем"
     },
     "minimumConversion": "Минимална конверзија: {amount:string}",
     "conversionUnavailable": "Конверзија тренутно није доступна. Покушајте поново."

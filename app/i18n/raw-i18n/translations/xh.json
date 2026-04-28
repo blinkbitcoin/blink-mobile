@@ -2409,13 +2409,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3663,12 +3656,6 @@
       "deactivateBody": "Ibhalansi yakho ye-USDB iya kuguqulelwa kwakhona kwi-BTC. Le yimali yoguqulelo elinqakraziweyo.",
       "deactivateConfirm": "Yicima",
       "cancel": "Rhoxisa"
-    },
-    "firstTimeModal": {
-      "title": "Malunga noGuqulo",
-      "dualBalance": "I-BTC ne-USD zibhalansi ezimbini ezizimeleyo kwi-wallet yakho. Sebenzisa u-Convert nangaliphi na ixesha ukuhambisa imali phakathi kwayo.",
-      "trustDisclosure": "Imowudi yeUSD isebenzisa iitokheni zeUSDB kwiSpark. Izicwangciso zokuthembela zahlukile kunokubamba iBTC ngokuthe ngqo. IUSDB ixhomekeke kumkhuphi weetokheni weSpark.",
-      "acknowledge": "Ndiyavumelana"
     },
     "minimumConversion": "Inguqulo encinci: {amount:string}",
     "conversionUnavailable": "Uguqulo aluxhanyiwe okwexeshana. Nceda uzame kwakhona."
