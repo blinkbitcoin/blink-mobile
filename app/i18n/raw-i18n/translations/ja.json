@@ -2347,6 +2347,7 @@
         "setYourLightningAddress": "Lightningアドレスを設定",
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
+        "nonCustodialAccount": "非カストディアルアカウント",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
         "recoveryMethod": "復元方法",
@@ -2374,7 +2375,30 @@
         "logoutOneAccountAlertContent": "{identifier: string}にリンクされたセッションからログアウトします。\n今後再度ログインできることを確認してください。",
         "logoutOneAccountConfirm": "了解しました。ログアウトしてください。",
         "receiveCurrency": "受取通貨",
-        "displayCurrency": "表示通貨"
+        "displayCurrency": "表示通貨",
+        "AccountInformation": {
+            "accountTypeLabel": "Account type",
+            "identityLabel": "Wallet identifier",
+            "backupStatusLabel": "Backup status",
+            "backupStatusCompleted": "Backup complete",
+            "backupStatusNotCompleted": "Backup not complete",
+            "loadError": "Could not load your account information."
+        },
+        "TransactionLimits": {
+            "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
+            "btcToUsdTitle": "Bitcoin to Dollars",
+            "usdToBtcTitle": "Dollars to Bitcoin",
+            "minFromLabel": "Minimum sent",
+            "minToLabel": "Minimum received",
+            "loadError": "Could not load conversion limits."
+        },
+        "WaysToGetPaid": {
+            "lightningAddressTitle": "Lightning address",
+            "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
+            "onchainTitle": "Bitcoin deposit address",
+            "onchainDescription": "Share this address to receive Bitcoin on-chain.",
+            "loadError": "Could not load your payment details."
+        }
     },
     "NotificationSettingsScreen": {
         "title": "通知設定",
@@ -3632,7 +3656,14 @@
     },
     "BackendFeatureGate": {
         "title": "機能が利用できません",
-        "description": "この機能にはカストディアルアカウントが必要です。"
+        "description": "この機能にはカストディアルアカウントが必要です。",
+        "signInTitle": "Sign in required",
+        "signInDescription": "Sign in to your custodial account to use {featureName}.",
+        "noAccountTitle": "Custodial account required",
+        "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "featureCircles": "Circles",
+        "featureEarn": "Earn",
+        "featureCard": "Card"
     },
     "SparkWalletCreationScreen": {
         "creating": "ウォレットを作成中...",
@@ -3699,5 +3730,21 @@
         "badgeFeeIssue": "手数料問題",
         "badgeError": "エラー",
         "badgeRefunded": "払い戻し済み"
+    },
+    "FeatureUnavailable": {
+        "SelfCustodial": {
+            "title": "Temporarily unavailable",
+            "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+        }
+    },
+    "NetworkStatus": {
+        "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+    },
+    "SelfCustodialDelete": {
+        "title": "Delete self-custodial wallet",
+        "warning": "This will remove this wallet from this device.",
+        "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
+        "backupBadgeCompleted": "Backup complete",
+        "backupBadgeMissing": "Backup not complete"
     }
 }

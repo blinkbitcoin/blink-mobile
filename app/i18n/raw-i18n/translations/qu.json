@@ -2347,6 +2347,7 @@
     "setYourLightningAddress": "Lightning tinkunaykita churay",
     "activated": "Kawsayniyta rikuchiykachkanki",
     "addressScreen": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanman",
+    "nonCustodialAccount": "Mana waqaychasqa kuenta",
     "tapUserName": "Yachanakuyta sutichinaqinmi kaniyta ruchiykachkanki",
     "notifications": "Notifications",
     "recoveryMethod": "Kutirichiy ñan",
@@ -2374,7 +2375,30 @@
     "logoutOneAccountAlertContent": "{identifier: string} nisqawan tinkisqa sesiónmanta lluqsinki.\nQhipaman watiqmanta yaykunaykipaq yaykuyta atisqaykita chiqapchay.",
     "logoutOneAccountConfirm": "Riqsinim. Ama hina kaspa lluqsichiy.",
     "receiveCurrency": "Chaskiy qullqi laya",
-    "displayCurrency": "Rikuchiy qullqi laya"
+    "displayCurrency": "Rikuchiy qullqi laya",
+    "AccountInformation": {
+      "accountTypeLabel": "Account type",
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information."
+    },
+    "TransactionLimits": {
+      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
+      "btcToUsdTitle": "Bitcoin to Dollars",
+      "usdToBtcTitle": "Dollars to Bitcoin",
+      "minFromLabel": "Minimum sent",
+      "minToLabel": "Minimum received",
+      "loadError": "Could not load conversion limits."
+    },
+    "WaysToGetPaid": {
+      "lightningAddressTitle": "Lightning address",
+      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
+      "onchainTitle": "Bitcoin deposit address",
+      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
+      "loadError": "Could not load your payment details."
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Willakuy churanakuna",
@@ -3641,7 +3665,14 @@
   },
   "BackendFeatureGate": {
     "title": "Kay mana kanchu",
-    "description": "Kay ruwayqa custodial cuentata munan."
+    "description": "Kay ruwayqa custodial cuentata munan.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
   },
   "SparkWalletCreationScreen": {
     "creating": "Walletaykita ruwachkanku...",
@@ -3708,5 +3739,21 @@
     "badgeFeeIssue": "Fee issue",
     "badgeError": "Pantay",
     "badgeRefunded": "Kutichisqa"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "title": "Delete self-custodial wallet",
+    "warning": "This will remove this wallet from this device.",
+    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
+    "backupBadgeCompleted": "Backup complete",
+    "backupBadgeMissing": "Backup not complete"
   }
 }
