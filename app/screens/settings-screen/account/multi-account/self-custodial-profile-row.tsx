@@ -10,10 +10,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { AccountType, DefaultAccountId } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -34,7 +31,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   const { LL } = useI18nContext()
 
   const { accounts, activeAccount, setActiveAccountId } = useAccountRegistry()
-  const { backupState } = useBackupState()
+  const { lightningAddress } = useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmText, setConfirmText] = useState("")
@@ -45,7 +42,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   if (!selfCustodialAccount) return null
 
   const selected = activeAccount?.type === AccountType.SelfCustodial
-  const isBackedUp = backupState.status === BackupStatus.Completed
+  const rowTitle = lightningAddress ?? LL.AccountTypeSelectionScreen.selfCustodialLabel()
 
   const closeModal = () => {
     setModalVisible(false)
@@ -130,14 +127,9 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
             <View style={styles.spacer} />
           )}
           <ListItem.Content>
-            <ListItem.Title>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+            <ListItem.Title numberOfLines={1} ellipsizeMode="middle">
+              {rowTitle}
             </ListItem.Title>
-            <Text type="p3" style={styles.subtleText}>
-              {isBackedUp
-                ? LL.SelfCustodialDelete.backupBadgeCompleted()
-                : LL.SelfCustodialDelete.backupBadgeMissing()}
-            </Text>
           </ListItem.Content>
           <GaloyIconButton
             name="close"

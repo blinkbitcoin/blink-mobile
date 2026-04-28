@@ -12220,14 +12220,6 @@ type RootTranslation = {
 		 */
 		recoveryNote: string
 		/**
-		 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
-		 */
-		backupBadgeCompleted: string
-		/**
-		 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
-		 */
-		backupBadgeMissing: string
-		/**
 		 * I​m​p​o​r​t​a​n​t
 		 */
 		dangerZoneImportantTitle: string
@@ -24304,14 +24296,6 @@ export type TranslationFunctions = {
 		 * If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.
 		 */
 		recoveryNote: () => LocalizedString
-		/**
-		 * Backup complete
-		 */
-		backupBadgeCompleted: () => LocalizedString
-		/**
-		 * Backup not complete
-		 */
-		backupBadgeMissing: () => LocalizedString
 		/**
 		 * Important
 		 */

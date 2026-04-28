@@ -2,7 +2,6 @@ import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { AccountType, DefaultAccountId } from "@app/types/wallet.types"
-import { BackupStatus } from "@app/self-custodial/providers/backup-state-provider"
 
 import { SelfCustodialProfileRow } from "@app/screens/settings-screen/account/multi-account/self-custodial-profile-row"
 
@@ -36,8 +35,8 @@ jest.mock("@rn-vui/themed", () => {
       {
         Content: ({ children }: { children: React.ReactNode }) =>
           React.createElement("ListItemContent", null, children),
-        Title: ({ children }: { children: React.ReactNode }) =>
-          React.createElement("ListItemTitle", null, children),
+        Title: ({ children, ...props }: { children: React.ReactNode }) =>
+          React.createElement("Text", props, children),
       },
     ),
     Overlay: ({
@@ -125,10 +124,9 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
-const mockUseBackupState = jest.fn()
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
-  BackupStatus: { Completed: "completed", Pending: "pending" },
-  useBackupState: () => mockUseBackupState(),
+const mockUseSelfCustodialWallet = jest.fn()
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
 const mockDeleteWallet = jest.fn()
@@ -153,8 +151,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         title: () => "Delete wallet",
         warning: () => "This action is destructive",
         recoveryNote: () => "Make sure you have your backup",
-        backupBadgeCompleted: () => "Backup ready",
-        backupBadgeMissing: () => "Backup missing",
       },
       AccountScreen: {
         pleaseWait: () => "Please wait",
@@ -176,9 +172,7 @@ describe("SelfCustodialProfileRow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseBackupState.mockReturnValue({
-      backupState: { status: BackupStatus.Completed },
-    })
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
     mockUseDeleteSelfCustodial.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
@@ -261,13 +255,19 @@ describe("SelfCustodialProfileRow", () => {
     expect(getByTestId("delete-overlay")).toBeTruthy()
   })
 
-  it("shows the missing-backup label when the wallet has no completed backup", () => {
-    mockUseBackupState.mockReturnValue({
-      backupState: { status: BackupStatus.Pending },
+  it("shows the lightning address as the title when available", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "magentamouse1845@breez.tips",
     })
 
     const { getByText } = render(<SelfCustodialProfileRow />)
 
-    expect(getByText("Backup missing")).toBeTruthy()
+    expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
+  })
+
+  it("falls back to the non-custodial label when no lightning address is available", () => {
+    const { getByText } = render(<SelfCustodialProfileRow />)
+
+    expect(getByText("Non-custodial")).toBeTruthy()
   })
 })
