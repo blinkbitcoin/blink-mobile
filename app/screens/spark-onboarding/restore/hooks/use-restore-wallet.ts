@@ -14,6 +14,7 @@ import {
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { DefaultAccountId } from "@app/types/wallet.types"
+import { logSelfCustodialRestoreCompleted } from "@app/utils/analytics"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { toastShow } from "@app/utils/toast"
 
@@ -54,6 +55,7 @@ export const useRestoreWallet = () => {
         activateAccount()
         reinitSdk()
         setBackupCompleted(BackupMethod.Manual)
+        logSelfCustodialRestoreCompleted()
         navigation.navigate("sparkBackupSuccessScreen")
       } catch (err) {
         await KeyStoreWrapper.deleteMnemonic().catch(() => {})

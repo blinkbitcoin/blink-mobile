@@ -11,6 +11,7 @@ import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { logSelfCustodialBackupCompleted } from "@app/utils/analytics"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import {
@@ -41,6 +42,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
 
   const onComplete = useCallback(() => {
     setBackupCompleted("manual")
+    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
     if (isMigrating && hasFunds) {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
