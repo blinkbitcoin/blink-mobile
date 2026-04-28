@@ -2483,7 +2483,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akawunti ey'okufuna eyekyamukirizo",
-    "info": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale. Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka."
+    "info": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale. Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
+    "titleSelfCustodial": "Akawunti eya bulijjo",
+    "infoSelfCustodial": "Akawunti eno y'eneekozesebwa nga eya bulijjo nga osasula n'okusiga. Osobola okukyusa buli kiseera."
   },
   "ThemeScreen": {
     "title": "Endabika",

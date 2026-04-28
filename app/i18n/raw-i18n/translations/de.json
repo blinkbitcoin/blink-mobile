@@ -2483,7 +2483,9 @@
     },
     "DefaultWalletScreen": {
         "title": "Standard-Empfangskonto",
-        "info": "Dein Bitcoin-Konto ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt. Dein Dollar-Konto wird von Stablesats betrieben — er hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht."
+        "info": "Dein Bitcoin-Konto ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt. Dein Dollar-Konto wird von Stablesats betrieben — er hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht.",
+        "titleSelfCustodial": "Standardkonto",
+        "infoSelfCustodial": "Dieses Konto wird standardmäßig zum Empfangen und Senden verwendet. Du kannst jederzeit wechseln."
     },
     "ThemeScreen": {
         "title": "Design",

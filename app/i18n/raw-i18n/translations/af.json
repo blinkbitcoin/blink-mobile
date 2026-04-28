@@ -2500,7 +2500,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Verstek ontvangrekening",
-    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie."
+    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
+    "titleSelfCustodial": "Verstek-rekening",
+    "infoSelfCustodial": "Hierdie rekening sal by verstek gebruik word vir ontvang en stuur. Jy kan enige tyd wissel."
   },
   "ThemeScreen": {
     "title": "Tema",
