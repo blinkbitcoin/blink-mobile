@@ -3693,8 +3693,6 @@
         "title": "Elimina wallet self-custodial",
         "warning": "Questo rimuoverà il wallet da questo dispositivo.",
         "recoveryNote": "Se hai salvato la tua frase di backup puoi ripristinare questo wallet su qualsiasi dispositivo. Se non l'hai, perderai l'accesso ai tuoi fondi.",
-        "backupBadgeCompleted": "Backup completato",
-        "backupBadgeMissing": "Backup incompleto",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "Questo rimuove il wallet solo da questo dispositivo",
         "dangerZoneBulletPermanent": "I tuoi fondi rimangono accessibili se hai la tua frase di backup",

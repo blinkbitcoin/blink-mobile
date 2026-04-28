@@ -3693,8 +3693,6 @@
         "title": "Eliminar billetera autocustodial",
         "warning": "Esto eliminará esta billetera de este dispositivo.",
         "recoveryNote": "Si tienes tu frase de respaldo guardada podrás restaurar esta billetera en cualquier dispositivo. Si no la tienes, perderás el acceso a tus fondos.",
-        "backupBadgeCompleted": "Respaldo completo",
-        "backupBadgeMissing": "Respaldo incompleto",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "Esto solo elimina la billetera de este dispositivo",
         "dangerZoneBulletPermanent": "Tus fondos siguen accesibles si tienes tu frase de respaldo",

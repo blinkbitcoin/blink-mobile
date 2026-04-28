@@ -3705,8 +3705,6 @@
     "title": "Delete self-custodial wallet",
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete",
     "dangerZoneImportantTitle": "Important",
     "dangerZoneBulletReinstated": "Aceasta elimină portofelul doar de pe acest dispozitiv",
     "dangerZoneBulletPermanent": "Fondurile tale rămân accesibile dacă ai fraza de recuperare",
