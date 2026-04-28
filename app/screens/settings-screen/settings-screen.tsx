@@ -9,6 +9,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -17,6 +18,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet.types"
 
 import { AccountBanner } from "./account/banner"
 import { EmailSetting } from "./account/settings/email"
@@ -89,10 +91,13 @@ export const SettingsScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
   const { shouldShowSettingsBanner } = useBackupNudgeState()
+  const { activeAccount } = useAccountRegistry()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
   })
+
+  const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
 
   const items = {
     account: [
@@ -118,8 +123,7 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
       StableBalanceSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],
-    recoveryMethod: [ViewBackupPhraseSetting],
+    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
@@ -175,11 +179,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        <SettingsGroup
-          name={LL.SettingsScreen.recoveryMethod()}
-          items={items.recoveryMethod}
-        />
-        <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
+        {!isSelfCustodialMode && (
+          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
+        )}
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
