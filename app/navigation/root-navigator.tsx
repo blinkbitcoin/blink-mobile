@@ -42,6 +42,11 @@ import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import { OfflineGate } from "@app/self-custodial/components"
 import { StableBalanceSettingsScreen } from "@app/screens/stable-balance-settings-screen"
+import { SelfCustodialAccountInformationScreen } from "@app/screens/settings-screen/self-custodial/account-information-screen"
+import { SelfCustodialBitcoinDepositScreen } from "@app/screens/settings-screen/self-custodial/bitcoin-deposit-screen"
+import { SelfCustodialTransactionLimitsScreen } from "@app/screens/settings-screen/self-custodial/transaction-limits-screen"
+import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
+import { useSelfCustodialUnavailable } from "@app/hooks/use-self-custodial-unavailable"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -190,6 +195,12 @@ export const RootStack = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
+  const shouldShowUnavailable = useSelfCustodialUnavailable()
+
+  if (shouldShowUnavailable) {
+    return <TemporarilyUnavailableScreen />
+  }
+
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -789,6 +800,21 @@ export const RootStack = () => {
         name="stableBalanceSettings"
         component={StableBalanceSettingsScreen}
         options={{ title: LL.StableBalance.settingsTitle() }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialAccountInformationScreen"
+        component={SelfCustodialAccountInformationScreen}
+        options={{ title: LL.common.accountInformation() }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialTransactionLimitsScreen"
+        component={SelfCustodialTransactionLimitsScreen}
+        options={{ title: LL.common.transactionLimits() }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBitcoinDepositScreen"
+        component={SelfCustodialBitcoinDepositScreen}
+        options={{ title: LL.SettingsScreen.WaysToGetPaid.onchainTitle() }}
       />
       <RootNavigator.Screen
         name="sparkMigrationExplainer"

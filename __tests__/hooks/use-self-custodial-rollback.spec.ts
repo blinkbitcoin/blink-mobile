@@ -5,10 +5,17 @@ import { AccountStatus, AccountType } from "@app/types/wallet.types"
 import { useSelfCustodialRollback } from "@app/hooks/use-self-custodial-rollback"
 
 let mockNonCustodialEnabled = true
+let mockGaloyAuthToken = ""
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({
     nonCustodialEnabled: mockNonCustodialEnabled,
+  }),
+}))
+
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: { galoyAuthToken: mockGaloyAuthToken },
   }),
 }))
 
@@ -33,6 +40,7 @@ describe("useSelfCustodialRollback", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockNonCustodialEnabled = true
+    mockGaloyAuthToken = "auth-token"
   })
 
   it("rolls back when flag disabled and active is self-custodial", () => {
