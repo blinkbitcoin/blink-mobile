@@ -2400,6 +2400,7 @@ const en: BaseTranslation = {
     setYourLightningAddress: "Set your lightning address",
     activated: "Activated",
     addressScreen: "Ways to get paid",
+    nonCustodialAccount: "Non-custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
     recoveryMethod: "Recovery method",
@@ -2431,6 +2432,32 @@ const en: BaseTranslation = {
     logoutOneAccountConfirm: "I understand. Please log out.",
     receiveCurrency: "Receive currency",
     displayCurrency: "Display currency",
+    AccountInformation: {
+      accountTypeLabel: "Account type",
+      identityLabel: "Wallet identifier",
+      lightningAddressLabel: "Lightning address",
+      backupStatusLabel: "Backup status",
+      backupStatusCompleted: "Backup complete",
+      backupStatusNotCompleted: "Backup not complete",
+      loadError: "Could not load your account information.",
+    },
+    TransactionLimits: {
+      protocolNote:
+        "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
+      btcToUsdTitle: "Bitcoin to Dollars",
+      usdToBtcTitle: "Dollars to Bitcoin",
+      minFromLabel: "Minimum sent",
+      minToLabel: "Minimum received",
+      loadError: "Could not load conversion limits.",
+    },
+    WaysToGetPaid: {
+      lightningAddressTitle: "Lightning address",
+      lightningAddressDescription:
+        "Share this address to receive Lightning payments instantly.",
+      onchainTitle: "Bitcoin deposit address",
+      onchainDescription: "Share this address to receive Bitcoin on-chain.",
+      loadError: "Could not load your payment details.",
+    },
   },
   NotificationSettingsScreen: {
     title: "Notification settings",
@@ -3824,6 +3851,34 @@ const en: BaseTranslation = {
   BackendFeatureGate: {
     title: "Feature unavailable",
     description: "This feature requires a custodial account.",
+    signInTitle: "Sign in required",
+    signInDescription:
+      "Sign in to your custodial account to use {featureName: string}.",
+    noAccountTitle: "Custodial account required",
+    noAccountDescription:
+      "{featureName: string} requires a Blink custodial account.",
+    featureCircles: "Circles",
+    featureEarn: "Earn",
+    featureCard: "Card",
+  },
+  FeatureUnavailable: {
+    SelfCustodial: {
+      title: "Temporarily unavailable",
+      description:
+        "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later.",
+    },
+  },
+  NetworkStatus: {
+    degradedBanner:
+      "Spark network is currently degraded. Payments may take longer.",
+  },
+  SelfCustodialDelete: {
+    title: "Delete self-custodial wallet",
+    warning: "This will remove this wallet from this device.",
+    recoveryNote:
+      "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
+    backupBadgeCompleted: "Backup complete",
+    backupBadgeMissing: "Backup not complete",
   },
 }
 

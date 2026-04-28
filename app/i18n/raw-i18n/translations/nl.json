@@ -2347,6 +2347,7 @@
     "setYourLightningAddress": "Stel je Lightning-adres in",
     "activated": "Geactiveerd",
     "addressScreen": "Manieren om betaald te krijgen",
+    "nonCustodialAccount": "Niet-bewaarde rekening",
     "tapUserName": "Click om gebruikersnaam in te stellen",
     "notifications": "Meldingen",
     "recoveryMethod": "Herstelmethode",
@@ -2374,7 +2375,30 @@
     "logoutOneAccountAlertContent": "Je wordt uitgelogd van de sessie gekoppeld aan {identifier: string}.\nZorg ervoor dat je in de toekomst weer kunt inloggen.",
     "logoutOneAccountConfirm": "Ik begrijp het. Log me uit.",
     "receiveCurrency": "Ontvangstvaluta",
-    "displayCurrency": "Weergavevaluta"
+    "displayCurrency": "Weergavevaluta",
+    "AccountInformation": {
+      "accountTypeLabel": "Account type",
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information."
+    },
+    "TransactionLimits": {
+      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
+      "btcToUsdTitle": "Bitcoin to Dollars",
+      "usdToBtcTitle": "Dollars to Bitcoin",
+      "minFromLabel": "Minimum sent",
+      "minToLabel": "Minimum received",
+      "loadError": "Could not load conversion limits."
+    },
+    "WaysToGetPaid": {
+      "lightningAddressTitle": "Lightning address",
+      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
+      "onchainTitle": "Bitcoin deposit address",
+      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
+      "loadError": "Could not load your payment details."
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Notificatie instellingen",
@@ -3644,7 +3668,14 @@
   },
   "BackendFeatureGate": {
     "title": "Functie niet beschikbaar",
-    "description": "Deze functie vereist een bewaarrekening."
+    "description": "Deze functie vereist een bewaarrekening.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
   },
   "SparkWalletCreationScreen": {
     "creating": "Portemonnee aanmaken...",
@@ -3711,5 +3742,21 @@
     "badgeFeeIssue": "Fee issue",
     "badgeError": "Fout",
     "badgeRefunded": "Terugbetaald"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "title": "Delete self-custodial wallet",
+    "warning": "This will remove this wallet from this device.",
+    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
+    "backupBadgeCompleted": "Backup complete",
+    "backupBadgeMissing": "Backup not complete"
   }
 }
