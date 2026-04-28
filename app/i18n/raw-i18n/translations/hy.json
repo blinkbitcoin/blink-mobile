@@ -2469,6 +2469,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Հաշվի ID",
+    "publicKey": "Հանրային բանալի",
+    "copiedPublicKey": "Հանրային բանալին պատճենվել է հիշապահոցում",
     "copy": "Պատճենել",
     "identityVerification": "Ինdelays delays"
   },

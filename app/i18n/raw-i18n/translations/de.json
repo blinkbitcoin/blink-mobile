@@ -2451,6 +2451,8 @@
         "copiedAccountId": "Kopieren Sie Ihre Konto-ID in die Zwischenablage",
         "yourAccountId": "Deine Konto ID",
         "accountId": "Konto ID",
+        "publicKey": "Öffentlicher Schlüssel",
+        "copiedPublicKey": "Öffentlicher Schlüssel in die Zwischenablage kopiert",
         "copy": "Kopieren",
         "identityVerification": "Identitätsverifizierung"
     },

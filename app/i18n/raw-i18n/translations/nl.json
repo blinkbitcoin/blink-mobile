@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Uw account-ID naar het klembord gekopieerd",
     "yourAccountId": "Uw account-ID",
     "accountId": "Account-ID",
+    "publicKey": "Publieke sleutel",
+    "copiedPublicKey": "Publieke sleutel gekopieerd naar klembord",
     "copy": "Kopiëren",
     "identityVerification": "Identiteitsverificatie"
   },

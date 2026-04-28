@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "معرّف الحساب",
+    "publicKey": "المفتاح العام",
+    "copiedPublicKey": "تم نسخ المفتاح العام إلى الحافظة",
     "copy": "Copy",
     "identityVerification": "التحقق من الهوية"
   },

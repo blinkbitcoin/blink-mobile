@@ -2451,6 +2451,8 @@
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
+        "publicKey": "Chave pública",
+        "copiedPublicKey": "Chave pública copiada para a área de transferência",
         "copy": "Copiar",
         "identityVerification": "Verificação de Identidade"
     },

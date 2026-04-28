@@ -2468,6 +2468,8 @@
         "copiedAccountId": "Copier votre identifiant de compte dans le presse-papiers",
         "yourAccountId": "Votre identifiant de compte",
         "accountId": "Identifiant du compte",
+        "publicKey": "Clé publique",
+        "copiedPublicKey": "Clé publique copiée dans le presse-papiers",
         "copy": "Copier",
         "identityVerification": "Vérification d'identité"
     },

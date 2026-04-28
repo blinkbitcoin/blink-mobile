@@ -2468,6 +2468,8 @@
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
         "accountId": "アカウントID",
+        "publicKey": "公開鍵",
+        "copiedPublicKey": "公開鍵をクリップボードにコピーしました",
         "copy": "コピー",
         "identityVerification": "本人確認"
     },

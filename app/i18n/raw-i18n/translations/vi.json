@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Mã Tài khoản",
+    "publicKey": "Khóa công khai",
+    "copiedPublicKey": "Đã sao chép khóa công khai vào bộ nhớ tạm",
     "copy": "Copy",
     "identityVerification": "Xác minh Danh tính"
   },

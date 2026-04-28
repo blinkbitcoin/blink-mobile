@@ -2450,6 +2450,8 @@
         "copiedAccountId": "Copiaste la ID de tu cuenta al portapapeles",
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
+        "publicKey": "Clave pública",
+        "copiedPublicKey": "Clave pública copiada al portapapeles",
         "copy": "Copiar",
         "identityVerification": "Verificación de identidad"
     },

@@ -2535,6 +2535,8 @@ const en: BaseTranslation = {
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
+    publicKey: "Public key",
+    copiedPublicKey: "Copied your public key to clipboard",
     copy: "Copy",
     identityVerification: "Identity Verification",
   },

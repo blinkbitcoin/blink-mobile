@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID účtu",
+    "publicKey": "Veřejný klíč",
+    "copiedPublicKey": "Veřejný klíč zkopírován do schránky",
     "copy": "Kopírovat",
     "identityVerification": "Ověření totožnosti"
   },

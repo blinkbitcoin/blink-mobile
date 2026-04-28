@@ -2451,6 +2451,8 @@
     "copiedAccountId": "A felhasználói fiók azonosítód a vágólapra másolva",
     "yourAccountId": "A felhasználói fiók azonosítód",
     "accountId": "Felhasználói fiók azonosító",
+    "publicKey": "Nyilvános kulcs",
+    "copiedPublicKey": "Nyilvános kulcs a vágólapra másolva",
     "copy": "Másol",
     "identityVerification": "Személyazonosság ellenőrzése"
   },

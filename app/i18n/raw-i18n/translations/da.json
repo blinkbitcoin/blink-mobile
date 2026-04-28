@@ -2454,6 +2454,8 @@
     "copiedAccountId": "Dit konto ID er kopieret til udklipsholderen",
     "yourAccountId": "Dit konto ID",
     "accountId": "Konto-ID",
+    "publicKey": "Offentlig nøgle",
+    "copiedPublicKey": "Offentlig nøgle kopieret til udklipsholder",
     "copy": "Kopier",
     "identityVerification": "Identitetsbekræftelse"
   },

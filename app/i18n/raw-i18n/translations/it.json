@@ -2451,6 +2451,8 @@
         "copiedAccountId": "Copiato l'ID del tuo account negli appunti",
         "yourAccountId": "Il tuo ID account",
         "accountId": "ID account",
+        "publicKey": "Chiave pubblica",
+        "copiedPublicKey": "Chiave pubblica copiata negli appunti",
         "copy": "Copia",
         "identityVerification": "Verifica dell'identità"
     },

@@ -2451,6 +2451,8 @@
     "copiedAccountId": "Ați copiat ID-ul contului în clipboard",
     "yourAccountId": "ID-ul contului dvs.",
     "accountId": "ID-ul contului",
+    "publicKey": "Cheie publică",
+    "copiedPublicKey": "Cheia publică a fost copiată în clipboard",
     "copy": "Copiați",
     "identityVerification": "Verificarea identității"
   },

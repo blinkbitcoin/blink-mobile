@@ -2451,6 +2451,8 @@
     "copiedAccountId": "Hesap kimliğiniz panoya kopyalandı",
     "yourAccountId": "Hesap Kimliğiniz",
     "accountId": "Hesap Kimliği",
+    "publicKey": "Genel anahtar",
+    "copiedPublicKey": "Genel anahtar panoya kopyalandı",
     "copy": "Kopyala",
     "identityVerification": "Kimlik Doğrulama"
   },

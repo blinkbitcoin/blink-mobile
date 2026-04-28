@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Jou rekening ID is oorgedra na die knipbord ",
     "yourAccountId": "Jou Rekening ID",
     "accountId": "Rekening-ID",
+    "publicKey": "Publieke sleutel",
+    "copiedPublicKey": "Publieke sleutel na knipbord gekopieer",
     "copy": "Dra oor",
     "identityVerification": "Identiteitsverifikasie"
   },

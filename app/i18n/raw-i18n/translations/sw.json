@@ -2451,6 +2451,8 @@
     "copiedAccountId": "Imeakiliwa ID ya akaunti yako kwenye ubao wa kunakili",
     "yourAccountId": "ID ya Akaunti Yako",
     "accountId": "Kitambulisho cha Akaunti",
+    "publicKey": "Ufunguo wa umma",
+    "copiedPublicKey": "Ufunguo wa umma umenakiliwa kwenye ubao wa kunakili",
     "copy": "Nakili",
     "identityVerification": "Uthibitishaji wa Utambulisho"
   },

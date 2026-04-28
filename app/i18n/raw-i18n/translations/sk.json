@@ -2451,6 +2451,8 @@
     "copiedAccountId": "ID účtu bolo skopírované do schránky",
     "yourAccountId": "Vaše ID účtu",
     "accountId": "ID účtu",
+    "publicKey": "Verejný kľúč",
+    "copiedPublicKey": "Verejný kľúč skopírovaný do schránky",
     "copy": "Kopírovať",
     "identityVerification": "Overenie identity"
   },
