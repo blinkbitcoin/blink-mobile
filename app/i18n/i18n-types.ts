@@ -7976,6 +7976,14 @@ type RootTranslation = {
 		 */
 		accountId: string
 		/**
+		 * P​u​b​l​i​c​ ​k​e​y
+		 */
+		publicKey: string
+		/**
+		 * C​o​p​i​e​d​ ​y​o​u​r​ ​p​u​b​l​i​c​ ​k​e​y​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copiedPublicKey: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -20122,6 +20130,14 @@ export type TranslationFunctions = {
 		 * Account ID
 		 */
 		accountId: () => LocalizedString
+		/**
+		 * Public key
+		 */
+		publicKey: () => LocalizedString
+		/**
+		 * Copied your public key to clipboard
+		 */
+		copiedPublicKey: () => LocalizedString
 		/**
 		 * Copy
 		 */

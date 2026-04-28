@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID налога",
+    "publicKey": "Јавни кључ",
+    "copiedPublicKey": "Јавни кључ копиран у међуспремник",
     "copy": "Copy",
     "identityVerification": "Верификација идентитета"
   },

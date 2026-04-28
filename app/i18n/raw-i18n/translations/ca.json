@@ -2451,6 +2451,8 @@
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",
+    "publicKey": "Clau pública",
+    "copiedPublicKey": "Clau pública copiada al porta-retalls",
     "copy": "Copiar",
     "identityVerification": "Verificació d'identitat"
   },

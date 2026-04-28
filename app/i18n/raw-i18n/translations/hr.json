@@ -2468,6 +2468,8 @@
     "copiedAccountId": "ID vašeg računa kopiran je u međuspremnik",
     "yourAccountId": "ID tvog računa",
     "accountId": "ID računa",
+    "publicKey": "Javni ključ",
+    "copiedPublicKey": "Javni ključ kopiran u međuspremnik",
     "copy": "Kopiraj",
     "identityVerification": "Provjera identiteta"
   },
