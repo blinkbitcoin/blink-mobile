@@ -41,12 +41,9 @@ import {
   AmountInputScreen,
   ConvertInputType,
 } from "@app/components/transfer-amount-input"
-import { StableBalanceFirstTimeModal } from "@app/components/stable-balance-first-time-modal"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
-import { useStableBalanceFirstTime } from "@app/hooks/use-stable-balance-first-time"
 import { convertDirectionFromCurrency } from "@app/types/payment.types"
 
 import {
@@ -89,7 +86,6 @@ export const ConversionDetailsScreen = () => {
   useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
-  const { isStableBalanceActive } = useSelfCustodialWallet()
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-and-network",
@@ -105,13 +101,6 @@ export const ConversionDetailsScreen = () => {
     displayCurrency,
   } = useDisplayCurrency()
   const styles = useStyles(displayCurrency !== WalletCurrency.Usd)
-
-  const {
-    shouldShow: shouldShowStableBalanceFirstTime,
-    markAsShown: markStableBalanceFirstTimeShown,
-  } = useStableBalanceFirstTime()
-  const showStableBalanceFirstTimeModal =
-    shouldShowStableBalanceFirstTime && isSelfCustodial && isStableBalanceActive
 
   const scWalletsForConvert = useMemo(() => {
     if (!isSelfCustodial) return null
@@ -524,10 +513,6 @@ export const ConversionDetailsScreen = () => {
 
   return (
     <Screen preset="fixed">
-      <StableBalanceFirstTimeModal
-        isVisible={showStableBalanceFirstTimeModal}
-        onAcknowledge={markStableBalanceFirstTimeShown}
-      />
       <View style={styles.styleWalletContainer}>
         <View
           style={[

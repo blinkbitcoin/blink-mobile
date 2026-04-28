@@ -66,14 +66,6 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   }),
 }))
 
-jest.mock("@app/hooks/use-stable-balance-first-time", () => ({
-  useStableBalanceFirstTime: () => ({
-    shouldShow: false,
-    markAsShown: jest.fn(),
-    loaded: true,
-  }),
-}))
-
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
   label?: string
