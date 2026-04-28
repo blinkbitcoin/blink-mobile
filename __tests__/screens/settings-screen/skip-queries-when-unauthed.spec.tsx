@@ -65,6 +65,17 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 8,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+  }),
+}))
+
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
   useTheme: () => ({

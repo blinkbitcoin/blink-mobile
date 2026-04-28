@@ -2571,7 +2571,9 @@ const en: BaseTranslation = {
   },
   DefaultWalletScreen: {
     title: "Default receive account",
+    titleSelfCustodial: "Default account",
     info: "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.",
+    infoSelfCustodial: "This account will be used by default when receiving and sending. You can switch any time.",
   },
   ThemeScreen: {
     title: "Theme",

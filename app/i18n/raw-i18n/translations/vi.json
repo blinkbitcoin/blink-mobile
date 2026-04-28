@@ -2500,7 +2500,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Tài khoản nhận mặc định",
-    "info": "Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường. Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi."
+    "info": "Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường. Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
+    "titleSelfCustodial": "Tài khoản mặc định",
+    "infoSelfCustodial": "Tài khoản này sẽ được sử dụng mặc định khi nhận và gửi. Bạn có thể chuyển đổi bất cứ lúc nào."
   },
   "ThemeScreen": {
     "title": "Theme",

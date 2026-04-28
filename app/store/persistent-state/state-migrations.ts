@@ -37,8 +37,22 @@ type PersistentState_7 = {
   activeAccountId?: string
 }
 
-const migrate7ToCurrent = (state: PersistentState_7): Promise<PersistentState> =>
+type PersistentState_8 = {
+  schemaVersion: 8
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+}
+
+const migrate8ToCurrent = (state: PersistentState_8): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate7ToCurrent = (state: PersistentState_7): Promise<PersistentState> =>
+  migrate8ToCurrent({
+    ...state,
+    schemaVersion: 8,
+  })
 
 const migrate6ToCurrent = (state: PersistentState_6): Promise<PersistentState> =>
   migrate7ToCurrent({
@@ -112,6 +126,7 @@ type StateMigrations = {
   5: (state: PersistentState_5) => Promise<PersistentState>
   6: (state: PersistentState_6) => Promise<PersistentState>
   7: (state: PersistentState_7) => Promise<PersistentState>
+  8: (state: PersistentState_8) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -120,12 +135,13 @@ const stateMigrations: StateMigrations = {
   5: migrate5ToCurrent,
   6: migrate6ToCurrent,
   7: migrate7ToCurrent,
+  8: migrate8ToCurrent,
 }
 
-export type PersistentState = PersistentState_7
+export type PersistentState = PersistentState_8
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 7,
+  schemaVersion: 8,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -137,7 +153,7 @@ export const migrateAndGetPersistentState = async (
   data: any,
 ): Promise<PersistentState> => {
   if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 | 7 = data.schemaVersion
+    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 = data.schemaVersion
     try {
       const migration = stateMigrations[schemaVersion]
       const persistentState = await migration(data)

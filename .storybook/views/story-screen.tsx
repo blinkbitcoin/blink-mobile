@@ -5,7 +5,7 @@ const PersistentStateWrapper: React.FC<React.PropsWithChildren> = ({ children })
   <PersistentStateContext.Provider
     value={{
       persistentState: {
-        schemaVersion: 7,
+        schemaVersion: 8,
         galoyInstance: {
           id: "Main",
         },

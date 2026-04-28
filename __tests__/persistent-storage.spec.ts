@@ -25,20 +25,20 @@ it("returns default when schema is not present", async () => {
   expect(state).toEqual(defaultPersistentState)
 })
 
-it("migration from 5 to 7", async () => {
+it("migration from 5 to 8", async () => {
   const state5 = {
     schemaVersion: 5,
     galoyInstance: { id: "Main" },
     galoyAuthToken: "myToken",
   }
 
-  const state7 = {
-    schemaVersion: 7,
+  const state8 = {
+    schemaVersion: 8,
     galoyInstance: { id: "Main" },
     galoyAuthToken: "myToken",
   }
 
   const res = await migrateAndGetPersistentState(state5)
 
-  expect(res).toStrictEqual(state7)
+  expect(res).toStrictEqual(state8)
 })
