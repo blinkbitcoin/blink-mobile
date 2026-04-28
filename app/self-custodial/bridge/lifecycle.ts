@@ -1,14 +1,12 @@
 import {
   Network,
   Seed,
-  StableBalanceActiveLabel,
   connect,
   defaultConfig,
   initLogging,
   type BreezSdkInterface,
   type SdkEvent,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { generateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
@@ -87,26 +85,6 @@ export const selfCustodialCreateWallet = async (): Promise<void> => {
   if (!stored) throw new Error("Failed to store mnemonic")
 
   await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
-
-  try {
-    const sdk = await initSdk(mnemonic)
-    try {
-      await sdk.updateUserSettings({
-        sparkPrivateModeEnabled: undefined,
-        stableBalanceActiveLabel: new StableBalanceActiveLabel.Set({
-          label: SparkToken.Label,
-        }),
-      })
-    } finally {
-      await disconnectSdk(sdk)
-    }
-  } catch (err) {
-    await KeyStoreWrapper.deleteMnemonic()
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Wallet creation failed: ${err}`),
-    )
-    throw err
-  }
 }
 
 export const selfCustodialRestoreWallet = async (mnemonic: string): Promise<void> => {
