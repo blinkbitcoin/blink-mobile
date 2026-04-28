@@ -11,6 +11,14 @@ jest.mock("@app/graphql/generated", () => ({
   useContactCreateMutation: () => [mockContactCreate],
 }))
 
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => ({ isSelfCustodial: false }),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({ sdk: null }),
+}))
+
 describe("useSaveLnAddressContact", () => {
   beforeEach(() => {
     jest.clearAllMocks()

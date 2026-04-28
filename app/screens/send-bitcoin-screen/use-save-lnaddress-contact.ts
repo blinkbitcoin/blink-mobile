@@ -2,8 +2,12 @@ import React from "react"
 import { gql } from "@apollo/client"
 import { utils as lnurlUtils } from "lnurl-pay"
 import { PaymentType } from "@blinkbitcoin/blink-client"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ContactType, useContactCreateMutation } from "@app/graphql/generated"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { addContact as bridgeAddContact } from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 
 gql`
   mutation contactCreate($input: ContactCreateInput!) {
@@ -27,6 +31,8 @@ type SaveLnAddressContactResult = { saved: boolean; handle?: string }
 
 export const useSaveLnAddressContact = () => {
   const [contactCreate] = useContactCreateMutation()
+  const { isSelfCustodial } = useActiveWallet()
+  const { sdk } = useSelfCustodialWallet()
 
   return React.useCallback(
     async ({
@@ -42,11 +48,24 @@ export const useSaveLnAddressContact = () => {
 
       const handle = `${parsed.username}@${parsed.domain}`
 
+      if (isSelfCustodial) {
+        if (!sdk) return { saved: false }
+        try {
+          await bridgeAddContact(sdk, { name: handle, paymentIdentifier: handle })
+          return { saved: true, handle }
+        } catch (err) {
+          crashlytics().log(
+            `[self-custodial contacts] auto-save failed for ${handle}: ${err}`,
+          )
+          return { saved: false, handle }
+        }
+      }
+
       await contactCreate({
         variables: { input: { handle, type: ContactType.Lnaddress } },
       })
       return { saved: true, handle }
     },
-    [contactCreate],
+    [contactCreate, isSelfCustodial, sdk],
   )
 }
