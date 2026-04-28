@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { AccountType, type AccountDescriptor } from "@app/types/wallet.types"
 
 type RollbackDeps = {
@@ -9,12 +10,17 @@ type RollbackDeps = {
   setActiveAccountId: (id: string) => void
 }
 
+type RollbackResult = {
+  shouldShowUnavailable: boolean
+}
+
 export const useSelfCustodialRollback = ({
   activeAccount,
   accounts,
   setActiveAccountId,
-}: RollbackDeps): void => {
+}: RollbackDeps): RollbackResult => {
   const { nonCustodialEnabled } = useFeatureFlags()
+  const hasCustodialAccount = useHasCustodialAccount()
 
   useEffect(() => {
     if (nonCustodialEnabled) return
@@ -25,4 +31,11 @@ export const useSelfCustodialRollback = ({
 
     setActiveAccountId(fallback.id)
   }, [nonCustodialEnabled, activeAccount, accounts, setActiveAccountId])
+
+  const shouldShowUnavailable =
+    !nonCustodialEnabled &&
+    activeAccount?.type === AccountType.SelfCustodial &&
+    !hasCustodialAccount
+
+  return { shouldShowUnavailable }
 }
