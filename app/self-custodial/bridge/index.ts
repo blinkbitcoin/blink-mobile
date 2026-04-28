@@ -6,7 +6,12 @@ export {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "./lifecycle"
-export { getWalletInfo, listPayments, getUserSettings } from "./wallet"
+export {
+  getWalletInfo,
+  listPayments,
+  getUserSettings,
+  getLightningAddress,
+} from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
@@ -29,3 +34,4 @@ export { buildConversionType, fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"
 export type { ParsedSparkAddress } from "./parse"
 export { findUsdbToken, fetchUsdbDecimals } from "./token-balance"
+export { listContacts, addContact, updateContact, deleteContact } from "./contacts"
