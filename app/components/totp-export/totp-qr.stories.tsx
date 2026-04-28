@@ -17,5 +17,5 @@ export default {
 }
 
 export const Default = () => (
-  <QrCodeComponent otpauth={"otpauth://totp/YOUR_IDENTIFICATION?secret=YOUR_SECRET"} />
+  <QrCodeComponent value={"otpauth://totp/YOUR_IDENTIFICATION?secret=YOUR_SECRET"} />
 )

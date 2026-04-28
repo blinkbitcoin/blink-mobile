@@ -6,6 +6,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { Switch } from "@app/components/atomic/switch"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { logSelfCustodialStableBalanceActivated } from "@app/utils/analytics"
 import {
   activateStableBalance,
   deactivateStableBalance,
@@ -71,6 +72,7 @@ export const StableBalanceSettingsScreen: React.FC = () => {
     try {
       if (activate) {
         await activateStableBalance(sdk, SparkToken.Label)
+        logSelfCustodialStableBalanceActivated({ label: SparkToken.Label })
       } else {
         await deactivateStableBalance(sdk)
       }
