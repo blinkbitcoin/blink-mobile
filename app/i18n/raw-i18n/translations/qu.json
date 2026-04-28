@@ -2500,7 +2500,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Ñawpaq chaskiy cuenta",
-    "info": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun. Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu."
+    "info": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun. Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu.",
+    "titleSelfCustodial": "Saqisqa cuenta",
+    "infoSelfCustodial": "Kay cuenta saqisqaman jina kanqa chaskichkaspa imapas apachichkaspapas. Mayllapipas tikrayta atikun."
   },
   "ThemeScreen": {
     "title": "Theme",

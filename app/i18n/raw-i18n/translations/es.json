@@ -2482,7 +2482,9 @@
     },
     "DefaultWalletScreen": {
         "title": "Cuenta de recepción predeterminada",
-        "info": "Tu Cuenta Bitcoin es para acumular sats, donde el valor USD se mueve con el mercado. Tu Cuenta Dólar está impulsado por Stablesats — contiene Bitcoin cubierto para mantenerse estable en términos USD. Siempre tienes Bitcoin, pero el valor en dólares no cambia."
+        "info": "Tu Cuenta Bitcoin es para acumular sats, donde el valor USD se mueve con el mercado. Tu Cuenta Dólar está impulsado por Stablesats — contiene Bitcoin cubierto para mantenerse estable en términos USD. Siempre tienes Bitcoin, pero el valor en dólares no cambia.",
+        "titleSelfCustodial": "Cuenta predeterminada",
+        "infoSelfCustodial": "Esta cuenta se usará por defecto al recibir y enviar. Podés cambiarla cuando quieras."
     },
     "ThemeScreen": {
         "title": "Tema",

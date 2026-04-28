@@ -2483,7 +2483,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akaunti ya kupokea chaguo-msingi",
-    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki."
+    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
+    "titleSelfCustodial": "Akaunti chaguomsingi",
+    "infoSelfCustodial": "Akaunti hii itatumika kwa chaguomsingi wakati wa kupokea na kutuma. Unaweza kubadilisha wakati wowote."
   },
   "ThemeScreen": {
     "title": "Mandhari",

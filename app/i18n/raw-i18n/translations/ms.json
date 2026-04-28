@@ -2500,7 +2500,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akaun penerima lalai",
-    "info": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran. Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah."
+    "info": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran. Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah.",
+    "titleSelfCustodial": "Akaun lalai",
+    "infoSelfCustodial": "Akaun ini akan digunakan secara lalai semasa menerima dan menghantar. Anda boleh tukar bila-bila masa."
   },
   "ThemeScreen": {
     "title": "Tema",
