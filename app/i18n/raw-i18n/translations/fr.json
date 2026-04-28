@@ -2390,13 +2390,6 @@
             "minFromLabel": "Minimum envoyé",
             "minToLabel": "Minimum reçu",
             "loadError": "Impossible de charger les limites de conversion."
-        },
-        "WaysToGetPaid": {
-            "lightningAddressTitle": "Adresse Lightning",
-            "lightningAddressDescription": "Partagez cette adresse pour recevoir des paiements Lightning instantanément.",
-            "onchainTitle": "Adresse de dépôt Bitcoin",
-            "onchainDescription": "Partagez cette adresse pour recevoir des Bitcoin on-chain.",
-            "loadError": "Impossible de charger vos coordonnées de paiement."
         }
     },
     "NotificationSettingsScreen": {
@@ -3645,12 +3638,6 @@
             "deactivateBody": "Votre solde en USDB sera reconverti en BTC. Voici les frais de conversion estimés.",
             "deactivateConfirm": "Désactiver",
             "cancel": "Annuler"
-        },
-        "firstTimeModal": {
-            "title": "À propos de la Conversion",
-            "dualBalance": "BTC et USD sont deux soldes indépendants dans votre portefeuille. Utilisez Convert à tout moment pour déplacer des fonds entre eux.",
-            "trustDisclosure": "Le mode USD utilise des jetons USDB sur Spark. Les hypothèses de confiance diffèrent de la détention directe de BTC. USDB repose sur l'émetteur de jetons de Spark.",
-            "acknowledge": "Je comprends"
         },
         "minimumConversion": "Conversion minimale : {amount:string}",
         "conversionUnavailable": "La conversion est temporairement indisponible. Veuillez réessayer."

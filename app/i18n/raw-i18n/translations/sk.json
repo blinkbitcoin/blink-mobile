@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Váš zostatok v USDB bude prevedený späť na BTC. Toto je odhadovaný poplatok za prevod.",
       "deactivateConfirm": "Deaktivovať",
       "cancel": "Zrušiť"
-    },
-    "firstTimeModal": {
-      "title": "O konverzii",
-      "dualBalance": "BTC a USD sú dva nezávislé zostatky vo vašej peňaženke. Kedykoľvek použite Convert na presun prostriedkov medzi nimi.",
-      "trustDisclosure": "Režim USD používa tokeny USDB na Sparku. Predpoklady dôvery sa líšia od priameho držania BTC. USDB sa spolieha na Sparkovho emitenta tokenov.",
-      "acknowledge": "Rozumiem"
     },
     "minimumConversion": "Minimálna konverzia: {amount:string}",
     "conversionUnavailable": "Konverzia je dočasne nedostupná. Skúste to znova."

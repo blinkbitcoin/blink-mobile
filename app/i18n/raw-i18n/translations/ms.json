@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3657,12 +3650,6 @@
       "deactivateBody": "Baki USDB anda akan ditukar semula kepada BTC. Ini adalah anggaran yuran penukaran.",
       "deactivateConfirm": "Nyahaktifkan",
       "cancel": "Batal"
-    },
-    "firstTimeModal": {
-      "title": "Mengenai Penukaran",
-      "dualBalance": "BTC dan USD ialah dua baki bebas dalam dompet anda. Gunakan Convert pada bila-bila masa untuk memindahkan dana antara keduanya.",
-      "trustDisclosure": "Mod USD menggunakan token USDB di Spark. Andaian kepercayaan berbeza daripada memegang BTC secara langsung. USDB bergantung pada penerbit token Spark.",
-      "acknowledge": "Saya faham"
     },
     "minimumConversion": "Penukaran minimum: {amount:string}",
     "conversionUnavailable": "Penukaran tidak tersedia buat sementara waktu. Sila cuba lagi."

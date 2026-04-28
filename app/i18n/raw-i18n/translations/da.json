@@ -2376,13 +2376,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3634,12 +3627,6 @@
       "deactivateBody": "Din USDB-saldo vil blive konverteret tilbage til BTC. Dette er det anslåede konverteringsgebyr.",
       "deactivateConfirm": "Deaktivér",
       "cancel": "Annullér"
-    },
-    "firstTimeModal": {
-      "title": "Om Konvertering",
-      "dualBalance": "BTC og USD er to uafhængige saldi i din tegnebog. Brug Convert når som helst til at flytte midler mellem dem.",
-      "trustDisclosure": "USD-tilstand bruger USDB-tokens på Spark. Tillidsantagelserne er anderledes end at holde BTC direkte. USDB er afhængig af Sparks tokenudsteder.",
-      "acknowledge": "Jeg forstår"
     },
     "minimumConversion": "Minimum konvertering: {amount:string}",
     "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."

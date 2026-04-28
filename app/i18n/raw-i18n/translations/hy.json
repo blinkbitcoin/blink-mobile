@@ -2391,13 +2391,6 @@
       "minFromLabel": "Նվազագույն ուղարկված",
       "minToLabel": "Նվազագույն ստացված",
       "loadError": "Չհաջողվեց բեռնել փոխարկման սահմանաչափերը։"
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning հասցե",
-      "lightningAddressDescription": "Կիսվեք այս հասցեով՝ Lightning վճարումներ անմիջապես ստանալու համար։",
-      "onchainTitle": "Bitcoin ավանդի հասցե",
-      "onchainDescription": "Կիսվեք այս հասցեով՝ Bitcoin on-chain ստանալու համար։",
-      "loadError": "Չհաջողվեց բեռնել ձեր վճարման տվյալները։"
     }
   },
   "NotificationSettingsScreen": {
@@ -3658,12 +3651,6 @@
       "deactivateBody": "Ձեր USDB մնացորդը նորից կփոխարկվի BTC-ի։ Սա փոխարկման գնահատված վճարն է։",
       "deactivateConfirm": "Ապաակտիվացնել",
       "cancel": "Չեղարկել"
-    },
-    "firstTimeModal": {
-      "title": "Փոխարկման մասին",
-      "dualBalance": "BTC-ն և USD-ն ձեր դրամապանակում երկու անկախ մնացորդներ են։ Ցանկացած պահի օգտագործեք Convert-ը՝ դրանց միջև միջոցներ տեղափոխելու համար։",
-      "trustDisclosure": "USD ռեժիմը օգտագործում է USDB թոքեններ Spark-ում։ Վստահության ենթադրությունները տարբերվում են BTC-ի ուղղակի պահելուց. USDB-ն հիմնված է Spark-ի թոքեն թողարկողի վրա։",
-      "acknowledge": "Ես հասկանում եմ"
     },
     "minimumConversion": "Նվազագույն փոխարկում. {amount:string}",
     "conversionUnavailable": "Փոխարկումը ժամանակավորապես անհասանելի է։ Խնդրում ենք փորձել կրկին։"

@@ -43,7 +43,6 @@ import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitc
 import { OfflineGate } from "@app/self-custodial/components"
 import { StableBalanceSettingsScreen } from "@app/screens/stable-balance-settings-screen"
 import { SelfCustodialAccountInformationScreen } from "@app/screens/settings-screen/self-custodial/account-information-screen"
-import { SelfCustodialBitcoinDepositScreen } from "@app/screens/settings-screen/self-custodial/bitcoin-deposit-screen"
 import { SelfCustodialTransactionLimitsScreen } from "@app/screens/settings-screen/self-custodial/transaction-limits-screen"
 import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
 import { useSelfCustodialUnavailable } from "@app/hooks/use-self-custodial-unavailable"
@@ -810,11 +809,6 @@ export const RootStack = () => {
         name="selfCustodialTransactionLimitsScreen"
         component={SelfCustodialTransactionLimitsScreen}
         options={{ title: LL.common.transactionLimits() }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialBitcoinDepositScreen"
-        component={SelfCustodialBitcoinDepositScreen}
-        options={{ title: LL.SettingsScreen.WaysToGetPaid.onchainTitle() }}
       />
       <RootNavigator.Screen
         name="sparkMigrationExplainer"

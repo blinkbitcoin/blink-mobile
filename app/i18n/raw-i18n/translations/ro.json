@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Soldul tău în USDB va fi convertit înapoi în BTC. Acesta este comisionul de conversie estimat.",
       "deactivateConfirm": "Dezactivează",
       "cancel": "Anulează"
-    },
-    "firstTimeModal": {
-      "title": "Despre Conversie",
-      "dualBalance": "BTC și USD sunt două solduri independente în portofelul tău. Folosește Convert oricând pentru a muta fonduri între ele.",
-      "trustDisclosure": "Modul USD folosește tokenuri USDB pe Spark. Presupunerile de încredere diferă de păstrarea BTC direct. USDB se bazează pe emitentul de tokenuri Spark.",
-      "acknowledge": "Am înțeles"
     },
     "minimumConversion": "Conversie minimă: {amount:string}",
     "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."

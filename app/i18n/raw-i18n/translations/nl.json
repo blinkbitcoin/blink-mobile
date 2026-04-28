@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3657,12 +3650,6 @@
       "deactivateBody": "Je USDB-saldo wordt terug omgezet naar BTC. Dit zijn de geschatte conversiekosten.",
       "deactivateConfirm": "Deactiveren",
       "cancel": "Annuleren"
-    },
-    "firstTimeModal": {
-      "title": "Over Converteren",
-      "dualBalance": "BTC en USD zijn twee onafhankelijke saldi in je portemonnee. Gebruik Convert op elk moment om geld tussen beide te verplaatsen.",
-      "trustDisclosure": "De USD-modus gebruikt USDB-tokens op Spark. De vertrouwensaannames verschillen van het direct aanhouden van BTC. USDB steunt op de token-uitgever van Spark.",
-      "acknowledge": "Ik begrijp het"
     },
     "minimumConversion": "Minimale conversie: {amount:string}",
     "conversionUnavailable": "Conversie is tijdelijk niet beschikbaar. Probeer het opnieuw."

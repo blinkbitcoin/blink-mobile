@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Az USDB egyenlegét visszaváltjuk BTC-re. Ez a becsült átváltási díj.",
       "deactivateConfirm": "Kikapcsolás",
       "cancel": "Mégse"
-    },
-    "firstTimeModal": {
-      "title": "A Konverzióról",
-      "dualBalance": "A BTC és az USD két független egyenleg a pénztárcádban. Használd a Convert funkciót bármikor, hogy pénzt mozgass közöttük.",
-      "trustDisclosure": "Az USD mód USDB tokeneket használ a Sparkon. A bizalmi feltételezések eltérnek a közvetlen BTC tartástól. Az USDB a Spark tokenkibocsátójára támaszkodik.",
-      "acknowledge": "Megértettem"
     },
     "minimumConversion": "Minimum konverzió: {amount:string}",
     "conversionUnavailable": "A konverzió ideiglenesen nem érhető el. Próbáld újra."

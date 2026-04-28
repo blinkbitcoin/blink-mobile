@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Saldo USDB Anda akan dikonversi kembali ke BTC. Ini adalah perkiraan biaya konversi.",
       "deactivateConfirm": "Nonaktifkan",
       "cancel": "Batal"
-    },
-    "firstTimeModal": {
-      "title": "Tentang Konversi",
-      "dualBalance": "BTC dan USD adalah dua saldo independen di dompet Anda. Gunakan Convert kapan saja untuk memindahkan dana di antara keduanya.",
-      "trustDisclosure": "Mode USD menggunakan token USDB di Spark. Asumsi kepercayaan berbeda dari memegang BTC langsung. USDB bergantung pada penerbit token Spark.",
-      "acknowledge": "Saya mengerti"
     },
     "minimumConversion": "Konversi minimum: {amount:string}",
     "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."

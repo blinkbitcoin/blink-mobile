@@ -2390,13 +2390,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3654,12 +3647,6 @@
       "deactivateBody": "Số dư USDB của bạn sẽ được chuyển đổi lại thành BTC. Đây là phí chuyển đổi ước tính.",
       "deactivateConfirm": "Tắt",
       "cancel": "Hủy"
-    },
-    "firstTimeModal": {
-      "title": "Về Chuyển đổi",
-      "dualBalance": "BTC và USD là hai số dư độc lập trong ví của bạn. Sử dụng Convert bất cứ lúc nào để chuyển tiền giữa chúng.",
-      "trustDisclosure": "Chế độ USD sử dụng token USDB trên Spark. Các giả định tin cậy khác với việc giữ BTC trực tiếp. USDB phụ thuộc vào nhà phát hành token của Spark.",
-      "acknowledge": "Tôi hiểu"
     },
     "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}",
     "conversionUnavailable": "Chuyển đổi tạm thời không khả dụng. Vui lòng thử lại."

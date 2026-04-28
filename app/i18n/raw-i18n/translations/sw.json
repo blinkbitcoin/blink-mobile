@@ -2373,13 +2373,6 @@
       "minFromLabel": "Minimum sent",
       "minToLabel": "Minimum received",
       "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -3616,12 +3609,6 @@
       "deactivateBody": "Salio lako la USDB litarudishwa kwa BTC. Hii ni ada ya makadirio ya ubadilishaji.",
       "deactivateConfirm": "Zima",
       "cancel": "Futa"
-    },
-    "firstTimeModal": {
-      "title": "Kuhusu Ubadilishaji",
-      "dualBalance": "BTC na USD ni salio mbili huru katika mkoba wako. Tumia Convert wakati wowote kuhamisha fedha kati yao.",
-      "trustDisclosure": "Modi ya USD hutumia tokeni za USDB kwenye Spark. Mawazo ya kuaminika ni tofauti na kushikilia BTC moja kwa moja. USDB inategemea mtoaji wa tokeni wa Spark.",
-      "acknowledge": "Naelewa"
     },
     "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
     "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
