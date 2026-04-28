@@ -305,7 +305,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     })
   })
 
-  it("Skips saveLnAddressContact entirely when the active wallet is self-custodial", async () => {
+  it("Calls saveLnAddressContact when the active wallet is self-custodial (hook routes internally)", async () => {
     useActiveWalletMock.mockReturnValue({
       isSelfCustodial: true,
       isReady: true,
@@ -339,7 +339,12 @@ describe("SendBitcoinConfirmationScreen", () => {
     })
 
     expect(sendPaymentMock).toHaveBeenCalledTimes(1)
-    expect(saveLnAddressContactMock).not.toHaveBeenCalled()
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
   })
 
   it("Does not call saveLnAddressContact when LNURL payment is to a merchant", async () => {
