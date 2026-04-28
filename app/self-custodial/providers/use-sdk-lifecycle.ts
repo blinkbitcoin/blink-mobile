@@ -23,7 +23,7 @@ type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
-  isStableBalanceActive: boolean
+  sdkStableBalanceActive: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -42,7 +42,7 @@ const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
-  const [isStableBalanceActive, setIsStableBalanceActive] = useState(false)
+  const [sdkStableBalanceActive, setSdkStableBalanceActive] = useState(false)
   const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -135,7 +135,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       getUserSettings(connectedSdk)
         .then((settings) => {
           if (mounted) {
-            setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+            setSdkStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
           }
         })
         .catch(() => {})
@@ -216,7 +216,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     if (!sdkRef.current) return
     try {
       const settings = await getUserSettings(sdkRef.current)
-      setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
+      setSdkStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh user settings: ${err}`)
     }
@@ -226,7 +226,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     wallets,
     status,
     sdk,
-    isStableBalanceActive,
+    sdkStableBalanceActive,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,

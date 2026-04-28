@@ -40,6 +40,11 @@ const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
 const mockGetUserSettings = jest.fn()
 
+let mockStableBalanceEnabled = true
+jest.mock("@app/config/feature-flags-context", () => ({
+  useFeatureFlags: () => ({ stableBalanceEnabled: mockStableBalanceEnabled }),
+}))
+
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
@@ -100,6 +105,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe("SelfCustodialWalletProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockStableBalanceEnabled = true
     mockGetMnemonic.mockResolvedValue(null)
     mockGetMnemonicNetwork.mockResolvedValue("regtest")
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
@@ -464,6 +470,7 @@ describe("SelfCustodialWalletProvider", () => {
 describe("SelfCustodialWalletProvider — async ops, connectivity & polling", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockStableBalanceEnabled = true
     mockGetMnemonic.mockResolvedValue(null)
     mockGetMnemonicNetwork.mockResolvedValue("regtest")
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
@@ -870,6 +877,22 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
       })
 
       expect(result.current.isStableBalanceActive).toBe(true)
+    })
+
+    it("reports false when remote flag is off, even if the SDK reports active", async () => {
+      mockStableBalanceEnabled = false
+      mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+      mockGetUserSettings.mockResolvedValue({
+        stableBalanceActiveLabel: { label: "USDB" },
+        sparkPrivateModeEnabled: false,
+      })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.sdk).toBeTruthy())
+      await waitFor(() => expect(mockGetUserSettings).toHaveBeenCalled())
+      expect(result.current.isStableBalanceActive).toBe(false)
     })
   })
 })
