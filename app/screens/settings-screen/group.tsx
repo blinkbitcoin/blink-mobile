@@ -1,8 +1,9 @@
 import React from "react"
 import { View, StyleProp, ViewStyle, TextStyle } from "react-native"
 
-import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
+
+import { testProps } from "@app/utils/testProps"
 
 type SettingsGroupProps = {
   name?: string
@@ -25,6 +26,8 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   } = useTheme()
 
   const filteredItems = items.filter((x) => x({}) !== null)
+
+  if (filteredItems.length === 0) return null
 
   return (
     <View>
