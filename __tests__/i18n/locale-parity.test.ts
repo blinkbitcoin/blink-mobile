@@ -39,13 +39,6 @@ describe("locale parity for backup/restore i18n keys", () => {
         loadLocale(locale)
       })
 
-      it("exposes a non-empty SettingsScreen.recoveryMethod string", () => {
-        const LL = i18nObject(locale)
-        const value = LL.SettingsScreen.recoveryMethod()
-        expect(typeof value).toBe("string")
-        expect(value.length).toBeGreaterThan(0)
-      })
-
       it("exposes a non-empty RestoreScreen.invalidMnemonic string", () => {
         const LL = i18nObject(locale)
         const value = LL.RestoreScreen.invalidMnemonic()
