@@ -3744,6 +3744,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "مهم",
+    "dangerZoneBulletReinstated": "يؤدي هذا إلى إزالة المحفظة من هذا الجهاز فقط",
+    "dangerZoneBulletPermanent": "تظل أموالك متاحة إذا كانت لديك عبارة النسخ الاحتياطي",
+    "dangerZoneBulletEmpty": "بدون عبارة النسخ الاحتياطي، قد تفقد الوصول بشكل دائم",
+    "dangerZoneDeleteButton": "إزالة المحفظة من هذا الجهاز",
+    "confirmModalTitle": "تأكيد إزالة المحفظة",
+    "confirmModalTypeToConfirm": "اكتب \"{delete: string}\" للتأكيد"
   }
 }

@@ -3735,6 +3735,13 @@
         "warning": "Cela supprimera ce portefeuille de cet appareil.",
         "recoveryNote": "Si vous avez sauvegardé votre phrase de sauvegarde, vous pouvez restaurer ce portefeuille sur n'importe quel appareil. Sinon, vous perdrez l'accès à vos fonds.",
         "backupBadgeCompleted": "Sauvegarde terminée",
-        "backupBadgeMissing": "Sauvegarde incomplète"
+        "backupBadgeMissing": "Sauvegarde incomplète",
+        "dangerZoneImportantTitle": "Important",
+        "dangerZoneBulletReinstated": "Cela supprime uniquement le portefeuille de cet appareil",
+        "dangerZoneBulletPermanent": "Vos fonds restent accessibles si vous avez votre phrase de récupération",
+        "dangerZoneBulletEmpty": "Sans votre phrase de récupération, vous pourriez perdre définitivement l'accès",
+        "dangerZoneDeleteButton": "Supprimer le portefeuille de cet appareil",
+        "confirmModalTitle": "Confirmer la suppression du portefeuille",
+        "confirmModalTypeToConfirm": "Saisissez \"{delete: string}\" pour confirmer"
     }
 }

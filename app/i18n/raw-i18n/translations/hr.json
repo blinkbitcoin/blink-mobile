@@ -3747,6 +3747,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Važno",
+    "dangerZoneBulletReinstated": "Ovo uklanja novčanik samo s ovog uređaja",
+    "dangerZoneBulletPermanent": "Vaša sredstva ostaju dostupna ako imate svoju sigurnosnu frazu",
+    "dangerZoneBulletEmpty": "Bez svoje sigurnosne fraze možete trajno izgubiti pristup",
+    "dangerZoneDeleteButton": "Ukloni novčanik s ovog uređaja",
+    "confirmModalTitle": "Potvrdi uklanjanje novčanika",
+    "confirmModalTypeToConfirm": "Upišite \"{delete: string}\" za potvrdu"
   }
 }

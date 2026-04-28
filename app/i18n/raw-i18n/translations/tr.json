@@ -3706,6 +3706,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Önemli",
+    "dangerZoneBulletReinstated": "Bu yalnızca cüzdanı bu cihazdan kaldırır",
+    "dangerZoneBulletPermanent": "Yedekleme ifadeniz varsa fonlarınıza erişiminiz devam eder",
+    "dangerZoneBulletEmpty": "Yedekleme ifadeniz olmadan erişimi kalıcı olarak kaybedebilirsiniz",
+    "dangerZoneDeleteButton": "Cüzdanı bu cihazdan kaldır",
+    "confirmModalTitle": "Cüzdanı kaldırmayı onayla",
+    "confirmModalTypeToConfirm": "\"{delete: string}\" yazarak onayla"
   }
 }

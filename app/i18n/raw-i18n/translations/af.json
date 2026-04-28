@@ -3747,6 +3747,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Belangrik",
+    "dangerZoneBulletReinstated": "Dit verwyder slegs die beursie van hierdie toestel",
+    "dangerZoneBulletPermanent": "Jou fondse bly toeganklik as jy jou rugsteunfrase het",
+    "dangerZoneBulletEmpty": "Sonder jou rugsteunfrase kan jy permanent toegang verloor",
+    "dangerZoneDeleteButton": "Verwyder beursie van hierdie toestel",
+    "confirmModalTitle": "Bevestig beursie-verwydering",
+    "confirmModalTypeToConfirm": "Tik \"{delete: string}\" om te bevestig"
   }
 }

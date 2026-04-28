@@ -3694,6 +3694,13 @@
         "warning": "Damit wird diese Wallet von diesem Gerät entfernt.",
         "recoveryNote": "Wenn du deine Wiederherstellungsphrase gespeichert hast, kannst du die Wallet auf jedem Gerät wiederherstellen. Andernfalls verlierst du den Zugriff auf deine Mittel.",
         "backupBadgeCompleted": "Backup abgeschlossen",
-        "backupBadgeMissing": "Backup unvollständig"
+        "backupBadgeMissing": "Backup unvollständig",
+        "dangerZoneImportantTitle": "Wichtig",
+        "dangerZoneBulletReinstated": "Dies entfernt die Wallet nur von diesem Gerät",
+        "dangerZoneBulletPermanent": "Dein Guthaben bleibt zugänglich, wenn du deine Backup-Phrase hast",
+        "dangerZoneBulletEmpty": "Ohne deine Backup-Phrase könntest du den Zugriff dauerhaft verlieren",
+        "dangerZoneDeleteButton": "Wallet von diesem Gerät entfernen",
+        "confirmModalTitle": "Wallet-Entfernung bestätigen",
+        "confirmModalTypeToConfirm": "Tippe \"{delete: string}\" zum Bestätigen"
     }
 }
