@@ -3,8 +3,10 @@ import { useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useAppConfig, useClipboard } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import { AccountType } from "@app/types/wallet.types"
 
 import { SettingsRow } from "../row"
 
@@ -15,10 +17,12 @@ export const PhoneLnAddress: React.FC = () => {
   } = useTheme()
   const hostName = appConfig.galoyInstance.lnAddressHostname
 
+  const { activeAccount } = useAccountRegistry()
   const { loading, phone, phoneVerified } = useLoginMethods()
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
 
+  if (activeAccount?.type === AccountType.SelfCustodial) return null
   if (!phoneVerified || !phone) return null
 
   const lnAddress = `${phone}@${hostName}`
