@@ -13,6 +13,8 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { BackendFeatureGate } from "@app/components/backend-feature-gate"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../../components/screen"
 import { InviteFriendsCard } from "./invite-friends-card"
 import { ShareCircles } from "./share-circles-card"
@@ -42,7 +44,7 @@ gql`
   }
 `
 
-export const CirclesDashboardScreen: React.FC = () => {
+const CirclesDashboardScreenContent: React.FC = () => {
   const {
     theme: { mode, colors },
   } = useTheme()
@@ -211,3 +213,15 @@ const useStyles = makeStyles(({ colors }) => {
     },
   }
 })
+
+export const CirclesDashboardScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  return (
+    <BackendFeatureGate
+      featureName={LL.BackendFeatureGate.featureCircles()}
+      icon={<GaloyIcon name="people" size={64} />}
+    >
+      <CirclesDashboardScreenContent />
+    </BackendFeatureGate>
+  )
+}
