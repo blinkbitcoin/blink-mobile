@@ -2468,6 +2468,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "รหัสบัญชี",
+    "publicKey": "คีย์สาธารณะ",
+    "copiedPublicKey": "คัดลอกคีย์สาธารณะไปยังคลิปบอร์ดแล้ว",
     "copy": "Copy",
     "identityVerification": "การยืนยันตัวตน"
   },

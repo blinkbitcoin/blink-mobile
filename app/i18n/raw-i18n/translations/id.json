@@ -2451,6 +2451,8 @@
     "copiedAccountId": "ID akun Anda telah disalin ke papan klip",
     "yourAccountId": "ID Akun Anda",
     "accountId": "ID Akun",
+    "publicKey": "Kunci publik",
+    "copiedPublicKey": "Kunci publik disalin ke papan klip",
     "copy": "Salin",
     "identityVerification": "Verifikasi Identitas"
   },
