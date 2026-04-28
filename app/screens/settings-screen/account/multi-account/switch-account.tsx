@@ -9,6 +9,7 @@ import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { ProfileScreen } from "./profile"
+import { SelfCustodialProfileRow } from "./self-custodial-profile-row"
 import { fetchProfiles } from "./utils"
 import { ScrollView, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -63,6 +64,7 @@ export const SwitchAccount: React.FC = () => {
             nextProfileToken={nextProfileToken}
           />
         ))}
+        <SelfCustodialProfileRow isFirstItem={profiles.length === 0} />
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
