@@ -2403,7 +2403,6 @@ const en: BaseTranslation = {
     nonCustodialAccount: "Non-custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
-    recoveryMethod: "Recovery method",
     title: "Settings",
     darkMode: "Dark Mode",
     setToDark: "Mode: dark.",
