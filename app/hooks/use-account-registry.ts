@@ -60,7 +60,9 @@ export const useAccountRegistry = (): AccountRegistryResult => {
       list.push(createCustodialDescriptor(LL.AccountTypeSelectionScreen.custodialLabel()))
     }
 
-    if (nonCustodialEnabled) {
+    const selfCustodialActive =
+      persistentState.activeAccountId === DefaultAccountId.SelfCustodial
+    if (nonCustodialEnabled || selfCustodialActive) {
       list.push(
         createSelfCustodialDescriptor(LL.AccountTypeSelectionScreen.selfCustodialLabel()),
       )
