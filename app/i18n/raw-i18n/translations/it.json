@@ -2330,6 +2330,7 @@
         "setYourLightningAddress": "Imposta il tuo indirizzo Lightning",
         "activated": "Attivato",
         "addressScreen": "Modi per farsi pagare",
+        "nonCustodialAccount": "Account non custodiale",
         "tapUserName": "Tocca per impostare l'username",
         "notifications": "Notifiche",
         "recoveryMethod": "Metodo di recupero",
@@ -2357,7 +2358,30 @@
         "logoutOneAccountAlertContent": "Verrai disconnesso dalla sessione collegata a {identifier: string}.\nAssicurati di avere accesso per effettuare nuovamente l'accesso in futuro.",
         "logoutOneAccountConfirm": "Ho capito. Procedi con la disconnessione.",
         "receiveCurrency": "Valuta di ricezione",
-        "displayCurrency": "Valuta di visualizzazione"
+        "displayCurrency": "Valuta di visualizzazione",
+        "AccountInformation": {
+            "accountTypeLabel": "Tipo di account",
+            "identityLabel": "Identificatore del wallet",
+            "backupStatusLabel": "Stato del backup",
+            "backupStatusCompleted": "Backup completato",
+            "backupStatusNotCompleted": "Backup incompleto",
+            "loadError": "Impossibile caricare le informazioni del tuo account."
+        },
+        "TransactionLimits": {
+            "protocolNote": "Le transazioni Lightning e on-chain seguono i limiti del protocollo Bitcoin. I limiti di conversione sotto sono imposti dalla rete Spark.",
+            "btcToUsdTitle": "Bitcoin in dollari",
+            "usdToBtcTitle": "Dollari in Bitcoin",
+            "minFromLabel": "Minimo inviato",
+            "minToLabel": "Minimo ricevuto",
+            "loadError": "Impossibile caricare i limiti di conversione."
+        },
+        "WaysToGetPaid": {
+            "lightningAddressTitle": "Indirizzo Lightning",
+            "lightningAddressDescription": "Condividi questo indirizzo per ricevere pagamenti Lightning istantaneamente.",
+            "onchainTitle": "Indirizzo di deposito Bitcoin",
+            "onchainDescription": "Condividi questo indirizzo per ricevere Bitcoin on-chain.",
+            "loadError": "Impossibile caricare i tuoi dati di pagamento."
+        }
     },
     "NotificationSettingsScreen": {
         "title": "Impostazioni di notifica",
@@ -3589,7 +3613,14 @@
     },
     "BackendFeatureGate": {
         "title": "Funzione non disponibile",
-        "description": "Questa funzione richiede un conto di custodia."
+        "description": "Questa funzione richiede un conto di custodia.",
+        "signInTitle": "Accesso richiesto",
+        "signInDescription": "Accedi al tuo account custodial per usare {featureName}.",
+        "noAccountTitle": "Account custodial richiesto",
+        "noAccountDescription": "{featureName} richiede un account custodial Blink.",
+        "featureCircles": "Circoli",
+        "featureEarn": "Guadagna",
+        "featureCard": "Carta"
     },
     "SparkWalletCreationScreen": {
         "creating": "Creazione del portafoglio...",
@@ -3655,5 +3686,21 @@
         "badgeFeeIssue": "Fee issue",
         "badgeError": "Errore",
         "badgeRefunded": "Rimborsato"
+    },
+    "FeatureUnavailable": {
+        "SelfCustodial": {
+            "title": "Temporaneamente non disponibile",
+            "description": "Le funzionalità del wallet self-custodial sono temporaneamente disabilitate. Il tuo wallet e i tuoi fondi sono al sicuro. Riprova più tardi."
+        }
+    },
+    "NetworkStatus": {
+        "degradedBanner": "La rete Spark è attualmente degradata. I pagamenti potrebbero richiedere più tempo."
+    },
+    "SelfCustodialDelete": {
+        "title": "Elimina wallet self-custodial",
+        "warning": "Questo rimuoverà il wallet da questo dispositivo.",
+        "recoveryNote": "Se hai salvato la tua frase di backup puoi ripristinare questo wallet su qualsiasi dispositivo. Se non l'hai, perderai l'accesso ai tuoi fondi.",
+        "backupBadgeCompleted": "Backup completato",
+        "backupBadgeMissing": "Backup incompleto"
     }
 }
