@@ -3730,6 +3730,13 @@
         "warning": "This will remove this wallet from this device.",
         "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
         "backupBadgeCompleted": "Backup complete",
-        "backupBadgeMissing": "Backup not complete"
+        "backupBadgeMissing": "Backup not complete",
+        "dangerZoneImportantTitle": "重要",
+        "dangerZoneBulletReinstated": "これはこのデバイスからウォレットを削除するだけです",
+        "dangerZoneBulletPermanent": "バックアップフレーズがあれば、資金は引き続きアクセス可能です",
+        "dangerZoneBulletEmpty": "バックアップフレーズがないと、永久にアクセスを失う可能性があります",
+        "dangerZoneDeleteButton": "このデバイスからウォレットを削除",
+        "confirmModalTitle": "ウォレット削除の確認",
+        "confirmModalTypeToConfirm": "確認するには \"{delete: string}\" と入力してください"
     }
 }

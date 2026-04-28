@@ -3701,6 +3701,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Important",
+    "dangerZoneBulletReinstated": "Això només elimina la cartera d'aquest dispositiu",
+    "dangerZoneBulletPermanent": "Els teus fons es mantenen accessibles si tens la teva frase de recuperació",
+    "dangerZoneBulletEmpty": "Sense la teva frase de recuperació pots perdre l'accés permanentment",
+    "dangerZoneDeleteButton": "Eliminar la cartera d'aquest dispositiu",
+    "confirmModalTitle": "Confirma l'eliminació de la cartera",
+    "confirmModalTypeToConfirm": "Escriu \"{delete: string}\" per confirmar"
   }
 }

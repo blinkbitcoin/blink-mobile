@@ -3701,6 +3701,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Kikulu",
+    "dangerZoneBulletReinstated": "Kino kiggya wallet ku kyuma kino kyokka",
+    "dangerZoneBulletPermanent": "Ssente zo zisigala ng'osobola okuziyingira singa olina ebigambo by'okuyimirizaawo",
+    "dangerZoneBulletEmpty": "Awatali bigambo by'okuyimirizaawo oyinza okufiirwa okutuukirira lubeerera",
+    "dangerZoneDeleteButton": "Ggyawo wallet ku kyuma kino",
+    "confirmModalTitle": "Kakasa okuggya wallet",
+    "confirmModalTypeToConfirm": "Wandika \"{delete: string}\" okukakasa"
   }
 }

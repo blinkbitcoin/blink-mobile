@@ -12227,6 +12227,35 @@ type RootTranslation = {
 		 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
 		 */
 		backupBadgeMissing: string
+		/**
+		 * I​m​p​o​r​t​a​n​t
+		 */
+		dangerZoneImportantTitle: string
+		/**
+		 * T​h​i​s​ ​o​n​l​y​ ​r​e​m​o​v​e​s​ ​t​h​e​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e
+		 */
+		dangerZoneBulletReinstated: string
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​r​e​m​a​i​n​ ​a​c​c​e​s​s​i​b​l​e​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		dangerZoneBulletPermanent: string
+		/**
+		 * W​i​t​h​o​u​t​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​y​o​u​ ​m​a​y​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​p​e​r​m​a​n​e​n​t​l​y
+		 */
+		dangerZoneBulletEmpty: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e
+		 */
+		dangerZoneDeleteButton: string
+		/**
+		 * C​o​n​f​i​r​m​ ​w​a​l​l​e​t​ ​r​e​m​o​v​a​l
+		 */
+		confirmModalTitle: string
+		/**
+		 * T​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+		 * @param {string} delete
+		 */
+		confirmModalTypeToConfirm: RequiredParams<'delete'>
 	}
 }
 
@@ -24283,6 +24312,34 @@ export type TranslationFunctions = {
 		 * Backup not complete
 		 */
 		backupBadgeMissing: () => LocalizedString
+		/**
+		 * Important
+		 */
+		dangerZoneImportantTitle: () => LocalizedString
+		/**
+		 * This only removes the wallet from this device
+		 */
+		dangerZoneBulletReinstated: () => LocalizedString
+		/**
+		 * Your funds remain accessible if you have your backup phrase
+		 */
+		dangerZoneBulletPermanent: () => LocalizedString
+		/**
+		 * Without your backup phrase you may lose access permanently
+		 */
+		dangerZoneBulletEmpty: () => LocalizedString
+		/**
+		 * Remove wallet from this device
+		 */
+		dangerZoneDeleteButton: () => LocalizedString
+		/**
+		 * Confirm wallet removal
+		 */
+		confirmModalTitle: () => LocalizedString
+		/**
+		 * Type "{delete}" to confirm
+		 */
+		confirmModalTypeToConfirm: (arg: { delete: string }) => LocalizedString
 	}
 }
 

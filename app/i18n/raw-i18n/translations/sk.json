@@ -3701,6 +3701,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Dôležité",
+    "dangerZoneBulletReinstated": "Toto odstráni peňaženku iba z tohto zariadenia",
+    "dangerZoneBulletPermanent": "Vaše prostriedky zostávajú dostupné, ak máte zálohovaciu frázu",
+    "dangerZoneBulletEmpty": "Bez zálohovacej frázy môžete trvalo stratiť prístup",
+    "dangerZoneDeleteButton": "Odstrániť peňaženku z tohto zariadenia",
+    "confirmModalTitle": "Potvrdiť odstránenie peňaženky",
+    "confirmModalTypeToConfirm": "Zadajte \"{delete: string}\" na potvrdenie"
   }
 }

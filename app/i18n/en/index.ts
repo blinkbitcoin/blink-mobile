@@ -3861,6 +3861,13 @@ const en: BaseTranslation = {
       "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     backupBadgeCompleted: "Backup complete",
     backupBadgeMissing: "Backup not complete",
+    dangerZoneImportantTitle: "Important",
+    dangerZoneBulletReinstated: "This only removes the wallet from this device",
+    dangerZoneBulletPermanent: "Your funds remain accessible if you have your backup phrase",
+    dangerZoneBulletEmpty: "Without your backup phrase you may lose access permanently",
+    dangerZoneDeleteButton: "Remove wallet from this device",
+    confirmModalTitle: "Confirm wallet removal",
+    confirmModalTypeToConfirm: 'Type "{delete: string}" to confirm',
   },
 }
 

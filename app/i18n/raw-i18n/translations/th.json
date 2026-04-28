@@ -3739,6 +3739,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "สำคัญ",
+    "dangerZoneBulletReinstated": "การกระทำนี้จะลบกระเป๋าเงินออกจากอุปกรณ์นี้เท่านั้น",
+    "dangerZoneBulletPermanent": "เงินของคุณยังคงเข้าถึงได้หากคุณมีวลีสำรอง",
+    "dangerZoneBulletEmpty": "หากไม่มีวลีสำรอง คุณอาจสูญเสียการเข้าถึงอย่างถาวร",
+    "dangerZoneDeleteButton": "ลบกระเป๋าเงินออกจากอุปกรณ์นี้",
+    "confirmModalTitle": "ยืนยันการลบกระเป๋าเงิน",
+    "confirmModalTypeToConfirm": "พิมพ์ \"{delete: string}\" เพื่อยืนยัน"
   }
 }

@@ -3701,6 +3701,13 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "backupBadgeMissing": "Backup not complete",
+    "dangerZoneImportantTitle": "Penting",
+    "dangerZoneBulletReinstated": "Ini hanya menghapus dompet dari perangkat ini",
+    "dangerZoneBulletPermanent": "Dana Anda tetap dapat diakses jika Anda memiliki frasa cadangan",
+    "dangerZoneBulletEmpty": "Tanpa frasa cadangan Anda dapat kehilangan akses secara permanen",
+    "dangerZoneDeleteButton": "Hapus dompet dari perangkat ini",
+    "confirmModalTitle": "Konfirmasi penghapusan dompet",
+    "confirmModalTypeToConfirm": "Ketik \"{delete: string}\" untuk mengonfirmasi"
   }
 }
