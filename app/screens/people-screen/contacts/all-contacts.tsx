@@ -6,16 +6,22 @@ import { gql } from "@apollo/client"
 import { Screen } from "@app/components/screen"
 import { UserContact, useContactsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useContacts } from "@app/hooks/use-contacts"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
+import type { Contact } from "@app/types/contact.types"
+import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+
+import { unifiedContactToUserContact } from "./legacy-contact-shims"
 
 gql`
   query contacts {
@@ -47,22 +53,57 @@ export const AllContactsScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
 
   const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+  const contactsAdapter = useContacts()
+
+  const [selfCustodialContacts, setSelfCustodialContacts] = useState<Contact[]>([])
+  const [selfCustodialLoading, setSelfCustodialLoading] = useState(false)
+
+  const adapterRef = React.useRef(contactsAdapter)
+  adapterRef.current = contactsAdapter
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!isSelfCustodial) return undefined
+      let cancelled = false
+      setSelfCustodialLoading(true)
+      adapterRef.current
+        .list()
+        .then((result) => {
+          if (!cancelled) setSelfCustodialContacts(result.contacts)
+        })
+        .finally(() => {
+          if (!cancelled) setSelfCustodialLoading(false)
+        })
+      return () => {
+        cancelled = true
+      }
+    }, [isSelfCustodial]),
+  )
 
   const [matchingContacts, setMatchingContacts] = useState<UserContact[]>([])
   const [searchText, setSearchText] = useState("")
   const { LL } = useI18nContext()
-  const { loading, data, error } = useContactsQuery({
-    skip: !isAuthed,
+  const {
+    loading: gqlLoading,
+    data,
+    error,
+  } = useContactsQuery({
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "cache-and-network",
   })
 
-  if (error) {
+  if (error && !isSelfCustodial) {
     toastShow({ message: error.message, LL })
   }
 
+  const loading = isSelfCustodial ? selfCustodialLoading : gqlLoading
+
   const contacts: UserContact[] = useMemo(() => {
+    if (isSelfCustodial) return selfCustodialContacts.map(unifiedContactToUserContact)
     return data?.me?.contacts.slice() ?? []
-  }, [data])
+  }, [isSelfCustodial, selfCustodialContacts, data])
 
   const reset = useCallback(() => {
     setSearchText("")
@@ -178,7 +219,9 @@ export const AllContactsScreen: React.FC = () => {
         renderItem={({ item }) => {
           const handle = item?.handle?.trim() ?? ""
           const displayHandle =
-            handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
+            isSelfCustodial || !handle || handle.includes("@")
+              ? handle
+              : `${handle}@${lnAddressHostname}`
 
           return (
             <ListItem
