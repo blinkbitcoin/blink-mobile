@@ -1,7 +1,15 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react"
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
+import { getLightningAddress } from "@app/self-custodial/bridge"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -13,6 +21,7 @@ import { useSdkLifecycle } from "./use-sdk-lifecycle"
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
   sdk: BreezSdkInterface | null
+  lightningAddress: string | null
   isStableBalanceActive: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
@@ -30,6 +39,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   accountType: AccountType.SelfCustodial,
   retry: () => {},
   sdk: null,
+  lightningAddress: null,
   isStableBalanceActive: false,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
@@ -63,6 +73,22 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     setRetryCount((prev) => prev + 1)
   }, [])
 
+  const [lightningAddress, setLightningAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!sdk) return undefined
+    let mounted = true
+    getLightningAddress(sdk)
+      .then((info) => {
+        if (!mounted) return
+        setLightningAddress(info?.lightningAddress ?? null)
+      })
+      .catch(() => {})
+    return () => {
+      mounted = false
+    }
+  }, [sdk])
+
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
       wallets,
@@ -70,6 +96,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
+      lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,
       hasMoreTransactions,
@@ -83,6 +110,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       status,
       retry,
       sdk,
+      lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,
       hasMoreTransactions,

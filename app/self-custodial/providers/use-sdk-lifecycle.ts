@@ -12,7 +12,7 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
-import { getServiceStatus, isOnlineStatus } from "./is-online"
+import { getServiceStatus, isDegradedStatus, isOnlineStatus } from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -37,6 +37,8 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
   ActiveWalletStatus.Unavailable,
 ]
 
+const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
+
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
@@ -49,6 +51,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
+  const failureCountRef = useRef(0)
+  const backoffTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const refreshWallets = useCallback(async () => {
     if (!sdkRef.current) return
@@ -63,7 +67,17 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       setWallets(snapshot.wallets)
       setHasMoreTransactions(snapshot.hasMore)
       rawTxOffsetRef.current = snapshot.rawTransactionCount
-      setStatus(ActiveWalletStatus.Ready)
+      const serviceStatus = await getServiceStatus()
+      setStatus(
+        isDegradedStatus(serviceStatus)
+          ? ActiveWalletStatus.Degraded
+          : ActiveWalletStatus.Ready,
+      )
+      failureCountRef.current = 0
+      if (backoffTimerRef.current) {
+        clearTimeout(backoffTimerRef.current)
+        backoffTimerRef.current = null
+      }
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
       crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
@@ -73,6 +87,16 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
         return online ? ActiveWalletStatus.Error : ActiveWalletStatus.Offline
       })
+      const attempt = failureCountRef.current
+      if (attempt < RECONNECT_BACKOFF_MS.length) {
+        const delay = RECONNECT_BACKOFF_MS[attempt]
+        failureCountRef.current = attempt + 1
+        if (backoffTimerRef.current) clearTimeout(backoffTimerRef.current)
+        backoffTimerRef.current = setTimeout(() => {
+          backoffTimerRef.current = null
+          if (sdkRef.current) refreshWallets()
+        }, delay)
+      }
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
       if (pendingRefreshRef.current) {
@@ -144,6 +168,10 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
     return () => {
       mounted = false
+      if (backoffTimerRef.current) {
+        clearTimeout(backoffTimerRef.current)
+        backoffTimerRef.current = null
+      }
       if (sdkRef.current) {
         disconnectSdk(sdkRef.current)
         sdkRef.current = null

@@ -25,5 +25,8 @@ export const getServiceStatus = async (): Promise<ServiceStatus> => {
 export const isOnlineStatus = (status: ServiceStatus): boolean =>
   ONLINE_STATUSES.includes(status)
 
+export const isDegradedStatus = (status: ServiceStatus): boolean =>
+  status === ServiceStatus.Degraded
+
 export const isOnline = async (): Promise<boolean> =>
   isOnlineStatus(await getServiceStatus())
