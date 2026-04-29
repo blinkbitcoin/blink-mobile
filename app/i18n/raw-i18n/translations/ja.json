@@ -2793,6 +2793,7 @@
         "submit": "提出する",
         "success": "成功！",
         "dollarStablesats": "ドル（Stablesats）",
+        "dollarStablecoin": "ドル（Stablecoin）",
         "to": "送金先",
         "total": "合計",
         "transactions": "トランザクション",

@@ -2774,6 +2774,7 @@
         "submit": "Entregar",
         "success": "Éxito",
         "dollarStablesats": "Dólar (Stablesats)",
+        "dollarStablecoin": "Dólar (Stablecoin)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transacciones",
