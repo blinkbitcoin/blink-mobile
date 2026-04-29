@@ -3696,11 +3696,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Kikulu",
-    "dangerZoneBulletReinstated": "Kino kiggya wallet ku kyuma kino kyokka",
-    "dangerZoneBulletPermanent": "Ssente zo zisigala ng'osobola okuziyingira singa olina ebigambo by'okuyimirizaawo",
-    "dangerZoneBulletEmpty": "Awatali bigambo by'okuyimirizaawo oyinza okufiirwa okutuukirira lubeerera",
-    "dangerZoneDeleteButton": "Ggyawo wallet ku kyuma kino",
-    "confirmModalTitle": "Kakasa okuggya wallet",
-    "confirmModalTypeToConfirm": "Wandika \"{delete: string}\" okukakasa"
+    "dangerZoneBulletReinstated": "Akawunti esangiddwawo teyinza kuzzibwawo",
+    "dangerZoneBulletPermanent": "Okusangulawo akawunti kya lubeerera",
+    "dangerZoneBulletEmpty": "Kakasa nti akawunti nkalu",
+    "dangerZoneDeleteButton": "Sangulawo akawunti n'ebigamuli",
+    "confirmModalTitle": "Kakasa okusangulawo akawunti",
+    "confirmModalTypeToConfirm": "Wandika \"{delete: string}\" okukakasa",
+    "hasFundsWarningTitle": "Okulabula",
+    "hasFundsWarningBody": "Ssente zo eziri ku akawunti ze {balance}. Olw'obukuumi bwo, tetukkiriza kusangulawo akawunti ezirimu sente.",
+    "hasFundsWarningHelper": "Okweyongera okusangulawo, jjawo sente zo oba kuba ne togaba mu economies circular.",
+    "hasFundsWarningButton": "Komawo"
   }
 }

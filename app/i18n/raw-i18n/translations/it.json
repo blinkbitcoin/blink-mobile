@@ -3684,11 +3684,15 @@
         "warning": "Questo rimuoverà il wallet da questo dispositivo.",
         "recoveryNote": "Se hai salvato la tua frase di backup puoi ripristinare questo wallet su qualsiasi dispositivo. Se non l'hai, perderai l'accesso ai tuoi fondi.",
         "dangerZoneImportantTitle": "Importante",
-        "dangerZoneBulletReinstated": "Questo rimuove il wallet solo da questo dispositivo",
-        "dangerZoneBulletPermanent": "I tuoi fondi rimangono accessibili se hai la tua frase di backup",
-        "dangerZoneBulletEmpty": "Senza la tua frase di backup potresti perdere l'accesso in modo permanente",
-        "dangerZoneDeleteButton": "Rimuovi il wallet da questo dispositivo",
-        "confirmModalTitle": "Conferma rimozione del wallet",
-        "confirmModalTypeToConfirm": "Digita \"{delete: string}\" per confermare"
+        "dangerZoneBulletReinstated": "L'account eliminato non può essere ripristinato",
+        "dangerZoneBulletPermanent": "L'eliminazione dell'account è permanente",
+        "dangerZoneBulletEmpty": "Assicurati che l'account sia vuoto",
+        "dangerZoneDeleteButton": "Elimina account e dati",
+        "confirmModalTitle": "Conferma eliminazione account",
+        "confirmModalTypeToConfirm": "Digita \"{delete: string}\" per confermare",
+        "hasFundsWarningTitle": "Attenzione",
+        "hasFundsWarningBody": "Il tuo portafoglio ha un saldo di {balance}. Per la tua sicurezza, non consentiamo l'eliminazione di account con fondi.",
+        "hasFundsWarningHelper": "Per procedere con l'eliminazione, svuota il tuo account o fai una donazione a economie circolari.",
+        "hasFundsWarningButton": "Indietro"
     }
 }

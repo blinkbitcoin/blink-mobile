@@ -3696,11 +3696,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Important",
-    "dangerZoneBulletReinstated": "Aceasta elimină portofelul doar de pe acest dispozitiv",
-    "dangerZoneBulletPermanent": "Fondurile tale rămân accesibile dacă ai fraza de recuperare",
-    "dangerZoneBulletEmpty": "Fără fraza de recuperare poți pierde definitiv accesul",
-    "dangerZoneDeleteButton": "Elimină portofelul de pe acest dispozitiv",
-    "confirmModalTitle": "Confirmă eliminarea portofelului",
-    "confirmModalTypeToConfirm": "Scrie \"{delete: string}\" pentru a confirma"
+    "dangerZoneBulletReinstated": "Contul șters nu poate fi restabilit",
+    "dangerZoneBulletPermanent": "Ștergerea contului este permanentă",
+    "dangerZoneBulletEmpty": "Asigură-te că contul este gol",
+    "dangerZoneDeleteButton": "Șterge contul și datele",
+    "confirmModalTitle": "Confirmă ștergerea contului",
+    "confirmModalTypeToConfirm": "Scrie \"{delete: string}\" pentru a confirma",
+    "hasFundsWarningTitle": "Avertisment",
+    "hasFundsWarningBody": "Portofelul tău are un sold de {balance}. Pentru siguranța ta, nu permitem ștergerea conturilor cu fonduri.",
+    "hasFundsWarningHelper": "Pentru a continua ștergerea, golește-ți contul sau donează către economii circulare.",
+    "hasFundsWarningButton": "Înapoi"
   }
 }

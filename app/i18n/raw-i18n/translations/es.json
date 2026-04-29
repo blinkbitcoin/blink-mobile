@@ -3684,11 +3684,15 @@
         "warning": "Esto eliminará esta billetera de este dispositivo.",
         "recoveryNote": "Si tienes tu frase de respaldo guardada podrás restaurar esta billetera en cualquier dispositivo. Si no la tienes, perderás el acceso a tus fondos.",
         "dangerZoneImportantTitle": "Importante",
-        "dangerZoneBulletReinstated": "Esto solo elimina la billetera de este dispositivo",
-        "dangerZoneBulletPermanent": "Tus fondos siguen accesibles si tienes tu frase de respaldo",
-        "dangerZoneBulletEmpty": "Sin tu frase de respaldo podrías perder el acceso de forma permanente",
-        "dangerZoneDeleteButton": "Eliminar billetera de este dispositivo",
-        "confirmModalTitle": "Confirmar eliminación de billetera",
-        "confirmModalTypeToConfirm": "Escribe \"{delete: string}\" para confirmar"
+        "dangerZoneBulletReinstated": "La cuenta eliminada no se puede restablecer",
+        "dangerZoneBulletPermanent": "La eliminación de la cuenta es permanente",
+        "dangerZoneBulletEmpty": "Asegúrate de que la cuenta esté vacía",
+        "dangerZoneDeleteButton": "Eliminar cuenta y datos",
+        "confirmModalTitle": "Confirmar eliminación de cuenta",
+        "confirmModalTypeToConfirm": "Escribe \"{delete: string}\" para confirmar",
+        "hasFundsWarningTitle": "Advertencia",
+        "hasFundsWarningBody": "Tu billetera tiene un saldo de {balance}. Por tu seguridad, no permitimos eliminar cuentas con fondos.",
+        "hasFundsWarningHelper": "Para continuar con la eliminación, vacía tu cuenta o dona a economías circulares.",
+        "hasFundsWarningButton": "Volver"
     }
 }

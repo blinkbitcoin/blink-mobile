@@ -3696,11 +3696,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Dôležité",
-    "dangerZoneBulletReinstated": "Toto odstráni peňaženku iba z tohto zariadenia",
-    "dangerZoneBulletPermanent": "Vaše prostriedky zostávajú dostupné, ak máte zálohovaciu frázu",
-    "dangerZoneBulletEmpty": "Bez zálohovacej frázy môžete trvalo stratiť prístup",
-    "dangerZoneDeleteButton": "Odstrániť peňaženku z tohto zariadenia",
-    "confirmModalTitle": "Potvrdiť odstránenie peňaženky",
-    "confirmModalTypeToConfirm": "Zadajte \"{delete: string}\" na potvrdenie"
+    "dangerZoneBulletReinstated": "Zmazaný účet nie je možné obnoviť",
+    "dangerZoneBulletPermanent": "Zmazanie účtu je trvalé",
+    "dangerZoneBulletEmpty": "Uistite sa, že je účet prázdny",
+    "dangerZoneDeleteButton": "Zmazať účet a údaje",
+    "confirmModalTitle": "Potvrdiť zmazanie účtu",
+    "confirmModalTypeToConfirm": "Zadajte \"{delete: string}\" na potvrdenie",
+    "hasFundsWarningTitle": "Upozornenie",
+    "hasFundsWarningBody": "Vaša peňaženka má zostatok {balance}. Pre vašu bezpečnosť neumožňujeme mazanie účtov s prostriedkami.",
+    "hasFundsWarningHelper": "Ak chcete pokračovať v mazaní, vyprázdnite svoj účet alebo darujte do cirkulárnych ekonomík.",
+    "hasFundsWarningButton": "Späť"
   }
 }

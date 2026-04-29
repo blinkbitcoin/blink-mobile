@@ -3737,11 +3737,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Penting",
-    "dangerZoneBulletReinstated": "Ini hanya membuang dompet daripada peranti ini",
-    "dangerZoneBulletPermanent": "Dana anda kekal boleh diakses jika anda mempunyai frasa sandaran",
-    "dangerZoneBulletEmpty": "Tanpa frasa sandaran anda mungkin kehilangan akses secara kekal",
-    "dangerZoneDeleteButton": "Buang dompet daripada peranti ini",
-    "confirmModalTitle": "Sahkan pemadaman dompet",
-    "confirmModalTypeToConfirm": "Taip \"{delete: string}\" untuk mengesahkan"
+    "dangerZoneBulletReinstated": "Akaun yang dipadam tidak boleh dikembalikan",
+    "dangerZoneBulletPermanent": "Pemadaman akaun adalah kekal",
+    "dangerZoneBulletEmpty": "Pastikan akaun kosong",
+    "dangerZoneDeleteButton": "Padam akaun dan data",
+    "confirmModalTitle": "Sahkan pemadaman akaun",
+    "confirmModalTypeToConfirm": "Taip \"{delete: string}\" untuk mengesahkan",
+    "hasFundsWarningTitle": "Amaran",
+    "hasFundsWarningBody": "Dompet anda mempunyai baki sebanyak {balance}. Demi keselamatan anda, kami tidak membenarkan pemadaman akaun yang mempunyai dana.",
+    "hasFundsWarningHelper": "Untuk meneruskan pemadaman, kosongkan akaun anda atau dermakan kepada ekonomi pekeliling.",
+    "hasFundsWarningButton": "Kembali"
   }
 }

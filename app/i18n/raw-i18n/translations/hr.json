@@ -3737,11 +3737,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Važno",
-    "dangerZoneBulletReinstated": "Ovo uklanja novčanik samo s ovog uređaja",
-    "dangerZoneBulletPermanent": "Vaša sredstva ostaju dostupna ako imate svoju sigurnosnu frazu",
-    "dangerZoneBulletEmpty": "Bez svoje sigurnosne fraze možete trajno izgubiti pristup",
-    "dangerZoneDeleteButton": "Ukloni novčanik s ovog uređaja",
-    "confirmModalTitle": "Potvrdi uklanjanje novčanika",
-    "confirmModalTypeToConfirm": "Upišite \"{delete: string}\" za potvrdu"
+    "dangerZoneBulletReinstated": "Izbrisani račun ne može se vratiti",
+    "dangerZoneBulletPermanent": "Brisanje računa je trajno",
+    "dangerZoneBulletEmpty": "Provjerite je li račun prazan",
+    "dangerZoneDeleteButton": "Izbriši račun i podatke",
+    "confirmModalTitle": "Potvrdi brisanje računa",
+    "confirmModalTypeToConfirm": "Upišite \"{delete: string}\" za potvrdu",
+    "hasFundsWarningTitle": "Upozorenje",
+    "hasFundsWarningBody": "Vaš novčanik ima saldo od {balance}. Radi vaše sigurnosti ne dopuštamo brisanje računa sa sredstvima.",
+    "hasFundsWarningHelper": "Da biste nastavili s brisanjem, ispraznite svoj račun ili donirajte u kružne ekonomije.",
+    "hasFundsWarningButton": "Natrag"
   }
 }

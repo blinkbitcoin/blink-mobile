@@ -3734,11 +3734,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Quan trọng",
-    "dangerZoneBulletReinstated": "Điều này chỉ xóa ví khỏi thiết bị này",
-    "dangerZoneBulletPermanent": "Tiền của bạn vẫn có thể truy cập được nếu bạn có cụm từ sao lưu",
-    "dangerZoneBulletEmpty": "Nếu không có cụm từ sao lưu, bạn có thể mất quyền truy cập vĩnh viễn",
-    "dangerZoneDeleteButton": "Xóa ví khỏi thiết bị này",
-    "confirmModalTitle": "Xác nhận xóa ví",
-    "confirmModalTypeToConfirm": "Nhập \"{delete: string}\" để xác nhận"
+    "dangerZoneBulletReinstated": "Tài khoản đã xóa không thể khôi phục",
+    "dangerZoneBulletPermanent": "Xóa tài khoản là vĩnh viễn",
+    "dangerZoneBulletEmpty": "Đảm bảo tài khoản trống",
+    "dangerZoneDeleteButton": "Xóa tài khoản và dữ liệu",
+    "confirmModalTitle": "Xác nhận xóa tài khoản",
+    "confirmModalTypeToConfirm": "Nhập \"{delete: string}\" để xác nhận",
+    "hasFundsWarningTitle": "Cảnh báo",
+    "hasFundsWarningBody": "Ví của bạn có số dư là {balance}. Vì sự an toàn của bạn, chúng tôi không cho phép xóa tài khoản còn tiền.",
+    "hasFundsWarningHelper": "Để tiếp tục xóa, hãy làm trống tài khoản hoặc quyên góp cho các nền kinh tế tuần hoàn.",
+    "hasFundsWarningButton": "Quay lại"
   }
 }

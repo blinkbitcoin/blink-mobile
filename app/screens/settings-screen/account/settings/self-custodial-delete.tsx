@@ -1,16 +1,15 @@
 import React, { useState } from "react"
-import { ActivityIndicator, TextInput, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
-import Modal from "react-native-modal"
 import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { InfoCard } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { testProps } from "@app/utils/testProps"
 
+import { DeleteAccountConfirmModal } from "../../self-custodial/delete-account-confirm-modal"
+import { DeleteAccountHasFundsModal } from "../../self-custodial/delete-account-has-funds-modal"
 import { SettingsButton } from "../../button"
 import { useDeleteSelfCustodial } from "../multi-account/hooks/use-delete-self-custodial"
 
@@ -21,22 +20,25 @@ export const SelfCustodialDelete: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const { state, deleteWallet } = useDeleteSelfCustodial()
+  const { wallets } = useSelfCustodialWallet()
 
-  const [confirmText, setConfirmText] = useState("")
-  const [modalVisible, setModalVisible] = useState(false)
+  const [confirmVisible, setConfirmVisible] = useState(false)
+  const [warningVisible, setWarningVisible] = useState(false)
 
-  const closeModal = () => {
-    setModalVisible(false)
-    setConfirmText("")
+  const hasFunds = wallets.some((w) => w.balance.amount > 0)
+
+  const handleDeletePress = () => {
+    if (hasFunds) {
+      setWarningVisible(true)
+      return
+    }
+    setConfirmVisible(true)
   }
 
-  const handleDelete = async () => {
-    closeModal()
+  const handleConfirm = async () => {
+    setConfirmVisible(false)
     await deleteWallet()
   }
-
-  const userWroteDelete =
-    confirmText.trim().toLowerCase() === LL.support.delete().toLowerCase().trim()
 
   const bulletItems = [
     LL.SelfCustodialDelete.dangerZoneBulletReinstated(),
@@ -55,7 +57,7 @@ export const SelfCustodialDelete: React.FC = () => {
       <SettingsButton
         title={LL.SelfCustodialDelete.dangerZoneDeleteButton()}
         variant="critical"
-        onPress={() => setModalVisible(true)}
+        onPress={handleDeletePress}
         {...testProps("self-custodial-danger-zone-delete-button")}
       />
 
@@ -64,87 +66,28 @@ export const SelfCustodialDelete: React.FC = () => {
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
 
-      <Modal
-        animationOut="fadeOut"
-        animationIn="fadeIn"
-        isVisible={modalVisible}
-        onBackdropPress={closeModal}
-        backdropColor={colors.white}
-        avoidKeyboard
-        backdropTransitionOutTiming={0}
-      >
-        <View style={styles.modalView}>
-          <View style={styles.modalHeader}>
-            <Text type="h1" bold>
-              {LL.SelfCustodialDelete.confirmModalTitle()}
-            </Text>
-            <GaloyIconButton name="close" size="medium" onPress={closeModal} />
-          </View>
-          <Text type="p1">
-            {LL.SelfCustodialDelete.confirmModalTypeToConfirm({
-              delete: LL.support.delete(),
-            })}
-          </Text>
-          <TextInput
-            autoCapitalize="none"
-            style={styles.textInput}
-            onChangeText={setConfirmText}
-            value={confirmText}
-            placeholder={LL.support.delete()}
-            placeholderTextColor={colors.grey3}
-            {...testProps("self-custodial-danger-zone-delete-input")}
-          />
-          <View style={styles.modalActions}>
-            <GaloyPrimaryButton
-              title={LL.common.confirm()}
-              disabled={!userWroteDelete}
-              onPress={handleDelete}
-              {...testProps("self-custodial-danger-zone-delete-confirm")}
-            />
-            <GaloySecondaryButton title={LL.common.cancel()} onPress={closeModal} />
-          </View>
-        </View>
-      </Modal>
+      <DeleteAccountHasFundsModal
+        isVisible={warningVisible}
+        onClose={() => setWarningVisible(false)}
+      />
+
+      <DeleteAccountConfirmModal
+        isVisible={confirmVisible}
+        onClose={() => setConfirmVisible(false)}
+        onConfirm={handleConfirm}
+      />
     </View>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
     flexDirection: "column",
     rowGap: 18,
     marginTop: 8,
   },
-  subtleText: {
-    color: colors.grey2,
-  },
   overlayStyle: {
     backgroundColor: "transparent",
     shadowColor: "transparent",
-  },
-  modalView: {
-    marginHorizontal: 20,
-    backgroundColor: colors.grey5,
-    padding: 20,
-    borderRadius: 20,
-    flexDirection: "column",
-    rowGap: 16,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  modalActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  textInput: {
-    fontSize: 16,
-    backgroundColor: colors.grey4,
-    padding: 12,
-    color: colors.black,
-    borderRadius: 8,
   },
 }))

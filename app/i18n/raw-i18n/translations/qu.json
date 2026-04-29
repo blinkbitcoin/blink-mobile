@@ -3734,11 +3734,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Anchaq allin",
-    "dangerZoneBulletReinstated": "Kayqa kay imaymanaqmanta wallet-llata anchhuchin",
-    "dangerZoneBulletPermanent": "Qulqiykikuna haypanapaq kashan, sichus rimaykuna kanchik backup-mantaqa",
-    "dangerZoneBulletEmpty": "Mana backup rimaykuna kaptin, wiñaypaq haykunata chinkachiyta atinki",
-    "dangerZoneDeleteButton": "Wallet-ta kay imaymanamanta anchhuchiy",
-    "confirmModalTitle": "Walletpa anchhuchiyninta sut'inchay",
-    "confirmModalTypeToConfirm": "Sut'inchanapaq \"{delete: string}\" qillqay"
+    "dangerZoneBulletReinstated": "Pichasqa cuenta mana kutichinachu",
+    "dangerZoneBulletPermanent": "Cuenta pichaykuy wiñaypaqmi",
+    "dangerZoneBulletEmpty": "Cuentaqa ch'usaq kanan",
+    "dangerZoneDeleteButton": "Cuentata datakunatapas pichay",
+    "confirmModalTitle": "Cuentata pichana sutichay",
+    "confirmModalTypeToConfirm": "Sut'inchanapaq \"{delete: string}\" qillqay",
+    "hasFundsWarningTitle": "Yuyay",
+    "hasFundsWarningBody": "Wallet-niykipi {balance} kachkan. Allin kawsayniykipaq, qullqi kapuq cuentakunata mana pichaykachiykuchu.",
+    "hasFundsWarningHelper": "Pichayta qatipayta munaspaqa, cuentaykita ch'usaqyachiy utaq circular economies-man qullqita qoy.",
+    "hasFundsWarningButton": "Kutiy"
   }
 }

@@ -3853,12 +3853,18 @@ const en: BaseTranslation = {
     recoveryNote:
       "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     dangerZoneImportantTitle: "Important",
-    dangerZoneBulletReinstated: "This only removes the wallet from this device",
-    dangerZoneBulletPermanent: "Your funds remain accessible if you have your backup phrase",
-    dangerZoneBulletEmpty: "Without your backup phrase you may lose access permanently",
-    dangerZoneDeleteButton: "Remove wallet from this device",
-    confirmModalTitle: "Confirm wallet removal",
+    dangerZoneBulletReinstated: "Deleted account cannot be reinstated",
+    dangerZoneBulletPermanent: "Account deletion is permanent",
+    dangerZoneBulletEmpty: "Make sure account is empty",
+    dangerZoneDeleteButton: "Delete account and data",
+    confirmModalTitle: "Confirm account removal",
     confirmModalTypeToConfirm: 'Type "{delete: string}" to confirm',
+    hasFundsWarningTitle: "Warning",
+    hasFundsWarningBody:
+      "Your wallet has a balance of {balance: string}. For your safety, we dont allow deletion of accounts with funds.",
+    hasFundsWarningHelper:
+      "To proceed with deletion, either empty your account or donate to circular economies.",
+    hasFundsWarningButton: "Go back",
   },
 }
 

@@ -3734,11 +3734,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "สำคัญ",
-    "dangerZoneBulletReinstated": "การกระทำนี้จะลบกระเป๋าเงินออกจากอุปกรณ์นี้เท่านั้น",
-    "dangerZoneBulletPermanent": "เงินของคุณยังคงเข้าถึงได้หากคุณมีวลีสำรอง",
-    "dangerZoneBulletEmpty": "หากไม่มีวลีสำรอง คุณอาจสูญเสียการเข้าถึงอย่างถาวร",
-    "dangerZoneDeleteButton": "ลบกระเป๋าเงินออกจากอุปกรณ์นี้",
-    "confirmModalTitle": "ยืนยันการลบกระเป๋าเงิน",
-    "confirmModalTypeToConfirm": "พิมพ์ \"{delete: string}\" เพื่อยืนยัน"
+    "dangerZoneBulletReinstated": "บัญชีที่ถูกลบไม่สามารถกู้คืนได้",
+    "dangerZoneBulletPermanent": "การลบบัญชีเป็นการถาวร",
+    "dangerZoneBulletEmpty": "ตรวจสอบให้แน่ใจว่าบัญชีว่างเปล่า",
+    "dangerZoneDeleteButton": "ลบบัญชีและข้อมูล",
+    "confirmModalTitle": "ยืนยันการลบบัญชี",
+    "confirmModalTypeToConfirm": "พิมพ์ \"{delete: string}\" เพื่อยืนยัน",
+    "hasFundsWarningTitle": "คำเตือน",
+    "hasFundsWarningBody": "กระเป๋าเงินของคุณมียอดคงเหลือ {balance} เพื่อความปลอดภัยของคุณ เราจึงไม่อนุญาตให้ลบบัญชีที่ยังมีเงินอยู่",
+    "hasFundsWarningHelper": "หากต้องการดำเนินการลบต่อ โปรดถอนเงินออกจากบัญชีของคุณหรือบริจาคให้กับ circular economies",
+    "hasFundsWarningButton": "ย้อนกลับ"
   }
 }

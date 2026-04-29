@@ -3737,11 +3737,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Belangrijk",
-    "dangerZoneBulletReinstated": "Dit verwijdert de wallet alleen van dit apparaat",
-    "dangerZoneBulletPermanent": "Je tegoeden blijven toegankelijk als je je back-upzin hebt",
-    "dangerZoneBulletEmpty": "Zonder je back-upzin kun je permanent de toegang verliezen",
-    "dangerZoneDeleteButton": "Wallet van dit apparaat verwijderen",
-    "confirmModalTitle": "Bevestig wallet-verwijdering",
-    "confirmModalTypeToConfirm": "Typ \"{delete: string}\" om te bevestigen"
+    "dangerZoneBulletReinstated": "Een verwijderd account kan niet worden hersteld",
+    "dangerZoneBulletPermanent": "Account verwijderen is permanent",
+    "dangerZoneBulletEmpty": "Zorg dat het account leeg is",
+    "dangerZoneDeleteButton": "Account en gegevens verwijderen",
+    "confirmModalTitle": "Account verwijderen bevestigen",
+    "confirmModalTypeToConfirm": "Typ \"{delete: string}\" om te bevestigen",
+    "hasFundsWarningTitle": "Waarschuwing",
+    "hasFundsWarningBody": "Je portemonnee heeft een saldo van {balance}. Voor je veiligheid staan we het verwijderen van accounts met geld er nog op niet toe.",
+    "hasFundsWarningHelper": "Om door te gaan met verwijderen, maak je account leeg of doneer aan circulaire economieën.",
+    "hasFundsWarningButton": "Terug"
   }
 }

@@ -3743,11 +3743,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Kubalulekile",
-    "dangerZoneBulletReinstated": "Oku kususa kuphela isipaji kwesi sixhobo",
-    "dangerZoneBulletPermanent": "Imali yakho ihlala ifikeleleka ukuba unayo ibinzana lokugcina",
-    "dangerZoneBulletEmpty": "Ngaphandle kwebinzana lokugcina ungaphulukana nokufikelela ngokusisigxina",
-    "dangerZoneDeleteButton": "Susa isipaji kwesi sixhobo",
-    "confirmModalTitle": "Qinisekisa ukususwa kwesipaji",
-    "confirmModalTypeToConfirm": "Bhala \"{delete: string}\" ukuze uqinisekise"
+    "dangerZoneBulletReinstated": "Iakhawunti ecinyiweyo ayinakubuyiselwa",
+    "dangerZoneBulletPermanent": "Ukucima iakhawunti kuhlala kunjalo",
+    "dangerZoneBulletEmpty": "Qiniseka ukuba iakhawunti ayinanto",
+    "dangerZoneDeleteButton": "Cima iakhawunti nedatha",
+    "confirmModalTitle": "Qinisekisa ukucima iakhawunti",
+    "confirmModalTypeToConfirm": "Bhala \"{delete: string}\" ukuze uqinisekise",
+    "hasFundsWarningTitle": "Isilumkiso",
+    "hasFundsWarningBody": "Ipokotho yakho inebhalansi ye-{balance}. Ngenxa yokhuseleko lwakho, asivumeli ukucinywa kweeakhawunti ezineemali.",
+    "hasFundsWarningHelper": "Ukuze uqhubeke nokucima, sisa imali eseakhawuntini yakho okanye unikele kuluhlu lweemali ezijikelezayo.",
+    "hasFundsWarningButton": "Buyela"
   }
 }
