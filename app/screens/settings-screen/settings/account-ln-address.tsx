@@ -15,8 +15,10 @@ import { SettingsRow } from "../row"
 
 export const AccountLNAddress: React.FC = () => {
   const { activeAccount } = useAccountRegistry()
+  const { lightningAddress: selfCustodialLightningAddress } = useSelfCustodialWallet()
 
   if (activeAccount?.type === AccountType.SelfCustodial) {
+    if (!selfCustodialLightningAddress) return null
     return <SelfCustodialLightningAddressRow />
   }
   return <CustodialLightningAddressRow />

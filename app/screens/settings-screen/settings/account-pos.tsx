@@ -21,7 +21,7 @@ export const AccountPOS: React.FC = () => {
   const isAuthed = useIsAuthed()
 
   const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
-  if (!data?.me?.username) return <></>
+  if (!data?.me?.username) return null
 
   const pos = `${posUrl}/${data.me.username}`
 
