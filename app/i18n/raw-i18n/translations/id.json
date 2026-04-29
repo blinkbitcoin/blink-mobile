@@ -3701,11 +3701,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Penting",
-    "dangerZoneBulletReinstated": "Ini hanya menghapus dompet dari perangkat ini",
-    "dangerZoneBulletPermanent": "Dana Anda tetap dapat diakses jika Anda memiliki frasa cadangan",
-    "dangerZoneBulletEmpty": "Tanpa frasa cadangan Anda dapat kehilangan akses secara permanen",
-    "dangerZoneDeleteButton": "Hapus dompet dari perangkat ini",
-    "confirmModalTitle": "Konfirmasi penghapusan dompet",
-    "confirmModalTypeToConfirm": "Ketik \"{delete: string}\" untuk mengonfirmasi"
+    "dangerZoneBulletReinstated": "Akun yang dihapus tidak dapat dipulihkan",
+    "dangerZoneBulletPermanent": "Penghapusan akun bersifat permanen",
+    "dangerZoneBulletEmpty": "Pastikan akun kosong",
+    "dangerZoneDeleteButton": "Hapus akun dan data",
+    "confirmModalTitle": "Konfirmasi penghapusan akun",
+    "confirmModalTypeToConfirm": "Ketik \"{delete: string}\" untuk mengonfirmasi",
+    "hasFundsWarningTitle": "Peringatan",
+    "hasFundsWarningBody": "Dompet Anda memiliki saldo {balance}. Demi keamanan Anda, kami tidak mengizinkan penghapusan akun yang masih memiliki dana.",
+    "hasFundsWarningHelper": "Untuk melanjutkan penghapusan, kosongkan akun Anda atau donasikan ke ekonomi sirkular.",
+    "hasFundsWarningButton": "Kembali"
   }
 }

@@ -3730,11 +3730,15 @@
         "warning": "Cela supprimera ce portefeuille de cet appareil.",
         "recoveryNote": "Si vous avez sauvegardé votre phrase de sauvegarde, vous pouvez restaurer ce portefeuille sur n'importe quel appareil. Sinon, vous perdrez l'accès à vos fonds.",
         "dangerZoneImportantTitle": "Important",
-        "dangerZoneBulletReinstated": "Cela supprime uniquement le portefeuille de cet appareil",
-        "dangerZoneBulletPermanent": "Vos fonds restent accessibles si vous avez votre phrase de récupération",
-        "dangerZoneBulletEmpty": "Sans votre phrase de récupération, vous pourriez perdre définitivement l'accès",
-        "dangerZoneDeleteButton": "Supprimer le portefeuille de cet appareil",
-        "confirmModalTitle": "Confirmer la suppression du portefeuille",
-        "confirmModalTypeToConfirm": "Saisissez \"{delete: string}\" pour confirmer"
+        "dangerZoneBulletReinstated": "Un compte supprimé ne peut pas être rétabli",
+        "dangerZoneBulletPermanent": "La suppression du compte est définitive",
+        "dangerZoneBulletEmpty": "Assure-toi que le compte est vide",
+        "dangerZoneDeleteButton": "Supprimer compte et données",
+        "confirmModalTitle": "Confirmer la suppression du compte",
+        "confirmModalTypeToConfirm": "Saisissez \"{delete: string}\" pour confirmer",
+        "hasFundsWarningTitle": "Avertissement",
+        "hasFundsWarningBody": "Votre portefeuille a un solde de {balance}. Pour votre sécurité, nous n'autorisons pas la suppression de comptes contenant des fonds.",
+        "hasFundsWarningHelper": "Pour poursuivre la suppression, videz votre compte ou faites un don à des économies circulaires.",
+        "hasFundsWarningButton": "Retour"
     }
 }

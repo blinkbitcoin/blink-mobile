@@ -3689,11 +3689,15 @@
         "warning": "Isso removerá esta carteira deste dispositivo.",
         "recoveryNote": "Se você tem sua frase de backup salva pode restaurar esta carteira em qualquer dispositivo. Se não tem, perderá o acesso aos seus fundos.",
         "dangerZoneImportantTitle": "Importante",
-        "dangerZoneBulletReinstated": "Isto remove a carteira apenas deste dispositivo",
-        "dangerZoneBulletPermanent": "Os teus fundos continuam acessíveis se tiveres a tua frase de recuperação",
-        "dangerZoneBulletEmpty": "Sem a tua frase de recuperação podes perder o acesso permanentemente",
-        "dangerZoneDeleteButton": "Remover carteira deste dispositivo",
-        "confirmModalTitle": "Confirmar remoção da carteira",
-        "confirmModalTypeToConfirm": "Digite \"{delete: string}\" para confirmar"
+        "dangerZoneBulletReinstated": "A conta excluída não pode ser restabelecida",
+        "dangerZoneBulletPermanent": "A exclusão da conta é permanente",
+        "dangerZoneBulletEmpty": "Certifique-se de que a conta esteja vazia",
+        "dangerZoneDeleteButton": "Excluir conta e dados",
+        "confirmModalTitle": "Confirmar exclusão da conta",
+        "confirmModalTypeToConfirm": "Digite \"{delete: string}\" para confirmar",
+        "hasFundsWarningTitle": "Atenção",
+        "hasFundsWarningBody": "Sua carteira tem um saldo de {balance}. Para sua segurança, não permitimos a exclusão de contas com fundos.",
+        "hasFundsWarningHelper": "Para prosseguir com a exclusão, esvazie sua conta ou faça uma doação a economias circulares.",
+        "hasFundsWarningButton": "Voltar"
     }
 }

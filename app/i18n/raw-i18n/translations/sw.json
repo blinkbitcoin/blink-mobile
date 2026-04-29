@@ -3701,11 +3701,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Muhimu",
-    "dangerZoneBulletReinstated": "Hii inaondoa pochi kutoka kwenye kifaa hiki tu",
-    "dangerZoneBulletPermanent": "Fedha zako zinabaki kupatikana ikiwa una kifungu chako cha hifadhi nakala",
-    "dangerZoneBulletEmpty": "Bila kifungu chako cha hifadhi nakala unaweza kupoteza ufikiaji kwa kudumu",
-    "dangerZoneDeleteButton": "Ondoa pochi kutoka kwenye kifaa hiki",
-    "confirmModalTitle": "Thibitisha kuondoa pochi",
-    "confirmModalTypeToConfirm": "Andika \"{delete: string}\" kuthibitisha"
+    "dangerZoneBulletReinstated": "Akaunti iliyofutwa haiwezi kurejeshwa",
+    "dangerZoneBulletPermanent": "Kufuta akaunti ni kwa kudumu",
+    "dangerZoneBulletEmpty": "Hakikisha akaunti haina chochote",
+    "dangerZoneDeleteButton": "Futa akaunti na data",
+    "confirmModalTitle": "Thibitisha kufuta akaunti",
+    "confirmModalTypeToConfirm": "Andika \"{delete: string}\" kuthibitisha",
+    "hasFundsWarningTitle": "Onyo",
+    "hasFundsWarningBody": "Pochi yako ina salio la {balance}. Kwa usalama wako, hatukuruhusu kufuta akaunti zenye fedha.",
+    "hasFundsWarningHelper": "Ili kuendelea na kufutwa, futa fedha kwenye akaunti yako au changia kwa uchumi wa mzunguko.",
+    "hasFundsWarningButton": "Rudi nyuma"
   }
 }

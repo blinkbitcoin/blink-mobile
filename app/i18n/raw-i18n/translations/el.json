@@ -3701,11 +3701,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Σημαντικό",
-    "dangerZoneBulletReinstated": "Αυτό αφαιρεί το πορτοφόλι μόνο από αυτή τη συσκευή",
-    "dangerZoneBulletPermanent": "Τα κεφάλαιά σας παραμένουν προσβάσιμα αν έχετε τη φράση αντιγράφου ασφαλείας",
-    "dangerZoneBulletEmpty": "Χωρίς τη φράση αντιγράφου ασφαλείας μπορεί να χάσετε οριστικά την πρόσβαση",
-    "dangerZoneDeleteButton": "Αφαίρεση πορτοφολιού από αυτή τη συσκευή",
-    "confirmModalTitle": "Επιβεβαίωση αφαίρεσης πορτοφολιού",
-    "confirmModalTypeToConfirm": "Πληκτρολογήστε \"{delete: string}\" για επιβεβαίωση"
+    "dangerZoneBulletReinstated": "Ο διαγραμμένος λογαριασμός δεν μπορεί να επαναφερθεί",
+    "dangerZoneBulletPermanent": "Η διαγραφή του λογαριασμού είναι μόνιμη",
+    "dangerZoneBulletEmpty": "Βεβαιώσου ότι ο λογαριασμός είναι άδειος",
+    "dangerZoneDeleteButton": "Διαγραφή λογαριασμού και δεδομένων",
+    "confirmModalTitle": "Επιβεβαίωση διαγραφής λογαριασμού",
+    "confirmModalTypeToConfirm": "Πληκτρολογήστε \"{delete: string}\" για επιβεβαίωση",
+    "hasFundsWarningTitle": "Προσοχή",
+    "hasFundsWarningBody": "Το πορτοφόλι σου έχει υπόλοιπο {balance}. Για την ασφάλειά σου, δεν επιτρέπουμε τη διαγραφή λογαριασμών με κεφάλαια.",
+    "hasFundsWarningHelper": "Για να συνεχίσεις με τη διαγραφή, άδειασε τον λογαριασμό σου ή δώρισε σε κυκλικές οικονομίες.",
+    "hasFundsWarningButton": "Πίσω"
   }
 }

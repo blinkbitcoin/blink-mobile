@@ -3739,11 +3739,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Важно",
-    "dangerZoneBulletReinstated": "Ово уклања новчаник само са овог уређаја",
-    "dangerZoneBulletPermanent": "Ваша средства остају доступна ако имате своју резервну фразу",
-    "dangerZoneBulletEmpty": "Без своје резервне фразе можете трајно изгубити приступ",
-    "dangerZoneDeleteButton": "Уклони новчаник са овог уређаја",
-    "confirmModalTitle": "Потврди уклањање новчаника",
-    "confirmModalTypeToConfirm": "Унесите \"{delete: string}\" за потврду"
+    "dangerZoneBulletReinstated": "Обрисани налог се не може вратити",
+    "dangerZoneBulletPermanent": "Брисање налога је трајно",
+    "dangerZoneBulletEmpty": "Уверите се да је налог празан",
+    "dangerZoneDeleteButton": "Обриши налог и податке",
+    "confirmModalTitle": "Потврди брисање налога",
+    "confirmModalTypeToConfirm": "Унесите \"{delete: string}\" за потврду",
+    "hasFundsWarningTitle": "Упозорење",
+    "hasFundsWarningBody": "Ваш новчаник има стање од {balance}. Због ваше безбедности, не дозвољавамо брисање налога са средствима.",
+    "hasFundsWarningHelper": "Да бисте наставили са брисањем, испразните свој налог или донирајте циркуларним економијама.",
+    "hasFundsWarningButton": "Назад"
   }
 }
