@@ -7645,10 +7645,6 @@ type RootTranslation = {
 		displayCurrency: string
 		AccountInformation: {
 			/**
-			 * A​c​c​o​u​n​t​ ​t​y​p​e
-			 */
-			accountTypeLabel: string
-			/**
 			 * W​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r
 			 */
 			identityLabel: string
@@ -7670,32 +7666,6 @@ type RootTranslation = {
 			backupStatusNotCompleted: string
 			/**
 			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​.
-			 */
-			loadError: string
-		}
-		TransactionLimits: {
-			/**
-			 * L​i​g​h​t​n​i​n​g​ ​a​n​d​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​f​o​l​l​o​w​ ​B​i​t​c​o​i​n​ ​p​r​o​t​o​c​o​l​ ​l​i​m​i​t​s​.​ ​C​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​ ​b​e​l​o​w​ ​a​r​e​ ​e​n​f​o​r​c​e​d​ ​b​y​ ​t​h​e​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​.
-			 */
-			protocolNote: string
-			/**
-			 * B​i​t​c​o​i​n​ ​t​o​ ​D​o​l​l​a​r​s
-			 */
-			btcToUsdTitle: string
-			/**
-			 * D​o​l​l​a​r​s​ ​t​o​ ​B​i​t​c​o​i​n
-			 */
-			usdToBtcTitle: string
-			/**
-			 * M​i​n​i​m​u​m​ ​s​e​n​t
-			 */
-			minFromLabel: string
-			/**
-			 * M​i​n​i​m​u​m​ ​r​e​c​e​i​v​e​d
-			 */
-			minToLabel: string
-			/**
-			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​c​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​.
 			 */
 			loadError: string
 		}
@@ -19840,10 +19810,6 @@ export type TranslationFunctions = {
 		displayCurrency: () => LocalizedString
 		AccountInformation: {
 			/**
-			 * Account type
-			 */
-			accountTypeLabel: () => LocalizedString
-			/**
 			 * Wallet identifier
 			 */
 			identityLabel: () => LocalizedString
@@ -19865,32 +19831,6 @@ export type TranslationFunctions = {
 			backupStatusNotCompleted: () => LocalizedString
 			/**
 			 * Could not load your account information.
-			 */
-			loadError: () => LocalizedString
-		}
-		TransactionLimits: {
-			/**
-			 * Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.
-			 */
-			protocolNote: () => LocalizedString
-			/**
-			 * Bitcoin to Dollars
-			 */
-			btcToUsdTitle: () => LocalizedString
-			/**
-			 * Dollars to Bitcoin
-			 */
-			usdToBtcTitle: () => LocalizedString
-			/**
-			 * Minimum sent
-			 */
-			minFromLabel: () => LocalizedString
-			/**
-			 * Minimum received
-			 */
-			minToLabel: () => LocalizedString
-			/**
-			 * Could not load conversion limits.
 			 */
 			loadError: () => LocalizedString
 		}
