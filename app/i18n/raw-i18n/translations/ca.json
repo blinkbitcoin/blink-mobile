@@ -3589,11 +3589,7 @@
     "settingsWarning": "Fes una còpia de seguretat de la teva cartera. Si perds aquest dispositiu, perdràs els teus fons.",
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
-    "secureMe": "Assegurar cartera",
-    "trustModelTitle": "Tu tens el control",
-    "trustModelDescription": "Les teves claus controlen els teus fons. Les transaccions són processades pels operadors de Spark, no es validen directament a Bitcoin L1.",
-    "trustModelWarning": "Els balanços molt petits poden no ser econòmics de recuperar a la cadena base de Bitcoin.",
-    "trustModelDismiss": "Ho entenc"
+    "secureMe": "Assegurar cartera"
   },
   "StableBalance": {
     "title": "Balanç estable",

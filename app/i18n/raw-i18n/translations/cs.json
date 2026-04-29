@@ -3630,11 +3630,7 @@
     "settingsWarning": "Zálohujte svou peněženku. Pokud ztratíte toto zařízení, přijdete o své prostředky.",
     "modalTitle": "Zabezpečte své prostředky",
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
-    "secureMe": "Zabezpečit peněženku",
-    "trustModelTitle": "Máte kontrolu",
-    "trustModelDescription": "Vaše klíče řídí vaše prostředky. Transakce zpracovávají operátoři Spark, nikoliv přímo na Bitcoin L1.",
-    "trustModelWarning": "Obnova velmi malých zůstatků na základní řetězec Bitcoinu nemusí být ekonomická.",
-    "trustModelDismiss": "Rozumím"
+    "secureMe": "Zabezpečit peněženku"
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",

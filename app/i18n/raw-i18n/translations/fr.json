@@ -3618,11 +3618,7 @@
         "settingsWarning": "Sauvegardez votre portefeuille. Si vous perdez cet appareil, vous perdrez vos fonds.",
         "modalTitle": "Sécurisez vos fonds",
         "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
-        "secureMe": "Sécuriser le portefeuille",
-        "trustModelTitle": "Vous avez le contrôle",
-        "trustModelDescription": "Vos clés contrôlent vos fonds. Les transactions sont traitées par les opérateurs Spark, non validées directement sur Bitcoin L1.",
-        "trustModelWarning": "Les très petits soldes peuvent ne pas être économiques à récupérer sur la chaîne de base Bitcoin.",
-        "trustModelDismiss": "Je comprends"
+        "secureMe": "Sécuriser le portefeuille"
     },
     "StableBalance": {
         "title": "Solde stable",

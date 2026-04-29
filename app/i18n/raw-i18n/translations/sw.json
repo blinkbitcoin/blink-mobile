@@ -3589,11 +3589,7 @@
     "settingsWarning": "Hifadhi mkoba wako. Ukipoteza kifaa hiki, utapoteza fedha zako.",
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
-    "secureMe": "Linda pochi",
-    "trustModelTitle": "Wewe ndiye unayedhibiti",
-    "trustModelDescription": "Funguo zako zinadhibiti fedha zako. Miamala inashughulikiwa na waendeshaji wa Spark, si moja kwa moja kwenye Bitcoin L1.",
-    "trustModelWarning": "Salio ndogo sana huenda zisifae kiuchumi kurejesha kwenye mnyororo wa msingi wa Bitcoin.",
-    "trustModelDismiss": "Naelewa"
+    "secureMe": "Linda pochi"
   },
   "StableBalance": {
     "title": "Salio thabiti",

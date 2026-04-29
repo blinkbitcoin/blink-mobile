@@ -3630,11 +3630,7 @@
     "settingsWarning": "Napravite sigurnosnu kopiju. Ako izgubite ovaj uređaj, izgubit ćete svoja sredstva.",
     "modalTitle": "Osigurajte svoja sredstva",
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
-    "secureMe": "Osiguraj novčanik",
-    "trustModelTitle": "Vi imate kontrolu",
-    "trustModelDescription": "Vaši ključevi kontroliraju vaša sredstva. Transakcije obrađuju Spark operateri, a ne izravno na Bitcoin L1.",
-    "trustModelWarning": "Vrlo mali saldi možda neće biti ekonomični za oporavak na Bitcoin baznom lancu.",
-    "trustModelDismiss": "Razumijem"
+    "secureMe": "Osiguraj novčanik"
   },
   "StableBalance": {
     "title": "Stabilan saldo",

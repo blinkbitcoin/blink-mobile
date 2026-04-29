@@ -3577,11 +3577,7 @@
         "settingsWarning": "Faça backup da sua carteira. Se perder este dispositivo, perderá seus fundos.",
         "modalTitle": "Proteja seus fundos",
         "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
-        "secureMe": "Proteger carteira",
-        "trustModelTitle": "Você está no controle",
-        "trustModelDescription": "Suas chaves controlam seus fundos. As transações são processadas pelos operadores Spark, não validadas diretamente no Bitcoin L1.",
-        "trustModelWarning": "Saldos muito pequenos podem não ser econômicos para recuperar na cadeia base do Bitcoin.",
-        "trustModelDismiss": "Eu entendo"
+        "secureMe": "Proteger carteira"
     },
     "StableBalance": {
         "title": "Saldo estável",

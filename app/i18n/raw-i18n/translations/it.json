@@ -3577,11 +3577,7 @@
         "settingsWarning": "Esegui il backup del portafoglio. Se perdi questo dispositivo, perderai i tuoi fondi.",
         "modalTitle": "Metti al sicuro i tuoi fondi",
         "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
-        "secureMe": "Proteggi portafoglio",
-        "trustModelTitle": "Sei tu ad avere il controllo",
-        "trustModelDescription": "Le tue chiavi controllano i tuoi fondi. Le transazioni sono elaborate dagli operatori Spark, non validate direttamente su Bitcoin L1.",
-        "trustModelWarning": "Saldi molto piccoli potrebbero non essere economici da recuperare sulla catena base di Bitcoin.",
-        "trustModelDismiss": "Ho capito"
+        "secureMe": "Proteggi portafoglio"
     },
     "StableBalance": {
         "title": "Saldo stabile",

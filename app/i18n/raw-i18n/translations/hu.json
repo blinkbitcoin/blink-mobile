@@ -3589,11 +3589,7 @@
     "settingsWarning": "Készíts biztonsági mentést. Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
     "modalTitle": "Biztosítsa pénzeszközeit",
     "modalDescription": "Nyomatékosan javasoljuk, hogy készítsen biztonsági mentést a tárcájáról, hogy megelőzze a pénzeszközök teljes elvesztését, ha elveszíti ezt az eszközt.",
-    "secureMe": "Tárca biztosítása",
-    "trustModelTitle": "Te irányítasz",
-    "trustModelDescription": "A kulcsaid irányítják a pénzedet. A tranzakciókat Spark operátorok dolgozzák fel, nem közvetlenül a Bitcoin L1-en.",
-    "trustModelWarning": "Nagyon kis egyenlegek visszaállítása a Bitcoin alapláncon nem biztos, hogy gazdaságos.",
-    "trustModelDismiss": "Megértettem"
+    "secureMe": "Tárca biztosítása"
   },
   "StableBalance": {
     "title": "Stabil egyenleg",

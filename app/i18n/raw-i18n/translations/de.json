@@ -3577,11 +3577,7 @@
         "settingsWarning": "Sichere deine Wallet. Wenn du dieses Gerät verlierst, verlierst du deine Guthaben.",
         "modalTitle": "Sichern Sie Ihre Mittel",
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
-        "secureMe": "Wallet sichern",
-        "trustModelTitle": "Du hast die Kontrolle",
-        "trustModelDescription": "Deine Schlüssel kontrollieren deine Guthaben. Transaktionen werden von Spark-Betreibern verarbeitet, nicht direkt auf Bitcoin L1 validiert.",
-        "trustModelWarning": "Sehr kleine Guthaben sind möglicherweise nicht wirtschaftlich auf die Bitcoin-Basiskette wiederherzustellen.",
-        "trustModelDismiss": "Ich verstehe"
+        "secureMe": "Wallet sichern"
     },
     "StableBalance": {
         "title": "Stabiler Saldo",

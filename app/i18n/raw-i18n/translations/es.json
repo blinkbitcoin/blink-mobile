@@ -3577,11 +3577,7 @@
         "settingsWarning": "Respalda tu billetera. Si pierdes este dispositivo, perderás tus fondos.",
         "modalTitle": "Asegura tus fondos",
         "modalDescription": "Te recomendamos encarecidamente respaldar tu billetera para prevenir una pérdida total de fondos en caso de que pierdas este dispositivo.",
-        "secureMe": "Asegurar billetera",
-        "trustModelTitle": "Tú tienes el control",
-        "trustModelDescription": "Tus llaves controlan tus fondos. Las transacciones son procesadas por operadores de Spark, no se validan directamente en Bitcoin L1.",
-        "trustModelWarning": "Los saldos muy pequeños pueden no ser económicos de recuperar en la cadena base de Bitcoin.",
-        "trustModelDismiss": "Entiendo"
+        "secureMe": "Asegurar billetera"
     },
     "StableBalance": {
         "title": "Balance estable",
