@@ -78,5 +78,6 @@ const useStyles = makeStyles(() => ({
   },
   outerSelfCustodial: {
     paddingHorizontal: 20,
+    rowGap: 20,
   },
 }))
