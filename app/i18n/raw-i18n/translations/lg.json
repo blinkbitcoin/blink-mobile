@@ -2503,7 +2503,10 @@
     "header": "Akawunti ya Dola yo etambulizibwa Stablesats",
     "body": "Akawunti ya Dola ekozesa tekinologiya ya Stablesats okukuuma Bitcoin ennywevu ku bbeeyi ya USD. Bulijjo okutta Bitcoin — si ddoola ennyangu — naye omuwendo gwa USD teguyunjuluka. Osobola okusindika n'okufuna Bitcoin nga bulijjo, naye tekitukayanganye na sisitemu y'amabanka eya bulijjo.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
-    "learnMore": "Yiga ebisingawo ku Stablesats"
+    "learnMore": "Yiga ebisingawo ku Stablesats",
+      "headerSelfCustodial": "Akawunti yo eya Dollar elina stablecoins",
+      "bodySelfCustodial": "Mu akawunti ya Dollar olina stablecoins. Tokens eziwagirwa ebintu nga omuwendo gwazo gugume nga gwekuusa ku USD. Tosobola kusindika oba kufuna stablecoins (nga kati). Bw'osindika okuva mu akawunti ya Dollar, stablecoins zo zinaakyusibwa ne zisindikibwa nga Bitcoin eri omufunisi.",
+      "learnMoreSelfCustodial": "Manya ebisingawo"
   },
   "SplashScreen": {
     "update": "App yo evudde ku mulembe. Okulongoosa kwetaagibwa nga app tennakozesebwa.\n\nKino osobola okukikola okuva ku PlayStore eya Android ne Testflight eya iOS"

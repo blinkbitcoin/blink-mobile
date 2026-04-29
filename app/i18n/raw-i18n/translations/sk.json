@@ -2503,7 +2503,10 @@
     "header": "Váš Dolárový účet je poháňaný technológiou Stablesats",
     "body": "Dolárový účet využíva technológiu Stablesats na udržanie Bitcoinu stabilného na cene USD. Vždy držíte Bitcoin — nie skutočné doláre — ale hodnota USD nekolíše. Môžete odosielať a prijímať Bitcoin ako zvyčajne, ale nie je to kompatibilné s tradičným bankovým systémom.",
     "termsAndConditions": "Prečítajte si podmienky používania",
-    "learnMore": "Zistite viac o Stablesats"
+    "learnMore": "Zistite viac o Stablesats",
+      "headerSelfCustodial": "Váš dolárový účet drží stablecoiny",
+      "bodySelfCustodial": "Na dolárovom účte držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z dolárového účtu, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
+      "learnMoreSelfCustodial": "Zistiť viac"
   },
   "SplashScreen": {
     "update": "Vaša aplikácia je zastaraná. Pred použitím aplikácie je potrebná aktualizácia.\n\nMôžete to urobiť v obchode PlayStore pre Android a Testflight pre iOS"

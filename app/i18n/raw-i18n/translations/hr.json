@@ -2520,7 +2520,10 @@
     "header": "Vaš Dolar račun pokreće Stablesats",
     "body": "Dolar račun koristi Stablesats tehnologiju za održavanje Bitcoina stabilnim na USD cijeni. Uvijek držite Bitcoin — ne prave dolare — ali USD vrijednost ne fluktuira. Možete slati i primati Bitcoin kao i obično, ali nije kompatibilan s tradicionalnim bankarskim sustavom.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
-    "learnMore": "Saznajte više o Stablesats-u"
+    "learnMore": "Saznajte više o Stablesats-u",
+      "headerSelfCustodial": "Vaš dolarski račun drži stablecoine",
+      "bodySelfCustodial": "Na dolarskom računu držite stablecoine. Tokeni potpomognuti imovinom čija je vrijednost stabilna u odnosu na USD. Stablecoine zasad ne možete slati ni primati. Kada šaljete s dolarskog računa, vaši stablecoini se zamjenjuju i šalju kao Bitcoin primatelju.",
+      "learnMoreSelfCustodial": "Saznajte više"
   },
   "SplashScreen": {
     "update": "Vaša je aplikacija zastarjela. Prije upotrebe aplikacije potrebno je ažuriranje.\n\nTo se može učiniti iz PlayStorea za Android i Testflighta za iOS"

@@ -2503,7 +2503,10 @@
     "header": "Cont Dolar-ul tău este alimentat de Stablesats",
     "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
     "termsAndConditions": "Citiți Termenii și condițiile",
-    "learnMore": "Aflați mai multe despre Stablesats"
+    "learnMore": "Aflați mai multe despre Stablesats",
+      "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
+      "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
+      "learnMoreSelfCustodial": "Află mai multe"
   },
   "SplashScreen": {
     "update": "Aplicația este învechită. Este necesară o actualizare înainte ca aplicația să poată fi utilizată.\n\nAcest lucru se poate face din PlayStore pentru Android și Testflight pentru iOS"

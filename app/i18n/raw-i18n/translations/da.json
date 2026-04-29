@@ -2506,7 +2506,10 @@
     "header": "Din Dollar-konto er drevet af Stablesats",
     "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
     "termsAndConditions": "Læs vilkårene",
-    "learnMore": "Læs mere om Stablesats"
+    "learnMore": "Læs mere om Stablesats",
+      "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
+      "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
+      "learnMoreSelfCustodial": "Lær mere"
   },
   "SplashScreen": {
     "update": "Din app er forældet. En opdatering er nødvendig, før appen kan bruges.\n\nDette kan gøres fra PlayStore for Android og Testflight for iOS"
