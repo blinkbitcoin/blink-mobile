@@ -2376,21 +2376,12 @@
     "receiveCurrency": "Ստացման արժույթ",
     "displayCurrency": "Ցուցադրման արժույթ",
     "AccountInformation": {
-      "accountTypeLabel": "Հաշվի տեսակը",
       "identityLabel": "Դրամապանակի նույնացուցիչ",
       "lightningAddressLabel": "Lightning հասցե",
       "backupStatusLabel": "Պահուստավորման վիճակ",
       "backupStatusCompleted": "Պահուստավորումը ավարտված է",
       "backupStatusNotCompleted": "Պահուստավորումը ավարտված չէ",
       "loadError": "Չհաջողվեց բեռնել ձեր հաշվի տեղեկությունները։"
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning և on-chain գործարքները հետևում են Bitcoin արձանագրության սահմանափակումներին։ Ստորև նշված փոխարկման սահմանաչափերը կիրառվում են Spark ցանցի կողմից։",
-      "btcToUsdTitle": "Բիթքոյնից դոլար",
-      "usdToBtcTitle": "Դոլարից բիթքոյն",
-      "minFromLabel": "Նվազագույն ուղարկված",
-      "minToLabel": "Նվազագույն ստացված",
-      "loadError": "Չհաջողվեց բեռնել փոխարկման սահմանաչափերը։"
     }
   },
   "NotificationSettingsScreen": {

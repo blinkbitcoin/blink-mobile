@@ -2359,20 +2359,11 @@
         "receiveCurrency": "Empfangswährung",
         "displayCurrency": "Anzeigewährung",
         "AccountInformation": {
-            "accountTypeLabel": "Kontotyp",
             "identityLabel": "Wallet-Kennung",
             "backupStatusLabel": "Backup-Status",
             "backupStatusCompleted": "Backup abgeschlossen",
             "backupStatusNotCompleted": "Backup unvollständig",
             "loadError": "Kontoinformationen konnten nicht geladen werden."
-        },
-        "TransactionLimits": {
-            "protocolNote": "Lightning- und On-Chain-Transaktionen folgen den Limits des Bitcoin-Protokolls. Die Konvertierungslimits unten setzt das Spark-Netzwerk.",
-            "btcToUsdTitle": "Bitcoin zu Dollar",
-            "usdToBtcTitle": "Dollar zu Bitcoin",
-            "minFromLabel": "Minimaler Sendebetrag",
-            "minToLabel": "Minimaler Empfangsbetrag",
-            "loadError": "Konvertierungslimits konnten nicht geladen werden."
         }
     },
     "NotificationSettingsScreen": {
