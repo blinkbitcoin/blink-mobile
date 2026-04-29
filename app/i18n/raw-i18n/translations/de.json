@@ -3685,9 +3685,6 @@
         "degradedBanner": "Das Spark-Netzwerk ist derzeit beeinträchtigt. Zahlungen können länger dauern."
     },
     "SelfCustodialDelete": {
-        "title": "Self-custodial Wallet löschen",
-        "warning": "Damit wird diese Wallet von diesem Gerät entfernt.",
-        "recoveryNote": "Wenn du deine Wiederherstellungsphrase gespeichert hast, kannst du die Wallet auf jedem Gerät wiederherstellen. Andernfalls verlierst du den Zugriff auf deine Mittel.",
         "dangerZoneImportantTitle": "Wichtig",
         "dangerZoneBulletReinstated": "Gelöschtes Konto kann nicht wiederhergestellt werden",
         "dangerZoneBulletPermanent": "Kontolöschung ist endgültig",

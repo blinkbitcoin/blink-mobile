@@ -3685,9 +3685,6 @@
         "degradedBanner": "A rede Spark está degradada no momento. Os pagamentos podem demorar mais."
     },
     "SelfCustodialDelete": {
-        "title": "Excluir carteira autocustodial",
-        "warning": "Isso removerá esta carteira deste dispositivo.",
-        "recoveryNote": "Se você tem sua frase de backup salva pode restaurar esta carteira em qualquer dispositivo. Se não tem, perderá o acesso aos seus fundos.",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "A conta excluída não pode ser restabelecida",
         "dangerZoneBulletPermanent": "A exclusão da conta é permanente",
