@@ -12,6 +12,7 @@ export {
   getUserSettings,
   syncSelfCustodialWallet,
   getLightningAddress,
+  syncSelfCustodialWallet,
 } from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"

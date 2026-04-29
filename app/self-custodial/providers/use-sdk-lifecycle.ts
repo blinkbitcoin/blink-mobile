@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  type BreezSdkInterface,
+  SdkEvent_Tags as SdkEventTags,
+} from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
@@ -14,6 +17,7 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
+  syncSelfCustodialWallet,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { useBackoffRetry } from "../hooks/use-backoff-retry"
@@ -81,6 +85,7 @@ export const useSdkLifecycle = (
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
+  const initialSyncCompletedRef = useRef(false)
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
@@ -111,12 +116,14 @@ export const useSdkLifecycle = (
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
-        const serviceStatus = await getServiceStatus()
-        setStatus(
-          isDegradedStatus(serviceStatus)
-            ? ActiveWalletStatus.Degraded
-            : ActiveWalletStatus.Ready,
-        )
+        if (initialSyncCompletedRef.current) {
+          const serviceStatus = await getServiceStatus()
+          setStatus(
+            isDegradedStatus(serviceStatus)
+              ? ActiveWalletStatus.Degraded
+              : ActiveWalletStatus.Ready,
+          )
+        }
         resetBackoff()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
@@ -165,6 +172,7 @@ export const useSdkLifecycle = (
     let mounted = true
     abortRef.current = false
     const accountId = activeSelfCustodialAccountId
+    initialSyncCompletedRef.current = false
 
     const connectAndListen = async (mnemonic: string) => {
       const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
@@ -181,6 +189,8 @@ export const useSdkLifecycle = (
         if (!mounted) return
         if (!REFRESH_EVENTS.has(event.tag)) return
 
+        if (event.tag === SdkEventTags.Synced) initialSyncCompletedRef.current = true
+
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
@@ -194,6 +204,18 @@ export const useSdkLifecycle = (
       listenerIdRef.current = listenerId
 
       refreshWallets()
+
+      // Force token balances to materialize. Whichever fires first — the
+      // `Synced` event or this promise settling — releases the loading state.
+      syncSelfCustodialWallet(connectedSdk)
+        .catch((err) => {
+          crashlytics().log(`[SparkSDK] post-connect sync failed: ${err}`)
+        })
+        .finally(() => {
+          if (!mounted || initialSyncCompletedRef.current) return
+          initialSyncCompletedRef.current = true
+          refreshWallets().catch(() => {})
+        })
 
       getUserSettings(connectedSdk)
         .then((settings) => {
