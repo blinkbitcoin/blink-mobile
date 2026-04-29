@@ -8,7 +8,9 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { InfoCard } from "@app/components/card-screen"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 
 import { SettingsButton } from "../../button"
@@ -20,6 +22,7 @@ export const SelfCustodialDelete: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const { activeAccount } = useAccountRegistry()
   const { state, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmText, setConfirmText] = useState("")
@@ -31,8 +34,9 @@ export const SelfCustodialDelete: React.FC = () => {
   }
 
   const handleDelete = async () => {
+    if (activeAccount?.type !== AccountType.SelfCustodial) return
     closeModal()
-    await deleteWallet()
+    await deleteWallet(activeAccount.id)
   }
 
   const userWroteDelete =

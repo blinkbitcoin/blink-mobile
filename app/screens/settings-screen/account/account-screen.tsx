@@ -5,6 +5,7 @@ import { Screen } from "@app/components/screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { SelfCustodialAccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
@@ -50,19 +51,28 @@ export const AccountScreen: React.FC = () => {
     <AccountDeleteContextProvider>
       <Screen keyboardShouldPersistTaps="handled">
         <ScrollView
-          contentContainerStyle={styles.outer}
+          contentContainerStyle={[
+            styles.outer,
+            isSelfCustodial && styles.outerSelfCustodial,
+          ]}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           {...testProps("account-screen-scroll-view")}
         >
           <AccountBannerVertical />
-          <UpgradeTrialAccount />
-          <SettingsGroup
-            items={[UpgradeAccountLevelOne]}
-            name={LL.AccountScreen.upgrade()}
-          />
-          <AccountId />
+          {isSelfCustodial ? (
+            <SelfCustodialAccountFields />
+          ) : (
+            <>
+              <UpgradeTrialAccount />
+              <SettingsGroup
+                items={[UpgradeAccountLevelOne]}
+                name={LL.AccountScreen.upgrade()}
+              />
+              <AccountId />
+            </>
+          )}
           <DangerZoneSettings />
         </ScrollView>
       </Screen>
@@ -78,5 +88,8 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     rowGap: 15,
+  },
+  outerSelfCustodial: {
+    paddingHorizontal: 20,
   },
 }))
