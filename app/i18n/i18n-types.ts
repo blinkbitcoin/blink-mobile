@@ -12230,23 +12230,23 @@ type RootTranslation = {
 		 */
 		dangerZoneImportantTitle: string
 		/**
-		 * T​h​i​s​ ​o​n​l​y​ ​r​e​m​o​v​e​s​ ​t​h​e​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e
+		 * D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d
 		 */
 		dangerZoneBulletReinstated: string
 		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​r​e​m​a​i​n​ ​a​c​c​e​s​s​i​b​l​e​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 * A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t
 		 */
 		dangerZoneBulletPermanent: string
 		/**
-		 * W​i​t​h​o​u​t​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​y​o​u​ ​m​a​y​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​p​e​r​m​a​n​e​n​t​l​y
+		 * M​a​k​e​ ​s​u​r​e​ ​a​c​c​o​u​n​t​ ​i​s​ ​e​m​p​t​y
 		 */
 		dangerZoneBulletEmpty: string
 		/**
-		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e
+		 * D​e​l​e​t​e​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​d​a​t​a
 		 */
 		dangerZoneDeleteButton: string
 		/**
-		 * C​o​n​f​i​r​m​ ​w​a​l​l​e​t​ ​r​e​m​o​v​a​l
+		 * C​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​r​e​m​o​v​a​l
 		 */
 		confirmModalTitle: string
 		/**
@@ -12254,6 +12254,23 @@ type RootTranslation = {
 		 * @param {string} delete
 		 */
 		confirmModalTypeToConfirm: RequiredParams<'delete'>
+		/**
+		 * W​a​r​n​i​n​g
+		 */
+		hasFundsWarningTitle: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​F​o​r​ ​y​o​u​r​ ​s​a​f​e​t​y​,​ ​w​e​ ​d​o​n​t​ ​a​l​l​o​w​ ​d​e​l​e​t​i​o​n​ ​o​f​ ​a​c​c​o​u​n​t​s​ ​w​i​t​h​ ​f​u​n​d​s​.
+		 * @param {string} balance
+		 */
+		hasFundsWarningBody: RequiredParams<'balance'>
+		/**
+		 * T​o​ ​p​r​o​c​e​e​d​ ​w​i​t​h​ ​d​e​l​e​t​i​o​n​,​ ​e​i​t​h​e​r​ ​e​m​p​t​y​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​o​r​ ​d​o​n​a​t​e​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s​.
+		 */
+		hasFundsWarningHelper: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		hasFundsWarningButton: string
 	}
 }
 
@@ -24313,29 +24330,45 @@ export type TranslationFunctions = {
 		 */
 		dangerZoneImportantTitle: () => LocalizedString
 		/**
-		 * This only removes the wallet from this device
+		 * Deleted account cannot be reinstated
 		 */
 		dangerZoneBulletReinstated: () => LocalizedString
 		/**
-		 * Your funds remain accessible if you have your backup phrase
+		 * Account deletion is permanent
 		 */
 		dangerZoneBulletPermanent: () => LocalizedString
 		/**
-		 * Without your backup phrase you may lose access permanently
+		 * Make sure account is empty
 		 */
 		dangerZoneBulletEmpty: () => LocalizedString
 		/**
-		 * Remove wallet from this device
+		 * Delete account and data
 		 */
 		dangerZoneDeleteButton: () => LocalizedString
 		/**
-		 * Confirm wallet removal
+		 * Confirm account removal
 		 */
 		confirmModalTitle: () => LocalizedString
 		/**
 		 * Type "{delete}" to confirm
 		 */
 		confirmModalTypeToConfirm: (arg: { delete: string }) => LocalizedString
+		/**
+		 * Warning
+		 */
+		hasFundsWarningTitle: () => LocalizedString
+		/**
+		 * Your wallet has a balance of {balance}. For your safety, we dont allow deletion of accounts with funds.
+		 */
+		hasFundsWarningBody: (arg: { balance: string }) => LocalizedString
+		/**
+		 * To proceed with deletion, either empty your account or donate to circular economies.
+		 */
+		hasFundsWarningHelper: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		hasFundsWarningButton: () => LocalizedString
 	}
 }
 

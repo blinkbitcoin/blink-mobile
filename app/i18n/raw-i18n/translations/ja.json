@@ -3730,11 +3730,15 @@
         "warning": "This will remove this wallet from this device.",
         "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
         "dangerZoneImportantTitle": "重要",
-        "dangerZoneBulletReinstated": "これはこのデバイスからウォレットを削除するだけです",
-        "dangerZoneBulletPermanent": "バックアップフレーズがあれば、資金は引き続きアクセス可能です",
-        "dangerZoneBulletEmpty": "バックアップフレーズがないと、永久にアクセスを失う可能性があります",
-        "dangerZoneDeleteButton": "このデバイスからウォレットを削除",
-        "confirmModalTitle": "ウォレット削除の確認",
-        "confirmModalTypeToConfirm": "確認するには \"{delete: string}\" と入力してください"
+        "dangerZoneBulletReinstated": "削除したアカウントは復元できません",
+        "dangerZoneBulletPermanent": "アカウントの削除は永久的です",
+        "dangerZoneBulletEmpty": "アカウントが空であることを確認してください",
+        "dangerZoneDeleteButton": "アカウントとデータを削除",
+        "confirmModalTitle": "アカウント削除の確認",
+        "confirmModalTypeToConfirm": "確認するには \"{delete: string}\" と入力してください",
+        "hasFundsWarningTitle": "警告",
+        "hasFundsWarningBody": "ウォレットには{balance}の残高があります。安全のため、残高のあるアカウントの削除は許可されていません。",
+        "hasFundsWarningHelper": "削除を続行するには、アカウントを空にするか、循環経済へ寄付してください。",
+        "hasFundsWarningButton": "戻る"
     }
 }

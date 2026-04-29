@@ -3719,11 +3719,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Vigtigt",
-    "dangerZoneBulletReinstated": "Dette fjerner kun pungen fra denne enhed",
-    "dangerZoneBulletPermanent": "Dine midler forbliver tilgængelige, hvis du har din backup-frase",
-    "dangerZoneBulletEmpty": "Uden din backup-frase kan du miste adgangen permanent",
-    "dangerZoneDeleteButton": "Fjern pungen fra denne enhed",
-    "confirmModalTitle": "Bekræft fjernelse af pung",
-    "confirmModalTypeToConfirm": "Skriv \"{delete: string}\" for at bekræfte"
+    "dangerZoneBulletReinstated": "Slettet konto kan ikke gendannes",
+    "dangerZoneBulletPermanent": "Sletning af kontoen er permanent",
+    "dangerZoneBulletEmpty": "Sørg for, at kontoen er tom",
+    "dangerZoneDeleteButton": "Slet konto og data",
+    "confirmModalTitle": "Bekræft sletning af konto",
+    "confirmModalTypeToConfirm": "Skriv \"{delete: string}\" for at bekræfte",
+    "hasFundsWarningTitle": "Advarsel",
+    "hasFundsWarningBody": "Din tegnebog har en saldo på {balance}. For din sikkerhed tillader vi ikke sletning af konti med midler.",
+    "hasFundsWarningHelper": "For at fortsætte med sletningen skal du tømme din konto eller donere til cirkulære økonomier.",
+    "hasFundsWarningButton": "Tilbage"
   }
 }

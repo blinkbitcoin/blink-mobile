@@ -3701,11 +3701,15 @@
     "warning": "This will remove this wallet from this device.",
     "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     "dangerZoneImportantTitle": "Fontos",
-    "dangerZoneBulletReinstated": "Ez csak eltávolítja a tárcát erről az eszközről",
-    "dangerZoneBulletPermanent": "A pénzed elérhető marad, ha megvan a biztonsági mentési kifejezésed",
-    "dangerZoneBulletEmpty": "Biztonsági mentési kifejezés nélkül véglegesen elveszítheted a hozzáférést",
-    "dangerZoneDeleteButton": "Tárca eltávolítása erről az eszközről",
-    "confirmModalTitle": "Tárca eltávolításának megerősítése",
-    "confirmModalTypeToConfirm": "Írja be: \"{delete: string}\" a megerősítéshez"
+    "dangerZoneBulletReinstated": "A törölt fiók nem állítható vissza",
+    "dangerZoneBulletPermanent": "A fiók törlése végleges",
+    "dangerZoneBulletEmpty": "Győződj meg róla, hogy a fiók üres",
+    "dangerZoneDeleteButton": "Fiók és adatok törlése",
+    "confirmModalTitle": "Fiók törlésének megerősítése",
+    "confirmModalTypeToConfirm": "Írja be: \"{delete: string}\" a megerősítéshez",
+    "hasFundsWarningTitle": "Figyelmeztetés",
+    "hasFundsWarningBody": "A pénztárcád egyenlege {balance}. Biztonságod érdekében nem engedélyezzük olyan fiókok törlését, amelyekben még van összeg.",
+    "hasFundsWarningHelper": "A törlés folytatásához ürítsd ki a fiókodat, vagy adományozz körkörös gazdaságoknak.",
+    "hasFundsWarningButton": "Vissza"
   }
 }
