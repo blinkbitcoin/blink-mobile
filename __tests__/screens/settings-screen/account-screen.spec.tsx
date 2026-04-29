@@ -45,13 +45,24 @@ jest.mock("@app/components/screen", () => ({
     React.createElement("Screen", null, children),
 }))
 
+const captureRefreshControl: { onRefresh?: () => void | Promise<void> } = {}
 jest.mock("react-native-gesture-handler", () => {
-  const RN = jest.requireActual<typeof import("react-native")>("react-native")
+  const RNs = jest.requireActual<typeof import("react-native")>("react-native")
+  const ReactNs = jest.requireActual<typeof import("react")>("react")
   return {
-    ScrollView: RN.View,
-    RefreshControl: () => null,
-    TouchableOpacity: RN.TouchableOpacity,
-    TouchableWithoutFeedback: RN.TouchableOpacity,
+    ScrollView: ({
+      children,
+      refreshControl,
+    }: {
+      children?: React.ReactNode
+      refreshControl?: React.ReactNode
+    }) => ReactNs.createElement(RNs.View, null, refreshControl, children),
+    RefreshControl: ({ onRefresh }: { onRefresh?: () => void | Promise<void> }) => {
+      captureRefreshControl.onRefresh = onRefresh
+      return null
+    },
+    TouchableOpacity: RNs.TouchableOpacity,
+    TouchableWithoutFeedback: RNs.TouchableOpacity,
   }
 })
 
@@ -81,8 +92,9 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
 }))
 
+const mockUpdateCurrentProfile = jest.fn()
 jest.mock("@app/hooks/use-save-session-profile", () => ({
-  useSaveSessionProfile: () => ({ updateCurrentProfile: jest.fn() }),
+  useSaveSessionProfile: () => ({ updateCurrentProfile: mockUpdateCurrentProfile }),
 }))
 
 const mockCopyToClipboard = jest.fn()
@@ -106,9 +118,11 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: () => ({ data: null, loading: false }),
 }))
 
+const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => ({
     lightningAddress: "satoshi@blink.sv",
+    refreshWallets: mockRefreshSelfCustodialWallets,
   }),
 }))
 
@@ -203,6 +217,15 @@ describe("AccountScreen", () => {
       )
     })
 
+    it("pull-to-refresh refreshes the SC wallets and never hits updateCurrentProfile", async () => {
+      render(<AccountScreen />)
+
+      await captureRefreshControl.onRefresh?.()
+
+      expect(mockRefreshSelfCustodialWallets).toHaveBeenCalledTimes(1)
+      expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
+    })
+
     it("hides the Lightning address field when the wallet has no LN address yet", () => {
       mockUseAccountInfo.mockReturnValue({
         identityPubkey: "abc",
@@ -220,6 +243,15 @@ describe("AccountScreen", () => {
   describe("custodial mode", () => {
     beforeEach(() => {
       mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+    })
+
+    it("pull-to-refresh calls updateCurrentProfile (custodial behavior unchanged)", async () => {
+      render(<AccountScreen />)
+
+      await captureRefreshControl.onRefresh?.()
+
+      expect(mockUpdateCurrentProfile).toHaveBeenCalledTimes(1)
+      expect(mockRefreshSelfCustodialWallets).not.toHaveBeenCalled()
     })
 
     it("renders the existing custodial layout (AccountId + upgrade rows)", () => {
