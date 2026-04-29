@@ -44,7 +44,6 @@ export const DisplayCurrencyScreen: React.FC = () => {
 
   const { data, loading } = useCurrencyListQuery({
     fetchPolicy: "cache-and-network",
-    skip: !isAuthed,
   })
 
   const [newCurrency, setNewCurrency] = React.useState("")
