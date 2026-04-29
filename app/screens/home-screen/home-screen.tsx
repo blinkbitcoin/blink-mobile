@@ -521,6 +521,7 @@ export const HomeScreen: React.FC = () => {
       <StableSatsModal
         isVisible={isStablesatModalVisible}
         setIsVisible={setIsStablesatModalVisible}
+        variant={isSelfCustodial ? "selfCustodial" : "custodial"}
       />
       <TrialAccountLimitsModal
         isVisible={isUpgradeModalVisible}

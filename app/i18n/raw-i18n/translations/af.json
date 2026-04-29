@@ -2520,7 +2520,10 @@
     "header": "Jou Dollar-rekening word aangedryf deur Stablesats",
     "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
-    "learnMore": "Leer meer van Stablesats"
+    "learnMore": "Leer meer van Stablesats",
+      "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
+      "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
+      "learnMoreSelfCustodial": "Lees meer"
   },
   "SplashScreen": {
     "update": "Jou toepassing is lanklaas opgedateer. Dateer asseblief die toepassing op voordat jy dit kan gebruik.\n\nDit kan gedoen word by die Android of google Playstore of Apple App store vir IOS."

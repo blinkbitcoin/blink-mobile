@@ -2502,7 +2502,10 @@
         "header": "Your Dollar account is powered by Stablesats",
         "body": "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
         "termsAndConditions": "Read the Terms & Conditions.",
-        "learnMore": "Learn more about Stablesats"
+        "learnMore": "Learn more about Stablesats",
+        "headerSelfCustodial": "Your Dollar account holds stablecoins",
+        "bodySelfCustodial": "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
+        "learnMoreSelfCustodial": "Learn more"
     },
     "SplashScreen": {
         "update": "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS"

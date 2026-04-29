@@ -2541,7 +2541,10 @@
     "header": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats",
     "body": "I-Akhawunti ye-Idola isebenzisa iteknoloji ye-Stablesats ukugcina i-Bitcoin izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin — hayi iidola zenene — kodwa ixabiso le-USD aliguquguquki. Ungakwazi ukuthumela nokufumana i-Bitcoin njengoko uqhele ukwenza, kodwa ayihambelani nenkqubo yebhanki yesithethe.",
     "termsAndConditions": "Funda iMigaqo neMiqathango",
-    "learnMore": "Funda ngakumbi malunga neStablesats"
+    "learnMore": "Funda ngakumbi malunga neStablesats",
+      "headerSelfCustodial": "Iakhawunti yakho yeDola igcina ii-stablecoin",
+      "bodySelfCustodial": "Kwiakhawunti yeDola ugcina ii-stablecoin. Iitokheni ezixhaswe ngeempahla ezigcine ixabiso lizinzile kwiUSD. Awukakwazi ukuthumela nokufumana ii-stablecoin. Xa uthumela kusuka kwiakhawunti yeDola, ii-stablecoin zakho ziya kutshintshwa zize zithunyelwe njengeBitcoin kumamkeli.",
+      "learnMoreSelfCustodial": "Funda okungakumbi"
   },
   "SplashScreen": {
     "update": "Usetyenziso lwakho luphelelwe lixesha. Uhlaziyo luyafuneka phambi kokuba i-app isetyenziswe. Oku kunokwenziwa kwi-PlayStore ye-Android kunye ne-Testflight ye-iOS"

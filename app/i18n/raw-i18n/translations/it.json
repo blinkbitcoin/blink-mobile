@@ -2503,7 +2503,10 @@
         "header": "Il tuo Conto Dollaro è alimentato da Stablesats",
         "body": "Conto Dollaro utilizza la tecnologia Stablesats per mantenere il Bitcoin stabile al prezzo USD. Detieni sempre Bitcoin — non dollari veri — ma il valore USD non fluttua. Puoi inviare e ricevere Bitcoin normalmente, ma non è compatibile con il sistema bancario tradizionale.",
         "termsAndConditions": "Leggi i Terms & Conditions",
-        "learnMore": "Scopri di più su Stablesats"
+        "learnMore": "Scopri di più su Stablesats",
+        "headerSelfCustodial": "Il tuo conto Dollaro contiene stablecoin",
+        "bodySelfCustodial": "Nel conto Dollaro detieni stablecoin. Token garantiti da attività il cui valore è mantenuto stabile rispetto al dollaro USA. Non puoi ancora inviare e ricevere stablecoin. Quando invii dal conto Dollaro, i tuoi stablecoin vengono scambiati e inviati come Bitcoin al destinatario.",
+        "learnMoreSelfCustodial": "Scopri di più"
     },
     "SplashScreen": {
         "update": "L'applicazione è obsoleta. È necessario un aggiornamento prima di poter utilizzare l'app.\n\nL'aggiornamento può essere effettuato dal PlayStore per Android e da Testflight per iOS."
