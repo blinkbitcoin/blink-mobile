@@ -9,6 +9,7 @@ export type InvoiceData = {
   invoiceType: InvoiceType
   paymentRequest?: string
   address?: string
+  username?: string
   getFullUriFn: (params: UriParams) => string
   getCopyableInvoiceFn: () => string
 }
