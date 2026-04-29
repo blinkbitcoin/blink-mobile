@@ -2503,7 +2503,10 @@
     "header": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir",
     "body": "Dolar Hesabı, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
-    "learnMore": "Stablesats'i öğrenin"
+    "learnMore": "Stablesats'i öğrenin",
+      "headerSelfCustodial": "Dolar hesabın stablecoin tutar",
+      "bodySelfCustodial": "Dolar hesabında stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar hesabından gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
+      "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {
     "update": "Uygulamanızın modası geçmiş. Uygulamanın kullanılabilmesi için bir güncelleme gereklidir.\n\nBu, Android için PlayStore'dan ve iOS için Testflight'tan yapılabilir"

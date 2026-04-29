@@ -2503,7 +2503,10 @@
     "header": "A Dollár Számla-odat a Stablesats működteti",
     "body": "A Dollár Számla Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
-    "learnMore": "Tudj meg többet a Stablesatsról"
+    "learnMore": "Tudj meg többet a Stablesatsról",
+      "headerSelfCustodial": "A Dollár-számlád stablecoinokat tárol",
+      "bodySelfCustodial": "A Dollár-számlán stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár-számláról küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
+      "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {
     "update": "Az alkalmazása elavult. Az alkalmazás használatához frissítés szükséges.\n\nAndroid esetén a Play Áruházból, iOS esetén pedig a Testflight alkalmazáson keresztül tudod elvégezni."

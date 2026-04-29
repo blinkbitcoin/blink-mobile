@@ -2503,7 +2503,10 @@
         "header": "Dein Dollar-Konto wird von Stablesats betrieben",
         "body": "Der Dollar-Konto nutzt Stablesats-Technologie, um Bitcoin stabil zum USD-Preis zu halten. Du hältst immer Bitcoin — keine echten Dollar — aber der USD-Wert schwankt nicht. Du kannst Bitcoin wie gewohnt senden und empfangen, aber es ist nicht mit dem traditionellen Bankensystem kompatibel.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
-        "learnMore": "Mehr über Stablesats erfahren"
+        "learnMore": "Mehr über Stablesats erfahren",
+        "headerSelfCustodial": "Dein Dollar-Konto hält Stablecoins",
+        "bodySelfCustodial": "Im Dollar-Konto hältst du Stablecoins. Tokens, die durch Vermögenswerte gedeckt sind und deren Wert stabil zum USD gehalten wird. Du kannst Stablecoins (noch) nicht senden und empfangen. Wenn du vom Dollar-Konto sendest, werden deine Stablecoins getauscht und als Bitcoin an den Empfänger geschickt.",
+        "learnMoreSelfCustodial": "Mehr erfahren"
     },
     "SplashScreen": {
         "update": "Deine App ist veraltet. Ein Update wird benötigt, bevor Du die App nutzen kannst.\n\nLade bitte ein Update aus dem Android PlayStore oder Testflight für iOS"

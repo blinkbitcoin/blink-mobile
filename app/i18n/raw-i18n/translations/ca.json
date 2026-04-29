@@ -2503,7 +2503,10 @@
     "header": "El teu Compte Dòlar està impulsat per Stablesats",
     "body": "Compte Dòlar utilitza la tecnologia Stablesats per mantenir Bitcoin estable al preu USD. Sempre tens Bitcoin — no dòlars reals — però el valor USD no fluctua. Pots enviar i rebre Bitcoin com de costum, però no és compatible amb el sistema bancari tradicional.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
-    "learnMore": "Apren més sobre els Stablesats"
+    "learnMore": "Apren més sobre els Stablesats",
+      "headerSelfCustodial": "El teu compte Dòlar té stablecoins",
+      "bodySelfCustodial": "Al compte Dòlar tens stablecoins. Tokens recolzats per actius amb el valor estable respecte al dòlar. Encara no pots enviar ni rebre stablecoins. Quan enviïs des del compte Dòlar, canviaràs els teus stablecoins i els enviaràs com a Bitcoin al destinatari.",
+      "learnMoreSelfCustodial": "Més informació"
   },
   "SplashScreen": {
     "update": "La teva apliació esta obsoleta. Es necessari actulitzar l'aplicació abans d'utilitzar-la.\n\nEs pot actualitzar a la PlayStore per Android o Testflight per iOS"

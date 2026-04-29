@@ -2520,7 +2520,10 @@
         "header": "あなたのドルウォレットはStablesatsで動いています",
         "body": "ドルウォレットはStablesats技術を使用してBitcoinをUSD価格で安定させます。常にBitcoinを保有しています — 実際のドルではありません — がUSD価値は変動しません。通常どおりBitcoinの送受信ができますが、従来の銀行システムとは互換性がありません。",
         "termsAndConditions": "利用規約を読む",
-        "learnMore": "ステーブル satsについて詳しく見る"
+        "learnMore": "ステーブル satsについて詳しく見る",
+        "headerSelfCustodial": "ドル口座にはステーブルコインが保管されています",
+        "bodySelfCustodial": "ドル口座ではステーブルコインを保有しています。資産に裏付けられ、米ドルに対して価値を安定させたトークンです。ステーブルコインの送受信はまだできません。ドル口座から送金すると、ステーブルコインが交換され、ビットコインとして受取人に送られます。",
+        "learnMoreSelfCustodial": "詳しく見る"
     },
     "SplashScreen": {
         "update": "旧バージョンのアプリです。 アプリを使用するには更新してください。\n\nAndroidの場合はPlayStoreから、iOSの場合はTestflightから実行できます。"

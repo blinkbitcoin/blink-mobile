@@ -2502,7 +2502,10 @@
         "header": "Tu Cuenta Dólar está impulsado por Stablesats",
         "body": "Cuenta Dólar utiliza la tecnología Stablesats para mantener Bitcoin estable al precio USD. Siempre tienes Bitcoin — no dólares reales — pero el valor USD no fluctúa. Puedes enviar y recibir Bitcoin como siempre, pero no es compatible con el sistema bancario tradicional.",
         "termsAndConditions": "Lee los términos y condiciones",
-        "learnMore": "Aprende más sobre StableSats"
+        "learnMore": "Aprende más sobre StableSats",
+        "headerSelfCustodial": "Tu cuenta Dólar tiene stablecoins",
+        "bodySelfCustodial": "En la cuenta Dólar tienes stablecoins. Tokens respaldados por activos cuyo valor se mantiene estable respecto al USD. Aún no puedes enviar ni recibir stablecoins. Cuando envíes desde la cuenta Dólar, intercambiarás tus stablecoins y se enviarán como Bitcoin al destinatario.",
+        "learnMoreSelfCustodial": "Saber más"
     },
     "SplashScreen": {
         "update": "Tu aplicación está desactualizada. Se necesita una actualización antes de que se pueda utilizar la aplicación.\n\n Esto se puede hacer desde PlayStore para Android y Testflight para iOS."

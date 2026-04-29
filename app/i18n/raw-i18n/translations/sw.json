@@ -2503,7 +2503,10 @@
     "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
     "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
     "termsAndConditions": "Soma Sheria na Masharti",
-    "learnMore": "Soma zaidi kuhusu Stablesats"
+    "learnMore": "Soma zaidi kuhusu Stablesats",
+      "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
+      "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+      "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {
     "update": "Aplikisheni yako imepitwa na wakati. Sahihisho linahitajika kabla aplikisheni inaweza kutumiwa.\n\nHii inaweza kufanywa kutoka kwenye PlayStore kwa Android na Testflight kwa iOS"

@@ -2520,7 +2520,10 @@
     "header": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa",
     "body": "Dolar qillqay Stablesats yachaykunata llamk'achin Bitcoin-ta USD chaniman sayasqata waqaychispa. Wiñaypaq Bitcoin-ta hap'inki — mana chiqap dólar-tachu — ichaqa USD chanin mana kuyunchu. Bitcoin-ta apachiy hinaspa chaskiy atikunki imaynatachus, ichaqa mana banco kay pachap sistemanwan tupanchu.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
-    "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki"
+    "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki",
+      "headerSelfCustodial": "Dólar cuentaykipi stablecoinkuna kachkanku",
+      "bodySelfCustodial": "Dólar cuentapi stablecoinkunata waqaychanki. Tokenkuna activokunawan saywanachasqa, USDwan kuska valormi takyan. Manaraqmi stablecoinkunata apachiyta nitaq chaskiyta atinkichu. Dólar cuentamanta apachiqtiykiqa, stablecoinkunaykita trukaspa Bitcoin hina chaskiqman apachisun.",
+      "learnMoreSelfCustodial": "Astawan yachay"
   },
   "SplashScreen": {
     "update": "Ñuqaqmi app qatichkanmi kaniyta rikuchiy, chaymanta app qillqata sutichinaqinmi kaniyta munanki. Chaymi PlayStore Androidmanta Testflight iOSmanta kaniyta rikuchiy"

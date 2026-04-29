@@ -2520,7 +2520,10 @@
     "header": "Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats",
     "body": "Tài khoản Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
-    "learnMore": "Tìm hiểu thêm về Stablesats"
+    "learnMore": "Tìm hiểu thêm về Stablesats",
+      "headerSelfCustodial": "Tài khoản Đô la của bạn giữ stablecoin",
+      "bodySelfCustodial": "Trong tài khoản Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ tài khoản Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
+      "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {
     "update": "Ứng dụng của bạn đã lỗi thời. Cần cập nhật ứng dụng để chạy ứng dụng.\n\nĐiều này có thể được thực hiện từ PlayStore cho Android và Testflight cho iOS"

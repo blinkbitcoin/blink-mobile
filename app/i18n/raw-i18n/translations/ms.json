@@ -2520,7 +2520,10 @@
     "header": "Akaun Dolar anda dikuasakan oleh Stablesats",
     "body": "Akaun Dolar menggunakan teknologi Stablesats untuk mengekalkan Bitcoin stabil pada harga USD. Anda sentiasa memegang Bitcoin — bukan dolar sebenar — tetapi nilai USD tidak turun naik. Anda boleh menghantar dan menerima Bitcoin seperti biasa, tetapi ia tidak serasi dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca terma & syarat",
-    "learnMore": "Ketahui lebih lanjut tentang stablesats"
+    "learnMore": "Ketahui lebih lanjut tentang stablesats",
+      "headerSelfCustodial": "Akaun Dolar anda menyimpan stablecoin",
+      "bodySelfCustodial": "Dalam akaun Dolar anda menyimpan stablecoin. Token yang disokong oleh aset dengan nilai dikekalkan stabil terhadap USD. Anda belum boleh menghantar dan menerima stablecoin. Apabila anda menghantar dari akaun Dolar, stablecoin anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
+      "learnMoreSelfCustodial": "Ketahui lebih lanjut"
   },
   "SplashScreen": {
     "update": "Aplikasi anda bukan versi terkini. Kemaskini diperlukan sebelum aplikasi dapat digunakan\n\nKemaskini boleh dilakukan dsri PlayStore untuk Android dan Testflight untuk iOS"
