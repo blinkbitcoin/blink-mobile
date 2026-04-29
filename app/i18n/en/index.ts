@@ -3848,10 +3848,6 @@ const en: BaseTranslation = {
       "Spark network is currently degraded. Payments may take longer.",
   },
   SelfCustodialDelete: {
-    title: "Delete self-custodial wallet",
-    warning: "This will remove this wallet from this device.",
-    recoveryNote:
-      "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
     dangerZoneImportantTitle: "Important",
     dangerZoneBulletReinstated: "Deleted account cannot be reinstated",
     dangerZoneBulletPermanent: "Account deletion is permanent",

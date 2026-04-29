@@ -3680,9 +3680,6 @@
         "degradedBanner": "La red Spark está degradada actualmente. Los pagos pueden tardar más."
     },
     "SelfCustodialDelete": {
-        "title": "Eliminar billetera autocustodial",
-        "warning": "Esto eliminará esta billetera de este dispositivo.",
-        "recoveryNote": "Si tienes tu frase de respaldo guardada podrás restaurar esta billetera en cualquier dispositivo. Si no la tienes, perderás el acceso a tus fondos.",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "La cuenta eliminada no se puede restablecer",
         "dangerZoneBulletPermanent": "La eliminación de la cuenta es permanente",

@@ -3680,9 +3680,6 @@
         "degradedBanner": "La rete Spark è attualmente degradata. I pagamenti potrebbero richiedere più tempo."
     },
     "SelfCustodialDelete": {
-        "title": "Elimina wallet self-custodial",
-        "warning": "Questo rimuoverà il wallet da questo dispositivo.",
-        "recoveryNote": "Se hai salvato la tua frase di backup puoi ripristinare questo wallet su qualsiasi dispositivo. Se non l'hai, perderai l'accesso ai tuoi fondi.",
         "dangerZoneImportantTitle": "Importante",
         "dangerZoneBulletReinstated": "L'account eliminato non può essere ripristinato",
         "dangerZoneBulletPermanent": "L'eliminazione dell'account è permanente",

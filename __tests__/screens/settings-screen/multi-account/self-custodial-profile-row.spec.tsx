@@ -52,13 +52,31 @@ jest.mock("@rn-vui/themed", () => {
   }
 })
 
-jest.mock("react-native-modal", () => {
-  const ReactActual = jest.requireActual("react")
-  return ({ children, isVisible }: { children: React.ReactNode; isVisible: boolean }) =>
-    isVisible
-      ? ReactActual.createElement("Modal", { testID: "delete-modal" }, children)
-      : null
-})
+const lastConfirmModalProps: {
+  isVisible?: boolean
+  onClose?: () => void
+  onConfirm?: () => void | Promise<void>
+} = {}
+jest.mock(
+  "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal",
+  () => {
+    const ReactActual = jest.requireActual("react")
+    return {
+      DeleteAccountConfirmModal: (props: {
+        isVisible: boolean
+        onClose: () => void
+        onConfirm: () => void | Promise<void>
+      }) => {
+        lastConfirmModalProps.isVisible = props.isVisible
+        lastConfirmModalProps.onClose = props.onClose
+        lastConfirmModalProps.onConfirm = props.onConfirm
+        return props.isVisible
+          ? ReactActual.createElement("View", { testID: "delete-modal" })
+          : null
+      },
+    }
+  },
+)
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
@@ -78,42 +96,6 @@ jest.mock("@app/components/atomic/galoy-icon-button/galoy-icon-button", () => {
   }
 })
 
-jest.mock("@app/components/atomic/galoy-primary-button", () => {
-  const ReactActual = jest.requireActual("react")
-  const { TouchableOpacity, Text } = jest.requireActual("react-native")
-  return {
-    GaloyPrimaryButton: ({
-      title,
-      onPress,
-      disabled,
-      ...props
-    }: {
-      title: string
-      onPress?: () => void
-      disabled?: boolean
-      [key: string]: unknown
-    }) =>
-      ReactActual.createElement(
-        TouchableOpacity,
-        { onPress, disabled, ...props },
-        ReactActual.createElement(Text, null, title),
-      ),
-  }
-})
-
-jest.mock("@app/components/atomic/galoy-secondary-button", () => {
-  const ReactActual = jest.requireActual("react")
-  const { TouchableOpacity, Text } = jest.requireActual("react-native")
-  return {
-    GaloySecondaryButton: ({ title, onPress }: { title: string; onPress?: () => void }) =>
-      ReactActual.createElement(
-        TouchableOpacity,
-        { onPress },
-        ReactActual.createElement(Text, null, title),
-      ),
-  }
-})
-
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
@@ -129,7 +111,7 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
-const mockDeleteWallet = jest.fn()
+const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
 const mockUseDeleteSelfCustodial = jest.fn()
 jest.mock(
   "@app/screens/settings-screen/account/multi-account/hooks/use-delete-self-custodial",
@@ -147,21 +129,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       ProfileScreen: {
         switchAccount: () => "Switched accounts",
       },
-      SelfCustodialDelete: {
-        title: () => "Delete wallet",
-        warning: () => "This action is destructive",
-        recoveryNote: () => "Make sure you have your backup",
-      },
       AccountScreen: {
         pleaseWait: () => "Please wait",
-      },
-      support: {
-        delete: () => "delete",
-        typeDelete: ({ delete: word }: { delete: string }) => `Type ${word}`,
-      },
-      common: {
-        confirm: () => "Confirm",
-        cancel: () => "Cancel",
       },
     },
   }),
@@ -172,6 +141,7 @@ describe("SelfCustodialProfileRow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    lastConfirmModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
     mockUseDeleteSelfCustodial.mockReturnValue({
       state: "idle",
@@ -227,21 +197,45 @@ describe("SelfCustodialProfileRow", () => {
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 
-  it("opens the delete modal and keeps the confirm button disabled until the user types delete", () => {
+  it("opens the confirm-removal modal when the close icon is pressed", () => {
     const { getByTestId, queryByTestId } = render(<SelfCustodialProfileRow />)
 
     expect(queryByTestId("delete-modal")).toBeNull()
 
     fireEvent.press(getByTestId("self-custodial-delete-button"))
+
     expect(getByTestId("delete-modal")).toBeTruthy()
-
-    fireEvent.press(getByTestId("self-custodial-delete-confirm"))
     expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
 
-    fireEvent.changeText(getByTestId("self-custodial-delete-input"), "  DELETE  ")
-    fireEvent.press(getByTestId("self-custodial-delete-confirm"))
+  it("calls deleteWallet and closes the modal when the user confirms", async () => {
+    const { getByTestId, queryByTestId, rerender } = render(<SelfCustodialProfileRow />)
+    fireEvent.press(getByTestId("self-custodial-delete-button"))
+
+    await lastConfirmModalProps.onConfirm?.()
+    rerender(<SelfCustodialProfileRow />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+    expect(queryByTestId("delete-modal")).toBeNull()
+  })
+
+  it("does not gate the confirm modal by wallet balance (logout path)", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 9999, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
+
+    const { getByTestId } = render(<SelfCustodialProfileRow />)
+    fireEvent.press(getByTestId("self-custodial-delete-button"))
+
+    expect(getByTestId("delete-modal")).toBeTruthy()
   })
 
   it("renders the deleting overlay when the delete hook is in deleting state", () => {

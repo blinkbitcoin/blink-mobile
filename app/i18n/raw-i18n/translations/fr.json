@@ -3721,9 +3721,6 @@
         "degradedBanner": "Le réseau Spark est actuellement dégradé. Les paiements peuvent prendre plus de temps."
     },
     "SelfCustodialDelete": {
-        "title": "Supprimer le portefeuille auto-custodial",
-        "warning": "Cela supprimera ce portefeuille de cet appareil.",
-        "recoveryNote": "Si vous avez sauvegardé votre phrase de sauvegarde, vous pouvez restaurer ce portefeuille sur n'importe quel appareil. Sinon, vous perdrez l'accès à vos fonds.",
         "dangerZoneImportantTitle": "Important",
         "dangerZoneBulletReinstated": "Un compte supprimé ne peut pas être rétabli",
         "dangerZoneBulletPermanent": "La suppression du compte est définitive",
