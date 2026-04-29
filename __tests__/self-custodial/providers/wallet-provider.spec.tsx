@@ -39,6 +39,7 @@ const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
 const mockGetUserSettings = jest.fn()
+const mockSyncSelfCustodialWallet = jest.fn()
 
 let mockStableBalanceEnabled = true
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -59,6 +60,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
   getLightningAddress: jest.fn().mockResolvedValue(null),
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -111,6 +113,7 @@ describe("SelfCustodialWalletProvider", () => {
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -476,6 +479,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,

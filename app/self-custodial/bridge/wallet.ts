@@ -1,7 +1,13 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  SyncWalletRequest,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
   sdk.getInfo({ ensureSynced: false })
+
+export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
+  sdk.syncWallet(SyncWalletRequest.create({}))
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
