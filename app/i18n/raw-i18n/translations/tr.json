@@ -3591,11 +3591,7 @@
     "settingsWarning": "Cüzdanınızı yedekleyin. Bu cihazı kaybederseniz, fonlarınızı kaybedersiniz.",
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
-    "secureMe": "Cüzdanı güvenceye al",
-    "trustModelTitle": "Kontrol sizde",
-    "trustModelDescription": "Anahtarlarınız fonlarınızı kontrol eder. İşlemler Spark operatörleri tarafından işlenir, doğrudan Bitcoin L1'de doğrulanmaz.",
-    "trustModelWarning": "Çok küçük bakiyeler Bitcoin temel zincirine kurtarmak için ekonomik olmayabilir.",
-    "trustModelDismiss": "Anlıyorum"
+    "secureMe": "Cüzdanı güvenceye al"
   },
   "StableBalance": {
     "title": "Sabit bakiye",

@@ -3620,11 +3620,7 @@
         "settingsWarning": "ウォレットをバックアップしてください。このデバイスを紛失すると、資金を失います。",
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
-        "secureMe": "ウォレットを保護",
-        "trustModelTitle": "あなたが管理しています",
-        "trustModelDescription": "あなたの鍵があなたの資金を管理しています。トランザクションはSparkオペレーターによって処理され、Bitcoin L1で直接検証されません。",
-        "trustModelWarning": "非常に少額の残高は、Bitcoinベースチェーンへの復元が経済的でない場合があります。",
-        "trustModelDismiss": "理解しました"
+        "secureMe": "ウォレットを保護"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

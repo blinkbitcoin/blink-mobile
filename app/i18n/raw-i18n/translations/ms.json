@@ -3632,11 +3632,7 @@
     "settingsWarning": "Sandarkan dompet anda. Jika anda kehilangan peranti ini, anda akan kehilangan dana anda.",
     "modalTitle": "Lindungi dana anda",
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
-    "secureMe": "Lindungi dompet",
-    "trustModelTitle": "Anda yang mengawal",
-    "trustModelDescription": "Kunci anda mengawal dana anda. Transaksi diproses oleh operator Spark, bukan disahkan terus di Bitcoin L1.",
-    "trustModelWarning": "Baki yang sangat kecil mungkin tidak ekonomik untuk dipulihkan ke rantai asas Bitcoin.",
-    "trustModelDismiss": "Saya faham"
+    "secureMe": "Lindungi dompet"
   },
   "StableBalance": {
     "title": "Baki stabil",

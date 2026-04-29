@@ -3754,12 +3754,6 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
-    trustModelTitle: "You are in control",
-    trustModelDescription:
-      "Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.",
-    trustModelWarning:
-      "Very small balances may not be economical to recover to the Bitcoin base chain.",
-    trustModelDismiss: "I understand",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

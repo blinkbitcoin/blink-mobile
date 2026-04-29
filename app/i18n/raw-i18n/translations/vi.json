@@ -3629,11 +3629,7 @@
     "settingsWarning": "Sao lưu ví của bạn. Nếu bạn mất thiết bị này, bạn sẽ mất tiền.",
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
-    "secureMe": "Bảo mật ví",
-    "trustModelTitle": "Bạn nắm quyền kiểm soát",
-    "trustModelDescription": "Khóa của bạn kiểm soát tiền của bạn. Giao dịch được xử lý bởi các nhà điều hành Spark, không được xác thực trực tiếp trên Bitcoin L1.",
-    "trustModelWarning": "Số dư rất nhỏ có thể không kinh tế để khôi phục về chuỗi cơ sở Bitcoin.",
-    "trustModelDismiss": "Tôi hiểu"
+    "secureMe": "Bảo mật ví"
   },
   "StableBalance": {
     "title": "Số dư ổn định",

@@ -3609,11 +3609,7 @@
     "settingsWarning": "Sikkerhedskopiér din tegnebog. Hvis du mister denne enhed, mister du dine midler.",
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
-    "secureMe": "Sikr tegnebog",
-    "trustModelTitle": "Du har kontrollen",
-    "trustModelDescription": "Dine nøgler styrer dine midler. Transaktioner behandles af Spark-operatører, ikke direkte valideret på Bitcoin L1.",
-    "trustModelWarning": "Meget små saldi er muligvis ikke økonomiske at gendanne til Bitcoin-basiskæden.",
-    "trustModelDismiss": "Jeg forstår"
+    "secureMe": "Sikr tegnebog"
   },
   "StableBalance": {
     "title": "Stabil saldo",

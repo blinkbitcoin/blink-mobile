@@ -3591,11 +3591,7 @@
     "settingsWarning": "Koppa wallet yo. Bw'ofiirwa ekikozesebwa kino, onofiirwa ssente zo.",
     "modalTitle": "Kuuma ssente zo",
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
-    "secureMe": "Kuuma wallet",
-    "trustModelTitle": "Ggwe ofuga",
-    "trustModelDescription": "Ebisumuluzo byo bifuga ssente zo. Okutambula kw'ensimbi kukolebwa Spark operators, so si butereevu ku Bitcoin L1.",
-    "trustModelWarning": "Balance entono ennyo teyandibadde ya mugaso okuddamu ku Bitcoin base chain.",
-    "trustModelDismiss": "Ntegedde"
+    "secureMe": "Kuuma wallet"
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",
