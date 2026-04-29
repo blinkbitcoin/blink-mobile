@@ -2376,20 +2376,11 @@
         "receiveCurrency": "Devise de réception",
         "displayCurrency": "Devise d'affichage",
         "AccountInformation": {
-            "accountTypeLabel": "Type de compte",
             "identityLabel": "Identifiant du portefeuille",
             "backupStatusLabel": "État de la sauvegarde",
             "backupStatusCompleted": "Sauvegarde terminée",
             "backupStatusNotCompleted": "Sauvegarde incomplète",
             "loadError": "Impossible de charger les informations de votre compte."
-        },
-        "TransactionLimits": {
-            "protocolNote": "Les transactions Lightning et on-chain suivent les limites du protocole Bitcoin. Les limites de conversion ci-dessous sont appliquées par le réseau Spark.",
-            "btcToUsdTitle": "Bitcoin vers dollars",
-            "usdToBtcTitle": "Dollars vers Bitcoin",
-            "minFromLabel": "Minimum envoyé",
-            "minToLabel": "Minimum reçu",
-            "loadError": "Impossible de charger les limites de conversion."
         }
     },
     "NotificationSettingsScreen": {

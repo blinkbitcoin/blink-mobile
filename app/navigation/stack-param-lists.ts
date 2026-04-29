@@ -198,8 +198,6 @@ export type RootStackParamList = {
   sparkRestoreMethodScreen: undefined
   sparkCloudRestoreScreen: undefined
   stableBalanceSettings: undefined
-  selfCustodialAccountInformationScreen: undefined
-  selfCustodialTransactionLimitsScreen: undefined
 }
 
 export type OnboardingStackParamList = {

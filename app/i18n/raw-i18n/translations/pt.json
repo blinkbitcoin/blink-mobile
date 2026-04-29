@@ -2359,20 +2359,11 @@
         "receiveCurrency": "Moeda de recebimento",
         "displayCurrency": "Moeda de exibição",
         "AccountInformation": {
-            "accountTypeLabel": "Tipo de conta",
             "identityLabel": "Identificador da carteira",
             "backupStatusLabel": "Status do backup",
             "backupStatusCompleted": "Backup completo",
             "backupStatusNotCompleted": "Backup incompleto",
             "loadError": "Não foi possível carregar as informações da conta."
-        },
-        "TransactionLimits": {
-            "protocolNote": "As transações Lightning e on-chain seguem os limites do protocolo Bitcoin. Os limites de conversão abaixo são aplicados pela rede Spark.",
-            "btcToUsdTitle": "Bitcoin para dólares",
-            "usdToBtcTitle": "Dólares para Bitcoin",
-            "minFromLabel": "Mínimo enviado",
-            "minToLabel": "Mínimo recebido",
-            "loadError": "Não foi possível carregar os limites de conversão."
         }
     },
     "NotificationSettingsScreen": {
