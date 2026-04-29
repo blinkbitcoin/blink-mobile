@@ -182,7 +182,7 @@ const SelfCustodialDefaultWallet: React.FC = () => {
     },
     {
       key: WalletCurrency.Usd,
-      name: LL.common.dollarStablesats(),
+      name: LL.common.dollarStablecoin(),
       isSelected: selectedCurrency === WalletCurrency.Usd,
       onSelect: () => setCurrency(WalletCurrency.Usd),
     },

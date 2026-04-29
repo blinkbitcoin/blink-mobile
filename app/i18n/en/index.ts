@@ -2895,6 +2895,7 @@ const en: BaseTranslation = {
     submit: "Submit",
     success: "Success!",
     dollarStablesats: "Dollar (Stablesats)",
+    dollarStablecoin: "Dollar (Stablecoin)",
     to: "To",
     total: "Total",
     transactions: "Transactions",
