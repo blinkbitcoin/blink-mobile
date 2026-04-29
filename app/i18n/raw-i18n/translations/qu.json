@@ -3629,11 +3629,7 @@
     "settingsWarning": "Walletniykita backup ruray. Kay aparatuta chinkachispaqa, qullqiykita chinkachinki.",
     "modalTitle": "Waqaychay qullqiykikunata",
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
-    "secureMe": "Waqaychay wallita",
-    "trustModelTitle": "Qammi kamachkanki",
-    "trustModelDescription": "Llaviykikuna qullqiykita kamachin. Transacciones Spark operadorkuna ruranku, mana Bitcoin L1 pi.",
-    "trustModelWarning": "Ancha uchuy saldokuna mana allinchu Bitcoin cadena base man kutichiy.",
-    "trustModelDismiss": "Entiendeni"
+    "secureMe": "Waqaychay wallita"
   },
   "StableBalance": {
     "title": "Saldo sinchi",

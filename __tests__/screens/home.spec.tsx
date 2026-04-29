@@ -41,10 +41,6 @@ jest.mock("@app/components/backup-nudge-modal", () => ({
 
 let mockIsFocused = true
 
-jest.mock("@app/screens/spark-onboarding/trust-model-screen", () => ({
-  SparkTrustModelScreen: () => null,
-  useTrustModelSeen: () => ({ seen: true, markAsSeen: jest.fn() }),
-}))
 
 // eslint-disable-next-line prefer-const
 let mockActiveWalletOverride: Record<string, unknown> | null = null
@@ -477,6 +473,43 @@ describe("HomeScreen", () => {
     await act(async () => {})
 
     expect(getByTestId("slide-up-handle")).toBeTruthy()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("never renders the trust-model modal for self-custodial users with balance", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 5000,
+      usdBalance: 0,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(queryByTestId("trust-model-modal")).toBeNull()
 
     mockActiveWalletOverride = null
   })

@@ -3638,11 +3638,7 @@
     "settingsWarning": "Gcina isipaji sakho. Ukuba ulahlekelwa sesi sixhobo, uya kulahlekelwa yimali yakho.",
     "modalTitle": "Khuseleka imali yakho",
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
-    "secureMe": "Khuseleka ingxowa",
-    "trustModelTitle": "Nguwe olawulayo",
-    "trustModelDescription": "Izitshixo zakho zilawula imali yakho. Iintlawulo zenziwa ngabaqhubi beSpark, haziqinisekiswa ngqo kwi-Bitcoin L1.",
-    "trustModelWarning": "Ibhalansi encinane kakhulu inokungabi yoqoqosho ukubuyisela kumxokelelwane wesiseko we-Bitcoin.",
-    "trustModelDismiss": "Ndiyaqonda"
+    "secureMe": "Khuseleka ingxowa"
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",

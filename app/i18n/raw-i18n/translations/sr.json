@@ -3629,11 +3629,7 @@
     "settingsWarning": "Направите резервну копију. Ако изгубите уређај, изгубићете средства.",
     "modalTitle": "Obezbedite svoja sredstva",
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
-    "secureMe": "Obezbedi novčanik",
-    "trustModelTitle": "Ви имате контролу",
-    "trustModelDescription": "Ваши кључеви контролишу ваша средства. Трансакције обрађују Spark оператери, не директно на Bitcoin L1.",
-    "trustModelWarning": "Врло мали салди можда неће бити економични за повраћај на Bitcoin базни ланац.",
-    "trustModelDismiss": "Разумем"
+    "secureMe": "Obezbedi novčanik"
   },
   "StableBalance": {
     "title": "Стабилан салдо",

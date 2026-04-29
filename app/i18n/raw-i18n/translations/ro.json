@@ -3591,11 +3591,7 @@
     "settingsWarning": "Fă backup la portofel. Dacă pierzi acest dispozitiv, vei pierde fondurile.",
     "modalTitle": "Securizați-vă fondurile",
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
-    "secureMe": "Securizare portofel",
-    "trustModelTitle": "Tu ai controlul",
-    "trustModelDescription": "Cheile tale controlează fondurile. Tranzacțiile sunt procesate de operatorii Spark, nu validate direct pe Bitcoin L1.",
-    "trustModelWarning": "Soldurile foarte mici pot să nu fie economice de recuperat pe lanțul de bază Bitcoin.",
-    "trustModelDismiss": "Înțeleg"
+    "secureMe": "Securizare portofel"
   },
   "StableBalance": {
     "title": "Sold stabil",

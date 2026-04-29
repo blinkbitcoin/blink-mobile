@@ -3591,11 +3591,7 @@
     "settingsWarning": "Cadangkan dompet Anda. Jika Anda kehilangan perangkat ini, Anda akan kehilangan dana.",
     "modalTitle": "Amankan dana Anda",
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
-    "secureMe": "Amankan dompet",
-    "trustModelTitle": "Anda yang mengendalikan",
-    "trustModelDescription": "Kunci Anda mengendalikan dana Anda. Transaksi diproses oleh operator Spark, bukan langsung di Bitcoin L1.",
-    "trustModelWarning": "Saldo yang sangat kecil mungkin tidak ekonomis untuk dipulihkan ke rantai dasar Bitcoin.",
-    "trustModelDismiss": "Saya mengerti"
+    "secureMe": "Amankan dompet"
   },
   "StableBalance": {
     "title": "Saldo stabil",

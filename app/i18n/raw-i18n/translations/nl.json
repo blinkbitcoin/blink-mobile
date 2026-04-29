@@ -3632,11 +3632,7 @@
     "settingsWarning": "Maak een back-up van je portemonnee. Als je dit apparaat verliest, verlies je je tegoeden.",
     "modalTitle": "Beveilig uw fondsen",
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
-    "secureMe": "Portemonnee beveiligen",
-    "trustModelTitle": "Jij hebt de controle",
-    "trustModelDescription": "Jouw sleutels beheren je tegoeden. Transacties worden verwerkt door Spark-operators, niet direct gevalideerd op Bitcoin L1.",
-    "trustModelWarning": "Zeer kleine saldi zijn mogelijk niet economisch om te herstellen naar de Bitcoin-basisketen.",
-    "trustModelDismiss": "Ik begrijp het"
+    "secureMe": "Portemonnee beveiligen"
   },
   "StableBalance": {
     "title": "Stabiel saldo",
