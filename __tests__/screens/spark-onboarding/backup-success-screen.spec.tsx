@@ -39,7 +39,10 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 }))
 
 const mockDispatch = jest.fn()
-const mockRouteParams = jest.fn<{ reBackup?: boolean } | undefined, []>()
+const mockRouteParams = jest.fn<
+  { reBackup?: boolean; message?: string } | undefined,
+  []
+>()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ dispatch: mockDispatch }),
@@ -82,6 +85,34 @@ describe("SparkBackupSuccessScreen", () => {
 
     expect(getByText(LL.common.success())).toBeTruthy()
     expect(queryByText(LL.BackupScreen.ManualBackup.Success.title())).toBeNull()
+  })
+
+  it("uses the caller-supplied message when provided, regardless of reBackup", () => {
+    mockRouteParams.mockReturnValue({
+      reBackup: true,
+      message: LL.BackupScreen.ManualBackup.Success.testSuccess(),
+    })
+
+    const { getByText, queryByText } = render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByText(LL.BackupScreen.ManualBackup.Success.testSuccess())).toBeTruthy()
+    expect(queryByText(LL.common.success())).toBeNull()
+  })
+
+  it("falls back to onboarding copy when neither reBackup nor message are set", () => {
+    mockRouteParams.mockReturnValue({})
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByText(LL.BackupScreen.ManualBackup.Success.title())).toBeTruthy()
   })
 
   it("renders without crashing", () => {

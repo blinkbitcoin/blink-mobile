@@ -186,10 +186,12 @@ export type RootStackParamList = {
   sparkCloudBackupScreen: undefined
   sparkBackupAlertsScreen: undefined
   sparkBackupPhraseScreen: { step: PhraseStep }
+  sparkViewBackupPhraseScreen: undefined
   sparkBackupConfirmScreen: {
     challenges: Array<{ index: number; word: string }>
+    successMessage?: string
   }
-  sparkBackupSuccessScreen: { reBackup?: boolean } | undefined
+  sparkBackupSuccessScreen: { reBackup?: boolean; message?: string } | undefined
   sparkMigrationExplainer: undefined
   sparkMigrationTransferringFunds: undefined
   sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }

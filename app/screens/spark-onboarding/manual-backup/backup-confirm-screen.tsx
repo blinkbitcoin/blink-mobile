@@ -31,7 +31,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { challenges } = useRoute<ConfirmRouteProp>().params
+  const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
   const { wallets } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
@@ -47,8 +47,18 @@ export const SparkBackupConfirmScreen: React.FC = () => {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
     }
-    navigation.navigate("sparkBackupSuccessScreen", { reBackup: alreadyBackedUp })
-  }, [navigation, isMigrating, hasFunds, alreadyBackedUp, setBackupCompleted])
+    navigation.navigate("sparkBackupSuccessScreen", {
+      reBackup: alreadyBackedUp,
+      message: successMessage,
+    })
+  }, [
+    navigation,
+    isMigrating,
+    hasFunds,
+    alreadyBackedUp,
+    setBackupCompleted,
+    successMessage,
+  ])
 
   const {
     inputs,

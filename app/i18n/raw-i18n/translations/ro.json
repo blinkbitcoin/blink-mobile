@@ -3503,7 +3503,8 @@
         "saveItNow": "Salvează acum",
         "savedConfirm": "Am salvat-o",
         "copy": "Copiază",
-        "continueButton": "Continuă"
+        "continueButton": "Continuă",
+        "testBackup": "Testează-ți copia de rezervă"
       },
       "Confirm": {
         "headerTitle": "Confirmă fraza de backup",
@@ -3514,7 +3515,8 @@
         "incorrectWord": "Cuvânt incorect, verificați ordinea"
       },
       "Success": {
-        "title": "Bun venit la Blink non-custodial"
+        "title": "Bun venit la Blink non-custodial",
+        "testSuccess": "Fraza ta de rezervă este corectă"
       }
     },
     "CloudBackup": {

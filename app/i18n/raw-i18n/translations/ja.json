@@ -3532,7 +3532,8 @@
                 "saveItNow": "今すぐ保存",
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
-                "continueButton": "続行"
+                "continueButton": "続行",
+                "testBackup": "バックアップをテスト"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",
@@ -3543,7 +3544,8 @@
                 "incorrectWord": "正しくない単語です。順番を確認してください"
             },
             "Success": {
-                "title": "ノンカストディアルBlinkへようこそ"
+                "title": "ノンカストディアルBlinkへようこそ",
+                "testSuccess": "バックアップフレーズは正しいです"
             }
         },
         "CloudBackup": {

@@ -21,16 +21,20 @@ export const SparkBackupSuccessScreen: React.FC = () => {
   const styles = useStyles()
   const navigation = useNavigation()
   const { clearCheckpoint } = useMigrationCheckpoint()
-  const reBackup = useRoute<SuccessRouteProp>().params?.reBackup ?? false
+  const params = useRoute<SuccessRouteProp>().params
+  const reBackup = params?.reBackup ?? false
+  const customMessage = params?.message
 
   const navigateToHome = useCallback(() => {
     clearCheckpoint()
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
   }, [navigation, clearCheckpoint])
 
-  const message = reBackup
+  const fallbackMessage = reBackup
     ? LL.common.success()
     : LL.BackupScreen.ManualBackup.Success.title()
+
+  const message = customMessage ?? fallbackMessage
 
   return (
     <Screen preset="fixed">
