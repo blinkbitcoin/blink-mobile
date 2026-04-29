@@ -6,6 +6,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SelfCustodialAccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles } from "@rn-vui/themed"
@@ -24,15 +25,17 @@ export const AccountScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const { activeAccount } = useAccountRegistry()
   const { updateCurrentProfile } = useSaveSessionProfile()
+  const { refreshWallets: refreshSelfCustodialWallets } = useSelfCustodialWallet()
   const [refreshing, setRefreshing] = useState(false)
 
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    await updateCurrentProfile()
+    const refresh = isSelfCustodial ? refreshSelfCustodialWallets : updateCurrentProfile
+    await refresh()
     setRefreshing(false)
-  }, [updateCurrentProfile])
+  }, [isSelfCustodial, refreshSelfCustodialWallets, updateCurrentProfile])
 
   return (
     <AccountDeleteContextProvider>
