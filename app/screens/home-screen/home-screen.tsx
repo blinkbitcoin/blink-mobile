@@ -174,8 +174,11 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
-  const { refreshWallets: refreshSelfCustodialWallets, isStableBalanceActive } =
-    useSelfCustodialWallet()
+  const {
+    refreshWallets: refreshSelfCustodialWallets,
+    isStableBalanceActive,
+    lightningAddress: selfCustodialLightningAddress,
+  } = useSelfCustodialWallet()
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
@@ -246,7 +249,9 @@ export const HomeScreen: React.FC = () => {
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
-  const usernameTitle = username || phone || LL.common.blinkUser()
+  const usernameTitle = isSelfCustodial
+    ? selfCustodialLightningAddress ?? ""
+    : username || phone || LL.common.blinkUser()
 
   const wallets = isSelfCustodial
     ? activeWallet.wallets.map((w) => ({
