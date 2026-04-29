@@ -3,14 +3,23 @@ import { act, renderHook } from "@testing-library/react-native"
 import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset-mode"
 
 const mockSelfCustodialWallet = jest.fn()
+const mockPersistentState = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: mockPersistentState(),
+    updateState: jest.fn(),
+  }),
+}))
+
 describe("useReceiveAssetMode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockPersistentState.mockReturnValue({})
   })
 
   describe("initial state", () => {
@@ -23,6 +32,29 @@ describe("useReceiveAssetMode", () => {
 
     it("starts on Dollar and locks the toggle when stable balance is active", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.assetMode).toBe("dollar")
+      expect(result.current.isToggleDisabled).toBe(true)
+    })
+
+    it("starts on Dollar when default account preference is USD", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      mockPersistentState.mockReturnValue({ selfCustodialDefaultWalletCurrency: "USD" })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.assetMode).toBe("dollar")
+      expect(result.current.isToggleDisabled).toBe(false)
+    })
+
+    it("starts on Bitcoin when default account preference is BTC", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      mockPersistentState.mockReturnValue({ selfCustodialDefaultWalletCurrency: "BTC" })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.assetMode).toBe("bitcoin")
+    })
+
+    it("stable-balance active overrides default account preference", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
+      mockPersistentState.mockReturnValue({ selfCustodialDefaultWalletCurrency: "BTC" })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("dollar")
       expect(result.current.isToggleDisabled).toBe(true)
