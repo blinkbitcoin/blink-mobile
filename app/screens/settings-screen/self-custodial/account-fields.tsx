@@ -29,7 +29,7 @@ const ReadOnlyField: React.FC<FieldProps> = ({
   const styles = useStyles()
 
   return (
-    <View style={styles.fieldContainer}>
+    <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.box}>
         <Text
@@ -47,19 +47,17 @@ const ReadOnlyField: React.FC<FieldProps> = ({
 }
 
 const CopyButton: React.FC<{ value: string; testID: string }> = ({ value, testID }) => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { copyToClipboard } = useClipboard()
   return (
     <TouchableOpacity
-      style={styles.copyButton}
       hitSlop={8}
       onPress={() => copyToClipboard({ content: value })}
       {...testProps(testID)}
     >
-      <GaloyIcon name="copy-paste" size={18} color={colors.primary} />
+      <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
     </TouchableOpacity>
   )
 }
@@ -122,7 +120,7 @@ export const SelfCustodialAccountFields: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   list: {
-    gap: 16,
+    gap: 20,
   },
   loadingContainer: {
     paddingVertical: 24,
@@ -133,31 +131,28 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     lineHeight: 20,
   },
-  fieldContainer: {
-    gap: 6,
+  fieldGroup: {
+    gap: 3,
   },
   label: {
-    color: colors.grey1,
-    fontSize: 13,
-    lineHeight: 18,
+    color: colors.black,
+    fontSize: 14,
+    lineHeight: 20,
   },
   box: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.grey5,
     borderRadius: 8,
-    minHeight: 50,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    gap: 8,
+    paddingLeft: 14,
+    paddingRight: 10,
+    paddingVertical: 14,
+    gap: 14,
   },
   value: {
     flex: 1,
     color: colors.black,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  copyButton: {
-    padding: 4,
+    fontSize: 14,
+    lineHeight: 20,
   },
 }))
