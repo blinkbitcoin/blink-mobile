@@ -3491,7 +3491,8 @@
                 "saveItNow": "Jetzt speichern",
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
-                "continueButton": "Weiter"
+                "continueButton": "Weiter",
+                "testBackup": "Sicherung testen"
             },
             "Confirm": {
                 "headerTitle": "Sicherungswörter bestätigen",
@@ -3502,7 +3503,8 @@
                 "incorrectWord": "Falsches Wort, bitte überprüfe die Reihenfolge"
             },
             "Success": {
-                "title": "Willkommen bei nicht-verwaltetem Blink"
+                "title": "Willkommen bei nicht-verwaltetem Blink",
+                "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
         },
         "CloudBackup": {

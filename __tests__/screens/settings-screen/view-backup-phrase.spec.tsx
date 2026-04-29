@@ -1,5 +1,5 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { ViewBackupPhraseSetting } from "@app/screens/settings-screen/settings/view-backup-phrase"
 import { AccountType } from "@app/types/wallet.types"
@@ -35,8 +35,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/screens/settings-screen/row", () => ({
-  SettingsRow: ({ title }: { title: string }) =>
-    React.createElement("Text", { testID: "settings-row" }, title),
+  SettingsRow: ({ title, action }: { title: string; action?: () => void }) =>
+    React.createElement("Text", { testID: "settings-row", onPress: action }, title),
 }))
 
 describe("ViewBackupPhraseSetting", () => {
@@ -53,6 +53,18 @@ describe("ViewBackupPhraseSetting", () => {
     const { getByTestId } = render(<ViewBackupPhraseSetting />)
 
     expect(getByTestId("settings-row")).toBeTruthy()
+  })
+
+  it("navigates to the view-backup-phrase screen on press", () => {
+    mockActiveAccount.mockReturnValue({
+      type: AccountType.SelfCustodial,
+    })
+    mockBackupState.mockReturnValue({ status: "completed" })
+
+    const { getByTestId } = render(<ViewBackupPhraseSetting />)
+    fireEvent.press(getByTestId("settings-row"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
   })
 
   it("returns null when custodial account", () => {

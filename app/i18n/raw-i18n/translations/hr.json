@@ -3544,7 +3544,8 @@
         "saveItNow": "Spremite sada",
         "savedConfirm": "Spremio sam je",
         "copy": "Kopiraj",
-        "continueButton": "Nastavi"
+        "continueButton": "Nastavi",
+        "testBackup": "Testirajte sigurnosnu kopiju"
       },
       "Confirm": {
         "headerTitle": "Potvrdite sigurnosnu frazu",
@@ -3555,7 +3556,8 @@
         "incorrectWord": "Pogrešna riječ, provjerite redoslijed"
       },
       "Success": {
-        "title": "Dobrodošli u Blink bez skrbništva"
+        "title": "Dobrodošli u Blink bez skrbništva",
+        "testSuccess": "Vaša fraza za sigurnosnu kopiju je točna"
       }
     },
     "CloudBackup": {

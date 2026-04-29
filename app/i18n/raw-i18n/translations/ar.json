@@ -3541,7 +3541,8 @@
         "saveItNow": "احفظها الآن",
         "savedConfirm": "لقد حفظتها",
         "copy": "نسخ",
-        "continueButton": "متابعة"
+        "continueButton": "متابعة",
+        "testBackup": "اختبر نسختك الاحتياطية"
       },
       "Confirm": {
         "headerTitle": "تأكيد عبارة النسخ الاحتياطي",
@@ -3552,7 +3553,8 @@
         "incorrectWord": "كلمة غير صحيحة، يرجى التحقق من الترتيب"
       },
       "Success": {
-        "title": "مرحبًا بك في Blink غير الحافظة"
+        "title": "مرحبًا بك في Blink غير الحافظة",
+        "testSuccess": "عبارة النسخ الاحتياطي صحيحة"
       }
     },
     "CloudBackup": {

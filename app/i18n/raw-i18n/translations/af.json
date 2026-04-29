@@ -3544,7 +3544,8 @@
         "saveItNow": "Stoor dit nou",
         "savedConfirm": "Ek het dit gestoor",
         "copy": "Kopieer",
-        "continueButton": "Gaan voort"
+        "continueButton": "Gaan voort",
+        "testBackup": "Toets jou rugsteun"
       },
       "Confirm": {
         "headerTitle": "Bevestig rugsteunfrase",
@@ -3555,7 +3556,8 @@
         "incorrectWord": "Verkeerde woord, kontroleer asseblief die volgorde"
       },
       "Success": {
-        "title": "Welkom by nie-bewaarder Blink"
+        "title": "Welkom by nie-bewaarder Blink",
+        "testSuccess": "Jou rugsteunfrase is korrek"
       }
     },
     "CloudBackup": {

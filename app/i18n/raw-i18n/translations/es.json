@@ -3491,7 +3491,8 @@
                 "saveItNow": "Guárdala ahora",
                 "savedConfirm": "Ya la guardé",
                 "copy": "Copiar",
-                "continueButton": "Continuar"
+                "continueButton": "Continuar",
+                "testBackup": "Prueba tu respaldo"
             },
             "Confirm": {
                 "headerTitle": "Confirmar frase de respaldo",
@@ -3502,7 +3503,8 @@
                 "incorrectWord": "Palabra incorrecta, revisa el orden"
             },
             "Success": {
-                "title": "Bienvenido a Blink sin custodia"
+                "title": "Bienvenido a Blink sin custodia",
+                "testSuccess": "Tus frases de respaldo son correctas"
             }
         },
         "CloudBackup": {

@@ -3544,7 +3544,8 @@
         "saveItNow": "Uložte ji nyní",
         "savedConfirm": "Už jsem ji uložil",
         "copy": "Kopírovat",
-        "continueButton": "Pokračovat"
+        "continueButton": "Pokračovat",
+        "testBackup": "Otestujte zálohu"
       },
       "Confirm": {
         "headerTitle": "Potvrďte záložní frázi",
@@ -3555,7 +3556,8 @@
         "incorrectWord": "Nesprávné slovo, zkontroluj prosím pořadí"
       },
       "Success": {
-        "title": "Vítejte v necustodial Blink"
+        "title": "Vítejte v necustodial Blink",
+        "testSuccess": "Vaše záložní fráze je správná"
       }
     },
     "CloudBackup": {

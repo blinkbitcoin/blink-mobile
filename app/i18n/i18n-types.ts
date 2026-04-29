@@ -11687,6 +11687,10 @@ type RootTranslation = {
 				 * C​o​p​y
 				 */
 				copy: string
+				/**
+				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
+				 */
+				testBackup: string
 			}
 			Confirm: {
 				/**
@@ -11719,6 +11723,10 @@ type RootTranslation = {
 				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
 				 */
 				title: string
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​s​ ​c​o​r​r​e​c​t
+				 */
+				testSuccess: string
 			}
 		}
 	}
@@ -23808,6 +23816,10 @@ export type TranslationFunctions = {
 				 * Copy
 				 */
 				copy: () => LocalizedString
+				/**
+				 * Test your backup
+				 */
+				testBackup: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -23840,6 +23852,10 @@ export type TranslationFunctions = {
 				 * Welcome to non-custodial Blink
 				 */
 				title: () => LocalizedString
+				/**
+				 * Your backup phrase is correct
+				 */
+				testSuccess: () => LocalizedString
 			}
 		}
 	}

@@ -3544,7 +3544,8 @@
         "saveItNow": "Sla het nu op",
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
-        "continueButton": "Doorgaan"
+        "continueButton": "Doorgaan",
+        "testBackup": "Test je back-up"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3555,7 +3556,8 @@
         "incorrectWord": "Onjuist woord, controleer de volgorde"
       },
       "Success": {
-        "title": "Welkom bij non-custodial Blink"
+        "title": "Welkom bij non-custodial Blink",
+        "testSuccess": "Je back-upzin is correct"
       }
     },
     "CloudBackup": {
