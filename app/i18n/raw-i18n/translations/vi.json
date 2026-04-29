@@ -3539,7 +3539,8 @@
         "saveItNow": "Lưu ngay",
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
-        "continueButton": "Tiếp tục"
+        "continueButton": "Tiếp tục",
+        "testBackup": "Kiểm tra bản sao lưu của bạn"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
@@ -3550,7 +3551,8 @@
         "incorrectWord": "Sai từ, vui lòng kiểm tra thứ tự"
       },
       "Success": {
-        "title": "Chào mừng đến với Blink tự quản lý"
+        "title": "Chào mừng đến với Blink tự quản lý",
+        "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
     "CloudBackup": {

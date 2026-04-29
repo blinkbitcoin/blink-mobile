@@ -3501,7 +3501,8 @@
         "saveItNow": "Şimdi kaydet",
         "savedConfirm": "Kaydettim",
         "copy": "Kopyala",
-        "continueButton": "Devam et"
+        "continueButton": "Devam et",
+        "testBackup": "Yedeğini test et"
       },
       "Confirm": {
         "headerTitle": "Yedekleme ifadesini onayla",
@@ -3512,7 +3513,8 @@
         "incorrectWord": "Yanlış kelime, lütfen sırayı kontrol edin"
       },
       "Success": {
-        "title": "Gözetimsiz Blink'e hoş geldiniz"
+        "title": "Gözetimsiz Blink'e hoş geldiniz",
+        "testSuccess": "Yedekleme ifaden doğru"
       }
     },
     "CloudBackup": {

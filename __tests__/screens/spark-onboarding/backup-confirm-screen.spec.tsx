@@ -55,18 +55,23 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockRouteParams = jest.fn<
+  {
+    challenges: Array<{ index: number; word: string }>
+    successMessage?: string
+  },
+  []
+>(() => ({
+  challenges: [
+    { index: 0, word: "youth" },
+    { index: 4, word: "bundle" },
+    { index: 8, word: "harvest" },
+  ],
+}))
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({
-    params: {
-      challenges: [
-        { index: 0, word: "youth" },
-        { index: 4, word: "bundle" },
-        { index: 8, word: "harvest" },
-      ],
-    },
-  }),
+  useRoute: () => ({ params: mockRouteParams() }),
 }))
 
 loadLocale("en")
@@ -79,6 +84,13 @@ describe("SparkBackupConfirmScreen", () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     mockCheckpoint.mockReturnValue(null)
+    mockRouteParams.mockReturnValue({
+      challenges: [
+        { index: 0, word: "youth" },
+        { index: 4, word: "bundle" },
+        { index: 8, word: "harvest" },
+      ],
+    })
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "none", method: null },
       setBackupCompleted: mockSetBackupCompleted,
@@ -226,9 +238,10 @@ describe("SparkBackupConfirmScreen", () => {
     fillAllChallenges(getByPlaceholderText)
     jest.advanceTimersByTime(500)
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen", {
-      reBackup: true,
-    })
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sparkBackupSuccessScreen",
+      expect.objectContaining({ reBackup: true }),
+    )
   })
 
   it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", () => {
@@ -243,9 +256,10 @@ describe("SparkBackupConfirmScreen", () => {
     fillAllChallenges(getByPlaceholderText)
     jest.advanceTimersByTime(500)
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen", {
-      reBackup: false,
-    })
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sparkBackupSuccessScreen",
+      expect.objectContaining({ reBackup: false }),
+    )
   })
 
   it("does not route to migration when migrating but no funds", () => {
@@ -264,8 +278,41 @@ describe("SparkBackupConfirmScreen", () => {
     jest.advanceTimersByTime(500)
 
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkMigrationTransferringFunds")
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen", {
-      reBackup: false,
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sparkBackupSuccessScreen",
+      expect.objectContaining({ reBackup: false }),
+    )
+  })
+
+  it("forwards the route's successMessage to the success screen when provided", () => {
+    mockRouteParams.mockReturnValue({
+      challenges: [
+        { index: 0, word: "youth" },
+        { index: 4, word: "bundle" },
+        { index: 8, word: "harvest" },
+      ],
+      successMessage: "Your backup phrase is correct",
     })
+    mockBackupStateValue.mockReturnValue({
+      backupState: { status: "completed", method: "manual" },
+      setBackupCompleted: mockSetBackupCompleted,
+    })
+
+    const { getByPlaceholderText } = render(
+      <ContextForScreen>
+        <SparkBackupConfirmScreen />
+      </ContextForScreen>,
+    )
+
+    fillAllChallenges(getByPlaceholderText)
+    jest.advanceTimersByTime(500)
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sparkBackupSuccessScreen",
+      expect.objectContaining({
+        reBackup: true,
+        message: "Your backup phrase is correct",
+      }),
+    )
   })
 })

@@ -3501,7 +3501,8 @@
         "saveItNow": "Simpan sekarang",
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
-        "continueButton": "Lanjutkan"
+        "continueButton": "Lanjutkan",
+        "testBackup": "Uji cadanganmu"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",
@@ -3512,7 +3513,8 @@
         "incorrectWord": "Kata salah, harap periksa urutannya"
       },
       "Success": {
-        "title": "Selamat datang di Blink non-kustodial"
+        "title": "Selamat datang di Blink non-kustodial",
+        "testSuccess": "Frasa cadanganmu sudah benar"
       }
     },
     "CloudBackup": {

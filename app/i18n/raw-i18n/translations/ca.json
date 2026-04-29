@@ -3501,7 +3501,8 @@
         "saveItNow": "Desa-la ara",
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
-        "continueButton": "Continua"
+        "continueButton": "Continua",
+        "testBackup": "Prova la teva còpia de seguretat"
       },
       "Confirm": {
         "headerTitle": "Confirma la frase de còpia de seguretat",
@@ -3512,7 +3513,8 @@
         "incorrectWord": "Paraula incorrecta, comprova l'ordre"
       },
       "Success": {
-        "title": "Benvingut a Blink sense custòdia"
+        "title": "Benvingut a Blink sense custòdia",
+        "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
     "CloudBackup": {

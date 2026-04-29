@@ -3501,7 +3501,8 @@
         "saveItNow": "Kitereke kati",
         "savedConfirm": "Nkitereka",
         "copy": "Koppa",
-        "continueButton": "Weyongerawo"
+        "continueButton": "Weyongerawo",
+        "testBackup": "Gezza okukuumako"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",
@@ -3512,7 +3513,8 @@
         "incorrectWord": "Ekigambo si kituufu, tunuulira enkola"
       },
       "Success": {
-        "title": "Tukulabiriza ku Blink etali ya kuzibika"
+        "title": "Tukulabiriza ku Blink etali ya kuzibika",
+        "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
     "CloudBackup": {

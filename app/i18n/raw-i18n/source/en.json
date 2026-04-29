@@ -3526,7 +3526,8 @@
                 "saveItNow": "Save it now",
                 "continueButton": "Continue",
                 "savedConfirm": "I have saved it",
-                "copy": "Copy"
+                "copy": "Copy",
+                "testBackup": "Test your backup"
             },
             "Confirm": {
                 "headerTitle": "Confirm backup phrase",
@@ -3537,7 +3538,8 @@
                 "incorrectWord": "Incorrect word, please check the order"
             },
             "Success": {
-                "title": "Welcome to non-custodial Blink"
+                "title": "Welcome to non-custodial Blink",
+                "testSuccess": "Your backup phrase is correct"
             }
         }
     },

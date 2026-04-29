@@ -3489,7 +3489,8 @@
                 "saveItNow": "Salve agora",
                 "savedConfirm": "Já salvei",
                 "copy": "Copiar",
-                "continueButton": "Continuar"
+                "continueButton": "Continuar",
+                "testBackup": "Teste seu backup"
             },
             "Confirm": {
                 "headerTitle": "Confirmar frase de backup",
@@ -3500,7 +3501,8 @@
                 "incorrectWord": "Palavra incorreta, verifique a ordem"
             },
             "Success": {
-                "title": "Bem-vindo ao Blink não-custodial"
+                "title": "Bem-vindo ao Blink não-custodial",
+                "testSuccess": "Sua frase de backup está correta"
             }
         },
         "CloudBackup": {

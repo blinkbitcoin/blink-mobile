@@ -3678,6 +3678,7 @@ const en: BaseTranslation = {
         continueButton: "Continue",
         savedConfirm: "I have saved it",
         copy: "Copy",
+        testBackup: "Test your backup",
       },
       Confirm: {
         headerTitle: "Confirm backup phrase",
@@ -3689,6 +3690,7 @@ const en: BaseTranslation = {
       },
       Success: {
         title: "Welcome to non-custodial Blink",
+        testSuccess: "Your backup phrase is correct",
       },
     },
   },

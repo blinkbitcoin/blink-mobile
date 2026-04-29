@@ -3519,7 +3519,8 @@
         "saveItNow": "Gem den nu",
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
-        "continueButton": "Fortsæt"
+        "continueButton": "Fortsæt",
+        "testBackup": "Test din backup"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",
@@ -3530,7 +3531,8 @@
         "incorrectWord": "Forkert ord, kontroller venligst rækkefølgen"
       },
       "Success": {
-        "title": "Velkommen til non-custodial Blink"
+        "title": "Velkommen til non-custodial Blink",
+        "testSuccess": "Din backup-frase er korrekt"
       }
     },
     "CloudBackup": {

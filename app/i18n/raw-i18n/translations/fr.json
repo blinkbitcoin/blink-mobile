@@ -3530,7 +3530,8 @@
                 "saveItNow": "Enregistrez-la maintenant",
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
-                "continueButton": "Continuer"
+                "continueButton": "Continuer",
+                "testBackup": "Tester votre sauvegarde"
             },
             "Confirm": {
                 "headerTitle": "Confirmer la phrase de sauvegarde",
@@ -3541,7 +3542,8 @@
                 "incorrectWord": "Mot incorrect, veuillez vérifier l'ordre"
             },
             "Success": {
-                "title": "Bienvenue sur Blink non-custodial"
+                "title": "Bienvenue sur Blink non-custodial",
+                "testSuccess": "Votre phrase de sauvegarde est correcte"
             }
         },
         "CloudBackup": {

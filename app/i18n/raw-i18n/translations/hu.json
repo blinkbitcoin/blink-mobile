@@ -3501,7 +3501,8 @@
         "saveItNow": "Mentsd el most",
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
-        "continueButton": "Tovább"
+        "continueButton": "Tovább",
+        "testBackup": "Tesztelje a biztonsági másolatot"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3512,7 +3513,8 @@
         "incorrectWord": "Helytelen szó, kérlek ellenőrizd a sorrendet"
       },
       "Success": {
-        "title": "Üdvözöljük a nem letétkezelő Blinkben"
+        "title": "Üdvözöljük a nem letétkezelő Blinkben",
+        "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
     "CloudBackup": {

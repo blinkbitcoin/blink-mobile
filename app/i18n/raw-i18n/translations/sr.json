@@ -3539,7 +3539,8 @@
         "saveItNow": "Сачувајте сада",
         "savedConfirm": "Сачувао сам је",
         "copy": "Копирај",
-        "continueButton": "Настави"
+        "continueButton": "Настави",
+        "testBackup": "Тестирајте резервну копију"
       },
       "Confirm": {
         "headerTitle": "Потврдите резервну фразу",
@@ -3550,7 +3551,8 @@
         "incorrectWord": "Погрешна реч, проверите редослед"
       },
       "Success": {
-        "title": "Добродошли у Blink без скрбништва"
+        "title": "Добродошли у Blink без скрбништва",
+        "testSuccess": "Ваша резервна фраза је тачна"
       }
     },
     "CloudBackup": {

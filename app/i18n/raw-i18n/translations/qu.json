@@ -3539,7 +3539,8 @@
         "saveItNow": "Waqaychay kunan",
         "savedConfirm": "Ñam waqaychani",
         "copy": "Kopiyay",
-        "continueButton": "Hinaspa"
+        "continueButton": "Hinaspa",
+        "testBackup": "Bakuyniykita pruwaspay"
       },
       "Confirm": {
         "headerTitle": "Waqaychay rimayta takyachiy",
@@ -3550,7 +3551,8 @@
         "incorrectWord": "Mana allin simi, kawariy patmanta"
       },
       "Success": {
-        "title": "Blink mana waqaychisqaman haykuy"
+        "title": "Blink mana waqaychisqaman haykuy",
+        "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
     "CloudBackup": {

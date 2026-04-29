@@ -136,6 +136,7 @@ import {
   SparkCloudBackupScreen,
   SparkBackupAlertsScreen,
   SparkBackupPhraseScreen,
+  SparkViewBackupPhraseScreen,
   SparkBackupConfirmScreen,
   SparkBackupSuccessScreen,
   SparkWalletCreationScreen,
@@ -774,6 +775,13 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sparkBackupPhraseScreen"
         component={SparkBackupPhraseScreen}
+        options={{
+          title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="sparkViewBackupPhraseScreen"
+        component={SparkViewBackupPhraseScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
         }}

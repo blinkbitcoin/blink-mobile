@@ -3542,7 +3542,8 @@
         "saveItNow": "Simpan sekarang",
         "savedConfirm": "Saya telah menyimpannya",
         "copy": "Salin",
-        "continueButton": "Teruskan"
+        "continueButton": "Teruskan",
+        "testBackup": "Uji sandaran anda"
       },
       "Confirm": {
         "headerTitle": "Sahkan frasa sandaran",
@@ -3553,7 +3554,8 @@
         "incorrectWord": "Perkataan salah, sila semak susunan"
       },
       "Success": {
-        "title": "Selamat datang ke Blink bukan jagaan"
+        "title": "Selamat datang ke Blink bukan jagaan",
+        "testSuccess": "Frasa sandaran anda betul"
       }
     },
     "CloudBackup": {

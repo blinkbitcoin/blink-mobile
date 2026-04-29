@@ -3539,7 +3539,8 @@
         "saveItNow": "บันทึกตอนนี้",
         "savedConfirm": "ฉันบันทึกแล้ว",
         "copy": "คัดลอก",
-        "continueButton": "ดำเนินการต่อ"
+        "continueButton": "ดำเนินการต่อ",
+        "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
       },
       "Confirm": {
         "headerTitle": "ยืนยันวลีสำรอง",
@@ -3550,7 +3551,8 @@
         "incorrectWord": "คำไม่ถูกต้อง โปรดตรวจสอบลำดับ"
       },
       "Success": {
-        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล"
+        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล",
+        "testSuccess": "วลีสำรองของคุณถูกต้อง"
       }
     },
     "CloudBackup": {
