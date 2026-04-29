@@ -40,6 +40,7 @@ const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
 const mockRemoveSdkEventListener = jest.fn()
 const mockGetUserSettings = jest.fn()
+const mockSyncSelfCustodialWallet = jest.fn()
 
 let mockStableBalanceEnabled = true
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -59,6 +60,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
   getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
 const mockListSelfCustodialAccounts = jest.fn().mockResolvedValue([])
@@ -175,6 +177,7 @@ describe("SelfCustodialWalletProvider", () => {
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
     mockRemoveSdkEventListener.mockResolvedValue(undefined)
+    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -777,6 +780,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
     mockRemoveSdkEventListener.mockResolvedValue(undefined)
+    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
