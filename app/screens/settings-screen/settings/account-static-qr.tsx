@@ -22,7 +22,7 @@ export const AccountStaticQR: React.FC = () => {
   const isAuthed = useIsAuthed()
 
   const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
-  if (!data?.me?.username) return <></>
+  if (!data?.me?.username) return null
 
   const qrUrl = `${posUrl}/${data.me.username}/print`
 

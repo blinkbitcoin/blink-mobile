@@ -49,19 +49,20 @@ export const AccountBannerVertical: React.FC = () => {
   if (loading) return <Skeleton style={styles.outer} animation="pulse" />
 
   if (isSelfCustodial) {
-    const title = scLightningAddress ?? LL.common.blinkUser()
+    const subtitle = LL.SettingsScreen.nonCustodialAccount()
+    const avatarChar = (scLightningAddress ?? subtitle).charAt(0)
     return (
       <View style={styles.outer}>
         <Avatar
           size={80}
           rounded
-          title={title.charAt(0)}
+          title={avatarChar}
           containerStyle={styles.containerStyle}
           titleStyle={styles.titleStyle}
         />
         <View style={styles.textContainer}>
-          <Text type="p2">{title}</Text>
-          <Text type="p2">{LL.SettingsScreen.nonCustodialAccount()}</Text>
+          {scLightningAddress ? <Text type="p2">{scLightningAddress}</Text> : null}
+          <Text type="p2">{subtitle}</Text>
         </View>
       </View>
     )
