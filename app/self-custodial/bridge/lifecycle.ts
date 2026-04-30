@@ -1,7 +1,5 @@
 import {
-  Network,
   Seed,
-  StableBalanceActiveLabel,
   connect,
   defaultConfig,
   initLogging,
@@ -19,8 +17,10 @@ import {
   SparkConfig,
   SparkNetworkLabel,
   SparkToken,
+  storageDirFor,
 } from "../config"
 import { createSdkLogListener } from "../logging"
+import { addSelfCustodialAccountId } from "../storage/account-index"
 
 const initializeLogging = (() => {
   let done = false
@@ -30,7 +30,7 @@ const initializeLogging = (() => {
     try {
       initLogging(undefined, createSdkLogListener(), undefined)
     } catch {
-      // initLogging can fail if called after SDK state changes — non-fatal
+      // initLogging can fail if called after SDK state changes; non-fatal
     }
   }
 })()
@@ -49,11 +49,14 @@ const createSdkConfig = () => {
   return config
 }
 
-export const initSdk = async (mnemonic: string): Promise<BreezSdkInterface> => {
+export const initSdk = async (
+  mnemonic: string,
+  storageDir: string,
+): Promise<BreezSdkInterface> => {
   initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
   const config = createSdkConfig()
-  return connect({ config, seed, storageDir: SparkConfig.storageDir })
+  return connect({ config, seed, storageDir })
 }
 
 export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
@@ -68,67 +71,38 @@ export const addSdkEventListener = (
 export const removeSdkEventListener = (sdk: BreezSdkInterface, listenerId: string) =>
   sdk.removeEventListener(listenerId)
 
-export const selfCustodialCreateWallet = async (): Promise<void> => {
-  if (!__DEV__) {
-    throw new Error(
-      "Wallet creation is disabled in production builds until backup flow is available",
-    )
-  }
-
-  if (__DEV__ && SparkConfig.network === Network.Mainnet) {
-    throw new Error(
-      "Wallet creation is disabled on mainnet in debug builds. Set BREEZ_NETWORK=regtest",
-    )
-  }
-
+export const selfCustodialCreateWallet = async (accountId: string): Promise<void> => {
   const mnemonic = generateMnemonic(128, (size: number) =>
     Buffer.from(Crypto.randomBytes(size)),
   )
   if (!mnemonic) throw new Error("Failed to generate mnemonic")
 
-  const stored = await KeyStoreWrapper.setMnemonic(mnemonic)
+  const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
-
-  try {
-    const sdk = await initSdk(mnemonic)
-    try {
-      await sdk.updateUserSettings({
-        sparkPrivateModeEnabled: undefined,
-        stableBalanceActiveLabel: new StableBalanceActiveLabel.Set({
-          label: SparkToken.Label,
-        }),
-      })
-    } finally {
-      await disconnectSdk(sdk)
-    }
-  } catch (err) {
-    await KeyStoreWrapper.deleteMnemonic()
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Wallet creation failed: ${err}`),
-    )
-    throw err
-  }
+  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
+  await addSelfCustodialAccountId(accountId)
 }
 
-export const selfCustodialRestoreWallet = async (mnemonic: string): Promise<void> => {
+export const selfCustodialRestoreWallet = async (
+  accountId: string,
+  mnemonic: string,
+): Promise<void> => {
   const trimmed = mnemonic.trim().replace(/\s+/g, " ")
   if (!validateMnemonic(trimmed)) {
     throw new Error("Invalid BIP39 mnemonic")
   }
 
-  const stored = await KeyStoreWrapper.setMnemonic(trimmed)
+  const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, trimmed)
   if (!stored) throw new Error("Failed to store mnemonic")
 
   try {
-    await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
-    const sdk = await initSdk(trimmed)
+    await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
+    const sdk = await initSdk(trimmed, storageDirFor(accountId))
     await disconnectSdk(sdk)
+    await addSelfCustodialAccountId(accountId)
   } catch (err) {
-    // Roll back the stored mnemonic so a key the SDK can't actually use never
-    // latches onto the device.
-    await KeyStoreWrapper.deleteMnemonic()
+    await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
     crashlytics().recordError(
       err instanceof Error ? err : new Error(`Wallet restore failed: ${err}`),
     )

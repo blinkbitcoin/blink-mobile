@@ -5,8 +5,8 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { SparkNetworkLabel } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
-export const validateStoredNetwork = async (): Promise<boolean> => {
-  const storedNetwork = await KeyStoreWrapper.getMnemonicNetwork()
+export const validateStoredNetwork = async (accountId: string): Promise<boolean> => {
+  const storedNetwork = await KeyStoreWrapper.getMnemonicNetworkForAccount(accountId)
   if (!storedNetwork) return true
   if (storedNetwork === SparkNetworkLabel) return true
 
