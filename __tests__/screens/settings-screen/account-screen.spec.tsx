@@ -119,10 +119,12 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
+const mockUpdateCurrentSelfCustodialAccount = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => ({
     lightningAddress: "satoshi@blink.sv",
     refreshWallets: mockRefreshSelfCustodialWallets,
+    updateCurrentSelfCustodialAccount: mockUpdateCurrentSelfCustodialAccount,
   }),
 }))
 

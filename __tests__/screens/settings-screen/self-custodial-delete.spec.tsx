@@ -2,7 +2,11 @@ import React from "react"
 
 import { fireEvent, render } from "@testing-library/react-native"
 
+import { AccountStatus, AccountType } from "@app/types/wallet.types"
+
 import { SelfCustodialDelete } from "@app/screens/settings-screen/account/settings/self-custodial-delete"
+
+const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
@@ -106,6 +110,18 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: {
+      id: TEST_SC_ACCOUNT_ID,
+      type: AccountType.SelfCustodial,
+      label: "Spark",
+      selected: true,
+      status: AccountStatus.RequiresRestore,
+    },
+  }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -207,6 +223,7 @@ describe("SelfCustodialDelete", () => {
     rerender(<SelfCustodialDelete />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+    expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(queryByTestId("confirm-modal")).toBeNull()
   })
 })
