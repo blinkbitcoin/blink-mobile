@@ -76,6 +76,14 @@ export const removeBackupStateFor = async (accountId: string): Promise<void> => 
   await AsyncStorage.removeItem(backupStateKeyFor(accountId))
 }
 
+export const markBackupCompletedFor = async (
+  accountId: string,
+  method: BackupMethod,
+): Promise<void> => {
+  const state: BackupState = { status: BackupStatus.Completed, method }
+  await AsyncStorage.setItem(backupStateKeyFor(accountId), JSON.stringify(state))
+}
+
 export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { activeAccount } = useAccountRegistry()
   const activeSelfCustodialAccountId =
