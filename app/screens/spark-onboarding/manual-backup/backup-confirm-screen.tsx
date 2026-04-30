@@ -33,11 +33,12 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
-  const { wallets } = useActiveWallet()
+  const { wallets, isSelfCustodial } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
   const { checkpoint, loading: checkpointLoading } = useMigrationCheckpoint()
   const alreadyBackedUp = backupState.status === BackupStatus.Completed
-  const isMigrating = checkpoint !== null && !alreadyBackedUp
+  // Migration only applies on a custodial account; SC backups are standalone.
+  const isMigrating = !isSelfCustodial && checkpoint !== null && !alreadyBackedUp
   const hasFunds = wallets.some((w) => w.balance.amount > 0)
 
   const onComplete = useCallback(() => {
