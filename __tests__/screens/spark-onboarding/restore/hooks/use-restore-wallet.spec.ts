@@ -13,7 +13,7 @@ const mockNavigate = jest.fn()
 const mockRecordError = jest.fn()
 const mockToastShow = jest.fn()
 const mockReinitSdk = jest.fn()
-const mockSetBackupCompleted = jest.fn()
+const mockMarkBackupCompletedFor = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockFindSelfCustodialAccountByMnemonic = jest.fn()
 
@@ -54,7 +54,7 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
-  useBackupState: () => ({ setBackupCompleted: mockSetBackupCompleted }),
+  markBackupCompletedFor: (...args: unknown[]) => mockMarkBackupCompletedFor(...args),
   BackupMethod: { Manual: "manual", Recovery: "recovery" },
 }))
 
@@ -98,7 +98,7 @@ describe("useRestoreWallet", () => {
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "manual")
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 

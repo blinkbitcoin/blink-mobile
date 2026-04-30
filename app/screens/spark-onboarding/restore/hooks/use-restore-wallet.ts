@@ -11,7 +11,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import {
   BackupMethod,
-  useBackupState,
+  markBackupCompletedFor,
 } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { findSelfCustodialAccountByMnemonic } from "@app/self-custodial/storage/account-index"
@@ -34,7 +34,6 @@ export const useRestoreWallet = () => {
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
-  const { setBackupCompleted } = useBackupState()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
   const guard = useInFlightGuard()
 
@@ -62,10 +61,10 @@ export const useRestoreWallet = () => {
           }
           const accountId = Crypto.randomUUID()
           await selfCustodialRestoreWallet(accountId, mnemonic)
+          await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
           activateAccount(accountId)
           reinitSdk()
-          setBackupCompleted(BackupMethod.Manual)
           logSelfCustodialRestoreCompleted()
           navigation.navigate("sparkBackupSuccessScreen")
         } catch (err) {
@@ -76,15 +75,7 @@ export const useRestoreWallet = () => {
         }
       })
     },
-    [
-      guard,
-      activateAccount,
-      reinitSdk,
-      reloadSelfCustodialAccounts,
-      setBackupCompleted,
-      navigation,
-      LL,
-    ],
+    [guard, activateAccount, reinitSdk, reloadSelfCustodialAccounts, navigation, LL],
   )
 
   return { restore, status }
