@@ -4,6 +4,8 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import { DefaultAccountId } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -29,6 +31,7 @@ gql`
 export const useSaveSessionProfile = () => {
   const { LL } = useI18nContext()
   const client = useApolloClient()
+  const { updateState } = usePersistentStateContext()
 
   const {
     saveToken,
@@ -86,6 +89,10 @@ export const useSaveSessionProfile = () => {
       if (!token) return
 
       await saveToken(token)
+      updateState((prev) => {
+        if (!prev) return prev
+        return { ...prev, activeAccountId: DefaultAccountId.Custodial }
+      })
 
       const profiles = await KeyStoreWrapper.getSessionProfiles()
 
@@ -112,7 +119,7 @@ export const useSaveSessionProfile = () => {
 
       await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
     },
-    [saveToken, tryFetchUserProps, fetchUsername, resetUpgradeModal, client],
+    [saveToken, updateState, tryFetchUserProps, fetchUsername, resetUpgradeModal, client],
   )
 
   const updateCurrentProfile = useCallback(async (): Promise<void> => {
