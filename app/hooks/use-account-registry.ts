@@ -14,8 +14,7 @@ import {
   DefaultAccountId,
   type AccountDescriptor,
 } from "@app/types/wallet.types"
-
-import { useAppConfig } from "./use-app-config"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const createCustodialDescriptor = (label: string): AccountDescriptor => ({
   id: DefaultAccountId.Custodial,
@@ -59,7 +58,6 @@ export const useAccountRegistry = (): AccountRegistryResult => {
   const isAuthed = useIsAuthed()
   const { nonCustodialEnabled } = useFeatureFlags()
   const { persistentState, updateState } = usePersistentStateContext()
-  const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()
 
   const [selfCustodialEntries, setSelfCustodialEntries] = useState<
@@ -71,6 +69,10 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     return [{ id, lightningAddress: null }]
   })
 
+  // KeyStore-derived so home agrees with switch-account when the live token has
+  // been cleared but a session profile is still saved.
+  const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
+
   const reloadSelfCustodialAccounts = useCallback(async () => {
     const entries = await listSelfCustodialAccounts()
     setSelfCustodialEntries(entries)
@@ -80,10 +82,20 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     reloadSelfCustodialAccounts()
   }, [reloadSelfCustodialAccounts, persistentState.activeAccountId])
 
+  useEffect(() => {
+    let mounted = true
+    KeyStoreWrapper.getSessionProfiles().then((profiles) => {
+      if (mounted) setHasStoredCustodialProfile(profiles.length > 0)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [persistentState.galoyAuthToken, persistentState.activeAccountId])
+
   const accounts = useMemo(() => {
     const list: AccountDescriptor[] = []
 
-    if (isAuthed) {
+    if (isAuthed || hasStoredCustodialProfile) {
       list.push(createCustodialDescriptor(LL.AccountTypeSelectionScreen.custodialLabel()))
     }
 
@@ -100,6 +112,7 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     return markSelected(list, persistentState.activeAccountId)
   }, [
     isAuthed,
+    hasStoredCustodialProfile,
     nonCustodialEnabled,
     selfCustodialEntries,
     persistentState.activeAccountId,
@@ -114,13 +127,8 @@ export const useAccountRegistry = (): AccountRegistryResult => {
         if (!prev) return prev
         return { ...prev, activeAccountId: id }
       })
-
-      const target = accounts.find((a) => a.id === id)
-      if (target?.type === AccountType.Custodial) {
-        saveToken(persistentState.galoyAuthToken)
-      }
     },
-    [accounts, updateState, saveToken, persistentState.galoyAuthToken],
+    [updateState],
   )
 
   return {

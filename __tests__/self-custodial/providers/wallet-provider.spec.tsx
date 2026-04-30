@@ -48,6 +48,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   default: {
     getMnemonicForAccount: (id: string) => mockGetMnemonicForAccount(id),
     getMnemonicNetworkForAccount: (id: string) => mockGetMnemonicNetworkForAccount(id),
+    getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
 }))
 
