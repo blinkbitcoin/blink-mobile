@@ -3540,6 +3540,7 @@
         "savedConfirm": "Už jsem ji uložil",
         "copy": "Kopírovat",
         "continueButton": "Pokračovat",
+        "selfCustodialDisabled": "Nesvěřenectví je dočasně nedostupné.",
         "testBackup": "Otestujte zálohu"
       },
       "Confirm": {

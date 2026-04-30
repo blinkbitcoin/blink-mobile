@@ -3499,6 +3499,7 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
+        "selfCustodialDisabled": "A nem-letétkezelés átmenetileg nem elérhető.",
         "testBackup": "Tesztelje a biztonsági másolatot"
       },
       "Confirm": {

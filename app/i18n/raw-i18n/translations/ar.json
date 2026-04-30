@@ -3537,6 +3537,7 @@
         "savedConfirm": "لقد حفظتها",
         "copy": "نسخ",
         "continueButton": "متابعة",
+        "selfCustodialDisabled": "الحفظ الذاتي غير متاح مؤقتًا.",
         "testBackup": "اختبر نسختك الاحتياطية"
       },
       "Confirm": {

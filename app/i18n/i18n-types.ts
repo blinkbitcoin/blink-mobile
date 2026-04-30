@@ -11780,6 +11780,10 @@ type RootTranslation = {
 		 */
 		continueButton: string
 		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		selfCustodialDisabled: string
+		/**
 		 * C​o​m​i​n​g​ ​s​o​o​n
 		 */
 		restoreComingSoonTitle: string
@@ -23883,6 +23887,10 @@ export type TranslationFunctions = {
 		 * Continue
 		 */
 		continueButton: () => LocalizedString
+		/**
+		 * Non-custodial is temporarily unavailable.
+		 */
+		selfCustodialDisabled: () => LocalizedString
 		/**
 		 * Coming soon
 		 */

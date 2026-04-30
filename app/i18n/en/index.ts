@@ -3712,6 +3712,7 @@ const en: BaseTranslation = {
     selfCustodialDescription: "Only you can access funds",
     chooseMethod: "Choose method",
     continueButton: "Continue",
+    selfCustodialDisabled: "Non-custodial is temporarily unavailable.",
     restoreComingSoonTitle: "Coming soon",
     restoreComingSoonDescription:
       "Restore flow will be available in a future update.",

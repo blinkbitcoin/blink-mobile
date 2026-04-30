@@ -3540,6 +3540,7 @@
         "savedConfirm": "Spremio sam je",
         "copy": "Kopiraj",
         "continueButton": "Nastavi",
+        "selfCustodialDisabled": "Ne-skrbništvo je privremeno nedostupno.",
         "testBackup": "Testirajte sigurnosnu kopiju"
       },
       "Confirm": {

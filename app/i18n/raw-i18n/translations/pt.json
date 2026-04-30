@@ -3487,6 +3487,7 @@
                 "savedConfirm": "Já salvei",
                 "copy": "Copiar",
                 "continueButton": "Continuar",
+                "selfCustodialDisabled": "Não custodial está temporariamente indisponível.",
                 "testBackup": "Teste seu backup"
             },
             "Confirm": {

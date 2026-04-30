@@ -3540,6 +3540,7 @@
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
         "continueButton": "Doorgaan",
+        "selfCustodialDisabled": "Niet-bewaard is tijdelijk niet beschikbaar.",
         "testBackup": "Test je back-up"
       },
       "Confirm": {

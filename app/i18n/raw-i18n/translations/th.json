@@ -3537,6 +3537,7 @@
         "savedConfirm": "ฉันบันทึกแล้ว",
         "copy": "คัดลอก",
         "continueButton": "ดำเนินการต่อ",
+        "selfCustodialDisabled": "ไม่ฝากดูแลไม่พร้อมใช้งานชั่วคราว",
         "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
       },
       "Confirm": {

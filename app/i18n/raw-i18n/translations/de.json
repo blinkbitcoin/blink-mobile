@@ -3487,6 +3487,7 @@
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
                 "continueButton": "Weiter",
+                "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar.",
                 "testBackup": "Sicherung testen"
             },
             "Confirm": {
