@@ -159,7 +159,7 @@ export const SettingsScreen: React.FC = () => {
           name={LL.SettingsScreen.addressScreen()}
           items={items.waysToGetPaid}
         />
-        {isAtLeastLevelOne && (
+        {isAtLeastLevelOne && !isSelfCustodialMode && (
           <SettingsGroup
             name={LL.AccountScreen.loginMethods()}
             items={items.loginMethods}
