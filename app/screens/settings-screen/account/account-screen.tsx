@@ -2,30 +2,49 @@ import React, { useState, useCallback } from "react"
 import { ScrollView, RefreshControl } from "react-native-gesture-handler"
 
 import { Screen } from "@app/components/screen"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles } from "@rn-vui/themed"
 
+import { SettingsGroup } from "../group"
+
 import { AccountDeleteContextProvider } from "./account-delete-context"
+import { AccountBannerVertical } from "./banner-vertical"
 import { AccountId } from "./id"
 import { DangerZoneSettings } from "./settings/danger-zone"
 import { UpgradeAccountLevelOne } from "./settings/upgrade"
 import { UpgradeTrialAccount } from "./settings/upgrade-trial-account"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { AccountBannerVertical } from "./banner-vertical"
-import { SettingsGroup } from "../group"
-import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 export const AccountScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { activeAccount } = useAccountRegistry()
   const { updateCurrentProfile } = useSaveSessionProfile()
+  const {
+    refreshWallets: refreshSelfCustodialWallets,
+    updateCurrentSelfCustodialAccount,
+  } = useSelfCustodialWallet()
   const [refreshing, setRefreshing] = useState(false)
+
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    await updateCurrentProfile()
+    const work = isSelfCustodial
+      ? Promise.all([refreshSelfCustodialWallets(), updateCurrentSelfCustodialAccount()])
+      : updateCurrentProfile()
+    await work
     setRefreshing(false)
-  }, [updateCurrentProfile])
+  }, [
+    isSelfCustodial,
+    refreshSelfCustodialWallets,
+    updateCurrentSelfCustodialAccount,
+    updateCurrentProfile,
+  ])
 
   return (
     <AccountDeleteContextProvider>
