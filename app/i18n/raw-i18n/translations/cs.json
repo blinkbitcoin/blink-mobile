@@ -2173,7 +2173,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
     "autoConvertMinAmount": "Částky pod {minSats: number} satoshi nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
-    "autoConvertSuccess": "Přijato {amount: number} satoshi, převedeno na dolary.",
     "autoConvertFailed": "Platba přijata, ale konverze selhala."
   },
   "RedeemBitcoinScreen": {

@@ -2173,7 +2173,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
-    "autoConvertSuccess": "Đã nhận {amount: number} sats, đã chuyển đổi sang Đô la.",
     "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại."
   },
   "RedeemBitcoinScreen": {

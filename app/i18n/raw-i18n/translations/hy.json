@@ -2173,7 +2173,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
     "autoConvertMinAmount": "{minSats: number} սաթերից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
-    "autoConvertSuccess": "Ստացվեց {amount: number} սաթ, փոխարկվեց Դոլարի։",
     "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։"
   },
   "RedeemBitcoinScreen": {

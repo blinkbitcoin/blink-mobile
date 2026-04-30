@@ -2166,7 +2166,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Biaya deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit di atas {threshold} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
-    "autoConvertSuccess": "Diterima {amount: number} sats, dikonversi ke Dolar.",
     "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal."
   },
   "RedeemBitcoinScreen": {

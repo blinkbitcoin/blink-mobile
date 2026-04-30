@@ -6875,11 +6875,6 @@ type RootTranslation = {
 		 */
 		autoConvertMinAmount: RequiredParams<'minSats'>
 		/**
-		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}​ ​s​a​t​s​,​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​.
-		 * @param {number} amount
-		 */
-		autoConvertSuccess: RequiredParams<'amount'>
-		/**
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
 		 */
 		autoConvertFailed: string
@@ -19082,10 +19077,6 @@ export type TranslationFunctions = {
 		 * Amounts below {minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
 		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
-		/**
-		 * Received {amount} sats, converted to Dollar.
-		 */
-		autoConvertSuccess: (arg: { amount: number }) => LocalizedString
 		/**
 		 * Payment received but the conversion failed.
 		 */

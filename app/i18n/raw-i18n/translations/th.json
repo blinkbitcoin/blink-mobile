@@ -2173,7 +2173,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
     "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
-    "autoConvertSuccess": "ได้รับ {amount: number} satoshi แปลงเป็นดอลลาร์แล้ว",
     "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว"
   },
   "RedeemBitcoinScreen": {

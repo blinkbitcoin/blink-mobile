@@ -16,7 +16,6 @@ const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUsePriceConversion = jest.fn()
-const mockToastShow = jest.fn()
 
 jest.mock("@app/self-custodial/auto-convert", () => ({
   AutoConvertStatus: {
@@ -60,12 +59,12 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => mockUsePriceConversion(),
 }))
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({ LL: {} }),
-}))
-
+// Regression guard: the listener must stay silent. If anyone re-introduces a
+// toast on auto-convert outcomes, this mock crashes the test loudly.
 jest.mock("@app/utils/toast", () => ({
-  toastShow: (...args: unknown[]) => mockToastShow(...args),
+  toastShow: () => {
+    throw new Error("auto-convert listener must not surface a toast")
+  },
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
@@ -190,7 +189,6 @@ describe("useAutoConvertListener — live trigger", () => {
       intervalMs: baseRemoteConfig.autoConvertPollIntervalMs,
     })
     expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1dollar")
-    expect(mockToastShow).toHaveBeenCalled()
   })
 
   it("skips when the paid invoice has no pending record", async () => {
@@ -214,7 +212,6 @@ describe("useAutoConvertListener — live trigger", () => {
     })
 
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("drops the record without running when attempts reached the cap", async () => {
@@ -237,7 +234,6 @@ describe("useAutoConvertListener — live trigger", () => {
       expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1")
     })
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("re-reads attempts from storage so concurrent invocations agree on the cap (Important #2)", async () => {
@@ -284,10 +280,9 @@ describe("useAutoConvertListener — live trigger", () => {
       expect(mockExecuteAutoConvert).toHaveBeenCalled()
     })
     expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
-  it("drops the record silently on AlreadyConverted without any toast", async () => {
+  it("drops the record silently on AlreadyConverted", async () => {
     const sdk = makeSdk({
       getPayment: jest.fn().mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
     })
@@ -307,7 +302,6 @@ describe("useAutoConvertListener — live trigger", () => {
     await waitFor(() => {
       expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1")
     })
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("keeps the record on SkippedStableBalanceActive so a later toggle-off retries (Critical #8)", async () => {

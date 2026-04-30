@@ -11,10 +11,8 @@ import {
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
-import { toastShow } from "@app/utils/toast"
 
 import {
   AutoConvertStatus,
@@ -37,8 +35,8 @@ import { useSelfCustodialWallet } from "../providers/wallet-provider"
 
 /**
  * Drives BTC->USDB auto-convert for Lightning invoices flagged Dollar:
- * wait for payment completion, run convert under a retry+cooldown
- * policy, surface only the success toast (failures are silent).
+ * wait for payment completion, run convert under a retry+cooldown policy.
+ * Outcome surfacing is handled by the receiving screen, not by this hook.
  */
 
 /** Deduplicates concurrent triggers (live event + sync + mount replay). */
@@ -50,8 +48,6 @@ const ORPHAN_TIMEOUT_MS = 2 * 60 * 1000
 type ConvertMoneyAmount = NonNullable<
   ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
 >
-
-type LL = ReturnType<typeof useI18nContext>["LL"]
 
 const extractLightningInvoiceFromPayment = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
@@ -88,14 +84,6 @@ const isRetryableNow = (record: PendingAutoConvert, nowMs: number): boolean => {
   return elapsed >= RETRY_COOLDOWN_MS
 }
 
-const showConvertedToast = (satsReceived: number, LL: LL): void => {
-  toastShow({
-    message: (tr) => tr.ReceiveScreen.autoConvertSuccess({ amount: satsReceived }),
-    LL,
-    type: "success",
-  })
-}
-
 type RunAutoConvertParams = {
   sdk: BreezSdkInterface
   record: PendingAutoConvert
@@ -103,7 +91,6 @@ type RunAutoConvertParams = {
   satsReceived: number
   isStableBalanceActive: boolean
   convert: ConvertMoneyAmount
-  LL: LL
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
@@ -123,7 +110,6 @@ const runAutoConvert = async ({
   satsReceived,
   isStableBalanceActive,
   convert,
-  LL,
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
@@ -171,7 +157,6 @@ const runAutoConvert = async ({
     }
 
     await removePendingAutoConvert(record.paymentRequest)
-    showConvertedToast(satsReceived, LL)
     return
   }
 
@@ -230,7 +215,6 @@ export const useAutoConvertListener = (): void => {
   // Defaults unknown to not-active so existing records still process.
   const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
-  const { LL } = useI18nContext()
   const {
     autoConvertMaxAttempts,
     autoConvertPollMaxAttempts,
@@ -288,7 +272,6 @@ export const useAutoConvertListener = (): void => {
           satsReceived: toNumber(payment.amount),
           isStableBalanceActive,
           convert: convertMoneyAmount,
-          LL,
           maxAttempts: autoConvertMaxAttempts,
           waitOptions,
           amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
@@ -305,7 +288,6 @@ export const useAutoConvertListener = (): void => {
     lastReceivedPaymentId,
     isStableBalanceActive,
     convertMoneyAmount,
-    LL,
     autoConvertMaxAttempts,
     waitOptions,
     autoConvertAmountMatchToleranceBps,
@@ -361,7 +343,6 @@ export const useAutoConvertListener = (): void => {
             satsReceived: paid.amount,
             isStableBalanceActive,
             convert: convertMoneyAmount,
-            LL,
             maxAttempts: autoConvertMaxAttempts,
             waitOptions,
             amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
@@ -383,7 +364,6 @@ export const useAutoConvertListener = (): void => {
     sdk,
     convertMoneyAmount,
     isStableBalanceActive,
-    LL,
     autoConvertMaxAttempts,
     waitOptions,
     autoConvertAmountMatchToleranceBps,
