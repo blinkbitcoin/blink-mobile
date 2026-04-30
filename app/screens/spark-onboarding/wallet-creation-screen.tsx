@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
@@ -13,8 +13,11 @@ export const SparkWalletCreationScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const { status, create } = useCreateWallet()
+  const autoTriggeredRef = useRef(false)
 
   useEffect(() => {
+    if (autoTriggeredRef.current) return
+    autoTriggeredRef.current = true
     create()
   }, [create])
 
