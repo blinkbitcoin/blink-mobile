@@ -2708,6 +2708,8 @@
     "accountInformation": "Fiókadatok",
     "trialAccount": "Próba felhasználói fiók",
     "blinkUser": "Blink felhasználó",
+    "anonymous": "Névtelen",
+    "anonymousUser": "Névtelen felhasználó",
     "blinkToBlink": "Blinkről Blinkre",
     "transactionLimits": "Tranzakciós Limitek",
     "activateWallet": "Tárca Aktiválása",

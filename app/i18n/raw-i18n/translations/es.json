@@ -2707,6 +2707,8 @@
         "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
+        "anonymous": "Anónimo",
+        "anonymousUser": "Usuario anónimo",
         "transactionLimits": "Límites de la transacción",
         "activateWallet": "Activar billetera",
         "amountRequired": "Se requiere cantidad",

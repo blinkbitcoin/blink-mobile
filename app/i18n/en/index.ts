@@ -2826,6 +2826,8 @@ const en: BaseTranslation = {
     accountInformation: "Account Information",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
+    anonymous: "Anonymous",
+    anonymousUser: "Anonymous user",
     blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
