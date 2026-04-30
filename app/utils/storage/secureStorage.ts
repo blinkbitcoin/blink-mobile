@@ -208,6 +208,76 @@ export default class KeyStoreWrapper {
     }
   }
 
+  private static mnemonicKeyFor(accountId: string): string {
+    return `${KeyStoreWrapper.MNEMONIC}:${accountId}`
+  }
+
+  private static mnemonicNetworkKeyFor(accountId: string): string {
+    return `${KeyStoreWrapper.MNEMONIC_NETWORK}:${accountId}`
+  }
+
+  public static async getMnemonicForAccount(accountId: string): Promise<string | null> {
+    try {
+      return await RNSecureKeyStore.get(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    } catch {
+      return null
+    }
+  }
+
+  public static async setMnemonicForAccount(
+    accountId: string,
+    mnemonic: string,
+  ): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.mnemonicKeyFor(accountId), mnemonic, {
+        accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.mnemonicKeyFor(accountId))
+      await RNSecureKeyStore.remove(
+        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      ).catch(() => {})
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async getMnemonicNetworkForAccount(
+    accountId: string,
+  ): Promise<string | null> {
+    try {
+      return await RNSecureKeyStore.get(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    } catch {
+      return null
+    }
+  }
+
+  public static async setMnemonicNetworkForAccount(
+    accountId: string,
+    network: string,
+  ): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(
+        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+        network,
+        {
+          accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        },
+      )
+      return true
+    } catch {
+      return false
+    }
+  }
+
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {
     try {
       const profiles = await KeyStoreWrapper.getSessionProfiles()
