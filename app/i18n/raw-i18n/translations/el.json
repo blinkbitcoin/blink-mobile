@@ -3499,6 +3499,7 @@
         "savedConfirm": "Την αποθήκευσα",
         "copy": "Αντιγραφή",
         "continueButton": "Συνέχεια",
+        "selfCustodialDisabled": "Το μη-επιμελούμενο είναι προσωρινά μη διαθέσιμο.",
         "testBackup": "Δοκιμάστε το αντίγραφο ασφαλείας"
       },
       "Confirm": {

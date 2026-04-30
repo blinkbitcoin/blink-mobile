@@ -3528,6 +3528,7 @@
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
                 "continueButton": "Continuer",
+                "selfCustodialDisabled": "Non-custodial est temporairement indisponible.",
                 "testBackup": "Tester votre sauvegarde"
             },
             "Confirm": {

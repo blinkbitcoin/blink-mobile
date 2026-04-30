@@ -3499,6 +3499,7 @@
         "savedConfirm": "Am salvat-o",
         "copy": "Copiază",
         "continueButton": "Continuă",
+        "selfCustodialDisabled": "Non-custodial este temporar indisponibil.",
         "testBackup": "Testează-ți copia de rezervă"
       },
       "Confirm": {

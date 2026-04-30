@@ -3537,6 +3537,7 @@
         "savedConfirm": "Сачувао сам је",
         "copy": "Копирај",
         "continueButton": "Настави",
+        "selfCustodialDisabled": "Не-старатељство је привремено недоступно.",
         "testBackup": "Тестирајте резервну копију"
       },
       "Confirm": {

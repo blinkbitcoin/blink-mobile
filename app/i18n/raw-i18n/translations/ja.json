@@ -3528,6 +3528,7 @@
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
                 "continueButton": "続行",
+                "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。",
                 "testBackup": "バックアップをテスト"
             },
             "Confirm": {

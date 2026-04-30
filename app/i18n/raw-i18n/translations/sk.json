@@ -3499,6 +3499,7 @@
         "savedConfirm": "Už som ju uložil",
         "copy": "Kopírovať",
         "continueButton": "Pokračovať",
+        "selfCustodialDisabled": "Nezáväzná správa je dočasne nedostupná.",
         "testBackup": "Otestujte zálohu"
       },
       "Confirm": {

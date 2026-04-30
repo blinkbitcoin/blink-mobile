@@ -3499,6 +3499,7 @@
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
         "continueButton": "Continua",
+        "selfCustodialDisabled": "El no custodial no està disponible temporalment.",
         "testBackup": "Prova la teva còpia de seguretat"
       },
       "Confirm": {

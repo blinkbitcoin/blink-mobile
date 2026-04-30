@@ -3487,6 +3487,7 @@
                 "savedConfirm": "L'ho salvata",
                 "copy": "Copia",
                 "continueButton": "Continua",
+                "selfCustodialDisabled": "Non custodiale temporaneamente non disponibile.",
                 "testBackup": "Verifica il tuo backup"
             },
             "Confirm": {
