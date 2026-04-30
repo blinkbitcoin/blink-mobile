@@ -9,6 +9,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
 import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
+import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
@@ -30,6 +31,7 @@ type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
+  connectedAccountId: string | null
   isStableBalanceActive?: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
@@ -46,7 +48,10 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 
-export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
+export const useSdkLifecycle = (
+  activeSelfCustodialAccountId: string | null,
+  retryCount: number,
+): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [isStableBalanceActive, setIsStableBalanceActive] = useState<boolean>()
@@ -54,6 +59,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
+  const [connectedAccountId, setConnectedAccountId] = useState<string | null>(null)
   const sdkRef = useRef<BreezSdkInterface | null>(null)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
@@ -145,10 +151,16 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   }, [])
 
   useEffect(() => {
+    if (!activeSelfCustodialAccountId) {
+      setStatus(ActiveWalletStatus.Unavailable)
+      return
+    }
+
     let mounted = true
+    const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(mnemonic)
+      const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
       if (!mounted) {
         await disconnectSdk(connectedSdk)
         return
@@ -156,6 +168,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
       sdkRef.current = connectedSdk
       setSdk(connectedSdk)
+      setConnectedAccountId(accountId)
 
       await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
@@ -184,13 +197,13 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonic()
+      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
       if (!mnemonic) {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
 
-      const networkValid = await validateStoredNetwork()
+      const networkValid = await validateStoredNetwork(accountId)
       if (!networkValid) {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
@@ -218,9 +231,10 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         disconnectSdk(sdkRef.current)
         sdkRef.current = null
         setSdk(null)
+        setConnectedAccountId(null)
       }
     }
-  }, [retryCount, refreshWallets])
+  }, [retryCount, refreshWallets, activeSelfCustodialAccountId])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -280,6 +294,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     wallets,
     status,
     sdk,
+    connectedAccountId,
     isStableBalanceActive,
     lastReceivedPaymentId,
     hasMoreTransactions,

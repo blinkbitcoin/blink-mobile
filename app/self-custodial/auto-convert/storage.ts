@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
+
+import { reportError } from "@app/utils/error-logging"
 
 import type { AutoConvertPairing, PendingAutoConvert } from "./types"
 
@@ -12,10 +13,6 @@ const RECORD_TTL_MS = 24 * 60 * 60 * 1000
 /** Long enough for orphan replays; bounded so the persisted set stays small. */
 const PAIRING_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
-const reportError = (err: unknown, context: string): void => {
-  crashlytics().recordError(err instanceof Error ? err : new Error(`${context}: ${err}`))
-}
-
 const readAll = async (): Promise<PendingAutoConvert[]> => {
   try {
     const raw = await AsyncStorage.getItem(PENDING_STORAGE_KEY)
@@ -24,7 +21,7 @@ const readAll = async (): Promise<PendingAutoConvert[]> => {
     if (!Array.isArray(parsed)) return []
     return parsed.filter(isPendingAutoConvert).map(normalizeRecord)
   } catch (err) {
-    reportError(err, "auto-convert-storage: readAll failed")
+    reportError("auto-convert-storage readAll", err)
     return []
   }
 }
@@ -33,7 +30,7 @@ const writeAll = async (records: PendingAutoConvert[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(records))
   } catch (err) {
-    reportError(err, "auto-convert-storage: writeAll failed")
+    reportError("auto-convert-storage writeAll", err)
   }
 }
 
@@ -146,7 +143,7 @@ const readPairings = async (): Promise<AutoConvertPairing[]> => {
     if (!Array.isArray(parsed)) return []
     return parsed.filter(isAutoConvertPairing)
   } catch (err) {
-    reportError(err, "auto-convert-storage: readPairings failed")
+    reportError("auto-convert-storage readPairings", err)
     return []
   }
 }
@@ -155,7 +152,7 @@ const writePairings = async (pairings: AutoConvertPairing[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(PAIRINGS_STORAGE_KEY, JSON.stringify(pairings))
   } catch (err) {
-    reportError(err, "auto-convert-storage: writePairings failed")
+    reportError("auto-convert-storage writePairings", err)
   }
 }
 
