@@ -2190,7 +2190,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT",
     "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
-    "autoConvertSuccess": "Kufumene {amount: number} sats, kuguqulelwe kwi-Dollar.",
     "autoConvertFailed": "Intlawulo ifumenekile kodwa ukuguqulwa kusilele."
   },
   "RedeemBitcoinScreen": {

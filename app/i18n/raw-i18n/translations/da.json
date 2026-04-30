@@ -2169,7 +2169,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
     "autoConvertMinAmount": "Beløb under {minSats: number} sats kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
-    "autoConvertSuccess": "Modtog {amount: number} sats, konverteret til Dollar.",
     "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes."
   },
   "RedeemBitcoinScreen": {

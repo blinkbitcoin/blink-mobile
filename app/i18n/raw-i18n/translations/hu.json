@@ -2166,7 +2166,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
     "autoConvertMinAmount": "A {minSats: number} satoshi alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
-    "autoConvertSuccess": "{amount: number} satoshi beérkezett, Dollárra konvertálva.",
     "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült."
   },
   "RedeemBitcoinScreen": {

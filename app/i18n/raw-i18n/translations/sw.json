@@ -2166,7 +2166,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT",
     "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
-    "autoConvertSuccess": "Imepokelewa sats {amount: number}, zimebadilishwa kwa Dola.",
     "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa."
   },
   "RedeemBitcoinScreen": {

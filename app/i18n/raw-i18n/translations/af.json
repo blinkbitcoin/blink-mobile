@@ -2173,7 +2173,6 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT",
     "autoConvertMinAmount": "Bedrae onder {minSats: number} sats kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
-    "autoConvertSuccess": "{amount: number} sats ontvang, na Dollar omgeskakel.",
     "autoConvertFailed": "Betaling ontvang maar die omskakeling het misluk."
   },
   "RedeemBitcoinScreen": {
