@@ -84,6 +84,9 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
             <ListItem.Title numberOfLines={1} ellipsizeMode="middle">
               {rowTitle}
             </ListItem.Title>
+            <Text type="p3" style={styles.subtleText}>
+              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+            </Text>
           </ListItem.Content>
           <GaloyIconButton
             name="close"
@@ -119,6 +122,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   spacer: {
     width: 20,
+  },
+  subtleText: {
+    color: colors.grey2,
   },
   overlayStyle: {
     backgroundColor: "transparent",
