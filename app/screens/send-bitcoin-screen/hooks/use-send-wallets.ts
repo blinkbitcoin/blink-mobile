@@ -16,6 +16,7 @@ import {
 } from "@app/graphql/wallets-utils"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 import { type WalletState } from "@app/types/wallet.types"
 
 export const toWalletBalances = (wallets: WalletState[]): WalletBalance[] =>
@@ -61,8 +62,7 @@ export const useSendWallets = (): SendWallets => {
     const usd = selfCustodialWallets.find(
       ({ walletCurrency }) => walletCurrency === WalletCurrency.Usd,
     )
-    const preferred =
-      persistentState.selfCustodialDefaultWalletCurrency ?? WalletCurrency.Btc
+    const preferred = getSelfCustodialDefaultCurrency(persistentState)
     const defaultWallet = preferred === WalletCurrency.Usd ? usd ?? btc : btc
     return {
       wallets: selfCustodialWallets,

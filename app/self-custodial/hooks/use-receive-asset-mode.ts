@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 
 import { ReceiveAssetMode, ReceiveRail } from "../auto-convert"
 import { useSelfCustodialWallet } from "../providers/wallet-provider"
@@ -36,7 +37,7 @@ const resolveInitialMode = (
 export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const { isStableBalanceActive } = useSelfCustodialWallet()
   const { persistentState } = usePersistentStateContext()
-  const defaultCurrency = persistentState.selfCustodialDefaultWalletCurrency
+  const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
     resolveInitialMode(isStableBalanceActive, defaultCurrency),
