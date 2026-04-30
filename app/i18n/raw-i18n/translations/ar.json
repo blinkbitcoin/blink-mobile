@@ -2725,6 +2725,8 @@
     "accountInformation": "معلومات الحساب",
     "trialAccount": "حساب تجريبي",
     "blinkUser": "مستخدم Blink",
+    "anonymous": "مجهول",
+    "anonymousUser": "مستخدم مجهول",
     "blinkToBlink": "من Blink إلى Blink",
     "transactionLimits": "قيود المعاملات",
     "activateWallet": "تفعيل المحفظة",

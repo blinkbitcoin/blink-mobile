@@ -2708,6 +2708,8 @@
         "accountInformation": "Informações da Conta",
         "trialAccount": "Conta teste",
         "blinkUser": "Usuário Blink",
+        "anonymous": "Anónimo",
+        "anonymousUser": "Utilizador anónimo",
         "blinkToBlink": "Blink para Blink",
         "transactionLimits": "Limites de transação",
         "activateWallet": "Ativar Carteira",

@@ -2725,6 +2725,8 @@
         "accountInformation": "アカウント情報",
         "trialAccount": "トライアルアカウント",
         "blinkUser": "Blinkユーザー",
+        "anonymous": "匿名",
+        "anonymousUser": "匿名ユーザー",
         "blinkToBlink": "Blink から Blink へ",
         "transactionLimits": "トランザクション限度額",
         "activateWallet": "ウォレットを有効化する",
