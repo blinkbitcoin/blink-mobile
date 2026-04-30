@@ -24,6 +24,8 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-token"
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
+
+import { useEffectiveAuthToken } from "./use-effective-auth-token"
 import { ensureLocaleLoaded } from "@app/i18n/lazy-locale-loader"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
@@ -72,6 +74,7 @@ const getAuthorizationHeader = (token: string): string => {
 
 const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   const { appConfig } = useAppConfig()
+  const effectiveToken = useEffectiveAuthToken()
 
   const [networkError, setNetworkError] = useState<NetworkError | undefined>(undefined)
   const hasNetworkErrorRef = useRef<boolean>(false)
@@ -88,7 +91,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      const token = appConfig.token
+      const token = effectiveToken
 
       console.log(
         `creating new apollo client, token: ${Boolean(token)}, uri: ${
@@ -286,9 +289,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       const currentVersion = await loadString(SCHEMA_VERSION_KEY)
 
       if (currentVersion === SCHEMA_VERSION) {
-        // If the current version matches the latest version,
-        // we're good to go and can restore the cache.
-        await persistor.restore()
+        // Skip restore in self-custodial mode so the persisted custodial cache cannot leak.
+        if (token) {
+          await persistor.restore()
+        }
       } else {
         // Otherwise, we'll want to purge the outdated persisted cache
         // and mark ourselves as having updated to the latest version.
@@ -298,7 +302,9 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         await saveString(SCHEMA_VERSION_KEY, SCHEMA_VERSION)
       }
 
-      client.onClearStore(persistor.purge)
+      if (token) {
+        client.onClearStore(persistor.purge)
+      }
 
       setApolloClient({
         client,
@@ -308,7 +314,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       return () => client.cache.reset()
     })()
-  }, [appConfig.token, appConfig.galoyInstance, clearNetworkError])
+  }, [effectiveToken, appConfig.galoyInstance, clearNetworkError])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
