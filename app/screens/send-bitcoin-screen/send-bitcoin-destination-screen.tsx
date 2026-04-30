@@ -35,6 +35,7 @@ import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useSelfCustodialContactList } from "@app/hooks/use-self-custodial-contact-list"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { parseSparkAddress } from "@app/self-custodial/bridge"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
@@ -204,9 +205,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     () => data?.globals?.network ?? unauthedData?.globals?.network,
     [data?.globals?.network, unauthedData?.globals?.network],
   )
+  const selfCustodialContacts = useSelfCustodialContactList(isSelfCustodial)
   const contacts = useMemo(
-    () => (isSelfCustodial ? [] : data?.me?.contacts ?? []),
-    [isSelfCustodial, data?.me?.contacts],
+    () => (isSelfCustodial ? selfCustodialContacts : data?.me?.contacts ?? []),
+    [isSelfCustodial, selfCustodialContacts, data?.me?.contacts],
   )
   const contactHandleSet = useMemo(
     () => new Set(contacts.map((contact) => normalizeString(contact.handle))),
