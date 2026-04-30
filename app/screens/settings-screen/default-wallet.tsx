@@ -15,6 +15,10 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import {
+  getSelfCustodialDefaultCurrency,
+  withSelfCustodialDefaultCurrency,
+} from "@app/store/persistent-state/self-custodial-default-currency"
 import { AccountType } from "@app/types/wallet.types"
 
 import { Screen } from "../../components/screen"
@@ -164,13 +168,10 @@ const SelfCustodialDefaultWallet: React.FC = () => {
   const { LL } = useI18nContext()
   const { persistentState, updateState } = usePersistentStateContext()
 
-  const selectedCurrency =
-    persistentState.selfCustodialDefaultWalletCurrency ?? WalletCurrency.Btc
+  const selectedCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const setCurrency = (currency: "BTC" | "USD") => {
-    updateState(
-      (prev) => prev && { ...prev, selfCustodialDefaultWalletCurrency: currency },
-    )
+    updateState((prev) => prev && withSelfCustodialDefaultCurrency(prev, currency))
   }
 
   const options: ReadonlyArray<WalletOption> = [

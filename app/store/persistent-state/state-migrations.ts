@@ -53,8 +53,21 @@ type PersistentState_9 = {
   selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
 }
 
-const migrate9ToCurrent = (state: PersistentState_9): Promise<PersistentState> =>
+type PersistentState_10 = {
+  schemaVersion: 10
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  // Legacy fallback for pre-schema-10 users; new writes go to the per-account map.
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+}
+
+const migrate10ToCurrent = (state: PersistentState_10): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate9ToCurrent = (state: PersistentState_9): Promise<PersistentState> =>
+  migrate10ToCurrent({ ...state, schemaVersion: 10 })
 
 const migrate8ToCurrent = (state: PersistentState_8): Promise<PersistentState> =>
   migrate9ToCurrent({ ...state, schemaVersion: 9 })
@@ -136,6 +149,7 @@ type StateMigrations = {
   7: (state: PersistentState_7) => Promise<PersistentState>
   8: (state: PersistentState_8) => Promise<PersistentState>
   9: (state: PersistentState_9) => Promise<PersistentState>
+  10: (state: PersistentState_10) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -146,12 +160,13 @@ const stateMigrations: StateMigrations = {
   7: migrate7ToCurrent,
   8: migrate8ToCurrent,
   9: migrate9ToCurrent,
+  10: migrate10ToCurrent,
 }
 
-export type PersistentState = PersistentState_9
+export type PersistentState = PersistentState_10
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 9,
+  schemaVersion: 10,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -163,7 +178,7 @@ export const migrateAndGetPersistentState = async (
   data: any,
 ): Promise<PersistentState> => {
   if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 = data.schemaVersion
+    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 = data.schemaVersion
     try {
       const migration = stateMigrations[schemaVersion]
       const persistentState = await migration(data)

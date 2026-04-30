@@ -10,6 +10,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 import { AccountType } from "@app/types/wallet.types"
 
 import { SettingsRow } from "../row"
@@ -30,8 +31,7 @@ export const DefaultWallet: React.FC = () => {
       ? WalletCurrency.Btc
       : WalletCurrency.Usd
 
-  const selfCustodialDefaultCurrency =
-    persistentState.selfCustodialDefaultWalletCurrency ?? WalletCurrency.Btc
+  const selfCustodialDefaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const selectedCurrency = isSelfCustodial
     ? selfCustodialDefaultCurrency
