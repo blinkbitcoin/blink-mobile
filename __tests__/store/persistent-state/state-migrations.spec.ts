@@ -3,8 +3,8 @@ import {
   migrateAndGetPersistentState,
 } from "@app/store/persistent-state/state-migrations"
 
-describe("state-migrations schema 7", () => {
-  it("migrates schema 6 to 7 with activeAccountId undefined", async () => {
+describe("state-migrations schema 9", () => {
+  it("migrates schema 6 to 9 with activeAccountId undefined", async () => {
     const state6 = {
       schemaVersion: 6,
       galoyInstance: { id: "Main" },
@@ -13,7 +13,7 @@ describe("state-migrations schema 7", () => {
 
     const result = await migrateAndGetPersistentState(state6)
 
-    expect(result.schemaVersion).toBe(7)
+    expect(result.schemaVersion).toBe(9)
     expect(result.galoyAuthToken).toBe("test-token")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -29,11 +29,11 @@ describe("state-migrations schema 7", () => {
 
     const result = await migrateAndGetPersistentState(state7)
 
-    expect(result.schemaVersion).toBe(7)
+    expect(result.schemaVersion).toBe(9)
     expect(result.activeAccountId).toBe("custodial-default")
   })
 
-  it("migrates schema 5 through to 7", async () => {
+  it("migrates schema 5 through to 9", async () => {
     const state5 = {
       schemaVersion: 5,
       galoyInstance: { id: "Main" },
@@ -42,7 +42,7 @@ describe("state-migrations schema 7", () => {
 
     const result = await migrateAndGetPersistentState(state5)
 
-    expect(result.schemaVersion).toBe(7)
+    expect(result.schemaVersion).toBe(9)
     expect(result.galoyAuthToken).toBe("old-token")
     expect(result.activeAccountId).toBeUndefined()
   })
@@ -59,7 +59,7 @@ describe("state-migrations schema 7", () => {
     expect(result).toEqual(defaultPersistentState)
   })
 
-  it("migrates schema 4 through to 7", async () => {
+  it("migrates schema 4 through to 9", async () => {
     const state4 = {
       schemaVersion: 4,
       hasShownStableSatsWelcome: false,
@@ -82,13 +82,13 @@ describe("state-migrations schema 7", () => {
 
     const result = await migrateAndGetPersistentState(state4)
 
-    expect(result.schemaVersion).toBe(7)
+    expect(result.schemaVersion).toBe(9)
     expect(result.galoyAuthToken).toBe("token-v4")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("migrates schema 3 through full chain to 7", async () => {
+  it("migrates schema 3 through full chain to 9", async () => {
     const state3 = {
       schemaVersion: 3,
       hasShownStableSatsWelcome: false,
@@ -111,14 +111,14 @@ describe("state-migrations schema 7", () => {
 
     const result = await migrateAndGetPersistentState(state3)
 
-    expect(result.schemaVersion).toBe(7)
+    expect(result.schemaVersion).toBe(9)
     expect(result.galoyAuthToken).toBe("token-v3")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("default state has schema version 7", () => {
-    expect(defaultPersistentState.schemaVersion).toBe(7)
+  it("default state has schema version 9", () => {
+    expect(defaultPersistentState.schemaVersion).toBe(9)
     expect(defaultPersistentState.activeAccountId).toBeUndefined()
   })
 })

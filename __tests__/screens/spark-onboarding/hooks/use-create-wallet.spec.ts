@@ -11,9 +11,22 @@ const mockDispatch = jest.fn()
 const mockRecordError = jest.fn()
 const mockReinitSdk = jest.fn()
 const mockResetBackupState = jest.fn()
+const mockReloadSelfCustodialAccounts = jest.fn()
+
+const TEST_ACCOUNT_ID = "test-account-id-123"
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomUUID: () => "test-account-id-123",
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: () => mockCreateWallet(),
+  selfCustodialCreateWallet: (accountId: string) => mockCreateWallet(accountId),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+  }),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -44,7 +57,8 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 describe("useCreateWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCreateWallet.mockResolvedValue("word1 word2 word3")
+    mockCreateWallet.mockResolvedValue(undefined)
+    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
   it("starts with idle status", () => {
@@ -87,7 +101,7 @@ describe("useCreateWallet", () => {
     expect(updater(null)).toBeNull()
     expect(updater({ galoyAuthToken: "t" })).toEqual({
       galoyAuthToken: "t",
-      activeAccountId: "self-custodial-default",
+      activeAccountId: TEST_ACCOUNT_ID,
     })
   })
 

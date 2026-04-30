@@ -6,6 +6,10 @@ import {
   useBackupState,
   BackupStatus,
 } from "@app/self-custodial/providers/backup-state-provider"
+import { AccountType, AccountStatus } from "@app/types/wallet.types"
+
+const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
+const BACKUP_KEY = `backupState:${TEST_SC_ACCOUNT_ID}`
 
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
@@ -13,6 +17,26 @@ const mockSetItem = jest.fn()
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: (...args: unknown[]) => mockGetItem(...args),
   setItem: (...args: unknown[]) => mockSetItem(...args),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: {
+      id: TEST_SC_ACCOUNT_ID,
+      type: AccountType.SelfCustodial,
+      label: "Spark",
+      selected: true,
+      status: AccountStatus.RequiresRestore,
+    },
+    accounts: [],
+    selfCustodialEntries: [{ id: TEST_SC_ACCOUNT_ID, lightningAddress: null }],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn().mockResolvedValue(undefined),
+  }),
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
 }))
 
 const wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
@@ -26,8 +50,10 @@ describe("BackupStateProvider", () => {
     mockSetItem.mockResolvedValue(undefined)
   })
 
-  it("provides default state when no persisted data", () => {
+  it("provides default state when no persisted data", async () => {
     const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
 
     expect(result.current.backupState.status).toBe(BackupStatus.None)
     expect(result.current.backupState.method).toBeNull()
@@ -42,12 +68,15 @@ describe("BackupStateProvider", () => {
 
     await act(async () => {})
 
+    expect(mockGetItem).toHaveBeenCalledWith(BACKUP_KEY)
     expect(result.current.backupState.status).toBe(BackupStatus.Completed)
     expect(result.current.backupState.method).toBe("cloud")
   })
 
-  it("sets backup completed and persists", async () => {
+  it("sets backup completed and persists under the accountId key", async () => {
     const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
 
     await act(async () => {
       result.current.setBackupCompleted("manual")
@@ -56,7 +85,7 @@ describe("BackupStateProvider", () => {
     expect(result.current.backupState.status).toBe(BackupStatus.Completed)
     expect(result.current.backupState.method).toBe("manual")
     expect(mockSetItem).toHaveBeenCalledWith(
-      "backupState",
+      BACKUP_KEY,
       JSON.stringify({ status: "completed", method: "manual" }),
     )
   })
@@ -83,6 +112,8 @@ describe("BackupStateProvider", () => {
 
   it("resets backup state and persists", async () => {
     const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
 
     await act(async () => {
       result.current.setBackupCompleted("keychain")

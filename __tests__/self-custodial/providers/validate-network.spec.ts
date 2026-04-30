@@ -1,11 +1,11 @@
 import { validateStoredNetwork } from "@app/self-custodial/providers/validate-network"
 
-const mockGetMnemonicNetwork = jest.fn()
+const mockGetMnemonicNetworkForAccount = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getMnemonicNetwork: () => mockGetMnemonicNetwork(),
+    getMnemonicNetworkForAccount: (id: string) => mockGetMnemonicNetworkForAccount(id),
   },
 }))
 
@@ -28,20 +28,20 @@ describe("validateStoredNetwork", () => {
   })
 
   it("returns true when no stored network (legacy wallets)", async () => {
-    mockGetMnemonicNetwork.mockResolvedValue(null)
+    mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
 
-    expect(await validateStoredNetwork()).toBe(true)
+    expect(await validateStoredNetwork("test-account-id")).toBe(true)
   })
 
   it("returns true when stored network matches config", async () => {
-    mockGetMnemonicNetwork.mockResolvedValue("regtest")
+    mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
 
-    expect(await validateStoredNetwork()).toBe(true)
+    expect(await validateStoredNetwork("test-account-id")).toBe(true)
   })
 
   it("returns false on network mismatch", async () => {
-    mockGetMnemonicNetwork.mockResolvedValue("mainnet")
+    mockGetMnemonicNetworkForAccount.mockResolvedValue("mainnet")
 
-    expect(await validateStoredNetwork()).toBe(false)
+    expect(await validateStoredNetwork("test-account-id")).toBe(false)
   })
 })

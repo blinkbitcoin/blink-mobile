@@ -1,10 +1,11 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
-import { AccountType, DefaultAccountId } from "@app/types/wallet.types"
-import { BackupStatus } from "@app/self-custodial/providers/backup-state-provider"
+import { AccountStatus, AccountType } from "@app/types/wallet.types"
 
 import { SelfCustodialProfileRow } from "@app/screens/settings-screen/account/multi-account/self-custodial-profile-row"
+
+const TEST_ENTRY_ID = "test-account-id"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
@@ -37,7 +38,7 @@ jest.mock("@rn-vui/themed", () => {
         Content: ({ children }: { children: React.ReactNode }) =>
           React.createElement("ListItemContent", null, children),
         Title: ({ children }: { children: React.ReactNode }) =>
-          React.createElement("ListItemTitle", null, children),
+          React.createElement("Text", null, children),
       },
     ),
     Overlay: ({
@@ -115,6 +116,11 @@ jest.mock("@app/components/atomic/galoy-secondary-button", () => {
   }
 })
 
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: mockNavigate }),
+}))
+
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
@@ -123,12 +129,6 @@ jest.mock("@app/utils/toast", () => ({
 const mockUseAccountRegistry = jest.fn()
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
-}))
-
-const mockUseBackupState = jest.fn()
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
-  BackupStatus: { Completed: "completed", Pending: "pending" },
-  useBackupState: () => mockUseBackupState(),
 }))
 
 const mockDeleteWallet = jest.fn()
@@ -153,8 +153,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         title: () => "Delete wallet",
         warning: () => "This action is destructive",
         recoveryNote: () => "Make sure you have your backup",
-        backupBadgeCompleted: () => "Backup ready",
-        backupBadgeMissing: () => "Backup missing",
       },
       AccountScreen: {
         pleaseWait: () => "Please wait",
@@ -166,79 +164,95 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: {
         confirm: () => "Confirm",
         cancel: () => "Cancel",
+        anonymous: () => "Anonymous",
       },
     },
   }),
 }))
 
-describe("SelfCustodialProfileRow", () => {
-  const setActiveAccountId = jest.fn()
+const setActiveAccountId = jest.fn()
 
+describe("SelfCustodialProfileRow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseBackupState.mockReturnValue({
-      backupState: { status: BackupStatus.Completed },
-    })
     mockUseDeleteSelfCustodial.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
     })
     mockUseAccountRegistry.mockReturnValue({
-      accounts: [
-        { id: DefaultAccountId.SelfCustodial, type: AccountType.SelfCustodial },
-        { id: DefaultAccountId.Custodial, type: AccountType.Custodial },
-      ],
-      activeAccount: { id: DefaultAccountId.Custodial, type: AccountType.Custodial },
+      activeAccount: {
+        id: "current-custodial-id",
+        type: AccountType.Custodial,
+        label: "Blink",
+        selected: true,
+        status: AccountStatus.Available,
+      },
       setActiveAccountId,
     })
   })
 
-  it("renders nothing when there is no self-custodial account in the registry", () => {
-    mockUseAccountRegistry.mockReturnValue({
-      accounts: [{ id: DefaultAccountId.Custodial, type: AccountType.Custodial }],
-      activeAccount: { id: DefaultAccountId.Custodial, type: AccountType.Custodial },
-      setActiveAccountId,
-    })
+  it("renders the lightning address as the row title when one is set", () => {
+    const { getByText } = render(
+      <SelfCustodialProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@example.com" }}
+      />,
+    )
 
-    const { queryByTestId } = render(<SelfCustodialProfileRow />)
-
-    expect(queryByTestId("self-custodial-profile-row")).toBeNull()
+    expect(getByText("alice@example.com")).toBeTruthy()
   })
 
-  it("switches to the self-custodial account when the row is pressed", () => {
-    const { getByTestId } = render(<SelfCustodialProfileRow />)
+  it("falls back to anonymous label when no lightning address is set", () => {
+    const { getByText } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
 
-    fireEvent.press(getByTestId("self-custodial-profile-row"))
+    expect(getByText("Anonymous")).toBeTruthy()
+  })
 
-    expect(setActiveAccountId).toHaveBeenCalledWith(DefaultAccountId.SelfCustodial)
+  it("switches to the entry's account id when the row is pressed", () => {
+    const { getByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    fireEvent.press(getByTestId(`self-custodial-profile-row-${TEST_ENTRY_ID}`))
+
+    expect(setActiveAccountId).toHaveBeenCalledWith(TEST_ENTRY_ID)
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success", message: "Switched accounts" }),
     )
+    expect(mockNavigate).toHaveBeenCalledWith("Primary")
   })
 
-  it("does not switch when the self-custodial account is already selected", () => {
+  it("does not switch when the entry is the active self-custodial account", () => {
     mockUseAccountRegistry.mockReturnValue({
-      accounts: [{ id: DefaultAccountId.SelfCustodial, type: AccountType.SelfCustodial }],
       activeAccount: {
-        id: DefaultAccountId.SelfCustodial,
+        id: TEST_ENTRY_ID,
         type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
       },
       setActiveAccountId,
     })
 
-    const { getByTestId } = render(<SelfCustodialProfileRow />)
-    fireEvent.press(getByTestId("self-custodial-profile-row"))
+    const { getByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    fireEvent.press(getByTestId(`self-custodial-profile-row-${TEST_ENTRY_ID}`))
 
     expect(setActiveAccountId).not.toHaveBeenCalled()
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("opens the delete modal and keeps the confirm button disabled until the user types delete", () => {
-    const { getByTestId, queryByTestId } = render(<SelfCustodialProfileRow />)
+    const { getByTestId, queryByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
 
     expect(queryByTestId("delete-modal")).toBeNull()
 
-    fireEvent.press(getByTestId("self-custodial-delete-button"))
+    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
     expect(getByTestId("delete-modal")).toBeTruthy()
 
     fireEvent.press(getByTestId("self-custodial-delete-confirm"))
@@ -248,6 +262,7 @@ describe("SelfCustodialProfileRow", () => {
     fireEvent.press(getByTestId("self-custodial-delete-confirm"))
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+    expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_ENTRY_ID)
   })
 
   it("renders the deleting overlay when the delete hook is in deleting state", () => {
@@ -256,18 +271,10 @@ describe("SelfCustodialProfileRow", () => {
       deleteWallet: mockDeleteWallet,
     })
 
-    const { getByTestId } = render(<SelfCustodialProfileRow />)
+    const { getByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
 
     expect(getByTestId("delete-overlay")).toBeTruthy()
-  })
-
-  it("shows the missing-backup label when the wallet has no completed backup", () => {
-    mockUseBackupState.mockReturnValue({
-      backupState: { status: BackupStatus.Pending },
-    })
-
-    const { getByText } = render(<SelfCustodialProfileRow />)
-
-    expect(getByText("Backup missing")).toBeTruthy()
   })
 })
