@@ -38,6 +38,7 @@ import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { TrustModelModal } from "@app/components/trust-model-modal"
@@ -47,6 +48,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
+import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
@@ -176,8 +178,13 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
-  const { refreshWallets: refreshSelfCustodialWallets, isStableBalanceActive } =
-    useSelfCustodialWallet()
+  const {
+    refreshWallets: refreshSelfCustodialWallets,
+    isStableBalanceActive,
+    lightningAddress: selfCustodialLightningAddress,
+  } = useSelfCustodialWallet()
+  const { accounts } = useAccountRegistry()
+  const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
@@ -253,7 +260,15 @@ export const HomeScreen: React.FC = () => {
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
-  const usernameTitle = username || phone || LL.common.blinkUser()
+  const selfCustodialFallbackTitle = hasMultipleAccounts ? LL.common.anonymousUser() : ""
+
+  const selfCustodialUsername = extractLightningAddressUsername(
+    selfCustodialLightningAddress,
+  )
+  const usernameTitle = isSelfCustodial
+    ? selfCustodialUsername ?? selfCustodialFallbackTitle
+    : username || phone || LL.common.blinkUser()
+  const canSwitchAccount = isSelfCustodial ? hasMultipleAccounts : isAtLeastLevelOne
 
   const wallets = isSelfCustodial
     ? activeWallet.wallets.map((w) => ({
@@ -540,10 +555,10 @@ export const HomeScreen: React.FC = () => {
           />
           <View>
             {!loading && usernameTitle && (
-              <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
+              <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
                   <Text type="p2">{usernameTitle}</Text>
-                  {isAtLeastLevelOne && <GaloyIcon name={"caret-down"} size={18} />}
+                  {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
             )}
