@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 import { ActivityIndicator, TextInput, TouchableOpacity, View } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
 import Modal from "react-native-modal"
 import { ListItem, makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
@@ -10,42 +12,40 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
-import { AccountType, DefaultAccountId } from "@app/types/wallet.types"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
+import { AccountType } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
 import { useDeleteSelfCustodial } from "./hooks/use-delete-self-custodial"
 
 type SelfCustodialProfileRowProps = {
+  entry: SelfCustodialAccountEntry
   isFirstItem?: boolean
 }
 
 export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = ({
+  entry,
   isFirstItem,
 }) => {
+  const { id: accountId, lightningAddress } = entry
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const { accounts, activeAccount, setActiveAccountId } = useAccountRegistry()
-  const { backupState } = useBackupState()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { activeAccount, setActiveAccountId } = useAccountRegistry()
   const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmText, setConfirmText] = useState("")
   const [modalVisible, setModalVisible] = useState(false)
 
-  const selfCustodialAccount = accounts.find((a) => a.type === AccountType.SelfCustodial)
-
-  if (!selfCustodialAccount) return null
-
-  const selected = activeAccount?.type === AccountType.SelfCustodial
-  const isBackedUp = backupState.status === BackupStatus.Completed
+  const isActive =
+    activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
+  const rowTitle = lightningAddress ?? LL.common.anonymous()
 
   const closeModal = () => {
     setModalVisible(false)
@@ -53,18 +53,19 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   }
 
   const handleSwitch = () => {
-    if (selected) return
-    setActiveAccountId(DefaultAccountId.SelfCustodial)
+    if (isActive) return
+    setActiveAccountId(accountId)
     toastShow({
       type: "success",
       message: LL.ProfileScreen.switchAccount(),
       LL,
     })
+    navigation.navigate("Primary")
   }
 
   const handleDelete = async () => {
     closeModal()
-    await deleteWallet()
+    await deleteWallet(accountId)
   }
 
   const userWroteDelete =
@@ -118,25 +119,23 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
     <>
       <TouchableOpacity
         onPress={handleSwitch}
-        {...testProps("self-custodial-profile-row")}
+        {...testProps(`self-custodial-profile-row-${accountId}`)}
       >
         <ListItem
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
-          {selected ? (
+          {isActive ? (
             <GaloyIcon name="check-circle" size={20} color={colors._green} />
           ) : (
             <View style={styles.spacer} />
           )}
           <ListItem.Content>
-            <ListItem.Title>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+            <ListItem.Title numberOfLines={1} ellipsizeMode="middle">
+              {rowTitle}
             </ListItem.Title>
             <Text type="p3" style={styles.subtleText}>
-              {isBackedUp
-                ? LL.SelfCustodialDelete.backupBadgeCompleted()
-                : LL.SelfCustodialDelete.backupBadgeMissing()}
+              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
             </Text>
           </ListItem.Content>
           <GaloyIconButton
@@ -144,7 +143,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
             size="small"
             onPress={() => setModalVisible(true)}
             backgroundColor={colors.grey4}
-            {...testProps("self-custodial-delete-button")}
+            {...testProps(`self-custodial-delete-button-${accountId}`)}
           />
         </ListItem>
       </TouchableOpacity>

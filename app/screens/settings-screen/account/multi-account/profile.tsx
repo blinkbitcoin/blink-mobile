@@ -3,11 +3,12 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { ListItem, makeStyles, Overlay, useTheme, Text } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useState } from "react"
 import { useAppConfig } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { testProps } from "@app/utils/testProps"
 import useLogout from "@app/hooks/use-logout"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -15,6 +16,7 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-
 import Modal from "react-native-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { DefaultAccountId, AccountType } from "@app/types/wallet.types"
 import { toastShow } from "@app/utils/toast"
 
 export const ProfileScreen: React.FC<ProfileProps> = ({
@@ -40,10 +42,13 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 
   const { saveToken } = useAppConfig()
   const { logout } = useLogout()
+  const { accounts, activeAccount, setActiveAccountId } = useAccountRegistry()
+  const isCurrentlyActive = selected && activeAccount?.type === AccountType.Custodial
 
   const handleProfileSwitch = async (nextToken?: string) => {
     setSwitchLoading(true)
     await saveToken(nextToken || token)
+    setActiveAccountId(DefaultAccountId.Custodial)
 
     setSwitchLoading(false)
     toastShow({
@@ -54,35 +59,60 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
     navigation.navigate("Primary")
   }
 
+  const fallbackSelfCustodial = accounts.find((a) => a.type === AccountType.SelfCustodial)
+
+  type LogoutStrategy =
+    | { kind: "switchToOtherCustodial"; nextToken: string }
+    | { kind: "fallbackToSelfCustodial"; selfCustodialId: string }
+    | { kind: "resetToLaunch" }
+    | { kind: "removeInactive" }
+
+  const resolveLogoutStrategy = (): LogoutStrategy => {
+    if (!isCurrentlyActive) return { kind: "removeInactive" }
+    if (nextProfileToken) {
+      return { kind: "switchToOtherCustodial", nextToken: nextProfileToken }
+    }
+    if (fallbackSelfCustodial) {
+      return {
+        kind: "fallbackToSelfCustodial",
+        selfCustodialId: fallbackSelfCustodial.id,
+      }
+    }
+    return { kind: "resetToLaunch" }
+  }
+
   const handleLogout = async () => {
     closeModal()
     setLogoutLoading(true)
 
-    const shouldSwitchProfile = selected && nextProfileToken
-    const shouldLogoutAndReset = selected && !nextProfileToken
+    const strategy = resolveLogoutStrategy()
 
-    if (shouldSwitchProfile) {
-      await logout({ stateToDefault: false, token })
-      await handleProfileSwitch(nextProfileToken)
-      toastShow({
-        type: "success",
-        message: LL.ProfileScreen.removedAccount({ identifier }),
-        LL,
-      })
-      return
+    switch (strategy.kind) {
+      case "switchToOtherCustodial":
+        await logout({ stateToDefault: false, token })
+        await handleProfileSwitch(strategy.nextToken)
+        toastShow({
+          type: "success",
+          message: LL.ProfileScreen.removedAccount({ identifier }),
+          LL,
+        })
+        return
+      case "fallbackToSelfCustodial":
+        setActiveAccountId(strategy.selfCustodialId)
+        await saveToken("")
+        navigation.dispatch(
+          CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
+        )
+        logout({ stateToDefault: false, token }).catch(() => {})
+        return
+      case "resetToLaunch":
+        await logout()
+        navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
+        return
+      case "removeInactive":
+        await logout({ stateToDefault: false, token })
+        navigation.navigate("Primary")
     }
-
-    if (shouldLogoutAndReset) {
-      await logout()
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
-      return
-    }
-
-    await logout({ stateToDefault: false, token })
-    navigation.navigate("Primary")
   }
 
   const closeModal = () => {
@@ -139,7 +169,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
-          {selected ? (
+          {isCurrentlyActive ? (
             <GaloyIcon name="check-circle" size={20} color={colors._green} />
           ) : (
             <View style={styles.spacerStyle} />
@@ -148,6 +178,9 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
             <ListItem.Title>
               {hasUsername ? `${identifier}@${lnAddressHostname}` : identifier}
             </ListItem.Title>
+            <Text type="p3" style={styles.subtitle}>
+              {LL.AccountTypeSelectionScreen.custodialLabel()}
+            </Text>
           </ListItem.Content>
           {logoutLoading ? (
             <ActivityIndicator size="small" color={colors.primary} />
@@ -186,6 +219,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   spacerStyle: {
     width: 20,
+  },
+  subtitle: {
+    color: colors.grey2,
   },
   modalView: {
     marginHorizontal: 20,
