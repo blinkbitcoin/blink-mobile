@@ -99,7 +99,7 @@ type RunAutoConvertParams = {
 
 const triggerBackgroundSync = (sdk: BreezSdkInterface): void => {
   syncSelfCustodialWallet(sdk).catch((err) => {
-    reportError(err, "auto-convert-listener syncWallet")
+    reportError("auto-convert-listener syncWallet", err)
   })
 }
 
@@ -124,12 +124,15 @@ const runAutoConvert = async ({
     return
   }
 
+  // Run sync in parallel with the bounded poll: by the time `waitForPaymentCompleted`
+  // resolves, the SDK has typically materialized the just-received token balance.
   triggerBackgroundSync(sdk)
 
   const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
   if (!settled) return
 
-  // Stamp the attempt for retry cooldown and orphan detection.
+  // Stamp the attempt only after the convert had a chance to run — phantom
+  // poll-exhaustion failures must not consume the retry budget (Critical #1).
   await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
   const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
@@ -234,7 +237,6 @@ export const useAutoConvertListener = (): void => {
     [autoConvertPollMaxAttempts, autoConvertPollIntervalMs],
   )
 
-  // Live: reacts when a new payment id arrives while the app is open.
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
     if (!lastReceivedPaymentId) return
@@ -293,8 +295,6 @@ export const useAutoConvertListener = (): void => {
     autoConvertAmountMatchToleranceBps,
   ])
 
-  // Replay on mount: handles payments that settled while closed, plus
-  // orphans from attempts the previous run abandoned mid-way.
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
     if (initialReplayDoneRef.current) return

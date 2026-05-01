@@ -37,6 +37,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentRequest: {
     create: (args: unknown) => args,
   },
+  SyncWalletRequest: {
+    create: (args: unknown) => args,
+  },
   ReceivePaymentRequest: {
     create: (args: unknown) => args,
   },
@@ -80,6 +83,7 @@ jest.mock("@app/self-custodial/bridge/limits", () => {
 const createMockSdk = () => ({
   prepareSendPayment: jest.fn(),
   sendPayment: jest.fn(),
+  syncWallet: jest.fn().mockResolvedValue(undefined),
   receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own" }),
   listUnclaimedDeposits: jest.fn(),
   claimDeposit: jest.fn(),
