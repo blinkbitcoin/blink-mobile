@@ -94,8 +94,8 @@ const defaultRemoteConfig: RemoteConfig = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   autoConvertMaxAttempts: 3,
-  autoConvertPollMaxAttempts: 7,
-  autoConvertPollIntervalMs: 2000,
+  autoConvertPollMaxAttempts: 30,
+  autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
 }
 

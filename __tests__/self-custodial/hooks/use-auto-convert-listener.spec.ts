@@ -16,6 +16,7 @@ const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUsePriceConversion = jest.fn()
+const mockSyncSelfCustodialWallet = jest.fn()
 
 jest.mock("@app/self-custodial/auto-convert", () => ({
   AutoConvertStatus: {
@@ -57,6 +58,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => mockUsePriceConversion(),
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
 // Regression guard: the listener must stay silent. If anyone re-introduces a
@@ -143,6 +148,7 @@ const setupDefaults = (sdk: ListenerSdk) => {
   mockRemovePendingAutoConvert.mockResolvedValue(undefined)
   mockWaitForPaymentCompleted.mockResolvedValue(true)
   mockExecuteAutoConvert.mockResolvedValue({ status: AutoConvertStatus.Converted })
+  mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
 }
 
 describe("useAutoConvertListener — live trigger", () => {
@@ -189,6 +195,104 @@ describe("useAutoConvertListener — live trigger", () => {
       intervalMs: baseRemoteConfig.autoConvertPollIntervalMs,
     })
     expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1dollar")
+    expect(mockSyncSelfCustodialWallet).toHaveBeenCalledWith(sdk)
+  })
+
+  it("does not run convert when waitForPaymentCompleted times out", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1" }))
+    mockWaitForPaymentCompleted.mockResolvedValue(false)
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockWaitForPaymentCompleted).toHaveBeenCalled()
+    })
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+  })
+
+  it("leaves the record pending when the convert outcome is Failed", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1" }))
+    mockExecuteAutoConvert.mockResolvedValue({ status: AutoConvertStatus.Failed })
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+  })
+
+  it("does not block the convert pipeline on the pre-convert sync", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1" }))
+    let resolveSync: () => void = () => undefined
+    mockSyncSelfCustodialWallet.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSync = resolve
+      }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
+    expect(mockSyncSelfCustodialWallet).toHaveBeenCalledWith(sdk)
+    resolveSync()
+  })
+
+  it("does not crash when the parallel sync rejects", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1" }))
+    mockSyncSelfCustodialWallet.mockRejectedValue(new Error("network"))
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
   })
 
   it("skips when the paid invoice has no pending record", async () => {
