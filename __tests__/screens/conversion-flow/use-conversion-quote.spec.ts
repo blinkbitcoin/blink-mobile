@@ -38,17 +38,6 @@ jest.mock("@react-native-firebase/crashlytics", () => {
   }
 })
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      ConversionConfirmationScreen: {
-        amountFloored: () => "Amount floored",
-        amountDustBumped: () => "Amount bumped",
-      },
-    },
-  }),
-}))
-
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
   feeAmount: toUsdMoneyAmount(5),
   amountAdjustment,
@@ -122,31 +111,37 @@ describe("useConversionQuote", () => {
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
   })
 
-  it("maps FlooredToMin to the correct i18n message", async () => {
+  it("forwards FlooredToMin adjustment from the quote", async () => {
     mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
-    await waitFor(() => expect(result.current.adjustmentText).toBe("Amount floored"))
+    await waitFor(() =>
+      expect(result.current.amountAdjustment).toBe(ConvertAmountAdjustment.FlooredToMin),
+    )
   })
 
-  it("maps IncreasedToAvoidDust to the correct i18n message", async () => {
+  it("forwards IncreasedToAvoidDust adjustment from the quote", async () => {
     mockGetQuote.mockResolvedValue(
       buildQuote(ConvertAmountAdjustment.IncreasedToAvoidDust),
     )
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
-    await waitFor(() => expect(result.current.adjustmentText).toBe("Amount bumped"))
+    await waitFor(() =>
+      expect(result.current.amountAdjustment).toBe(
+        ConvertAmountAdjustment.IncreasedToAvoidDust,
+      ),
+    )
   })
 
-  it("returns null adjustmentText when the SDK reports none", async () => {
+  it("returns null amountAdjustment when the SDK reports none", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
     await waitFor(() => expect(result.current.quote).not.toBeNull())
-    expect(result.current.adjustmentText).toBeNull()
+    expect(result.current.amountAdjustment).toBeNull()
   })
 
   it("cancels the stale in-flight request when params change", async () => {

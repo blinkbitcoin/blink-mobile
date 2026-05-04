@@ -62,7 +62,8 @@
     "title": "Çevir",
     "transfer": "Transfer",
     "percentageToConvert": "Dönüştürülecek %",
-    "reviewTransfer": "Transferi incele"
+    "reviewTransfer": "Transferi incele",
+    "dustError": "Bakiyenin tamamı transfer edilmelidir."
   },
   "ConversionConfirmationScreen": {
     "title": "Çevirmeyi incele",
@@ -72,9 +73,7 @@
     "infoDollar": "Dolar miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et",
     "feeLabel": "Dönüştürme ücreti",
-    "feeError": "Dönüştürme ücreti alınamadı",
-    "amountFloored": "Tutar, dönüştürme minimumunu karşılamak için artırıldı.",
-    "amountDustBumped": "Tutar, tüm bakiyenizi dönüştürmek için artırıldı."
+    "feeError": "Dönüştürme ücreti alınamadı"
   },
   "ConversionSuccessScreen": {
     "message": "Çevirme başarılı",

@@ -73,6 +73,7 @@ const en: BaseTranslation = {
     transfer: "Transfer",
     percentageToConvert: "% to convert",
     reviewTransfer: "Review transfer",
+    dustError: "Full balance has to be transferred.",
   },
   ConversionConfirmationScreen: {
     title: "Confirm transfer",
@@ -83,8 +84,6 @@ const en: BaseTranslation = {
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
     feeLabel: "Conversion fee",
     feeError: "Couldn't fetch the conversion fee",
-    amountFloored: "Amount increased to meet the conversion minimum.",
-    amountDustBumped: "Amount increased to convert your full balance.",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",

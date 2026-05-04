@@ -64,7 +64,8 @@
     "title": "Ruil",
     "transfer": "Oordrag",
     "percentageToConvert": "% om te ruil",
-    "reviewTransfer": "Hersien oordrag"
+    "reviewTransfer": "Hersien oordrag",
+    "dustError": "Die volle saldo moet oorgedra word."
   },
   "ConversionConfirmationScreen": {
     "title": "Hersien omskakeling",
@@ -74,9 +75,7 @@
     "infoDollar": "Dollar-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "transferButtonText": "Dra {fromWallet} oor na {toWallet}",
     "feeLabel": "Omskakelingsfooi",
-    "feeError": "Kon nie die omskakelingsfooi haal nie",
-    "amountFloored": "Bedrag verhoog om die omskakelingsminimum te haal.",
-    "amountDustBumped": "Bedrag verhoog om jou volle saldo om te skakel."
+    "feeError": "Kon nie die omskakelingsfooi haal nie"
   },
   "ConversionSuccessScreen": {
     "message": "Omskakeling suksesvol",

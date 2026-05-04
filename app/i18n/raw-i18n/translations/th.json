@@ -64,7 +64,8 @@
     "title": "แลกเปลี่ยน",
     "transfer": "โอน",
     "percentageToConvert": "% ที่ต้องการแลกเปลี่ยน",
-    "reviewTransfer": "ตรวจสอบการโอน"
+    "reviewTransfer": "ตรวจสอบการโอน",
+    "dustError": "ต้องโอนยอดคงเหลือทั้งหมด"
   },
   "ConversionConfirmationScreen": {
     "title": "ตรวจสอบการแลกเปลี่ยน",
@@ -74,9 +75,7 @@
     "infoDollar": "จำนวนดอลลาร์เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}",
     "feeLabel": "ค่าธรรมเนียมการแปลง",
-    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้",
-    "amountFloored": "จำนวนเงินเพิ่มขึ้นเพื่อให้ถึงขั้นต่ำในการแปลง",
-    "amountDustBumped": "จำนวนเงินเพิ่มขึ้นเพื่อแปลงยอดคงเหลือทั้งหมดของคุณ"
+    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้"
   },
   "ConversionSuccessScreen": {
     "message": "การแลกเปลี่ยนสำเร็จแล้ว",

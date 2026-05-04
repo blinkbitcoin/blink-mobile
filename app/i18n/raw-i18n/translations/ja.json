@@ -64,7 +64,8 @@
         "title": "両替",
         "transfer": "振替",
         "percentageToConvert": "%を換える",
-        "reviewTransfer": "振替内容を確認"
+        "reviewTransfer": "振替内容を確認",
+        "dustError": "残高をすべて送金する必要があります。"
     },
     "ConversionConfirmationScreen": {
         "title": "ご確認ください",
@@ -74,9 +75,7 @@
         "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
         "transferButtonText": "{fromWallet}から{toWallet}へ振替",
         "feeLabel": "変換手数料",
-        "feeError": "変換手数料を取得できませんでした",
-        "amountFloored": "変換の最小額に達するよう金額を引き上げました。",
-        "amountDustBumped": "全残高を変換するため金額を引き上げました。"
+        "feeError": "変換手数料を取得できませんでした"
     },
     "ConversionSuccessScreen": {
         "message": "両替が完了しました",

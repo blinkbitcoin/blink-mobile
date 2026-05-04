@@ -62,7 +62,8 @@
         "title": "Transfer funds",
         "transfer": "Transfer",
         "percentageToConvert": "% to convert",
-        "reviewTransfer": "Review transfer"
+        "reviewTransfer": "Review transfer",
+        "dustError": "Full balance has to be transferred."
     },
     "ConversionConfirmationScreen": {
         "title": "Confirm transfer",
@@ -72,9 +73,7 @@
         "infoDollar": "Dollar amount is only approximate. It can vary by a small amount.",
         "transferButtonText": "Transfer {fromWallet} to {toWallet}",
         "feeLabel": "Conversion fee",
-        "feeError": "Couldn't fetch the conversion fee",
-        "amountFloored": "Amount increased to meet the conversion minimum.",
-        "amountDustBumped": "Amount increased to convert your full balance."
+        "feeError": "Couldn't fetch the conversion fee"
     },
     "ConversionSuccessScreen": {
         "message": "Transfer successful"

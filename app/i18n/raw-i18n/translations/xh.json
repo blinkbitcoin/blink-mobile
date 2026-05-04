@@ -64,7 +64,8 @@
     "title": "Guqula",
     "transfer": "Dlulisela",
     "percentageToConvert": "% ukuguqula",
-    "reviewTransfer": "Phonononga ukudlulisela"
+    "reviewTransfer": "Phonononga ukudlulisela",
+    "dustError": "Yonke ibhalansi kufuneka idluliselwe."
   },
   "ConversionConfirmationScreen": {
     "title": "Phonononga uguqulo",
@@ -74,9 +75,7 @@
     "infoDollar": "Isixa seDola siqikelelo kuphela. Singatshintsha ngesixa esincinci.",
     "transferButtonText": "Dlulisela {fromWallet} kuya ku {toWallet}",
     "feeLabel": "Imali yotshintsho",
-    "feeError": "Ayikwazanga ukufumana imali yotshintsho",
-    "amountFloored": "Isixa sonyuswe ukuze sifike kumngcele osezantsi wotshintsho.",
-    "amountDustBumped": "Isixa sonyuswe ukuze kutshintshwe ibhalansi yakho iphela."
+    "feeError": "Ayikwazanga ukufumana imali yotshintsho"
   },
   "ConversionSuccessScreen": {
     "message": "Uguqulo luphumelele",

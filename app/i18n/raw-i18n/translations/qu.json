@@ -64,7 +64,8 @@
     "title": "Tukuyta",
     "transfer": "Apachimuq",
     "percentageToConvert": "Tukuyta llump'an kay %",
-    "reviewTransfer": "Apachimuqta qhaway"
+    "reviewTransfer": "Apachimuqta qhaway",
+    "dustError": "Llapa qullqi apachina kanan."
   },
   "ConversionConfirmationScreen": {
     "title": "Tukuyta unanchay",
@@ -74,9 +75,7 @@
     "infoDollar": "Dólar yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
     "transferButtonText": "{fromWallet} manta {toWallet} man apachimuq",
     "feeLabel": "Conversionpa pagon",
-    "feeError": "Conversionpa pagon mana apaykachay atinchu",
-    "amountFloored": "Qullqi yapayqa conversion minimumman chayanapaq.",
-    "amountDustBumped": "Qullqi yapayqa llapan qullqikipi conversion ruwanapaq."
+    "feeError": "Conversionpa pagon mana apaykachay atinchu"
   },
   "ConversionSuccessScreen": {
     "message": "Unanchayninmi kamarichik",

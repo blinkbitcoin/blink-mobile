@@ -62,7 +62,8 @@
     "title": "Átváltás",
     "transfer": "Átutalás",
     "percentageToConvert": "% átváltása",
-    "reviewTransfer": "Átutalás ellenőrzése"
+    "reviewTransfer": "Átutalás ellenőrzése",
+    "dustError": "A teljes egyenleget át kell utalni."
   },
   "ConversionConfirmationScreen": {
     "title": "Átváltás ellenörzése",
@@ -72,9 +73,7 @@
     "infoDollar": "A dollár összeg csak hozzávetőleges. Kis mértékben változhat.",
     "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be",
     "feeLabel": "Átváltási díj",
-    "feeError": "Nem sikerült lekérni az átváltási díjat",
-    "amountFloored": "Az összeget megemeltük az átváltási minimum eléréséhez.",
-    "amountDustBumped": "Az összeget megemeltük a teljes egyenleg átváltásához."
+    "feeError": "Nem sikerült lekérni az átváltási díjat"
   },
   "ConversionSuccessScreen": {
     "message": "Sikeres átváltás",

@@ -64,7 +64,8 @@
     "title": "تحويل",
     "transfer": "تحويل",
     "percentageToConvert": "النسبة المئوية (%) المراد تحويلها",
-    "reviewTransfer": "مراجعة التحويل"
+    "reviewTransfer": "مراجعة التحويل",
+    "dustError": "يجب تحويل الرصيد بالكامل."
   },
   "ConversionConfirmationScreen": {
     "title": "مراجعة التحويل",
@@ -74,9 +75,7 @@
     "infoDollar": "مبلغ الدولار تقريبي فقط. قد يختلف بمقدار صغير.",
     "transferButtonText": "تحويل من {fromWallet} إلى {toWallet}",
     "feeLabel": "رسوم التحويل",
-    "feeError": "تعذر جلب رسوم التحويل",
-    "amountFloored": "تم زيادة المبلغ للوصول إلى الحد الأدنى للتحويل.",
-    "amountDustBumped": "تم زيادة المبلغ لتحويل رصيدك بالكامل."
+    "feeError": "تعذر جلب رسوم التحويل"
   },
   "ConversionSuccessScreen": {
     "message": "تم التحويل بنجاح",

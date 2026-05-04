@@ -62,7 +62,8 @@
     "title": "Konversi",
     "transfer": "Transfer",
     "percentageToConvert": "% untuk dikonversi",
-    "reviewTransfer": "Tinjau transfer"
+    "reviewTransfer": "Tinjau transfer",
+    "dustError": "Seluruh saldo harus ditransfer."
   },
   "ConversionConfirmationScreen": {
     "title": "Tinjau konversi",
@@ -72,9 +73,7 @@
     "infoDollar": "Jumlah Dolar hanya perkiraan. Bisa sedikit berbeda.",
     "transferButtonText": "Transfer {fromWallet} ke {toWallet}",
     "feeLabel": "Biaya konversi",
-    "feeError": "Tidak dapat mengambil biaya konversi",
-    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum konversi.",
-    "amountDustBumped": "Jumlah dinaikkan untuk mengonversi seluruh saldo Anda."
+    "feeError": "Tidak dapat mengambil biaya konversi"
   },
   "ConversionSuccessScreen": {
     "message": "Konversi Berhasil",

@@ -49,6 +49,7 @@ import { convertDirectionFromCurrency } from "@app/types/payment.types"
 import {
   useConversionFormatting,
   useConversionOverlayFocus,
+  useNonCustodialConversionGuard,
   useSyncedInputValues,
 } from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
@@ -153,6 +154,14 @@ export const ConversionDetailsScreen = () => {
     ? scConversionLimits?.minFromAmount ?? null
     : null
   const scLimitsUnavailable = isSelfCustodial && scLimitsError !== null
+
+  const conversionGuard = useNonCustodialConversionGuard({
+    fromCurrency: fromWallet?.walletCurrency,
+    amountInSourceCurrency: settlementSendAmount?.amount ?? 0,
+    fromWalletBalance: fromWallet?.balance,
+    enabled: isSelfCustodial,
+  })
+  const quoteBlocking = conversionGuard.blockingReason !== null
 
   const [focusedInputValues, setFocusedInputValues] = useState<InputField | null>(null)
   const [initialAmount, setInitialAmount] =
@@ -492,12 +501,16 @@ export const ConversionDetailsScreen = () => {
         amount: formatMoneyAmount({ moneyAmount: minMoneyAmount }),
       })
     }
+    if (quoteBlocking) {
+      return LL.ConversionDetailsScreen.dustError()
+    }
   })()
 
   const hasError = Boolean(amountFieldError)
 
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
+    setLockFormattingInputId(null)
     setUiLocked(true)
     setLoadingPercent(percentage)
 
@@ -731,7 +744,9 @@ export const ConversionDetailsScreen = () => {
             isTyping ||
             Boolean(loadingPercent) ||
             belowMinimum ||
-            scLimitsUnavailable
+            scLimitsUnavailable ||
+            quoteBlocking ||
+            conversionGuard.isQuoting
           }
           onPress={moveToNextScreen}
           testID="next-button"

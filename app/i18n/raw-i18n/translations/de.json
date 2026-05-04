@@ -62,7 +62,8 @@
         "title": "Konvertieren",
         "transfer": "Übertragen",
         "percentageToConvert": "% umtauschen",
-        "reviewTransfer": "Transfer überprüfen"
+        "reviewTransfer": "Transfer überprüfen",
+        "dustError": "Das gesamte Guthaben muss übertragen werden."
     },
     "ConversionConfirmationScreen": {
         "title": "Umtausch prüfen",
@@ -72,9 +73,7 @@
         "infoDollar": "Der Dollar-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "transferButtonText": "{fromWallet} zu {toWallet} transferieren",
         "feeLabel": "Konvertierungsgebühr",
-        "feeError": "Konvertierungsgebühr konnte nicht abgerufen werden",
-        "amountFloored": "Betrag erhöht, um das Konvertierungsminimum zu erreichen.",
-        "amountDustBumped": "Betrag erhöht, um dein gesamtes Guthaben umzuwandeln."
+        "feeError": "Konvertierungsgebühr konnte nicht abgerufen werden"
     },
     "ConversionSuccessScreen": {
         "message": "Das hat geklappt!",
