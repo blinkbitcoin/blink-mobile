@@ -64,7 +64,8 @@
         "title": "Convertir",
         "transfer": "Transférer",
         "percentageToConvert": "% à convertir",
-        "reviewTransfer": "Vérifier le transfert"
+        "reviewTransfer": "Vérifier le transfert",
+        "dustError": "La totalité du solde doit être transférée."
     },
     "ConversionConfirmationScreen": {
         "title": "Vérifier la conversion",
@@ -74,9 +75,7 @@
         "infoDollar": "Le montant en dollars est approximatif. Il peut varier légèrement.",
         "transferButtonText": "Transférer de {fromWallet} vers {toWallet}",
         "feeLabel": "Frais de conversion",
-        "feeError": "Impossible de récupérer les frais de conversion",
-        "amountFloored": "Montant augmenté pour atteindre le minimum de conversion.",
-        "amountDustBumped": "Montant augmenté pour convertir la totalité de votre solde."
+        "feeError": "Impossible de récupérer les frais de conversion"
     },
     "ConversionSuccessScreen": {
         "message": "Conversion réussie",

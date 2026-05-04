@@ -62,7 +62,8 @@
     "title": "Kyusa",
     "transfer": "Weereza",
     "percentageToConvert": "Ebitundu ku kikumi eby'okukyusa",
-    "reviewTransfer": "Kebera okuweereza"
+    "reviewTransfer": "Kebera okuweereza",
+    "dustError": "Ssente zonna zirina okutambuzibwa."
   },
   "ConversionConfirmationScreen": {
     "title": "Wekenneenye enkyusa",
@@ -72,9 +73,7 @@
     "infoDollar": "Omuwendo gwa Doola gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
     "transferButtonText": "Weereza {fromWallet} eri {toWallet}",
     "feeLabel": "Ssente z'okukyusa",
-    "feeError": "Tekisoboka kuggya ssente z'okukyusa",
-    "amountFloored": "Omuwendo gulinnyisiddwa okutuuka ku minimum y'okukyusa.",
-    "amountDustBumped": "Omuwendo gulinnyisiddwa okukyusa akasente ko kwonna."
+    "feeError": "Tekisoboka kuggya ssente z'okukyusa"
   },
   "ConversionSuccessScreen": {
     "message": "Okukyusa kutuuse kubuwanguzi",

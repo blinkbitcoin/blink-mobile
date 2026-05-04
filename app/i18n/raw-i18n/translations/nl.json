@@ -64,7 +64,8 @@
     "title": "Wisselen",
     "transfer": "Overschrijven",
     "percentageToConvert": "% om te wisselen",
-    "reviewTransfer": "Overschrijving controleren"
+    "reviewTransfer": "Overschrijving controleren",
+    "dustError": "Het volledige saldo moet worden overgemaakt."
   },
   "ConversionConfirmationScreen": {
     "title": "Bevestig wissel",
@@ -74,9 +75,7 @@
     "infoDollar": "Het dollarbedrag is slechts een schatting. Het kan enigszins afwijken.",
     "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}",
     "feeLabel": "Conversiekosten",
-    "feeError": "Kon de conversiekosten niet ophalen",
-    "amountFloored": "Bedrag verhoogd om aan het conversieminimum te voldoen.",
-    "amountDustBumped": "Bedrag verhoogd om je volledige saldo te converteren."
+    "feeError": "Kon de conversiekosten niet ophalen"
   },
   "ConversionSuccessScreen": {
     "message": "Wissel geslaagd",

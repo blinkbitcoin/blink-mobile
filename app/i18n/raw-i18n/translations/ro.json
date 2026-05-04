@@ -62,7 +62,8 @@
     "title": "Conversie",
     "transfer": "Transfer",
     "percentageToConvert": "Conversie % ",
-    "reviewTransfer": "Examinați transferul"
+    "reviewTransfer": "Examinați transferul",
+    "dustError": "Trebuie transferat întregul sold."
   },
   "ConversionConfirmationScreen": {
     "title": "Examinați conversia",
@@ -72,9 +73,7 @@
     "infoDollar": "Suma în dolari este doar aproximativă. Poate varia cu o mică diferență.",
     "transferButtonText": "Transferă {fromWallet} către {toWallet}",
     "feeLabel": "Comision de conversie",
-    "feeError": "Nu s-a putut obține comisionul de conversie",
-    "amountFloored": "Suma a fost mărită pentru a atinge minimul de conversie.",
-    "amountDustBumped": "Suma a fost mărită pentru a converti întregul sold."
+    "feeError": "Nu s-a putut obține comisionul de conversie"
   },
   "ConversionSuccessScreen": {
     "message": "Conversie reușită",

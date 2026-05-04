@@ -62,7 +62,8 @@
     "title": "Badilisha",
     "transfer": "Hamisha",
     "percentageToConvert": "Asilimia ya kubadilishwa.",
-    "reviewTransfer": "Kagua uhamisho"
+    "reviewTransfer": "Kagua uhamisho",
+    "dustError": "Salio lote lazima lihamishwe."
   },
   "ConversionConfirmationScreen": {
     "title": "Hakikisha ubadilishaji",
@@ -72,9 +73,7 @@
     "infoDollar": "Kiasi cha Dola ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}",
     "feeLabel": "Ada ya ubadilishaji",
-    "feeError": "Imeshindikana kupata ada ya ubadilishaji",
-    "amountFloored": "Kiasi kimeongezwa ili kufikia kima cha chini cha ubadilishaji.",
-    "amountDustBumped": "Kiasi kimeongezwa ili kubadilisha salio lako lote."
+    "feeError": "Imeshindikana kupata ada ya ubadilishaji"
   },
   "ConversionSuccessScreen": {
     "message": "Ubadilishaji umekamilika",

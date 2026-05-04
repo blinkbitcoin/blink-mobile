@@ -258,6 +258,10 @@ type RootTranslation = {
 		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
 		 */
 		reviewTransfer: string
+		/**
+		 * F​u​l​l​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​t​o​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​.
+		 */
+		dustError: string
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -294,14 +298,6 @@ type RootTranslation = {
 		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
 		 */
 		feeError: string
-		/**
-		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​m​e​e​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​m​i​n​i​m​u​m​.
-		 */
-		amountFloored: string
-		/**
-		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​c​o​n​v​e​r​t​ ​y​o​u​r​ ​f​u​l​l​ ​b​a​l​a​n​c​e​.
-		 */
-		amountDustBumped: string
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -12481,6 +12477,10 @@ export type TranslationFunctions = {
 		 * Review transfer
 		 */
 		reviewTransfer: () => LocalizedString
+		/**
+		 * Full balance has to be transferred.
+		 */
+		dustError: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -12515,14 +12515,6 @@ export type TranslationFunctions = {
 		 * Couldn't fetch the conversion fee
 		 */
 		feeError: () => LocalizedString
-		/**
-		 * Amount increased to meet the conversion minimum.
-		 */
-		amountFloored: () => LocalizedString
-		/**
-		 * Amount increased to convert your full balance.
-		 */
-		amountDustBumped: () => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**

@@ -378,7 +378,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         {isSelfCustodial && (
           <ConversionFeeRow
             feeText={nonCustodialConversion.feeText}
-            adjustmentText={nonCustodialConversion.adjustmentText}
             isLoading={nonCustodialConversion.isQuoting}
             hasError={nonCustodialConversion.hasQuoteError}
           />

@@ -64,7 +64,8 @@
     "title": "Penukaran",
     "transfer": "Pindahan",
     "percentageToConvert": "% untuk penukaran",
-    "reviewTransfer": "Semak pindahan"
+    "reviewTransfer": "Semak pindahan",
+    "dustError": "Keseluruhan baki mesti dipindahkan."
   },
   "ConversionConfirmationScreen": {
     "title": "Semak penukaran",
@@ -74,9 +75,7 @@
     "infoDollar": "Jumlah Dolar hanyalah anggaran. Ia mungkin berbeza sedikit.",
     "transferButtonText": "Pindahkan {fromWallet} ke {toWallet}",
     "feeLabel": "Yuran pertukaran",
-    "feeError": "Tidak dapat mendapatkan yuran pertukaran",
-    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum pertukaran.",
-    "amountDustBumped": "Jumlah dinaikkan untuk menukar keseluruhan baki anda."
+    "feeError": "Tidak dapat mendapatkan yuran pertukaran"
   },
   "ConversionSuccessScreen": {
     "message": "Penukaran telah berjaya",

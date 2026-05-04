@@ -64,7 +64,8 @@
     "title": "Převod",
     "transfer": "Převod",
     "percentageToConvert": "% k převodu",
-    "reviewTransfer": "Zkontrolovat převod"
+    "reviewTransfer": "Zkontrolovat převod",
+    "dustError": "Musí se převést celý zůstatek."
   },
   "ConversionConfirmationScreen": {
     "title": "Přezkoumat převod",
@@ -74,9 +75,7 @@
     "infoDollar": "Částka v dolarech je pouze přibližná. Může se mírně lišit.",
     "transferButtonText": "Převést {fromWallet} na {toWallet}",
     "feeLabel": "Poplatek za konverzi",
-    "feeError": "Nepodařilo se načíst poplatek za konverzi",
-    "amountFloored": "Částka zvýšena na minimum konverze.",
-    "amountDustBumped": "Částka zvýšena pro konverzi celého zůstatku."
+    "feeError": "Nepodařilo se načíst poplatek za konverzi"
   },
   "ConversionSuccessScreen": {
     "message": "Úspěšný převod",

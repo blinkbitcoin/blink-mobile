@@ -12,7 +12,6 @@ type Props = {
   isVisible: boolean
   isActivating: boolean
   feeText: string
-  adjustmentText: string | null
   isLoading: boolean
   hasError: boolean
   showFeeRow: boolean
@@ -26,7 +25,6 @@ export const StableBalanceConfirmModal: React.FC<Props> = ({
   isVisible,
   isActivating,
   feeText,
-  adjustmentText,
   isLoading,
   hasError,
   showFeeRow,
@@ -69,7 +67,6 @@ export const StableBalanceConfirmModal: React.FC<Props> = ({
             <View style={styles.feeRowWrapper}>
               <ConversionFeeRow
                 feeText={feeText}
-                adjustmentText={adjustmentText}
                 isLoading={isLoading}
                 hasError={hasError}
               />

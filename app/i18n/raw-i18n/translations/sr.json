@@ -64,7 +64,8 @@
     "title": "Конвертуј",
     "transfer": "Пренос",
     "percentageToConvert": "% конвертовати",
-    "reviewTransfer": "Преглед преноса"
+    "reviewTransfer": "Преглед преноса",
+    "dustError": "Мора се пренети цео салдо."
   },
   "ConversionConfirmationScreen": {
     "title": "Преглед конверзије",
@@ -74,9 +75,7 @@
     "infoDollar": "Доларски износ је само приближан. Може варирати за мали износ.",
     "transferButtonText": "Пренеси {fromWallet} на {toWallet}",
     "feeLabel": "Накнада за конверзију",
-    "feeError": "Није било могуће преузети накнаду за конверзију",
-    "amountFloored": "Износ увећан да би се испунио минимум за конверзију.",
-    "amountDustBumped": "Износ увећан да се конвертује цео салдо."
+    "feeError": "Није било могуће преузети накнаду за конверзију"
   },
   "ConversionSuccessScreen": {
     "message": "Конверзија успешна",

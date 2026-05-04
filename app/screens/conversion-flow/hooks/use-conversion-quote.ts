@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePayments } from "@app/hooks/use-payments"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ConvertAmountAdjustment,
   type ConvertParams,
@@ -25,14 +24,13 @@ export type ConversionQuoteState = {
   hasQuoteError: boolean
   quote: ConvertQuote | null
   feeText: string
-  adjustmentText: string | null
+  amountAdjustment: ConvertAmountAdjustment | null
 }
 
 export const useConversionQuote = (
   quoteParams: ConvertParams | null,
 ): ConversionQuoteState => {
   const { getConversionQuote } = usePayments()
-  const { LL } = useI18nContext()
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
@@ -78,22 +76,16 @@ export const useConversionQuote = (
     })
   }, [quote, formatMoneyAmount, convertMoneyAmount])
 
-  const adjustmentText = useMemo(() => {
+  const amountAdjustment = useMemo<ConvertAmountAdjustment | null>(() => {
     if (!quote) return null
-    if (quote.amountAdjustment === ConvertAmountAdjustment.FlooredToMin) {
-      return LL.ConversionConfirmationScreen.amountFloored()
-    }
-    if (quote.amountAdjustment === ConvertAmountAdjustment.IncreasedToAvoidDust) {
-      return LL.ConversionConfirmationScreen.amountDustBumped()
-    }
-    return null
-  }, [quote, LL])
+    return quote.amountAdjustment ?? null
+  }, [quote])
 
   return {
     isQuoting: state.status === QuoteStatus.Loading,
     hasQuoteError: state.status === QuoteStatus.Error,
     quote: state.quote,
     feeText,
-    adjustmentText,
+    amountAdjustment,
   }
 }

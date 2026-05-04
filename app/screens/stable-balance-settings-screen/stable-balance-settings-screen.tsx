@@ -124,7 +124,6 @@ export const StableBalanceSettingsScreen: React.FC = () => {
         isVisible={pendingDirection !== null}
         isActivating={isActivating}
         feeText={toggleQuote.feeText}
-        adjustmentText={toggleQuote.adjustmentText}
         isLoading={toggleQuote.isQuoting}
         hasError={toggleQuote.hasQuoteError}
         showFeeRow={showFeeRow}

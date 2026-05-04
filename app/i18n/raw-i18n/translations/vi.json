@@ -64,7 +64,8 @@
     "title": "Chuyển đổi",
     "transfer": "Chuyển khoản",
     "percentageToConvert": "% chuyển đổi",
-    "reviewTransfer": "Xem lại chuyển khoản"
+    "reviewTransfer": "Xem lại chuyển khoản",
+    "dustError": "Phải chuyển toàn bộ số dư."
   },
   "ConversionConfirmationScreen": {
     "title": "Xem lại sự chuyển đổi",
@@ -74,9 +75,7 @@
     "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "transferButtonText": "Chuyển {fromWallet} sang {toWallet}",
     "feeLabel": "Phí chuyển đổi",
-    "feeError": "Không thể lấy phí chuyển đổi",
-    "amountFloored": "Số tiền đã được tăng để đạt mức tối thiểu chuyển đổi.",
-    "amountDustBumped": "Số tiền đã được tăng để chuyển đổi toàn bộ số dư của bạn."
+    "feeError": "Không thể lấy phí chuyển đổi"
   },
   "ConversionSuccessScreen": {
     "message": "Chuyễn đổi đã thành công",

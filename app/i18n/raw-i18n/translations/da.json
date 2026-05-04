@@ -64,7 +64,8 @@
     "title": "Konverter",
     "transfer": "Overfør",
     "percentageToConvert": "% som skal konverteres",
-    "reviewTransfer": "Gennemgå overførsel"
+    "reviewTransfer": "Gennemgå overførsel",
+    "dustError": "Hele saldoen skal overføres."
   },
   "ConversionConfirmationScreen": {
     "title": "Gennemgå konvertering",
@@ -74,9 +75,7 @@
     "infoDollar": "Dollar-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "transferButtonText": "Overfør {fromWallet} til {toWallet}",
     "feeLabel": "Konverteringsgebyr",
-    "feeError": "Kunne ikke hente konverteringsgebyret",
-    "amountFloored": "Beløb forøget for at opfylde konverteringsminimum.",
-    "amountDustBumped": "Beløb forøget for at konvertere hele din saldo."
+    "feeError": "Kunne ikke hente konverteringsgebyret"
   },
   "ConversionSuccessScreen": {
     "message": "Konvertering vel afsluttet",

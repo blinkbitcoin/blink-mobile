@@ -62,7 +62,8 @@
     "title": "Converteix",
     "transfer": "Transferència",
     "percentageToConvert": "% a convertir",
-    "reviewTransfer": "Revisa la transferència"
+    "reviewTransfer": "Revisa la transferència",
+    "dustError": "S'ha de transferir el saldo complet."
   },
   "ConversionConfirmationScreen": {
     "title": "Revisa la conversió",
@@ -72,9 +73,7 @@
     "infoDollar": "La quantitat en dòlars és només aproximada. Pot variar lleugerament.",
     "transferButtonText": "Transferir {fromWallet} a {toWallet}",
     "feeLabel": "Comissió de conversió",
-    "feeError": "No s'ha pogut obtenir la comissió de conversió",
-    "amountFloored": "Import augmentat per complir el mínim de conversió.",
-    "amountDustBumped": "Import augmentat per convertir tot el teu saldo."
+    "feeError": "No s'ha pogut obtenir la comissió de conversió"
   },
   "ConversionSuccessScreen": {
     "message": "Conversió efectuada amb èxit",

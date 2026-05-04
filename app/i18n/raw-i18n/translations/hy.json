@@ -64,7 +64,8 @@
     "title": "Փոխակերպել",
     "transfer": "Փոխանցում",
     "percentageToConvert": "փոխակերպելու %",
-    "reviewTransfer": "Ստուգել փոխանցումը"
+    "reviewTransfer": "Ստուգել փոխանցումը",
+    "dustError": "Ամբողջ մնացորդը պետք է փոխանցվի։"
   },
   "ConversionConfirmationScreen": {
     "title": "Ստուգել փոխակերպումը",
@@ -74,9 +75,7 @@
     "infoDollar": "Դոլարի գումարը մոտավորապես է։ Այն կարող է փոքր-ինչ տարբերվել։",
     "transferButtonText": "Փոխանցել {fromWallet}-ից {toWallet}",
     "feeLabel": "Փոխարկման վճար",
-    "feeError": "Չհաջողվեց ստանալ փոխարկման վճարը",
-    "amountFloored": "Գումարն ավելացվեց փոխարկման նվազագույնին հասնելու համար։",
-    "amountDustBumped": "Գումարն ավելացվեց ամբողջ մնացորդդ փոխարկելու համար։"
+    "feeError": "Չհաջողվեց ստանալ փոխարկման վճարը"
   },
   "ConversionSuccessScreen": {
     "message": "Փոխակերպումը հաջողությամբ է կատարվել",

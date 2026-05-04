@@ -64,7 +64,8 @@
     "title": "Konvertiraj",
     "transfer": "Prijenos",
     "percentageToConvert": "% za konverziju",
-    "reviewTransfer": "Pregledaj prijenos"
+    "reviewTransfer": "Pregledaj prijenos",
+    "dustError": "Mora se prenijeti cijeli iznos."
   },
   "ConversionConfirmationScreen": {
     "title": "Pregled konverzije",
@@ -74,9 +75,7 @@
     "infoDollar": "Dolarski iznos je samo približan. Može varirati za mali iznos.",
     "transferButtonText": "Prenesi {fromWallet} u {toWallet}",
     "feeLabel": "Naknada za konverziju",
-    "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju",
-    "amountFloored": "Iznos povećan kako bi se zadovoljio minimum konverzije.",
-    "amountDustBumped": "Iznos povećan radi konverzije cijelog salda."
+    "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju"
   },
   "ConversionSuccessScreen": {
     "message": "Konverzija uspješna",

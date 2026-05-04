@@ -62,7 +62,8 @@
         "title": "Converter",
         "transfer": "Transferir",
         "percentageToConvert": "% para converter",
-        "reviewTransfer": "Revisar transferência"
+        "reviewTransfer": "Revisar transferência",
+        "dustError": "O saldo total deve ser transferido."
     },
     "ConversionConfirmationScreen": {
         "title": "Revisar conversão",
@@ -72,9 +73,7 @@
         "infoDollar": "O valor em Dólar é apenas aproximado. Ele pode variar uma pequena quantia.",
         "transferButtonText": "Transferir {fromWallet} para {toWallet}",
         "feeLabel": "Taxa de conversão",
-        "feeError": "Não foi possível obter a taxa de conversão",
-        "amountFloored": "Valor aumentado para cumprir o mínimo de conversão.",
-        "amountDustBumped": "Valor aumentado para converter todo o seu saldo."
+        "feeError": "Não foi possível obter a taxa de conversão"
     },
     "ConversionSuccessScreen": {
         "message": "Conversão bem sucedida",
