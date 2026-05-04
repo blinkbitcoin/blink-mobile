@@ -56,13 +56,22 @@ jest.mock("@app/screens/settings-screen/button", () => ({
     ),
 }))
 
-const lastWarningProps: { isVisible?: boolean; onClose?: () => void } = {}
+const lastWarningProps: {
+  isVisible?: boolean
+  onClose?: () => void
+  wallets?: ReadonlyArray<{ balance: { amount: number } }>
+} = {}
 jest.mock(
   "@app/screens/settings-screen/self-custodial/delete-account-has-funds-modal",
   () => ({
-    DeleteAccountHasFundsModal: (props: { isVisible: boolean; onClose: () => void }) => {
+    DeleteAccountHasFundsModal: (props: {
+      isVisible: boolean
+      onClose: () => void
+      wallets: ReadonlyArray<{ balance: { amount: number } }>
+    }) => {
       lastWarningProps.isVisible = props.isVisible
       lastWarningProps.onClose = props.onClose
+      lastWarningProps.wallets = props.wallets
       return props.isVisible
         ? React.createElement("View", { testID: "warning-modal" })
         : null
@@ -108,6 +117,14 @@ jest.mock(
 const mockUseSelfCustodialWallet = jest.fn()
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
+}))
+
+const mockFormatMoneyAmount = jest.fn(
+  ({ moneyAmount }: { moneyAmount: { amount: number; currencyCode: string } }) =>
+    `${moneyAmount.currencyCode} ${moneyAmount.amount}`,
+)
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({

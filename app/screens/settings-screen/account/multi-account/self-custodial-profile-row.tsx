@@ -11,9 +11,12 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal"
+import { DeleteAccountHasFundsModal } from "@app/screens/settings-screen/self-custodial/delete-account-has-funds-modal"
+import { probeSelfCustodialAccountWallets } from "@app/self-custodial/probe-account-wallets"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType, type WalletState } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -41,9 +44,13 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
+  const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
+  const [warningWallets, setWarningWallets] = useState<ReadonlyArray<WalletState>>([])
+  const [probingBalance, setProbingBalance] = useState(false)
 
   const isActive =
     activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
+
   const lightningAddress = isActive
     ? liveLightningAddress ?? persistedLightningAddress
     : persistedLightningAddress
@@ -60,9 +67,34 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
     navigation.navigate("Primary")
   }
 
+  const handleRemovePress = async () => {
+    if (probingBalance) return
+    setProbingBalance(true)
+    try {
+      const wallets = (await probeSelfCustodialAccountWallets(accountId)) ?? []
+      const hasFunds = wallets.some((w) => w.balance.amount > 0)
+      if (hasFunds) {
+        setWarningWallets(wallets)
+        setHasFundsWarningVisible(true)
+        return
+      }
+      setConfirmVisible(true)
+    } catch (err) {
+      reportError("self-custodial-profile-row probeBalance", err)
+      setConfirmVisible(true)
+    } finally {
+      setProbingBalance(false)
+    }
+  }
+
   const handleConfirm = async () => {
     setConfirmVisible(false)
     await deleteWallet(accountId)
+  }
+
+  const dismissHasFundsWarning = () => {
+    setHasFundsWarningVisible(false)
+    setWarningWallets([])
   }
 
   return (
@@ -88,19 +120,32 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
               {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
             </Text>
           </ListItem.Content>
-          <GaloyIconButton
-            name="close"
-            size="small"
-            onPress={() => setConfirmVisible(true)}
-            backgroundColor={colors.grey4}
-            {...testProps(`self-custodial-delete-button-${accountId}`)}
-          />
+          {probingBalance ? (
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              {...testProps(`self-custodial-probe-spinner-${accountId}`)}
+            />
+          ) : (
+            <GaloyIconButton
+              name="close"
+              size="small"
+              onPress={handleRemovePress}
+              backgroundColor={colors.grey4}
+              {...testProps(`self-custodial-delete-button-${accountId}`)}
+            />
+          )}
         </ListItem>
       </TouchableOpacity>
       <Overlay isVisible={deleteState === "deleting"} overlayStyle={styles.overlayStyle}>
         <ActivityIndicator size={50} color={colors.primary} />
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
+      <DeleteAccountHasFundsModal
+        isVisible={hasFundsWarningVisible}
+        onClose={dismissHasFundsWarning}
+        wallets={warningWallets}
+      />
       <DeleteAccountConfirmModal
         isVisible={confirmVisible}
         onClose={() => setConfirmVisible(false)}
