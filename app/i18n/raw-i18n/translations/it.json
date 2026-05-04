@@ -2166,7 +2166,8 @@
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Commissione di deposito: {fee} SAT per importi inferiori a {threshold} SAT o {overFee} SAT per depositi superiori a {threshold} SAT",
         "autoConvertMinAmount": "Gli importi inferiori a {minSats: number} sats non possono essere convertiti in Dollari automaticamente. Riceverai Bitcoin.",
-        "autoConvertFailed": "Pagamento ricevuto ma la conversione è fallita."
+        "autoConvertFailed": "Pagamento ricevuto ma la conversione è fallita.",
+        "pleaseWaitForConversion": "Attendi finché la conversione non è completata"
     },
     "RedeemBitcoinScreen": {
         "title": "Riscatta Bitcoin",

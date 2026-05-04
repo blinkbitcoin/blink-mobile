@@ -2166,7 +2166,8 @@
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT",
         "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
-        "autoConvertFailed": "Pago recibido pero la conversión falló."
+        "autoConvertFailed": "Pago recibido pero la conversión falló.",
+        "pleaseWaitForConversion": "Por favor espera hasta que la conversión se complete"
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",

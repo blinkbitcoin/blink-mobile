@@ -27,6 +27,10 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
+import {
+  AutoConvertStatus,
+  useAutoConvertStatus,
+} from "../providers/auto-convert-status-provider"
 import { useSelfCustodialWallet } from "../providers/wallet-provider"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
@@ -69,6 +73,8 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const baselinePaymentIdRef = useRef<string | null>(lastReceivedPaymentId)
   const lastPaymentIdRef = useRef(lastReceivedPaymentId)
   lastPaymentIdRef.current = lastReceivedPaymentId
+  const requestStateRef = useRef<string>(PaymentRequestState.Idle)
+  requestStateRef.current = requestState
 
   const receivingCurrency =
     assetMode === ReceiveAssetMode.Dollar ? WalletCurrency.Usd : WalletCurrency.Btc
@@ -91,6 +97,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const generateRequest = useCallback(async () => {
     if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
     if (type === Invoice.OnChain || type === Invoice.PayCode) return
+    if (
+      requestStateRef.current === PaymentRequestState.Converting ||
+      requestStateRef.current === PaymentRequestState.Paid
+    ) {
+      return
+    }
     setRequestState(PaymentRequestState.Loading)
 
     try {
@@ -228,12 +240,23 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     return pendingSats < autoConvertMinSats
   }, [assetMode, autoConvertMinSats, amountInSats])
 
+  const autoConvertStatus = useAutoConvertStatus(paymentRequest)
+
   useEffect(() => {
     if (requestState !== PaymentRequestState.Created) return
     if (!lastReceivedPaymentId) return
     if (lastReceivedPaymentId === baselinePaymentIdRef.current) return
+    const isDollarInvoice = assetMode === ReceiveAssetMode.Dollar
+    setRequestState(
+      isDollarInvoice ? PaymentRequestState.Converting : PaymentRequestState.Paid,
+    )
+  }, [lastReceivedPaymentId, requestState, assetMode])
+
+  useEffect(() => {
+    if (requestState !== PaymentRequestState.Converting) return
+    if (autoConvertStatus !== AutoConvertStatus.Settled) return
     setRequestState(PaymentRequestState.Paid)
-  }, [lastReceivedPaymentId, requestState])
+  }, [requestState, autoConvertStatus])
 
   const getFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {

@@ -2173,7 +2173,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT",
     "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
-    "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela."
+    "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela.",
+    "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"
   },
   "RedeemBitcoinScreen": {
     "title": "Povuci bitcoin",

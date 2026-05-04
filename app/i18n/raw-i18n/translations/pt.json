@@ -2166,7 +2166,8 @@
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Taxa de depósito: {fee} SAT para valores abaixo de {threshold} SAT ou {overFee} SAT para depósitos acima de {threshold} SAT",
         "autoConvertMinAmount": "Valores abaixo de {minSats: number} sats não podem ser convertidos em Dólar automaticamente. Você receberá Bitcoin.",
-        "autoConvertFailed": "Pagamento recebido mas a conversão falhou."
+        "autoConvertFailed": "Pagamento recebido mas a conversão falhou.",
+        "pleaseWaitForConversion": "Por favor aguarde até que a conversão seja concluída"
     },
     "RedeemBitcoinScreen": {
         "title": "Resgatar Bitcoin",

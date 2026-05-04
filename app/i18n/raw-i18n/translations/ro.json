@@ -2166,7 +2166,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT",
     "autoConvertMinAmount": "Sumele sub {minSats: number} sats nu pot fi convertite automat în Dolari. Veți primi Bitcoin în schimb.",
-    "autoConvertFailed": "Plata primită, dar conversia a eșuat."
+    "autoConvertFailed": "Plata primită, dar conversia a eșuat.",
+    "pleaseWaitForConversion": "Vă rugăm să așteptați până când conversia este finalizată"
   },
   "RedeemBitcoinScreen": {
     "title": "Răscumpărați Bitcoin",
