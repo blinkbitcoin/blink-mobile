@@ -44,10 +44,9 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
       toggleModal={handleClose}
       showCloseIconButton={true}
       title={LL.SelfCustodialDelete.confirmModalTitle()}
-      titleTextAlignment="left"
       body={
         <View style={styles.body}>
-          <Text type="p1">
+          <Text style={styles.paragraph}>
             {LL.SelfCustodialDelete.confirmModalTypeToConfirm({
               delete: LL.support.delete(),
             })}
@@ -77,11 +76,18 @@ const useStyles = makeStyles(({ colors }) => ({
   body: {
     rowGap: 16,
   },
+  paragraph: {
+    fontSize: 16,
+    lineHeight: 22,
+    textAlign: "center",
+    color: colors.black,
+  },
   textInput: {
     fontSize: 16,
     backgroundColor: colors.grey4,
     padding: 12,
     color: colors.black,
     borderRadius: 8,
+    textAlign: "center",
   },
 }))
