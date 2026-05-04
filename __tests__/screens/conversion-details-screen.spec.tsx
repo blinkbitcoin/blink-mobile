@@ -68,6 +68,17 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
     refreshWallets: async () => {},
   }),
 }))
+
+jest.mock(
+  "@app/screens/conversion-flow/hooks/use-non-custodial-conversion-guard",
+  () => ({
+    useNonCustodialConversionGuard: () => ({
+      isQuoting: false,
+      blockingReason: null,
+    }),
+  }),
+)
+
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
   label?: string

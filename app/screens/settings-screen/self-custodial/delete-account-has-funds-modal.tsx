@@ -7,27 +7,29 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { testProps } from "@app/utils/testProps"
+
+import { formatBalance, type WalletWithBalance } from "./format-balance"
 
 type Props = {
   isVisible: boolean
   onClose: () => void
+  wallets: ReadonlyArray<WalletWithBalance>
 }
 
-export const DeleteAccountHasFundsModal: React.FC<Props> = ({ isVisible, onClose }) => {
+export const DeleteAccountHasFundsModal: React.FC<Props> = ({
+  isVisible,
+  onClose,
+  wallets,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { wallets } = useSelfCustodialWallet()
   const { formatMoneyAmount } = useDisplayCurrency()
 
-  const balanceText = wallets
-    .filter((w) => w.balance.amount > 0)
-    .map((w) => formatMoneyAmount({ moneyAmount: w.balance }))
-    .join(" + ")
+  const balanceText = formatBalance(wallets, formatMoneyAmount)
 
   return (
     <CustomModal

@@ -73,6 +73,7 @@ export const SelfCustodialDelete: React.FC = () => {
       <DeleteAccountHasFundsModal
         isVisible={warningVisible}
         onClose={() => setWarningVisible(false)}
+        wallets={wallets}
       />
 
       <DeleteAccountConfirmModal
