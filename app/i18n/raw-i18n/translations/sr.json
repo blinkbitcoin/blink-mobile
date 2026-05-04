@@ -2173,7 +2173,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT",
     "autoConvertMinAmount": "Износи мањи од {minSats: number} сатошија не могу се аутоматски конвертовати у Доларе. Добићете Биткоин уместо тога.",
-    "autoConvertFailed": "Уплата примљена, али конверзија није успела."
+    "autoConvertFailed": "Уплата примљена, али конверзија није успела.",
+    "pleaseWaitForConversion": "Сачекајте док се конверзија не заврши"
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",

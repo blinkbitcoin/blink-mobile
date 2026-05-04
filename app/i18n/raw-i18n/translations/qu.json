@@ -2173,7 +2173,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq",
     "autoConvertMinAmount": "{minSats: number} sats manta pisi kaqkunaqa mana automatikumantachu Dólarman tikrasqa kanman. Bitcointa chaskinki.",
-    "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan."
+    "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan.",
+    "pleaseWaitForConversion": "Ama hina kaspa, tikrachiy tukukunankama suyay"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",

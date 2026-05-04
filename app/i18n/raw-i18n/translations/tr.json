@@ -2166,7 +2166,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
     "autoConvertMinAmount": "{minSats: number} sats altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
-    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu."
+    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu.",
+    "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",

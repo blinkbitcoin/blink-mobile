@@ -6878,6 +6878,10 @@ type RootTranslation = {
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
 		 */
 		autoConvertFailed: string
+		/**
+		 * P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​i​s​ ​d​o​n​e
+		 */
+		pleaseWaitForConversion: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -19081,6 +19085,10 @@ export type TranslationFunctions = {
 		 * Payment received but the conversion failed.
 		 */
 		autoConvertFailed: () => LocalizedString
+		/**
+		 * Please wait until the conversion is done
+		 */
+		pleaseWaitForConversion: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**

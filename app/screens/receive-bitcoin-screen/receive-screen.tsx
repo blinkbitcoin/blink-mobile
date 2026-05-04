@@ -164,6 +164,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     }, [openTrialModal]),
   )
 
+  const isConverting = requestState.state === PaymentRequestState.Converting
+
   useEffect(() => {
     if (requestState.state !== PaymentRequestState.Paid) return
     const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
@@ -194,6 +196,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={requestState.info?.data?.getFullUriFn}
             loading={requestState.state === PaymentRequestState.Loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err={
               requestState.state === PaymentRequestState.Error
                 ? LL.ReceiveScreen.error()
@@ -213,6 +216,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={onchain.getFullUriFn}
             loading={onchain.loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err=""
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}

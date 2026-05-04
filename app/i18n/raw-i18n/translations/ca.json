@@ -2166,7 +2166,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT",
     "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
-    "autoConvertFailed": "Pagament rebut però la conversió ha fallat."
+    "autoConvertFailed": "Pagament rebut però la conversió ha fallat.",
+    "pleaseWaitForConversion": "Si us plau, espera fins que la conversió s'hagi completat"
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",

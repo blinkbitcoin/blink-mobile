@@ -2169,7 +2169,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
     "autoConvertMinAmount": "Beløb under {minSats: number} sats kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
-    "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes."
+    "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes.",
+    "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",
