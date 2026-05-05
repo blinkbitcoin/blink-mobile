@@ -3615,7 +3615,9 @@
     "noBackupFound": "Záloha nenalezena",
     "noBackupDescription": "Nepodařilo se najít zálohu. Můžete zadat zálohovací frázi ručně.",
     "enterPassword": "Zadejte heslo šifrování",
-    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu."
+    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
+    "pickBackupTitle": "Vyberte peněženku",
+    "pickBackupDescription": "Vyberte zálohu k obnovení"
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",

@@ -3734,6 +3734,8 @@ const en: BaseTranslation = {
       "We couldn't find a backup. You can enter your backup phrase manually instead.",
     enterPassword: "Enter your encryption password",
     wrongPassword: "Incorrect password. Please try again.",
+    pickBackupTitle: "Choose a wallet",
+    pickBackupDescription: "Select a backup to restore",
   },
   BackupNudge: {
     title: "Your funds are at risk",

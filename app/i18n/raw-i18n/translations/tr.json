@@ -3574,7 +3574,9 @@
     "noBackupFound": "Yedek bulunamadı",
     "noBackupDescription": "Bir yedek bulamadık. Yedekleme ifadenizi manuel olarak girebilirsiniz.",
     "enterPassword": "Şifreleme parolanızı girin",
-    "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin."
+    "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin.",
+    "pickBackupTitle": "Bir cüzdan seçin",
+    "pickBackupDescription": "Geri yüklemek için bir yedek seçin"
   },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",

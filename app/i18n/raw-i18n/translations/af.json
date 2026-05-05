@@ -3615,7 +3615,9 @@
     "noBackupFound": "Geen rugsteun gevind nie",
     "noBackupDescription": "Ons kon nie 'n rugsteun vind nie. Jy kan jou rugsteunfrase handmatig invoer.",
     "enterPassword": "Voer jou enkripsierwagwoord in",
-    "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer."
+    "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
+    "pickBackupTitle": "Kies 'n beursie",
+    "pickBackupDescription": "Kies 'n rugsteun om te herstel"
   },
   "BackupNudge": {
     "title": "Jou fondse is in gevaar",

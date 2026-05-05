@@ -3574,7 +3574,9 @@
     "noBackupFound": "Tewali koppa efuniddwa",
     "noBackupDescription": "Tetufunye koppa. Osobola okuyingiza ekigambo ky'okukuuma mu ngalo.",
     "enterPassword": "Yingiza password yo ey'okusiba",
-    "wrongPassword": "Password si ntuufu. Gezaako nate."
+    "wrongPassword": "Password si ntuufu. Gezaako nate.",
+    "pickBackupTitle": "Londa wallet",
+    "pickBackupDescription": "Londa kopiyo y'okuzzaawo"
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",

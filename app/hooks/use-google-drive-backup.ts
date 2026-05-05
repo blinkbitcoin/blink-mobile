@@ -5,8 +5,10 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
 import {
   findAppDataFile,
+  listAppDataFiles,
   uploadAppDataFile,
   downloadAppDataFile,
+  type AppDataFileEntry,
 } from "@app/utils/google-drive-client"
 
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
@@ -73,25 +75,33 @@ export const useGoogleDriveBackup = () => {
     [],
   )
 
-  const download = useCallback(async (session: DriveSession): Promise<DownloadResult> => {
-    setLoading(true)
-    try {
-      if (!session.existingFileId) {
-        return { success: false, error: "no-backup-found" }
+  const downloadById = useCallback(
+    async (fileId: string, accessToken: string): Promise<DownloadResult> => {
+      setLoading(true)
+      try {
+        const content = await downloadAppDataFile(fileId, accessToken)
+        return { success: true, content }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error"
+        console.error("[GoogleDrive] Download error:", message)
+        return { success: false, error: message }
+      } finally {
+        setLoading(false)
       }
-      const content = await downloadAppDataFile(
-        session.existingFileId,
-        session.accessToken,
-      )
-      return { success: true, content }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error"
-      console.error("[GoogleDrive] Download error:", message)
-      return { success: false, error: message }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    [],
+  )
 
-  return { startSession, upload, download, loading }
+  const listBackups = useCallback(
+    async (
+      filenamePrefix: string,
+    ): Promise<{ entries: ReadonlyArray<AppDataFileEntry>; accessToken: string }> => {
+      const accessToken = await signIn()
+      const entries = await listAppDataFiles(filenamePrefix, accessToken)
+      return { entries, accessToken }
+    },
+    [],
+  )
+
+  return { startSession, upload, downloadById, listBackups, loading }
 }

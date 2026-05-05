@@ -3574,7 +3574,9 @@
     "noBackupFound": "Nem található biztonsági mentés",
     "noBackupDescription": "Nem találtunk biztonsági mentést. Kézzel is megadhatod a biztonsági kifejezésedet.",
     "enterPassword": "Add meg a titkosítási jelszavadat",
-    "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra."
+    "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra.",
+    "pickBackupTitle": "Válassz tárcát",
+    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
   },
   "BackupNudge": {
     "title": "Az Ön pénzeszközei veszélyben vannak",

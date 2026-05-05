@@ -3621,7 +3621,9 @@
     "noBackupFound": "Akukho gcino lifunyenweyo",
     "noBackupDescription": "Asikwazanga ukufumana igcino. Ungafaka umgca wakho wokugcina ngesandla.",
     "enterPassword": "Faka iphasiwedi yakho yokufihla",
-    "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona."
+    "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona.",
+    "pickBackupTitle": "Khetha isipaji",
+    "pickBackupDescription": "Khetha ugcino lokubuyisela"
   },
   "BackupNudge": {
     "title": "Imali yakho isengozini",

@@ -3574,7 +3574,9 @@
     "noBackupFound": "Niciun backup găsit",
     "noBackupDescription": "Nu am găsit un backup. Puteți introduce fraza de backup manual.",
     "enterPassword": "Introduceți parola de criptare",
-    "wrongPassword": "Parolă incorectă. Încercați din nou."
+    "wrongPassword": "Parolă incorectă. Încercați din nou.",
+    "pickBackupTitle": "Alege un portofel",
+    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare"
   },
   "BackupNudge": {
     "title": "Fondurile dumneavoastră sunt în pericol",

@@ -41,6 +41,15 @@ jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
+let mockLightningAddress: string | null = null
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
+  useSelfCustodialAccountInfo: () => ({
+    identityPubkey: mockIdentityPubkey,
+    lightningAddress: mockLightningAddress,
+  }),
+}))
+
 jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
   useBackupState: () => ({
     setBackupCompleted: jest.fn(),
@@ -49,9 +58,19 @@ jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
 
 jest.mock("@app/utils/backup-payload", () => ({
   buildBackupPayload: jest.fn(
-    (_mnemonic: string, opts: { password?: string; version?: number }) =>
+    (
+      _mnemonic: string,
+      opts: {
+        walletIdentifier: string
+        lightningAddress?: string
+        password?: string
+        version?: number
+      },
+    ) =>
       JSON.stringify({
         version: opts.version ?? 1,
+        walletIdentifier: opts.walletIdentifier,
+        ...(opts.lightningAddress ? { lightningAddress: opts.lightningAddress } : {}),
         encrypted: Boolean(opts.password),
         mnemonic: opts.password ? "ZW5jcnlwdGVk" : "youth indicate void",
       }),
@@ -92,6 +111,8 @@ describe("useCloudBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
+    mockIdentityPubkey = "test-pubkey-1234"
+    mockLightningAddress = null
     mockStartSession.mockResolvedValue(noExistingFile)
   })
 
@@ -106,10 +127,12 @@ describe("useCloudBackup", () => {
       await result.current.handleBackup()
     })
 
-    expect(mockStartSession).toHaveBeenCalledWith("blink-spark-backup-blink.json")
+    expect(mockStartSession).toHaveBeenCalledWith(
+      "blink-spark-backup-blink-test-pubkey-1234.json",
+    )
     expect(mockUpload).toHaveBeenCalledWith(
       expect.stringContaining('"encrypted":false'),
-      "blink-spark-backup-blink.json",
+      "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
@@ -128,7 +151,7 @@ describe("useCloudBackup", () => {
 
     expect(mockUpload).toHaveBeenCalledWith(
       expect.stringContaining('"encrypted":true'),
-      "blink-spark-backup-blink.json",
+      "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
@@ -189,7 +212,7 @@ describe("useCloudBackup", () => {
     )
     expect(mockUpload).toHaveBeenCalledWith(
       expect.stringContaining('"encrypted":false'),
-      "blink-spark-backup-blink.json",
+      "blink-spark-backup-blink-test-pubkey-1234.json",
       withExistingFile,
     )
   })
@@ -226,5 +249,62 @@ describe("useCloudBackup", () => {
       expect.stringContaining("blink-spark-backup"),
       noExistingFile,
     )
+  })
+
+  it("aborts and toasts when identityPubkey is missing", async () => {
+    mockIdentityPubkey = null
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockStartSession).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Sign in failed" }),
+    )
+  })
+
+  it("includes walletIdentifier and lightningAddress in payload when set", async () => {
+    mockLightningAddress = "alice@blink.sv"
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockUpload).toHaveBeenCalledWith(
+      expect.stringContaining('"walletIdentifier":"test-pubkey-1234"'),
+      "blink-spark-backup-blink-test-pubkey-1234.json",
+      noExistingFile,
+    )
+    expect(mockUpload).toHaveBeenCalledWith(
+      expect.stringContaining('"lightningAddress":"alice@blink.sv"'),
+      expect.any(String),
+      noExistingFile,
+    )
+  })
+
+  it("omits lightningAddress in payload when null", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    const uploadedPayload = mockUpload.mock.calls[0][0] as string
+    expect(uploadedPayload).not.toContain("lightningAddress")
   })
 })

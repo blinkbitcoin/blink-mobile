@@ -3562,7 +3562,9 @@
         "noBackupFound": "No se encontró respaldo",
         "noBackupDescription": "No pudimos encontrar un respaldo. Puedes ingresar tu frase de respaldo manualmente.",
         "enterPassword": "Ingresa tu contraseña de cifrado",
-        "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo."
+        "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo.",
+        "pickBackupTitle": "Elige una cartera",
+        "pickBackupDescription": "Selecciona una copia de seguridad para restaurar"
     },
     "BackupNudge": {
         "title": "Tus fondos están en riesgo",

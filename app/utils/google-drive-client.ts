@@ -53,6 +53,28 @@ export const findAppDataFile = async (
   return data.files[0]?.id
 }
 
+export type AppDataFileEntry = { id: string; name: string }
+
+export const listAppDataFiles = async (
+  filenamePrefix: string,
+  accessToken: string,
+): Promise<ReadonlyArray<AppDataFileEntry>> => {
+  const safePrefix = escapeFileName(filenamePrefix)
+  const query = encodeURIComponent(
+    `name contains '${safePrefix}' and '${DRIVE_APP_DATA_FOLDER}' in parents and trashed = false`,
+  )
+  const url = `${DRIVE_FILES_URL}?spaces=${DRIVE_APP_DATA_FOLDER}&q=${query}&fields=files(id,name)`
+
+  const response = await fetch(url, { headers: authHeader(accessToken) })
+  if (!response.ok) {
+    const body = await response.text()
+    throw new Error(`Drive list query failed (${response.status}): ${body}`)
+  }
+
+  const data = (await response.json()) as { files: ReadonlyArray<AppDataFileEntry> }
+  return data.files.filter((f) => f.name.startsWith(filenamePrefix))
+}
+
 export const uploadAppDataFile = async ({
   content,
   fileName,

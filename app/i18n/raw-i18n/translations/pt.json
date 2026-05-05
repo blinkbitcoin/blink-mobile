@@ -3562,7 +3562,9 @@
         "noBackupFound": "Nenhum backup encontrado",
         "noBackupDescription": "Não encontramos um backup. Você pode digitar sua frase de backup manualmente.",
         "enterPassword": "Digite sua senha de criptografia",
-        "wrongPassword": "Senha incorreta. Tente novamente."
+        "wrongPassword": "Senha incorreta. Tente novamente.",
+        "pickBackupTitle": "Escolha uma carteira",
+        "pickBackupDescription": "Selecione um backup para restaurar"
     },
     "BackupNudge": {
         "title": "Seus fundos estão em risco",

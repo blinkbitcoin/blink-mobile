@@ -7,16 +7,19 @@ import {
   encryptAesGcm,
 } from "./crypto"
 
-type PlainBackupPayload = {
+type BaseBackupPayload = {
   version: number
+  walletIdentifier: string
+  lightningAddress?: string
   createdAt: number
+}
+
+type PlainBackupPayload = BaseBackupPayload & {
   encrypted: false
   mnemonic: string
 }
 
-type EncryptedBackupPayload = {
-  version: number
-  createdAt: number
+type EncryptedBackupPayload = BaseBackupPayload & {
   encrypted: true
   kdf: typeof KDF_PARAMS
   cipher: typeof CIPHER
@@ -27,7 +30,17 @@ type EncryptedBackupPayload = {
 
 export type BackupPayload = PlainBackupPayload | EncryptedBackupPayload
 
+export type BackupMetadata = {
+  version: number
+  walletIdentifier: string
+  lightningAddress?: string
+  createdAt: number
+  encrypted: boolean
+}
+
 type BuildOptions = {
+  walletIdentifier: string
+  lightningAddress?: string
   password?: string
   version?: number
 }
@@ -43,9 +56,27 @@ const KDF_PARAMS = {
   keyLen: PBKDF2_KEY_LENGTH,
 } as const
 
-export const buildBackupPayload = (mnemonic: string, opts: BuildOptions = {}): string => {
-  const { password, version = CURRENT_VERSION } = opts
-  const base = { version, createdAt: Date.now() }
+const buildBase = ({
+  walletIdentifier,
+  lightningAddress,
+  version,
+}: {
+  walletIdentifier: string
+  lightningAddress?: string
+  version: number
+}): BaseBackupPayload => {
+  const base: BaseBackupPayload = {
+    version,
+    walletIdentifier,
+    createdAt: Date.now(),
+  }
+  if (lightningAddress) base.lightningAddress = lightningAddress
+  return base
+}
+
+export const buildBackupPayload = (mnemonic: string, opts: BuildOptions): string => {
+  const { walletIdentifier, lightningAddress, password, version = CURRENT_VERSION } = opts
+  const base = buildBase({ walletIdentifier, lightningAddress, version })
 
   if (!password) {
     const payload: PlainBackupPayload = { ...base, encrypted: false, mnemonic }
@@ -73,6 +104,24 @@ export const isEncryptedBackup = (raw: string): boolean => {
     return parsed?.encrypted === true
   } catch {
     return false
+  }
+}
+
+export const parseBackupMetadata = (raw: string): BackupMetadata | null => {
+  try {
+    const parsed = JSON.parse(raw) as Partial<BackupPayload>
+    if (typeof parsed.walletIdentifier !== "string" || !parsed.walletIdentifier) {
+      return null
+    }
+    return {
+      version: typeof parsed.version === "number" ? parsed.version : 0,
+      walletIdentifier: parsed.walletIdentifier,
+      lightningAddress: parsed.lightningAddress,
+      createdAt: typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
+      encrypted: parsed.encrypted === true,
+    }
+  } catch {
+    return null
   }
 }
 

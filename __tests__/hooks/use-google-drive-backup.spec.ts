@@ -23,11 +23,13 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
 const mockFindAppDataFile = jest.fn()
 const mockUploadAppDataFile = jest.fn()
 const mockDownloadAppDataFile = jest.fn()
+const mockListAppDataFiles = jest.fn()
 
 jest.mock("@app/utils/google-drive-client", () => ({
   findAppDataFile: (...args: readonly unknown[]) => mockFindAppDataFile(...args),
   uploadAppDataFile: (...args: readonly unknown[]) => mockUploadAppDataFile(...args),
   downloadAppDataFile: (...args: readonly unknown[]) => mockDownloadAppDataFile(...args),
+  listAppDataFiles: (...args: readonly unknown[]) => mockListAppDataFiles(...args),
 }))
 
 describe("useGoogleDriveBackup", () => {
@@ -147,6 +149,99 @@ describe("useGoogleDriveBackup", () => {
 
       expect(uploadResult.success).toBe(false)
       expect(uploadResult.error).toBe("Drive upload failed (403): Forbidden")
+    })
+  })
+
+  describe("listBackups", () => {
+    it("signs in and returns entries with the access token", async () => {
+      const entries = [
+        { id: "file-1", name: "blink-spark-backup-blink-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-blink-pubkey2.json" },
+      ]
+      mockListAppDataFiles.mockResolvedValueOnce(entries)
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let listResult: Awaited<ReturnType<typeof result.current.listBackups>> | undefined
+      await act(async () => {
+        listResult = await result.current.listBackups("blink-spark-backup-blink-")
+      })
+
+      expect(mockSignIn).toHaveBeenCalled()
+      expect(mockListAppDataFiles).toHaveBeenCalledWith(
+        "blink-spark-backup-blink-",
+        "test-access-token",
+      )
+      expect(listResult).toEqual({
+        entries,
+        accessToken: "test-access-token",
+      })
+    })
+
+    it("returns empty entries when none match", async () => {
+      mockListAppDataFiles.mockResolvedValueOnce([])
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let listResult: Awaited<ReturnType<typeof result.current.listBackups>> | undefined
+      await act(async () => {
+        listResult = await result.current.listBackups("prefix-")
+      })
+
+      expect(listResult?.entries).toEqual([])
+    })
+
+    it("propagates sign-in failure", async () => {
+      mockSignIn.mockRejectedValueOnce(new Error("Sign in cancelled"))
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      await expect(
+        act(async () => {
+          await result.current.listBackups("prefix-")
+        }),
+      ).rejects.toThrow("Sign in cancelled")
+    })
+  })
+
+  describe("downloadById", () => {
+    it("returns content on success", async () => {
+      mockDownloadAppDataFile.mockResolvedValueOnce('{"mnemonic":"words"}')
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let downloadResult:
+        | Awaited<ReturnType<typeof result.current.downloadById>>
+        | undefined
+      await act(async () => {
+        downloadResult = await result.current.downloadById("file-1", "token-abc")
+      })
+
+      expect(mockDownloadAppDataFile).toHaveBeenCalledWith("file-1", "token-abc")
+      expect(downloadResult).toEqual({
+        success: true,
+        content: '{"mnemonic":"words"}',
+      })
+    })
+
+    it("returns error on failure", async () => {
+      mockDownloadAppDataFile.mockRejectedValueOnce(
+        new Error("Drive download failed (404)"),
+      )
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let downloadResult:
+        | Awaited<ReturnType<typeof result.current.downloadById>>
+        | undefined
+      await act(async () => {
+        downloadResult = await result.current.downloadById("file-1", "token-abc")
+      })
+
+      expect(downloadResult).toEqual({
+        success: false,
+        error: "Drive download failed (404)",
+      })
     })
   })
 })

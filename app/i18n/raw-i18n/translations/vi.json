@@ -3612,7 +3612,9 @@
     "noBackupFound": "Không tìm thấy bản sao lưu",
     "noBackupDescription": "Chúng tôi không tìm thấy bản sao lưu. Bạn có thể nhập cụm từ sao lưu thủ công.",
     "enterPassword": "Nhập mật khẩu mã hóa của bạn",
-    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại."
+    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
+    "pickBackupTitle": "Chọn một ví",
+    "pickBackupDescription": "Chọn bản sao lưu để khôi phục"
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
