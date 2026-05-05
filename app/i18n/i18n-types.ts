@@ -9253,12 +9253,13 @@ type RootTranslation = {
 		 */
 		defaultEmailSubject: RequiredParams<'bankName'>
 		/**
-		 * H​e​y​ ​t​h​e​r​e​!​ ​I​ ​n​e​e​d​ ​s​o​m​e​ ​h​e​l​p​ ​w​i​t​h​ ​{​b​a​n​k​N​a​m​e​}​,​ ​I​'​m​ ​u​s​i​n​g​ ​t​h​e​ ​v​e​r​s​i​o​n​ ​{​v​e​r​s​i​o​n​}​ ​o​n​ ​{​o​s​}​.
+		 * H​e​y​ ​t​h​e​r​e​!​ ​I​ ​n​e​e​d​ ​s​o​m​e​ ​h​e​l​p​ ​w​i​t​h​ ​{​b​a​n​k​N​a​m​e​}​,​ ​I​'​m​ ​u​s​i​n​g​ ​t​h​e​ ​v​e​r​s​i​o​n​ ​{​v​e​r​s​i​o​n​}​ ​o​n​ ​{​o​s​}​.​ ​M​y​ ​A​c​c​o​u​n​t​ ​I​D​ ​i​s​:​ ​{​a​c​c​o​u​n​t​I​d​}
+		 * @param {string} accountId
 		 * @param {string} bankName
 		 * @param {string} os
 		 * @param {string} version
 		 */
-		defaultSupportMessage: RequiredParams<'bankName' | 'os' | 'version'>
+		defaultSupportMessage: RequiredParams<'accountId' | 'bankName' | 'os' | 'version'>
 		/**
 		 * e​m​a​i​l​ ​{​e​m​a​i​l​}​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 * @param {string} email
@@ -20424,9 +20425,9 @@ export type TranslationFunctions = {
 		 */
 		defaultEmailSubject: (arg: { bankName: string }) => LocalizedString
 		/**
-		 * Hey there! I need some help with {bankName}, I'm using the version {version} on {os}.
+		 * Hey there! I need some help with {bankName}, I'm using the version {version} on {os}. My Account ID is: {accountId}
 		 */
-		defaultSupportMessage: (arg: { bankName: string, os: string, version: string }) => LocalizedString
+		defaultSupportMessage: (arg: { accountId: string, bankName: string, os: string, version: string }) => LocalizedString
 		/**
 		 * email {email} copied to clipboard
 		 */

@@ -2926,7 +2926,7 @@ const en: BaseTranslation = {
     thankYouText: "Thank you for the feedback, would you like to suggest an improvement?",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
-      "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
+      "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}. My Account ID is: {accountId: string}",
     emailCopied: "email {email: string} copied to clipboard",
     deleteAccount: "Delete account",
     delete: "delete",
