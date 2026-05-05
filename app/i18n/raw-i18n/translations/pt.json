@@ -3466,8 +3466,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "Gerenciador de senhas",
             "manualBackup": "Backup manual",
-            "keychainSaved": "Backup salvo no gerenciador de senhas",
-            "keychainFailed": "Falha ao salvar o backup",
+            "passwordManagerBackupSaved": "Backup salvo no gerenciador de senhas",
+            "passwordManagerBackupFailed": "Falha ao salvar o backup",
+            "passwordManagerUnavailable": "Nenhum gerenciador de senhas disponível neste dispositivo. Use o backup do Drive ou salve sua frase de 12 palavras manualmente.",
             "iOSComingSoon": "Backup no iCloud em breve"
         },
         "ManualBackup": {

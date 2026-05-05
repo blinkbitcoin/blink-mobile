@@ -3496,8 +3496,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Adgangskodeadministrator",
       "manualBackup": "Manuel backup",
-      "keychainSaved": "Backup gemt i adgangskodeadministrator",
-      "keychainFailed": "Kunne ikke gemme backup",
+      "passwordManagerBackupSaved": "Backup gemt i adgangskodeadministrator",
+      "passwordManagerBackupFailed": "Kunne ikke gemme backup",
+      "passwordManagerUnavailable": "Ingen adgangskodeadministrator er tilgængelig på denne enhed. Brug Drive-backup eller gem din 12-ord-frase manuelt.",
       "iOSComingSoon": "iCloud-sikkerhedskopi kommer snart"
     },
     "ManualBackup": {

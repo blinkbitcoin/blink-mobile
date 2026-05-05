@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Manager de parole",
       "manualBackup": "Backup manual",
-      "keychainSaved": "Backup salvat în managerul de parole",
-      "keychainFailed": "Nu s-a putut salva backup-ul",
+      "passwordManagerBackupSaved": "Backup salvat în managerul de parole",
+      "passwordManagerBackupFailed": "Nu s-a putut salva backup-ul",
+      "passwordManagerUnavailable": "Niciun manager de parole nu este disponibil pe acest dispozitiv. Folosește copia de rezervă Drive sau salvează manual fraza ta de 12 cuvinte.",
       "iOSComingSoon": "Backup-ul în iCloud va fi disponibil în curând"
     },
     "ManualBackup": {

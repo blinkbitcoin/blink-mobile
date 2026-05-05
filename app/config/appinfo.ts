@@ -20,8 +20,7 @@ export const getInviteLink = (_username: string | null | undefined) => {
   return `https://get.blink.sv${username}`
 }
 
-export const getSparkKeychainService = (network: string) =>
-  `blink-spark-backup-${network.toLowerCase()}`
+export const BLINK_DOMAIN = "blink.sv"
 
 export const getSparkDriveBackupFilenamePrefix = (network: string) =>
   `blink-spark-backup-${network.toLowerCase()}-`

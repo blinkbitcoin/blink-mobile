@@ -3516,8 +3516,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Yaykuna rimay kamachiq",
       "manualBackup": "Makiwan waqaychay",
-      "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
-      "keychainFailed": "Mana atikurqachu waqaychayta",
+      "passwordManagerBackupSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
+      "passwordManagerBackupFailed": "Mana atikurqachu waqaychayta",
+      "passwordManagerUnavailable": "Kay laqacheqpiqa manan kanchu password kamachiq. Drive backup-ta apaykachay icha 12 simi rimayniykita makillaykiwan waqaychay.",
       "iOSComingSoon": "iCloudpi waqaychayqa utqayman hamunqa"
     },
     "ManualBackup": {

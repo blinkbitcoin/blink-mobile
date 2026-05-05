@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Kidhibiti cha nywila",
       "manualBackup": "Nakala ya mkono",
-      "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
-      "keychainFailed": "Imeshindwa kuhifadhi nakala",
+      "passwordManagerBackupSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
+      "passwordManagerBackupFailed": "Imeshindwa kuhifadhi nakala",
+      "passwordManagerUnavailable": "Hakuna kidhibiti cha nenosiri kinachopatikana kwenye kifaa hiki. Tumia nakala rudufu ya Drive au hifadhi maneno yako 12 mwenyewe.",
       "iOSComingSoon": "Hifadhi nakala ya iCloud inakuja hivi karibuni"
     },
     "ManualBackup": {

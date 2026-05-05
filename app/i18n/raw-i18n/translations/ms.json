@@ -3519,8 +3519,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Pengurus kata laluan",
       "manualBackup": "Sandaran manual",
-      "keychainSaved": "Sandaran disimpan ke pengurus kata laluan",
-      "keychainFailed": "Gagal menyimpan sandaran",
+      "passwordManagerBackupSaved": "Sandaran disimpan ke pengurus kata laluan",
+      "passwordManagerBackupFailed": "Gagal menyimpan sandaran",
+      "passwordManagerUnavailable": "Tiada pengurus kata laluan tersedia pada peranti ini. Gunakan sandaran Drive atau simpan frasa 12 perkataan anda secara manual.",
       "iOSComingSoon": "Sandaran iCloud akan datang tidak lama lagi"
     },
     "ManualBackup": {

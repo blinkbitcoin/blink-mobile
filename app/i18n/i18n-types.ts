@@ -11523,11 +11523,15 @@ type RootTranslation = {
 			/**
 			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
 			 */
-			keychainSaved: string
+			passwordManagerBackupSaved: string
 			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
 			 */
-			keychainFailed: string
+			passwordManagerBackupFailed: string
+			/**
+			 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​U​s​e​ ​D​r​i​v​e​ ​b​a​c​k​u​p​ ​o​r​ ​s​a​v​e​ ​y​o​u​r​ ​1​2​-​w​o​r​d​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+			 */
+			passwordManagerUnavailable: string
 			/**
 			 * i​C​l​o​u​d​ ​b​a​c​k​u​p​ ​c​o​m​i​n​g​ ​s​o​o​n
 			 */
@@ -23640,11 +23644,15 @@ export type TranslationFunctions = {
 			/**
 			 * Backup saved to password manager
 			 */
-			keychainSaved: () => LocalizedString
+			passwordManagerBackupSaved: () => LocalizedString
 			/**
 			 * Failed to save backup
 			 */
-			keychainFailed: () => LocalizedString
+			passwordManagerBackupFailed: () => LocalizedString
+			/**
+			 * No password manager available on this device. Use Drive backup or save your 12-word phrase manually.
+			 */
+			passwordManagerUnavailable: () => LocalizedString
 			/**
 			 * iCloud backup coming soon
 			 */

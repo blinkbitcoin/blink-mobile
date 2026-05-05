@@ -1,6 +1,8 @@
 import React from "react"
-import { render, fireEvent } from "@testing-library/react-native"
 import { Pressable, Text } from "react-native"
+
+import { act, fireEvent, render } from "@testing-library/react-native"
+
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -17,9 +19,9 @@ let mockIsCloudBackupAvailable = true
 
 jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   useBackupMethods: () => ({
-    isCloudBackupAvailable: mockIsCloudBackupAvailable,
-    keychainLoading: mockKeychainLoading,
-    handleKeychainBackup: mockHandleKeychainBackup,
+    isDriveBackupAvailable: mockIsCloudBackupAvailable,
+    credentialLoading: mockKeychainLoading,
+    handleCredentialBackup: mockHandleKeychainBackup,
     handleCloudBackup: mockHandleCloudBackup,
     handleManualBackup: mockHandleManualBackup,
   }),
@@ -100,17 +102,16 @@ describe("SparkBackupMethodScreen", () => {
     ).toBeTruthy()
   })
 
-  it("renders all buttons", () => {
-    const { getByText, queryByText } = render(
+  it("renders all three backup method buttons", () => {
+    const { getByText } = render(
       <ContextForScreen>
         <SparkBackupMethodScreen />
       </ContextForScreen>,
     )
 
     expect(getByText(LL.BackupScreen.BackupMethod.appleICloud())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeTruthy()
     expect(getByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
-    // TODO: re-enable once the password manager flow supports multi-account
-    expect(queryByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeNull()
   })
 
   it("calls handleCloudBackup on cloud provider press", () => {
@@ -135,20 +136,19 @@ describe("SparkBackupMethodScreen", () => {
     expect(mockHandleManualBackup).toHaveBeenCalled()
   })
 
-  // TODO: re-enable once the password manager flow supports multi-account
-  // it("calls handleKeychainBackup on password manager press", async () => {
-  //   const { getByText } = render(
-  //     <ContextForScreen>
-  //       <SparkBackupMethodScreen />
-  //     </ContextForScreen>,
-  //   )
-  //
-  //   await act(async () => {
-  //     fireEvent.press(getByText(LL.BackupScreen.BackupMethod.passwordManager()))
-  //   })
-  //
-  //   expect(mockHandleKeychainBackup).toHaveBeenCalled()
-  // })
+  it("calls handleCredentialBackup on password manager press", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(getByText(LL.BackupScreen.BackupMethod.passwordManager()))
+    })
+
+    expect(mockHandleKeychainBackup).toHaveBeenCalled()
+  })
 
   it("disables cloud backup and shows coming soon text when unavailable", () => {
     mockIsCloudBackupAvailable = false

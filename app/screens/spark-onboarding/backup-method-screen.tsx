@@ -16,9 +16,6 @@ import { useBackupMethods } from "./hooks"
 import { OnboardingScreenLayout } from "./layouts"
 import { getCloudProviderName } from "./utils"
 
-// TODO: remove this gate once the password manager flow supports multi-account
-const SHOW_PASSWORD_MANAGER_OPTION = false
-
 export const SparkBackupMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -28,9 +25,9 @@ export const SparkBackupMethodScreen: React.FC = () => {
 
   const { saveCheckpoint } = useMigrationCheckpoint()
   const {
-    isCloudBackupAvailable,
-    keychainLoading,
-    handleKeychainBackup,
+    isDriveBackupAvailable,
+    credentialLoading,
+    handleCredentialBackup,
     handleCloudBackup,
     handleManualBackup,
   } = useBackupMethods()
@@ -48,22 +45,20 @@ export const SparkBackupMethodScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={cloudProvider}
             onPress={handleCloudBackup}
-            disabled={!isCloudBackupAvailable}
+            disabled={!isDriveBackupAvailable}
             {...testProps("backup-cloud-button")}
           />
-          {!isCloudBackupAvailable && (
+          {!isDriveBackupAvailable && (
             <Text style={styles.comingSoonText}>
               {LL.BackupScreen.BackupMethod.iOSComingSoon()}
             </Text>
           )}
-          {SHOW_PASSWORD_MANAGER_OPTION && (
-            <GaloySecondaryButton
-              title={LL.BackupScreen.BackupMethod.passwordManager()}
-              onPress={handleKeychainBackup}
-              loading={keychainLoading}
-              {...testProps("backup-keychain-button")}
-            />
-          )}
+          <GaloySecondaryButton
+            title={LL.BackupScreen.BackupMethod.passwordManager()}
+            onPress={handleCredentialBackup}
+            loading={credentialLoading}
+            {...testProps("backup-credential-button")}
+          />
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={handleManualBackup}

@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Jelszókezelő",
       "manualBackup": "Kézi biztonsági mentés",
-      "keychainSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
-      "keychainFailed": "Nem sikerült elmenteni a biztonsági mentést",
+      "passwordManagerBackupSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
+      "passwordManagerBackupFailed": "Nem sikerült elmenteni a biztonsági mentést",
+      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használja a Drive biztonsági mentését, vagy mentse el a 12 szavas kifejezését manuálisan.",
       "iOSComingSoon": "Az iCloud biztonsági mentés hamarosan érkezik"
     },
     "ManualBackup": {

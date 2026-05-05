@@ -1,15 +1,15 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
-import { getSparkKeychainService } from "@app/config/appinfo"
-import { useAppConfig, useKeychainBackup } from "@app/hooks"
+import { CredentialError, useCredentialBackup } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -19,34 +19,45 @@ import { getCloudProviderName } from "../utils"
 
 import { useRestoreWallet } from "./hooks/use-restore-wallet"
 
-// TODO: remove this gate once the password manager flow supports multi-account
-const SHOW_PASSWORD_MANAGER_OPTION = false
+const showRestoreErrorToast = (
+  error: CredentialError,
+  LL: TranslationFunctions,
+): void => {
+  switch (error) {
+    case CredentialError.UserCancelled:
+      return
+    case CredentialError.NoProvider:
+    case CredentialError.Unsupported:
+      toastShow({ message: LL.RestoreScreen.noBackupFound(), LL })
+      return
+    case CredentialError.Unknown:
+      toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
+      return
+    default: {
+      const _exhaustive: never = error
+      throw new Error(`Unknown credential error: ${_exhaustive}`)
+    }
+  }
+}
 
 export const SparkRestoreMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { appConfig } = useAppConfig()
-  const { read: readKeychain, loading: keychainLoading } = useKeychainBackup(
-    getSparkKeychainService(appConfig.galoyInstance.name),
-  )
+  const { read, loading: credentialLoading } = useCredentialBackup()
   const { restore } = useRestoreWallet()
-  const [keychainError, setKeychainError] = useState(false)
   const cloudProvider = getCloudProviderName(LL)
 
-  const handleKeychainRestore = useCallback(async () => {
-    setKeychainError(false)
-    const mnemonic = await readKeychain()
-    if (!mnemonic) {
-      setKeychainError(true)
-      toastShow({ message: LL.RestoreScreen.noBackupFound(), LL })
+  const handleCredentialRestore = useCallback(async () => {
+    const result = await read()
+    if (!result.success) {
+      showRestoreErrorToast(result.error, LL)
       return
     }
-    await restore(mnemonic).catch(() => {})
-  }, [readKeychain, restore, LL])
+    await restore(result.mnemonic).catch(() => {})
+  }, [read, restore, LL])
 
   return (
     <OnboardingScreenLayout
@@ -57,14 +68,12 @@ export const SparkRestoreMethodScreen: React.FC = () => {
             onPress={() => navigation.navigate("sparkCloudRestoreScreen")}
             {...testProps("restore-cloud-button")}
           />
-          {SHOW_PASSWORD_MANAGER_OPTION && (
-            <GaloySecondaryButton
-              title={LL.BackupScreen.BackupMethod.passwordManager()}
-              onPress={handleKeychainRestore}
-              loading={keychainLoading}
-              {...testProps("restore-keychain-button")}
-            />
-          )}
+          <GaloySecondaryButton
+            title={LL.BackupScreen.BackupMethod.passwordManager()}
+            onPress={handleCredentialRestore}
+            loading={credentialLoading}
+            {...testProps("restore-credential-button")}
+          />
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={() =>
@@ -83,18 +92,6 @@ export const SparkRestoreMethodScreen: React.FC = () => {
         title={LL.RestoreScreen.title()}
         subtitle={LL.RestoreScreen.description()}
       />
-      {keychainError && (
-        <Text style={styles.errorText}>{LL.RestoreScreen.noBackupFound()}</Text>
-      )}
     </OnboardingScreenLayout>
   )
 }
-
-const useStyles = makeStyles(({ colors }) => ({
-  errorText: {
-    textAlign: "center",
-    color: colors.error,
-    fontSize: 14,
-    marginTop: 12,
-  },
-}))

@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Správca hesiel",
       "manualBackup": "Ručné zálohovanie",
-      "keychainSaved": "Záloha uložená do správcu hesiel",
-      "keychainFailed": "Nepodarilo sa uložiť zálohu",
+      "passwordManagerBackupSaved": "Záloha uložená do správcu hesiel",
+      "passwordManagerBackupFailed": "Nepodarilo sa uložiť zálohu",
+      "passwordManagerUnavailable": "Na tomto zariadení nie je k dispozícii žiadny správca hesiel. Použite zálohu Drive alebo uložte svoju 12-slovnú frázu ručne.",
       "iOSComingSoon": "Zálohovanie do iCloudu bude čoskoro k dispozícii"
     },
     "ManualBackup": {

@@ -4,47 +4,78 @@ import { Platform } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { getSparkKeychainService } from "@app/config/appinfo"
-import { useAppConfig, useKeychainBackup } from "@app/hooks"
+import { CredentialError, useCredentialBackup } from "@app/hooks"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
+import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
+import {
+  BackupMethod,
+  useBackupState,
+} from "@app/self-custodial/providers/backup-state-provider"
 import { toastShow } from "@app/utils/toast"
+
+const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {
+  switch (error) {
+    case CredentialError.UserCancelled:
+      return
+    case CredentialError.NoProvider:
+    case CredentialError.Unsupported:
+      toastShow({
+        message: LL.BackupScreen.BackupMethod.passwordManagerUnavailable(),
+        LL,
+      })
+      return
+    case CredentialError.Unknown:
+      toastShow({
+        message: LL.BackupScreen.BackupMethod.passwordManagerBackupFailed(),
+        LL,
+      })
+      return
+    default: {
+      const _exhaustive: never = error
+      throw new Error(`Unknown credential error: ${_exhaustive}`)
+    }
+  }
+}
 
 export const useBackupMethods = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { appConfig } = useAppConfig()
   const mnemonic = useWalletMnemonic()
+  const { identityPubkey } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
-  const isCloudBackupAvailable = Platform.OS !== "ios"
+  const isDriveBackupAvailable = Platform.OS !== "ios"
 
-  const { save: saveToKeychain, loading: keychainLoading } = useKeychainBackup(
-    getSparkKeychainService(appConfig.galoyInstance.name),
-  )
+  const { save, loading: credentialLoading } = useCredentialBackup()
 
-  const handleKeychainBackup = useCallback(async () => {
-    const success = await saveToKeychain(mnemonic)
-    if (!success) {
+  const handleCredentialBackup = useCallback(async () => {
+    if (!identityPubkey) {
       toastShow({
-        message: LL.BackupScreen.BackupMethod.keychainFailed(),
+        message: LL.BackupScreen.BackupMethod.passwordManagerBackupFailed(),
         LL,
       })
       return
     }
 
-    setBackupCompleted("keychain")
+    const result = await save(identityPubkey, mnemonic)
+    if (!result.success) {
+      showBackupErrorToast(result.error, LL)
+      return
+    }
+
+    setBackupCompleted(BackupMethod.Keychain)
     toastShow({
-      message: LL.BackupScreen.BackupMethod.keychainSaved(),
+      message: LL.BackupScreen.BackupMethod.passwordManagerBackupSaved(),
       type: "success",
       LL,
     })
     navigation.navigate("sparkBackupSuccessScreen")
-  }, [saveToKeychain, navigation, LL, mnemonic, setBackupCompleted])
+  }, [save, navigation, LL, mnemonic, identityPubkey, setBackupCompleted])
 
   const handleCloudBackup = useCallback(() => {
-    if (!isCloudBackupAvailable) {
+    if (!isDriveBackupAvailable) {
       toastShow({
         message: LL.BackupScreen.BackupMethod.iOSComingSoon(),
         LL,
@@ -52,16 +83,16 @@ export const useBackupMethods = () => {
       return
     }
     navigation.navigate("sparkCloudBackupScreen")
-  }, [isCloudBackupAvailable, navigation, LL])
+  }, [isDriveBackupAvailable, navigation, LL])
 
   const handleManualBackup = useCallback(() => {
     navigation.navigate("sparkBackupAlertsScreen")
   }, [navigation])
 
   return {
-    isCloudBackupAvailable,
-    keychainLoading,
-    handleKeychainBackup,
+    isDriveBackupAvailable,
+    credentialLoading,
+    handleCredentialBackup,
     handleCloudBackup,
     handleManualBackup,
   }

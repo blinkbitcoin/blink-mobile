@@ -3516,8 +3516,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "ตัวจัดการรหัสผ่าน",
       "manualBackup": "สำรองข้อมูลด้วยตนเอง",
-      "keychainSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
-      "keychainFailed": "ไม่สามารถบันทึกสำรองได้",
+      "passwordManagerBackupSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
+      "passwordManagerBackupFailed": "ไม่สามารถบันทึกสำรองได้",
+      "passwordManagerUnavailable": "ไม่มีตัวจัดการรหัสผ่านที่ใช้ได้บนอุปกรณ์นี้ ใช้การสำรองข้อมูล Drive หรือบันทึกวลี 12 คำของคุณด้วยตนเอง",
       "iOSComingSoon": "การสำรองข้อมูลไปยัง iCloud จะมาเร็ว ๆ นี้"
     },
     "ManualBackup": {
