@@ -527,7 +527,7 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("renders Move to non-custodial option in Account section", async () => {
+  it("does not render Move to non-custodial option until migration is complete", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
@@ -541,7 +541,8 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(screen.getByText("Move to non-custodial")).toBeTruthy()
+    // TODO: re-enable once the custodial → non-custodial migration is complete
+    expect(screen.queryByText("Move to non-custodial")).toBeNull()
   })
 
   it("does not render a standalone Recovery method group (Critical #7)", async () => {
