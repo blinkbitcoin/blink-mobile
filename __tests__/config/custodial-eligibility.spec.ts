@@ -1,5 +1,5 @@
 jest.mock("@app/config/custodial-countries", () => ({
-  CUSTODIAL_ALLOWED_COUNTRIES: ["SV", "AR"],
+  CUSTODIAL_BLOCKED_COUNTRIES: ["US", "DE"],
 }))
 
 import { isCustodialAllowedForCountry } from "@app/config/custodial-eligibility"
@@ -13,16 +13,18 @@ describe("isCustodialAllowedForCountry", () => {
     expect(isCustodialAllowedForCountry("")).toBe(false)
   })
 
-  it("returns true when the country code is on the allow-list", () => {
-    expect(isCustodialAllowedForCountry("SV")).toBe(true)
-    expect(isCustodialAllowedForCountry("AR")).toBe(true)
-  })
-
-  it("is case-insensitive", () => {
-    expect(isCustodialAllowedForCountry("sv")).toBe(true)
-  })
-
-  it("returns false for a country that is not allow-listed", () => {
+  it("returns false when the country code is on the deny-list", () => {
     expect(isCustodialAllowedForCountry("US")).toBe(false)
+    expect(isCustodialAllowedForCountry("DE")).toBe(false)
+  })
+
+  it("is case-insensitive against the deny-list", () => {
+    expect(isCustodialAllowedForCountry("us")).toBe(false)
+  })
+
+  it("returns true for any country not on the deny-list", () => {
+    expect(isCustodialAllowedForCountry("SV")).toBe(true)
+    expect(isCustodialAllowedForCountry("HN")).toBe(true)
+    expect(isCustodialAllowedForCountry("MX")).toBe(true)
   })
 })
