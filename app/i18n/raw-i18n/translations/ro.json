@@ -3547,8 +3547,8 @@
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Custodial",
+    "selfCustodialLabel": "Non-custodial",
     "custodialDescription": "Noi păstrăm fondurile în numele dumneavoastră",
     "selfCustodialDescription": "Doar dumneavoastră puteți accesa fondurile",
     "continueButton": "Continuă",

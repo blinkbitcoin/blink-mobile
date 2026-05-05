@@ -3535,8 +3535,8 @@
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Verwahrt",
+        "selfCustodialLabel": "Selbstverwahrt",
         "custodialDescription": "Wir verwahren die Mittel in deinem Namen",
         "selfCustodialDescription": "Nur du hast Zugang zu den Mitteln",
         "continueButton": "Weiter",

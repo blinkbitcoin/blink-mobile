@@ -3565,8 +3565,8 @@
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Forvaltet",
+    "selfCustodialLabel": "Selvforvaltet",
     "custodialDescription": "Vi opbevarer midlerne på dine vegne",
     "selfCustodialDescription": "Kun du har adgang til midlerne",
     "continueButton": "Fortsæt",

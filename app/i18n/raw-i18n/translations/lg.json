@@ -3547,8 +3547,8 @@
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Eterekeddwa",
+    "selfCustodialLabel": "Yeefuga",
     "custodialDescription": "Tukuuma ssente zo ku lw'ekitiibwa kyo",
     "selfCustodialDescription": "Ggwe wekka oyinza okufuna ssente",
     "continueButton": "Weyongerayo",

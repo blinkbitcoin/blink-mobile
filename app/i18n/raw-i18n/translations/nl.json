@@ -3588,8 +3588,8 @@
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Bewaard",
+    "selfCustodialLabel": "Zelfbeheerd",
     "custodialDescription": "Wij bewaren de fondsen namens u",
     "selfCustodialDescription": "Alleen jij hebt toegang tot de fondsen",
     "continueButton": "Doorgaan",

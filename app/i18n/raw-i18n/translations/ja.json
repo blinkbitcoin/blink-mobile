@@ -3576,8 +3576,8 @@
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "カストディアル",
+        "selfCustodialLabel": "ノンカストディアル",
         "custodialDescription": "お客様に代わって資金を保管します",
         "selfCustodialDescription": "あなただけが資金にアクセスできます",
         "continueButton": "続行",

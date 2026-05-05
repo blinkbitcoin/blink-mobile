@@ -3547,8 +3547,8 @@
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Letéti",
+    "selfCustodialLabel": "Önletéti",
     "custodialDescription": "Mi kezeljük a pénzeszközöket az Ön nevében",
     "selfCustodialDescription": "Csak Ön férhet hozzá a pénzeszközökhöz",
     "continueButton": "Folytatás",

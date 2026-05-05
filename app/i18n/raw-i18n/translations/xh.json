@@ -3594,8 +3594,8 @@
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Igciniwe",
+    "selfCustodialLabel": "Engagciniwe",
     "custodialDescription": "Sigcina imali egameni lakho",
     "selfCustodialDescription": "Nguwe wedwa onokufikelela kwimali",
     "continueButton": "Qhubeka",

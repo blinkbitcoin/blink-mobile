@@ -3547,8 +3547,8 @@
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Emanetli",
+    "selfCustodialLabel": "Emanetsiz",
     "custodialDescription": "Fonlarınızı sizin adınıza saklıyoruz",
     "selfCustodialDescription": "Fonlarınıza yalnızca siz erişebilirsiniz",
     "continueButton": "Devam et",

@@ -3588,8 +3588,8 @@
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Spravovaný",
+    "selfCustodialLabel": "Vlastní správa",
     "custodialDescription": "Prostředky držíme za vás",
     "selfCustodialDescription": "Pouze vy máte přístup k prostředkům",
     "continueButton": "Pokračovat",

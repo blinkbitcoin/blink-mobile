@@ -3547,8 +3547,8 @@
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Με θεματοφυλακή",
+    "selfCustodialLabel": "Χωρίς θεματοφυλακή",
     "custodialDescription": "Κρατάμε τα κεφάλαια για λογαριασμό σας",
     "selfCustodialDescription": "Μόνο εσείς έχετε πρόσβαση στα κεφάλαια",
     "continueButton": "Συνέχεια",

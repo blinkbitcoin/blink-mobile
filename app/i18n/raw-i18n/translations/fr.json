@@ -3576,8 +3576,8 @@
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Sous garde",
+        "selfCustodialLabel": "Sans garde",
         "custodialDescription": "Nous gardons les fonds en votre nom",
         "selfCustodialDescription": "Vous seul pouvez accéder aux fonds",
         "continueButton": "Continuer",

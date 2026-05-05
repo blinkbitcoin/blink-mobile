@@ -3588,8 +3588,8 @@
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Bewaard",
+    "selfCustodialLabel": "Self-bewaard",
     "custodialDescription": "Ons hou die fondse namens jou",
     "selfCustodialDescription": "Net jy kan toegang tot fondse kry",
     "continueButton": "Gaan voort",

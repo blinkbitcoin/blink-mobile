@@ -3585,8 +3585,8 @@
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Waqaychasqa",
+    "selfCustodialLabel": "Mana waqaychasqa",
     "custodialDescription": "Ñuqayku qullqiykita waqaychayku",
     "selfCustodialDescription": "Qamlla qullqiykiman yaykuyta atinki",
     "continueButton": "Hinaspa",
