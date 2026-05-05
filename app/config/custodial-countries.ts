@@ -1,4 +1,53 @@
-// Allow-list of ISO-3166 alpha-2 country codes where a custodial Blink account
-// can be created.
-// TODO: replace this hardcoded list with the country list returned by the backend.
-export const CUSTODIAL_ALLOWED_COUNTRIES: readonly string[] = ["SV", "HN"] as const
+// ISO-3166 alpha-2 codes where custodial Blink accounts are blocked.
+// Sources: OFAC comprehensive sanctions and Google Play policy 16329703
+// (https://support.google.com/googleplay/android-developer/answer/16329703).
+// TODO: replace with backend-driven list.
+export const CUSTODIAL_BLOCKED_COUNTRIES: readonly string[] = [
+  // OFAC sanctions
+  "CU",
+  "IR",
+  "KP",
+
+  // Google Play 16329703 (non-EU)
+  "AE",
+  "BH",
+  "CA",
+  "CH",
+  "GB",
+  "ID",
+  "IL",
+  "JP",
+  "KR",
+  "PH",
+  "US",
+  "ZA",
+
+  // Google Play 16329703 — EU-27 (MiCA)
+  "AT",
+  "BE",
+  "BG",
+  "CY",
+  "CZ",
+  "DE",
+  "DK",
+  "EE",
+  "ES",
+  "FI",
+  "FR",
+  "GR",
+  "HR",
+  "HU",
+  "IE",
+  "IT",
+  "LT",
+  "LU",
+  "LV",
+  "MT",
+  "NL",
+  "PL",
+  "PT",
+  "RO",
+  "SE",
+  "SI",
+  "SK",
+] as const
