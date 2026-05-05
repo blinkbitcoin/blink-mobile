@@ -3535,8 +3535,8 @@
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Custodito",
+        "selfCustodialLabel": "Non custodito",
         "custodialDescription": "Noi custodiamo i fondi per tuo conto",
         "selfCustodialDescription": "Solo tu puoi accedere ai fondi",
         "continueButton": "Continua",

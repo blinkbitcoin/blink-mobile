@@ -3589,8 +3589,8 @@
     "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։"
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Պահառությամբ",
+    "selfCustodialLabel": "Ինքնապահառությամբ",
     "custodialDescription": "Մենք պահում ենք միջոցները ձեր անունից",
     "selfCustodialDescription": "Միայն դուք կարող եք մուտք գործել միջոցներին",
     "continueButton": "Շարունակել",

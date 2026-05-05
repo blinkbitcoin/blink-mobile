@@ -3535,8 +3535,8 @@
         "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Custodiada",
+        "selfCustodialLabel": "No custodiada",
         "custodialDescription": "Nosotros custodiamos los fondos por ti",
         "selfCustodialDescription": "Solo tú puedes acceder a los fondos",
         "continueButton": "Continuar",

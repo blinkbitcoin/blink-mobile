@@ -3585,8 +3585,8 @@
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "محفوظ",
+    "selfCustodialLabel": "محفوظ ذاتيًا",
     "custodialDescription": "نحن نحتفظ بالأموال نيابة عنك",
     "selfCustodialDescription": "أنت فقط يمكنك الوصول إلى الأموال",
     "continueButton": "متابعة",

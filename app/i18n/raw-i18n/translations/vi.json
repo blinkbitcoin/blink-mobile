@@ -3585,8 +3585,8 @@
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Lưu ký",
+    "selfCustodialLabel": "Phi lưu ký",
     "custodialDescription": "Chúng tôi giữ tiền thay mặt bạn",
     "selfCustodialDescription": "Chỉ bạn mới có thể truy cập tiền",
     "continueButton": "Tiếp tục",

@@ -3547,8 +3547,8 @@
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Kustodian",
+    "selfCustodialLabel": "Non-kustodian",
     "custodialDescription": "Kami menyimpan dana atas nama Anda",
     "selfCustodialDescription": "Hanya Anda yang dapat mengakses dana",
     "continueButton": "Lanjutkan",

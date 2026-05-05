@@ -3547,8 +3547,8 @@
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Spravovaný",
+    "selfCustodialLabel": "Vlastná správa",
     "custodialDescription": "Prostriedky držíme za vás",
     "selfCustodialDescription": "Len vy máte prístup k prostriedkom",
     "continueButton": "Pokračovať",

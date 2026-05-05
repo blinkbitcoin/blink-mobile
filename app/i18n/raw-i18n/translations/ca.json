@@ -3547,8 +3547,8 @@
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Custodiat",
+    "selfCustodialLabel": "No custodiat",
     "custodialDescription": "Nosaltres custodiem els fons per tu",
     "selfCustodialDescription": "Només tu pots accedir als fons",
     "continueButton": "Continuar",

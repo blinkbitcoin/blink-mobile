@@ -3585,8 +3585,8 @@
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "ควบคุมโดยผู้ดูแล",
+    "selfCustodialLabel": "ควบคุมด้วยตัวเอง",
     "custodialDescription": "เราดูแลเงินทุนในนามของคุณ",
     "selfCustodialDescription": "คุณเท่านั้นที่สามารถเข้าถึงเงินทุน",
     "continueButton": "ดำเนินการต่อ",

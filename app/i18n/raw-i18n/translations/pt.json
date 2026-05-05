@@ -3535,8 +3535,8 @@
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Custodiada",
+        "selfCustodialLabel": "Não custodiada",
         "custodialDescription": "Nós custodiamos os fundos em seu nome",
         "selfCustodialDescription": "Somente você pode acessar os fundos",
         "continueButton": "Continuar",

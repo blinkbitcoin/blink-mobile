@@ -3588,8 +3588,8 @@
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Pod skrbništvom",
+    "selfCustodialLabel": "Bez skrbništva",
     "custodialDescription": "Mi čuvamo sredstva u vaše ime",
     "selfCustodialDescription": "Samo vi možete pristupiti sredstvima",
     "continueButton": "Nastavi",

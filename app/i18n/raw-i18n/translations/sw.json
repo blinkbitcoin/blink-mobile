@@ -3547,8 +3547,8 @@
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Iliyohifadhiwa",
+    "selfCustodialLabel": "Isiyohifadhiwa",
     "custodialDescription": "Tunashikilia fedha kwa niaba yako",
     "selfCustodialDescription": "Wewe peke yako unaweza kufikia fedha",
     "continueButton": "Endelea",
