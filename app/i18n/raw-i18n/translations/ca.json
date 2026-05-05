@@ -3574,7 +3574,9 @@
     "noBackupFound": "No s'ha trobat cap còpia de seguretat",
     "noBackupDescription": "No hem pogut trobar una còpia de seguretat. Pots introduir la teva frase de recuperació manualment.",
     "enterPassword": "Introdueix la teva contrasenya de xifratge",
-    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar."
+    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
+    "pickBackupTitle": "Tria una cartera",
+    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar"
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",

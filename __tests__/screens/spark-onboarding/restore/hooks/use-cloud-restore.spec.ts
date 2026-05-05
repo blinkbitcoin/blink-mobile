@@ -2,8 +2,8 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { useCloudRestore } from "@app/screens/spark-onboarding/restore/hooks/use-cloud-restore"
 
-const mockStartSession = jest.fn()
-const mockDownload = jest.fn()
+const mockListBackups = jest.fn()
+const mockDownloadById = jest.fn()
 const mockRestore = jest.fn()
 const mockRecordError = jest.fn()
 
@@ -12,14 +12,15 @@ jest.mock("@app/hooks", () => ({
     appConfig: { galoyInstance: { name: "Main" } },
   }),
   useGoogleDriveBackup: () => ({
-    startSession: mockStartSession,
-    download: mockDownload,
+    listBackups: mockListBackups,
+    downloadById: mockDownloadById,
     loading: false,
   }),
 }))
 
 jest.mock("@app/config/appinfo", () => ({
-  getSparkDriveBackupFilename: (name: string) => `spark-backup-${name}.json`,
+  getSparkDriveBackupFilenamePrefix: (name: string) =>
+    `blink-spark-backup-${name.toLowerCase()}-`,
 }))
 
 jest.mock("@app/utils/backup-payload", () => ({
@@ -33,6 +34,29 @@ jest.mock("@app/utils/backup-payload", () => ({
   parseBackupPayload: (content: string) => {
     const parsed = JSON.parse(content) as { mnemonic: string }
     return { mnemonic: parsed.mnemonic }
+  },
+  parseBackupMetadata: (content: string) => {
+    try {
+      const parsed = JSON.parse(content) as {
+        version?: number
+        walletIdentifier?: string
+        lightningAddress?: string
+        encrypted?: boolean
+        createdAt?: number
+      }
+      if (typeof parsed.walletIdentifier !== "string" || !parsed.walletIdentifier) {
+        return null
+      }
+      return {
+        version: parsed.version ?? 1,
+        walletIdentifier: parsed.walletIdentifier,
+        lightningAddress: parsed.lightningAddress,
+        createdAt: parsed.createdAt ?? 0,
+        encrypted: parsed.encrypted === true,
+      }
+    } catch {
+      return null
+    }
   },
   parseEncryptedBackupPayload: jest.fn((content: string, _password: string) => {
     const parsed = JSON.parse(content) as { mnemonic: string }
@@ -62,19 +86,48 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const buildPlainBackup = (walletIdentifier: string, mnemonic: string) =>
+  JSON.stringify({
+    version: 1,
+    walletIdentifier,
+    encrypted: false,
+    mnemonic,
+  })
+
+const buildEncryptedBackup = (walletIdentifier: string, mnemonic: string) =>
+  JSON.stringify({
+    version: 1,
+    walletIdentifier,
+    encrypted: true,
+    mnemonic,
+    data: "enc",
+    iv: "iv",
+    salt: "salt",
+  })
+
 describe("useCloudRestore", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockStartSession.mockResolvedValue({
-      accessToken: "token",
-      existingFileId: "file-id",
+  })
+
+  it("shows not-found when no backups are listed", async () => {
+    mockListBackups.mockResolvedValue({ entries: [], accessToken: "token" })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
     })
   })
 
-  it("restores unencrypted backup automatically", async () => {
-    mockDownload.mockResolvedValue({
+  it("auto-restores when only one backup exists and it is unencrypted", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
       success: true,
-      content: JSON.stringify({ mnemonic: "word1 word2 word3" }),
+      content: buildPlainBackup("pubkey1", "word1 word2 word3"),
     })
 
     renderHook(() => useCloudRestore())
@@ -84,29 +137,14 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("shows not-found when download fails", async () => {
-    mockDownload.mockResolvedValue({
-      success: false,
-      error: "no-backup-found",
+  it("shows password step when only one backup exists and it is encrypted", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
     })
-
-    const { result } = renderHook(() => useCloudRestore())
-
-    await waitFor(() => {
-      expect(result.current.isNotFound).toBe(true)
-    })
-  })
-
-  it("shows password step for encrypted backup", async () => {
-    mockDownload.mockResolvedValue({
+    mockDownloadById.mockResolvedValue({
       success: true,
-      content: JSON.stringify({
-        mnemonic: null,
-        encrypted: true,
-        data: "enc",
-        iv: "iv",
-        salt: "salt",
-      }),
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
     })
 
     const { result } = renderHook(() => useCloudRestore())
@@ -116,30 +154,90 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("shows error for corrupted/malformed JSON", async () => {
-    mockDownload.mockResolvedValue({
-      success: true,
-      content: "not valid json {{{",
+  it("shows picker when multiple valid backups exist", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) => {
+      if (fileId === "file-1") {
+        return Promise.resolve({
+          success: true,
+          content: buildPlainBackup("pubkey1", "words 1"),
+        })
+      }
+      return Promise.resolve({
+        success: true,
+        content: buildPlainBackup("pubkey2", "words 2"),
+      })
     })
 
     const { result } = renderHook(() => useCloudRestore())
 
     await waitFor(() => {
-      expect(result.current.hasError).toBe(true)
+      expect(result.current.isPicker).toBe(true)
     })
-    expect(mockRecordError).toHaveBeenCalled()
+    expect(result.current.entries).toHaveLength(2)
+    expect(result.current.entries[0].metadata.walletIdentifier).toBe("pubkey1")
+    expect(result.current.entries[1].metadata.walletIdentifier).toBe("pubkey2")
+  })
+
+  it("skips entries that fail to download or parse", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-bad.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) => {
+      if (fileId === "file-1") {
+        return Promise.resolve({
+          success: true,
+          content: buildPlainBackup("pubkey1", "words 1"),
+        })
+      }
+      return Promise.resolve({
+        success: true,
+        content: "garbage{",
+      })
+    })
+
+    renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(mockRestore).toHaveBeenCalledWith("words 1")
+    })
+  })
+
+  it("treats all-failed downloads as not-found", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: false,
+      error: "404",
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
   })
 
   it("decrypts encrypted backup with correct password", async () => {
-    mockDownload.mockResolvedValue({
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
       success: true,
-      content: JSON.stringify({
-        encrypted: true,
-        mnemonic: "decrypted words",
-        data: "enc",
-        iv: "iv",
-        salt: "salt",
-      }),
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
     })
 
     const { result } = renderHook(() => useCloudRestore())
@@ -163,14 +261,13 @@ describe("useCloudRestore", () => {
       throw new Error("decrypt failed")
     })
 
-    mockDownload.mockResolvedValue({
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
       success: true,
-      content: JSON.stringify({
-        encrypted: true,
-        data: "enc",
-        iv: "iv",
-        salt: "salt",
-      }),
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
     })
 
     const { result } = renderHook(() => useCloudRestore())
@@ -186,10 +283,14 @@ describe("useCloudRestore", () => {
     expect(result.current.passwordError).toBe("Wrong password")
   })
 
-  it("does not fire attemptDownload twice on rerender", async () => {
-    mockDownload.mockResolvedValue({
+  it("does not fire loadCloudBackups twice on rerender", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
       success: true,
-      content: JSON.stringify({ mnemonic: "word1 word2 word3" }),
+      content: buildPlainBackup("pubkey1", "word1 word2 word3"),
     })
 
     const { rerender } = renderHook(() => useCloudRestore())
@@ -200,16 +301,56 @@ describe("useCloudRestore", () => {
 
     rerender({})
 
-    expect(mockStartSession).toHaveBeenCalledTimes(1)
+    expect(mockListBackups).toHaveBeenCalledTimes(1)
   })
 
-  it("reports sign-in errors to crashlytics", async () => {
-    mockStartSession.mockRejectedValue(new Error("sign-in failed"))
+  it("reports list errors to crashlytics and shows error step", async () => {
+    mockListBackups.mockRejectedValue(new Error("sign-in failed"))
 
-    renderHook(() => useCloudRestore())
+    const { result } = renderHook(() => useCloudRestore())
 
     await waitFor(() => {
       expect(mockRecordError).toHaveBeenCalled()
     })
+    expect(result.current.hasError).toBe(true)
+  })
+
+  it("handlePick downloads and restores the selected entry", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) => {
+      if (fileId === "file-1") {
+        return Promise.resolve({
+          success: true,
+          content: buildPlainBackup("pubkey1", "words 1"),
+        })
+      }
+      return Promise.resolve({
+        success: true,
+        content: buildPlainBackup("pubkey2", "words 2"),
+      })
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPicker).toBe(true)
+    })
+
+    const targetEntry = result.current.entries.find(
+      (e) => e.metadata.walletIdentifier === "pubkey2",
+    )
+    expect(targetEntry).toBeDefined()
+
+    await waitFor(async () => {
+      if (targetEntry) await result.current.handlePick(targetEntry)
+    })
+
+    expect(mockRestore).toHaveBeenCalledWith("words 2")
   })
 })

@@ -3615,7 +3615,9 @@
     "noBackupFound": "Sigurnosna kopija nije pronađena",
     "noBackupDescription": "Nismo mogli pronaći sigurnosnu kopiju. Možete unijeti svoju sigurnosnu frazu ručno.",
     "enterPassword": "Unesite lozinku za šifriranje",
-    "wrongPassword": "Netočna lozinka. Pokušajte ponovo."
+    "wrongPassword": "Netočna lozinka. Pokušajte ponovo.",
+    "pickBackupTitle": "Odaberite novčanik",
+    "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje"
   },
   "BackupNudge": {
     "title": "Vaša sredstva su u opasnosti",

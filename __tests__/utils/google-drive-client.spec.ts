@@ -2,6 +2,7 @@ import {
   buildMultipartBody,
   downloadAppDataFile,
   findAppDataFile,
+  listAppDataFiles,
   uploadAppDataFile,
 } from "@app/utils/google-drive-client"
 
@@ -118,6 +119,91 @@ describe("google drive client", () => {
         headers: { Authorization: "Bearer token-abc" },
       }),
     )
+  })
+
+  describe("listAppDataFiles", () => {
+    it("queries appDataFolder with name-contains and trashed filter", async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ files: [] }),
+      })
+
+      await listAppDataFiles("blink-spark-backup-blink-", "token")
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining(
+          encodeURIComponent(
+            "name contains 'blink-spark-backup-blink-' and 'appDataFolder' in parents and trashed = false",
+          ),
+        ),
+        expect.objectContaining({
+          headers: { Authorization: "Bearer token" },
+        }),
+      )
+    })
+
+    it("returns matching entries with id and name", async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          files: [
+            { id: "file-1", name: "blink-spark-backup-blink-pubkey1.json" },
+            { id: "file-2", name: "blink-spark-backup-blink-pubkey2.json" },
+          ],
+        }),
+      })
+
+      const entries = await listAppDataFiles("blink-spark-backup-blink-", "token")
+
+      expect(entries).toEqual([
+        { id: "file-1", name: "blink-spark-backup-blink-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-blink-pubkey2.json" },
+      ])
+    })
+
+    it("filters out entries that do not start with the prefix (substring matches)", async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          files: [
+            { id: "file-1", name: "blink-spark-backup-blink-pubkey1.json" },
+            { id: "file-2", name: "other-blink-spark-backup-blink-noise.json" },
+          ],
+        }),
+      })
+
+      const entries = await listAppDataFiles("blink-spark-backup-blink-", "token")
+
+      expect(entries).toEqual([
+        { id: "file-1", name: "blink-spark-backup-blink-pubkey1.json" },
+      ])
+    })
+
+    it("escapes single quotes in the prefix", async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ files: [] }),
+      })
+
+      await listAppDataFiles("blink's-backup-", "token")
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent("name contains 'blink\\'s-backup-'")),
+        expect.any(Object),
+      )
+    })
+
+    it("throws when list response is not ok", async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 401,
+        text: async () => "Unauthorized",
+      })
+
+      await expect(listAppDataFiles("prefix-", "token")).rejects.toThrow(
+        "Drive list query failed (401): Unauthorized",
+      )
+    })
   })
 
   it("downloadAppDataFile throws on non-OK response", async () => {

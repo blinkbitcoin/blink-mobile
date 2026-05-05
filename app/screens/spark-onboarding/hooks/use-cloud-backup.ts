@@ -5,6 +5,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { getSparkDriveBackupFilename } from "@app/config/appinfo"
+import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
@@ -34,12 +35,21 @@ export const useCloudBackup = ({
   const { appConfig } = useAppConfig()
   const { startSession, upload, loading } = useGoogleDriveBackup()
   const mnemonic = useWalletMnemonic()
+  const { identityPubkey, lightningAddress } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
 
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
 
-    const filename = getSparkDriveBackupFilename(appConfig.galoyInstance.name)
+    if (!identityPubkey) {
+      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed(), LL })
+      return
+    }
+
+    const filename = getSparkDriveBackupFilename(
+      appConfig.galoyInstance.name,
+      identityPubkey,
+    )
 
     let session
     try {
@@ -65,6 +75,8 @@ export const useCloudBackup = ({
     }
 
     const payload = buildBackupPayload(mnemonic, {
+      walletIdentifier: identityPubkey,
+      lightningAddress: lightningAddress ?? undefined,
       password: isEncrypted ? password : undefined,
       version,
     })
@@ -93,6 +105,8 @@ export const useCloudBackup = ({
     LL,
     appConfig.galoyInstance.name,
     mnemonic,
+    identityPubkey,
+    lightningAddress,
     setBackupCompleted,
   ])
 

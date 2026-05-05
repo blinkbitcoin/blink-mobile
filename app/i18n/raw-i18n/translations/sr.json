@@ -3612,7 +3612,9 @@
     "noBackupFound": "Резервна копија није пронађена",
     "noBackupDescription": "Нисмо пронашли резервну копију. Можете унети безбедносну фразу ручно.",
     "enterPassword": "Унесите лозинку за шифровање",
-    "wrongPassword": "Нетачна лозинка. Покушајте поново."
+    "wrongPassword": "Нетачна лозинка. Покушајте поново.",
+    "pickBackupTitle": "Изаберите новчаник",
+    "pickBackupDescription": "Изаберите резервну копију за враћање"
   },
   "BackupNudge": {
     "title": "Vaša sredstva su u opasnosti",

@@ -3615,7 +3615,9 @@
     "noBackupFound": "Tiada sandaran ditemui",
     "noBackupDescription": "Kami tidak dapat menemui sandaran. Anda boleh memasukkan frasa sandaran secara manual.",
     "enterPassword": "Masukkan kata laluan penyulitan anda",
-    "wrongPassword": "Kata laluan salah. Sila cuba lagi."
+    "wrongPassword": "Kata laluan salah. Sila cuba lagi.",
+    "pickBackupTitle": "Pilih dompet",
+    "pickBackupDescription": "Pilih sandaran untuk dipulihkan"
   },
   "BackupNudge": {
     "title": "Dana anda dalam bahaya",

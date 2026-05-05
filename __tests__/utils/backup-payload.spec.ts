@@ -20,6 +20,7 @@ jest.mock("react-native-quick-crypto", () => {
 import {
   buildBackupPayload,
   isEncryptedBackup,
+  parseBackupMetadata,
   parseBackupPayload,
   parseEncryptedBackupPayload,
 } from "@app/utils/backup-payload"
@@ -27,21 +28,30 @@ import {
 describe("spark backup format", () => {
   const mnemonic =
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain"
+  const walletIdentifier =
+    "02abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+  const lightningAddress = "alice@example.com"
 
   it("builds and parses an unencrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic)
+    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
 
     expect(parseBackupPayload(raw)).toEqual({ mnemonic })
   })
 
   it("builds and parses an encrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
 
     expect(parseEncryptedBackupPayload(raw, "ValidPass1234!")).toEqual({ mnemonic })
   })
 
   it("persists cipher and kdf parameters for encrypted payloads", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
     const payload = JSON.parse(raw) as {
       encrypted: boolean
       cipher: string
@@ -59,27 +69,33 @@ describe("spark backup format", () => {
   })
 
   it("stores a 12-byte IV for encrypted payloads", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
     const payload = JSON.parse(raw) as { iv: string }
 
     expect(Buffer.from(payload.iv, "base64")).toHaveLength(12)
   })
 
   it("fails to decrypt encrypted payload with wrong password", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
 
     expect(() => parseEncryptedBackupPayload(raw, "WrongPassword!1")).toThrow()
   })
 
   it("produces different encrypted payload content across runs", () => {
     const first = JSON.parse(
-      buildBackupPayload(mnemonic, { password: "ValidPass1234!" }),
+      buildBackupPayload(mnemonic, { walletIdentifier, password: "ValidPass1234!" }),
     ) as {
       data: string
       iv: string
     }
     const second = JSON.parse(
-      buildBackupPayload(mnemonic, { password: "ValidPass1234!" }),
+      buildBackupPayload(mnemonic, { walletIdentifier, password: "ValidPass1234!" }),
     ) as {
       data: string
       iv: string
@@ -90,12 +106,15 @@ describe("spark backup format", () => {
   })
 
   it("isEncryptedBackup returns true for encrypted payloads", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
     expect(isEncryptedBackup(raw)).toBe(true)
   })
 
   it("isEncryptedBackup returns false for unencrypted payloads", () => {
-    const raw = buildBackupPayload(mnemonic)
+    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
     expect(isEncryptedBackup(raw)).toBe(false)
   })
 
@@ -104,17 +123,23 @@ describe("spark backup format", () => {
   })
 
   it("parseBackupPayload throws on encrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
     expect(() => parseBackupPayload(raw)).toThrow("Encrypted payload requires password")
   })
 
   it("parseEncryptedBackupPayload handles unencrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic)
+    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
     expect(parseEncryptedBackupPayload(raw, "anything")).toEqual({ mnemonic })
   })
 
   it("matches the app payload shape with standards-compliant AES-GCM output", () => {
-    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    const raw = buildBackupPayload(mnemonic, {
+      walletIdentifier,
+      password: "ValidPass1234!",
+    })
     const payload = JSON.parse(raw) as { iv: string; data: string; salt: string }
 
     const key = nodeCrypto.pbkdf2Sync(
@@ -137,5 +162,82 @@ describe("spark backup format", () => {
     ]).toString("utf8")
 
     expect(decrypted).toBe(mnemonic)
+  })
+
+  describe("metadata", () => {
+    it("includes walletIdentifier and version in encrypted payloads", () => {
+      const raw = buildBackupPayload(mnemonic, {
+        walletIdentifier,
+        password: "ValidPass1234!",
+      })
+      const payload = JSON.parse(raw) as {
+        version: number
+        walletIdentifier: string
+        createdAt: number
+      }
+
+      expect(payload.version).toBe(1)
+      expect(payload.walletIdentifier).toBe(walletIdentifier)
+      expect(typeof payload.createdAt).toBe("number")
+    })
+
+    it("includes walletIdentifier in unencrypted payloads", () => {
+      const raw = buildBackupPayload(mnemonic, { walletIdentifier })
+      const payload = JSON.parse(raw) as { walletIdentifier: string }
+
+      expect(payload.walletIdentifier).toBe(walletIdentifier)
+    })
+
+    it("persists lightningAddress when provided", () => {
+      const raw = buildBackupPayload(mnemonic, { walletIdentifier, lightningAddress })
+      const payload = JSON.parse(raw) as { lightningAddress?: string }
+
+      expect(payload.lightningAddress).toBe(lightningAddress)
+    })
+
+    it("omits lightningAddress when not provided", () => {
+      const raw = buildBackupPayload(mnemonic, { walletIdentifier })
+      const payload = JSON.parse(raw) as { lightningAddress?: string }
+
+      expect(payload.lightningAddress).toBeUndefined()
+    })
+
+    it("parseBackupMetadata extracts metadata from unencrypted payload", () => {
+      const raw = buildBackupPayload(mnemonic, { walletIdentifier, lightningAddress })
+
+      expect(parseBackupMetadata(raw)).toEqual({
+        version: 1,
+        walletIdentifier,
+        lightningAddress,
+        createdAt: expect.any(Number),
+        encrypted: false,
+      })
+    })
+
+    it("parseBackupMetadata extracts metadata from encrypted payload without decrypting", () => {
+      const raw = buildBackupPayload(mnemonic, {
+        walletIdentifier,
+        lightningAddress,
+        password: "ValidPass1234!",
+      })
+
+      expect(parseBackupMetadata(raw)).toEqual({
+        version: 1,
+        walletIdentifier,
+        lightningAddress,
+        createdAt: expect.any(Number),
+        encrypted: true,
+      })
+    })
+
+    it("parseBackupMetadata returns null for invalid JSON", () => {
+      expect(parseBackupMetadata("not json {{{")).toBeNull()
+    })
+
+    it("parseBackupMetadata returns null when walletIdentifier is missing", () => {
+      const raw = JSON.stringify({ version: 1, mnemonic, encrypted: false })
+
+      expect(parseBackupMetadata(raw)).toBeNull()
+    })
   })
 })

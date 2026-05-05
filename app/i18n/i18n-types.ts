@@ -11856,6 +11856,14 @@ type RootTranslation = {
 		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		wrongPassword: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​w​a​l​l​e​t
+		 */
+		pickBackupTitle: string
+		/**
+		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
+		 */
+		pickBackupDescription: string
 	}
 	BackupNudge: {
 		/**
@@ -23960,6 +23968,14 @@ export type TranslationFunctions = {
 		 * Incorrect password. Please try again.
 		 */
 		wrongPassword: () => LocalizedString
+		/**
+		 * Choose a wallet
+		 */
+		pickBackupTitle: () => LocalizedString
+		/**
+		 * Select a backup to restore
+		 */
+		pickBackupDescription: () => LocalizedString
 	}
 	BackupNudge: {
 		/**

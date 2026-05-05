@@ -3603,7 +3603,9 @@
         "noBackupFound": "バックアップが見つかりません",
         "noBackupDescription": "バックアップが見つかりませんでした。バックアップフレーズを手動で入力できます。",
         "enterPassword": "暗号化パスワードを入力してください",
-        "wrongPassword": "パスワードが正しくありません。再試行してください."
+        "wrongPassword": "パスワードが正しくありません。再試行してください.",
+        "pickBackupTitle": "ウォレットを選択",
+        "pickBackupDescription": "復元するバックアップを選択"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",

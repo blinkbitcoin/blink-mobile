@@ -3562,7 +3562,9 @@
         "noBackupFound": "Nessun backup trovato",
         "noBackupDescription": "Non abbiamo trovato un backup. Puoi inserire la tua frase di backup manualmente.",
         "enterPassword": "Inserisci la password di crittografia",
-        "wrongPassword": "Password errata. Riprova."
+        "wrongPassword": "Password errata. Riprova.",
+        "pickBackupTitle": "Scegli un portafoglio",
+        "pickBackupDescription": "Seleziona un backup da ripristinare"
     },
     "BackupNudge": {
         "title": "I tuoi fondi sono a rischio",

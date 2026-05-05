@@ -3574,7 +3574,9 @@
     "noBackupFound": "Hakuna hifadhi iliyopatikana",
     "noBackupDescription": "Hatukupata hifadhi. Unaweza kuingiza msemo wako wa hifadhi kwa mkono.",
     "enterPassword": "Ingiza nenosiri lako la usimbaji",
-    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena."
+    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
+    "pickBackupTitle": "Chagua pochi",
+    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha"
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",

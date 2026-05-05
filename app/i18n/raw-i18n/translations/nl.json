@@ -3615,7 +3615,9 @@
     "noBackupFound": "Geen back-up gevonden",
     "noBackupDescription": "We konden geen back-up vinden. Je kunt je back-upfrase handmatig invoeren.",
     "enterPassword": "Voer je versleutelingswachtwoord in",
-    "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw."
+    "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
+    "pickBackupTitle": "Kies een wallet",
+    "pickBackupDescription": "Kies een back-up om te herstellen"
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",

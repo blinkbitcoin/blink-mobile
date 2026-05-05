@@ -3574,7 +3574,9 @@
     "noBackupFound": "Cadangan tidak ditemukan",
     "noBackupDescription": "Kami tidak dapat menemukan cadangan. Anda dapat memasukkan frasa cadangan secara manual.",
     "enterPassword": "Masukkan kata sandi enkripsi Anda",
-    "wrongPassword": "Kata sandi salah. Silakan coba lagi."
+    "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
+    "pickBackupTitle": "Pilih dompet",
+    "pickBackupDescription": "Pilih cadangan untuk dipulihkan"
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",

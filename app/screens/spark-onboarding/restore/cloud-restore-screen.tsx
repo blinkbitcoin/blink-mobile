@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
@@ -14,6 +14,7 @@ import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "../layouts"
 
+import { CloudBackupPicker } from "./cloud-backup-picker"
 import { useCloudRestore } from "./hooks/use-cloud-restore"
 
 export const SparkCloudRestoreScreen: React.FC = () => {
@@ -25,13 +26,22 @@ export const SparkCloudRestoreScreen: React.FC = () => {
     isLoading,
     hasError,
     isNotFound,
+    isPicker,
     isPassword,
+    entries,
     password,
     setPassword,
     passwordError,
-    attemptDownload,
+    loadCloudBackups,
+    handlePick,
     handleDecrypt,
   } = useCloudRestore()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: isPicker ? LL.RestoreScreen.pickBackupTitle() : "",
+    })
+  }, [isPicker, navigation, LL])
 
   if (isLoading) {
     return (
@@ -60,7 +70,7 @@ export const SparkCloudRestoreScreen: React.FC = () => {
             />
             <GaloySecondaryButton
               title={LL.common.tryAgain()}
-              onPress={attemptDownload}
+              onPress={loadCloudBackups}
               {...testProps("retry-download-button")}
             />
           </>
@@ -74,6 +84,20 @@ export const SparkCloudRestoreScreen: React.FC = () => {
         {isNotFound && (
           <Text style={styles.description}>{LL.RestoreScreen.noBackupDescription()}</Text>
         )}
+      </OnboardingScreenLayout>
+    )
+  }
+
+  if (isPicker) {
+    return (
+      <OnboardingScreenLayout scrollable>
+        <Text
+          style={styles.pickerDescription}
+          {...testProps("cloud-backup-picker-description")}
+        >
+          {LL.RestoreScreen.pickBackupDescription()}
+        </Text>
+        <CloudBackupPicker entries={entries} onSelect={handlePick} />
       </OnboardingScreenLayout>
     )
   }
@@ -117,6 +141,13 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     color: colors.grey2,
+  },
+  pickerDescription: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.grey2,
+    marginTop: 10,
+    marginBottom: 12,
   },
   centerContainer: {
     flex: 1,

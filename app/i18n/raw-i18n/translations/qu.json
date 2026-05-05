@@ -3612,7 +3612,9 @@
     "noBackupFound": "Mana backup tarikunchu",
     "noBackupDescription": "Mana backup tarikuyta atinichu. Makiykiwan backup frase qillqayta atinki.",
     "enterPassword": "Cifrado contraseñaykita qillqay",
-    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway."
+    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway.",
+    "pickBackupTitle": "Akllay wallet",
+    "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq"
   },
   "BackupNudge": {
     "title": "Qullqiykikuna sasachakuypi kachkan",

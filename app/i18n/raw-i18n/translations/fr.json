@@ -3603,7 +3603,9 @@
         "noBackupFound": "Aucune sauvegarde trouvée",
         "noBackupDescription": "Nous n'avons pas trouvé de sauvegarde. Vous pouvez entrer votre phrase de sauvegarde manuellement.",
         "enterPassword": "Entrez votre mot de passe de chiffrement",
-        "wrongPassword": "Mot de passe incorrect. Veuillez réessayer."
+        "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
+        "pickBackupTitle": "Choisissez un portefeuille",
+        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer"
     },
     "BackupNudge": {
         "title": "Vos fonds sont en danger",

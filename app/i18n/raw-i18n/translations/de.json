@@ -3562,7 +3562,9 @@
         "noBackupFound": "Kein Backup gefunden",
         "noBackupDescription": "Wir konnten kein Backup finden. Du kannst deine Sicherungsphrase manuell eingeben.",
         "enterPassword": "Gib dein Verschlüsselungspasswort ein",
-        "wrongPassword": "Falsches Passwort. Bitte versuche es erneut."
+        "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
+        "pickBackupTitle": "Wallet auswählen",
+        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen"
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",
