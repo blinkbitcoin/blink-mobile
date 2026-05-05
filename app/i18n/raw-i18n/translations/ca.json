@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Gestor de contrasenyes",
       "manualBackup": "Còpia de seguretat manual",
-      "keychainSaved": "Còpia de seguretat desada al gestor de contrasenyes",
-      "keychainFailed": "No s’ha pogut desar la còpia de seguretat",
+      "passwordManagerBackupSaved": "Còpia de seguretat desada al gestor de contrasenyes",
+      "passwordManagerBackupFailed": "No s’ha pogut desar la còpia de seguretat",
+      "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Utilitza la còpia de seguretat de Drive o desa la teva frase de 12 paraules manualment.",
       "iOSComingSoon": "La còpia de seguretat a l’iCloud arribarà aviat"
     },
     "ManualBackup": {

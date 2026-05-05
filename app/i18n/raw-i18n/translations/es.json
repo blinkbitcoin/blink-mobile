@@ -3466,8 +3466,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "Gestor de contraseñas",
             "manualBackup": "Respaldo manual",
-            "keychainSaved": "Respaldo guardado en el gestor de contraseñas",
-            "keychainFailed": "Error al guardar el respaldo",
+            "passwordManagerBackupSaved": "Respaldo guardado en el gestor de contraseñas",
+            "passwordManagerBackupFailed": "Error al guardar el respaldo",
+            "passwordManagerUnavailable": "No hay ningún gestor de contraseñas disponible en este dispositivo. Usa la copia de seguridad de Drive o guarda tu frase de 12 palabras manualmente.",
             "iOSComingSoon": "Respaldo en iCloud próximamente"
         },
         "ManualBackup": {

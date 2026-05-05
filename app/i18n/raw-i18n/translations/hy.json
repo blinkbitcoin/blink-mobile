@@ -3520,8 +3520,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Գաղտնաբառերի կառավարիչ",
       "manualBackup": "Ձեռքով պահուստավորում",
-      "keychainSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
-      "keychainFailed": "Չհաջողվել պահուստավորումը",
+      "passwordManagerBackupSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
+      "passwordManagerBackupFailed": "Չհաջողվել պահուստավորումը",
+      "passwordManagerUnavailable": "Այս սարքում գաղտնաբառերի կառավարիչ չկա։ Օգտագործեք Drive-ի պահուստը կամ պահպանեք ձեր 12-բառ արտահայտությունը ձեռքով։",
       "iOSComingSoon": "iCloud-ի պահուստավորումը շուտով հասանելի կլինի"
     },
     "ManualBackup": {

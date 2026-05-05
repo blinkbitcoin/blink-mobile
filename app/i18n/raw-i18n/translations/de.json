@@ -3466,8 +3466,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "Passwort-Manager",
             "manualBackup": "Manuelle Sicherung",
-            "keychainSaved": "Sicherung im Passwort-Manager gespeichert",
-            "keychainFailed": "Sicherung konnte nicht gespeichert werden",
+            "passwordManagerBackupSaved": "Sicherung im Passwort-Manager gespeichert",
+            "passwordManagerBackupFailed": "Sicherung konnte nicht gespeichert werden",
+            "passwordManagerUnavailable": "Auf diesem Gerät ist kein Passwortmanager verfügbar. Nutze die Drive-Sicherung oder speichere deine 12-Wort-Phrase manuell.",
             "iOSComingSoon": "iCloud-Backup kommt bald"
         },
         "ManualBackup": {

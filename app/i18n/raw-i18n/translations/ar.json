@@ -3516,8 +3516,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "مدير كلمات المرور",
       "manualBackup": "نسخ احتياطي يدوي",
-      "keychainSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
-      "keychainFailed": "فشل حفظ النسخة الاحتياطية",
+      "passwordManagerBackupSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
+      "passwordManagerBackupFailed": "فشل حفظ النسخة الاحتياطية",
+      "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متوفر على هذا الجهاز. استخدم النسخ الاحتياطي على Drive أو احفظ عبارة الـ 12 كلمة يدوياً.",
       "iOSComingSoon": "النسخ الاحتياطي على iCloud قريبًا"
     },
     "ManualBackup": {

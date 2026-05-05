@@ -3519,8 +3519,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Upravitelj lozinki",
       "manualBackup": "Ručna sigurnosna kopija",
-      "keychainSaved": "Sigurnosna kopija spremljena u upravitelj lozinki",
-      "keychainFailed": "Spremanje sigurnosne kopije nije uspjelo",
+      "passwordManagerBackupSaved": "Sigurnosna kopija spremljena u upravitelj lozinki",
+      "passwordManagerBackupFailed": "Spremanje sigurnosne kopije nije uspjelo",
+      "passwordManagerUnavailable": "Na ovom uređaju nije dostupan upravitelj lozinki. Koristite sigurnosnu kopiju Drive ili ručno spremite svoju 12-riječnu frazu.",
       "iOSComingSoon": "iCloud sigurnosna kopija uskoro dolazi"
     },
     "ManualBackup": {

@@ -3516,8 +3516,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Trình quản lý mật khẩu",
       "manualBackup": "Sao lưu thủ công",
-      "keychainSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
-      "keychainFailed": "Không thể lưu bản sao lưu",
+      "passwordManagerBackupSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
+      "passwordManagerBackupFailed": "Không thể lưu bản sao lưu",
+      "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào khả dụng trên thiết bị này. Hãy sử dụng bản sao lưu Drive hoặc lưu cụm từ 12 chữ của bạn theo cách thủ công.",
       "iOSComingSoon": "Sao lưu iCloud sắp ra mắt"
     },
     "ManualBackup": {

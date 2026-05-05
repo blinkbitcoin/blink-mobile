@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Pengelola kata sandi",
       "manualBackup": "Cadangan manual",
-      "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
-      "keychainFailed": "Gagal menyimpan cadangan",
+      "passwordManagerBackupSaved": "Cadangan disimpan ke pengelola kata sandi",
+      "passwordManagerBackupFailed": "Gagal menyimpan cadangan",
+      "passwordManagerUnavailable": "Tidak ada pengelola kata sandi yang tersedia di perangkat ini. Gunakan cadangan Drive atau simpan frasa 12 kata Anda secara manual.",
       "iOSComingSoon": "Pencadangan iCloud segera hadir"
     },
     "ManualBackup": {

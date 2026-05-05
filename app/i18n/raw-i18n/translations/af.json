@@ -3519,8 +3519,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Wagwoordbestuurder",
       "manualBackup": "Handmatige rugsteun",
-      "keychainSaved": "Rugsteun gestoor in wagwoordbestuurder",
-      "keychainFailed": "Kon nie rugsteun stoor nie",
+      "passwordManagerBackupSaved": "Rugsteun gestoor in wagwoordbestuurder",
+      "passwordManagerBackupFailed": "Kon nie rugsteun stoor nie",
+      "passwordManagerUnavailable": "Geen wagwoordbestuurder op hierdie toestel beskikbaar nie. Gebruik Drive-rugsteun of stoor jou 12-woord-frase handmatig.",
       "iOSComingSoon": "iCloud-rugsteun kom binnekort"
     },
     "ManualBackup": {

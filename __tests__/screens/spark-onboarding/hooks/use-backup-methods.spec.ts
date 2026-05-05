@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 import { Platform } from "react-native"
 
 import { useBackupMethods } from "@app/screens/spark-onboarding/hooks/use-backup-methods"
@@ -13,12 +13,16 @@ const mockSave = jest.fn()
 let mockLoading = false
 
 jest.mock("@app/hooks", () => ({
-  useKeychainBackup: () => ({
+  CredentialError: {
+    NoProvider: "no-provider",
+    UserCancelled: "user-cancelled",
+    Unsupported: "unsupported",
+    Unknown: "unknown",
+  },
+  useCredentialBackup: () => ({
     save: mockSave,
+    read: jest.fn(),
     loading: mockLoading,
-  }),
-  useAppConfig: () => ({
-    appConfig: { galoyInstance: { name: "Blink" } },
   }),
 }))
 
@@ -31,13 +35,22 @@ jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
+  useSelfCustodialAccountInfo: () => ({
+    identityPubkey: mockIdentityPubkey,
+    lightningAddress: null,
+  }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       BackupScreen: {
         BackupMethod: {
-          keychainSaved: () => "Backup saved",
-          keychainFailed: () => "Failed to save backup",
+          passwordManagerBackupSaved: () => "Backup saved",
+          passwordManagerBackupFailed: () => "Failed to save backup",
+          passwordManagerUnavailable: () => "No password manager available",
           iOSComingSoon: () => "Coming soon on iOS",
         },
       },
@@ -45,20 +58,15 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/utils/storage/secureStorage", () => ({
-  __esModule: true,
-  default: {
-    getMnemonic: jest
-      .fn()
-      .mockResolvedValue(
-        "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
-      ),
-  },
-}))
-
+const mockSetBackupCompleted = jest.fn()
 jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+  BackupMethod: {
+    Cloud: "cloud",
+    Keychain: "keychain",
+    Manual: "manual",
+  },
   useBackupState: () => ({
-    setBackupCompleted: jest.fn(),
+    setBackupCompleted: mockSetBackupCompleted,
   }),
 }))
 
@@ -68,6 +76,7 @@ describe("useBackupMethods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
+    mockIdentityPubkey = "test-pubkey-1234"
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
@@ -75,79 +84,138 @@ describe("useBackupMethods", () => {
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
-  it("returns keychain loading state", () => {
+  it("exposes credential manager loading state", () => {
     mockLoading = true
     const { result } = renderHook(() => useBackupMethods())
-    expect(result.current.keychainLoading).toBe(true)
-    expect(result.current.isCloudBackupAvailable).toBe(originalPlatform !== "ios")
+    expect(result.current.credentialLoading).toBe(true)
+    expect(result.current.isDriveBackupAvailable).toBe(originalPlatform !== "ios")
   })
 
-  it("saves to keychain and navigates to success on handleKeychainBackup", async () => {
-    mockSave.mockResolvedValue(true)
-    const { result } = renderHook(() => useBackupMethods())
+  describe("handleCredentialBackup", () => {
+    it("bails out with a failure toast when identityPubkey is missing", async () => {
+      mockIdentityPubkey = null
+      const { result } = renderHook(() => useBackupMethods())
 
-    await act(async () => {
-      await result.current.handleKeychainBackup()
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockSave).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Failed to save backup" }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    expect(mockSave).toHaveBeenCalled()
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "success" }),
-    )
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    it("saves with the identity pubkey and navigates to success on completion", async () => {
+      mockSave.mockResolvedValue({ success: true })
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockSave).toHaveBeenCalledWith("test-pubkey-1234", "youth indicate void")
+      expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "success", message: "Backup saved" }),
+      )
+      expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    })
+
+    it("stays silent when the user cancels", async () => {
+      mockSave.mockResolvedValue({ success: false, error: "user-cancelled" })
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+    })
+
+    it("shows the unavailable toast when no provider is configured", async () => {
+      mockSave.mockResolvedValue({ success: false, error: "no-provider" })
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "No password manager available" }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("shows the unavailable toast on unsupported platform", async () => {
+      mockSave.mockResolvedValue({ success: false, error: "unsupported" })
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "No password manager available" }),
+      )
+    })
+
+    it("shows the failure toast on unknown errors", async () => {
+      mockSave.mockResolvedValue({ success: false, error: "unknown" })
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Failed to save backup" }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
-  it("does not navigate on keychain save failure", async () => {
-    mockSave.mockResolvedValue(false)
-    const { result } = renderHook(() => useBackupMethods())
+  describe("handleCloudBackup", () => {
+    it("shows iOS-coming-soon toast on iOS", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+      const { result } = renderHook(() => useBackupMethods())
 
-    await act(async () => {
-      await result.current.handleKeychainBackup()
+      act(() => {
+        result.current.handleCloudBackup()
+      })
+
+      expect(result.current.isDriveBackupAvailable).toBe(false)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Coming soon on iOS" }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalledWith("sparkCloudBackupScreen")
     })
 
-    expect(mockSave).toHaveBeenCalled()
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Failed to save backup" }),
-    )
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    it("navigates to the cloud backup screen on Android", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+      const { result } = renderHook(() => useBackupMethods())
+
+      act(() => {
+        result.current.handleCloudBackup()
+      })
+
+      expect(result.current.isDriveBackupAvailable).toBe(true)
+      expect(mockNavigate).toHaveBeenCalledWith("sparkCloudBackupScreen")
+    })
   })
 
-  it("does not navigate on handleCloudBackup on iOS", () => {
-    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+  describe("handleManualBackup", () => {
+    it("navigates to the alerts screen", () => {
+      const { result } = renderHook(() => useBackupMethods())
 
-    const { result } = renderHook(() => useBackupMethods())
+      act(() => {
+        result.current.handleManualBackup()
+      })
 
-    act(() => {
-      result.current.handleCloudBackup()
+      expect(mockNavigate).toHaveBeenCalledWith("sparkBackupAlertsScreen")
     })
-
-    expect(result.current.isCloudBackupAvailable).toBe(false)
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Coming soon on iOS" }),
-    )
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkCloudBackupScreen")
-  })
-
-  it("navigates on handleCloudBackup when platform is not iOS", () => {
-    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
-
-    const { result } = renderHook(() => useBackupMethods())
-
-    act(() => {
-      result.current.handleCloudBackup()
-    })
-
-    expect(result.current.isCloudBackupAvailable).toBe(true)
-    expect(mockNavigate).toHaveBeenCalledWith("sparkCloudBackupScreen")
-  })
-
-  it("navigates to alerts screen on handleManualBackup", () => {
-    const { result } = renderHook(() => useBackupMethods())
-
-    act(() => {
-      result.current.handleManualBackup()
-    })
-
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupAlertsScreen")
   })
 })

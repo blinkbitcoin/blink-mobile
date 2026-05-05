@@ -3478,8 +3478,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Şifre yöneticisi",
       "manualBackup": "Manuel yedekleme",
-      "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
-      "keychainFailed": "Yedekleme kaydedilemedi",
+      "passwordManagerBackupSaved": "Yedekleme şifre yöneticisine kaydedildi",
+      "passwordManagerBackupFailed": "Yedekleme kaydedilemedi",
+      "passwordManagerUnavailable": "Bu cihazda kullanılabilir parola yöneticisi yok. Drive yedeklemesini kullan veya 12 kelimelik ifadeni manuel olarak kaydet.",
       "iOSComingSoon": "iCloud yedekleme yakında geliyor"
     },
     "ManualBackup": {

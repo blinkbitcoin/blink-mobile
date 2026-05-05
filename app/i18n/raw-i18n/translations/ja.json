@@ -3507,8 +3507,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "パスワードマネージャー",
             "manualBackup": "手動バックアップ",
-            "keychainSaved": "バックアップがパスワードマネージャーに保存されました",
-            "keychainFailed": "バックアップの保存に失敗しました",
+            "passwordManagerBackupSaved": "バックアップがパスワードマネージャーに保存されました",
+            "passwordManagerBackupFailed": "バックアップの保存に失敗しました",
+            "passwordManagerUnavailable": "このデバイスでは利用可能なパスワードマネージャーがありません。Driveバックアップを使用するか、12単語のフレーズを手動で保存してください。",
             "iOSComingSoon": "iCloudバックアップは近日公開予定です"
         },
         "ManualBackup": {

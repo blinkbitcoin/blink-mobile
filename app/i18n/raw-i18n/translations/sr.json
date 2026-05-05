@@ -3516,8 +3516,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Менаџер лозинки",
       "manualBackup": "Ручна резервна копија",
-      "keychainSaved": "Резервна копија сачувана у менаџеру лозинки",
-      "keychainFailed": "Чување резервне копије није успело",
+      "passwordManagerBackupSaved": "Резервна копија сачувана у менаџеру лозинки",
+      "passwordManagerBackupFailed": "Чување резервне копије није успело",
+      "passwordManagerUnavailable": "На овом уређају није доступан управљач лозинкама. Користите Drive резервну копију или ручно сачувајте своју фразу од 12 речи.",
       "iOSComingSoon": "iCloud резервна копија ускоро стиже"
     },
     "ManualBackup": {

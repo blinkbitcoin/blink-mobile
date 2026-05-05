@@ -3519,8 +3519,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Wachtwoordbeheerder",
       "manualBackup": "Handmatige back-up",
-      "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
-      "keychainFailed": "Back-up opslaan mislukt",
+      "passwordManagerBackupSaved": "Back-up opgeslagen in wachtwoordbeheerder",
+      "passwordManagerBackupFailed": "Back-up opslaan mislukt",
+      "passwordManagerUnavailable": "Geen wachtwoordbeheerder beschikbaar op dit apparaat. Gebruik Drive-back-up of bewaar je 12-woord-frase handmatig.",
       "iOSComingSoon": "iCloud-back-up komt binnenkort"
     },
     "ManualBackup": {

@@ -3525,8 +3525,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Umlawuli wezigxina",
       "manualBackup": "Ukugcina ngesandla",
-      "keychainSaved": "Ukugcinwa kugcinwe kumlawuli wezigxina",
-      "keychainFailed": "Ukugcinwa akuphumelelanga",
+      "passwordManagerBackupSaved": "Ukugcinwa kugcinwe kumlawuli wezigxina",
+      "passwordManagerBackupFailed": "Ukugcinwa akuphumelelanga",
+      "passwordManagerUnavailable": "Akukho mlawuli wegama lokugqitha ofumanekayo kwesi sixhobo. Sebenzisa ungqino lwe-Drive okanye ugcine ibinzana lakho lamagama ali-12 ngokwesandla.",
       "iOSComingSoon": "Ugcino lwe-iCloud luyeza kungekudala"
     },
     "ManualBackup": {

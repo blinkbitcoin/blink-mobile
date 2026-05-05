@@ -3627,8 +3627,10 @@ const en: BaseTranslation = {
       appleICloud: "Apple iCloud",
       passwordManager: "Password manager",
       manualBackup: "Manual backup",
-      keychainSaved: "Backup saved to password manager",
-      keychainFailed: "Failed to save backup",
+      passwordManagerBackupSaved: "Backup saved to password manager",
+      passwordManagerBackupFailed: "Failed to save backup",
+      passwordManagerUnavailable:
+        "No password manager available on this device. Use Drive backup or save your 12-word phrase manually.",
       iOSComingSoon: "iCloud backup coming soon",
     },
     CloudBackup: {
