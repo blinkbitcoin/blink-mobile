@@ -16,6 +16,9 @@ import { useBackupMethods } from "./hooks"
 import { OnboardingScreenLayout } from "./layouts"
 import { getCloudProviderName } from "./utils"
 
+// TODO: remove this gate once the password manager flow supports multi-account
+const SHOW_PASSWORD_MANAGER_OPTION = false
+
 export const SparkBackupMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -53,12 +56,14 @@ export const SparkBackupMethodScreen: React.FC = () => {
               {LL.BackupScreen.BackupMethod.iOSComingSoon()}
             </Text>
           )}
-          <GaloySecondaryButton
-            title={LL.BackupScreen.BackupMethod.passwordManager()}
-            onPress={handleKeychainBackup}
-            loading={keychainLoading}
-            {...testProps("backup-keychain-button")}
-          />
+          {SHOW_PASSWORD_MANAGER_OPTION && (
+            <GaloySecondaryButton
+              title={LL.BackupScreen.BackupMethod.passwordManager()}
+              onPress={handleKeychainBackup}
+              loading={keychainLoading}
+              {...testProps("backup-keychain-button")}
+            />
+          )}
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={handleManualBackup}

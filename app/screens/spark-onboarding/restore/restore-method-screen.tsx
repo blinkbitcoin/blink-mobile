@@ -19,6 +19,9 @@ import { getCloudProviderName } from "../utils"
 
 import { useRestoreWallet } from "./hooks/use-restore-wallet"
 
+// TODO: remove this gate once the password manager flow supports multi-account
+const SHOW_PASSWORD_MANAGER_OPTION = false
+
 export const SparkRestoreMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -54,12 +57,14 @@ export const SparkRestoreMethodScreen: React.FC = () => {
             onPress={() => navigation.navigate("sparkCloudRestoreScreen")}
             {...testProps("restore-cloud-button")}
           />
-          <GaloySecondaryButton
-            title={LL.BackupScreen.BackupMethod.passwordManager()}
-            onPress={handleKeychainRestore}
-            loading={keychainLoading}
-            {...testProps("restore-keychain-button")}
-          />
+          {SHOW_PASSWORD_MANAGER_OPTION && (
+            <GaloySecondaryButton
+              title={LL.BackupScreen.BackupMethod.passwordManager()}
+              onPress={handleKeychainRestore}
+              loading={keychainLoading}
+              {...testProps("restore-keychain-button")}
+            />
+          )}
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={() =>
