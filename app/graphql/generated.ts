@@ -477,6 +477,9 @@ export type Card = {
   readonly lastFour: Scalars['String']['output'];
   readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
   readonly shippingAddress?: Maybe<ShippingAddress>;
+  readonly spendingLimitStatus: ReadonlyArray<SpendingLimitStatus>;
+  readonly spendingLimits: ReadonlyArray<SpendingLimit>;
+  readonly spendingToggles: ReadonlyArray<SpendingToggle>;
   readonly status: CardStatus;
 };
 
@@ -572,6 +575,23 @@ export type CardHolder = {
   readonly lastName: Scalars['String']['output'];
 };
 
+export type CardMerchant = {
+  readonly __typename: 'CardMerchant';
+  readonly brandName?: Maybe<Scalars['String']['output']>;
+  readonly category?: Maybe<Scalars['String']['output']>;
+  readonly categoryGroup?: Maybe<Scalars['String']['output']>;
+  readonly city?: Maybe<Scalars['String']['output']>;
+  readonly confidenceRange?: Maybe<Scalars['String']['output']>;
+  readonly confidenceScore?: Maybe<Scalars['Float']['output']>;
+  readonly country?: Maybe<Scalars['String']['output']>;
+  readonly displayName?: Maybe<Scalars['String']['output']>;
+  readonly iconUrl?: Maybe<Scalars['String']['output']>;
+  readonly logoUrl?: Maybe<Scalars['String']['output']>;
+  readonly phone?: Maybe<Scalars['String']['output']>;
+  readonly state?: Maybe<Scalars['String']['output']>;
+  readonly website?: Maybe<Scalars['String']['output']>;
+};
+
 export type CardPinUpdateInput = {
   readonly cardId: Scalars['ID']['input'];
   readonly encryptedPin: Scalars['String']['input'];
@@ -587,6 +607,43 @@ export type CardSecretsEncrypted = {
   readonly __typename: 'CardSecretsEncrypted';
   readonly encryptedCvc: EncryptedData;
   readonly encryptedPan: EncryptedData;
+};
+
+export type CardSpendingLimitRemoveInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly period: SpendingPeriod;
+};
+
+export type CardSpendingLimitRemovePayload = {
+  readonly __typename: 'CardSpendingLimitRemovePayload';
+  readonly removedLimit: SpendingLimit;
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+};
+
+export type CardSpendingLimitSetInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['input'];
+  readonly period: SpendingPeriod;
+};
+
+export type CardSpendingLimitSetPayload = {
+  readonly __typename: 'CardSpendingLimitSetPayload';
+  readonly limit: SpendingLimit;
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+};
+
+export type CardSpendingToggleSetInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly enabled: Scalars['Boolean']['input'];
+};
+
+export type CardSpendingToggleSetPayload = {
+  readonly __typename: 'CardSpendingToggleSetPayload';
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+  readonly toggle: SpendingToggle;
 };
 
 export const CardStatus = {
@@ -610,6 +667,7 @@ export type CardTransaction = {
   readonly id: Scalars['ID']['output'];
   readonly localAmount?: Maybe<Scalars['Int']['output']>;
   readonly localCurrency?: Maybe<Scalars['String']['output']>;
+  readonly merchant?: Maybe<CardMerchant>;
   readonly merchantCategory?: Maybe<Scalars['String']['output']>;
   readonly merchantCategoryCode?: Maybe<Scalars['String']['output']>;
   readonly merchantCity?: Maybe<Scalars['String']['output']>;
@@ -1360,6 +1418,9 @@ export type Mutation = {
   readonly cardCreate: Card;
   readonly cardPinUpdate: Scalars['Boolean']['output'];
   readonly cardReplace: Card;
+  readonly cardSpendingLimitRemove: CardSpendingLimitRemovePayload;
+  readonly cardSpendingLimitSet: CardSpendingLimitSetPayload;
+  readonly cardSpendingToggleSet: CardSpendingToggleSetPayload;
   readonly cardUpdate: Card;
   readonly contactCreate: ContactPayload;
   readonly deviceNotificationTokenCreate: SuccessPayload;
@@ -1580,6 +1641,21 @@ export type MutationCardPinUpdateArgs = {
 
 export type MutationCardReplaceArgs = {
   input: CardReplaceInput;
+};
+
+
+export type MutationCardSpendingLimitRemoveArgs = {
+  input: CardSpendingLimitRemoveInput;
+};
+
+
+export type MutationCardSpendingLimitSetArgs = {
+  input: CardSpendingLimitSetInput;
+};
+
+
+export type MutationCardSpendingToggleSetArgs = {
+  input: CardSpendingToggleSetInput;
 };
 
 
@@ -2368,6 +2444,39 @@ export type ShippingAddressInput = {
   readonly phoneNumber: Scalars['String']['input'];
   readonly postalCode: Scalars['String']['input'];
   readonly region: Scalars['String']['input'];
+};
+
+export const SpendingCategory = {
+  Atm: 'ATM'
+} as const;
+
+export type SpendingCategory = typeof SpendingCategory[keyof typeof SpendingCategory];
+export type SpendingLimit = {
+  readonly __typename: 'SpendingLimit';
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['output'];
+  readonly period: SpendingPeriod;
+};
+
+export type SpendingLimitStatus = {
+  readonly __typename: 'SpendingLimitStatus';
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['output'];
+  readonly period: SpendingPeriod;
+  readonly remainingCents: Scalars['Int']['output'];
+  readonly spentCents: Scalars['Int']['output'];
+};
+
+export const SpendingPeriod = {
+  Daily: 'DAILY',
+  Monthly: 'MONTHLY'
+} as const;
+
+export type SpendingPeriod = typeof SpendingPeriod[keyof typeof SpendingPeriod];
+export type SpendingToggle = {
+  readonly __typename: 'SpendingToggle';
+  readonly category: SpendingCategory;
+  readonly enabled: Scalars['Boolean']['output'];
 };
 
 export type StatefulNotification = {
@@ -9298,9 +9407,17 @@ export type ResolversTypes = {
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
   CardHolder: ResolverTypeWrapper<CardHolder>;
+  CardMerchant: ResolverTypeWrapper<CardMerchant>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
+  CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
+  CardSpendingLimitRemovePayload: ResolverTypeWrapper<CardSpendingLimitRemovePayload>;
+  CardSpendingLimitSetInput: CardSpendingLimitSetInput;
+  CardSpendingLimitSetPayload: ResolverTypeWrapper<CardSpendingLimitSetPayload>;
+  CardSpendingToggleSetInput: CardSpendingToggleSetInput;
+  CardSpendingToggleSetPayload: ResolverTypeWrapper<CardSpendingToggleSetPayload>;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
   CardTransactionConnection: ResolverTypeWrapper<CardTransactionConnection>;
@@ -9321,7 +9438,6 @@ export type ResolversTypes = {
   ContactPayload: ResolverTypeWrapper<ContactPayload>;
   ContactType: ContactType;
   Coordinates: ResolverTypeWrapper<Coordinates>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']['output']>;
   Currency: ResolverTypeWrapper<Currency>;
@@ -9467,6 +9583,11 @@ export type ResolversTypes = {
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: ResolverTypeWrapper<Scalars['SignedAmount']['output']>;
   SignedDisplayMajorAmount: ResolverTypeWrapper<Scalars['SignedDisplayMajorAmount']['output']>;
+  SpendingCategory: SpendingCategory;
+  SpendingLimit: ResolverTypeWrapper<SpendingLimit>;
+  SpendingLimitStatus: ResolverTypeWrapper<SpendingLimitStatus>;
+  SpendingPeriod: SpendingPeriod;
+  SpendingToggle: ResolverTypeWrapper<SpendingToggle>;
   StatefulNotification: ResolverTypeWrapper<Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversTypes['NotificationAction']> }>;
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
   StatefulNotificationAcknowledgePayload: ResolverTypeWrapper<StatefulNotificationAcknowledgePayload>;
@@ -9581,9 +9702,17 @@ export type ResolversParentTypes = {
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
   CardHolder: CardHolder;
+  CardMerchant: CardMerchant;
+  Float: Scalars['Float']['output'];
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
+  CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
+  CardSpendingLimitRemovePayload: CardSpendingLimitRemovePayload;
+  CardSpendingLimitSetInput: CardSpendingLimitSetInput;
+  CardSpendingLimitSetPayload: CardSpendingLimitSetPayload;
+  CardSpendingToggleSetInput: CardSpendingToggleSetInput;
+  CardSpendingToggleSetPayload: CardSpendingToggleSetPayload;
   CardTransaction: CardTransaction;
   CardTransactionConnection: CardTransactionConnection;
   CardTransactionEdge: CardTransactionEdge;
@@ -9601,7 +9730,6 @@ export type ResolversParentTypes = {
   ContactId: Scalars['ContactId']['output'];
   ContactPayload: ContactPayload;
   Coordinates: Coordinates;
-  Float: Scalars['Float']['output'];
   Country: Country;
   CountryCode: Scalars['CountryCode']['output'];
   Currency: Currency;
@@ -9734,6 +9862,9 @@ export type ResolversParentTypes = {
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: Scalars['SignedAmount']['output'];
   SignedDisplayMajorAmount: Scalars['SignedDisplayMajorAmount']['output'];
+  SpendingLimit: SpendingLimit;
+  SpendingLimitStatus: SpendingLimitStatus;
+  SpendingToggle: SpendingToggle;
   StatefulNotification: Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversParentTypes['NotificationAction']> };
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
   StatefulNotificationAcknowledgePayload: StatefulNotificationAcknowledgePayload;
@@ -9978,6 +10109,9 @@ export type CardResolvers<ContextType = any, ParentType extends ResolversParentT
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   shippingAddress?: Resolver<Maybe<ResolversTypes['ShippingAddress']>, ParentType, ContextType>;
+  spendingLimitStatus?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  spendingLimits?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimit']>, ParentType, ContextType>;
+  spendingToggles?: Resolver<ReadonlyArray<ResolversTypes['SpendingToggle']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -10009,9 +10143,44 @@ export type CardHolderResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CardMerchantResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardMerchant'] = ResolversParentTypes['CardMerchant']> = {
+  brandName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  category?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  categoryGroup?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  confidenceRange?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  confidenceScore?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  iconUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
   encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
   encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingLimitRemovePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingLimitRemovePayload'] = ResolversParentTypes['CardSpendingLimitRemovePayload']> = {
+  removedLimit?: Resolver<ResolversTypes['SpendingLimit'], ParentType, ContextType>;
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingLimitSetPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingLimitSetPayload'] = ResolversParentTypes['CardSpendingLimitSetPayload']> = {
+  limit?: Resolver<ResolversTypes['SpendingLimit'], ParentType, ContextType>;
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingToggleSetPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingToggleSetPayload'] = ResolversParentTypes['CardSpendingToggleSetPayload']> = {
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  toggle?: Resolver<ResolversTypes['SpendingToggle'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10025,6 +10194,7 @@ export type CardTransactionResolvers<ContextType = any, ParentType extends Resol
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   localAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   localCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchant?: Resolver<Maybe<ResolversTypes['CardMerchant']>, ParentType, ContextType>;
   merchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantCategoryCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -10462,6 +10632,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   cardCreate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardCreateArgs, 'input'>>;
   cardPinUpdate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCardPinUpdateArgs, 'input'>>;
   cardReplace?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardReplaceArgs, 'input'>>;
+  cardSpendingLimitRemove?: Resolver<ResolversTypes['CardSpendingLimitRemovePayload'], ParentType, ContextType, RequireFields<MutationCardSpendingLimitRemoveArgs, 'input'>>;
+  cardSpendingLimitSet?: Resolver<ResolversTypes['CardSpendingLimitSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingLimitSetArgs, 'input'>>;
+  cardSpendingToggleSet?: Resolver<ResolversTypes['CardSpendingToggleSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingToggleSetArgs, 'input'>>;
   cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
@@ -10840,6 +11013,28 @@ export interface SignedDisplayMajorAmountScalarConfig extends GraphQLScalarTypeC
   name: 'SignedDisplayMajorAmount';
 }
 
+export type SpendingLimitResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingLimit'] = ResolversParentTypes['SpendingLimit']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  limitCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  period?: Resolver<ResolversTypes['SpendingPeriod'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SpendingLimitStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingLimitStatus'] = ResolversParentTypes['SpendingLimitStatus']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  limitCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  period?: Resolver<ResolversTypes['SpendingPeriod'], ParentType, ContextType>;
+  remainingCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  spentCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SpendingToggleResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingToggle'] = ResolversParentTypes['SpendingToggle']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type StatefulNotificationResolvers<ContextType = any, ParentType extends ResolversParentTypes['StatefulNotification'] = ResolversParentTypes['StatefulNotification']> = {
   acknowledgedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
   action?: Resolver<Maybe<ResolversTypes['NotificationAction']>, ParentType, ContextType>;
@@ -11156,7 +11351,11 @@ export type Resolvers<ContextType = any> = {
   CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
   CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
   CardHolder?: CardHolderResolvers<ContextType>;
+  CardMerchant?: CardMerchantResolvers<ContextType>;
   CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
+  CardSpendingLimitRemovePayload?: CardSpendingLimitRemovePayloadResolvers<ContextType>;
+  CardSpendingLimitSetPayload?: CardSpendingLimitSetPayloadResolvers<ContextType>;
+  CardSpendingToggleSetPayload?: CardSpendingToggleSetPayloadResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
   CardTransactionEdge?: CardTransactionEdgeResolvers<ContextType>;
@@ -11267,6 +11466,9 @@ export type Resolvers<ContextType = any> = {
   ShippingAddress?: ShippingAddressResolvers<ContextType>;
   SignedAmount?: GraphQLScalarType;
   SignedDisplayMajorAmount?: GraphQLScalarType;
+  SpendingLimit?: SpendingLimitResolvers<ContextType>;
+  SpendingLimitStatus?: SpendingLimitStatusResolvers<ContextType>;
+  SpendingToggle?: SpendingToggleResolvers<ContextType>;
   StatefulNotification?: StatefulNotificationResolvers<ContextType>;
   StatefulNotificationAcknowledgePayload?: StatefulNotificationAcknowledgePayloadResolvers<ContextType>;
   StatefulNotificationConnection?: StatefulNotificationConnectionResolvers<ContextType>;
