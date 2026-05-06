@@ -13,7 +13,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state6)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.galoyAuthToken).toBe("test-token")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -29,7 +29,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state7)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.activeAccountId).toBe("custodial-default")
   })
 
@@ -42,7 +42,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state5)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.galoyAuthToken).toBe("old-token")
     expect(result.activeAccountId).toBeUndefined()
   })
@@ -58,7 +58,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -77,10 +77,53 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "sc-id-1": "USD",
       "sc-id-2": "BTC",
+    })
+  })
+
+  it("migrates schema 10 to 11 leaving the new per-account maps undefined", async () => {
+    const state10 = {
+      schemaVersion: 10,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+    }
+
+    const result = await migrateAndGetPersistentState(state10)
+
+    expect(result.schemaVersion).toBe(11)
+    expect(result.selfCustodialDisplayCurrencyByAccountId).toBeUndefined()
+    expect(result.selfCustodialLanguageByAccountId).toBeUndefined()
+  })
+
+  it("preserves schema 11 per-account display currency and language maps as-is", async () => {
+    const state11 = {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "sc-id-1",
+      selfCustodialDisplayCurrencyByAccountId: {
+        "sc-id-1": "EUR",
+        "sc-id-2": "JPY",
+      },
+      selfCustodialLanguageByAccountId: {
+        "sc-id-1": "es",
+        "sc-id-2": "fr",
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state11)
+
+    expect(result.schemaVersion).toBe(11)
+    expect(result.selfCustodialDisplayCurrencyByAccountId).toEqual({
+      "sc-id-1": "EUR",
+      "sc-id-2": "JPY",
+    })
+    expect(result.selfCustodialLanguageByAccountId).toEqual({
+      "sc-id-1": "es",
+      "sc-id-2": "fr",
     })
   })
 
@@ -119,7 +162,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state4)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.galoyAuthToken).toBe("token-v4")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -148,14 +191,14 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state3)
 
-    expect(result.schemaVersion).toBe(10)
+    expect(result.schemaVersion).toBe(11)
     expect(result.galoyAuthToken).toBe("token-v3")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("default state has schema version 10", () => {
-    expect(defaultPersistentState.schemaVersion).toBe(10)
+  it("default state has schema version 11", () => {
+    expect(defaultPersistentState.schemaVersion).toBe(11)
     expect(defaultPersistentState.activeAccountId).toBeUndefined()
     expect(
       defaultPersistentState.selfCustodialDefaultWalletCurrencyByAccountId,
