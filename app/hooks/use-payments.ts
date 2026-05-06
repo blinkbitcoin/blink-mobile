@@ -40,13 +40,13 @@ type PaymentsResult = {
   listPendingDeposits?: ListPendingDepositsAdapter
   claimDeposit?: ClaimDepositAdapter
   convert?: ConvertAdapter
-  accountType: AccountType
+  accountType?: AccountType
 }
 
 export const usePayments = (): PaymentsResult => {
   const { activeAccount } = useAccountRegistry()
   const { sdk } = useSelfCustodialWallet()
-  const accountType = activeAccount?.type ?? AccountType.Custodial
+  const accountType = activeAccount?.type
 
   return useMemo((): PaymentsResult => {
     if (accountType === AccountType.SelfCustodial && sdk) {
@@ -62,11 +62,15 @@ export const usePayments = (): PaymentsResult => {
       }
     }
 
-    return {
-      listPendingDeposits: createCustodialListPendingDeposits,
-      claimDeposit: createCustodialClaimDeposit,
-      convert: createCustodialConvert,
-      accountType,
+    if (accountType === AccountType.Custodial) {
+      return {
+        listPendingDeposits: createCustodialListPendingDeposits,
+        claimDeposit: createCustodialClaimDeposit,
+        convert: createCustodialConvert,
+        accountType,
+      }
     }
+
+    return { accountType }
   }, [accountType, sdk])
 }
