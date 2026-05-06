@@ -29,6 +29,29 @@ import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
 
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
 const mockNavigate = jest.fn()
 const originalConsoleError = console.error
 let consoleErrorSpy: jest.SpyInstance | null = null

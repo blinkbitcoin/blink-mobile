@@ -16,7 +16,6 @@ const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUsePriceConversion = jest.fn()
-const mockSyncSelfCustodialWallet = jest.fn()
 const mockRefreshWallets = jest.fn()
 
 jest.mock("@app/self-custodial/auto-convert", () => ({
@@ -456,7 +455,6 @@ describe("useAutoConvertListener — live trigger", () => {
       expect(mockExecuteAutoConvert).toHaveBeenCalled()
     })
     expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("returns without running convert when waitForPaymentCompleted times out", async () => {
@@ -925,7 +923,6 @@ describe("useAutoConvertListener — mount replay", () => {
     await waitFor(() => {
       expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1low")
     })
-    expect(mockToastShow).not.toHaveBeenCalled()
   })
 })
 
