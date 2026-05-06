@@ -26,8 +26,8 @@ const BITCOIN_ONLY = [ReceiveAssetMode.Bitcoin] as const
 const DOLLAR_ONLY = [ReceiveAssetMode.Dollar] as const
 
 const resolveInitialMode = (
-  isStableBalanceActive: boolean,
-  defaultCurrency: "BTC" | "USD" | undefined,
+  isStableBalanceActive?: boolean,
+  defaultCurrency?: "BTC" | "USD",
 ): ReceiveAssetMode => {
   if (isStableBalanceActive) return ReceiveAssetMode.Dollar
   if (defaultCurrency === WalletCurrency.Usd) return ReceiveAssetMode.Dollar

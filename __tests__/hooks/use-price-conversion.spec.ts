@@ -1,12 +1,20 @@
 // sort-imports-ignore
 
 import { useRealtimePriceQuery } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet.types"
 
 type MockUseRealtimePriceResponse = Pick<ReturnType<typeof useRealtimePriceQuery>, "data">
 const mockUseRealtimePriceQuery = jest.fn<
   MockUseRealtimePriceResponse,
   Parameters<typeof useRealtimePriceQuery>
 >()
+const mockUseRealtimePriceUnauthedQuery = jest.fn().mockReturnValue({ data: undefined })
+const mockUseAccountRegistry = jest.fn().mockReturnValue({ activeAccount: undefined })
+const mockUseEffectiveDisplayCurrency = jest.fn().mockReturnValue({
+  displayCurrency: "NGN",
+  setDisplayCurrency: jest.fn(),
+  loading: false,
+})
 
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import {
@@ -23,9 +31,18 @@ jest.mock("@app/graphql/generated", () => {
   return {
     ...jest.requireActual("@app/graphql/generated"),
     useRealtimePriceQuery: mockUseRealtimePriceQuery,
-    useRealtimePriceUnauthedQuery: jest.fn().mockReturnValue({ data: undefined }),
+    useRealtimePriceUnauthedQuery: (...args: unknown[]) =>
+      mockUseRealtimePriceUnauthedQuery(...args),
   }
 })
+
+jest.mock("@app/graphql/is-authed-context", () => ({ useIsAuthed: () => true }))
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => mockUseAccountRegistry(),
+}))
+jest.mock("@app/hooks/use-effective-display-currency", () => ({
+  useEffectiveDisplayCurrency: () => mockUseEffectiveDisplayCurrency(),
+}))
 
 const mockPriceData: MockUseRealtimePriceResponse = {
   data: {
@@ -74,6 +91,13 @@ const amounts = {
 describe("usePriceConversion", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: undefined })
+    mockUseEffectiveDisplayCurrency.mockReturnValue({
+      displayCurrency: "NGN",
+      setDisplayCurrency: jest.fn(),
+      loading: false,
+    })
+    mockUseRealtimePriceUnauthedQuery.mockReturnValue({ data: undefined })
   })
 
   it("should return null fields when no price is provided", () => {
@@ -119,6 +143,120 @@ describe("usePriceConversion", () => {
       amountsArray.forEach((amount) => {
         expect(convertMoneyAmount(amount, amount.currency)).toBe(amount)
       })
+    })
+  })
+
+  describe("displayCurrency", () => {
+    it("comes from the effective adapter, not from the realtime price", () => {
+      mockUseRealtimePriceQuery.mockReturnValue(mockPriceData)
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "EUR",
+        setDisplayCurrency: jest.fn(),
+        loading: false,
+      })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.displayCurrency).toBe("EUR")
+    })
+  })
+
+  describe("fetchPolicy", () => {
+    it("authed query uses cache-and-network so account switches refresh", () => {
+      mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
+
+      renderHook(() => usePriceConversion())
+
+      expect(mockUseRealtimePriceQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ fetchPolicy: "cache-and-network" }),
+      )
+    })
+
+    it("unauthed query uses cache-and-network so currency changes refresh", () => {
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+      })
+      mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
+
+      renderHook(() => usePriceConversion())
+
+      expect(mockUseRealtimePriceUnauthedQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ fetchPolicy: "cache-and-network" }),
+      )
+    })
+  })
+
+  describe("self-custodial isolation", () => {
+    beforeEach(() => {
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+      })
+    })
+
+    it("skips the authed query when active account is self-custodial", () => {
+      mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
+
+      renderHook(() => usePriceConversion())
+
+      expect(mockUseRealtimePriceQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+    })
+
+    it("forwards the effective display currency to the unauthed query", () => {
+      mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "JPY",
+        setDisplayCurrency: jest.fn(),
+        loading: false,
+      })
+
+      renderHook(() => usePriceConversion())
+
+      expect(mockUseRealtimePriceUnauthedQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: false,
+          variables: { currency: "JPY" },
+        }),
+      )
+    })
+
+    it("ignores a stale authed price even if the cache still serves it", () => {
+      mockUseRealtimePriceQuery.mockReturnValue(mockPriceData)
+      mockUseRealtimePriceUnauthedQuery.mockReturnValue({ data: undefined })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.convertMoneyAmount).toBeUndefined()
+      expect(result.current.usdPerSat).toBeNull()
+    })
+  })
+
+  describe("cached-currency guard", () => {
+    it("discards a price whose denominatorCurrency differs from the preference", () => {
+      mockUseRealtimePriceQuery.mockReturnValue(mockPriceData)
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "EUR",
+        setDisplayCurrency: jest.fn(),
+        loading: false,
+      })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.convertMoneyAmount).toBeUndefined()
+    })
+
+    it("trusts a price whose denominatorCurrency matches the preference", () => {
+      mockUseRealtimePriceQuery.mockReturnValue(mockPriceData)
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "NGN",
+        setDisplayCurrency: jest.fn(),
+        loading: false,
+      })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.convertMoneyAmount).toBeDefined()
     })
   })
 })

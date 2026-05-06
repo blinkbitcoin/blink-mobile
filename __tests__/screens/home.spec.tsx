@@ -41,7 +41,6 @@ jest.mock("@app/components/backup-nudge-modal", () => ({
 
 let mockIsFocused = true
 
-
 // eslint-disable-next-line prefer-const
 let mockActiveWalletOverride: Record<string, unknown> | null = null
 // eslint-disable-next-line prefer-const

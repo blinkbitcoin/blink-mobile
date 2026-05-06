@@ -12,6 +12,29 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { useShowWarningSecureAccount } from "@app/screens/settings-screen/account/show-warning-secure-account-hook"
 import { renderHook } from "@testing-library/react-hooks"
 
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
 // FIXME: the mockPrice doesn't work as expect.
 // it's ok because we have more than $5 in the dollar wallet
 const mocksPrice = [
