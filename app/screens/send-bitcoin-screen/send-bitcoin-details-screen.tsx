@@ -13,8 +13,6 @@ import { PaymentDestinationDisplay } from "@app/components/payment-destination-d
 import { Screen } from "@app/components/screen"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
-  Network,
-  useOnChainTxFeeLazyQuery,
   useSendBitcoinInternalLimitsQuery,
   useSendBitcoinWithdrawalLimitsQuery,
   Wallet,
@@ -46,6 +44,7 @@ import {
 } from "@app/types/amounts"
 
 import { FeeTierSelector } from "./fee-tier-selector"
+import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
@@ -217,11 +216,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert(
+  const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
-    btcWallet?.id as string,
+    walletId: btcWallet?.id as string,
     network,
-  )
+    isSelfCustodial,
+  })
 
   if (!paymentDetail) {
     return <></>
@@ -727,67 +727,3 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingLeft: 20,
   },
 }))
-
-const useOnchainFeeAlert = (
-  paymentDetail: PaymentDetail<WalletCurrency> | null,
-  walletId: string,
-  network: Network | undefined,
-) => {
-  const dummyAddress =
-    network === "mainnet"
-      ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
-      : "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
-
-  const isOnchainPayment =
-    walletId && paymentDetail && paymentDetail.paymentType === "onchain"
-
-  // we need to have an approximate value for the onchain fees
-  // by the time the user tap on the next button
-  // so we are fetching some fees when the screen loads
-  // the fees are approximate but that doesn't matter for the use case
-  // of warning the user if the fees are high compared to the amount sent
-
-  // TODO: check if the BTC wallet is empty, and only USD wallet is used, if the query works
-  const [getOnChainTxFee] = useOnChainTxFeeLazyQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      walletId,
-      amount: 1000,
-      address: dummyAddress,
-    },
-  })
-
-  const [onChainTxFee, setOnChainTxFee] = useState(0)
-
-  useEffect(() => {
-    if (isOnchainPayment) {
-      ;(async () => {
-        const result = await getOnChainTxFee()
-        const fees = result.data?.onChainTxFee.amount
-
-        if (fees) {
-          setOnChainTxFee(fees)
-        } else {
-          console.error("failed to get onchain fees")
-        }
-      })()
-    }
-  }, [getOnChainTxFee, isOnchainPayment])
-
-  if (!isOnchainPayment) {
-    return false
-  }
-
-  const { convertMoneyAmount } = paymentDetail
-
-  // alert will shows if amount is less than fees * ratioFeesToAmount
-  const ratioFeesToAmount = 2
-  const ratioedFees = toBtcMoneyAmount(onChainTxFee * ratioFeesToAmount)
-
-  const alertHighFees =
-    paymentDetail.paymentType === "onchain" &&
-    convertMoneyAmount(paymentDetail.settlementAmount, WalletCurrency.Btc).amount <
-      ratioedFees.amount
-
-  return alertHighFees
-}
