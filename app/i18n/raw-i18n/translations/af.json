@@ -2800,7 +2800,9 @@
       "minChars": "Moet ten minste {min} karakters wees",
       "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
       "invalidRegion": "Ongeldige streekkeuse"
-    }
+    },
+    "passwordTooWeak": "Wagwoord is te swak. Gebruik ’n mengsel van hoofletters, kleinletters, syfers en spesiale karakters.",
+    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord."
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -3469,6 +3471,68 @@
         "subtitle": "Geskatte wagtyd: {waitTime: string}",
         "buttonText": "Sluit"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Kies jou rugsteunmetode",
+      "subtitle": "Ons beveel {provider} aan vir nuwe gebruikers.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Wagwoordbestuurder",
+      "manualBackup": "Handmatige rugsteun",
+      "keychainSaved": "Rugsteun gestoor in wagwoordbestuurder",
+      "keychainFailed": "Kon nie rugsteun stoor nie",
+      "iOSComingSoon": "iCloud-rugsteun kom binnekort"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Hou jou rugsteunfrase geheim!",
+        "check1": "Ek verstaan niemand kan my beursie herstel as ek hierdie frase verloor nie",
+        "check2": "Ek verstaan as iemand hierdie frase kry, kan hulle al my fondse steel.",
+        "check3": "Niemand vra my vir hierdie inligting via boodskap of oproep nie"
+      },
+      "Phrase": {
+        "headerTitle": "Jou rugsteunfrase",
+        "sparkCompatible": "Hierdie rugsteunfrase werk in enige {sparkCompatibleLink}",
+        "sparkCompatibleLink": "Spark-versoenbare beursie",
+        "copiedToast": "Rugsteunfrase na knipbord gekopieer",
+        "saveItNow": "Stoor dit nou",
+        "savedConfirm": "Ek het dit gestoor",
+        "copy": "Kopieer",
+        "continueButton": "Gaan voort"
+      },
+      "Confirm": {
+        "headerTitle": "Bevestig rugsteunfrase",
+        "subtitle": "Vinnige kontrole of jy dit korrek neergeskryf het",
+        "enterWord": "Voer woord in",
+        "enterWords": "Voer woorde in",
+        "confirm": "Bevestig"
+      },
+      "Success": {
+        "title": "Welkom by nie-bewaarder Blink"
+      }
+    },
+    "CloudBackup": {
+      "title": "Kom ons rugsteun jou beursie",
+      "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
+      "encryptCheckbox": "Enkripteer met bykomende wagwoord",
+      "password": "Wagwoord",
+      "passwordPlaceholder": "(minimum 12 karakters)",
+      "confirmPassword": "Bevestig wagwoord",
+      "confirmPasswordPlaceholder": "Voer wagwoord weer in",
+      "continueButton": "Gaan voort",
+      "importantTitle": "Belangrik",
+      "importantMessage": "Blink stoor nie hierdie wagwoord nie. As jy dit verloor, sal ons {bold} jou beursie herstel nie.",
+      "importantMessageBold": "nie in staat wees om",
+      "passwordTooShort": "Minimum 12 karakters",
+      "passwordMismatch": "Wagwoorde stem nie ooreen nie",
+      "uploadSuccess": "Rugsteun gestoor in {provider}",
+      "uploadFailed": "Kon nie rugsteun oplaai nie",
+      "signInFailed": "Kon nie by Google aanmeld nie",
+      "existingBackupTitle": "Rugsteun gevind",
+      "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
+      "overwrite": "Oorskryf"
     }
   }
 }

@@ -2783,7 +2783,9 @@
       "minChars": "Lazima iwe na angalau herufi {min}",
       "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika",
       "invalidRegion": "Uchaguzi wa eneo si sahihi"
-    }
+    },
+    "passwordTooWeak": "Nenosiri ni dhaifu sana. Tumia mchanganyiko wa herufi kubwa, herufi ndogo, nambari na alama maalum.",
+    "passwordCommon": "Nenosiri hili ni la kawaida sana. Tafadhali chagua nenosiri lenye nguvu zaidi."
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -3428,6 +3430,68 @@
         "subtitle": "Muda wa kusubiri unaokadiriwa: {waitTime: string}",
         "buttonText": "Funga"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Chagua njia yako ya nakala",
+      "subtitle": "Tunapendekeza {provider} kwa watumiaji wapya.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Kidhibiti cha nywila",
+      "manualBackup": "Nakala ya mkono",
+      "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
+      "keychainFailed": "Imeshindwa kuhifadhi nakala",
+      "iOSComingSoon": "Hifadhi nakala ya iCloud inakuja hivi karibuni"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Weka maneno yako ya nakala siri!",
+        "check1": "Naelewa hakuna mtu anayeweza kurejesha pochi yangu nikipoteza maneno haya",
+        "check2": "Naelewa ikiwa mtu atapata maneno haya, anaweza kuiba fedha zangu zote.",
+        "check3": "Hakuna mtu anayeniomba taarifa hizi kupitia ujumbe au simu"
+      },
+      "Phrase": {
+        "headerTitle": "Maneno yako ya nakala",
+        "sparkCompatible": "Maneno haya ya nakala yanafanya kazi katika {sparkCompatibleLink} yoyote",
+        "sparkCompatibleLink": "pochi inayoendana na Spark",
+        "copiedToast": "Maneno ya nakala yamenakiliwa kwenye ubao",
+        "saveItNow": "Hifadhi sasa",
+        "savedConfirm": "Nimehifadhi",
+        "copy": "Nakili",
+        "continueButton": "Endelea"
+      },
+      "Confirm": {
+        "headerTitle": "Thibitisha maneno ya nakala",
+        "subtitle": "Ukaguzi wa haraka kama umeyaandika kwa usahihi",
+        "enterWord": "Ingiza neno",
+        "enterWords": "Ingiza maneno",
+        "confirm": "Thibitisha"
+      },
+      "Success": {
+        "title": "Karibu kwa Blink isiyo na uhifadhi"
+      }
+    },
+    "CloudBackup": {
+      "title": "Tuhifadhi nakala ya mkoba wako",
+      "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
+      "encryptCheckbox": "Ficha kwa nywila ya ziada",
+      "password": "Nywila",
+      "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
+      "confirmPassword": "Thibitisha nywila",
+      "confirmPasswordPlaceholder": "Ingiza nywila tena",
+      "continueButton": "Endelea",
+      "importantTitle": "Muhimu",
+      "importantMessage": "Blink haihifadhi nywila hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
+      "importantMessageBold": "hatutaweza",
+      "passwordTooShort": "Herufi 12 ndogo zaidi",
+      "passwordMismatch": "Nywila hazifanani",
+      "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
+      "uploadFailed": "Imeshindwa kupakia nakala",
+      "signInFailed": "Imeshindwa kuingia kwenye Google",
+      "existingBackupTitle": "Nakala imepatikana",
+      "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
+      "overwrite": "Badilisha"
     }
   }
 }

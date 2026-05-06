@@ -78,6 +78,30 @@ jest.mock("@app/screens/card-screen/utils", () => ({
   ).mockAddressToLines,
 }))
 
+jest.mock("@app/components/checkbox-row", () => {
+  const { View, Text: RNText } = jest.requireActual("react-native")
+  return {
+    CheckboxRow: ({
+      label,
+      isChecked,
+      onPress,
+    }: {
+      label: string
+      isChecked: boolean
+      onPress: () => void
+    }) => (
+      <View
+        testID="checkbox-row"
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: isChecked }}
+        onTouchEnd={onPress}
+      >
+        <RNText>{label}</RNText>
+      </View>
+    ),
+  }
+})
+
 jest.mock("@app/components/card-screen", () => ({
   SelectableOptionRow: ({
     title,
@@ -108,24 +132,6 @@ jest.mock("@app/components/card-screen", () => ({
       {lines.map((line: string) => (
         <RNText key={line}>{line}</RNText>
       ))}
-    </View>
-  ),
-  CheckboxRow: ({
-    label,
-    isChecked,
-    onPress,
-  }: {
-    label: string
-    isChecked: boolean
-    onPress: () => void
-  }) => (
-    <View
-      testID="checkbox-row"
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: isChecked }}
-      onTouchEnd={onPress}
-    >
-      <RNText>{label}</RNText>
     </View>
   ),
   ShippingAddressForm: ({ address }: { address: ShippingAddress }) => (

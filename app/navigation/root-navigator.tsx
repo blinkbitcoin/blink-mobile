@@ -123,6 +123,14 @@ import {
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
+  SparkBackupMethodScreen,
+  SparkCloudBackupScreen,
+  SparkBackupAlertsScreen,
+  SparkBackupPhraseScreen,
+  SparkBackupConfirmScreen,
+  SparkBackupSuccessScreen,
+} from "@app/screens/spark-onboarding"
+import {
   OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
@@ -689,6 +697,40 @@ export const RootStack = () => {
           title: LL.CardFlow.CardStatus.title(),
           headerRight: headerCloseControl(),
         }}
+      />
+      <RootNavigator.Screen
+        name="sparkBackupMethodScreen"
+        component={SparkBackupMethodScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkCloudBackupScreen"
+        component={SparkCloudBackupScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkBackupAlertsScreen"
+        component={SparkBackupAlertsScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkBackupPhraseScreen"
+        component={SparkBackupPhraseScreen}
+        options={{
+          title: LL.SparkOnboarding.ManualBackup.Phrase.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="sparkBackupConfirmScreen"
+        component={SparkBackupConfirmScreen}
+        options={{
+          title: LL.SparkOnboarding.ManualBackup.Confirm.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="sparkBackupSuccessScreen"
+        component={SparkBackupSuccessScreen}
+        options={{ headerShown: false }}
       />
     </RootNavigator.Navigator>
   )
