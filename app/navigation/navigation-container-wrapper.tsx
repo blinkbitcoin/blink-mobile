@@ -18,6 +18,7 @@ import { RootStackParamList } from "./stack-param-lists"
 
 import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { Action, useActionsContext } from "@app/components/actions"
+import { COMPATIBLE_LINK_PREFIXES } from "@app/navigation/linking-prefixes"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -99,15 +100,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   }
 
   const linking: LinkingOptions<RootStackParamList> = {
-    prefixes: [
-      ...PREFIX_LINKING,
-      "bitcoin://",
-      "lightning://",
-      "lapp://",
-      "lnurlw://",
-      "lnurlp://",
-      "lnurl://",
-    ],
+    prefixes: [...PREFIX_LINKING, ...COMPATIBLE_LINK_PREFIXES],
     config: {
       screens: {
         Primary: {
