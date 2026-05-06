@@ -123,6 +123,10 @@ export const useDepositActions = () => {
       feeRateSatPerVb: number,
     ) => {
       if (!claimDeposit || !destinationAddress.trim()) return
+      if (feeRateSatPerVb <= 0) {
+        toastShow({ message: LL.UnclaimedDeposit.feeRateUnavailable(), LL })
+        return false
+      }
       setActiveAction({ depositId: deposit.id, type: DepositActionType.Refund })
       try {
         const result = await claimDeposit.refundDeposit({

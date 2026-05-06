@@ -3617,6 +3617,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Tewasobola kutikka ssente z'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
     "refundNow": "Zzaayo kati",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

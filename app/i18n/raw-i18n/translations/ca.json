@@ -3617,6 +3617,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "No s'han pogut carregar les comissions de xarxa. Comprova la connexió i torna-ho a provar.",
     "refundNow": "Reemborsar ara",
     "refundSuccess": "Reemborsament iniciat amb èxit",
     "claimSuccess": "Dipòsit reclamat amb èxit",

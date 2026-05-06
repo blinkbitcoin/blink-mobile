@@ -11908,6 +11908,10 @@ type RootTranslation = {
 		 */
 		feeRateUnit: RequiredParams<'rate'>
 		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		feeRateUnavailable: string
+		/**
 		 * R​e​f​u​n​d​ ​n​o​w
 		 */
 		refundNow: string
@@ -23703,6 +23707,10 @@ export type TranslationFunctions = {
 		 * {rate} sat/vB
 		 */
 		feeRateUnit: (arg: { rate: unknown }) => LocalizedString
+		/**
+		 * Couldn't load network fees. Please check your connection and try again.
+		 */
+		feeRateUnavailable: () => LocalizedString
 		/**
 		 * Refund now
 		 */

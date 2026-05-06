@@ -3655,6 +3655,7 @@
     "feeRateHalfHour": "عادي (~{sats} sats) ~30 دقيقة",
     "feeRateHour": "اقتصادي (~{sats} sats) ~60 دقيقة",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "تعذّر تحميل رسوم الشبكة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
     "refundNow": "استرداد الآن",
     "refundSuccess": "تم بدء الاسترداد بنجاح",
     "claimSuccess": "تم استلام الإيداع بنجاح",

@@ -3646,6 +3646,7 @@
         "feeRateHalfHour": "通常 (~{sats} sats) ~30分",
         "feeRateHour": "エコノミー (~{sats} sats) ~60分",
         "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "ネットワーク手数料を読み込めませんでした。接続を確認してもう一度お試しください。",
         "refundNow": "今すぐ払い戻し",
         "refundSuccess": "払い戻しが正常に開始されました",
         "claimSuccess": "デポジットが正常に請求されました",

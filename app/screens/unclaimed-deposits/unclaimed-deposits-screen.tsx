@@ -37,7 +37,10 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const [refundAddress, setRefundAddress] = useState("")
   const [feeTier, setFeeTier] = useState<FeeTierOption>(FeeTierOption.Medium)
 
-  const feeTiers = useRecommendedFeeTiers(sdk ?? null, refundDepositId !== null)
+  const { tiers: feeTiers, error: feeTiersError } = useRecommendedFeeTiers(
+    sdk ?? null,
+    refundDepositId !== null,
+  )
   const feeTierOptions = buildFeeTierOptions({
     tiers: feeTiers,
     labels: {
@@ -51,6 +54,8 @@ export const UnclaimedDepositsScreen: React.FC = () => {
 
   const isRefundMode = refundDepositId !== null
   const hasAddress = refundAddress.trim().length > 0
+  const selectedFeeRate = feeTiers[feeTier].feeSats
+  const canSubmitRefund = hasAddress && feeTiersError === null && selectedFeeRate > 0
 
   const resetRefund = () => {
     setRefundDepositId(null)
@@ -150,6 +155,11 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                         />
                       ))}
                     </View>
+                    {feeTiersError !== null && (
+                      <Text style={styles.errorText}>
+                        {LL.UnclaimedDeposit.feeRateUnavailable()}
+                      </Text>
+                    )}
                   </View>
 
                   <View style={styles.actions}>
@@ -166,7 +176,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.refundNow()}
                         onPress={() => onRefund(deposit.id)}
-                        disabled={!hasAddress || isBusy}
+                        disabled={!canSubmitRefund || isBusy}
                         {...testProps("refund-now-button")}
                       />
                     )}
@@ -220,6 +230,11 @@ const useStyles = makeStyles(({ colors }) => ({
   mutedText: {
     fontSize: 12,
     color: colors.grey2,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.error,
+    marginTop: 8,
   },
   actions: {
     flexDirection: "row",

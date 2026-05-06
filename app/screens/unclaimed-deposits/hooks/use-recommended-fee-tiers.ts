@@ -4,7 +4,11 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { getRecommendedFees } from "@app/self-custodial/bridge"
 
-import { ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
+import {
+  classifySdkFeeError,
+  ETA_MINUTES,
+  SdkFeeError,
+} from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import {
   type FeeTierInfo,
   FeeTierOption,
@@ -17,14 +21,23 @@ const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
   [Tier.Slow]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Slow] },
 }
 
+type RecommendedFeeTiersResult = {
+  tiers: Record<FeeTierOption, FeeTierInfo>
+  error: SdkFeeError | null
+}
+
 export const useRecommendedFeeTiers = (
   sdk: BreezSdkInterface | null,
   enabled: boolean,
-): Record<FeeTierOption, FeeTierInfo> => {
+): RecommendedFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
+  const [error, setError] = useState<SdkFeeError | null>(null)
 
   const fetchFees = useCallback(async () => {
-    if (!sdk || !enabled) return
+    if (!sdk || !enabled) {
+      setError(null)
+      return
+    }
 
     try {
       const rates = await getRecommendedFees(sdk)
@@ -42,8 +55,9 @@ export const useRecommendedFeeTiers = (
           etaMinutes: ETA_MINUTES[Tier.Slow],
         },
       })
-    } catch {
-      // keep defaults
+      setError(null)
+    } catch (err) {
+      setError(classifySdkFeeError(err))
     }
   }, [sdk, enabled])
 
@@ -51,7 +65,7 @@ export const useRecommendedFeeTiers = (
     fetchFees()
   }, [fetchFees])
 
-  return tiers
+  return { tiers, error }
 }
 
 export const getFeeRateSatPerVb = (

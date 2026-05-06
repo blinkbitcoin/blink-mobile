@@ -3617,6 +3617,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Tidak dapat memuat biaya jaringan. Periksa koneksi Anda dan coba lagi.",
     "refundNow": "Kembalikan sekarang",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

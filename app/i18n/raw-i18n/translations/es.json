@@ -3605,6 +3605,7 @@
         "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
         "feeRateHour": "Económico (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "No se pudieron cargar las tarifas de red. Verifica tu conexión e inténtalo de nuevo.",
         "refundNow": "Reembolsar ahora",
         "refundSuccess": "Reembolso iniciado exitosamente",
         "claimSuccess": "Depósito reclamado exitosamente",

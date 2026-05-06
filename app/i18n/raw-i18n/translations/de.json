@@ -3605,6 +3605,7 @@
         "feeRateHalfHour": "Normal (~{sats} sats) ~30 Min",
         "feeRateHour": "Sparsam (~{sats} sats) ~60 Min",
         "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "Netzwerkgebühren konnten nicht geladen werden. Bitte überprüfe deine Verbindung und versuche es erneut.",
         "refundNow": "Jetzt erstatten",
         "refundSuccess": "Rückerstattung erfolgreich eingeleitet",
         "claimSuccess": "Einzahlung erfolgreich beansprucht",

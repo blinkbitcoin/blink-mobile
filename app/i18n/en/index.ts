@@ -3750,6 +3750,7 @@ const en: BaseTranslation = {
     feeRateHalfHour: "Normal (~{sats} sats) ~30 min",
     feeRateHour: "Economy (~{sats} sats) ~60 min",
     feeRateUnit: "{rate} sat/vB",
+    feeRateUnavailable: "Couldn't load network fees. Please check your connection and try again.",
     refundNow: "Refund now",
     refundSuccess: "Refund initiated successfully",
     claimSuccess: "Deposit claimed successfully",

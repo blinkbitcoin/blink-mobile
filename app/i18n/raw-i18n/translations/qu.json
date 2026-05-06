@@ -3655,6 +3655,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Mana atikurqachu red kustukunata wakichiyta. Tinkichakuyta qhaway, kutispa ruway.",
     "refundNow": "Kunan kutichiy",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

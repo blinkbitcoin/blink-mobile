@@ -3658,6 +3658,7 @@
     "feeRateHalfHour": "Ստանդարտ (~{sats} sats) ~30 րոպե",
     "feeRateHour": "Տնտեսող (~{sats} sats) ~60 րոպե",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Չհաջողվեց բեռնել ցանցի վճարները: Ստուգեք միացումը և կրկին փորձեք:",
     "refundNow": "Վերադարձնել հիմա",
     "refundSuccess": "Վերադարձը հաջողությամբ սկսվեց",
     "claimSuccess": "Ավանդը հաջողությամբ պահանջվեց",

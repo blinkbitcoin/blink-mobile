@@ -3635,6 +3635,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Kunne ikke indlæse netværksgebyrer. Tjek din forbindelse og prøv igen.",
     "refundNow": "Refunder nu",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
