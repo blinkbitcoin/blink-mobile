@@ -49,47 +49,55 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const pendingRefreshRef = useRef(false)
 
   const refreshWallets = useCallback(async () => {
-    if (!sdkRef.current) return
+    const sdk = sdkRef.current
+    if (!sdk) return
     if (refreshingRef.current) {
       pendingRefreshRef.current = true
       return
     }
     refreshingRef.current = true
 
-    try {
-      const onlineState = await getOnlineState()
-      if (onlineState === OnlineState.Offline) {
-        setStatus((prev) =>
-          OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
-        )
-        return
-      }
-      if (onlineState === OnlineState.Unknown) {
-        crashlytics().log(
-          `[SparkSDK] connectivity check failed; preserving previous status`,
-        )
-        return
-      }
-
-      const snapshot = await getSelfCustodialWalletSnapshot(sdkRef.current)
-      setWallets(snapshot.wallets)
-      setHasMoreTransactions(snapshot.hasMore)
-      setStatus(ActiveWalletStatus.Ready)
-    } catch (err) {
-      logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
-      crashlytics().log(`[SparkSDK] refresh failed: ${err}`)
-      setStatus((prev) => {
-        if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {
-          return ActiveWalletStatus.Offline
+    const runOnce = async () => {
+      try {
+        const onlineState = await getOnlineState()
+        if (onlineState === OnlineState.Offline) {
+          setStatus((prev) =>
+            OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
+          )
+          return
         }
-        return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Ready : prev
-      })
+        if (onlineState === OnlineState.Unknown) {
+          crashlytics().log(
+            `[SparkSDK] connectivity check failed; preserving previous status`,
+          )
+          return
+        }
+
+        const snapshot = await getSelfCustodialWalletSnapshot(sdk)
+        setWallets(snapshot.wallets)
+        setHasMoreTransactions(snapshot.hasMore)
+        setStatus(ActiveWalletStatus.Ready)
+      } catch (err) {
+        logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`Refresh failed: ${err}`),
+        )
+        setStatus((prev) => {
+          if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {
+            return ActiveWalletStatus.Offline
+          }
+          return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Error : prev
+        })
+      }
+    }
+
+    try {
+      do {
+        pendingRefreshRef.current = false
+        await runOnce()
+      } while (pendingRefreshRef.current)
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
-      if (pendingRefreshRef.current) {
-        pendingRefreshRef.current = false
-        refreshWallets()
-      }
     }
   }, [])
 
@@ -117,7 +125,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         await refreshWallets()
       })
 
-      refreshWallets().catch(() => {})
+      refreshWallets()
 
       getUserSettings(connectedSdk)
         .then((settings) => {
@@ -125,7 +133,10 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
             setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          logSdkEvent(SdkLogLevel.Error, `getUserSettings failed: ${err}`)
+          crashlytics().recordError(new Error(`getUserSettings failed: ${err}`))
+        })
     }
 
     const initialize = async () => {

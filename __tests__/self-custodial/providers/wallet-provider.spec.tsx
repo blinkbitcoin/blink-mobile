@@ -55,9 +55,11 @@ jest.mock("@app/self-custodial/logging", () => ({
   SdkLogLevel: { Error: "error" },
 }))
 
+const mockCrashlyticsRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
-  recordError: jest.fn(),
-  log: jest.fn(),
+  recordError: (...args: unknown[]) => mockCrashlyticsRecordError(...args),
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -398,6 +400,80 @@ describe("SelfCustodialWalletProvider", () => {
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Offline)
+    })
+  })
+
+  it("logs to crashlytics and transitions to Error when initial refresh fails (regression Critical #7)", async () => {
+    setupConnectedWallet({
+      getMnemonic: mockGetMnemonic,
+      initSdk: mockInitSdk,
+      addSdkEventListener: mockAddSdkEventListener,
+    })
+    const { getSelfCustodialWalletSnapshot } = getWalletSnapshotMocks()
+    getSelfCustodialWalletSnapshot.mockReset()
+    getSelfCustodialWalletSnapshot.mockRejectedValue(new Error("initial sync failed"))
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+
+    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("initial sync failed"),
+      }),
+    )
+  })
+
+  it("transitions Ready→Offline on refresh failure and records error to crashlytics (Critical #7)", async () => {
+    const { listener } = setupConnectedWallet({
+      getMnemonic: mockGetMnemonic,
+      initSdk: mockInitSdk,
+      addSdkEventListener: mockAddSdkEventListener,
+    })
+    const { getSelfCustodialWalletSnapshot } = getWalletSnapshotMocks()
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    getSelfCustodialWalletSnapshot.mockRejectedValueOnce(new Error("transient sync fail"))
+
+    await act(async () => {
+      await listener.current?.({ tag: "Synced" })
+    })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Offline)
+    })
+
+    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("transient sync fail"),
+      }),
+    )
+  })
+
+  it("logs to crashlytics when getUserSettings fails (no longer silent — Critical #7)", async () => {
+    setupConnectedWallet({
+      getMnemonic: mockGetMnemonic,
+      initSdk: mockInitSdk,
+      addSdkEventListener: mockAddSdkEventListener,
+    })
+    const bridge = jest.requireMock("@app/self-custodial/bridge")
+    bridge.getUserSettings.mockRejectedValue(new Error("settings boom"))
+
+    renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("getUserSettings failed"),
+        }),
+      )
     })
   })
 
