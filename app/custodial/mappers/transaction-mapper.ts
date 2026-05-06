@@ -4,7 +4,7 @@ import {
   WalletCurrency,
   type TransactionFragment,
 } from "@app/graphql/generated"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toWalletMoneyAmount } from "@app/types/amounts"
 import {
   PaymentType,
   TransactionDirection,
@@ -39,23 +39,18 @@ const mapPaymentType = (tx: TransactionFragment): PaymentType => {
   return PaymentType.Lightning
 }
 
-const toMoneyAmount = (amount: number, currency: WalletCurrency) => {
-  if (currency === WalletCurrency.Btc) return toBtcMoneyAmount(Math.abs(amount))
-  return toUsdMoneyAmount(Math.abs(amount))
-}
-
 export const mapCustodialTransaction = (
   tx: TransactionFragment,
   walletCurrency: WalletCurrency,
 ): NormalizedTransaction => ({
   id: tx.id,
-  amount: toMoneyAmount(tx.settlementAmount, walletCurrency),
+  amount: toWalletMoneyAmount(tx.settlementAmount, walletCurrency),
   direction: mapDirection(tx.direction),
   status: mapStatus(tx.status),
   timestamp: tx.createdAt,
   paymentType: mapPaymentType(tx),
   ...(tx.settlementFee !== 0 && {
-    fee: toMoneyAmount(tx.settlementFee, walletCurrency),
+    fee: toWalletMoneyAmount(tx.settlementFee, walletCurrency),
   }),
   sourceAccountType: AccountType.Custodial,
 })

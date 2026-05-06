@@ -1,4 +1,8 @@
-import { SdkLogLevel, connectToSdkLogger, logSdkEvent } from "@app/self-custodial/logging"
+import {
+  SdkLogLevel,
+  createSdkLogListener,
+  logSdkEvent,
+} from "@app/self-custodial/logging"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
@@ -55,7 +59,7 @@ describe("logSdkEvent", () => {
   })
 })
 
-describe("connectToSdkLogger", () => {
+describe("createSdkLogListener", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(console, "debug").mockImplementation()
@@ -67,39 +71,19 @@ describe("connectToSdkLogger", () => {
     jest.restoreAllMocks()
   })
 
-  it("wires SDK event listener to logSdkEvent", async () => {
-    let capturedListener: { onEvent: (e: { level: string; line: string }) => void }
+  it("creates a log listener that routes to logSdkEvent", () => {
+    const listener = createSdkLogListener()
 
-    const mockSdk = {
-      addEventListener: jest.fn().mockImplementation((listener) => {
-        capturedListener = listener
-        return Promise.resolve("listener-id")
-      }),
-    }
-
-    const listenerId = await connectToSdkLogger(mockSdk)
-
-    expect(listenerId).toBe("listener-id")
-    expect(mockSdk.addEventListener).toHaveBeenCalledTimes(1)
-
-    capturedListener!.onEvent({ level: "INFO", line: "sdk initialized" })
+    listener.log({ level: "INFO", line: "sdk initialized" })
 
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] sdk initialized")
     expect(mockLog).toHaveBeenCalledWith("[SparkSDK] sdk initialized")
   })
 
-  it("maps unknown level to info", async () => {
-    let capturedListener: { onEvent: (e: { level: string; line: string }) => void }
+  it("maps unknown level to info", () => {
+    const listener = createSdkLogListener()
 
-    const mockSdk = {
-      addEventListener: jest.fn().mockImplementation((listener) => {
-        capturedListener = listener
-        return Promise.resolve("id")
-      }),
-    }
-
-    await connectToSdkLogger(mockSdk)
-    capturedListener!.onEvent({ level: "UNKNOWN", line: "bad level" })
+    listener.log({ level: "UNKNOWN", line: "bad level" })
 
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] bad level")
     expect(mockLog).toHaveBeenCalledWith("[SparkSDK] bad level")

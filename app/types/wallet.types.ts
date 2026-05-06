@@ -7,15 +7,17 @@ import { WalletDescriptor } from "./wallets"
 export type { WalletCurrency }
 export type { WalletDescriptor }
 
-export const CUSTODIAL_DEFAULT_ID = "custodial-default"
-export const SELF_CUSTODIAL_DEFAULT_ID = "self-custodial-default"
-
 export const AccountType = {
   Custodial: "custodial",
   SelfCustodial: "self-custodial",
 } as const
 
 export type AccountType = (typeof AccountType)[keyof typeof AccountType]
+
+export const DefaultAccountId = {
+  Custodial: `${AccountType.Custodial}-default`,
+  SelfCustodial: `${AccountType.SelfCustodial}-default`,
+} as const
 
 export const AccountStatus = {
   Available: "available",

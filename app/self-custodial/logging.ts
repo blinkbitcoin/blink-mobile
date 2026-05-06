@@ -41,15 +41,13 @@ export const logSdkEvent = (level: SdkLogLevel, message: string): void => {
   logDispatch[level](`${LOG_PREFIX} ${message}`)
 }
 
-type SdkLogListener = {
-  addEventListener: (listener: {
-    onEvent: (event: { level: string; line: string }) => void
-  }) => Promise<string>
+type LogEntry = {
+  level: string
+  line: string
 }
 
-export const connectToSdkLogger = (sdk: SdkLogListener): Promise<string> =>
-  sdk.addEventListener({
-    onEvent: (event) => {
-      logSdkEvent(toSdkLogLevel(event.level), event.line)
-    },
-  })
+export const createSdkLogListener = () => ({
+  log: (entry: LogEntry) => {
+    logSdkEvent(toSdkLogLevel(entry.level), entry.line)
+  },
+})

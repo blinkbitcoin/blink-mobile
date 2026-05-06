@@ -3542,10 +3542,16 @@
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Chọn loại tài khoản",
-    "description": "Chọn cách bạn muốn quản lý tiền của mình",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Chúng tôi giữ tiền thay mặt bạn",
+    "selfCustodialDescription": "Chỉ bạn mới có thể truy cập tiền",
+    "continueButton": "Tiếp tục",
+    "descriptionDefault": "Vui lòng chọn loại Blink bạn muốn.",
+    "descriptionSelected": "Vui lòng chọn loại tài khoản.",
+    "chooseMethod": "Chọn phương thức",
+    "restoreComingSoonTitle": "Sắp ra mắt",
+    "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai."
   },
   "BackupScreen": {
     "title": "Sao lưu ví",
@@ -3566,5 +3572,11 @@
   "BackendFeatureGate": {
     "title": "Tính năng không khả dụng",
     "description": "Tính năng này yêu cầu tài khoản lưu ký."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Đang tạo ví của bạn...",
+    "errorTitle": "Tạo ví thất bại",
+    "errorDescription": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "retry": "Thử lại"
   }
 }

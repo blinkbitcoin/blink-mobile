@@ -36,6 +36,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   }
 
   const action = async () => {
+    if (flow === "selfCustodial") {
+      navigation.navigate("sparkWalletCreation")
+      return
+    }
+
     if (flow === "phone" || !appCheckToken) {
       fallbackToPhoneLogin()
       return

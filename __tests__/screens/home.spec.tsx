@@ -14,6 +14,21 @@ import {
 
 let currentMocks: MockedResponse[] = []
 
+// eslint-disable-next-line prefer-const
+let mockActiveWalletOverride: Record<string, unknown> | null = null
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () =>
+    mockActiveWalletOverride ?? {
+      wallets: [],
+      status: "unavailable",
+      accountType: "custodial",
+      isReady: false,
+      isSelfCustodial: false,
+      needsBackendAuth: true,
+    },
+}))
+
 jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
   isIos: true,
@@ -286,16 +301,19 @@ const androidCases: ConvertButtonCase[] = [
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
+    mockActiveWalletOverride = null
     jest.clearAllMocks()
   })
 
-  it("HomeAuthed", async () => {
-    render(
+  it("renders home screen for custodial user", async () => {
+    const { getByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
     await act(async () => {})
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
   })
 
   it.each([...iosCases, ...androidCases] satisfies ConvertButtonCase[])(
@@ -335,5 +353,41 @@ describe("HomeScreen", () => {
     fireEvent.press(getByTestId("slide-up-handle"))
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
+  })
+
+  it("renders home screen for self-custodial user", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
+
+    mockActiveWalletOverride = null
   })
 })

@@ -3504,10 +3504,16 @@
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Επιλέξτε τύπο λογαριασμού",
-    "description": "Επιλέξτε πώς θέλετε να διαχειριστείτε τα κεφάλαιά σας",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Κρατάμε τα κεφάλαια για λογαριασμό σας",
+    "selfCustodialDescription": "Μόνο εσείς έχετε πρόσβαση στα κεφάλαια",
+    "continueButton": "Συνέχεια",
+    "descriptionDefault": "Παρακαλώ επιλέξτε τον προτιμώμενο τύπο Blink.",
+    "descriptionSelected": "Παρακαλώ επιλέξτε τύπο λογαριασμού.",
+    "chooseMethod": "Επιλέξτε μέθοδο",
+    "restoreComingSoonTitle": "Σύντομα διαθέσιμο",
+    "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση."
   },
   "BackupScreen": {
     "title": "Δημιουργία αντιγράφου ασφαλείας",
@@ -3528,5 +3534,11 @@
   "BackendFeatureGate": {
     "title": "Λειτουργία μη διαθέσιμη",
     "description": "Αυτή η λειτουργία απαιτεί λογαριασμό θεματοφύλαξης."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Δημιουργία πορτοφολιού...",
+    "errorTitle": "Αποτυχία δημιουργίας πορτοφολιού",
+    "errorDescription": "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά.",
+    "retry": "Δοκιμάστε ξανά"
   }
 }

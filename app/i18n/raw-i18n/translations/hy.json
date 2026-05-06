@@ -3545,10 +3545,16 @@
     "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։"
   },
   "AccountTypeSelectionScreen": {
-    "title": "Ընտրեք հաշվի տեսակը",
-    "description": "Ընտրեք, թե ինչպես եք ցանկանում կառավարել ձեր միջոցները",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Մենք պահում ենք միջոցները ձեր անունից",
+    "selfCustodialDescription": "Միայն դուք կարող եք մուտք գործել միջոցներին",
+    "continueButton": "Շարունակել",
+    "descriptionDefault": "Խնդրում ենք ընտրել Blink-ի ձեր նախընտրած տեսակը։",
+    "descriptionSelected": "Խնդրում ենք ընտրել հաշվի տեսակը։",
+    "chooseMethod": "Ընտրեք եղանակը",
+    "restoreComingSoonTitle": "Շուտով",
+    "restoreComingSoonDescription": "Վերականգնման գործառույթը հասանելի կլինի ապագա թարմացման մեջ։"
   },
   "BackupScreen": {
     "title": "Պահուստավորեք ձեր դրամապանակը",
@@ -3569,5 +3575,11 @@
   "BackendFeatureGate": {
     "title": "Հնարավորությունը հասանելի չէ",
     "description": "Այս հնարավորությունը պահանջում է պահառու հաշիվ։"
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Ստեղծում ենք ձեր դրամապանակը...",
+    "errorTitle": "Դրամապանակի ստեղծումը ձախողվեց",
+    "errorDescription": "Ինչ-որ բան սխալ գնաց։ Խնդրում ենք կրկին փորձել։",
+    "retry": "Փորձել կրկին"
   }
 }

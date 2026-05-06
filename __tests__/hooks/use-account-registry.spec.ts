@@ -1,11 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import {
-  AccountStatus,
-  AccountType,
-  CUSTODIAL_DEFAULT_ID,
-  SELF_CUSTODIAL_DEFAULT_ID,
-} from "@app/types/wallet.types"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet.types"
 
 import {
   createCustodialDescriptor,
@@ -157,7 +152,7 @@ describe("createCustodialDescriptor", () => {
   it("creates a custodial descriptor with correct defaults", () => {
     const desc = createCustodialDescriptor("Blink")
 
-    expect(desc.id).toBe(CUSTODIAL_DEFAULT_ID)
+    expect(desc.id).toBe(DefaultAccountId.Custodial)
     expect(desc.type).toBe(AccountType.Custodial)
     expect(desc.label).toBe("Blink")
     expect(desc.selected).toBe(false)
@@ -169,7 +164,7 @@ describe("createSelfCustodialDescriptor", () => {
   it("creates a self-custodial descriptor with correct defaults", () => {
     const desc = createSelfCustodialDescriptor("Spark")
 
-    expect(desc.id).toBe(SELF_CUSTODIAL_DEFAULT_ID)
+    expect(desc.id).toBe(DefaultAccountId.SelfCustodial)
     expect(desc.type).toBe(AccountType.SelfCustodial)
     expect(desc.label).toBe("Spark")
     expect(desc.selected).toBe(false)
@@ -184,7 +179,7 @@ describe("markSelected", () => {
   ]
 
   it("marks account matching activeId as selected", () => {
-    const result = markSelected(accounts, SELF_CUSTODIAL_DEFAULT_ID)
+    const result = markSelected(accounts, DefaultAccountId.SelfCustodial)
 
     expect(result[0].selected).toBe(false)
     expect(result[1].selected).toBe(true)

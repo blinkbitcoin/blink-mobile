@@ -3545,10 +3545,16 @@
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Kies accounttype",
-    "description": "Kies hoe je je fondsen wilt beheren",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Wij bewaren de fondsen namens u",
+    "selfCustodialDescription": "Alleen jij hebt toegang tot de fondsen",
+    "continueButton": "Doorgaan",
+    "descriptionDefault": "Kies je voorkeurs type Blink.",
+    "descriptionSelected": "Kies accounttype.",
+    "chooseMethod": "Kies methode",
+    "restoreComingSoonTitle": "Binnenkort beschikbaar",
+    "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update."
   },
   "BackupScreen": {
     "title": "Portemonnee back-uppen",
@@ -3569,5 +3575,11 @@
   "BackendFeatureGate": {
     "title": "Functie niet beschikbaar",
     "description": "Deze functie vereist een bewaarrekening."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Portemonnee aanmaken...",
+    "errorTitle": "Aanmaken portemonnee mislukt",
+    "errorDescription": "Er is iets misgegaan. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen"
   }
 }
