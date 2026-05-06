@@ -12,7 +12,7 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
-import { isOnline } from "./is-online"
+import { getOnlineState, OnlineState } from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -57,10 +57,16 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     refreshingRef.current = true
 
     try {
-      const online = await isOnline()
-      if (!online) {
+      const onlineState = await getOnlineState()
+      if (onlineState === OnlineState.Offline) {
         setStatus((prev) =>
           OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
+        )
+        return
+      }
+      if (onlineState === OnlineState.Unknown) {
+        crashlytics().log(
+          `[SparkSDK] connectivity check failed; preserving previous status`,
         )
         return
       }
