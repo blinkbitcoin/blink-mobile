@@ -3,17 +3,44 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createSelfCustodialLightningPaymentDetails } from "@app/self-custodial/payment-details/lightning"
 
-const mockCreateGetFee = jest.fn().mockReturnValue(jest.fn())
-const mockCreateSendMutation = jest.fn().mockReturnValue(jest.fn())
+// Spy on createGetFee / createSendMutation but delegate to the REAL
+// implementations so the LIGHTNING_FEE_SATS bug (and any future regression in
+// how the helpers compute fees) is no longer hidden behind bare jest.fn() stubs.
+const mockCreateGetFee = jest.fn()
+const mockCreateSendMutation = jest.fn()
 
 jest.mock("@app/self-custodial/payment-details/send-helpers", () => {
   const actual = jest.requireActual("@app/self-custodial/payment-details/send-helpers")
   return {
     ...actual,
-    createGetFee: (...args: unknown[]) => mockCreateGetFee(...args),
-    createSendMutation: (...args: unknown[]) => mockCreateSendMutation(...args),
+    createGetFee: (...args: unknown[]) => {
+      mockCreateGetFee(...args)
+      return (actual.createGetFee as (...a: unknown[]) => unknown)(...args)
+    },
+    createSendMutation: (...args: unknown[]) => {
+      mockCreateSendMutation(...args)
+      return (actual.createSendMutation as (...a: unknown[]) => unknown)(...args)
+    },
   }
 })
+
+/* eslint-disable camelcase */
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  PrepareSendPaymentRequest: { create: jest.fn((args: unknown) => args) },
+  SendPaymentRequest: { create: jest.fn((args: unknown) => args) },
+  Network: { Mainnet: 0, Regtest: 1 },
+  BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+  InputType_Tags: { SparkAddress: "SparkAddress" },
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  SendPaymentMethod_Tags: {
+    BitcoinAddress: "BitcoinAddress",
+    Bolt11Invoice: "Bolt11Invoice",
+  },
+  SendPaymentOptions: {
+    BitcoinAddress: jest.fn().mockImplementation((args: unknown) => args),
+  },
+}))
+/* eslint-enable camelcase */
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { tokenIdentifier: "usdb-token-id" },

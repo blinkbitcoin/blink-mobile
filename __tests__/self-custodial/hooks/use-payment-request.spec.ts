@@ -311,4 +311,36 @@ describe("usePaymentRequest", () => {
     })
     expect(uri).toBe("bitcoin:bc1qtest...")
   })
+
+  describe("onchain adapter rejection (I7 — fire-and-forget guard)", () => {
+    // TODO(I7): unskip these once `use-payment-request.ts:107-113` adds a
+    // `.catch(...)` to the `createReceiveOnchain(sdk).then(...)` chain. They
+    // are kept as documented placeholders so the regression has a home.
+    // eslint-disable-next-line jest/no-disabled-tests
+    xit("does not crash the hook when createReceiveOnchain rejects (I7 unfixed)", async () => {
+      mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current).not.toBeNull()
+      })
+      expect(result.current?.onchainAddress).toBeUndefined()
+    })
+
+    // eslint-disable-next-line jest/no-disabled-tests
+    xit("does not surface an unhandled rejection when the SDK adapter throws (I7 unfixed)", async () => {
+      const onUnhandled = jest.fn()
+      process.on("unhandledRejection", onUnhandled)
+
+      mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain rejected"))
+      renderHook(() => usePaymentRequest())
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 0)
+      })
+      process.off("unhandledRejection", onUnhandled)
+
+      expect(onUnhandled).not.toHaveBeenCalled()
+    })
+  })
 })
