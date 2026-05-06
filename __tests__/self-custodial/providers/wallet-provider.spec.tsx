@@ -70,7 +70,9 @@ jest.mock("@app/self-custodial/providers/validate-network", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/is-online", () => ({
+  ...jest.requireActual("@app/self-custodial/providers/is-online"),
   isOnline: jest.fn().mockResolvedValue(true),
+  getOnlineState: jest.fn().mockResolvedValue("online"),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
@@ -91,6 +93,12 @@ describe("SelfCustodialWalletProvider", () => {
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    jest
+      .requireMock("@app/self-custodial/providers/is-online")
+      .getOnlineState.mockResolvedValue("online")
+    jest
+      .requireMock("@app/self-custodial/providers/is-online")
+      .isOnline.mockResolvedValue(true)
   })
 
   it("renders children", () => {
@@ -373,10 +381,10 @@ describe("SelfCustodialWalletProvider", () => {
       initSdk: mockInitSdk,
       addSdkEventListener: mockAddSdkEventListener,
     })
-    const isOnlineMock = jest.requireMock(
+    const getOnlineStateMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+    ).getOnlineState
+    getOnlineStateMock.mockResolvedValueOnce("online").mockResolvedValueOnce("offline")
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -393,7 +401,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("transitions Offline→Ready when network returns after being Offline", async () => {
+  it("preserves Ready status when connectivity is 'unknown' (regression Critical #4)", async () => {
     const { listener } = setupConnectedWallet({
       getMnemonic: mockGetMnemonic,
       initSdk: mockInitSdk,
@@ -401,11 +409,36 @@ describe("SelfCustodialWalletProvider", () => {
     })
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock
-      .mockResolvedValueOnce(true) // initial refresh → Ready
-      .mockResolvedValueOnce(false) // Synced event → Offline
-      .mockResolvedValueOnce(true) // manual refresh → Ready
+    ).getOnlineState
+    isOnlineMock.mockResolvedValueOnce("online").mockResolvedValueOnce("unknown")
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    await act(async () => {
+      await listener.current?.({ tag: "Synced" })
+    })
+
+    // Unknown must NOT transition Ready → Offline.
+    expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+  })
+
+  it("transitions Offline→Ready when network returns after being Offline", async () => {
+    const { listener } = setupConnectedWallet({
+      getMnemonic: mockGetMnemonic,
+      initSdk: mockInitSdk,
+      addSdkEventListener: mockAddSdkEventListener,
+    })
+    const getOnlineStateMock = jest.requireMock(
+      "@app/self-custodial/providers/is-online",
+    ).getOnlineState
+    getOnlineStateMock
+      .mockResolvedValueOnce("online") // initial refresh → Ready
+      .mockResolvedValueOnce("offline") // Synced event → Offline
+      .mockResolvedValueOnce("online") // manual refresh → Ready
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
@@ -469,12 +502,12 @@ describe("SelfCustodialWalletProvider", () => {
 
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
+    ).getOnlineState
     // Initial refresh online so we reach Ready, then we simulate an Error
     // status from elsewhere (e.g. init failure scenario) and check offline
     // ticks do not overwrite it. Since the direct path from Ready cannot
     // become Error, we validate through the network validation branch.
-    isOnlineMock.mockResolvedValue(false)
+    isOnlineMock.mockResolvedValue("offline")
 
     const mockValidate = jest.requireMock(
       "@app/self-custodial/providers/validate-network",
@@ -499,8 +532,8 @@ describe("SelfCustodialWalletProvider", () => {
   it("preserves Unavailable status when isOnline=false (no mnemonic case)", async () => {
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(false)
+    ).getOnlineState
+    isOnlineMock.mockResolvedValue("offline")
 
     mockGetMnemonic.mockResolvedValue(null)
 
@@ -529,8 +562,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(false)
+    ).getOnlineState
+    isOnlineMock.mockResolvedValue("offline")
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -555,8 +588,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getOnlineState
+    isOnlineMock.mockResolvedValue("online")
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -600,8 +633,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getOnlineState
+    isOnlineMock.mockResolvedValue("online")
 
     mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     mockInitSdk.mockResolvedValue({})
@@ -638,8 +671,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const isOnlineMock = jest.requireMock(
       "@app/self-custodial/providers/is-online",
-    ).isOnline
-    isOnlineMock.mockResolvedValue(true)
+    ).getOnlineState
+    isOnlineMock.mockResolvedValue("online")
 
     const listeners: Array<(state: string) => void> = []
     const addEventListenerSpy = jest
