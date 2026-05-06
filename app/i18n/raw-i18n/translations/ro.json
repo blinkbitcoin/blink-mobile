@@ -2045,6 +2045,7 @@
     "createAccount": "Creați un cont nou",
     "exploreWallet": "Explorați portofelul",
     "login": "Autentificare",
+    "loginOrRestore": "Autentificare / Restaurare",
     "logBackInWith": "Conectați-vă din nou cu",
     "headline": "Wallet powered by Galoy",
     "startTrialAccount": "Începeți cu un cont de încercare",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Alege metoda de backup",
       "subtitle": "Recomandăm {provider} pentru utilizatorii noi.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "În curând",
     "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare."
   },
-  "BackupScreen": {
-    "title": "Copie de siguranță portofel",
-    "description": "Alegeți o metodă de backup pentru a vă proteja fondurile"
-  },
   "RestoreScreen": {
     "title": "Restaurare portofel",
-    "description": "Recuperați portofelul dintr-o copie de siguranță"
+    "description": "Recuperați portofelul dintr-o copie de siguranță",
+    "phraseTitle": "Restaurare portofel",
+    "phraseSubtitleStep1": "Introduceți primele 6 cuvinte din fraza de backup",
+    "phraseSubtitleStep2": "Introduceți restul frazei de backup",
+    "nextWords": "Următoarele 6 cuvinte",
+    "paste": "Lipește",
+    "enterWord": "Cuvânt",
+    "invalidMnemonic": "Frază de backup invalidă. Verificați cuvintele și încercați din nou.",
+    "restoring": "Se restaurează portofelul...",
+    "restoreSuccess": "Portofel restaurat cu succes",
+    "restoreFailed": "Restaurarea a eșuat. Încercați din nou.",
+    "restore": "Restaurare portofel",
+    "noBackupFound": "Niciun backup găsit",
+    "noBackupDescription": "Nu am găsit un backup. Puteți introduce fraza de backup manual.",
+    "enterPassword": "Introduceți parola de criptare",
+    "wrongPassword": "Parolă incorectă. Încercați din nou."
   },
   "BackupNudge": {
-    "title": "Securizați-vă portofelul",
-    "description": "Fondurile dvs. sunt în pericol. Securizați-vă portofelul acum."
+    "title": "Fondurile dumneavoastră sunt în pericol",
+    "description": "Securizați-vă portofelul acum. Durează doar un minut.",
+    "cta": "Securizare portofel",
+    "settingsWarning": "Fă backup la portofel. Dacă pierzi acest dispozitiv, vei pierde fondurile.",
+    "modalTitle": "Securizați-vă fondurile",
+    "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
+    "secureMe": "Securizare portofel",
+    "trustModelTitle": "Tu ai controlul",
+    "trustModelDescription": "Cheile tale controlează fondurile. Tranzacțiile sunt procesate de operatorii Spark, nu validate direct pe Bitcoin L1.",
+    "trustModelWarning": "Soldurile foarte mici pot să nu fie economice de recuperat pe lanțul de bază Bitcoin.",
+    "trustModelDismiss": "Înțeleg"
   },
   "StableBalance": {
     "title": "Sold stabil",

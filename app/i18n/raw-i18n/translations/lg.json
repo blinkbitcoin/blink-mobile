@@ -2045,6 +2045,7 @@
     "createAccount": "Gulawo akawunti empya",
     "exploreWallet": "Lambuula waleti",
     "login": "Yingira",
+    "loginOrRestore": "Yingira / Zzaawo",
     "logBackInWith": "Ddamu oyingire ne",
     "headline": "Waleti ewagidwa Galoy",
     "startTrialAccount": "Tandika ne akawunti y'okugezesa",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Londa enkola yo ey'okukoppa",
       "subtitle": "Tukutegeeza {provider} gy'abakozesa abapya.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Kijja mangu",
     "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja."
   },
-  "BackupScreen": {
-    "title": "Koppa wallet yo",
-    "description": "Londa enkola y'okukoppa okukuuma ssente zo"
-  },
   "RestoreScreen": {
     "title": "Zzaawo wallet",
-    "description": "Zzaawo wallet yo okuva mu koppi"
+    "description": "Zzaawo wallet yo okuva mu koppi",
+    "phraseTitle": "Zzaawo wallet",
+    "phraseSubtitleStep1": "Yingiza ebigambo 6 ebyasooka eby'ekigambo ky'okukuuma",
+    "phraseSubtitleStep2": "Yingiza ebigambo ebikyasigaddewo",
+    "nextWords": "Ebigambo 6 ebiddako",
+    "paste": "Teeka",
+    "enterWord": "Ekigambo",
+    "invalidMnemonic": "Ekigambo ky'okukuuma si kituufu. Kebera ebigambo byo oddemu.",
+    "restoring": "Ezzaawo wallet yo...",
+    "restoreSuccess": "Wallet eddiziddwamu bulungi",
+    "restoreFailed": "Okuzzaawo wallet kulemye. Gezaako nate.",
+    "restore": "Zzaawo wallet",
+    "noBackupFound": "Tewali koppa efuniddwa",
+    "noBackupDescription": "Tetufunye koppa. Osobola okuyingiza ekigambo ky'okukuuma mu ngalo.",
+    "enterPassword": "Yingiza password yo ey'okusiba",
+    "wrongPassword": "Password si ntuufu. Gezaako nate."
   },
   "BackupNudge": {
-    "title": "Kuuma wallet yo",
-    "description": "Ssente zo ziri mu kabi. Kuuma wallet yo kati."
+    "title": "Ssente zo ziri mu bulabe",
+    "description": "Kuuma wallet yo kati. Kimala ddakiika emu yokka.",
+    "cta": "Kuuma wallet",
+    "settingsWarning": "Koppa wallet yo. Bw'ofiirwa ekikozesebwa kino, onofiirwa ssente zo.",
+    "modalTitle": "Kuuma ssente zo",
+    "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
+    "secureMe": "Kuuma wallet",
+    "trustModelTitle": "Ggwe ofuga",
+    "trustModelDescription": "Ebisumuluzo byo bifuga ssente zo. Okutambula kw'ensimbi kukolebwa Spark operators, so si butereevu ku Bitcoin L1.",
+    "trustModelWarning": "Balance entono ennyo teyandibadde ya mugaso okuddamu ku Bitcoin base chain.",
+    "trustModelDismiss": "Ntegedde"
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",

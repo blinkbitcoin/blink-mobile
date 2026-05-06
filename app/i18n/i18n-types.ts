@@ -6428,6 +6428,10 @@ type RootTranslation = {
 		 */
 		login: string
 		/**
+		 * L​o​g​ ​i​n​ ​/​ ​R​e​s​t​o​r​e
+		 */
+		loginOrRestore: string
+		/**
 		 * L​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h
 		 */
 		logBackInWith: string
@@ -11292,7 +11296,15 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
-	SparkOnboarding: {
+	BackupScreen: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d​ ​t​o​ ​s​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		description: string
 		BackupMethod: {
 			/**
 			 * C​h​o​o​s​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d
@@ -11570,16 +11582,6 @@ type RootTranslation = {
 		 */
 		restoreComingSoonDescription: string
 	}
-	BackupScreen: {
-		/**
-		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
-		 */
-		title: string
-		/**
-		 * C​h​o​o​s​e​ ​a​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d​ ​t​o​ ​s​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
-		 */
-		description: string
-	}
 	RestoreScreen: {
 		/**
 		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
@@ -11589,16 +11591,112 @@ type RootTranslation = {
 		 * R​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​a​ ​b​a​c​k​u​p
 		 */
 		description: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		phraseTitle: string
+		/**
+		 * E​n​t​e​r​ ​f​i​r​s​t​ ​6​ ​w​o​r​d​s​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep1: string
+		/**
+		 * E​n​t​e​r​ ​r​e​s​t​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep2: string
+		/**
+		 * N​e​x​t​ ​6​ ​w​o​r​d​s
+		 */
+		nextWords: string
+		/**
+		 * P​a​s​t​e
+		 */
+		paste: string
+		/**
+		 * W​o​r​d
+		 */
+		enterWord: string
+		/**
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​w​o​r​d​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		invalidMnemonic: string
+		/**
+		 * R​e​s​t​o​r​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		restoring: string
+		/**
+		 * W​a​l​l​e​t​ ​r​e​s​t​o​r​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		restoreSuccess: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​r​e​s​t​o​r​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		restoreFailed: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		restore: string
+		/**
+		 * N​o​ ​b​a​c​k​u​p​ ​f​o​u​n​d
+		 */
+		noBackupFound: string
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​f​i​n​d​ ​a​ ​b​a​c​k​u​p​.​ ​Y​o​u​ ​c​a​n​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​ ​i​n​s​t​e​a​d​.
+		 */
+		noBackupDescription: string
+		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​w​o​r​d
+		 */
+		enterPassword: string
+		/**
+		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		wrongPassword: string
 	}
 	BackupNudge: {
 		/**
-		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
 		 */
 		title: string
 		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k​.​ ​S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​i​n​u​t​e​.
 		 */
 		description: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		cta: string
+		/**
+		 * B​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​l​o​s​e​ ​y​o​u​r​ ​f​u​n​d​s​.
+		 */
+		settingsWarning: string
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		modalTitle: string
+		/**
+		 * W​e​ ​h​i​g​h​l​y​ ​r​e​c​o​m​m​e​n​d​ ​y​o​u​ ​b​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​p​r​e​v​e​n​t​ ​a​ ​c​o​m​p​l​e​t​e​ ​l​o​s​s​ ​o​f​ ​f​u​n​d​s​ ​i​n​ ​c​a​s​e​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​.
+		 */
+		modalDescription: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		secureMe: string
+		/**
+		 * Y​o​u​ ​a​r​e​ ​i​n​ ​c​o​n​t​r​o​l
+		 */
+		trustModelTitle: string
+		/**
+		 * Y​o​u​r​ ​k​e​y​s​ ​c​o​n​t​r​o​l​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​T​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​p​r​o​c​e​s​s​e​d​ ​b​y​ ​S​p​a​r​k​ ​o​p​e​r​a​t​o​r​s​,​ ​n​o​t​ ​v​a​l​i​d​a​t​e​d​ ​d​i​r​e​c​t​l​y​ ​o​n​ ​B​i​t​c​o​i​n​ ​L​1​.
+		 */
+		trustModelDescription: string
+		/**
+		 * V​e​r​y​ ​s​m​a​l​l​ ​b​a​l​a​n​c​e​s​ ​m​a​y​ ​n​o​t​ ​b​e​ ​e​c​o​n​o​m​i​c​a​l​ ​t​o​ ​r​e​c​o​v​e​r​ ​t​o​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​b​a​s​e​ ​c​h​a​i​n​.
+		 */
+		trustModelWarning: string
+		/**
+		 * I​ ​u​n​d​e​r​s​t​a​n​d
+		 */
+		trustModelDismiss: string
 	}
 	StableBalance: {
 		/**
@@ -18020,6 +18118,10 @@ export type TranslationFunctions = {
 		 */
 		login: () => LocalizedString
 		/**
+		 * Log in / Restore
+		 */
+		loginOrRestore: () => LocalizedString
+		/**
 		 * Log back in with
 		 */
 		logBackInWith: () => LocalizedString
@@ -22786,7 +22888,15 @@ export type TranslationFunctions = {
 		 */
 		noNotifications: () => LocalizedString
 	}
-	SparkOnboarding: {
+	BackupScreen: {
+		/**
+		 * Back up your wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Choose a backup method to secure your funds
+		 */
+		description: () => LocalizedString
 		BackupMethod: {
 			/**
 			 * Choose your backup method
@@ -23058,16 +23168,6 @@ export type TranslationFunctions = {
 		 */
 		restoreComingSoonDescription: () => LocalizedString
 	}
-	BackupScreen: {
-		/**
-		 * Back up your wallet
-		 */
-		title: () => LocalizedString
-		/**
-		 * Choose a backup method to secure your funds
-		 */
-		description: () => LocalizedString
-	}
 	RestoreScreen: {
 		/**
 		 * Restore wallet
@@ -23077,16 +23177,112 @@ export type TranslationFunctions = {
 		 * Recover your wallet from a backup
 		 */
 		description: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		phraseTitle: () => LocalizedString
+		/**
+		 * Enter first 6 words of your backup phrase
+		 */
+		phraseSubtitleStep1: () => LocalizedString
+		/**
+		 * Enter rest of your backup phrase
+		 */
+		phraseSubtitleStep2: () => LocalizedString
+		/**
+		 * Next 6 words
+		 */
+		nextWords: () => LocalizedString
+		/**
+		 * Paste
+		 */
+		paste: () => LocalizedString
+		/**
+		 * Word
+		 */
+		enterWord: () => LocalizedString
+		/**
+		 * Invalid backup phrase. Please check your words and try again.
+		 */
+		invalidMnemonic: () => LocalizedString
+		/**
+		 * Restoring your wallet...
+		 */
+		restoring: () => LocalizedString
+		/**
+		 * Wallet restored successfully
+		 */
+		restoreSuccess: () => LocalizedString
+		/**
+		 * Failed to restore wallet. Please try again.
+		 */
+		restoreFailed: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		restore: () => LocalizedString
+		/**
+		 * No backup found
+		 */
+		noBackupFound: () => LocalizedString
+		/**
+		 * We couldn't find a backup. You can enter your backup phrase manually instead.
+		 */
+		noBackupDescription: () => LocalizedString
+		/**
+		 * Enter your encryption password
+		 */
+		enterPassword: () => LocalizedString
+		/**
+		 * Incorrect password. Please try again.
+		 */
+		wrongPassword: () => LocalizedString
 	}
 	BackupNudge: {
 		/**
-		 * Secure your wallet
+		 * Your funds are at risk
 		 */
 		title: () => LocalizedString
 		/**
-		 * Your funds are at risk. Secure your wallet now.
+		 * Secure your wallet now. It only takes a minute.
 		 */
 		description: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		cta: () => LocalizedString
+		/**
+		 * Backup your wallet. If you lose this device, you will lose your funds.
+		 */
+		settingsWarning: () => LocalizedString
+		/**
+		 * Secure your funds
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.
+		 */
+		modalDescription: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		secureMe: () => LocalizedString
+		/**
+		 * You are in control
+		 */
+		trustModelTitle: () => LocalizedString
+		/**
+		 * Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.
+		 */
+		trustModelDescription: () => LocalizedString
+		/**
+		 * Very small balances may not be economical to recover to the Bitcoin base chain.
+		 */
+		trustModelWarning: () => LocalizedString
+		/**
+		 * I understand
+		 */
+		trustModelDismiss: () => LocalizedString
 	}
 	StableBalance: {
 		/**

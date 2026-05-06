@@ -1,73 +1,69 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
-const BannerVariant = {
-  Info: "info",
-  Warning: "warning",
-} as const
-
-type BannerVariant = (typeof BannerVariant)[keyof typeof BannerVariant]
-
 type InfoBannerProps = {
   children: React.ReactNode
-  variant?: BannerVariant
   title?: string
   icon?: IconNamesType
+  iconColor?: keyof Colors
+  titleColor?: keyof Colors
 }
 
 export const InfoBanner: React.FC<InfoBannerProps> = ({
   children,
-  variant = BannerVariant.Info,
   title,
   icon,
+  iconColor = "black",
+  titleColor = "primary",
 }) => {
-  const isWarning = variant === BannerVariant.Warning
-  const styles = useStyles({ isWarning })
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-
-  const iconColor = isWarning ? colors._orange : colors.primary
 
   return (
     <View style={styles.container}>
       {(icon || title) && (
         <View style={styles.header}>
-          {icon && <GaloyIcon name={icon} size={16} color={iconColor} />}
-          {title && <Text style={styles.title}>{title}</Text>}
+          {icon && <GaloyIcon name={icon} size={20} color={String(colors[iconColor])} />}
+          {title && (
+            <Text style={[styles.title, { color: String(colors[titleColor]) }]}>
+              {title}
+            </Text>
+          )}
         </View>
       )}
-      {children}
+      <Text style={styles.description}>{children}</Text>
     </View>
   )
 }
 
-export { BannerVariant }
-
-type StyleParams = { isWarning: boolean }
-
-const useStyles = makeStyles(({ colors }, { isWarning }: StyleParams) => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     backgroundColor: colors.grey5,
-    borderLeftWidth: 2,
-    borderLeftColor: isWarning ? colors._orange : colors.black,
-    borderRadius: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 14,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    marginBottom: 6,
+    gap: 14,
   },
   title: {
+    fontSize: 16,
     fontWeight: "700",
-    fontSize: 13,
-    color: isWarning ? colors._orange : colors.black,
+    lineHeight: 22,
+  },
+  description: {
+    fontSize: 16,
+    fontWeight: "400",
+    lineHeight: 22,
+    color: colors.grey2,
   },
 }))

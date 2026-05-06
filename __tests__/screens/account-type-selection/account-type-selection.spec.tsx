@@ -1,5 +1,4 @@
 import React from "react"
-import { Alert } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { AccountTypeSelectionScreen } from "@app/screens/account-type-selection"
@@ -149,19 +148,15 @@ describe("AccountTypeSelectionScreen", () => {
     })
   })
 
-  it("shows alert for self-custodial restore (not yet implemented)", () => {
+  it("navigates to restore method screen for self-custodial restore", () => {
     mockMode.mockReturnValue("restore")
-    const alertSpy = jest.spyOn(Alert, "alert")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Coming soon",
-      "Restore flow will be available in a future update.",
-    )
+    expect(mockNavigate).toHaveBeenCalledWith("sparkRestoreMethodScreen")
   })
 
   it("does not navigate when nothing selected", () => {

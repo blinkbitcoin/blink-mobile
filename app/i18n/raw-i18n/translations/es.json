@@ -2045,6 +2045,7 @@
         "exploreWallet": "Explora la wallet",
         "logBackInWith": "Reinicia sesión con",
         "login": "Iniciar sesión",
+        "loginOrRestore": "Iniciar sesión / Restaurar",
         "headline": "El banco con dinero sólido",
         "upgradeYourAccount": "Actualiza tu cuenta",
         "startTrialAccount": "Empieza con una cuenta de prueba.",
@@ -3420,7 +3421,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Elige tu método de respaldo",
             "subtitle": "Recomendamos {provider} para nuevos usuarios.",
@@ -3503,17 +3506,37 @@
         "restoreComingSoonTitle": "Próximamente",
         "restoreComingSoonDescription": "La función de restauración estará disponible en una actualización futura."
     },
-    "BackupScreen": {
-        "title": "Respaldar billetera",
-        "description": "Elige un método de respaldo para proteger tus fondos"
-    },
     "RestoreScreen": {
         "title": "Restaurar billetera",
-        "description": "Recupera tu billetera desde un respaldo"
+        "description": "Recupera tu billetera desde un respaldo",
+        "phraseTitle": "Restaurar billetera",
+        "phraseSubtitleStep1": "Ingresa las primeras 6 palabras de tu frase de respaldo",
+        "phraseSubtitleStep2": "Ingresa el resto de tu frase de respaldo",
+        "nextWords": "Siguientes 6 palabras",
+        "paste": "Pegar",
+        "enterWord": "Palabra",
+        "invalidMnemonic": "Frase de respaldo inválida. Por favor revisa tus palabras e intenta de nuevo.",
+        "restoring": "Restaurando tu billetera...",
+        "restoreSuccess": "Billetera restaurada exitosamente",
+        "restoreFailed": "Error al restaurar la billetera. Por favor intenta de nuevo.",
+        "restore": "Restaurar billetera",
+        "noBackupFound": "No se encontró respaldo",
+        "noBackupDescription": "No pudimos encontrar un respaldo. Puedes ingresar tu frase de respaldo manualmente.",
+        "enterPassword": "Ingresa tu contraseña de cifrado",
+        "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo."
     },
     "BackupNudge": {
-        "title": "Asegura tu billetera",
-        "description": "Tus fondos están en riesgo. Asegura tu billetera ahora."
+        "title": "Tus fondos están en riesgo",
+        "description": "Asegura tu billetera ahora. Solo toma un minuto.",
+        "cta": "Asegurar billetera",
+        "settingsWarning": "Respalda tu billetera. Si pierdes este dispositivo, perderás tus fondos.",
+        "modalTitle": "Asegura tus fondos",
+        "modalDescription": "Te recomendamos encarecidamente respaldar tu billetera para prevenir una pérdida total de fondos en caso de que pierdas este dispositivo.",
+        "secureMe": "Asegurar billetera",
+        "trustModelTitle": "Tú tienes el control",
+        "trustModelDescription": "Tus llaves controlan tus fondos. Las transacciones son procesadas por operadores de Spark, no se validan directamente en Bitcoin L1.",
+        "trustModelWarning": "Los saldos muy pequeños pueden no ser económicos de recuperar en la cadena base de Bitcoin.",
+        "trustModelDismiss": "Entiendo"
     },
     "StableBalance": {
         "title": "Balance estable",

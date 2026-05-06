@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "Пријава",
+    "loginOrRestore": "Пријава / Обнова",
     "logBackInWith": "Log back in with",
     "headline": "Новчаник омогућен од стране „Galoy“",
     "startTrialAccount": "Почните са пробним налогом",
@@ -3470,7 +3471,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Изаберите метод резервне копије",
       "subtitle": "Препоручујемо {provider} за нове кoriснике.",
@@ -3553,17 +3556,37 @@
     "restoreComingSoonTitle": "Ускоро доступно",
     "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању."
   },
-  "BackupScreen": {
-    "title": "Резервна копија новчаника",
-    "description": "Изаберите метод резервне копије за заштиту средстава"
-  },
   "RestoreScreen": {
     "title": "Враћање новчаника",
-    "description": "Вратите новчаник из резервне копије"
+    "description": "Вратите новчаник из резервне копије",
+    "phraseTitle": "Обнови новчаник",
+    "phraseSubtitleStep1": "Унесите првих 6 речи безбедносне фразе",
+    "phraseSubtitleStep2": "Унесите остатак безбедносне фразе",
+    "nextWords": "Следећих 6 речи",
+    "paste": "Налепи",
+    "enterWord": "Реч",
+    "invalidMnemonic": "Неважећа безбедносна фраза. Проверите речи и покушајте поново.",
+    "restoring": "Обнављање новчаника...",
+    "restoreSuccess": "Новчаник успешно обновљен",
+    "restoreFailed": "Обнова новчаника није успела. Покушајте поново.",
+    "restore": "Обнови новчаник",
+    "noBackupFound": "Резервна копија није пронађена",
+    "noBackupDescription": "Нисмо пронашли резервну копију. Можете унети безбедносну фразу ручно.",
+    "enterPassword": "Унесите лозинку за шифровање",
+    "wrongPassword": "Нетачна лозинка. Покушајте поново."
   },
   "BackupNudge": {
-    "title": "Заштитите новчаник",
-    "description": "Ваша средства су угрожена. Заштитите новчаник сада."
+    "title": "Vaša sredstva su u opasnosti",
+    "description": "Obezbedite svoj novčanik sada. Traje samo minut.",
+    "cta": "Obezbedi novčanik",
+    "settingsWarning": "Направите резервну копију. Ако изгубите уређај, изгубићете средства.",
+    "modalTitle": "Obezbedite svoja sredstva",
+    "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
+    "secureMe": "Obezbedi novčanik",
+    "trustModelTitle": "Ви имате контролу",
+    "trustModelDescription": "Ваши кључеви контролишу ваша средства. Трансакције обрађују Spark оператери, не директно на Bitcoin L1.",
+    "trustModelWarning": "Врло мали салди можда неће бити економични за повраћај на Bitcoin базни ланац.",
+    "trustModelDismiss": "Разумем"
   },
   "StableBalance": {
     "title": "Стабилан салдо",

@@ -6,6 +6,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
+import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { DefaultAccountId } from "@app/types/wallet.types"
@@ -22,6 +23,7 @@ export const useCreateWallet = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
+  const { resetBackupState } = useBackupState()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
 
   const create = useCallback(async () => {
@@ -29,6 +31,7 @@ export const useCreateWallet = () => {
     try {
       await selfCustodialCreateWallet()
       reinitSdk()
+      resetBackupState()
       updateState((prev) => {
         if (!prev) return prev
         return { ...prev, activeAccountId: DefaultAccountId.SelfCustodial }
@@ -42,7 +45,7 @@ export const useCreateWallet = () => {
       )
       setStatus(CreationStatus.Error)
     }
-  }, [navigation, updateState])
+  }, [navigation, updateState, reinitSdk, resetBackupState])
 
   return { status, create }
 }

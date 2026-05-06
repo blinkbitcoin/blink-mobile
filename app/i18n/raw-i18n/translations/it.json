@@ -2045,6 +2045,7 @@
         "createAccount": "Crea un nuovo account",
         "exploreWallet": "Esplora il portafoglio",
         "login": "Accedi",
+        "loginOrRestore": "Accedi / Ripristina",
         "logBackInWith": "Accedi nuovamente con",
         "headline": "Wallet creato da Galoy",
         "startTrialAccount": "Inizia con un conto di prova",
@@ -3420,7 +3421,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Scegli il metodo di backup",
             "subtitle": "Consigliamo {provider} per i nuovi utenti.",
@@ -3503,17 +3506,37 @@
         "restoreComingSoonTitle": "In arrivo",
         "restoreComingSoonDescription": "La funzione di ripristino sarà disponibile in un aggiornamento futuro."
     },
-    "BackupScreen": {
-        "title": "Backup del portafoglio",
-        "description": "Scegli un metodo di backup per proteggere i tuoi fondi"
-    },
     "RestoreScreen": {
         "title": "Ripristina portafoglio",
-        "description": "Recupera il tuo portafoglio da un backup"
+        "description": "Recupera il tuo portafoglio da un backup",
+        "phraseTitle": "Ripristina portafoglio",
+        "phraseSubtitleStep1": "Inserisci le prime 6 parole della tua frase di backup",
+        "phraseSubtitleStep2": "Inserisci il resto della tua frase di backup",
+        "nextWords": "Prossime 6 parole",
+        "paste": "Incolla",
+        "enterWord": "Parola",
+        "invalidMnemonic": "Frase di backup non valida. Controlla le tue parole e riprova.",
+        "restoring": "Ripristino del portafoglio...",
+        "restoreSuccess": "Portafoglio ripristinato con successo",
+        "restoreFailed": "Ripristino del portafoglio fallito. Riprova.",
+        "restore": "Ripristina portafoglio",
+        "noBackupFound": "Nessun backup trovato",
+        "noBackupDescription": "Non abbiamo trovato un backup. Puoi inserire la tua frase di backup manualmente.",
+        "enterPassword": "Inserisci la password di crittografia",
+        "wrongPassword": "Password errata. Riprova."
     },
     "BackupNudge": {
-        "title": "Proteggi il portafoglio",
-        "description": "I tuoi fondi sono a rischio. Proteggi il portafoglio ora."
+        "title": "I tuoi fondi sono a rischio",
+        "description": "Metti al sicuro il tuo portafoglio ora. Ci vuole solo un minuto.",
+        "cta": "Proteggi portafoglio",
+        "settingsWarning": "Esegui il backup del portafoglio. Se perdi questo dispositivo, perderai i tuoi fondi.",
+        "modalTitle": "Metti al sicuro i tuoi fondi",
+        "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
+        "secureMe": "Proteggi portafoglio",
+        "trustModelTitle": "Sei tu ad avere il controllo",
+        "trustModelDescription": "Le tue chiavi controllano i tuoi fondi. Le transazioni sono elaborate dagli operatori Spark, non validate direttamente su Bitcoin L1.",
+        "trustModelWarning": "Saldi molto piccoli potrebbero non essere economici da recuperare sulla catena base di Bitcoin.",
+        "trustModelDismiss": "Ho capito"
     },
     "StableBalance": {
         "title": "Saldo stabile",

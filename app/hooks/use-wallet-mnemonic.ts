@@ -1,14 +1,25 @@
-// TODO: Replace with real wallet mnemonic from Spark SDK (KeyStoreWrapper.getMnemonic)
-// This hook currently returns mock data for development. Must not ship to production.
+import { useEffect, useState } from "react"
 
-import { MOCK_WORDS } from "@app/screens/spark-onboarding/spark-mock-data"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const useWalletMnemonic = (): string => {
-  if (__DEV__) return MOCK_WORDS.join(" ")
-  throw new Error("useWalletMnemonic: real mnemonic not yet wired")
+  const [mnemonic, setMnemonic] = useState("")
+
+  useEffect(() => {
+    let mounted = true
+    KeyStoreWrapper.getMnemonic().then((stored) => {
+      if (mounted && stored) setMnemonic(stored)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return mnemonic
 }
 
 export const useWalletMnemonicWords = (): readonly string[] => {
-  if (__DEV__) return MOCK_WORDS
-  throw new Error("useWalletMnemonicWords: real mnemonic not yet wired")
+  const mnemonic = useWalletMnemonic()
+  if (!mnemonic) return []
+  return mnemonic.split(" ")
 }

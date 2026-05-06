@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, waitFor } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -25,6 +25,17 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     sparkCompatibleWalletsUrl: "https://example.com",
   }),
+}))
+
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    getMnemonic: jest
+      .fn()
+      .mockResolvedValue(
+        "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
+      ),
+  },
 }))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
@@ -56,14 +67,14 @@ describe("SparkBackupPhraseScreen", () => {
   })
 
   describe("step 1", () => {
-    it("renders first 6 words", () => {
+    it("renders first 6 words", async () => {
       const { getByText, queryByText } = render(
         <ContextForScreen>
           <SparkBackupPhraseScreen />
         </ContextForScreen>,
       )
 
-      expect(getByText("youth")).toBeTruthy()
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
       expect(getByText("execute")).toBeTruthy()
       expect(queryByText("ritual")).toBeNull()
     })
@@ -75,9 +86,7 @@ describe("SparkBackupPhraseScreen", () => {
         </ContextForScreen>,
       )
 
-      expect(
-        getByText(LL.SparkOnboarding.ManualBackup.Phrase.continueButton()),
-      ).toBeTruthy()
+      expect(getByText(LL.BackupScreen.ManualBackup.Phrase.continueButton())).toBeTruthy()
     })
 
     it("navigates to step 2 on continue press", () => {
@@ -87,7 +96,7 @@ describe("SparkBackupPhraseScreen", () => {
         </ContextForScreen>,
       )
 
-      fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Phrase.continueButton()))
+      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.continueButton()))
       expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", { step: 2 })
     })
 
@@ -101,7 +110,7 @@ describe("SparkBackupPhraseScreen", () => {
       )
 
       expect(
-        getByText(new RegExp(LL.SparkOnboarding.ManualBackup.Phrase.saveItNow())),
+        getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
       ).toBeTruthy()
     })
 
@@ -115,7 +124,7 @@ describe("SparkBackupPhraseScreen", () => {
       )
 
       fireEvent.press(
-        getByText(new RegExp(LL.SparkOnboarding.ManualBackup.Phrase.saveItNow())),
+        getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
       )
       expect(mockNavigate).not.toHaveBeenCalled()
     })
@@ -126,14 +135,14 @@ describe("SparkBackupPhraseScreen", () => {
       mockStep = 2
     })
 
-    it("renders last 6 words", () => {
+    it("renders last 6 words", async () => {
       const { getByText, queryByText } = render(
         <ContextForScreen>
           <SparkBackupPhraseScreen />
         </ContextForScreen>,
       )
 
-      expect(getByText("ritual")).toBeTruthy()
+      await waitFor(() => expect(getByText("ritual")).toBeTruthy())
       expect(getByText("captain")).toBeTruthy()
       expect(queryByText("youth")).toBeNull()
     })
@@ -145,19 +154,18 @@ describe("SparkBackupPhraseScreen", () => {
         </ContextForScreen>,
       )
 
-      expect(
-        getByText(LL.SparkOnboarding.ManualBackup.Phrase.savedConfirm()),
-      ).toBeTruthy()
+      expect(getByText(LL.BackupScreen.ManualBackup.Phrase.savedConfirm())).toBeTruthy()
     })
 
-    it("navigates to confirm screen on button press", () => {
+    it("navigates to confirm screen on button press", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <SparkBackupPhraseScreen />
         </ContextForScreen>,
       )
 
-      fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Phrase.savedConfirm()))
+      await waitFor(() => expect(getByText("ritual")).toBeTruthy())
+      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.savedConfirm()))
       expect(mockNavigate).toHaveBeenCalledWith(
         "sparkBackupConfirmScreen",
         expect.objectContaining({
@@ -180,21 +188,22 @@ describe("SparkBackupPhraseScreen", () => {
         </ContextForScreen>,
       )
 
-      expect(getByText(LL.SparkOnboarding.ManualBackup.Phrase.copy())).toBeTruthy()
+      expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
 
-    it("calls copyToClipboard when copy button is pressed", () => {
+    it("calls copyToClipboard when copy button is pressed", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <SparkBackupPhraseScreen />
         </ContextForScreen>,
       )
 
-      fireEvent.press(getByText(LL.SparkOnboarding.ManualBackup.Phrase.copy()))
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
           content: expect.stringContaining("youth"),
-          message: LL.SparkOnboarding.ManualBackup.Phrase.copiedToast(),
+          message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
         }),
       )
     })
@@ -207,7 +216,7 @@ describe("SparkBackupPhraseScreen", () => {
       )
 
       expect(
-        getByText(LL.SparkOnboarding.ManualBackup.Phrase.sparkCompatibleLink()),
+        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
       ).toBeTruthy()
     })
   })

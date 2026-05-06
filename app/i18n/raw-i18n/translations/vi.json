@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "Đăng nhập",
+    "loginOrRestore": "Đăng nhập / Khôi phục",
     "logBackInWith": "Log back in with",
     "headline": "Ví được cung cấp bởi Galoy",
     "startTrialAccount": "Start with a trial account",
@@ -3470,7 +3471,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
       "subtitle": "Chúng tôi khuyên dùng {provider} cho người dùng mới.",
@@ -3553,17 +3556,37 @@
     "restoreComingSoonTitle": "Sắp ra mắt",
     "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai."
   },
-  "BackupScreen": {
-    "title": "Sao lưu ví",
-    "description": "Chọn phương pháp sao lưu để bảo vệ tiền của bạn"
-  },
   "RestoreScreen": {
     "title": "Khôi phục ví",
-    "description": "Khôi phục ví của bạn từ bản sao lưu"
+    "description": "Khôi phục ví của bạn từ bản sao lưu",
+    "phraseTitle": "Khôi phục ví",
+    "phraseSubtitleStep1": "Nhập 6 từ đầu tiên của cụm từ sao lưu",
+    "phraseSubtitleStep2": "Nhập phần còn lại của cụm từ sao lưu",
+    "nextWords": "6 từ tiếp theo",
+    "paste": "Dán",
+    "enterWord": "Từ",
+    "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra các từ và thử lại.",
+    "restoring": "Đang khôi phục ví...",
+    "restoreSuccess": "Khôi phục ví thành công",
+    "restoreFailed": "Khôi phục ví thất bại. Vui lòng thử lại.",
+    "restore": "Khôi phục ví",
+    "noBackupFound": "Không tìm thấy bản sao lưu",
+    "noBackupDescription": "Chúng tôi không tìm thấy bản sao lưu. Bạn có thể nhập cụm từ sao lưu thủ công.",
+    "enterPassword": "Nhập mật khẩu mã hóa của bạn",
+    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại."
   },
   "BackupNudge": {
-    "title": "Bảo mật ví của bạn",
-    "description": "Tiền của bạn đang gặp rủi ro. Bảo mật ví ngay bây giờ."
+    "title": "Tiền của bạn đang gặp rủi ro",
+    "description": "Bảo mật ví của bạn ngay bây giờ. Chỉ mất một phút.",
+    "cta": "Bảo mật ví",
+    "settingsWarning": "Sao lưu ví của bạn. Nếu bạn mất thiết bị này, bạn sẽ mất tiền.",
+    "modalTitle": "Bảo mật tiền của bạn",
+    "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
+    "secureMe": "Bảo mật ví",
+    "trustModelTitle": "Bạn nắm quyền kiểm soát",
+    "trustModelDescription": "Khóa của bạn kiểm soát tiền của bạn. Giao dịch được xử lý bởi các nhà điều hành Spark, không được xác thực trực tiếp trên Bitcoin L1.",
+    "trustModelWarning": "Số dư rất nhỏ có thể không kinh tế để khôi phục về chuỗi cơ sở Bitcoin.",
+    "trustModelDismiss": "Tôi hiểu"
   },
   "StableBalance": {
     "title": "Số dư ổn định",

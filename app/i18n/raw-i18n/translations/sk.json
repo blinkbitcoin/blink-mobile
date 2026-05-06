@@ -2045,6 +2045,7 @@
     "createAccount": "Vytvoriť nový účet",
     "exploreWallet": "Preskúmať peňaženku",
     "login": "Prihlásiť sa",
+    "loginOrRestore": "Prihlásiť sa / Obnoviť",
     "logBackInWith": "Prihláste sa späť pomocou",
     "headline": "Peňaženka od spoločnosti Galoy",
     "startTrialAccount": "Začnite so skúšobným účtom",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vyberte metódu zálohovania",
       "subtitle": "Pre nových používateľov odporúčame {provider}.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Čoskoro dostupné",
     "restoreComingSoonDescription": "Funkcia obnovenia bude dostupná v budúcej aktualizácii."
   },
-  "BackupScreen": {
-    "title": "Zálohovať peňaženku",
-    "description": "Vyberte metódu zálohovania na ochranu prostriedkov"
-  },
   "RestoreScreen": {
     "title": "Obnoviť peňaženku",
-    "description": "Obnovte peňaženku zo zálohy"
+    "description": "Obnovte peňaženku zo zálohy",
+    "phraseTitle": "Obnoviť peňaženku",
+    "phraseSubtitleStep1": "Zadajte prvých 6 slov vašej zálohovacej frázy",
+    "phraseSubtitleStep2": "Zadajte zvyšok vašej zálohovacej frázy",
+    "nextWords": "Ďalších 6 slov",
+    "paste": "Prilepiť",
+    "enterWord": "Slovo",
+    "invalidMnemonic": "Neplatná zálohovacia fráza. Skontrolujte slová a skúste znova.",
+    "restoring": "Obnovovanie peňaženky...",
+    "restoreSuccess": "Peňaženka úspešne obnovená",
+    "restoreFailed": "Obnova peňaženky zlyhala. Skúste znova.",
+    "restore": "Obnoviť peňaženku",
+    "noBackupFound": "Záloha nenájdená",
+    "noBackupDescription": "Nenašli sme zálohu. Môžete zadať zálohovaciu frázu ručne.",
+    "enterPassword": "Zadajte šifrovacie heslo",
+    "wrongPassword": "Nesprávne heslo. Skúste znova."
   },
   "BackupNudge": {
-    "title": "Zabezpečte peňaženku",
-    "description": "Vaše prostriedky sú ohrozené. Zabezpečte peňaženku teraz."
+    "title": "Vaše prostriedky sú v ohrožení",
+    "description": "Zabezpečte svoju peňaženku teraz. Trvá to len minútu.",
+    "cta": "Zabezpečiť peňaženku",
+    "settingsWarning": "Zálohujte svoju peňaženku. Ak stratíte toto zariadenie, stratíte svoje prostriedky.",
+    "modalTitle": "Zabezpečte svoje prostriedky",
+    "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
+    "secureMe": "Zabezpečiť peňaženku",
+    "trustModelTitle": "Máte kontrolu",
+    "trustModelDescription": "Vaše kľúče riadia vaše prostriedky. Transakcie spracúvajú operátori Spark, nie priamo na Bitcoin L1.",
+    "trustModelWarning": "Obnova veľmi malých zostatkov na základný reťazec Bitcoinu nemusí byť ekonomická.",
+    "trustModelDismiss": "Rozumiem"
   },
   "StableBalance": {
     "title": "Stabilný zostatok",

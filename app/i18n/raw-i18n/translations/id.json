@@ -2045,6 +2045,7 @@
     "createAccount": "Buat akun baru",
     "exploreWallet": "Jelajahi dompet",
     "login": "Masuk",
+    "loginOrRestore": "Masuk / Pulihkan",
     "logBackInWith": "Masuk kembali dengan",
     "headline": "Dompet didukung oleh Galoy",
     "startTrialAccount": "Mulai dengan akun percobaan",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",
       "subtitle": "Kami merekomendasikan {provider} untuk pengguna baru.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Segera hadir",
     "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang."
   },
-  "BackupScreen": {
-    "title": "Cadangkan dompet",
-    "description": "Pilih metode pencadangan untuk mengamankan dana Anda"
-  },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
-    "description": "Pulihkan dompet Anda dari cadangan"
+    "description": "Pulihkan dompet Anda dari cadangan",
+    "phraseTitle": "Pulihkan dompet",
+    "phraseSubtitleStep1": "Masukkan 6 kata pertama dari frasa cadangan Anda",
+    "phraseSubtitleStep2": "Masukkan sisa frasa cadangan Anda",
+    "nextWords": "6 kata berikutnya",
+    "paste": "Tempel",
+    "enterWord": "Kata",
+    "invalidMnemonic": "Frasa cadangan tidak valid. Periksa kata-kata Anda dan coba lagi.",
+    "restoring": "Memulihkan dompet Anda...",
+    "restoreSuccess": "Dompet berhasil dipulihkan",
+    "restoreFailed": "Gagal memulihkan dompet. Silakan coba lagi.",
+    "restore": "Pulihkan dompet",
+    "noBackupFound": "Cadangan tidak ditemukan",
+    "noBackupDescription": "Kami tidak dapat menemukan cadangan. Anda dapat memasukkan frasa cadangan secara manual.",
+    "enterPassword": "Masukkan kata sandi enkripsi Anda",
+    "wrongPassword": "Kata sandi salah. Silakan coba lagi."
   },
   "BackupNudge": {
-    "title": "Amankan dompet Anda",
-    "description": "Dana Anda dalam bahaya. Amankan dompet Anda sekarang."
+    "title": "Dana Anda dalam bahaya",
+    "description": "Amankan dompet Anda sekarang. Hanya butuh satu menit.",
+    "cta": "Amankan dompet",
+    "settingsWarning": "Cadangkan dompet Anda. Jika Anda kehilangan perangkat ini, Anda akan kehilangan dana.",
+    "modalTitle": "Amankan dana Anda",
+    "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
+    "secureMe": "Amankan dompet",
+    "trustModelTitle": "Anda yang mengendalikan",
+    "trustModelDescription": "Kunci Anda mengendalikan dana Anda. Transaksi diproses oleh operator Spark, bukan langsung di Bitcoin L1.",
+    "trustModelWarning": "Saldo yang sangat kecil mungkin tidak ekonomis untuk dipulihkan ke rantai dasar Bitcoin.",
+    "trustModelDismiss": "Saya mengerti"
   },
   "StableBalance": {
     "title": "Saldo stabil",
