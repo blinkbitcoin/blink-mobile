@@ -1,3 +1,4 @@
+import crashlytics from "@react-native-firebase/crashlytics"
 import {
   PaymentDetails,
   PaymentDetails_Tags as PaymentDetailsTags,
@@ -19,21 +20,52 @@ import {
 import { AccountType } from "@app/types/wallet.types"
 import { toNumber } from "@app/utils/helper"
 
+const reportUnhandledEnum = <T>(scope: string, unhandled: unknown, fallback: T): T => {
+  crashlytics().recordError(
+    new Error(`transaction-mapper.${scope}: unhandled SDK value ${String(unhandled)}`),
+  )
+  return fallback
+}
+
 const mapPaymentMethod = (
   method: PaymentMethod,
   details?: Payment["details"],
 ): PaymentType => {
   if (details?.tag === PaymentDetailsTags.Token) return PaymentType.Conversion
-  if (method === PaymentMethod.Lightning) return PaymentType.Lightning
-  if (method === PaymentMethod.Spark) return PaymentType.Spark
-  if (method === PaymentMethod.Deposit) return PaymentType.Onchain
-  if (method === PaymentMethod.Withdraw) return PaymentType.Onchain
-  return PaymentType.Lightning
+  switch (method) {
+    case PaymentMethod.Lightning:
+      return PaymentType.Lightning
+    case PaymentMethod.Spark:
+      return PaymentType.Spark
+    case PaymentMethod.Token:
+      return PaymentType.Conversion
+    case PaymentMethod.Deposit:
+    case PaymentMethod.Withdraw:
+      return PaymentType.Onchain
+    case PaymentMethod.Unknown:
+      return reportUnhandledEnum("mapPaymentMethod", "Unknown", PaymentType.Lightning)
+    default:
+      return reportUnhandledEnum(
+        "mapPaymentMethod",
+        method satisfies never,
+        PaymentType.Lightning,
+      )
+  }
 }
 
 const mapDirection = (paymentType: SdkPaymentType): TransactionDirection => {
-  if (paymentType === SdkPaymentType.Send) return TransactionDirection.Send
-  return TransactionDirection.Receive
+  switch (paymentType) {
+    case SdkPaymentType.Send:
+      return TransactionDirection.Send
+    case SdkPaymentType.Receive:
+      return TransactionDirection.Receive
+    default:
+      return reportUnhandledEnum(
+        "mapDirection",
+        paymentType satisfies never,
+        TransactionDirection.Receive,
+      )
+  }
 }
 
 const mapStatus = (status: PaymentStatus): TransactionStatus => {
@@ -43,8 +75,22 @@ const mapStatus = (status: PaymentStatus): TransactionStatus => {
 }
 
 export const mapCurrency = (details?: Payment["details"]): WalletCurrency => {
-  if (details?.tag === PaymentDetailsTags.Token) return WalletCurrency.Usd
-  return WalletCurrency.Btc
+  if (!details) return WalletCurrency.Btc
+  switch (details.tag) {
+    case PaymentDetailsTags.Token:
+      return WalletCurrency.Usd
+    case PaymentDetailsTags.Spark:
+    case PaymentDetailsTags.Lightning:
+    case PaymentDetailsTags.Withdraw:
+    case PaymentDetailsTags.Deposit:
+      return WalletCurrency.Btc
+    default:
+      return reportUnhandledEnum(
+        "mapCurrency",
+        (details as { tag: never }).tag,
+        WalletCurrency.Btc,
+      )
+  }
 }
 
 const getTokenDecimals = (details?: Payment["details"]): number => {

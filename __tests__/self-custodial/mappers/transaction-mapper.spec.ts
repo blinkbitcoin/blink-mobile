@@ -12,6 +12,11 @@ import {
   mapSelfCustodialTransactions,
 } from "@app/self-custodial/mappers/transaction-mapper"
 
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (err: Error) => mockRecordError(err),
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
   const instanceOf = (tag: string) => ({
     instanceOf: (obj: { tag?: string }) => obj?.tag === tag,
@@ -172,6 +177,73 @@ describe("mapCurrency", () => {
 
   it("defaults to BTC when details are undefined", () => {
     expect(mapCurrency(undefined)).toBe(WalletCurrency.Btc)
+  })
+})
+
+describe("mapper exhaustiveness (Critical #8)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("logs and falls back to Lightning when SDK returns PaymentMethod.Unknown", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        method: 5, // PaymentMethod.Unknown
+        details: { tag: "Spark", inner: {} },
+      }),
+    )
+
+    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapPaymentMethod"),
+      }),
+    )
+  })
+
+  it("maps PaymentMethod.Token (without Token details) to Conversion", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        method: 2, // PaymentMethod.Token
+        details: { tag: "Spark", inner: {} },
+      }),
+    )
+
+    expect(result.paymentType).toBe(PaymentType.Conversion)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("logs and falls back to Receive when SDK returns an unhandled paymentType", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({ paymentType: 99 } as never),
+    )
+
+    expect(result.direction).toBe(TransactionDirection.Receive)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapDirection"),
+      }),
+    )
+  })
+
+  it("maps every known PaymentDetails tag to the right currency without logging", () => {
+    expect(mapCurrency({ tag: "Spark", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Lightning", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Withdraw", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Deposit", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Token", inner: {} } as never)).toBe(WalletCurrency.Usd)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("logs and falls back to BTC for an unknown PaymentDetails tag", () => {
+    const result = mapCurrency({ tag: "FutureTag", inner: {} } as never)
+
+    expect(result).toBe(WalletCurrency.Btc)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapCurrency"),
+      }),
+    )
   })
 })
 
