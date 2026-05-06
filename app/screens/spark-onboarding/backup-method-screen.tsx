@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { View } from "react-native"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -8,6 +8,10 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
 import { testProps } from "@app/utils/testProps"
 
 import { useBackupMethods } from "./hooks"
@@ -20,6 +24,7 @@ export const SparkBackupMethodScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
+  const { saveCheckpoint } = useMigrationCheckpoint()
   const {
     isCloudBackupAvailable,
     keychainLoading,
@@ -27,6 +32,10 @@ export const SparkBackupMethodScreen: React.FC = () => {
     handleCloudBackup,
     handleManualBackup,
   } = useBackupMethods()
+
+  useEffect(() => {
+    saveCheckpoint(MigrationCheckpoint.BackupMethod)
+  }, [saveCheckpoint])
 
   const cloudProvider = getCloudProviderName(LL)
 

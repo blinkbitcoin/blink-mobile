@@ -3534,5 +3534,14 @@
       "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
       "overwrite": "Oorskryf"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Skuif na nie-bewaarde",
+    "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
+    "explainerStep1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep, <link>leer meer hier</link>",
+    "explainerStep2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening en jou huidige rekening sal verwyder word",
+    "explainerStep3": "Gebruik Blink voort soos gewoonlik",
+    "letsMove": "Kom ons gaan",
+    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
   }
 }

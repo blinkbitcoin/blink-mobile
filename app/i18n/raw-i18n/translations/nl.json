@@ -3534,5 +3534,14 @@
       "existingBackupMessage": "Er bestaat al een back-up in je {provider}. Wil je deze overschrijven?",
       "overwrite": "Overschrijven"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Overstappen naar non-custodial",
+    "explainerTitle": "Wat betekent overstappen naar non-custodial?",
+    "explainerStep1": "Je maakt een non-custodial account aan op het Spark-protocol, <link>lees hier meer</link>",
+    "explainerStep2": "We dragen je saldo over naar je nieuwe non-custodial account en je huidige account wordt verwijderd",
+    "explainerStep3": "Blijf Blink gebruiken zoals gewoonlijk",
+    "letsMove": "Laten we gaan",
+    "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
   }
 }

@@ -3534,5 +3534,14 @@
       "existingBackupMessage": "Sandaran sudah wujud di {provider} anda. Adakah anda mahu menimpanya?",
       "overwrite": "Tulis ganti"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Beralih ke non-custodial",
+    "explainerTitle": "Apakah maksud beralih ke non-custodial?",
+    "explainerStep1": "Anda akan membuat akaun non-custodial di protokol Spark, <link>ketahui lebih lanjut di sini</link>",
+    "explainerStep2": "Kami memindahkan dana anda ke akaun non-custodial baharu dan akaun semasa anda akan dipadamkan",
+    "explainerStep3": "Teruskan menggunakan Blink seperti biasa",
+    "letsMove": "Jom",
+    "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
   }
 }

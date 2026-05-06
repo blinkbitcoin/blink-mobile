@@ -3493,5 +3493,14 @@
       "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
       "overwrite": "Suprascrie"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Treci la non-custodial",
+    "explainerTitle": "Ce înseamnă să treci la non-custodial?",
+    "explainerStep1": "Vei crea un cont non-custodial pe protocolul Spark, <link>află mai multe aici</link>",
+    "explainerStep2": "Transferăm fondurile tale în noul tău cont non-custodial, iar contul actual va fi șters",
+    "explainerStep3": "Continuă să folosești Blink ca de obicei",
+    "letsMove": "Hai să mergem",
+    "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
   }
 }

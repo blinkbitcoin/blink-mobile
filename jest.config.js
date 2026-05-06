@@ -54,6 +54,7 @@ module.exports = {
       "|react-native-nfc-manager" +
       "|uuid" +
       "|@formatjs" +
+      "|react-native-inappbrowser-reborn" +
       ")/)",
   ],
 }

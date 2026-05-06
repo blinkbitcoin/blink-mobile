@@ -3531,5 +3531,14 @@
       "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
       "overwrite": "Препиши"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Пребаци на non-custodial",
+    "explainerTitle": "Шта значи пребацити на non-custodial?",
+    "explainerStep1": "Креираћете non-custodial налог на Spark протоколу, <link>сазнајте више овде</link>",
+    "explainerStep2": "Пребацујемо ваша средства на ваш нови non-custodial налог, а ваш тренутни налог ће бити обрисан",
+    "explainerStep3": "Наставите да користите Blink као и обично",
+    "letsMove": "Идемо",
+    "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
   }
 }

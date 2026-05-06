@@ -31,6 +31,13 @@ jest.mock("@app/components/success-animation/success-text-animation", () => {
   }
 })
 
+const mockClearCheckpoint = jest.fn()
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationCheckpoint: () => ({
+    clearCheckpoint: mockClearCheckpoint,
+  }),
+}))
+
 const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -88,5 +95,19 @@ describe("SparkBackupSuccessScreen", () => {
         payload: { index: 0, routes: [{ name: "Primary" }] },
       }),
     )
+  })
+
+  it("clears migration checkpoint on navigation", async () => {
+    render(
+      <ContextForScreen>
+        <SparkBackupSuccessScreen />
+      </ContextForScreen>,
+    )
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50)
+    })
+
+    expect(mockClearCheckpoint).toHaveBeenCalled()
   })
 })
