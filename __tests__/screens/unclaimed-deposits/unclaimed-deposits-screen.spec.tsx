@@ -11,7 +11,10 @@ import { WalletCurrency } from "@app/graphql/generated"
 
 const mockHandleRefund = jest.fn()
 const mockHandleClaim = jest.fn()
+const mockOpenMempoolTx = jest.fn()
 let mockDeposits: PendingDeposit[] = []
+let mockIsBusy = false
+let mockIsProcessing: (id: string, action: string) => boolean = () => false
 let mockFeeTiers = {
   [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
   [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
@@ -22,12 +25,17 @@ let mockFeeTiersError: SdkFeeError | null = null
 jest.mock("@app/screens/unclaimed-deposits/hooks/use-deposit-actions", () => ({
   useDepositActions: () => ({
     deposits: mockDeposits,
-    isBusy: false,
-    isProcessing: () => false,
+    isBusy: mockIsBusy,
+    isProcessing: (id: string, action: string) => mockIsProcessing(id, action),
     handleClaim: mockHandleClaim,
     handleRefund: mockHandleRefund,
     DepositActionType: { Claim: "claim", Refund: "refund" },
   }),
+}))
+
+jest.mock("@app/screens/unclaimed-deposits/utils", () => ({
+  openMempoolTx: (...args: unknown[]) => mockOpenMempoolTx(...args),
+  ADDRESS_PLACEHOLDER: "bc1q...",
 }))
 
 jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () => {
@@ -107,6 +115,8 @@ describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockDeposits = [claimableDeposit]
+    mockIsBusy = false
+    mockIsProcessing = () => false
     mockFeeTiers = {
       [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
       [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
@@ -184,5 +194,99 @@ describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
       "bc1qaddr",
       20, // medium tier feeSats
     )
+  })
+})
+
+describe("UnclaimedDepositsScreen — broader flows", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockDeposits = [claimableDeposit]
+    mockIsBusy = false
+    mockIsProcessing = () => false
+    mockFeeTiers = {
+      [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
+      [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
+      [FeeTierOption.Slow]: { feeSats: 10, etaMinutes: 60 },
+    }
+    mockFeeTiersError = null
+  })
+
+  it("renders empty-state copy when there are no deposits", () => {
+    mockDeposits = []
+    const { getByText, queryByTestId } = renderScreen()
+
+    expect(getByText("Unable to claim this deposit")).toBeTruthy()
+    expect(queryByTestId("claim-deposit-1")).toBeNull()
+  })
+
+  it("calls handleClaim with the deposit when Claim is pressed", () => {
+    const utils = renderScreen()
+
+    fireEvent.press(utils.getByTestId(`claim-${claimableDeposit.id}`))
+
+    expect(mockHandleClaim).toHaveBeenCalledWith(
+      expect.objectContaining({ id: claimableDeposit.id }),
+    )
+  })
+
+  it("opens the mempool tx URL when the txid row is pressed", () => {
+    const utils = renderScreen()
+
+    fireEvent.press(utils.getByText(claimableDeposit.txid))
+
+    expect(mockOpenMempoolTx).toHaveBeenCalledWith(claimableDeposit.txid)
+  })
+
+  it("shows the immature copy and hides claim/refund actions for Immature deposits", () => {
+    mockDeposits = [{ ...claimableDeposit, status: DepositStatus.Immature }]
+    const utils = renderScreen()
+
+    expect(utils.getByText("Waiting for confirmations...")).toBeTruthy()
+    expect(utils.queryByTestId(`claim-${claimableDeposit.id}`)).toBeNull()
+    expect(utils.queryByTestId(`refund-toggle-${claimableDeposit.id}`)).toBeNull()
+  })
+
+  it("renders the claim spinner instead of the Claim button while a claim is in flight", () => {
+    mockIsProcessing = (_id, action) => action === "claim"
+    const utils = renderScreen()
+
+    expect(utils.queryByTestId(`claim-${claimableDeposit.id}`)).toBeNull()
+    expect(utils.queryByTestId(`refund-toggle-${claimableDeposit.id}`)).toBeTruthy()
+  })
+
+  it("renders the refund spinner instead of Refund now while a refund is in flight", () => {
+    mockIsProcessing = (_id, action) => action === "refund"
+    const utils = renderScreen()
+    enterRefundMode(utils)
+
+    expect(utils.queryByTestId("refund-now-button")).toBeNull()
+    expect(utils.queryByTestId("cancel-refund")).toBeTruthy()
+  })
+
+  it("disables the Claim button when isBusy is true", () => {
+    mockIsBusy = true
+    const utils = renderScreen()
+
+    const claimBtn = utils.getByTestId(`claim-${claimableDeposit.id}`)
+    expect(claimBtn.props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it("exits refund mode when Cancel is pressed", () => {
+    const utils = renderScreen()
+    enterRefundMode(utils)
+
+    expect(utils.queryByTestId("refund-now-button")).toBeTruthy()
+
+    fireEvent.press(utils.getByTestId("cancel-refund"))
+
+    expect(utils.queryByTestId("refund-now-button")).toBeNull()
+    expect(utils.queryByTestId(`refund-toggle-${claimableDeposit.id}`)).toBeTruthy()
+  })
+
+  it("hides the Claim button on the card currently in refund mode", () => {
+    const utils = renderScreen()
+    enterRefundMode(utils)
+
+    expect(utils.queryByTestId(`claim-${claimableDeposit.id}`)).toBeNull()
   })
 })
