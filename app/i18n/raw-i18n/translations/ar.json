@@ -3540,5 +3540,31 @@
     "explainerStep3": "استمر في استخدام Blink كالمعتاد",
     "letsMove": "هيا بنا",
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "اختر نوع الحساب",
+    "description": "حدد كيف تريد إدارة أموالك",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "نسخ احتياطي للمحفظة",
+    "description": "اختر طريقة النسخ الاحتياطي لتأمين أموالك"
+  },
+  "RestoreScreen": {
+    "title": "استعادة المحفظة",
+    "description": "استعد محفظتك من نسخة احتياطية"
+  },
+  "BackupNudge": {
+    "title": "أمّن محفظتك",
+    "description": "أموالك في خطر. أمّن محفظتك الآن."
+  },
+  "StableBalance": {
+    "title": "الرصيد المستقر",
+    "description": "احتفظ برصيد مقوّم بالدولار مدعوم بـ USDB على Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "الميزة غير متاحة",
+    "description": "تتطلب هذه الميزة حساباً وصائياً."
   }
 }

@@ -3502,5 +3502,31 @@
     "explainerStep3": "Continua fent servir Blink com sempre",
     "letsMove": "Anem-hi",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Tria el tipus de compte",
+    "description": "Selecciona com vols gestionar els teus fons",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Còpia de seguretat",
+    "description": "Tria un mètode de còpia de seguretat per protegir els teus fons"
+  },
+  "RestoreScreen": {
+    "title": "Restaura la cartera",
+    "description": "Recupera la teva cartera des d'una còpia de seguretat"
+  },
+  "BackupNudge": {
+    "title": "Protegeix la teva cartera",
+    "description": "Els teus fons estan en risc. Protegeix la teva cartera ara."
+  },
+  "StableBalance": {
+    "title": "Balanç estable",
+    "description": "Mantén un balanç denominat en USD amb USDB a Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funció no disponible",
+    "description": "Aquesta funció requereix un compte custodial."
   }
 }

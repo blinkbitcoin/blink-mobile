@@ -3531,5 +3531,31 @@
         "explainerStep3": "Continuez à utiliser Blink comme d'habitude",
         "letsMove": "Allons-y",
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
+    },
+    "AccountTypeSelectionScreen": {
+        "title": "Choisir le type de compte",
+        "description": "Sélectionnez comment vous souhaitez gérer vos fonds",
+        "custodialLabel": "Blink",
+        "selfCustodialLabel": "Spark"
+    },
+    "BackupScreen": {
+        "title": "Sauvegarder le portefeuille",
+        "description": "Choisissez une méthode de sauvegarde pour protéger vos fonds"
+    },
+    "RestoreScreen": {
+        "title": "Restaurer le portefeuille",
+        "description": "Récupérez votre portefeuille à partir d'une sauvegarde"
+    },
+    "BackupNudge": {
+        "title": "Sécurisez votre portefeuille",
+        "description": "Vos fonds sont en danger. Sécurisez votre portefeuille maintenant."
+    },
+    "StableBalance": {
+        "title": "Solde stable",
+        "description": "Conservez un solde en USD propulsé par USDB sur Spark."
+    },
+    "BackendFeatureGate": {
+        "title": "Fonctionnalité indisponible",
+        "description": "Cette fonctionnalité nécessite un compte de garde."
     }
 }

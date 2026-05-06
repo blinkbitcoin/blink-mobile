@@ -3490,5 +3490,31 @@
         "explainerStep3": "Nutze Blink weiterhin wie gewohnt",
         "letsMove": "Los geht's",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
+    },
+    "AccountTypeSelectionScreen": {
+        "title": "Kontotyp wählen",
+        "description": "Wähle, wie du deine Mittel verwalten möchtest",
+        "custodialLabel": "Blink",
+        "selfCustodialLabel": "Spark"
+    },
+    "BackupScreen": {
+        "title": "Wallet sichern",
+        "description": "Wähle eine Sicherungsmethode zum Schutz deiner Mittel"
+    },
+    "RestoreScreen": {
+        "title": "Wallet wiederherstellen",
+        "description": "Stelle dein Wallet aus einer Sicherung wieder her"
+    },
+    "BackupNudge": {
+        "title": "Sichere dein Wallet",
+        "description": "Deine Mittel sind gefährdet. Sichere dein Wallet jetzt."
+    },
+    "StableBalance": {
+        "title": "Stabiler Saldo",
+        "description": "Halte einen USD-Saldo betrieben durch USDB auf Spark."
+    },
+    "BackendFeatureGate": {
+        "title": "Funktion nicht verfügbar",
+        "description": "Diese Funktion erfordert ein Verwahrungskonto."
     }
 }

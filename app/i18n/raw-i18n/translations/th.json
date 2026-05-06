@@ -3540,5 +3540,31 @@
     "explainerStep3": "ใช้ Blink ต่อไปได้ตามปกติ",
     "letsMove": "ไปกันเลย",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "เลือกประเภทบัญชี",
+    "description": "เลือกวิธีที่คุณต้องการจัดการเงินของคุณ",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "สำรองข้อมูลกระเป๋าเงิน",
+    "description": "เลือกวิธีการสำรองข้อมูลเพื่อปกป้องเงินของคุณ"
+  },
+  "RestoreScreen": {
+    "title": "กู้คืนกระเป๋าเงิน",
+    "description": "กู้คืนกระเป๋าเงินจากข้อมูลสำรอง"
+  },
+  "BackupNudge": {
+    "title": "รักษาความปลอดภัยกระเป๋าเงิน",
+    "description": "เงินของคุณตกอยู่ในความเสี่ยง รักษาความปลอดภัยกระเป๋าเงินตอนนี้"
+  },
+  "StableBalance": {
+    "title": "ยอดคงเหลือมั่นคง",
+    "description": "ถือยอดคงเหลือเป็น USD ขับเคลื่อนโดย USDB บน Spark"
+  },
+  "BackendFeatureGate": {
+    "title": "ฟีเจอร์ไม่พร้อมใช้งาน",
+    "description": "ฟีเจอร์นี้ต้องการบัญชีแบบรับฝาก"
   }
 }

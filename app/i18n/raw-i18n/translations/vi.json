@@ -3540,5 +3540,31 @@
     "explainerStep3": "Tiếp tục sử dụng Blink như bình thường",
     "letsMove": "Bắt đầu nào",
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Chọn loại tài khoản",
+    "description": "Chọn cách bạn muốn quản lý tiền của mình",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Sao lưu ví",
+    "description": "Chọn phương pháp sao lưu để bảo vệ tiền của bạn"
+  },
+  "RestoreScreen": {
+    "title": "Khôi phục ví",
+    "description": "Khôi phục ví của bạn từ bản sao lưu"
+  },
+  "BackupNudge": {
+    "title": "Bảo mật ví của bạn",
+    "description": "Tiền của bạn đang gặp rủi ro. Bảo mật ví ngay bây giờ."
+  },
+  "StableBalance": {
+    "title": "Số dư ổn định",
+    "description": "Giữ số dư tính bằng USD được hỗ trợ bởi USDB trên Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Tính năng không khả dụng",
+    "description": "Tính năng này yêu cầu tài khoản lưu ký."
   }
 }
