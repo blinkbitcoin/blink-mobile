@@ -1,6 +1,6 @@
 import { WalletCurrency } from "@app/graphql/generated"
 
-import { MoneyAmount } from "./amounts"
+import { MoneyAmount, UsdMoneyAmount } from "./amounts"
 
 export type PaymentError = {
   message: string
@@ -202,7 +202,7 @@ export type ConvertAmountAdjustment =
   (typeof ConvertAmountAdjustment)[keyof typeof ConvertAmountAdjustment]
 
 export type ConvertQuote = {
-  feeAmount: MoneyAmount<typeof WalletCurrency.Usd>
+  feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
   execute: () => Promise<PaymentAdapterResult>
 }

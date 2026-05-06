@@ -12,6 +12,7 @@ import {
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
 const mockGetQuote = jest.fn()
+const mockConvertMoneyAmount = jest.fn((amount) => amount)
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
@@ -25,9 +26,7 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
-  usePriceConversion: () => ({
-    convertMoneyAmount: (amount: { amount: number }) => amount,
-  }),
+  usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => {
@@ -91,6 +90,38 @@ describe("useConversionQuote", () => {
     expect(result.current.feeText).toBe("$0.05")
     expect(result.current.isQuoting).toBe(false)
     expect(result.current.hasQuoteError).toBe(false)
+  })
+
+  it("converts feeAmount to display currency before formatting (avoids stale USD code)", async () => {
+    const quote = buildQuote()
+    mockGetQuote.mockResolvedValue(quote)
+
+    const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
+
+    await waitFor(() => expect(result.current.quote).toBe(quote))
+    expect(mockConvertMoneyAmount).toHaveBeenCalledWith(
+      quote.feeAmount,
+      "DisplayCurrency",
+    )
+  })
+
+  it("falls back to the raw USD fee when convertMoneyAmount is unavailable", async () => {
+    const quote = buildQuote()
+    mockGetQuote.mockResolvedValue(quote)
+
+    const usePriceConversionMock = jest.requireMock("@app/hooks/use-price-conversion")
+    usePriceConversionMock.usePriceConversion = () => ({ convertMoneyAmount: undefined })
+
+    const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
+
+    await waitFor(() => expect(result.current.quote).toBe(quote))
+    // formatUsdInDisplay falls back to formatting the raw USD amount so the UI
+    // never blocks on price loading.
+    expect(result.current.feeText).toBe("$0.05")
+
+    usePriceConversionMock.usePriceConversion = () => ({
+      convertMoneyAmount: mockConvertMoneyAmount,
+    })
   })
 
   it("transitions to Error when the quote is null", async () => {
