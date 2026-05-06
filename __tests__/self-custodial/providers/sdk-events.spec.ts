@@ -1,3 +1,5 @@
+import { SdkEvent_Tags as SdkEventTags } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   extractPaymentId,
   REFRESH_EVENTS,
@@ -6,18 +8,53 @@ import {
 
 describe("sdk-events", () => {
   describe("REFRESH_EVENTS", () => {
-    it("includes expected event tags", () => {
-      expect(REFRESH_EVENTS.size).toBeGreaterThanOrEqual(5)
+    it("includes Synced for general SDK sync ticks", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.Synced)).toBe(true)
     })
 
-    it("does not include PaymentFailed", () => {
-      const tags = [...REFRESH_EVENTS]
-      expect(tags).not.toContain("PaymentFailed")
+    it("includes PaymentSucceeded so a successful send refreshes wallet state", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.PaymentSucceeded)).toBe(true)
+    })
+
+    it("includes PaymentPending so an in-flight payment refreshes wallet state", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.PaymentPending)).toBe(true)
+    })
+
+    it("includes ClaimedDeposits so a claim updates the wallets list", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.ClaimedDeposits)).toBe(true)
+    })
+
+    it("includes UnclaimedDeposits so the deposit banner updates", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.UnclaimedDeposits)).toBe(true)
+    })
+
+    it("includes NewDeposits so newly seen deposits trigger a refresh", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.NewDeposits)).toBe(true)
+    })
+
+    it("does NOT include PaymentFailed (failed sends should not trigger a refresh)", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.PaymentFailed)).toBe(false)
+    })
+
+    it("contains exactly the documented refresh tags (no silent additions)", () => {
+      expect(REFRESH_EVENTS.size).toBe(6)
     })
   })
 
   describe("PAYMENT_RECEIVED_EVENTS", () => {
-    it("has at least 2 events", () => {
+    it("includes PaymentSucceeded", () => {
+      expect(PAYMENT_RECEIVED_EVENTS.has(SdkEventTags.PaymentSucceeded)).toBe(true)
+    })
+
+    it("includes PaymentPending (treated as received for UI feedback)", () => {
+      expect(PAYMENT_RECEIVED_EVENTS.has(SdkEventTags.PaymentPending)).toBe(true)
+    })
+
+    it("does NOT include PaymentFailed", () => {
+      expect(PAYMENT_RECEIVED_EVENTS.has(SdkEventTags.PaymentFailed)).toBe(false)
+    })
+
+    it("contains exactly the two documented received-payment tags", () => {
       expect(PAYMENT_RECEIVED_EVENTS.size).toBe(2)
     })
   })

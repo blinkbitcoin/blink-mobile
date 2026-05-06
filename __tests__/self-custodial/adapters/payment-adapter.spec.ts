@@ -190,6 +190,63 @@ describe("self-custodial payment adapters", () => {
         expect.objectContaining({ tokenIdentifier: undefined }),
       )
     })
+
+    it("returns onchain quote with feeTier, confirmationEtaMinutes and totalDebited (Tier 2: previously unasserted)", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({
+        amount: BigInt(50000),
+        paymentMethod: {
+          tag: "BitcoinAddress",
+          inner: {
+            feeQuote: {
+              speedFast: { userFeeSat: BigInt(500), l1BroadcastFeeSat: BigInt(300) },
+              speedMedium: { userFeeSat: BigInt(250), l1BroadcastFeeSat: BigInt(150) },
+              speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(60) },
+            },
+          },
+        },
+      })
+
+      const getFee = createGetFee(sdk as never)
+      const result = await getFee({
+        destination: "bc1q...",
+        amount: { amount: 50000, currency: "BTC", currencyCode: "BTC" },
+      })
+
+      if (result?.paymentType !== "onchain") {
+        throw new Error("expected onchain quote")
+      }
+      // Hardcoded today; documenting current behaviour. When I9 is fixed the
+      // returned feeTier/feeAmount must match the requested tier.
+      expect(result.feeTier).toBe("fast")
+      expect(result.confirmationEtaMinutes).toBe(10)
+      expect(result.feeAmount.amount).toBe(800)
+      expect(result.recipientAmount.amount).toBe(50000)
+      expect(result.totalDebited.amount).toBe(50800)
+    })
+
+    it("returns Lightning quote with the SDK fee from extractLightningFee (regression for #1)", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({
+        amount: BigInt(2000),
+        paymentMethod: {
+          tag: "Bolt11Invoice",
+          inner: {
+            lightningFeeSats: BigInt(42),
+          },
+        },
+      })
+
+      const getFee = createGetFee(sdk as never)
+      const result = await getFee({
+        destination: "lnbc1...",
+        amount: { amount: 2000, currency: "BTC", currencyCode: "BTC" },
+      })
+
+      expect(result?.paymentType).toBe("lightning")
+      // Real SDK quote, not the LIGHTNING_FEE_SATS=0 stub from the legacy helper.
+      expect(result?.feeAmount?.amount).toBe(42)
+    })
   })
 
   describe("createReceiveLightning", () => {

@@ -170,6 +170,58 @@ describe("toTransactionFragment", () => {
     expect(result.settlementDisplayCurrency).toBe("USD")
     expect(display.convertMoneyAmount).toHaveBeenCalled()
   })
+
+  it("converts the BTC fee separately from the USD settlement amount on a token tx (mixed-unit guard)", () => {
+    const tx = createTx({
+      paymentType: PaymentType.Lightning,
+      amount: {
+        amount: 500, // 500 USD cents = $5
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
+      },
+      fee: {
+        amount: 12, // 12 sats — must NOT be treated as 12 USD cents
+        currency: WalletCurrency.Btc,
+        currencyCode: WalletCurrency.Btc,
+      },
+    })
+
+    const convertMoneyAmount = jest.fn(({ amount, currency }) => {
+      // Stub conversion: USD cents pass through, BTC sats become 1 cent
+      // regardless of amount. The point is to verify the input we pass.
+      if (currency === WalletCurrency.Usd) {
+        return { amount, currency: "USD", currencyCode: "USD" }
+      }
+      return { amount: 1, currency: "USD", currencyCode: "USD" }
+    })
+
+    toTransactionFragment(tx, {
+      displayCurrency: "USD",
+      convertMoneyAmount: convertMoneyAmount as never,
+      fractionDigits: 2,
+    })
+
+    // First call converts the settlement amount in USD cents
+    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        amount: 512, // |signedAmount| = settlement (500) + fee (12) for a Send
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
+      }),
+      "USD",
+    )
+    // Second call converts the fee in BTC sats — NOT mixed in with the USD amount
+    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        amount: 12,
+        currency: WalletCurrency.Btc,
+        currencyCode: WalletCurrency.Btc,
+      }),
+      "USD",
+    )
+  })
 })
 
 describe("toTransactionFragments", () => {
