@@ -35,7 +35,7 @@ export const AuthenticationContextProvider = AuthenticationContext.Provider
 
 export const useAuthenticationContext = () => React.useContext(AuthenticationContext)
 
-const processLinkForAction = (url: string): Action | null => {
+export const processLinkForAction = (url: string): Action | null => {
   // grab action query param
   const urlObj = new URL(url)
   const action = urlObj.searchParams.get("action")
