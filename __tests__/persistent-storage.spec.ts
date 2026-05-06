@@ -35,7 +35,7 @@ it("migration from 5 to current", async () => {
   const res = await migrateAndGetPersistentState(state5)
 
   expect(res).toStrictEqual({
-    schemaVersion: 10,
+    schemaVersion: 11,
     galoyInstance: { id: "Main" },
     galoyAuthToken: "myToken",
   })

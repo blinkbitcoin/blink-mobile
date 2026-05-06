@@ -63,8 +63,22 @@ type PersistentState_10 = {
   selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
 }
 
-const migrate10ToCurrent = (state: PersistentState_10): Promise<PersistentState> =>
+type PersistentState_11 = {
+  schemaVersion: 11
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+}
+
+const migrate11ToCurrent = (state: PersistentState_11): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate10ToCurrent = (state: PersistentState_10): Promise<PersistentState> =>
+  migrate11ToCurrent({ ...state, schemaVersion: 11 })
 
 const migrate9ToCurrent = (state: PersistentState_9): Promise<PersistentState> =>
   migrate10ToCurrent({ ...state, schemaVersion: 10 })
@@ -150,6 +164,7 @@ type StateMigrations = {
   8: (state: PersistentState_8) => Promise<PersistentState>
   9: (state: PersistentState_9) => Promise<PersistentState>
   10: (state: PersistentState_10) => Promise<PersistentState>
+  11: (state: PersistentState_11) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -161,12 +176,13 @@ const stateMigrations: StateMigrations = {
   8: migrate8ToCurrent,
   9: migrate9ToCurrent,
   10: migrate10ToCurrent,
+  11: migrate11ToCurrent,
 }
 
-export type PersistentState = PersistentState_10
+export type PersistentState = PersistentState_11
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 10,
+  schemaVersion: 11,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -178,7 +194,7 @@ export const migrateAndGetPersistentState = async (
   data: any,
 ): Promise<PersistentState> => {
   if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 = data.schemaVersion
+    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 = data.schemaVersion
     try {
       const migration = stateMigrations[schemaVersion]
       const persistentState = await migration(data)

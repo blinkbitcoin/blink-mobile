@@ -76,7 +76,7 @@ describe("PersistentStateProvider", () => {
     })
 
     expect(screen.getByTestId("token").props.children).toBe("saved-token")
-    expect(screen.getByTestId("schema").props.children).toBe(10)
+    expect(screen.getByTestId("schema").props.children).toBe(11)
   })
 
   it("falls back to default state when no persisted data exists", async () => {
