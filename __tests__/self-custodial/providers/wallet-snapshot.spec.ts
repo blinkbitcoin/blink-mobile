@@ -6,6 +6,7 @@ import { AccountType, toWalletId, type WalletState } from "@app/types/wallet.typ
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
+  loadMoreTransactions,
 } from "@app/self-custodial/providers/wallet-snapshot"
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -89,6 +90,89 @@ describe("getSelfCustodialWalletSnapshot", () => {
   })
 })
 
+const buildKnownPayment = (id: string) => ({
+  id,
+  paymentType: 0,
+  amount: BigInt(1000),
+  fees: BigInt(10),
+  timestamp: BigInt(1700000000),
+  status: 0,
+  method: 0,
+  details: { tag: "Lightning", inner: { description: id } },
+})
+
+const buildUnknownTokenPayment = (id: string) => ({
+  id,
+  paymentType: 0,
+  amount: BigInt(1000),
+  fees: BigInt(10),
+  timestamp: BigInt(1700000000),
+  status: 0,
+  method: 2, // PaymentMethod.Token
+  details: {
+    tag: "Token",
+    inner: {
+      metadata: { ticker: "OTHER", decimals: 6, identifier: "other-token-id" },
+    },
+  },
+})
+
+describe("hasMore pagination (Critical #10)", () => {
+  it("computes hasMore from the raw response, not after isKnownPayment filtering", async () => {
+    // 20 raw items (page-size) where 5 are unknown tokens that get filtered out.
+    const sdk = createMockSdk()
+    const payments = [
+      ...Array.from({ length: 15 }, (_, i) => buildKnownPayment(`known-${i}`)),
+      ...Array.from({ length: 5 }, (_, i) => buildUnknownTokenPayment(`other-${i}`)),
+    ]
+    sdk.listPayments.mockResolvedValue({ payments })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never)
+
+    expect(snapshot.hasMore).toBe(true)
+  })
+
+  it("hasMore is false when raw response is shorter than page size", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: Array.from({ length: 10 }, (_, i) => buildKnownPayment(`p-${i}`)),
+    })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never)
+
+    expect(snapshot.hasMore).toBe(false)
+  })
+})
+
+describe("loadMoreTransactions", () => {
+  it("returns hasMore=true when raw response fills the page", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`p-${i}`)),
+    })
+
+    const page = await loadMoreTransactions(sdk as never, 0)
+
+    expect(page.hasMore).toBe(true)
+    expect(page.transactions).toHaveLength(20)
+  })
+
+  it("returns hasMore=true even when filtering reduces transactions below page size", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: [
+        ...Array.from({ length: 12 }, (_, i) => buildKnownPayment(`k-${i}`)),
+        ...Array.from({ length: 8 }, (_, i) => buildUnknownTokenPayment(`o-${i}`)),
+      ],
+    })
+
+    const page = await loadMoreTransactions(sdk as never, 20)
+
+    expect(page.hasMore).toBe(true)
+    expect(page.transactions).toHaveLength(12)
+  })
+})
+
 const buildTx = (id: string, currency: WalletCurrency): NormalizedTransaction => ({
   id,
   amount: toWalletMoneyAmount(1, currency),
@@ -151,5 +235,32 @@ describe("appendTransactions", () => {
     const result = appendTransactions(wallets, [])
 
     expect(result[0].transactions).toEqual([existing])
+  })
+
+  it("dedupes incoming transactions whose id is already in the wallet (regression Critical #10)", () => {
+    const existing = buildTx("dup-btc", WalletCurrency.Btc)
+    const wallets = [buildWallet(WalletCurrency.Btc, [existing])]
+    const newTxs = [
+      buildTx("dup-btc", WalletCurrency.Btc), // duplicate of existing
+      buildTx("fresh-btc", WalletCurrency.Btc),
+    ]
+
+    const result = appendTransactions(wallets, newTxs)
+
+    expect(result[0].transactions.map((t) => t.id)).toEqual(["dup-btc", "fresh-btc"])
+  })
+
+  it("dedupes duplicates within a single newTxs batch", () => {
+    const wallets = [buildWallet(WalletCurrency.Btc)]
+    const newTxs = [
+      buildTx("a", WalletCurrency.Btc),
+      buildTx("a", WalletCurrency.Btc), // same id twice in the batch
+      buildTx("b", WalletCurrency.Btc),
+    ]
+
+    const result = appendTransactions(wallets, newTxs)
+
+    // Existing wallet is empty so the first "a" is appended; the second is filtered.
+    expect(result[0].transactions.map((t) => t.id)).toEqual(["a", "b"])
   })
 })

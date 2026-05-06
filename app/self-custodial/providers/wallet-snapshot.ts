@@ -41,13 +41,20 @@ const isKnownPayment = (payment: Payment): boolean => {
   return payment.details.inner.metadata.identifier === SparkConfig.tokenIdentifier
 }
 
+type PaymentsPage = {
+  transactions: NormalizedTransaction[]
+  hasMore: boolean
+}
+
 const fetchAndMapPayments = async (
   sdk: BreezSdkInterface,
   offset: number,
-): Promise<NormalizedTransaction[]> => {
+): Promise<PaymentsPage> => {
   const response = await listPayments(sdk, offset, TRANSACTIONS_PER_PAGE)
-
-  return mapSelfCustodialTransactions(response.payments.filter(isKnownPayment))
+  return {
+    transactions: mapSelfCustodialTransactions(response.payments.filter(isKnownPayment)),
+    hasMore: response.payments.length >= TRANSACTIONS_PER_PAGE,
+  }
 }
 
 type WalletBalances = {
@@ -83,7 +90,7 @@ export const getSelfCustodialWalletSnapshot = async (
   sdk: BreezSdkInterface,
 ): Promise<WalletSnapshot> => {
   const info = await getWalletInfo(sdk)
-  const transactions = await fetchAndMapPayments(sdk, 0)
+  const page = await fetchAndMapPayments(sdk, 0)
 
   return {
     wallets: buildWallets(
@@ -92,9 +99,9 @@ export const getSelfCustodialWalletSnapshot = async (
         btcBalance: Number(info.balanceSats),
         stableBalance: getStableBalance(info.tokenBalances),
       },
-      transactions,
+      page.transactions,
     ),
-    hasMore: transactions.length >= TRANSACTIONS_PER_PAGE,
+    hasMore: page.hasMore,
   }
 }
 
@@ -102,21 +109,13 @@ export const appendTransactions = (
   wallets: WalletState[],
   newTxs: NormalizedTransaction[],
 ): WalletState[] =>
-  wallets.map((w) => ({
-    ...w,
-    transactions: [
-      ...w.transactions,
-      ...newTxs.filter((tx) => tx.amount.currency === w.walletCurrency),
-    ],
-  }))
+  wallets.map((w) => {
+    const compatible = newTxs.filter((tx) => tx.amount.currency === w.walletCurrency)
+    const merged = new Map([...w.transactions, ...compatible].map((tx) => [tx.id, tx]))
+    return { ...w, transactions: [...merged.values()] }
+  })
 
 export const loadMoreTransactions = async (
   sdk: BreezSdkInterface,
   currentCount: number,
-): Promise<{ transactions: NormalizedTransaction[]; hasMore: boolean }> => {
-  const transactions = await fetchAndMapPayments(sdk, currentCount)
-  return {
-    transactions,
-    hasMore: transactions.length >= TRANSACTIONS_PER_PAGE,
-  }
-}
+): Promise<PaymentsPage> => fetchAndMapPayments(sdk, currentCount)
