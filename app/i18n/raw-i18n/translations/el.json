@@ -3617,6 +3617,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Δεν ήταν δυνατή η φόρτωση των τελών δικτύου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
     "refundNow": "Επιστροφή τώρα",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

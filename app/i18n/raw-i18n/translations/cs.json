@@ -3658,6 +3658,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Nepodařilo se načíst síťové poplatky. Zkontrolujte připojení a zkuste to znovu.",
     "refundNow": "Vrátit nyní",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

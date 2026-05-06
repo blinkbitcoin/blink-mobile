@@ -3617,6 +3617,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Nu s-au putut încărca comisioanele rețelei. Verifică conexiunea și încearcă din nou.",
     "refundNow": "Rambursează acum",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

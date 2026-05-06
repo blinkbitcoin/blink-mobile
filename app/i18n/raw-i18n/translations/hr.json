@@ -3658,6 +3658,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Nije moguće učitati mrežne naknade. Provjerite vezu i pokušajte ponovno.",
     "refundNow": "Povrat sada",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

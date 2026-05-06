@@ -3655,6 +3655,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "ไม่สามารถโหลดค่าธรรมเนียมเครือข่ายได้ โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "refundNow": "คืนเงินตอนนี้",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

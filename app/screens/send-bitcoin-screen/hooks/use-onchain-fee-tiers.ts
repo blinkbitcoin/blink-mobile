@@ -48,7 +48,7 @@ const MESSAGE_TAG_MATCHERS: Array<[SdkErrorTags, SdkFeeError]> = [
   [SdkErrorTags.NetworkError, SdkFeeError.NetworkError],
 ]
 
-const classifyError = (err: unknown): SdkFeeError => {
+export const classifySdkFeeError = (err: unknown): SdkFeeError => {
   if (SdkError.instanceOf(err)) {
     return SDK_ERROR_TAG_MAP[err.tag] ?? SdkFeeError.Generic
   }
@@ -97,7 +97,7 @@ export const useOnchainFeeTiers = (
       })
       setError(null)
     } catch (err) {
-      setError(classifyError(err))
+      setError(classifySdkFeeError(err))
     }
   }, [sdk, address, amountSats])
 

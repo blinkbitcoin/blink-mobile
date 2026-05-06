@@ -3658,6 +3658,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Kon netwerkkosten niet laden. Controleer je verbinding en probeer het opnieuw.",
     "refundNow": "Nu terugbetalen",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",

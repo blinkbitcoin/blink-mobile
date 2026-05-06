@@ -3655,6 +3655,7 @@
     "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
     "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Không thể tải phí mạng. Vui lòng kiểm tra kết nối và thử lại.",
     "refundNow": "Hoàn tiền ngay",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
