@@ -146,6 +146,21 @@ describe("useOnchainFeeTiers", () => {
     })
   })
 
+  it("surfaces Generic error when extractOnchainFees returns null (regression Critical #3)", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    mockExtractOnchainFees.mockReturnValue(null)
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(SdkFeeError.Generic)
+    })
+
+    expect(result.current.tiers.fast.feeSats).toBe(0)
+    expect(result.current.tiers.medium.feeSats).toBe(0)
+    expect(result.current.tiers.slow.feeSats).toBe(0)
+  })
+
   it("classifies non-Error rejections as Generic", async () => {
     mockPrepareSend.mockRejectedValue("string error")
 

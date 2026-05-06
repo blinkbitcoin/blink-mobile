@@ -79,7 +79,10 @@ export const useOnchainFeeTiers = (
         amount: BigInt(amountSats),
       })
       const fees = extractOnchainFees(prepared)
-      if (!fees) return
+      if (!fees) {
+        setError(SdkFeeError.Generic)
+        return
+      }
 
       setTiers({
         [FeeTierOption.Fast]: {
