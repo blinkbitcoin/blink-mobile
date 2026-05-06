@@ -21,6 +21,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { SCHEMA_VERSION_KEY } from "@app/config"
 import { useAppConfig } from "@app/hooks"
+import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-token"
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
@@ -33,7 +34,7 @@ import { isIos } from "../utils/helper"
 import { loadString, saveString } from "../utils/storage"
 import { AnalyticsContainer } from "./analytics"
 import { createCache } from "./cache"
-import { useLanguageQuery, useRealtimePriceQuery } from "./generated"
+import { useRealtimePriceQuery } from "./generated"
 import { HideAmountContainer } from "./hide-amount-component"
 import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
@@ -370,13 +371,9 @@ const MyPriceUpdates = () => {
 }
 
 const LanguageSync = () => {
-  const isAuthed = useIsAuthed()
+  const { language } = useEffectiveLanguage()
 
-  const { data } = useLanguageQuery({ fetchPolicy: "cache-first", skip: !isAuthed })
-
-  const userPreferredLocale = getLocaleFromLanguage(
-    getLanguageFromString(data?.me?.language),
-  )
+  const userPreferredLocale = getLocaleFromLanguage(getLanguageFromString(language))
   const { locale, setLocale } = useI18nContext()
 
   useEffect(() => {
