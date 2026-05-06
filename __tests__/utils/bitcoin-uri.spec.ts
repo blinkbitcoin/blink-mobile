@@ -38,9 +38,26 @@ describe("buildBitcoinUri", () => {
     expect(uri).toBe("bitcoin:bc1q...?amount=0.0005")
   })
 
-  it("includes memo as message param", () => {
+  it("formats 1 sat as plain decimal (never exponential)", () => {
+    const uri = buildBitcoinUri({ address: "bc1q...", amountSats: 1 })
+    expect(uri).toBe("bitcoin:bc1q...?amount=0.00000001")
+    expect(uri).not.toContain("e-")
+  })
+
+  it("formats whole BTC without trailing zeros", () => {
+    const uri = buildBitcoinUri({ address: "bc1q...", amountSats: 100000000 })
+    expect(uri).toBe("bitcoin:bc1q...?amount=1")
+  })
+
+  it("percent-encodes spaces in memo as %20 (BIP-21), not + (form-encoding)", () => {
     const uri = buildBitcoinUri({ address: "bc1q...", memo: "test payment" })
-    expect(uri).toContain("message=test+payment")
+    expect(uri).toContain("message=test%20payment")
+    expect(uri).not.toContain("message=test+payment")
+  })
+
+  it("percent-encodes URI-reserved characters in memo", () => {
+    const uri = buildBitcoinUri({ address: "bc1q...", memo: "a&b=c?d" })
+    expect(uri).toContain("message=a%26b%3Dc%3Fd")
   })
 
   it("includes both amount and memo", () => {

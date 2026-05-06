@@ -1,6 +1,12 @@
 const SATS_PER_BTC = 1e8
+const BIP21_AMOUNT_DECIMALS = 8
 
 export const satsToBtc = (sats: number): number => sats / SATS_PER_BTC
+
+const formatBip21Amount = (amountSats: number): string => {
+  const fixed = satsToBtc(amountSats).toFixed(BIP21_AMOUNT_DECIMALS)
+  return fixed.replace(/\.?0+$/, "")
+}
 
 type BuildBitcoinUriParams = {
   address: string
@@ -23,10 +29,9 @@ export const buildBitcoinUri = ({
   const addr = uppercase ? address.toUpperCase() : address
   const base = prefix ? `bitcoin:${addr}` : addr
 
-  const params = new URLSearchParams()
-  if (amountSats) params.append("amount", `${satsToBtc(amountSats)}`)
-  if (memo) params.append("message", memo)
+  const parts: string[] = []
+  if (amountSats) parts.push(`amount=${formatBip21Amount(amountSats)}`)
+  if (memo) parts.push(`message=${encodeURIComponent(memo)}`)
 
-  const query = params.toString()
-  return query ? `${base}?${query}` : base
+  return parts.length ? `${base}?${parts.join("&")}` : base
 }
