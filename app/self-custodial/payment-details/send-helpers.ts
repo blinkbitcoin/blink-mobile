@@ -65,11 +65,11 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const fees = extractOnchainFees(prepared)
-      const feeKey = TIER_TO_FEE_KEY[feeTier]
-      const feeSats = fees ? fees[feeKey] : 0
+      if (!fees) return { amount: undefined }
 
+      const feeKey = TIER_TO_FEE_KEY[feeTier]
       return {
-        amount: toWalletAmount({ amount: feeSats, currency }),
+        amount: toWalletAmount({ amount: fees[feeKey], currency }),
       }
     } catch {
       return { amount: undefined }

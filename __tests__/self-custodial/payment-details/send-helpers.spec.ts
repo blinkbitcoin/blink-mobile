@@ -127,6 +127,22 @@ describe("createGetFee", () => {
     expect(result.amount?.amount).toBe(800)
   })
 
+  it("returns undefined amount when extractOnchainFees returns null (regression Critical #3)", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      amount: BigInt(50000),
+      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+    })
+
+    const getFee = createGetFeeOnchain(
+      { sdk: mockSdk, paymentRequest: "lnbc1...", amount: BigInt(50000) },
+      WalletCurrency.Btc,
+      "medium",
+    )
+    const result = await getFee()
+
+    expect(result.amount).toBeUndefined()
+  })
+
   it("returns undefined amount on error", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("fail"))
 
