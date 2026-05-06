@@ -113,7 +113,7 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeDefined()
   })
 
-  it("falls back to custodial adapters when self-custodial account without SDK", () => {
+  it("returns no adapters while a self-custodial account is loading its SDK (regression Critical #5)", () => {
     mockActiveAccount.mockReturnValue({
       id: "self-custodial-default",
       type: AccountType.SelfCustodial,
@@ -124,5 +124,24 @@ describe("usePayments", () => {
 
     expect(result.current.accountType).toBe(AccountType.SelfCustodial)
     expect(result.current.sendPayment).toBeUndefined()
+    expect(result.current.getFee).toBeUndefined()
+    expect(result.current.receiveLightning).toBeUndefined()
+    expect(result.current.receiveOnchain).toBeUndefined()
+    expect(result.current.listPendingDeposits).toBeUndefined()
+    expect(result.current.claimDeposit).toBeUndefined()
+    expect(result.current.convert).toBeUndefined()
+  })
+
+  it("returns no adapters and undefined accountType while activeAccount is missing (loading window)", () => {
+    mockActiveAccount.mockReturnValue(undefined)
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.accountType).toBeUndefined()
+    expect(result.current.sendPayment).toBeUndefined()
+    expect(result.current.listPendingDeposits).toBeUndefined()
+    expect(result.current.claimDeposit).toBeUndefined()
+    expect(result.current.convert).toBeUndefined()
   })
 })
