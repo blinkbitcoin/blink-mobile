@@ -4,6 +4,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
+  FEE_TIER_ETA_MINUTES,
   FeeMode,
   FeeQuoteType,
   FeeTier,
@@ -47,7 +48,7 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
 }
 
 export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
-  return async ({ destination, amount }) => {
+  return async ({ destination, amount, feeTier }) => {
     try {
       const currency = amount?.currency ?? WalletCurrency.Btc
       const prepared = await prepareSend(sdk, {
@@ -58,16 +59,17 @@ export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
 
       const onchainFees = extractOnchainFees(prepared)
       if (onchainFees) {
-        const feeSats = onchainFees.fast
+        const tier = feeTier ?? FeeTier.Fast
+        const feeSats = onchainFees[tier]
         const amountSats = toNumber(prepared.amount)
         return {
           paymentType: FeeQuoteType.Onchain,
           feeAmount: toBtcMoneyAmount(feeSats),
-          feeTier: FeeTier.Fast,
+          feeTier: tier,
           feeMode: FeeMode.PaySeparately,
           recipientAmount: toBtcMoneyAmount(amountSats),
           totalDebited: toBtcMoneyAmount(amountSats + feeSats),
-          confirmationEtaMinutes: 10,
+          confirmationEtaMinutes: FEE_TIER_ETA_MINUTES[tier],
         }
       }
 

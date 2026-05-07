@@ -33,6 +33,12 @@ export const FeeTier = {
 
 export type FeeTier = (typeof FeeTier)[keyof typeof FeeTier]
 
+export const FEE_TIER_ETA_MINUTES = {
+  fast: 10,
+  medium: 30,
+  slow: 60,
+} as const
+
 export type SendPaymentParams = {
   destination: string
   amount?: MoneyAmount<WalletCurrency>

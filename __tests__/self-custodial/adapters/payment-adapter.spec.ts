@@ -14,6 +14,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   InputType_Tags: { SparkAddress: "SparkAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  SdkError: { instanceOf: () => false },
+  SdkError_Tags: {
+    InsufficientFunds: "InsufficientFunds",
+    InvalidInput: "InvalidInput",
+    NetworkError: "NetworkError",
+    Generic: "Generic",
+  },
   PrepareSendPaymentRequest: {
     create: (args: unknown) => args,
   },
@@ -223,6 +230,68 @@ describe("self-custodial payment adapters", () => {
       expect(result.feeAmount.amount).toBe(800)
       expect(result.recipientAmount.amount).toBe(50000)
       expect(result.totalDebited.amount).toBe(50800)
+    })
+
+    it("honours the requested feeTier (medium) instead of always picking fast (regression I9)", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({
+        amount: BigInt(50000),
+        paymentMethod: {
+          tag: "BitcoinAddress",
+          inner: {
+            feeQuote: {
+              speedFast: { userFeeSat: BigInt(500), l1BroadcastFeeSat: BigInt(300) },
+              speedMedium: { userFeeSat: BigInt(250), l1BroadcastFeeSat: BigInt(150) },
+              speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(60) },
+            },
+          },
+        },
+      })
+
+      const getFee = createGetFee(sdk as never)
+      const result = await getFee({
+        destination: "bc1q...",
+        amount: { amount: 50000, currency: "BTC", currencyCode: "BTC" },
+        feeTier: "medium",
+      })
+
+      if (result?.paymentType !== "onchain") {
+        throw new Error("expected onchain quote")
+      }
+      expect(result.feeTier).toBe("medium")
+      expect(result.feeAmount.amount).toBe(400)
+      expect(result.confirmationEtaMinutes).toBe(30)
+    })
+
+    it("honours the requested feeTier (slow)", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({
+        amount: BigInt(50000),
+        paymentMethod: {
+          tag: "BitcoinAddress",
+          inner: {
+            feeQuote: {
+              speedFast: { userFeeSat: BigInt(500), l1BroadcastFeeSat: BigInt(300) },
+              speedMedium: { userFeeSat: BigInt(250), l1BroadcastFeeSat: BigInt(150) },
+              speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(60) },
+            },
+          },
+        },
+      })
+
+      const getFee = createGetFee(sdk as never)
+      const result = await getFee({
+        destination: "bc1q...",
+        amount: { amount: 50000, currency: "BTC", currencyCode: "BTC" },
+        feeTier: "slow",
+      })
+
+      if (result?.paymentType !== "onchain") {
+        throw new Error("expected onchain quote")
+      }
+      expect(result.feeTier).toBe("slow")
+      expect(result.feeAmount.amount).toBe(160)
+      expect(result.confirmationEtaMinutes).toBe(60)
     })
 
     it("returns Lightning quote with the SDK fee from extractLightningFee (regression for #1)", async () => {
