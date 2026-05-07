@@ -4,7 +4,6 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
   DepositErrorReason,
   DepositStatus,
-  FeeQuoteType,
   PaymentResultStatus,
   type ClaimDepositAdapter,
   type ListPendingDepositsAdapter,
@@ -52,12 +51,17 @@ const mapToPendingDeposit = (deposit: MappedDeposit): PendingDeposit => ({
   errorMessage: deposit.claimError?.message,
 })
 
-const parseDepositId = (depositId: string): { txid: string; vout: number } => {
+export const parseDepositId = (
+  depositId: string,
+): { txid: string; vout: number } | null => {
   const lastColon = depositId.lastIndexOf(":")
-  return {
-    txid: depositId.substring(0, lastColon),
-    vout: Number(depositId.substring(lastColon + 1)),
-  }
+  if (lastColon <= 0) return null
+  const txid = depositId.substring(0, lastColon)
+  const voutStr = depositId.substring(lastColon + 1)
+  if (!txid || !/^\d+$/.test(voutStr)) return null
+  const vout = Number(voutStr)
+  if (!Number.isSafeInteger(vout) || vout < 0) return null
+  return { txid, vout }
 }
 
 export const createListPendingDeposits = (
@@ -81,26 +85,17 @@ export const createListPendingDeposits = (
 }
 
 export const createClaimDeposit = (sdk: BreezSdkInterface): ClaimDepositAdapter => ({
+  // null signals "fee unknown" to the UI; SDK has no standalone claim-fee quote.
   getClaimFee: async ({ depositId }) => {
-    try {
-      const { txid, vout } = parseDepositId(depositId)
-      const deposits = await listDeposits(sdk)
-      const deposit = deposits.find((d) => d.txid === txid && d.vout === vout)
-      if (!deposit) return null
-
-      return {
-        paymentType: FeeQuoteType.Claim,
-        feeAmount: toBtcMoneyAmount(0),
-      }
-    } catch {
-      return null
-    }
+    if (!parseDepositId(depositId)) return null
+    return null
   },
 
   claimDeposit: async ({ depositId, maxFeeSats }) => {
+    const parsed = parseDepositId(depositId)
+    if (!parsed) return failed(`Invalid depositId: ${depositId}`)
     try {
-      const { txid, vout } = parseDepositId(depositId)
-      await claimDeposit({ sdk, txid, vout, maxFeeSats })
+      await claimDeposit({ sdk, ...parsed, maxFeeSats })
       return { status: PaymentResultStatus.Success }
     } catch (err) {
       return failed(err instanceof Error ? err.message : `Claim failed: ${err}`)
@@ -108,9 +103,10 @@ export const createClaimDeposit = (sdk: BreezSdkInterface): ClaimDepositAdapter 
   },
 
   refundDeposit: async ({ depositId, destinationAddress, feeRateSatPerVb }) => {
+    const parsed = parseDepositId(depositId)
+    if (!parsed) return failed(`Invalid depositId: ${depositId}`)
     try {
-      const { txid, vout } = parseDepositId(depositId)
-      await refundDeposit({ sdk, txid, vout, destinationAddress, feeRateSatPerVb })
+      await refundDeposit({ sdk, ...parsed, destinationAddress, feeRateSatPerVb })
       return { status: PaymentResultStatus.Success }
     } catch (err) {
       return failed(err instanceof Error ? err.message : `Refund failed: ${err}`)
