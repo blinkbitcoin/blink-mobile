@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
+import crashlytics from "@react-native-firebase/crashlytics"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -7,6 +9,7 @@ import {
   Invoice,
   InvoiceType,
   PaymentRequestState,
+  PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
@@ -37,7 +40,9 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   )
   const [paymentRequest, setPaymentRequest] = useState<string>()
   const [onchainAddress, setOnchainAddress] = useState<string>()
-  const [requestState, setRequestState] = useState<string>(PaymentRequestState.Idle)
+  const [requestState, setRequestState] = useState<PaymentRequestStateType>(
+    PaymentRequestState.Idle,
+  )
   const baselinePaymentIdRef = useRef<string | null>(lastReceivedPaymentId)
   const lastPaymentIdRef = useRef(lastReceivedPaymentId)
   lastPaymentIdRef.current = lastReceivedPaymentId
@@ -105,12 +110,26 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   }, [generateRequest])
 
   useEffect(() => {
-    if (!sdk || onchainAddress) return
+    if (!sdk) return
+    let cancelled = false
     const adapter = createReceiveOnchain(sdk)
-    adapter().then((result: { address?: string }) => {
-      if (result.address) setOnchainAddress(result.address)
-    })
-  }, [sdk, onchainAddress])
+    adapter()
+      .then((result: { address?: string }) => {
+        if (cancelled) return
+        if (result.address) setOnchainAddress(result.address)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        crashlytics().recordError(
+          err instanceof Error
+            ? err
+            : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [sdk])
 
   useEffect(() => {
     if (requestState !== PaymentRequestState.Created) return
@@ -143,7 +162,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     [onchainAddress, amountInSats, memo],
   )
 
-  if (!sdk || !btcWallet) return null
+  if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
   const invoiceData: InvoiceData | undefined = paymentRequest
     ? {
@@ -164,7 +183,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     switchReceivingWallet,
     setExpirationTime: () => {},
     regenerateInvoice: generateRequest,
-    expiresInSeconds: undefined,
+    expiresInSeconds: null,
     expirationTime: 0,
     canSetExpirationTime: false,
     memo,

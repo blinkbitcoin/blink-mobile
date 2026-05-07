@@ -21,6 +21,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 
@@ -57,18 +58,12 @@ const ReceiveScreen = () => {
   if (!requestState) return null
 
   return (
-    <ReceiveScreenContent
-      requestState={requestState as ReceiveScreenContentProps["requestState"]}
-      isSelfCustodial={isSelfCustodial}
-    />
+    <ReceiveScreenContent requestState={requestState} isSelfCustodial={isSelfCustodial} />
   )
 }
 
 type ReceiveScreenContentProps = {
-  requestState: NonNullable<ReturnType<typeof usePaymentRequest>> & {
-    onchainAddress?: string
-    getOnchainFullUriFn?: (params: { uppercase?: boolean; prefix?: boolean }) => string
-  }
+  requestState: SelfCustodialPaymentRequestState
   isSelfCustodial: boolean
 }
 

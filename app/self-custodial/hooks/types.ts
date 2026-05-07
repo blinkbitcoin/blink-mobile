@@ -1,6 +1,9 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
+import {
+  InvoiceType,
+  PaymentRequestStateType,
+} from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 type UriParams = { uppercase?: boolean; prefix?: boolean }
@@ -9,26 +12,29 @@ export type InvoiceData = {
   invoiceType: InvoiceType
   paymentRequest?: string
   address?: string
+  username?: string
   getFullUriFn: (params: UriParams) => string
   getCopyableInvoiceFn: () => string
 }
 
 export type SelfCustodialPaymentRequestState = {
   type: InvoiceType
-  state: string
+  state?: PaymentRequestStateType
   setType: (type: InvoiceType) => void
   setMemo: () => void
   setAmount: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
   switchReceivingWallet: (type: InvoiceType, currency: WalletCurrency) => void
   setExpirationTime: (time: number) => void
   regenerateInvoice: () => void
-  expiresInSeconds: number | undefined
-  expirationTime: number
+  expiresInSeconds: number | null
+  expirationTime?: number
   canSetExpirationTime: boolean
   memo?: string
   memoChangeText: string | null
   setMemoChangeText: (text: string | null) => void
-  convertMoneyAmount: ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
+  convertMoneyAmount: NonNullable<
+    ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
+  >
   settlementAmount?: MoneyAmount<WalletCurrency>
   unitOfAccountAmount?: MoneyAmount<WalletOrDisplayCurrency>
   receivingWalletDescriptor: { id: string; currency: WalletCurrency }
@@ -47,11 +53,11 @@ export type SelfCustodialPaymentRequestState = {
         }
       }
     | undefined
-  info?: { data: InvoiceData }
+  info?: { data?: InvoiceData }
   onchainAddress?: string
   getOnchainFullUriFn?: (params: UriParams) => string
   pr: {
-    state: string
+    state?: PaymentRequestStateType
     info?: { data?: InvoiceData }
-  }
+  } | null
 }
