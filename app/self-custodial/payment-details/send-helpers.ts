@@ -1,3 +1,4 @@
+import crashlytics from "@react-native-firebase/crashlytics"
 import {
   OnchainConfirmationSpeed,
   type BreezSdkInterface,
@@ -27,12 +28,6 @@ const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
   [FeeTierOption.Medium]: OnchainConfirmationSpeed.Medium,
   [FeeTierOption.Slow]: OnchainConfirmationSpeed.Slow,
 }
-
-const TIER_TO_FEE_KEY = {
-  [FeeTierOption.Fast]: "fast",
-  [FeeTierOption.Medium]: "medium",
-  [FeeTierOption.Slow]: "slow",
-} as const
 
 const toPrepareOptions = (params: PrepareParams) => ({
   paymentRequest: params.paymentRequest,
@@ -67,14 +62,22 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
       const fees = extractOnchainFees(prepared)
       if (!fees) return { amount: undefined }
 
-      const feeKey = TIER_TO_FEE_KEY[feeTier]
       return {
-        amount: toWalletAmount({ amount: fees[feeKey], currency }),
+        amount: toWalletAmount({ amount: fees[feeTier], currency }),
       }
     } catch {
       return { amount: undefined }
     }
   }
+}
+
+const reportSendFailure = (
+  scope: string,
+  err: unknown,
+): { __typename: "GraphQLApplicationError"; message: string } => {
+  const message = err instanceof Error ? err.message : `${scope}: ${err}`
+  crashlytics().recordError(err instanceof Error ? err : new Error(`${scope}: ${err}`))
+  return { __typename: "GraphQLApplicationError", message }
 }
 
 export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {
@@ -86,12 +89,7 @@ export const createSendMutation = (params: PrepareParams): SendPaymentMutation =
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,
-        errors: [
-          {
-            __typename: "GraphQLApplicationError" as const,
-            message: err instanceof Error ? err.message : `Send failed: ${err}`,
-          },
-        ],
+        errors: [reportSendFailure("Self-custodial Lightning send failed", err)],
       }
     }
   }
@@ -109,12 +107,7 @@ export const createSendMutationOnchain = (
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,
-        errors: [
-          {
-            __typename: "GraphQLApplicationError" as const,
-            message: err instanceof Error ? err.message : `Send failed: ${err}`,
-          },
-        ],
+        errors: [reportSendFailure("Self-custodial onchain send failed", err)],
       }
     }
   }

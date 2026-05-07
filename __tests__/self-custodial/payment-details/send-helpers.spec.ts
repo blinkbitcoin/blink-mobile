@@ -50,6 +50,11 @@ jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
   FeeTierOption: { Fast: "fast", Medium: "medium", Slow: "slow" },
 }))
 
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+}))
+
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
@@ -215,7 +220,45 @@ describe("createSendMutation", () => {
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
-    expect(result.errors?.[0].message).toBe("Send failed: string error")
+    expect(result.errors?.[0].message).toBe(
+      "Self-custodial Lightning send failed: string error",
+    )
+  })
+
+  it("records send failures to crashlytics with a scoped Error (regression I8)", async () => {
+    mockRecordError.mockClear()
+    mockPrepareSendPayment.mockRejectedValue(new Error("payment refused"))
+
+    const send = createSendMutation({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    await send()
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "payment refused" }),
+    )
+  })
+
+  it("records non-Error throws as a scoped Error so Sentry never gets a bare string (I8)", async () => {
+    mockRecordError.mockClear()
+    mockPrepareSendPayment.mockRejectedValue("network blip")
+
+    const send = createSendMutation({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    await send()
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Self-custodial Lightning send failed: network blip",
+        ),
+      }),
+    )
   })
 
   it("forwards tokenIdentifier from prepare params to the SDK prepare call", async () => {
