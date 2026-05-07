@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import {
   SdkError,
@@ -7,14 +7,11 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
+import { FEE_TIER_ETA_MINUTES } from "@app/types/payment.types"
 
 import { FeeTierOption, type FeeTierInfo } from "./fee-tiers.types"
 
-export const ETA_MINUTES: Record<FeeTierOption, number> = {
-  [FeeTierOption.Fast]: 10,
-  [FeeTierOption.Medium]: 30,
-  [FeeTierOption.Slow]: 60,
-}
+export const ETA_MINUTES: Record<FeeTierOption, number> = FEE_TIER_ETA_MINUTES
 
 const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
   [FeeTierOption.Fast]: { feeSats: 0, etaMinutes: ETA_MINUTES[FeeTierOption.Fast] },
@@ -42,19 +39,9 @@ const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
   [SdkErrorTags.NetworkError]: SdkFeeError.NetworkError,
 }
 
-const MESSAGE_TAG_MATCHERS: Array<[SdkErrorTags, SdkFeeError]> = [
-  [SdkErrorTags.InsufficientFunds, SdkFeeError.InsufficientFunds],
-  [SdkErrorTags.InvalidInput, SdkFeeError.InvalidInput],
-  [SdkErrorTags.NetworkError, SdkFeeError.NetworkError],
-]
-
 export const classifySdkFeeError = (err: unknown): SdkFeeError => {
   if (SdkError.instanceOf(err)) {
     return SDK_ERROR_TAG_MAP[err.tag] ?? SdkFeeError.Generic
-  }
-  const message = err instanceof Error ? err.message : String(err)
-  for (const [tag, code] of MESSAGE_TAG_MATCHERS) {
-    if (message.includes(tag)) return code
   }
   return SdkFeeError.Generic
 }
@@ -66,8 +53,13 @@ export const useOnchainFeeTiers = (
 ): OnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
   const [error, setError] = useState<SdkFeeError | null>(null)
+  // Discards stale prepareSend resolutions when deps change mid-flight.
+  const requestTokenRef = useRef(0)
 
   const fetchFees = useCallback(async () => {
+    requestTokenRef.current += 1
+    const token = requestTokenRef.current
+
     if (!sdk || !address || !amountSats) {
       setError(null)
       return
@@ -78,6 +70,8 @@ export const useOnchainFeeTiers = (
         paymentRequest: address,
         amount: BigInt(amountSats),
       })
+      if (token !== requestTokenRef.current) return
+
       const fees = extractOnchainFees(prepared)
       if (!fees) {
         setError(SdkFeeError.Generic)
@@ -100,6 +94,7 @@ export const useOnchainFeeTiers = (
       })
       setError(null)
     } catch (err) {
+      if (token !== requestTokenRef.current) return
       setError(classifySdkFeeError(err))
     }
   }, [sdk, address, amountSats])
