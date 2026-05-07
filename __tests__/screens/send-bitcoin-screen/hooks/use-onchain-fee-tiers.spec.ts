@@ -81,36 +81,19 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers[FeeTierOption.Slow].etaMinutes).toBe(60)
   })
 
-  it("classifies InsufficientFunds error", async () => {
+  it("classifies plain wrapped errors as Generic (no fragile message-string matching, I1)", async () => {
+    // After I1: a thrown Error whose .message happens to contain a tag name
+    // does NOT short-circuit classification — only typed SdkError instances
+    // do. Everything else collapses to Generic.
     mockPrepareSend.mockRejectedValue(new Error("SdkError.InsufficientFunds"))
 
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
 
     await waitFor(() => {
-      expect(result.current.error).toBe(SdkFeeError.InsufficientFunds)
+      expect(result.current.error).toBe(SdkFeeError.Generic)
     })
 
     expect(result.current.tiers.fast.feeSats).toBe(0)
-  })
-
-  it("classifies InvalidInput error", async () => {
-    mockPrepareSend.mockRejectedValue(new Error("SdkError.InvalidInput"))
-
-    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 100))
-
-    await waitFor(() => {
-      expect(result.current.error).toBe(SdkFeeError.InvalidInput)
-    })
-  })
-
-  it("classifies NetworkError", async () => {
-    mockPrepareSend.mockRejectedValue(new Error("SdkError.NetworkError"))
-
-    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 1000))
-
-    await waitFor(() => {
-      expect(result.current.error).toBe(SdkFeeError.NetworkError)
-    })
   })
 
   it("classifies typed SdkError instances by tag (prefers tag over message)", async () => {
@@ -172,7 +155,7 @@ describe("useOnchainFeeTiers", () => {
   })
 
   it("clears error on successful retry", async () => {
-    mockPrepareSend.mockRejectedValue(new Error("SdkError.InvalidInput"))
+    mockPrepareSend.mockRejectedValue(new Error("transient"))
 
     const { result, rerender } = renderHook(
       ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
@@ -180,7 +163,7 @@ describe("useOnchainFeeTiers", () => {
     )
 
     await waitFor(() => {
-      expect(result.current.error).toBe(SdkFeeError.InvalidInput)
+      expect(result.current.error).toBe(SdkFeeError.Generic)
     })
 
     mockPrepareSend.mockResolvedValue({})
@@ -196,7 +179,7 @@ describe("useOnchainFeeTiers", () => {
   })
 
   it("clears error when amount becomes undefined", async () => {
-    mockPrepareSend.mockRejectedValue(new Error("SdkError.InvalidInput"))
+    mockPrepareSend.mockRejectedValue(new Error("transient"))
 
     const { result, rerender } = renderHook(
       ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
@@ -204,7 +187,7 @@ describe("useOnchainFeeTiers", () => {
     )
 
     await waitFor(() => {
-      expect(result.current.error).toBe(SdkFeeError.InvalidInput)
+      expect(result.current.error).toBe(SdkFeeError.Generic)
     })
 
     rerender({ amount: undefined })
@@ -212,5 +195,42 @@ describe("useOnchainFeeTiers", () => {
     await waitFor(() => {
       expect(result.current.error).toBeNull()
     })
+  })
+
+  it("ignores stale prepareSend resolutions when dependencies change mid-flight (regression I12)", async () => {
+    let resolveStale: (value: unknown) => void = () => {}
+    const stalePrepared = new Promise((resolve) => {
+      resolveStale = resolve
+    })
+    // First call: never resolves until we explicitly trigger it.
+    mockPrepareSend.mockImplementationOnce(() => stalePrepared)
+    // Second call (after dep change): resolves immediately with fresh tiers.
+    mockPrepareSend.mockResolvedValueOnce({ id: "fresh" })
+    // The fresh call resolves first → consumes the first queued return value.
+    // The stale call resolves later → consumes the second queued return value.
+    mockExtractOnchainFees
+      .mockReturnValueOnce({ fast: 100, medium: 80, slow: 50 }) // fresh tiers
+      .mockReturnValueOnce({ fast: 999, medium: 999, slow: 999 }) // stale tiers
+
+    const { result, rerender } = renderHook(
+      ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      { initialProps: { amount: 1000 as number } },
+    )
+
+    // Trigger the dependency change while the first request is still pending.
+    rerender({ amount: 5000 })
+
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeSats).toBe(100)
+    })
+
+    // Now resolve the stale request — it must NOT overwrite the fresh tiers.
+    resolveStale({ id: "stale" })
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0)
+    })
+
+    expect(result.current.tiers.fast.feeSats).toBe(100)
+    expect(result.current.tiers.fast.feeSats).not.toBe(999)
   })
 })
