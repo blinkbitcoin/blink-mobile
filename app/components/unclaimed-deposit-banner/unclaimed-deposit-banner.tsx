@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
@@ -25,18 +25,22 @@ export const UnclaimedDepositBanner: React.FC = () => {
   const { wallets } = useSelfCustodialWallet()
   const [count, setCount] = useState(0)
   const [totalSats, setTotalSats] = useState(0)
+  // Coordinates concurrent fetches (focus + wallet-refresh) so only the latest
+  // in-flight resolution commits state.
+  const fetchGenerationRef = useRef(0)
 
   const fetchDeposits = useCallback(() => {
     if (!listPendingDeposits) return
-    let cancelled = false
+    fetchGenerationRef.current += 1
+    const generation = fetchGenerationRef.current
     listPendingDeposits().then(({ deposits }) => {
-      if (cancelled) return
+      if (generation !== fetchGenerationRef.current) return
       const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)
       setCount(active.length)
       setTotalSats(active.reduce((sum, { amount }) => sum + amount.amount, 0))
     })
     return () => {
-      cancelled = true
+      fetchGenerationRef.current += 1
     }
   }, [listPendingDeposits])
 
