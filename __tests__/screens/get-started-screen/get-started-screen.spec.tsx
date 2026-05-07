@@ -199,4 +199,31 @@ describe("GetStartedScreen", () => {
       flow: "trial",
     })
   })
+
+  it("routes Login to the selection screen with restore mode when non-custodial is enabled", () => {
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    fireEvent.press(getByTestId("login-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "restore" })
+  })
+
+  it("routes Login directly to phone login when non-custodial is off", () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+      loading: false,
+    })
+
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    fireEvent.press(getByTestId("login-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("login", { type: "Login" })
+  })
 })

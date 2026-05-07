@@ -11,12 +11,8 @@ import { AccountOption, useAccountTypeOptions } from "@app/hooks/use-account-typ
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { AccountTypeMode } from "@app/types/account.types"
 import { testProps } from "@app/utils/testProps"
-
-const SelectionMode = {
-  Create: "create",
-  Restore: "restore",
-} as const
 
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
@@ -32,10 +28,9 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     defaultSelected,
     selfCustodialTemporarilyDisabled,
     loading: detectingCountry,
-  } = useAccountTypeOptions()
+  } = useAccountTypeOptions(mode)
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
-  // Pre-select the only available option once detection finishes.
   useEffect(() => {
     if (defaultSelected && !selected) setSelected(defaultSelected)
   }, [defaultSelected, selected])
@@ -44,7 +39,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     if (!selected) return
 
     if (selected === AccountOption.Custodial) {
-      if (mode === SelectionMode.Create) {
+      if (mode === AccountTypeMode.Create) {
         navigation.navigate("acceptTermsAndConditions", { flow: "trial" })
         return
       }
@@ -54,7 +49,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       return
     }
 
-    if (mode === SelectionMode.Create) {
+    if (mode === AccountTypeMode.Create) {
       navigation.navigate("acceptTermsAndConditions", {
         flow: "selfCustodial",
       })
@@ -73,7 +68,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       <View style={styles.wrapper}>
         <View style={styles.body}>
           <Text style={styles.description}>
-            {mode === SelectionMode.Create
+            {mode === AccountTypeMode.Create
               ? LL.AccountTypeSelectionScreen.descriptionDefault()
               : LL.AccountTypeSelectionScreen.descriptionSelected()}
           </Text>

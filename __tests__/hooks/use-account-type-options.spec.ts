@@ -107,4 +107,77 @@ describe("useAccountTypeOptions", () => {
 
     expect(result.current.loading).toBe(true)
   })
+
+  describe("login flow (mode = restore)", () => {
+    it("shows custodial even from a country in the deny-list", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "DE", loading: false })
+
+      const { result } = renderHook(() => useAccountTypeOptions("restore"))
+
+      expect(result.current.options).toEqual([
+        AccountOption.SelfCustodial,
+        AccountOption.Custodial,
+      ])
+    })
+
+    it("shows custodial from an OFAC sanctioned country", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "CU", loading: false })
+
+      const { result } = renderHook(() => useAccountTypeOptions("restore"))
+
+      expect(result.current.options).toContain(AccountOption.Custodial)
+    })
+
+    it("shows custodial when country detection failed", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      const { result } = renderHook(() => useAccountTypeOptions("restore"))
+
+      expect(result.current.options).toContain(AccountOption.Custodial)
+    })
+
+    it("keeps custodial as the only option when self-custodial is disabled and country is blocked", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: false })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "DE", loading: false })
+
+      const { result } = renderHook(() => useAccountTypeOptions("restore"))
+
+      expect(result.current.options).toEqual([AccountOption.Custodial])
+      expect(result.current.defaultSelected).toBe(AccountOption.Custodial)
+    })
+
+    it("reports loading: false even while device location is still loading", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+
+      const { result } = renderHook(() => useAccountTypeOptions("restore"))
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.options).toContain(AccountOption.Custodial)
+    })
+  })
+
+  describe("create flow (mode = create)", () => {
+    it("hides custodial from a country in the deny-list (explicit mode)", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "DE", loading: false })
+
+      const { result } = renderHook(() => useAccountTypeOptions("create"))
+
+      expect(result.current.options).toEqual([AccountOption.SelfCustodial])
+    })
+
+    it("matches the default-mode behavior", () => {
+      mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: true })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "DE", loading: false })
+
+      const explicit = renderHook(() => useAccountTypeOptions("create"))
+      const defaulted = renderHook(() => useAccountTypeOptions())
+
+      expect(explicit.result.current.options).toEqual(defaulted.result.current.options)
+    })
+  })
 })

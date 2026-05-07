@@ -8,6 +8,7 @@ import { useAppConfig } from "@app/hooks"
 import { useAccountTypeOptions } from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
+import { AccountTypeMode } from "@app/types/account.types"
 import { logGetStartedAction } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
@@ -58,7 +59,7 @@ export const GetStartedScreen: React.FC = () => {
     })
 
     if (nonCustodialEnabled) {
-      navigation.navigate("accountTypeSelection", { mode: "create" })
+      navigation.navigate("accountTypeSelection", { mode: AccountTypeMode.Create })
       return
     }
 
@@ -72,7 +73,7 @@ export const GetStartedScreen: React.FC = () => {
     })
 
     if (nonCustodialEnabled) {
-      navigation.navigate("accountTypeSelection", { mode: "restore" })
+      navigation.navigate("accountTypeSelection", { mode: AccountTypeMode.Restore })
       return
     }
 

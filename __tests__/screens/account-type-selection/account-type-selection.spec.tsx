@@ -40,7 +40,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 const mockUseAccountTypeOptions = jest.fn()
 jest.mock("@app/hooks/use-account-type-options", () => ({
   AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
-  useAccountTypeOptions: () => mockUseAccountTypeOptions(),
+  useAccountTypeOptions: (mode: string) => mockUseAccountTypeOptions(mode),
 }))
 
 const mockCardDefaultBg = "#1d1d1d"
@@ -275,5 +275,28 @@ describe("AccountTypeSelectionScreen", () => {
     expect(queryByTestId("self-custodial-option")).toBeNull()
     fireEvent.press(getByTestId("continue-button"))
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("forwards the route mode argument to useAccountTypeOptions", () => {
+    mockMode.mockReturnValue("restore")
+
+    render(<AccountTypeSelectionScreen />)
+
+    expect(mockUseAccountTypeOptions).toHaveBeenCalledWith("restore")
+  })
+
+  it("renders both options on restore even when running from a country blocked for custodial creation", () => {
+    mockMode.mockReturnValue("restore")
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial", "custodial"],
+      defaultSelected: null,
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    expect(getByTestId("custodial-option")).toBeTruthy()
+    expect(getByTestId("self-custodial-option")).toBeTruthy()
   })
 })
