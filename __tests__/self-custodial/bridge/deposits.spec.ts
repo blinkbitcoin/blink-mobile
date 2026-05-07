@@ -102,7 +102,7 @@ describe("listDeposits", () => {
     expect(result[0].claimError?.reason).toBe("missing_utxo")
   })
 
-  it("maps below_dust from generic error message", async () => {
+  it("surfaces dust-limit messages as Generic with the raw SDK message (I1: no fragile string-match)", async () => {
     mockListUnclaimedDeposits.mockResolvedValue({
       deposits: [
         {
@@ -121,7 +121,7 @@ describe("listDeposits", () => {
 
     const result = await listDeposits(mockSdk)
 
-    expect(result[0].claimError?.reason).toBe("below_dust")
+    expect(result[0].claimError?.reason).toBe("generic")
     expect(result[0].claimError?.message).toContain("dust limit")
   })
 

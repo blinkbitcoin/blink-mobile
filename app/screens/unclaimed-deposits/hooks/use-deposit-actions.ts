@@ -52,9 +52,7 @@ const resolveRefundErrorMessage = (
   errors: PaymentError[] | undefined,
   LL: LL,
 ): string => {
-  const raw = errors?.[0]?.message?.toLowerCase() ?? ""
-
-  if (raw.includes("dust") || deposit.errorReason === DepositErrorReason.BelowDust) {
+  if (deposit.errorReason === DepositErrorReason.BelowDust) {
     return LL.UnclaimedDeposit.belowDustLimit()
   }
   if (deposit.errorReason === DepositErrorReason.FeeExceeded) {

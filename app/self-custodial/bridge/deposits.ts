@@ -46,10 +46,6 @@ const mapClaimError = (deposit: DepositInfo): ClaimErrorInfo | null => {
       ? String((inner as Record<string, unknown>).message)
       : undefined
 
-  if (message && message.toLowerCase().includes("dust limit")) {
-    return { reason: "below_dust", message }
-  }
-
   return { reason: "generic", message }
 }
 
