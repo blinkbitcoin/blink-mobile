@@ -33,8 +33,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 }))
 
 const mockGenerateMnemonic = jest.fn().mockReturnValue("word1 word2 word3")
+const mockValidateMnemonic = jest.fn().mockReturnValue(true)
 jest.mock("bip39", () => ({
   generateMnemonic: (...args: unknown[]) => mockGenerateMnemonic(...args),
+  validateMnemonic: (...args: unknown[]) => mockValidateMnemonic(...args),
 }))
 
 jest.mock("react-native-quick-crypto", () => ({
@@ -237,18 +239,45 @@ describe("selfCustodialCreateWallet — rollback path (security-critical)", () =
   })
 })
 
-describe("selfCustodialRestoreWallet", () => {
+describe("selfCustodialRestoreWallet (I14)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSetMnemonic.mockResolvedValue(true)
     mockSetMnemonicNetwork.mockResolvedValue(true)
+    mockDeleteMnemonic.mockResolvedValue(true)
+    mockValidateMnemonic.mockReturnValue(true)
+    const sdk = makeSdk()
+    mockConnect.mockResolvedValue(sdk)
+    mockDisconnect.mockResolvedValue(undefined)
   })
 
-  it("stores the provided mnemonic and the active network label", async () => {
-    await selfCustodialRestoreWallet("provided-mnemonic words")
+  it("trims/normalises whitespace before validating the mnemonic", async () => {
+    await selfCustodialRestoreWallet("  alpha   beta  gamma  ")
 
-    expect(mockSetMnemonic).toHaveBeenCalledWith("provided-mnemonic words")
+    expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+    expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+  })
+
+  it("throws and skips storage when BIP39 validation fails", async () => {
+    mockValidateMnemonic.mockReturnValueOnce(false)
+
+    await expect(selfCustodialRestoreWallet("totally invalid")).rejects.toThrow(
+      "Invalid BIP39 mnemonic",
+    )
+
+    expect(mockSetMnemonic).not.toHaveBeenCalled()
+    expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it("stores the mnemonic and writes the active network label on success", async () => {
+    await selfCustodialRestoreWallet("provided mnemonic words")
+
+    expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
+    expect(mockConnect).toHaveBeenCalledTimes(1)
+    expect(mockDisconnect).toHaveBeenCalledTimes(1)
+    expect(mockDeleteMnemonic).not.toHaveBeenCalled()
   })
 
   it("throws when secure storage refuses to persist the mnemonic", async () => {
@@ -258,5 +287,20 @@ describe("selfCustodialRestoreWallet", () => {
       "Failed to store mnemonic",
     )
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it("rolls back the stored mnemonic and records the error when SDK init fails", async () => {
+    mockConnect.mockRejectedValueOnce(new Error("SDK init refused"))
+
+    await expect(selfCustodialRestoreWallet("any valid words")).rejects.toThrow(
+      "SDK init refused",
+    )
+
+    expect(mockSetMnemonic).toHaveBeenCalledTimes(1)
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining("SDK init refused") }),
+    )
   })
 })
