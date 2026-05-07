@@ -13,9 +13,6 @@ import { PaymentDestinationDisplay } from "@app/components/payment-destination-d
 import { Screen } from "@app/components/screen"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
-  Network,
-  useOnChainTxFeeLazyQuery,
-  useSendBitcoinDetailsScreenQuery,
   useSendBitcoinInternalLimitsQuery,
   useSendBitcoinWithdrawalLimitsQuery,
   Wallet,
@@ -24,7 +21,16 @@ import {
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
-import { getBtcWallet, getDefaultWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+
+import {
+  decodeInvoiceString,
+  Network as NetworkLibGaloy,
+  PaymentType,
+} from "@blinkbitcoin/blink-client"
+import crashlytics from "@react-native-firebase/crashlytics"
+import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
 import { useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -36,13 +42,11 @@ import {
   toUsdMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import {
-  decodeInvoiceString,
-  Network as NetworkLibGaloy,
-} from "@blinkbitcoin/blink-client"
-import crashlytics from "@react-native-firebase/crashlytics"
-import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { FeeTierSelector } from "./fee-tier-selector"
+import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
+import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
+import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
@@ -119,11 +123,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { hideAmount } = useHideAmount()
 
-  const { data } = useSendBitcoinDetailsScreenQuery({
-    fetchPolicy: "cache-first",
-    returnPartialData: true,
-    skip: !useIsAuthed(),
-  })
+  const { wallets, defaultWallet, btcWallet, usdWallet, network, isSelfCustodial } =
+    useSendWallets()
 
   const { formatMoneyAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
@@ -133,22 +134,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-
-  const defaultWallet = getDefaultWallet(
-    data?.me?.defaultAccount?.wallets,
-    data?.me?.defaultAccount?.defaultWalletId,
-  )
-
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
-
-  const network = data?.globals?.network
-
-  const wallets = data?.me?.defaultAccount?.wallets
   const { paymentDestination } = route.params
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
+  const { feeTier, setFeeTier, feeTierOptions, feeTierErrorMessage } =
+    useOnchainFeeTierOptions({
+      paymentDetail,
+      isSelfCustodial,
+      paymentDestination,
+      convertMoneyAmount: _convertMoneyAmount,
+    })
+
+  const handleFeeTierChange = (tier: typeof feeTier) => {
+    const rebuilt = setFeeTier(tier, paymentDetail)
+    if (rebuilt) setPaymentDetail(rebuilt)
+  }
 
   const { data: withdrawalLimitsData } = useSendBitcoinWithdrawalLimitsQuery({
     fetchPolicy: "no-cache",
@@ -215,11 +216,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert(
+  const alertHighFees = useOnchainFeeAlert({
     paymentDetail,
-    btcWallet?.id as string,
+    walletId: btcWallet?.id as string,
     network,
-  )
+    isSelfCustodial,
+  })
 
   if (!paymentDetail) {
     return <></>
@@ -293,6 +295,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (paymentDetail?.paymentType === "onchain") return LL.common.onchain()
     if (paymentDetail?.paymentType === "lightning") return LL.common.lightning()
     if (paymentDetail?.paymentType === "lnurl") return LL.common.lightning()
+    if (paymentDetail?.paymentType === "spark") return LL.common.spark()
   }
 
   const ChooseWalletModal = wallets && (
@@ -576,6 +579,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             />
           </View>
         </View>
+        {isSelfCustodial && paymentDetail.paymentType === PaymentType.Onchain && (
+          <View style={styles.fieldContainer}>
+            <FeeTierSelector
+              title={LL.SendBitcoinScreen.feeTier()}
+              options={feeTierOptions}
+              selected={feeTier}
+              onSelect={handleFeeTierChange}
+            />
+          </View>
+        )}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
           <NoteInput
@@ -587,7 +600,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           />
         </View>
         <SendBitcoinDetailsExtraInfo
-          errorMessage={asyncErrorMessage}
+          errorMessage={asyncErrorMessage || feeTierErrorMessage}
           amountStatus={amountStatus}
           currentLevel={currentLevel}
         />
@@ -595,7 +608,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           <GaloyPrimaryButton
             onPress={goToNextScreen || undefined}
             loading={isLoadingLnurl}
-            disabled={!goToNextScreen || !amountStatus.validAmount}
+            disabled={
+              !goToNextScreen || !amountStatus.validAmount || Boolean(feeTierErrorMessage)
+            }
             title={LL.common.next()}
           />
         </View>
@@ -712,67 +727,3 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingLeft: 20,
   },
 }))
-
-const useOnchainFeeAlert = (
-  paymentDetail: PaymentDetail<WalletCurrency> | null,
-  walletId: string,
-  network: Network | undefined,
-) => {
-  const dummyAddress =
-    network === "mainnet"
-      ? "bc1qk2cpytjea36ry6vga8wwr7297sl3tdkzwzy2cw"
-      : "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
-
-  const isOnchainPayment =
-    walletId && paymentDetail && paymentDetail.paymentType === "onchain"
-
-  // we need to have an approximate value for the onchain fees
-  // by the time the user tap on the next button
-  // so we are fetching some fees when the screen loads
-  // the fees are approximate but that doesn't matter for the use case
-  // of warning the user if the fees are high compared to the amount sent
-
-  // TODO: check if the BTC wallet is empty, and only USD wallet is used, if the query works
-  const [getOnChainTxFee] = useOnChainTxFeeLazyQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      walletId,
-      amount: 1000,
-      address: dummyAddress,
-    },
-  })
-
-  const [onChainTxFee, setOnChainTxFee] = useState(0)
-
-  useEffect(() => {
-    if (isOnchainPayment) {
-      ;(async () => {
-        const result = await getOnChainTxFee()
-        const fees = result.data?.onChainTxFee.amount
-
-        if (fees) {
-          setOnChainTxFee(fees)
-        } else {
-          console.error("failed to get onchain fees")
-        }
-      })()
-    }
-  }, [getOnChainTxFee, isOnchainPayment])
-
-  if (!isOnchainPayment) {
-    return false
-  }
-
-  const { convertMoneyAmount } = paymentDetail
-
-  // alert will shows if amount is less than fees * ratioFeesToAmount
-  const ratioFeesToAmount = 2
-  const ratioedFees = toBtcMoneyAmount(onChainTxFee * ratioFeesToAmount)
-
-  const alertHighFees =
-    paymentDetail.paymentType === "onchain" &&
-    convertMoneyAmount(paymentDetail.settlementAmount, WalletCurrency.Btc).amount <
-      ratioedFees.amount
-
-  return alertHighFees
-}

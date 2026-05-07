@@ -34,11 +34,13 @@ import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { TrustModelModal } from "@app/components/trust-model-modal"
 import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import {
@@ -170,6 +172,7 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  const { refreshWallets: refreshSelfCustodialWallets } = useSelfCustodialWallet()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const {
     seen: trustModelSeen,
@@ -336,6 +339,11 @@ export const HomeScreen: React.FC = () => {
   ])
 
   const refetch = React.useCallback(() => {
+    if (isSelfCustodial) {
+      refreshSelfCustodialWallets()
+      return
+    }
+
     if (!isAuthed) return
 
     Promise.all([
@@ -349,6 +357,8 @@ export const HomeScreen: React.FC = () => {
     })
   }, [
     isAuthed,
+    isSelfCustodial,
+    refreshSelfCustodialWallets,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,
@@ -579,6 +589,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
+        {isSelfCustodial && <UnclaimedDepositBanner />}
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />

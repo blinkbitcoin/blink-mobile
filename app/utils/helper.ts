@@ -1,4 +1,5 @@
 import { Platform } from "react-native"
+
 import { MASK_CHAR } from "@app/config/appinfo"
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array

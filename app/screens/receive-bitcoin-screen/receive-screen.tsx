@@ -17,8 +17,12 @@ import { SetLightningAddressModal } from "@app/components/set-lightning-address-
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import { ActiveWalletStatus } from "@app/types/wallet.types"
 import { testProps } from "@app/utils/testProps"
 
 import { NfcHeaderButton } from "./nfc-header-button"
@@ -28,7 +32,7 @@ import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types
 import {
   useDisplayPaymentRequest,
   useNfcReceive,
-  useOnChainAddress,
+  useOnchainResolver,
   usePaymentRequest,
   useReceiveCarousel,
   useReceiveFlow,
@@ -36,19 +40,37 @@ import {
 
 const AUTO_DISMISS_DELAY = 5000
 
-const ReceiveScreen = () => {
-  const requestState = usePaymentRequest()
+const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
+  ActiveWalletStatus.Error,
+  ActiveWalletStatus.Unavailable,
+]
 
+const ReceiveScreen = () => {
+  const { isSelfCustodial, status } = useActiveWallet()
+  const custodialRequest = usePaymentRequest()
+  const selfCustodialRequest = useSelfCustodialPaymentRequest()
+
+  if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
+    return null
+  }
+
+  const requestState = isSelfCustodial ? selfCustodialRequest : custodialRequest
   if (!requestState) return null
 
-  return <ReceiveScreenContent requestState={requestState} />
+  return (
+    <ReceiveScreenContent requestState={requestState} isSelfCustodial={isSelfCustodial} />
+  )
 }
 
 type ReceiveScreenContentProps = {
-  requestState: NonNullable<ReturnType<typeof usePaymentRequest>>
+  requestState: SelfCustodialPaymentRequestState
+  isSelfCustodial: boolean
 }
 
-const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestState }) => {
+const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
+  requestState,
+  isSelfCustodial,
+}) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
@@ -71,15 +93,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
 
   const carousel = useReceiveCarousel(requestState, openTrialModal)
 
-  const onchainWalletId =
-    carousel.onchainWalletCurrency === WalletCurrency.Btc
-      ? requestState.btcWalletId
-      : requestState.usdWalletId
-
-  const onchain = useOnChainAddress(onchainWalletId, {
-    amount: requestState.settlementAmount?.amount,
-    memo: requestState.memo || undefined,
-  })
+  const onchain = useOnchainResolver(
+    isSelfCustodial,
+    requestState,
+    carousel.onchainWalletCurrency,
+  )
 
   const {
     handleSetAmount,
@@ -234,7 +252,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
           setAmount={handleSetAmount}
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
-          canToggleWallet={true}
+          canToggleWallet={!isSelfCustodial}
           disabled={
             carousel.isOnChainPage &&
             carousel.onchainWalletCurrency === WalletCurrency.Usd

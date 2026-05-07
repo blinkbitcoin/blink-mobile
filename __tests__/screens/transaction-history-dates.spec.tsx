@@ -55,6 +55,56 @@ jest.mock("../../app/graphql/cache", () => {
   }
 })
 
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => ({
+    wallets: [],
+    status: "ready",
+    accountType: "custodial",
+    isReady: true,
+    isSelfCustodial: false,
+    needsBackendAuth: true,
+  }),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({
+    loadMore: jest.fn(),
+    hasMoreTransactions: false,
+    loadingMore: false,
+  }),
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  usePriceConversion: () => ({
+    convertMoneyAmount: (amount: { amount: number; currency: string }) => amount,
+    displayCurrency: "USD",
+  }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    fractionDigits: 2,
+    formatCurrency: () => "$0.00",
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `$${(moneyAmount.amount / 100).toFixed(2)}`,
+    formatDisplayAndWalletAmount: () => ({
+      primaryAmount: { displayAmount: "$0.00" },
+      secondaryAmount: { displayAmount: "0 sats" },
+    }),
+    getSecondaryAmountIfCurrencyIsDifferent: () => undefined,
+  }),
+}))
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    feeReimbursementMemo: "",
+  }),
+  useFeatureFlags: () => ({
+    nonCustodialEnabled: false,
+    stableBalanceEnabled: false,
+  }),
+}))
+
 jest.mock("@app/graphql/mocks", () => {
   const actual = jest.requireActual("@app/graphql/mocks")
 
