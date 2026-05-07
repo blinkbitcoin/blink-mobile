@@ -43,7 +43,7 @@ describe("getInvoiceFullUri", () => {
       memo: "will not forget",
     })
 
-    expect(uri).toBe(`bitcoin:btc1234567890address?message=will+not+forget`)
+    expect(uri).toBe(`bitcoin:btc1234567890address?message=will%20not%20forget`)
   })
 
   it("contains memo and amount in the uri", () => {
@@ -55,7 +55,7 @@ describe("getInvoiceFullUri", () => {
     })
 
     expect(uri).toBe(
-      `bitcoin:btc1234567890address?amount=${100 / 10 ** 8}&message=will+not+forget`,
+      `bitcoin:btc1234567890address?amount=${100 / 10 ** 8}&message=will%20not%20forget`,
     )
   })
 
