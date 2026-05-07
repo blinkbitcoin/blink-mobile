@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react"
 
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
 import { getLightningAddress } from "@app/utils/pay-links"
 
 import { truncateMiddle } from "../payment/helpers"
 import { Invoice } from "../payment/index.types"
-import { usePaymentRequest } from "./use-payment-request"
 
-type RequestState = NonNullable<ReturnType<typeof usePaymentRequest>>
+type RequestState = SelfCustodialPaymentRequestState
 
 type DisplayPaymentRequestReturn = {
   displayPaymentRequest: string
@@ -29,7 +29,11 @@ export const useDisplayPaymentRequest = (
   const readablePaymentRequest = (() => {
     if (info?.data?.invoiceType === Invoice.Lightning)
       return truncateMiddle(info.data.getFullUriFn({}))
-    if (requestType === Invoice.PayCode && info?.data?.invoiceType === Invoice.PayCode)
+    if (
+      requestType === Invoice.PayCode &&
+      info?.data?.invoiceType === Invoice.PayCode &&
+      info.data.username
+    )
       return getLightningAddress(lnAddressHostname, info.data.username)
   })()
 

@@ -147,7 +147,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr.info?.data?.getFullUriFn({
+    const uri = result.current?.pr?.info?.data?.getFullUriFn({
       prefix: true,
       uppercase: false,
     })
@@ -161,7 +161,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr.info?.data?.getFullUriFn({
+    const uri = result.current?.pr?.info?.data?.getFullUriFn({
       prefix: false,
       uppercase: false,
     })
@@ -175,7 +175,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const invoice = result.current?.pr.info?.data?.getCopyableInvoiceFn()
+    const invoice = result.current?.pr?.info?.data?.getCopyableInvoiceFn()
     expect(invoice).toBe("lnbc1test...")
   })
 
@@ -312,13 +312,10 @@ describe("usePaymentRequest", () => {
     expect(uri).toBe("bitcoin:bc1qtest...")
   })
 
-  describe("onchain adapter rejection (I7 — fire-and-forget guard)", () => {
-    // TODO(I7): unskip these once `use-payment-request.ts:107-113` adds a
-    // `.catch(...)` to the `createReceiveOnchain(sdk).then(...)` chain. They
-    // are kept as documented placeholders so the regression has a home.
-    // eslint-disable-next-line jest/no-disabled-tests
-    xit("does not crash the hook when createReceiveOnchain rejects (I7 unfixed)", async () => {
+  describe("onchain adapter rejection (regression I7)", () => {
+    it("does not crash the hook when createReceiveOnchain rejects", async () => {
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
       const { result } = renderHook(() => usePaymentRequest())
 
@@ -326,11 +323,12 @@ describe("usePaymentRequest", () => {
         expect(result.current).not.toBeNull()
       })
       expect(result.current?.onchainAddress).toBeUndefined()
+      consoleSpy.mockRestore()
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    xit("does not surface an unhandled rejection when the SDK adapter throws (I7 unfixed)", async () => {
+    it("does not surface an unhandled rejection when the SDK adapter throws", async () => {
       const onUnhandled = jest.fn()
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
       process.on("unhandledRejection", onUnhandled)
 
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain rejected"))
@@ -339,8 +337,33 @@ describe("usePaymentRequest", () => {
         setTimeout(resolve, 0)
       })
       process.off("unhandledRejection", onUnhandled)
+      consoleSpy.mockRestore()
 
       expect(onUnhandled).not.toHaveBeenCalled()
+    })
+
+    it("retries the onchain address when the SDK identity changes (reconnect)", async () => {
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockResolvedValueOnce({ address: "bc1qsecond..." })
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+
+      // Simulate SDK reconnect: provider hands back a new sdk identity.
+      mockSelfCustodialWallet.mockReturnValue({
+        sdk: { id: "different-sdk" },
+        lastReceivedPaymentId: null,
+      })
+
+      rerender({})
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qsecond...")
+      })
     })
   })
 })
