@@ -1,6 +1,7 @@
 import {
   createClaimDeposit,
   createListPendingDeposits,
+  parseDepositId,
 } from "@app/self-custodial/adapters/deposit-adapter"
 
 const mockListDeposits = jest.fn()
@@ -155,5 +156,106 @@ describe("createClaimDeposit", () => {
 
     expect(result.status).toBe("failed")
     expect(result.errors?.[0].message).toContain("refund failed")
+  })
+
+  describe("malformed depositId guards (I10)", () => {
+    beforeEach(() => jest.clearAllMocks())
+
+    const malformed = [
+      "",
+      ":",
+      "no-colon",
+      ":0",
+      "abc:",
+      "abc:notnum",
+      "abc:-1",
+      "abc:1.5",
+    ]
+
+    for (const bad of malformed) {
+      it(`claimDeposit refuses to call SDK for "${bad}"`, async () => {
+        const adapter = createClaimDeposit(mockSdk)
+        const result = await adapter.claimDeposit({ depositId: bad })
+
+        expect(result.status).toBe("failed")
+        expect(mockClaimDeposit).not.toHaveBeenCalled()
+      })
+
+      it(`refundDeposit refuses to call SDK for "${bad}"`, async () => {
+        const adapter = createClaimDeposit(mockSdk)
+        const result = await adapter.refundDeposit({
+          depositId: bad,
+          destinationAddress: "bc1q...",
+          feeRateSatPerVb: 3,
+        })
+
+        expect(result.status).toBe("failed")
+        expect(mockRefundDeposit).not.toHaveBeenCalled()
+      })
+    }
+  })
+
+  describe("getClaimFee (I11 — null instead of misleading 0)", () => {
+    beforeEach(() => jest.clearAllMocks())
+
+    it("returns null even when the deposit exists, until SDK exposes a real quote", async () => {
+      mockListDeposits.mockResolvedValue([
+        {
+          txid: "abc",
+          vout: 0,
+          amountSats: 5000,
+          isMature: true,
+          claimError: null,
+          hasRefund: false,
+        },
+      ])
+
+      const adapter = createClaimDeposit(mockSdk)
+      const result = await adapter.getClaimFee({ depositId: "abc:0" })
+
+      expect(result).toBeNull()
+    })
+
+    it("returns null for a malformed depositId without hitting the SDK", async () => {
+      const adapter = createClaimDeposit(mockSdk)
+      const result = await adapter.getClaimFee({ depositId: "garbage" })
+
+      expect(result).toBeNull()
+      expect(mockListDeposits).not.toHaveBeenCalled()
+    })
+  })
+})
+
+describe("parseDepositId (I10)", () => {
+  it("parses a well-formed txid:vout pair", () => {
+    expect(parseDepositId("abc123:0")).toEqual({ txid: "abc123", vout: 0 })
+  })
+
+  it("supports vouts > 0", () => {
+    expect(parseDepositId("abc123:42")).toEqual({ txid: "abc123", vout: 42 })
+  })
+
+  it("returns null for missing colon", () => {
+    expect(parseDepositId("abc123")).toBeNull()
+  })
+
+  it("returns null for empty txid", () => {
+    expect(parseDepositId(":0")).toBeNull()
+  })
+
+  it("returns null for empty vout", () => {
+    expect(parseDepositId("abc123:")).toBeNull()
+  })
+
+  it("returns null for non-numeric vout", () => {
+    expect(parseDepositId("abc:notnum")).toBeNull()
+  })
+
+  it("returns null for negative vout", () => {
+    expect(parseDepositId("abc:-1")).toBeNull()
+  })
+
+  it("returns null for fractional vout", () => {
+    expect(parseDepositId("abc:1.5")).toBeNull()
   })
 })
