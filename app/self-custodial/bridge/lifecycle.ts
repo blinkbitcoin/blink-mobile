@@ -9,7 +9,7 @@ import {
   type SdkEvent,
 } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
-import { generateMnemonic } from "bip39"
+import { generateMnemonic, validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -110,8 +110,25 @@ export const selfCustodialCreateWallet = async (): Promise<void> => {
 }
 
 export const selfCustodialRestoreWallet = async (mnemonic: string): Promise<void> => {
-  const stored = await KeyStoreWrapper.setMnemonic(mnemonic)
+  const trimmed = mnemonic.trim().replace(/\s+/g, " ")
+  if (!validateMnemonic(trimmed)) {
+    throw new Error("Invalid BIP39 mnemonic")
+  }
+
+  const stored = await KeyStoreWrapper.setMnemonic(trimmed)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
+  try {
+    await KeyStoreWrapper.setMnemonicNetwork(SparkNetworkLabel)
+    const sdk = await initSdk(trimmed)
+    await disconnectSdk(sdk)
+  } catch (err) {
+    // Roll back the stored mnemonic so a key the SDK can't actually use never
+    // latches onto the device.
+    await KeyStoreWrapper.deleteMnemonic()
+    crashlytics().recordError(
+      err instanceof Error ? err : new Error(`Wallet restore failed: ${err}`),
+    )
+    throw err
+  }
 }

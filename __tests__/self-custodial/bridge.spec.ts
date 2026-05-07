@@ -15,6 +15,7 @@ const mockRecordError = jest.fn()
 
 jest.mock("bip39", () => ({
   generateMnemonic: (...args: unknown[]) => mockGenerateMnemonic(...args),
+  validateMnemonic: jest.fn().mockReturnValue(true),
 }))
 
 jest.mock("react-native-quick-crypto", () => ({
