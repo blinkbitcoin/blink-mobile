@@ -2,7 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useStableBalanceToggleQuote } from "@app/screens/stable-balance-settings-screen/hooks/use-stable-balance-toggle-quote"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -18,6 +18,13 @@ jest.mock("@app/hooks/use-payments", () => ({
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `$${(moneyAmount.amount / 100).toFixed(2)}`,
+  }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => {
@@ -40,7 +47,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const makeQuote = (amountAdjustment?: ConvertAmountAdjustment) => ({
-  formattedFee: "$0.05",
+  feeAmount: toUsdMoneyAmount(5),
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })
@@ -49,10 +56,13 @@ describe("useStableBalanceToggleQuote", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockImplementation(
-      (amount: { amount: number }, currency: WalletCurrency) =>
-        currency === WalletCurrency.Btc
-          ? toBtcMoneyAmount(amount.amount * 100)
-          : toUsdMoneyAmount(Math.round(amount.amount / 100)),
+      (amount: { amount: number }, currency: WalletCurrency | typeof DisplayCurrency) => {
+        if (currency === WalletCurrency.Btc) return toBtcMoneyAmount(amount.amount * 100)
+        if (currency === DisplayCurrency) {
+          return { amount: amount.amount, currency: DisplayCurrency, currencyCode: "USD" }
+        }
+        return toUsdMoneyAmount(Math.round(amount.amount / 100))
+      },
     )
   })
 

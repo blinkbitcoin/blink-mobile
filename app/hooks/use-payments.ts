@@ -14,7 +14,6 @@ import {
   createListPendingDeposits,
 } from "@app/self-custodial/adapters/deposit-adapter"
 import {
-  createConvert,
   createGetConversionQuote,
   createReceiveLightning,
   createReceiveOnchain,
@@ -60,7 +59,6 @@ export const usePayments = (): PaymentsResult => {
         receiveOnchain: createReceiveOnchain(sdk),
         listPendingDeposits: createListPendingDeposits(sdk),
         claimDeposit: createClaimDeposit(sdk),
-        convert: createConvert(sdk),
         getConversionQuote: createGetConversionQuote(sdk),
         accountType,
       }

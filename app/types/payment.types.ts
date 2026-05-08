@@ -202,7 +202,7 @@ export type ConvertAmountAdjustment =
   (typeof ConvertAmountAdjustment)[keyof typeof ConvertAmountAdjustment]
 
 export type ConvertQuote = {
-  formattedFee: string
+  feeAmount: MoneyAmount<typeof WalletCurrency.Usd>
   amountAdjustment?: ConvertAmountAdjustment
   execute: () => Promise<PaymentAdapterResult>
 }

@@ -78,6 +78,10 @@ module.exports = {
       .fn()
       .mockImplementation((args) => ({ tag: "ToBitcoin", inner: args })),
   },
+  AmountAdjustmentReason: {
+    FlooredToMinLimit: "FlooredToMinLimit",
+    IncreasedToAvoidDust: "IncreasedToAvoidDust",
+  },
   PrepareSendPaymentRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
   ReceivePaymentRequest: { create: (p) => p },

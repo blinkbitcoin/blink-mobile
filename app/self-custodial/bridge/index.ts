@@ -21,7 +21,7 @@ export {
 export type { OnchainFeeTiers, PrepareSendOptions } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
-export { createConvert, createGetConversionQuote } from "./convert"
+export { createGetConversionQuote } from "./convert"
 export { fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"
 export type { ParsedSparkAddress } from "./parse"

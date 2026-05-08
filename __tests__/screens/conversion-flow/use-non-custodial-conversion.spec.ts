@@ -20,6 +20,13 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `$${(moneyAmount.amount / 100).toFixed(2)}`,
+  }),
+}))
+
 jest.mock("@app/utils/analytics", () => ({
   logConversionAttempt: jest.fn(),
 }))
@@ -55,11 +62,11 @@ const defaultParams = {
 const makeQuote = (
   overrides: Partial<{
     amountAdjustment?: ConvertAmountAdjustment
-    formattedFee: string
+    feeAmount: ReturnType<typeof toUsdMoneyAmount>
     execute: jest.Mock
   }> = {},
 ) => ({
-  formattedFee: overrides.formattedFee ?? "$0.05",
+  feeAmount: overrides.feeAmount ?? toUsdMoneyAmount(5),
   amountAdjustment: overrides.amountAdjustment,
   execute:
     overrides.execute ??

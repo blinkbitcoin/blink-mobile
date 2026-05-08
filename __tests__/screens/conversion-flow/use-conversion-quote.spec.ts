@@ -17,6 +17,19 @@ jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `$${(moneyAmount.amount / 100).toFixed(2)}`,
+  }),
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  usePriceConversion: () => ({
+    convertMoneyAmount: (amount: { amount: number }) => amount,
+  }),
+}))
+
 jest.mock("@react-native-firebase/crashlytics", () => {
   const recordError = jest.fn()
   return {
@@ -37,7 +50,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
-  formattedFee: "$0.05",
+  feeAmount: toUsdMoneyAmount(5),
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })
