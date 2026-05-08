@@ -98,10 +98,10 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
           return
         }
 
-        const snapshot = await getSelfCustodialWalletSnapshot(sdk)
+        const snapshot = await getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current)
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
-        rawTxOffsetRef.current = snapshot.rawTransactionCount
+        rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
         setStatus(ActiveWalletStatus.Ready)
 
         updateBalanceStale(detectBalanceStale(snapshot.wallets))

@@ -609,6 +609,47 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(result.current.hasMoreTransactions).toBe(false)
   })
 
+  it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot (Critical #8)", async () => {
+    const { listener } = setupConnectedWallet(
+      {
+        getMnemonicForAccount: mockGetMnemonicForAccount,
+        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+        setActiveAccountId: (id: string) => {
+          mockState.activeAccountId = id
+        },
+        initSdk: mockInitSdk,
+        addSdkEventListener: mockAddSdkEventListener,
+      },
+      { wallets: [], hasMore: true, rawTransactionCount: 20 },
+    )
+    const snapshot = getWalletSnapshotMocks()
+    snapshot.loadMoreTransactions.mockResolvedValue({
+      transactions: [{ id: "tx-loadmore" }],
+      rawCount: 20,
+      hasMore: true,
+    })
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+    })
+
+    await act(async () => {
+      await result.current.loadMore()
+    })
+
+    snapshot.getSelfCustodialWalletSnapshot.mockClear()
+    await act(async () => {
+      await listener.current?.({ tag: "Synced" })
+    })
+
+    expect(snapshot.getSelfCustodialWalletSnapshot).toHaveBeenCalledWith(
+      expect.anything(),
+      40,
+    )
+  })
+
   const buildStaleSnapshot = () => ({
     wallets: [
       {
