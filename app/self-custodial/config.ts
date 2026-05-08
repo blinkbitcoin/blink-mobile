@@ -35,10 +35,19 @@ export const SparkConfig = {
   apiKey: Config.BREEZ_API_KEY ?? "",
 } as const
 
+let cachedTokenIdentifier: string | null = null
+
+// Validates SPARK_TOKEN_IDENTIFIER once per session. The first call (typically
+// from `lifecycle.createSdkConfig` at SDK init) performs the env lookup and
+// throws on a misconfigured build; downstream callers in hot paths (mappers,
+// snapshot loops, conversion entry points) read the cached value without
+// re-validating.
 export const requireSparkTokenIdentifier = (): string => {
+  if (cachedTokenIdentifier !== null) return cachedTokenIdentifier
   const id = Config.SPARK_TOKEN_IDENTIFIER
   if (!id) {
     throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
   }
+  cachedTokenIdentifier = id
   return id
 }
