@@ -3614,7 +3614,7 @@
     "activationLabel": "Hoạt động",
     "activeHint": "Ví của bạn đang giữ USD qua USDB.",
     "inactiveHint": "Ví của bạn chỉ giữ BTC.",
-    "deactivateWarningBody": "Bạn vẫn còn {amount:string} USD. Hãy chuyển sang BTC trước, nếu không số dư USD của bạn sẽ bị ẩn cho đến khi bạn kích hoạt lại Số Dư Ổn Định.",
+    "deactivateWarningBody": "Bạn vẫn còn {amount:string}. Hãy chuyển sang BTC trước, nếu không số dư USD của bạn sẽ bị ẩn cho đến khi bạn kích hoạt lại Stable Balance.",
     "toggleFailedToast": "Không thể cập nhật Stable Balance. Vui lòng thử lại.",
     "toggleModal": {
       "activateTitle": "Bật số dư ổn định",

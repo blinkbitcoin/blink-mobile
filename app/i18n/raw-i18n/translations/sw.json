@@ -3576,7 +3576,7 @@
     "activationLabel": "Hai",
     "activeHint": "Pochi yako inashikilia USD kupitia USDB.",
     "inactiveHint": "Pochi yako inashikilia BTC tu.",
-    "deactivateWarningBody": "Bado una {amount:string} USD. Badilisha kuwa BTC kwanza, ama salio lako la USD litafichwa hadi uwashe tena Salio Thabiti.",
+    "deactivateWarningBody": "Bado una {amount:string}. Badilisha kuwa BTC kwanza, ama salio lako la USD litafichwa hadi uwashe upya Stable Balance.",
     "toggleFailedToast": "Imeshindikana kusasisha Stable Balance. Tafadhali jaribu tena.",
     "toggleModal": {
       "activateTitle": "Washa Salio Thabiti",

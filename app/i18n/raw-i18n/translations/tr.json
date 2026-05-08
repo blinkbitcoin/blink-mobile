@@ -3576,7 +3576,7 @@
     "activationLabel": "Aktif",
     "activeHint": "Cüzdanınız USDB üzerinden USD tutuyor.",
     "inactiveHint": "Cüzdanınız sadece BTC tutuyor.",
-    "deactivateWarningBody": "Hâlâ {amount:string} USD'niz var. Önce BTC'ye dönüştürün; aksi halde Stabil Bakiye'yi tekrar etkinleştirene kadar USD bakiyeniz gizlenir.",
+    "deactivateWarningBody": "Hâlâ {amount:string} bakiyeniz var. Önce BTC'ye dönüştürün; aksi halde Stable Balance'ı tekrar etkinleştirene kadar USD bakiyeniz gizlenecek.",
     "toggleFailedToast": "Stable Balance güncellenemedi. Lütfen tekrar deneyin.",
     "toggleModal": {
       "activateTitle": "Sabit Bakiyeyi Etkinleştir",

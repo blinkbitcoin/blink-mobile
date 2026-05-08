@@ -46,6 +46,19 @@ jest.mock("@app/self-custodial/bridge", () => ({
   deactivateStableBalance: (...args: unknown[]) => mockDeactivate(...args),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `$${(moneyAmount.amount / 100).toFixed(2)}`,
+  }),
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  usePriceConversion: () => ({
+    convertMoneyAmount: (amount: { amount: number }) => amount,
+  }),
+}))
+
 jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
 }))
@@ -71,7 +84,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         activeHint: () => "Holding USD",
         inactiveHint: () => "Holding BTC only",
         deactivateWarningBody: ({ amount }: { amount: string }) =>
-          `You still have ${amount} USD.`,
+          `You still have ${amount}.`,
         toggleFailedToast: () => "Could not update Stable Balance. Please try again.",
         toggleModal: {
           activateTitle: () => "Activate Stable Balance",
@@ -213,7 +226,7 @@ describe("StableBalanceSettingsScreen", () => {
 
     expect(getByTestId("stable-balance-confirm-modal")).toBeTruthy()
     expect(getByText("Deactivate Stable Balance")).toBeTruthy()
-    expect(getByText("You still have 5.00 USD.")).toBeTruthy()
+    expect(getByText("You still have $5.00.")).toBeTruthy()
     expect(getByText("$0.05")).toBeTruthy()
     expect(mockDeactivate).not.toHaveBeenCalled()
   })

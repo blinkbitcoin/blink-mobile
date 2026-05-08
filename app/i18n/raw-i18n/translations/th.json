@@ -3614,7 +3614,7 @@
     "activationLabel": "เปิดใช้งาน",
     "activeHint": "กระเป๋าเงินของคุณถือ USD ผ่าน USDB",
     "inactiveHint": "กระเป๋าเงินของคุณถือ BTC เท่านั้น",
-    "deactivateWarningBody": "คุณยังมี {amount:string} USD โปรดแปลงเป็น BTC ก่อน มิฉะนั้นยอด USD จะถูกซ่อนไว้จนกว่าคุณจะเปิดยอดเงินคงที่อีกครั้ง",
+    "deactivateWarningBody": "คุณยังมี {amount:string} โปรดแปลงเป็น BTC ก่อน มิฉะนั้นยอด USD จะถูกซ่อนไว้จนกว่าคุณจะเปิด Stable Balance อีกครั้ง",
     "toggleFailedToast": "ไม่สามารถอัปเดต Stable Balance ได้ โปรดลองอีกครั้ง",
     "toggleModal": {
       "activateTitle": "เปิดใช้ยอดคงเหลือแบบเสถียร",

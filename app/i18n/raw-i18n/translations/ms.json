@@ -3617,7 +3617,7 @@
     "activationLabel": "Aktif",
     "activeHint": "Dompet anda menyimpan USD melalui USDB.",
     "inactiveHint": "Dompet anda hanya menyimpan BTC.",
-    "deactivateWarningBody": "Anda masih mempunyai {amount:string} USD. Tukarkan ke BTC terlebih dahulu, atau baki USD anda akan disembunyikan sehingga anda mengaktifkan semula Baki Stabil.",
+    "deactivateWarningBody": "Anda masih mempunyai {amount:string}. Tukarkan ke BTC terlebih dahulu, atau baki USD anda akan disembunyikan sehingga anda mengaktifkan semula Stable Balance.",
     "toggleFailedToast": "Tidak dapat mengemas kini Stable Balance. Sila cuba lagi.",
     "toggleModal": {
       "activateTitle": "Aktifkan Baki Stabil",

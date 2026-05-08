@@ -3576,7 +3576,7 @@
     "activationLabel": "Actiu",
     "activeHint": "La teva cartera manté USD via USDB.",
     "inactiveHint": "La teva cartera manté només BTC.",
-    "deactivateWarningBody": "Encara tens {amount:string} USD. Converteix a BTC primer, o el teu saldo en USD quedarà ocult fins que reactivis Saldo Estable.",
+    "deactivateWarningBody": "Encara tens {amount:string}. Converteix a BTC primer, o el teu saldo en USD quedarà ocult fins que reactivis el Saldo Estable.",
     "toggleFailedToast": "No s'ha pogut actualitzar el saldo estable. Torna-ho a provar.",
     "toggleModal": {
       "activateTitle": "Activa el saldo estable",

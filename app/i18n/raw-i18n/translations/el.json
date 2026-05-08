@@ -3576,7 +3576,7 @@
     "activationLabel": "Ενεργό",
     "activeHint": "Το πορτοφόλι διατηρεί USD μέσω USDB.",
     "inactiveHint": "Το πορτοφόλι διατηρεί μόνο BTC.",
-    "deactivateWarningBody": "Έχεις ακόμη {amount:string} USD. Μετατρέψτε πρώτα σε BTC, αλλιώς το υπόλοιπο USD θα είναι κρυφό μέχρι να ενεργοποιήσετε ξανά το Σταθερό Υπόλοιπο.",
+    "deactivateWarningBody": "Έχεις ακόμη {amount:string}. Μετατρέψτε πρώτα σε BTC, αλλιώς το υπόλοιπο USD θα είναι κρυφό μέχρι να επανενεργοποιήσετε το Stable Balance.",
     "toggleFailedToast": "Δεν ήταν δυνατή η ενημέρωση του Stable Balance. Δοκιμάστε ξανά.",
     "toggleModal": {
       "activateTitle": "Ενεργοποίηση σταθερού υπολοίπου",

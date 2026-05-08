@@ -3623,7 +3623,7 @@
     "activationLabel": "Iyasebenza",
     "activeHint": "Isipaji sakho sigcina i-USD ngeUSDB.",
     "inactiveHint": "Isipaji sakho sigcina i-BTC kuphela.",
-    "deactivateWarningBody": "Usenayo {amount:string} USD. Yitshintshele kwi-BTC kuqala, okanye ibhalansi yakho yeUSD iza kufihlakala de uyivuselele iBhalansi Ezinzileyo.",
+    "deactivateWarningBody": "Usenayo {amount:string}. Yitshintshele kwi-BTC kuqala, okanye ibhalansi yakho yeUSD iza kufihlakala de uphinde uvulele iStable Balance.",
     "toggleFailedToast": "Akukwazekanga ukuhlaziya iStable Balance. Nceda uzame kwakhona.",
     "toggleModal": {
       "activateTitle": "Vulela iBhalansi ezinzileyo",

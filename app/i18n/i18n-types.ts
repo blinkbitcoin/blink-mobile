@@ -11996,7 +11996,7 @@ type RootTranslation = {
 		 */
 		inactiveHint: string
 		/**
-		 * Y​o​u​ ​s​t​i​l​l​ ​h​a​v​e​ ​{​a​m​o​u​n​t​}​ ​U​S​D​.​ ​C​o​n​v​e​r​t​ ​t​o​ ​B​T​C​ ​f​i​r​s​t​,​ ​o​r​ ​y​o​u​r​ ​U​S​D​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​h​i​d​d​e​n​ ​u​n​t​i​l​ ​y​o​u​ ​r​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.
+		 * Y​o​u​ ​s​t​i​l​l​ ​h​a​v​e​ ​{​a​m​o​u​n​t​}​.​ ​C​o​n​v​e​r​t​ ​t​o​ ​B​T​C​ ​f​i​r​s​t​,​ ​o​r​ ​y​o​u​r​ ​U​S​D​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​h​i​d​d​e​n​ ​u​n​t​i​l​ ​y​o​u​ ​r​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.
 		 * @param {string} amount
 		 */
 		deactivateWarningBody: RequiredParams<'amount'>
@@ -23920,7 +23920,7 @@ export type TranslationFunctions = {
 		 */
 		inactiveHint: () => LocalizedString
 		/**
-		 * You still have {amount} USD. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
+		 * You still have {amount}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
 		 */
 		deactivateWarningBody: (arg: { amount: string }) => LocalizedString
 		/**
