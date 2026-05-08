@@ -25,6 +25,13 @@ export const tokenBaseUnitsToCents = (
 ): number =>
   Math.round(tokenBaseUnitsToCentsExact(rawAmount, tokenDecimals, displayDecimals))
 
+export const tokenBaseUnitsToCentsCeil = (
+  rawAmount: number,
+  tokenDecimals: number,
+  displayDecimals = 2,
+): number =>
+  Math.ceil(tokenBaseUnitsToCentsExact(rawAmount, tokenDecimals, displayDecimals))
+
 export const centsToTokenBaseUnits = (
   cents: number,
   tokenDecimals: number,
