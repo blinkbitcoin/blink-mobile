@@ -3594,7 +3594,7 @@
     "activationLabel": "Aktiv",
     "activeHint": "Din pung holder USD via USDB.",
     "inactiveHint": "Din pung holder kun BTC.",
-    "deactivateWarningBody": "Du har stadig {amount:string} USD. Konverter til BTC først, ellers skjules din USD-saldo, indtil du genaktiverer Stabil Saldo.",
+    "deactivateWarningBody": "Du har stadig {amount:string}. Konverter til BTC først, ellers skjules din USD-saldo, indtil du genaktiverer Stable Balance.",
     "toggleFailedToast": "Kunne ikke opdatere Stable Balance. Prøv igen.",
     "toggleModal": {
       "activateTitle": "Aktivér stabil saldo",

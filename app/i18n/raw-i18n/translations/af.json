@@ -3617,7 +3617,7 @@
     "activationLabel": "Aktief",
     "activeHint": "Jou beursie hou USD via USDB.",
     "inactiveHint": "Jou beursie hou net BTC.",
-    "deactivateWarningBody": "Jy het nog $ {amount:string} USD. Skakel eers om na BTC, anders word jou USD-saldo versteek totdat jy Stabiele Balans heraktiveer.",
+    "deactivateWarningBody": "Jy het nog {amount:string}. Skakel eers om na BTC, anders word jou USD-saldo versteek totdat jy Stabiele Balans heractiveer.",
     "toggleFailedToast": "Kon nie Stabiele Balans bywerk nie. Probeer asseblief weer.",
     "toggleModal": {
       "activateTitle": "Aktiveer Stabiele Saldo",

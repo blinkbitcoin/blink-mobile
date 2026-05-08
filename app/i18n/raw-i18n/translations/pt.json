@@ -3564,7 +3564,7 @@
         "activationLabel": "Ativo",
         "activeHint": "A tua carteira mantém USD via USDB.",
         "inactiveHint": "A tua carteira só mantém BTC.",
-        "deactivateWarningBody": "Ainda tens {amount:string} USD. Converte primeiro para BTC, ou o teu saldo em USD ficará oculto até reativares o Saldo Estável.",
+        "deactivateWarningBody": "Ainda tens {amount:string}. Converte primeiro para BTC, ou o teu saldo em USD ficará oculto até reativares o Stable Balance.",
         "toggleFailedToast": "Não foi possível atualizar o Stable Balance. Tenta novamente.",
         "toggleModal": {
             "activateTitle": "Ativar saldo estável",

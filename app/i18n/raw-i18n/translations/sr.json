@@ -3614,7 +3614,7 @@
     "activationLabel": "Активно",
     "activeHint": "Твој новчаник држи USD преко USDB.",
     "inactiveHint": "Твој новчаник држи само BTC.",
-    "deactivateWarningBody": "Још имаш {amount:string} USD. Прво пребаци у BTC, иначе ће твој USD биланс бити сакривен док поново не активираш Стабилно стање.",
+    "deactivateWarningBody": "Још имаш {amount:string}. Прво пребаци у BTC, иначе ће твој USD биланс бити сакривен док поново не активираш Stable Balance.",
     "toggleFailedToast": "Није могуће ажурирати Stable Balance. Покушајте поново.",
     "toggleModal": {
       "activateTitle": "Активирај стабилни салдо",

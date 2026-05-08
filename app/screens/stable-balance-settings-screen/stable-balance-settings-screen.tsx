@@ -6,6 +6,8 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { Screen } from "@app/components/screen"
 import { Switch } from "@app/components/atomic/switch"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   activateStableBalance,
@@ -13,6 +15,7 @@ import {
 } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { WalletCurrency } from "@app/graphql/generated"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -26,15 +29,14 @@ const ToggleDirection = {
 } as const
 type ToggleDirection = (typeof ToggleDirection)[keyof typeof ToggleDirection]
 
-const USD_CENTS_PER_DOLLAR = 100
-const USD_FRACTION_DIGITS = 2
-
 const SCREEN_TEST_ID = "stable-balance-settings-screen"
 const SWITCH_TEST_ID = "stable-balance-switch"
 
 export const StableBalanceSettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { formatMoneyAmount } = useDisplayCurrency()
+  const { convertMoneyAmount } = usePriceConversion()
   const {
     sdk,
     isStableBalanceActive,
@@ -55,6 +57,14 @@ export const StableBalanceSettingsScreen: React.FC = () => {
     wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)?.balance.amount ?? 0
   const hasUsdBalance = usdBalanceAmount > 0
   const hasBtcBalance = btcBalanceAmount > 0
+
+  const formatUsdBalanceForDisplay = (cents: number): string => {
+    const usdAmount = toUsdMoneyAmount(cents)
+    if (!convertMoneyAmount) return formatMoneyAmount({ moneyAmount: usdAmount })
+    return formatMoneyAmount({
+      moneyAmount: convertMoneyAmount(usdAmount, DisplayCurrency),
+    })
+  }
 
   const isActivating = pendingDirection === ToggleDirection.Activate
   const sourceBalance = isActivating ? btcBalanceAmount : usdBalanceAmount
@@ -163,9 +173,7 @@ export const StableBalanceSettingsScreen: React.FC = () => {
         deactivationWarning={
           pendingDirection === ToggleDirection.Deactivate && hasUsdBalance
             ? LL.StableBalance.deactivateWarningBody({
-                amount: (usdBalanceAmount / USD_CENTS_PER_DOLLAR).toFixed(
-                  USD_FRACTION_DIGITS,
-                ),
+                amount: formatUsdBalanceForDisplay(usdBalanceAmount),
               })
             : undefined
         }

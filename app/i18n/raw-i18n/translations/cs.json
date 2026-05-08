@@ -3617,7 +3617,7 @@
     "activationLabel": "Aktivní",
     "activeHint": "Peněženka drží USD přes USDB.",
     "inactiveHint": "Peněženka drží pouze BTC.",
-    "deactivateWarningBody": "Máš ještě {amount:string} USD. Nejdřív převeď na BTC, jinak bude zůstatek v USD skrytý, dokud Stabilní zůstatek znovu neaktivuješ.",
+    "deactivateWarningBody": "Máš ještě {amount:string}. Nejdřív převeď na BTC, jinak bude zůstatek v USD skrytý, dokud Stabilní zůstatek znovu neaktivuješ.",
     "toggleFailedToast": "Stabilní zůstatek se nepodařilo aktualizovat. Zkuste to znovu.",
     "toggleModal": {
       "activateTitle": "Aktivovat stabilní zůstatek",

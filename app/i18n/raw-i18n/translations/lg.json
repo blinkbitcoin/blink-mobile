@@ -3576,7 +3576,7 @@
     "activationLabel": "Kisaliddwa",
     "activeHint": "Valet yo ekwata USD nga eyita mu USDB.",
     "inactiveHint": "Valet yo ekwata BTC kyokka.",
-    "deactivateWarningBody": "Okyasigalawo {amount:string} USD. Sooka ofuule BTC, oba balansi yo eya USD eyiinzira nga tokyalongedde Balansi Enywevu.",
+    "deactivateWarningBody": "Okyasigalawo {amount:string}. Sooka ofuule BTC, oba balansi yo eya USD eyiinzira nga tokyalonge Stable Balance.",
     "toggleFailedToast": "Tetwasobozeswa kufuna Stable Balance. Gezaako nate.",
     "toggleModal": {
       "activateTitle": "Kola Ssente Ezinywedde",
