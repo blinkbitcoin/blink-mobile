@@ -69,6 +69,23 @@ describe("fetchConversionLimits", () => {
     expect(result).toEqual({ minFromAmount: 50, minToAmount: 800 })
   })
 
+  it("ceils sub-cent residues so the UI never accepts an amount the SDK will reject", async () => {
+    const fetchConversionLimitsFn = jest.fn().mockResolvedValue({
+      minFromAmount: BigInt(1_000_001),
+      minToAmount: BigInt(0),
+    })
+
+    const result = await fetchConversionLimits(
+      {
+        fetchConversionLimits: fetchConversionLimitsFn,
+        getInfo: mockGetInfo,
+      } as never,
+      ConvertDirection.UsdToBtc,
+    )
+
+    expect(result.minFromAmount).toBe(101)
+  })
+
   it("returns null fields when the SDK returns undefined limits", async () => {
     const fetchConversionLimitsFn = jest.fn().mockResolvedValue({
       minFromAmount: undefined,

@@ -4,7 +4,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { ConvertDirection, type ConversionLimits } from "@app/types/payment.types"
-import { tokenBaseUnitsToCents } from "@app/utils/amounts"
+import { tokenBaseUnitsToCentsCeil } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
 import { requireSparkTokenIdentifier } from "../config"
@@ -26,7 +26,7 @@ const toWalletUnit = (
   if (raw === null || raw === undefined) return null
   const value = toNumber(raw)
   if (!assetIsToken) return value
-  return tokenBaseUnitsToCents(value, tokenDecimals)
+  return tokenBaseUnitsToCentsCeil(value, tokenDecimals)
 }
 
 export const fetchConversionLimits = async (
