@@ -73,6 +73,11 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     }
   }, [])
 
+  // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
+  // SDK events): only one runOnce executes at a time, and any overlapping call
+  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns. The
+  // two require-atomic-updates disables below (post-await ref writes) are safe
+  // under that invariant.
   const refreshWallets = useCallback(async () => {
     const sdk = sdkRef.current
     if (!sdk) return

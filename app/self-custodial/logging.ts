@@ -8,6 +8,13 @@ export const recordErrorOnce = (dedupKey: string, error: Error): void => {
   crashlytics().recordError(error)
 }
 
+// Test-only escape hatch so specs that mount/unmount the SC stack repeatedly
+// (or swap envs across `jest.isolateModules` boundaries) don't see one test's
+// dedup state poisoning the next.
+export const __resetRecordedErrorsForTests = (): void => {
+  reportedDedupKeys.clear()
+}
+
 export const SdkLogLevel = {
   Debug: "debug",
   Info: "info",
