@@ -29,6 +29,17 @@ const mockRefresh = jest.fn()
 const mockRefreshStableBalanceActive = jest.fn()
 const mockWallet = jest.fn()
 const mockToggleQuote = jest.fn()
+const mockRecordError = jest.fn()
+const mockToastShow = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError }),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   activateStableBalance: (...args: unknown[]) => mockActivate(...args),
@@ -61,6 +72,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         inactiveHint: () => "Holding BTC only",
         deactivateWarningBody: ({ amount }: { amount: string }) =>
           `You still have ${amount} USD.`,
+        toggleFailedToast: () => "Could not update Stable Balance. Please try again.",
         toggleModal: {
           activateTitle: () => "Activate Stable Balance",
           activateBody: () => "Your BTC will be converted to USDB.",
@@ -274,5 +286,51 @@ describe("StableBalanceSettingsScreen", () => {
     })
     expect(mockActivate).not.toHaveBeenCalled()
     expect(mockDeactivate).not.toHaveBeenCalled()
+  })
+
+  it("calls refreshStableBalanceActive before refreshWallets after activating", async () => {
+    const { getByTestId } = renderScreen()
+
+    fireEvent(getByTestId("stable-balance-switch"), "pressIn")
+
+    await waitFor(() => {
+      expect(mockRefreshStableBalanceActive).toHaveBeenCalledTimes(1)
+      expect(mockRefresh).toHaveBeenCalledTimes(1)
+    })
+    const refreshActiveOrder = mockRefreshStableBalanceActive.mock.invocationCallOrder[0]
+    const refreshWalletsOrder = mockRefresh.mock.invocationCallOrder[0]
+    expect(refreshActiveOrder).toBeLessThan(refreshWalletsOrder)
+  })
+
+  it("records to crashlytics and shows error toast when activation rejects", async () => {
+    const failure = new Error("update failed")
+    mockActivate.mockRejectedValueOnce(failure)
+    const { getByTestId } = renderScreen()
+
+    fireEvent(getByTestId("stable-balance-switch"), "pressIn")
+
+    await waitFor(() => {
+      expect(mockRecordError).toHaveBeenCalledWith(failure)
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+    expect(mockToastShow.mock.calls[0][0].type).toBe("error")
+    expect(mockRefresh).not.toHaveBeenCalled()
+    expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
+  })
+
+  it("records to crashlytics and shows error toast when deactivation rejects", async () => {
+    const failure = new Error("deactivate failed")
+    mockDeactivate.mockRejectedValueOnce(failure)
+    mockWallet.mockReturnValue({ ...baseContext, isStableBalanceActive: true })
+    const { getByTestId } = renderScreen()
+
+    fireEvent(getByTestId("stable-balance-switch"), "pressIn")
+
+    await waitFor(() => {
+      expect(mockRecordError).toHaveBeenCalledWith(failure)
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+    expect(mockRefresh).not.toHaveBeenCalled()
+    expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
   })
 })

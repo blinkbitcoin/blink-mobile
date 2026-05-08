@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { Screen } from "@app/components/screen"
 import { Switch } from "@app/components/atomic/switch"
@@ -14,6 +15,7 @@ import { SparkToken } from "@app/self-custodial/config"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { WalletCurrency } from "@app/graphql/generated"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 import { StableBalanceConfirmModal } from "./stable-balance-confirm-modal"
 import { useStableBalanceToggleQuote } from "./hooks"
@@ -76,6 +78,16 @@ export const StableBalanceSettingsScreen: React.FC = () => {
       }
       await refreshStableBalanceActive()
       await refreshWallets()
+    } catch (err) {
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Stable Balance toggle failed: ${err}`),
+      )
+      toastShow({
+        message: (tr) => tr.StableBalance.toggleFailedToast(),
+        LL,
+        type: "error",
+      })
+      resyncSwitch()
     } finally {
       setBusy(false)
       setPendingValue(null)

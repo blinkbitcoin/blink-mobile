@@ -80,7 +80,7 @@ export const StableBalanceConfirmModal: React.FC<Props> = ({
       primaryButtonTitle={confirmTitle}
       primaryButtonOnPress={onConfirm}
       primaryButtonLoading={isSubmitting}
-      primaryButtonDisabled={isSubmitting || isLoading}
+      primaryButtonDisabled={isSubmitting || isLoading || hasError}
       secondaryButtonTitle={LL.StableBalance.toggleModal.cancel()}
       secondaryButtonOnPress={onCancel}
     />
