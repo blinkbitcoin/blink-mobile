@@ -9,11 +9,26 @@ import {
   loadMoreTransactions,
 } from "@app/self-custodial/providers/wallet-snapshot"
 
+const mockRecordError = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
 jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
   SparkConfig: {},
   requireSparkTokenIdentifier: () => "test-token-id",
 }))
+
+const loadFreshSnapshotModule = () => {
+  let mod: typeof import("@app/self-custodial/providers/wallet-snapshot") | undefined
+  jest.isolateModules(() => {
+    mod = require("@app/self-custodial/providers/wallet-snapshot")
+  })
+  return mod!
+}
 
 const createMockSdk = (overrides = {}) => ({
   getInfo: jest.fn().mockResolvedValue({
@@ -267,5 +282,49 @@ describe("appendTransactions", () => {
 
     // Existing wallet is empty so the first "a" is appended; the second is filtered.
     expect(result[0].transactions.map((t) => t.id)).toEqual(["a", "b"])
+  })
+})
+
+describe("isKnownPayment crashlytics reporting (Critical #10)", () => {
+  beforeEach(() => {
+    mockRecordError.mockClear()
+  })
+
+  it("records to crashlytics once per unknown token identifier and drops the payment", async () => {
+    const fresh = loadFreshSnapshotModule()
+    const unknownTokenPayment = {
+      id: "unknown-1",
+      method: 2,
+      paymentType: 0,
+      status: 0,
+      amount: 100,
+      fees: 0,
+      timestamp: 0,
+      details: {
+        tag: "Token",
+        inner: {
+          metadata: { identifier: "rogue-token-id", decimals: 6, ticker: "ROGUE" },
+        },
+      },
+    }
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({
+        identityPubkey: "pk",
+        balanceSats: 0,
+        tokenBalances: {},
+      }),
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [unknownTokenPayment, unknownTokenPayment],
+      }),
+    } as never
+
+    await fresh.getSelfCustodialWalletSnapshot(sdk)
+
+    const reportedErrors = mockRecordError.mock.calls.filter((args) => {
+      const message = args[0]?.message ?? ""
+      return message.includes("rogue-token-id")
+    })
+    expect(reportedErrors).toHaveLength(1)
+    expect(reportedErrors[0][0].message).toContain("expected=test-token-id")
   })
 })

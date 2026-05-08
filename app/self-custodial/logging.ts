@@ -1,5 +1,13 @@
 import crashlytics from "@react-native-firebase/crashlytics"
 
+const reportedDedupKeys = new Set<string>()
+
+export const recordErrorOnce = (dedupKey: string, error: Error): void => {
+  if (reportedDedupKeys.has(dedupKey)) return
+  reportedDedupKeys.add(dedupKey)
+  crashlytics().recordError(error)
+}
+
 export const SdkLogLevel = {
   Debug: "debug",
   Info: "info",

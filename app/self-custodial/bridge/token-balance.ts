@@ -5,6 +5,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { requireSparkTokenIdentifier, SparkToken } from "../config"
+import { recordErrorOnce } from "../logging"
 
 const listTokenBalances = (info: GetInfoResponse): TokenBalance[] =>
   info.tokenBalances instanceof Map
@@ -13,12 +14,31 @@ const listTokenBalances = (info: GetInfoResponse): TokenBalance[] =>
 
 export const findUsdbToken = (info: GetInfoResponse): TokenBalance | undefined => {
   const expectedIdentifier = requireSparkTokenIdentifier()
-  return listTokenBalances(info).find(
+  const match = listTokenBalances(info).find(
     (token) => token.tokenMetadata?.identifier === expectedIdentifier,
   )
+  if (!match) {
+    recordErrorOnce(
+      `spark-token-not-found:${expectedIdentifier}`,
+      new Error(
+        `Spark token ${expectedIdentifier} not present in tokenBalances response`,
+      ),
+    )
+  }
+  return match
 }
 
 export const fetchUsdbDecimals = async (sdk: BreezSdkInterface): Promise<number> => {
   const info = await sdk.getInfo({ ensureSynced: false })
-  return findUsdbToken(info)?.tokenMetadata?.decimals ?? SparkToken.DefaultDecimals
+  const decimals = findUsdbToken(info)?.tokenMetadata?.decimals
+  if (decimals === undefined) {
+    recordErrorOnce(
+      "spark-token-decimals-missing",
+      new Error(
+        `Spark token decimals unavailable; falling back to ${SparkToken.DefaultDecimals}`,
+      ),
+    )
+    return SparkToken.DefaultDecimals
+  }
+  return decimals
 }
