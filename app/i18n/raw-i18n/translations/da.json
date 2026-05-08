@@ -3611,7 +3611,8 @@
       "trustDisclosure": "USD-tilstand bruger USDB-tokens på Spark. Tillidsantagelserne er anderledes end at holde BTC direkte. USDB er afhængig af Sparks tokenudsteder.",
       "acknowledge": "Jeg forstår"
     },
-    "minimumConversion": "Minimum konvertering: {amount:string}"
+    "minimumConversion": "Minimum konvertering: {amount:string}",
+    "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."
   },
   "BackendFeatureGate": {
     "title": "Funktion ikke tilgængelig",

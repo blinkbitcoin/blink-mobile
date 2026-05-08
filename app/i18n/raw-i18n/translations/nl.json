@@ -3634,7 +3634,8 @@
       "trustDisclosure": "De USD-modus gebruikt USDB-tokens op Spark. De vertrouwensaannames verschillen van het direct aanhouden van BTC. USDB steunt op de token-uitgever van Spark.",
       "acknowledge": "Ik begrijp het"
     },
-    "minimumConversion": "Minimale conversie: {amount:string}"
+    "minimumConversion": "Minimale conversie: {amount:string}",
+    "conversionUnavailable": "Conversie is tijdelijk niet beschikbaar. Probeer het opnieuw."
   },
   "BackendFeatureGate": {
     "title": "Functie niet beschikbaar",

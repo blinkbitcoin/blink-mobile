@@ -12057,6 +12057,10 @@ type RootTranslation = {
 		 * @param {string} amount
 		 */
 		minimumConversion: RequiredParams<'amount'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		conversionUnavailable: string
 	}
 	SparkWalletCreationScreen: {
 		/**
@@ -23975,6 +23979,10 @@ export type TranslationFunctions = {
 		 * Minimum conversion: {amount}
 		 */
 		minimumConversion: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Conversion is temporarily unavailable. Please try again.
+		 */
+		conversionUnavailable: () => LocalizedString
 	}
 	SparkWalletCreationScreen: {
 		/**

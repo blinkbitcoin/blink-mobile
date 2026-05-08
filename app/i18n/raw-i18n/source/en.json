@@ -3634,7 +3634,8 @@
             "trustDisclosure": "USD mode uses USDB tokens on Spark. The trust assumptions are different from holding BTC directly. USDB relies on Spark's token issuer.",
             "acknowledge": "I understand"
         },
-        "minimumConversion": "Minimum conversion: {amount:string}"
+        "minimumConversion": "Minimum conversion: {amount:string}",
+        "conversionUnavailable": "Conversion is temporarily unavailable. Please try again."
     },
     "SparkWalletCreationScreen": {
         "creating": "Creating your wallet...",

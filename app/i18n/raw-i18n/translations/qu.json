@@ -3631,7 +3631,8 @@
       "trustDisclosure": "USD modoqa Sparkpi USDB tokenkunata apaykachan. Iñiy suposikuykunaqa wakjina kan BTC-ta direkto hapishaptikimanta. USDB Sparkpa token tuqyachisqanman tiyan.",
       "acknowledge": "Entiendechkani"
     },
-    "minimumConversion": "Aswan aslla tikray: {amount:string}"
+    "minimumConversion": "Aswan aslla tikray: {amount:string}",
+    "conversionUnavailable": "Tikrachiy mana atikuyniyuqchu kachkan. Yapamanta intentay."
   },
   "BackendFeatureGate": {
     "title": "Kay mana kanchu",

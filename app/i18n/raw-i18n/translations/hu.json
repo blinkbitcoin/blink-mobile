@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Az USD mód USDB tokeneket használ a Sparkon. A bizalmi feltételezések eltérnek a közvetlen BTC tartástól. Az USDB a Spark tokenkibocsátójára támaszkodik.",
       "acknowledge": "Megértettem"
     },
-    "minimumConversion": "Minimum konverzió: {amount:string}"
+    "minimumConversion": "Minimum konverzió: {amount:string}",
+    "conversionUnavailable": "A konverzió ideiglenesen nem érhető el. Próbáld újra."
   },
   "BackendFeatureGate": {
     "title": "Funkció nem elérhető",

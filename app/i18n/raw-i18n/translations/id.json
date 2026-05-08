@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Mode USD menggunakan token USDB di Spark. Asumsi kepercayaan berbeda dari memegang BTC langsung. USDB bergantung pada penerbit token Spark.",
       "acknowledge": "Saya mengerti"
     },
-    "minimumConversion": "Konversi minimum: {amount:string}"
+    "minimumConversion": "Konversi minimum: {amount:string}",
+    "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."
   },
   "BackendFeatureGate": {
     "title": "Fitur tidak tersedia",

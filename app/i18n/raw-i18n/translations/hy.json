@@ -3634,7 +3634,8 @@
       "trustDisclosure": "USD ռեժիմը օգտագործում է USDB թոքեններ Spark-ում։ Վստահության ենթադրությունները տարբերվում են BTC-ի ուղղակի պահելուց. USDB-ն հիմնված է Spark-ի թոքեն թողարկողի վրա։",
       "acknowledge": "Ես հասկանում եմ"
     },
-    "minimumConversion": "Նվազագույն փոխարկում. {amount:string}"
+    "minimumConversion": "Նվազագույն փոխարկում. {amount:string}",
+    "conversionUnavailable": "Փոխարկումը ժամանակավորապես անհասանելի է։ Խնդրում ենք փորձել կրկին։"
   },
   "BackendFeatureGate": {
     "title": "Հնարավորությունը հասանելի չէ",

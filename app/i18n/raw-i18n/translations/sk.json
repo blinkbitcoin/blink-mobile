@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Režim USD používa tokeny USDB na Sparku. Predpoklady dôvery sa líšia od priameho držania BTC. USDB sa spolieha na Sparkovho emitenta tokenov.",
       "acknowledge": "Rozumiem"
     },
-    "minimumConversion": "Minimálna konverzia: {amount:string}"
+    "minimumConversion": "Minimálna konverzia: {amount:string}",
+    "conversionUnavailable": "Konverzia je dočasne nedostupná. Skúste to znova."
   },
   "BackendFeatureGate": {
     "title": "Funkcia nedostupná",

@@ -3622,7 +3622,8 @@
             "trustDisclosure": "USDモードはSpark上のUSDBトークンを使用します。信頼の前提はBTCを直接保有することとは異なります. USDBはSparkのトークン発行者に依存しています。",
             "acknowledge": "理解しました"
         },
-        "minimumConversion": "最小変換額: {amount:string}"
+        "minimumConversion": "最小変換額: {amount:string}",
+        "conversionUnavailable": "変換は一時的に利用できません。もう一度お試しください。"
     },
     "BackendFeatureGate": {
         "title": "機能が利用できません",

@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Endowooza ya USD ekozesa tokens za USDB ku Spark. Ebiteebereezebwa eby'obwesige bya njawulo okukuuma BTC butereevu. USDB yeesigamye ku muwa tokens wa Spark.",
       "acknowledge": "Ntegedde"
     },
-    "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}"
+    "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}",
+    "conversionUnavailable": "Okukyusa tekikolaako kati. Gezaako nate."
   },
   "BackendFeatureGate": {
     "title": "Ekikola tekiriwo",
