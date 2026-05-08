@@ -609,6 +609,40 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(result.current.hasMoreTransactions).toBe(false)
   })
 
+  it("disconnects the SDK and skips listener registration when the provider unmounts before initSdk resolves (I11)", async () => {
+    let resolveInit: (sdk: unknown) => void = () => {}
+    mockInitSdk.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveInit = resolve
+        }),
+    )
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    mockListSelfCustodialAccounts.mockResolvedValue([
+      { id: "test-sc-uuid", lightningAddress: null },
+    ])
+    mockState.activeAccountId = "test-sc-uuid"
+    const fakeSdk = { id: "fake-sdk" }
+
+    const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).toHaveBeenCalled()
+    })
+
+    unmount()
+
+    await act(async () => {
+      resolveInit(fakeSdk)
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 0)
+      })
+    })
+
+    expect(mockDisconnectSdk).toHaveBeenCalledWith(fakeSdk)
+    expect(mockAddSdkEventListener).not.toHaveBeenCalled()
+  })
+
   it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot (Critical #8)", async () => {
     const { listener } = setupConnectedWallet(
       {

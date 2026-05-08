@@ -8,10 +8,24 @@ import {
 } from "@app/self-custodial/providers/is-online"
 
 const mockGetSparkStatus = jest.fn()
+const mockRecordError = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   getSparkStatus: () => mockGetSparkStatus(),
 }))
+
+const loadFreshIsOnlineModule = () => {
+  let mod: typeof import("@app/self-custodial/providers/is-online") | undefined
+  jest.isolateModules(() => {
+    mod = require("@app/self-custodial/providers/is-online")
+  })
+  return mod!
+}
 
 describe("getServiceStatus", () => {
   beforeEach(() => {
@@ -140,5 +154,47 @@ describe("getOnlineState (3-state, Critical #4)", () => {
     mockGetSparkStatus.mockRejectedValue(new Error("auth failed"))
 
     expect(await getOnlineState()).toBe("unknown")
+  })
+})
+
+describe("crashlytics reporting on Spark status failures (I4)", () => {
+  beforeEach(() => {
+    mockRecordError.mockClear()
+  })
+
+  it("records to crashlytics once per session when getServiceStatus catches the SDK error", async () => {
+    const fresh = loadFreshIsOnlineModule()
+    mockGetSparkStatus.mockRejectedValue(new Error("network down"))
+
+    await fresh.getServiceStatus()
+    await fresh.getServiceStatus()
+    await fresh.getServiceStatus()
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect(mockRecordError.mock.calls[0][0].message).toBe("network down")
+  })
+
+  it("records to crashlytics once per session when getOnlineState catches the SDK error", async () => {
+    const fresh = loadFreshIsOnlineModule()
+    mockGetSparkStatus.mockRejectedValue(new Error("auth failed"))
+
+    await fresh.getOnlineState()
+    await fresh.getOnlineState()
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect(mockRecordError.mock.calls[0][0].message).toBe("auth failed")
+  })
+
+  it("does not record the failure when the SDK eventually returns a status", async () => {
+    const fresh = loadFreshIsOnlineModule()
+    mockGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await fresh.getServiceStatus()
+    await fresh.getOnlineState()
+
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 })
