@@ -4,12 +4,12 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePayments } from "@app/hooks/use-payments"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { DisplayCurrency } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   type ConvertParams,
   type ConvertQuote,
 } from "@app/types/payment.types"
+import { formatUsdInDisplay } from "@app/utils/amounts"
 
 const QuoteStatus = {
   Idle: "idle",
@@ -68,24 +68,26 @@ export const useConversionQuote = (
     }
   }, [getConversionQuote, quoteParams])
 
+  const { quote } = state
+
   const feeText = useMemo(() => {
-    if (state.status !== QuoteStatus.Ready || !state.quote) return ""
-    if (!convertMoneyAmount) return ""
-    const feeInDisplay = convertMoneyAmount(state.quote.feeAmount, DisplayCurrency)
-    return formatMoneyAmount({ moneyAmount: feeInDisplay })
-  }, [state, formatMoneyAmount, convertMoneyAmount])
+    if (!quote) return ""
+    return formatUsdInDisplay(quote.feeAmount.amount, {
+      formatMoneyAmount,
+      convertMoneyAmount,
+    })
+  }, [quote, formatMoneyAmount, convertMoneyAmount])
 
   const adjustmentText = useMemo(() => {
-    if (state.status !== QuoteStatus.Ready || !state.quote) return null
-    const adjustment = state.quote.amountAdjustment
-    if (adjustment === ConvertAmountAdjustment.FlooredToMin) {
+    if (!quote) return null
+    if (quote.amountAdjustment === ConvertAmountAdjustment.FlooredToMin) {
       return LL.ConversionConfirmationScreen.amountFloored()
     }
-    if (adjustment === ConvertAmountAdjustment.IncreasedToAvoidDust) {
+    if (quote.amountAdjustment === ConvertAmountAdjustment.IncreasedToAvoidDust) {
       return LL.ConversionConfirmationScreen.amountDustBumped()
     }
     return null
-  }, [state, LL])
+  }, [quote, LL])
 
   return {
     isQuoting: state.status === QuoteStatus.Loading,
