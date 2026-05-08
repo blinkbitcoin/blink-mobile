@@ -241,6 +241,9 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
       setIsStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh user settings: ${err}`)
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`Refresh user settings failed: ${err}`),
+      )
     }
   }, [])
 
