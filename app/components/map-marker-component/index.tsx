@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import React, { useRef } from "react"
 import { Dimensions, View } from "react-native"
 import {
   Callout,
@@ -12,18 +12,11 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
 import { Text, makeStyles } from "@rn-vui/themed"
 
-/*
-  In order to increase performance, markers are initially rendered without content in the callout.
-  Only after being pressed does the content render, and then the callout is shown by a method call
-  from the component's ref
-*/
-
 type Props = {
   item: MapMarker
   color: string
   handleMarkerPress: (_item: MapMarker, _ref?: MapMarkerType) => void
   handleCalloutPress: (item: MapMarker) => void
-  isFocused: boolean
 }
 
 export default function MapMarkerComponent({
@@ -31,17 +24,10 @@ export default function MapMarkerComponent({
   color,
   handleMarkerPress,
   handleCalloutPress,
-  isFocused,
 }: Props) {
   const ref = useRef<MapMarkerType>(null)
   const { LL } = useI18nContext()
   const styles = useStyles()
-
-  useEffect(() => {
-    if (isFocused && ref.current) {
-      ref.current.showCallout()
-    }
-  }, [isFocused])
 
   return (
     <Marker
@@ -55,26 +41,24 @@ export default function MapMarkerComponent({
       stopPropagation
     >
       <Callout tooltip onPress={() => handleCalloutPress(item)}>
-        {isFocused && (
-          <View style={styles.border}>
-            <View style={styles.customView}>
-              <Text type="h1" style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-                {item.mapInfo.title}
-              </Text>
-              {isIos ? (
-                <CalloutSubview onPress={() => handleCalloutPress(item)}>
-                  <View style={styles.pseudoButton}>
-                    <Text style={styles.text}>{LL.MapScreen.payBusiness()}</Text>
-                  </View>
-                </CalloutSubview>
-              ) : (
+        <View style={styles.border}>
+          <View style={styles.customView}>
+            <Text type="h1" style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+              {item.mapInfo.title}
+            </Text>
+            {isIos ? (
+              <CalloutSubview onPress={() => handleCalloutPress(item)}>
                 <View style={styles.pseudoButton}>
                   <Text style={styles.text}>{LL.MapScreen.payBusiness()}</Text>
                 </View>
-              )}
-            </View>
+              </CalloutSubview>
+            ) : (
+              <View style={styles.pseudoButton}>
+                <Text style={styles.text}>{LL.MapScreen.payBusiness()}</Text>
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </Callout>
     </Marker>
   )
