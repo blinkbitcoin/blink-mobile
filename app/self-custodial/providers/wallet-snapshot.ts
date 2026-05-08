@@ -94,9 +94,25 @@ export type WalletSnapshot = {
 
 export const getSelfCustodialWalletSnapshot = async (
   sdk: BreezSdkInterface,
+  targetRawCount: number = TRANSACTIONS_PER_PAGE,
 ): Promise<WalletSnapshot> => {
   const info = await getWalletInfo(sdk)
-  const page = await fetchAndMapPayments(sdk, 0)
+  const minRawCount = Math.max(targetRawCount, TRANSACTIONS_PER_PAGE)
+
+  const transactions: NormalizedTransaction[] = []
+  let rawTransactionCount = 0
+  let hasMore = false
+
+  while (rawTransactionCount < minRawCount) {
+    const page = await fetchAndMapPayments(sdk, rawTransactionCount)
+    if (page.rawCount === 0) break
+
+    transactions.push(...page.transactions)
+    rawTransactionCount += page.rawCount
+    hasMore = page.hasMore
+
+    if (!hasMore) break
+  }
 
   return {
     wallets: buildWallets(
@@ -105,10 +121,10 @@ export const getSelfCustodialWalletSnapshot = async (
         btcBalance: Number(info.balanceSats),
         stableBalance: getStableBalance(info),
       },
-      page.transactions,
+      transactions,
     ),
-    hasMore: page.hasMore,
-    rawTransactionCount: page.rawCount,
+    hasMore,
+    rawTransactionCount,
   }
 }
 

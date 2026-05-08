@@ -3,7 +3,11 @@
 // but these helpers remove the repeated mock-access and lifecycle wiring from
 // every test body.
 
-type WalletSnapshot = { wallets: unknown[]; hasMore: boolean }
+type WalletSnapshot = {
+  wallets: unknown[]
+  hasMore: boolean
+  rawTransactionCount?: number
+}
 type SdkEventListener = (event: { tag: string; inner?: unknown }) => Promise<void>
 
 type CapturedListenerRef = { current: SdkEventListener | null }

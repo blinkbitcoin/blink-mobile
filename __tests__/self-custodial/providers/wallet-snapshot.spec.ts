@@ -191,6 +191,112 @@ describe("loadMoreTransactions", () => {
     expect(page.hasMore).toBe(true)
     expect(page.transactions).toHaveLength(12)
   })
+
+  it("rawCount counts every payment from the SDK, not just the ones that survived filtering", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: [
+        ...Array.from({ length: 12 }, (_, i) => buildKnownPayment(`k-${i}`)),
+        ...Array.from({ length: 8 }, (_, i) => buildUnknownTokenPayment(`o-${i}`)),
+      ],
+    })
+
+    const page = await loadMoreTransactions(sdk as never, 20)
+
+    expect(page.rawCount).toBe(20)
+    expect(page.transactions).toHaveLength(12)
+  })
+
+  it("a caller advancing the cursor by rawCount keeps the next loadMore aligned with the SDK page size, not the filtered count", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: [
+          ...Array.from({ length: 12 }, (_, i) => buildKnownPayment(`k0-${i}`)),
+          ...Array.from({ length: 8 }, (_, i) => buildUnknownTokenPayment(`o0-${i}`)),
+        ],
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 5 }, (_, i) => buildKnownPayment(`k1-${i}`)),
+      })
+
+    const first = await loadMoreTransactions(sdk as never, 0)
+    expect(first.rawCount).toBe(20)
+    expect(first.transactions).toHaveLength(12)
+
+    await loadMoreTransactions(sdk as never, first.rawCount)
+
+    expect(sdk.listPayments).toHaveBeenLastCalledWith(
+      expect.objectContaining({ offset: 20, limit: 20 }),
+    )
+  })
+})
+
+describe("getSelfCustodialWalletSnapshot pagination preservation (Critical #8)", () => {
+  it("fetches a single page when no targetRawCount is provided", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`p-${i}`)),
+    })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(1)
+    expect(sdk.listPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ offset: 0, limit: 20 }),
+    )
+    expect(snapshot.rawTransactionCount).toBe(20)
+    expect(snapshot.hasMore).toBe(true)
+  })
+
+  it("re-fetches every page up to the target raw count so loadMore cursor is preserved across refresh", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page0-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page1-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page2-${i}`)),
+      })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never, 60)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(3)
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ offset: 0, limit: 20 }),
+    )
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ offset: 20, limit: 20 }),
+    )
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ offset: 40, limit: 20 }),
+    )
+    expect(snapshot.rawTransactionCount).toBe(60)
+    expect(snapshot.hasMore).toBe(true)
+  })
+
+  it("stops paginating early when the SDK returns fewer than a full page (no more transactions)", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page0-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 5 }, (_, i) => buildKnownPayment(`page1-${i}`)),
+      })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never, 60)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(2)
+    expect(snapshot.rawTransactionCount).toBe(25)
+    expect(snapshot.hasMore).toBe(false)
+  })
 })
 
 const buildTx = (id: string, currency: WalletCurrency): NormalizedTransaction => ({
