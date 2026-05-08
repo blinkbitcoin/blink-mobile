@@ -3618,6 +3618,7 @@
     "activeHint": "Je wallet houdt USD via USDB.",
     "inactiveHint": "Je wallet houdt alleen BTC.",
     "deactivateWarningBody": "Je hebt nog {amount:string} USD. Zet eerst om naar BTC, anders wordt je USD-saldo verborgen totdat je Stabiel Saldo weer inschakelt.",
+    "toggleFailedToast": "Stable Balance kon niet worden bijgewerkt. Probeer het opnieuw.",
     "toggleModal": {
       "activateTitle": "Stabiel saldo activeren",
       "activateBody": "Je BTC-saldo wordt omgezet naar USDB. Dit zijn de geschatte conversiekosten.",

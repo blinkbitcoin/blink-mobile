@@ -3618,6 +3618,7 @@
     "activeHint": "Tvoj novčanik drži USD putem USDB.",
     "inactiveHint": "Tvoj novčanik drži samo BTC.",
     "deactivateWarningBody": "Još imaš {amount:string} USD. Pretvori u BTC prvo, inače će tvoje USD stanje biti skriveno dok ponovno ne aktiviraš Stabilno stanje.",
+    "toggleFailedToast": "Nije moguće ažurirati Stable Balance. Pokušajte ponovno.",
     "toggleModal": {
       "activateTitle": "Aktiviraj stabilni saldo",
       "activateBody": "Vaš BTC saldo bit će pretvoren u USDB. Ovo je procijenjena naknada za konverziju.",

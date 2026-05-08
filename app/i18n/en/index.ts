@@ -3778,6 +3778,7 @@ const en: BaseTranslation = {
     inactiveHint: "Your wallet is holding BTC only.",
     deactivateWarningBody:
       "You still have {amount:string} USD. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.",
+    toggleFailedToast: "Could not update Stable Balance. Please try again.",
     toggleModal: {
       activateTitle: "Activate Stable Balance",
       activateBody:

@@ -3615,6 +3615,7 @@
     "activeHint": "Walletniyki USD-ta USDB-nintakama waqaychan.",
     "inactiveHint": "Walletniyki BTC-llata waqaychan.",
     "deactivateWarningBody": "Qanqa kanraqmi {amount:string} USD. Ñawpaqta BTC-man tikray, manaña chayqa USD saldoyki pakakunqa Saldo Takyasqa kutiy kawsachisqa kanan kama.",
+    "toggleFailedToast": "Stable Balance manam hukmanchayta atikurqachu. Yapamanta intentay.",
     "toggleModal": {
       "activateTitle": "Sayaq Qullqita Kachaykuy",
       "activateBody": "BTC qullqiyki USDB-man tikrakunqa. Kaymi tikrachiypa chaninchasqa chaninchayninmi.",

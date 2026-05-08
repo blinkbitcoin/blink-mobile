@@ -3618,6 +3618,7 @@
     "activeHint": "Ձեր դրամապանակը USD է պահում USDB-ի միջոցով։",
     "inactiveHint": "Ձեր դրամապանակը պահում է միայն BTC։",
     "deactivateWarningBody": "Դուք դեռ ունեք {amount:string} USD։ Նախ փոխարկեք BTC, այլապես ձեր USD մնացորդը թաքցվելու է, մինչև նորից չակտիվացնեք Կայուն մնացորդը։",
+    "toggleFailedToast": "Չհաջողվեց թարմացնել Stable Balance-ը։ Խնդրում ենք փորձել կրկին։",
     "toggleModal": {
       "activateTitle": "Ակտիվացնել կայուն մնացորդը",
       "activateBody": "Ձեր BTC մնացորդը կփոխարկվի USDB-ի։ Սա փոխարկման գնահատված վճարն է։",

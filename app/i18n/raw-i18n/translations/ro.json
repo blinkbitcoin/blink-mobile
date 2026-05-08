@@ -3577,6 +3577,7 @@
     "activeHint": "Portofelul tău păstrează USD prin USDB.",
     "inactiveHint": "Portofelul tău păstrează doar BTC.",
     "deactivateWarningBody": "Mai ai {amount:string} USD. Convertește mai întâi în BTC, altfel soldul în USD va fi ascuns până reactivezi Sold Stabil.",
+    "toggleFailedToast": "Nu am putut actualiza Stable Balance. Încearcă din nou.",
     "toggleModal": {
       "activateTitle": "Activează soldul stabil",
       "activateBody": "Soldul tău în BTC va fi convertit în USDB. Acesta este comisionul de conversie estimat.",

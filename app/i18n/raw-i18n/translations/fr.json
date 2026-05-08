@@ -3606,6 +3606,7 @@
         "activeHint": "Votre portefeuille détient des USD via USDB.",
         "inactiveHint": "Votre portefeuille ne détient que des BTC.",
         "deactivateWarningBody": "Il vous reste {amount:string} USD. Convertissez-les d'abord en BTC, sinon votre solde USD sera masqué jusqu'à la réactivation du Solde Stable.",
+        "toggleFailedToast": "Impossible de mettre à jour Stable Balance. Veuillez réessayer.",
         "toggleModal": {
             "activateTitle": "Activer le solde stable",
             "activateBody": "Votre solde en BTC sera converti en USDB. Voici les frais de conversion estimés.",

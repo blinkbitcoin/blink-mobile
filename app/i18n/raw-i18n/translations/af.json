@@ -3618,6 +3618,7 @@
     "activeHint": "Jou beursie hou USD via USDB.",
     "inactiveHint": "Jou beursie hou net BTC.",
     "deactivateWarningBody": "Jy het nog $ {amount:string} USD. Skakel eers om na BTC, anders word jou USD-saldo versteek totdat jy Stabiele Balans heraktiveer.",
+    "toggleFailedToast": "Kon nie Stabiele Balans bywerk nie. Probeer asseblief weer.",
     "toggleModal": {
       "activateTitle": "Aktiveer Stabiele Saldo",
       "activateBody": "Jou BTC-saldo sal na USDB omgeskakel word. Dit is die geskatte omskakelingsfooi.",

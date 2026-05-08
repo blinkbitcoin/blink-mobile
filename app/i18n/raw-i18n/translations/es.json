@@ -3565,6 +3565,7 @@
         "activeHint": "Tu billetera mantiene USD vía USDB.",
         "inactiveHint": "Tu billetera solo mantiene BTC.",
         "deactivateWarningBody": "Todavía tienes {amount:string} USD. Conviértelos a BTC primero, o tu saldo en USD quedará oculto hasta que reactives Saldo Estable.",
+        "toggleFailedToast": "No se pudo actualizar Stable Balance. Inténtalo de nuevo.",
         "toggleModal": {
             "activateTitle": "Activar saldo estable",
             "activateBody": "Tu saldo en BTC se convertirá a USDB. Esta es la comisión de conversión estimada.",
