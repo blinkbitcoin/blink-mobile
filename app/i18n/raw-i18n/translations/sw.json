@@ -3577,6 +3577,7 @@
     "activeHint": "Pochi yako inashikilia USD kupitia USDB.",
     "inactiveHint": "Pochi yako inashikilia BTC tu.",
     "deactivateWarningBody": "Bado una {amount:string} USD. Badilisha kuwa BTC kwanza, ama salio lako la USD litafichwa hadi uwashe tena Salio Thabiti.",
+    "toggleFailedToast": "Imeshindikana kusasisha Stable Balance. Tafadhali jaribu tena.",
     "toggleModal": {
       "activateTitle": "Washa Salio Thabiti",
       "activateBody": "Salio lako la BTC litabadilishwa kuwa USDB. Hii ni ada ya makadirio ya ubadilishaji.",

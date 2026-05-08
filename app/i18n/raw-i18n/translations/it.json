@@ -3565,6 +3565,7 @@
         "activeHint": "Il tuo portafoglio detiene USD tramite USDB.",
         "inactiveHint": "Il tuo portafoglio detiene solo BTC.",
         "deactivateWarningBody": "Hai ancora {amount:string} USD. Converti prima in BTC, altrimenti il tuo saldo in USD sarà nascosto finché non riattiverai Saldo Stabile.",
+        "toggleFailedToast": "Impossibile aggiornare Stable Balance. Riprova.",
         "toggleModal": {
             "activateTitle": "Attiva saldo stabile",
             "activateBody": "Il tuo saldo in BTC sarà convertito in USDB. Questa è la commissione di conversione stimata.",

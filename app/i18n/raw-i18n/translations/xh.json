@@ -3624,6 +3624,7 @@
     "activeHint": "Isipaji sakho sigcina i-USD ngeUSDB.",
     "inactiveHint": "Isipaji sakho sigcina i-BTC kuphela.",
     "deactivateWarningBody": "Usenayo {amount:string} USD. Yitshintshele kwi-BTC kuqala, okanye ibhalansi yakho yeUSD iza kufihlakala de uyivuselele iBhalansi Ezinzileyo.",
+    "toggleFailedToast": "Akukwazekanga ukuhlaziya iStable Balance. Nceda uzame kwakhona.",
     "toggleModal": {
       "activateTitle": "Vulela iBhalansi ezinzileyo",
       "activateBody": "Ibhalansi yakho ye-BTC iya kuguqulelwa kwi-USDB. Le yimali yoguqulelo elinqakraziweyo.",

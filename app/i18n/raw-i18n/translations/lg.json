@@ -3577,6 +3577,7 @@
     "activeHint": "Valet yo ekwata USD nga eyita mu USDB.",
     "inactiveHint": "Valet yo ekwata BTC kyokka.",
     "deactivateWarningBody": "Okyasigalawo {amount:string} USD. Sooka ofuule BTC, oba balansi yo eya USD eyiinzira nga tokyalongedde Balansi Enywevu.",
+    "toggleFailedToast": "Tetwasobozeswa kufuna Stable Balance. Gezaako nate.",
     "toggleModal": {
       "activateTitle": "Kola Ssente Ezinywedde",
       "activateBody": "BTC yo ejja kukyusibwa mu USDB. Lino lye sente ez'okukyusa ezisuubiddwa.",

@@ -12000,6 +12000,10 @@ type RootTranslation = {
 		 * @param {string} amount
 		 */
 		deactivateWarningBody: RequiredParams<'amount'>
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​u​p​d​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		toggleFailedToast: string
 		toggleModal: {
 			/**
 			 * A​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
@@ -23915,6 +23919,10 @@ export type TranslationFunctions = {
 		 * You still have {amount} USD. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
 		 */
 		deactivateWarningBody: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Could not update Stable Balance. Please try again.
+		 */
+		toggleFailedToast: () => LocalizedString
 		toggleModal: {
 			/**
 			 * Activate Stable Balance

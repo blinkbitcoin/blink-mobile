@@ -3577,6 +3577,7 @@
     "activeHint": "A pénztárcád USD-t tart USDB-n keresztül.",
     "inactiveHint": "A pénztárcád csak BTC-t tart.",
     "deactivateWarningBody": "Még van {amount:string} USD-d. Először konvertáld BTC-re, különben az USD egyenleged rejtett marad, amíg újra nem aktiválod a Stabil egyenleget.",
+    "toggleFailedToast": "A Stable Balance frissítése nem sikerült. Próbáld újra.",
     "toggleModal": {
       "activateTitle": "Stabil egyenleg aktiválása",
       "activateBody": "A BTC egyenlegét USDB-re váltjuk át. Ez a becsült átváltási díj.",

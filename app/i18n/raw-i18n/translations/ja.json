@@ -3606,6 +3606,7 @@
         "activeHint": "ウォレットはUSDB経由でUSDを保持しています。",
         "inactiveHint": "ウォレットはBTCのみを保持しています。",
         "deactivateWarningBody": "まだ {amount:string} USDあります。先にBTCに変換してください。そうしないと、安定残高を再度有効にするまでUSD残高は非表示になります。",
+        "toggleFailedToast": "Stable Balanceを更新できませんでした。もう一度お試しください。",
         "toggleModal": {
             "activateTitle": "安定残高を有効化",
             "activateBody": "BTC残高はUSDBに変換されます。これは推定される変換手数料です。",

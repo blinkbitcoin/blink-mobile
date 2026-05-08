@@ -3618,6 +3618,7 @@
     "activeHint": "Dompet anda menyimpan USD melalui USDB.",
     "inactiveHint": "Dompet anda hanya menyimpan BTC.",
     "deactivateWarningBody": "Anda masih mempunyai {amount:string} USD. Tukarkan ke BTC terlebih dahulu, atau baki USD anda akan disembunyikan sehingga anda mengaktifkan semula Baki Stabil.",
+    "toggleFailedToast": "Tidak dapat mengemas kini Stable Balance. Sila cuba lagi.",
     "toggleModal": {
       "activateTitle": "Aktifkan Baki Stabil",
       "activateBody": "Baki BTC anda akan ditukar kepada USDB. Ini adalah anggaran yuran penukaran.",
