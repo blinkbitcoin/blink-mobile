@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -8,6 +8,7 @@ import {
   convertDirectionFromCurrency,
   oppositeWalletCurrency,
   PaymentResultStatus,
+  type ConvertParams,
 } from "@app/types/payment.types"
 import { logConversionAttempt } from "@app/utils/analytics"
 
@@ -40,7 +41,7 @@ export const useNonCustodialConversion = ({
   const { convertMoneyAmount } = usePriceConversion()
   const { LL } = useI18nContext()
 
-  const quoteParams = useMemo(() => {
+  const liveQuoteParams = useMemo(() => {
     if (!enabled || !convertMoneyAmount) return null
     const toCurrency = oppositeWalletCurrency(fromCurrency)
     return {
@@ -50,8 +51,22 @@ export const useNonCustodialConversion = ({
     }
   }, [enabled, convertMoneyAmount, moneyAmount, fromCurrency])
 
+  const [snapshotParams, setSnapshotParams] = useState<ConvertParams | null>(null)
+
+  useEffect(() => {
+    setSnapshotParams(null)
+  }, [enabled, fromCurrency, moneyAmount.amount, moneyAmount.currencyCode])
+
+  const quoteParams = snapshotParams ?? liveQuoteParams
+
   const { isQuoting, hasQuoteError, quote, feeText, adjustmentText } =
     useConversionQuote(quoteParams)
+
+  useEffect(() => {
+    if (quote && !snapshotParams && liveQuoteParams) {
+      setSnapshotParams(liveQuoteParams)
+    }
+  }, [quote, snapshotParams, liveQuoteParams])
 
   const execute = useCallback(async (): Promise<NonCustodialConversionOutcome> => {
     if (!quote) {
