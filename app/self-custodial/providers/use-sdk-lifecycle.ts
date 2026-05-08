@@ -152,6 +152,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         }
         await refreshWallets()
       })
+      if (!mounted) return
 
       refreshWallets()
 
@@ -204,7 +205,12 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
-      if (state === "active") refreshWallets()
+      if (state !== "active") return
+      refreshWallets().catch((err) => {
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`AppState refresh failed: ${err}`),
+        )
+      })
     })
     return () => subscription.remove()
   }, [refreshWallets])
@@ -214,7 +220,11 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     const interval = setInterval(() => {
       if (!sdkRef.current) return
       if (AppState.currentState !== "active") return
-      refreshWallets()
+      refreshWallets().catch((err) => {
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`Polling refresh failed: ${err}`),
+        )
+      })
     }, CONNECTIVITY_POLL_MS)
     return () => clearInterval(interval)
   }, [refreshWallets])
