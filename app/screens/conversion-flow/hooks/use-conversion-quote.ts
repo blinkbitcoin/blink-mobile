@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePayments } from "@app/hooks/use-payments"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { DisplayCurrency } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   type ConvertParams,
@@ -32,6 +35,8 @@ export const useConversionQuote = (
 ): ConversionQuoteState => {
   const { getConversionQuote } = usePayments()
   const { LL } = useI18nContext()
+  const { formatMoneyAmount } = useDisplayCurrency()
+  const { convertMoneyAmount } = usePriceConversion()
 
   const [state, setState] = useState<{
     status: QuoteStatus
@@ -63,8 +68,12 @@ export const useConversionQuote = (
     }
   }, [getConversionQuote, quoteParams])
 
-  const feeText =
-    state.status === QuoteStatus.Ready && state.quote ? state.quote.formattedFee : ""
+  const feeText = useMemo(() => {
+    if (state.status !== QuoteStatus.Ready || !state.quote) return ""
+    if (!convertMoneyAmount) return ""
+    const feeInDisplay = convertMoneyAmount(state.quote.feeAmount, DisplayCurrency)
+    return formatMoneyAmount({ moneyAmount: feeInDisplay })
+  }, [state, formatMoneyAmount, convertMoneyAmount])
 
   const adjustmentText = useMemo(() => {
     if (state.status !== QuoteStatus.Ready || !state.quote) return null

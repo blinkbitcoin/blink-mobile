@@ -7,40 +7,26 @@ import {
   SendPaymentRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
+import crashlytics from "@react-native-firebase/crashlytics"
 
+import { toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
   ConvertErrorCode,
   PaymentResultStatus,
-  type ConvertAdapter,
   type ConvertParams,
   type ConvertQuote,
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
 } from "@app/types/payment.types"
-import { centsToTokenBaseUnits } from "@app/utils/amounts"
+import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
 import { requireSparkTokenIdentifier, SparkConfig } from "../config"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals } from "./token-balance"
-
-const MIN_USD_FRACTION_DIGITS = 2
-
-const formatUsdFromBaseUnits = (rawAmount: number, decimals: number): string => {
-  const divisor = 10 ** decimals
-  const whole = Math.floor(rawAmount / divisor)
-  const fractional = rawAmount % divisor
-  const padded = String(fractional).padStart(decimals, "0")
-  const trimmed = padded.replace(/0+$/, "")
-  const fractionalStr =
-    trimmed.length < MIN_USD_FRACTION_DIGITS
-      ? trimmed.padEnd(MIN_USD_FRACTION_DIGITS, "0")
-      : trimmed
-  return `$${whole}.${fractionalStr}`
-}
 
 const failed = (message: string, code?: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
@@ -98,6 +84,15 @@ type PreparedConversion = {
   tokenDecimals: number
 }
 
+const recordConvertError = (err: unknown, params: ConvertParams, where: string): void => {
+  crashlytics().log(
+    `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
+  )
+  crashlytics().recordError(
+    err instanceof Error ? err : new Error(`${where} failed: ${err}`),
+  )
+}
+
 const prepareConversion = async (
   sdk: BreezSdkInterface,
   { fromAmount, toAmount, direction }: ConvertParams,
@@ -152,11 +147,13 @@ const prepareConversion = async (
 const executePrepared = async (
   sdk: BreezSdkInterface,
   prepared: PrepareSendPaymentResponse,
+  params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
     return { status: PaymentResultStatus.Success }
   } catch (err) {
+    recordConvertError(err, params, "executePrepared")
     return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
   }
 }
@@ -164,20 +161,16 @@ const executePrepared = async (
 const toConvertQuote = (
   sdk: BreezSdkInterface,
   { prepared, tokenDecimals }: PreparedConversion,
+  params: ConvertParams,
 ): ConvertQuote | null => {
   const estimate = prepared.conversionEstimate
   if (!estimate) return null
+  const feeCents = tokenBaseUnitsToCents(toNumber(estimate.fee), tokenDecimals)
   return {
-    formattedFee: formatUsdFromBaseUnits(toNumber(estimate.fee), tokenDecimals),
+    feeAmount: toUsdMoneyAmount(feeCents),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
-    execute: () => executePrepared(sdk, prepared),
+    execute: () => executePrepared(sdk, prepared, params),
   }
-}
-
-const toFailedResult = (err: unknown): PaymentAdapterResult => {
-  if (err instanceof ConvertError) return failed(err.message, err.code)
-  if (err instanceof Error) return failed(err.message)
-  return failed(`Conversion failed: ${err}`)
 }
 
 export const createGetConversionQuote =
@@ -185,19 +178,9 @@ export const createGetConversionQuote =
   async (params) => {
     try {
       const context = await prepareConversion(sdk, params)
-      return toConvertQuote(sdk, context)
-    } catch {
-      return null
-    }
-  }
-
-export const createConvert =
-  (sdk: BreezSdkInterface): ConvertAdapter =>
-  async (params) => {
-    try {
-      const context = await prepareConversion(sdk, params)
-      return await executePrepared(sdk, context.prepared)
+      return toConvertQuote(sdk, context, params)
     } catch (err) {
-      return toFailedResult(err)
+      recordConvertError(err, params, "getConversionQuote")
+      throw err
     }
   }

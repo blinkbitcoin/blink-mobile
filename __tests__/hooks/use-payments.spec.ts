@@ -29,7 +29,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
     getClaimFee: jest.fn(),
     claimDeposit: jest.fn(),
   }),
-  createConvert: jest.fn().mockReturnValue(jest.fn()),
   createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
 }))
 
@@ -66,12 +65,6 @@ describe("usePayments", () => {
     expect(result.current.claimDeposit).toBeDefined()
     expect(result.current.claimDeposit!.getClaimFee).toBeDefined()
     expect(result.current.claimDeposit!.claimDeposit).toBeDefined()
-  })
-
-  it("returns convert adapter", () => {
-    const { result } = renderHook(() => usePayments())
-
-    expect(result.current.convert).toBeDefined()
   })
 
   it("returns sendPayment as undefined (not wired yet)", () => {
