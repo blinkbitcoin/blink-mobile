@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePayments } from "@app/hooks/use-payments"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -58,9 +56,11 @@ export const useConversionQuote = (
         }
         setState({ status: QuoteStatus.Ready, quote })
       })
-      .catch((err) => {
+      .catch(() => {
         if (cancelled) return
-        if (err instanceof Error) crashlytics().recordError(err)
+        // Bridge already records to crashlytics with breadcrumbs
+        // (`createGetConversionQuote` in `app/self-custodial/bridge/convert.ts`),
+        // so the hook only needs to surface the Error state to the UI.
         setState({ status: QuoteStatus.Error, quote: null })
       })
     return () => {
