@@ -3631,7 +3631,8 @@
       "trustDisclosure": "USD режим користи USDB токене на Sparku. Претпоставке поверења разликују се од директног држања BTC-а. USDB се ослања на Sparkovog издаваоца токена.",
       "acknowledge": "Разумем"
     },
-    "minimumConversion": "Минимална конверзија: {amount:string}"
+    "minimumConversion": "Минимална конверзија: {amount:string}",
+    "conversionUnavailable": "Конверзија тренутно није доступна. Покушајте поново."
   },
   "BackendFeatureGate": {
     "title": "Функција недоступна",

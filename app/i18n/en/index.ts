@@ -3799,6 +3799,7 @@ const en: BaseTranslation = {
       acknowledge: "I understand",
     },
     minimumConversion: "Minimum conversion: {amount:string}",
+    conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
   },
   SparkWalletCreationScreen: {
     creating: "Creating your wallet...",

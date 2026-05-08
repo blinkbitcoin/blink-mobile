@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Modi ya USD hutumia tokeni za USDB kwenye Spark. Mawazo ya kuaminika ni tofauti na kushikilia BTC moja kwa moja. USDB inategemea mtoaji wa tokeni wa Spark.",
       "acknowledge": "Naelewa"
     },
-    "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}"
+    "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
+    "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
   },
   "BackendFeatureGate": {
     "title": "Kipengele hakipatikani",

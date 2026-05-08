@@ -3593,7 +3593,8 @@
       "trustDisclosure": "USD modu Spark üzerindeki USDB tokenlarını kullanır. Güven varsayımları doğrudan BTC tutmaktan farklıdır. USDB Spark'ın token çıkaranına dayanır.",
       "acknowledge": "Anlıyorum"
     },
-    "minimumConversion": "Minimum dönüşüm: {amount:string}"
+    "minimumConversion": "Minimum dönüşüm: {amount:string}",
+    "conversionUnavailable": "Dönüşüm geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
   },
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",

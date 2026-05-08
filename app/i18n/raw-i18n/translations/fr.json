@@ -3622,7 +3622,8 @@
             "trustDisclosure": "Le mode USD utilise des jetons USDB sur Spark. Les hypothèses de confiance diffèrent de la détention directe de BTC. USDB repose sur l'émetteur de jetons de Spark.",
             "acknowledge": "Je comprends"
         },
-        "minimumConversion": "Conversion minimale : {amount:string}"
+        "minimumConversion": "Conversion minimale : {amount:string}",
+        "conversionUnavailable": "La conversion est temporairement indisponible. Veuillez réessayer."
     },
     "BackendFeatureGate": {
         "title": "Fonctionnalité indisponible",

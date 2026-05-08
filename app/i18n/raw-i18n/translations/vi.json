@@ -3631,7 +3631,8 @@
       "trustDisclosure": "Chế độ USD sử dụng token USDB trên Spark. Các giả định tin cậy khác với việc giữ BTC trực tiếp. USDB phụ thuộc vào nhà phát hành token của Spark.",
       "acknowledge": "Tôi hiểu"
     },
-    "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}"
+    "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}",
+    "conversionUnavailable": "Chuyển đổi tạm thời không khả dụng. Vui lòng thử lại."
   },
   "BackendFeatureGate": {
     "title": "Tính năng không khả dụng",

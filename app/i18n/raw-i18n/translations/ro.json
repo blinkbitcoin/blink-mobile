@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Modul USD folosește tokenuri USDB pe Spark. Presupunerile de încredere diferă de păstrarea BTC direct. USDB se bazează pe emitentul de tokenuri Spark.",
       "acknowledge": "Am înțeles"
     },
-    "minimumConversion": "Conversie minimă: {amount:string}"
+    "minimumConversion": "Conversie minimă: {amount:string}",
+    "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."
   },
   "BackendFeatureGate": {
     "title": "Funcție indisponibilă",

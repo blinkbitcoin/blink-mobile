@@ -3581,7 +3581,8 @@
             "trustDisclosure": "O modo USD usa tokens USDB no Spark. As suposições de confiança são diferentes de deter BTC diretamente. O USDB depende do emissor de tokens do Spark.",
             "acknowledge": "Compreendo"
         },
-        "minimumConversion": "Conversão mínima: {amount:string}"
+        "minimumConversion": "Conversão mínima: {amount:string}",
+        "conversionUnavailable": "A conversão está temporariamente indisponível. Tenta novamente."
     },
     "BackendFeatureGate": {
         "title": "Recurso indisponível",

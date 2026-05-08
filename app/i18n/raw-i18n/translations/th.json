@@ -3631,7 +3631,8 @@
       "trustDisclosure": "โหมด USD ใช้โทเค็น USDB บน Spark ข้อสันนิษฐานด้านความเชื่อถือต่างจากการถือ BTC โดยตรง. USDB พึ่งพาผู้ออกโทเค็นของ Spark",
       "acknowledge": "เข้าใจแล้ว"
     },
-    "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}"
+    "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}",
+    "conversionUnavailable": "ขณะนี้ไม่สามารถแปลงได้ โปรดลองอีกครั้ง"
   },
   "BackendFeatureGate": {
     "title": "ฟีเจอร์ไม่พร้อมใช้งาน",

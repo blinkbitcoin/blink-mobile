@@ -3631,7 +3631,8 @@
       "trustDisclosure": "يستخدم وضع USD رموز USDB على Spark. افتراضات الثقة تختلف عن الاحتفاظ بالبيتكوين مباشرة. USDB يعتمد على مُصدر الرموز في Spark.",
       "acknowledge": "فهمت"
     },
-    "minimumConversion": "الحد الأدنى للتحويل: {amount:string}"
+    "minimumConversion": "الحد الأدنى للتحويل: {amount:string}",
+    "conversionUnavailable": "التحويل غير متاح مؤقتًا. يرجى المحاولة مرة أخرى."
   },
   "BackendFeatureGate": {
     "title": "الميزة غير متاحة",

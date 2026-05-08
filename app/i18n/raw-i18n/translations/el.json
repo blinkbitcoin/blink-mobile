@@ -3593,7 +3593,8 @@
       "trustDisclosure": "Η λειτουργία USD χρησιμοποιεί tokens USDB στο Spark. Οι παραδοχές εμπιστοσύνης είναι διαφορετικές από το να κρατάτε BTC απευθείας. το USDB βασίζεται στον εκδότη tokens του Spark.",
       "acknowledge": "Καταλαβαίνω"
     },
-    "minimumConversion": "Ελάχιστη μετατροπή: {amount:string}"
+    "minimumConversion": "Ελάχιστη μετατροπή: {amount:string}",
+    "conversionUnavailable": "Η μετατροπή δεν είναι διαθέσιμη προσωρινά. Δοκιμάστε ξανά."
   },
   "BackendFeatureGate": {
     "title": "Λειτουργία μη διαθέσιμη",

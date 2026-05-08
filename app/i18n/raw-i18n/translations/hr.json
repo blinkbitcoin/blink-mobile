@@ -3634,7 +3634,8 @@
       "trustDisclosure": "USD način koristi USDB tokene na Sparku. Pretpostavke povjerenja razlikuju se od izravnog držanja BTC-a. USDB se oslanja na Sparkovog izdavatelja tokena.",
       "acknowledge": "Razumijem"
     },
-    "minimumConversion": "Minimalna pretvorba: {amount:string}"
+    "minimumConversion": "Minimalna pretvorba: {amount:string}",
+    "conversionUnavailable": "Konverzija je privremeno nedostupna. Pokušajte ponovno."
   },
   "BackendFeatureGate": {
     "title": "Značajka nedostupna",

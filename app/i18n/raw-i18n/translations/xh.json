@@ -3640,7 +3640,8 @@
       "trustDisclosure": "Imowudi yeUSD isebenzisa iitokheni zeUSDB kwiSpark. Izicwangciso zokuthembela zahlukile kunokubamba iBTC ngokuthe ngqo. IUSDB ixhomekeke kumkhuphi weetokheni weSpark.",
       "acknowledge": "Ndiyavumelana"
     },
-    "minimumConversion": "Inguqulo encinci: {amount:string}"
+    "minimumConversion": "Inguqulo encinci: {amount:string}",
+    "conversionUnavailable": "Uguqulo aluxhanyiwe okwexeshana. Nceda uzame kwakhona."
   },
   "BackendFeatureGate": {
     "title": "Isici asifumaneki",

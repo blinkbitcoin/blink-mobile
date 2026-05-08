@@ -3634,7 +3634,8 @@
       "trustDisclosure": "Mod USD menggunakan token USDB di Spark. Andaian kepercayaan berbeza daripada memegang BTC secara langsung. USDB bergantung pada penerbit token Spark.",
       "acknowledge": "Saya faham"
     },
-    "minimumConversion": "Penukaran minimum: {amount:string}"
+    "minimumConversion": "Penukaran minimum: {amount:string}",
+    "conversionUnavailable": "Penukaran tidak tersedia buat sementara waktu. Sila cuba lagi."
   },
   "BackendFeatureGate": {
     "title": "Ciri tidak tersedia",
