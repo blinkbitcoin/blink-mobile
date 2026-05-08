@@ -158,10 +158,12 @@ export const ConversionDetailsScreen = () => {
     isSelfCustodial && fromWallet
       ? convertDirectionFromCurrency(fromWallet.walletCurrency)
       : undefined
-  const { limits: scConversionLimits } = useNonCustodialConversionLimits(convertDirection)
+  const { limits: scConversionLimits, error: scLimitsError } =
+    useNonCustodialConversionLimits(convertDirection)
   const scMinFromAmount = isSelfCustodial
     ? scConversionLimits?.minFromAmount ?? null
     : null
+  const scLimitsUnavailable = isSelfCustodial && scLimitsError !== null
 
   const [focusedInputValues, setFocusedInputValues] = useState<InputField | null>(null)
   const [initialAmount, setInitialAmount] =
@@ -489,6 +491,9 @@ export const ConversionDetailsScreen = () => {
     if (exceedsBalance) {
       return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
     }
+    if (scLimitsUnavailable) {
+      return LL.StableBalance.conversionUnavailable()
+    }
     if (belowMinimum && scMinFromAmount !== null) {
       const minMoneyAmount = toWalletMoneyAmount(
         scMinFromAmount,
@@ -675,7 +680,11 @@ export const ConversionDetailsScreen = () => {
             size={14}
             color={hasError ? colors.error : "transparent"}
           />
-          <Text type="p3" color={hasError ? colors.error : "transparent"}>
+          <Text
+            type="p3"
+            color={hasError ? colors.error : "transparent"}
+            testID="amount-field-error"
+          >
             {amountFieldError || " "}
           </Text>
         </View>
@@ -736,7 +745,8 @@ export const ConversionDetailsScreen = () => {
             toggleInitiated.current ||
             isTyping ||
             Boolean(loadingPercent) ||
-            belowMinimum
+            belowMinimum ||
+            scLimitsUnavailable
           }
           onPress={moveToNextScreen}
           testID="next-button"
